@@ -78,7 +78,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Mock.Get(contentCache).Setup(x => x.GetById(child.Key)).Returns(child);
         Mock.Get(contentCache).Setup(x => x.GetById(grandchild.Key)).Returns(grandchild);
 
-        var builder = CreateApiContentRouteBuilder(hideTopLevelNodeFromPath, contentCache:contentCache, navigationQueryService: navigationQueryServiceMock.Object);
+        var builder = CreateApiContentRouteBuilder(hideTopLevelNodeFromPath, contentCache: contentCache, navigationQueryService: navigationQueryServiceMock.Object);
         var result = builder.Build(grandchild);
         Assert.IsNotNull(result);
         Assert.AreEqual("/the-child/the-grandchild", result.Path);
@@ -101,7 +101,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Mock.Get(contentCache).Setup(x => x.GetById(root.Key)).Returns(root);
         Mock.Get(contentCache).Setup(x => x.GetById(child.Key)).Returns(child);
 
-        var builder = CreateApiContentRouteBuilder(false, contentCache:contentCache, navigationQueryService: navigationQueryServiceMock.Object);
+        var builder = CreateApiContentRouteBuilder(false, contentCache: contentCache, navigationQueryService: navigationQueryServiceMock.Object);
         var result = builder.Build(child, "en-us");
         Assert.IsNotNull(result);
         Assert.AreEqual("/the-child-en-us", result.Path);
@@ -130,7 +130,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Mock.Get(contentCache).Setup(x => x.GetById(root.Key)).Returns(root);
         Mock.Get(contentCache).Setup(x => x.GetById(child.Key)).Returns(child);
 
-        var builder = CreateApiContentRouteBuilder(false, contentCache:contentCache, navigationQueryService: navigationQueryServiceMock.Object);
+        var builder = CreateApiContentRouteBuilder(false, contentCache: contentCache, navigationQueryService: navigationQueryServiceMock.Object);
         var result = builder.Build(child, "en-us");
         Assert.IsNotNull(result);
         Assert.AreEqual("/the-child", result.Path);
@@ -159,7 +159,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Mock.Get(contentCache).Setup(x => x.GetById(root.Key)).Returns(root);
         Mock.Get(contentCache).Setup(x => x.GetById(child.Key)).Returns(child);
 
-        var builder = CreateApiContentRouteBuilder(false, contentCache:contentCache, navigationQueryService: navigationQueryServiceMock.Object);
+        var builder = CreateApiContentRouteBuilder(false, contentCache: contentCache, navigationQueryService: navigationQueryServiceMock.Object);
         var result = builder.Build(child, "en-us");
         Assert.IsNotNull(result);
         Assert.AreEqual("/the-child-en-us", result.Path);
@@ -251,7 +251,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Mock.Get(contentCache).Setup(x => x.GetById(true, root.Key)).Returns(root);
         Mock.Get(contentCache).Setup(x => x.GetById(true, child.Key)).Returns(child);
 
-        var builder = CreateApiContentRouteBuilder(hideTopLevelNodeFromPath, contentCache:contentCache,isPreview: true, navigationQueryService: navigationQueryServiceMock.Object);
+        var builder = CreateApiContentRouteBuilder(hideTopLevelNodeFromPath, contentCache: contentCache, isPreview: true, navigationQueryService: navigationQueryServiceMock.Object);
         var result = builder.Build(child);
         Assert.IsNotNull(result);
         Assert.AreEqual($"/{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}{childKey:D}", result.Path);
@@ -304,9 +304,9 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
         var contentCache = CreatePublishedContentCache("#");
         Mock.Get(contentCache).Setup(x => x.GetById(root.Key)).Returns(root);
-         Mock.Get(contentCache).Setup(x => x.GetById(child.Key)).Returns(child);
+        Mock.Get(contentCache).Setup(x => x.GetById(child.Key)).Returns(child);
 
-        var builder = CreateApiContentRouteBuilder(true,contentCache:contentCache, isPreview: isPreview, navigationQueryService: navigationQueryServiceMock.Object);
+        var builder = CreateApiContentRouteBuilder(true, contentCache: contentCache, isPreview: isPreview, navigationQueryService: navigationQueryServiceMock.Object);
         var result = builder.Build(child);
 
         if (isPreview)
@@ -342,9 +342,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
             .Setup(p => p.GetContentPath(It.IsAny<IPublishedContent>(), It.IsAny<string?>()))
             .Returns((IPublishedContent content, string? culture) => $"my-custom-path-for-{content.UrlSegment}");
 
-
-
-        var builder = CreateApiContentRouteBuilder(true, contentCache:contentCache,apiContentPathProvider: apiContentPathProvider.Object, navigationQueryService: navigationQueryServiceMock.Object);
+        var builder = CreateApiContentRouteBuilder(true, contentCache: contentCache, apiContentPathProvider: apiContentPathProvider.Object, navigationQueryService: navigationQueryServiceMock.Object);
         var result = builder.Build(root);
         Assert.NotNull(result);
         Assert.AreEqual("/my-custom-path-for-the-root", result.Path);
@@ -469,7 +467,6 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         publishedContentCacheMock
             .Setup(c => c.GetRouteById(It.IsAny<int>(), It.IsAny<string?>()))
             .Returns(routeById);
-
 
         return publishedContentCacheMock.Object;
     }
