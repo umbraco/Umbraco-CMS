@@ -12,6 +12,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 // NOTE: These tests are in place to ensure that element level variation works for Block Grid. Element level variation
 //       is tested more in-depth for Block List (see BlockListElementLevelVariationTests), but since the actual
 //       implementation is shared between Block List and Block Grid, we won't repeat all those tests here.
+[Platform("Linux", Reason = "This currently uses too much memory for Windows. It can likely be run on Windows when NuCache is removed.")]
 public class BlockGridElementLevelVariationTests : BlockEditorElementVariationTestBase
 {
     private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();

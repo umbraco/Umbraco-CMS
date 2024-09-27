@@ -10,6 +10,7 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
+[Platform("Linux", Reason = "This currently uses too much memory for Windows. It can likely be run on Windows when NuCache is removed.")]
 public partial class BlockListElementLevelVariationTests : BlockEditorElementVariationTestBase
 {
     [OneTimeSetUp]
