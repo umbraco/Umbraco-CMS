@@ -44,6 +44,16 @@ export const manifests: Array<UmbExtensionManifest> = [
 			UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
 		],
 	},
+	{
+		type: 'workspace',
+		kind: 'default',
+		alias: 'Umb.Workspace.DocumentType.Root',
+		name: 'Document Type Root Workspace',
+		meta: {
+			entityType: UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
+			headline: '#treeHeaders_documentTypes',
+		},
+	},
 	...folderManifests,
 	...reloadManifests,
 ];

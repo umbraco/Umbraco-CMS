@@ -44,6 +44,16 @@ export const manifests: Array<UmbExtensionManifest> = [
 			UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE,
 		],
 	},
+	{
+		type: 'workspace',
+		kind: 'default',
+		alias: 'Umb.Workspace.DocumentBlueprint.Root',
+		name: 'Document Blueprint Root Workspace',
+		meta: {
+			entityType: UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE,
+			headline: '#treeHeaders_contentBlueprints',
+		},
+	},
 	...reloadManifests,
 	...folderManifests,
 ];

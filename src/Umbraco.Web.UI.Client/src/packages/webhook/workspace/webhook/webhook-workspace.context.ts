@@ -15,9 +15,6 @@ export class UmbWebhookWorkspaceContext
 	extends UmbEntityDetailWorkspaceContextBase<UmbWebhookDetailModel, UmbWebhookDetailRepository>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	readonly data = this._data.current;
-	readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
-
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			workspaceAlias: UMB_WEBHOOK_WORKSPACE_ALIAS,
