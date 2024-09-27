@@ -16,7 +16,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				oneOf: [UMB_BLOCK_WORKSPACE_ALIAS],
+				match: UMB_BLOCK_WORKSPACE_ALIAS,
 			},
 			{
 				alias: 'Umb.Condition.BlockWorkspaceIsExposed',
@@ -38,7 +38,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				oneOf: [UMB_BLOCK_WORKSPACE_ALIAS],
+				match: UMB_BLOCK_WORKSPACE_ALIAS,
 			},
 			{
 				alias: 'Umb.Condition.BlockWorkspaceIsExposed',
