@@ -26,9 +26,13 @@ export interface UmbBlockExposeModel {
 	segment: string | null;
 }
 
-export interface UmbBlockValueType<BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel> {
-	layout: { [key: string]: Array<BlockLayoutType> | undefined };
+export interface UmbBlockValueDataPropertiesBaseType {
 	contentData: Array<UmbBlockDataModel>;
 	settingsData: Array<UmbBlockDataModel>;
 	expose: Array<UmbBlockExposeModel>;
+}
+
+export interface UmbBlockValueType<BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
+	extends UmbBlockValueDataPropertiesBaseType {
+	layout: { [key: string]: Array<BlockLayoutType> | undefined };
 }

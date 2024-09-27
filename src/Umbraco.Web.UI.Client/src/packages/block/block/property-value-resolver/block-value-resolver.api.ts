@@ -1,57 +1,45 @@
-import type { UmbBlockDataValueModel, UmbBlockExposeModel, UmbBlockValueType } from '../types.js';
+import type { UmbBlockDataValueModel, UmbBlockExposeModel, UmbBlockValueDataPropertiesBaseType } from '../types.js';
 import type { UmbContentValueModel } from '@umbraco-cms/backoffice/content';
 import type { UmbPropertyValueResolver } from '@umbraco-cms/backoffice/property';
 
-export class UmbBlockValueResolver
-	implements
-		UmbPropertyValueResolver<UmbContentValueModel<UmbBlockValueType>, UmbBlockDataValueModel, UmbBlockExposeModel>
+export abstract class UmbBlockValueResolver<ValueType>
+	implements UmbPropertyValueResolver<UmbContentValueModel<ValueType>, UmbBlockDataValueModel, UmbBlockExposeModel>
 {
-	async processValues(
-		property: UmbContentValueModel<UmbBlockValueType>,
+	abstract processValues(
+		property: UmbContentValueModel<ValueType>,
+		valuesCallback: (values: Array<UmbBlockDataValueModel>) => Promise<Array<UmbBlockDataValueModel> | undefined>,
+	): Promise<UmbContentValueModel<ValueType>>;
+
+	protected async _processValueBlockData<ValueType extends UmbBlockValueDataPropertiesBaseType>(
+		value: ValueType,
 		valuesCallback: (values: Array<UmbBlockDataValueModel>) => Promise<Array<UmbBlockDataValueModel> | undefined>,
 	) {
-		if (property.value) {
-			const contentData = await Promise.all(
-				property.value.contentData?.map(async (entry) => ({
-					...entry,
-					values: (await valuesCallback(entry.values)) ?? [],
-				})),
-			);
-			const settingsData = await Promise.all(
-				property.value.settingsData?.map(async (entry) => ({
-					...entry,
-					values: (await valuesCallback(entry.values)) ?? [],
-				})),
-			);
-
-			return {
-				...property,
-				value: {
-					...property.value,
-					contentData,
-					settingsData,
-				},
-			};
-		}
-		return property;
+		const contentData = await Promise.all(
+			value.contentData?.map(async (entry) => ({
+				...entry,
+				values: (await valuesCallback(entry.values)) ?? [],
+			})),
+		);
+		const settingsData = await Promise.all(
+			value.settingsData?.map(async (entry) => ({
+				...entry,
+				values: (await valuesCallback(entry.values)) ?? [],
+			})),
+		);
+		return { ...value, contentData, settingsData };
 	}
 
-	async processVariants(
-		property: UmbContentValueModel<UmbBlockValueType>,
+	abstract processVariants(
+		property: UmbContentValueModel<ValueType>,
+		variantsCallback: (values: Array<UmbBlockExposeModel>) => Promise<Array<UmbBlockExposeModel> | undefined>,
+	): Promise<UmbContentValueModel<ValueType>>;
+
+	protected async _processVariantBlockData<ValueType extends UmbBlockValueDataPropertiesBaseType>(
+		value: ValueType,
 		variantsCallback: (values: Array<UmbBlockExposeModel>) => Promise<Array<UmbBlockExposeModel> | undefined>,
 	) {
-		if (property.value) {
-			const expose = (await variantsCallback(property.value.expose)) ?? [];
-
-			return {
-				...property,
-				value: {
-					...property.value,
-					expose,
-				},
-			};
-		}
-		return property;
+		const expose = (await variantsCallback(value.expose)) ?? [];
+		return { ...value, expose };
 	}
 
 	compareVariants(a: UmbBlockExposeModel, b: UmbBlockExposeModel) {

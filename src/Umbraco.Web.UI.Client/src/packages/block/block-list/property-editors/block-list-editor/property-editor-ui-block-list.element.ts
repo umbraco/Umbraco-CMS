@@ -2,7 +2,7 @@ import { UmbBlockListManagerContext } from '../../context/block-list-manager.con
 import { UmbBlockListEntriesContext } from '../../context/block-list-entries.context.js';
 import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../types.js';
 import type { UmbBlockListEntryElement } from '../../components/block-list-entry/index.js';
-import { UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS } from './manifests.js';
+import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from './manifests.js';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, property, state, repeat, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -71,7 +71,7 @@ export class UmbPropertyEditorUIBlockListElement
 		buildUpValue.expose ??= [];
 		this._value = buildUpValue as UmbBlockListValueModel;
 
-		this.#managerContext.setLayouts(this._value.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS] ?? []);
+		this.#managerContext.setLayouts(this._value.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? []);
 		this.#managerContext.setContents(this._value.contentData);
 		this.#managerContext.setSettings(this._value.settingsData);
 		this.#managerContext.setExposes(this._value.expose);
@@ -192,7 +192,7 @@ export class UmbPropertyEditorUIBlockListElement
 				([layouts, contents, settings, exposes]) => {
 					this._value = {
 						...this._value,
-						layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS]: layouts },
+						layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
 						contentData: contents,
 						settingsData: settings,
 						expose: exposes,

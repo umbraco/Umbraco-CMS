@@ -1,5 +1,5 @@
 import { UmbBlockGridManagerContext } from '../../context/block-grid-manager.context.js';
-import { UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS } from './manifests.js';
+import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from './manifests.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	html,
@@ -69,7 +69,7 @@ export class UmbPropertyEditorUIBlockGridElement
 		buildUpValue.expose ??= [];
 		this._value = buildUpValue as UmbBlockGridValueModel;
 
-		this.#managerContext.setLayouts(this._value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS] ?? []);
+		this.#managerContext.setLayouts(this._value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? []);
 		this.#managerContext.setContents(this._value.contentData);
 		this.#managerContext.setSettings(this._value.settingsData);
 		this.#managerContext.setExposes(this._value.expose);
@@ -111,7 +111,7 @@ export class UmbPropertyEditorUIBlockGridElement
 				([layouts, contents, settings]) => {
 					this._value = {
 						...this._value,
-						layout: { [UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS]: layouts },
+						layout: { [UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
 						contentData: contents,
 						settingsData: settings,
 					};

@@ -1,17 +1,18 @@
 import { manifest as blockGridSchemaManifest } from './Umbraco.BlockGrid.js';
-import { UmbBlockValueResolver } from '@umbraco-cms/backoffice/block';
+import { UmbStandardBlockValueResolver } from '@umbraco-cms/backoffice/block';
 
-export const UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS = 'Umbraco.BlockGrid';
+export const UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS = 'Umbraco.BlockGrid';
+export const UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS = 'Umb.PropertyEditorUi.BlockGrid';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
-		alias: 'Umb.PropertyEditorUi.BlockGrid',
+		alias: UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
 		name: 'Block Grid Property Editor UI',
 		element: () => import('./property-editor-ui-block-grid.element.js'),
 		meta: {
 			label: 'Block Grid',
-			propertyEditorSchemaAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS,
+			propertyEditorSchemaAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
 			icon: 'icon-layout',
 			group: 'richContent',
 			settings: {
@@ -71,9 +72,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'propertyValueResolver',
 		alias: 'Umb.PropertyValueResolver.Block',
 		name: 'Block Value Resolver',
-		api: UmbBlockValueResolver,
+		api: UmbStandardBlockValueResolver,
 		meta: {
-			editorAlias: 'Umbraco.BlockGrid',
+			editorAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
 		},
 	},
 ];
