@@ -27,13 +27,7 @@ export const uriAttributeSanitizer = (editor: Editor) => {
 
 		return function parseUri(uri: string, tagName: string) {
 			uri = uri.replace(trimRegExp, '');
-			try {
-				// Might throw malformed URI sequence
-				uri = decodeURIComponent(uri);
-			} catch (ex) {
-				// Fallback to non UTF-8 decoder
-				uri = unescape(uri);
-			}
+			uri = decodeURIComponent(uri);
 
 			if (scriptUriRegExp.test(uri)) {
 				return;

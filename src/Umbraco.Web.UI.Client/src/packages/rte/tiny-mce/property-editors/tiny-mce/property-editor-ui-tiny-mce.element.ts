@@ -10,11 +10,11 @@ import '../../components/input-tiny-mce/input-tiny-mce.element.js';
 @customElement('umb-property-editor-ui-tiny-mce')
 export class UmbPropertyEditorUITinyMceElement extends UmbRteBaseElement {
 	#onChange(event: CustomEvent & { target: UmbInputTinyMceElement }) {
-		const value = event.target.value;
+		const value = typeof event.target.value === 'string' ? event.target.value : '';
 
 		// Clone the DOM, to remove the classes and attributes on the original:
 		const div = document.createElement('div');
-		div.innerHTML = value.toString();
+		div.innerHTML = value;
 
 		// Loop through used, to remove the classes on these.
 		const blockEls = div.querySelectorAll(`umb-rte-block, umb-rte-block-inline`);

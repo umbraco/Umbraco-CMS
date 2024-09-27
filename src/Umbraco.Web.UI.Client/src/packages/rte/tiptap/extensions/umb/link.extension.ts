@@ -53,7 +53,7 @@ export default class UmbTiptapLinkExtensionApi extends UmbTiptapToolbarElementAp
 		let { queryString, url } = link;
 
 		// If an anchor exists, check that it is appropriately prefixed
-		if (queryString && !queryString?.startsWith('?') && !queryString?.startsWith('#')) {
+		if (!queryString?.startsWith('?') && !queryString?.startsWith('#')) {
 			queryString = (queryString?.startsWith('=') ? '#' : '?') + queryString;
 		}
 

@@ -64,7 +64,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 
 	override set value(newValue: FormDataEntryValue | FormData) {
 		super.value = newValue;
-		const newContent = newValue?.toString() ?? '';
+		const newContent = typeof newValue === 'string' ? newValue : '';
 
 		if (this.#editorRef && this.#editorRef.getContent() != newContent) {
 			this.#editorRef.setContent(newContent);
@@ -362,7 +362,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		//enable browser based spell checking
 		editor.getBody().setAttribute('spellcheck', 'true');
 		uriAttributeSanitizer(editor);
-		editor.setContent(this.value?.toString() ?? '');
+		editor.setContent(typeof this.value === 'string' ? this.value : '');
 	}
 
 	#onChange(value: string) {
