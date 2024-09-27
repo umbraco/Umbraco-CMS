@@ -6,6 +6,6 @@ export const manifests: Array<ManifestModal> = [
 		type: 'modal',
 		alias: UMB_SORT_CHILDREN_OF_MODAL_ALIAS,
 		name: 'Sort Children Of Modal',
-		js: () => import('./sort-children-of-modal.element.js'),
+		element: () => import('./sort-children-of-modal.element.js'),
 	},
 ];

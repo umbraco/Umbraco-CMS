@@ -30,6 +30,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'modal',
 		alias: 'Umb.Modal.CultureAndHostnames',
 		name: 'Culture And Hostnames Modal',
-		js: () => import('./modal/culture-and-hostnames-modal.element.js'),
+		element: () => import('./modal/culture-and-hostnames-modal.element.js'),
 	},
 ];
