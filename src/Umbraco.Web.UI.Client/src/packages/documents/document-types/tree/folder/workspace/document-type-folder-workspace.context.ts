@@ -40,12 +40,21 @@ export class UmbDocumentTypeFolderWorkspaceContext
 	}
 
 	/**
-	 * @description Set the name of the script
+	 * @description Set the name of the document type folder
 	 * @param {string} value
-	 * @memberof UmbScriptWorkspaceContext
+	 * @memberof UmbDocumentTypeFolderWorkspaceContext
 	 */
 	public setName(value: string) {
 		this._data.updateCurrent({ name: value });
+	}
+
+	/**
+	 * @description Get the name of the document type folder
+	 * @returns {string}
+	 * @memberof UmbDocumentTypeFolderWorkspaceContext
+	 */
+	public getName() {
+		return this._data.getCurrent()?.name;
 	}
 }
 

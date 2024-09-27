@@ -37,12 +37,21 @@ export class UmbDataTypeFolderWorkspaceContext
 	}
 
 	/**
-	 * @description Set the name of the script
+	 * @description Set the name of the data type folder
 	 * @param {string} value
-	 * @memberof UmbScriptWorkspaceContext
+	 * @memberof UmbDataTypeFolderWorkspaceContext
 	 */
 	public setName(value: string) {
 		this._data.updateCurrent({ name: value });
+	}
+
+	/**
+	 * @description Get the name of the data type folder
+	 * @returns {string}
+	 * @memberof UmbDataTypeFolderWorkspaceContext
+	 */
+	public getName() {
+		return this._data.getCurrent()?.name;
 	}
 }
 

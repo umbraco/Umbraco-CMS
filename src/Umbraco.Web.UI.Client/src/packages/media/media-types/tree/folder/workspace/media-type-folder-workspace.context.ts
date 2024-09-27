@@ -37,12 +37,21 @@ export class UmbMediaTypeFolderWorkspaceContext
 	}
 
 	/**
-	 * @description Set the name of the script
+	 * @description Set the name of the media type folder
 	 * @param {string} value
-	 * @memberof UmbScriptWorkspaceContext
+	 * @memberof UmbMediaTypeFolderWorkspaceContext
 	 */
 	public setName(value: string) {
 		this._data.updateCurrent({ name: value });
+	}
+
+	/**
+	 * @description Get the name of the media type folder
+	 * @returns {string}
+	 * @memberof UmbMediaTypeFolderWorkspaceContext
+	 */
+	public getName() {
+		return this._data.getCurrent()?.name;
 	}
 }
 
