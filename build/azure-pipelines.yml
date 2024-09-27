@@ -5,10 +5,6 @@ parameters:
     displayName: Run SQL Server Integration Tests
     type: boolean
     default: false
-  - name: sqlServerAcceptanceTests
-    displayName: Run SQL Server Acceptance Tests
-    type: boolean
-    default: false
   - name: myGetDeploy
     displayName: Deploy to MyGet
     type: boolean
@@ -517,10 +513,7 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
-          - ${{ if eq(parameters.isNightly, true) }}:
-              pwsh: npm run test --ignore-certificate-errors
-            ${{ else }}:
-              pwsh: npm run smokeTest --ignore-certificate-errors
+          - pwsh: npm run smokeTest --ignore-certificate-errors
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
@@ -556,8 +549,6 @@ stages:
 
       - job:
         displayName: E2E Tests (SQL Server)
-        # condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerAcceptanceTests}}) # Outcommented due to timeouts
-        condition: eq(${{parameters.sqlServerAcceptanceTests}}, True)
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
@@ -593,7 +584,8 @@ stages:
           - pwsh: |
               "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
               UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-              URL=$(ASPNETCORE_URLS)" | Out-File .env
+              URL=$(ASPNETCORE_URLS)
+              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json" | Out-File .env
             displayName: Generate .env
             workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
 
@@ -660,10 +652,7 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
-          - ${{ if eq(parameters.isNightly, true) }}:
-              pwsh: npm run test --ignore-certificate-errors
-            ${{ else }}:
-              pwsh: npm run smokeTest --ignore-certificate-errors
+          - pwsh: npm run smokeTest --ignore-certificate-errors
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
@@ -714,7 +703,7 @@ stages:
     dependsOn:
       - Unit
       - Integration
-#      - E2E
+    #      - E2E
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.myGetDeploy}}))
     jobs:
       - job:

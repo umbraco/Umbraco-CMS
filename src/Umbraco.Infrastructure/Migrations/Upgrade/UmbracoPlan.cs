@@ -63,18 +63,19 @@ public class UmbracoPlan : MigrationPlan
         To<V_13_0_0.ChangeWebhookUrlColumnsToNvarcharMax>("{21C42760-5109-4C03-AB4F-7EA53577D1F5}");
         To<V_13_0_0.AddExceptionOccured>("{6158F3A3-4902-4201-835E-1ED7F810B2D8}");
         To<V_13_3_0.AlignUpgradedDatabase>("{985AF2BA-69D3-4DBA-95E0-AD3FA7459FA7}");
+        To<V_13_5_0.ChangeRedirectUrlToNvarcharMax>("{CC47C751-A81B-489A-A2BC-0240245DB687}");
 
         // To 14.0.0
         To<V_14_0_0.AddPropertyEditorUiAliasColumn>("{419827A0-4FCE-464B-A8F3-247C6092AF55}");
-        To<V_14_0_0.AddGuidsToUserGroups>("{69E12556-D9B3-493A-8E8A-65EC89FB658D}");
-        To<V_14_0_0.AddUserGroup2PermisionTable>("{F2B16CD4-F181-4BEE-81C9-11CF384E6025}");
-        To<V_14_0_0.AddGuidsToUsers>("{A8E01644-9F2E-4988-8341-587EF5B7EA69}");
+        To<NoopMigration>("{69E12556-D9B3-493A-8E8A-65EC89FB658D}");
+        To<NoopMigration>("{F2B16CD4-F181-4BEE-81C9-11CF384E6025}");
+        To<NoopMigration>("{A8E01644-9F2E-4988-8341-587EF5B7EA69}");
         To<V_14_0_0.UpdateDefaultGuidsOfCreatedPackages>("{E073DBC0-9E8E-4C92-8210-9CB18364F46E}");
         To<V_14_0_0.RenameTechnologyLeakingPropertyEditorAliases>("{80D282A4-5497-47FF-991F-BC0BCE603121}");
         To<V_14_0_0.MigrateSchduledPublishesToUtc>("{96525697-E9DC-4198-B136-25AD033442B8}");
         To<V_14_0_0.AddListViewKeysToDocumentTypes>("{7FC5AC9B-6F56-415B-913E-4A900629B853}");
         To<V_14_0_0.MigrateDataTypeConfigurations>("{1539A010-2EB5-4163-8518-4AE2AA98AFC6}");
-        To<V_14_0_0.MigrateCharPermissionsToStrings>("{C567DE81-DF92-4B99-BEA8-CD34EF99DA5D}");
+        To<NoopMigration>("{C567DE81-DF92-4B99-BEA8-CD34EF99DA5D}");
         To<V_14_0_0.DeleteMacroTables>("{0D82C836-96DD-480D-A924-7964E458BD34}");
         To<V_14_0_0.MoveDocumentBlueprintsToFolders>("{1A0FBC8A-6FC6-456C-805C-B94816B2E570}");
         To<V_14_0_0.MigrateTours>("{302DE171-6D83-4B6B-B3C0-AC8808A16CA1}");
@@ -91,5 +92,8 @@ public class UmbracoPlan : MigrationPlan
 
         // To 14.2.0
         To<V_14_2_0.AddMissingDateTimeConfiguration>("{20ED404C-6FF9-4F91-8AC9-2B298E0002EB}");
+
+        // To 14.3.0
+        To<V_13_5_0.ChangeRedirectUrlToNvarcharMax>("{EEF792FC-318C-4921-9859-51EBF07A53A3}"); // Execute again, to ensure all that migrated to 14.0.0 without 13.5 will have this
     }
 }

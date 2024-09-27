@@ -53,7 +53,6 @@ public class FilePermissionHelper : IFilePermissionHelper
         {
             hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Bin),
             hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Umbraco),
-            hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoPath),
             hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Packages),
         };
     }
