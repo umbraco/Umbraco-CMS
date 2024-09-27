@@ -56,6 +56,9 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	@state()
 	private _editor!: Editor;
 
+	@state()
+	_toolbar: string[][][] = [[[]]];
+
 	protected override async firstUpdated() {
 		await Promise.all([await this.#loadExtensions(), await this.#loadEditor()]);
 	}
@@ -89,6 +92,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		if (maxWidth) this.setAttribute('style', `max-width: ${maxWidth}px;`);
 		if (maxHeight) element.setAttribute('style', `max-height: ${maxHeight}px;`);
 
+		this._toolbar = this.configuration?.getValueByAlias<string[][][]>('toolbar') ?? [[[]]];
+
 		const extensions = this._extensions
 			.map((ext) => ext.getTiptapExtensions({ configuration: this.configuration }))
 			.flat();
@@ -117,7 +122,10 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				!this._editor && !this._extensions?.length,
 				() => html`<uui-loader></uui-loader>`,
 				() => html`
-					<umb-tiptap-fixed-menu .editor=${this._editor} ?readonly=${this.readonly}></umb-tiptap-fixed-menu>
+					<umb-tiptap-fixed-menu
+						.toolbar=${this._toolbar}
+						.editor=${this._editor}
+						?readonly=${this.readonly}></umb-tiptap-fixed-menu>
 				`,
 			)}
 			<div id="editor"></div>
