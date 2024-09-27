@@ -107,13 +107,15 @@ export class UmbPropertyEditorUIBlockGridElement
 					this.#managerContext.layouts,
 					this.#managerContext.contents,
 					this.#managerContext.settings,
+					this.#managerContext.exposes,
 				]).pipe(debounceTime(20)),
-				([layouts, contents, settings]) => {
+				([layouts, contents, settings, exposes]) => {
 					this._value = {
 						...this._value,
 						layout: { [UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
 						contentData: contents,
 						settingsData: settings,
+						expose: exposes,
 					};
 					propertyContext.setValue(this._value);
 				},
