@@ -70,7 +70,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	blockGridSchemaManifest,
 	{
 		type: 'propertyValueResolver',
-		alias: 'Umb.PropertyValueResolver.Block',
+		alias: 'Umb.PropertyValueResolver.BlockGrid',
 		name: 'Block Value Resolver',
 		api: UmbStandardBlockValueResolver,
 		meta: {

@@ -51,7 +51,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	blockListSchemaManifest,
 	{
 		type: 'propertyValueResolver',
-		alias: 'Umb.PropertyValueResolver.Block',
+		alias: 'Umb.PropertyValueResolver.BlockList',
 		name: 'Block Value Resolver',
 		api: UmbStandardBlockValueResolver,
 		meta: {

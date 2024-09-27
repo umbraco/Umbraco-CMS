@@ -136,7 +136,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'propertyValueResolver',
-		alias: 'Umb.PropertyValueResolver.Block',
+		alias: 'Umb.PropertyValueResolver.TinyMce',
 		name: 'Block Value Resolver',
 		api: UmbRteBlockValueResolver,
 		meta: {
