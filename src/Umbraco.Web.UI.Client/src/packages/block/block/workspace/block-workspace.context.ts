@@ -144,7 +144,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				observeMultiple([context.isReadOnly, this.variantId]),
 				([isReadOnly, variantId]) => {
 					const unique = 'UMB_PROPERTY_CONTEXT';
-					console.log('make states', variantId);
 					if (variantId === undefined) return;
 
 					if (isReadOnly) {
