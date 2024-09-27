@@ -13,12 +13,6 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 	readonly = false;
 
 	@property({ attribute: false })
-	toolbarConfig: Array<{
-		alias: string;
-		position?: [number, number, number];
-	}> = [];
-
-	@property({ attribute: false })
 	set editor(value) {
 		const oldValue = this.#editor;
 		if (value === oldValue) {

@@ -28,10 +28,12 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	@property({ attribute: false })
 	set value(value: string[][][]) {
 		// TODO: Make sure that value has at least one row and one group
+		// TODO: This can be optimized with cashing;
 		this.#value = value.map((rows) => rows.map((groups) => [...groups]));
 	}
 
 	get value(): string[][][] {
+		// TODO: This can be optimized with cashing;
 		return this.#value.map((rows) => rows.map((groups) => [...groups]));
 	}
 
