@@ -48,7 +48,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	protected override async firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
 		super.firstUpdated(_changedProperties);
 
-		this.observe(umbExtensionsRegistry.byType('tiptapExtension'), (extensions) => {
+		this.observe(umbExtensionsRegistry.byType('tiptapToolbarExtension'), (extensions) => {
 			this._extensions = extensions.map((ext) => {
 				return {
 					alias: ext.alias,
@@ -226,14 +226,15 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		return html`<div class="extensions" dropzone="move" @drop=${this.#onDrop} @dragover=${this.#onDragOver}>
 			${repeat(
 				this._extensions.filter((ext) => !this.#value.flat(2).includes(ext.alias)),
-				(extension) =>
-					html`<div
+				(extension) => html`
+					<div
 						class="item"
 						draggable="true"
 						@dragend=${this.#onDragEnd}
 						@dragstart=${(e: DragEvent) => this.#onDragStart(e, extension.alias)}>
 						<umb-icon name=${extension.icon ?? ''}></umb-icon>
-					</div>`,
+					</div>
+				`,
 			)}
 		</div>`;
 	}
