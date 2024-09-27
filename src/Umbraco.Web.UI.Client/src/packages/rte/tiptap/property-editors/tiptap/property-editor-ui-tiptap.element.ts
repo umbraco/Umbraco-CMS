@@ -1,4 +1,5 @@
 import type { UmbInputTiptapElement } from '../../components/input-tiptap/input-tiptap.element.js';
+import { UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS } from '../../../types.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbBlockRteEntriesContext, UmbBlockRteManagerContext } from '@umbraco-cms/backoffice/block-rte';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -14,8 +15,6 @@ export interface UmbRichTextEditorValueType {
 	markup: string;
 	blocks: UmbBlockValueType<UmbBlockRteLayoutModel>;
 }
-
-const UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS = 'Umbraco.TinyMCE';
 
 const elementName = 'umb-property-editor-ui-tiptap';
 

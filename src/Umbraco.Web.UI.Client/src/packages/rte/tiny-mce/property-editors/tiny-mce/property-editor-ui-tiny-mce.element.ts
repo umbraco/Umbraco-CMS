@@ -1,4 +1,5 @@
 import type { UmbInputTinyMceElement } from '../../components/input-tiny-mce/input-tiny-mce.element.js';
+import { UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS } from '../../../types.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
@@ -18,8 +19,6 @@ export interface UmbRichTextEditorValueType {
 	markup: string;
 	blocks: UmbBlockValueType<UmbBlockRteLayoutModel>;
 }
-
-const UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS = 'Umbraco.TinyMCE'; // Not rich text, cause this has not been migrated [NL]
 
 /**
  * @element umb-property-editor-ui-tiny-mce
