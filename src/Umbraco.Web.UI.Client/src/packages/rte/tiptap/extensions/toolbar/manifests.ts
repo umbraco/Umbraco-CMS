@@ -251,6 +251,7 @@ export const manifests: Array<ManifestTiptapToolbarExtension | ManifestTiptapToo
 			alias: 'unlink',
 			icon: 'icon-unlink',
 			label: 'Unlink',
+			isDefault: true,
 		},
 	},
 ];
