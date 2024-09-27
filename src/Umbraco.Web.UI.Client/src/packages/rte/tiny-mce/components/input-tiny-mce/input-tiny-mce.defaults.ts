@@ -72,8 +72,6 @@ export const defaultFallbackConfig: RawEditorOptions = {
 			editor.dom.doc.head.appendChild(stylesheet);
 		});
 
-		// TODO: Lets use/adapt the router-slot logic so we do not need to add this here [NL]
-		// TODO: When transferring this code, make sure that we check for target='_parent' or target='top' if its happening within a iframe. [NL]
 		editor.dom.doc.addEventListener('click', (e: MouseEvent) => {
 			// If we try to open link in a new tab, then we want to skip skip:
 			//if ((isWindows && e.ctrlKey) || (!isWindows && e.metaKey)) return;
@@ -120,7 +118,7 @@ export const defaultFallbackConfig: RawEditorOptions = {
 		const script = document.createElement('script');
 		script.type = 'text/javascript';
 		script.setAttribute('type', 'module');
-		// TODO: Check that we actually get the same extension registry, or find a way so we can make it do so. — It could be some kind of iframe detection? [NL]
+
 		script.text = `import "@umbraco-cms/backoffice/extension-registry";`;
 		script.text = `import "${UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH}";`;
 		editor.dom.doc.head.appendChild(script);
