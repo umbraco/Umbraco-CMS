@@ -146,7 +146,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IMigrationPlanExecutor, MigrationPlanExecutor>();
         builder.Services.AddSingleton<IMigrationBuilder>(factory => new MigrationBuilder(factory));
 
-        builder.Services.AddSingleton<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
+        builder.Services.AddSingleton<ICacheRebuilder, CacheRebuilder>();
 
         builder.Services.AddSingleton<IVariationContextAccessor, HybridVariationContextAccessor>();
         builder.Services.AddSingleton<IBackOfficeVariationContextAccessor, HttpContextBackOfficeVariationContextAccessor>();

@@ -5,17 +5,17 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 
 /// <summary>
-///     Implements <see cref="IPublishedSnapshotRebuilder" /> in Umbraco.Web (rebuilding).
+///     Implements <see cref="ICacheRebuilder" /> in Umbraco.Web (rebuilding).
 /// </summary>
-public class PublishedSnapshotRebuilder : IPublishedSnapshotRebuilder
+public class CacheRebuilder : ICacheRebuilder
 {
     private readonly DistributedCache _distributedCache;
     private readonly IDatabaseCacheRebuilder _databaseCacheRebuilder;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="PublishedSnapshotRebuilder" /> class.
+    ///     Initializes a new instance of the <see cref="CacheRebuilder" /> class.
     /// </summary>
-    public PublishedSnapshotRebuilder(
+    public CacheRebuilder(
         DistributedCache distributedCache,
         IDatabaseCacheRebuilder databaseCacheRebuilder)
     {
