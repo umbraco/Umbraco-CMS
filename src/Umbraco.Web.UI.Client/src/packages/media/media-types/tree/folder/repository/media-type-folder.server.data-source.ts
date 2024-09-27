@@ -1,4 +1,4 @@
-import { UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
+import { UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE } from '../../../entity.js';
 import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
