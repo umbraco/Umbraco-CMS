@@ -1,68 +1,15 @@
-import { UMB_DICTIONARY_WORKSPACE_CONTEXT } from './dictionary-workspace.context-token.js';
-import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-dictionary-workspace-editor')
 export class UmbDictionaryWorkspaceEditorElement extends UmbLitElement {
-	@state()
-	private _name?: string | null = '';
-
-	#workspaceContext?: typeof UMB_DICTIONARY_WORKSPACE_CONTEXT.TYPE;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_DICTIONARY_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance;
-			this.#observeName();
-		});
-	}
-
-	#observeName() {
-		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.name, (name) => (this._name = name));
-	}
-
-	// TODO. find a way where we don't have to do this for all workspaces.
-	#handleInput(event: UUIInputEvent) {
-		if (event instanceof UUIInputEvent) {
-			const target = event.composedPath()[0] as UUIInputElement;
-
-			if (typeof target?.value === 'string') {
-				this.#workspaceContext?.setName(target.value);
-			}
-		}
-	}
-
 	override render() {
 		return html`
-			<umb-workspace-editor alias="Umb.Workspace.Dictionary" back-path="section/dictionary/dashboard">
-				<div id="header" slot="header">
-					<uui-input
-						placeholder=${this.localize.term('placeholders_entername')}
-						.value=${this._name ?? ''}
-						@input="${this.#handleInput}"
-						label="${this.localize.term('general_dictionary')} ${this.localize.term('general_name')}"
-						${umbFocus()}></uui-input>
-				</div>
+			<umb-workspace-editor back-path="section/dictionary/dashboard">
+				<umb-workspace-name slot="header"></umb-workspace-name>
 			</umb-workspace-editor>
 		`;
 	}
-
-	static override styles = [
-		css`
-			#header {
-				display: flex;
-				gap: var(--uui-size-space-4);
-				width: 100%;
-			}
-			uui-input {
-				width: 100%;
-			}
-		`,
-	];
 }
 
 export default UmbDictionaryWorkspaceEditorElement;
