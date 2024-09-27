@@ -24,6 +24,7 @@ public class PublishedRouter : IPublishedRouter
     private readonly IContentLastChanceFinder _contentLastChanceFinder;
     private readonly IContentTypeService _contentTypeService;
     private readonly IEventAggregator _eventAggregator;
+    private readonly IDomainCache _domainCache;
     private readonly IFileService _fileService;
     private readonly ILogger<PublishedRouter> _logger;
     private readonly IProfilingLogger _profilingLogger;
@@ -50,7 +51,8 @@ public class PublishedRouter : IPublishedRouter
         IFileService fileService,
         IContentTypeService contentTypeService,
         IUmbracoContextAccessor umbracoContextAccessor,
-        IEventAggregator eventAggregator)
+        IEventAggregator eventAggregator,
+        IDomainCache domainCache)
     {
         _webRoutingSettings = webRoutingSettings.CurrentValue ??
                               throw new ArgumentNullException(nameof(webRoutingSettings));
@@ -68,6 +70,7 @@ public class PublishedRouter : IPublishedRouter
         _contentTypeService = contentTypeService;
         _umbracoContextAccessor = umbracoContextAccessor;
         _eventAggregator = eventAggregator;
+        _domainCache = domainCache;
         webRoutingSettings.OnChange(x => _webRoutingSettings = x);
     }
 
@@ -404,11 +407,10 @@ public class PublishedRouter : IPublishedRouter
         }
 
         var rootNodeId = request.Domain != null ? request.Domain.ContentId : (int?)null;
-        IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
         Domain? domain =
-            DomainUtilities.FindWildcardDomainInPath(umbracoContext.Domains?.GetAll(true), nodePath, rootNodeId);
+            DomainUtilities.FindWildcardDomainInPath(_domainCache.GetAll(true), nodePath, rootNodeId);
 
-        // always has a contentId and a culture
+
         if (domain != null)
         {
             request.SetCulture(domain.Culture);

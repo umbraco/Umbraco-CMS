@@ -8,15 +8,17 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs;
 public interface IRecurringBackgroundJob
 {
     static readonly TimeSpan DefaultDelay = System.TimeSpan.FromMinutes(3);
-    static readonly ServerRole[] DefaultServerRoles = new[] { ServerRole.Single, ServerRole.SchedulingPublisher }; 
+    static readonly ServerRole[] DefaultServerRoles = new[] { ServerRole.Single, ServerRole.SchedulingPublisher };
 
-    /// <param name="period">Timespan representing how often the task should recur.</param>
+    /// <summary>
+    /// Timespan representing how often the task should recur.
+    /// </summary>
     TimeSpan Period { get; }
 
-    /// <param name="delay">
-    ///     Timespan representing the initial delay after application start-up before the first run of the task
-    ///     occurs.
-    /// </param>
+    /// <summary>
+    /// Timespan representing the initial delay after application start-up before the first run of the task
+    /// occurs.
+    /// </summary>
     TimeSpan Delay { get => DefaultDelay; }
 
     ServerRole[] ServerRoles { get => DefaultServerRoles; }

@@ -620,10 +620,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentOutOfRangeException(nameof(pageSize));
         }
 
-        if (ordering == null)
-        {
-            ordering = Ordering.By("sortOrder");
-        }
+        ordering ??= Ordering.By("sortOrder");
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -651,10 +648,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentOutOfRangeException(nameof(pageSize));
         }
 
-        if (ordering == null)
-        {
-            ordering = Ordering.By("sortOrder");
-        }
+        ordering ??= Ordering.By("sortOrder");
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -811,10 +805,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentOutOfRangeException(nameof(pageSize));
         }
 
-        if (ordering == null)
-        {
-            ordering = Ordering.By("sortOrder");
-        }
+        ordering ??= Ordering.By("sortOrder");
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -828,10 +819,7 @@ public class ContentService : RepositoryService, IContentService
     /// <inheritdoc />
     public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter = null, Ordering? ordering = null)
     {
-        if (ordering == null)
-        {
-            ordering = Ordering.By("Path");
-        }
+        ordering ??= Ordering.By("Path");
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -969,10 +957,7 @@ public class ContentService : RepositoryService, IContentService
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            if (ordering == null)
-            {
-                ordering = Ordering.By("Path");
-            }
+            ordering ??= Ordering.By("Path");
 
             scope.ReadLock(Constants.Locks.ContentTree);
             IQuery<IContent>? query = Query<IContent>()?
@@ -1075,7 +1060,14 @@ public class ContentService : RepositoryService, IContentService
             // Updates in-memory navigation structure - we only handle new items, other updates are not a concern
             UpdateInMemoryNavigationStructure(
                 "Umbraco.Cms.Core.Services.ContentService.Save-with-contentSchedule",
-                () => _documentNavigationManagementService.Add(content.Key, GetParent(content)?.Key));
+                () =>
+                {
+                    _documentNavigationManagementService.Add(content.Key, GetParent(content)?.Key);
+                    if (content.Trashed)
+                    {
+                        _documentNavigationManagementService.MoveToBin(content.Key);
+                    }
+                });
 
             if (contentSchedule != null)
             {
@@ -1144,7 +1136,14 @@ public class ContentService : RepositoryService, IContentService
                 // Updates in-memory navigation structure - we only handle new items, other updates are not a concern
                 UpdateInMemoryNavigationStructure(
                     "Umbraco.Cms.Core.Services.ContentService.Save",
-                    () => _documentNavigationManagementService.Add(content.Key, GetParent(content)?.Key));
+                    () =>
+                    {
+                        _documentNavigationManagementService.Add(content.Key, GetParent(content)?.Key);
+                        if (content.Trashed)
+                        {
+                            _documentNavigationManagementService.MoveToBin(content.Key);
+                        }
+                    });
             }
 
             scope.Notifications.Publish(
@@ -1242,9 +1241,10 @@ public class ContentService : RepositoryService, IContentService
 
             // publish the culture(s)
             // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
+            var publishTime = DateTime.Now;
             foreach (CultureImpact? impact in impacts)
             {
-                content.PublishCulture(impact);
+                content.PublishCulture(impact, publishTime);
             }
 
             // Change state to publishing
@@ -1409,6 +1409,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="scope"></param>
     /// <param name="content"></param>
     /// <param name="allLangs"></param>
+    /// <param name="notificationState"></param>
     /// <param name="userId"></param>
     /// <param name="branchOne"></param>
     /// <param name="branchRoot"></param>
@@ -1879,8 +1880,8 @@ public class ContentService : RepositoryService, IContentService
 
                         // publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                         IProperty[]? invalidProperties = null;
-                        var impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(allLangs.Value, culture));
-                        var tryPublish = d.PublishCulture(impact) &&
+                        CultureImpact impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(allLangs.Value, culture));
+                        var tryPublish = d.PublishCulture(impact, date) &&
                                          _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
                         if (invalidProperties != null && invalidProperties.Length > 0)
                         {
@@ -1957,17 +1958,19 @@ public class ContentService : RepositoryService, IContentService
     {
         // variant content type - publish specified cultures
         // invariant content type - publish only the invariant culture
+
+        var publishTime = DateTime.Now;
         if (content.ContentType.VariesByCulture())
         {
             return culturesToPublish.All(culture =>
             {
-                var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
-                return content.PublishCulture(impact) &&
+                CultureImpact? impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
+                return content.PublishCulture(impact, publishTime) &&
                        _propertyValidationService.Value.IsPropertyDataValid(content, out _, impact);
             });
         }
 
-        return content.PublishCulture(_cultureImpactFactory.ImpactInvariant())
+        return content.PublishCulture(_cultureImpactFactory.ImpactInvariant(), publishTime)
                && _propertyValidationService.Value.IsPropertyDataValid(content, out _, _cultureImpactFactory.ImpactInvariant());
     }
 
@@ -1977,10 +1980,7 @@ public class ContentService : RepositoryService, IContentService
         // if published, republish
         if (published)
         {
-            if (cultures == null)
-            {
-                cultures = new HashSet<string>(); // empty means 'already published'
-            }
+            cultures ??= new HashSet<string>(); // empty means 'already published'
 
             if (edited)
             {
@@ -1996,10 +1996,7 @@ public class ContentService : RepositoryService, IContentService
             return cultures; // null means 'nothing to do'
         }
 
-        if (cultures == null)
-        {
-            cultures = new HashSet<string>();
-        }
+        cultures ??= new HashSet<string>();
 
         cultures.Add(c); // <culture> means 'publish this culture'
         return cultures;
@@ -2751,7 +2748,6 @@ public class ContentService : RepositoryService, IContentService
     /// </summary>
     /// <param name="content">The <see cref="IContent" /> to copy</param>
     /// <param name="parentId">Id of the Content's new Parent</param>
-    /// <param name="parentKey">Key of the Content's new Parent</param>
     /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
     /// <param name="recursive">A value indicating whether to recursively copy children.</param>
     /// <param name="userId">Optional Id of the User copying the Content</param>
@@ -3200,7 +3196,8 @@ public class ContentService : RepositoryService, IContentService
                     .ToArray();
 
         // publish the culture(s)
-        if (!impactsToPublish.All(content.PublishCulture))
+        var publishTime = DateTime.Now;
+        if (!impactsToPublish.All(impact => content.PublishCulture(impact, publishTime)))
         {
             return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
         }
@@ -3420,6 +3417,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="scope"></param>
     /// <param name="content"></param>
     /// <param name="evtMsgs"></param>
+    /// <param name="notificationState"></param>
     /// <returns></returns>
     private PublishResult StrategyCanUnpublish(
         ICoreScope scope,
@@ -3428,7 +3426,7 @@ public class ContentService : RepositoryService, IContentService
         IDictionary<string, object?>? notificationState)
     {
         // raise Unpublishing notification
-        var notification = new ContentUnpublishingNotification(content, evtMsgs).WithState(notificationState);
+        ContentUnpublishingNotification notification = new ContentUnpublishingNotification(content, evtMsgs).WithState(notificationState);
         var notificationResult = scope.Notifications.PublishCancelable(notification);
 
         if (notificationResult)

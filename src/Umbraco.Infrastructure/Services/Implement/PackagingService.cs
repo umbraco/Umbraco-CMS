@@ -1,3 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using System.Runtime.Loader;
 using System.Xml.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -354,7 +357,15 @@ public class PackagingService : IPackagingService
 
             if (!string.IsNullOrEmpty(packageManifest.Version))
             {
+                // Always use package version from manifest
                 installedPackage.Version = packageManifest.Version;
+            }
+            else if (string.IsNullOrEmpty(installedPackage.Version) &&
+                string.IsNullOrEmpty(installedPackage.PackageId) is false &&
+                TryGetAssemblyInformationalVersion(installedPackage.PackageId, out string? version))
+            {
+                // Use version of the assembly with the same name as the package ID
+                installedPackage.Version = version;
             }
         }
 
@@ -413,5 +424,21 @@ public class PackagingService : IPackagingService
         }
 
         return packageFile.CreateReadStream();
+    }
+
+    private static bool TryGetAssemblyInformationalVersion(string name, [NotNullWhen(true)] out string? version)
+    {
+        foreach (Assembly assembly in AssemblyLoadContext.Default.Assemblies)
+        {
+            AssemblyName assemblyName = assembly.GetName();
+            if (string.Equals(assemblyName.Name, name, StringComparison.OrdinalIgnoreCase) &&
+                assembly.TryGetInformationalVersion(out version))
+            {
+                return true;
+            }
+        }
+
+        version = null;
+        return false;
     }
 }

@@ -7,7 +7,10 @@
     <AssemblyName>Umbraco.Cms.Api.Management</AssemblyName>
     <RootNamespace>Umbraco.Cms.Api.Management</RootNamespace>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <!-- TODO: Fix all warnings and remove this override -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="JsonPatch.Net" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
