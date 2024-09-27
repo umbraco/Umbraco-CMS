@@ -3,10 +3,8 @@ import { UMB_USER_ROOT_WORKSPACE_PATH } from '../../paths.js';
 import type { UmbUserWorkspaceContext } from './user-workspace.context.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from './user-workspace.context-token.js';
 import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
-import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 // import local components. Theses are not meant to be used outside of this component.
@@ -37,17 +35,6 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		this.observe(this.#workspaceContext.data, (user) => (this._user = user), 'umbUserObserver');
 	}
 
-	// TODO. find a way where we don't have to do this for all workspaces.
-	#onNameChange(event: UUIInputEvent) {
-		if (event instanceof UUIInputEvent) {
-			const target = event.composedPath()[0] as UUIInputElement;
-
-			if (typeof target?.value === 'string') {
-				this.#workspaceContext?.updateProperty('name', target.value);
-			}
-		}
-	}
-
 	override render() {
 		if (!this._user) return html`User not found`;
 
@@ -67,9 +54,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 
 	#renderHeader() {
 		return html`
-			<div id="header" slot="header">
-				<uui-input id="name" .value=${this._user?.name ?? ''} @input="${this.#onNameChange}" ${umbFocus()}></uui-input>
-			</div>
+			<umb-workspace-name slot="header"></umb-workspace-name>
 			<umb-workspace-entity-action-menu slot="action-menu"></umb-workspace-entity-action-menu>
 		`;
 	}
@@ -104,11 +89,6 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 			:host {
 				display: block;
 				height: 100%;
-			}
-
-			#header {
-				width: 100%;
-				display: grid;
 			}
 
 			#main {
