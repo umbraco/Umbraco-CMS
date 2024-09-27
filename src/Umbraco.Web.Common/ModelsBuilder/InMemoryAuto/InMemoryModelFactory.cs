@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
+using Umbraco.Cms.Infrastructure.ModelsBuilder.Building.Interfaces;
 using Umbraco.Extensions;
 using File = System.IO.File;
 
@@ -35,6 +36,8 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
         private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly ModelsGenerationError _errors;
         private readonly IPublishedValueFallback _publishedValueFallback;
+        private readonly IBuilderBase _builderBase;
+        private readonly ITextBuilder _textBuilder;
         private readonly InMemoryAssemblyLoadContextManager _loadContextManager;
         private readonly RuntimeCompilationCacheBuster _runtimeCompilationCacheBuster;
         private readonly Lazy<string> _pureLiveDirectory = null!;
@@ -56,6 +59,8 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
             IPublishedValueFallback publishedValueFallback,
+            IBuilderBase builderBase,
+            ITextBuilder textBuilder,
             InMemoryAssemblyLoadContextManager loadContextManager,
             RuntimeCompilationCacheBuster runtimeCompilationCacheBuster)
         {
@@ -71,7 +76,8 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             _errors = new ModelsGenerationError(config, _hostingEnvironment);
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
-
+            _builderBase = builderBase;
+            _textBuilder = textBuilder;
             if (!hostingEnvironment.IsHosted)
             {
                 return;
@@ -537,7 +543,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             _ver++;
             string mbAssemblyDirective = $@"[assembly:ModelsBuilderAssembly(IsInMemory = true, SourceHash = ""{currentHash}"")]
 [assembly:System.Reflection.AssemblyVersion(""0.0.0.{ver}"")]";
-            code = code.Replace("//ASSATTR", mbAssemblyDirective);
+            code = code.Replace(Core.Constants.ModelsBuilder.DefaultAssemblyMarker, mbAssemblyDirective);
             File.WriteAllText(modelsSrcFile, code);
 
             // generate proj, save
@@ -707,15 +713,13 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
                 Directory.CreateDirectory(_pureLiveDirectory.Value);
             }
 
-            foreach (var file in Directory.GetFiles(_pureLiveDirectory.Value, "*.generated.cs"))
+            foreach (var file in Directory.GetFiles(_pureLiveDirectory.Value, "*." + Core.Constants.ModelsBuilder.DefaultOutputFileExtension))
             {
                 File.Delete(file);
             }
 
-            var builder = new TextBuilder(_config, typeModels);
-
             var codeBuilder = new StringBuilder();
-            builder.Generate(codeBuilder, builder.GetModelsToGenerate());
+            _textBuilder.Generate(codeBuilder, typeModels, typeModels, true);
             var code = codeBuilder.ToString();
 
             return code;

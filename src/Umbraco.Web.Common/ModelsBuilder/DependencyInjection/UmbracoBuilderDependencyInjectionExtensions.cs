@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
+using Umbraco.Cms.Infrastructure.ModelsBuilder.Building.Interfaces;
 using Umbraco.Cms.Web.Common.ModelsBuilder;
 using Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
@@ -134,8 +135,12 @@ public static class UmbracoBuilderDependencyInjectionExtensions
         builder.Services.TryAddSingleton<IModelsBuilderDashboardProvider, NoopModelsBuilderDashboardProvider>();
 
         // Register required services for ModelsBuilderDashboardController
-        builder.Services.AddSingleton<IModelsGenerator, ModelsGenerator>();
-
+        builder.Services.AddTransient<IModelsGenerator, ModelsGenerator>();
+        builder.Services.AddTransient<IBuilderBase, BuilderBase>();
+        builder.Services.AddTransient<ITextBuilder, TextBuilder>();
+        builder.Services.AddTransient<ITextBuilderSubActions, TextBuilderSubActions>();
+        builder.Services.AddTransient<ITextBuilderActions, TextBuilderActions>();
+        
         // TODO: Remove in v13 - this is only here in case someone is already using this generator directly
         builder.Services.AddSingleton<ModelsGenerator>();
         builder.Services.AddSingleton<OutOfDateModelsStatus>();

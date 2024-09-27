@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
+using Umbraco.Cms.Infrastructure.ModelsBuilder.Building.Interfaces;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.ModelsBuilder;
@@ -73,7 +74,7 @@ public class BuildModelsBuilderController : ModelsBuilderControllerBase
                 return new ObjectResult(problemDetailsModel) { StatusCode = StatusCodes.Status428PreconditionRequired };
             }
 
-            _modelGenerator.GenerateModels();
+            _modelGenerator.GenerateModels(Core.Constants.ModelsBuilder.DefaultOutputFileExtension);
             _mbErrors.Clear();
         }
         catch (Exception e)
