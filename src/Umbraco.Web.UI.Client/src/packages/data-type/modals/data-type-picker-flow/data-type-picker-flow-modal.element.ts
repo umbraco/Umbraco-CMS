@@ -1,6 +1,8 @@
 import { UMB_DATATYPE_WORKSPACE_MODAL } from '../../workspace/data-type-workspace.modal-token.js';
-import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DATA_TYPE_ENTITY_TYPE, UMB_DATA_TYPE_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UmbDataTypeCollectionRepository } from '../../collection/index.js';
+import type { UmbDataTypeItemModel } from '../../repository/index.js';
+import { UMB_CREATE_DATA_TYPE_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL } from './data-type-picker-flow-data-type-picker-modal.token.js';
 import type {
 	UmbDataTypePickerFlowModalData,
@@ -16,7 +18,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
 import { UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/property-type';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbDataTypeItemModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
@@ -68,12 +69,14 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 
 	#createDataType(propertyEditorUiAlias: string) {
+		const createPath = UMB_CREATE_DATA_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({
+			parentEntityType: UMB_DATA_TYPE_ROOT_ENTITY_TYPE,
+			parentUnique: null,
+		});
+
 		// TODO: Could be nice with a more pretty way to prepend to the URL:
 		// Open create modal:
-		this.#createDataTypeModal.open(
-			{ uiAlias: propertyEditorUiAlias },
-			`create/parent/${UMB_DATA_TYPE_ENTITY_TYPE}/null`,
-		);
+		this.#createDataTypeModal.open({ uiAlias: propertyEditorUiAlias }, createPath);
 	}
 
 	async #init() {
