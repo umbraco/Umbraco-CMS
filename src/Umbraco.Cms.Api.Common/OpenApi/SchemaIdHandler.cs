@@ -6,8 +6,14 @@ namespace Umbraco.Cms.Api.Common.OpenApi;
 // NOTE: Left unsealed on purpose, so it is extendable.
 public class SchemaIdHandler : ISchemaIdHandler
 {
+    [Obsolete("Use CanHandle(Type type, string documentName) instead. Will be removed in v16.")]
     public virtual bool CanHandle(Type type)
         => type.Namespace?.StartsWith("Umbraco.Cms") is true;
+
+#pragma warning disable CS0618 // Type or member is obsolete
+    public virtual bool CanHandle(Type type, string documentName)
+        => CanHandle(type);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     public virtual string Handle(Type type)
         => UmbracoSchemaId(type);
