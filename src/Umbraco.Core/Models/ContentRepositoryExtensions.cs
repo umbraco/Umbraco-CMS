@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -289,21 +290,21 @@ public static class ContentRepositoryExtensions
         }
     }
 
+    [Obsolete("Please use the overload that accepts all parameters. Will be removed in V16.")]
+    public static bool PublishCulture(this IContent content, CultureImpact? impact)
+        => PublishCulture(content, impact, DateTime.Now, StaticServiceProvider.Instance.GetRequiredService<PropertyEditorCollection>());
+
     /// <summary>
     ///     Sets the publishing values for names and properties.
     /// </summary>
     /// <param name="content"></param>
     /// <param name="impact"></param>
+    /// <param name="publishTime"></param>
     /// <param name="propertyEditorCollection"></param>
     /// <returns>
     ///     A value indicating whether it was possible to publish the names and values for the specified
     ///     culture(s). The method may fail if required names are not set, but it does NOT validate property data
     /// </returns>
-    [Obsolete("TODO: KJA")]
-    public static bool PublishCulture(this IContent content, CultureImpact? impact)
-    {
-        return PublishCulture(content, impact, DateTime.Now, StaticServiceProvider.Instance.GetService<PropertyEditorCollection>());
-    }
     public static bool PublishCulture(this IContent content, CultureImpact? impact, DateTime publishTime, PropertyEditorCollection propertyEditorCollection)
     {
         if (impact == null)
