@@ -12,7 +12,7 @@ type ExtensionConfig = {
 	alias: string;
 	label: string;
 	icon?: string;
-	category: string;
+	group: string;
 };
 
 type ExtensionCategoryItem = {
@@ -61,7 +61,7 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 					alias: ext.alias,
 					label: ext.meta.label,
 					icon: ext.meta.icon,
-					category: '',
+					group: ext.meta.group,
 				};
 			});
 			this.#setupExtensionCategories();
@@ -77,7 +77,7 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 		});
 
 		const grouped = withSelectedProperty.reduce((acc: any, item) => {
-			const group = item.category || 'Uncategorized'; // Assign to "Uncategorized" if no group
+			const group = item.group || 'Uncategorized'; // Assign to "Uncategorized" if no group
 			if (!acc[group]) {
 				acc[group] = [];
 			}
