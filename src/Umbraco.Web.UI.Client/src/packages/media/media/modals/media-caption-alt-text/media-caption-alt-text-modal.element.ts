@@ -1,11 +1,10 @@
+import { UmbMediaDetailRepository } from '../../repository/index.js';
 import type {
 	UmbMediaCaptionAltTextModalData,
 	UmbMediaCaptionAltTextModalValue,
 } from './media-caption-alt-text-modal.token.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import '@umbraco-cms/backoffice/block-type';
-import { UmbMediaDetailRepository } from '@umbraco-cms/backoffice/media';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-media-caption-alt-text-modal')
@@ -27,7 +26,7 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 		const { data } = await this.#mediaDetailRepository.requestByUnique(this.#mediaUnique);
 		if (!data) return;
 
-		this.value = { ...this.value, altText: this.value.altText ?? data.variants[0].name, url: data.urls[0]?.url ?? '' };
+		this.value = { ...this.value, altText: this.value?.altText ?? data.variants[0].name, url: data.urls[0]?.url ?? '' };
 	}
 
 	override render() {
