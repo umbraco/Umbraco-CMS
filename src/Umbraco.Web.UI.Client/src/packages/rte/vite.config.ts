@@ -11,6 +11,7 @@ export default defineConfig({
 	...getDefaultConfig({
 		dist,
 		entry: {
+			'tiny-mce/index': 'tiny-mce/index.ts',
 			'tiptap/index': 'tiptap/index.ts',
 			manifests: 'manifests.ts',
 			'umbraco-package': 'umbraco-package.ts',
