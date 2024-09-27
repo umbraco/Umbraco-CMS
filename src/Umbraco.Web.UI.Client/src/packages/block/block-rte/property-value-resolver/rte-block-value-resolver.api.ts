@@ -32,7 +32,7 @@ export class UmbRteBlockValueResolver extends UmbBlockValueResolver<UmbPropertyE
 				...property,
 				value: {
 					...property.value,
-					value: await this._processVariantBlockData(property.value.blocks, variantsCallback),
+					blocks: await this._processVariantBlockData(property.value.blocks, variantsCallback),
 				},
 			};
 		}
