@@ -664,6 +664,8 @@ export default {
 		a11yCreateItem: 'Create item',
 		a11yEdit: 'Edit',
 		a11yName: 'Name',
+		rteParagraph: 'Write something amazing...',
+		rteHeading: "What's the title?",
 	},
 	editcontenttype: {
 		createListView: 'Create custom list view',

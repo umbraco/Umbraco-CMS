@@ -10,6 +10,7 @@ import {
 	HardBreak,
 	History,
 	Paragraph,
+	Placeholder,
 	Text,
 } from '@umbraco-cms/backoffice/external/tiptap';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -24,7 +25,24 @@ const elementName = 'umb-input-tiptap';
 
 @customElement(elementName)
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
-	readonly #requiredExtensions = [Document, Dropcursor, Gapcursor, HardBreak, History, Paragraph, Text];
+	readonly #requiredExtensions = [
+		Document,
+		Dropcursor,
+		Gapcursor,
+		HardBreak,
+		History,
+		Paragraph,
+		Placeholder.configure({
+			placeholder: ({ node }) => {
+				if (node.type.name === 'heading') {
+					return this.localize.term('placeholders_rteHeading');
+				}
+
+				return this.localize.term('placeholders_rteParagraph');
+			},
+		}),
+		Text,
+	];
 
 	@state()
 	private _extensions: Array<UmbTiptapExtensionApi> = [];
@@ -148,6 +166,15 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				outline: none;
 				white-space: pre-wrap;
 				min-width: 0;
+			}
+
+			.tiptap .is-editor-empty:first-child::before {
+				color: var(--uui-color-text);
+				opacity: 0.55;
+				content: attr(data-placeholder);
+				float: left;
+				height: 0;
+				pointer-events: none;
 			}
 
 			#editor {

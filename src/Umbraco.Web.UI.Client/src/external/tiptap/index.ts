@@ -6,6 +6,7 @@ export { Gapcursor } from '@tiptap/extension-gapcursor';
 export { HardBreak } from '@tiptap/extension-hard-break';
 export { History } from '@tiptap/extension-history';
 export { Paragraph } from '@tiptap/extension-paragraph';
+export { Placeholder } from '@tiptap/extension-placeholder';
 export { Text } from '@tiptap/extension-text';
 
 // OPTIONAL EXTENSIONS
