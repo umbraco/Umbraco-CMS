@@ -89,7 +89,7 @@ export class UmbBlockElementManager extends UmbControllerBase {
 	}
 
 	// We will implement propertyAlias in the future, when implementing Varying Blocks. [NL]
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 	async propertyVariantId(propertyAlias: string) {
 		return mergeObservables(
 			[await this.structure.propertyStructureByAlias(propertyAlias), this.variantId],

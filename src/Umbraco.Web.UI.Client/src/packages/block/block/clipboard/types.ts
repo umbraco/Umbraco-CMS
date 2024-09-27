@@ -5,9 +5,7 @@
  */
 //export type UmbBlockClipboardEntry = UmbClipboardEntry<'block', UmbBlockClipboardEntryMeta, any>;
 
-interface UmbBlockClipboardEntryMeta {
-	/**
-	 * The aliases of the content-types of these entries.
-	 */
+/*interface UmbBlockClipboardEntryMeta {
 	contentTypeAliases: Array<string>;
 }
+*/

@@ -1,5 +1,5 @@
-import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
 import type { UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION, UMB_WORKSPACE_HAS_COLLECTION_CONDITION } from './const.js';
+import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
 
 export type WorkspaceAliasConditionConfig = UmbConditionConfigBase<'Umb.Condition.WorkspaceAlias'> & {
 	/**
