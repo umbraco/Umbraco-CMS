@@ -7,7 +7,13 @@ import {
 	UmbWorkspaceIsNewRedirectController,
 	type ManifestWorkspace,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbClassState, UmbObjectState, UmbStringState, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import {
+	UmbBooleanState,
+	UmbClassState,
+	UmbObjectState,
+	UmbStringState,
+	observeMultiple,
+} from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_CONTEXT, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { decodeFilePath, UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
@@ -60,6 +66,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	readonly variantId = this.#variantId.asObservable();
 
+	#exposed = new UmbBooleanState<undefined>(undefined);
+	readonly exposed = this.#exposed.asObservable();
+
 	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
 
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
@@ -105,6 +114,22 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					this.#variantId.setValue(variantId);
 				},
 				'observeBlockType',
+			);
+
+			this.observe(
+				observeMultiple([this.variantId, this.contentKey]),
+				([variantId, contentKey]) => {
+					if (!variantId || !contentKey) return;
+
+					this.observe(
+						manager.hasExposeOf(contentKey, variantId),
+						(exposed) => {
+							this.#exposed.setValue(exposed);
+						},
+						'observeHasExpose',
+					);
+				},
+				'observeVariantIdContentKey',
 			);
 		}).asPromise();
 

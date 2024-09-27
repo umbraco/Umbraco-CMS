@@ -5,11 +5,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspaceAction',
 		kind: 'default',
-		alias: 'Umb.WorkspaceAction.Block.Save',
-		name: 'Save Block Type Workspace Action',
+		alias: 'Umb.WorkspaceAction.Block.SubmitCreate',
+		name: 'Submit Create Block Workspace Action',
 		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: '#general_submit',
+			label: '#general_create',
 			look: 'primary',
 			color: 'positive',
 		},
@@ -17,6 +17,31 @@ export const manifests: Array<UmbExtensionManifest> = [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
 				oneOf: [UMB_BLOCK_WORKSPACE_ALIAS],
+			},
+			{
+				alias: 'Umb.Condition.BlockWorkspaceIsExposed',
+				match: false,
+			},
+		],
+	},
+	{
+		type: 'workspaceAction',
+		kind: 'default',
+		alias: 'Umb.WorkspaceAction.Block.SubmitUpdate',
+		name: 'Submit Update Block Workspace Action',
+		api: UmbSubmitWorkspaceAction,
+		meta: {
+			label: '#general_update',
+			look: 'primary',
+			color: 'positive',
+		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				oneOf: [UMB_BLOCK_WORKSPACE_ALIAS],
+			},
+			{
+				alias: 'Umb.Condition.BlockWorkspaceIsExposed',
 			},
 		],
 	},
