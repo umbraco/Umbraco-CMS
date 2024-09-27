@@ -26,8 +26,12 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	implements UmbPropertyEditorUiElement
 {
 	@property({ attribute: false })
-	set value(value: string[][][]) {
-		// TODO: Make sure that value has at least one row and one group
+	set value(value: string[][][] | undefined) {
+		if (!value) {
+			this.#value = [[[]]];
+			return;
+		}
+
 		// TODO: This can be optimized with cashing;
 		this.#value = value.map((rows) => rows.map((groups) => [...groups]));
 	}

@@ -14,17 +14,17 @@ export const manifests: Array<ManifestTypes> = [
 			settings: {
 				properties: [
 					{
-						alias: 'extensions',
-						label: 'Extensions',
-						description: 'Extensions to enable',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Tiptap.ExtensionsConfiguration',
-						weight: 5,
-					},
-					{
 						alias: 'toolbar',
 						label: 'Toolbar',
 						description: 'Pick the toolbar items that should be available when editing',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Tiptap.ToolbarConfiguration',
+						weight: 5,
+					},
+					{
+						alias: 'extensions',
+						label: 'Extensions',
+						description: 'Extensions to enable',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Tiptap.ExtensionsConfiguration',
 						weight: 10,
 					},
 					{

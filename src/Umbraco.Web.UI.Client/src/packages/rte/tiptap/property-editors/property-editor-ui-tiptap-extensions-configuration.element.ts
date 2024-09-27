@@ -33,15 +33,14 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 	implements UmbPropertyEditorUiElement
 {
 	@property({ attribute: false })
-	set value(value: string[]) {
-		if (!value) value = [];
+	set value(value: string[] | undefined) {
 		this.#value = value;
 	}
-	get value(): string[] {
+	get value(): string[] | undefined {
 		return this.#value;
 	}
 
-	#value: string[] = [];
+	#value?: string[] = [];
 
 	@property({ attribute: false })
 	config?: UmbPropertyEditorConfigCollection;
@@ -64,15 +63,23 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 					group: ext.meta.group,
 				};
 			});
+
+			if (!this.value) {
+				// The default value is all extensions enabled
+				this.#value = this._extensionConfigs.map((ext) => ext.alias);
+				this.dispatchEvent(new UmbPropertyValueChangeEvent());
+			}
+
 			this.#setupExtensionCategories();
 		});
 	}
 
 	#setupExtensionCategories() {
+		const useDefault = !this.value; // The default value is all extensions enabled
 		const withSelectedProperty = this._extensionConfigs.map((extensionConfig) => {
 			return {
 				...extensionConfig,
-				selected: this.value.includes(extensionConfig.alias),
+				selected: useDefault ? true : this.value!.includes(extensionConfig.alias),
 			};
 		});
 
@@ -92,6 +99,10 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 
 	#onExtensionClick(item: ExtensionCategoryItem) {
 		item.selected = !item.selected;
+
+		if (!this.value) {
+			this.value = [];
+		}
 
 		if (item.selected) {
 			this.#value = [...this.value, item.alias];
