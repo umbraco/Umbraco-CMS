@@ -225,7 +225,7 @@ public class DocumentUrlService : IDocumentUrlService
         var toDelete = new List<Guid>();
         var allCultures = documents.SelectMany(x => x.AvailableCultures ).Distinct();
 
-        var languages = await _languageService.GetMultipleAsync(allCultures);
+        var languages = await _languageService.GetAllAsync();
         var languageDictionary = languages.ToDictionary(x=>x.IsoCode);
 
         foreach (IContent document in documents)
@@ -235,20 +235,9 @@ public class DocumentUrlService : IDocumentUrlService
                 _logger.LogTrace("Rebuilding urls for document with key {DocumentKey}", document.Key);
             }
 
-            if (document.AvailableCultures.Any())
+            foreach ((string culture, ILanguage language) in languageDictionary)
             {
-                foreach (var culture in document.AvailableCultures)
-                {
-                    var language = languageDictionary[culture];
-
-                    HandleCaching(_coreScopeProvider.Context!, document, culture, language, toDelete, toSave);
-                }
-            }
-            else
-            {
-                var language = await _languageService.GetDefaultLanguageAsync();
-
-                HandleCaching(_coreScopeProvider.Context!, document, null, language!, toDelete, toSave);
+                HandleCaching(_coreScopeProvider.Context!, document, document.ContentType.VariesByCulture() ? culture : null, language, toDelete, toSave);
             }
         }
 
