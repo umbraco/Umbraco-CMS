@@ -40,6 +40,16 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Stylesheet Tree Item',
 		forEntityTypes: [UMB_STYLESHEET_ROOT_ENTITY_TYPE, UMB_STYLESHEET_ENTITY_TYPE, UMB_STYLESHEET_FOLDER_ENTITY_TYPE],
 	},
+	{
+		type: 'workspace',
+		kind: 'default',
+		alias: 'Umb.Workspace.Stylesheet.Root',
+		name: 'Stylesheet Root Workspace',
+		meta: {
+			entityType: UMB_STYLESHEET_ROOT_ENTITY_TYPE,
+			headline: '#treeHeaders_stylesheets',
+		},
+	},
 	...folderManifests,
 	...reloadTreeItemChildrenManifest,
 ];

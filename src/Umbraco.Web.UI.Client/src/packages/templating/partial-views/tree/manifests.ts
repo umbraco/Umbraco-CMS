@@ -43,6 +43,16 @@ export const manifests: Array<UmbExtensionManifest> = [
 			UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
 		],
 	},
+	{
+		type: 'workspace',
+		kind: 'default',
+		alias: 'Umb.Workspace.PartialView.Root',
+		name: 'Partial View Root Workspace',
+		meta: {
+			entityType: UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
+			headline: '#treeHeaders_partialViews',
+		},
+	},
 	...folderManifests,
 	...reloadTreeItemChildrenManifest,
 ];
