@@ -1,4 +1,4 @@
-import type { ManifestTiptapExtensionButtonKind } from '../../extensions/tiptap-extension.js';
+import type { ManifestTiptapToolbarExtensionButtonKind } from '../../extensions/index.js';
 import type { UmbTiptapToolbarElementApi } from '../../extensions/types.js';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import { customElement, html, ifDefined, state, when } from '@umbraco-cms/backoffice/external/lit';
@@ -10,7 +10,7 @@ const elementName = 'umb-tiptap-toolbar-button';
 export class UmbTiptapToolbarButtonElement extends UmbLitElement {
 	public api?: UmbTiptapToolbarElementApi;
 	public editor?: Editor;
-	public manifest?: ManifestTiptapExtensionButtonKind;
+	public manifest?: ManifestTiptapToolbarExtensionButtonKind;
 
 	@state()
 	protected isActive = false;
