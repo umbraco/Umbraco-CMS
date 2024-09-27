@@ -501,11 +501,12 @@ public class DocumentUrlService : IDocumentUrlService
             return domains.ToDictionary(x => x.LanguageIsoCode!);
         });
 
-        var urlSegments = new List<string>();
         foreach (var culture in cultures)
         {
+           var urlSegments = new List<string>();
            IDomain? foundDomain = null;
 
+           var hasUrlInCulture = true;
            foreach (Guid ancestorOrSelfKey in ancestorsOrSelfKeysArray)
            {
                 if (ancestorOrSelfKeyToDomains.TryGetValue(ancestorOrSelfKey, out Task<Dictionary<string, IDomain>>? domainDictionaryTask))
@@ -522,12 +523,16 @@ public class DocumentUrlService : IDocumentUrlService
                 {
                     urlSegments.Add(publishedDocumentUrlSegment.UrlSegment);
                 }
+                else
+                {
+                    hasUrlInCulture = false;
+                }
             }
 
             var isRootFirstItem = GetTopMostRootKey() == ancestorsOrSelfKeysArray.Last();
             result.Add(new UrlInfo(
                 text: GetFullUrl(isRootFirstItem, urlSegments, foundDomain),
-                isUrl: true,
+                isUrl: hasUrlInCulture,
                 culture: culture
             ));
 
@@ -543,7 +548,7 @@ public class DocumentUrlService : IDocumentUrlService
 
         if (foundDomain is not null)
         {
-            return foundDomain.DomainName + string.Join('/', urlSegments);
+            return foundDomain.DomainName.EnsureEndsWith("/") + string.Join('/', urlSegments);
         }
 
         return '/' + string.Join('/', urlSegments.Skip(_globalSettings.HideTopLevelNodeFromPath && isRootFirstItem ? 1 : 0));
