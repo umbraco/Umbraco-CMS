@@ -28,6 +28,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	@property({ attribute: false })
 	set value(value: string[][][] | undefined) {
 		if (!value) {
+			this.#useDefault = true;
 			this.#value = [[[]]];
 			return;
 		}
@@ -40,6 +41,8 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		// TODO: This can be optimized with cashing;
 		return this.#value.map((rows) => rows.map((groups) => [...groups]));
 	}
+
+	#useDefault = false;
 
 	#value: string[][][] = [[[]]];
 
@@ -56,6 +59,9 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 
 		this.observe(umbExtensionsRegistry.byType('tiptapToolbarExtension'), (extensions) => {
 			this._extensions = extensions.map((ext) => {
+				if (this.#useDefault && ext.meta.isDefault) {
+					this.#value[0][0].push(ext.alias);
+				}
 				return {
 					alias: ext.alias,
 					label: ext.meta.label,
@@ -63,6 +69,10 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 					category: '',
 				};
 			});
+
+			if (this.#useDefault) {
+				this.dispatchEvent(new UmbPropertyValueChangeEvent());
+			}
 		});
 	}
 
@@ -167,6 +177,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		const extension = this._extensions.find((ext) => ext.alias === alias);
 		if (!extension) return nothing;
 		return html`<div
+			title=${extension.label}
 			class="item"
 			draggable="true"
 			@dragend=${this.#onDragEnd}
@@ -234,6 +245,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				this._extensions.filter((ext) => !this.#value.flat(2).includes(ext.alias)),
 				(extension) => html`
 					<div
+						title=${extension.label}
 						class="item"
 						draggable="true"
 						@dragend=${this.#onDragEnd}
@@ -306,6 +318,10 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 			.row:hover .remove-row-button:not(.hidden),
 			.group:hover .remove-group-button:not(.hidden) {
 				display: flex;
+			}
+			umb-icon {
+				/* Prevents titles from bugging out */
+				pointer-events: none;
 			}
 		`,
 	];

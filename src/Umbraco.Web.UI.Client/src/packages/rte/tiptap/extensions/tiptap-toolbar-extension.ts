@@ -13,6 +13,7 @@ export interface MetaTiptapToolbarExtension {
 	alias: string;
 	icon: string;
 	label: string;
+	isDefault?: boolean;
 }
 
 export interface ManifestTiptapToolbarExtensionButtonKind<

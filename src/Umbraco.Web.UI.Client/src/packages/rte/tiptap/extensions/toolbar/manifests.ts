@@ -15,6 +15,7 @@ export const manifests: Array<ManifestTiptapToolbarExtension | ManifestTiptapToo
 			alias: 'blockquote',
 			icon: 'icon-blockquote',
 			label: 'Blockquote',
+			isDefault: true,
 		},
 	},
 	{
@@ -28,6 +29,7 @@ export const manifests: Array<ManifestTiptapToolbarExtension | ManifestTiptapToo
 			alias: 'bold',
 			icon: 'icon-bold',
 			label: 'Bold',
+			isDefault: true,
 		},
 	},
 	{
@@ -41,6 +43,7 @@ export const manifests: Array<ManifestTiptapToolbarExtension | ManifestTiptapToo
 			alias: 'codeBlock',
 			icon: 'icon-code',
 			label: 'Code Block',
+			isDefault: true,
 		},
 	},
 	{
@@ -54,6 +57,7 @@ export const manifests: Array<ManifestTiptapToolbarExtension | ManifestTiptapToo
 			alias: 'bulletList',
 			icon: 'icon-bulleted-list',
 			label: 'Bullet List',
+			isDefault: true,
 		},
 	},
 	{
@@ -67,6 +71,7 @@ export const manifests: Array<ManifestTiptapToolbarExtension | ManifestTiptapToo
 			alias: 'orderedList',
 			icon: 'icon-ordered-list',
 			label: 'Ordered List',
+			isDefault: true,
 		},
 	},
 	{
@@ -80,6 +85,7 @@ export const manifests: Array<ManifestTiptapToolbarExtension | ManifestTiptapToo
 			alias: 'strike',
 			icon: 'icon-strikethrough',
 			label: 'Strike',
+			isDefault: true,
 		},
 	},
 	{
@@ -106,6 +112,7 @@ export const manifests: Array<ManifestTiptapToolbarExtension | ManifestTiptapToo
 			alias: 'heading1',
 			icon: 'icon-heading-1',
 			label: 'Heading 1',
+			isDefault: true,
 		},
 	},
 	{
@@ -119,6 +126,7 @@ export const manifests: Array<ManifestTiptapToolbarExtension | ManifestTiptapToo
 			alias: 'heading2',
 			icon: 'icon-heading-2',
 			label: 'Heading 2',
+			isDefault: true,
 		},
 	},
 	{
@@ -132,6 +140,7 @@ export const manifests: Array<ManifestTiptapToolbarExtension | ManifestTiptapToo
 			alias: 'heading3',
 			icon: 'icon-heading-3',
 			label: 'Heading 3',
+			isDefault: true,
 		},
 	},
 	{
@@ -158,6 +167,7 @@ export const manifests: Array<ManifestTiptapToolbarExtension | ManifestTiptapToo
 			alias: 'italic',
 			icon: 'icon-italic',
 			label: 'Italic',
+			isDefault: true,
 		},
 	},
 	{
@@ -171,6 +181,7 @@ export const manifests: Array<ManifestTiptapToolbarExtension | ManifestTiptapToo
 			alias: 'text-align-center',
 			icon: 'icon-text-align-center',
 			label: 'Text Align Center',
+			isDefault: true,
 		},
 	},
 	{
@@ -197,6 +208,7 @@ export const manifests: Array<ManifestTiptapToolbarExtension | ManifestTiptapToo
 			alias: 'text-align-left',
 			icon: 'icon-text-align-left',
 			label: 'Text Align Left',
+			isDefault: true,
 		},
 	},
 	{
@@ -210,6 +222,7 @@ export const manifests: Array<ManifestTiptapToolbarExtension | ManifestTiptapToo
 			alias: 'text-align-right',
 			icon: 'icon-text-align-right',
 			label: 'Text Align Right',
+			isDefault: true,
 		},
 	},
 	{
@@ -223,6 +236,7 @@ export const manifests: Array<ManifestTiptapToolbarExtension | ManifestTiptapToo
 			alias: 'underline',
 			icon: 'icon-underline',
 			label: 'Underline',
+			isDefault: true,
 		},
 	},
 	{
@@ -237,6 +251,7 @@ export const manifests: Array<ManifestTiptapToolbarExtension | ManifestTiptapToo
 			alias: 'unlink',
 			icon: 'icon-unlink',
 			label: 'Unlink',
+			isDefault: true,
 		},
 	},
 ];
