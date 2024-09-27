@@ -354,11 +354,9 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentNullException(nameof(parent));
         }
 
-        IContentType contentType = GetContentType(contentTypeAlias);
-        if (contentType == null)
-        {
-            throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias)); // causes rollback
-        }
+        IContentType contentType = GetContentType(contentTypeAlias)
+            // causes rollback
+            ?? throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
 
         var content = new Content(name, parent, contentType, userId);
 
@@ -382,11 +380,11 @@ public class ContentService : RepositoryService, IContentService
             // locking the content tree secures content types too
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            IContentType contentType = GetContentType(contentTypeAlias); // + locks
-            if (contentType == null)
-            {
-                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias)); // causes rollback
-            }
+            IContentType contentType = GetContentType(contentTypeAlias)
+                // + locks
+                ??
+                // causes rollback
+                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
 
             IContent? parent = parentId > 0 ? GetById(parentId) : null; // + locks
             if (parentId > 0 && parent == null)
@@ -428,11 +426,11 @@ public class ContentService : RepositoryService, IContentService
             // locking the content tree secures content types too
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            IContentType contentType = GetContentType(contentTypeAlias); // + locks
-            if (contentType == null)
-            {
-                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias)); // causes rollback
-            }
+            IContentType contentType = GetContentType(contentTypeAlias)
+            // + locks
+                ??
+                // causes rollback
+                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
 
             var content = new Content(name, parent, contentType, userId);
 
@@ -1997,7 +1995,7 @@ public class ContentService : RepositoryService, IContentService
     {
         // note: EditedValue and PublishedValue are objects here, so it is important to .Equals()
         // and not to == them, else we would be comparing references, and that is a bad thing
-        cultures = cultures ?? Array.Empty<string>();
+        cultures ??= Array.Empty<string>();
 
         if (content.ContentType.VariesByCulture() is false && cultures.Length == 0)
         {
@@ -3036,6 +3034,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="evtMsgs"></param>
     /// <param name="culturesPublishing"></param>
     /// <param name="allLangs"></param>
+    /// <param name="notificationState"></param>
     /// <returns></returns>
     private PublishResult StrategyCanPublish(
         ICoreScope scope,
@@ -3466,13 +3465,11 @@ public class ContentService : RepositoryService, IContentService
         scope.ReadLock(Constants.Locks.ContentTypes);
 
         IQuery<IContentType> query = Query<IContentType>().Where(x => x.Alias == contentTypeAlias);
-        IContentType? contentType = _contentTypeRepository.Get(query).FirstOrDefault();
-
-        if (contentType == null)
-        {
-            throw new Exception(
-                $"No ContentType matching the passed in Alias: '{contentTypeAlias}' was found"); // causes rollback
-        }
+        IContentType? contentType = _contentTypeRepository.Get(query).FirstOrDefault()
+            ??
+        // causes rollback
+            throw new Exception($"No ContentType matching the passed in Alias: '{contentTypeAlias}'" +
+            $" was found");
 
         return contentType;
     }

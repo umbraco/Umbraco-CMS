@@ -360,7 +360,7 @@ public class StringExtensionsTests
         TryIsFullPath(@"\dir", false); // An "absolute", but not "full" path
 
         // Invalid on both Windows and Linux
-        TryIsFullPath("", false, false);
+        TryIsFullPath(string.Empty, false, false);
         TryIsFullPath("   ", false, false); // technically, a valid filename on Linux
     }
 

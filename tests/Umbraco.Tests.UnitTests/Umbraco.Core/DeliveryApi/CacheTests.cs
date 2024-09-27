@@ -28,8 +28,7 @@ public class CacheTests : DeliveryApiTests
             It.IsAny<PropertyCacheLevel>(),
             It.IsAny<object?>(),
             It.IsAny<bool>(),
-            It.IsAny<bool>())
-        ).Returns(() => $"Delivery API value: {++invocationCount}");
+            It.IsAny<bool>())).Returns(() => $"Delivery API value: {++invocationCount}");
         propertyValueConverter.Setup(p => p.IsConverter(It.IsAny<IPublishedPropertyType>())).Returns(true);
         propertyValueConverter.Setup(p => p.GetPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(cacheLevel);
         propertyValueConverter.Setup(p => p.GetDeliveryApiPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(cacheLevel);
@@ -41,11 +40,13 @@ public class CacheTests : DeliveryApiTests
 
         var prop1 = new PublishedElementPropertyBase(propertyType, element.Object, false, cacheLevel);
 
-        var results = new List<string>();
-        results.Add(prop1.GetDeliveryApiValue(expanding)!.ToString());
-        results.Add(prop1.GetDeliveryApiValue(expanding)!.ToString());
-        results.Add(prop1.GetDeliveryApiValue(expanding)!.ToString());
-        results.Add(prop1.GetDeliveryApiValue(expanding)!.ToString());
+        var results = new List<string>
+        {
+            prop1.GetDeliveryApiValue(expanding)!.ToString(),
+            prop1.GetDeliveryApiValue(expanding)!.ToString(),
+            prop1.GetDeliveryApiValue(expanding)!.ToString(),
+            prop1.GetDeliveryApiValue(expanding)!.ToString()
+        };
 
         Assert.AreEqual("Delivery API value: 1", results.First());
         Assert.AreEqual(expectedConverterHits, results.Distinct().Count());

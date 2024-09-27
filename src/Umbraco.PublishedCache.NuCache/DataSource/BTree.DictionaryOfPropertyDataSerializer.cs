@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 internal class DictionaryOfPropertyDataSerializer : SerializerBase, ISerializer<IDictionary<string, PropertyData[]>>,
     IDictionaryOfPropertyDataSerializer
 {
-    private static readonly PropertyData[] Empty = Array.Empty<PropertyData>();
+    private static readonly PropertyData[] _empty = Array.Empty<PropertyData>();
 
     public IDictionary<string, PropertyData[]> ReadFrom(Stream stream)
     {
@@ -26,7 +26,7 @@ internal class DictionaryOfPropertyDataSerializer : SerializerBase, ISerializer<
             var vcount = PrimitiveSerializer.Int32.ReadFrom(stream);
             if (vcount == 0)
             {
-                dict[key] = Empty;
+                dict[key] = _empty;
                 continue;
             }
 

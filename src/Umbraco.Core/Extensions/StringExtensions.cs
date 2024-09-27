@@ -83,11 +83,11 @@ public static class StringExtensions
             return fileName;
         }
 
-        var spanFileName = fileName.AsSpan();
+        ReadOnlySpan<char> spanFileName = fileName.AsSpan();
         var lastIndex = spanFileName.LastIndexOf('.');
         if (lastIndex > 0)
         {
-            var ext = spanFileName[lastIndex..];
+            ReadOnlySpan<char> ext = spanFileName[lastIndex..];
 
             // file extensions cannot contain whitespace
             if (ext.Contains(' '))
@@ -377,7 +377,7 @@ public static class StringExtensions
 
         while (value.StartsWith(forRemoving, StringComparison.InvariantCultureIgnoreCase))
         {
-            value = value.Substring(forRemoving.Length);
+            value = value[forRemoving.Length..];
         }
 
         return value;
@@ -497,7 +497,7 @@ public static class StringExtensions
 
         var convertToHex = input.ConvertToHex();
         var hexLength = convertToHex.Length < 32 ? convertToHex.Length : 32;
-        var hex = convertToHex.Substring(0, hexLength).PadLeft(32, '0');
+        var hex = convertToHex[..hexLength].PadLeft(32, '0');
         Guid output = Guid.Empty;
         return Guid.TryParse(hex, out output) ? output : Guid.Empty;
     }
@@ -528,8 +528,8 @@ public static class StringExtensions
         var strValue = string.Empty;
         while (hexValue.Length > 0)
         {
-            strValue += Convert.ToChar(Convert.ToUInt32(hexValue.Substring(0, 2), 16)).ToString();
-            hexValue = hexValue.Substring(2, hexValue.Length - 2);
+            strValue += Convert.ToChar(Convert.ToUInt32(hexValue[..2], 16)).ToString();
+            hexValue = hexValue[2..];
         }
 
         return strValue;
@@ -871,7 +871,7 @@ public static class StringExtensions
             return truncatedString;
         }
 
-        truncatedString = text.Substring(0, strLength);
+        truncatedString = text[..strLength];
         truncatedString = truncatedString.TrimEnd();
         truncatedString += suffix;
 
@@ -914,7 +914,7 @@ public static class StringExtensions
     public static string ToFirstUpper(this string input) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input.Substring(0, 1).ToUpper() + input.Substring(1);
+            : input[..1].ToUpper() + input[1..];
 
     /// <summary>
     ///     Returns a copy of the string with the first character converted to lowercase.
@@ -924,7 +924,7 @@ public static class StringExtensions
     public static string ToFirstLower(this string input) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input.Substring(0, 1).ToLower() + input.Substring(1);
+            : input[..1].ToLower() + input[1..];
 
     /// <summary>
     ///     Returns a copy of the string with the first character converted to uppercase using the casing rules of the
@@ -936,7 +936,7 @@ public static class StringExtensions
     public static string ToFirstUpper(this string input, CultureInfo culture) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input.Substring(0, 1).ToUpper(culture) + input.Substring(1);
+            : input[..1].ToUpper(culture) + input[1..];
 
     /// <summary>
     ///     Returns a copy of the string with the first character converted to lowercase using the casing rules of the
@@ -948,7 +948,7 @@ public static class StringExtensions
     public static string ToFirstLower(this string input, CultureInfo culture) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input.Substring(0, 1).ToLower(culture) + input.Substring(1);
+            : input[..1].ToLower(culture) + input[1..];
 
     /// <summary>
     ///     Returns a copy of the string with the first character converted to uppercase using the casing rules of the
@@ -959,7 +959,7 @@ public static class StringExtensions
     public static string ToFirstUpperInvariant(this string input) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input.Substring(0, 1).ToUpperInvariant() + input.Substring(1);
+            : input[..1].ToUpperInvariant() + input[1..];
 
     /// <summary>
     ///     Returns a copy of the string with the first character converted to lowercase using the casing rules of the
@@ -970,7 +970,7 @@ public static class StringExtensions
     public static string ToFirstLowerInvariant(this string input) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input.Substring(0, 1).ToLowerInvariant() + input.Substring(1);
+            : input[..1].ToLowerInvariant() + input[1..];
 
     /// <summary>
     ///     Returns a new string in which all occurrences of specified strings are replaced by other specified strings.
@@ -1355,7 +1355,7 @@ public static class StringExtensions
             return a;
         }
 
-        return char.ToLowerInvariant(a[0]) + a.Substring(1);
+        return char.ToLowerInvariant(a[0]) + a[1..];
     }
 
     /// <summary>

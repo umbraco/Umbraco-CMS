@@ -4,16 +4,13 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 
 internal class ContentNodeKitSerializer : ISerializer<ContentNodeKit>
 {
-    private static readonly ContentDataSerializer S_defaultDataSerializer = new();
+    private static readonly ContentDataSerializer _defaultDataSerializer = new();
     private readonly ContentDataSerializer? _contentDataSerializer;
 
     public ContentNodeKitSerializer(ContentDataSerializer? contentDataSerializer = null)
     {
         _contentDataSerializer = contentDataSerializer;
-        if (_contentDataSerializer == null)
-        {
-            _contentDataSerializer = S_defaultDataSerializer;
-        }
+        _contentDataSerializer ??= _defaultDataSerializer;
     }
 
     // static readonly ListOfIntSerializer ChildContentIdsSerializer = new ListOfIntSerializer();

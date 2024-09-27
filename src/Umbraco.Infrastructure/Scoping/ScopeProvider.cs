@@ -159,11 +159,8 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         /// <inheritdoc />
         public IScope DetachScope()
         {
-            Scope? ambientScope = AmbientScope;
-            if (ambientScope == null)
-            {
-                throw new InvalidOperationException("There is no ambient scope.");
-            }
+            Scope? ambientScope = AmbientScope
+                ?? throw new InvalidOperationException("There is no ambient scope.");
 
             if (ambientScope.Detachable == false)
             {
@@ -389,7 +386,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false) =>
-            (Cms.Core.Scoping.IScope) CreateScope(
+            (Cms.Core.Scoping.IScope)CreateScope(
                 isolationLevel,
                 repositoryCacheMode,
                 eventDispatcher,
@@ -399,9 +396,12 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 autoComplete);
 
         /// <inheritdoc />
-        Core.Scoping.IScope Core.Scoping.IScopeProvider.CreateDetachedScope(IsolationLevel isolationLevel,
-            RepositoryCacheMode repositoryCacheMode, IEventDispatcher? eventDispatcher,
-            IScopedNotificationPublisher? scopedNotificationPublisher, bool? scopeFileSystems) =>
+        Core.Scoping.IScope Core.Scoping.IScopeProvider.CreateDetachedScope(
+            IsolationLevel isolationLevel,
+            RepositoryCacheMode repositoryCacheMode,
+            IEventDispatcher? eventDispatcher,
+            IScopedNotificationPublisher? scopedNotificationPublisher,
+            bool? scopeFileSystems) =>
             (Core.Scoping.IScope)CreateDetachedScope(
                 isolationLevel,
                 repositoryCacheMode,
