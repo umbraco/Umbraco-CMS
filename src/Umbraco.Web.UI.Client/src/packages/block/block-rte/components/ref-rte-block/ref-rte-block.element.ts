@@ -1,4 +1,4 @@
-import { UMB_BLOCK_ENTRY_CONTEXT } from '@umbraco-cms/backoffice/block';
+import { UMB_BLOCK_ENTRY_CONTEXT, type UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -13,6 +13,12 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 
 	@property({ type: String })
 	icon?: string;
+
+	@property({ type: Boolean, reflect: true })
+	unpublished?: boolean;
+
+	@property({ attribute: false })
+	content?: UmbBlockDataType;
 
 	@state()
 	_workspaceEditPath?: string;
@@ -32,15 +38,19 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<uui-ref-node standalone .name=${this.label ?? ''} href=${this._workspaceEditPath ?? '#'}
-			><uui-icon slot="icon" .name=${this.icon ?? null}></uui-icon
-		></uui-ref-node>`;
+		return html`<uui-ref-node standalone href=${this._workspaceEditPath ?? '#'}>
+			<uui-icon slot="icon" .name=${this.icon ?? null}></uui-icon>
+			<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
+		</uui-ref-node>`;
 	}
 
 	static override styles = [
 		css`
 			uui-ref-node {
 				min-height: var(--uui-size-16);
+			}
+			:host([unpublished]) uui-ref-node {
+				opacity: 0.6;
 			}
 		`,
 	];

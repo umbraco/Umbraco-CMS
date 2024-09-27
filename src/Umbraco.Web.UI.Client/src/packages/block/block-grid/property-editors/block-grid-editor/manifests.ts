@@ -1,4 +1,5 @@
 import { manifest as blockGridSchemaManifest } from './Umbraco.BlockGrid.js';
+import { UmbBlockValueResolver } from '@umbraco-cms/backoffice/block';
 
 export const UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS = 'Umbraco.BlockGrid';
 
@@ -66,4 +67,13 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	blockGridSchemaManifest,
+	{
+		type: 'propertyValueResolver',
+		alias: 'Umb.PropertyValueResolver.Block',
+		name: 'Block Value Resolver',
+		api: UmbBlockValueResolver,
+		meta: {
+			editorAlias: 'Umbraco.BlockGrid',
+		},
+	},
 ];

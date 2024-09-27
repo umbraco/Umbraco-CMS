@@ -39,6 +39,9 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	_icon?: string;
 
 	@state()
+	_exposed?: boolean;
+
+	@state()
 	_workspaceEditContentPath?: string;
 
 	@state()
@@ -90,6 +93,14 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			(icon) => {
 				this.#updateBlockViewProps({ icon });
 				this._icon = icon;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.hasExpose,
+			(exposed) => {
+				this.#updateBlockViewProps({ unpublished: !exposed });
+				this._exposed = exposed;
 			},
 			null,
 		);
@@ -167,7 +178,12 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	#renderRefBlock() {
-		return html`<umb-ref-rte-block .label=${this._label} .icon=${this._icon}></umb-ref-rte-block>`;
+		return html`<umb-ref-rte-block
+			.label=${this._label}
+			.icon=${this._icon}
+			.unpublished=${!this._exposed}
+			.content=${this._blockViewProps.content}
+			.settings=${this._blockViewProps.settings}></umb-ref-rte-block>`;
 	}
 
 	#renderBlock() {
