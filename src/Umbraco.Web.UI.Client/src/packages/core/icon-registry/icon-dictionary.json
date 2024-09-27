@@ -2162,6 +2162,10 @@
 			"file": "underline.svg"
 		},
 		{
+			"name": "icon-unlink",
+			"file": "unlink.svg"
+		},
+		{
 			"name": "icon-unlocked",
 			"file": "lock-open.svg"
 		},

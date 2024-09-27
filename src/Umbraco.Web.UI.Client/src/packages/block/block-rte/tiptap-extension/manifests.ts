@@ -1,12 +1,23 @@
-import type { ManifestTiptapExtensionButtonKind } from '@umbraco-cms/backoffice/tiptap';
+import type { ManifestTiptapExtension, ManifestTiptapToolbarExtensionButtonKind } from '@umbraco-cms/backoffice/tiptap';
 
-export const manifests: ManifestTiptapExtensionButtonKind[] = [
+export const manifests: Array<ManifestTiptapExtension | ManifestTiptapToolbarExtensionButtonKind> = [
 	{
 		type: 'tiptapExtension',
+		alias: 'Umb.Tiptap.Block',
+		name: 'Block Tiptap Extension',
+		api: () => import('./block.extension.js'),
+		meta: {
+			icon: 'icon-block',
+			label: 'Block',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
 		kind: 'button',
-		alias: 'Umb.TiptapExtension.BlockPicker',
+		alias: 'Umb.Tiptap.Toolbar.BlockPicker',
 		name: 'Block Picker Tiptap Extension Button',
-		api: () => import('./block-picker.extension.js'),
+		api: () => import('./block-picker-toolbar.extension.js'),
+		weight: 90,
 		meta: {
 			alias: 'umbblockpicker',
 			icon: 'icon-plugin',

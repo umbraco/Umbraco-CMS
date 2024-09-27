@@ -1,11 +1,6 @@
-import { UmbTiptapToolbarElementApiBase } from '../types.js';
+import { UmbTiptapExtensionApiBase } from '../types.js';
 import { Blockquote } from '@umbraco-cms/backoffice/external/tiptap';
-import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
-export default class UmbTiptapBlockquoteExtensionApi extends UmbTiptapToolbarElementApiBase {
+export default class UmbTiptapBlockquoteExtensionApi extends UmbTiptapExtensionApiBase {
 	getTiptapExtensions = () => [Blockquote];
-
-	override execute(editor?: Editor) {
-		editor?.chain().focus().toggleBlockquote().run();
-	}
 }

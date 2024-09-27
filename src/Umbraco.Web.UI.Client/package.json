@@ -91,7 +91,7 @@
 		"./template": "./dist-cms/packages/templating/templates/index.js",
 		"./temporary-file": "./dist-cms/packages/core/temporary-file/index.js",
 		"./themes": "./dist-cms/packages/core/themes/index.js",
-		"./tiny-mce": "./dist-cms/packages/tiny-mce/index.js",
+		"./tiny-mce": "./dist-cms/packages/rte/tiny-mce/index.js",
 		"./tiptap": "./dist-cms/packages/rte/tiptap/index.js",
 		"./tree": "./dist-cms/packages/core/tree/index.js",
 		"./ufm": "./dist-cms/packages/ufm/index.js",

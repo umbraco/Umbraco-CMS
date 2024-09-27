@@ -5,8 +5,6 @@ import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
 export default class UmbTiptapEmbedExtensionApi extends UmbTiptapToolbarElementApiBase {
-	getTiptapExtensions = () => [umbEmbeddedMedia.configure({ inline: true })];
-
 	override isActive = (editor: Editor) => editor.isActive(umbEmbeddedMedia.name) === true;
 
 	override async execute(editor?: Editor) {

@@ -13,7 +13,7 @@ export class UmbTiptapToolbarButtonElement extends UmbLitElement {
 	public manifest?: ManifestTiptapExtensionButtonKind;
 
 	@state()
-	private _isActive = false;
+	protected isActive = false;
 
 	override connectedCallback() {
 		super.connectedCallback();
@@ -35,7 +35,7 @@ export class UmbTiptapToolbarButtonElement extends UmbLitElement {
 
 	readonly #onEditorUpdate = () => {
 		if (this.api && this.editor && this.manifest) {
-			this._isActive = this.api.isActive(this.editor);
+			this.isActive = this.api.isActive(this.editor);
 		}
 	};
 
@@ -43,7 +43,7 @@ export class UmbTiptapToolbarButtonElement extends UmbLitElement {
 		return html`
 			<uui-button
 				compact
-				look=${this._isActive ? 'outline' : 'default'}
+				look=${this.isActive ? 'outline' : 'default'}
 				label=${ifDefined(this.manifest?.meta.label)}
 				title=${this.manifest?.meta.label ? this.localize.string(this.manifest.meta.label) : ''}
 				@click=${() => (this.api && this.editor ? this.api.execute(this.editor) : null)}>

@@ -1,4 +1,4 @@
-import type { ManifestTiptapExtension } from '../../extensions/tiptap-extension.js';
+import type { ManifestTiptapToolbarExtension } from '../../extensions/tiptap-toolbar-extension.js';
 import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
@@ -34,10 +34,8 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 	override render() {
 		return html`
 			<umb-extension-with-api-slot
-				type="tiptapExtension"
-				.filter=${(ext: ManifestTiptapExtension) => {
-					return !!this.toolbarConfig.find((x) => x.alias === ext.alias) && (!!ext.kind || !!ext.element);
-				}}
+				type="tiptapToolbarExtension"
+				.filter=${(ext: ManifestTiptapToolbarExtension) => !!ext.kind || !!ext.element}
 				.elementProps=${{ editor: this.editor }}>
 			</umb-extension-with-api-slot>
 		`;
