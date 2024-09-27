@@ -12,7 +12,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 // NOTE: These tests are in place to ensure that element level variation works for Rich Text. Element level variation
 //       is tested more in-depth for Block List (see BlockListElementLevelVariationTests), but since the actual
 //       implementation is shared between Block List and Rich Text, we won't repeat all those tests here.
-[Platform("Linux", Reason = "This currently uses too much memory for Windows. It can likely be run on Windows when NuCache is removed.")]
 public class RichTextElementLevelVariationTests : BlockEditorElementVariationTestBase
 {
     private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
