@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
@@ -220,7 +220,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <param name="userId">Optional id of the user saving the dictionary item</param>
     [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     public void Save(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
-    { ;
+    {
         Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
         if (dictionaryItem.Id > 0)
         {

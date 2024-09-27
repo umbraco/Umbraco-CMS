@@ -196,7 +196,7 @@ public interface IDataTypeService : IService
     /// </summary>
     /// <param name="propertyEditorAlias">Alias of the property editor</param>
     /// <returns>Collection of <see cref="IDataType" /> configured for the property editor</returns>
-    Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string propertyEditorAlias);
+    Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string propertyEditorAlias) => Task.FromResult(GetByEditorAlias(propertyEditorAlias));
 
     /// <summary>
     ///     Gets all <see cref="IDataType" /> for a given editor UI alias
@@ -246,5 +246,5 @@ public interface IDataTypeService : IService
     /// </summary>
     /// <param name="propertyEditorAlias">Aliases of the property editors</param>
     /// <returns>Collection of <see cref="IDataType" /> configured for the property editors</returns>
-    Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string[] propertyEditorAlias);
+    Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string[] propertyEditorAlias) => Task.FromResult(propertyEditorAlias.SelectMany(x=>GetByEditorAlias(x)));
 }

@@ -21,7 +21,7 @@ using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
-using Umbraco.Cms.Tests.Integration.TestServerTest;
+
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
@@ -172,6 +172,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
                 .AddCoreMappingProfiles();
         }
 
+        services.RemoveAll(x=>x.ImplementationType == typeof(DocumentUrlServiceInitializer));
         services.AddSignalR();
         services.AddMvc();
 

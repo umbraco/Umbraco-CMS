@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 ///         be refactored, really.
 ///     </para>
 /// </remarks>
-public interface IPublishedSnapshotRebuilder
+public interface ICacheRebuilder
 {
     /// <summary>
     ///     Rebuilds.
