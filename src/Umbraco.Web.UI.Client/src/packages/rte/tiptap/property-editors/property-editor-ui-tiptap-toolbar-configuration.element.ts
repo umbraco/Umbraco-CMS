@@ -32,7 +32,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	}
 
 	get value(): string[][][] {
-		return this.#value;
+		return this.#value.map((rows) => rows.map((groups) => [...groups]));
 	}
 
 	#value: string[][][] = [[[]]];
@@ -133,7 +133,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	};
 
 	#removeGroup = (rowIndex: number, groupIndex: number) => {
-		if (rowIndex === 0 && groupIndex === 0) {
+		if (groupIndex === 0) {
 			// Prevent removing the last group
 			this.#value[rowIndex][groupIndex] = [];
 		} else {
@@ -181,7 +181,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 					look="primary"
 					color="danger"
 					compact
-					class="remove-group-button ${rowIndex === 0 && groupIndex === 0 && group.length === 0 ? 'hidden' : undefined}"
+					class="remove-group-button ${groupIndex === 0 && group.length === 0 ? 'hidden' : undefined}"
 					@click=${() => this.#removeGroup(rowIndex, groupIndex)}>
 					<umb-icon name="icon-trash"></umb-icon>
 				</uui-button>
@@ -198,7 +198,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 					look="primary"
 					color="danger"
 					compact
-					class="remove-row-button ${rowIndex === 0 && row[rowIndex].length === 0 ? 'hidden' : undefined}"
+					class="remove-row-button ${rowIndex === 0 && row.length === 1 && row[0].length === 0 ? 'hidden' : undefined}"
 					@click=${() => this.#removeRow(rowIndex)}>
 					<umb-icon name="icon-trash"></umb-icon>
 				</uui-button>
