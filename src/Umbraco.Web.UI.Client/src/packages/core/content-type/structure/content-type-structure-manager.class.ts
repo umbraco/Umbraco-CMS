@@ -273,9 +273,9 @@ export class UmbContentTypeStructureManager<
 
 	/**
 	 * Ensure a container exists for a specific Content Type. Otherwise clone it.
-	 * @param containerId - The container to ensure exists on the given ContentType.
-	 * @param contentTypeUnique - The content type to ensure the container for.
-	 * @returns Promise<UmbPropertyTypeContainerModel | undefined>
+	 * @param {string} containerId - The container to ensure exists on the given ContentType.
+	 * @param {string} contentTypeUnique - The content type to ensure the container for.
+	 * @returns {Promise<UmbPropertyTypeContainerModel | undefined>} - The container found or created for the owner ContentType.
 	 */
 	async ensureContainerOf(
 		containerId: string,
@@ -296,9 +296,9 @@ export class UmbContentTypeStructureManager<
 
 	/**
 	 * Clone a container to a specific Content Type.
-	 * @param containerId - The container to clone, assuming it does not already exist on the given Content Type.
-	 * @param toContentTypeUnique - The content type to clone to.
-	 * @returns Promise<UmbPropertyTypeContainerModel | undefined>
+	 * @param {string} containerId - The container to clone, assuming it does not already exist on the given Content Type.
+	 * @param {string} toContentTypeUnique - The content type to clone to.
+	 * @returns {Promise<UmbPropertyTypeContainerModel | undefined>} - The container cloned or found for the owner ContentType.
 	 */
 	async cloneContainerTo(
 		containerId: string,
