@@ -7,6 +7,7 @@ import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context-tok
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT,
@@ -81,6 +82,12 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 				const newPath = routeBuilder({});
 				this._workspacePath.setValue(newPath);
 			});
+
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (dataset) => {
+			const variantId = dataset.getVariantId();
+			this.#catalogueModal.setUniquePathValue('variantId', variantId?.toString());
+			this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
+		});
 	}
 
 	protected _gotBlockManager() {
@@ -106,16 +113,6 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 			(alias) => {
 				this.#catalogueModal.setUniquePathValue('propertyAlias', alias ?? 'null');
 				this.#workspaceModal.setUniquePathValue('propertyAlias', alias ?? 'null');
-			},
-			'observePropertyAlias',
-		);
-
-		this.observe(
-			this._manager.variantId,
-			(variantId) => {
-				// TODO: This might not be the property variant ID, but the content variant ID. Check up on what makes most sense?
-				this.#catalogueModal.setUniquePathValue('variantId', variantId?.toString());
-				this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
 			},
 			'observePropertyAlias',
 		);

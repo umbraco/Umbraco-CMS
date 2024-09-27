@@ -82,7 +82,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 			this._tabs?.forEach((tab) => {
 				const tabName = tab.name ?? '';
 				routes.push({
-					path: `tab/${encodeFolderName(tabName).toString()}`,
+					path: `tab/${encodeFolderName(tabName)}`,
 					component: () => import('./content-editor-tab.element.js'),
 					setup: (component) => {
 						(component as UmbContentWorkspaceViewEditTabElement).containerId = tab.id;
@@ -102,10 +102,12 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		}
 
 		if (routes.length !== 0) {
-			routes.push({
-				path: '',
-				redirectTo: routes[0]?.path,
-			});
+			if (!this._hasRootGroups) {
+				routes.push({
+					path: '',
+					redirectTo: routes[0]?.path,
+				});
+			}
 
 			routes.push({
 				path: `**`,

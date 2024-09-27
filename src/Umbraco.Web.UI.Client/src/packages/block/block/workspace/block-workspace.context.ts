@@ -284,7 +284,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#observeBlockData(unique: string) {
 		if (!this.#blockEntries) {
 			throw new Error('Block Entries not found');
-			return;
 		}
 		this.observe(
 			this.#blockEntries.layoutOf(unique),

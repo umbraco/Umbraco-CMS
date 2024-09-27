@@ -19,6 +19,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { pathFolderName } from '@umbraco-cms/backoffice/utils';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 interface UmbBlockGridAreaTypeInvalidRuleType {
 	groupKey?: string;
@@ -200,6 +201,12 @@ export class UmbBlockGridEntriesContext
 				const newPath = routeBuilder({});
 				this._workspacePath.setValue(newPath);
 			});
+
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (dataset) => {
+			const variantId = dataset.getVariantId();
+			this.#catalogueModal.setUniquePathValue('variantId', variantId?.toString());
+			this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
+		});
 	}
 
 	protected _gotBlockManager() {
@@ -213,16 +220,6 @@ export class UmbBlockGridEntriesContext
 			(alias) => {
 				this.#catalogueModal.setUniquePathValue('propertyAlias', alias ?? 'null');
 				this.#workspaceModal.setUniquePathValue('propertyAlias', alias ?? 'null');
-			},
-			'observePropertyAlias',
-		);
-
-		this.observe(
-			this._manager.variantId,
-			(variantId) => {
-				// TODO: This might not be the property variant ID, but the content variant ID. Check up on what makes most sense?
-				this.#catalogueModal.setUniquePathValue('variantId', variantId?.toString());
-				this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
 			},
 			'observePropertyAlias',
 		);

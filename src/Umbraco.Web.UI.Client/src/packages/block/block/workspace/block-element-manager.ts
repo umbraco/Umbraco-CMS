@@ -125,9 +125,8 @@ export class UmbBlockElementManager extends UmbControllerBase {
 
 	/**
 	 * Get the current value of the property with the given alias and variantId.
-	 * @param alias
-	 * @param variantId
-	 * @returns The value or undefined if not set or found.
+	 * @param {string} alias - The alias of the property
+	 * @returns {ReturnType} The value or undefined if not set or found.
 	 */
 	async getPropertyValue<ReturnType = unknown>(alias: string) {
 		await this.#getDataPromise;
@@ -144,9 +143,8 @@ export class UmbBlockElementManager extends UmbControllerBase {
 
 	/**
 	 * @function setPropertyValue
-	 * @param {string} alias
+	 * @param {string} alias - The alias of the property
 	 * @param {unknown} value - value can be a promise resolving into the actual value or the raw value it self.
-	 * @param {UmbVariantId | undefined} variantId - Optional variantId to filter by.
 	 * @returns {Promise<void>}
 	 * @description Set the value of this property.
 	 */

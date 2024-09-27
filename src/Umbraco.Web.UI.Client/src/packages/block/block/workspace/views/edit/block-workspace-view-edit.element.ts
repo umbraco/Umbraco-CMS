@@ -90,7 +90,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 			this._tabs?.forEach((tab) => {
 				const tabName = tab.name ?? '';
 				routes.push({
-					path: `tab/${encodeFolderName(tabName).toString()}`,
+					path: `tab/${encodeFolderName(tabName)}`,
 					component: () => import('./block-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
 						(component as UmbBlockWorkspaceViewEditTabElement).managerName = this.#managerName;
@@ -112,10 +112,12 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 		}
 
 		if (routes.length !== 0) {
-			routes.push({
-				path: '',
-				redirectTo: routes[0]?.path,
-			});
+			if (!this._hasRootGroups) {
+				routes.push({
+					path: '',
+					redirectTo: routes[0]?.path,
+				});
+			}
 			routes.push({
 				path: `**`,
 				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
