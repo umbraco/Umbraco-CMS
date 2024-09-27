@@ -1,8 +1,4 @@
-import {
-	UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
-	UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE,
-	UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE,
-} from '../entity.js';
+import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../entity.js';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS = 'Umb.Workspace.DocumentBlueprint';
