@@ -156,14 +156,21 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 		const { selection } = await modalHandler.onSubmit().catch(() => ({ selection: undefined }));
 		if (!selection || !selection.length) return;
 
-		this.#showMediaCaptionAltText(selection[0]);
+		this.#showMediaCaptionAltText(selection[0], currentTarget);
 		this.editor.dispatch('Change');
 	}
 
-	async #showMediaCaptionAltText(mediaUnique: string | null) {
+	async #showMediaCaptionAltText(mediaUnique: string | null, currentTarget: MediaPickerTargetData) {
 		if (!mediaUnique) return;
 
-		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, { data: { mediaUnique } });
+		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, {
+			data: { mediaUnique },
+			value: {
+				url: '',
+				altText: currentTarget.altText,
+				caption: currentTarget.caption,
+			},
+		});
 
 		const mediaData = await modalHandler?.onSubmit().catch(() => null);
 		if (!mediaData) return;
