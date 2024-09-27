@@ -16,15 +16,22 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	@property({ attribute: false })
 	label?: string;
 
+	@property({ type: String, reflect: false })
+	icon?: string;
+
 	@property({ attribute: false })
 	config?: UmbBlockEditorCustomViewConfiguration;
+
+	@property({ type: Boolean, reflect: true })
+	unpublished?: boolean;
 
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
 
 	override render() {
 		return html`<umb-ref-grid-block standalone href=${this.config?.editContentPath ?? ''}>
-			<umb-ufm-render inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
+			<umb-icon slot="icon" .name=${this.icon}></umb-icon>
+			<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
 			<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
 		</umb-ref-grid-block>`;
 	}
@@ -36,6 +43,10 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 			}
 			umb-block-grid-areas-container::part(area) {
 				margin: var(--uui-size-2);
+			}
+			:host([unpublished]) umb-icon,
+			:host([unpublished]) umb-ufm-render {
+				opacity: 0.6;
 			}
 		`,
 	];

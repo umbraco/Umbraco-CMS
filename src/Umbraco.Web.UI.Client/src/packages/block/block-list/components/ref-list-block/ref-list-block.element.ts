@@ -55,7 +55,8 @@ export class UmbRefListBlockElement extends UmbLitElement {
 			uui-ref-node {
 				min-height: var(--uui-size-16);
 			}
-			:host([unpublished]) uui-ref-node {
+			:host([unpublished]) umb-icon,
+			:host([unpublished]) umb-ufm-render {
 				opacity: 0.6;
 			}
 		`,
