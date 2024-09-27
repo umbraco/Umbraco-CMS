@@ -275,8 +275,8 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				border-radius: var(--uui-border-radius);
 				background-color: var(--uui-color-surface-alt);
 				padding: 6px;
-				min-height: 30px;
-				min-width: 30px;
+				min-height: 32px;
+				min-width: 32px;
 			}
 			.item {
 				padding: var(--uui-size-space-2);
@@ -285,7 +285,10 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				background-color: var(--uui-color-surface);
 				cursor: move;
 				display: flex;
-				align-items: baseline;
+				box-sizing: border-box;
+				width: 32px;
+				height: 32px;
+				justify-content: center;
 			}
 
 			.remove-row-button,
