@@ -57,5 +57,8 @@ public class UmbracoPremigrationPlan : MigrationPlan
         To<V_14_0_0.AddUserGroup2PermisionTable>("{7BCB5352-B2ED-4D4B-B27D-ECDED930B50A}");
         To<V_14_0_0.AddGuidsToUsers>("{3E69BF9B-BEAB-41B1-BB11-15383CCA1C7F}");
         To<V_14_0_0.MigrateCharPermissionsToStrings>("{F12C609B-86B9-4386-AFA4-78E02857247C}");
+
+        // To 15.0.0
+        To<V_15_0_0.AddDocumentUrl>("{B9133686-B758-404D-AF12-708AA80C7E44}");
     }
 }

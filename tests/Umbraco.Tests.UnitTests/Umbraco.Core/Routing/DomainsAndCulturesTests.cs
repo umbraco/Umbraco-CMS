@@ -305,7 +305,7 @@ public class DomainsAndCulturesTests : UrlRoutingTestBase
         GlobalSettings.HideTopLevelNodeFromPath = false;
 
         var umbracoContextAccessor = GetUmbracoContextAccessor(inputUrl);
-        var publishedRouter = CreatePublishedRouter(umbracoContextAccessor);
+        var publishedRouter = CreatePublishedRouter(umbracoContextAccessor, domainCache: umbracoContextAccessor.GetRequiredUmbracoContext().PublishedSnapshot.Domains);
         var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
         var frequest = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 

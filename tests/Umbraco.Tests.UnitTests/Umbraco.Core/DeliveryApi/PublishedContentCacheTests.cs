@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
@@ -16,6 +17,8 @@ public class PublishedContentCacheTests : DeliveryApiTests
     private readonly Guid _contentTwoId = Guid.Parse("4EF11E1E-FB50-4627-8A86-E10ED6F4DCE4");
 
     private IPublishedSnapshotAccessor _publishedSnapshotAccessor = null!;
+    private IPublishedContentCache _contentCacheMock;
+    private IDocumentUrlService _documentUrlService;
 
     [SetUp]
     public void Setup()
@@ -29,6 +32,14 @@ public class PublishedContentCacheTests : DeliveryApiTests
         contentTypeTwoMock.SetupGet(m => m.Alias).Returns("theOtherContentType");
         var contentTwoMock = new Mock<IPublishedContent>();
         ConfigurePublishedContentMock(contentTwoMock, _contentTwoId, "Content Two", "content-two", contentTypeTwoMock.Object, Array.Empty<IPublishedProperty>());
+
+        var documentUrlService = new Mock<IDocumentUrlService>();
+        documentUrlService
+            .Setup(x => x.GetDocumentKeyByRoute("content-one", It.IsAny<string?>(), It.IsAny<int?>(), It.IsAny<bool>()))
+            .Returns(_contentOneId);
+        documentUrlService
+            .Setup(x => x.GetDocumentKeyByRoute("content-two", It.IsAny<string?>(), It.IsAny<int?>(), It.IsAny<bool>()))
+            .Returns(_contentTwoId);
 
         var contentCacheMock = new Mock<IPublishedContentCache>();
         contentCacheMock
@@ -52,12 +63,14 @@ public class PublishedContentCacheTests : DeliveryApiTests
         publishedSnapshotAccessorMock.Setup(m => m.TryGetPublishedSnapshot(out publishedSnapshot)).Returns(true);
 
         _publishedSnapshotAccessor = publishedSnapshotAccessorMock.Object;
+        _contentCacheMock = contentCacheMock.Object;
+        _documentUrlService = documentUrlService.Object;
     }
 
     [Test]
     public void PublishedContentCache_CanGetById()
     {
-        var publishedContentCache = new ApiPublishedContentCache(_publishedSnapshotAccessor, CreateRequestPreviewService(), CreateDeliveryApiSettings());
+        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateRequestCultureService(), CreateDeliveryApiSettings(), _documentUrlService, _contentCacheMock);
         var content = publishedContentCache.GetById(_contentOneId);
         Assert.IsNotNull(content);
         Assert.AreEqual(_contentOneId, content.Key);
@@ -68,7 +81,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     [Test]
     public void PublishedContentCache_CanGetByRoute()
     {
-        var publishedContentCache = new ApiPublishedContentCache(_publishedSnapshotAccessor, CreateRequestPreviewService(), CreateDeliveryApiSettings());
+        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateRequestCultureService(), CreateDeliveryApiSettings(), _documentUrlService, _contentCacheMock);
         var content = publishedContentCache.GetByRoute("content-two");
         Assert.IsNotNull(content);
         Assert.AreEqual(_contentTwoId, content.Key);
@@ -79,7 +92,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     [Test]
     public void PublishedContentCache_CanGetByIds()
     {
-        var publishedContentCache = new ApiPublishedContentCache(_publishedSnapshotAccessor, CreateRequestPreviewService(), CreateDeliveryApiSettings());
+        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateRequestCultureService(), CreateDeliveryApiSettings(), _documentUrlService, _contentCacheMock);
         var content = publishedContentCache.GetByIds(new[] { _contentOneId, _contentTwoId }).ToArray();
         Assert.AreEqual(2, content.Length);
         Assert.AreEqual(_contentOneId, content.First().Key);
@@ -91,7 +104,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     public void PublishedContentCache_GetById_SupportsDenyList(bool denied)
     {
         var denyList = denied ? new[] { "theOtherContentType" } : null;
-        var publishedContentCache = new ApiPublishedContentCache(_publishedSnapshotAccessor, CreateRequestPreviewService(), CreateDeliveryApiSettings(denyList));
+        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateRequestCultureService(), CreateDeliveryApiSettings(denyList), _documentUrlService, _contentCacheMock);
         var content = publishedContentCache.GetById(_contentTwoId);
 
         if (denied)
@@ -109,7 +122,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     public void PublishedContentCache_GetByRoute_SupportsDenyList(bool denied)
     {
         var denyList = denied ? new[] { "theContentType" } : null;
-        var publishedContentCache = new ApiPublishedContentCache(_publishedSnapshotAccessor, CreateRequestPreviewService(), CreateDeliveryApiSettings(denyList));
+        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateRequestCultureService(), CreateDeliveryApiSettings(denyList), _documentUrlService, _contentCacheMock);
         var content = publishedContentCache.GetByRoute("content-one");
 
         if (denied)
@@ -127,7 +140,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     public void PublishedContentCache_GetByIds_SupportsDenyList(string deniedContentType)
     {
         var denyList = new[] { deniedContentType };
-        var publishedContentCache = new ApiPublishedContentCache(_publishedSnapshotAccessor, CreateRequestPreviewService(), CreateDeliveryApiSettings(denyList));
+        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateRequestCultureService(), CreateDeliveryApiSettings(denyList), _documentUrlService, _contentCacheMock);
         var content = publishedContentCache.GetByIds(new[] { _contentOneId, _contentTwoId }).ToArray();
 
         Assert.AreEqual(1, content.Length);
@@ -145,7 +158,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     public void PublishedContentCache_GetById_CanRetrieveContentTypesOutsideTheDenyList()
     {
         var denyList = new[] { "theContentType" };
-        var publishedContentCache = new ApiPublishedContentCache(_publishedSnapshotAccessor, CreateRequestPreviewService(), CreateDeliveryApiSettings(denyList));
+        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateRequestCultureService(), CreateDeliveryApiSettings(denyList), _documentUrlService, _contentCacheMock);
         var content = publishedContentCache.GetById(_contentTwoId);
         Assert.IsNotNull(content);
         Assert.AreEqual(_contentTwoId, content.Key);
@@ -157,7 +170,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     public void PublishedContentCache_GetByRoute_CanRetrieveContentTypesOutsideTheDenyList()
     {
         var denyList = new[] { "theOtherContentType" };
-        var publishedContentCache = new ApiPublishedContentCache(_publishedSnapshotAccessor, CreateRequestPreviewService(), CreateDeliveryApiSettings(denyList));
+        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateRequestCultureService(), CreateDeliveryApiSettings(denyList), _documentUrlService, _contentCacheMock);
         var content = publishedContentCache.GetByRoute("content-one");
         Assert.IsNotNull(content);
         Assert.AreEqual(_contentOneId, content.Key);
@@ -169,7 +182,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     public void PublishedContentCache_GetByIds_CanDenyAllRequestedContent()
     {
         var denyList = new[] { "theContentType", "theOtherContentType" };
-        var publishedContentCache = new ApiPublishedContentCache(_publishedSnapshotAccessor, CreateRequestPreviewService(), CreateDeliveryApiSettings(denyList));
+        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateRequestCultureService(), CreateDeliveryApiSettings(denyList), _documentUrlService, _contentCacheMock);
         var content = publishedContentCache.GetByIds(new[] { _contentOneId, _contentTwoId }).ToArray();
         Assert.IsEmpty(content);
     }
@@ -178,9 +191,16 @@ public class PublishedContentCacheTests : DeliveryApiTests
     public void PublishedContentCache_DenyListIsCaseInsensitive()
     {
         var denyList = new[] { "THEcontentTYPE" };
-        var publishedContentCache = new ApiPublishedContentCache(_publishedSnapshotAccessor, CreateRequestPreviewService(), CreateDeliveryApiSettings(denyList));
+        var publishedContentCache = new ApiPublishedContentCache(CreateRequestPreviewService(), CreateRequestCultureService(), CreateDeliveryApiSettings(denyList), _documentUrlService, _contentCacheMock);
         var content = publishedContentCache.GetByRoute("content-one");
         Assert.IsNull(content);
+    }
+
+    private IRequestCultureService CreateRequestCultureService()
+    {
+        var mock = new Mock<IRequestCultureService>();
+
+        return mock.Object;
     }
 
     private IRequestPreviewService CreateRequestPreviewService(bool isPreview = false)
