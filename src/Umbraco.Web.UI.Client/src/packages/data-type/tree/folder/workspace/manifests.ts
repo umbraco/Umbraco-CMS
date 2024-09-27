@@ -1,6 +1,6 @@
-import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import { UMB_DATA_TYPE_FOLDER_ENTITY_TYPE } from '../../../entity.js';
 import { UMB_DATA_TYPE_FOLDER_WORKSPACE_ALIAS } from './constants.js';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -16,7 +16,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspaceAction',
 		kind: 'default',
-		alias: 'Umb.WorkspaceAction.MediaType.Folder.Submit',
+		alias: 'Umb.WorkspaceAction.DataType.Folder.Submit',
 		name: 'Save Media Type Folder Workspace Action',
 		api: UmbSubmitWorkspaceAction,
 		meta: {
