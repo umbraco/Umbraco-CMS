@@ -17,7 +17,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'workspaceAction',
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.DataType.Folder.Submit',
-		name: 'Save Media Type Folder Workspace Action',
+		name: 'Submit Media Type Folder Workspace Action',
 		api: UmbSubmitWorkspaceAction,
 		meta: {
 			label: '#buttons_save',
