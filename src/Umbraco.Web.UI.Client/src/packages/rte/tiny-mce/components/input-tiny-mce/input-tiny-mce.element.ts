@@ -23,7 +23,6 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
  * Handles the resize event
  * @param e
  */
-// TODO: This does somehow not belong as a utility method as it is very specific to this implementation. [NL]
 async function onResize(
 	e: EditorEvent<{
 		target: HTMLElement;
@@ -336,7 +335,6 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 			/**
 			 * Prevent injecting arbitrary JavaScript execution in on-attributes.
 			 *
-			 * TODO: This used to be toggleable through server variables with window.Umbraco?.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce
 			 */
 			const allNodes = Array.from(editor.dom.doc.getElementsByTagName('*'));
 			allNodes.forEach((node) => {
