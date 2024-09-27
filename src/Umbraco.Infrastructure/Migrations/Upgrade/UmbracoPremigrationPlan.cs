@@ -64,5 +64,6 @@ public class UmbracoPremigrationPlan : MigrationPlan
         //   replaced with a noop migration for the corresponding migration state.
         To<V_14_0_0.MigrateTours>("{A08254B6-D9E7-4207-A496-2ED0A87FB4FD}");
         To<V_15_0_0.AddKindToUser>("{69AA6889-8B67-42B4-AA4F-114704487A45}");
+        To<V_15_0_0.AddDocumentUrl>("{B9133686-B758-404D-AF12-708AA80C7E44}");
     }
 }
