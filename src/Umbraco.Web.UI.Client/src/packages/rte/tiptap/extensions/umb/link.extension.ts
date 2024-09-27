@@ -49,39 +49,89 @@ export default class UmbTiptapLinkExtensionApi extends UmbTiptapToolbarElementAp
 		let { queryString, url } = link;
 
 		// If an anchor exists, check that it is appropriately prefixed
-		if (!queryString?.startsWith('?') && !queryString?.startsWith('#')) {
-			queryString = (queryString?.startsWith('=') ? '#' : '?') + queryString;
-		}
+		queryString = this.#queryStringFromUrl(queryString);
 
 		// The href might be an external url, so check the value for an anchor/querystring;
 		// `href` has the anchor re-appended later, hence the reset here to avoid duplicating the anchor
 		if (!queryString) {
-			const urlParts = url?.split(/([#?])/);
-			if (urlParts?.length === 3) {
-				url = urlParts[0];
-				queryString = urlParts[1] + urlParts[2];
-			}
+			const extractedInfo = this.#extractUrlAndQueryString(url, queryString);
+			url = extractedInfo.url;
+			queryString = extractedInfo.queryString;
 		}
 
 		// If we have a unique id, it must be a `/{localLink:guid}`
 		if (unique) {
 			url = `/{localLink:${unique}}`;
+		} else {
+			// If it's an email address and not `//user@domain.com` and protocol (e.g. mailto:, sip:) is not specified;
+			// then we'll assume it should be a "mailto" link.
+			url = this.#transformURLToMailto(url);
+
+			url = this.#ensureHttpProtocol(url);
 		}
 
-		// If it's an email address and not `//user@domain.com` and protocol (e.g. mailto:, sip:) is not specified;
-		// then we'll assume it should be a "mailto" link.
+		const anchor = this.#getAnchorFromQueryString(queryString);
+
+		if (anchor) url += anchor;
+
+		if (!url) return null;
+
+		return {
+			type: type ?? 'external',
+			href: url,
+			'data-anchor': anchor,
+			target,
+			title: name ?? url,
+		};
+	}
+
+	#extractUrlAndQueryString(url: string | null | undefined, queryString: string | null) {
+		const urlParts = url?.split(/([#?])/);
+		if (urlParts?.length === 3) {
+			url = urlParts[0];
+			queryString = urlParts[1] + urlParts[2];
+		}
+		return { url, queryString };
+	}
+
+	/**
+	 * If the URL is prefixed "www.", then prepend "http://" protocol scheme.
+	 */
+	#ensureHttpProtocol(url: string | null | undefined) {
+		if (!url) return null;
+		if (/^\s*www\./i.test(url)) {
+			url = `http://${url}`;
+		}
+		return url;
+	}
+
+	/**
+	 * If the URL is an email address, then prepend "mailto:" protocol scheme.
+	 */
+	#transformURLToMailto(url: string | null | undefined) {
+		if (!url) return null;
 		if (url?.includes('@') && !url.includes('//') && !url.includes(':')) {
 			url = `mailto:${url}`;
 		}
+		return url;
+	}
 
-		// If the URL is prefixed "www.", then prepend "http://" protocol scheme.
-		if (url && /^\s*www\./i.test(url)) {
-			url = `http://${url}`;
+	/**
+	 * If the URL contains an anchor, then return the anchor.
+	 */
+	#getAnchorFromQueryString(queryString: string | null) {
+		if (!queryString) return null;
+		return queryString.startsWith('#') || queryString.startsWith('?') ? queryString : null;
+	}
+
+	/**
+	 * If the query string does not start with "?" or "#", then prepend it.
+	 */
+	#queryStringFromUrl(queryString: string | null | undefined) {
+		if (!queryString) return null;
+		if (!queryString.startsWith('?') && !queryString.startsWith('#')) {
+			queryString = (queryString.startsWith('=') ? '#' : '?') + queryString;
 		}
-
-		const anchor = queryString?.startsWith('#') || queryString?.startsWith('?') ? queryString : null;
-		const href = url + (anchor ?? '');
-
-		return href ? { type: type ?? 'external', href, 'data-anchor': anchor, target, title: name ?? url } : null;
+		return queryString;
 	}
 }
