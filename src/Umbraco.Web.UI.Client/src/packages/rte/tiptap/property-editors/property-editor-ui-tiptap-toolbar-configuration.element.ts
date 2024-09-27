@@ -1,39 +1,24 @@
-import type UmbTiptapToolbarGroupsConfigurationElement from './input-tiptap-toolbar-layout.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, css, html, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import {
+	customElement,
+	css,
+	html,
+	property,
+	state,
+	repeat,
+	nothing,
+	type PropertyValueMap,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry, type UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	UmbPropertyValueChangeEvent,
-	type UmbPropertyEditorConfigCollection,
-} from '@umbraco-cms/backoffice/property-editor';
 
 import './input-tiptap-toolbar-layout.element.js';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 
-// If an extension does not have a position, it is considered hidden in the toolbar
-type TestServerValue = Array<{
-	alias: string;
-	position?: [number, number, number];
-}>;
-
-type ExtensionConfig = {
+type Extension = {
 	alias: string;
 	label: string;
-	icon?: string;
-	category: string;
-};
-
-type ExtensionCategoryItem = {
-	alias: string;
-	label: string;
-	icon?: string;
-	selected: boolean;
-};
-
-type ExtensionCategory = {
-	category: string;
-	extensions: ExtensionCategoryItem[];
+	icon: string;
 };
 
 @customElement('umb-property-editor-ui-tiptap-toolbar-configuration')
@@ -42,30 +27,25 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	implements UmbPropertyEditorUiElement
 {
 	@property({ attribute: false })
-	set value(value: TestServerValue) {
-		if (!value) value = [];
-		this.#value = value;
+	set value(value: string[][][]) {
+		// TODO: Make sure that value has at least one row and one group
+		this.#value = value.map((rows) => rows.map((groups) => [...groups]));
 	}
-	get value(): TestServerValue {
+
+	get value(): string[][][] {
 		return this.#value;
 	}
 
-	#value: TestServerValue = [];
-
-	@property({ attribute: false })
-	config?: UmbPropertyEditorConfigCollection;
+	#value: string[][][] = [[[]]];
 
 	@state()
-	private _extensionCategories: ExtensionCategory[] = [];
-
-	@state()
-	private _extensionConfigs: ExtensionConfig[] = [];
+	_extensions: Extension[] = [];
 
 	protected override async firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
 		super.firstUpdated(_changedProperties);
 
 		this.observe(umbExtensionsRegistry.byType('tiptapExtension'), (extensions) => {
-			this._extensionConfigs = extensions.map((ext) => {
+			this._extensions = extensions.map((ext) => {
 				return {
 					alias: ext.alias,
 					label: ext.meta.label,
@@ -73,137 +53,240 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 					category: '',
 				};
 			});
-			this.#setupExtensionCategories();
 		});
 	}
 
-	#setupExtensionCategories() {
-		const withSelectedProperty = this._extensionConfigs.map((v) => {
-			return {
-				...v,
-				selected: this.value?.some((item) => item.alias === v.alias),
-			};
-		});
+	#onDragStart = (event: DragEvent, alias: string, fromPos?: [number, number, number]) => {
+		event.dataTransfer!.effectAllowed = 'move';
+		event.dataTransfer!.setData(
+			'application/json',
+			JSON.stringify({
+				alias,
+				fromPos,
+			}),
+		);
+	};
 
-		const grouped = withSelectedProperty.reduce((acc: any, item) => {
-			const group = item.category || 'miscellaneous'; // Assign to "miscellaneous" if no group
-			if (!acc[group]) {
-				acc[group] = [];
-			}
-			acc[group].push(item);
-			return acc;
-		}, {});
-		this._extensionCategories = Object.keys(grouped).map((group) => ({
-			category: group.charAt(0).toUpperCase() + group.slice(1).replace(/-/g, ' '),
-			extensions: grouped[group],
-		}));
-	}
+	#onDragOver = (event: DragEvent) => {
+		event.preventDefault();
+		event.dataTransfer!.dropEffect = 'move';
+	};
 
-	#onExtensionSelect(item: ExtensionCategoryItem) {
-		item.selected = !item.selected;
+	#onDragEnd = (event: DragEvent) => {
+		event.preventDefault();
+		if (event.dataTransfer?.dropEffect === 'none') {
+			const { fromPos } = JSON.parse(event.dataTransfer!.getData('application/json'));
+			if (!fromPos) return;
 
-		if (item.selected) {
-			this.value = [
-				...this.value,
-				{
-					alias: item.alias,
-				},
-			];
-		} else {
-			this.value = this.value.filter((v) => v.alias !== item.alias);
+			this.#removeItem(fromPos);
 		}
+	};
 
-		this.requestUpdate('_extensionCategories');
+	#onDrop = (event: DragEvent, toPos: [number, number, number]) => {
+		event.preventDefault();
+
+		const { alias, fromPos } = JSON.parse(event.dataTransfer!.getData('application/json'));
+
+		if (fromPos) {
+			this.#moveItem(fromPos, toPos);
+		} else if (alias) {
+			this.#insertItem(alias, toPos);
+		}
+	};
+
+	#moveItem = (from: [number, number, number], to: [number, number, number]) => {
+		const [rowIndex, groupIndex, itemIndex] = from;
+
+		// Get the item to move from the 'from' position
+		const itemToMove = this.#value[rowIndex][groupIndex][itemIndex];
+
+		// Remove the item from the original position
+		this.#value[rowIndex][groupIndex].splice(itemIndex, 1);
+
+		this.#insertItem(itemToMove, to);
+	};
+
+	#insertItem = (alias: string, toPos: [number, number, number]) => {
+		const [rowIndex, groupIndex, itemIndex] = toPos;
+		// Insert the item into the new position
+		this.#value[rowIndex][groupIndex].splice(itemIndex, 0, alias);
+
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+	};
+
+	#removeItem(from: [number, number, number]) {
+		const [rowIndex, groupIndex, itemIndex] = from;
+		this.#value[rowIndex][groupIndex].splice(itemIndex, 1);
+
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	#onChange(event: CustomEvent) {
-		this.value = (event.target as UmbTiptapToolbarGroupsConfigurationElement).value;
-
-		// update the selected state of the extensions
-		// TODO this should be done in a more efficient way
-		this._extensionCategories.forEach((category) => {
-			category.extensions.forEach((item) => {
-				item.selected = this.value.some((v) => v.alias === item.alias);
-			});
-		});
-
+	#addGroup = (rowIndex: number, groupIndex: number) => {
+		this.#value[rowIndex].splice(groupIndex, 0, []);
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+	};
+
+	#removeGroup = (rowIndex: number, groupIndex: number) => {
+		if (rowIndex === 0 && groupIndex === 0) {
+			// Prevent removing the last group
+			this.#value[rowIndex][groupIndex] = [];
+		} else {
+			this.#value[rowIndex].splice(groupIndex, 1);
+		}
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+	};
+
+	#addRow = (rowIndex: number) => {
+		this.#value.splice(rowIndex, 0, [[]]);
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+	};
+
+	#removeRow = (rowIndex: number) => {
+		if (rowIndex === 0) {
+			// Prevent removing the last row
+			this.#value[rowIndex] = [[]];
+		} else {
+			this.#value.splice(rowIndex, 1);
+		}
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+	};
+
+	#renderItem(alias: string, rowIndex: number, groupIndex: number, itemIndex: number) {
+		const extension = this._extensions.find((ext) => ext.alias === alias);
+		if (!extension) return nothing;
+		return html`<div
+			class="item"
+			draggable="true"
+			@dragend=${this.#onDragEnd}
+			@dragstart=${(e: DragEvent) => this.#onDragStart(e, alias, [rowIndex, groupIndex, itemIndex])}>
+			<umb-icon name=${extension.icon ?? ''}></umb-icon>
+		</div>`;
 	}
 
-	override render() {
+	#renderGroup(group: string[], rowIndex: number, groupIndex: number) {
 		return html`
-		<umb-input-tiptap-toolbar-layout .extensionConfigs=${this._extensionConfigs} @change=${this.#onChange} .value=${this.value}></umb-input-tiptap-toolbar-layout>
-			<div class="extensions">
-				${repeat(
-					this._extensionCategories,
-					(category) => html`
-						<div class="category">
-							<p class="category-name">${category.category}</p>
-							${repeat(
-								category.extensions,
-								(item) =>
-									html`<div class="extension-item">
-										<uui-button
-											compact
-											look="outline"
-											class=${item.selected ? 'selected' : ''}
-											label=${item.label}
-											.value=${item.alias}
-											@click=${() => this.#onExtensionSelect(item)}
-											><umb-icon name=${item.icon ?? ''}></umb-icon
-										></uui-button>
-										<span>${item.label}</span>
-									</div>`,
-							)}
-						</div>
-					`,
-				)}
-					</div>
+			<div
+				class="group"
+				dropzone="move"
+				@dragover=${this.#onDragOver}
+				@drop=${(e: DragEvent) => this.#onDrop(e, [rowIndex, groupIndex, group.length])}>
+				${group.map((alias, itemIndex) => this.#renderItem(alias, rowIndex, groupIndex, itemIndex))}
+				<uui-button
+					look="primary"
+					color="danger"
+					compact
+					class="remove-group-button ${rowIndex === 0 && groupIndex === 0 && group.length === 0 ? 'hidden' : undefined}"
+					@click=${() => this.#removeGroup(rowIndex, groupIndex)}>
+					<umb-icon name="icon-trash"></umb-icon>
+				</uui-button>
 			</div>
 		`;
 	}
 
-	static override readonly styles = [
+	#renderRow(row: string[][], rowIndex: number) {
+		return html`
+			<div class="row">
+				${repeat(row, (group, groupIndex) => this.#renderGroup(group, rowIndex, groupIndex))}
+				<uui-button look="secondary" @click=${() => this.#addGroup(rowIndex, row.length)}>+</uui-button>
+				<uui-button
+					look="primary"
+					color="danger"
+					compact
+					class="remove-row-button ${rowIndex === 0 && row[rowIndex].length === 0 ? 'hidden' : undefined}"
+					@click=${() => this.#removeRow(rowIndex)}>
+					<umb-icon name="icon-trash"></umb-icon>
+				</uui-button>
+			</div>
+		`;
+	}
+
+	override render() {
+		return html`
+			<p style="margin-top: 0">
+				<uui-tag color="warning">WIP Feature</uui-tag> Rows, groups, and item order have no effect yet. <br />
+				However, adding and removing items from the toolbar is functional. Additionally, hiding items from the toolbar
+				while retaining their functionality by excluding them from the toolbar layout is also functional.
+			</p>
+			${repeat(this.#value, (row, rowIndex) => this.#renderRow(row, rowIndex))}
+			<uui-button look="secondary" @click=${() => this.#addRow(this.#value.length)}>+</uui-button>
+			${this.#renderExtensions()}
+		`;
+	}
+
+	#renderExtensions() {
+		// TODO: Can we avoid using a flat here? or is it okay for performance?
+		return html`<div class="extensions">
+			${repeat(
+				this._extensions.filter((ext) => !this.#value.flat(2).includes(ext.alias)),
+				(extension) =>
+					html`<div
+						class="item"
+						draggable="true"
+						@dragend=${this.#onDragEnd}
+						@dragstart=${(e: DragEvent) => this.#onDragStart(e, extension.alias)}>
+						<umb-icon name=${extension.icon ?? ''}></umb-icon>
+					</div>`,
+			)}
+		</div>`;
+	}
+
+	static override styles = [
 		UmbTextStyles,
 		css`
-			uui-icon {
-				width: unset;
-				height: unset;
+			:host {
 				display: flex;
-				vertical-align: unset;
-			}
-			uui-button.selected {
-				--uui-button-border-color: var(--uui-color-selected);
-				--uui-button-border-width: 2px;
+				flex-direction: column;
+				gap: 6px;
 			}
 			.extensions {
 				display: flex;
 				flex-wrap: wrap;
-				gap: 16px;
-				margin-top: 16px;
-			}
-			.extension-item {
-				display: grid;
-				grid-template-columns: 36px 1fr;
-				grid-template-rows: 1fr;
-				align-items: center;
-				gap: 9px;
-			}
-			.category {
-				flex: 1;
+				gap: 3px;
+				border-radius: var(--uui-border-radius);
 				background-color: var(--uui-color-surface-alt);
-				padding: 12px;
-				border-radius: 6px;
-				display: flex;
-				flex-direction: column;
-				gap: 6px;
-				border: 1px solid var(--uui-color-border);
+				padding: 6px;
+				min-height: 30px;
+				min-width: 30px;
 			}
-			.category-name {
-				grid-column: 1 / -1;
-				margin: 0;
-				font-weight: bold;
+			.row {
+				position: relative;
+				display: flex;
+				gap: 12px;
+			}
+			.group {
+				position: relative;
+				display: flex;
+				gap: 3px;
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-surface-alt);
+				padding: 6px;
+				min-height: 30px;
+				min-width: 30px;
+			}
+			.item {
+				padding: var(--uui-size-space-2);
+				border: 1px solid var(--uui-color-border);
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-surface);
+				cursor: move;
+				display: flex;
+				align-items: baseline;
+			}
+
+			.remove-row-button,
+			.remove-group-button {
+				display: none;
+			}
+			.remove-group-button {
+				position: absolute;
+				top: -26px;
+				left: 50%;
+				transform: translateX(-50%);
+				z-index: 1;
+			}
+
+			.row:hover .remove-row-button:not(.hidden),
+			.group:hover .remove-group-button:not(.hidden) {
 				display: flex;
 			}
 		`,
