@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -11,6 +12,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
 public partial class BlockListElementLevelVariationTests : BlockEditorElementVariationTestBase
 {
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
+    {
+        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Publish_Invariant_Properties_Without_Default_Culture_With_AllowEditInvariantFromNonDefault));
+    }
+
     private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
 
     private async Task<IDataType> CreateBlockListDataType(IContentType elementType)

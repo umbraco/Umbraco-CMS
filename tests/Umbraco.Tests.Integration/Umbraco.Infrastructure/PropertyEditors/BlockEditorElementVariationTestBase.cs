@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -21,14 +23,17 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-[Platform("Linux", Reason = "This currently uses too much memory for Windows. It can likely be run on Windows when NuCache is removed.")]
 public abstract class BlockEditorElementVariationTestBase : UmbracoIntegrationTest
 {
+    protected List<string> TestsRequiringAllowEditInvariantFromNonDefault { get; set; } = new();
+
     protected ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     protected IContentService ContentService => GetRequiredService<IContentService>();
 
     protected IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
+    protected PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
 
     private IPublishedSnapshotService PublishedSnapshotService => GetRequiredService<IPublishedSnapshotService>();
 
@@ -39,8 +44,6 @@ public abstract class BlockEditorElementVariationTestBase : UmbracoIntegrationTe
     private IVariationContextAccessor VariationContextAccessor => GetRequiredService<IVariationContextAccessor>();
 
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
-
-    private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
 
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer => GetRequiredService<IConfigurationEditorJsonSerializer>();
 
@@ -57,6 +60,9 @@ public abstract class BlockEditorElementVariationTestBase : UmbracoIntegrationTe
         builder.Services.AddUnique(mockHttpContextAccessor.Object);
         builder.AddUmbracoHybridCache();
         builder.AddNuCache();
+
+        builder.Services.Configure<ContentSettings>(config =>
+            config.AllowEditInvariantFromNonDefault = TestsRequiringAllowEditInvariantFromNonDefault.Contains(TestContext.CurrentContext.Test.Name));
     }
 
     [SetUp]
