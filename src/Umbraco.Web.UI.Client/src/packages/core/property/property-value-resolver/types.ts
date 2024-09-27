@@ -7,12 +7,12 @@ export type * from './property-value-resolver.extension.js';
 export interface UmbPropertyValueResolver<
 	PropertyValueType extends UmbPropertyValueData = UmbPropertyValueData,
 	InnerPropertyValueType extends UmbPropertyValueData = PropertyValueType,
-	InnerPropertyVariantType extends UmbVariantDataModel = UmbVariantDataModel,
+	InnerVariantType extends UmbVariantDataModel = UmbVariantDataModel,
 > extends UmbApi {
 	processValues?: UmbPropertyValueResolverValuesProcessor<PropertyValueType, InnerPropertyValueType>;
-	processVariants?: UmbPropertyValueResolverVariantsProcessor<PropertyValueType, InnerPropertyVariantType>;
+	processVariants?: UmbPropertyValueResolverVariantsProcessor<PropertyValueType, InnerVariantType>;
 	//ensureVariants?: UmbPropertyValueResolverEnsureVariants<PropertyValueType>;
-	compareVariants?: (a: InnerPropertyVariantType, b: InnerPropertyVariantType) => boolean;
+	compareVariants?: (a: InnerVariantType, b: InnerVariantType) => boolean;
 }
 
 export type UmbPropertyValueResolverValuesProcessor<
@@ -25,10 +25,10 @@ export type UmbPropertyValueResolverValuesProcessor<
 
 export type UmbPropertyValueResolverVariantsProcessor<
 	PropertyValueType extends UmbPropertyValueData = UmbPropertyValueData,
-	InnerPropertyVariantType extends UmbVariantDataModel = UmbVariantDataModel,
+	InnerVariantType extends UmbVariantDataModel = UmbVariantDataModel,
 > = (
 	value: PropertyValueType,
-	valuesProcessor: (values: Array<InnerPropertyVariantType>) => Promise<Array<InnerPropertyVariantType> | undefined>,
+	variantsProcessor: (values: Array<InnerVariantType>) => Promise<Array<InnerVariantType> | undefined>,
 ) => PromiseLike<PropertyValueType | undefined>;
 
 /*
