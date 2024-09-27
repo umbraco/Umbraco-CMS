@@ -1,4 +1,4 @@
-import { UmbTiptapToolbarElementApiBase, type UmbTiptapExtensionArgs } from '../types.js';
+import { UmbTiptapToolbarElementApiBase } from '../types.js';
 import {
 	UMB_MEDIA_CAPTION_ALT_TEXT_MODAL,
 	UMB_MEDIA_PICKER_MODAL,
@@ -8,18 +8,16 @@ import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { getGuidFromUdi, getProcessedImageUrl, imageSize } from '@umbraco-cms/backoffice/utils';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-export default class UmbTiptapMediaPickerExtensionApi extends UmbTiptapToolbarElementApiBase {
+export default class UmbTiptapMediaPickerToolbarExtensionApi extends UmbTiptapToolbarElementApiBase {
 	#modalManager?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
-	#configuration?: UmbPropertyEditorConfigCollection;
 
 	/**
 	 * @returns {number} The maximum width of uploaded images
 	 */
 	get maxWidth(): number {
-		const maxImageSize = parseInt(this.#configuration?.getValueByAlias('maxImageSize') ?? '', 10);
+		const maxImageSize = parseInt(this.configuration?.getValueByAlias('maxImageSize') ?? '', 10);
 		return isNaN(maxImageSize) ? 500 : maxImageSize;
 	}
 
@@ -29,11 +27,6 @@ export default class UmbTiptapMediaPickerExtensionApi extends UmbTiptapToolbarEl
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalManager = instance;
 		});
-	}
-
-	getTiptapExtensions(args: UmbTiptapExtensionArgs) {
-		this.#configuration = args?.configuration;
-		return [];
 	}
 
 	override isActive(editor?: Editor) {

@@ -140,6 +140,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 					<umb-tiptap-fixed-menu
 						.toolbar=${this._toolbar}
 						.editor=${this._editor}
+						.configuration=${this.configuration}
 						?readonly=${this.readonly}></umb-tiptap-fixed-menu>
 				`,
 			)}

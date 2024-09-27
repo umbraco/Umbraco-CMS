@@ -55,7 +55,7 @@ export interface UmbTiptapExtensionArgs {
 	configuration?: UmbPropertyEditorConfigCollection;
 }
 
-export interface UmbTiptapToolbarElementApi extends UmbApi {
+export interface UmbTiptapToolbarElementApi extends UmbApi, UmbTiptapExtensionArgs {
 	/**
 	 * The manifest for the extension.
 	 */
@@ -77,6 +77,11 @@ export abstract class UmbTiptapToolbarElementApiBase extends UmbControllerBase i
 	 * The manifest for the extension.
 	 */
 	manifest?: ManifestTiptapToolbarExtension;
+
+	/**
+	 * The data type configuration for the property editor that the editor is used for.
+	 */
+	configuration?: UmbPropertyEditorConfigCollection;
 
 	/**
 	 * A method to execute the toolbar element action.

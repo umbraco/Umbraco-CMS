@@ -2,6 +2,7 @@ import type { ManifestTiptapToolbarExtension } from '../../extensions/tiptap-too
 import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 import '../toolbar/tiptap-toolbar-dropdown-base.element.js';
 
@@ -13,17 +14,10 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 	readonly = false;
 
 	@property({ attribute: false })
-	set editor(value) {
-		const oldValue = this.#editor;
-		if (value === oldValue) {
-			return;
-		}
-		this.#editor = value;
-	}
-	get editor() {
-		return this.#editor;
-	}
-	#editor?: Editor;
+	editor?: Editor;
+
+	@property({ attribute: false })
+	configuration?: UmbPropertyEditorConfigCollection;
 
 	@property({ attribute: false })
 	toolbar: string[][][] = [[[]]];
@@ -34,7 +28,8 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 				type="tiptapToolbarExtension"
 				.filter=${(ext: ManifestTiptapToolbarExtension) =>
 					this.toolbar.flat(2).includes(ext.alias) && (!!ext.kind || !!ext.element)}
-				.elementProps=${{ editor: this.editor }}>
+				.elementProps=${{ editor: this.editor, configuration: this.configuration }}
+				.apiProps=${{ configuration: this.configuration }}>
 			</umb-extension-with-api-slot>
 		`;
 	}
