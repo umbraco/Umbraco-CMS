@@ -78,7 +78,7 @@ public class UmbracoPlan : MigrationPlan
         To<NoopMigration>("{C567DE81-DF92-4B99-BEA8-CD34EF99DA5D}");
         To<V_14_0_0.DeleteMacroTables>("{0D82C836-96DD-480D-A924-7964E458BD34}");
         To<V_14_0_0.MoveDocumentBlueprintsToFolders>("{1A0FBC8A-6FC6-456C-805C-B94816B2E570}");
-        To<V_14_0_0.MigrateTours>("{302DE171-6D83-4B6B-B3C0-AC8808A16CA1}");
+        To<NoopMigration>("{302DE171-6D83-4B6B-B3C0-AC8808A16CA1}");
         To<V_14_0_0.MigrateUserGroup2PermissionPermissionColumnType>("{8184E61D-ECBA-4AAA-B61B-D7A82EB82EB7}");
         To<V_14_0_0.MigrateNotificationCharsToStrings>("{E261BF01-2C7F-4544-BAE7-49D545B21D68}");
         To<V_14_0_0.AddEditorUiToDataType>("{5A2EF07D-37B4-49D5-8E9B-3ED01877263B}");
@@ -98,7 +98,6 @@ public class UmbracoPlan : MigrationPlan
 
         // To 15.0.0
         To<V_15_0_0.AddUserClientId>("{7F4F31D8-DD71-4F0D-93FC-2690A924D84B}");
-        To<V_15_0_0.AddKindToUser>("{1A8835EF-F8AB-4472-B4D8-D75B7C164022}");
-
+        To<NoopMigration>("{1A8835EF-F8AB-4472-B4D8-D75B7C164022}");
     }
 }

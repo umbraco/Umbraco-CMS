@@ -26,16 +26,18 @@ internal class MigrateTours : UnscopedMigrationBase
 
     protected override void Migrate()
     {
+        // if the table already exists, do nothing
+        if (TableExists(Constants.DatabaseSchema.Tables.UserData))
+        {
+            Context.Complete();
+            return;
+        }
+
         using IScope scope = _scopeProvider.CreateScope();
         using IDisposable notificationSuppression = scope.Notifications.Suppress();
         ScopeDatabase(scope);
 
         // create table
-        if (TableExists(Constants.DatabaseSchema.Tables.UserData))
-        {
-            return;
-        }
-
         Create.Table<UserDataDto>().Do();
 
         // transform all existing UserTour fields in to userdata
