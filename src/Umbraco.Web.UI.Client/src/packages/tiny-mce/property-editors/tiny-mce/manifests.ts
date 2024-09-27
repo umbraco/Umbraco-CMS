@@ -1,5 +1,5 @@
-import { UmbRteBlockValueResolver } from '@umbraco-cms/backoffice/block-rte';
 import { manifest as schemaManifest } from './Umbraco.RichText.js';
+import { UmbRteBlockValueResolver } from './property-value-resolver/rte-block-value-resolver.api.js';
 
 export const UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS = 'Umbraco.RichText';
 export const UMB_BLOCK_RTE_PROPERTY_EDITOR_UI_ALIAS = 'Umb.PropertyEditorUi.TinyMCE';

@@ -1,4 +1,4 @@
-import type { UmbPropertyEditorUiValueType } from '../../../tiny-mce/types.js';
+import type { UmbPropertyEditorUiValueType } from '../../../types.js';
 import {
 	UmbBlockValueResolver,
 	type UmbBlockDataValueModel,

@@ -1,12 +1,6 @@
-import type { UmbBlockDataModel, UmbBlockExposeModel } from '@umbraco-cms/backoffice/block';
-
-export interface UmbRteBlockValueType {
-	contentData: Array<UmbBlockDataModel>;
-	settingsData: Array<UmbBlockDataModel>;
-	expose: Array<UmbBlockExposeModel>;
-}
+import type { UmbBlockValueDataPropertiesBaseType } from '@umbraco-cms/backoffice/block';
 
 export interface UmbPropertyEditorUiValueType {
 	markup: string;
-	blocks: UmbRteBlockValueType;
+	blocks: UmbBlockValueDataPropertiesBaseType;
 }
