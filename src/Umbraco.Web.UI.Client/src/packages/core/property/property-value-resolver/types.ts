@@ -30,16 +30,3 @@ export type UmbPropertyValueResolverVariantsProcessor<
 	value: PropertyValueType,
 	variantsProcessor: (values: Array<InnerVariantType>) => Promise<Array<InnerVariantType> | undefined>,
 ) => PromiseLike<PropertyValueType | undefined>;
-
-/*
-export type UmbPropertyValueResolverEnsureVariants<
-	PropertyValueType extends UmbPropertyValueData = UmbPropertyValueData,
-> = (
-	value: PropertyValueType,
-	args: UmbPropertyValueResolverEnsureVariantArgs,
-) => PromiseLike<PropertyValueType | undefined>;
-
-export type UmbPropertyValueResolverEnsureVariantArgs = {
-	selectedVariants: Array<UmbVariantId>;
-};
-*/
