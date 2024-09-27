@@ -41,6 +41,11 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	@state()
 	_extensions: Extension[] = [];
 
+	#currentDragItem?: {
+		alias: string;
+		fromPos?: [number, number, number];
+	};
+
 	protected override async firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
 		super.firstUpdated(_changedProperties);
 
@@ -58,13 +63,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 
 	#onDragStart = (event: DragEvent, alias: string, fromPos?: [number, number, number]) => {
 		event.dataTransfer!.effectAllowed = 'move';
-		event.dataTransfer!.setData(
-			'application/json',
-			JSON.stringify({
-				alias,
-				fromPos,
-			}),
-		);
+		this.#currentDragItem = { alias, fromPos };
 	};
 
 	#onDragOver = (event: DragEvent) => {
@@ -75,21 +74,29 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	#onDragEnd = (event: DragEvent) => {
 		event.preventDefault();
 		if (event.dataTransfer?.dropEffect === 'none') {
-			const { fromPos } = JSON.parse(event.dataTransfer!.getData('application/json'));
+			const { fromPos } = this.#currentDragItem ?? {};
 			if (!fromPos) return;
 
 			this.#removeItem(fromPos);
 		}
 	};
 
-	#onDrop = (event: DragEvent, toPos: [number, number, number]) => {
+	#onDrop = (event: DragEvent, toPos?: [number, number, number]) => {
 		event.preventDefault();
+		const { alias, fromPos } = this.#currentDragItem ?? {};
 
-		const { alias, fromPos } = JSON.parse(event.dataTransfer!.getData('application/json'));
-
-		if (fromPos) {
+		// Remove item if no destination position is provided
+		if (fromPos && !toPos) {
+			this.#removeItem(fromPos);
+			return;
+		}
+		// Move item if both source and destination positions are available
+		if (fromPos && toPos) {
 			this.#moveItem(fromPos, toPos);
-		} else if (alias) {
+			return;
+		}
+		// Insert item if an alias and a destination position are provided
+		if (alias && toPos) {
 			this.#insertItem(alias, toPos);
 		}
 	};
@@ -215,7 +222,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 
 	#renderExtensions() {
 		// TODO: Can we avoid using a flat here? or is it okay for performance?
-		return html`<div class="extensions">
+		return html`<div class="extensions" dropzone="move" @drop=${this.#onDrop} @dragover=${this.#onDragOver}>
 			${repeat(
 				this._extensions.filter((ext) => !this.#value.flat(2).includes(ext.alias)),
 				(extension) =>
