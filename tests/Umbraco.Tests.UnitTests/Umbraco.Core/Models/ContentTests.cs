@@ -90,7 +90,7 @@ public class ContentTests
 
         Thread.Sleep(500); // The "Date" wont be dirty if the test runs too fast since it will be the same date
         content.SetCultureName("name-fr", langFr);
-        content.PublishCulture(CultureImpact.Explicit(langFr, false), _propertyEditorCollection); // we've set the name, now we're publishing it
+        content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.Now, _propertyEditorCollection); // we've set the name, now we're publishing it
         Assert.IsTrue(
             content.IsPropertyDirty("PublishCultureInfos")); // now it will be changed since the collection has changed
         var frCultureName = content.PublishCultureInfos[langFr];
@@ -103,7 +103,7 @@ public class ContentTests
 
         Thread.Sleep(500); // The "Date" wont be dirty if the test runs too fast since it will be the same date
         content.SetCultureName("name-fr", langFr);
-        content.PublishCulture(CultureImpact.Explicit(langFr, false), _propertyEditorCollection); // we've set the name, now we're publishing it
+        content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.Now, _propertyEditorCollection); // we've set the name, now we're publishing it
         Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
         Assert.IsTrue(content.IsPropertyDirty("PublishCultureInfos")); // it's true now since we've updated a name
     }
@@ -303,7 +303,7 @@ public class ContentTests
 
         content.SetCultureName("Hello", "en-US");
         content.SetCultureName("World", "es-ES");
-        content.PublishCulture(CultureImpact.All, _propertyEditorCollection);
+        content.PublishCulture(CultureImpact.All, DateTime.Now, _propertyEditorCollection);
 
         // should not try to clone something that's not Published or Unpublished
         // (and in fact it will not work)
@@ -416,7 +416,7 @@ public class ContentTests
 
         content.SetCultureName("Hello", "en-US");
         content.SetCultureName("World", "es-ES");
-        content.PublishCulture(CultureImpact.All, _propertyEditorCollection);
+        content.PublishCulture(CultureImpact.All, DateTime.Now, _propertyEditorCollection);
 
         var i = 200;
         foreach (var property in content.Properties)

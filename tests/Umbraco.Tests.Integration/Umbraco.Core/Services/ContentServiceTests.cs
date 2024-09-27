@@ -1290,7 +1290,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         content.SetCultureName("name-fr", langFr.IsoCode);
         content.SetCultureName("name-da", langDa.IsoCode);
 
-        content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault), PropertyEditorCollection);
+        content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault), DateTime.Now, PropertyEditorCollection);
         var result = ContentService.CommitDocumentChanges(content);
         Assert.IsTrue(result.Success);
         content = ContentService.GetById(content.Id);
@@ -1298,7 +1298,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsFalse(content.IsCulturePublished(langDa.IsoCode));
 
         content.UnpublishCulture(langFr.IsoCode);
-        content.PublishCulture(CultureImpact.Explicit(langDa.IsoCode, langDa.IsDefault), PropertyEditorCollection);
+        content.PublishCulture(CultureImpact.Explicit(langDa.IsoCode, langDa.IsDefault), DateTime.Now, PropertyEditorCollection);
 
         result = ContentService.CommitDocumentChanges(content);
         Assert.IsTrue(result.Success);
