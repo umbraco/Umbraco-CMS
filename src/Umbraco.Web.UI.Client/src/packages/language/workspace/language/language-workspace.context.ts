@@ -55,6 +55,10 @@ export class UmbLanguageWorkspaceContext
 		this._data.updateCurrent({ name });
 	}
 
+	getName() {
+		return this._data.getCurrent()?.name;
+	}
+
 	setCulture(unique: string) {
 		this._data.updateCurrent({ unique });
 	}
