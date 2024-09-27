@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Member;
 
-public class MemberMapDefinition : ContentMapDefinition<IMember, MemberValueModel, MemberVariantResponseModel>, IMapDefinition
+public class MemberMapDefinition : ContentMapDefinition<IMember, MemberValueResponseModel, MemberVariantResponseModel>, IMapDefinition
 {
     public MemberMapDefinition(PropertyEditorCollection propertyEditorCollection)
         : base(propertyEditorCollection)
@@ -17,7 +17,7 @@ public class MemberMapDefinition : ContentMapDefinition<IMember, MemberValueMode
     public void DefineMaps(IUmbracoMapper mapper)
         => mapper.Define<IMember, MemberResponseModel>((_, _) => new MemberResponseModel(), Map);
 
-    // Umbraco.Code.MapAll -IsTwoFactorEnabled -Groups
+    // Umbraco.Code.MapAll -IsTwoFactorEnabled -Groups -Kind
     private void Map(IMember source, MemberResponseModel target, MapperContext context)
     {
         target.Id = source.Key;

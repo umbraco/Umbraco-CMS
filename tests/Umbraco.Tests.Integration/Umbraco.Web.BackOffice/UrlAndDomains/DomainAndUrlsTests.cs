@@ -17,6 +17,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.UrlAndDomains;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Mapper = true, WithApplication = true, Logger = UmbracoTestOptions.Logger.Console)]
+[Platform("Linux", Reason = "This uses too much memory when running both caches, should be removed when nuchache is removed")]
 public class DomainAndUrlsTests : UmbracoIntegrationTest
 {
     [SetUp]
@@ -66,6 +67,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.Services.AddUnique<IVariationContextAccessor>(_variationContextAccessor);
+        builder.AddUmbracoHybridCache();
         builder.AddNuCache();
     }
 

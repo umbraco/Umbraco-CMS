@@ -80,6 +80,7 @@ internal sealed class ContentEditingService
         return await Task.FromResult(content);
     }
 
+    [Obsolete("Please use the validate update method that is not obsoleted. Will be removed in V16.")]
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ContentUpdateModel updateModel)
     {
         IContent? content = ContentService.GetById(key);
@@ -88,8 +89,16 @@ internal sealed class ContentEditingService
             : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
     }
 
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ValidateContentUpdateModel updateModel)
+    {
+        IContent? content = ContentService.GetById(key);
+        return content is not null
+            ? await ValidateCulturesAndPropertiesAsync(updateModel, content.ContentType.Key, updateModel.Cultures)
+            : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
+    }
+
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ContentCreateModel createModel)
-        => await ValidateCulturesAndPropertiesAsync(createModel, createModel.ContentTypeKey);
+        => await ValidateCulturesAndPropertiesAsync(createModel, createModel.ContentTypeKey, createModel.Variants.Select(variant => variant.Culture));
 
     public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey)
     {
@@ -230,10 +239,11 @@ internal sealed class ContentEditingService
 
     private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCulturesAndPropertiesAsync(
         ContentEditingModelBase contentEditingModelBase,
-        Guid contentTypeKey)
+        Guid contentTypeKey,
+        IEnumerable<string?>? culturesToValidate = null)
         => await ValidateCulturesAsync(contentEditingModelBase) is false
             ? Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentValidationResult())
-            : await ValidatePropertiesAsync(contentEditingModelBase, contentTypeKey);
+            : await ValidatePropertiesAsync(contentEditingModelBase, contentTypeKey, culturesToValidate);
 
     private async Task<ContentEditingOperationStatus> UpdateTemplateAsync(IContent content, Guid? templateKey)
     {

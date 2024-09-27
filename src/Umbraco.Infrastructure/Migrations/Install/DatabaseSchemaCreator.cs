@@ -53,6 +53,7 @@ public class DatabaseSchemaCreator
         typeof(ContentType2ContentTypeDto),
         typeof(ContentTypeAllowedContentTypeDto),
         typeof(User2NodeNotifyDto),
+        typeof(User2ClientIdDto),
         typeof(ServerRegistrationDto),
         typeof(AccessDto),
         typeof(AccessRuleDto),

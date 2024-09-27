@@ -48,6 +48,9 @@
     <PackageReference Include="Serilog.Sinks.Async" />
     <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="Serilog.Sinks.Map" />
+
+    <!-- Take top-level depedendency on System.Text.RegularExpressions, because both Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc depend on a vulnerable version -->
+    <PackageReference Include="System.Text.RegularExpressions" />
   </ItemGroup>
 
   <ItemGroup>

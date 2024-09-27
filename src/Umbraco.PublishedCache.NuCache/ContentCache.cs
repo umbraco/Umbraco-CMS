@@ -56,6 +56,12 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
     public IPublishedContent? GetByRoute(string route, bool? hideTopLevelNode = null, string? culture = null) =>
         GetByRoute(PreviewDefault, route, hideTopLevelNode, culture);
 
+    public Task<IPublishedContent?> GetByIdAsync(int id, bool preview = false) => throw new NotImplementedException();
+
+    public Task<IPublishedContent?> GetByIdAsync(Guid key, bool preview = false) => throw new NotImplementedException();
+
+    public Task<bool> HasByIdAsync(int id, bool preview = false) => throw new NotImplementedException();
+
     public IPublishedContent? GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string? culture = null)
     {
         if (route == null)

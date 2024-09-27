@@ -95,5 +95,9 @@ public class UmbracoPlan : MigrationPlan
 
         // To 14.3.0
         To<V_13_5_0.ChangeRedirectUrlToNvarcharMax>("{EEF792FC-318C-4921-9859-51EBF07A53A3}"); // Execute again, to ensure all that migrated to 14.0.0 without 13.5 will have this
+
+        // To 15.0.0
+        To<V_15_0_0.AddUserClientId>("{7F4F31D8-DD71-4F0D-93FC-2690A924D84B}");
+        To<V_15_0_0.AddKindToUser>("{1A8835EF-F8AB-4472-B4D8-D75B7C164022}");
     }
 }

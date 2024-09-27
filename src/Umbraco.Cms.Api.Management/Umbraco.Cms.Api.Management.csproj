@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj" />
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
   </ItemGroup>

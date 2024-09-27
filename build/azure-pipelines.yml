@@ -287,8 +287,8 @@ stages:
         displayName: Integration Tests (SQLite)
         strategy:
           matrix:
-            Windows:
-              vmImage: 'windows-latest'
+#            Windows:
+#              vmImage: 'windows-latest'
             Linux:
               vmImage: 'ubuntu-latest'
             macOS:

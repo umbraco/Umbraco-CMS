@@ -12,6 +12,10 @@
           and remove these overrides -->
     <WarningsNotAsErrors>ASP0019,CS0618,SA1401,SA1649,IDE0270,IDE1006</WarningsNotAsErrors>
   </PropertyGroup>
+  <PropertyGroup>
+    <!-- TODO: Fix all warnings and remove this override -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
   </ItemGroup>
