@@ -6,9 +6,9 @@ import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-ed
 import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '@umbraco-cms/backoffice/block-rte';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbBlockValueType } from '@umbraco-cms/backoffice/block';
 
 import '../../components/input-tiptap/input-tiptap.element.js';
-import type { UmbBlockValueType } from '@umbraco-cms/backoffice/block';
 
 export interface UmbRichTextEditorValueType {
 	markup: string;
