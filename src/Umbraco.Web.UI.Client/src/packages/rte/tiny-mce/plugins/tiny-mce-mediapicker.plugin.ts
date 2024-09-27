@@ -31,7 +31,7 @@ interface MediaPickerResultData {
 
 export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 	#modalManager?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
-	#temporaryFileRepository;
+	readonly #temporaryFileRepository;
 
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
@@ -144,7 +144,7 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 		if (!modalHandler) return;
 
 		const { selection } = await modalHandler.onSubmit().catch(() => ({ selection: undefined }));
-		if (!selection || !selection.length) return;
+		if (!selection?.length) return;
 
 		this.#showMediaCaptionAltText(selection[0], currentTarget);
 		this.editor.dispatch('Change');
@@ -200,13 +200,11 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 			} else {
 				parentElement.innerHTML = combined;
 			}
-		} else {
+		} else if (parentElement?.nodeName === 'FIGURE' && parentElement.parentElement) {
 			//if caption is removed, remove the figure element
-			if (parentElement?.nodeName === 'FIGURE' && parentElement.parentElement) {
-				parentElement.parentElement.innerHTML = newImage;
-			} else {
-				this.editor.selection.setContent(newImage);
-			}
+			parentElement.parentElement.innerHTML = newImage;
+		} else {
+			this.editor.selection.setContent(newImage);
 		}
 
 		// Using settimeout to wait for a DoM-render, so we can find the new element by ID.

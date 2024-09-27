@@ -128,7 +128,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 		</ul>`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			ul {

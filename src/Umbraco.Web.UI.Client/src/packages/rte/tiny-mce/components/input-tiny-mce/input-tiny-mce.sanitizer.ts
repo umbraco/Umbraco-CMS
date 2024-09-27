@@ -46,4 +46,16 @@ export const uriAttributeSanitizer = (editor: Editor) => {
 			return uri;
 		};
 	})();
+
+	editor.serializer.addAttributeFilter('uriAttributesToSanitize', function (nodes) {
+		nodes.forEach(function (node) {
+			if (!node.attributes) return;
+			for (const attr of node.attributes) {
+				const attrName = attr.name.toLowerCase();
+				if (uriAttributesToSanitize.indexOf(attrName) !== -1) {
+					attr.value = parseUri(attr.value, node.name) ?? '';
+				}
+			}
+		});
+	});
 };

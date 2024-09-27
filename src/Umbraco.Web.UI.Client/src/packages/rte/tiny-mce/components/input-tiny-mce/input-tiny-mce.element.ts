@@ -18,6 +18,7 @@ import {
 	renderEditor,
 } from '@umbraco-cms/backoffice/external/tinymce';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  * Handles the resize event
@@ -41,7 +42,7 @@ async function onResize(
 	const resizedPath = await getProcessedImageUrl(path, {
 		width: e.width,
 		height: e.height,
-		mode: 'max',
+		mode: ImageCropModeModel.MAX,
 	});
 
 	e.target.setAttribute('data-mce-src', resizedPath);
@@ -54,8 +55,8 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 
 	#plugins: Array<ClassConstructor<UmbTinyMcePluginBase> | undefined> = [];
 	#editorRef?: Editor | null = null;
-	#stylesheetRepository = new UmbStylesheetDetailRepository(this);
-	#umbStylesheetRuleManager = new UmbStylesheetRuleManager();
+	readonly #stylesheetRepository = new UmbStylesheetDetailRepository(this);
+	readonly #umbStylesheetRuleManager = new UmbStylesheetRuleManager();
 
 	protected override getFormElement() {
 		return this._editorElement?.querySelector('iframe') ?? undefined;
@@ -93,14 +94,13 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	#readonly = false;
 
 	@query('.editor', true)
-	private _editorElement?: HTMLElement;
+	private readonly _editorElement?: HTMLElement;
 
 	getEditor() {
 		return this.#editorRef;
 	}
 
-	constructor() {
-		super();
+	override firstUpdated() {
 		this.#loadEditor();
 	}
 
@@ -226,8 +226,8 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 
 		// set the configured toolbar if any, otherwise false
 		const toolbar = this.configuration?.getValueByAlias<string[]>('toolbar');
-		if (toolbar && toolbar.length) {
-			configurationOptions.toolbar = toolbar?.join(' ');
+		if (toolbar?.length) {
+			configurationOptions.toolbar = toolbar.join(' ');
 		} else {
 			configurationOptions.toolbar = false;
 		}
@@ -338,9 +338,9 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 			 */
 			const allNodes = Array.from(editor.dom.doc.getElementsByTagName('*'));
 			allNodes.forEach((node) => {
-				for (let i = 0; i < node.attributes.length; i++) {
-					if (node.attributes[i].name.startsWith('on')) {
-						node.removeAttribute(node.attributes[i].name);
+				for (const attr of node.attributes) {
+					if (attr.name.startsWith('on')) {
+						node.removeAttribute(attr.name);
 					}
 				}
 			});
