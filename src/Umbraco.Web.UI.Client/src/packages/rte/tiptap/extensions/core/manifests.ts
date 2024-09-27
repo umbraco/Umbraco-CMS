@@ -1,6 +1,6 @@
-import type { ManifestTiptapExtension, ManifestTiptapExtensionButtonKind } from '../tiptap-extension.js';
+import type { ManifestTiptapExtension } from '../tiptap-extension.js';
 
-export const manifests: Array<ManifestTiptapExtension | ManifestTiptapExtensionButtonKind> = [
+export const manifests: Array<ManifestTiptapExtension> = [
 	{
 		type: 'tiptapExtension',
 		kind: 'button',
@@ -9,7 +9,6 @@ export const manifests: Array<ManifestTiptapExtension | ManifestTiptapExtensionB
 		api: () => import('./blockquote.extension.js'),
 		weight: 995,
 		meta: {
-			alias: 'blockquote',
 			icon: 'icon-blockquote',
 			label: 'Blockquote',
 		},
@@ -22,22 +21,8 @@ export const manifests: Array<ManifestTiptapExtension | ManifestTiptapExtensionB
 		api: () => import('./bold.extension.js'),
 		weight: 999,
 		meta: {
-			alias: 'bold',
 			icon: 'icon-bold',
 			label: 'Bold',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.BulletList',
-		name: 'Bullet List Tiptap Extension',
-		api: () => import('./bullet-list.extension.js'),
-		weight: 993,
-		meta: {
-			alias: 'bulletList',
-			icon: 'icon-bulleted-list',
-			label: 'Bullet List',
 		},
 	},
 	{
@@ -48,9 +33,30 @@ export const manifests: Array<ManifestTiptapExtension | ManifestTiptapExtensionB
 		api: () => import('./code-block.extension.js'),
 		weight: 994,
 		meta: {
-			alias: 'codeBlock',
 			icon: 'icon-code',
 			label: 'Code Block',
+		},
+	},
+	{
+		type: 'tiptapExtension',
+		alias: 'Umb.Tiptap.Embed',
+		name: 'Embed Tiptap Extension',
+		api: () => import('./embedded-media.extension.js'),
+		weight: 70,
+		meta: {
+			icon: 'icon-embed',
+			label: '#general_embed',
+		},
+	},
+	{
+		type: 'tiptapExtension',
+		alias: 'Umb.Tiptap.Link',
+		name: 'Link Tiptap Extension',
+		api: () => import('./link.extension.js'),
+		weight: 102,
+		meta: {
+			icon: 'icon-link',
+			label: '#defaultdialogs_urlLinkPicker',
 		},
 	},
 	{
@@ -60,48 +66,8 @@ export const manifests: Array<ManifestTiptapExtension | ManifestTiptapExtensionB
 		api: () => import('./figure.extension.js'),
 		weight: 955,
 		meta: {
-			alias: 'figure',
 			icon: 'icon-frame',
 			label: 'Figure',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Heading1',
-		name: 'Heading 1 Tiptap Extension',
-		api: () => import('./heading1.extension.js'),
-		weight: 949,
-		meta: {
-			alias: 'heading1',
-			icon: 'icon-heading-1',
-			label: 'Heading 1',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Heading2',
-		name: 'Heading 2 Tiptap Extension',
-		api: () => import('./heading2.extension.js'),
-		weight: 948,
-		meta: {
-			alias: 'heading2',
-			icon: 'icon-heading-2',
-			label: 'Heading 2',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Heading3',
-		name: 'Heading 3 Tiptap Extension',
-		api: () => import('./heading3.extension.js'),
-		weight: 947,
-		meta: {
-			alias: 'heading3',
-			icon: 'icon-heading-3',
-			label: 'Heading 3',
 		},
 	},
 	{
@@ -112,7 +78,6 @@ export const manifests: Array<ManifestTiptapExtension | ManifestTiptapExtensionB
 		api: () => import('./horizontal-rule.extension.js'),
 		weight: 991,
 		meta: {
-			alias: 'horizontalRule',
 			icon: 'icon-horizontal-rule',
 			label: 'Horizontal Rule',
 		},
@@ -123,7 +88,8 @@ export const manifests: Array<ManifestTiptapExtension | ManifestTiptapExtensionB
 		name: 'Image Tiptap Extension',
 		api: () => import('./image.extension.js'),
 		meta: {
-			alias: 'image',
+			icon: 'icon-picture',
+			label: 'Image',
 		},
 	},
 	{
@@ -134,22 +100,8 @@ export const manifests: Array<ManifestTiptapExtension | ManifestTiptapExtensionB
 		api: () => import('./italic.extension.js'),
 		weight: 998,
 		meta: {
-			alias: 'italic',
 			icon: 'icon-italic',
 			label: 'Italic',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.OrderedList',
-		name: 'Ordered List Tiptap Extension',
-		api: () => import('./ordered-list.extension.js'),
-		weight: 992,
-		meta: {
-			alias: 'orderedList',
-			icon: 'icon-ordered-list',
-			label: 'Ordered List',
 		},
 	},
 	{
@@ -160,7 +112,6 @@ export const manifests: Array<ManifestTiptapExtension | ManifestTiptapExtensionB
 		api: () => import('./strike.extension.js'),
 		weight: 996,
 		meta: {
-			alias: 'strike',
 			icon: 'icon-strikethrough',
 			label: 'Strike',
 		},
@@ -173,61 +124,8 @@ export const manifests: Array<ManifestTiptapExtension | ManifestTiptapExtensionB
 		api: () => import('./table.extension.js'),
 		weight: 909,
 		meta: {
-			alias: 'table',
 			icon: 'icon-table',
 			label: 'Table',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.TextAlignCenter',
-		name: 'Text Align Center Tiptap Extension',
-		api: () => import('./text-align-center.extension.js'),
-		weight: 918,
-		meta: {
-			alias: 'text-align-center',
-			icon: 'icon-text-align-center',
-			label: 'Text Align Center',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.TextAlignJustify',
-		name: 'Text Align Justify Tiptap Extension',
-		api: () => import('./text-align-justify.extension.js'),
-		weight: 916,
-		meta: {
-			alias: 'text-align-justify',
-			icon: 'icon-text-align-justify',
-			label: 'Text Align Justify',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.TextAlignLeft',
-		name: 'Text Align Left Tiptap Extension',
-		api: () => import('./text-align-left.extension.js'),
-		weight: 919,
-		meta: {
-			alias: 'text-align-left',
-			icon: 'icon-text-align-left',
-			label: 'Text Align Left',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.TextAlignRight',
-		name: 'Text Align Right Tiptap Extension',
-		api: () => import('./text-align-right.extension.js'),
-		weight: 917,
-		meta: {
-			alias: 'text-align-right',
-			icon: 'icon-text-align-right',
-			label: 'Text Align Right',
 		},
 	},
 	{
@@ -238,23 +136,38 @@ export const manifests: Array<ManifestTiptapExtension | ManifestTiptapExtensionB
 		api: () => import('./underline.extension.js'),
 		weight: 997,
 		meta: {
-			alias: 'underline',
 			icon: 'icon-underline',
 			label: 'Underline',
 		},
 	},
 	{
 		type: 'tiptapExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Unlink',
-		name: 'Unlink Tiptap Extension',
-		api: () => import('./unlink.extension.js'),
-		element: () => import('../../components/toolbar/tiptap-toolbar-button-disabled.element.js'),
-		weight: 101,
+		alias: 'Umb.Tiptap.Heading',
+		name: 'Heading Tiptap Extension',
+		api: () => import('./heading.extension.js'),
 		meta: {
-			alias: 'unlink',
-			icon: 'icon-unlink',
-			label: 'Unlink',
+			icon: 'icon-heading-1',
+			label: 'Heading',
+		},
+	},
+	{
+		type: 'tiptapExtension',
+		alias: 'Umb.Tiptap.List',
+		name: 'List Tiptap Extension',
+		api: () => import('./list.extension.js'),
+		meta: {
+			icon: 'icon-ordered-list',
+			label: 'Ordered List',
+		},
+	},
+	{
+		type: 'tiptapExtension',
+		alias: 'Umb.Tiptap.TextAlign',
+		name: 'Text Align Tiptap Extension',
+		api: () => import('./text-align.extension.js'),
+		meta: {
+			icon: 'icon-text-align-justify',
+			label: 'Text Align',
 		},
 	},
 ];

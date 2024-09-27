@@ -4,90 +4,11 @@ import type { UmbBlockDataType } from '../../block/types.js';
 import { UMB_DATA_CONTENT_UDI, type UmbBlockRteLayoutModel } from '../types.js';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import { UmbTiptapToolbarElementApiBase } from '@umbraco-cms/backoffice/tiptap';
-import { Node, type Editor } from '@umbraco-cms/backoffice/external/tiptap';
+import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { distinctUntilChanged } from '@umbraco-cms/backoffice/external/rxjs';
 
-declare module '@tiptap/core' {
-	interface Commands<ReturnType> {
-		umbRteBlock: {
-			setBlock: (options: { contentUdi: string }) => ReturnType;
-		};
-		umbRteBlockInline: {
-			setBlockInline: (options: { contentUdi: string }) => ReturnType;
-		};
-	}
-}
-
-const umbRteBlock = Node.create({
-	name: 'umbRteBlock',
-	group: 'block',
-	content: undefined, // The block does not have any content, it is just a wrapper.
-	atom: true, // The block is an atom, meaning it is a single unit that cannot be split.
-	marks: '', // We do not allow marks on the block
-	draggable: true,
-	selectable: true,
-
-	addAttributes() {
-		return {
-			[UMB_DATA_CONTENT_UDI]: {
-				isRequired: true,
-			},
-		};
-	},
-
-	parseHTML() {
-		return [{ tag: 'umb-rte-block' }];
-	},
-
-	renderHTML({ HTMLAttributes }) {
-		return ['umb-rte-block', HTMLAttributes];
-	},
-
-	addCommands() {
-		return {
-			setBlock:
-				(options) =>
-				({ commands }) => {
-					const attrs = { [UMB_DATA_CONTENT_UDI]: options.contentUdi };
-					return commands.insertContent({
-						type: this.name,
-						attrs,
-					});
-				},
-		};
-	},
-});
-
-const umbRteBlockInline = umbRteBlock.extend({
-	name: 'umbRteBlockInline',
-	group: 'inline',
-	inline: true,
-
-	parseHTML() {
-		return [{ tag: 'umb-rte-block-inline' }];
-	},
-
-	renderHTML({ HTMLAttributes }) {
-		return ['umb-rte-block-inline', HTMLAttributes];
-	},
-
-	addCommands() {
-		return {
-			setBlockInline:
-				(options) =>
-				({ commands }) => {
-					const attrs = { [UMB_DATA_CONTENT_UDI]: options.contentUdi };
-					return commands.insertContent({
-						type: this.name,
-						attrs,
-					});
-				},
-		};
-	},
-});
-
-export default class UmbTiptapBlockPickerExtension extends UmbTiptapToolbarElementApiBase {
+export default class UmbTiptapBlockPickerToolbarExtension extends UmbTiptapToolbarElementApiBase {
 	#blocks?: Array<UmbBlockTypeBaseModel>;
 	#entriesContext?: typeof UMB_BLOCK_RTE_ENTRIES_CONTEXT.TYPE;
 
@@ -115,10 +36,6 @@ export default class UmbTiptapBlockPickerExtension extends UmbTiptapToolbarEleme
 		this.consumeContext(UMB_BLOCK_RTE_ENTRIES_CONTEXT, (context) => {
 			this.#entriesContext = context;
 		});
-	}
-
-	getTiptapExtensions() {
-		return [umbRteBlock, umbRteBlockInline];
 	}
 
 	override isActive(editor: Editor) {

@@ -6,10 +6,6 @@ import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbLinkPickerLink } from '@umbraco-cms/backoffice/multi-url-picker';
 
 export default class UmbTiptapLinkExtensionApi extends UmbTiptapToolbarElementApiBase {
-	getTiptapExtensions() {
-		return [UmbLink.configure({ openOnClick: false })];
-	}
-
 	override async execute(editor?: Editor) {
 		const attrs = editor?.getAttributes(UmbLink.name) ?? {};
 		const link = this.#getLinkData(attrs);

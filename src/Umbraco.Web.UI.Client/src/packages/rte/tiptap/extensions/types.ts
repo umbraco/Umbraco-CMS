@@ -1,10 +1,16 @@
 import type { ManifestTiptapExtension } from './tiptap-extension.js';
+import type { ManifestTiptapToolbarExtension } from './tiptap-toolbar-extension.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { Editor, Extension, Mark, Node } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 export interface UmbTiptapExtensionApi extends UmbApi {
+	/**
+	 * The manifest for the extension.
+	 */
+	manifest?: ManifestTiptapExtension;
+
 	/**
 	 * Sets the editor instance to the extension.
 	 */
@@ -20,7 +26,7 @@ export abstract class UmbTiptapExtensionApiBase extends UmbControllerBase implem
 	/**
 	 * The manifest for the extension.
 	 */
-	protected manifest?: ManifestTiptapExtension;
+	manifest?: ManifestTiptapExtension;
 
 	/**
 	 * The editor instance.
@@ -49,7 +55,12 @@ export interface UmbTiptapExtensionArgs {
 	configuration?: UmbPropertyEditorConfigCollection;
 }
 
-export interface UmbTiptapToolbarElementApi extends UmbTiptapExtensionApi {
+export interface UmbTiptapToolbarElementApi extends UmbApi {
+	/**
+	 * The manifest for the extension.
+	 */
+	manifest?: ManifestTiptapToolbarExtension;
+
 	/**
 	 * Executes the toolbar element action.
 	 */
@@ -61,10 +72,12 @@ export interface UmbTiptapToolbarElementApi extends UmbTiptapExtensionApi {
 	isActive(editor: Editor): boolean;
 }
 
-export abstract class UmbTiptapToolbarElementApiBase
-	extends UmbTiptapExtensionApiBase
-	implements UmbTiptapToolbarElementApi
-{
+export abstract class UmbTiptapToolbarElementApiBase extends UmbControllerBase implements UmbTiptapToolbarElementApi {
+	/**
+	 * The manifest for the extension.
+	 */
+	manifest?: ManifestTiptapToolbarExtension;
+
 	/**
 	 * A method to execute the toolbar element action.
 	 */
@@ -72,7 +85,9 @@ export abstract class UmbTiptapToolbarElementApiBase
 
 	/**
 	 * Informs the toolbar element if it is active or not. It uses the manifest meta alias to check if the toolbar element is active.
-	 * @see {ManifestTiptapExtension}
+	 * @see {ManifestTiptapToolbarExtension}
+	 * @param {Editor} editor The editor instance.
+	 * @returns {boolean} Returns true if the toolbar element is active.
 	 */
 	public isActive(editor: Editor) {
 		return editor && this.manifest?.meta.alias ? editor?.isActive(this.manifest.meta.alias) : false;

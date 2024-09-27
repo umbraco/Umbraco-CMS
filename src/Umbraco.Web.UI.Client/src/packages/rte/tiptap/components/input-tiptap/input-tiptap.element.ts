@@ -96,7 +96,10 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			extensions: [...this.#requiredExtensions, ...extensions],
 			content: this.#markup,
 			onBeforeCreate: ({ editor }) => {
-				this._extensions.forEach((ext) => ext.setEditor(editor));
+				this._extensions.forEach((ext) => {
+					console.log('🚀 ~ this._extensions.forEach ~ ext:', ext);
+					ext.setEditor(editor);
+				});
 			},
 			onUpdate: ({ editor }) => {
 				this.#markup = editor.getHTML();
