@@ -131,4 +131,10 @@ public interface ITrackedReferencesRepository
         long take,
         bool filterMustBeIsDependency,
         out long totalRecords);
+
+    Task<PagedModel<Guid>> GetPagedNodeKeysWithDependantReferencesAsync(
+        ISet<Guid> keys,
+        Guid nodeObjectTypeId,
+        long skip,
+        long take);
 }
