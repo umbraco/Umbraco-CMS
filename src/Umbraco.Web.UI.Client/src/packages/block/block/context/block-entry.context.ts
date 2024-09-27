@@ -196,8 +196,9 @@ export abstract class UmbBlockEntryContext<
 					if (!propertyValues || !properties || !variantId) return;
 
 					return properties.reduce((acc, property) => {
-						acc[property.alias] = propertyValues.find((x) =>
-							this.#createPropertyVariantId(property, variantId).compare(x),
+						const propertyVariantId = this.#createPropertyVariantId(property, variantId);
+						acc[property.alias] = propertyValues.find(
+							(x) => x.alias === property.alias && propertyVariantId.compare(x),
 						)?.value;
 						return acc;
 					}, {} as UmbBlockDataType);
