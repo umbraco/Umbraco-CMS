@@ -1,4 +1,4 @@
-import type { ManifestTiptapExtension } from '@umbraco-cms/backoffice/tiptap';
+import type { ManifestTiptapExtension, ManifestTiptapToolbarExtensionButtonKind } from '@umbraco-cms/backoffice/tiptap';
 
 export const manifests: Array<ManifestTiptapExtension | ManifestTiptapToolbarExtensionButtonKind> = [
 	{

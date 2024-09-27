@@ -1,6 +1,10 @@
-import { UMB_DATA_CONTENT_UDI } from '../types.js';
+import { UMB_DATA_CONTENT_UDI, type UmbBlockRteLayoutModel } from '../types.js';
+import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from '../context/index.js';
 import { UmbTiptapExtensionApiBase } from '@umbraco-cms/backoffice/tiptap';
 import { Node } from '@umbraco-cms/backoffice/external/tiptap';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { distinctUntilChanged } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 
 declare module '@tiptap/core' {
 	interface Commands<ReturnType> {
@@ -82,7 +86,45 @@ const umbRteBlockInline = umbRteBlock.extend({
 });
 
 export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase {
+	constructor(host: UmbControllerHost) {
+		super(host);
+
+		this.consumeContext(UMB_BLOCK_RTE_MANAGER_CONTEXT, (context) => {
+			this.observe(
+				context.contents.pipe(
+					distinctUntilChanged((prev, curr) => prev.map((y) => y.udi).join() === curr.map((y) => y.udi).join()),
+				),
+				(contents) => {
+					this.#updateBlocks(contents, context.getLayouts());
+				},
+				'contents',
+			);
+		});
+	}
+
 	getTiptapExtensions() {
 		return [umbRteBlock, umbRteBlockInline];
+	}
+
+	#updateBlocks(blocks: UmbBlockDataType[], layouts: Array<UmbBlockRteLayoutModel>) {
+		const editor = this._editor;
+		if (!editor) return;
+
+		const existingBlocks = Array.from(editor.view.dom.querySelectorAll('umb-rte-block, umb-rte-block-inline')).map(
+			(x) => x.getAttribute(UMB_DATA_CONTENT_UDI),
+		);
+		const newBlocks = blocks.filter((x) => !existingBlocks.find((contentUdi) => contentUdi === x.udi));
+
+		newBlocks.forEach((block) => {
+			// Find layout for block
+			const layout = layouts.find((x) => x.contentUdi === block.udi);
+			const inline = layout?.displayInline ?? false;
+
+			if (inline) {
+				editor.commands.setBlockInline({ contentUdi: block.udi });
+			} else {
+				editor.commands.setBlock({ contentUdi: block.udi });
+			}
+		});
 	}
 }
