@@ -25,11 +25,15 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 	}
 	#editor?: Editor;
 
+	@property({ attribute: false })
+	toolbar: string[][][] = [[[]]];
+
 	override render() {
 		return html`
 			<umb-extension-with-api-slot
 				type="tiptapToolbarExtension"
-				.filter=${(ext: ManifestTiptapToolbarExtension) => !!ext.kind || !!ext.element}
+				.filter=${(ext: ManifestTiptapToolbarExtension) =>
+					this.toolbar.flat(2).includes(ext.alias) && (!!ext.kind || !!ext.element)}
 				.elementProps=${{ editor: this.editor }}>
 			</umb-extension-with-api-slot>
 		`;

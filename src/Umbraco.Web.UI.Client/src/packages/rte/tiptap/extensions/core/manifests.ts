@@ -11,6 +11,7 @@ export const manifests: Array<ManifestTiptapExtension> = [
 		meta: {
 			icon: 'icon-blockquote',
 			label: 'Blockquote',
+			group: 'Content Structure',
 		},
 	},
 	{
@@ -23,6 +24,7 @@ export const manifests: Array<ManifestTiptapExtension> = [
 		meta: {
 			icon: 'icon-bold',
 			label: 'Bold',
+			group: 'Text Formatting',
 		},
 	},
 	{
@@ -35,6 +37,7 @@ export const manifests: Array<ManifestTiptapExtension> = [
 		meta: {
 			icon: 'icon-code',
 			label: 'Code Block',
+			group: 'Content Structure',
 		},
 	},
 	{
@@ -46,6 +49,7 @@ export const manifests: Array<ManifestTiptapExtension> = [
 		meta: {
 			icon: 'icon-embed',
 			label: '#general_embed',
+			group: 'Media and Embeds',
 		},
 	},
 	{
@@ -57,6 +61,7 @@ export const manifests: Array<ManifestTiptapExtension> = [
 		meta: {
 			icon: 'icon-link',
 			label: '#defaultdialogs_urlLinkPicker',
+			group: 'Interactive Elements',
 		},
 	},
 	{
@@ -68,6 +73,7 @@ export const manifests: Array<ManifestTiptapExtension> = [
 		meta: {
 			icon: 'icon-frame',
 			label: 'Figure',
+			group: 'Media and Embeds',
 		},
 	},
 	{
@@ -80,6 +86,7 @@ export const manifests: Array<ManifestTiptapExtension> = [
 		meta: {
 			icon: 'icon-horizontal-rule',
 			label: 'Horizontal Rule',
+			group: 'Content Structure',
 		},
 	},
 	{
@@ -90,6 +97,7 @@ export const manifests: Array<ManifestTiptapExtension> = [
 		meta: {
 			icon: 'icon-picture',
 			label: 'Image',
+			group: 'Media and Embeds',
 		},
 	},
 	{
@@ -102,6 +110,7 @@ export const manifests: Array<ManifestTiptapExtension> = [
 		meta: {
 			icon: 'icon-italic',
 			label: 'Italic',
+			group: 'Text Formatting',
 		},
 	},
 	{
@@ -114,6 +123,7 @@ export const manifests: Array<ManifestTiptapExtension> = [
 		meta: {
 			icon: 'icon-strikethrough',
 			label: 'Strike',
+			group: 'Text Formatting',
 		},
 	},
 	{
@@ -126,6 +136,7 @@ export const manifests: Array<ManifestTiptapExtension> = [
 		meta: {
 			icon: 'icon-table',
 			label: 'Table',
+			group: 'Interactive Elements',
 		},
 	},
 	{
@@ -138,6 +149,7 @@ export const manifests: Array<ManifestTiptapExtension> = [
 		meta: {
 			icon: 'icon-underline',
 			label: 'Underline',
+			group: 'Text Formatting',
 		},
 	},
 	{
@@ -148,6 +160,7 @@ export const manifests: Array<ManifestTiptapExtension> = [
 		meta: {
 			icon: 'icon-heading-1',
 			label: 'Heading',
+			group: 'Text Formatting',
 		},
 	},
 	{
@@ -158,6 +171,7 @@ export const manifests: Array<ManifestTiptapExtension> = [
 		meta: {
 			icon: 'icon-ordered-list',
 			label: 'Ordered List',
+			group: 'Content Structure',
 		},
 	},
 	{
@@ -168,6 +182,7 @@ export const manifests: Array<ManifestTiptapExtension> = [
 		meta: {
 			icon: 'icon-text-align-justify',
 			label: 'Text Align',
+			group: 'Content Structure',
 		},
 	},
 ];

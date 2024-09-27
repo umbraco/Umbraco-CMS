@@ -15,4 +15,15 @@ export const manifests: Array<ManifestTypes> = [
 			group: 'common',
 		},
 	},
+	{
+		type: 'propertyEditorUi',
+		alias: 'Umb.PropertyEditorUi.Tiptap.ExtensionsConfiguration',
+		name: 'Tiptap Extensions Property Editor UI',
+		js: () => import('./property-editor-ui-tiptap-extensions-configuration.element.js'),
+		meta: {
+			label: 'Tiptap Extensions Configuration',
+			icon: 'icon-autofill',
+			group: 'common',
+		},
+	},
 ];

@@ -10,6 +10,7 @@ export interface ManifestTiptapExtension<MetaType extends MetaTiptapExtension = 
 export interface MetaTiptapExtension {
 	icon: string;
 	label: string;
+	group: string;
 }
 
 declare global {
