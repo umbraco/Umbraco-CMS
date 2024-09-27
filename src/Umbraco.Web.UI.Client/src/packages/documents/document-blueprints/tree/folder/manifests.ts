@@ -1,14 +1,9 @@
 import { UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE } from '../../entity.js';
-
-export const UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS = 'Umb.Repository.DocumentBlueprint.Folder';
+import { UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS } from './repository/index.js';
+import { manifests as repositoryManifests } from './repository/manifests.js';
+import { manifests as workspaceManifests } from './workspace/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
-	{
-		type: 'repository',
-		alias: UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS,
-		name: 'Document Blueprint Folder Repository',
-		api: () => import('./document-blueprint-folder.repository.js'),
-	},
 	{
 		type: 'entityAction',
 		kind: 'folderUpdate',
@@ -29,4 +24,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			folderRepositoryAlias: UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS,
 		},
 	},
+	...repositoryManifests,
+	...workspaceManifests,
 ];

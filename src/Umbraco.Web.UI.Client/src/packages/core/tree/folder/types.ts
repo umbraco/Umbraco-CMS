@@ -1,15 +1,5 @@
-export interface UmbFolderModel {
-	unique: string;
-	name: string;
-}
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
-export interface UmbCreateFolderModel {
-	unique: string;
-	parentUnique: string | null;
-	name: string;
-}
-
-export interface UmbUpdateFolderModel {
-	unique: string;
+export interface UmbFolderModel extends UmbEntityModel {
 	name: string;
 }

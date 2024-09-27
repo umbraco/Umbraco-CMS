@@ -3,7 +3,7 @@ import { UmbEntityWorkspaceDataManager } from '../entity/entity-workspace-data-m
 import { UMB_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityModel, UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { UMB_DISCARD_CHANGES_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import {
@@ -38,13 +38,17 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 */
 	protected readonly _data = new UmbEntityWorkspaceDataManager<DetailModelType>(this);
 
+	public readonly data = this._data.current;
+	public readonly entityType = this._data.createObservablePartOfCurrent((data) => data?.entityType);
+	public readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
+
 	protected _getDataPromise?: Promise<any>;
 
 	protected _detailRepository?: DetailRepositoryType;
 
 	#entityType: string;
 
-	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
+	#parent = new UmbObjectState<{ entityType: string; unique: UmbEntityUnique } | undefined>(undefined);
 	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
 	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
 

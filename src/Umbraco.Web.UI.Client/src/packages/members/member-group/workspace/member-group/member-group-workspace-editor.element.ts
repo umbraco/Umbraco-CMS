@@ -27,7 +27,7 @@ export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
 			this.#workspaceContext = workspaceContext;
 			if (!this.#workspaceContext) return;
 			this.observe(this.#workspaceContext.name, (name) => (this._name = name ?? ''));
-			this.observe(this.#workspaceContext.unique, (unique) => (this._unique = unique));
+			this.observe(this.#workspaceContext.unique, (unique) => (this._unique = unique ?? undefined));
 		});
 	}
 

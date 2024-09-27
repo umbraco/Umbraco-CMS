@@ -46,9 +46,6 @@ export class UmbDataTypeWorkspaceContext
 	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
-	readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
-	readonly entityType = this._data.createObservablePartOfCurrent((data) => data?.entityType);
-
 	readonly propertyEditorUiAlias = this._data.createObservablePartOfCurrent((data) => data?.editorUiAlias);
 	readonly propertyEditorSchemaAlias = this._data.createObservablePartOfCurrent((data) => data?.editorAlias);
 

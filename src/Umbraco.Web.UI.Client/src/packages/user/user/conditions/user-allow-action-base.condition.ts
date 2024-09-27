@@ -51,7 +51,7 @@ export abstract class UmbUserActionConditionBase
 			this.observe(
 				observeMultiple([context.unique, context.state, context.kind]),
 				([unique, state, kind]) => {
-					this.userUnique = unique;
+					this.userUnique = unique ?? undefined;
 					this.userState = state;
 					this.userKind = kind;
 					this._onUserDataChange();

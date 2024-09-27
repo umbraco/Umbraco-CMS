@@ -34,5 +34,15 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Template Tree Item',
 		forEntityTypes: [UMB_TEMPLATE_ROOT_ENTITY_TYPE, UMB_TEMPLATE_ENTITY_TYPE],
 	},
+	{
+		type: 'workspace',
+		kind: 'default',
+		alias: 'Umb.Workspace.Template.Root',
+		name: 'Template Root Workspace',
+		meta: {
+			entityType: UMB_TEMPLATE_ROOT_ENTITY_TYPE,
+			headline: '#treeHeaders_templates',
+		},
+	},
 	...reloadTreeItemChildrenManifest,
 ];
