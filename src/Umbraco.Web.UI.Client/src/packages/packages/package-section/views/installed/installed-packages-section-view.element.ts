@@ -4,7 +4,7 @@ import { html, css, customElement, state, repeat, nothing, unsafeHTML } from '@u
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbSectionViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbSectionViewElement } from '@umbraco-cms/backoffice/section';
 
 import './installed-packages-section-view-item.element.js';
 

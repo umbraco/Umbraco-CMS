@@ -1,11 +1,7 @@
+import type { ManifestSectionSidebarAppBaseMenu, ManifestSectionSidebarAppMenuKind } from '../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type {
-	ManifestMenu,
-	ManifestSectionSidebarAppBaseMenu,
-	ManifestSectionSidebarAppMenuKind,
-	UmbExtensionManifestKind,
-} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestMenu, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 

@@ -1,13 +1,13 @@
 import type { ManifestSectionRoute } from './extensions/section-route.extension.js';
 import type { UmbSectionMainViewElement } from './section-main-views/section-main-views.element.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	ManifestSection,
 	ManifestSectionSidebarApp,
 	ManifestSectionSidebarAppMenuKind,
 	UmbSectionElement,
-} from '@umbraco-cms/backoffice/extension-registry';
+} from './types.js';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { IRoute, IRoutingInfo, PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

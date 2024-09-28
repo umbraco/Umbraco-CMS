@@ -2,7 +2,7 @@ import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbSectionViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbSectionViewElement } from '@umbraco-cms/backoffice/section';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 

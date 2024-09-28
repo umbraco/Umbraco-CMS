@@ -1,5 +1,5 @@
+import type { UmbSectionElement } from './section-element.interface.js';
 import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbSectionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 export interface ManifestSection
 	extends ManifestElement<UmbSectionElement>,
