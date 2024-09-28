@@ -1,4 +1,4 @@
-import type { ManifestSectionRoute } from '../extension-registry/models/section-route.model.js';
+import type { ManifestSectionRoute } from './extensions/section-route.extension.js';
 import type { UmbSectionMainViewElement } from './section-main-views/section-main-views.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';

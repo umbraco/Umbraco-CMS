@@ -1,5 +1,5 @@
-import type { UmbSectionSidebarAppElement } from '../interfaces/section-sidebar-app-element.interface.js';
 import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbSectionSidebarAppElement } from '@umbraco-cms/backoffice/extension-registry';
 
 export interface ManifestSectionSidebarApp
 	extends ManifestElement<UmbSectionSidebarAppElement>,

@@ -34,9 +34,6 @@ import type { ManifestPreviewAppProvider } from './preview-app.model.js';
 import type { ManifestPropertyAction, ManifestPropertyActionDefaultKind } from './property-action.model.js';
 import type { ManifestPropertyEditorUi, ManifestPropertyEditorSchema } from './property-editor.model.js';
 import type { ManifestRepository } from './repository.model.js';
-import type { ManifestSection } from './section.model.js';
-import type { ManifestSectionSidebarApp, ManifestSectionSidebarAppMenuKind } from './section-sidebar-app.model.js';
-import type { ManifestSectionView } from './section-view.model.js';
 import type { ManifestStore, ManifestTreeStore, ManifestItemStore } from './store.model.js';
 import type { ManifestTheme } from './theme.model.js';
 import type { ManifestTinyMcePlugin } from './tinymce-plugin.model.js';
@@ -50,7 +47,6 @@ import type { ManifestAppEntryPoint } from './app-entry-point.model.js';
 import type { ManifestBackofficeEntryPoint } from './backoffice-entry-point.model.js';
 import type { ManifestEntryPoint } from './entry-point.model.js';
 import type { ManifestMonacoMarkdownEditorAction } from './monaco-markdown-editor-action.model.js';
-import type { ManifestSectionRoute } from './section-route.model.js';
 import type { ManifestPickerSearchResultItem } from './picker-search-result-item.model.js';
 import type { ManifestBase, ManifestBundle, ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
@@ -82,9 +78,6 @@ export type * from './preview-app.model.js';
 export type * from './property-action.model.js';
 export type * from './property-editor.model.js';
 export type * from './repository.model.js';
-export type * from './section-sidebar-app.model.js';
-export type * from './section-view.model.js';
-export type * from './section.model.js';
 export type * from './store.model.js';
 export type * from './theme.model.js';
 export type * from './tinymce-plugin.model.js';
@@ -150,11 +143,6 @@ export type ManifestTypes =
 	| ManifestPropertyEditorSchema
 	| ManifestPropertyEditorUi
 	| ManifestRepository
-	| ManifestSection
-	| ManifestSectionRoute
-	| ManifestSectionSidebarApp
-	| ManifestSectionSidebarAppMenuKind
-	| ManifestSectionView
 	| ManifestStore
 	| ManifestTheme
 	| ManifestTinyMcePlugin
