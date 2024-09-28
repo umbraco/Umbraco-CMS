@@ -32,7 +32,6 @@ import type { ManifestModal } from './modal.model.js';
 import type { ManifestPackageView } from './package-view.model.js';
 import type { ManifestPreviewAppProvider } from './preview-app.model.js';
 import type { ManifestPropertyAction, ManifestPropertyActionDefaultKind } from './property-action.model.js';
-import type { ManifestPropertyEditorUi, ManifestPropertyEditorSchema } from './property-editor.model.js';
 import type { ManifestRepository } from './repository.model.js';
 import type { ManifestSection } from './section.model.js';
 import type { ManifestSectionSidebarApp, ManifestSectionSidebarAppMenuKind } from './section-sidebar-app.model.js';
@@ -80,7 +79,6 @@ export type * from './package-view.model.js';
 export type * from './picker-search-result-item.model.js';
 export type * from './preview-app.model.js';
 export type * from './property-action.model.js';
-export type * from './property-editor.model.js';
 export type * from './repository.model.js';
 export type * from './section-sidebar-app.model.js';
 export type * from './section-view.model.js';
@@ -147,8 +145,6 @@ export type ManifestTypes =
 	| ManifestPickerSearchResultItem
 	| ManifestPreviewAppProvider
 	| ManifestPropertyActions
-	| ManifestPropertyEditorSchema
-	| ManifestPropertyEditorUi
 	| ManifestRepository
 	| ManifestSection
 	| ManifestSectionRoute

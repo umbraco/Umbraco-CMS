@@ -13,7 +13,8 @@ import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { DataTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { type ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 
 let manifestPropertyEditorUis: Array<ManifestPropertyEditorUi> = [];
 

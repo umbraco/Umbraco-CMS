@@ -14,7 +14,7 @@ import {
 import { UmbArrayState, UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/extension-registry';
+import type { PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/property-editor';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
 export class UmbBlockGridAreaTypeWorkspaceContext
