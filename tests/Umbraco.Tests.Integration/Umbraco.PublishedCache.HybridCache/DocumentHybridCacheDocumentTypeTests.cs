@@ -21,7 +21,7 @@ public class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationTestWithCo
     [Test]
     public async Task Can_Get_Draft_Content_By_Id()
     {
-        //Act
+        // Act
         await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
 
         ContentType.RemovePropertyType("title");
