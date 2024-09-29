@@ -28,7 +28,6 @@ import type { ManifestIcons } from './icons.model.js';
 import type { ManifestLocalization } from './localization.model.js';
 import type { ManifestMenu } from './menu.model.js';
 import type { ManifestMenuItem, ManifestMenuItemLinkKind, ManifestMenuItemTreeKind } from './menu-item.model.js';
-import type { ManifestModal } from './modal.model.js';
 import type { ManifestPackageView } from './package-view.model.js';
 import type { ManifestPreviewAppProvider } from './preview-app.model.js';
 import type { ManifestPropertyAction, ManifestPropertyActionDefaultKind } from './property-action.model.js';
@@ -73,7 +72,6 @@ export type * from './localization.model.js';
 export type * from './menu-item.model.js';
 export type * from './menu.model.js';
 export type * from './mfa-login-provider.model.js';
-export type * from './modal.model.js';
 export type * from './monaco-markdown-editor-action.model.js';
 export type * from './package-view.model.js';
 export type * from './picker-search-result-item.model.js';
@@ -139,7 +137,6 @@ export type ManifestTypes =
 	| ManifestMenuItemTreeKind
 	| ManifestMenuItemLinkKind
 	| ManifestMfaLoginProvider
-	| ManifestModal
 	| ManifestMonacoMarkdownEditorAction
 	| ManifestPackageView
 	| ManifestPickerSearchResultItem

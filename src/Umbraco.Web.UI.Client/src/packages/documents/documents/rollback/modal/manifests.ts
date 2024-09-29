@@ -1,7 +1,6 @@
 import { UMB_ROLLBACK_MODAL_ALIAS } from './constants.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'modal',
 		alias: UMB_ROLLBACK_MODAL_ALIAS,
