@@ -15,7 +15,7 @@ export interface MetaLocalization {
 	 * The value is used to describe the language of the translations according to the extension system
 	 * and it will be set as the `lang` attribute on the `<html>` element.
 	 * @see https://en.wikipedia.org/wiki/Language_localisation#Language_tags_and_codes
-	 * @examples ["en-us", "en-gb", "da-dk"]
+	 * @example ["en-us", "en-gb", "da-dk"]
 	 */
 	culture: string;
 
@@ -25,7 +25,7 @@ export interface MetaLocalization {
 	 * The value is used to describe the direction of the translations according to the extension system
 	 * and it will be set as the `dir` attribute on the `<html>` element. It defaults to `ltr`.
 	 * @see https://en.wikipedia.org/wiki/Right-to-left
-	 * @examples ["ltr"]
+	 * @example ["ltr"]
 	 * @default "ltr"
 	 */
 	direction?: 'ltr' | 'rtl';
@@ -41,4 +41,10 @@ export interface MetaLocalization {
 	 * }
 	 */
 	localizations?: UmbLocalizationDictionary;
+}
+
+declare global {
+	interface UmbExtensionManifestMap {
+		UmbLocalizationExtension: ManifestLocalization;
+	}
 }
