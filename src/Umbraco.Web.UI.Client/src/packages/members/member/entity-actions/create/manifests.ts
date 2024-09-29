@@ -1,7 +1,6 @@
 import { UMB_MEMBER_ROOT_ENTITY_TYPE } from '../../entity.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
@@ -16,15 +15,10 @@ const entityActions: Array<ManifestTypes> = [
 			additionalOptions: true,
 		},
 	},
-];
-
-const modals: Array<ManifestTypes> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.Member.CreateOptions',
 		name: 'Member Create Options Modal',
-		js: () => import('./member-create-options-modal.element.js'),
+		element: () => import('./member-create-options-modal.element.js'),
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...entityActions, ...modals];
