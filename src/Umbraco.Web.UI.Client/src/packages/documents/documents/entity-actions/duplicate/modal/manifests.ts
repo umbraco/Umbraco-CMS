@@ -1,5 +1,5 @@
 import { UMB_DUPLICATE_DOCUMENT_MODAL_ALIAS } from './constants.js';
-import type { ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestModal } from '@umbraco-cms/backoffice/modal';
 
 export const manifests: Array<ManifestModal> = [
 	{

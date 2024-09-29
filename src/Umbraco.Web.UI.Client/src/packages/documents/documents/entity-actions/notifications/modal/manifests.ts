@@ -1,4 +1,4 @@
-import type { ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestModal } from '@umbraco-cms/backoffice/modal';
 
 export const UMB_DOCUMENT_NOTIFICATIONS_MODAL_ALIAS = 'Umb.Modal.DocumentNotifications';
 
