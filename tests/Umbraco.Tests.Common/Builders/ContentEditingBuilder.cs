@@ -33,7 +33,10 @@ public class ContentEditingBuilder : ContentEditingBaseBuilder<ContentCreateMode
         new ContentEditingBuilder()
             .WithContentTypeKey(contentTypeKey)
             .WithInvariantName("Home")
-            .WithInvariantProperty("title", "Welcome to our Home page")
+            .AddInvariantProperty()
+                .WithAlias("alias")
+                .WithValue("Welcome to our Home page")
+                .Done()
             .Build();
 
     public static ContentCreateModel CreateSimpleContent(Guid contentTypeKey, string name, Guid? parentKey) =>
@@ -41,20 +44,40 @@ public class ContentEditingBuilder : ContentEditingBaseBuilder<ContentCreateMode
             .WithContentTypeKey(contentTypeKey)
             .WithInvariantName(name)
             .WithParentKey(parentKey)
-            .WithInvariantProperty("title", "Welcome to our Home page")
+            .AddInvariantProperty()
+                .WithAlias("alias")
+                .WithValue("Welcome to our Home page")
+                .Done()
             .Build();
 
     public static ContentCreateModel CreateSimpleContent(Guid contentTypeKey, string name) =>
         new ContentEditingBuilder()
             .WithContentTypeKey(contentTypeKey)
             .WithInvariantName(name)
-            .WithInvariantProperty("title", "Welcome to our Home page")
+            .AddInvariantProperty()
+                .WithAlias("alias")
+                .WithValue("Welcome to our Home page")
+                .Done()
             .Build();
 
     public static ContentCreateModel CreateContentWithTwoVariantProperties(Guid contentTypeKey, string firstCulture, string secondCulture, string propertyAlias, string propertyName) =>
         new ContentEditingBuilder()
             .WithContentTypeKey(contentTypeKey)
-            .AddVariant(firstCulture, null, firstCulture, new[] { new PropertyValueModel { Alias = propertyAlias, Value = propertyName } })
-            .AddVariant(secondCulture, null, secondCulture, new[] { new PropertyValueModel { Alias = propertyAlias, Value = propertyName } })
+            .AddVariant()
+                .WithCulture(firstCulture)
+                .WithName(firstCulture)
+                .AddProperty()
+                    .WithAlias(propertyAlias)
+                    .WithValue(propertyName)
+                    .Done()
+                .Done()
+            .AddVariant()
+                .WithCulture(secondCulture)
+                .WithName(secondCulture)
+                .AddProperty()
+                    .WithAlias(propertyAlias)
+                    .WithValue(propertyName)
+                    .Done()
+                .Done()
             .Build();
 }

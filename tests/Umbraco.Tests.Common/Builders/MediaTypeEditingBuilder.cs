@@ -1,9 +1,10 @@
-﻿using Umbraco.Cms.Core.Models.ContentTypeEditing;
-using Umbraco.Cms.Tests.Common.Builders.Extensions;
+﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.ContentTypeEditing;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
-public class MediaTypeEditingBuilder : ContentTypeEditingBaseBuilder<MediaTypeEditingBuilder, MediaTypeCreateModel, MediaTypePropertyTypeModel, MediaTypePropertyContainerModel>
+public class MediaTypeEditingBuilder : ContentTypeEditingBaseBuilder<MediaTypeEditingBuilder, MediaTypeCreateModel,
+    MediaTypePropertyTypeModel, MediaTypePropertyContainerModel>
 {
     private Guid? _key;
     private Guid? _containerKey;
@@ -38,7 +39,8 @@ public class MediaTypeEditingBuilder : ContentTypeEditingBaseBuilder<MediaTypeEd
             .Build();
     }
 
-    public static MediaTypeCreateModel CreateBasicFolderMediaType(string alias = "basicFolder", string name = "BasicFolder")
+    public static MediaTypeCreateModel CreateBasicFolderMediaType(string alias = "basicFolder",
+        string name = "BasicFolder")
     {
         var builder = new MediaTypeEditingBuilder();
         return (MediaTypeCreateModel)builder
@@ -46,6 +48,27 @@ public class MediaTypeEditingBuilder : ContentTypeEditingBaseBuilder<MediaTypeEd
             .WithName(name)
             .WithIcon("icon-folder")
             .WithAllowAtRoot(true)
+            .Build();
+    }
+
+    public static MediaTypeCreateModel CreateMediaTypeWithOneProperty(string alias = "testMediaType", string name = "TestMediaType", string propertyAlias = "testProperty", string propertyName = "TestProperty")
+    {
+        var containerKey = Guid.NewGuid();
+        var builder = new MediaTypeEditingBuilder();
+        return (MediaTypeCreateModel)builder
+            .WithAlias(alias)
+            .WithName(name)
+            .WithAllowAtRoot(true)
+            .AddPropertyGroup()
+                .WithName("TestGroup")
+                .WithKey(containerKey)
+                .Done()
+            .AddPropertyType()
+                .WithAlias(propertyAlias)
+                .WithName(propertyName)
+                .WithDataTypeKey(Constants.DataTypes.Guids.TextstringGuid)
+                .WithContainerKey(containerKey)
+                .Done()
             .Build();
     }
 }

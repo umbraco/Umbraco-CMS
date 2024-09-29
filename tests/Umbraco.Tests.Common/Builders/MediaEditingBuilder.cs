@@ -1,5 +1,4 @@
-﻿using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models.ContentEditing;
+﻿using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
@@ -21,4 +20,14 @@ public class MediaEditingBuilder : ContentEditingBaseBuilder<MediaCreateModel>
             .WithParentKey(parentKey)
             .Build();
 
+    public static MediaCreateModel CreateMediaWithAProperty(Guid mediaTypeKey, string name, Guid? parentKey, string propertyAlias = "testProperty", string propertyValue = "TestValue") =>
+        new MediaEditingBuilder()
+            .WithContentTypeKey(mediaTypeKey)
+            .WithInvariantName(name)
+            .WithParentKey(parentKey)
+            .AddInvariantProperty()
+                .WithAlias(propertyAlias)
+                .WithValue(propertyValue)
+                .Done()
+            .Build();
 }
