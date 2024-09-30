@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -18,12 +17,11 @@ public class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWithMediaEdi
 
     private new IMediaTypeEditingService MediaTypeEditingService => GetRequiredService<IMediaTypeEditingService>();
 
-
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
 
     // Currently failing, unsure if actual issue or test issue
     [Test]
-    public async Task Can_Get_Media_By_Id()
+    public async Task Cannot_Get_Property_From_Media_After_It_Is_Removed_From_MediaType_By_Id()
     {
         // Arrange
         var oldMedia = await PublishedMediaHybridCache.GetByIdAsync(SubTestMediaId);
@@ -41,8 +39,9 @@ public class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWithMediaEdi
         Assert.IsNull(newMedia.Value("testProperty"));
     }
 
+    // Currently failing, unsure if actual issue or test issue
     [Test]
-    public async Task Can_Get_Media_By_Key()
+    public async Task Cannot_Get_Property_From_Media_After_It_Is_Removed_From_MediaType_By_Key()
     {
         // Arrange
         var oldMedia = await PublishedMediaHybridCache.GetByIdAsync(SubTestMedia.Key.Value);
@@ -63,12 +62,14 @@ public class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWithMediaEdi
     [Test]
     public async Task Media_Gets_Removed_When_MediaType_Is_Deleted()
     {
-        // Load into cache
+        // Arrange
         var media = await PublishedMediaHybridCache.GetByIdAsync(SubTestMedia.Key.Value);
         Assert.IsNotNull(media);
 
+        // Act
         await MediaTypeService.DeleteAsync(CustomMediaType.Key, Constants.Security.SuperUserKey);
 
+        // Assert
         var newMedia = await PublishedMediaHybridCache.GetByIdAsync(SubTestMedia.Key.Value);
         Assert.IsNull(newMedia);
     }

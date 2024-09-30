@@ -38,7 +38,6 @@ public class DocumentHybridCacheTemplateTests : UmbracoIntegrationTestWithConten
         // Assert
         Assert.AreEqual(updateContentResult.Status, ContentEditingOperationStatus.Success);
         var textPageAfter = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
-        // Should this not be null?
         Assert.AreEqual(textPageAfter.TemplateId, null);
     }
 }
