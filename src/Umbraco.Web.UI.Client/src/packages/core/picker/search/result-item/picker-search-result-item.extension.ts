@@ -7,3 +7,9 @@ export interface ManifestPickerSearchResultItem extends ManifestElementAndApi {
 	type: 'pickerSearchResultItem';
 	forEntityTypes: Array<string>;
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbPickerSearchResultItem: ManifestPickerSearchResultItem;
+	}
+}

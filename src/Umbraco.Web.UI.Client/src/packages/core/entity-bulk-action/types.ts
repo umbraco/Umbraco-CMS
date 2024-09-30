@@ -1,4 +1,4 @@
-import type { MetaEntityBulkAction } from '../extension-registry/models/entity-bulk-action.model.js';
+import type { MetaEntityBulkAction } from '../extension-registry/extensions/entity-bulk-action.extension.js';
 
 export interface UmbEntityBulkActionArgs<MetaArgsType extends MetaEntityBulkAction> {
 	entityType: string;

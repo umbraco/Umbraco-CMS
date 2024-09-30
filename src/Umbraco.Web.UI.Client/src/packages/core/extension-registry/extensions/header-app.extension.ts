@@ -9,13 +9,6 @@ export interface ManifestHeaderApp extends ManifestElement {
 	//meta: MetaHeaderApp;
 }
 
-// TODO: Warren these don't seem to be used anywhere
-export interface MetaHeaderApp {
-	pathname: string;
-	label: string;
-	icon: string;
-}
-
 export interface ManifestHeaderAppButtonKind extends ManifestHeaderApp {
 	type: 'headerApp';
 	kind: 'button';
@@ -26,4 +19,10 @@ export interface MetaHeaderAppButtonKind {
 	href: string;
 	label: string;
 	icon: string;
+}
+
+declare global {
+	interface UmbExtensionManifestMap {
+		UmbHeaderAppExtension: ManifestHeaderApp | ManifestHeaderAppButtonKind;
+	}
 }
