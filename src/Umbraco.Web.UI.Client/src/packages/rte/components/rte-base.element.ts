@@ -12,8 +12,6 @@ import {
 	type UmbBlockRteTypeModel,
 } from '@umbraco-cms/backoffice/block-rte';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
 export abstract class UmbRteBaseElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
