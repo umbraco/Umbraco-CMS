@@ -91,7 +91,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		if (!element) return;
 
 		const dimensions = this.configuration?.getValueByAlias<{ width?: number; height?: number }>('dimensions');
-		console.log(this.configuration, dimensions);
 		if (dimensions?.width) this.setAttribute('style', `max-width: ${dimensions.width}px;`);
 		if (dimensions?.height) element.setAttribute('style', `max-height: ${dimensions.height}px;`);
 
@@ -120,7 +119,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		return html`
 			${when(
 				!this._editor && !this._extensions?.length,
-				() => html`<uui-loader></uui-loader>`,
+				() => html`<div id="loader"><uui-loader></uui-loader></div>`,
 				() => html`
 					<umb-tiptap-fixed-menu
 						.toolbar=${this._toolbar}
@@ -140,12 +139,19 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				position: relative;
 				z-index: 0;
 			}
+
 			:host([readonly]) {
 				pointer-events: none;
 
 				#editor {
 					background-color: var(--uui-color-surface-alt);
 				}
+			}
+
+			#loader {
+				display: flex;
+				align-items: center;
+				justify-content: center;
 			}
 
 			.tiptap {
