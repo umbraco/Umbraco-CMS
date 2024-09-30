@@ -1,5 +1,4 @@
-import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from '../context/block-rte-manager.context-token.js';
-import { UMB_BLOCK_RTE_ENTRIES_CONTEXT } from '../context/block-rte-entries.context-token.js';
+import { UMB_BLOCK_RTE_MANAGER_CONTEXT, UMB_BLOCK_RTE_ENTRIES_CONTEXT } from '@umbraco-cms/backoffice/block-rte';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import { UmbTiptapToolbarElementApiBase } from '@umbraco-cms/backoffice/tiptap';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';

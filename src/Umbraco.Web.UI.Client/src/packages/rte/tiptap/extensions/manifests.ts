@@ -5,7 +5,7 @@ import type {
 	ManifestTiptapToolbarExtension,
 	ManifestTiptapToolbarExtensionButtonKind,
 } from './tiptap-toolbar-extension.js';
-import type { ManifestTypes, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 const kinds: Array<UmbExtensionManifestKind> = [
 	{
@@ -90,11 +90,6 @@ const umbExtensions: Array<ManifestTiptapExtension> = [
 	},
 ];
 
-const extensions: Array<ManifestTiptapExtension | ManifestTiptapToolbarExtension> = [
-	...core,
-	...toolbar,
-	...umbToolbarExtensions,
-	...umbExtensions,
-];
+const extensions = [...core, ...toolbar, ...umbToolbarExtensions, ...umbExtensions];
 
-export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [...kinds, ...extensions];
+export const manifests = [...kinds, ...extensions];

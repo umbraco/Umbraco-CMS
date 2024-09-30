@@ -1,5 +1,5 @@
 import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '../types.js';
-import type { UmbBlockDataType } from '../../block/types.js';
+import type { UmbBlockDataModel } from '../../block/types.js';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 
 import '../components/block-rte-entry/index.js';
@@ -10,12 +10,12 @@ import '../components/block-rte-entry/index.js';
 export class UmbBlockRteManagerContext<
 	BlockLayoutType extends UmbBlockRteLayoutModel = UmbBlockRteLayoutModel,
 > extends UmbBlockManagerContext<UmbBlockRteTypeModel, BlockLayoutType> {
-	removeOneLayout(contentUdi: string) {
-		this._layouts.removeOne(contentUdi);
+	removeOneLayout(contentKey: string) {
+		this._layouts.removeOne(contentKey);
 	}
 
-	create(contentElementTypeKey: string, partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>) {
-		const data = super.createBlockData(contentElementTypeKey, partialLayoutEntry);
+	create(contentElementTypeKey: string, partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>) {
+		const data = super._createBlockData(contentElementTypeKey, partialLayoutEntry);
 
 		// Find block type.
 		const blockType = this.getBlockTypes().find((x) => x.contentElementTypeKey === contentElementTypeKey);
@@ -30,7 +30,7 @@ export class UmbBlockRteManagerContext<
 		return data;
 	}
 
-	insert(layoutEntry: BlockLayoutType, content: UmbBlockDataType, settings: UmbBlockDataType | undefined) {
+	insert(layoutEntry: BlockLayoutType, content: UmbBlockDataModel, settings: UmbBlockDataModel | undefined) {
 		this._layouts.appendOne(layoutEntry);
 
 		this.insertBlockData(layoutEntry, content, settings);
@@ -39,10 +39,10 @@ export class UmbBlockRteManagerContext<
 	}
 
 	/**
-	 * @param contentUdi
+	 * @param contentKey
 	 * @internal
 	 */
-	public deleteLayoutElement(contentUdi: string) {
-		this.removeBlockUdi(contentUdi);
+	public deleteLayoutElement(contentKey: string) {
+		this.removeBlockUdi(contentKey);
 	}
 }

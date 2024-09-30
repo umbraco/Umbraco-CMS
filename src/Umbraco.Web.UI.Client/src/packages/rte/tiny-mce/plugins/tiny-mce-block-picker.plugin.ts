@@ -1,11 +1,14 @@
-import type { UmbBlockDataType } from '../../block/types.js';
-import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from '../context/block-rte-manager.context-token.js';
-import { UMB_BLOCK_RTE_ENTRIES_CONTEXT } from '../context/block-rte-entries.context-token.js';
-import { UMB_DATA_CONTENT_UDI, type UmbBlockRteLayoutModel } from '../types.js';
+import { UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '../../types.js';
 import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/tiny-mce';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type { Editor } from '@umbraco-cms/backoffice/external/tinymce';
+import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
+import {
+	UMB_BLOCK_RTE_ENTRIES_CONTEXT,
+	UMB_BLOCK_RTE_MANAGER_CONTEXT,
+	type UmbBlockRteLayoutModel,
+} from '@umbraco-cms/backoffice/block-rte';
 
 export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase {
 	readonly #localize = new UmbLocalizationController(this._host);
@@ -24,7 +27,7 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 			onAction: () => this.showDialog(),
 			onSetup: function (api) {
 				const changed = args.editor.selection.selectorChangedWithUnbind(
-					'umb-rte-block[data-content-udi], umb-rte-block-inline[data-content-udi]',
+					'umb-rte-block[data-content-key], umb-rte-block-inline[data-content-key]',
 					(state) => api.setActive(state),
 				);
 				return () => changed.unbind();
@@ -57,10 +60,10 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 		//const blockEl = this.editor.selection.getNode();
 
 		/*if (blockEl.nodeName === 'UMB-RTE-BLOCK' || blockEl.nodeName === 'UMB-RTE-BLOCK-INLINE') {
-			const blockUdi = blockEl.getAttribute('data-content-udi') ?? undefined;
-			if (blockUdi) {
+			const blockkey = blockEl.getAttribute('data-content-key') ?? undefined;
+			if (blockkey) {
 				// TODO: Missing a solution to edit a block from this scope. [NL]
-				this.#editBlock(blockUdi);
+				this.#editBlock(blockkey);
 				return;
 			}
 		}*/
@@ -89,18 +92,18 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 		}
 	}
 
-	#updateBlocks(blocks: UmbBlockDataType[], layouts: Array<UmbBlockRteLayoutModel>) {
+	#updateBlocks(blocks: UmbBlockDataModel[], layouts: Array<UmbBlockRteLayoutModel>) {
 		const editor = this.#editor;
 		if (!editor?.dom) return;
 
 		const existingBlocks = editor.dom
 			.select('umb-rte-block, umb-rte-block-inline')
-			.map((x) => x.getAttribute(UMB_DATA_CONTENT_UDI));
-		const newBlocks = blocks.filter((x) => !existingBlocks.find((contentUdi) => contentUdi === x.udi));
+			.map((x) => x.getAttribute(UMB_BLOCK_RTE_DATA_CONTENT_KEY));
+		const newBlocks = blocks.filter((x) => !existingBlocks.find((contentKey) => contentKey === x.key));
 
 		newBlocks.forEach((block) => {
 			// Find layout for block
-			const layout = layouts.find((x) => x.contentUdi === block.udi);
+			const layout = layouts.find((x) => x.contentKey === block.key);
 			const inline = layout?.displayInline ?? false;
 
 			let blockTag = 'umb-rte-block';
@@ -109,7 +112,9 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 				blockTag = 'umb-rte-block-inline';
 			}
 
-			editor.insertContent(`<${blockTag} data-content-udi="${block.udi}"></${blockTag}>`);
+			const blockEl = `<${blockTag} ${UMB_BLOCK_RTE_DATA_CONTENT_KEY}="${block.key}"></${blockTag}>`;
+
+			editor.insertContent(blockEl);
 		});
 	}
 }

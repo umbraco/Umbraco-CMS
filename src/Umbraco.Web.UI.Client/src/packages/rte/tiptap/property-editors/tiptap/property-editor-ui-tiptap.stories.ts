@@ -66,6 +66,7 @@ const meta: Meta<UmbPropertyEditorUiTiptapElement> = {
 				layout: {},
 				contentData: [],
 				settingsData: [],
+				expose: [],
 			},
 			markup: `
 			<h2>Tiptap</h2>

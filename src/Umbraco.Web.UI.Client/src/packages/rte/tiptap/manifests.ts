@@ -1,5 +1,5 @@
 import { manifests as extensions } from './extensions/manifests.js';
 import { manifests as propertyEditors } from './property-editors/manifests.js';
-import type { ManifestTypes, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as plugins } from './plugins/manifests.js';
 
-export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [...extensions, ...propertyEditors];
+export const manifests = [...extensions, ...propertyEditors, ...plugins];

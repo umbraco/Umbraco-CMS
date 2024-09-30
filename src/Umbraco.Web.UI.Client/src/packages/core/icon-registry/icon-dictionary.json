@@ -1816,7 +1816,7 @@
 		{
 			"name": "icon-shoe",
 			"file": "footprints.svg",
-			"legay": true
+			"legacy": true
 		},
 		{
 			"name": "icon-shopping-basket-alt-2",
@@ -1837,6 +1837,11 @@
 		},
 		{
 			"name": "icon-sience",
+			"file": "atom.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-science",
 			"file": "atom.svg"
 		},
 		{

@@ -1,18 +1,18 @@
-import { UMB_DATA_CONTENT_KEY, type UmbBlockRteLayoutModel } from '../types.js';
-import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from '../context/index.js';
+import { UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '../../types.js';
 import { UmbTiptapExtensionApiBase } from '@umbraco-cms/backoffice/tiptap';
 import { Node } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { distinctUntilChanged } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
+import { UMB_BLOCK_RTE_MANAGER_CONTEXT, type UmbBlockRteLayoutModel } from '@umbraco-cms/backoffice/block-rte';
 
 declare module '@tiptap/core' {
 	interface Commands<ReturnType> {
 		umbRteBlock: {
-			setBlock: (options: { contentUdi: string }) => ReturnType;
+			setBlock: (options: { contentKey: string }) => ReturnType;
 		};
 		umbRteBlockInline: {
-			setBlockInline: (options: { contentUdi: string }) => ReturnType;
+			setBlockInline: (options: { contentKey: string }) => ReturnType;
 		};
 	}
 }
@@ -28,7 +28,7 @@ const umbRteBlock = Node.create({
 
 	addAttributes() {
 		return {
-			[UMB_DATA_CONTENT_KEY]: {
+			[UMB_BLOCK_RTE_DATA_CONTENT_KEY]: {
 				isRequired: true,
 			},
 		};
@@ -47,7 +47,7 @@ const umbRteBlock = Node.create({
 			setBlock:
 				(options) =>
 				({ commands }) => {
-					const attrs = { [UMB_DATA_CONTENT_KEY]: options.contentUdi };
+					const attrs = { [UMB_BLOCK_RTE_DATA_CONTENT_KEY]: options.contentKey };
 					return commands.insertContent({
 						type: this.name,
 						attrs,
@@ -75,7 +75,7 @@ const umbRteBlockInline = umbRteBlock.extend({
 			setBlockInline:
 				(options) =>
 				({ commands }) => {
-					const attrs = { [UMB_DATA_CONTENT_KEY]: options.contentUdi };
+					const attrs = { [UMB_BLOCK_RTE_DATA_CONTENT_KEY]: options.contentKey };
 					return commands.insertContent({
 						type: this.name,
 						attrs,
@@ -92,7 +92,7 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 		this.consumeContext(UMB_BLOCK_RTE_MANAGER_CONTEXT, (context) => {
 			this.observe(
 				context.contents.pipe(
-					distinctUntilChanged((prev, curr) => prev.map((y) => y.udi).join() === curr.map((y) => y.udi).join()),
+					distinctUntilChanged((prev, curr) => prev.map((y) => y.key).join() === curr.map((y) => y.key).join()),
 				),
 				(contents) => {
 					this.#updateBlocks(contents, context.getLayouts());
@@ -106,24 +106,24 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 		return [umbRteBlock, umbRteBlockInline];
 	}
 
-	#updateBlocks(blocks: UmbBlockDataType[], layouts: Array<UmbBlockRteLayoutModel>) {
+	#updateBlocks(blocks: UmbBlockDataModel[], layouts: Array<UmbBlockRteLayoutModel>) {
 		const editor = this._editor;
 		if (!editor) return;
 
 		const existingBlocks = Array.from(editor.view.dom.querySelectorAll('umb-rte-block, umb-rte-block-inline')).map(
-			(x) => x.getAttribute(UMB_DATA_CONTENT_KEY),
+			(x) => x.getAttribute(UMB_BLOCK_RTE_DATA_CONTENT_KEY),
 		);
-		const newBlocks = blocks.filter((x) => !existingBlocks.find((contentUdi) => contentUdi === x.udi));
+		const newBlocks = blocks.filter((x) => !existingBlocks.find((contentKey) => contentKey === x.key));
 
 		newBlocks.forEach((block) => {
 			// Find layout for block
-			const layout = layouts.find((x) => x.contentUdi === block.udi);
+			const layout = layouts.find((x) => x.contentKey === block.key);
 			const inline = layout?.displayInline ?? false;
 
 			if (inline) {
-				editor.commands.setBlockInline({ contentUdi: block.udi });
+				editor.commands.setBlockInline({ contentKey: block.key });
 			} else {
-				editor.commands.setBlock({ contentUdi: block.udi });
+				editor.commands.setBlock({ contentKey: block.key });
 			}
 		});
 	}

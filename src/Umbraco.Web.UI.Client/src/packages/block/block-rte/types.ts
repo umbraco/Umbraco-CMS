@@ -3,15 +3,6 @@ import type { UmbBlockLayoutBaseModel, UmbBlockValueType } from '@umbraco-cms/ba
 
 export const UMB_BLOCK_RTE_TYPE = 'block-rte-type';
 export const UMB_BLOCK_RTE = 'block-rte';
-/**
- * The attribute where the block content key is stored.
- * @deprecated Use {@link UMB_DATA_CONTENT_KEY} instead
- */
-export const UMB_DATA_CONTENT_UDI = 'data-content-udi';
-/**
- * The attribute where the block content key is stored.
- */
-export const UMB_DATA_CONTENT_KEY = 'data-content-key';
 
 export interface UmbBlockRteTypeModel extends UmbBlockTypeBaseModel {
 	displayInline: boolean;

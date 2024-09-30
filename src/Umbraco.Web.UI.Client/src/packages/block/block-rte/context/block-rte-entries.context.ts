@@ -1,4 +1,4 @@
-import type { UmbBlockDataType } from '../../block/index.js';
+import type { UmbBlockDataModel } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
 import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '../types.js';
 import {
@@ -9,6 +9,7 @@ import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from './block-rte-manager.context-token
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 	typeof UMB_BLOCK_RTE_MANAGER_CONTEXT,
@@ -18,11 +19,11 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 	UmbBlockRteWorkspaceOriginData
 > {
 	//
-	#catalogueModal: UmbModalRouteRegistrationController<
+	readonly #catalogueModal: UmbModalRouteRegistrationController<
 		typeof UMB_BLOCK_CATALOGUE_MODAL.DATA,
 		typeof UMB_BLOCK_CATALOGUE_MODAL.VALUE
 	>;
-	#workspaceModal;
+	readonly #workspaceModal;
 
 	// We will just say its always allowed for RTE for now: [NL]
 	public readonly canCreate = new UmbBooleanState(true).asObservable();
@@ -72,6 +73,12 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 				const newPath = routeBuilder({});
 				this._workspacePath.setValue(newPath);
 			});
+
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (dataset) => {
+			const variantId = dataset.getVariantId();
+			this.#catalogueModal.setUniquePathValue('variantId', variantId?.toString());
+			this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
+		});
 	}
 
 	protected _gotBlockManager() {
@@ -100,16 +107,6 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 			},
 			'observePropertyAlias',
 		);
-
-		this.observe(
-			this._manager.variantId,
-			(variantId) => {
-				// TODO: This might not be the property variant ID, but the content variant ID. Check up on what makes most sense?
-				this.#catalogueModal.setUniquePathValue('variantId', variantId?.toString());
-				this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
-			},
-			'observePropertyAlias',
-		);
 	}
 
 	getPathForCreateBlock() {
@@ -125,22 +122,26 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 		this._manager?.setLayouts(layouts);
 	}
 
-	async create(contentElementTypeKey: string, partialLayoutEntry?: Omit<UmbBlockRteLayoutModel, 'contentUdi'>) {
+	async create(contentElementTypeKey: string, partialLayoutEntry?: Omit<UmbBlockRteLayoutModel, 'contentKey'>) {
 		await this._retrieveManager;
 		return this._manager?.create(contentElementTypeKey, partialLayoutEntry);
 	}
 
 	// insert Block?
 
-	async insert(layoutEntry: UmbBlockRteLayoutModel, content: UmbBlockDataType, settings: UmbBlockDataType | undefined) {
+	async insert(
+		layoutEntry: UmbBlockRteLayoutModel,
+		content: UmbBlockDataModel,
+		settings: UmbBlockDataModel | undefined,
+	) {
 		await this._retrieveManager;
 		return this._manager?.insert(layoutEntry, content, settings) ?? false;
 	}
 
 	// create Block?
-	override async delete(contentUdi: string) {
+	override async delete(contentKey: string) {
 		// TODO: Loop through children and delete them as well?
-		await super.delete(contentUdi);
-		this._manager?.deleteLayoutElement(contentUdi);
+		await super.delete(contentKey);
+		this._manager?.deleteLayoutElement(contentKey);
 	}
 }

@@ -1,4 +1,4 @@
-import type { UmbBlockDataType } from '../../block/index.js';
+import type { UmbBlockDataModel } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
 import type { UmbBlockListWorkspaceOriginData } from '../index.js';
 import { UMB_BLOCK_LIST_WORKSPACE_MODAL } from '../index.js';
@@ -7,6 +7,7 @@ import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context-tok
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT,
@@ -47,11 +48,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 			})
 			.onSubmit(async (value, data) => {
 				if (value?.create && data) {
-					const created = await this.create(
-						value.create.contentElementTypeKey,
-						{},
-						data.originData as UmbBlockListWorkspaceOriginData,
-					);
+					const created = await this.create(value.create.contentElementTypeKey, {});
 					if (created) {
 						this.insert(
 							created.layout,
@@ -81,6 +78,12 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 				const newPath = routeBuilder({});
 				this._workspacePath.setValue(newPath);
 			});
+
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (dataset) => {
+			const variantId = dataset.getVariantId();
+			this.#catalogueModal.setUniquePathValue('variantId', variantId?.toString());
+			this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
+		});
 	}
 
 	protected _gotBlockManager() {
@@ -109,16 +112,6 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 			},
 			'observePropertyAlias',
 		);
-
-		this.observe(
-			this._manager.variantId,
-			(variantId) => {
-				// TODO: This might not be the property variant ID, but the content variant ID. Check up on what makes most sense?
-				this.#catalogueModal.setUniquePathValue('variantId', variantId?.toString());
-				this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
-			},
-			'observePropertyAlias',
-		);
 	}
 
 	getPathForCreateBlock(index: number) {
@@ -134,21 +127,17 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 		this._manager?.setLayouts(layouts);
 	}
 
-	async create(
-		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<UmbBlockListLayoutModel, 'contentUdi'>,
-		originData?: UmbBlockListWorkspaceOriginData,
-	) {
+	async create(contentElementTypeKey: string, partialLayoutEntry?: Omit<UmbBlockListLayoutModel, 'contentKey'>) {
 		await this._retrieveManager;
-		return this._manager?.create(contentElementTypeKey, partialLayoutEntry, originData);
+		return this._manager?.create(contentElementTypeKey, partialLayoutEntry);
 	}
 
 	// insert Block?
 
 	async insert(
 		layoutEntry: UmbBlockListLayoutModel,
-		content: UmbBlockDataType,
-		settings: UmbBlockDataType | undefined,
+		content: UmbBlockDataModel,
+		settings: UmbBlockDataModel | undefined,
 		originData: UmbBlockListWorkspaceOriginData,
 	) {
 		await this._retrieveManager;
@@ -156,8 +145,8 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	}
 
 	// create Block?
-	override async delete(contentUdi: string) {
+	override async delete(contentKey: string) {
 		// TODO: Loop through children and delete them as well?
-		await super.delete(contentUdi);
+		await super.delete(contentKey);
 	}
 }

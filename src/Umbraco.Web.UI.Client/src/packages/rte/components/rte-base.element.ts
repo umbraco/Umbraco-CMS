@@ -1,3 +1,4 @@
+import { type UmbPropertyEditorUiValueType, UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../types.js';
 import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
@@ -8,17 +9,11 @@ import type {
 import {
 	UmbBlockRteEntriesContext,
 	UmbBlockRteManagerContext,
-	type UmbBlockRteLayoutModel,
 	type UmbBlockRteTypeModel,
 } from '@umbraco-cms/backoffice/block-rte';
-import type { UmbBlockValueType } from '@umbraco-cms/backoffice/block';
-
-export interface UmbRichTextEditorValueType {
-	markup: string;
-	blocks: UmbBlockValueType<UmbBlockRteLayoutModel>;
-}
-
-export const UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS = 'Umbraco.RichText';
+import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
 export abstract class UmbRteBaseElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -42,29 +37,30 @@ export abstract class UmbRteBaseElement extends UmbLitElement implements UmbProp
 	@property({
 		attribute: false,
 		type: Object,
-		hasChanged(value?: UmbRichTextEditorValueType, oldValue?: UmbRichTextEditorValueType) {
+		hasChanged(value?: UmbPropertyEditorUiValueType, oldValue?: UmbPropertyEditorUiValueType) {
 			return value?.markup !== oldValue?.markup;
 		},
 	})
-	public set value(value: UmbRichTextEditorValueType | undefined) {
-		const buildUpValue: Partial<UmbRichTextEditorValueType> = value ? { ...value } : {};
+	public set value(value: UmbPropertyEditorUiValueType | undefined) {
+		const buildUpValue: Partial<UmbPropertyEditorUiValueType> = value ? { ...value } : {};
 		buildUpValue.markup ??= '';
-		buildUpValue.blocks ??= { layout: {}, contentData: [], settingsData: [] };
-		buildUpValue.blocks.layout ??= {};
+		buildUpValue.blocks ??= { layout: {}, contentData: [], settingsData: [], expose: [] };
 		buildUpValue.blocks.contentData ??= [];
 		buildUpValue.blocks.settingsData ??= [];
-		this._value = buildUpValue as UmbRichTextEditorValueType;
+		buildUpValue.blocks.expose ??= [];
+		this._value = buildUpValue as UmbPropertyEditorUiValueType;
 
 		// Only update the actual editor markup if it is not the same as the value.
 		if (this._latestMarkup !== this._value.markup) {
 			this._markup = this._value.markup;
 		}
 
-		this.#managerContext.setLayouts(buildUpValue.blocks.layout[UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS] ?? []);
+		this.#managerContext.setLayouts(buildUpValue.blocks.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? []);
 		this.#managerContext.setContents(buildUpValue.blocks.contentData);
 		this.#managerContext.setSettings(buildUpValue.blocks.settingsData);
+		this.#managerContext.setExposes(buildUpValue.blocks.expose);
 	}
-	public get value(): UmbRichTextEditorValueType {
+	public get value() {
 		return this._value;
 	}
 
@@ -72,9 +68,9 @@ export abstract class UmbRteBaseElement extends UmbLitElement implements UmbProp
 	protected _config?: UmbPropertyEditorConfigCollection;
 
 	@state()
-	protected _value: UmbRichTextEditorValueType = {
+	protected _value: UmbPropertyEditorUiValueType = {
 		markup: '',
-		blocks: { layout: {}, contentData: [], settingsData: [] },
+		blocks: { layout: {}, contentData: [], settingsData: [], expose: [] },
 	};
 
 	/**
@@ -94,32 +90,73 @@ export abstract class UmbRteBaseElement extends UmbLitElement implements UmbProp
 	constructor() {
 		super();
 
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			// TODO: Implement validation translation for RTE Blocks:
+			/*
+			this.observe(
+				context.dataPath,
+				(dataPath) => {
+					// Translate paths for content/settings:
+					this.#contentDataPathTranslator?.destroy();
+					this.#settingsDataPathTranslator?.destroy();
+					if (dataPath) {
+						// Set the data path for the local validation context:
+						this.#validationContext.setDataPath(dataPath);
+
+						this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
+						this.#settingsDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'settingsData');
+					}
+				},
+				'observeDataPath',
+			);
+			*/
+
+			this.observe(
+				context?.alias,
+				(alias) => {
+					this.#managerContext.setPropertyAlias(alias);
+				},
+				'observePropertyAlias',
+			);
+
+			this.observe(
+				observeMultiple([
+					this.#managerContext.layouts,
+					this.#managerContext.contents,
+					this.#managerContext.settings,
+					this.#managerContext.exposes,
+				]).pipe(debounceTime(20)),
+				([layouts, contents, settings, exposes]) => {
+					console.log('new blocks', layouts, contents, exposes);
+					this._value = {
+						...this._value,
+						blocks: {
+							layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
+							contentData: contents,
+							settingsData: settings,
+							expose: exposes,
+						},
+					};
+					//context.setValue(this._value);
+					this._fireChangeEvent();
+				},
+				'motherObserver',
+			);
+		});
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
+			this.#managerContext.setVariantId(context.getVariantId());
+		});
+
 		this.observe(this.#entriesContext.layoutEntries, (layouts) => {
 			// Update manager:
 			this.#managerContext.setLayouts(layouts);
 		});
-
-		this.observe(this.#managerContext.layouts, (layouts) => {
-			this._value = {
-				...this._value,
-				blocks: { ...this._value.blocks, layout: { [UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS]: layouts } },
-			};
-			this._fireChangeEvent();
-		});
-		this.observe(this.#managerContext.contents, (contents) => {
-			this._value = { ...this._value, blocks: { ...this._value.blocks, contentData: contents } };
-			this._fireChangeEvent();
-		});
-		this.observe(this.#managerContext.settings, (settings) => {
-			this._value = { ...this._value, blocks: { ...this._value.blocks, settingsData: settings } };
-			this._fireChangeEvent();
-		});
 	}
 
-	protected _filterUnusedBlocks(usedContentUdis: (string | null)[]) {
-		const unusedBlocks = this.#managerContext.getLayouts().filter((x) => usedContentUdis.indexOf(x.contentUdi) === -1);
+	protected _filterUnusedBlocks(usedContentKeys: (string | null)[]) {
+		const unusedBlocks = this.#managerContext.getLayouts().filter((x) => usedContentKeys.indexOf(x.contentKey) === -1);
 		unusedBlocks.forEach((blockLayout) => {
-			this.#managerContext.removeOneLayout(blockLayout.contentUdi);
+			this.#managerContext.removeOneLayout(blockLayout.contentKey);
 		});
 	}
 

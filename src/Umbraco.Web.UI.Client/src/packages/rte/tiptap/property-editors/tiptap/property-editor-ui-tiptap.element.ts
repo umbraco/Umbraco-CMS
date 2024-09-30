@@ -21,20 +21,20 @@ export class UmbPropertyEditorUiTiptapElement extends UmbRteBaseElement {
 		};
 
 		// Remove unused Blocks of Blocks Layout. Leaving only the Blocks that are present in Markup.
-		const usedContentUdis: string[] = [];
+		const usedContentKeys: string[] = [];
 
-		// Regex matching all block elements in the markup, and extracting the content UDI. It's the same as the one used on the backend.
+		// Regex matching all block elements in the markup, and extracting the content key. It's the same as the one used on the backend.
 		const regex = new RegExp(
-			/<umb-rte-block(?:-inline)?(?: class="(?:.[^"]*)")? data-content-udi="(?<udi>.[^"]*)">(?:<!--Umbraco-Block-->)?<\/umb-rte-block(?:-inline)?>/gi,
+			/<umb-rte-block(?:-inline)?(?: class="(?:.[^"]*)")? data-content-key="(?<key>.[^"]*)">(?:<!--Umbraco-Block-->)?<\/umb-rte-block(?:-inline)?>/gi,
 		);
 		let blockElement: RegExpExecArray | null;
 		while ((blockElement = regex.exec(this._latestMarkup)) !== null) {
-			if (blockElement.groups?.udi) {
-				usedContentUdis.push(blockElement.groups.udi);
+			if (blockElement.groups?.key) {
+				usedContentKeys.push(blockElement.groups.key);
 			}
 		}
 
-		this._filterUnusedBlocks(usedContentUdis);
+		this._filterUnusedBlocks(usedContentKeys);
 
 		this._fireChangeEvent();
 	}

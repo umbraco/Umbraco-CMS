@@ -43,6 +43,7 @@ export class UmbDataTypeSearchServerDataSource implements UmbSearchDataSource<Um
 					entityType: UMB_DATA_TYPE_ENTITY_TYPE,
 					unique: item.id,
 					name: item.name,
+					propertyEditorSchemaAlias: item.editorAlias,
 					propertyEditorUiAlias: item.editorUiAlias || '',
 				};
 			});

@@ -1,4 +1,5 @@
 import { UmbRteBaseElement } from '../../../components/rte-base.element.js';
+import { UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '../../../types.js';
 import type { UmbInputTinyMceElement } from '../../components/input-tiny-mce/input-tiny-mce.element.js';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 
@@ -27,9 +28,11 @@ export class UmbPropertyEditorUITinyMceElement extends UmbRteBaseElement {
 
 		// Remove unused Blocks of Blocks Layout. Leaving only the Blocks that are present in Markup.
 		//const blockElements = editor.dom.select(`umb-rte-block, umb-rte-block-inline`);
-		const usedContentUdis = Array.from(blockEls).map((blockElement) => blockElement.getAttribute('data-content-udi'));
+		const usedContentKeys = Array.from(blockEls).map((blockElement) =>
+			blockElement.getAttribute(UMB_BLOCK_RTE_DATA_CONTENT_KEY),
+		);
 
-		this._filterUnusedBlocks(usedContentUdis);
+		this._filterUnusedBlocks(usedContentKeys);
 
 		// Then get the content of the editor and update the value.
 		// maybe in this way doc.body.innerHTML;
