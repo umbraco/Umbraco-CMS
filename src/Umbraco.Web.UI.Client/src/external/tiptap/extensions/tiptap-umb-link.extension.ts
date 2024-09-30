@@ -17,6 +17,7 @@ export const UmbLink = Link.extend({
 			...this.parent?.(),
 			HTMLAttributes: {
 				target: '',
+				'data-router-slot': 'disabled',
 			},
 		};
 	},
