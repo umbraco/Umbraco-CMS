@@ -229,13 +229,13 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 					}
 
 					&.ProseMirror-selectednode {
-						outline: 3px solid #b4d7ff;
+						outline: 3px solid var(--uui-color-focus);
 					}
 				}
 
 				img {
 					&.ProseMirror-selectednode {
-						outline: 3px solid #b4d7ff;
+						outline: 3px solid var(--uui-color-focus);
 					}
 				}
 
