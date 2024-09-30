@@ -1,3 +1,4 @@
+import type { ManifestLocalization } from '../extensions/localization.extension.js';
 import {
 	type UmbLocalizationSetBase,
 	type UmbLocalizationDictionary,
@@ -10,7 +11,6 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 import { hasDefaultExport, loadManifestPlainJs } from '@umbraco-cms/backoffice/extension-api';
-import type { ManifestLocalization } from '../extensions/localization.extension';
 
 /**
  *
