@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -25,6 +26,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 public class ContentTests
 {
     private readonly IContentTypeService _contentTypeService = Mock.Of<IContentTypeService>();
+
+    private readonly PropertyEditorCollection _propertyEditorCollection = new (new DataEditorCollection(() => []));
 
     [Test]
     public void Variant_Culture_Names_Track_Dirty_Changes()
@@ -87,7 +90,7 @@ public class ContentTests
 
         Thread.Sleep(500); // The "Date" wont be dirty if the test runs too fast since it will be the same date
         content.SetCultureName("name-fr", langFr);
-        content.PublishCulture(CultureImpact.Explicit(langFr, false)); // we've set the name, now we're publishing it
+        content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.Now, _propertyEditorCollection); // we've set the name, now we're publishing it
         Assert.IsTrue(
             content.IsPropertyDirty("PublishCultureInfos")); // now it will be changed since the collection has changed
         var frCultureName = content.PublishCultureInfos[langFr];
@@ -100,7 +103,7 @@ public class ContentTests
 
         Thread.Sleep(500); // The "Date" wont be dirty if the test runs too fast since it will be the same date
         content.SetCultureName("name-fr", langFr);
-        content.PublishCulture(CultureImpact.Explicit(langFr, false)); // we've set the name, now we're publishing it
+        content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.Now, _propertyEditorCollection); // we've set the name, now we're publishing it
         Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
         Assert.IsTrue(content.IsPropertyDirty("PublishCultureInfos")); // it's true now since we've updated a name
     }
@@ -300,7 +303,7 @@ public class ContentTests
 
         content.SetCultureName("Hello", "en-US");
         content.SetCultureName("World", "es-ES");
-        content.PublishCulture(CultureImpact.All);
+        content.PublishCulture(CultureImpact.All, DateTime.Now, _propertyEditorCollection);
 
         // should not try to clone something that's not Published or Unpublished
         // (and in fact it will not work)
@@ -413,7 +416,7 @@ public class ContentTests
 
         content.SetCultureName("Hello", "en-US");
         content.SetCultureName("World", "es-ES");
-        content.PublishCulture(CultureImpact.All);
+        content.PublishCulture(CultureImpact.All, DateTime.Now, _propertyEditorCollection);
 
         var i = 200;
         foreach (var property in content.Properties)

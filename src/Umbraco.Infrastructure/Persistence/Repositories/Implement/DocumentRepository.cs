@@ -742,7 +742,10 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             "DELETE FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE nodeId = @id",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE loginNodeId = @id",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE noAccessNodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id"
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentUrl + " WHERE uniqueId IN (SELECT uniqueId FROM " + Constants.DatabaseSchema.Tables.Node +
+            " WHERE id = @id)",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id",
+
         };
         return list;
     }

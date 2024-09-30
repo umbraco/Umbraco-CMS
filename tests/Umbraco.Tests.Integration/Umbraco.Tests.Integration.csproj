@@ -9,7 +9,10 @@
     <EnablePackageValidation>$(BaseEnablePackageValidation)</EnablePackageValidation>
     <NoWarn>NU5100</NoWarn>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <!-- TODO: Fix all warnings and remove this override -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Bogus" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
@@ -154,6 +157,12 @@
     </Compile>
     <Compile Update="Umbraco.Core\Services\MediaTypeEditingServiceTests.GetFolderMediaTypes.cs">
       <DependentUpon>MediaTypeEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\PropertyEditors\BlockListElementLevelVariationTests.Parsing.cs">
+      <DependentUpon>BlockListElementLevelVariationTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\PropertyEditors\BlockListElementLevelVariationTests.Publishing.cs">
+      <DependentUpon>BlockListElementLevelVariationTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Copy.cs">
       <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>

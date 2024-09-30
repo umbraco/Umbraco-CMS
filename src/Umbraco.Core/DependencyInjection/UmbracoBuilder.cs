@@ -412,6 +412,10 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // add validation services
             Services.AddUnique<IElementSwitchValidator, ElementSwitchValidator>();
+
+            // Routing
+            Services.AddUnique<IDocumentUrlService, DocumentUrlService>();
+            Services.AddHostedService<DocumentUrlServiceInitializer>();
         }
     }
 }

@@ -98,7 +98,7 @@
           },
           {
             "condition": "(UmbracoRelease == 'LTS')",
-            "value": "13.4.1"
+            "value": "13.5.0"
           }
         ]
       }

@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Asp.Versioning;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
@@ -281,7 +281,7 @@ public class BackOfficeController : SecurityControllerBase
     /// <summary>
     ///     Called when a user links an external login provider in the back office
     /// </summary>
-    /// <param name="provider"></param>
+    /// <param name="requestModel"></param>
     /// <returns></returns>
     // This method is marked as AllowAnonymous and protected with a secret (linkKey) inside the model for the following reasons
     // - when a js client uses the fetch api (or old ajax requests) they can send a bearer token

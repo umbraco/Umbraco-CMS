@@ -2,6 +2,8 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -23,6 +25,16 @@ public class BlockGridPropertyEditor : BlockGridPropertyEditorBase
         => _ioHelper = ioHelper;
 
     public override bool SupportsConfigurableElements => true;
+
+    /// <inheritdoc />
+    public override bool CanMergePartialPropertyValues(IPropertyType propertyType) => propertyType.VariesByCulture() is false;
+
+    /// <inheritdoc />
+    public override object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture)
+    {
+        var valueEditor = (BlockGridEditorPropertyValueEditor)GetValueEditor();
+        return valueEditor.MergePartialPropertyValueForCulture(sourceValue, targetValue, culture);
+    }
 
     #region Pre Value Editor
 

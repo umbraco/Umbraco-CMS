@@ -1148,7 +1148,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             Assert.AreEqual("foo", entity.Name);
 
             var e = ContentService.GetById(entity.Id);
-            Assert.AreEqual("Home", e.Name);
+            Assert.AreEqual("Textpage", e.Name);
 
             savingWasCalled = true;
         };
@@ -1165,7 +1165,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         try
         {
             var content = ContentService.GetById(Textpage.Id);
-            Assert.AreEqual("Home", content.Name);
+            Assert.AreEqual("Textpage", content.Name);
 
             content.Name = "foo";
             ContentService.Save(content);
@@ -1290,7 +1290,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         content.SetCultureName("name-fr", langFr.IsoCode);
         content.SetCultureName("name-da", langDa.IsoCode);
 
-        content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault));
+        content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault), DateTime.Now, PropertyEditorCollection);
         var result = ContentService.CommitDocumentChanges(content);
         Assert.IsTrue(result.Success);
         content = ContentService.GetById(content.Id);
@@ -1298,7 +1298,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsFalse(content.IsCulturePublished(langDa.IsoCode));
 
         content.UnpublishCulture(langFr.IsoCode);
-        content.PublishCulture(CultureImpact.Explicit(langDa.IsoCode, langDa.IsDefault));
+        content.PublishCulture(CultureImpact.Explicit(langDa.IsoCode, langDa.IsDefault), DateTime.Now, PropertyEditorCollection);
 
         result = ContentService.CommitDocumentChanges(content);
         Assert.IsTrue(result.Success);
@@ -2186,7 +2186,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         var temp = ContentService.GetById(Textpage.Id);
-        Assert.AreEqual("Home", temp.Name);
+        Assert.AreEqual("Textpage", temp.Name);
         Assert.AreEqual(3, ContentService.CountChildren(temp.Id));
 
         // Act
@@ -2211,7 +2211,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         var temp = ContentService.GetById(Textpage.Id);
-        Assert.AreEqual("Home", temp.Name);
+        Assert.AreEqual("Textpage", temp.Name);
         Assert.AreEqual(3, ContentService.CountChildren(temp.Id));
 
         // Act

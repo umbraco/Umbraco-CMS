@@ -103,7 +103,8 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
             GetRequiredService<IPublishedContentFactory>(),
             GetRequiredService<ICacheNodeFactory>(),
             GetSeedProviders(),
-            Options.Create(new CacheSettings()));
+            Options.Create(new CacheSettings()),
+            GetRequiredService<IPublishedModelFactory>());
 
         _mockedCache = new DocumentCache(_mockDocumentCacheService, GetRequiredService<IPublishedContentTypeCache>());
     }
@@ -163,7 +164,7 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
         await _mockDocumentCacheService.DeleteItemAsync(Textpage);
 
         _cacheSettings.ContentTypeKeys = [ Textpage.ContentType.Key ];
-        await _mockDocumentCacheService.SeedAsync();
+        await _mockDocumentCacheService.SeedAsync(CancellationToken.None);
         var textPage = await _mockedCache.GetByIdAsync(Textpage.Id);
         AssertTextPage(textPage);
 
@@ -184,7 +185,7 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
         await _mockDocumentCacheService.DeleteItemAsync(Textpage);
 
         _cacheSettings.ContentTypeKeys = [ Textpage.ContentType.Key ];
-        await _mockDocumentCacheService.SeedAsync();
+        await _mockDocumentCacheService.SeedAsync(CancellationToken.None);
         var textPage = await _mockedCache.GetByIdAsync(Textpage.Key);
         AssertTextPage(textPage);
 
@@ -198,7 +199,7 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
         await _mockDocumentCacheService.DeleteItemAsync(Textpage);
 
         _cacheSettings.ContentTypeKeys = [ Textpage.ContentType.Key ];
-        await _mockDocumentCacheService.SeedAsync();
+        await _mockDocumentCacheService.SeedAsync(CancellationToken.None);
         var textPage = await _mockedCache.GetByIdAsync(Textpage.Id, true);
         AssertTextPage(textPage);
 
@@ -211,7 +212,7 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
         _cacheSettings.ContentTypeKeys = [ Textpage.ContentType.Key ];
         await _mockDocumentCacheService.DeleteItemAsync(Textpage);
 
-        await _mockDocumentCacheService.SeedAsync();
+        await _mockDocumentCacheService.SeedAsync(CancellationToken.None);
         var textPage = await _mockedCache.GetByIdAsync(Textpage.Key, true);
         AssertTextPage(textPage);
 

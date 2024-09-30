@@ -23,6 +23,11 @@ public class ContentTypeSortBuilder<TBuilder>
     {
     }
 
+    public ContentTypeSortBuilder(ContentTypeEditingBuilder parentBuilder)
+        : base(null)
+    {
+    }
+
     string IWithAliasBuilder.Alias
     {
         get => _alias;
