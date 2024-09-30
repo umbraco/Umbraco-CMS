@@ -12,3 +12,9 @@ export interface MetaGranularUserPermission {
 	description?: string;
 	descriptionKey?: string;
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbUserGranularPermission: ManifestGranularUserPermission;
+	}
+}
