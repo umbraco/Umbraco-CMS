@@ -1,4 +1,4 @@
-import type { ManifestLocalization } from '../extension-registry/models/localization.model.js';
+import type { ManifestLocalization } from './extensions/localization.extension.js';
 
 export const manifests: Array<ManifestLocalization> = [
 	{
