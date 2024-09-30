@@ -1,3 +1,4 @@
+import type { UmbTiptapToolbarValue } from '../../extensions/types.js';
 import { css, customElement, html, map, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -27,7 +28,7 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 	configuration?: UmbPropertyEditorConfigCollection;
 
 	@property({ attribute: false })
-	toolbar: Array<Array<Array<string>>> = [[[]]];
+	toolbar: UmbTiptapToolbarValue = [[[]]];
 
 	override connectedCallback(): void {
 		super.connectedCallback();
