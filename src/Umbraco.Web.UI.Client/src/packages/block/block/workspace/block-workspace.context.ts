@@ -1,4 +1,4 @@
-import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
+import type { UmbBlockDataModel, UmbBlockLayoutBaseModel } from '../types.js';
 import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
 import { UmbBlockElementManager } from './block-element-manager.js';
 import {
@@ -7,7 +7,13 @@ import {
 	UmbWorkspaceIsNewRedirectController,
 	type ManifestWorkspace,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbClassState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	UmbBooleanState,
+	UmbClassState,
+	UmbObjectState,
+	UmbStringState,
+	observeMultiple,
+} from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_CONTEXT, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { decodeFilePath, UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
@@ -18,7 +24,7 @@ import {
 	type UmbBlockWorkspaceData,
 } from '@umbraco-cms/backoffice/block';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
@@ -41,13 +47,13 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#liveEditingMode?: boolean;
 
 	#initialLayout?: LayoutDataType;
-	#initialContent?: UmbBlockDataType;
-	#initialSettings?: UmbBlockDataType;
+	#initialContent?: UmbBlockDataModel;
+	#initialSettings?: UmbBlockDataModel;
 
 	#layout = new UmbObjectState<LayoutDataType | undefined>(undefined);
 	readonly layout = this.#layout.asObservable();
-	readonly unique = this.#layout.asObservablePart((x) => x?.contentUdi);
-	readonly contentUdi = this.#layout.asObservablePart((x) => x?.contentUdi);
+	readonly unique = this.#layout.asObservablePart((x) => x?.contentKey);
+	readonly contentKey = this.#layout.asObservablePart((x) => x?.contentKey);
 
 	readonly content = new UmbBlockElementManager(this, 'contentData');
 
@@ -59,6 +65,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	readonly variantId = this.#variantId.asObservable();
+
+	#exposed = new UmbBooleanState<undefined>(undefined);
+	readonly exposed = this.#exposed.asObservable();
 
 	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
 
@@ -75,14 +84,52 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			context.onSubmit().catch(this.#modalRejected);
 		}).asPromise();
 
-		this.#retrieveBlockManager = this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (context) => {
-			this.#blockManager = context;
+		this.#retrieveBlockManager = this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (manager) => {
+			this.#blockManager = manager;
+
 			this.observe(
-				context.liveEditingMode,
+				manager.liveEditingMode,
 				(liveEditingMode) => {
 					this.#liveEditingMode = liveEditingMode;
 				},
 				'observeLiveEditingMode',
+			);
+
+			this.observe(
+				observeMultiple([
+					manager.variantId,
+					this.content.structure.variesByCulture,
+					this.content.structure.variesBySegment,
+				]),
+				([variantId, variesByCulture, variesBySegment]) => {
+					if (!variantId || variesByCulture === undefined || variesBySegment === undefined) return;
+					if (!variesBySegment && !variesByCulture) {
+						variantId = UmbVariantId.CreateInvariant();
+					} else if (!variesBySegment) {
+						variantId = variantId.toSegmentInvariant();
+					} else if (!variesByCulture) {
+						variantId = variantId.toCultureInvariant();
+					}
+
+					this.#variantId.setValue(variantId);
+				},
+				'observeBlockType',
+			);
+
+			this.observe(
+				observeMultiple([this.variantId, this.contentKey]),
+				([variantId, contentKey]) => {
+					if (!variantId || !contentKey) return;
+
+					this.observe(
+						manager.hasExposeOf(contentKey, variantId),
+						(exposed) => {
+							this.#exposed.setValue(exposed);
+						},
+						'observeHasExpose',
+					);
+				},
+				'observeVariantIdContentKey',
 			);
 		}).asPromise();
 
@@ -91,32 +138,33 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		}).asPromise();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			this.observe(context.variantId, (variantId) => {
-				this.#variantId.setValue(variantId);
-			});
-
+			// TODO: Ideally we move this into the Block Manager [NL] To avoid binding the Block Manager to a Property...
 			// If the current property is readonly all inner block content should also be readonly.
-			this.observe(context.isReadOnly, (isReadOnly) => {
-				const unique = 'UMB_PROPERTY_CONTEXT';
-				const variantId = this.#variantId.getValue();
-				if (variantId === undefined) return;
+			this.observe(
+				observeMultiple([context.isReadOnly, this.variantId]),
+				([isReadOnly, variantId]) => {
+					const unique = 'UMB_PROPERTY_CONTEXT';
+					if (variantId === undefined) return;
 
-				if (isReadOnly) {
-					const state = {
-						unique,
-						variantId,
-						message: '',
-					};
+					if (isReadOnly) {
+						const state = {
+							unique,
+							variantId,
+							message: '',
+						};
 
-					this.readOnlyState?.addState(state);
-				} else {
-					this.readOnlyState?.removeState(unique);
-				}
-			});
+						this.readOnlyState?.addState(state);
+					} else {
+						this.readOnlyState?.removeState(unique);
+					}
+				},
+				'observeIsReadOnly',
+			);
 		});
 
 		this.observe(this.variantId, (variantId) => {
 			this.content.setVariantId(variantId);
+			this.settings.setVariantId(variantId);
 		});
 
 		this.routes.setRoutes([
@@ -137,12 +185,12 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				},
 			},
 			{
-				path: 'edit/:udi',
+				path: 'edit/:key',
 				component: UmbBlockWorkspaceEditorElement,
 				setup: (component, info) => {
 					(component as UmbBlockWorkspaceEditorElement).workspaceAlias = manifest.alias;
-					const udi = decodeFilePath(info.match.params.udi);
-					this.load(udi);
+					const key = decodeFilePath(info.match.params.key);
+					this.load(key);
 				},
 			},
 		]);
@@ -188,11 +236,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		await this.#retrieveModalContext;
 		if (!this.#blockEntries) {
 			throw new Error('Block Entries not found');
-			return;
 		}
 		if (!this.#modalContext) {
 			throw new Error('Modal Context not found');
-			return;
 		}
 
 		// TODO: Missing some way to append more layout data... this could be part of modal data, (or context api?)
@@ -209,6 +255,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		}
 
 		// TODO: We should investigate if it makes sense to gather
+
+		const unique = blockCreated.layout.contentKey;
 
 		if (!this.#liveEditingMode) {
 			this.#layout.setValue(blockCreated.layout as LayoutDataType);
@@ -228,8 +276,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				throw new Error('Block Entries could not insert block');
 			}
 
-			const unique = blockCreated.layout.contentUdi;
-
 			this.#observeBlockData(unique);
 			this.establishLiveSync();
 		}
@@ -238,7 +284,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#observeBlockData(unique: string) {
 		if (!this.#blockEntries) {
 			throw new Error('Block Entries not found');
-			return;
 		}
 		this.observe(
 			this.#blockEntries.layoutOf(unique),
@@ -246,13 +291,13 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				this.#layout.setValue(layoutData as LayoutDataType);
 
 				// Content:
-				const contentUdi = layoutData?.contentUdi;
-				if (!contentUdi) {
+				const contentKey = layoutData?.contentKey;
+				if (!contentKey) {
 					return;
 				}
 
 				this.observe(
-					this.#blockManager!.contentOf(contentUdi),
+					this.#blockManager!.contentOf(contentKey),
 					(contentData) => {
 						this.content.setData(contentData);
 					},
@@ -260,7 +305,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				);
 				if (!this.#initialContent) {
 					this.observe(
-						this.#blockManager!.contentOf(contentUdi),
+						this.#blockManager!.contentOf(contentKey),
 						(contentData) => {
 							this.#initialContent ??= contentData;
 							this.removeUmbControllerByAlias('observeContentInitially');
@@ -270,10 +315,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				}
 
 				// Settings:
-				const settingsUdi = layoutData?.settingsUdi;
-				if (settingsUdi) {
+				const settingsKey = layoutData?.settingsKey;
+				if (settingsKey) {
 					this.observe(
-						this.#blockManager!.settingsOf(settingsUdi),
+						this.#blockManager!.settingsOf(settingsKey),
 						(settingsData) => {
 							this.settings.setData(settingsData);
 						},
@@ -281,7 +326,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					);
 					if (!this.#initialSettings) {
 						this.observe(
-							this.#blockManager!.settingsOf(settingsUdi),
+							this.#blockManager!.settingsOf(settingsKey),
 							(settingsData) => {
 								this.#initialSettings ??= settingsData;
 								this.removeUmbControllerByAlias('observeSettingsInitially');
@@ -302,21 +347,33 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	 * in the backoffice UI.
 	 */
 	establishLiveSync() {
-		this.observe(this.layout, (layoutData) => {
-			if (layoutData) {
-				this.#blockManager?.setOneLayout(layoutData, this.#modalContext?.data as UmbBlockWorkspaceData);
-			}
-		});
-		this.observe(this.content.data, (contentData) => {
-			if (contentData) {
-				this.#blockManager?.setOneContent(contentData);
-			}
-		});
-		this.observe(this.settings.data, (settingsData) => {
-			if (settingsData) {
-				this.#blockManager?.setOneSettings(settingsData);
-			}
-		});
+		this.observe(
+			this.layout,
+			(layoutData) => {
+				if (layoutData) {
+					this.#blockManager?.setOneLayout(layoutData, this.#modalContext?.data as UmbBlockWorkspaceData);
+				}
+			},
+			'observeThisLayout',
+		);
+		this.observe(
+			this.content.data,
+			(contentData) => {
+				if (contentData) {
+					this.#blockManager?.setOneContent(contentData);
+				}
+			},
+			'observeThisContent',
+		);
+		this.observe(
+			this.settings.data,
+			(settingsData) => {
+				if (settingsData) {
+					this.#blockManager?.setOneSettings(settingsData);
+				}
+			},
+			'observeThisSettings',
+		);
 	}
 
 	getData() {
@@ -324,7 +381,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	}
 
 	getUnique() {
-		return this.getData()!.contentUdi;
+		return this.getData()!.contentKey;
 	}
 
 	getEntityType() {
@@ -362,7 +419,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	async setPropertyValue(alias: string, value: unknown) {
 		const currentData = this.#layout.value;
 		if (currentData) {
-			this.#layout.update({ ...currentData, [alias]: value });
+			this.#layout.update({ ...currentData, [alias]: await value });
 		}
 	}
 
@@ -400,7 +457,17 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			}
 		}
 
+		this.#expose(layoutData.contentKey);
 		this.setIsNew(false);
+	}
+
+	#expose(unique: string) {
+		const variantId = this.#variantId.getValue();
+		if (!variantId) {
+			throw new Error('Block could not bre exposed cause we where missing a variant ID.');
+		}
+		// expose
+		this.#blockManager?.setOneExpose(unique, variantId);
 	}
 
 	#modalRejected = () => {
@@ -409,9 +476,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			// Did it exist before?
 			if (this.getIsNew() === true) {
 				// Remove the block?
-				const contentUdi = this.#layout.value?.contentUdi;
-				if (contentUdi) {
-					this.#blockEntries?.delete(contentUdi);
+				const contentKey = this.#layout.value?.contentKey;
+				if (contentKey) {
+					this.#blockEntries?.delete(contentKey);
 				}
 			} else {
 				// Revert the layout, content & settings data to the original state: [NL]

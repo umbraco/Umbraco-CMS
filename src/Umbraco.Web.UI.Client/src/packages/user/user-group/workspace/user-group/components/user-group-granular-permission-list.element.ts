@@ -1,7 +1,7 @@
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.context-token.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import type { ManifestGranularUserPermission } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestGranularUserPermission } from '@umbraco-cms/backoffice/user-permission';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

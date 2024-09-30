@@ -5,21 +5,22 @@ import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export class UmbBlockElementPropertyDatasetContext extends UmbControllerBase implements UmbPropertyDatasetContext {
 	#elementManager: UmbBlockElementManager;
+	public getVariantId() {
+		return this.#elementManager.getVariantId();
+	}
+	#variantId: UmbVariantId;
 
 	#readOnly = new UmbBooleanState(false);
 	public readOnly = this.#readOnly.asObservable();
 
 	// default data:
 
-	getVariantId() {
-		return UmbVariantId.CreateInvariant();
-	}
 	getEntityType() {
 		return this.#elementManager.getEntityType();
 	}
@@ -32,16 +33,18 @@ export class UmbBlockElementPropertyDatasetContext extends UmbControllerBase imp
 	}
 	readonly name: Observable<string | undefined> = 'TODO: get label observable' as any;
 
-	constructor(host: UmbControllerHost, elementManager: UmbBlockElementManager) {
+	constructor(host: UmbControllerHost, elementManager: UmbBlockElementManager, variantId?: UmbVariantId) {
 		// The controller alias, is a very generic name cause we want only one of these for this controller host.
 		super(host, UMB_PROPERTY_DATASET_CONTEXT.toString());
 		this.#elementManager = elementManager;
+		this.#variantId = variantId ?? UmbVariantId.CreateInvariant();
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspace) => {
 			this.observe(
-				workspace.readOnlyState.isOn,
-				(value) => {
-					this.#readOnly.setValue(value);
+				workspace.readOnlyState.states,
+				(states) => {
+					const isReadOnly = states.some((state) => state.variantId.equal(this.#variantId));
+					this.#readOnly.setValue(isReadOnly);
 				},
 				'umbObserveReadOnlyStates',
 			);
@@ -71,8 +74,8 @@ export class UmbBlockElementPropertyDatasetContext extends UmbControllerBase imp
 	 * @returns {Promise<void>}
 	 * @description Set the value of this property.
 	 */
-	async setPropertyValue(alias: string, value: unknown) {
-		return this.#elementManager.setPropertyValue(alias, value);
+	async setPropertyValue(alias: string, value: PromiseLike<unknown>) {
+		this.#elementManager.setPropertyValue(alias, value);
 	}
 
 	/**

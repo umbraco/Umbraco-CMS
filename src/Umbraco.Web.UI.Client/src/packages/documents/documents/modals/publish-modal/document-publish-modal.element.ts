@@ -65,8 +65,6 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 				.variantLanguageOptions=${this._options}
 				.pickableFilter=${this.data?.pickableFilter}></umb-document-variant-language-picker>
 
-			<p><umb-localize key="content_variantsWillBeSaved">All new variants will be saved.</umb-localize></p>
-
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				<uui-button

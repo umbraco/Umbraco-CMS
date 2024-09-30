@@ -243,7 +243,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 					values: [
 						{
 							// We do not need to parse the right editorAlias here, because the server does not read it. If we need to parse it we would need to load the contentType to make this happen properly. [NL]
-							//editorAlias: null as any,
+							editorAlias: null as any,
 							alias: 'umbracoFile',
 							value: { temporaryFileId: upload.temporaryUnique },
 							culture: null,

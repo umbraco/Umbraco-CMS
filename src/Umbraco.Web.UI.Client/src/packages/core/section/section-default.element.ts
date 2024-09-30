@@ -1,13 +1,8 @@
-import type { ManifestSectionRoute } from '../extension-registry/models/section-route.model.js';
+import type { ManifestSectionRoute } from './extensions/section-route.extension.js';
 import type { UmbSectionMainViewElement } from './section-main-views/section-main-views.element.js';
+import type { ManifestSection, UmbSectionElement } from './types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import type {
-	ManifestSection,
-	ManifestSectionSidebarApp,
-	ManifestSectionSidebarAppMenuKind,
-	UmbSectionElement,
-} from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { IRoute, IRoutingInfo, PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -44,9 +39,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	private _routes?: Array<UmbRoute>;
 
 	@state()
-	private _sidebarApps?: Array<
-		UmbExtensionElementInitializer<ManifestSectionSidebarApp | ManifestSectionSidebarAppMenuKind>
-	>;
+	private _sidebarApps?: Array<UmbExtensionElementInitializer<any>>;
 
 	@state()
 	_splitPanelPosition = '300px';

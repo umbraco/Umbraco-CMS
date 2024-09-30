@@ -19,6 +19,7 @@ export default defineConfig({
 			'content-type/index': './content-type/index.ts',
 			'content/index': './content/index.ts',
 			'culture/index': './culture/index.ts',
+			'dashboard/index': './dashboard/index.ts',
 			'debug/index': './debug/index.ts',
 			'entity-action/index': './entity-action/index.ts',
 			'entity-bulk-action/index': './entity-bulk-action/index.ts',
@@ -57,7 +58,6 @@ export default defineConfig({
 			'validation/index': './validation/index.ts',
 			'variant/index': './variant/index.ts',
 			'workspace/index': './workspace/index.ts',
-			//'settings/index': './settings/index.ts', // currently no index file so it is left out
 			manifests: 'manifests.ts',
 		},
 	}),

@@ -1,8 +1,8 @@
 import { UmbLocalizeElement } from './localize.element.js';
 import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testing';
-import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { umbLocalizationRegistry } from './registry/localization.registry.js';
 
 const english = {
 	type: 'localization',

@@ -65,7 +65,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		this.consumeContext(UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, (instance) => {
 			this.#splitViewContext = instance;
 
-			// NOTICE: This is dirty (the TypeScript casting), we can only accept doing this so far because we currently only use the Variant Selector on Document Workspace. [NL]
+			// NOTICE: This is hacky (the TypeScript casting), we can only accept doing this so far because we currently only use the Variant Selector on Document Workspace. [NL]
 			// This would need a refactor to enable the code below to work with different ContentTypes. Main problem here is the state, which is not generic for them all. [NL]
 			const workspaceContext = this.#splitViewContext.getWorkspaceContext() as unknown as UmbDocumentWorkspaceContext;
 			if (!workspaceContext) throw new Error('Split View Workspace context not found');

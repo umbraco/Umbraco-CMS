@@ -1,6 +1,6 @@
 import type { UmbBlockListLayoutModel, UmbBlockListTypeModel } from '../types.js';
 import type { UmbBlockListWorkspaceOriginData } from '../index.js';
-import type { UmbBlockDataType } from '../../block/types.js';
+import type { UmbBlockDataModel } from '../../block/types.js';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 
@@ -23,18 +23,18 @@ export class UmbBlockListManagerContext<
 
 	create(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
 		// This property is used by some implementations, but not used in this.
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		originData?: UmbBlockListWorkspaceOriginData,
 	) {
-		return super.createBlockData(contentElementTypeKey, partialLayoutEntry);
+		return super._createBlockData(contentElementTypeKey, partialLayoutEntry);
 	}
 
 	insert(
 		layoutEntry: BlockLayoutType,
-		content: UmbBlockDataType,
-		settings: UmbBlockDataType | undefined,
+		content: UmbBlockDataModel,
+		settings: UmbBlockDataModel | undefined,
 		originData: UmbBlockListWorkspaceOriginData,
 	) {
 		this._layouts.appendOneAt(layoutEntry, originData.index ?? -1);

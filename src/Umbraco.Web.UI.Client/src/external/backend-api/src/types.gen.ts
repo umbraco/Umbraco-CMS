@@ -488,6 +488,7 @@ export type DataTypeItemResponseModel = {
     id: string;
     name: string;
     editorUiAlias?: (string) | null;
+    editorAlias: string;
     isDeletable: boolean;
 };
 
@@ -2803,6 +2804,13 @@ export type UserTwoFactorProviderModel = {
     isEnabledOnUser: boolean;
 };
 
+export type ValidateUpdateDocumentRequestModel = {
+    values: Array<(DocumentValueModel)>;
+    variants: Array<(DocumentVariantRequestModel)>;
+    template?: ((ReferenceByIdModel) | null);
+    cultures?: Array<(string)> | null;
+};
+
 export type VariantItemResponseModel = {
     name: string;
     culture?: (string) | null;
@@ -3510,6 +3518,13 @@ export type PutDocumentByIdValidateData = {
 };
 
 export type PutDocumentByIdValidateResponse = (string);
+
+export type PutUmbracoManagementApiV11DocumentByIdValidate11Data = {
+    id: string;
+    requestBody?: (ValidateUpdateDocumentRequestModel);
+};
+
+export type PutUmbracoManagementApiV11DocumentByIdValidate11Response = (string);
 
 export type GetDocumentAreReferencedData = {
     id?: Array<(string)>;

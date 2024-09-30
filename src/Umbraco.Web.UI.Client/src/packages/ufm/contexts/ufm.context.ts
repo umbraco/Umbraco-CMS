@@ -1,5 +1,7 @@
 import { ufm } from '../plugins/marked-ufm.plugin.js';
 import type { UfmPlugin } from '../plugins/marked-ufm.plugin.js';
+import type { ManifestUfmComponent } from '../ufm-component.extension.js';
+import type { ManifestUfmFilter } from '../ufm-filter.extension.js';
 import { DOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
 import { Marked } from '@umbraco-cms/backoffice/external/marked';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -7,7 +9,6 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { ManifestUfmFilter, ManifestUfmComponent } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 

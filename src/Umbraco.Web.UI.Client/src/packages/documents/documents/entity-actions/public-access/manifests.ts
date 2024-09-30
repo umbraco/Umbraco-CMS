@@ -34,6 +34,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'modal',
 		alias: 'Umb.Modal.PublicAccess',
 		name: 'Public Access Modal',
-		js: () => import('./modal/public-access-modal.element.js'),
+		element: () => import('./modal/public-access-modal.element.js'),
 	},
 ];

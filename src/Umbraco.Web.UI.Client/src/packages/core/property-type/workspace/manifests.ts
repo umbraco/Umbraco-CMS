@@ -16,7 +16,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.PropertyType.Settings',
 		name: 'Property Type Settings Workspace View',
-		js: () => import('./views/settings/property-workspace-view-settings.element.js'),
+		element: () => import('./views/settings/property-workspace-view-settings.element.js'),
 		weight: 1000,
 		meta: {
 			label: '#general_content',

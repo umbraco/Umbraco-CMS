@@ -41,7 +41,7 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 				this.#reloadMenu();
 			}
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 		}
 	}
 

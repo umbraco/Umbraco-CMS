@@ -1,5 +1,5 @@
 import type { UmbCollectionBulkActionPermissions } from '@umbraco-cms/backoffice/collection';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';

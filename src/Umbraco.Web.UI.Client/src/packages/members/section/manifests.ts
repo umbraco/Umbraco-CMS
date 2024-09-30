@@ -1,9 +1,9 @@
 import { UMB_MEMBER_MANAGEMENT_SECTION_ALIAS } from './constants.js';
 import { manifests as sectionSidebarAppManifests } from './sidebar-app/manifests.js';
 import { manifests as menuManifests } from './menu/manifests.js';
-import type { ManifestSection, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-const section: ManifestSection = {
+const section: UmbExtensionManifest = {
 	type: 'section',
 	alias: UMB_MEMBER_MANAGEMENT_SECTION_ALIAS,
 	name: 'Members Section',

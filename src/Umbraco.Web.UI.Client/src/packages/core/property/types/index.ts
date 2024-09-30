@@ -1,2 +1,2 @@
-export * from './property-value-data.type.js';
-export * from './unsupported-properties.type.js';
+export type * from './property-value-data.type.js';
+export type * from './unsupported-properties.type.js';

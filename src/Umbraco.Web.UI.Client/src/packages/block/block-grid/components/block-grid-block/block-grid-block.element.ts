@@ -1,6 +1,5 @@
-import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../../context/block-grid-entry.context-token.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 
@@ -17,29 +16,22 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	@property({ attribute: false })
 	label?: string;
 
+	@property({ type: String, reflect: false })
+	icon?: string;
+
 	@property({ attribute: false })
 	config?: UmbBlockEditorCustomViewConfiguration;
 
-	@state()
-	_content?: UmbBlockDataType;
+	@property({ type: Boolean, reflect: true })
+	unpublished?: boolean;
 
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (context) => {
-			this.observe(
-				context.content,
-				(content) => {
-					this._content = content;
-				},
-				'observeContent',
-			);
-		});
-	}
+	@property({ attribute: false })
+	content?: UmbBlockDataType;
 
 	override render() {
 		return html`<umb-ref-grid-block standalone href=${this.config?.editContentPath ?? ''}>
-			<umb-ufm-render inline .markdown=${this.label} .value=${this._content}></umb-ufm-render>
+			<umb-icon slot="icon" .name=${this.icon}></umb-icon>
+			<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
 			<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
 		</umb-ref-grid-block>`;
 	}
@@ -51,6 +43,10 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 			}
 			umb-block-grid-areas-container::part(area) {
 				margin: var(--uui-size-2);
+			}
+			:host([unpublished]) umb-icon,
+			:host([unpublished]) umb-ufm-render {
+				opacity: 0.6;
 			}
 		`,
 	];
