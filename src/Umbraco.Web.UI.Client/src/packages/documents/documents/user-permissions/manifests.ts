@@ -18,10 +18,8 @@ import {
 } from './constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as conditionManifests } from './conditions/manifests.js';
-import type {
-	ManifestGranularUserPermission,
-	ManifestEntityUserPermission,
-} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestGranularUserPermission } from '@umbraco-cms/backoffice/user-permission';
+import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 
 const permissions: Array<ManifestEntityUserPermission> = [
 	{
