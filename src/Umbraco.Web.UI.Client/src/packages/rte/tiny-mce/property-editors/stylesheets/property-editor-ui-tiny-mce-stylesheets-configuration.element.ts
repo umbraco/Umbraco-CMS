@@ -1,9 +1,11 @@
-import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
+import type {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/property-editor';
 import type { UmbStylesheetInputElement } from '@umbraco-cms/backoffice/stylesheet';
 
 /**

@@ -18,7 +18,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-	#inUse: Set<string> = new Set();
+	readonly #inUse: Set<string> = new Set();
 
 	#currentDragItem?: {
 		alias: string;
@@ -55,17 +55,17 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		});
 	}
 
-	#onDragStart = (event: DragEvent, alias: string, fromPos?: [number, number, number]) => {
+	#onDragStart(event: DragEvent, alias: string, fromPos?: [number, number, number]) {
 		event.dataTransfer!.effectAllowed = 'move';
 		this.#currentDragItem = { alias, fromPos };
-	};
+	}
 
-	#onDragOver = (event: DragEvent) => {
+	#onDragOver(event: DragEvent) {
 		event.preventDefault();
 		event.dataTransfer!.dropEffect = 'move';
-	};
+	}
 
-	#onDragEnd = (event: DragEvent) => {
+	#onDragEnd(event: DragEvent) {
 		event.preventDefault();
 		if (event.dataTransfer?.dropEffect === 'none') {
 			const { fromPos } = this.#currentDragItem ?? {};
@@ -73,9 +73,9 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 
 			this.#removeItem(fromPos);
 		}
-	};
+	}
 
-	#onDrop = (event: DragEvent, toPos?: [number, number, number]) => {
+	#onDrop(event: DragEvent, toPos?: [number, number, number]) {
 		event.preventDefault();
 		const { alias, fromPos } = this.#currentDragItem ?? {};
 
@@ -93,9 +93,9 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		if (alias && toPos) {
 			this.#insertItem(alias, toPos);
 		}
-	};
+	}
 
-	#moveItem = (from: [number, number, number], to: [number, number, number]) => {
+	#moveItem(from: [number, number, number], to: [number, number, number]) {
 		const [rowIndex, groupIndex, itemIndex] = from;
 
 		// Get the item to move from the 'from' position
@@ -105,9 +105,9 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		this.#value[rowIndex][groupIndex].splice(itemIndex, 1);
 
 		this.#insertItem(itemToMove, to);
-	};
+	}
 
-	#insertItem = (alias: string, toPos: [number, number, number]) => {
+	#insertItem(alias: string, toPos: [number, number, number]) {
 		const [rowIndex, groupIndex, itemIndex] = toPos;
 
 		// Insert the item into the new position
@@ -115,7 +115,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		inserted.forEach((alias) => this.#inUse.add(alias));
 
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
-	};
+	}
 
 	#removeItem(from: [number, number, number]) {
 		const [rowIndex, groupIndex, itemIndex] = from;
@@ -126,12 +126,12 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	#addGroup = (rowIndex: number, groupIndex: number) => {
+	#addGroup(rowIndex: number, groupIndex: number) {
 		this.#value[rowIndex].splice(groupIndex, 0, []);
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
-	};
+	}
 
-	#removeGroup = (rowIndex: number, groupIndex: number) => {
+	#removeGroup(rowIndex: number, groupIndex: number) {
 		if (this.#value[rowIndex].length > groupIndex) {
 			const removed = this.#value[rowIndex].splice(groupIndex, 1);
 			removed.forEach((group) => group.forEach((alias) => this.#inUse.delete(alias)));
@@ -143,14 +143,14 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		}
 
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
-	};
+	}
 
-	#addRow = (rowIndex: number) => {
+	#addRow(rowIndex: number) {
 		this.#value.splice(rowIndex, 0, [[]]);
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
-	};
+	}
 
-	#removeRow = (rowIndex: number) => {
+	#removeRow(rowIndex: number) {
 		if (this.#value.length > rowIndex) {
 			const removed = this.#value.splice(rowIndex, 1);
 			removed.forEach((row) => row.forEach((group) => group.forEach((alias) => this.#inUse.delete(alias))));
@@ -162,7 +162,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		}
 
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
-	};
+	}
 
 	override render() {
 		return html`
@@ -250,7 +250,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			:host {

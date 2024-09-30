@@ -30,7 +30,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	];
 
 	@state()
-	private _extensions: Array<UmbTiptapExtensionApi> = [];
+	private readonly _extensions: Array<UmbTiptapExtensionApi> = [];
 
 	@property({ type: String })
 	override set value(value: string) {
@@ -312,9 +312,10 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 						}
 					}
 
-				.resize-cursor {
-					cursor: ew-resize;
-					cursor: col-resize;
+					.resize-cursor {
+						cursor: ew-resize;
+						cursor: col-resize;
+					}
 				}
 			}
 		`,

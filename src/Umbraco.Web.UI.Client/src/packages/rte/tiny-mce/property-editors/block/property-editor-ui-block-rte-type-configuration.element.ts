@@ -1,14 +1,15 @@
-import { type UmbBlockTypeBaseModel, UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
-import { UMB_BLOCK_RTE_TYPE } from '@umbraco-cms/backoffice/block-rte';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
-import { html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UmbPropertyValueChangeEvent,
-	type UmbPropertyEditorConfigCollection,
-} from '@umbraco-cms/backoffice/property-editor';
+import { customElement, html, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_BLOCK_RTE_TYPE } from '@umbraco-cms/backoffice/block-rte';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
+import type {
+	UmbPropertyEditorUiElement,
+	UmbPropertyEditorConfigCollection,
+} from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * @element umb-property-editor-ui-block-rte-type-configuration
