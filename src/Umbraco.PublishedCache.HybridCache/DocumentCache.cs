@@ -55,7 +55,8 @@ public sealed class DocumentCache : IPublishedContentCache
 
     public bool HasContent() => StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>().HasAny();
 
-    public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType) => throw new NotImplementedException();
+    public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
+        => _documentCacheService.GetByContentType(contentType);
 
     public IPublishedContent? GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string? culture = null) => throw new NotImplementedException();
 

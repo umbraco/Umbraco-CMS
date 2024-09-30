@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using Microsoft.Extensions.Caching.Hybrid;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -94,6 +92,17 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             async cancel => await _databaseCacheRepository.GetContentSourceAsync(id, preview));
         scope.Complete();
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview).CreateModel(_publishedModelFactory);;
+    }
+
+    public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        IEnumerable<ContentCacheNode> nodes = _databaseCacheRepository.GetContentByContentTypeKey([contentType.Key]);
+        scope.Complete();
+
+        return nodes
+            .Select(x => _publishedContentFactory.ToIPublishedContent(x, x.IsDraft).CreateModel(_publishedModelFactory))
+            .WhereNotNull();
     }
 
     public async Task SeedAsync(CancellationToken cancellationToken)
