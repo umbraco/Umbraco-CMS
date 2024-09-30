@@ -76,7 +76,12 @@ public sealed class InternalPublishedContent : IPublishedContent
 
     public bool IsPublished(string? culture = null) => true;
 
-    public IEnumerable<IPublishedContent> Children { get; set; } = Enumerable.Empty<IPublishedContent>();
+    [Obsolete(
+        "Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
+    public IEnumerable<IPublishedContent> Children => this.Children(
+        StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>(),
+        StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
+        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>());
 
     public IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
 
