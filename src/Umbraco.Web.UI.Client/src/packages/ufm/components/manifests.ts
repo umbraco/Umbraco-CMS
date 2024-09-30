@@ -1,4 +1,4 @@
-import type { ManifestUfmComponent } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestUfmComponent } from '../ufm-component.extension.js';
 
 export const manifests: Array<ManifestUfmComponent> = [
 	{

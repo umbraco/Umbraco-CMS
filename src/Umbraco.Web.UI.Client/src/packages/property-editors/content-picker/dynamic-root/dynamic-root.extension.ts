@@ -23,3 +23,10 @@ export interface MetaDynamicRootQueryStep {
 	description?: string;
 	icon?: string;
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbDynamicRootOrigin: ManifestDynamicRootOrigin;
+		umbDynamicRootQueryStep: ManifestDynamicRootQueryStep;
+	}
+}
