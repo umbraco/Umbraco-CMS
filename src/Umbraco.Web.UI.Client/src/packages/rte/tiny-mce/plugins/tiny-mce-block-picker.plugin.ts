@@ -116,6 +116,7 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 
 			editor.selection.setContent(blockEl);
 			editor.setDirty(true);
+			editor.dispatch('Change');
 		});
 	}
 }
