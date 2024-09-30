@@ -49,12 +49,12 @@ public class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationTestWithCo
     public async Task Content_Gets_Removed_When_DocumentType_Is_Deleted()
     {
         // Load into cache
-        var textpage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, preview: true);
-        Assert.IsNotNull(textpage);
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, preview: true);
+        Assert.IsNotNull(textPage);
 
-        await ContentTypeService.DeleteAsync(textpage.ContentType.Key, Constants.Security.SuperUserKey);
+        await ContentTypeService.DeleteAsync(textPage.ContentType.Key, Constants.Security.SuperUserKey);
 
-        var textpageAgain = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, preview: true);
-        Assert.IsNull(textpageAgain);
+        var textPageAgain = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, preview: true);
+        Assert.IsNull(textPageAgain);
     }
 }
