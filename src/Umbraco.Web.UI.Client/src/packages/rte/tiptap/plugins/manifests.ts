@@ -8,9 +8,9 @@ export const manifests: Array<ManifestTiptapExtension | ManifestTiptapToolbarExt
 		name: 'Block Tiptap Extension',
 		api: () => import('./block.extension.js'),
 		meta: {
-			icon: 'icon-block',
+			icon: 'icon-plugin',
 			label: 'Block',
-			group: 'Interactive Elements',
+			group: '#tiptap_extGroup_interactive',
 		},
 	},
 	{

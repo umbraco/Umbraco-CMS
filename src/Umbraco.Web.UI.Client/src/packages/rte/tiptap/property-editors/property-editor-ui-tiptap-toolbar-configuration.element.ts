@@ -58,7 +58,6 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 					alias: ext.alias,
 					label: ext.meta.label,
 					icon: ext.meta.icon,
-					category: '',
 				};
 			});
 
@@ -168,14 +167,16 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	#renderItem(alias: string, rowIndex: number, groupIndex: number, itemIndex: number) {
 		const extension = this._extensions.find((ext) => ext.alias === alias);
 		if (!extension) return nothing;
-		return html`<div
-			title=${extension.label}
-			class="item"
-			draggable="true"
-			@dragend=${this.#onDragEnd}
-			@dragstart=${(e: DragEvent) => this.#onDragStart(e, alias, [rowIndex, groupIndex, itemIndex])}>
-			<umb-icon name=${extension.icon ?? ''}></umb-icon>
-		</div>`;
+		return html`
+			<div
+				title=${extension.label}
+				class="item"
+				draggable="true"
+				@dragend=${this.#onDragEnd}
+				@dragstart=${(e: DragEvent) => this.#onDragStart(e, alias, [rowIndex, groupIndex, itemIndex])}>
+				<umb-icon name=${extension.icon ?? ''}></umb-icon>
+			</div>
+		`;
 	}
 
 	#renderGroup(group: string[], rowIndex: number, groupIndex: number) {
@@ -225,21 +226,23 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 
 	#renderExtensions() {
 		// TODO: Can we avoid using a flat here? or is it okay for performance?
-		return html`<div class="extensions" dropzone="move" @drop=${this.#onDrop} @dragover=${this.#onDragOver}>
-			${repeat(
-				this._extensions.filter((ext) => !this.#value.flat(2).includes(ext.alias)),
-				(extension) => html`
-					<div
-						title=${extension.label}
-						class="item"
-						draggable="true"
-						@dragend=${this.#onDragEnd}
-						@dragstart=${(e: DragEvent) => this.#onDragStart(e, extension.alias)}>
-						<umb-icon name=${extension.icon ?? ''}></umb-icon>
-					</div>
-				`,
-			)}
-		</div>`;
+		return html`
+			<div class="extensions" dropzone="move" @drop=${this.#onDrop} @dragover=${this.#onDragOver}>
+				${repeat(
+					this._extensions.filter((ext) => !this.#value.flat(2).includes(ext.alias)),
+					(extension) => html`
+						<div
+							title=${extension.label}
+							class="item"
+							draggable="true"
+							@dragend=${this.#onDragEnd}
+							@dragstart=${(e: DragEvent) => this.#onDragStart(e, extension.alias)}>
+							<umb-icon name=${extension.icon ?? ''}></umb-icon>
+						</div>
+					`,
+				)}
+			</div>
+		`;
 	}
 
 	static override styles = [

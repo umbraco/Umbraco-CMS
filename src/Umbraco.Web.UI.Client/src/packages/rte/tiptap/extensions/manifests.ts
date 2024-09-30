@@ -85,7 +85,7 @@ const umbExtensions: Array<ManifestTiptapExtension> = [
 		meta: {
 			icon: 'icon-image-up',
 			label: 'Media upload',
-			group: 'Media and Embeds',
+			group: '#tiptap_extGroup_media',
 		},
 	},
 ];

@@ -2628,4 +2628,10 @@ export default {
 		wordWrapConfigLabel: 'Word wrap',
 		wordWrapConfigDescription: 'Enable word wrapping in the code editor.',
 	},
+	tiptap: {
+		extGroup_formatting: 'Text formatting',
+		extGroup_interactive: 'Interactive elements',
+		extGroup_media: 'Embeds and media',
+		extGroup_structure: 'Content structure',
+	}
 } as UmbLocalizationDictionary;
