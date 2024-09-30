@@ -56,14 +56,16 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 		super.firstUpdated(_changedProperties);
 
 		this.observe(umbExtensionsRegistry.byType('tiptapExtension'), (extensions) => {
-			this._extensionConfigs = extensions.map((ext) => {
-				return {
-					alias: ext.alias,
-					label: ext.meta.label,
-					icon: ext.meta.icon,
-					group: ext.meta.group,
-				};
-			});
+			this._extensionConfigs = extensions
+				.sort((a, b) => a.alias.localeCompare(b.alias))
+				.map((ext) => {
+					return {
+						alias: ext.alias,
+						label: ext.meta.label,
+						icon: ext.meta.icon,
+						group: ext.meta.group,
+					};
+				});
 
 			if (!this.value) {
 				// The default value is all extensions enabled
@@ -84,18 +86,16 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 			};
 		});
 
-		const grouped = withSelectedProperty.reduce((acc: any, item) => {
-			const group = item.group || 'Uncategorized'; // Assign to "Uncategorized" if no group
-			if (!acc[group]) {
-				acc[group] = [];
-			}
-			acc[group].push(item);
-			return acc;
-		}, {});
-		this._extensionCategories = Object.keys(grouped).map((group) => ({
-			category: group.charAt(0).toUpperCase() + group.slice(1).replace(/-/g, ' '),
-			extensions: grouped[group],
-		}));
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-expect-error
+		const grouped = Object.groupBy(withSelectedProperty, (item: ExtensionConfig) => item.group || 'Uncategorized');
+
+		this._extensionCategories = Object.keys(grouped)
+			.sort((a, b) => a.localeCompare(b))
+			.map((key) => ({
+				category: key,
+				extensions: grouped[key],
+			}));
 	}
 
 	#onExtensionClick(item: ExtensionCategoryItem) {
