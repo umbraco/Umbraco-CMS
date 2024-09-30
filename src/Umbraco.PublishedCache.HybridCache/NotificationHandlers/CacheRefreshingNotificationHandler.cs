@@ -76,6 +76,8 @@ internal sealed class CacheRefreshingNotificationHandler :
         IEnumerable<IRelation> childRelations = _relationService.GetByChild(content);
 
         var ids = parentRelations.Select(x => x.ChildId).Concat(childRelations.Select(x => x.ParentId)).ToHashSet();
+        // We need to add ourselves to the list of ids to clear
+        ids.Add(content.Id);
         foreach (var id in ids)
         {
             if (await _documentCacheService.HasContentByIdAsync(id) is false)
@@ -92,12 +94,12 @@ internal sealed class CacheRefreshingNotificationHandler :
             foreach (IPublishedProperty publishedProperty in publishedContent.Properties)
             {
                 var property = (PublishedProperty) publishedProperty;
-                if (property.ReferenceCacheLevel != PropertyCacheLevel.Elements)
+                if (property.ReferenceCacheLevel is PropertyCacheLevel.Elements
+                    || property.PropertyType.DeliveryApiCacheLevel is PropertyCacheLevel.Elements
+                    || property.PropertyType.DeliveryApiCacheLevelForExpansion is PropertyCacheLevel.Elements)
                 {
-                    continue;
+                    _elementsCache.ClearByKey(property.ValuesCacheKey);
                 }
-
-                _elementsCache.ClearByKey(property.ValuesCacheKey);
             }
         }
     }
