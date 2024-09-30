@@ -35,7 +35,6 @@ import type { ManifestSection } from './section.model.js';
 import type { ManifestSectionSidebarApp, ManifestSectionSidebarAppMenuKind } from './section-sidebar-app.model.js';
 import type { ManifestSectionView } from './section-view.model.js';
 import type { ManifestStore, ManifestTreeStore, ManifestItemStore } from './store.model.js';
-import type { ManifestTheme } from './theme.model.js';
 import type { ManifestTinyMcePlugin } from './tinymce-plugin.model.js';
 import type { ManifestUfmComponent } from './ufm-component.model.js';
 import type { ManifestUfmFilter } from './ufm-filter.model.js';
@@ -80,7 +79,6 @@ export type * from './section-sidebar-app.model.js';
 export type * from './section-view.model.js';
 export type * from './section.model.js';
 export type * from './store.model.js';
-export type * from './theme.model.js';
 export type * from './tinymce-plugin.model.js';
 export type * from './ufm-component.model.js';
 export type * from './ufm-filter.model.js';
@@ -145,7 +143,6 @@ export type ManifestTypes =
 	| ManifestSectionSidebarAppMenuKind
 	| ManifestSectionView
 	| ManifestStore
-	| ManifestTheme
 	| ManifestTinyMcePlugin
 	| ManifestTreeStore
 	| ManifestUfmComponent
