@@ -105,6 +105,7 @@ public abstract class PublishedContentWrapped : IPublishedContent
     public virtual bool IsPublished(string? culture = null) => _content.IsPublished(culture);
 
     /// <inheritdoc />
+    [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
     public virtual IEnumerable<IPublishedContent> Children => _content.Children;
 
     /// <inheritdoc cref="IPublishedElement.Properties" />
