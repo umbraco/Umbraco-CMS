@@ -1696,8 +1696,12 @@ name: "icon-shuffle",
 path: () => import("./icons/icon-shuffle.js"),
 },{
 name: "icon-sience",
-
+legacy: true,
 path: () => import("./icons/icon-sience.js"),
+},{
+name: "icon-science",
+
+path: () => import("./icons/icon-science.js"),
 },{
 name: "icon-single-note",
 

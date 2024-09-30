@@ -414,6 +414,21 @@ export class UmbExtensionRegistry<
 		) as Observable<Array<T>>;
 	}
 
+	// TODO: Write test for this method:
+	getByTypeAndFilter<
+		Key extends string,
+		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>,
+	>(type: Key, filter: (ext: T) => boolean): Array<T> {
+		const exts = this._extensions
+			.getValue()
+			.filter((ext) => ext.type === type && filter(ext as unknown as T)) as unknown as T[];
+		if (exts.length === 0) {
+			return [];
+		}
+		const kinds = this._kinds.getValue();
+		return exts.map((ext) => (ext?.kind ? (this.#mergeExtensionWithKinds([ext, kinds]) ?? ext) : ext));
+	}
+
 	/**
 	 * Get an observable of extensions by types and a given filter method.
 	 * This will return the all extensions that matches the types and which filter method returns true.

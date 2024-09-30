@@ -51,7 +51,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 			this.#tabsStructureHelper.mergedContainers,
 			(tabs) => {
 				this._tabs = tabs;
-				this._createRoutes();
+				this.#createRoutes();
 			},
 			null,
 		);
@@ -64,25 +64,25 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 		});
 	}
 
-	#setStructureManager() {
+	async #setStructureManager() {
 		if (!this.#blockWorkspace || !this.#managerName) return;
-		const dataManager = this.#blockWorkspace[this.#managerName];
-		this.#tabsStructureHelper.setStructureManager(dataManager.structure);
+		const blockManager = this.#blockWorkspace[this.#managerName];
+		this.#tabsStructureHelper.setStructureManager(blockManager.structure);
 
 		// Create Data Set & setup Validation Context:
-		dataManager.setup(this);
+		blockManager.setup(this);
 
 		this.observe(
-			this.#blockWorkspace![this.#managerName!].structure.hasRootContainers('Group'),
+			await this.#blockWorkspace![this.#managerName!].structure.hasRootContainers('Group'),
 			(hasRootGroups) => {
 				this._hasRootGroups = hasRootGroups;
-				this._createRoutes();
+				this.#createRoutes();
 			},
 			'observeGroups',
 		);
 	}
 
-	private _createRoutes() {
+	#createRoutes() {
 		if (!this._tabs || !this.#blockWorkspace) return;
 		const routes: UmbRoute[] = [];
 
@@ -90,7 +90,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 			this._tabs?.forEach((tab) => {
 				const tabName = tab.name ?? '';
 				routes.push({
-					path: `tab/${encodeFolderName(tabName).toString()}`,
+					path: `tab/${encodeFolderName(tabName)}`,
 					component: () => import('./block-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
 						(component as UmbBlockWorkspaceViewEditTabElement).managerName = this.#managerName;
@@ -112,10 +112,12 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 		}
 
 		if (routes.length !== 0) {
-			routes.push({
-				path: '',
-				redirectTo: routes[0]?.path,
-			});
+			if (!this._hasRootGroups) {
+				routes.push({
+					path: '',
+					redirectTo: routes[0]?.path,
+				});
+			}
 			routes.push({
 				path: `**`,
 				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,

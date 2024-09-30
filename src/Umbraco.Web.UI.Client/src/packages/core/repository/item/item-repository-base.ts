@@ -37,6 +37,7 @@ export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 		await this._init;
 
 		const { data, error: _error } = await this.#itemSource.getItems(uniques);
+
 		const error: any = _error;
 		if (data) {
 			this._itemStore!.appendItems(data);

@@ -32,19 +32,19 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	@property({ attribute: false })
-	public get contentUdi(): string | undefined {
-		return this._contentUdi;
+	public get contentKey(): string | undefined {
+		return this._contentKey;
 	}
-	public set contentUdi(value: string | undefined) {
-		if (!value || value === this._contentUdi) return;
-		this._contentUdi = value;
-		this._blockViewProps.contentUdi = value;
-		this.setAttribute('data-element-udi', value);
-		this.#context.setContentUdi(value);
+	public set contentKey(value: string | undefined) {
+		if (!value || value === this._contentKey) return;
+		this._contentKey = value;
+		this._blockViewProps.contentKey = value;
+		this.setAttribute('data-element-key', value);
+		this.#context.setContentKey(value);
 
 		new UmbObserveValidationStateController(
 			this,
-			`$.contentData[${UmbDataPathBlockElementDataQuery({ udi: value })}]`,
+			`$.contentData[${UmbDataPathBlockElementDataQuery({ key: value })}]`,
 			(hasMessages) => {
 				this._contentInvalid = hasMessages;
 				this._blockViewProps.contentInvalid = hasMessages;
@@ -52,7 +52,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			'observeMessagesForContent',
 		);
 	}
-	private _contentUdi?: string | undefined;
+	private _contentKey?: string | undefined;
 	//
 
 	#context = new UmbBlockGridEntryContext(this);
@@ -85,6 +85,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	_icon?: string;
 
 	@state()
+	_exposed?: boolean;
+
+	@state()
 	_workspaceEditContentPath?: string;
 
 	@state()
@@ -113,7 +116,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockGridLayoutModel> = {
-		contentUdi: undefined!,
+		contentKey: undefined!,
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
 
@@ -174,6 +177,14 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			null,
 		);
 		this.observe(
+			this.#context.hasExpose,
+			(exposed) => {
+				this.#updateBlockViewProps({ unpublished: !exposed });
+				this._exposed = exposed;
+			},
+			null,
+		);
+		this.observe(
 			this.#context.inlineEditingMode,
 			(mode) => {
 				this._inlineEditingMode = mode;
@@ -189,24 +200,17 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
-		this.observe(
-			this.#context.content,
-			(content) => {
-				this.#updateBlockViewProps({ content });
-			},
-			null,
-		);
-		this.observe(
-			this.#context.settings,
-			(settings) => {
-				this.#updateBlockViewProps({ settings });
+		this.#observeData();
 
+		this.observe(
+			this.#context.settingsKey,
+			(settingsKey) => {
 				this.removeUmbControllerByAlias('observeMessagesForSettings');
-				if (settings) {
+				if (settingsKey) {
 					// Observe settings validation state:
 					new UmbObserveValidationStateController(
 						this,
-						`$.settingsData[${UmbDataPathBlockElementDataQuery(settings)}]`,
+						`$.settingsData[${UmbDataPathBlockElementDataQuery({ key: settingsKey })}]`,
 						(hasMessages) => {
 							this._settingsInvalid = hasMessages;
 							this._blockViewProps.settingsInvalid = hasMessages;
@@ -250,6 +254,23 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			(path) => {
 				this._workspaceEditSettingsPath = path;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editSettingsPath: path } });
+			},
+			null,
+		);
+	}
+
+	async #observeData() {
+		this.observe(
+			await this.#context.contentValues(),
+			(content) => {
+				this.#updateBlockViewProps({ content });
+			},
+			null,
+		);
+		this.observe(
+			await this.#context.settingsValues(),
+			(settings) => {
+				this.#updateBlockViewProps({ settings });
 			},
 			null,
 		);
@@ -364,17 +385,25 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	#renderInlineEditBlock() {
 		return html`<umb-block-grid-block-inline
 			class="umb-block-grid__block--view"
-			.label=${this._label}></umb-block-grid-block-inline>`;
+			.label=${this._label}
+			.icon=${this._icon}
+			.unpublished=${!this._exposed}
+			.content=${this._blockViewProps.content}
+			.settings=${this._blockViewProps.settings}></umb-block-grid-block-inline>`;
 	}
 
 	#renderRefBlock() {
 		return html`<umb-block-grid-block
 			class="umb-block-grid__block--view"
-			.label=${this._label}></umb-block-grid-block>`;
+			.label=${this._label}
+			.icon=${this._icon}
+			.unpublished=${!this._exposed}
+			.content=${this._blockViewProps.content}
+			.settings=${this._blockViewProps.settings}></umb-block-grid-block>`;
 	}
 
 	#renderBlock() {
-		return this.contentUdi && this._contentTypeAlias
+		return this.contentKey && this._contentTypeAlias
 			? html`
 					${this._createBeforePath && this._showInlineCreateBefore
 						? html`<uui-button-inline-create

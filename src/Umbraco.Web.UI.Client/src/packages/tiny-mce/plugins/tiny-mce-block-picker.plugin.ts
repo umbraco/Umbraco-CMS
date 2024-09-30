@@ -1,5 +1,5 @@
-import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from '../context/block-rte-manager.context-token.js';
-import { UMB_BLOCK_RTE_ENTRIES_CONTEXT } from '../context/block-rte-entries.context-token.js';
+import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from '../../block/block-rte/context/block-rte-manager.context-token.js';
+import { UMB_BLOCK_RTE_ENTRIES_CONTEXT } from '../../block/block-rte/context/block-rte-entries.context-token.js';
 import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/tiny-mce';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
@@ -19,7 +19,7 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 			onAction: () => this.showDialog(),
 			onSetup: function (api) {
 				const changed = args.editor.selection.selectorChangedWithUnbind(
-					'umb-rte-block[data-content-udi], umb-rte-block-inline[data-content-udi]',
+					'umb-rte-block[data-content-key], umb-rte-block-inline[data-content-key]',
 					(state) => api.setActive(state),
 				);
 				return () => changed.unbind();
@@ -46,10 +46,10 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 		//const blockEl = this.editor.selection.getNode();
 
 		/*if (blockEl.nodeName === 'UMB-RTE-BLOCK' || blockEl.nodeName === 'UMB-RTE-BLOCK-INLINE') {
-			const blockUdi = blockEl.getAttribute('data-content-udi') ?? undefined;
-			if (blockUdi) {
+			const blockkey = blockEl.getAttribute('data-content-key') ?? undefined;
+			if (blockkey) {
 				// TODO: Missing a solution to edit a block from this scope. [NL]
-				this.#editBlock(blockUdi);
+				this.#editBlock(blockkey);
 				return;
 			}
 		}*/

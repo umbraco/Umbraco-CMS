@@ -14,8 +14,8 @@ export class UmbBlockElementDataValidationPathTranslator extends UmbAbstractArra
 		if (!this._context) return;
 		const data = this._context.getTranslationData();
 		const entry = data[this.#propertyName][index];
-		if (!entry || !entry.udi) {
-			console.log('block did not have UDI', this.#propertyName, index, data);
+		if (!entry || !entry.key) {
+			console.error('block did not have key', this.#propertyName, index, data);
 			return false;
 		}
 		return entry;
