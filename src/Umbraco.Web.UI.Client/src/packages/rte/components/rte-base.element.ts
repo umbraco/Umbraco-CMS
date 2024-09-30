@@ -1,17 +1,17 @@
-import type { UmbBlockValueType } from '@umbraco-cms/backoffice/block';
+import { property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import type {
+	UmbPropertyEditorUiElement,
+	UmbPropertyEditorConfigCollection,
+} from '@umbraco-cms/backoffice/property-editor';
 import {
 	UmbBlockRteEntriesContext,
 	UmbBlockRteManagerContext,
 	type UmbBlockRteLayoutModel,
 	type UmbBlockRteTypeModel,
 } from '@umbraco-cms/backoffice/block-rte';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UmbPropertyValueChangeEvent,
-	type UmbPropertyEditorConfigCollection,
-} from '@umbraco-cms/backoffice/property-editor';
+import type { UmbBlockValueType } from '@umbraco-cms/backoffice/block';
 
 export interface UmbRichTextEditorValueType {
 	markup: string;

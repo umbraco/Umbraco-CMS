@@ -6,9 +6,9 @@ import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import type { ManifestPackageView } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import type { ManifestPackageView } from '@umbraco-cms/backoffice/package';
 
 @customElement('umb-installed-packages-section-view-item')
 export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {

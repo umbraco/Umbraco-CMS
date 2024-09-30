@@ -25,20 +25,11 @@ import type { ManifestGlobalContext } from './global-context.model.js';
 import type { ManifestHeaderApp, ManifestHeaderAppButtonKind } from './header-app.model.js';
 import type { ManifestHealthCheck } from './health-check.model.js';
 import type { ManifestIcons } from './icons.model.js';
-import type { ManifestLocalization } from './localization.model.js';
 import type { ManifestMenu } from './menu.model.js';
 import type { ManifestMenuItem, ManifestMenuItemLinkKind, ManifestMenuItemTreeKind } from './menu-item.model.js';
-import type { ManifestModal } from './modal.model.js';
-import type { ManifestPackageView } from './package-view.model.js';
 import type { ManifestPreviewAppProvider } from './preview-app.model.js';
-import type { ManifestPropertyAction, ManifestPropertyActionDefaultKind } from './property-action.model.js';
-import type { ManifestPropertyEditorUi, ManifestPropertyEditorSchema } from './property-editor.model.js';
 import type { ManifestRepository } from './repository.model.js';
-import type { ManifestSection } from './section.model.js';
-import type { ManifestSectionSidebarApp, ManifestSectionSidebarAppMenuKind } from './section-sidebar-app.model.js';
-import type { ManifestSectionView } from './section-view.model.js';
 import type { ManifestStore, ManifestTreeStore, ManifestItemStore } from './store.model.js';
-import type { ManifestTheme } from './theme.model.js';
 import type { ManifestTinyMcePlugin } from './tinymce-plugin.model.js';
 import type { ManifestUfmComponent } from './ufm-component.model.js';
 import type { ManifestUfmFilter } from './ufm-filter.model.js';
@@ -50,7 +41,6 @@ import type { ManifestAppEntryPoint } from './app-entry-point.model.js';
 import type { ManifestBackofficeEntryPoint } from './backoffice-entry-point.model.js';
 import type { ManifestEntryPoint } from './entry-point.model.js';
 import type { ManifestMonacoMarkdownEditorAction } from './monaco-markdown-editor-action.model.js';
-import type { ManifestSectionRoute } from './section-route.model.js';
 import type { ManifestPickerSearchResultItem } from './picker-search-result-item.model.js';
 import type { ManifestBase, ManifestBundle, ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
@@ -70,23 +60,14 @@ export type * from './global-context.model.js';
 export type * from './header-app.model.js';
 export type * from './health-check.model.js';
 export type * from './icons.model.js';
-export type * from './localization.model.js';
 export type * from './menu-item.model.js';
 export type * from './menu.model.js';
 export type * from './mfa-login-provider.model.js';
-export type * from './modal.model.js';
 export type * from './monaco-markdown-editor-action.model.js';
-export type * from './package-view.model.js';
 export type * from './picker-search-result-item.model.js';
 export type * from './preview-app.model.js';
-export type * from './property-action.model.js';
-export type * from './property-editor.model.js';
 export type * from './repository.model.js';
-export type * from './section-sidebar-app.model.js';
-export type * from './section-view.model.js';
-export type * from './section.model.js';
 export type * from './store.model.js';
-export type * from './theme.model.js';
 export type * from './tinymce-plugin.model.js';
 export type * from './ufm-component.model.js';
 export type * from './ufm-filter.model.js';
@@ -108,8 +89,6 @@ export type ManifestEntityActions =
 	| ManifestEntityActionSortChildrenOfKind
 	| ManifestEntityActionTrashKind
 	| ManifestEntityActionUpdateFolderKind;
-
-export type ManifestPropertyActions = ManifestPropertyAction | ManifestPropertyActionDefaultKind;
 
 export type ManifestTypes =
 	| ManifestAppEntryPoint
@@ -135,28 +114,16 @@ export type ManifestTypes =
 	| ManifestHealthCheck
 	| ManifestIcons
 	| ManifestItemStore
-	| ManifestLocalization
 	| ManifestMenu
 	| ManifestMenuItem
 	| ManifestMenuItemTreeKind
 	| ManifestMenuItemLinkKind
 	| ManifestMfaLoginProvider
-	| ManifestModal
 	| ManifestMonacoMarkdownEditorAction
-	| ManifestPackageView
 	| ManifestPickerSearchResultItem
 	| ManifestPreviewAppProvider
-	| ManifestPropertyActions
-	| ManifestPropertyEditorSchema
-	| ManifestPropertyEditorUi
 	| ManifestRepository
-	| ManifestSection
-	| ManifestSectionRoute
-	| ManifestSectionSidebarApp
-	| ManifestSectionSidebarAppMenuKind
-	| ManifestSectionView
 	| ManifestStore
-	| ManifestTheme
 	| ManifestTinyMcePlugin
 	| ManifestTreeStore
 	| ManifestUfmComponent

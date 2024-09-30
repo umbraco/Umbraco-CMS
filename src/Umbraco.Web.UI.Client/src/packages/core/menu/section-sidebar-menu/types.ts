@@ -1,10 +1,8 @@
-import type { UmbSectionSidebarAppElement } from '../interfaces/section-sidebar-app-element.interface.js';
-import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestSectionSidebarApp } from '@umbraco-cms/backoffice/section';
 
-export interface ManifestSectionSidebarApp
-	extends ManifestElement<UmbSectionSidebarAppElement>,
-		ManifestWithDynamicConditions<UmbExtensionCondition> {
-	type: 'sectionSidebarApp';
+export interface MetaSectionSidebarAppMenuKind {
+	label: string;
+	menu: string;
 }
 
 export interface ManifestSectionSidebarAppBaseMenu extends ManifestSectionSidebarApp {
@@ -15,11 +13,6 @@ export interface ManifestSectionSidebarAppBaseMenu extends ManifestSectionSideba
 export interface ManifestSectionSidebarAppMenuKind extends ManifestSectionSidebarAppBaseMenu {
 	type: 'sectionSidebarApp';
 	kind: 'menu';
-}
-
-export interface MetaSectionSidebarAppMenuKind {
-	label: string;
-	menu: string;
 }
 
 export interface ManifestSectionSidebarAppMenuWithEntityActionsKind extends ManifestSectionSidebarAppBaseMenu {

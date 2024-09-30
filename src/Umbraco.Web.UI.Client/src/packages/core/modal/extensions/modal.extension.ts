@@ -1,4 +1,4 @@
-import type { UmbModalExtensionElement } from '../interfaces/modal-extension-element.interface.js';
+import type { UmbModalExtensionElement } from './modal-extension-element.interface.js';
 import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestModal

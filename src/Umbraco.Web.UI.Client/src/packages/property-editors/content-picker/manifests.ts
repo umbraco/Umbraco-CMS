@@ -2,7 +2,7 @@ import { manifest as sourceManifest } from './config/source/manifests.js';
 import { manifest as sourceTypeManifest } from './config/source-type/manifests.js';
 import { manifest as schemaManifest } from './Umbraco.MultiNodeTreePicker.js';
 import { manifests as dynamicRootManifests } from './dynamic-root/manifests.js';
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 
 const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',

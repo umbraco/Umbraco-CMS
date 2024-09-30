@@ -1,12 +1,8 @@
+import type { ManifestSectionView, UmbSectionViewElement } from '../extensions/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
-import type {
-	ManifestDashboard,
-	ManifestSectionView,
-	UmbDashboardElement,
-	UmbSectionViewElement,
-} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestDashboard, UmbDashboardElement } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
