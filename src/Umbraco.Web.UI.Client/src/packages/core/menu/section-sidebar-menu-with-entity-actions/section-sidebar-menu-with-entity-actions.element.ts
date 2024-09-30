@@ -1,5 +1,5 @@
 import { UmbSectionSidebarMenuElement } from '../section-sidebar-menu/section-sidebar-menu.element.js';
-import type { ManifestSectionSidebarAppMenuWithEntityActionsKind } from '../types.js';
+import type { ManifestSectionSidebarAppMenuWithEntityActionsKind } from '../section-sidebar-menu/types.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
