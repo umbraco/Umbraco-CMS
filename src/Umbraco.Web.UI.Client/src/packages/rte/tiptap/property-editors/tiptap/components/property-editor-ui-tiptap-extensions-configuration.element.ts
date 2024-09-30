@@ -83,7 +83,10 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-expect-error
-		const grouped = Object.groupBy(withSelectedProperty, (item: UmbTiptapExtensionConfig) => item.group || 'Uncategorized');
+		const grouped = Object.groupBy(
+			withSelectedProperty,
+			(item: UmbTiptapExtensionConfig) => item.group || 'Uncategorized',
+		);
 
 		this._extensionCategories = Object.keys(grouped)
 			.sort((a, b) => a.localeCompare(b))
