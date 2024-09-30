@@ -105,10 +105,9 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		const element = this.shadowRoot?.querySelector('#editor');
 		if (!element) return;
 
-		const maxWidth = this.configuration?.getValueByAlias<number>('maxWidth');
-		const maxHeight = this.configuration?.getValueByAlias<number>('maxHeight');
-		if (maxWidth) this.setAttribute('style', `max-width: ${maxWidth}px;`);
-		if (maxHeight) element.setAttribute('style', `max-height: ${maxHeight}px;`);
+		const dimensions = this.configuration?.getValueByAlias<{ width?: number; height?: number }>('dimensions');
+		if (dimensions?.width) this.setAttribute('style', `max-width: ${dimensions.width}px;`);
+		if (dimensions?.height) element.setAttribute('style', `max-height: ${dimensions.height}px;`);
 
 		this._toolbar = this.configuration?.getValueByAlias<UmbTiptapToolbarValue>('toolbar') ?? [[[]]];
 

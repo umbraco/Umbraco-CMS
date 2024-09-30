@@ -28,18 +28,11 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 						weight: 10,
 					},
 					{
-						alias: 'maxWidth',
-						label: 'MaxWidth',
-						description: 'Editor max width',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
+						alias: 'dimensions',
+						label: 'Dimensions',
+						description: 'Set the maximum width and height of the editor',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.DimensionsConfiguration',
 						weight: 20,
-					},
-					{
-						alias: 'maxHeight',
-						label: 'MaxHeight',
-						description: 'Editor max height',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
-						weight: 30,
 					},
 					{
 						alias: 'maxImageSize',
