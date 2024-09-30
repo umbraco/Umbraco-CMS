@@ -96,20 +96,20 @@ export const data: Array<UmbMockDocumentModel> = [
 	<li>Aenean massa cum sociis natoque penatibus.</li>
 </ul>
 <p>
-	Lorem ipsum dolor sit amet, consectetuer adipiscing 
+	Lorem ipsum dolor sit amet, consectetuer adipiscing
 	elit. Aenean commodo ligula eget dolor.
 </p>
 <p>
 	<blockquote>
-		Lorem ipsum dolor sit amet, consectetuer 
-		adipiscing elit. Aenean commodo ligula eget dolor. 
-		Aenean massa <strong>strong</strong>. Cum sociis 
-		natoque penatibus et magnis dis parturient montes, 
-		nascetur ridiculus mus. Donec quam felis, ultricies 
-		nec, pellentesque eu, pretium quis, sem. Nulla consequat 
-		massa quis enim. Donec pede justo, fringilla vel, 
-		aliquet nec, vulputate eget, arcu. In <em>em</em> 
-		enim justo, rhoncus ut, imperdiet a, venenatis vitae, 
+		Lorem ipsum dolor sit amet, consectetuer
+		adipiscing elit. Aenean commodo ligula eget dolor.
+		Aenean massa <strong>strong</strong>. Cum sociis
+		natoque penatibus et magnis dis parturient montes,
+		nascetur ridiculus mus. Donec quam felis, ultricies
+		nec, pellentesque eu, pretium quis, sem. Nulla consequat
+		massa quis enim. Donec pede justo, fringilla vel,
+		aliquet nec, vulputate eget, arcu. In <em>em</em>
+		enim justo, rhoncus ut, imperdiet a, venenatis vitae,
 		justo. Nullam <a class="external ext" href="#">link</a>
 		dictum felis eu pede mollis pretium.
 	</blockquote>
@@ -275,21 +275,21 @@ export const data: Array<UmbMockDocumentModel> = [
 					layout: {
 						'Umbraco.BlockList': [
 							{
-								contentUdi: '1234',
-								settingsUdi: '5678',
+								contentKey: '1234',
+								settingsKey: '5678',
 							},
 						],
 					},
 					contentData: [
 						{
-							udi: '1234',
+							key: '1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 							elementProperty: 'Hello world',
 						},
 					],
 					settingsData: [
 						{
-							udi: '5678',
+							key: '5678',
 							contentTypeKey: 'all-property-editors-document-type-id',
 							elementProperty: 'Hello world',
 							textBox: 'Hello world 123',
@@ -297,21 +297,21 @@ export const data: Array<UmbMockDocumentModel> = [
 								layout: {
 									'Umbraco.BlockList': [
 										{
-											contentUdi: '1234b',
-											settingsUdi: '5678b',
+											contentKey: '1234b',
+											settingsKey: '5678b',
 										},
 									],
 								},
 								contentData: [
 									{
-										udi: '1234b',
+										key: '1234b',
 										contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 										elementProperty: 'Hello world',
 									},
 								],
 								settingsData: [
 									{
-										udi: '5678b',
+										key: '5678b',
 										contentTypeKey: 'all-property-editors-document-type-id',
 										elementProperty: 'Hello world',
 									},
@@ -425,21 +425,21 @@ export const data: Array<UmbMockDocumentModel> = [
 					layout: {
 						'Umbraco.BlockGrid': [
 							{
-								contentUdi: '1234',
-								settingsUdi: '5678',
+								contentKey: '1234',
+								settingsKey: '5678',
 								columnSpan: 12,
 								areas: [
 									{
 										key: 'area1_key',
 										items: [
 											{
-												contentUdi: 'a1234',
-												settingsUdi: 'a5678',
+												contentKey: 'a1234',
+												settingsKey: 'a5678',
 												columnSpan: 3,
 												rowSpan: 2,
 											},
 											{
-												contentUdi: 'c1234',
+												contentKey: 'c1234',
 												columnSpan: 3,
 											},
 										],
@@ -448,8 +448,8 @@ export const data: Array<UmbMockDocumentModel> = [
 										key: 'area2_key',
 										items: [
 											{
-												contentUdi: 'b1234',
-												settingsUdi: 'b5678',
+												contentKey: 'b1234',
+												settingsKey: 'b5678',
 												columnSpan: 6,
 												areas: [],
 											},
@@ -461,39 +461,39 @@ export const data: Array<UmbMockDocumentModel> = [
 					},
 					contentData: [
 						{
-							udi: '1234',
+							key: '1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 							elementProperty: 'Hello world',
 						},
 						{
-							udi: 'a1234',
+							key: 'a1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 							elementProperty: 'Hello world from area 1',
 						},
 						{
-							udi: 'b1234',
+							key: 'b1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 							elementProperty: 'Hello world from area 2',
 						},
 						{
-							udi: 'c1234',
+							key: 'c1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 							elementProperty: 'Hello CCC from area 1',
 						},
 					],
 					settingsData: [
 						{
-							udi: '5678',
+							key: '5678',
 							contentTypeKey: 'all-property-editors-document-type-id',
 							elementProperty: 'Hello world',
 						},
 						{
-							udi: 'a5678',
+							key: 'a5678',
 							contentTypeKey: 'all-property-editors-document-type-id',
 							elementProperty: 'Hello world from area 1 settings',
 						},
 						{
-							udi: 'b5678',
+							key: 'b5678',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 							elementProperty: 'Hello world from area 2 settings',
 						},

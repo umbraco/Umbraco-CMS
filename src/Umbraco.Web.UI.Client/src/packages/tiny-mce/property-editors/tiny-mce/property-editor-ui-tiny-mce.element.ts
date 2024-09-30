@@ -10,15 +10,18 @@ import {
 	type UmbBlockRteTypeModel,
 } from '@umbraco-cms/backoffice/block-rte';
 import type { UmbBlockValueType } from '@umbraco-cms/backoffice/block';
+import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 import '../../components/input-tiny-mce/input-tiny-mce.element.js';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface UmbRichTextEditorValueType {
 	markup: string;
 	blocks: UmbBlockValueType<UmbBlockRteLayoutModel>;
 }
 
-const UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS = 'Umbraco.TinyMCE'; // Not rich text, cause this has not been migrated [NL]
+const UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS = 'Umbraco.RichText'; // Not rich text, cause this has not been migrated [NL]
 
 /**
  * @element umb-property-editor-ui-tiny-mce
@@ -42,10 +45,11 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	public set value(value: UmbRichTextEditorValueType | undefined) {
 		const buildUpValue: Partial<UmbRichTextEditorValueType> = value ? { ...value } : {};
 		buildUpValue.markup ??= '';
-		buildUpValue.blocks ??= { layout: {}, contentData: [], settingsData: [] };
+		buildUpValue.blocks ??= { layout: {}, contentData: [], settingsData: [], expose: [] };
 		buildUpValue.blocks.layout ??= {};
 		buildUpValue.blocks.contentData ??= [];
 		buildUpValue.blocks.settingsData ??= [];
+		buildUpValue.blocks.expose ??= [];
 		this._value = buildUpValue as UmbRichTextEditorValueType;
 
 		if (this._latestMarkup !== this._value.markup) {
@@ -55,6 +59,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		this.#managerContext.setLayouts(buildUpValue.blocks.layout[UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS] ?? []);
 		this.#managerContext.setContents(buildUpValue.blocks.contentData);
 		this.#managerContext.setSettings(buildUpValue.blocks.settingsData);
+		this.#managerContext.setExposes(buildUpValue.blocks.expose);
 	}
 	public get value(): UmbRichTextEditorValueType {
 		return this._value;
@@ -75,7 +80,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	@state()
 	private _value: UmbRichTextEditorValueType = {
 		markup: '',
-		blocks: { layout: {}, contentData: [], settingsData: [] },
+		blocks: { layout: {}, contentData: [], settingsData: [], expose: [] },
 	};
 
 	// Separate state for markup, to avoid re-rendering/re-setting the value of the TinyMCE editor when the value does not really change.
@@ -89,30 +94,65 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	constructor() {
 		super();
 
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			// TODO: Implement validation translation for RTE Blocks:
+			/*
+			this.observe(
+				context.dataPath,
+				(dataPath) => {
+					// Translate paths for content/settings:
+					this.#contentDataPathTranslator?.destroy();
+					this.#settingsDataPathTranslator?.destroy();
+					if (dataPath) {
+						// Set the data path for the local validation context:
+						this.#validationContext.setDataPath(dataPath);
+
+						this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
+						this.#settingsDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'settingsData');
+					}
+				},
+				'observeDataPath',
+			);
+			*/
+
+			this.observe(
+				context?.alias,
+				(alias) => {
+					this.#managerContext.setPropertyAlias(alias);
+				},
+				'observePropertyAlias',
+			);
+
+			this.observe(
+				observeMultiple([
+					this.#managerContext.layouts,
+					this.#managerContext.contents,
+					this.#managerContext.settings,
+					this.#managerContext.exposes,
+				]).pipe(debounceTime(20)),
+				([layouts, contents, settings, exposes]) => {
+					this._value = {
+						...this._value,
+						blocks: {
+							layout: { [UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS]: layouts },
+							contentData: contents,
+							settingsData: settings,
+							expose: exposes,
+						},
+					};
+					context.setValue(this._value);
+				},
+				'motherObserver',
+			);
+		});
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
+			this.#managerContext.setVariantId(context.getVariantId());
+		});
+
 		this.observe(this.#entriesContext.layoutEntries, (layouts) => {
 			// Update manager:
 			this.#managerContext.setLayouts(layouts);
 		});
-
-		this.observe(this.#managerContext.layouts, (layouts) => {
-			this._value = {
-				...this._value,
-				blocks: { ...this._value.blocks, layout: { [UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS]: layouts } },
-			};
-			this.#fireChangeEvent();
-		});
-		this.observe(this.#managerContext.contents, (contents) => {
-			this._value = { ...this._value, blocks: { ...this._value.blocks, contentData: contents } };
-			this.#fireChangeEvent();
-		});
-		this.observe(this.#managerContext.settings, (settings) => {
-			this._value = { ...this._value, blocks: { ...this._value.blocks, settingsData: settings } };
-			this.#fireChangeEvent();
-		});
-	}
-
-	#fireChangeEvent() {
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	#onChange() {
@@ -134,10 +174,10 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 
 		// Remove unused Blocks of Blocks Layout. Leaving only the Blocks that are present in Markup.
 		//const blockElements = editor.dom.select(`umb-rte-block, umb-rte-block-inline`);
-		const usedContentUdis = Array.from(blockEls).map((blockElement) => blockElement.getAttribute('data-content-udi'));
-		const unusedBlocks = this.#managerContext.getLayouts().filter((x) => usedContentUdis.indexOf(x.contentUdi) === -1);
+		const usedContentKeys = Array.from(blockEls).map((blockElement) => blockElement.getAttribute('data-content-key'));
+		const unusedBlocks = this.#managerContext.getLayouts().filter((x) => usedContentKeys.indexOf(x.contentKey) === -1);
 		unusedBlocks.forEach((blockLayout) => {
-			this.#managerContext.removeOneLayout(blockLayout.contentUdi);
+			this.#managerContext.removeOneLayout(blockLayout.contentKey);
 		});
 
 		// Then get the content of the editor and update the value.

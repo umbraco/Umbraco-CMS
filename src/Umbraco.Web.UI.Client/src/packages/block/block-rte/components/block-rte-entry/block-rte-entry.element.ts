@@ -14,16 +14,16 @@ import '../ref-rte-block/index.js';
 @customElement('umb-rte-block')
 export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
-	@property({ type: String, attribute: 'data-content-udi', reflect: true })
-	public get contentUdi(): string | undefined {
-		return this._contentUdi;
+	@property({ type: String, attribute: 'data-content-key', reflect: true })
+	public get contentKey(): string | undefined {
+		return this._contentKey;
 	}
-	public set contentUdi(value: string | undefined) {
+	public set contentKey(value: string | undefined) {
 		if (!value) return;
-		this._contentUdi = value;
-		this.#context.setContentUdi(value);
+		this._contentKey = value;
+		this.#context.setContentKey(value);
 	}
-	private _contentUdi?: string | undefined;
+	private _contentKey?: string | undefined;
 
 	#context = new UmbBlockRteEntryContext(this);
 
@@ -39,6 +39,9 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	_icon?: string;
 
 	@state()
+	_exposed?: boolean;
+
+	@state()
 	_workspaceEditContentPath?: string;
 
 	@state()
@@ -46,7 +49,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 	@state()
 	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel> = {
-		contentUdi: undefined!,
+		contentKey: undefined!,
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
 
@@ -93,6 +96,14 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			},
 			null,
 		);
+		this.observe(
+			this.#context.hasExpose,
+			(exposed) => {
+				this.#updateBlockViewProps({ unpublished: !exposed });
+				this._exposed = exposed;
+			},
+			null,
+		);
 		// Data props:
 		this.observe(
 			this.#context.layout,
@@ -101,20 +112,31 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			},
 			null,
 		);
+
+		this.#observeData();
+
+		// TODO: Implement validation for RTE Blocks: [NL]
+		/*
 		this.observe(
-			this.#context.content,
-			(content) => {
-				this.#updateBlockViewProps({ content });
+			this.#context.settingsKey,
+			(settingsKey) => {
+				this.removeUmbControllerByAlias('observeMessagesForSettings');
+				if (settingsKey) {
+					// Observe settings validation state:
+					new UmbObserveValidationStateController(
+						this,
+						`$.settingsData[${UmbDataPathBlockElementDataQuery({ key: settingsKey })}]`,
+						(hasMessages) => {
+							this._settingsInvalid = hasMessages;
+							this._blockViewProps.settingsInvalid = hasMessages;
+						},
+						'observeMessagesForSettings',
+					);
+				}
 			},
 			null,
 		);
-		this.observe(
-			this.#context.settings,
-			(settings) => {
-				this.#updateBlockViewProps({ settings });
-			},
-			null,
-		);
+		*/
 		this.observe(
 			this.#context.workspaceEditContentPath,
 			(path) => {
@@ -133,13 +155,35 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		);
 	}
 
+	async #observeData() {
+		this.observe(
+			await this.#context.contentValues(),
+			(content) => {
+				this.#updateBlockViewProps({ content });
+			},
+			null,
+		);
+		this.observe(
+			await this.#context.settingsValues(),
+			(settings) => {
+				this.#updateBlockViewProps({ settings });
+			},
+			null,
+		);
+	}
+
 	override connectedCallback() {
 		super.connectedCallback();
 		this.setAttribute('contenteditable', 'false');
 	}
 
 	#renderRefBlock() {
-		return html`<umb-ref-rte-block .label=${this._label} .icon=${this._icon}></umb-ref-rte-block>`;
+		return html`<umb-ref-rte-block
+			.label=${this._label}
+			.icon=${this._icon}
+			.unpublished=${!this._exposed}
+			.content=${this._blockViewProps.content}
+			.settings=${this._blockViewProps.settings}></umb-ref-rte-block>`;
 	}
 
 	#renderBlock() {

@@ -6,6 +6,7 @@ import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type'
 import '../block-grid-areas-container/index.js';
 import '../ref-grid-block/index.js';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
+import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 
 /**
  * @element umb-block-grid-block-inline
@@ -16,8 +17,17 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	@property({ attribute: false })
 	label?: string;
 
+	@property({ type: String, reflect: false })
+	icon?: string;
+
 	@property({ attribute: false })
 	config?: UmbBlockEditorCustomViewConfiguration;
+
+	@property({ type: Boolean, reflect: true })
+	unpublished?: boolean;
+
+	@property({ attribute: false })
+	content?: UmbBlockDataType;
 
 	@state()
 	_inlineProperty: UmbPropertyTypeModel | undefined;
@@ -39,7 +49,9 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<umb-ref-grid-block standalone .name=${this.label ?? ''} href=${this.config?.editContentPath ?? ''}>
+		return html`<umb-ref-grid-block standalone href=${this.config?.editContentPath ?? ''}>
+			<umb-icon slot="icon" .name=${this.icon}></umb-icon>
+			<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
 			<umb-property-type-based-property
 				.property=${this._inlineProperty}
 				slot="areas"></umb-property-type-based-property>
@@ -54,6 +66,10 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 			}
 			umb-block-grid-areas-container::part(area) {
 				margin: var(--uui-size-2);
+			}
+			:host([unpublished]) umb-icon,
+			:host([unpublished]) umb-ufm-render {
+				opacity: 0.6;
 			}
 		`,
 	];
