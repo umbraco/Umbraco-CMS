@@ -164,9 +164,8 @@ internal class PublishedContent : PublishedContentBase
         }
     }
 
-    [Obsolete("Please use IDocumentNavigationQueryService.TryGetParentKey() instead. Scheduled for removal in V16.")]
-    public override IPublishedContent? Parent
-        => this.Parent<IPublishedContent>(StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(), StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>());
+    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
+    public override IPublishedContent? Parent => GetParent();
 
     /// <inheritdoc />
     public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures
@@ -268,5 +267,27 @@ internal class PublishedContent : PublishedContentBase
         // there is a 'published' published content, and varies
         // = depends on the culture
         return _contentNode.HasPublishedCulture(culture);
+    }
+
+    private IPublishedContent? GetParent()
+    {
+        INavigationQueryService? navigationQueryService;
+        IPublishedCache? publishedCache;
+
+        switch (ContentType.ItemType)
+        {
+            case PublishedItemType.Content:
+                publishedCache = StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>();
+                navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+                break;
+            case PublishedItemType.Media:
+                publishedCache = StaticServiceProvider.Instance.GetRequiredService<IPublishedMediaCache>();
+                navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>();
+                break;
+            default:
+                throw new NotImplementedException("Level is not implemented for " + ContentType.ItemType);
+        }
+
+        return this.Parent<IPublishedContent>(publishedCache, navigationQueryService);
     }
 }
