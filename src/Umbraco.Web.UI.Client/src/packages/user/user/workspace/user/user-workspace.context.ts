@@ -21,6 +21,7 @@ export class UmbUserWorkspaceContext
 	public readonly avatarRepository: UmbUserAvatarRepository = new UmbUserAvatarRepository(this);
 	public readonly configRepository = new UmbUserConfigRepository(this);
 
+	readonly name = this._data.createObservablePartOfCurrent((x) => x?.name);
 	readonly state = this._data.createObservablePartOfCurrent((x) => x?.state);
 	readonly kind = this._data.createObservablePartOfCurrent((x) => x?.kind);
 	readonly userGroupUniques = this._data.createObservablePartOfCurrent((x) => x?.userGroupUniques || []);
@@ -108,6 +109,14 @@ export class UmbUserWorkspaceContext
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Id is missing');
 		return this.avatarRepository.deleteAvatar(unique);
+	}
+
+	getName(): string {
+		return this._data.getCurrent()?.name || '';
+	}
+
+	setName(name: string) {
+		this._data.updateCurrent({ name });
 	}
 
 	override destroy(): void {
