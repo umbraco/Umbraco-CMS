@@ -1,7 +1,7 @@
 import { UMB_CURRENT_USER_CONTEXT } from '../current-user.context.token.js';
 import { UmbCurrentUserRepository } from '../repository/index.js';
+import type { UmbCurrentUserAction, UmbCurrentUserActionArgs } from '../current-user-action.extension.js';
 import { UmbActionBase } from '@umbraco-cms/backoffice/action';
-import type { UmbCurrentUserAction, UmbCurrentUserActionArgs } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_CHANGE_PASSWORD_MODAL } from '@umbraco-cms/backoffice/user-change-password';
