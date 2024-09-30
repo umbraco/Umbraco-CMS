@@ -136,7 +136,7 @@ export const manifests: Array<ManifestTiptapExtension> = [
 		meta: {
 			icon: 'icon-subscript',
 			label: 'Subscript',
-			group: 'Text Formatting',
+			group: '#tiptap_extGroup_formatting',
 		},
 	},
 	{
@@ -149,7 +149,7 @@ export const manifests: Array<ManifestTiptapExtension> = [
 		meta: {
 			icon: 'icon-superscript',
 			label: 'Superscript',
-			group: 'Text Formatting',
+			group: '#tiptap_extGroup_formatting',
 		},
 	},
 	{
