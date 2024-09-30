@@ -124,6 +124,7 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
         switch (cacheLevel)
         {
             case PropertyCacheLevel.None:
+            case PropertyCacheLevel.Snapshot:
                 // never cache anything
                 cacheValues = new CacheValues();
                 break;
