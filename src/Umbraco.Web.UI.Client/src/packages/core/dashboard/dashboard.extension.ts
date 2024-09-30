@@ -1,4 +1,4 @@
-import type { UmbDashboardElement } from '../extension-registry/interfaces/index.js';
+import type { UmbDashboardElement } from './dashboard-element.interface.js';
 import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestDashboard
