@@ -29,7 +29,6 @@ import type { ManifestLocalization } from './localization.model.js';
 import type { ManifestMenu } from './menu.model.js';
 import type { ManifestMenuItem, ManifestMenuItemLinkKind, ManifestMenuItemTreeKind } from './menu-item.model.js';
 import type { ManifestPreviewAppProvider } from './preview-app.model.js';
-import type { ManifestPropertyEditorUi, ManifestPropertyEditorSchema } from './property-editor.model.js';
 import type { ManifestRepository } from './repository.model.js';
 import type { ManifestStore, ManifestTreeStore, ManifestItemStore } from './store.model.js';
 import type { ManifestTinyMcePlugin } from './tinymce-plugin.model.js';
@@ -69,7 +68,6 @@ export type * from './mfa-login-provider.model.js';
 export type * from './monaco-markdown-editor-action.model.js';
 export type * from './picker-search-result-item.model.js';
 export type * from './preview-app.model.js';
-export type * from './property-editor.model.js';
 export type * from './repository.model.js';
 export type * from './store.model.js';
 export type * from './tinymce-plugin.model.js';
@@ -127,8 +125,6 @@ export type ManifestTypes =
 	| ManifestMonacoMarkdownEditorAction
 	| ManifestPickerSearchResultItem
 	| ManifestPreviewAppProvider
-	| ManifestPropertyEditorSchema
-	| ManifestPropertyEditorUi
 	| ManifestRepository
 	| ManifestStore
 	| ManifestTinyMcePlugin

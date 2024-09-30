@@ -1,7 +1,7 @@
 import '../../../block-type/components/input-block-type/index.js';
 import { UMB_BLOCK_LIST_TYPE } from '../../types.js';
 import type { UmbBlockTypeBaseModel, UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbPropertyValueChangeEvent,
