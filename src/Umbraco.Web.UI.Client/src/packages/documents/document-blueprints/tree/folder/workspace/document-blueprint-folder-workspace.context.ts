@@ -40,12 +40,21 @@ export class UmbDocumentBlueprintFolderWorkspaceContext
 	}
 
 	/**
-	 * @description Set the name of the script
+	 * @description Set the name of the document blueprint folder
 	 * @param {string} value
-	 * @memberof UmbScriptWorkspaceContext
+	 * @memberof UmbDocumentBlueprintFolderWorkspaceContext
 	 */
 	public setName(value: string) {
 		this._data.updateCurrent({ name: value });
+	}
+
+	/**
+	 * @description Get the name of the document blueprint folder
+	 * @returns {string}
+	 * @memberof UmbDocumentBlueprintFolderWorkspaceContext
+	 */
+	public getName() {
+		return this._data.getCurrent()?.name;
 	}
 }
 

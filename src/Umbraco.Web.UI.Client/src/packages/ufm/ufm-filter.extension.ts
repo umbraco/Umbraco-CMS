@@ -12,3 +12,9 @@ export interface ManifestUfmFilter extends ManifestApi<UmbUfmFilterApi> {
 	type: 'ufmFilter';
 	meta: MetaUfmFilter;
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbUfmFilter: ManifestUfmFilter;
+	}
+}

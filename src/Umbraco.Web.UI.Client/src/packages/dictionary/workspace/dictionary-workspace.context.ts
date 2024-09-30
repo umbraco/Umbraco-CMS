@@ -56,6 +56,10 @@ export class UmbDictionaryWorkspaceContext
 		this._data.updateCurrent({ name });
 	}
 
+	getName() {
+		return this._data.getCurrent()?.name;
+	}
+
 	setPropertyValue(isoCode: string, translation: string) {
 		const currentData = this._data.getCurrent();
 		if (!currentData) return;
