@@ -1,4 +1,4 @@
-import type { ManifestSectionView } from '../models/index.js';
+import type { ManifestSectionView } from './section-view.extension.js';
 
 export interface UmbSectionViewElement extends HTMLElement {
 	manifest?: ManifestSectionView;
