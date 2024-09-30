@@ -33,10 +33,15 @@ public class SubTypesSelector : ISubTypesSelector
     public IEnumerable<Type> SubTypes(Type type)
     {
         var backOfficePath =  _settings.Value.GetBackOfficePath(_hostingEnvironment);
-        if (_httpContextAccessor.HttpContext?.Request.Path.StartsWithSegments($"{backOfficePath}/swagger") ?? false)
+        var swaggerPath = $"{backOfficePath}/swagger";
+
+        if (_httpContextAccessor.HttpContext?.Request.Path.StartsWithSegments(swaggerPath) ?? false)
         {
             // Split the path into segments
-            var segments = _httpContextAccessor.HttpContext.Request.Path.Value!.TrimStart($"{backOfficePath}/swagger/").Split(Constants.CharArrays.ForwardSlash);
+            var segments = _httpContextAccessor.HttpContext.Request.Path.Value!
+                .Substring(swaggerPath.Length)
+                .TrimStart(Constants.CharArrays.ForwardSlash)
+                .Split(Constants.CharArrays.ForwardSlash);
 
             // Extract the document name from the path
             var documentName = segments[0];
