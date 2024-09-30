@@ -151,7 +151,7 @@ internal abstract class ContentNavigationServiceBase
             return false; // Node doesn't exist
         }
 
-        _roots.Remove(key);
+        _recycleBinRoots.Remove(key);
 
         RemoveDescendantsRecursively(nodeToRemove);
 
