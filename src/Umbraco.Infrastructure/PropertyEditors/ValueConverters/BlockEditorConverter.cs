@@ -16,7 +16,6 @@ public sealed class BlockEditorConverter
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
     private readonly ICacheManager _cacheManager;
     private readonly IPublishedModelFactory _publishedModelFactory;
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
 
@@ -50,7 +49,7 @@ public sealed class BlockEditorConverter
             .ToDictionary(propertyType => propertyType.Alias);
 
         var propertyValues = new Dictionary<string, object?>();
-        foreach (BlockItemData.BlockPropertyValue property in data.Values)
+        foreach (BlockPropertyValue property in data.Values)
         {
             if (!propertyTypesByAlias.TryGetValue(property.Alias, out IPublishedPropertyType? propertyType))
             {
@@ -60,7 +59,7 @@ public sealed class BlockEditorConverter
             // if case changes have been made to the content or element type variation since the parent content was published,
             // we need to align those changes for the block properties - unlike for root level properties, where these
             // things are handled when a content type is saved.
-            BlockItemData.BlockPropertyValue? alignedProperty = _blockEditorVarianceHandler.AlignedPropertyVarianceAsync(property, propertyType, owner).GetAwaiter().GetResult();
+            BlockPropertyValue? alignedProperty = _blockEditorVarianceHandler.AlignedPropertyVarianceAsync(property, propertyType, owner).GetAwaiter().GetResult();
             if (alignedProperty is null)
             {
                 continue;

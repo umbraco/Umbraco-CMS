@@ -209,7 +209,7 @@ public static class ContentRepositoryExtensions
             {
                 foreach (IPropertyValue pvalue in otherProperty.Values)
                 {
-                    if (((otherProperty?.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment, true) ?? false) &&
+                    if (((otherProperty?.PropertyType?.SupportsVariation(pvalue.Culture, pvalue.Segment, true) ?? false) &&
                         (culture == "*" ||(pvalue.Culture?.InvariantEquals(culture) ?? false))) ||
                          otherProperty?.PropertyType?.Variations == ContentVariation.Nothing)
                     {
