@@ -56,7 +56,6 @@ export type * from './file-upload-preview.model.js';
 export type * from './external-login-provider.model.js';
 export type * from './global-context.model.js';
 export type * from './header-app.model.js';
-export type * from '../../health-check/health-check.extension.js';
 export type * from './menu-item.model.js';
 export type * from './menu.model.js';
 export type * from './mfa-login-provider.model.js';
