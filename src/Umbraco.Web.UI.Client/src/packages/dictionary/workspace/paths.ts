@@ -1,4 +1,4 @@
-import { UMB_DICTIONARY_ENTITY_TYPE } from './entity.js';
+import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
 import { UmbPathPattern } from '@umbraco-cms/backoffice/router';
 import { UMB_TRANSLATION_SECTION_PATHNAME } from '@umbraco-cms/backoffice/translation';
 import { UMB_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';

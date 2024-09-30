@@ -1,5 +1,5 @@
 import type { UmbDictionaryCollectionModel } from '../../types.js';
-import { UMB_EDIT_DICTIONARY_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
+import { UMB_EDIT_DICTIONARY_WORKSPACE_PATH_PATTERN } from '../../../workspace/paths.js';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
