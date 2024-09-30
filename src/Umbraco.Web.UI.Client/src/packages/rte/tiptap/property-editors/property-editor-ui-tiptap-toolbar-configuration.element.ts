@@ -1,17 +1,10 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	customElement,
-	css,
-	html,
-	property,
-	state,
-	repeat,
-	nothing,
-	type PropertyValueMap,
-} from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbTiptapToolbarValue } from '../extensions/types.js';
+import { customElement, css, html, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPropertyValueChangeEvent, type UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
 type Extension = {
 	alias: string;
@@ -25,7 +18,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	implements UmbPropertyEditorUiElement
 {
 	@property({ attribute: false })
-	set value(value: string[][][] | undefined) {
+	set value(value: UmbTiptapToolbarValue | undefined) {
 		if (!value) {
 			this.#useDefault = true;
 			this.#value = [[[]]];
@@ -36,14 +29,14 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		this.#value = value.map((rows) => rows.map((groups) => [...groups]));
 	}
 
-	get value(): string[][][] {
+	get value(): UmbTiptapToolbarValue {
 		// TODO: This can be optimized with cashing;
 		return this.#value.map((rows) => rows.map((groups) => [...groups]));
 	}
 
 	#useDefault = false;
 
-	#value: string[][][] = [[[]]];
+	#value: UmbTiptapToolbarValue = [[[]]];
 
 	@state()
 	_extensions: Extension[] = [];

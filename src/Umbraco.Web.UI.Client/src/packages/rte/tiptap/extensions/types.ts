@@ -98,3 +98,5 @@ export abstract class UmbTiptapToolbarElementApiBase extends UmbControllerBase i
 		return editor && this.manifest?.meta.alias ? editor?.isActive(this.manifest.meta.alias) : false;
 	}
 }
+
+export type UmbTiptapToolbarValue = Array<Array<Array<string>>>;
