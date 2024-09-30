@@ -1,5 +1,8 @@
 using System.ComponentModel;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PublishedCache.Internal;
@@ -66,7 +69,8 @@ public sealed class InternalPublishedContent : IPublishedContent
 
     public PublishedItemType ItemType => PublishedItemType.Content;
 
-    public IPublishedContent? Parent { get; set; }
+    [Obsolete("Please use IDocumentNavigationQueryService.TryGetParentKey() instead. Scheduled for removal in V16.")]
+    public IPublishedContent? Parent => this.Parent<IPublishedContent>(StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(), StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>());
 
     public bool IsDraft(string? culture = null) => false;
 
@@ -94,7 +98,7 @@ public sealed class InternalPublishedContent : IPublishedContent
         IPublishedContent? content = this;
         while (content != null && (property == null || property.HasValue() == false))
         {
-            content = content.Parent;
+            content = content.Parent<IPublishedContent>(StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(), StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>());
             property = content?.GetProperty(alias);
         }
 

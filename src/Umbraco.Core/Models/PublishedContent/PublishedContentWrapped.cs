@@ -1,4 +1,9 @@
 using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent;
 
@@ -90,7 +95,8 @@ public abstract class PublishedContentWrapped : IPublishedContent
     public virtual PublishedItemType ItemType => _content.ItemType;
 
     /// <inheritdoc />
-    public virtual IPublishedContent? Parent => _content.Parent;
+    [Obsolete("Please use IDocumentNavigationQueryService.TryGetParentKey() instead. Scheduled for removal in V16.")]
+    public virtual IPublishedContent? Parent => _content.Parent<IPublishedContent>(StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(), StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>());
 
     /// <inheritdoc />
     public virtual bool IsDraft(string? culture = null) => _content.IsDraft(culture);

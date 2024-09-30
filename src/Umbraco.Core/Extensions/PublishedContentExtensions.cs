@@ -120,16 +120,36 @@ public static class PublishedContentExtensions
     /// </summary>
     /// <typeparam name="T">The content type.</typeparam>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <returns>The parent of content, of the given content type, else null.</returns>
-    public static T? Parent<T>(this IPublishedContent content)
+    public static T? Parent<T>(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService)
         where T : class, IPublishedContent
     {
-        if (content == null)
+        ArgumentNullException.ThrowIfNull(content);
+
+        return content.GetParent(contentCache, navigationQueryService) as T;
+    }
+
+    private static IPublishedContent? GetParent(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService)
+    {
+        IPublishedContent? parent;
+        if (navigationQueryService.TryGetParentKey(content.Key, out Guid? parentKey))
         {
-            throw new ArgumentNullException(nameof(content));
+            parent = parentKey.HasValue ? contentCache.GetById(parentKey.Value) : null;
+        }
+        else
+        {
+            throw new KeyNotFoundException($"Content with key '{content.Key}' was not found in the in-memory navigation structure.");
         }
 
-        return content.Parent as T;
+        return parent;
     }
 
     #endregion
@@ -498,41 +518,63 @@ public static class PublishedContentExtensions
     ///     Gets the ancestors of the content.
     /// </summary>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <returns>The ancestors of the content, in down-top order.</returns>
     /// <remarks>Does not consider the content itself.</remarks>
-    public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content) =>
-        content.AncestorsOrSelf(false, null);
+    public static IEnumerable<IPublishedContent> Ancestors(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService) =>
+        content.AncestorsOrSelf(contentCache, navigationQueryService, false, null);
 
     /// <summary>
     ///     Gets the ancestors of the content, at a level lesser or equal to a specified level.
     /// </summary>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <param name="maxLevel">The level.</param>
     /// <returns>The ancestors of the content, at a level lesser or equal to the specified level, in down-top order.</returns>
     /// <remarks>Does not consider the content itself. Only content that are "high enough" in the tree are returned.</remarks>
-    public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, int maxLevel) =>
-        content.AncestorsOrSelf(false, n => n.Level <= maxLevel);
+    public static IEnumerable<IPublishedContent> Ancestors(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        int maxLevel) =>
+        content.AncestorsOrSelf(contentCache, navigationQueryService, false, n => n.Level <= maxLevel);
 
     /// <summary>
     ///     Gets the ancestors of the content, of a specified content type.
     /// </summary>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <param name="contentTypeAlias">The content type.</param>
     /// <returns>The ancestors of the content, of the specified content type, in down-top order.</returns>
     /// <remarks>Does not consider the content itself. Returns all ancestors, of the specified content type.</remarks>
-    public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, string contentTypeAlias) =>
-        content.AncestorsOrSelf(false, n => n.ContentType.Alias.InvariantEquals(contentTypeAlias));
+    public static IEnumerable<IPublishedContent> Ancestors(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        string contentTypeAlias) =>
+        content.AncestorsOrSelf(contentCache, navigationQueryService, false, n => n.ContentType.Alias.InvariantEquals(contentTypeAlias));
 
     /// <summary>
     ///     Gets the ancestors of the content, of a specified content type.
     /// </summary>
     /// <typeparam name="T">The content type.</typeparam>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <returns>The ancestors of the content, of the specified content type, in down-top order.</returns>
     /// <remarks>Does not consider the content itself. Returns all ancestors, of the specified content type.</remarks>
-    public static IEnumerable<T> Ancestors<T>(this IPublishedContent content)
+    public static IEnumerable<T> Ancestors<T>(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService)
         where T : class, IPublishedContent =>
-        content.Ancestors().OfType<T>();
+        content.Ancestors(contentCache, navigationQueryService).OfType<T>();
 
     /// <summary>
     ///     Gets the ancestors of the content, at a level lesser or equal to a specified level, and of a specified content
@@ -540,6 +582,8 @@ public static class PublishedContentExtensions
     /// </summary>
     /// <typeparam name="T">The content type.</typeparam>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <param name="maxLevel">The level.</param>
     /// <returns>
     ///     The ancestors of the content, at a level lesser or equal to the specified level, and of the specified
@@ -549,22 +593,33 @@ public static class PublishedContentExtensions
     ///     Does not consider the content itself. Only content that are "high enough" in the trees, and of the
     ///     specified content type, are returned.
     /// </remarks>
-    public static IEnumerable<T> Ancestors<T>(this IPublishedContent content, int maxLevel)
+    public static IEnumerable<T> Ancestors<T>(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        int maxLevel)
         where T : class, IPublishedContent =>
-        content.Ancestors(maxLevel).OfType<T>();
+        content.Ancestors(contentCache, navigationQueryService, maxLevel).OfType<T>();
 
     /// <summary>
     ///     Gets the content and its ancestors.
     /// </summary>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <returns>The content and its ancestors, in down-top order.</returns>
-    public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content) =>
-        content.AncestorsOrSelf(true, null);
+    public static IEnumerable<IPublishedContent> AncestorsOrSelf(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService) =>
+        content.AncestorsOrSelf(contentCache, navigationQueryService, true, null);
 
     /// <summary>
     ///     Gets the content and its ancestors, at a level lesser or equal to a specified level.
     /// </summary>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <param name="maxLevel">The level.</param>
     /// <returns>
     ///     The content and its ancestors, at a level lesser or equal to the specified level,
@@ -574,30 +629,44 @@ public static class PublishedContentExtensions
     ///     Only content that are "high enough" in the tree are returned. So it may or may not begin
     ///     with the content itself, depending on its level.
     /// </remarks>
-    public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, int maxLevel) =>
-        content.AncestorsOrSelf(true, n => n.Level <= maxLevel);
+    public static IEnumerable<IPublishedContent> AncestorsOrSelf(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        int maxLevel) =>
+        content.AncestorsOrSelf(contentCache, navigationQueryService, true, n => n.Level <= maxLevel);
 
     /// <summary>
     ///     Gets the content and its ancestors, of a specified content type.
     /// </summary>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <param name="contentTypeAlias">The content type.</param>
     /// <returns>The content and its ancestors, of the specified content type, in down-top order.</returns>
     /// <remarks>May or may not begin with the content itself, depending on its content type.</remarks>
-    public static IEnumerable<IPublishedContent>
-        AncestorsOrSelf(this IPublishedContent content, string contentTypeAlias) =>
-        content.AncestorsOrSelf(true, n => n.ContentType.Alias.InvariantEquals(contentTypeAlias));
+    public static IEnumerable<IPublishedContent> AncestorsOrSelf(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        string contentTypeAlias) =>
+        content.AncestorsOrSelf(contentCache, navigationQueryService, true, n => n.ContentType.Alias.InvariantEquals(contentTypeAlias));
 
     /// <summary>
     ///     Gets the content and its ancestors, of a specified content type.
     /// </summary>
     /// <typeparam name="T">The content type.</typeparam>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <returns>The content and its ancestors, of the specified content type, in down-top order.</returns>
     /// <remarks>May or may not begin with the content itself, depending on its content type.</remarks>
-    public static IEnumerable<T> AncestorsOrSelf<T>(this IPublishedContent content)
+    public static IEnumerable<T> AncestorsOrSelf<T>(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService)
         where T : class, IPublishedContent =>
-        content.AncestorsOrSelf().OfType<T>();
+        content.AncestorsOrSelf(contentCache, navigationQueryService).OfType<T>();
 
     /// <summary>
     ///     Gets the content and its ancestor, at a lever lesser or equal to a specified level, and of a specified content
@@ -605,69 +674,104 @@ public static class PublishedContentExtensions
     /// </summary>
     /// <typeparam name="T">The content type.</typeparam>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <param name="maxLevel">The level.</param>
     /// <returns>
     ///     The content and its ancestors, at a level lesser or equal to the specified level, and of the specified
     ///     content type, in down-top order.
     /// </returns>
     /// <remarks>May or may not begin with the content itself, depending on its level and content type.</remarks>
-    public static IEnumerable<T> AncestorsOrSelf<T>(this IPublishedContent content, int maxLevel)
+    public static IEnumerable<T> AncestorsOrSelf<T>(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        int maxLevel)
         where T : class, IPublishedContent =>
-        content.AncestorsOrSelf(maxLevel).OfType<T>();
+        content.AncestorsOrSelf(contentCache, navigationQueryService, maxLevel).OfType<T>();
 
     /// <summary>
     ///     Gets the ancestor of the content, ie its parent.
     /// </summary>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <returns>The ancestor of the content.</returns>
     /// <remarks>This method is here for consistency purposes but does not make much sense.</remarks>
-    public static IPublishedContent? Ancestor(this IPublishedContent content) => content.Parent;
+    public static IPublishedContent? Ancestor(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService)
+        => content.GetParent(contentCache, navigationQueryService);
 
     /// <summary>
     ///     Gets the nearest ancestor of the content, at a lever lesser or equal to a specified level.
     /// </summary>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <param name="maxLevel">The level.</param>
     /// <returns>The nearest (in down-top order) ancestor of the content, at a level lesser or equal to the specified level.</returns>
     /// <remarks>Does not consider the content itself. May return <c>null</c>.</remarks>
-    public static IPublishedContent? Ancestor(this IPublishedContent content, int maxLevel) =>
-        content.EnumerateAncestors(false).FirstOrDefault(x => x.Level <= maxLevel);
+    public static IPublishedContent? Ancestor(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        int maxLevel) =>
+        content.EnumerateAncestors(contentCache, navigationQueryService, false).FirstOrDefault(x => x.Level <= maxLevel);
 
     /// <summary>
     ///     Gets the nearest ancestor of the content, of a specified content type.
     /// </summary>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <param name="contentTypeAlias">The content type alias.</param>
     /// <returns>The nearest (in down-top order) ancestor of the content, of the specified content type.</returns>
     /// <remarks>Does not consider the content itself. May return <c>null</c>.</remarks>
-    public static IPublishedContent? Ancestor(this IPublishedContent content, string contentTypeAlias) => content
-        .EnumerateAncestors(false).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias));
+    public static IPublishedContent? Ancestor(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        string contentTypeAlias) =>
+        content.EnumerateAncestors(contentCache, navigationQueryService, false).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias));
 
     /// <summary>
     ///     Gets the nearest ancestor of the content, of a specified content type.
     /// </summary>
     /// <typeparam name="T">The content type.</typeparam>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <returns>The nearest (in down-top order) ancestor of the content, of the specified content type.</returns>
     /// <remarks>Does not consider the content itself. May return <c>null</c>.</remarks>
-    public static T? Ancestor<T>(this IPublishedContent content)
+    public static T? Ancestor<T>(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService)
         where T : class, IPublishedContent =>
-        content.Ancestors<T>().FirstOrDefault();
+        content.Ancestors<T>(contentCache, navigationQueryService).FirstOrDefault();
 
     /// <summary>
     ///     Gets the nearest ancestor of the content, at the specified level and of the specified content type.
     /// </summary>
     /// <typeparam name="T">The content type.</typeparam>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <param name="maxLevel">The level.</param>
     /// <returns>The ancestor of the content, at the specified level and of the specified content type.</returns>
     /// <remarks>
     ///     Does not consider the content itself. If the ancestor at the specified level is
     ///     not of the specified type, returns <c>null</c>.
     /// </remarks>
-    public static T? Ancestor<T>(this IPublishedContent content, int maxLevel)
+    public static T? Ancestor<T>(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        int maxLevel)
         where T : class, IPublishedContent =>
-        content.Ancestors<T>(maxLevel).FirstOrDefault();
+        content.Ancestors<T>(contentCache, navigationQueryService, maxLevel).FirstOrDefault();
 
     /// <summary>
     ///     Gets the content or its nearest ancestor.
@@ -681,32 +785,49 @@ public static class PublishedContentExtensions
     ///     Gets the content or its nearest ancestor, at a lever lesser or equal to a specified level.
     /// </summary>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <param name="maxLevel">The level.</param>
     /// <returns>The content or its nearest (in down-top order) ancestor, at a level lesser or equal to the specified level.</returns>
     /// <remarks>May or may not return the content itself depending on its level. May return <c>null</c>.</remarks>
-    public static IPublishedContent AncestorOrSelf(this IPublishedContent content, int maxLevel) =>
-        content.EnumerateAncestors(true).FirstOrDefault(x => x.Level <= maxLevel) ?? content;
+    public static IPublishedContent AncestorOrSelf(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        int maxLevel) =>
+        content.EnumerateAncestors(contentCache, navigationQueryService, true).FirstOrDefault(x => x.Level <= maxLevel) ?? content;
 
     /// <summary>
     ///     Gets the content or its nearest ancestor, of a specified content type.
     /// </summary>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <param name="contentTypeAlias">The content type.</param>
     /// <returns>The content or its nearest (in down-top order) ancestor, of the specified content type.</returns>
     /// <remarks>May or may not return the content itself depending on its content type. May return <c>null</c>.</remarks>
-    public static IPublishedContent AncestorOrSelf(this IPublishedContent content, string contentTypeAlias) => content
-        .EnumerateAncestors(true).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias)) ?? content;
+    public static IPublishedContent AncestorOrSelf(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        string contentTypeAlias) => content
+        .EnumerateAncestors(contentCache, navigationQueryService, true).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias)) ?? content;
 
     /// <summary>
     ///     Gets the content or its nearest ancestor, of a specified content type.
     /// </summary>
     /// <typeparam name="T">The content type.</typeparam>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <returns>The content or its nearest (in down-top order) ancestor, of the specified content type.</returns>
     /// <remarks>May or may not return the content itself depending on its content type. May return <c>null</c>.</remarks>
-    public static T? AncestorOrSelf<T>(this IPublishedContent content)
+    public static T? AncestorOrSelf<T>(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService)
         where T : class, IPublishedContent =>
-        content.AncestorsOrSelf<T>().FirstOrDefault();
+        content.AncestorsOrSelf<T>(contentCache, navigationQueryService).FirstOrDefault();
 
     /// <summary>
     ///     Gets the content or its nearest ancestor, at a lever lesser or equal to a specified level, and of a specified
@@ -714,15 +835,26 @@ public static class PublishedContentExtensions
     /// </summary>
     /// <typeparam name="T">The content type.</typeparam>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <param name="maxLevel">The level.</param>
     /// <returns></returns>
-    public static T? AncestorOrSelf<T>(this IPublishedContent content, int maxLevel)
+    public static T? AncestorOrSelf<T>(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        int maxLevel)
         where T : class, IPublishedContent =>
-        content.AncestorsOrSelf<T>(maxLevel).FirstOrDefault();
+        content.AncestorsOrSelf<T>(contentCache, navigationQueryService, maxLevel).FirstOrDefault();
 
-    public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, bool orSelf, Func<IPublishedContent, bool>? func)
+    public static IEnumerable<IPublishedContent> AncestorsOrSelf(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        bool orSelf,
+        Func<IPublishedContent, bool>? func)
     {
-        IEnumerable<IPublishedContent> ancestorsOrSelf = content.EnumerateAncestors(orSelf);
+        IEnumerable<IPublishedContent> ancestorsOrSelf = content.EnumerateAncestors(contentCache, navigationQueryService, orSelf);
         return func == null ? ancestorsOrSelf : ancestorsOrSelf.Where(func);
     }
 
@@ -730,9 +862,15 @@ public static class PublishedContentExtensions
     ///     Enumerates ancestors of the content, bottom-up.
     /// </summary>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <param name="orSelf">Indicates whether the content should be included.</param>
     /// <returns>Enumerates bottom-up ie walking up the tree (parent, grand-parent, etc).</returns>
-    internal static IEnumerable<IPublishedContent> EnumerateAncestors(this IPublishedContent? content, bool orSelf)
+    internal static IEnumerable<IPublishedContent> EnumerateAncestors(
+        this IPublishedContent? content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        bool orSelf)
     {
         if (content == null)
         {
@@ -744,7 +882,7 @@ public static class PublishedContentExtensions
             yield return content;
         }
 
-        while ((content = content.Parent) != null)
+        while ((content = content.GetParent(contentCache, navigationQueryService)) != null)
         {
             yield return content;
         }
@@ -758,18 +896,26 @@ public static class PublishedContentExtensions
     ///     Gets the breadcrumbs (ancestors and self, top to bottom) for the specified <paramref name="content" />.
     /// </summary>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <param name="andSelf">Indicates whether the specified content should be included.</param>
     /// <returns>
     ///     The breadcrumbs (ancestors and self, top to bottom) for the specified <paramref name="content" />.
     /// </returns>
-    public static IEnumerable<IPublishedContent> Breadcrumbs(this IPublishedContent content, bool andSelf = true) =>
-        content.AncestorsOrSelf(andSelf, null).Reverse();
+    public static IEnumerable<IPublishedContent> Breadcrumbs(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        bool andSelf = true) =>
+        content.AncestorsOrSelf(contentCache, navigationQueryService, andSelf, null).Reverse();
 
     /// <summary>
     ///     Gets the breadcrumbs (ancestors and self, top to bottom) for the specified <paramref name="content" /> at a level
     ///     higher or equal to <paramref name="minLevel" />.
     /// </summary>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <param name="minLevel">The minimum level.</param>
     /// <param name="andSelf">Indicates whether the specified content should be included.</param>
     /// <returns>
@@ -778,9 +924,11 @@ public static class PublishedContentExtensions
     /// </returns>
     public static IEnumerable<IPublishedContent> Breadcrumbs(
         this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
         int minLevel,
         bool andSelf = true) =>
-        content.AncestorsOrSelf(andSelf, n => n.Level >= minLevel).Reverse();
+        content.AncestorsOrSelf(contentCache, navigationQueryService, andSelf, n => n.Level >= minLevel).Reverse();
 
     /// <summary>
     ///     Gets the breadcrumbs (ancestors and self, top to bottom) for the specified <paramref name="content" /> at a level
@@ -788,12 +936,18 @@ public static class PublishedContentExtensions
     /// </summary>
     /// <typeparam name="T">The root content type.</typeparam>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <param name="andSelf">Indicates whether the specified content should be included.</param>
     /// <returns>
     ///     The breadcrumbs (ancestors and self, top to bottom) for the specified <paramref name="content" /> at a level higher
     ///     or equal to the specified root content type <typeparamref name="T" />.
     /// </returns>
-    public static IEnumerable<IPublishedContent> Breadcrumbs<T>(this IPublishedContent content, bool andSelf = true)
+    public static IEnumerable<IPublishedContent> Breadcrumbs<T>(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        bool andSelf = true)
         where T : class, IPublishedContent
     {
         static IEnumerable<IPublishedContent> TakeUntil(IEnumerable<IPublishedContent> source, Func<IPublishedContent, bool> predicate)
@@ -808,7 +962,7 @@ public static class PublishedContentExtensions
             }
         }
 
-        return TakeUntil(content.AncestorsOrSelf(andSelf, null), n => n is T).Reverse();
+        return TakeUntil(content.AncestorsOrSelf(contentCache, navigationQueryService, andSelf, null), n => n is T).Reverse();
     }
 
     #endregion
@@ -1510,6 +1664,8 @@ public static class PublishedContentExtensions
     ///     Gets the root content (ancestor or self at level 1) for the specified <paramref name="content" />.
     /// </summary>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <returns>
     ///     The root content (ancestor or self at level 1) for the specified <paramref name="content" />.
     /// </returns>
@@ -1518,7 +1674,10 @@ public static class PublishedContentExtensions
     ///     <see cref="AncestorOrSelf(IPublishedContent, int)" /> with <c>maxLevel</c>
     ///     set to 1.
     /// </remarks>
-    public static IPublishedContent Root(this IPublishedContent content) => content.AncestorOrSelf(1);
+    public static IPublishedContent Root(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService) => content.AncestorOrSelf(contentCache, navigationQueryService, 1);
 
     /// <summary>
     ///     Gets the root content (ancestor or self at level 1) for the specified <paramref name="content" /> if it's of the
@@ -1526,6 +1685,8 @@ public static class PublishedContentExtensions
     /// </summary>
     /// <typeparam name="T">The content type.</typeparam>
     /// <param name="content">The content.</param>
+    /// <param name="contentCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
     /// <returns>
     ///     The root content (ancestor or self at level 1) for the specified <paramref name="content" /> of content type
     ///     <typeparamref name="T" />.
@@ -1535,9 +1696,12 @@ public static class PublishedContentExtensions
     ///     <see cref="AncestorOrSelf{T}(IPublishedContent, int)" /> with
     ///     <c>maxLevel</c> set to 1.
     /// </remarks>
-    public static T? Root<T>(this IPublishedContent content)
+    public static T? Root<T>(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService)
         where T : class, IPublishedContent =>
-        content.AncestorOrSelf<T>(1);
+        content.AncestorOrSelf<T>(contentCache, navigationQueryService, 1);
 
     #endregion
 

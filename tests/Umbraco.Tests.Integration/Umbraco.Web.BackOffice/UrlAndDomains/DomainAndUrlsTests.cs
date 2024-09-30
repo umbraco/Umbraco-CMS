@@ -7,8 +7,10 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
@@ -411,5 +413,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
             GetRequiredService<IVariationContextAccessor>(),
             GetRequiredService<ILogger<IContent>>(),
             GetRequiredService<UriUtility>(),
-            GetRequiredService<IPublishedUrlProvider>()).GetAwaiter().GetResult();
+            GetRequiredService<IPublishedUrlProvider>(),
+            GetRequiredService<IPublishedContentCache>(),
+            GetRequiredService<IDocumentNavigationQueryService>()).GetAwaiter().GetResult();
 }
