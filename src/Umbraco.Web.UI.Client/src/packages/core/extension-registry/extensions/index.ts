@@ -8,6 +8,7 @@ export type * from './entity-bulk-action.extension.js';
 export type * from './entity-user-permission.extension.js';
 export type * from './entry-point.extension.js';
 export type * from './menu-item.extension.js';
+export type * from './menu-item-element.interface.js';
 export type * from './menu.extension.js';
 export type * from './preview-app.extension.js';
 export type * from './store.extension.js';

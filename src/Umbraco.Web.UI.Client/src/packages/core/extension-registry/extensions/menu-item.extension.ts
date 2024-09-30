@@ -1,4 +1,4 @@
-import type { UmbMenuItemElement } from '../interfaces/menu-item-element.interface.js';
+import type { UmbMenuItemElement } from './menu-item-element.interface.js';
 import type { ManifestWithDynamicConditions, ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestMenuItem
