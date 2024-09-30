@@ -5,7 +5,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 	name: 'Rich Text',
 	alias: 'Umbraco.RichText',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.TinyMCE',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.Tiptap',
 		settings: {
 			properties: [
 				{

@@ -1,4 +1,3 @@
-import { manifest as schemaManifest } from './Umbraco.RichText.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 
 export const UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS = 'Umbraco.RichText';
@@ -134,4 +133,4 @@ const manifest: ManifestPropertyEditorUi = {
 	},
 };
 
-export const manifests: Array<UmbExtensionManifest> = [manifest, schemaManifest];
+export const manifests: Array<UmbExtensionManifest> = [manifest];
