@@ -78,3 +78,16 @@ export interface ManifestEntityBulkActionTrashKind extends ManifestEntityBulkAct
 export interface MetaEntityBulkActionTrashKind extends MetaEntityBulkActionDefaultKind {
 	bulkTrashRepositoryAlias: string;
 }
+
+export type UmbEntityBulkActionExtensions =
+	| ManifestEntityBulkAction
+	| ManifestEntityBulkActionDefaultKind
+	| ManifestEntityBulkActionDuplicateToKind
+	| ManifestEntityBulkActionMoveToKind
+	| ManifestEntityBulkActionTrashKind;
+
+declare global {
+	interface UmbExtensionManifestMap {
+		UmbEntityBulkActionExtensions: UmbEntityBulkActionExtensions;
+	}
+}

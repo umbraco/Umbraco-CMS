@@ -5,3 +5,9 @@ export interface ManifestRepository<ApiType extends UmbApi = UmbApi>
 		ManifestWithDynamicConditions<UmbExtensionCondition> {
 	type: 'repository';
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		UmbRepositoryExtension: ManifestRepository;
+	}
+}

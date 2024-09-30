@@ -1,4 +1,4 @@
-import type { ManifestBackofficeEntryPoint } from '../models/backoffice-entry-point.model.js';
+import type { ManifestBackofficeEntryPoint } from '../extensions/backoffice-entry-point.extension.js';
 import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
 import {
 	type UmbEntryPointModule,
