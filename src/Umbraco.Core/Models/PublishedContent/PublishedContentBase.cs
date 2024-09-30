@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public abstract bool IsPublished(string? culture = null);
 
         /// <inheritdoc />
-        [Obsolete("Please use IDocumentNavigationQueryService.TryGetParentKey() instead. Scheduled for removal in V16.")]
+        [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
         public abstract IPublishedContent? Parent { get; }
 
         // FIXME
