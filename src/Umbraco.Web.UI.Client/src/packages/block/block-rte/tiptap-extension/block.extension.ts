@@ -1,4 +1,4 @@
-import { UMB_DATA_CONTENT_UDI, type UmbBlockRteLayoutModel } from '../types.js';
+import { UMB_DATA_CONTENT_KEY, type UmbBlockRteLayoutModel } from '../types.js';
 import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from '../context/index.js';
 import { UmbTiptapExtensionApiBase } from '@umbraco-cms/backoffice/tiptap';
 import { Node } from '@umbraco-cms/backoffice/external/tiptap';
@@ -28,7 +28,7 @@ const umbRteBlock = Node.create({
 
 	addAttributes() {
 		return {
-			[UMB_DATA_CONTENT_UDI]: {
+			[UMB_DATA_CONTENT_KEY]: {
 				isRequired: true,
 			},
 		};
@@ -47,7 +47,7 @@ const umbRteBlock = Node.create({
 			setBlock:
 				(options) =>
 				({ commands }) => {
-					const attrs = { [UMB_DATA_CONTENT_UDI]: options.contentUdi };
+					const attrs = { [UMB_DATA_CONTENT_KEY]: options.contentUdi };
 					return commands.insertContent({
 						type: this.name,
 						attrs,
@@ -75,7 +75,7 @@ const umbRteBlockInline = umbRteBlock.extend({
 			setBlockInline:
 				(options) =>
 				({ commands }) => {
-					const attrs = { [UMB_DATA_CONTENT_UDI]: options.contentUdi };
+					const attrs = { [UMB_DATA_CONTENT_KEY]: options.contentUdi };
 					return commands.insertContent({
 						type: this.name,
 						attrs,
@@ -111,7 +111,7 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 		if (!editor) return;
 
 		const existingBlocks = Array.from(editor.view.dom.querySelectorAll('umb-rte-block, umb-rte-block-inline')).map(
-			(x) => x.getAttribute(UMB_DATA_CONTENT_UDI),
+			(x) => x.getAttribute(UMB_DATA_CONTENT_KEY),
 		);
 		const newBlocks = blocks.filter((x) => !existingBlocks.find((contentUdi) => contentUdi === x.udi));
 
