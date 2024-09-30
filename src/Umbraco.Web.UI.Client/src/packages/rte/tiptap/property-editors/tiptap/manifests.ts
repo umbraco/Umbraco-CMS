@@ -50,9 +50,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 						weight: 50,
 					},
 				],
-				defaultData: [
-					{ alias: 'overlaySize', value: 'medium' },
-				],
+				defaultData: [{ alias: 'overlaySize', value: 'medium' }],
 			},
 		},
 	},
