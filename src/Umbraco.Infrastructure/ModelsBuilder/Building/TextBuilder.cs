@@ -286,16 +286,16 @@ public class TextBuilder : Builder
         WriteGeneratedCodeAttribute(sb, "\t\t");
         WriteMaybeNullAttribute(sb, "\t\t", true);
         sb.Append(
-            "\t\tpublic new static IPublishedContentType GetModelContentType(IPublishedSnapshotAccessor publishedSnapshotAccessor)\n");
+            "\t\tpublic new static IPublishedContentType GetModelContentType(IPublishedContentTypeCache contentTypeCache)\n");
         sb.Append(
-            "\t\t\t=> PublishedModelUtility.GetModelContentType(publishedSnapshotAccessor, ModelItemType, ModelTypeAlias);\n");
+            "\t\t\t=> PublishedModelUtility.GetModelContentType(contentTypeCache, ModelItemType, ModelTypeAlias);\n");
         WriteGeneratedCodeAttribute(sb, "\t\t");
         WriteMaybeNullAttribute(sb, "\t\t", true);
         sb.AppendFormat(
-            "\t\tpublic static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedSnapshotAccessor publishedSnapshotAccessor, Expression<Func<{0}, TValue>> selector)\n",
+            "\t\tpublic static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<{0}, TValue>> selector)\n",
             type.ClrName);
         sb.Append(
-            "\t\t\t=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(publishedSnapshotAccessor), selector);\n");
+            "\t\t\t=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(contentTypeCache), selector);\n");
         sb.Append("#pragma warning restore 0109\n\n");
         sb.Append("\t\tprivate IPublishedValueFallback _publishedValueFallback;");
 
