@@ -1,12 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core;
+﻿using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
@@ -74,56 +74,46 @@ internal class PublishedContent : PublishedContentBase
     public override int SortOrder { get; }
 
     [Obsolete]
-    public override string Path => GetPath();
-
-    // This is ugly, but we need to still support Path because it's used to calculate permissions and stuff
-    // We should really remove path in its entirety.
-    private string GetPath()
+    public override string Path
     {
-        IIdKeyMap idKeyMap = StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>();
-        INavigationQueryService? navigationQueryService = null;
-        switch (_contentNode.ContentType.ItemType)
+        get
         {
-            case PublishedItemType.Content:
-                navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
-                break;
-            case PublishedItemType.Media:
-                navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>();
-                break;
-            default:
-                throw new NotImplementedException("Level is not implemented for " + _contentNode.ContentType.ItemType);
-        }
+            var documentNavigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+            var idKeyMap = StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>();
 
-        Guid? parentKey;
-        List<Guid> path = new();
-        path.Add(Key);
-        navigationQueryService.TryGetParentKey(Key, out parentKey);
 
-        while (parentKey is not null)
-        {
-            path.Add(parentKey.Value);
-            navigationQueryService.TryGetParentKey(parentKey.Value, out Guid? newParentKey);
-            parentKey = newParentKey;
-        }
-
-        // Resolve path to IDs
-        UmbracoObjectTypes objectType = _contentNode.ContentType.ItemType == PublishedItemType.Content ? UmbracoObjectTypes.Document : UmbracoObjectTypes.Media;
-        List<int> idPath = new();
-
-        foreach (Guid key in path)
-        {
-            Attempt<int> attempt = idKeyMap.GetIdForKey(key, objectType);
-            if (attempt.Success is false)
+            if (documentNavigationQueryService.TryGetAncestorsOrSelfKeys(Key, out var ancestorsOrSelfKeys))
             {
-                throw new InvalidOperationException("Could not resolve path to IDs.");
+                var sb = new StringBuilder("-1");
+                foreach (Guid ancestorsOrSelfKey in ancestorsOrSelfKeys.Reverse())
+                {
+                    var idAttempt = idKeyMap.GetIdForKey(ancestorsOrSelfKey, GetObjectType());
+                    if (idAttempt.Success)
+                    {
+                        sb.AppendFormat(",{0}", idAttempt.Result);
+                    }
+                }
+
+                return sb.ToString();
             }
 
-            idPath.Add(attempt.Result);
+            return string.Empty;
         }
+    }
 
-        idPath.Reverse();
-        // Path always starts with -1 as that's root
-        return "-1," + string.Join(',', idPath);
+    private UmbracoObjectTypes GetObjectType()
+    {
+        switch (ItemType)
+        {
+            case PublishedItemType.Content:
+                return UmbracoObjectTypes.Document;
+            case PublishedItemType.Media:
+                return UmbracoObjectTypes.Media;
+            case PublishedItemType.Member:
+                return UmbracoObjectTypes.Member;
+            default:
+                return UmbracoObjectTypes.Unknown;
+        }
     }
 
     public override int? TemplateId { get; }

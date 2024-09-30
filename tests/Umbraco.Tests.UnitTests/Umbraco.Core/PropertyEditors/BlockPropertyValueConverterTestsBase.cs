@@ -1,4 +1,5 @@
 ﻿using Moq;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 
@@ -56,4 +57,7 @@ public abstract class BlockPropertyValueConverterTestsBase<TPropertyEditorConfig
             && x.DataType == dataType);
         return propertyType;
     }
+
+    protected IPublishedElement GetPublishedElement()
+        => Mock.Of<IPublishedElement>(m => m.ContentType == Mock.Of<IPublishedContentType>());
 }

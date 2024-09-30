@@ -61,6 +61,9 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
                     case nameof(BlockValue.Layout):
                         DeserializeAndSetLayout(ref reader, options, typeToConvert, blockValue);
                         break;
+                    case nameof(BlockValue.Expose):
+                        blockValue.Expose = DeserializeBlockVariation(ref reader, options, typeToConvert, nameof(BlockValue.Expose));
+                        break;
                 }
             }
         }
@@ -83,6 +86,9 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
             writer.WritePropertyName(nameof(BlockValue.SettingsData).ToFirstLowerInvariant());
             JsonSerializer.Serialize(writer, value.SettingsData, options);
         }
+
+        writer.WritePropertyName(nameof(BlockValue.Expose).ToFirstLowerInvariant());
+        JsonSerializer.Serialize(writer, value.Expose, options);
 
         Type layoutItemType = GetLayoutItemType(value.GetType());
 
@@ -115,7 +121,13 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
     }
 
     private List<BlockItemData> DeserializeBlockItemData(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, string propertyName)
-        => JsonSerializer.Deserialize<List<BlockItemData>>(ref reader, options)
+        => DeserializeListOf<BlockItemData>(ref reader, options, typeToConvert, propertyName);
+
+    private List<BlockItemVariation> DeserializeBlockVariation(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, string propertyName)
+        => DeserializeListOf<BlockItemVariation>(ref reader, options, typeToConvert, propertyName);
+
+    private List<T> DeserializeListOf<T>(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, string propertyName)
+        => JsonSerializer.Deserialize<List<T>>(ref reader, options)
            ?? throw new JsonException($"Unable to deserialize {propertyName} from type: {typeToConvert.FullName}.");
 
     private void DeserializeAndSetLayout(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, BlockValue blockValue)
@@ -167,12 +179,12 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
                 }
 
                 // did we encounter the concrete block value?
-                if (blockEditorAlias == blockValue.PropertyEditorAlias)
+                if (blockValue.SupportsBlockLayoutAlias(blockEditorAlias))
                 {
                     // yes, deserialize the block layout items as their concrete type (list of layoutItemType)
                     var layoutItems = JsonSerializer.Deserialize(ref reader, layoutItemsType, options);
-                    blockValue.Layout[blockEditorAlias] = layoutItems as IEnumerable<IBlockLayoutItem>
-                                                          ?? throw new JsonException($"Could not deserialize block editor layout items as type: {layoutItemType.FullName} while attempting to deserialize layout items for block editor alias: {blockEditorAlias} for type: {typeToConvert.FullName}.");
+                    blockValue.Layout[blockValue.PropertyEditorAlias] = layoutItems as IEnumerable<IBlockLayoutItem>
+                                                                        ?? throw new JsonException($"Could not deserialize block editor layout items as type: {layoutItemType.FullName} while attempting to deserialize layout items for block editor alias: {blockEditorAlias} for type: {typeToConvert.FullName}.");
                 }
                 else
                 {

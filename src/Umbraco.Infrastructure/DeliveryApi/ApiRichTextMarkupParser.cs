@@ -112,15 +112,15 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
         HtmlNode[] blocks = doc.DocumentNode.SelectNodes("//*[starts-with(local-name(),'umb-rte-block')]")?.ToArray() ?? Array.Empty<HtmlNode>();
         foreach (HtmlNode block in blocks)
         {
-            var dataUdi = block.GetAttributeValue("data-content-udi", string.Empty);
-            if (UdiParser.TryParse<GuidUdi>(dataUdi, out GuidUdi? guidUdi) is false)
+            var dataKey = block.GetAttributeValue(BlockContentKeyAttribute, string.Empty);
+            if (Guid.TryParse(dataKey, out Guid key) is false)
             {
                 continue;
             }
 
             // swap the content UDI for the content ID
-            block.Attributes.Remove("data-content-udi");
-            block.SetAttributeValue("data-content-id", guidUdi.Guid.ToString("D"));
+            block.Attributes.Remove(BlockContentKeyAttribute);
+            block.SetAttributeValue("data-content-id", key.ToString("D"));
 
             // remove the inner comment placed by the RTE
             block.RemoveAllChildren();
