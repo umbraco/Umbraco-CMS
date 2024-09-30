@@ -1,4 +1,4 @@
-import type { ManifestTinyMcePlugin } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTinyMcePlugin } from './tinymce-plugin.extension.js';
 
 export const manifests: Array<ManifestTinyMcePlugin> = [
 	{
