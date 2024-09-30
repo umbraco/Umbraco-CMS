@@ -1,3 +1,4 @@
+import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from './data-type-workspace.context-token.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 /**
@@ -6,6 +7,14 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  */
 @customElement('umb-data-type-workspace-editor')
 export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, (workspaceContext) => {
+			workspaceContext.createPropertyDatasetContext(this);
+		});
+	}
+
 	override render() {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.DataType">

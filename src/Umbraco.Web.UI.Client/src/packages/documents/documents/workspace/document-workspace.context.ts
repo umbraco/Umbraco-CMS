@@ -647,7 +647,10 @@ export class UmbDocumentWorkspaceContext
 				this.#validationRepository.validateCreate(saveData, parent.unique),
 			);
 		} else {
-			this.#serverValidation.askServerForValidation(saveData, this.#validationRepository.validateSave(saveData));
+			this.#serverValidation.askServerForValidation(
+				saveData,
+				this.#validationRepository.validateSave(saveData, variantIds),
+			);
 		}
 
 		// TODO: Only validate the specified selection.. [NL]
