@@ -1,4 +1,4 @@
-import type { ManifestAuthProvider } from '../../extension-registry/models/auth-provider.model.js';
+import type { ManifestAuthProvider } from '../auth-provider.extension.js';
 import { UmbModalBaseElement } from '../../modal/index.js';
 import { UmbTextStyles } from '../../style/text-style.style.js';
 import { UMB_AUTH_CONTEXT } from '../auth.context.token.js';

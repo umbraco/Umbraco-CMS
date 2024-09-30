@@ -86,3 +86,9 @@ export interface MetaAuthProvider {
 		allowManualLinking?: boolean;
 	};
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbAuthProvider: ManifestAuthProvider;
+	}
+}
