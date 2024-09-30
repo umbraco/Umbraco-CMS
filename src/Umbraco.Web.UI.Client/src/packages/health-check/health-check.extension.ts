@@ -18,3 +18,9 @@ export interface HealthCheck {
 	name: string;
 	description: string;
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbHealthCheck: ManifestHealthCheck;
+	}
+}

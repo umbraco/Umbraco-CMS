@@ -1,6 +1,4 @@
-import type { ManifestFileUploadPreview, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-const previews: Array<ManifestFileUploadPreview> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'fileUploadPreview',
 		alias: 'Umb.FileUploadPreview.Audio',
@@ -42,5 +40,3 @@ const previews: Array<ManifestFileUploadPreview> = [
 		forMimeTypes: ['video/*'],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...previews];
