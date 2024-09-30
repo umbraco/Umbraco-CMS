@@ -6,64 +6,52 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPropertyValueChangeEvent, type UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
-type Extension = {
+type UmbTiptapToolbarExtension = {
 	alias: string;
 	label: string;
 	icon: string;
 };
+const elementName = 'umb-property-editor-ui-tiptap-toolbar-configuration';
 
-@customElement('umb-property-editor-ui-tiptap-toolbar-configuration')
+@customElement(elementName)
 export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-	@property({ attribute: false })
-	set value(value: UmbTiptapToolbarValue | undefined) {
-		if (!value) {
-			this.#useDefault = true;
-			this.#value = [[[]]];
-			return;
-		}
-
-		// TODO: This can be optimized with cashing;
-		this.#value = value.map((rows) => rows.map((groups) => [...groups]));
-	}
-
-	get value(): UmbTiptapToolbarValue {
-		// TODO: This can be optimized with cashing;
-		return this.#value.map((rows) => rows.map((groups) => [...groups]));
-	}
-
-	#useDefault = false;
-
-	#value: UmbTiptapToolbarValue = [[[]]];
-
-	@state()
-	_extensions: Extension[] = [];
+	#inUse: Set<string> = new Set();
 
 	#currentDragItem?: {
 		alias: string;
 		fromPos?: [number, number, number];
 	};
 
+	#lookup?: Map<string, UmbTiptapToolbarExtension>;
+
+	@state()
+	private _extensions: Array<UmbTiptapToolbarExtension> = [];
+
+	@property({ attribute: false })
+	set value(value: UmbTiptapToolbarValue | undefined) {
+		if (!value) {
+			this.#value = [[[]]];
+		} else {
+			// TODO: This can be optimized with cashing;
+			this.#value = value ? value.map((rows) => rows.map((groups) => [...groups])) : [[[]]];
+			value.forEach((row) => row.forEach((group) => group.forEach((alias) => this.#inUse.add(alias))));
+		}
+	}
+	get value(): UmbTiptapToolbarValue {
+		// TODO: This can be optimized with cashing;
+		return this.#value.map((rows) => rows.map((groups) => [...groups]));
+	}
+	#value: UmbTiptapToolbarValue = [[[]]];
+
 	protected override async firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
 		super.firstUpdated(_changedProperties);
 
 		this.observe(umbExtensionsRegistry.byType('tiptapToolbarExtension'), (extensions) => {
-			this._extensions = extensions.map((ext) => {
-				if (this.#useDefault && ext.meta.isDefault) {
-					this.#value[0][0].push(ext.alias);
-				}
-				return {
-					alias: ext.alias,
-					label: ext.meta.label,
-					icon: ext.meta.icon,
-				};
-			});
-
-			if (this.#useDefault) {
-				this.dispatchEvent(new UmbPropertyValueChangeEvent());
-			}
+			this._extensions = extensions.map((ext) => ({ alias: ext.alias, label: ext.meta.label, icon: ext.meta.icon }));
+			this.#lookup = new Map(this._extensions.map((ext) => [ext.alias, ext]));
 		});
 	}
 
@@ -121,15 +109,19 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 
 	#insertItem = (alias: string, toPos: [number, number, number]) => {
 		const [rowIndex, groupIndex, itemIndex] = toPos;
+
 		// Insert the item into the new position
-		this.#value[rowIndex][groupIndex].splice(itemIndex, 0, alias);
+		const inserted = this.#value[rowIndex][groupIndex].splice(itemIndex, 0, alias);
+		inserted.forEach((alias) => this.#inUse.add(alias));
 
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	};
 
 	#removeItem(from: [number, number, number]) {
 		const [rowIndex, groupIndex, itemIndex] = from;
-		this.#value[rowIndex][groupIndex].splice(itemIndex, 1);
+
+		const removed = this.#value[rowIndex][groupIndex].splice(itemIndex, 1);
+		removed.forEach((alias) => this.#inUse.delete(alias));
 
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
@@ -140,12 +132,16 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	};
 
 	#removeGroup = (rowIndex: number, groupIndex: number) => {
-		if (groupIndex === 0) {
-			// Prevent removing the last group
-			this.#value[rowIndex][groupIndex] = [];
-		} else {
-			this.#value[rowIndex].splice(groupIndex, 1);
+		if (this.#value[rowIndex].length > groupIndex) {
+			const removed = this.#value[rowIndex].splice(groupIndex, 1);
+			removed.forEach((group) => group.forEach((alias) => this.#inUse.delete(alias)));
 		}
+
+		// Prevent leaving an empty group
+		if (this.#value[rowIndex].length === 0) {
+			this.#value[rowIndex][groupIndex] = [];
+		}
+
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	};
 
@@ -155,26 +151,46 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	};
 
 	#removeRow = (rowIndex: number) => {
-		if (rowIndex === 0) {
-			// Prevent removing the last row
-			this.#value[rowIndex] = [[]];
-		} else {
-			this.#value.splice(rowIndex, 1);
+		if (this.#value.length > rowIndex) {
+			const removed = this.#value.splice(rowIndex, 1);
+			removed.forEach((row) => row.forEach((group) => group.forEach((alias) => this.#inUse.delete(alias))));
 		}
+
+		// Prevent leaving an empty row
+		if (this.#value.length === 0) {
+			this.#value[rowIndex] = [[]];
+		}
+
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	};
 
-	#renderItem(alias: string, rowIndex: number, groupIndex: number, itemIndex: number) {
-		const extension = this._extensions.find((ext) => ext.alias === alias);
-		if (!extension) return nothing;
+	override render() {
 		return html`
-			<div
-				title=${extension.label}
-				class="item"
-				draggable="true"
-				@dragend=${this.#onDragEnd}
-				@dragstart=${(e: DragEvent) => this.#onDragStart(e, alias, [rowIndex, groupIndex, itemIndex])}>
-				<umb-icon name=${extension.icon ?? ''}></umb-icon>
+			${repeat(this.#value, (row, rowIndex) => this.#renderRow(row, rowIndex))}
+			<uui-button look="secondary" @click=${() => this.#addRow(this.#value.length)}>
+				<uui-icon name="add"></uui-icon>
+				<span>Add row</span>
+			</uui-button>
+			${this.#renderExtensions()}
+		`;
+	}
+
+	#renderRow(row: string[][], rowIndex: number) {
+		return html`
+			<div class="row">
+				${repeat(row, (group, groupIndex) => this.#renderGroup(group, rowIndex, groupIndex))}
+				<uui-button look="secondary" @click=${() => this.#addGroup(rowIndex, row.length)}>
+					<uui-icon name="add"></uui-icon>
+					<span>Add group</span>
+				</uui-button>
+				<uui-button
+					compact
+					color="danger"
+					look="primary"
+					class="remove-row-button ${rowIndex === 0 && row.length === 1 && row[0].length === 0 ? 'hidden' : undefined}"
+					@click=${() => this.#removeRow(rowIndex)}>
+					<umb-icon name="icon-trash"></umb-icon>
+				</uui-button>
 			</div>
 		`;
 	}
@@ -188,9 +204,9 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				@drop=${(e: DragEvent) => this.#onDrop(e, [rowIndex, groupIndex, group.length])}>
 				${group.map((alias, itemIndex) => this.#renderItem(alias, rowIndex, groupIndex, itemIndex))}
 				<uui-button
-					look="primary"
-					color="danger"
 					compact
+					color="danger"
+					look="primary"
 					class="remove-group-button ${groupIndex === 0 && group.length === 0 ? 'hidden' : undefined}"
 					@click=${() => this.#removeGroup(rowIndex, groupIndex)}>
 					<umb-icon name="icon-trash"></umb-icon>
@@ -199,44 +215,33 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		`;
 	}
 
-	#renderRow(row: string[][], rowIndex: number) {
+	#renderItem(alias: string, rowIndex: number, groupIndex: number, itemIndex: number) {
+		const extension = this.#lookup?.get(alias);
+		if (!extension) return nothing;
 		return html`
-			<div class="row">
-				${repeat(row, (group, groupIndex) => this.#renderGroup(group, rowIndex, groupIndex))}
-				<uui-button look="secondary" @click=${() => this.#addGroup(rowIndex, row.length)}>+</uui-button>
-				<uui-button
-					look="primary"
-					color="danger"
-					compact
-					class="remove-row-button ${rowIndex === 0 && row.length === 1 && row[0].length === 0 ? 'hidden' : undefined}"
-					@click=${() => this.#removeRow(rowIndex)}>
-					<umb-icon name="icon-trash"></umb-icon>
-				</uui-button>
+			<div
+				title=${extension.label}
+				class="item"
+				draggable="true"
+				@dragend=${this.#onDragEnd}
+				@dragstart=${(e: DragEvent) => this.#onDragStart(e, alias, [rowIndex, groupIndex, itemIndex])}>
+				<umb-icon name=${extension.icon ?? ''}></umb-icon>
 			</div>
 		`;
 	}
 
-	override render() {
-		return html`
-			${repeat(this.#value, (row, rowIndex) => this.#renderRow(row, rowIndex))}
-			<uui-button look="secondary" @click=${() => this.#addRow(this.#value.length)}>+</uui-button>
-			${this.#renderExtensions()}
-		`;
-	}
-
 	#renderExtensions() {
-		// TODO: Can we avoid using a flat here? or is it okay for performance?
 		return html`
 			<div class="extensions" dropzone="move" @drop=${this.#onDrop} @dragover=${this.#onDragOver}>
 				${repeat(
-					this._extensions.filter((ext) => !this.#value.flat(2).includes(ext.alias)),
+					this._extensions.filter((ext) => !this.#inUse.has(ext.alias)),
 					(extension) => html`
 						<div
-							title=${extension.label}
 							class="item"
 							draggable="true"
-							@dragend=${this.#onDragEnd}
-							@dragstart=${(e: DragEvent) => this.#onDragStart(e, extension.alias)}>
+							title=${this.localize.string(extension.label)}
+							@dragstart=${(e: DragEvent) => this.#onDragStart(e, extension.alias)}
+							@dragend=${this.#onDragEnd}>
 							<umb-icon name=${extension.icon ?? ''}></umb-icon>
 						</div>
 					`,
@@ -315,10 +320,10 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	];
 }
 
-export default UmbPropertyEditorUiTiptapToolbarConfigurationElement;
+export { UmbPropertyEditorUiTiptapToolbarConfigurationElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-tiptap-toolbar-configuration': UmbPropertyEditorUiTiptapToolbarConfigurationElement;
+		[elementName]: UmbPropertyEditorUiTiptapToolbarConfigurationElement;
 	}
 }

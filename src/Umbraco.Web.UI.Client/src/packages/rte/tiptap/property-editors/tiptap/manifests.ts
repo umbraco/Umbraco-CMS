@@ -50,6 +50,24 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 					},
 				],
 				defaultData: [
+					{
+						alias: 'toolbar',
+						value: [
+							[
+								['Umb.Tiptap.Toolbar.CodeEditor'],
+								['Umb.Tiptap.Toolbar.Bold', 'Umb.Tiptap.Toolbar.Italic', 'Umb.Tiptap.Toolbar.Underline'],
+								[
+									'Umb.Tiptap.Toolbar.TextAlignLeft',
+									'Umb.Tiptap.Toolbar.TextAlignCenter',
+									'Umb.Tiptap.Toolbar.TextAlignRight',
+								],
+								['Umb.Tiptap.Toolbar.BulletList', 'Umb.Tiptap.Toolbar.OrderedList'],
+								['Umb.Tiptap.Toolbar.Blockquote', 'Umb.Tiptap.Toolbar.HorizontalRule'],
+								['Umb.Tiptap.Toolbar.Link', 'Umb.Tiptap.Toolbar.Unlink'],
+								['Umb.Tiptap.Toolbar.MediaPicker', 'Umb.Tiptap.Toolbar.Embed'],
+							],
+						],
+					},
 					{ alias: 'maxImageSize', value: 500 },
 					{ alias: 'overlaySize', value: 'medium' },
 				],

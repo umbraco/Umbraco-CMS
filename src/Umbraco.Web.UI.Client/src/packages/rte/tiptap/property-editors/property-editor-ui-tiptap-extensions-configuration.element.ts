@@ -9,48 +9,43 @@ import {
 	type UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 
-type ExtensionConfig = {
+type UmbTiptapExtensionConfig = {
 	alias: string;
 	label: string;
 	icon?: string;
 	group: string;
 };
 
-type ExtensionGroupItem = {
+type UmbTiptapExtensionGroupItem = {
 	alias: string;
 	label: string;
 	icon?: string;
 	selected: boolean;
 };
 
-type ExtensionGroup = {
+type UmbTiptapExtensionGroup = {
 	group: string;
-	extensions: ExtensionGroupItem[];
+	extensions: UmbTiptapExtensionGroupItem[];
 };
 
-@customElement('umb-property-editor-ui-tiptap-extensions-configuration')
+const elementName = 'umb-property-editor-ui-tiptap-extensions-configuration';
+
+@customElement(elementName)
 export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
 	@property({ attribute: false })
-	set value(value: string[] | undefined) {
-		this.#value = value;
-	}
-	get value(): string[] | undefined {
-		return this.#value;
-	}
-
-	#value?: string[] = [];
+	value?: Array<string> = [];
 
 	@property({ attribute: false })
 	config?: UmbPropertyEditorConfigCollection;
 
 	@state()
-	private _extensionCategories: ExtensionGroup[] = [];
+	private _extensionCategories: UmbTiptapExtensionGroup[] = [];
 
 	@state()
-	private _extensionConfigs: ExtensionConfig[] = [];
+	private _extensionConfigs: UmbTiptapExtensionConfig[] = [];
 
 	protected override async firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
 		super.firstUpdated(_changedProperties);
@@ -69,7 +64,7 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 
 			if (!this.value) {
 				// The default value is all extensions enabled
-				this.#value = this._extensionConfigs.map((ext) => ext.alias);
+				this.value = this._extensionConfigs.map((ext) => ext.alias);
 				this.dispatchEvent(new UmbPropertyValueChangeEvent());
 			}
 
@@ -88,7 +83,7 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-expect-error
-		const grouped = Object.groupBy(withSelectedProperty, (item: ExtensionConfig) => item.group || 'Uncategorized');
+		const grouped = Object.groupBy(withSelectedProperty, (item: UmbTiptapExtensionConfig) => item.group || 'Uncategorized');
 
 		this._extensionCategories = Object.keys(grouped)
 			.sort((a, b) => a.localeCompare(b))
@@ -98,7 +93,7 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 			}));
 	}
 
-	#onExtensionClick(item: ExtensionGroupItem) {
+	#onExtensionClick(item: UmbTiptapExtensionGroupItem) {
 		item.selected = !item.selected;
 
 		if (!this.value) {
@@ -106,9 +101,9 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 		}
 
 		if (item.selected) {
-			this.#value = [...this.value, item.alias];
+			this.value = [...this.value, item.alias];
 		} else {
-			this.#value = this.value.filter((alias) => alias !== item.alias);
+			this.value = this.value.filter((alias) => alias !== item.alias);
 		}
 
 		this.requestUpdate('_extensionCategories');
@@ -203,10 +198,10 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 	];
 }
 
-export default UmbPropertyEditorUiTiptapExtensionsConfigurationElement;
+export { UmbPropertyEditorUiTiptapExtensionsConfigurationElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-tiptap-extensions-configuration': UmbPropertyEditorUiTiptapExtensionsConfigurationElement;
+		[elementName]: UmbPropertyEditorUiTiptapExtensionsConfigurationElement;
 	}
 }

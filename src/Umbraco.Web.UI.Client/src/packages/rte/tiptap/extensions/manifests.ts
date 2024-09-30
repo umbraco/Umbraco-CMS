@@ -44,7 +44,6 @@ const umbToolbarExtensions: Array<ManifestTiptapToolbarExtension | ManifestTipta
 			alias: 'umbLink',
 			icon: 'icon-link',
 			label: '#defaultdialogs_urlLinkPicker',
-			isDefault: true,
 		},
 	},
 	{
@@ -58,7 +57,6 @@ const umbToolbarExtensions: Array<ManifestTiptapToolbarExtension | ManifestTipta
 			alias: 'umbMedia',
 			icon: 'icon-picture',
 			label: 'Media picker',
-			isDefault: true,
 		},
 	},
 	{
