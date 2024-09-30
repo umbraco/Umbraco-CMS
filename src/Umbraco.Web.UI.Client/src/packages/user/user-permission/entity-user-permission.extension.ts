@@ -15,6 +15,6 @@ export interface MetaEntityUserPermission {
 
 declare global {
 	interface UmbExtensionManifestMap {
-		UmbEntityUserPermissionExtension: ManifestEntityUserPermission;
+		umbEntityUserPermission: ManifestEntityUserPermission;
 	}
 }
