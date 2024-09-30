@@ -41,10 +41,10 @@ public abstract class BlockPropertyValueConverterTestsBase<TPropertyEditorConfig
             && x.Alias == SettingAlias2);
 
         var publishedContentTypeCacheMock = new Mock<IPublishedContentTypeCache>();
-        publishedContentTypeCacheMock.Setup(x => x.Get(PublishedItemType.Content, ContentKey1)).Returns(test1ContentType);
-        publishedContentTypeCacheMock.Setup(x => x.Get(PublishedItemType.Content, ContentKey2)).Returns(test2ContentType);
-        publishedContentTypeCacheMock.Setup(x => x.Get(PublishedItemType.Content, SettingKey1)).Returns(test3ContentType);
-        publishedContentTypeCacheMock.Setup(x => x.Get(PublishedItemType.Content, SettingKey2)).Returns(test4ContentType);
+        publishedContentTypeCacheMock.Setup(x => x.Get(PublishedItemType.Element, ContentKey1)).Returns(test1ContentType);
+        publishedContentTypeCacheMock.Setup(x => x.Get(PublishedItemType.Element, ContentKey2)).Returns(test2ContentType);
+        publishedContentTypeCacheMock.Setup(x => x.Get(PublishedItemType.Element, SettingKey1)).Returns(test3ContentType);
+        publishedContentTypeCacheMock.Setup(x => x.Get(PublishedItemType.Element, SettingKey2)).Returns(test4ContentType);
 
         return publishedContentTypeCacheMock.Object;
     }
