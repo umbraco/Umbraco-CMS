@@ -1,4 +1,4 @@
-import { UMB_DICTIONARY_SECTION_ALIAS } from '../section/index.js';
+import { UMB_TRANSLATION_SECTION_ALIAS } from '@umbraco-cms/backoffice/translation';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -8,12 +8,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 		element: () => import('./dictionary-overview-dashboard.element.js'),
 		meta: {
 			label: '#dictionaryItem_overviewTitle',
-			pathname: '',
+			pathname: 'dictionary-overview',
 		},
 		conditions: [
 			{
 				alias: 'Umb.Condition.SectionAlias',
-				match: UMB_DICTIONARY_SECTION_ALIAS,
+				match: UMB_TRANSLATION_SECTION_ALIAS,
 			},
 		],
 	},

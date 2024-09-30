@@ -1,4 +1,5 @@
 import type { UmbDictionaryCollectionModel } from '../../types.js';
+import { UMB_EDIT_DICTIONARY_WORKSPACE_PATH_PATTERN } from '../../../workspace/paths.js';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
@@ -74,17 +75,17 @@ export class UmbDictionaryTableCollectionViewElement extends UmbLitElement {
 
 	#createTableItems(dictionaries: Array<UmbDictionaryCollectionModel>, languages: Array<UmbLanguageDetailModel>) {
 		this._tableItems = dictionaries.map((dictionary) => {
+			const editPath = UMB_EDIT_DICTIONARY_WORKSPACE_PATH_PATTERN.generateAbsolute({
+				unique: dictionary.unique,
+			});
+
 			return {
 				id: dictionary.unique,
 				icon: 'icon-book-alt-2',
 				data: [
 					{
 						columnAlias: 'name',
-						value: html`<a
-							style="font-weight:bold"
-							href="section/dictionary/workspace/dictionary/edit/${dictionary.unique}">
-							${dictionary.name}</a
-						> `,
+						value: html`<a style="font-weight:bold" href=${editPath}> ${dictionary.name}</a> `,
 					},
 					...languages.map((language) => {
 						return {
