@@ -15,7 +15,6 @@ public class ApiRichTextMarkupParserTests
 {
     private Mock<IApiContentRouteBuilder> _apiContentRouteBuilder;
     private Mock<IApiMediaUrlProvider> _apiMediaUrlProvider;
-    private Mock<IPublishedSnapshotAccessor> _publishedSnapshotAccessor;
 
     [Test]
     public void Can_Parse_Legacy_LocalLinks()
