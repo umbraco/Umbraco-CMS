@@ -32,12 +32,12 @@ public class BlockGridModel : BlockModelCollection<BlockGridItem>
     /// Initializes a new instance of the <see cref="BlockGridModel" /> class.
     /// </summary>
     /// <param name="list">The list to wrap.</param>
-    /// <param name="gridColumns">The number of columns in the grid</param>
+    /// <param name="gridColumns">The number of columns in the grid.</param>
     public BlockGridModel(IList<BlockGridItem> list, int? gridColumns)
         : base(list) => GridColumns = gridColumns;
 
     /// <summary>
-    /// The number of columns in the grid
+    /// The number of columns in the grid.
     /// </summary>
     public int? GridColumns { get; }
 }

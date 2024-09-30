@@ -1,8 +1,11 @@
-@using Umbraco.Cms.Core.Models.Blocks
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<IEnumerable<BlockGridItem>>
+@using Microsoft.AspNetCore.Mvc.ViewComponents;
+@using Umbraco.Cms.Core.Models.Blocks;
 @{
     if (Model?.Any() != true) { return; }
 }
+
+@inject IViewComponentSelector _selector;
 
 <div class="umb-block-grid__layout-container">
     @foreach (var item in Model)
@@ -16,18 +19,26 @@
             data-row-span="@item.RowSpan"
             style=" --umb-block-grid--item-column-span: @item.ColumnSpan; --umb-block-grid--item-row-span: @item.RowSpan; ">
             @{
-                var partialViewName = "blockgrid/Components/" + item.Content.ContentType.Alias;
-                try
+                if (_selector.SelectComponent(item.Content.ContentType.Alias) is not null)
                 {
-                    @await Html.PartialAsync(partialViewName, item)
+                    @await Component.InvokeAsync(item.Content.ContentType.Alias, item)
                 }
-                catch (InvalidOperationException)
+                else
                 {
-                    <p>
-                        <strong>Could not render component of type: @(item.Content.ContentType.Alias)</strong>
-                        <br/>
-                        This likely happened because the partial view <em>@partialViewName</em> could not be found.
-                    </p>
+                    var partialViewName = "blockgrid/Components/" + item.Content.ContentType.Alias;
+
+                    try
+                    {
+                        @await Html.PartialAsync(partialViewName, item)
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        <p>
+                            <strong>Could not render component of type: @(item.Content.ContentType.Alias)</strong>
+                            <br />
+                            This likely happened because the partial view <em>@partialViewName</em> could not be found.
+                        </p>
+                    }
                 }
             }
         </div>
