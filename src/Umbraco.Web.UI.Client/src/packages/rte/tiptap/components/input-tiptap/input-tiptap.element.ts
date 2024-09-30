@@ -152,6 +152,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		css`
 			:host {
 				display: block;
+				position: relative;
+				z-index: 0;
 			}
 			:host([readonly]) {
 				pointer-events: none;
@@ -191,7 +193,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				width: 100%;
 				min-height: 400px;
 				display: grid; /* Don't ask me why this is needed, but it is. */
-
 				pre {
 					background-color: var(--uui-color-surface-alt);
 					padding: var(--uui-size-space-2) var(--uui-size-space-4);
