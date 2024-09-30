@@ -62,16 +62,19 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`
-			${map(
-				this.toolbar,
-				(row) => html`
-					<div class="row">
-						${map(row, (group) => html`<div class="group">${map(group, (alias) => this._lookup?.get(alias))}</div>`)}
-					</div>
-				`,
-			)}
-		`;
+		return html`${map(this.toolbar, (row, rowIndex) =>
+			map(
+				row,
+				(group, groupIndex) =>
+					html`${map(group, (alias, aliasIndex) => {
+							const newRow = rowIndex !== 0 && groupIndex === 0 && aliasIndex === 0;
+							return html`<div class="item" ?data-new-row=${newRow} style="${newRow ? 'grid-column: 1 / span 3' : ''}">
+								${this._lookup?.get(alias)}
+							</div>`;
+						})}
+						<div class="separator"></div> `,
+			),
+		)} `;
 	}
 
 	static override readonly styles = css`
@@ -87,8 +90,9 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 			border-bottom-right-radius: 0;
 			background-color: var(--uui-color-surface);
 			color: var(--color-text);
-			display: flex;
-			flex-direction: column;
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(10px, 1fr));
+			grid-auto-flow: row;
 			position: sticky;
 			top: -25px;
 			left: 0px;
@@ -97,15 +101,19 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 			z-index: 9999999;
 		}
 
-		.row {
-			display: flex;
-			flex-direction: row;
-			gap: var(--uui-size-space-3);
+		.item {
+			grid-column: span 3;
 		}
 
-		.group {
-			display: flex;
-			flex-direction: row;
+		.separator {
+			background-color: var(--uui-color-border);
+			width: 1px;
+			place-self: center;
+			height: 22px;
+		}
+		.separator:last-child,
+		.separator:has(+ [data-new-row]) {
+			display: none;
 		}
 	`;
 }
