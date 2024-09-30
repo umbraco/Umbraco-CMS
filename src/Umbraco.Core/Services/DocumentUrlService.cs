@@ -464,6 +464,12 @@ public class DocumentUrlService : IDocumentUrlService
         return GetFullUrl(isRootFirstItem, urlSegments, null);
     }
 
+    public bool HasAny()
+    {
+        ThrowIfNotInitialized();
+        return _cache.Any();
+    }
+
 
     public async Task<IEnumerable<UrlInfo>> ListUrlsAsync(Guid contentKey)
     {
