@@ -95,9 +95,21 @@ public sealed class DocumentCache : IPublishedContentCache
     public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
         => _documentCacheService.GetByContentType(contentType);
 
-    public IPublishedContent? GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string? culture = null) => throw new NotImplementedException();
+    [Obsolete("Use IDocumentUrlService.GetDocumentKeyByRoute instead, scheduled for removal in v17")]
+    public IPublishedContent? GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string? culture = null)
+    {
+        IDocumentUrlService documentUrlService = StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>();
+        Guid? key = documentUrlService.GetDocumentKeyByRoute(route, culture, null, preview);
+        return key is not null ? GetById(preview, key.Value) : null;
+    }
 
-    public IPublishedContent? GetByRoute(string route, bool? hideTopLevelNode = null, string? culture = null) => throw new NotImplementedException();
+    [Obsolete("Use IDocumentUrlService.GetDocumentKeyByRoute instead, scheduled for removal in v17")]
+    public IPublishedContent? GetByRoute(string route, bool? hideTopLevelNode = null, string? culture = null)
+    {
+        IDocumentUrlService documentUrlService = StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>();
+        Guid? key = documentUrlService.GetDocumentKeyByRoute(route, culture, null, false);
+        return key is not null ? GetById(key.Value) : null;
+    }
 
     public string? GetRouteById(bool preview, int contentId, string? culture = null) => throw new NotImplementedException();
 
