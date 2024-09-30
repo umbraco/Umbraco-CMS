@@ -24,3 +24,9 @@ export interface MetaDashboard {
 	 */
 	pathname?: string;
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbDashboard: ManifestDashboard;
+	}
+}
