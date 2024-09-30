@@ -307,7 +307,7 @@ export abstract class UmbBlockManagerContext<
 		}
 	}
 
-	protected removeBlockUdi(contentUdi: string) {
-		this.#contents.removeOne(contentUdi);
+	protected removeBlockKey(contentKey: string) {
+		this.#contents.removeOne(contentKey);
 	}
 }
