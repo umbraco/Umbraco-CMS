@@ -4,7 +4,6 @@ import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from './
 import type { ManifestFileUploadPreview } from './file-upload-preview.model.js';
 import type { ManifestExternalLoginProvider } from './external-login-provider.model.js';
 import type { ManifestHealthCheck } from './health-check.model.js';
-import type { ManifestTinyMcePlugin } from './tinymce-plugin.model.js';
 import type { ManifestUfmComponent } from './ufm-component.model.js';
 import type { ManifestUfmFilter } from './ufm-filter.model.js';
 import type { ManifestUserProfileApp } from './user-profile-app.model.js';
@@ -23,7 +22,6 @@ export type * from './mfa-login-provider.model.js';
 export type * from './monaco-markdown-editor-action.model.js';
 export type * from './mfa-login-provider.model.js';
 export type * from './monaco-markdown-editor-action.model.js';
-export type * from './tinymce-plugin.model.js';
 export type * from './ufm-component.model.js';
 export type * from './ufm-filter.model.js';
 export type * from './user-granular-permission.model.js';
@@ -43,7 +41,6 @@ export type ManifestTypes =
 	| ManifestHealthCheck
 	| ManifestMfaLoginProvider
 	| ManifestMonacoMarkdownEditorAction
-	| ManifestTinyMcePlugin
 	| ManifestUfmComponent
 	| ManifestUfmFilter
 	| ManifestUserProfileApp
