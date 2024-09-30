@@ -1,12 +1,13 @@
-import type { UmbBackofficeExtensionRegistry, ManifestAuthProvider } from '../extension-registry/index.js';
 import { UmbAuthFlow } from './auth-flow.js';
 import { UMB_AUTH_CONTEXT, UMB_STORAGE_TOKEN_RESPONSE_NAME } from './auth.context.token.js';
 import type { UmbOpenApiConfiguration } from './models/openApiConfiguration.js';
+import type { ManifestAuthProvider } from './auth-provider.extension.js';
 import { OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { ReplaySubject, Subject, firstValueFrom, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	#isAuthorized = new UmbBooleanState<boolean>(false);

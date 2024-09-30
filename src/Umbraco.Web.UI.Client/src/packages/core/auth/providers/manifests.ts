@@ -1,4 +1,4 @@
-import type { ManifestAuthProvider } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestAuthProvider } from '../auth-provider.extension.js';
 
 export const manifests: Array<ManifestAuthProvider> = [
 	{
