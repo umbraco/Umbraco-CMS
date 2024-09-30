@@ -4,7 +4,9 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
@@ -37,12 +39,11 @@ public sealed class DocumentCache : IPublishedContentCache
 
     public IPublishedContentType? GetContentType(string alias) => _publishedContentTypeCache.Get(PublishedItemType.Content, alias);
 
-
     public IPublishedContentType? GetContentType(Guid key) => _publishedContentTypeCache.Get(PublishedItemType.Content, key);
 
-    // FIXME: These need to be refactored when removing nucache
-    // Thats the time where we can change the IPublishedContentCache interface.
+    // TODO: These are all obsolete and should be removed
 
+    [Obsolete("Scheduled for removal in v17")]
     public IPublishedContent? GetById(bool preview, Udi contentId)
     {
         if(contentId is not GuidUdi guidUdi)
@@ -53,6 +54,7 @@ public sealed class DocumentCache : IPublishedContentCache
         return GetById(preview, guidUdi.Guid);
     }
 
+    [Obsolete("Scheduled for removal in v17")]
     public IPublishedContent? GetById(Udi contentId)
     {
         if(contentId is not GuidUdi guidUdi)
@@ -63,14 +65,33 @@ public sealed class DocumentCache : IPublishedContentCache
         return GetById(guidUdi.Guid);
     }
 
-    public IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null) => throw new NotImplementedException();
+    [Obsolete("Scheduled for removal, use IDocumentNavigationQueryService instead in v17")]
+    public IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null)
+    {
+        IDocumentNavigationQueryService navigationService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+        navigationService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
 
-    public IEnumerable<IPublishedContent> GetAtRoot(string? culture = null) => throw new NotImplementedException();
+        IEnumerable<IPublishedContent> rootContent = rootKeys.Select(key => GetById(preview, key)).WhereNotNull();
+        return culture is null ? rootContent : rootContent.Where(x => x.IsInvariantOrHasCulture(culture));
+    }
 
-    public bool HasContent(bool preview) => throw new NotImplementedException();
+    [Obsolete("Scheduled for removal, use IDocumentNavigationQueryService instead in v17")]
+    public IEnumerable<IPublishedContent> GetAtRoot(string? culture = null)
+    {
+        IDocumentNavigationQueryService navigationService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+        navigationService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
 
+        IEnumerable<IPublishedContent> rootContent = rootKeys.Select(key => GetById(key)).WhereNotNull();
+        return culture is null ? rootContent : rootContent.Where(x => x.IsInvariantOrHasCulture(culture));
+    }
+
+    [Obsolete("Scheduled for removal in v17")]
+    public bool HasContent(bool preview) => HasContent();
+
+    [Obsolete("Scheduled for removal in v17")]
     public bool HasContent() => StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>().HasAny();
 
+    [Obsolete]
     public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
         => _documentCacheService.GetByContentType(contentType);
 
