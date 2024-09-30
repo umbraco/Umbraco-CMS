@@ -1,7 +1,7 @@
 import { UmbTiptapToolbarElementApiBase } from '../types.js';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
-export default class UmbTiptapUndoExtensionApi extends UmbTiptapToolbarElementApiBase {
+export default class UmbTiptapToolbarUndoExtensionApi extends UmbTiptapToolbarElementApiBase {
 	override isActive(editor: Editor): boolean {
 		return editor.can().undo();
 	}

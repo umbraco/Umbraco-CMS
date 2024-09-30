@@ -4,7 +4,7 @@ import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 const elementName = 'umb-tiptap-style-select-toolbar-element';
 
 @customElement(elementName)
-export class UmbTiptapStyleSelectToolbarElement extends UmbTiptapToolbarDropdownBaseElement {
+export class UmbTiptapToolbarStyleSelectToolbarElement extends UmbTiptapToolbarDropdownBaseElement {
 	protected override label = 'Style select';
 
 	@state()
@@ -15,10 +15,10 @@ export class UmbTiptapStyleSelectToolbarElement extends UmbTiptapToolbarDropdown
 	static override readonly styles = UmbTiptapToolbarDropdownBaseElement.styles;
 }
 
-export { UmbTiptapStyleSelectToolbarElement as element };
+export { UmbTiptapToolbarStyleSelectToolbarElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbTiptapStyleSelectToolbarElement;
+		[elementName]: UmbTiptapToolbarStyleSelectToolbarElement;
 	}
 }

@@ -54,7 +54,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 						alias: 'toolbar',
 						value: [
 							[
-								['Umb.Tiptap.Toolbar.CodeEditor'],
+								['Umb.Tiptap.Toolbar.SourceEditor'],
 								['Umb.Tiptap.Toolbar.Bold', 'Umb.Tiptap.Toolbar.Italic', 'Umb.Tiptap.Toolbar.Underline'],
 								[
 									'Umb.Tiptap.Toolbar.TextAlignLeft',

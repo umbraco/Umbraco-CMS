@@ -1,11 +1,10 @@
 import { UmbTiptapToolbarElementApiBase } from '../types.js';
 import { UMB_CODE_EDITOR_MODAL } from '@umbraco-cms/backoffice/code-editor';
-import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
-export default class UmbTiptapCodeEditorExtensionApi extends UmbTiptapToolbarElementApiBase {
+export default class UmbTiptapToolbarSourceEditorExtensionApi extends UmbTiptapToolbarElementApiBase {
 	override async execute(editor?: Editor) {
-		console.log('umb-code-editor.execute', editor);
 		if (!editor) return;
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);

@@ -6,7 +6,7 @@ import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbLinkPickerLink } from '@umbraco-cms/backoffice/multi-url-picker';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
-export default class UmbTiptapLinkExtensionApi extends UmbTiptapToolbarElementApiBase {
+export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarElementApiBase {
 	override async execute(editor?: Editor) {
 		const attrs = editor?.getAttributes(UmbLink.name) ?? {};
 		const link = this.#getLinkData(attrs);

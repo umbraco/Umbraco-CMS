@@ -1,16 +1,13 @@
 import { UmbTiptapToolbarElementApiBase } from '../types.js';
-import {
-	UMB_MEDIA_CAPTION_ALT_TEXT_MODAL,
-	UMB_MEDIA_PICKER_MODAL,
-	type UmbMediaCaptionAltTextModalValue,
-} from '@umbraco-cms/backoffice/media';
+import { getGuidFromUdi, getProcessedImageUrl, imageSize } from '@umbraco-cms/backoffice/utils';
+import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { getGuidFromUdi, getProcessedImageUrl, imageSize } from '@umbraco-cms/backoffice/utils';
-import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbMediaCaptionAltTextModalValue } from '@umbraco-cms/backoffice/media';
 
-export default class UmbTiptapMediaPickerToolbarExtensionApi extends UmbTiptapToolbarElementApiBase {
+export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbTiptapToolbarElementApiBase {
 	#modalManager?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 
 	/**

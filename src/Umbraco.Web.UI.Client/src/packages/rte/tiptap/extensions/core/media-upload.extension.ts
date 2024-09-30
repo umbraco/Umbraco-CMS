@@ -1,18 +1,17 @@
-import { UmbTiptapExtensionApiBase, type UmbTiptapExtensionArgs } from '../types.js';
-import {
-	TemporaryFileStatus,
-	UmbTemporaryFileManager,
-	type UmbTemporaryFileModel,
-} from '@umbraco-cms/backoffice/temporary-file';
+import { UmbTiptapExtensionApiBase } from '../types.js';
+import type { UmbTiptapExtensionArgs } from '../types.js';
 import { imageSize } from '@umbraco-cms/backoffice/utils';
-import { type Editor, Extension } from '@umbraco-cms/backoffice/external/tiptap';
+import { Extension } from '@umbraco-cms/backoffice/external/tiptap';
+import { TemporaryFileStatus, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
 
-export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApiBase {
+export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtensionApiBase {
 	#configuration?: UmbPropertyEditorConfigCollection;
 
 	/**

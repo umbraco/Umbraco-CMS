@@ -1,7 +1,7 @@
 import { UmbTiptapToolbarElementApiBase } from '../types.js';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
-export default class UmbTiptapUnlinkExtensionApi extends UmbTiptapToolbarElementApiBase {
+export default class UmbTiptapToolbarUnlinkExtensionApi extends UmbTiptapToolbarElementApiBase {
 	override isActive = (editor?: Editor) => editor?.isActive('umbLink') ?? false;
 
 	override execute(editor?: Editor) {
