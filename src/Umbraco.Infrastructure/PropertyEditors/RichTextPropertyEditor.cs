@@ -6,12 +6,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -51,6 +51,16 @@ public class RichTextPropertyEditor : DataEditor
 
     public override bool SupportsConfigurableElements => true;
 
+    /// <inheritdoc />
+    public override bool CanMergePartialPropertyValues(IPropertyType propertyType) => propertyType.VariesByCulture() is false;
+
+    /// <inheritdoc />
+    public override object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture)
+    {
+        var valueEditor = (RichTextPropertyValueEditor)GetValueEditor();
+        return valueEditor.MergePartialPropertyValueForCulture(sourceValue, targetValue, culture);
+    }
+
     /// <summary>
     ///     Create a custom value editor
     /// </summary>
@@ -78,46 +88,6 @@ public class RichTextPropertyEditor : DataEditor
         private readonly IRichTextRequiredValidator _richTextRequiredValidator;
         private readonly ILogger<RichTextPropertyValueEditor> _logger;
 
-        [Obsolete("Use non-obsolete constructor. This is schedules for removal in v16.")]
-        public RichTextPropertyValueEditor(
-            DataEditorAttribute attribute,
-            PropertyEditorCollection propertyEditors,
-            IDataTypeConfigurationCache dataTypeReadCache,
-            ILogger<RichTextPropertyValueEditor> logger,
-            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper,
-            HtmlImageSourceParser imageSourceParser,
-            HtmlLocalLinkParser localLinkParser,
-            RichTextEditorPastedImages pastedImages,
-            IJsonSerializer jsonSerializer,
-            IIOHelper ioHelper,
-            IHtmlSanitizer htmlSanitizer,
-            IBlockEditorElementTypeCache elementTypeCache,
-            IPropertyValidationService propertyValidationService,
-            DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection)
-            : this(
-                attribute,
-                propertyEditors,
-                dataTypeReadCache,
-                logger,
-                backOfficeSecurityAccessor,
-                localizedTextService,
-                shortStringHelper,
-                imageSourceParser,
-                localLinkParser,
-                pastedImages,
-                jsonSerializer,
-                ioHelper,
-                htmlSanitizer,
-                elementTypeCache,
-                propertyValidationService,
-                dataValueReferenceFactoryCollection,
-                StaticServiceProvider.Instance.GetRequiredService<IRichTextRequiredValidator>())
-        {
-
-        }
-
         public RichTextPropertyValueEditor(
             DataEditorAttribute attribute,
             PropertyEditorCollection propertyEditors,
@@ -135,8 +105,9 @@ public class RichTextPropertyEditor : DataEditor
             IBlockEditorElementTypeCache elementTypeCache,
             IPropertyValidationService propertyValidationService,
             DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection,
-            IRichTextRequiredValidator richTextRequiredValidator)
-            : base(attribute, propertyEditors, dataTypeReadCache, localizedTextService, logger, shortStringHelper, jsonSerializer, ioHelper, dataValueReferenceFactoryCollection)
+            IRichTextRequiredValidator richTextRequiredValidator,
+            BlockEditorVarianceHandler blockEditorVarianceHandler)
+            : base(attribute, propertyEditors, dataTypeReadCache, localizedTextService, logger, shortStringHelper, jsonSerializer, ioHelper, dataValueReferenceFactoryCollection, blockEditorVarianceHandler)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _localizedTextService = localizedTextService;
@@ -153,6 +124,8 @@ public class RichTextPropertyEditor : DataEditor
         }
 
         public override IValueRequiredValidator RequiredValidator => _richTextRequiredValidator;
+
+        protected override RichTextBlockValue CreateWithLayout(IEnumerable<RichTextBlockLayoutItem> layout) => new(layout);
 
         /// <inheritdoc />
         public override object? ConfigurationObject
@@ -247,7 +220,7 @@ public class RichTextPropertyEditor : DataEditor
             richTextEditorValue.Markup = _imageSourceParser.EnsureImageSources(richTextEditorValue.Markup);
 
             // return json convertable object
-            return CleanAndMapBlocks(richTextEditorValue, blockValue => MapBlockValueToEditor(property, blockValue));
+            return CleanAndMapBlocks(richTextEditorValue, blockValue => MapBlockValueToEditor(property, blockValue, culture, segment));
         }
 
         /// <summary>
@@ -293,6 +266,38 @@ public class RichTextPropertyEditor : DataEditor
         {
             var configuration = ConfigurationObject as RichTextConfiguration;
             return configuration?.Blocks?.SelectMany(ConfiguredElementTypeKeys) ?? Enumerable.Empty<Guid>();
+        }
+
+        internal override object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture)
+        {
+            if (sourceValue is null)
+            {
+                return null;
+            }
+
+            if (TryParseEditorValue(sourceValue, out RichTextEditorValue? sourceRichTextEditorValue) is false
+                || sourceRichTextEditorValue.Blocks is null)
+            {
+                return null;
+            }
+
+            BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? sourceBlockEditorData = ConvertAndClean(sourceRichTextEditorValue.Blocks);
+            if (sourceBlockEditorData?.Layout is null)
+            {
+                return null;
+            }
+
+            TryParseEditorValue(targetValue, out RichTextEditorValue? targetRichTextEditorValue);
+
+            BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem> targetBlockEditorData =
+                (targetRichTextEditorValue?.Blocks is not null ? ConvertAndClean(targetRichTextEditorValue.Blocks) : null)
+                ?? new BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>([], CreateWithLayout(sourceBlockEditorData.Layout));
+
+            RichTextBlockValue blocksMergeResult = MergeBlockEditorDataForCulture(sourceBlockEditorData.BlockValue, targetBlockEditorData.BlockValue, culture);
+
+            // structure is global, and markup follows structure
+            var mergedEditorValue = new RichTextEditorValue { Markup = sourceRichTextEditorValue.Markup, Blocks = blocksMergeResult };
+            return RichTextPropertyEditorHelper.SerializeRichTextEditorValue(mergedEditorValue, _jsonSerializer);
         }
 
         private bool TryParseEditorValue(object? value, [NotNullWhen(true)] out RichTextEditorValue? richTextEditorValue)

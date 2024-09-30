@@ -9,13 +9,12 @@ internal static class NavigationFactory
     /// <summary>
     ///     Builds a dictionary of NavigationNode objects from a given dataset.
     /// </summary>
+    /// <param name="nodesStructure">A dictionary of <see cref="NavigationNode" /> objects with key corresponding to their unique Guid.</param>
     /// <param name="entities">The <see cref="INavigationModel" /> objects used to build the navigation nodes dictionary.</param>
-    /// <returns>A dictionary of <see cref="NavigationNode" /> objects with key corresponding to their unique Guid.</returns>
-    public static ConcurrentDictionary<Guid, NavigationNode> BuildNavigationDictionary(IEnumerable<INavigationModel> entities)
+    public static void BuildNavigationDictionary(ConcurrentDictionary<Guid, NavigationNode> nodesStructure, IEnumerable<INavigationModel> entities)
     {
-        var nodesStructure = new ConcurrentDictionary<Guid, NavigationNode>();
         var entityList = entities.ToList();
-        var idToKeyMap = entityList.ToDictionary(x => x.Id, x => x.Key);
+        Dictionary<int, Guid> idToKeyMap = entityList.ToDictionary(x => x.Id, x => x.Key);
 
         foreach (INavigationModel entity in entityList)
         {
@@ -39,7 +38,5 @@ internal static class NavigationFactory
                 parentNode.AddChild(node);
             }
         }
-
-        return nodesStructure;
     }
 }

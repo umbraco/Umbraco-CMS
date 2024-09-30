@@ -47,6 +47,7 @@ public class HealthCheckNotifierJob : IRecurringBackgroundJob
     /// <param name="logger">The typed logger.</param>
     /// <param name="profilingLogger">The profiling logger.</param>
     /// <param name="cronTabParser">Parser of crontab expressions.</param>
+    /// <param name="eventAggregator"></param>
     public HealthCheckNotifierJob(
         IOptionsMonitor<HealthChecksSettings> healthChecksSettings,
         HealthCheckCollection healthChecks,

@@ -117,20 +117,25 @@ public class PublishedSnapshotServiceTestBase
     protected static PublishedRouter CreatePublishedRouter(
         IUmbracoContextAccessor umbracoContextAccessor,
         IEnumerable<IContentFinder> contentFinders = null,
-        IPublishedUrlProvider publishedUrlProvider = null) => new(
-        Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x => x.CurrentValue == new WebRoutingSettings()),
-        new ContentFinderCollection(() => contentFinders ?? Enumerable.Empty<IContentFinder>()),
-        new TestLastChanceFinder(),
-        new TestVariationContextAccessor(),
-        Mock.Of<IProfilingLogger>(),
-        Mock.Of<ILogger<PublishedRouter>>(),
-        publishedUrlProvider ?? Mock.Of<IPublishedUrlProvider>(),
-        Mock.Of<IRequestAccessor>(),
-        Mock.Of<IPublishedValueFallback>(),
-        Mock.Of<IFileService>(),
-        Mock.Of<IContentTypeService>(),
-        umbracoContextAccessor,
-        Mock.Of<IEventAggregator>());
+        IPublishedUrlProvider publishedUrlProvider = null,
+        IDomainCache domainCache = null)
+    {
+        return new(
+            Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x => x.CurrentValue == new WebRoutingSettings()),
+            new ContentFinderCollection(() => contentFinders ?? Enumerable.Empty<IContentFinder>()),
+            new TestLastChanceFinder(),
+            new TestVariationContextAccessor(),
+            Mock.Of<IProfilingLogger>(),
+            Mock.Of<ILogger<PublishedRouter>>(),
+            publishedUrlProvider ?? Mock.Of<IPublishedUrlProvider>(),
+            Mock.Of<IRequestAccessor>(),
+            Mock.Of<IPublishedValueFallback>(),
+            Mock.Of<IFileService>(),
+            Mock.Of<IContentTypeService>(),
+            umbracoContextAccessor,
+            Mock.Of<IEventAggregator>(),
+            domainCache ?? Mock.Of<IDomainCache>());
+    }
 
     protected IUmbracoContextAccessor GetUmbracoContextAccessor(string urlAsString)
     {

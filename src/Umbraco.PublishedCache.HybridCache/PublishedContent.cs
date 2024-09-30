@@ -1,5 +1,11 @@
-﻿using Umbraco.Cms.Core.Exceptions;
+﻿using System.Text;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
@@ -66,8 +72,48 @@ internal class PublishedContent : PublishedContentBase
 
     public override int SortOrder { get; }
 
-    // TODO: Remove path.
-    public override string Path => string.Empty;
+    [Obsolete]
+    public override string Path
+    {
+        get
+        {
+            var documentNavigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+            var idKeyMap = StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>();
+
+
+            if (documentNavigationQueryService.TryGetAncestorsOrSelfKeys(Key, out var ancestorsOrSelfKeys))
+            {
+                var sb = new StringBuilder("-1");
+                foreach (Guid ancestorsOrSelfKey in ancestorsOrSelfKeys.Reverse())
+                {
+                    var idAttempt = idKeyMap.GetIdForKey(ancestorsOrSelfKey, GetObjectType());
+                    if (idAttempt.Success)
+                    {
+                        sb.AppendFormat(",{0}", idAttempt.Result);
+                    }
+                }
+
+                return sb.ToString();
+            }
+
+            return string.Empty;
+        }
+    }
+
+    private UmbracoObjectTypes GetObjectType()
+    {
+        switch (ItemType)
+        {
+            case PublishedItemType.Content:
+                return UmbracoObjectTypes.Document;
+            case PublishedItemType.Media:
+                return UmbracoObjectTypes.Media;
+            case PublishedItemType.Member:
+                return UmbracoObjectTypes.Member;
+            default:
+                return UmbracoObjectTypes.Unknown;
+        }
+    }
 
     public override int? TemplateId { get; }
 
