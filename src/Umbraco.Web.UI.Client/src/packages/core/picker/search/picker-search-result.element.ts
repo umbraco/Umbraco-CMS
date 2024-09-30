@@ -1,10 +1,10 @@
 import { UMB_PICKER_CONTEXT } from '../picker.context.token.js';
 import type { UmbPickerContext } from '../picker.context.js';
+import type { ManifestPickerSearchResultItem } from './result-item/picker-search-result-item.extension.js';
 import { customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import type { ManifestPickerSearchResultItem } from '@umbraco-cms/backoffice/extension-registry';
 
 const elementName = 'umb-picker-search-result';
 @customElement(elementName)

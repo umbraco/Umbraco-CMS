@@ -7,10 +7,12 @@ import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbChangeEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
-import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_ENTITY_USER_PERMISSION_MODAL } from '@umbraco-cms/backoffice/user-permission';
+import {
+	UMB_ENTITY_USER_PERMISSION_MODAL,
+	type ManifestEntityUserPermission,
+} from '@umbraco-cms/backoffice/user-permission';
 
 @customElement('umb-input-document-granular-user-permission')
 export class UmbInputDocumentGranularUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
