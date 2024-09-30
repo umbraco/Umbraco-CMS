@@ -33,7 +33,6 @@ import type { ManifestTinyMcePlugin } from './tinymce-plugin.model.js';
 import type { ManifestUfmComponent } from './ufm-component.model.js';
 import type { ManifestUfmFilter } from './ufm-filter.model.js';
 import type { ManifestUserProfileApp } from './user-profile-app.model.js';
-import type { ManifestEntityUserPermission } from './entity-user-permission.model.js';
 import type { ManifestMfaLoginProvider } from './mfa-login-provider.model.js';
 import type { ManifestAppEntryPoint } from './app-entry-point.model.js';
 import type { ManifestBackofficeEntryPoint } from './backoffice-entry-point.model.js';
@@ -50,7 +49,6 @@ export type * from './dashboard.model.js';
 export type * from './dynamic-root.model.js';
 export type * from './entity-action.model.js';
 export type * from './entity-bulk-action.model.js';
-export type * from './entity-user-permission.model.js';
 export type * from './entry-point.model.js';
 export type * from './file-upload-preview.model.js';
 export type * from './external-login-provider.model.js';
@@ -99,7 +97,6 @@ export type ManifestTypes =
 	| ManifestDynamicRootQueryStep
 	| ManifestEntityActions
 	| ManifestEntityBulkAction
-	| ManifestEntityUserPermission
 	| ManifestEntryPoint
 	| ManifestFileUploadPreview
 	| ManifestExternalLoginProvider
