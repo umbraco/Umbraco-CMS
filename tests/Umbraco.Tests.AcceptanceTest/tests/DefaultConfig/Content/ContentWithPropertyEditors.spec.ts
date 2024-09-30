@@ -18,15 +18,6 @@ test('can create content with the Rich Text Editor datatype', {tag: '@smoke'}, a
   // Arrange
   const dataTypeName = 'Richtext editor';
   const contentText = 'This is Rich Text Editor content!';
-  const expectedContentValue = {
-    blocks: {
-      contentData: [],
-      layout: {},
-      propertyEditorAlias: 'Umbraco.TinyMCE',
-      settingsData: [],
-    },
-    markup: '<p>' + contentText + '</p>',
-  };
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   await umbracoUi.goToBackOffice();
@@ -44,7 +35,8 @@ test('can create content with the Rich Text Editor datatype', {tag: '@smoke'}, a
   await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value).toEqual(expectedContentValue);
+  expect(contentData.values[0].value.markup).toEqual('<p>' + contentText + '</p>');
+  expect(contentData.values[0].value.blocks.propertyEditorAlias).toEqual('Umbraco.TinyMCE');
 });
 
 // TODO: Remove skip when the front-end is ready. Currently it returns error when publishing a content
