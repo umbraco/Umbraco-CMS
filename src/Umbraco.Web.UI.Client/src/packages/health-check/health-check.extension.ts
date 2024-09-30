@@ -21,6 +21,6 @@ export interface HealthCheck {
 
 declare global {
 	interface UmbExtensionManifestMap {
-		umbDashboard: ManifestHealthCheck;
+		umbHealthCheck: ManifestHealthCheck;
 	}
 }
