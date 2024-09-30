@@ -20,6 +20,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     private readonly IDomainCacheService _domainCacheService;
     private readonly IDocumentUrlService _documentUrlService;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
+    private readonly IDocumentNavigationManagementService _documentNavigationManagementService;
+    private readonly IContentService _contentService;
     private readonly IIdKeyMap _idKeyMap;
 
     public ContentCacheRefresher(
@@ -31,7 +33,9 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         ICacheRefresherNotificationFactory factory,
         IDocumentUrlService documentUrlService,
         IDomainCacheService domainCacheService,
-        IDocumentNavigationQueryService documentNavigationQueryService)
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IDocumentNavigationManagementService documentNavigationManagementService,
+        IContentService contentService)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
@@ -39,6 +43,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         _domainCacheService = domainCacheService;
         _documentUrlService = documentUrlService;
         _documentNavigationQueryService = documentNavigationQueryService;
+        _documentNavigationManagementService = documentNavigationManagementService;
+        _contentService = contentService;
     }
 
     #region Indirect
@@ -102,6 +108,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
             HandleRouting(payload);
 
+            HandleNavigation(payload);
             _idKeyMap.ClearCache(payload.Id);
             if (payload.Key.HasValue)
             {
@@ -133,6 +140,102 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         base.Refresh(payloads);
     }
+
+    private void HandleNavigation(JsonPayload payload)
+    {
+        if (payload.Key is null)
+        {
+            return;
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+        {
+            _documentNavigationManagementService.MoveToBin(payload.Key.Value);
+            _documentNavigationManagementService.RemoveFromBin(payload.Key.Value);
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
+        {
+            _documentNavigationManagementService.RebuildAsync();
+            _documentNavigationManagementService.RebuildBinAsync();
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
+        {
+            IContent? content = _contentService.GetById(payload.Id);
+
+            if (content is null)
+            {
+                return;
+            }
+
+            HandleNavigationForSingleContent(content);
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
+        {
+            IContent? content = _contentService.GetById(payload.Id);
+
+            if (content is null)
+            {
+                return;
+            }
+
+            IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(content.Id, 0, int.MaxValue, out _);
+            foreach (IContent descendant in content.Yield().Concat(descendants))
+            {
+                HandleNavigationForSingleContent(descendant);
+            }
+        }
+    }
+
+    private void HandleNavigationForSingleContent(IContent content)
+    {
+        // First creation
+        if (ExistsInNavigation(content.Key) is false && ExistsInNavigationBin(content.Key) is false)
+        {
+            _documentNavigationManagementService.Add(content.Key, GetParentKey(content));
+            if (content.Trashed)
+            {
+                // If created as trashed, move to bin
+                _documentNavigationManagementService.MoveToBin(content.Key);
+            }
+        }
+        else if (ExistsInNavigation(content.Key) && ExistsInNavigationBin(content.Key) is false)
+        {
+            if (content.Trashed)
+            {
+                // It must have been trashed
+                _documentNavigationManagementService.MoveToBin(content.Key);
+            }
+            else
+            {
+                // It must have been saved. Check if parent is different
+                if (_documentNavigationQueryService.TryGetParentKey(content.Key, out var oldParentKey))
+                {
+                    Guid? newParentKey = GetParentKey(content);
+                    if (oldParentKey != newParentKey)
+                    {
+                        _documentNavigationManagementService.Move(content.Key, newParentKey);
+                    }
+                }
+            }
+        }
+        else if (ExistsInNavigation(content.Key) is false && ExistsInNavigationBin(content.Key))
+        {
+            if (content.Trashed is false)
+            {
+                // It must have been restored
+                _documentNavigationManagementService.RestoreFromBin(content.Key, GetParentKey(content));
+            }
+        }
+    }
+
+    private Guid? GetParentKey(IContent content) => (content.ParentId == -1) ? null : _idKeyMap.GetKeyForId(content.ParentId, UmbracoObjectTypes.Document).Result;
+
+    private bool ExistsInNavigation(Guid contentKey) => _documentNavigationQueryService.TryGetParentKey(contentKey, out _);
+
+    private bool ExistsInNavigationBin(Guid contentKey) => _documentNavigationQueryService.TryGetParentKeyInBin(contentKey, out _);
 
     private void HandleRouting(JsonPayload payload)
     {
