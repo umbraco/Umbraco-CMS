@@ -1,6 +1,5 @@
 ﻿using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
-using Umbraco.Cms.Tests.Common.Builders.Interfaces.ContentCreateModel;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
@@ -44,12 +43,6 @@ public abstract class ContentEditingBaseBuilder<TCreateModel> : BuilderBase<TCre
         set => _contentTypeKey = value;
     }
 
-    public ContentEditingBaseBuilder<TCreateModel> WithInvariantName(string invariantName)
-    {
-        _invariantName = invariantName;
-        return this;
-    }
-
     public ContentEditingPropertyValueBuilder<ContentEditingBaseBuilder<TCreateModel>> AddInvariantProperty()
     {
         var builder = new ContentEditingPropertyValueBuilder<ContentEditingBaseBuilder<TCreateModel>>(this);
@@ -62,24 +55,6 @@ public abstract class ContentEditingBaseBuilder<TCreateModel> : BuilderBase<TCre
         var builder = new ContentEditingVariantBuilder<ContentEditingBaseBuilder<TCreateModel>>(this);
         _variants.Add(builder);
         return builder;
-    }
-
-    public ContentEditingBaseBuilder<TCreateModel> WithParentKey(Guid parentKey)
-    {
-        _parentKey = parentKey;
-        return this;
-    }
-
-    public ContentEditingBaseBuilder<TCreateModel> WithContentTypeKey(Guid contentTypeKey)
-    {
-        _contentTypeKey = contentTypeKey;
-        return this;
-    }
-
-    public ContentEditingBaseBuilder<TCreateModel> WithKey(Guid key)
-    {
-        _key = key;
-        return this;
     }
 
     public override TCreateModel Build()

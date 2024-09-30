@@ -1,44 +1,37 @@
 ﻿using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
-public class ContentEditingVariantBuilder<TParent> : ChildBuilderBase<TParent, VariantModel>
+public class ContentEditingVariantBuilder<TParent>(TParent parentBuilder)
+    : ChildBuilderBase<TParent, VariantModel>(parentBuilder), IWithCultureBuilder, IWithSegmentBuilder, IWithNameBuilder
 {
     private string? _culture;
     private string? _segment;
     private string _name;
+    private readonly List<ContentEditingPropertyValueBuilder<ContentEditingVariantBuilder<TParent>>> _properties = new();
 
-    private readonly List<ContentEditingPropertyValueBuilder<ContentEditingVariantBuilder<TParent>>>
-        _properties = new();
-
-    public ContentEditingVariantBuilder(TParent parentBuilder)
-        : base(parentBuilder)
+    string? IWithCultureBuilder.Culture
     {
+        get => _culture;
+        set => _culture = value;
     }
 
-    public ContentEditingVariantBuilder<TParent> WithCulture(string culture)
+    string? IWithSegmentBuilder.Segment
     {
-        _culture = culture;
-        return this;
+        get => _segment;
+        set => _segment = value;
     }
 
-    public ContentEditingVariantBuilder<TParent> WithSegment(string segment)
+    string IWithNameBuilder.Name
     {
-        _segment = segment;
-        return this;
-    }
-
-    public ContentEditingVariantBuilder<TParent> WithName(string name)
-    {
-        _name = name;
-        return this;
+        get => _name;
+        set => _name = value;
     }
 
     public ContentEditingPropertyValueBuilder<ContentEditingVariantBuilder<TParent>> AddProperty()
     {
-        var builder =
-            new ContentEditingPropertyValueBuilder<ContentEditingVariantBuilder<TParent>>(
-                (ContentEditingVariantBuilder<TParent>)this);
+        var builder = new ContentEditingPropertyValueBuilder<ContentEditingVariantBuilder<TParent>>((ContentEditingVariantBuilder<TParent>)this);
         _properties.Add(builder);
         return builder;
     }

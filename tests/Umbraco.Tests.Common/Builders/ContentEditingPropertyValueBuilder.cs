@@ -1,27 +1,24 @@
 ﻿using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
-public class ContentEditingPropertyValueBuilder<TParent> : ChildBuilderBase<TParent, PropertyValueModel>
+public class ContentEditingPropertyValueBuilder<TParent>(TParent parentBuilder)
+    : ChildBuilderBase<TParent, PropertyValueModel>(parentBuilder), IWithAliasBuilder, IWithValueBuilder
 {
     private string _alias;
     private object? _value;
 
-    public ContentEditingPropertyValueBuilder(TParent parentBuilder)
-        : base(parentBuilder)
+    string IWithAliasBuilder.Alias
     {
+        get => _alias;
+        set => _alias = value;
     }
 
-    public ContentEditingPropertyValueBuilder<TParent> WithAlias(string alias)
+    object? IWithValueBuilder.Value
     {
-        _alias = alias;
-        return this;
-    }
-
-    public ContentEditingPropertyValueBuilder<TParent> WithValue(object value)
-    {
-        _value = value;
-        return this;
+        get => _value;
+        set => _value = value;
     }
 
     public override PropertyValueModel Build() => new() { Alias = _alias, Value = _value };

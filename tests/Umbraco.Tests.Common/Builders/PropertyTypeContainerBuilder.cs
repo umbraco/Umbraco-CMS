@@ -1,10 +1,10 @@
 ﻿using Umbraco.Cms.Core.Models.ContentTypeEditing;
+using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
 public class PropertyTypeContainerBuilder<TParent, TModel>(TParent parentBuilder)
-    : ChildBuilderBase<TParent, TModel>(parentBuilder)
-    where TModel : PropertyTypeContainerModelBase, new()
+    : ChildBuilderBase<TParent, TModel>(parentBuilder), IWithKeyBuilder, IWithParentKeyBuilder, IWithNameBuilder, IWithTypeBuilder, IWithSortOrderBuilder where TModel : PropertyTypeContainerModelBase, new()
 {
     private readonly TModel _model = new();
     private Guid? _key;
@@ -13,34 +13,34 @@ public class PropertyTypeContainerBuilder<TParent, TModel>(TParent parentBuilder
     private string _type;
     private int? _sortOrder;
 
-    public PropertyTypeContainerBuilder<TParent, TModel> WithKey(Guid key)
+    Guid? IWithKeyBuilder.Key
     {
-        _key = key;
-        return this;
+        get => _key;
+        set => _key = value;
     }
 
-    public PropertyTypeContainerBuilder<TParent, TModel> WithParentKey(Guid parentKey)
+    Guid? IWithParentKeyBuilder.ParentKey
     {
-        _parentKey = parentKey;
-        return this;
+        get => _parentKey;
+        set => _parentKey = value;
     }
 
-    public PropertyTypeContainerBuilder<TParent, TModel> WithName(string name)
+    string IWithNameBuilder.Name
     {
-        _name = name;
-        return this;
+        get => _name;
+        set => _name = value;
     }
 
-    public PropertyTypeContainerBuilder<TParent, TModel> WithType(string type)
+    string IWithTypeBuilder.Type
     {
-        _type = type;
-        return this;
+        get => _type;
+        set => _type = value;
     }
 
-    public PropertyTypeContainerBuilder<TParent, TModel> WithSortOrder(int sortOrder)
+    int? IWithSortOrderBuilder.SortOrder
     {
-        _model.SortOrder = sortOrder;
-        return this;
+        get => _sortOrder;
+        set => _sortOrder = value;
     }
 
     public override TModel Build()

@@ -1,27 +1,29 @@
 ﻿using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
 public class MediaTypeEditingBuilder : ContentTypeEditingBaseBuilder<MediaTypeEditingBuilder, MediaTypeCreateModel,
-    MediaTypePropertyTypeModel, MediaTypePropertyContainerModel>
+    MediaTypePropertyTypeModel, MediaTypePropertyContainerModel>, IWithKeyBuilder, IWithContainerKeyBuilder
 {
     private Guid? _key;
     private Guid? _containerKey;
 
-    public MediaTypeEditingBuilder WithKey(Guid key)
+    Guid? IWithKeyBuilder.Key
     {
-        _key = key;
-        return this;
+        get => _key;
+        set => _key = value;
     }
 
-    public MediaTypeEditingBuilder WithContainerKey(Guid containerKey)
+    Guid? IWithContainerKeyBuilder.ContainerKey
     {
-        _containerKey = containerKey;
-        return this;
+        get => _containerKey;
+        set => _containerKey = value;
     }
 
-    public override MediaTypeCreateModel Build()
+    protected override MediaTypeCreateModel Build()
     {
         _model.Key = _key ?? Guid.NewGuid();
         _model.ContainerKey = _containerKey;
@@ -35,7 +37,7 @@ public class MediaTypeEditingBuilder : ContentTypeEditingBaseBuilder<MediaTypeEd
         return (MediaTypeCreateModel)builder
             .WithAlias(alias)
             .WithName(name)
-            .WithAllowAtRoot(true)
+            .WithAllowAsRoot(true)
             .Build();
     }
 
@@ -47,7 +49,7 @@ public class MediaTypeEditingBuilder : ContentTypeEditingBaseBuilder<MediaTypeEd
             .WithAlias(alias)
             .WithName(name)
             .WithIcon("icon-folder")
-            .WithAllowAtRoot(true)
+            .WithAllowAsRoot(true)
             .Build();
     }
 
@@ -58,7 +60,7 @@ public class MediaTypeEditingBuilder : ContentTypeEditingBaseBuilder<MediaTypeEd
         return (MediaTypeCreateModel)builder
             .WithAlias(alias)
             .WithName(name)
-            .WithAllowAtRoot(true)
+            .WithAllowAsRoot(true)
             .AddPropertyGroup()
                 .WithName("TestGroup")
                 .WithKey(containerKey)

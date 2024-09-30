@@ -1,8 +1,12 @@
 ﻿using Umbraco.Cms.Core.Models.ContentTypeEditing;
+using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
-public abstract class ContentTypeEditingBaseBuilder<TBuilder, TCreateModel, TPropertyType, TPropertyTypeContainer>
+public abstract class ContentTypeEditingBaseBuilder<TBuilder, TCreateModel, TPropertyType, TPropertyTypeContainer> :
+    IWithAliasBuilder, IWithNameBuilder, IWithDescriptionBuilder, IWithIconBuilder, IWithAllowAsRootBuilder,
+    IWithIsElementBuilder, IWithVariesByCultureBuilder,
+    IWithVariesBySegmentBuilder
     where TBuilder : ContentTypeEditingBaseBuilder<TBuilder, TCreateModel, TPropertyType, TPropertyTypeContainer>
     where TCreateModel : ContentTypeEditingModelBase<TPropertyType, TPropertyTypeContainer>, new()
     where TPropertyType : PropertyTypeModelBase, new()
@@ -21,52 +25,53 @@ public abstract class ContentTypeEditingBaseBuilder<TBuilder, TCreateModel, TPro
     private readonly List<PropertyTypeContainerBuilder<TBuilder, TPropertyTypeContainer>> _propertyTypeContainerBuilders = new();
     private readonly List<ContentTypeSortBuilder<TBuilder>> _allowedContentTypeBuilders = new();
 
-    public TBuilder WithAlias(string alias)
+    string IWithAliasBuilder.Alias
     {
-        _alias = alias;
-        return (TBuilder)this;
+        get => _alias;
+        set => _alias = value;
     }
 
-    public TBuilder WithName(string name)
+    string IWithNameBuilder.Name
     {
-        _name = name;
-        return (TBuilder)this;
+        get => _name;
+        set => _name = value;
     }
 
-    public TBuilder WithDescription(string? description)
+    string? IWithDescriptionBuilder.Description
     {
-        _description = description;
-        return (TBuilder)this;
+        get => _description;
+        set => _description = value;
     }
 
-    public TBuilder WithIcon(string icon)
+    string IWithIconBuilder.Icon
     {
-        _icon = icon;
-        return (TBuilder)this;
+        get => _icon;
+        set => _icon = value;
     }
 
-    public TBuilder WithAllowAtRoot(bool allowAtRoot)
+    bool? IWithAllowAsRootBuilder.AllowAsRoot
     {
-        _allowedAsRoot = allowAtRoot;
-        return (TBuilder)this;
+        get => _allowedAsRoot ?? false;
+        set => _allowedAsRoot = value;
     }
 
-    public TBuilder WithIsElement(bool isElement)
+    bool? IWithIsElementBuilder.IsElement
     {
-        _isElement = isElement;
-        return (TBuilder)this;
+        get => _isElement ?? false;
+        set => _isElement = value;
     }
 
-    public TBuilder WithVariesByCulture(bool variesByCulture)
+
+    bool IWithVariesByCultureBuilder.VariesByCulture
     {
-        _variesByCulture = variesByCulture;
-        return (TBuilder)this;
+        get => _variesByCulture ?? false;
+        set => _variesByCulture = value;
     }
 
-    public TBuilder WithVariesBySegment(bool variesBySegment)
+    bool IWithVariesBySegmentBuilder.VariesBySegment
     {
-        _variesBySegment = variesBySegment;
-        return (TBuilder)this;
+        get => _variesBySegment ?? false;
+        set => _variesBySegment = value;
     }
 
     public PropertyTypeModelBuilder<TBuilder, TPropertyType> AddPropertyType()
@@ -90,10 +95,10 @@ public abstract class ContentTypeEditingBaseBuilder<TBuilder, TCreateModel, TPro
         return builder;
     }
 
-    public virtual TCreateModel Build()
+    protected virtual TCreateModel Build()
     {
-        _model.Properties = _propertyTypeBuilders.Select(x => x.Build()).Cast<TPropertyType>();
-        _model.Containers = _propertyTypeContainerBuilders.Select(x => x.Build()).Cast<TPropertyTypeContainer>();
+        _model.Properties = _propertyTypeBuilders.Select(x => x.Build());
+        _model.Containers = _propertyTypeContainerBuilders.Select(x => x.Build());
         _model.AllowedContentTypes = _allowedContentTypeBuilders.Select(x => x.Build());
         _model.Alias = _alias ?? "TestName";
         _model.Name = _name ?? "TestName";

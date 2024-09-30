@@ -1,17 +1,20 @@
 ﻿using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
+using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
-public class PropertyTypeModelBuilder<TParent, TModel> : ChildBuilderBase<TParent, TModel>
-    where TModel : PropertyTypeModelBase, new()
+public class PropertyTypeModelBuilder<TParent, TModel> : ChildBuilderBase<TParent, TModel>, IWithKeyBuilder,
+    IWithContainerKeyBuilder, IWithSortOrderBuilder, IWithAliasBuilder, IWithNameBuilder, IWithDescriptionBuilder,
+    IWithDataTypeKeyBuilder, IWithVariesByCultureBuilder,
+    IWithVariesBySegmentBuilder where TModel : PropertyTypeModelBase, new()
 {
     private readonly TModel _model;
     private Guid? _key;
     private Guid? _containerKey;
     private int? _sortOrder;
     private string _alias;
-    private string? _name;
+    private string _name;
     private string? _description;
     private Guid? _dataTypeKey;
     private bool _variesByCulture;
@@ -27,70 +30,72 @@ public class PropertyTypeModelBuilder<TParent, TModel> : ChildBuilderBase<TParen
         _appearanceBuilder = new PropertyTypeAppearanceBuilder<TParent, TModel>(this);
     }
 
-    public PropertyTypeModelBuilder<TParent, TModel> WithKey(Guid key)
+    Guid? IWithKeyBuilder.Key
     {
-        _key = key;
-        return this;
+        get => _key;
+        set => _key = value;
     }
 
-    public PropertyTypeModelBuilder<TParent, TModel> WithContainerKey(Guid? containerKey)
+    Guid? IWithContainerKeyBuilder.ContainerKey
     {
-        _containerKey = containerKey;
-        return this;
+        get => _containerKey;
+        set => _containerKey = value;
     }
 
-    public PropertyTypeModelBuilder<TParent, TModel> WithSortOrder(int sortOrder)
+    int? IWithSortOrderBuilder.SortOrder
     {
-        _sortOrder = sortOrder;
-        return this;
+        get => _sortOrder;
+        set => _sortOrder = value;
     }
 
-    public PropertyTypeModelBuilder<TParent, TModel> WithAlias(string alias)
+    string IWithAliasBuilder.Alias
     {
-        _alias = alias;
-        return this;
+        get => _alias;
+        set => _alias = value;
     }
 
-    public PropertyTypeModelBuilder<TParent, TModel> WithName(string name)
+    string IWithNameBuilder.Name
     {
-        _name = name;
-        return this;
+        get => _name;
+        set => _name = value;
     }
 
-    public PropertyTypeModelBuilder<TParent, TModel> WithDescription(string? description)
+    string? IWithDescriptionBuilder.Description
     {
-        _description = description;
-        return this;
+        get => _description;
+        set => _description = value;
     }
 
-    public PropertyTypeModelBuilder<TParent, TModel> WithDataTypeKey(Guid dataTypeKey)
+    Guid? IWithDataTypeKeyBuilder.DataTypeKey
     {
-        _dataTypeKey = dataTypeKey;
-        return this;
+        get => _dataTypeKey;
+        set => _dataTypeKey = value;
     }
 
-    public PropertyTypeModelBuilder<TParent, TModel> WithVariesByCulture(bool variesByCulture)
+    bool IWithVariesByCultureBuilder.VariesByCulture
     {
-        _variesByCulture = variesByCulture;
-        return this;
+        get => _variesByCulture;
+        set => _variesByCulture = value;
     }
 
-    public PropertyTypeModelBuilder<TParent, TModel> WithVariesBySegment(bool variesBySegment)
+    bool IWithVariesBySegmentBuilder.VariesBySegment
     {
-        _variesBySegment = variesBySegment;
-        return this;
+        get => _variesBySegment;
+        set => _variesBySegment = value;
     }
 
-    public PropertyTypeModelBuilder<TParent, TModel> WithValidation(PropertyTypeValidationEditingBuilder<TParent, TModel> validation)
+    public PropertyTypeValidationEditingBuilder<TParent, TModel> AddValidation()
     {
-        _validationBuilder = validation;
-        return this;
+        var builder = new PropertyTypeValidationEditingBuilder<TParent, TModel>(this);
+        _validationBuilder = builder;
+        return builder;
     }
 
-    public PropertyTypeModelBuilder<TParent, TModel> WithAppearance(PropertyTypeAppearanceBuilder<TParent, TModel> appearance)
+    public PropertyTypeAppearanceBuilder<TParent, TModel> AddAppearance()
     {
-        _appearanceBuilder = appearance;
-        return this;
+        var builder = new PropertyTypeAppearanceBuilder<TParent, TModel>(this);
+        _appearanceBuilder = builder;
+        return builder;
     }
 
     public override TModel Build()
