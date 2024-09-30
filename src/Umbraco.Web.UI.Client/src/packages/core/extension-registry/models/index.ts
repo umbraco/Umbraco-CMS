@@ -34,7 +34,6 @@ import type { ManifestUfmComponent } from './ufm-component.model.js';
 import type { ManifestUfmFilter } from './ufm-filter.model.js';
 import type { ManifestUserProfileApp } from './user-profile-app.model.js';
 import type { ManifestEntityUserPermission } from './entity-user-permission.model.js';
-import type { ManifestGranularUserPermission } from './user-granular-permission.model.js';
 import type { ManifestMfaLoginProvider } from './mfa-login-provider.model.js';
 import type { ManifestAppEntryPoint } from './app-entry-point.model.js';
 import type { ManifestBackofficeEntryPoint } from './backoffice-entry-point.model.js';
@@ -69,7 +68,6 @@ export type * from './store.model.js';
 export type * from './tinymce-plugin.model.js';
 export type * from './ufm-component.model.js';
 export type * from './ufm-filter.model.js';
-export type * from './user-granular-permission.model.js';
 export type * from './user-profile-app.model.js';
 
 export type ManifestEntityActions =
@@ -106,7 +104,6 @@ export type ManifestTypes =
 	| ManifestFileUploadPreview
 	| ManifestExternalLoginProvider
 	| ManifestGlobalContext
-	| ManifestGranularUserPermission
 	| ManifestHeaderApp
 	| ManifestHeaderAppButtonKind
 	| ManifestHealthCheck
