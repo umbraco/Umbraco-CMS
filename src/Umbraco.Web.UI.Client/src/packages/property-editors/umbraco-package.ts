@@ -9,7 +9,7 @@ export const extensions = [
 	{
 		name: 'Property Editors Entry Point',
 		alias: 'Umb.EntryPoint.PropertyEditors',
-		type: 'entryPoint',
+		type: 'backofficeEntryPoint',
 		js: () => import('./entry-point.js'),
 	},
 ];

@@ -12,3 +12,9 @@ export interface MetaEntityUserPermission {
 	description?: string;
 	group?: string;
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		UmbEntityUserPermissionExtension: ManifestEntityUserPermission;
+	}
+}
