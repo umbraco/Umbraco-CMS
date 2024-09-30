@@ -235,7 +235,7 @@ test.skip('can insert value into a partial view', async ({umbracoApi, umbracoUi}
 });
 
 test('can delete a partial view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
-  //Arrange
+  // Arrange
   await umbracoApi.partialView.create(partialViewFileName, partialViewFileName, '/');
   expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
 
@@ -249,7 +249,7 @@ test('can delete a partial view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeFalsy();
   // Verify the partial view is NOT displayed under the Partial Views section
   await umbracoUi.partialView.clickRootFolderCaretButton();
-  await umbracoUi.partialView.isPartialViewRootTreeItemVisible(partialViewFileName, false);
+  await umbracoUi.partialView.isPartialViewRootTreeItemVisible(partialViewFileName, false, false);
 });
 
 // TODO: Remove skip when the front-end is ready. Currently the returned items count is not updated after choosing the root content.
