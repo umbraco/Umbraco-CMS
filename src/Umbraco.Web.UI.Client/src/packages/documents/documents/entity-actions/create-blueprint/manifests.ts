@@ -30,6 +30,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'modal',
 		alias: 'Umb.Modal.CreateBlueprint',
 		name: 'Create Blueprint Modal',
-		js: () => import('./modal/create-blueprint-modal.element.js'),
+		element: () => import('./modal/create-blueprint-modal.element.js'),
 	},
 ];

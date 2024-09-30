@@ -11,13 +11,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: '#general_create',
 			href: 'section/member-management/workspace/member/create/member-type-1-id', // TODO: remove hardcoded member type id
 		},
-		js: () => import('./create-member-collection-action.element.js'),
+		element: () => import('./create-member-collection-action.element.js'),
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
 				match: 'Umb.Collection.Member',
 			},
 		],
-		// element: () => import('./create-member-collection-action.element.js'),
 	},
 ];

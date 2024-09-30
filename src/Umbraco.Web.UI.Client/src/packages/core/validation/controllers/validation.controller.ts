@@ -108,7 +108,6 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	setDataPath(dataPath: string): void {
 		if (this.#baseDataPath) {
 			if (this.#baseDataPath === dataPath) return;
-			console.log(this.#baseDataPath, dataPath);
 			// Just fire an error, as I haven't made the right clean up jet. Or haven't thought about what should happen if it changes while already setup.
 			// cause maybe all the messages should be removed as we are not interested in the old once any more. But then on the other side, some might be relevant as this is the same entity that changed its paths?
 			throw new Error('Data path is already set, we do not support changing the context data-path as of now.');

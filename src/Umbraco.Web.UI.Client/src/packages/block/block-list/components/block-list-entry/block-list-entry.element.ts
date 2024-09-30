@@ -28,17 +28,17 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	@property({ attribute: false })
-	public get contentUdi(): string | undefined {
-		return this._contentUdi;
+	public get contentKey(): string | undefined {
+		return this._contentKey;
 	}
-	public set contentUdi(value: string | undefined) {
+	public set contentKey(value: string | undefined) {
 		if (!value) return;
-		this._contentUdi = value;
-		this.#context.setContentUdi(value);
+		this._contentKey = value;
+		this.#context.setContentKey(value);
 
 		new UmbObserveValidationStateController(
 			this,
-			`$.contentData[${UmbDataPathBlockElementDataQuery({ udi: value })}]`,
+			`$.contentData[${UmbDataPathBlockElementDataQuery({ key: value })}]`,
 			(hasMessages) => {
 				this._contentInvalid = hasMessages;
 				this._blockViewProps.contentInvalid = hasMessages;
@@ -46,7 +46,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			'observeMessagesForContent',
 		);
 	}
-	private _contentUdi?: string | undefined;
+	private _contentKey?: string | undefined;
 
 	/**
 	 * Sets the element to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -74,6 +74,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	_icon?: string;
 
 	@state()
+	_exposed?: boolean;
+
+	@state()
 	_workspaceEditContentPath?: string;
 
 	@state()
@@ -92,7 +95,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockListLayoutModel> = {
-		contentUdi: undefined!,
+		contentKey: undefined!,
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
 
@@ -145,9 +148,17 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			null,
 		);
 		this.observe(
+			this.#context.hasExpose,
+			(exposed) => {
+				this.#updateBlockViewProps({ unpublished: !exposed });
+				this._exposed = exposed;
+			},
+			null,
+		);
+		this.observe(
 			this.#context.inlineEditingMode,
-			(inlineEditingMode) => {
-				this._inlineEditingMode = inlineEditingMode;
+			(mode) => {
+				this._inlineEditingMode = mode;
 			},
 			null,
 		);
@@ -159,24 +170,17 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
-		this.observe(
-			this.#context.content,
-			(content) => {
-				this.#updateBlockViewProps({ content });
-			},
-			null,
-		);
-		this.observe(
-			this.#context.settings,
-			(settings) => {
-				this.#updateBlockViewProps({ settings });
+		this.#observeData();
 
+		this.observe(
+			this.#context.settingsKey,
+			(settingsKey) => {
 				this.removeUmbControllerByAlias('observeMessagesForSettings');
-				if (settings) {
+				if (settingsKey) {
 					// Observe settings validation state:
 					new UmbObserveValidationStateController(
 						this,
-						`$.settingsData[${UmbDataPathBlockElementDataQuery(settings)}]`,
+						`$.settingsData[${UmbDataPathBlockElementDataQuery({ key: settingsKey })}]`,
 						(hasMessages) => {
 							this._settingsInvalid = hasMessages;
 							this._blockViewProps.settingsInvalid = hasMessages;
@@ -200,6 +204,23 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			(path) => {
 				this._workspaceEditSettingsPath = path;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editSettingsPath: path } });
+			},
+			null,
+		);
+	}
+
+	async #observeData() {
+		this.observe(
+			await this.#context.contentValues(),
+			(content) => {
+				this.#updateBlockViewProps({ content });
+			},
+			null,
+		);
+		this.observe(
+			await this.#context.settingsValues(),
+			(settings) => {
+				this.#updateBlockViewProps({ settings });
 			},
 			null,
 		);
@@ -243,11 +264,21 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	};
 
 	#renderRefBlock() {
-		return html`<umb-ref-list-block .label=${this._label} .icon=${this._icon}></umb-ref-list-block>`;
+		return html`<umb-ref-list-block
+			.label=${this._label}
+			.icon=${this._icon}
+			.unpublished=${!this._exposed}
+			.content=${this._blockViewProps.content}
+			.settings=${this._blockViewProps.settings}></umb-ref-list-block>`;
 	}
 
 	#renderInlineBlock() {
-		return html`<umb-inline-list-block .label=${this._label} .icon=${this._icon}></umb-inline-list-block>`;
+		return html`<umb-inline-list-block
+			.label=${this._label}
+			.icon=${this._icon}
+			.unpublished=${!this._exposed}
+			.content=${this._blockViewProps.content}
+			.settings=${this._blockViewProps.settings}></umb-inline-list-block>`;
 	}
 
 	#renderBlock() {
