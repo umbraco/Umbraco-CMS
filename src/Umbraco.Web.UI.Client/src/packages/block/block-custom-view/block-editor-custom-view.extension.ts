@@ -14,7 +14,7 @@ export interface ManifestBlockEditorCustomView extends ManifestElement<UmbBlockE
 	 * @property {string | Array<string> } forBlockEditor - Declare if this Custom View only must appear at specific Block Editors.
 	 * @description Optional condition if you like this custom view to only appear at a specific type of Block Editor.
 	 * @example 'block-list'
-	 * @example ['block-list', 'block-grid']
+	 * @example ['block-list', 'block-grid', 'block-rte']
 	 */
 	forBlockEditor?: string | Array<string>;
 }

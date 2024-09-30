@@ -256,8 +256,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		// TODO: We should investigate if it makes sense to gather
 
-		const unique = blockCreated.layout.contentKey;
-
 		if (!this.#liveEditingMode) {
 			this.#layout.setValue(blockCreated.layout as LayoutDataType);
 			this.content.setData(blockCreated.content);
@@ -275,6 +273,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			if (!blockInserted) {
 				throw new Error('Block Entries could not insert block');
 			}
+
+			const unique = blockCreated.layout.contentKey;
 
 			this.#observeBlockData(unique);
 			this.establishLiveSync();
@@ -351,7 +351,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			this.layout,
 			(layoutData) => {
 				if (layoutData) {
-					this.#blockManager?.setOneLayout(layoutData, this.#modalContext?.data as UmbBlockWorkspaceData);
+					this.#blockManager?.setOneLayout(layoutData);
 				}
 			},
 			'observeThisLayout',
@@ -447,7 +447,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			} else {
 				// Update data:
 
-				this.#blockManager.setOneLayout(layoutData, this.#modalContext.data.originData as UmbBlockWorkspaceOriginData);
+				this.#blockManager.setOneLayout(layoutData);
 				if (contentData) {
 					this.#blockManager.setOneContent(contentData);
 				}
@@ -483,7 +483,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			} else {
 				// Revert the layout, content & settings data to the original state: [NL]
 				if (this.#initialLayout) {
-					this.#blockManager?.setOneLayout(this.#initialLayout, this.#modalContext?.data as UmbBlockWorkspaceData);
+					this.#blockManager?.setOneLayout(this.#initialLayout);
 				}
 				if (this.#initialContent) {
 					this.#blockManager?.setOneContent(this.#initialContent);

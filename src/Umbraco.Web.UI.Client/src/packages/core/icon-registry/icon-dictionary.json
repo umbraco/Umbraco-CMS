@@ -167,12 +167,24 @@
 			"file": "ban.svg"
 		},
 		{
+			"name": "icon-blockquote",
+			"file": "text-quote.svg"
+		},
+		{
+			"_name": "icon-blueprint",
+			"____file": "blueprint.svg"
+		},
+		{
 			"name": "icon-bluetooth",
 			"file": "bluetooth.svg"
 		},
 		{
 			"name": "icon-boat-shipping",
 			"file": "ship.svg"
+		},
+		{
+			"name": "icon-bold",
+			"file": "bold.svg"
 		},
 		{
 			"name": "icon-bones",
@@ -386,6 +398,10 @@
 		{
 			"name": "icon-code",
 			"file": "code.svg"
+		},
+		{
+			"name": "icon-code-xml",
+			"file": "code-xml.svg"
 		},
 		{
 			"name": "icon-coffee",
@@ -651,6 +667,10 @@
 			"file": "pencil.svg"
 		},
 		{
+			"name": "icon-embed",
+			"file": "monitor-play.svg"
+		},
+		{
 			"name": "icon-employee",
 			"file": "user.svg",
 			"legacy": true
@@ -893,6 +913,18 @@
 			"legacy": true
 		},
 		{
+			"name": "icon-heading-1",
+			"file": "heading-1.svg"
+		},
+		{
+			"name": "icon-heading-2",
+			"file": "heading-2.svg"
+		},
+		{
+			"name": "icon-heading-3",
+			"file": "heading-3.svg"
+		},
+		{
 			"name": "icon-headphones",
 			"file": "headphones.svg"
 		},
@@ -926,6 +958,10 @@
 			"file": "house.svg"
 		},
 		{
+			"name": "icon-horizontal-rule",
+			"file": "separator-horizontal.svg"
+		},
+		{
 			"name": "icon-hourglass",
 			"file": "hourglass.svg"
 		},
@@ -933,6 +969,10 @@
 			"name": "icon-imac",
 			"file": "monitor.svg",
 			"legacy": true
+		},
+		{
+			"name": "icon-image-up",
+			"file": "image-up.svg"
 		},
 		{
 			"name": "icon-inbox-full",
@@ -969,6 +1009,10 @@
 			"name": "icon-iphone",
 			"file": "smartphone.svg",
 			"legacy": true
+		},
+		{
+			"name": "icon-italic",
+			"file": "italic.svg"
 		},
 		{
 			"name": "icon-item-arrangement",
@@ -1923,6 +1967,18 @@
 			"legacy": true
 		},
 		{
+			"name": "icon-strikethrough",
+			"file": "strikethrough.svg"
+		},
+		{
+			"name": "icon-subscript",
+			"file": "subscript.svg"
+		},
+		{
+			"name": "icon-superscript",
+			"file": "superscript.svg"
+		},
+		{
 			"name": "icon-sunny",
 			"file": "sun.svg"
 		},
@@ -1942,6 +1998,10 @@
 		{
 			"name": "icon-tab-key",
 			"file": "arrow-right-to-line.svg"
+		},
+		{
+			"name": "icon-table",
+			"file": "table.svg"
 		},
 		{
 			"name": "icon-tag",
@@ -1971,6 +2031,22 @@
 		{
 			"name": "icon-terminal",
 			"file": "square-terminal.svg"
+		},
+		{
+			"name": "icon-text-align-center",
+			"file": "align-center.svg"
+		},
+		{
+			"name": "icon-text-align-justify",
+			"file": "align-justify.svg"
+		},
+		{
+			"name": "icon-text-align-left",
+			"file": "align-left.svg"
+		},
+		{
+			"name": "icon-text-align-right",
+			"file": "align-right.svg"
 		},
 		{
 			"name": "icon-theater",
@@ -2097,6 +2173,14 @@
 		{
 			"name": "icon-undo",
 			"file": "undo-2.svg"
+		},
+		{
+			"name": "icon-underline",
+			"file": "underline.svg"
+		},
+		{
+			"name": "icon-unlink",
+			"file": "unlink.svg"
 		},
 		{
 			"name": "icon-unlocked",
