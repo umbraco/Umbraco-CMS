@@ -5,7 +5,8 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { loadManifestPlainJs } from '@umbraco-cms/backoffice/extension-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { type ManifestIcons, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestIcons } from '@umbraco-cms/backoffice/icon';
 
 export class UmbIconRegistryContext extends UmbContextBase<UmbIconRegistryContext> {
 	#registry: UmbIconRegistry;
