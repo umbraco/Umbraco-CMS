@@ -10,9 +10,8 @@ import {
 	type PropertyValueMap,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { umbExtensionsRegistry, type UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPropertyValueChangeEvent, type UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 
 type Extension = {
 	alias: string;

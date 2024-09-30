@@ -1,4 +1,4 @@
-import { umbDataTypeMockDb } from '../../../../mocks/data/data-type/data-type.db.js';
+import { umbDataTypeMockDb } from '../../../../../mocks/data/data-type/data-type.db.js';
 import type { Meta } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
