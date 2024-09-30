@@ -6,5 +6,6 @@ export * from './current-user.context.token.js';
 export * from './history/current-user-history.store.js';
 export * from './repository/index.js';
 export * from './utils/index.js';
+export * from './user-profile-app.extension.js';
 
 export type * from './types.js';
