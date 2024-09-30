@@ -23,7 +23,6 @@ import type { ManifestFileUploadPreview } from './file-upload-preview.model.js';
 import type { ManifestExternalLoginProvider } from './external-login-provider.model.js';
 import type { ManifestGlobalContext } from './global-context.model.js';
 import type { ManifestHeaderApp, ManifestHeaderAppButtonKind } from './header-app.model.js';
-import type { ManifestHealthCheck } from './health-check.model.js';
 import type { ManifestMenu } from './menu.model.js';
 import type { ManifestMenuItem, ManifestMenuItemLinkKind, ManifestMenuItemTreeKind } from './menu-item.model.js';
 import type { ManifestPreviewAppProvider } from './preview-app.model.js';
@@ -57,7 +56,7 @@ export type * from './file-upload-preview.model.js';
 export type * from './external-login-provider.model.js';
 export type * from './global-context.model.js';
 export type * from './header-app.model.js';
-export type * from './health-check.model.js';
+export type * from '../../health-check/health-check.extension.js';
 export type * from './menu-item.model.js';
 export type * from './menu.model.js';
 export type * from './mfa-login-provider.model.js';
@@ -109,7 +108,6 @@ export type ManifestTypes =
 	| ManifestGranularUserPermission
 	| ManifestHeaderApp
 	| ManifestHeaderAppButtonKind
-	| ManifestHealthCheck
 	| ManifestItemStore
 	| ManifestMenu
 	| ManifestMenuItem
