@@ -9,3 +9,9 @@ export interface MetaUserProfileApp {
 	label: string;
 	pathname: string;
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbUserProfileApp: ManifestUserProfileApp;
+	}
+}

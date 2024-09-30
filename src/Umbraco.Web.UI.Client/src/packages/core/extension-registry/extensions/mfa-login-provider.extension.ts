@@ -15,3 +15,9 @@ export interface ManifestMfaLoginProvider extends ManifestElement {
 export interface MetaMfaLoginProvider {
 	label?: string;
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbMfaLoginProvider: ManifestMfaLoginProvider;
+	}
+}

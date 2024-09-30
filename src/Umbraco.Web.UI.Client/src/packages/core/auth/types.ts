@@ -1,4 +1,4 @@
-import type { ManifestAuthProvider } from '../extension-registry/index.js';
+import type { ManifestAuthProvider } from './auth-provider.extension.js';
 
 /**
  * User login state that can be used to determine the current state of the user.
