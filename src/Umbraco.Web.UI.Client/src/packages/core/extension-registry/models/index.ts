@@ -1,6 +1,5 @@
 import type { ManifestAuthProvider } from './auth-provider.model.js';
 import type { ManifestCurrentUserAction, ManifestCurrentUserActionDefaultKind } from './current-user-action.model.js';
-import type { ManifestDashboard } from './dashboard.model.js';
 import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from './dynamic-root.model.js';
 import type { ManifestFileUploadPreview } from './file-upload-preview.model.js';
 import type { ManifestExternalLoginProvider } from './external-login-provider.model.js';
@@ -19,7 +18,6 @@ export type * from '../extensions/app-entry-point.extension.js';
 export type * from './auth-provider.model.js';
 export type * from '../extensions/backoffice-entry-point.extension.js';
 export type * from './current-user-action.model.js';
-export type * from './dashboard.model.js';
 export type * from './dynamic-root.model.js';
 export type * from '../extensions/entity-action.extension.js';
 export type * from '../extensions/entity-bulk-action.extension.js';
@@ -50,7 +48,6 @@ export type ManifestTypes =
 	| ManifestCondition
 	| ManifestCurrentUserAction
 	| ManifestCurrentUserActionDefaultKind
-	| ManifestDashboard
 	| ManifestDynamicRootOrigin
 	| ManifestDynamicRootQueryStep
 	| ManifestFileUploadPreview

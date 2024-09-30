@@ -1,4 +1,4 @@
-import type { UmbDashboardElement } from '../interfaces/index.js';
+import type { UmbDashboardElement } from '../extension-registry/interfaces/index.js';
 import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestDashboard
@@ -25,8 +25,8 @@ export interface MetaDashboard {
 	pathname?: string;
 }
 
-/*
-export interface ConditionsDashboard {
-	sections: string[];
+declare global {
+	interface UmbExtensionManifestMap {
+		umbDashboard: ManifestDashboard;
+	}
 }
-*/
