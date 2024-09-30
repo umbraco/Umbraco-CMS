@@ -2,17 +2,7 @@ import type { UmbTiptapExtensionApi, UmbTiptapToolbarValue } from '../../extensi
 import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	Document,
-	Dropcursor,
-	Editor,
-	Gapcursor,
-	HardBreak,
-	History,
-	Paragraph,
-	Placeholder,
-	Text,
-} from '@umbraco-cms/backoffice/external/tiptap';
+import { Editor, Placeholder, StarterKit, TextStyle } from '@umbraco-cms/backoffice/external/tiptap';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -26,12 +16,7 @@ const elementName = 'umb-input-tiptap';
 @customElement(elementName)
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
 	readonly #requiredExtensions = [
-		Document,
-		Dropcursor,
-		Gapcursor,
-		HardBreak,
-		History,
-		Paragraph,
+		StarterKit,
 		Placeholder.configure({
 			placeholder: ({ node }) => {
 				if (node.type.name === 'heading') {
@@ -41,7 +26,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				return this.localize.term('placeholders_rteParagraph');
 			},
 		}),
-		Text,
+		TextStyle,
 	];
 
 	@state()
@@ -106,6 +91,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		if (!element) return;
 
 		const dimensions = this.configuration?.getValueByAlias<{ width?: number; height?: number }>('dimensions');
+		console.log(this.configuration, dimensions);
 		if (dimensions?.width) this.setAttribute('style', `max-width: ${dimensions.width}px;`);
 		if (dimensions?.height) element.setAttribute('style', `max-height: ${dimensions.height}px;`);
 

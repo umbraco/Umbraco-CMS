@@ -1,13 +1,8 @@
 // REQUIRED EXTENSIONS
 export * from '@tiptap/core';
-export { Document } from '@tiptap/extension-document';
-export { Dropcursor } from '@tiptap/extension-dropcursor';
-export { Gapcursor } from '@tiptap/extension-gapcursor';
-export { HardBreak } from '@tiptap/extension-hard-break';
-export { History } from '@tiptap/extension-history';
-export { Paragraph } from '@tiptap/extension-paragraph';
+export { StarterKit } from '@tiptap/starter-kit';
 export { Placeholder } from '@tiptap/extension-placeholder';
-export { Text } from '@tiptap/extension-text';
+export { TextStyle } from '@tiptap/extension-text-style';
 
 // OPTIONAL EXTENSIONS
 export { Blockquote } from '@tiptap/extension-blockquote';
