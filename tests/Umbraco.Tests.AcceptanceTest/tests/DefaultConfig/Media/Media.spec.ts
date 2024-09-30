@@ -213,6 +213,7 @@ test('can restore a media item from the recycle bin', async ({umbracoApi, umbrac
 
   // Assert
   await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false);
+  await umbracoUi.media.reloadMediaTree();
   await umbracoUi.media.isTreeItemVisible(mediaFileName);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeTruthy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeFalsy();
