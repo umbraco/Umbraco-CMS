@@ -7,7 +7,7 @@ const elementName = 'umb-media-type-folder-workspace-editor';
 export class UmbMediaTypeFolderWorkspaceEditorElement extends UmbLitElement {
 	override render() {
 		return html`<umb-workspace-editor>
-			<umb-workspace-name slot="header"></umb-workspace-name>
+			<umb-workspace-editable-name-header slot="header"></umb-workspace-editable-name-header>
 		</umb-workspace-editor>`;
 	}
 

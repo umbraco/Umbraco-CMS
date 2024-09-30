@@ -6,7 +6,7 @@ export class UmbDictionaryWorkspaceEditorElement extends UmbLitElement {
 	override render() {
 		return html`
 			<umb-workspace-editor back-path="section/dictionary/dashboard">
-				<umb-workspace-name slot="header"></umb-workspace-name>
+				<umb-workspace-editable-name-header slot="header"></umb-workspace-editable-name-header>
 			</umb-workspace-editor>
 		`;
 	}

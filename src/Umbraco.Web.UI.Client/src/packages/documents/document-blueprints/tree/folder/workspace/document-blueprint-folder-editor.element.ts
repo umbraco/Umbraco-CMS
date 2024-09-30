@@ -7,7 +7,7 @@ const elementName = 'umb-document-blueprint-folder-workspace-editor';
 export class UmbDocumentBlueprintFolderWorkspaceEditorElement extends UmbLitElement {
 	override render() {
 		return html`<umb-workspace-editor>
-			<umb-workspace-name slot="header"></umb-workspace-name>
+			<umb-workspace-editable-name-header slot="header"></umb-workspace-editable-name-header>
 		</umb-workspace-editor>`;
 	}
 
