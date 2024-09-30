@@ -16,16 +16,16 @@ type ExtensionConfig = {
 	group: string;
 };
 
-type ExtensionCategoryItem = {
+type ExtensionGroupItem = {
 	alias: string;
 	label: string;
 	icon?: string;
 	selected: boolean;
 };
 
-type ExtensionCategory = {
-	category: string;
-	extensions: ExtensionCategoryItem[];
+type ExtensionGroup = {
+	group: string;
+	extensions: ExtensionGroupItem[];
 };
 
 @customElement('umb-property-editor-ui-tiptap-extensions-configuration')
@@ -47,7 +47,7 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 	config?: UmbPropertyEditorConfigCollection;
 
 	@state()
-	private _extensionCategories: ExtensionCategory[] = [];
+	private _extensionCategories: ExtensionGroup[] = [];
 
 	@state()
 	private _extensionConfigs: ExtensionConfig[] = [];
@@ -93,12 +93,12 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 		this._extensionCategories = Object.keys(grouped)
 			.sort((a, b) => a.localeCompare(b))
 			.map((key) => ({
-				category: key,
+				group: key,
 				extensions: grouped[key],
 			}));
 	}
 
-	#onExtensionClick(item: ExtensionCategoryItem) {
+	#onExtensionClick(item: ExtensionGroupItem) {
 		item.selected = !item.selected;
 
 		if (!this.value) {
@@ -120,11 +120,11 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 			<div class="extensions">
 				${repeat(
 					this._extensionCategories,
-					(category) => html`
-						<div class="category">
-							<p class="category-name">${this.localize.string(category.category)}</p>
+					(group) => html`
+						<div class="group">
+							<p class="group-name">${this.localize.string(group.group)}</p>
 							${repeat(
-								category.extensions,
+								group.extensions,
 								(item) => html`
 									<div class="extension-item">
 										<uui-button
@@ -161,16 +161,19 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 				display: flex;
 				vertical-align: unset;
 			}
+
 			uui-button.selected {
 				--uui-button-border-color: var(--uui-color-selected);
 				--uui-button-border-width: 2px;
 			}
+
 			.extensions {
 				display: flex;
 				flex-wrap: wrap;
 				gap: 16px;
 				margin-top: 16px;
 			}
+
 			.extension-item {
 				display: grid;
 				grid-template-columns: 36px 1fr;
@@ -178,21 +181,23 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 				align-items: center;
 				gap: 9px;
 			}
-			.category {
+
+			.group {
 				flex: 1;
-				background-color: var(--uui-color-surface-alt);
-				padding: 12px;
-				border-radius: 6px;
 				display: flex;
 				flex-direction: column;
 				gap: 6px;
+				padding: 12px;
+				background-color: var(--uui-color-surface-alt);
 				border: 1px solid var(--uui-color-border);
+				border-radius: 6px;
 			}
-			.category-name {
+
+			.group-name {
 				grid-column: 1 / -1;
-				margin: 0;
-				font-weight: bold;
 				display: flex;
+				font-weight: bold;
+				margin: 0;
 			}
 		`,
 	];
