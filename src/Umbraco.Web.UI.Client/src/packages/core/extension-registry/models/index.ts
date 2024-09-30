@@ -25,7 +25,6 @@ import type { ManifestGlobalContext } from './global-context.model.js';
 import type { ManifestHeaderApp, ManifestHeaderAppButtonKind } from './header-app.model.js';
 import type { ManifestHealthCheck } from './health-check.model.js';
 import type { ManifestIcons } from './icons.model.js';
-import type { ManifestLocalization } from './localization.model.js';
 import type { ManifestMenu } from './menu.model.js';
 import type { ManifestMenuItem, ManifestMenuItemLinkKind, ManifestMenuItemTreeKind } from './menu-item.model.js';
 import type { ManifestPreviewAppProvider } from './preview-app.model.js';
@@ -61,7 +60,6 @@ export type * from './global-context.model.js';
 export type * from './header-app.model.js';
 export type * from './health-check.model.js';
 export type * from './icons.model.js';
-export type * from './localization.model.js';
 export type * from './menu-item.model.js';
 export type * from './menu.model.js';
 export type * from './mfa-login-provider.model.js';
@@ -116,7 +114,6 @@ export type ManifestTypes =
 	| ManifestHealthCheck
 	| ManifestIcons
 	| ManifestItemStore
-	| ManifestLocalization
 	| ManifestMenu
 	| ManifestMenuItem
 	| ManifestMenuItemTreeKind
