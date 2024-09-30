@@ -43,9 +43,25 @@ public sealed class DocumentCache : IPublishedContentCache
     // FIXME: These need to be refactored when removing nucache
     // Thats the time where we can change the IPublishedContentCache interface.
 
-    public IPublishedContent? GetById(bool preview, Udi contentId) => throw new NotImplementedException();
+    public IPublishedContent? GetById(bool preview, Udi contentId)
+    {
+        if(contentId is not GuidUdi guidUdi)
+        {
+            throw new NotSupportedException("Only GuidUdi is supported");
+        }
 
-    public IPublishedContent? GetById(Udi contentId) => throw new NotImplementedException();
+        return GetById(preview, guidUdi.Guid);
+    }
+
+    public IPublishedContent? GetById(Udi contentId)
+    {
+        if(contentId is not GuidUdi guidUdi)
+        {
+            throw new NotSupportedException("Only GuidUdi is supported");
+        }
+
+        return GetById(guidUdi.Guid);
+    }
 
     public IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null) => throw new NotImplementedException();
 
