@@ -220,7 +220,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		if (!extension) return nothing;
 		return html`
 			<div
-				title=${extension.label}
+				title=${this.localize.string(extension.label)}
 				class="item"
 				draggable="true"
 				@dragend=${this.#onDragEnd}
