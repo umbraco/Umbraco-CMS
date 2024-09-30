@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
@@ -78,8 +79,8 @@ internal class PublishedContent : PublishedContentBase
     {
         get
         {
-            var documentNavigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
-            var idKeyMap = StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>();
+            IDocumentNavigationQueryService documentNavigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+            IIdKeyMap idKeyMap = StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>();
 
 
             if (documentNavigationQueryService.TryGetAncestorsOrSelfKeys(Key, out var ancestorsOrSelfKeys))
@@ -87,7 +88,7 @@ internal class PublishedContent : PublishedContentBase
                 var sb = new StringBuilder("-1");
                 foreach (Guid ancestorsOrSelfKey in ancestorsOrSelfKeys.Reverse())
                 {
-                    var idAttempt = idKeyMap.GetIdForKey(ancestorsOrSelfKey, GetObjectType());
+                    Attempt<int> idAttempt = idKeyMap.GetIdForKey(ancestorsOrSelfKey, GetObjectType());
                     if (idAttempt.Success)
                     {
                         sb.AppendFormat(",{0}", idAttempt.Result);
