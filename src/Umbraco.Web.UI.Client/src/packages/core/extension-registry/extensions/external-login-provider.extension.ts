@@ -10,3 +10,9 @@ export interface MetaExternalLoginProvider {
 	label: string;
 	pathname: string;
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbExternalLoginProvider: ManifestExternalLoginProvider;
+	}
+}

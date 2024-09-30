@@ -1,31 +1,22 @@
-import type { ManifestAuthProvider } from './auth-provider.model.js';
 import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from './dynamic-root.model.js';
 import type { ManifestFileUploadPreview } from './file-upload-preview.model.js';
-import type { ManifestExternalLoginProvider } from './external-login-provider.model.js';
 import type { ManifestTinyMcePlugin } from './tinymce-plugin.model.js';
 import type { ManifestUfmComponent } from './ufm-component.model.js';
 import type { ManifestUfmFilter } from './ufm-filter.model.js';
-import type { ManifestMfaLoginProvider } from './mfa-login-provider.model.js';
 import type { ManifestBase, ManifestBundle, ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
-export type * from './auth-provider.model.js';
 export type * from './dynamic-root.model.js';
 export type * from './file-upload-preview.model.js';
-export type * from './external-login-provider.model.js';
-export type * from './mfa-login-provider.model.js';
 export type * from './tinymce-plugin.model.js';
 export type * from './ufm-component.model.js';
 export type * from './ufm-filter.model.js';
 
 export type ManifestTypes =
-	| ManifestAuthProvider
 	| ManifestBundle<ManifestTypes>
 	| ManifestCondition
 	| ManifestDynamicRootOrigin
 	| ManifestDynamicRootQueryStep
 	| ManifestFileUploadPreview
-	| ManifestExternalLoginProvider
-	| ManifestMfaLoginProvider
 	| ManifestTinyMcePlugin
 	| ManifestUfmComponent
 	| ManifestUfmFilter
