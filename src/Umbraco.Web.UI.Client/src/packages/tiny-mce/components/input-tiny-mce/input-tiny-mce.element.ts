@@ -6,7 +6,7 @@ import type { UmbTinyMcePluginBase } from './tiny-mce-plugin.js';
 import { type ClassConstructor, loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { css, customElement, html, property, query } from '@umbraco-cms/backoffice/external/lit';
 import { getProcessedImageUrl, umbDeepMerge } from '@umbraco-cms/backoffice/utils';
-import { type ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbStylesheetDetailRepository, UmbStylesheetRuleManager } from '@umbraco-cms/backoffice/stylesheet';
@@ -18,6 +18,7 @@ import {
 	renderEditor,
 } from '@umbraco-cms/backoffice/external/tinymce';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { ManifestTinyMcePlugin } from '@umbraco-cms/backoffice/tiny-mce';
 
 /**
  * Handles the resize event

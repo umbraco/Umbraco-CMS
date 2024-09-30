@@ -1,10 +1,15 @@
 import type { UmbDocumentEntityType } from './entity.js';
-import type { UmbVariantModel, UmbVariantOptionModel, UmbVariantPublishModel } from '@umbraco-cms/backoffice/variant';
+import type {
+	UmbEntityVariantModel,
+	UmbEntityVariantOptionModel,
+	UmbEntityVariantPublishModel,
+} from '@umbraco-cms/backoffice/variant';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { DocumentVariantStateModel as UmbDocumentVariantState } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbContentDetailModel, UmbContentValueModel } from '@umbraco-cms/backoffice/content';
 export { UmbDocumentVariantState };
 
-export interface UmbDocumentDetailModel {
+export interface UmbDocumentDetailModel extends UmbContentDetailModel {
 	documentType: {
 		unique: string;
 		collection: UmbReferenceByUnique | null;
@@ -18,7 +23,7 @@ export interface UmbDocumentDetailModel {
 	variants: Array<UmbDocumentVariantModel>;
 }
 
-export interface UmbDocumentVariantModel extends UmbVariantModel {
+export interface UmbDocumentVariantModel extends UmbEntityVariantModel {
 	state: UmbDocumentVariantState | null;
 	publishDate: string | null;
 }
@@ -28,15 +33,11 @@ export interface UmbDocumentUrlInfoModel {
 	url: string;
 }
 
-export interface UmbDocumentValueModel<ValueType = unknown> {
-	culture: string | null;
-	segment: string | null;
-	alias: string;
-	value: ValueType;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbDocumentValueModel<ValueType = unknown> extends UmbContentValueModel<ValueType> {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbDocumentVariantOptionModel extends UmbVariantOptionModel<UmbDocumentVariantModel> {}
+export interface UmbDocumentVariantOptionModel extends UmbEntityVariantOptionModel<UmbDocumentVariantModel> {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbDocumentVariantPublishModel extends UmbVariantPublishModel {}
+export interface UmbDocumentVariantPublishModel extends UmbEntityVariantPublishModel {}

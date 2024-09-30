@@ -5,7 +5,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestSection } from '@umbraco-cms/backoffice/section';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';

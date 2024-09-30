@@ -168,7 +168,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		await this.#init;
 		if (!this.#structure) return;
 
-		return this.#structure.ownerContentTypePart((x) => x?.properties.some((y) => y.id === propertyId));
+		return this.#structure.ownerContentTypeObservablePart((x) => x?.properties.some((y) => y.id === propertyId));
 	}
 
 	async contentTypeOfProperty(propertyId: UmbPropertyTypeId) {

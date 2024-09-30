@@ -30,6 +30,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'modal',
 		alias: 'Umb.Modal.Document.CreateOptions',
 		name: 'Document Create Options Modal',
-		js: () => import('./document-create-options-modal.element.js'),
+		element: () => import('./document-create-options-modal.element.js'),
 	},
 ];

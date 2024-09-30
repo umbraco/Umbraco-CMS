@@ -26,7 +26,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 	/**
 	 * Creates a scaffold for a Media Type folder
 	 * @param {Partial<UmbFolderModel>} [preset]
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
 	async createScaffold(preset?: Partial<UmbFolderModel>) {

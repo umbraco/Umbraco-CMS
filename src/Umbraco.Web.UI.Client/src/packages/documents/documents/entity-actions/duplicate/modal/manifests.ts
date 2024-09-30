@@ -6,6 +6,6 @@ export const manifests: Array<ManifestModal> = [
 		type: 'modal',
 		alias: UMB_DUPLICATE_DOCUMENT_MODAL_ALIAS,
 		name: 'Duplicate Document To Modal',
-		js: () => import('./duplicate-document-modal.element.js'),
+		element: () => import('./duplicate-document-modal.element.js'),
 	},
 ];

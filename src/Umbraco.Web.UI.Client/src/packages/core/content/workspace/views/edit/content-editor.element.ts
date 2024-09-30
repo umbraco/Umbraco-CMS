@@ -57,15 +57,15 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		this.consumeContext(UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#structureManager = workspaceContext.structure;
 			this._tabsStructureHelper.setStructureManager(workspaceContext.structure);
-			this._observeRootGroups();
+			this.#observeRootGroups();
 		});
 	}
 
-	private _observeRootGroups() {
+	async #observeRootGroups() {
 		if (!this.#structureManager) return;
 
 		this.observe(
-			this.#structureManager.hasRootContainers('Group'),
+			await this.#structureManager.hasRootContainers('Group'),
 			(hasRootGroups) => {
 				this._hasRootGroups = hasRootGroups;
 				this._createRoutes();
@@ -82,7 +82,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 			this._tabs?.forEach((tab) => {
 				const tabName = tab.name ?? '';
 				routes.push({
-					path: `tab/${encodeFolderName(tabName).toString()}`,
+					path: `tab/${encodeFolderName(tabName)}`,
 					component: () => import('./content-editor-tab.element.js'),
 					setup: (component) => {
 						(component as UmbContentWorkspaceViewEditTabElement).containerId = tab.id;
@@ -102,10 +102,12 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		}
 
 		if (routes.length !== 0) {
-			routes.push({
-				path: '',
-				redirectTo: routes[0]?.path,
-			});
+			if (!this._hasRootGroups) {
+				routes.push({
+					path: '',
+					redirectTo: routes[0]?.path,
+				});
+			}
 
 			routes.push({
 				path: `**`,

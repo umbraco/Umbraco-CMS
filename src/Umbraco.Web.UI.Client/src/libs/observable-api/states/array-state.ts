@@ -23,6 +23,7 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	/**
 	 * @function sortBy
 	 * @param {(a: T, b: T) => number} sortMethod - A method to be used for sorting every time data is set.
+	 * @returns {UmbArrayState<T>} Reference to it self.
 	 * @description - A sort method to this Subject.
 	 * @example <caption>Example add sort method</caption>
 	 * const data = [
@@ -53,7 +54,7 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 * // myState.value is equal 'Goodnight'.
 	 */
 	override setValue(value: T[]) {
-		if (this.#sortMethod) {
+		if (value && this.#sortMethod) {
 			super.setValue([...value].sort(this.#sortMethod));
 		} else {
 			super.setValue(value);
@@ -76,6 +77,7 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	remove(uniques: unknown[]) {
 		if (this.getUniqueMethod) {
 			let next = this.getValue();
+			if (!next) return this;
 			uniques.forEach((unique) => {
 				next = next.filter((x) => {
 					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -105,6 +107,7 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	removeOne(unique: unknown) {
 		if (this.getUniqueMethod) {
 			let next = this.getValue();
+			if (!next) return this;
 			next = next.filter((x) => {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
@@ -138,7 +141,10 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 * ]
 	 */
 	filter(predicate: (value: T, index: number, array: T[]) => boolean) {
-		this.setValue(this.getValue().filter(predicate));
+		const value = this.getValue();
+		if (value) {
+			this.setValue(value.filter(predicate));
+		}
 		return this;
 	}
 

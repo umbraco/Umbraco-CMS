@@ -23,6 +23,10 @@ export class UmbVariantId {
 		return Object.freeze(new UmbVariantId(variantData.culture, variantData.segment));
 	}
 
+	public static CreateFromPartial(variantData: Partial<UmbObjectWithVariantProperties>): UmbVariantId {
+		return Object.freeze(new UmbVariantId(variantData.culture, variantData.segment));
+	}
+
 	public static CreateInvariant(): UmbVariantId {
 		return Object.freeze(new UmbVariantId(null, null));
 	}
@@ -77,6 +81,13 @@ export class UmbVariantId {
 
 	public toObject(): UmbObjectWithVariantProperties {
 		return { culture: this.culture, segment: this.segment };
+	}
+
+	public toSegmentInvariant(): UmbVariantId {
+		return Object.freeze(new UmbVariantId(this.culture, null));
+	}
+	public toCultureInvariant(): UmbVariantId {
+		return Object.freeze(new UmbVariantId(null, this.culture));
 	}
 
 	// TODO: needs localization option:

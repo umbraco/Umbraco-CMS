@@ -12,7 +12,8 @@ export interface UmbClassInterface extends UmbControllerHost {
 	/**
 	 * @description Observe an Observable. An Observable is a declared source of data that can be observed. An observables is declared from a UmbState.
 	 * @param {Observable} source An Observable to observe from.
-	 * @param {ObserverCallback} callback Callback method called when data is changed.
+	 * @param {ObserverCallback | undefined} callback Callback method called when data is changed.
+	 * @param {UmbControllerAlias | null | undefined} controllerAlias Define an explicit controller alias. If not defined then one will be generated based on the callback function. If null is parsed no controller alias will be given.
 	 * @returns {UmbObserverController} Reference to the created Observer Controller instance.
 	 * @memberof UmbClassInterface
 	 */
@@ -30,7 +31,7 @@ export interface UmbClassInterface extends UmbControllerHost {
 	>(
 		// This type dance checks if the Observable given could be undefined, if it potentially could be undefined it means that this potentially could return undefined and then call the callback with undefined. [NL]
 		source: ObservableType,
-		callback: ObserverCallback<SpecificT>,
+		callback?: ObserverCallback<SpecificT>,
 		controllerAlias?: UmbControllerAlias | null,
 	): SpecificR;
 

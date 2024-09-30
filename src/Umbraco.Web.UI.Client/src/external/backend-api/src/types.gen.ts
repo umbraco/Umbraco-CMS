@@ -488,6 +488,7 @@ export type DataTypeItemResponseModel = {
     id: string;
     name: string;
     editorUiAlias?: (string) | null;
+    editorAlias: string;
     isDeletable: boolean;
 };
 

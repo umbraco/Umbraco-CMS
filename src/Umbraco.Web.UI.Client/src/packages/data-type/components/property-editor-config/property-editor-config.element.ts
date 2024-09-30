@@ -1,7 +1,7 @@
 import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../workspace/data-type-workspace.context-token.js';
 import { html, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/extension-registry';
+import type { PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/property-editor';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 

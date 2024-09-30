@@ -15,7 +15,7 @@ import { UmbPaginationManager, debounce, fromCamelCase } from '@umbraco-cms/back
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
 import { UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/property-type';
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbDataTypeItemModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';

@@ -4,7 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '@umbraco-cms/backoffice/document';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbCollectionBulkActionPermissions,
 	UmbCollectionConfiguration,

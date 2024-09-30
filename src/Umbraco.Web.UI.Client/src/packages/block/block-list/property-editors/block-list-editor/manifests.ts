@@ -1,6 +1,8 @@
 import { manifest as blockListSchemaManifest } from './Umbraco.BlockList.js';
+import { UmbStandardBlockValueResolver } from '@umbraco-cms/backoffice/block';
 
-export const UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS = 'Umbraco.BlockList';
+export const UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS = 'Umbraco.BlockList';
+export const UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS = 'Umb.PropertyEditorUi.BlockList';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -10,7 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		element: () => import('./property-editor-ui-block-list.element.js'),
 		meta: {
 			label: 'Block List',
-			propertyEditorSchemaAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS,
+			propertyEditorSchemaAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
 			icon: 'icon-thumbnail-list',
 			group: 'lists',
 			supportsReadOnly: true,
@@ -47,4 +49,13 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	blockListSchemaManifest,
+	{
+		type: 'propertyValueResolver',
+		alias: 'Umb.PropertyValueResolver.BlockList',
+		name: 'Block Value Resolver',
+		api: UmbStandardBlockValueResolver,
+		meta: {
+			editorAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
+		},
+	},
 ];

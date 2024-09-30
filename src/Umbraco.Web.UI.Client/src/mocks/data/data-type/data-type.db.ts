@@ -82,6 +82,7 @@ const itemResponseMapper = (item: UmbMockDataTypeModel): DataTypeItemResponseMod
 	return {
 		id: item.id,
 		name: item.name,
+		editorAlias: item.editorAlias,
 		isDeletable: item.isDeletable,
 	};
 };

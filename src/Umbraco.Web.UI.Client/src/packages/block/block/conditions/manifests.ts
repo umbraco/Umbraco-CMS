@@ -13,4 +13,10 @@ export const manifests: Array<ManifestCondition> = [
 		alias: 'Umb.Condition.BlockEntryShowContentEdit',
 		api: () => import('./block-entry-show-content-edit.condition.js'),
 	},
+	{
+		type: 'condition',
+		name: 'Block Workspace Is Exposed Condition',
+		alias: 'Umb.Condition.BlockWorkspaceIsExposed',
+		api: () => import('./block-workspace-is-exposed.condition.js'),
+	},
 ];

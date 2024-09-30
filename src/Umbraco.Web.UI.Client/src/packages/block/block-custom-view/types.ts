@@ -18,7 +18,7 @@ export interface UmbBlockEditorCustomViewProperties<
 	manifest?: ManifestBlockEditorCustomView;
 	config?: Partial<UmbBlockEditorCustomViewConfiguration>;
 	blockType?: BlockType;
-	contentUdi?: string;
+	contentKey?: string;
 	label?: string;
 	icon?: string;
 	index?: number;
@@ -27,6 +27,7 @@ export interface UmbBlockEditorCustomViewProperties<
 	settings?: UmbBlockDataType;
 	contentInvalid?: boolean;
 	settingsInvalid?: boolean;
+	unpublished?: boolean;
 }
 
 export interface UmbBlockEditorCustomViewElement<

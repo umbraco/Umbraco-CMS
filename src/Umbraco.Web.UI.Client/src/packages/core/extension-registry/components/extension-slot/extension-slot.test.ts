@@ -1,7 +1,7 @@
 import { UmbExtensionSlotElement } from './extension-slot.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import type { ManifestDashboard } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestDashboard } from '@umbraco-cms/backoffice/dashboard';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 

@@ -1,7 +1,7 @@
 import type { UmbInputUploadFieldElement } from '../../components/input-upload-field/input-upload-field.element.js';
 import type { MediaValueType } from './types.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	UmbPropertyValueChangeEvent,

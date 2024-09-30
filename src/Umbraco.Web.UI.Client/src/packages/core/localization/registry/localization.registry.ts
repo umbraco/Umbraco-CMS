@@ -1,3 +1,4 @@
+import type { ManifestLocalization } from '../extensions/localization.extension.js';
 import {
 	type UmbLocalizationSetBase,
 	type UmbLocalizationDictionary,
@@ -5,7 +6,7 @@ import {
 	UMB_DEFAULT_LOCALIZATION_CULTURE,
 } from '@umbraco-cms/backoffice/localization-api';
 import { umbLocalizationManager } from '@umbraco-cms/backoffice/localization-api';
-import type { ManifestLocalization, UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
@@ -37,6 +38,7 @@ export class UmbLocalizationRegistry {
 
 	/**
 	 * Get the current registered translations.
+	 * @returns {Map<string, UmbLocalizationSetBase>} Returns the registered translations
 	 */
 	get localizations() {
 		return umbLocalizationManager.localizations;
@@ -111,7 +113,7 @@ export class UmbLocalizationRegistry {
 
 	/**
 	 * Load a language from the extension registry.
-	 * @param locale The locale to load.
+	 * @param {string} locale The locale to load.
 	 */
 	loadLanguage(locale: string) {
 		this.#currentLanguage.setValue(locale.toLowerCase());
