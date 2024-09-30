@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
@@ -14,11 +15,13 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
 {
     private readonly IPublishedMediaCache _publishedMediaCache;
     private readonly ILogger<ApiMediaQueryService> _logger;
+    private readonly IMediaNavigationQueryService _mediaNavigationQueryService;
 
-    public ApiMediaQueryService(IPublishedMediaCache publishedMediaCache, ILogger<ApiMediaQueryService> logger)
+    public ApiMediaQueryService(IPublishedMediaCache publishedMediaCache, ILogger<ApiMediaQueryService> logger, IMediaNavigationQueryService mediaNavigationQueryService)
     {
         _publishedMediaCache = publishedMediaCache;
         _logger = logger;
+        _mediaNavigationQueryService = mediaNavigationQueryService;
     }
 
     /// <inheritdoc/>
@@ -68,7 +71,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
                 break;
             }
 
-            currentChildren = resolvedMedia.Children;
+            currentChildren = resolvedMedia.Children(null, _publishedMediaCache, _mediaNavigationQueryService);
         }
 
         return resolvedMedia;
@@ -101,7 +104,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
             ? mediaCache.GetById(parentKey)
             : TryGetByPath(childrenOf, mediaCache);
 
-        return parent?.Children ?? Array.Empty<IPublishedContent>();
+        return parent?.Children(null, _publishedMediaCache, _mediaNavigationQueryService) ?? Array.Empty<IPublishedContent>();
     }
 
     private IEnumerable<IPublishedContent>? ApplyFilters(IEnumerable<IPublishedContent> source, IEnumerable<string> filters)
