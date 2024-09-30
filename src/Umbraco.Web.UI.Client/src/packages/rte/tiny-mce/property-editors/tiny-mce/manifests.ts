@@ -9,7 +9,7 @@ const manifest: ManifestPropertyEditorUi = {
 	name: 'Rich Text Editor Property Editor UI',
 	element: () => import('./property-editor-ui-tiny-mce.element.js'),
 	meta: {
-		label: 'Rich Text Editor',
+		label: 'Rich Text Editor [TinyMCE]',
 		propertyEditorSchemaAlias: UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS,
 		icon: 'icon-browser-window',
 		group: 'richContent',
