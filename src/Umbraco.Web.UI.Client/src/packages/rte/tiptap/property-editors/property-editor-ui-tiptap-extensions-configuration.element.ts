@@ -125,24 +125,24 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 							<p class="category-name">${category.category}</p>
 							${repeat(
 								category.extensions,
-								(item) =>
-									html`<div class="extension-item">
+								(item) => html`
+									<div class="extension-item">
 										<uui-button
 											compact
-											look="outline"
 											class=${item.selected ? 'selected' : ''}
-											label=${item.label}
+											label=${this.localize.string(item.label)}
+											look="outline"
 											.value=${item.alias}
-											@click=${() => this.#onExtensionClick(item)}
-											><umb-icon name=${item.icon ?? ''}></umb-icon
-										></uui-button>
-										<span>${item.label}</span>
-									</div>`,
+											@click=${() => this.#onExtensionClick(item)}>
+											<umb-icon name=${item.icon ?? ''}></umb-icon>
+										</uui-button>
+										<span>${this.localize.string(item.label)}</span>
+									</div>
+								`,
 							)}
 						</div>
 					`,
 				)}
-					</div>
 			</div>
 		`;
 	}
