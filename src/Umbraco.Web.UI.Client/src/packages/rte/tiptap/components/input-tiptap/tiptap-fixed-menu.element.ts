@@ -51,7 +51,7 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 			right: 0px;
 			padding: var(--uui-size-space-3);
 			align-items: center;
-			z-index: 100;
+			z-index: 9999999;
 		}
 
 		:host([readonly]) {
