@@ -5,7 +5,6 @@ namespace Umbraco.Cms.Tests.Common.Builders;
 
 public class MediaEditingBuilder : ContentEditingBaseBuilder<MediaCreateModel>
 {
-
     public static MediaCreateModel CreateBasicMedia(Guid mediaTypeKey, Guid? key) =>
         new MediaEditingBuilder()
             .WithKey(key)
