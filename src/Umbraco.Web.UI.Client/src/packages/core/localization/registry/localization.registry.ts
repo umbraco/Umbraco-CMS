@@ -6,11 +6,11 @@ import {
 } from '@umbraco-cms/backoffice/localization-api';
 import { umbLocalizationManager } from '@umbraco-cms/backoffice/localization-api';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { ManifestLocalization } from '@umbraco-cms/backoffice/localization';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 import { hasDefaultExport, loadManifestPlainJs } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestLocalization } from '../extensions/localization.extension';
 
 /**
  *
