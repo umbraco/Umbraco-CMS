@@ -213,6 +213,8 @@
 		"@tiptap/extension-paragraph": "^2.7.4",
 		"@tiptap/extension-placeholder": "^2.7.4",
 		"@tiptap/extension-strike": "^2.7.4",
+		"@tiptap/extension-subscript": "^2.7.4",
+		"@tiptap/extension-superscript": "^2.7.4",
 		"@tiptap/extension-table": "^2.7.4",
 		"@tiptap/extension-table-cell": "^2.7.4",
 		"@tiptap/extension-table-header": "^2.7.4",

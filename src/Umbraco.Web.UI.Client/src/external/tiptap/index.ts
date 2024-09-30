@@ -23,6 +23,8 @@ export { Link } from '@tiptap/extension-link';
 export { ListItem } from '@tiptap/extension-list-item';
 export { OrderedList } from '@tiptap/extension-ordered-list';
 export { Strike } from '@tiptap/extension-strike';
+export { Subscript } from '@tiptap/extension-subscript';
+export { Superscript } from '@tiptap/extension-superscript';
 export { Table } from '@tiptap/extension-table';
 export { TableCell } from '@tiptap/extension-table-cell';
 export { TableHeader } from '@tiptap/extension-table-header';
