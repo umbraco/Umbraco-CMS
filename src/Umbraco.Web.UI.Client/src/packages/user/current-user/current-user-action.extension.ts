@@ -1,4 +1,4 @@
-import type { UmbAction } from '../../action/action.interface.js';
+import type { UmbAction } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
@@ -68,4 +68,10 @@ export interface MetaCurrentUserActionDefaultKind extends MetaCurrentUserAction 
 	 * @default default
 	 */
 	color?: UUIInterfaceColor;
+}
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbCurrentUserAction: ManifestCurrentUserAction;
+	}
 }

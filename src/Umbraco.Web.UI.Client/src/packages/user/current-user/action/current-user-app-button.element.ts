@@ -1,11 +1,11 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { html, customElement, ifDefined, state, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
 	ManifestCurrentUserActionDefaultKind,
 	MetaCurrentUserActionDefaultKind,
 	UmbCurrentUserAction,
-} from '@umbraco-cms/backoffice/extension-registry';
+} from '../current-user-action.extension.js';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { html, customElement, ifDefined, state, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-current-user-app-button')
