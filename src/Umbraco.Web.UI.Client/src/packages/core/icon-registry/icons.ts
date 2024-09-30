@@ -163,6 +163,10 @@ name: "icon-block",
 
 path: () => import("./icons/icon-block.js"),
 },{
+name: "icon-blockquote",
+
+path: () => import("./icons/icon-blockquote.js"),
+},{
 name: "icon-bluetooth",
 
 path: () => import("./icons/icon-bluetooth.js"),
@@ -170,6 +174,10 @@ path: () => import("./icons/icon-bluetooth.js"),
 name: "icon-boat-shipping",
 
 path: () => import("./icons/icon-boat-shipping.js"),
+},{
+name: "icon-bold",
+
+path: () => import("./icons/icon-bold.js"),
 },{
 name: "icon-bones",
 
@@ -378,6 +386,10 @@ path: () => import("./icons/icon-cocktail.js"),
 name: "icon-code",
 
 path: () => import("./icons/icon-code.js"),
+},{
+name: "icon-code-xml",
+
+path: () => import("./icons/icon-code-xml.js"),
 },{
 name: "icon-coffee",
 
@@ -631,6 +643,10 @@ name: "icon-edit",
 
 path: () => import("./icons/icon-edit.js"),
 },{
+name: "icon-embed",
+
+path: () => import("./icons/icon-embed.js"),
+},{
 name: "icon-employee",
 legacy: true,
 path: () => import("./icons/icon-employee.js"),
@@ -859,6 +875,18 @@ name: "icon-hard-drive",
 legacy: true,
 path: () => import("./icons/icon-hard-drive.js"),
 },{
+name: "icon-heading-1",
+
+path: () => import("./icons/icon-heading-1.js"),
+},{
+name: "icon-heading-2",
+
+path: () => import("./icons/icon-heading-2.js"),
+},{
+name: "icon-heading-3",
+
+path: () => import("./icons/icon-heading-3.js"),
+},{
 name: "icon-headphones",
 
 path: () => import("./icons/icon-headphones.js"),
@@ -891,6 +919,10 @@ name: "icon-home",
 
 path: () => import("./icons/icon-home.js"),
 },{
+name: "icon-horizontal-rule",
+
+path: () => import("./icons/icon-horizontal-rule.js"),
+},{
 name: "icon-hourglass",
 
 path: () => import("./icons/icon-hourglass.js"),
@@ -898,6 +930,10 @@ path: () => import("./icons/icon-hourglass.js"),
 name: "icon-imac",
 legacy: true,
 path: () => import("./icons/icon-imac.js"),
+},{
+name: "icon-image-up",
+
+path: () => import("./icons/icon-image-up.js"),
 },{
 name: "icon-inbox-full",
 legacy: true,
@@ -930,6 +966,10 @@ path: () => import("./icons/icon-ipad.js"),
 name: "icon-iphone",
 legacy: true,
 path: () => import("./icons/icon-iphone.js"),
+},{
+name: "icon-italic",
+
+path: () => import("./icons/icon-italic.js"),
 },{
 name: "icon-item-arrangement",
 legacy: true,
@@ -1676,7 +1716,7 @@ name: "icon-shipping",
 path: () => import("./icons/icon-shipping.js"),
 },{
 name: "icon-shoe",
-
+legacy: true,
 path: () => import("./icons/icon-shoe.js"),
 },{
 name: "icon-shopping-basket-alt-2",
@@ -1811,6 +1851,18 @@ name: "icon-stream",
 legacy: true,
 path: () => import("./icons/icon-stream.js"),
 },{
+name: "icon-strikethrough",
+
+path: () => import("./icons/icon-strikethrough.js"),
+},{
+name: "icon-subscript",
+
+path: () => import("./icons/icon-subscript.js"),
+},{
+name: "icon-superscript",
+
+path: () => import("./icons/icon-superscript.js"),
+},{
 name: "icon-sunny",
 
 path: () => import("./icons/icon-sunny.js"),
@@ -1830,6 +1882,10 @@ path: () => import("./icons/icon-t-shirt.js"),
 name: "icon-tab-key",
 
 path: () => import("./icons/icon-tab-key.js"),
+},{
+name: "icon-table",
+
+path: () => import("./icons/icon-table.js"),
 },{
 name: "icon-tag",
 
@@ -1858,6 +1914,22 @@ path: () => import("./icons/icon-temperature.js"),
 name: "icon-terminal",
 
 path: () => import("./icons/icon-terminal.js"),
+},{
+name: "icon-text-align-center",
+
+path: () => import("./icons/icon-text-align-center.js"),
+},{
+name: "icon-text-align-justify",
+
+path: () => import("./icons/icon-text-align-justify.js"),
+},{
+name: "icon-text-align-left",
+
+path: () => import("./icons/icon-text-align-left.js"),
+},{
+name: "icon-text-align-right",
+
+path: () => import("./icons/icon-text-align-right.js"),
 },{
 name: "icon-theater",
 
@@ -1974,6 +2046,14 @@ path: () => import("./icons/icon-umbrella.js"),
 name: "icon-undo",
 
 path: () => import("./icons/icon-undo.js"),
+},{
+name: "icon-underline",
+
+path: () => import("./icons/icon-underline.js"),
+},{
+name: "icon-unlink",
+
+path: () => import("./icons/icon-unlink.js"),
 },{
 name: "icon-unlocked",
 

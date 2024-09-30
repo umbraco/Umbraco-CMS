@@ -21,7 +21,6 @@ export abstract class UmbBlockManagerContext<
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 	BlockOriginDataType extends UmbBlockWorkspaceOriginData = UmbBlockWorkspaceOriginData,
 > extends UmbContextBase<UmbBlockManagerContext> {
-	//
 	get contentTypesLoaded() {
 		return Promise.all(this.#contentTypeRequests);
 	}
@@ -40,7 +39,7 @@ export abstract class UmbBlockManagerContext<
 		this.#variantId.setValue(variantId);
 	}
 
-	#structures: Array<UmbContentTypeStructureManager> = [];
+	readonly #structures: Array<UmbContentTypeStructureManager> = [];
 
 	#blockTypes = new UmbArrayState(<Array<BlockType>>[], (x) => x.contentElementTypeKey);
 	public readonly blockTypes = this.#blockTypes.asObservable();
@@ -54,13 +53,16 @@ export abstract class UmbBlockManagerContext<
 	protected _layouts = new UmbArrayState(<Array<BlockLayoutType>>[], (x) => x.contentKey);
 	public readonly layouts = this._layouts.asObservable();
 
-	#contents = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
+	readonly #contents = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly contents = this.#contents.asObservable();
 
-	#settings = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
+	readonly #settings = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly settings = this.#settings.asObservable();
 
-	#exposes = new UmbArrayState(<Array<UmbBlockExposeModel>>[], (x) => x.contentKey + '_' + x.culture + '_' + x.segment);
+	readonly #exposes = new UmbArrayState(
+		<Array<UmbBlockExposeModel>>[],
+		(x) => x.contentKey + '_' + x.culture + '_' + x.segment,
+	);
 	public readonly exposes = this.#exposes.asObservable();
 
 	setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
@@ -83,8 +85,14 @@ export abstract class UmbBlockManagerContext<
 	setLayouts(layouts: Array<BlockLayoutType>) {
 		this._layouts.setValue(layouts);
 	}
+	getLayouts() {
+		return this._layouts.getValue();
+	}
 	setContents(contents: Array<UmbBlockDataModel>) {
 		this.#contents.setValue(contents);
+	}
+	getContents() {
+		return this.#contents.value;
 	}
 	setSettings(settings: Array<UmbBlockDataModel>) {
 		this.#settings.setValue(settings);
@@ -179,9 +187,7 @@ export abstract class UmbBlockManagerContext<
 	getContentOf(contentKey: string) {
 		return this.#contents.value.find((x) => x.key === contentKey);
 	}
-	// TODO: [v15]: ignoring unused var here here to prevent a breaking change
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	setOneLayout(layoutData: BlockLayoutType, originData?: BlockOriginDataType) {
+	setOneLayout(layoutData: BlockLayoutType) {
 		this._layouts.appendOne(layoutData);
 	}
 	setOneContent(contentData: UmbBlockDataModel) {
@@ -220,7 +226,7 @@ export abstract class UmbBlockManagerContext<
 		);
 	}
 	settingsProperty(key: string, propertyAlias: string) {
-		this.#contents.asObservablePart(
+		this.#settings.asObservablePart(
 			(source) => source.find((x) => x.key === key)?.values?.find((values) => values.alias === propertyAlias)?.value,
 		);
 	}
@@ -290,25 +296,21 @@ export abstract class UmbBlockManagerContext<
 		originData: BlockOriginDataType,
 	): boolean;
 
-	protected insertBlockData(
-		layoutEntry: BlockLayoutType,
-		content: UmbBlockDataModel,
-		settings: UmbBlockDataModel | undefined,
-		// TODO: [v15]: ignoring unused var here here to prevent a breaking change
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		originData: BlockOriginDataType,
-	) {
+	protected insertBlockData(layoutEntry: BlockLayoutType, content: UmbBlockDataModel, settings?: UmbBlockDataModel) {
 		// Create content entry:
 		if (layoutEntry.contentKey) {
 			this.#contents.appendOne(content);
 		} else {
 			throw new Error('Cannot create block, missing contentKey');
-			return false;
 		}
 
 		//Create settings entry:
 		if (settings && layoutEntry.settingsKey) {
 			this.#settings.appendOne(settings);
 		}
+	}
+
+	protected removeBlockKey(contentKey: string) {
+		this.#contents.removeOne(contentKey);
 	}
 }

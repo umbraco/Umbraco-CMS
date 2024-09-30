@@ -860,4 +860,73 @@ export const data: Array<UmbMockDocumentModel> = [
 			},
 		],
 	},
+	{
+		urls: [
+			{
+				culture: 'en-US',
+				url: '/',
+			},
+		],
+		template: null,
+		id: 'all-rtes-id',
+		parent: null,
+		documentType: {
+			id: 'all-rtes-document-type-id',
+			icon: 'icon-document',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: DocumentVariantStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:32:24.957009',
+				culture: null,
+				segment: null,
+				name: 'All RTEs',
+				createDate: '2023-02-06T15:32:05.350038',
+				updateDate: '2023-02-06T15:32:24.957009',
+			},
+		],
+		values: [
+			{
+				alias: 'tiptap',
+				editorAlias: 'Umb.PropertyEditorUi.Tiptap',
+				culture: null,
+				segment: null,
+				value: {
+					blocks: undefined,
+					markup: `
+						<p>
+							Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo
+						</p>
+						<p>
+							<img width="500" height="332" loading="lazy" alt="Jason" src="/umbraco/backoffice/assets/login.jpg" />
+						</p>
+						<p>End of test content</p>
+					`,
+				},
+			},
+			{
+				alias: 'tinymce',
+				editorAlias: 'Umb.PropertyEditorUi.TinyMCE',
+				culture: null,
+				segment: null,
+				value: {
+					blocks: undefined,
+					markup: `
+						<p>
+							Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo
+						</p>
+						<div class="umb-macro-holder TestMacro umb-macro-mce_1 mceNonEditable"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>
+						<p>
+							<img width="500" height="332" loading="lazy" alt="Jason" src="/umbraco/backoffice/assets/login.jpg" />
+						</p>
+						<p>End of test content</p>
+					`,
+				},
+			},
+		],
+	},
 ];

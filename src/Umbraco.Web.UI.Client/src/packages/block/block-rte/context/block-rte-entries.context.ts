@@ -19,11 +19,11 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 	UmbBlockRteWorkspaceOriginData
 > {
 	//
-	#catalogueModal: UmbModalRouteRegistrationController<
+	readonly #catalogueModal: UmbModalRouteRegistrationController<
 		typeof UMB_BLOCK_CATALOGUE_MODAL.DATA,
 		typeof UMB_BLOCK_CATALOGUE_MODAL.VALUE
 	>;
-	#workspaceModal;
+	readonly #workspaceModal;
 
 	// We will just say its always allowed for RTE for now: [NL]
 	public readonly canCreate = new UmbBooleanState(true).asObservable();
@@ -51,15 +51,9 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 						value.create.contentElementTypeKey,
 						// We can parse an empty object, cause the rest will be filled in by others.
 						{} as any,
-						data.originData as UmbBlockRteWorkspaceOriginData,
 					);
 					if (created) {
-						this.insert(
-							created.layout,
-							created.content,
-							created.settings,
-							data.originData as UmbBlockRteWorkspaceOriginData,
-						);
+						this.insert(created.layout, created.content, created.settings);
 					} else {
 						throw new Error('Failed to create block');
 					}
@@ -128,13 +122,9 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 		this._manager?.setLayouts(layouts);
 	}
 
-	async create(
-		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<UmbBlockRteLayoutModel, 'contentKey'>,
-		originData?: UmbBlockRteWorkspaceOriginData,
-	) {
+	async create(contentElementTypeKey: string, partialLayoutEntry?: Omit<UmbBlockRteLayoutModel, 'contentKey'>) {
 		await this._retrieveManager;
-		return this._manager?.create(contentElementTypeKey, partialLayoutEntry, originData);
+		return this._manager?.create(contentElementTypeKey, partialLayoutEntry);
 	}
 
 	// insert Block?
@@ -143,10 +133,9 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 		layoutEntry: UmbBlockRteLayoutModel,
 		content: UmbBlockDataModel,
 		settings: UmbBlockDataModel | undefined,
-		originData: UmbBlockRteWorkspaceOriginData,
 	) {
 		await this._retrieveManager;
-		return this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
+		return this._manager?.insert(layoutEntry, content, settings) ?? false;
 	}
 
 	// create Block?
