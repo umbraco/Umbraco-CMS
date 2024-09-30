@@ -127,7 +127,6 @@ export abstract class UmbRteBaseElement extends UmbLitElement implements UmbProp
 					this.#managerContext.exposes,
 				]).pipe(debounceTime(20)),
 				([layouts, contents, settings, exposes]) => {
-					console.log('new blocks', layouts, contents, exposes);
 					this._value = {
 						...this._value,
 						blocks: {
@@ -137,7 +136,7 @@ export abstract class UmbRteBaseElement extends UmbLitElement implements UmbProp
 							expose: exposes,
 						},
 					};
-					//context.setValue(this._value);
+
 					this._fireChangeEvent();
 				},
 				'motherObserver',
