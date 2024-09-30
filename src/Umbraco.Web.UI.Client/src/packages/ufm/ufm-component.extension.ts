@@ -13,3 +13,9 @@ export interface ManifestUfmComponent extends ManifestApi<UmbUfmComponentApi> {
 	type: 'ufmComponent';
 	meta: MetaUfmComponent;
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbUfmComponent: ManifestUfmComponent;
+	}
+}
