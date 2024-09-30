@@ -9,7 +9,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
-using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -85,7 +84,7 @@ public class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
             updateResult.Result.Content!.Key,
             new CultureAndScheduleModel()
             {
-                CulturesToPublishImmediately = new HashSet<string> {"*"},
+                CulturesToPublishImmediately = new HashSet<string> { "*" },
                 Schedules = new ContentScheduleCollection(),
             },
             Constants.Security.SuperUserKey);
@@ -105,35 +104,13 @@ public class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
 
     private async Task<IContent> CreateContentPickerDocument(Guid templateKey, Guid textPageKey)
     {
-        var builder = new ContentTypeEditingBuilder();
-        var pickerContentType = builder
-            .WithAlias("test")
-            .WithName("TestName")
-            .WithAllowAtRoot(true)
-            .AddAllowedTemplateKeys([templateKey])
-            .AddPropertyGroup()
-                .WithName("Content")
-                .Done()
-            .AddPropertyType()
-                .WithAlias("contentPicker")
-                .WithName("Content Picker")
-                .WithDataTypeKey(Constants.DataTypes.Guids.ContentPickerGuid)
-                .WithSortOrder(16)
-                .Done()
-            .Build();
-
+        var pickerContentType = ContentTypeEditingBuilder.CreateContentTypeWithContentPicker(templateKey: templateKey);
         await ContentTypeEditingService.CreateAsync(pickerContentType, Constants.Security.SuperUserKey);
 
-
-        var createOtherModel = new ContentCreateModel
-        {
-            ContentTypeKey = pickerContentType.Key.Value,
-            ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create",
-            InvariantProperties = new[] { new PropertyValueModel { Alias = "contentPicker", Value = textPageKey }, },
-        };
-
+        var createOtherModel = ContentEditingBuilder.CreateContentWithOneInvariantProperty(pickerContentType.Key.Value,
+            "Test Create", "contentPicker", textPageKey);
         var result = await ContentEditingService.CreateAsync(createOtherModel, Constants.Security.SuperUserKey);
+
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
 
@@ -141,11 +118,12 @@ public class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
             result.Result.Content!.Key,
             new CultureAndScheduleModel()
             {
-                CulturesToPublishImmediately = new HashSet<string> {"*"},
+                CulturesToPublishImmediately = new HashSet<string> { "*" },
                 Schedules = new ContentScheduleCollection(),
             },
             Constants.Security.SuperUserKey);
 
+        Assert.IsTrue(publishResult.Success);
         return result.Result.Content;
     }
 
@@ -154,26 +132,18 @@ public class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
         var textContentType = ContentTypeEditingBuilder.CreateTextPageContentType(defaultTemplateKey: templateKey);
         await ContentTypeEditingService.CreateAsync(textContentType, Constants.Security.SuperUserKey);
 
-        var createModel = new ContentCreateModel
-        {
-            ContentTypeKey = textContentType.Key.Value,
-            ParentKey = Constants.System.RootKey,
-            InvariantName = "Root Create",
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "title", Value = "The title value" },
-                new PropertyValueModel { Alias = "bodyText", Value = "The body text" }
-            },
-        };
+        var contentCreateModel = ContentEditingBuilder.CreateContentWithTwoInvariantProperties(
+            textContentType.Key.Value, "Root Create", "title", "The title value", "bodyText", "The body text",
+            Constants.System.RootKey);
 
-        var createResult = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        var createResult = await ContentEditingService.CreateAsync(contentCreateModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(createResult.Success);
 
         var publishResult = await ContentPublishingService.PublishAsync(
             createResult.Result.Content!.Key,
             new CultureAndScheduleModel()
             {
-                CulturesToPublishImmediately = new HashSet<string> {"*"},
+                CulturesToPublishImmediately = new HashSet<string> { "*" },
                 Schedules = new ContentScheduleCollection(),
             },
             Constants.Security.SuperUserKey);
