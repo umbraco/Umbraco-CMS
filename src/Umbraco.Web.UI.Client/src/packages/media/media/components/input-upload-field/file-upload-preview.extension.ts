@@ -1,4 +1,4 @@
-import type { UmbFileUploadPreviewElement } from '../interfaces/file-upload-preview.interface.js';
+import type { UmbFileUploadPreviewElement } from './file-upload-preview.interface.js';
 import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestFileUploadPreview extends ManifestElement<UmbFileUploadPreviewElement> {
@@ -9,4 +9,10 @@ export interface ManifestFileUploadPreview extends ManifestElement<UmbFileUpload
 	 * @required
 	 */
 	forMimeTypes: string | Array<string>;
+}
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbFileUploadPreview: ManifestFileUploadPreview;
+	}
 }
