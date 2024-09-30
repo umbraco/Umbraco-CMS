@@ -111,7 +111,14 @@ public sealed class DocumentCache : IPublishedContentCache
         return key is not null ? GetById(key.Value) : null;
     }
 
-    public string? GetRouteById(bool preview, int contentId, string? culture = null) => throw new NotImplementedException();
+    [Obsolete("Use IDocumentUrlService.GetDocumentKeyByRoute instead, scheduled for removal in v17")]
+    public string? GetRouteById(bool preview, int contentId, string? culture = null)
+    {
+        IDocumentUrlService documentUrlService = StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>();
+        IPublishedContent? content = GetById(preview, contentId);
+        return content is not null ? documentUrlService.GetLegacyRouteFormat(content.Key, culture, preview) : null;
+    }
 
-    public string? GetRouteById(int contentId, string? culture = null) => throw new NotImplementedException();
+    [Obsolete("Use IDocumentUrlService.GetDocumentKeyByRoute instead, scheduled for removal in v17")]
+    public string? GetRouteById(int contentId, string? culture = null) => GetRouteById(false, contentId, culture);
 }
