@@ -53,3 +53,9 @@ export interface ManifestTinyMcePlugin extends ManifestApi<UmbTinyMcePluginBase>
 	type: 'tinyMcePlugin';
 	meta?: MetaTinyMcePlugin;
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbTinyMcePlugin: ManifestTinyMcePlugin;
+	}
+}

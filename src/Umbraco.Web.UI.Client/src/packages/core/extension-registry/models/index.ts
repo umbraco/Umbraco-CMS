@@ -1,13 +1,11 @@
 import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from './dynamic-root.model.js';
 import type { ManifestFileUploadPreview } from './file-upload-preview.model.js';
-import type { ManifestTinyMcePlugin } from './tinymce-plugin.model.js';
 import type { ManifestUfmComponent } from './ufm-component.model.js';
 import type { ManifestUfmFilter } from './ufm-filter.model.js';
 import type { ManifestBase, ManifestBundle, ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
 export type * from './dynamic-root.model.js';
 export type * from './file-upload-preview.model.js';
-export type * from './tinymce-plugin.model.js';
 export type * from './ufm-component.model.js';
 export type * from './ufm-filter.model.js';
 
@@ -17,7 +15,6 @@ export type ManifestTypes =
 	| ManifestDynamicRootOrigin
 	| ManifestDynamicRootQueryStep
 	| ManifestFileUploadPreview
-	| ManifestTinyMcePlugin
 	| ManifestUfmComponent
 	| ManifestUfmFilter
 	| ManifestBase;
