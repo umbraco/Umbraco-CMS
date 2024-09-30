@@ -35,7 +35,6 @@ public class ContentService : RepositoryService, IContentService
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ICultureImpactFactory _cultureImpactFactory;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
-    private readonly IDocumentNavigationManagementService _documentNavigationManagementService;
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private IQuery<IContent>? _queryNotTrashed;
 
@@ -55,7 +54,6 @@ public class ContentService : RepositoryService, IContentService
         IShortStringHelper shortStringHelper,
         ICultureImpactFactory cultureImpactFactory,
         IUserIdKeyResolver userIdKeyResolver,
-        IDocumentNavigationManagementService documentNavigationManagementService,
         PropertyEditorCollection propertyEditorCollection)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
@@ -69,7 +67,6 @@ public class ContentService : RepositoryService, IContentService
         _shortStringHelper = shortStringHelper;
         _cultureImpactFactory = cultureImpactFactory;
         _userIdKeyResolver = userIdKeyResolver;
-        _documentNavigationManagementService = documentNavigationManagementService;
         _propertyEditorCollection = propertyEditorCollection;
         _logger = loggerFactory.CreateLogger<ContentService>();
     }
@@ -103,7 +100,6 @@ public class ContentService : RepositoryService, IContentService
             shortStringHelper,
             cultureImpactFactory,
             userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationManagementService>(),
             StaticServiceProvider.Instance.GetRequiredService<PropertyEditorCollection>())
     {
     }
@@ -136,7 +132,6 @@ public class ContentService : RepositoryService, IContentService
             shortStringHelper,
             cultureImpactFactory,
             StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationManagementService>(),
             StaticServiceProvider.Instance.GetRequiredService<PropertyEditorCollection>())
     {
     }
@@ -1063,18 +1058,6 @@ public class ContentService : RepositoryService, IContentService
             // have always changed if it's been saved in the back office but that's not really fail safe.
             _documentRepository.Save(content);
 
-            // Updates in-memory navigation structure - we only handle new items, other updates are not a concern
-            UpdateInMemoryNavigationStructure(
-                "Umbraco.Cms.Core.Services.ContentService.Save-with-contentSchedule",
-                () =>
-                {
-                    _documentNavigationManagementService.Add(content.Key, GetParent(content)?.Key);
-                    if (content.Trashed)
-                    {
-                        _documentNavigationManagementService.MoveToBin(content.Key);
-                    }
-                });
-
             if (contentSchedule != null)
             {
                 _documentRepository.PersistContentSchedule(content, contentSchedule);
@@ -1138,18 +1121,6 @@ public class ContentService : RepositoryService, IContentService
                 content.WriterId = userId;
 
                 _documentRepository.Save(content);
-
-                // Updates in-memory navigation structure - we only handle new items, other updates are not a concern
-                UpdateInMemoryNavigationStructure(
-                    "Umbraco.Cms.Core.Services.ContentService.Save",
-                    () =>
-                    {
-                        _documentNavigationManagementService.Add(content.Key, GetParent(content)?.Key);
-                        if (content.Trashed)
-                        {
-                            _documentNavigationManagementService.MoveToBin(content.Key);
-                        }
-                    });
             }
 
             scope.Notifications.Publish(
@@ -2339,26 +2310,6 @@ public class ContentService : RepositoryService, IContentService
         }
 
         DoDelete(content);
-
-        if (content.Trashed)
-        {
-            // Updates in-memory navigation structure for recycle bin items
-            UpdateInMemoryNavigationStructure(
-                "Umbraco.Cms.Core.Services.ContentService.DeleteLocked-trashed",
-                () => _documentNavigationManagementService.RemoveFromBin(content.Key));
-        }
-        else
-        {
-            // Updates in-memory navigation structure for both documents and recycle bin items
-            // as the item needs to be deleted whether it is in the recycle bin or not
-            UpdateInMemoryNavigationStructure(
-                "Umbraco.Cms.Core.Services.ContentService.DeleteLocked",
-                () =>
-                {
-                    _documentNavigationManagementService.MoveToBin(content.Key);
-                    _documentNavigationManagementService.RemoveFromBin(content.Key);
-                });
-        }
     }
 
     // TODO: both DeleteVersions methods below have an issue. Sort of. They do NOT take care of files the way
@@ -2633,33 +2584,6 @@ public class ContentService : RepositoryService, IContentService
             }
         }
         while (total > pageSize);
-
-        if (parentId == Constants.System.RecycleBinContent)
-        {
-            // Updates in-memory navigation structure for both document items and recycle bin items
-            // as we are moving to recycle bin
-            UpdateInMemoryNavigationStructure(
-                "Umbraco.Cms.Core.Services.ContentService.PerformMoveLocked-to-recycle-bin",
-                () => _documentNavigationManagementService.MoveToBin(content.Key));
-        }
-        else
-        {
-            if (cameFromRecycleBin)
-            {
-                // Updates in-memory navigation structure for both document items and recycle bin items
-                // as we are restoring from recycle bin
-                UpdateInMemoryNavigationStructure(
-                    "Umbraco.Cms.Core.Services.ContentService.PerformMoveLocked-restore",
-                    () => _documentNavigationManagementService.RestoreFromBin(content.Key, parent?.Key));
-            }
-            else
-            {
-                // Updates in-memory navigation structure
-                UpdateInMemoryNavigationStructure(
-                    "Umbraco.Cms.Core.Services.ContentService.PerformMoveLocked",
-                    () => _documentNavigationManagementService.Move(content.Key, parent?.Key));
-            }
-        }
     }
 
     private void PerformMoveContentLocked(IContent content, int userId, bool? trash)
@@ -2862,20 +2786,6 @@ public class ContentService : RepositoryService, IContentService
                         idmap[descendant.Id] = descendantCopy.Id;
                     }
                 }
-            }
-
-            if (navigationUpdates.Count > 0)
-            {
-                // Updates in-memory navigation structure
-                UpdateInMemoryNavigationStructure(
-                    "Umbraco.Cms.Core.Services.ContentService.Copy",
-                    () =>
-                    {
-                        foreach (Tuple<Guid, Guid?> update in navigationUpdates)
-                        {
-                            _documentNavigationManagementService.Add(update.Item1, update.Item2);
-                        }
-                    });
             }
 
             // not handling tags here, because
@@ -3822,28 +3732,4 @@ public class ContentService : RepositoryService, IContentService
 
     #endregion
 
-    /// <summary>
-    ///     Enlists an action in the current scope context to update the in-memory navigation structure
-    ///     when the scope completes successfully.
-    /// </summary>
-    /// <param name="enlistingActionKey">The unique key identifying the action to be enlisted.</param>
-    /// <param name="updateNavigation">The action to be performed for updating the in-memory navigation structure.</param>
-    /// <exception cref="NullReferenceException">Thrown when the scope context is null and therefore cannot be used.</exception>
-    private void UpdateInMemoryNavigationStructure(string enlistingActionKey, Action updateNavigation)
-    {
-        IScopeContext? scopeContext = ScopeProvider.Context;
-
-        if (scopeContext is null)
-        {
-            throw new NullReferenceException($"The {nameof(scopeContext)} is null and cannot be used.");
-        }
-
-        scopeContext.Enlist(enlistingActionKey, completed =>
-        {
-            if (completed)
-            {
-                updateNavigation();
-            }
-        });
-    }
 }
