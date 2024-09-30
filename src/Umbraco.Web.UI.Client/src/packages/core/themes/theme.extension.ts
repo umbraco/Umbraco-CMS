@@ -5,3 +5,9 @@ import type { ManifestPlainCss } from '@umbraco-cms/backoffice/extension-api';
 export interface ManifestTheme extends ManifestPlainCss {
 	type: 'theme';
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		UMB_THEME: ManifestTheme;
+	}
+}
