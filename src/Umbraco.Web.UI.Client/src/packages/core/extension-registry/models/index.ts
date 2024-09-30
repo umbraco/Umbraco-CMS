@@ -6,12 +6,6 @@ import type { ManifestFileUploadPreview } from './file-upload-preview.model.js';
 import type { ManifestExternalLoginProvider } from './external-login-provider.model.js';
 import type { ManifestHealthCheck } from './health-check.model.js';
 import type { ManifestIcons } from './icons.model.js';
-import type { ManifestLocalization } from './localization.model.js';
-import type { ManifestPropertyEditorUi, ManifestPropertyEditorSchema } from './property-editor.model.js';
-import type { ManifestSection } from './section.model.js';
-import type { ManifestSectionSidebarApp, ManifestSectionSidebarAppMenuKind } from './section-sidebar-app.model.js';
-import type { ManifestSectionView } from './section-view.model.js';
-import type { ManifestTheme } from './theme.model.js';
 import type { ManifestTinyMcePlugin } from './tinymce-plugin.model.js';
 import type { ManifestUfmComponent } from './ufm-component.model.js';
 import type { ManifestUfmFilter } from './ufm-filter.model.js';
@@ -19,7 +13,6 @@ import type { ManifestUserProfileApp } from './user-profile-app.model.js';
 import type { ManifestGranularUserPermission } from './user-granular-permission.model.js';
 import type { ManifestMfaLoginProvider } from './mfa-login-provider.model.js';
 import type { ManifestMonacoMarkdownEditorAction } from './monaco-markdown-editor-action.model.js';
-import type { ManifestSectionRoute } from './section-route.model.js';
 import type { ManifestPickerSearchResultItem } from './picker-search-result-item.model.js';
 import type { ManifestBase, ManifestBundle, ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
@@ -37,19 +30,16 @@ export type * from './file-upload-preview.model.js';
 export type * from './external-login-provider.model.js';
 export type * from './health-check.model.js';
 export type * from './icons.model.js';
-export type * from './localization.model.js';
 export type * from '../extensions/menu-item.extension.js';
 export type * from '../extensions/menu.extension.js';
 export type * from './mfa-login-provider.model.js';
 export type * from './monaco-markdown-editor-action.model.js';
 export type * from './picker-search-result-item.model.js';
 export type * from '../extensions/preview-app.extension.js';
-export type * from './property-editor.model.js';
-export type * from './section-sidebar-app.model.js';
-export type * from './section-view.model.js';
-export type * from './section.model.js';
 export type * from '../extensions/store.extension.js';
-export type * from './theme.model.js';
+export type * from './mfa-login-provider.model.js';
+export type * from './monaco-markdown-editor-action.model.js';
+export type * from './picker-search-result-item.model.js';
 export type * from './tinymce-plugin.model.js';
 export type * from './ufm-component.model.js';
 export type * from './ufm-filter.model.js';
@@ -70,18 +60,12 @@ export type ManifestTypes =
 	| ManifestGranularUserPermission
 	| ManifestHealthCheck
 	| ManifestIcons
-	| ManifestLocalization
 	| ManifestMfaLoginProvider
 	| ManifestMonacoMarkdownEditorAction
 	| ManifestPickerSearchResultItem
-	| ManifestPropertyEditorSchema
-	| ManifestPropertyEditorUi
-	| ManifestSection
-	| ManifestSectionRoute
-	| ManifestSectionSidebarApp
-	| ManifestSectionSidebarAppMenuKind
-	| ManifestSectionView
-	| ManifestTheme
+	| ManifestMfaLoginProvider
+	| ManifestMonacoMarkdownEditorAction
+	| ManifestPickerSearchResultItem
 	| ManifestTinyMcePlugin
 	| ManifestUfmComponent
 	| ManifestUfmFilter

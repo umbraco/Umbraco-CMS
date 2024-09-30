@@ -18,7 +18,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	PropertyEditorSettingsDefaultData,
 	PropertyEditorSettingsProperty,
-} from '@umbraco-cms/backoffice/extension-registry';
+} from '@umbraco-cms/backoffice/property-editor';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 

@@ -6,7 +6,7 @@ import { UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS } from './manifests.js';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, property, state, repeat, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import {
 	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
