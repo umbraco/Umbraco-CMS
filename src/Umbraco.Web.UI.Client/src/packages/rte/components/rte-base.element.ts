@@ -27,13 +27,6 @@ export abstract class UmbRteBaseElement extends UmbLitElement implements UmbProp
 		this.#managerContext.setEditorConfiguration(config);
 	}
 
-	/**
-	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
-	 * @default false
-	 */
-	@property({ type: Boolean, reflect: true })
-	readonly = false;
-
 	@property({
 		attribute: false,
 		type: Object,
@@ -45,6 +38,7 @@ export abstract class UmbRteBaseElement extends UmbLitElement implements UmbProp
 		const buildUpValue: Partial<UmbPropertyEditorUiValueType> = value ? { ...value } : {};
 		buildUpValue.markup ??= '';
 		buildUpValue.blocks ??= { layout: {}, contentData: [], settingsData: [], expose: [] };
+		buildUpValue.blocks.layout ??= {};
 		buildUpValue.blocks.contentData ??= [];
 		buildUpValue.blocks.settingsData ??= [];
 		buildUpValue.blocks.expose ??= [];
@@ -63,6 +57,13 @@ export abstract class UmbRteBaseElement extends UmbLitElement implements UmbProp
 	public get value() {
 		return this._value;
 	}
+
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
 
 	@state()
 	protected _config?: UmbPropertyEditorConfigCollection;
