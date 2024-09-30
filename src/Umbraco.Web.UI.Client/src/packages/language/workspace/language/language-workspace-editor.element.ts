@@ -24,7 +24,7 @@ export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 			back-path="section/settings/workspace/language-root">
 			${this._isNew
 				? html`<h3 slot="header">Add language</h3>`
-				: html`<umb-workspace-editable-name-header slot="header"></umb-workspace-editable-name-header>`}
+				: html`<umb-workspace-header-name-editable slot="header"></umb-workspace-header-name-editable>`}
 		</umb-workspace-editor>`;
 	}
 

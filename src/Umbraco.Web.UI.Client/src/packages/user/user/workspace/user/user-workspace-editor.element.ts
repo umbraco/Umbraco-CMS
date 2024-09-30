@@ -54,7 +54,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 
 	#renderHeader() {
 		return html`
-			<umb-workspace-editable-name-header slot="header"></umb-workspace-editable-name-header>
+			<umb-workspace-header-name-editable slot="header"></umb-workspace-header-name-editable>
 			<umb-workspace-entity-action-menu slot="action-menu"></umb-workspace-entity-action-menu>
 		`;
 	}

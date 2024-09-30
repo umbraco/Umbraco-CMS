@@ -6,8 +6,8 @@ import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
-@customElement('umb-workspace-editable-name-header')
-export class UmbWorkspaceEditableNameHeaderElement extends UmbLitElement {
+@customElement('umb-workspace-header-name-editable')
+export class UmbWorkspaceHeaderNameEditableElement extends UmbLitElement {
 	@state()
 	private _name = '';
 
@@ -71,6 +71,6 @@ export class UmbWorkspaceEditableNameHeaderElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-editable-name-header': UmbWorkspaceEditableNameHeaderElement;
+		'umb-workspace-header-name-editable': UmbWorkspaceHeaderNameEditableElement;
 	}
 }
