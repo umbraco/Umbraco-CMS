@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -35,6 +36,7 @@ public class ContentService : RepositoryService, IContentService
     private readonly ICultureImpactFactory _cultureImpactFactory;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IDocumentNavigationManagementService _documentNavigationManagementService;
+    private readonly PropertyEditorCollection _propertyEditorCollection;
     private IQuery<IContent>? _queryNotTrashed;
 
     #region Constructors
@@ -53,7 +55,8 @@ public class ContentService : RepositoryService, IContentService
         IShortStringHelper shortStringHelper,
         ICultureImpactFactory cultureImpactFactory,
         IUserIdKeyResolver userIdKeyResolver,
-        IDocumentNavigationManagementService documentNavigationManagementService)
+        IDocumentNavigationManagementService documentNavigationManagementService,
+        PropertyEditorCollection propertyEditorCollection)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
@@ -67,6 +70,7 @@ public class ContentService : RepositoryService, IContentService
         _cultureImpactFactory = cultureImpactFactory;
         _userIdKeyResolver = userIdKeyResolver;
         _documentNavigationManagementService = documentNavigationManagementService;
+        _propertyEditorCollection = propertyEditorCollection;
         _logger = loggerFactory.CreateLogger<ContentService>();
     }
 
@@ -99,11 +103,12 @@ public class ContentService : RepositoryService, IContentService
             shortStringHelper,
             cultureImpactFactory,
             userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationManagementService>())
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationManagementService>(),
+            StaticServiceProvider.Instance.GetRequiredService<PropertyEditorCollection>())
     {
     }
 
-    [Obsolete("Use constructor that takes IUserIdKeyResolver as a parameter, scheduled for removal in V15")]
+    [Obsolete("Use non-obsolete constructor. Scheduled for removal in V16.")]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -131,7 +136,8 @@ public class ContentService : RepositoryService, IContentService
             shortStringHelper,
             cultureImpactFactory,
             StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationManagementService>())
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationManagementService>(),
+            StaticServiceProvider.Instance.GetRequiredService<PropertyEditorCollection>())
     {
     }
 
@@ -1244,7 +1250,7 @@ public class ContentService : RepositoryService, IContentService
             var publishTime = DateTime.Now;
             foreach (CultureImpact? impact in impacts)
             {
-                content.PublishCulture(impact, publishTime);
+                content.PublishCulture(impact, publishTime, _propertyEditorCollection);
             }
 
             // Change state to publishing
@@ -1881,7 +1887,7 @@ public class ContentService : RepositoryService, IContentService
                         // publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                         IProperty[]? invalidProperties = null;
                         CultureImpact impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(allLangs.Value, culture));
-                        var tryPublish = d.PublishCulture(impact, date) &&
+                        var tryPublish = d.PublishCulture(impact, date, _propertyEditorCollection) &&
                                          _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
                         if (invalidProperties != null && invalidProperties.Length > 0)
                         {
@@ -1965,12 +1971,12 @@ public class ContentService : RepositoryService, IContentService
             return culturesToPublish.All(culture =>
             {
                 CultureImpact? impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
-                return content.PublishCulture(impact, publishTime) &&
+                return content.PublishCulture(impact, publishTime, _propertyEditorCollection) &&
                        _propertyValidationService.Value.IsPropertyDataValid(content, out _, impact);
             });
         }
 
-        return content.PublishCulture(_cultureImpactFactory.ImpactInvariant(), publishTime)
+        return content.PublishCulture(_cultureImpactFactory.ImpactInvariant(), publishTime, _propertyEditorCollection)
                && _propertyValidationService.Value.IsPropertyDataValid(content, out _, _cultureImpactFactory.ImpactInvariant());
     }
 
@@ -3197,7 +3203,7 @@ public class ContentService : RepositoryService, IContentService
 
         // publish the culture(s)
         var publishTime = DateTime.Now;
-        if (!impactsToPublish.All(impact => content.PublishCulture(impact, publishTime)))
+        if (!impactsToPublish.All(impact => content.PublishCulture(impact, publishTime, _propertyEditorCollection)))
         {
             return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
         }

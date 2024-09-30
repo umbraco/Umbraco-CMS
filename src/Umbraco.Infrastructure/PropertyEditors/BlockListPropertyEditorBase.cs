@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -62,13 +63,16 @@ public abstract class BlockListPropertyEditorBase : DataEditor
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
-            IPropertyValidationService propertyValidationService) :
-            base(attribute, propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
+            IPropertyValidationService propertyValidationService,
+            BlockEditorVarianceHandler blockEditorVarianceHandler)
+            : base(attribute, propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, textService, logger, shortStringHelper, jsonSerializer, ioHelper, blockEditorVarianceHandler)
         {
             BlockEditorValues = new BlockEditorValues<BlockListValue, BlockListLayoutItem>(blockEditorDataConverter, elementTypeCache, logger);
             Validators.Add(new BlockEditorValidator<BlockListValue, BlockListLayoutItem>(propertyValidationService, BlockEditorValues, elementTypeCache));
             Validators.Add(new MinMaxValidator(BlockEditorValues, textService));
         }
+
+        protected override BlockListValue CreateWithLayout(IEnumerable<BlockListLayoutItem> layout) => new(layout);
 
         private class MinMaxValidator : BlockEditorMinMaxValidatorBase<BlockListValue, BlockListLayoutItem>
         {
