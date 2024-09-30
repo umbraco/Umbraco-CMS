@@ -188,17 +188,19 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             return;
         }
 
-        if(payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
         {
             _documentNavigationManagementService.MoveToBin(payload.Key.Value);
             _documentNavigationManagementService.RemoveFromBin(payload.Key.Value);
         }
-        if(payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
         {
             _documentNavigationManagementService.RebuildAsync();
             _documentNavigationManagementService.RebuildBinAsync();
         }
-        if(payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
         {
             IContent? content = _contentService.GetById(payload.Id);
 
@@ -229,9 +231,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     private void HandleNavigationForSingleContent(IContent content)
     {
-
-        //First creation
-        if(ExistsInNavigation(content.Key) is false && ExistsInNavigationBin(content.Key) is false)
+        // First creation
+        if (ExistsInNavigation(content.Key) is false && ExistsInNavigationBin(content.Key) is false)
         {
             _documentNavigationManagementService.Add(content.Key, GetParentKey(content));
             if (content.Trashed)
@@ -239,7 +240,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 // If created as trashed, move to bin
                 _documentNavigationManagementService.MoveToBin(content.Key);
             }
-        }else if(ExistsInNavigation(content.Key) is true && ExistsInNavigationBin(content.Key) is false)
+        }
+        else if (ExistsInNavigation(content.Key) && ExistsInNavigationBin(content.Key) is false)
         {
             if (content.Trashed)
             {
@@ -248,7 +250,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             }
             else
             {
-                // it most have been saved. Check if parent is different
+                // It must have been saved. Check if parent is different
                 if (_documentNavigationQueryService.TryGetParentKey(content.Key, out var oldParentKey))
                 {
                     Guid? newParentKey = GetParentKey(content);
@@ -259,7 +261,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 }
             }
         }
-        else if (ExistsInNavigation(content.Key) is false && ExistsInNavigationBin(content.Key) is true)
+        else if (ExistsInNavigation(content.Key) is false && ExistsInNavigationBin(content.Key))
         {
             if (content.Trashed is false)
             {

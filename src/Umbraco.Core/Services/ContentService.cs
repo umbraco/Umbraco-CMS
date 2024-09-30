@@ -2534,8 +2534,6 @@ public class ContentService : RepositoryService, IContentService
     // trash indicates whether we are trashing, un-trashing, or not changing anything
     private void PerformMoveLocked(IContent content, int parentId, IContent? parent, int userId, ICollection<(IContent, string)> moves, bool? trash)
     {
-        // Needed to update the in-memory navigation structure
-        var cameFromRecycleBin = content.ParentId == Constants.System.RecycleBinContent;
         content.WriterId = userId;
         content.ParentId = parentId;
 
