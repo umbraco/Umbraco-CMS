@@ -122,7 +122,7 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 					this._extensionCategories,
 					(category) => html`
 						<div class="category">
-							<p class="category-name">${category.category}</p>
+							<p class="category-name">${this.localize.string(category.category)}</p>
 							${repeat(
 								category.extensions,
 								(item) => html`
