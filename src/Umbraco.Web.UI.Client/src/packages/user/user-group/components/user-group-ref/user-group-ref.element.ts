@@ -1,9 +1,9 @@
 import { UUIRefNodeElement } from '@umbraco-cms/backoffice/external/uui';
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
-import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
+import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/user-permission';
 
 /**
  *  @element umb-user-group-ref
