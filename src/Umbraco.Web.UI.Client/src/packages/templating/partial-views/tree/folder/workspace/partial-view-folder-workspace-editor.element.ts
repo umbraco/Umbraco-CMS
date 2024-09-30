@@ -23,11 +23,15 @@ export class UmbPartialViewFolderWorkspaceEditorElement extends UmbLitElement {
 
 	#observeName() {
 		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.name, (name) => {
-			if (name !== this._name) {
-				this._name = name ?? '';
-			}
-		});
+		this.observe(
+			this.#workspaceContext.name,
+			(name) => {
+				if (name !== this._name) {
+					this._name = name ?? '';
+				}
+			},
+			'observeName',
+		);
 	}
 
 	override render() {
