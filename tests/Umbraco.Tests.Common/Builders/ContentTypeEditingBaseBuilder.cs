@@ -21,7 +21,7 @@ public abstract class ContentTypeEditingBaseBuilder<TBuilder, TCreateModel, TPro
     private bool? _isElement;
     private bool? _variesByCulture;
     private bool? _variesBySegment;
-    private readonly List<PropertyTypeModelBuilder<TBuilder, TPropertyType>> _propertyTypeBuilders = new();
+    private readonly List<PropertyTypeEditingBuilder<TBuilder, TPropertyType>> _propertyTypeBuilders = new();
     private readonly List<PropertyTypeContainerBuilder<TBuilder, TPropertyTypeContainer>> _propertyTypeContainerBuilders = new();
     private readonly List<ContentTypeSortBuilder<TBuilder>> _allowedContentTypeBuilders = new();
 
@@ -74,9 +74,9 @@ public abstract class ContentTypeEditingBaseBuilder<TBuilder, TCreateModel, TPro
         set => _variesBySegment = value;
     }
 
-    public PropertyTypeModelBuilder<TBuilder, TPropertyType> AddPropertyType()
+    public PropertyTypeEditingBuilder<TBuilder, TPropertyType> AddPropertyType()
     {
-        var builder = new PropertyTypeModelBuilder<TBuilder, TPropertyType>((TBuilder)this);
+        var builder = new PropertyTypeEditingBuilder<TBuilder, TPropertyType>((TBuilder)this);
         _propertyTypeBuilders.Add(builder);
         return builder;
     }
