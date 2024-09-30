@@ -1,8 +1,8 @@
-import type { ManifestAuthProvider } from '../../extension-registry/models/index.js';
 import type { UmbAuthProviderDefaultProps, UmbUserLoginState } from '../types.js';
 import { UmbLitElement } from '../../lit-element/lit-element.element.js';
 import { UmbTextStyles } from '../../style/index.js';
 import { css, customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import type { ManifestAuthProvider } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-auth-provider-default')
 export class UmbAuthProviderDefaultElement extends UmbLitElement implements UmbAuthProviderDefaultProps {
