@@ -1,13 +1,6 @@
-import type { ManifestFileUploadPreview } from './file-upload-preview.model.js';
 import type { ManifestBase, ManifestBundle, ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
-export type * from './file-upload-preview.model.js';
-
-export type ManifestTypes =
-	| ManifestBundle<ManifestTypes>
-	| ManifestCondition
-	| ManifestFileUploadPreview
-	| ManifestBase;
+export type ManifestTypes = ManifestBundle<ManifestTypes> | ManifestCondition | ManifestBase;
 
 type UnionOfProperties<T> = T extends object ? T[keyof T] : never;
 
