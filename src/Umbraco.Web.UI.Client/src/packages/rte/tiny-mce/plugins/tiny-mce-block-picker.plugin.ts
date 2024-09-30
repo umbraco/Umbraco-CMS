@@ -114,7 +114,8 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 
 			const blockEl = `<${blockTag} ${UMB_BLOCK_RTE_DATA_CONTENT_KEY}="${block.key}"></${blockTag}>`;
 
-			editor.insertContent(blockEl);
+			editor.selection.setContent(blockEl);
+			editor.setDirty(true);
 		});
 	}
 }

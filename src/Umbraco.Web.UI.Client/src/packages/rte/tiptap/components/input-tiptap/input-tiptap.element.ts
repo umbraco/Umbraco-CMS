@@ -1,4 +1,4 @@
-import type { UmbTiptapExtensionApi } from '../../extensions/types.js';
+import type { UmbTiptapExtensionApi, UmbTiptapToolbarValue } from '../../extensions/types.js';
 import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -75,7 +75,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	private _editor!: Editor;
 
 	@state()
-	_toolbar: string[][][] = [[[]]];
+	_toolbar: UmbTiptapToolbarValue = [[[]]];
 
 	protected override async firstUpdated() {
 		await Promise.all([await this.#loadExtensions(), await this.#loadEditor()]);
@@ -105,12 +105,11 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		const element = this.shadowRoot?.querySelector('#editor');
 		if (!element) return;
 
-		const maxWidth = this.configuration?.getValueByAlias<number>('maxWidth');
-		const maxHeight = this.configuration?.getValueByAlias<number>('maxHeight');
-		if (maxWidth) this.setAttribute('style', `max-width: ${maxWidth}px;`);
-		if (maxHeight) element.setAttribute('style', `max-height: ${maxHeight}px;`);
+		const dimensions = this.configuration?.getValueByAlias<{ width?: number; height?: number }>('dimensions');
+		if (dimensions?.width) this.setAttribute('style', `max-width: ${dimensions.width}px;`);
+		if (dimensions?.height) element.setAttribute('style', `max-height: ${dimensions.height}px;`);
 
-		this._toolbar = this.configuration?.getValueByAlias<string[][][]>('toolbar') ?? [[[]]];
+		this._toolbar = this.configuration?.getValueByAlias<UmbTiptapToolbarValue>('toolbar') ?? [[[]]];
 
 		const extensions = this._extensions
 			.map((ext) => ext.getTiptapExtensions({ configuration: this.configuration }))
@@ -264,6 +263,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 				.umb-embed-holder.ProseMirror-selectednode::before {
 					background: rgba(0, 0, 0, 0.025);
+				}
+
 				/* Table-specific styling */
 				.tableWrapper {
 					margin: 1.5rem 0;
@@ -318,7 +319,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 							width: 3px;
 						}
 					}
-				}
 
 				.resize-cursor {
 					cursor: ew-resize;

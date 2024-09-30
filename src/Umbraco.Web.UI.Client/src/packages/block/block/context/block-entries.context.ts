@@ -95,7 +95,7 @@ export abstract class UmbBlockEntriesContext<
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataModel,
 		settings: UmbBlockDataModel | undefined,
-		originData: UmbBlockWorkspaceOriginData,
+		originData: BlockOriginData,
 	): Promise<boolean>;
 	//edit?
 	//editSettings
