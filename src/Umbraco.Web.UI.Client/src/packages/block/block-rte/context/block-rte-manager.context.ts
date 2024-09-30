@@ -43,6 +43,6 @@ export class UmbBlockRteManagerContext<
 	 * @internal
 	 */
 	public deleteLayoutElement(contentKey: string) {
-		this.removeBlockUdi(contentKey);
+		this.removeBlockKey(contentKey);
 	}
 }

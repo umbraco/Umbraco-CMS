@@ -27,13 +27,6 @@ export abstract class UmbRteBaseElement extends UmbLitElement implements UmbProp
 		this.#managerContext.setEditorConfiguration(config);
 	}
 
-	/**
-	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
-	 * @default false
-	 */
-	@property({ type: Boolean, reflect: true })
-	readonly = false;
-
 	@property({
 		attribute: false,
 		type: Object,
@@ -45,6 +38,7 @@ export abstract class UmbRteBaseElement extends UmbLitElement implements UmbProp
 		const buildUpValue: Partial<UmbPropertyEditorUiValueType> = value ? { ...value } : {};
 		buildUpValue.markup ??= '';
 		buildUpValue.blocks ??= { layout: {}, contentData: [], settingsData: [], expose: [] };
+		buildUpValue.blocks.layout ??= {};
 		buildUpValue.blocks.contentData ??= [];
 		buildUpValue.blocks.settingsData ??= [];
 		buildUpValue.blocks.expose ??= [];
@@ -63,6 +57,13 @@ export abstract class UmbRteBaseElement extends UmbLitElement implements UmbProp
 	public get value() {
 		return this._value;
 	}
+
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
 
 	@state()
 	protected _config?: UmbPropertyEditorConfigCollection;
@@ -119,7 +120,34 @@ export abstract class UmbRteBaseElement extends UmbLitElement implements UmbProp
 				'observePropertyAlias',
 			);
 
-			this.observe(
+			this.observe(this.#entriesContext.layoutEntries, (layouts) => {
+				// Update manager:
+				this.#managerContext.setLayouts(layouts);
+			});
+
+			// Observe the value of the property and update the editor value.
+			this.observe(this.#managerContext.layouts, (layouts) => {
+				this._value = {
+					...this._value,
+					blocks: { ...this._value.blocks, layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts } },
+				};
+				this._fireChangeEvent();
+			});
+			this.observe(this.#managerContext.contents, (contents) => {
+				this._value = { ...this._value, blocks: { ...this._value.blocks, contentData: contents } };
+				this._fireChangeEvent();
+			});
+			this.observe(this.#managerContext.settings, (settings) => {
+				this._value = { ...this._value, blocks: { ...this._value.blocks, settingsData: settings } };
+				this._fireChangeEvent();
+			});
+			this.observe(this.#managerContext.exposes, (exposes) => {
+				this._value = { ...this._value, blocks: { ...this._value.blocks, expose: exposes } };
+				this._fireChangeEvent();
+			});
+
+			// The above could potentially be replaced with a single observeMultiple call, but it is not done for now to avoid potential issues with the order of the updates.
+			/*this.observe(
 				observeMultiple([
 					this.#managerContext.layouts,
 					this.#managerContext.contents,
@@ -127,7 +155,6 @@ export abstract class UmbRteBaseElement extends UmbLitElement implements UmbProp
 					this.#managerContext.exposes,
 				]).pipe(debounceTime(20)),
 				([layouts, contents, settings, exposes]) => {
-					console.log('new blocks', layouts, contents, exposes);
 					this._value = {
 						...this._value,
 						blocks: {
@@ -137,11 +164,11 @@ export abstract class UmbRteBaseElement extends UmbLitElement implements UmbProp
 							expose: exposes,
 						},
 					};
-					//context.setValue(this._value);
+
 					this._fireChangeEvent();
 				},
 				'motherObserver',
-			);
+			);*/
 		});
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
 			this.#managerContext.setVariantId(context.getVariantId());
@@ -154,6 +181,10 @@ export abstract class UmbRteBaseElement extends UmbLitElement implements UmbProp
 	}
 
 	protected _filterUnusedBlocks(usedContentKeys: (string | null)[]) {
+		const unusedBlockContents = this.#managerContext.getContents().filter((x) => usedContentKeys.indexOf(x.key) === -1);
+		unusedBlockContents.forEach((blockContent) => {
+			this.#managerContext.removeOneContent(blockContent.key);
+		});
 		const unusedBlocks = this.#managerContext.getLayouts().filter((x) => usedContentKeys.indexOf(x.contentKey) === -1);
 		unusedBlocks.forEach((blockLayout) => {
 			this.#managerContext.removeOneLayout(blockLayout.contentKey);

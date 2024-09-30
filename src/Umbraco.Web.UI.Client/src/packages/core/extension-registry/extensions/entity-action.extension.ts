@@ -176,3 +176,30 @@ export interface MetaEntityActionSortChildrenOfKind extends MetaEntityActionDefa
 	sortChildrenOfRepositoryAlias: string;
 	treeRepositoryAlias: string;
 }
+
+export type UmbEntityActionExtensions =
+	| ManifestEntityAction
+	| ManifestEntityActionCreateFolderKind
+	| ManifestEntityActionDefaultKind
+	| ManifestEntityActionDeleteFolderKind
+	| ManifestEntityActionDeleteKind
+	| ManifestEntityActionDuplicateToKind
+	| ManifestEntityActionEmptyRecycleBinKind
+	| ManifestEntityActionMoveToKind
+	| ManifestEntityActionReloadTreeItemChildrenKind
+	| ManifestEntityActionRenameServerFileKind
+	| ManifestEntityActionRestoreFromRecycleBinKind
+	| ManifestEntityActionSortChildrenOfKind
+	| ManifestEntityActionTrashKind
+	| ManifestEntityActionUpdateFolderKind;
+
+/**
+ * @deprecated use `UmbEntityActionExtensions` instead.
+ */
+export type ManifestEntityActions = UmbEntityActionExtensions;
+
+declare global {
+	interface UmbExtensionManifestMap {
+		UmbEntityActionExtensions: UmbEntityActionExtensions;
+	}
+}

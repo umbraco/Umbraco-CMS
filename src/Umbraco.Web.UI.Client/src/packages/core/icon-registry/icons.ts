@@ -1712,7 +1712,7 @@ name: "icon-shipping",
 path: () => import("./icons/icon-shipping.js"),
 },{
 name: "icon-shoe",
-
+legacy: true,
 path: () => import("./icons/icon-shoe.js"),
 },{
 name: "icon-shopping-basket-alt-2",
@@ -1850,6 +1850,14 @@ path: () => import("./icons/icon-stream.js"),
 name: "icon-strikethrough",
 
 path: () => import("./icons/icon-strikethrough.js"),
+},{
+name: "icon-subscript",
+
+path: () => import("./icons/icon-subscript.js"),
+},{
+name: "icon-superscript",
+
+path: () => import("./icons/icon-superscript.js"),
 },{
 name: "icon-sunny",
 

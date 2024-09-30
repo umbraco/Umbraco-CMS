@@ -13,3 +13,11 @@ export interface ManifestTreeStore extends ManifestApi<UmbTreeStore<any>> {
 export interface ManifestItemStore extends ManifestApi<UmbItemStore<any>> {
 	type: 'itemStore';
 }
+
+export type UmbStoreExtensions = ManifestStore | ManifestTreeStore | ManifestItemStore;
+
+declare global {
+	interface UmbExtensionManifestMap {
+		UmbStoreExtensions: UmbStoreExtensions;
+	}
+}

@@ -1967,6 +1967,14 @@
 			"file": "strikethrough.svg"
 		},
 		{
+			"name": "icon-subscript",
+			"file": "subscript.svg"
+		},
+		{
+			"name": "icon-superscript",
+			"file": "superscript.svg"
+		},
+		{
 			"name": "icon-sunny",
 			"file": "sun.svg"
 		},

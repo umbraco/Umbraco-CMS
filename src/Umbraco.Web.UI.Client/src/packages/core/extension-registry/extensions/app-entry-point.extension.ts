@@ -10,3 +10,9 @@ import type { ManifestPlainJs, UmbEntryPointModule } from '@umbraco-cms/backoffi
 export interface ManifestAppEntryPoint extends ManifestPlainJs<UmbEntryPointModule> {
 	type: 'appEntryPoint';
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		UmbGlobalAppEntryPointExtension: ManifestAppEntryPoint;
+	}
+}
