@@ -30,9 +30,6 @@ import type { ManifestMenu } from './menu.model.js';
 import type { ManifestMenuItem, ManifestMenuItemLinkKind, ManifestMenuItemTreeKind } from './menu-item.model.js';
 import type { ManifestPreviewAppProvider } from './preview-app.model.js';
 import type { ManifestRepository } from './repository.model.js';
-import type { ManifestSection } from './section.model.js';
-import type { ManifestSectionSidebarApp, ManifestSectionSidebarAppMenuKind } from './section-sidebar-app.model.js';
-import type { ManifestSectionView } from './section-view.model.js';
 import type { ManifestStore, ManifestTreeStore, ManifestItemStore } from './store.model.js';
 import type { ManifestTinyMcePlugin } from './tinymce-plugin.model.js';
 import type { ManifestUfmComponent } from './ufm-component.model.js';
@@ -45,7 +42,6 @@ import type { ManifestAppEntryPoint } from './app-entry-point.model.js';
 import type { ManifestBackofficeEntryPoint } from './backoffice-entry-point.model.js';
 import type { ManifestEntryPoint } from './entry-point.model.js';
 import type { ManifestMonacoMarkdownEditorAction } from './monaco-markdown-editor-action.model.js';
-import type { ManifestSectionRoute } from './section-route.model.js';
 import type { ManifestPickerSearchResultItem } from './picker-search-result-item.model.js';
 import type { ManifestBase, ManifestBundle, ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
@@ -73,9 +69,6 @@ export type * from './monaco-markdown-editor-action.model.js';
 export type * from './picker-search-result-item.model.js';
 export type * from './preview-app.model.js';
 export type * from './repository.model.js';
-export type * from './section-sidebar-app.model.js';
-export type * from './section-view.model.js';
-export type * from './section.model.js';
 export type * from './store.model.js';
 export type * from './tinymce-plugin.model.js';
 export type * from './ufm-component.model.js';
@@ -133,11 +126,6 @@ export type ManifestTypes =
 	| ManifestPickerSearchResultItem
 	| ManifestPreviewAppProvider
 	| ManifestRepository
-	| ManifestSection
-	| ManifestSectionRoute
-	| ManifestSectionSidebarApp
-	| ManifestSectionSidebarAppMenuKind
-	| ManifestSectionView
 	| ManifestStore
 	| ManifestTinyMcePlugin
 	| ManifestTreeStore

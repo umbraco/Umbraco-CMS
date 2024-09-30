@@ -3,7 +3,7 @@ import { UMB_BACKOFFICE_CONTEXT } from '../backoffice.context.js';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSectionContext, UMB_SECTION_CONTEXT, UMB_SECTION_PATH_PATTERN } from '@umbraco-cms/backoffice/section';
 import type { PageComponent, UmbRoute, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
-import type { ManifestSection, UmbSectionElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestSection, UmbSectionElement } from '@umbraco-cms/backoffice/section';
 import type { UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
