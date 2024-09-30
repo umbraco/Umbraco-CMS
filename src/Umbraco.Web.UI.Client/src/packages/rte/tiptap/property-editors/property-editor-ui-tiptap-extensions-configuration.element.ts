@@ -136,7 +136,12 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 											@click=${() => this.#onExtensionClick(item)}>
 											<umb-icon name=${item.icon ?? ''}></umb-icon>
 										</uui-button>
-										<span>${this.localize.string(item.label)}</span>
+										<uui-button
+											compact
+											label=${this.localize.string(item.label)}
+											look="default"
+											style="--uui-button-content-align:left;"
+											@click=${() => this.#onExtensionClick(item)}></uui-button>
 									</div>
 								`,
 							)}
