@@ -64,7 +64,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 								['Umb.Tiptap.Toolbar.BulletList', 'Umb.Tiptap.Toolbar.OrderedList'],
 								['Umb.Tiptap.Toolbar.Blockquote', 'Umb.Tiptap.Toolbar.HorizontalRule'],
 								['Umb.Tiptap.Toolbar.Link', 'Umb.Tiptap.Toolbar.Unlink'],
-								['Umb.Tiptap.Toolbar.MediaPicker', 'Umb.Tiptap.Toolbar.Embed'],
+								['Umb.Tiptap.Toolbar.MediaPicker', 'Umb.Tiptap.Toolbar.EmbeddedMedia'],
 							],
 						],
 					},

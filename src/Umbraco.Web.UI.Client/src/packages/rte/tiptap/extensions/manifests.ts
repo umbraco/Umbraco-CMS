@@ -463,8 +463,8 @@ const umbToolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 	{
 		type: 'tiptapToolbarExtension',
 		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.Embed',
-		name: 'Embed Tiptap Extension',
+		alias: 'Umb.Tiptap.Toolbar.EmbeddedMedia',
+		name: 'Embedded Media Tiptap Extension',
 		api: () => import('./toolbar/embedded-media.extension.js'),
 		meta: {
 			alias: 'umbEmbeddedMedia',
