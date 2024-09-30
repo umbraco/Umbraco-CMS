@@ -86,7 +86,7 @@ export class UmbCodeBlockElement extends LitElement {
 			pre,
 			code {
 				word-wrap: normal;
-				white-space: pre-line;
+				white-space: pre;
 			}
 
 			#header {

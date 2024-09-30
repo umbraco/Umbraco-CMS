@@ -1,5 +1,5 @@
 import type { UmbBlockWorkspaceOriginData } from '../workspace/block-workspace.modal-token.js';
-import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
+import type { UmbBlockDataModel, UmbBlockLayoutBaseModel } from '../types.js';
 import type { UmbBlockDataObjectModel, UmbBlockManagerContext } from './block-manager.context.js';
 import { UMB_BLOCK_ENTRIES_CONTEXT } from './block-entries.context-token.js';
 import { type Observable, UmbArrayState, UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
@@ -38,7 +38,7 @@ export abstract class UmbBlockEntriesContext<
 
 	public abstract readonly canCreate: Observable<boolean>;
 
-	protected _layoutEntries = new UmbArrayState<BlockLayoutType>([], (x) => x.contentUdi);
+	protected _layoutEntries = new UmbArrayState<BlockLayoutType>([], (x) => x.contentKey);
 	readonly layoutEntries = this._layoutEntries.asObservable();
 	readonly layoutEntriesLength = this._layoutEntries.asObservablePart((x) => x.length);
 
@@ -69,11 +69,11 @@ export abstract class UmbBlockEntriesContext<
 
 	// Public methods:
 
-	layoutOf(contentUdi: string) {
-		return this._layoutEntries.asObservablePart((source) => source.find((x) => x.contentUdi === contentUdi));
+	layoutOf(contentKey: string) {
+		return this._layoutEntries.asObservablePart((source) => source.find((x) => x.contentKey === contentKey));
 	}
-	getLayoutOf(contentUdi: string) {
-		return this._layoutEntries.getValue().find((x) => x.contentUdi === contentUdi);
+	getLayoutOf(contentKey: string) {
+		return this._layoutEntries.getValue().find((x) => x.contentKey === contentKey);
 	}
 	setLayouts(layouts: Array<BlockLayoutType>) {
 		return this._layoutEntries.setValue(layouts);
@@ -87,33 +87,34 @@ export abstract class UmbBlockEntriesContext<
 
 	public abstract create(
 		contentElementTypeKey: string,
-		layoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
+		layoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
 		originData?: BlockOriginData,
 	): Promise<UmbBlockDataObjectModel<BlockLayoutType> | undefined>;
 
 	abstract insert(
 		layoutEntry: BlockLayoutType,
-		content: UmbBlockDataType,
-		settings: UmbBlockDataType | undefined,
+		content: UmbBlockDataModel,
+		settings: UmbBlockDataModel | undefined,
 		originData: BlockOriginData,
 	): Promise<boolean>;
 	//edit?
 	//editSettings
 
 	// Idea: should we return true if it was successful?
-	public async delete(contentUdi: string) {
+	public async delete(contentKey: string) {
 		await this._retrieveManager;
-		const layout = this._layoutEntries.value.find((x) => x.contentUdi === contentUdi);
+		const layout = this._layoutEntries.value.find((x) => x.contentKey === contentKey);
 		if (!layout) {
-			throw new Error(`Cannot delete block, missing layout for ${contentUdi}`);
+			throw new Error(`Cannot delete block, missing layout for ${contentKey}`);
 		}
 
-		if (layout.settingsUdi) {
-			this._manager!.removeOneSettings(layout.settingsUdi);
+		if (layout.settingsKey) {
+			this._manager!.removeOneSettings(layout.settingsKey);
 		}
-		this._manager!.removeOneContent(contentUdi);
+		this._manager!.removeOneContent(contentKey);
+		this._manager!.removeExposesOf(contentKey);
 
-		this._layoutEntries.removeOne(contentUdi);
+		this._layoutEntries.removeOne(contentKey);
 	}
 	//copy
 }

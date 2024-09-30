@@ -20,7 +20,6 @@ export class UmbUserGroupCollectionHeaderElement extends UmbLitElement {
 	#onSearch(event: InputEvent) {
 		const target = event.target as HTMLInputElement;
 		const query = target.value || '';
-		console.log(this.#collectionContext);
 		this.#debouncedSearch(query);
 	}
 

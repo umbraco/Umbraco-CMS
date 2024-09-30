@@ -1,2 +1,2 @@
 export * from './media-workspace.context-token.js';
-export * from './media-workspace.context.js';
+export * from './constants.js';

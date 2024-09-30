@@ -1,125 +1,49 @@
 import type { ManifestAuthProvider } from './auth-provider.model.js';
 import type { ManifestCurrentUserAction, ManifestCurrentUserActionDefaultKind } from './current-user-action.model.js';
-import type { ManifestDashboard } from './dashboard.model.js';
-import type {
-	ManifestEntityAction,
-	ManifestEntityActionDeleteKind,
-	ManifestEntityActionRenameServerFileKind,
-	ManifestEntityActionReloadTreeItemChildrenKind,
-	ManifestEntityActionDuplicateToKind,
-	ManifestEntityActionMoveToKind,
-	ManifestEntityActionCreateFolderKind,
-	ManifestEntityActionUpdateFolderKind,
-	ManifestEntityActionDeleteFolderKind,
-	ManifestEntityActionDefaultKind,
-	ManifestEntityActionTrashKind,
-	ManifestEntityActionRestoreFromRecycleBinKind,
-	ManifestEntityActionEmptyRecycleBinKind,
-	ManifestEntityActionSortChildrenOfKind,
-} from './entity-action.model.js';
 import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from './dynamic-root.model.js';
-import type { ManifestEntityBulkAction } from './entity-bulk-action.model.js';
 import type { ManifestFileUploadPreview } from './file-upload-preview.model.js';
 import type { ManifestExternalLoginProvider } from './external-login-provider.model.js';
-import type { ManifestGlobalContext } from './global-context.model.js';
-import type { ManifestHeaderApp, ManifestHeaderAppButtonKind } from './header-app.model.js';
 import type { ManifestHealthCheck } from './health-check.model.js';
-import type { ManifestMenu } from './menu.model.js';
-import type { ManifestMenuItem, ManifestMenuItemLinkKind, ManifestMenuItemTreeKind } from './menu-item.model.js';
-import type { ManifestPreviewAppProvider } from './preview-app.model.js';
-import type { ManifestRepository } from './repository.model.js';
-import type { ManifestStore, ManifestTreeStore, ManifestItemStore } from './store.model.js';
 import type { ManifestTinyMcePlugin } from './tinymce-plugin.model.js';
 import type { ManifestUfmComponent } from './ufm-component.model.js';
 import type { ManifestUfmFilter } from './ufm-filter.model.js';
 import type { ManifestUserProfileApp } from './user-profile-app.model.js';
-import type { ManifestEntityUserPermission } from './entity-user-permission.model.js';
 import type { ManifestGranularUserPermission } from './user-granular-permission.model.js';
 import type { ManifestMfaLoginProvider } from './mfa-login-provider.model.js';
-import type { ManifestAppEntryPoint } from './app-entry-point.model.js';
-import type { ManifestBackofficeEntryPoint } from './backoffice-entry-point.model.js';
-import type { ManifestEntryPoint } from './entry-point.model.js';
 import type { ManifestMonacoMarkdownEditorAction } from './monaco-markdown-editor-action.model.js';
 import type { ManifestBase, ManifestBundle, ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
-export type * from './app-entry-point.model.js';
 export type * from './auth-provider.model.js';
-export type * from './backoffice-entry-point.model.js';
 export type * from './current-user-action.model.js';
-export type * from './dashboard.model.js';
 export type * from './dynamic-root.model.js';
-export type * from './entity-action.model.js';
-export type * from './entity-bulk-action.model.js';
-export type * from './entity-user-permission.model.js';
-export type * from './entry-point.model.js';
 export type * from './file-upload-preview.model.js';
 export type * from './external-login-provider.model.js';
-export type * from './global-context.model.js';
-export type * from './header-app.model.js';
 export type * from './health-check.model.js';
-export type * from './menu-item.model.js';
-export type * from './menu.model.js';
 export type * from './mfa-login-provider.model.js';
 export type * from './monaco-markdown-editor-action.model.js';
-export type * from './preview-app.model.js';
-export type * from './repository.model.js';
-export type * from './store.model.js';
+export type * from './mfa-login-provider.model.js';
+export type * from './monaco-markdown-editor-action.model.js';
 export type * from './tinymce-plugin.model.js';
 export type * from './ufm-component.model.js';
 export type * from './ufm-filter.model.js';
 export type * from './user-granular-permission.model.js';
 export type * from './user-profile-app.model.js';
 
-export type ManifestEntityActions =
-	| ManifestEntityAction
-	| ManifestEntityActionCreateFolderKind
-	| ManifestEntityActionDefaultKind
-	| ManifestEntityActionDeleteFolderKind
-	| ManifestEntityActionDeleteKind
-	| ManifestEntityActionDuplicateToKind
-	| ManifestEntityActionEmptyRecycleBinKind
-	| ManifestEntityActionMoveToKind
-	| ManifestEntityActionReloadTreeItemChildrenKind
-	| ManifestEntityActionRenameServerFileKind
-	| ManifestEntityActionRestoreFromRecycleBinKind
-	| ManifestEntityActionSortChildrenOfKind
-	| ManifestEntityActionTrashKind
-	| ManifestEntityActionUpdateFolderKind;
-
 export type ManifestTypes =
-	| ManifestAppEntryPoint
 	| ManifestAuthProvider
-	| ManifestBackofficeEntryPoint
 	| ManifestBundle<ManifestTypes>
 	| ManifestCondition
 	| ManifestCurrentUserAction
 	| ManifestCurrentUserActionDefaultKind
-	| ManifestDashboard
 	| ManifestDynamicRootOrigin
 	| ManifestDynamicRootQueryStep
-	| ManifestEntityActions
-	| ManifestEntityBulkAction
-	| ManifestEntityUserPermission
-	| ManifestEntryPoint
 	| ManifestFileUploadPreview
 	| ManifestExternalLoginProvider
-	| ManifestGlobalContext
 	| ManifestGranularUserPermission
-	| ManifestHeaderApp
-	| ManifestHeaderAppButtonKind
 	| ManifestHealthCheck
-	| ManifestItemStore
-	| ManifestMenu
-	| ManifestMenuItem
-	| ManifestMenuItemTreeKind
-	| ManifestMenuItemLinkKind
 	| ManifestMfaLoginProvider
 	| ManifestMonacoMarkdownEditorAction
-	| ManifestPreviewAppProvider
-	| ManifestRepository
-	| ManifestStore
 	| ManifestTinyMcePlugin
-	| ManifestTreeStore
 	| ManifestUfmComponent
 	| ManifestUfmFilter
 	| ManifestUserProfileApp

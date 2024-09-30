@@ -1,17 +1,23 @@
-import type { UmbBlockDataType } from '../types.js';
+import type { UmbBlockDataModel, UmbBlockDataValueModel } from '../types.js';
 import { UmbBlockElementPropertyDatasetContext } from './block-element-property-dataset.context.js';
-import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
-import { UmbClassState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	type Observable,
+	UmbClassState,
+	UmbObjectState,
+	appendToFrozenArray,
+	mergeObservables,
+} from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbValidationController } from '@umbraco-cms/backoffice/validation';
 
 export class UmbBlockElementManager extends UmbControllerBase {
 	//
-	#data = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
+	#data = new UmbObjectState<UmbBlockDataModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	#getDataPromise = new Promise<void>((resolve) => {
 		this.#getDataResolver = resolve;
@@ -21,7 +27,7 @@ export class UmbBlockElementManager extends UmbControllerBase {
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	readonly variantId = this.#variantId.asObservable();
 
-	readonly unique = this.#data.asObservablePart((data) => data?.udi);
+	readonly unique = this.#data.asObservablePart((data) => data?.key);
 	readonly contentTypeId = this.#data.asObservablePart((data) => data?.contentTypeKey);
 
 	readonly structure = new UmbContentTypeStructureManager<UmbContentTypeModel>(
@@ -35,9 +41,9 @@ export class UmbBlockElementManager extends UmbControllerBase {
 		super(host);
 
 		this.observe(this.contentTypeId, (id) => this.structure.loadType(id));
-		this.observe(this.unique, (udi) => {
-			if (udi) {
-				this.validation.setDataPath('$.' + dataPathPropertyName + `[?(@.udi = '${udi}')]`);
+		this.observe(this.unique, (key) => {
+			if (key) {
+				this.validation.setDataPath('$.' + dataPathPropertyName + `[?(@.key = '${key}')]`);
 			}
 		});
 	}
@@ -49,8 +55,12 @@ export class UmbBlockElementManager extends UmbControllerBase {
 	setVariantId(variantId: UmbVariantId | undefined) {
 		this.#variantId.setValue(variantId);
 	}
+	getVariantId(): UmbVariantId {
+		return this.#variantId.getValue() ?? UmbVariantId.CreateInvariant();
+	}
 
-	setData(data: UmbBlockDataType | undefined) {
+	// TODO: rename to currentData:
+	setData(data: UmbBlockDataModel | undefined) {
 		this.#data.setValue(data);
 		this.#getDataResolver();
 	}
@@ -60,7 +70,7 @@ export class UmbBlockElementManager extends UmbControllerBase {
 	}
 
 	getUnique() {
-		return this.getData()?.udi;
+		return this.getData()?.key;
 	}
 
 	getEntityType() {
@@ -71,42 +81,92 @@ export class UmbBlockElementManager extends UmbControllerBase {
 		return this.getData()?.contentTypeKey;
 	}
 
+	#createPropertyVariantId(property: UmbPropertyTypeModel, variantId: UmbVariantId) {
+		return UmbVariantId.Create({
+			culture: property.variesByCulture ? variantId.culture : null,
+			segment: property.variesBySegment ? variantId.segment : null,
+		});
+	}
+
 	// We will implement propertyAlias in the future, when implementing Varying Blocks. [NL]
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 	async propertyVariantId(propertyAlias: string) {
-		return this.variantId;
+		return mergeObservables(
+			[await this.structure.propertyStructureByAlias(propertyAlias), this.variantId],
+			([property, variantId]) =>
+				property && variantId ? this.#createPropertyVariantId(property, variantId) : undefined,
+		);
 	}
 
 	/**
 	 * @function propertyValueByAlias
-	 * @param {string} propertyAlias
-	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @param {string} propertyAlias - Property Alias to observe the value of.
+	 * @param {UmbVariantId | undefined} variantId - Optional variantId to filter by.
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>} - Promise which resolves to an Observable
 	 * @description Get an Observable for the value of this property.
 	 */
-	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
+	async propertyValueByAlias<PropertyValueType = unknown>(
+		propertyAlias: string,
+	): Promise<Observable<PropertyValueType | undefined> | undefined> {
 		await this.#getDataPromise;
 
-		return this.#data.asObservablePart((data) => data?.[propertyAlias] as ReturnType);
+		return mergeObservables(
+			[
+				this.#data.asObservablePart((data) => data?.values?.filter((x) => x?.alias === propertyAlias)),
+				await this.propertyVariantId(propertyAlias),
+			],
+			([propertyValues, propertyVariantId]) => {
+				if (!propertyValues || !propertyVariantId) return;
+
+				return propertyValues.find((x) => propertyVariantId.compare(x))?.value as PropertyValueType;
+			},
+		);
 	}
 
-	async getPropertyValue<ReturnType = unknown>(propertyAlias: string) {
+	/**
+	 * Get the current value of the property with the given alias and variantId.
+	 * @param {string} alias - The alias of the property
+	 * @returns {ReturnType} The value or undefined if not set or found.
+	 */
+	async getPropertyValue<ReturnType = unknown>(alias: string) {
 		await this.#getDataPromise;
-
-		return this.#data.getValue()?.[propertyAlias] as ReturnType;
+		const managerVariantId = this.#variantId.getValue();
+		if (!managerVariantId) return;
+		const property = await this.structure.getPropertyStructureByAlias(alias);
+		if (!property) return;
+		const variantId = this.#createPropertyVariantId(property, managerVariantId);
+		const currentData = this.getData();
+		if (!currentData) return;
+		const newDataSet = currentData.values?.find((x) => x.alias === alias && (variantId ? variantId.compare(x) : true));
+		return newDataSet?.value as ReturnType;
 	}
 
 	/**
 	 * @function setPropertyValue
-	 * @param {string} alias
+	 * @param {string} alias - The alias of the property
 	 * @param {unknown} value - value can be a promise resolving into the actual value or the raw value it self.
 	 * @returns {Promise<void>}
 	 * @description Set the value of this property.
 	 */
-	async setPropertyValue(alias: string, value: unknown) {
+	async setPropertyValue<ValueType = unknown>(alias: string, value: ValueType) {
 		this.initiatePropertyValueChange();
 		await this.#getDataPromise;
+		const managerVariantId = this.#variantId.getValue();
+		if (!managerVariantId) return;
+		const property = await this.structure.getPropertyStructureByAlias(alias);
+		if (!property) return;
+		const variantId = this.#createPropertyVariantId(property, managerVariantId);
 
-		this.#data.update({ [alias]: value });
+		const entry = { ...variantId.toObject(), alias, value } as UmbBlockDataValueModel<ValueType>;
+		const currentData = this.getData();
+		if (currentData) {
+			const values = appendToFrozenArray(
+				currentData.values ?? [],
+				entry,
+				(x) => x.alias === alias && variantId.compare(x),
+			);
+			this.#data.update({ values });
+		}
 		this.finishPropertyValueChange();
 	}
 
@@ -130,7 +190,7 @@ export class UmbBlockElementManager extends UmbControllerBase {
 	}
 
 	public createPropertyDatasetContext(host: UmbControllerHost) {
-		return new UmbBlockElementPropertyDatasetContext(host, this);
+		return new UmbBlockElementPropertyDatasetContext(host, this, this.getVariantId());
 	}
 
 	public setup(host: UmbClassInterface) {

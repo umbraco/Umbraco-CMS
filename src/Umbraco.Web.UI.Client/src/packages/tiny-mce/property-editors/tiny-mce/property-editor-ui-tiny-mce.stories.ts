@@ -84,6 +84,7 @@ const meta: Meta<UmbPropertyEditorUITinyMceElement> = {
 				layout: {},
 				contentData: [],
 				settingsData: [],
+				expose: [],
 			},
 			markup: `
 			<h2>TinyMCE</h2>

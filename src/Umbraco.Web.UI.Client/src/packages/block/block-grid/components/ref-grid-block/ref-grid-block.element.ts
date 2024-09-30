@@ -33,7 +33,11 @@ export class UmbRefGridBlockElement extends UUIRefNodeElement {
 			#open-part {
 				min-height: var(
 					--uui-size-layout-2
-				); /* We should not do this, but it is a quick fix for now to ensure that the top part of a block gets a minimum height. */
+				); /* TODO: We should not do this, but it is a quick fix for now to ensure that the top part of a block gets a minimum height. */
+			}
+
+			:host([unpublished]) #open-part {
+				opacity: 0.6;
 			}
 		`,
 	];
