@@ -109,8 +109,8 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
                     mediaCache.Result?.ClearOfType<IMedia>((_, v) => v.Path?.Contains(pathid) ?? false);
                 }
             }
-            HandleNavigation(payload);
 
+            HandleNavigation(payload);
         }
 
         _publishedSnapshotService.Notify(payloads, out var hasPublishedDataChanged);
@@ -131,50 +131,51 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
             return;
         }
 
-        if(payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
         {
             _mediaNavigationManagementService.MoveToBin(payload.Key.Value);
             _mediaNavigationManagementService.RemoveFromBin(payload.Key.Value);
         }
-        if(payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
         {
             _mediaNavigationManagementService.RebuildAsync();
             _mediaNavigationManagementService.RebuildBinAsync();
         }
-        if(payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
-        {
-            IMedia? content = _mediaService.GetById(payload.Id);
 
-            if (content is null)
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
+        {
+            IMedia? media = _mediaService.GetById(payload.Id);
+
+            if (media is null)
             {
                 return;
             }
 
-            HandleNavigationForSingleContent(content);
+            HandleNavigationForSingleMedia(media);
         }
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
         {
-            IMedia? content = _mediaService.GetById(payload.Id);
+            IMedia? media = _mediaService.GetById(payload.Id);
 
-            if (content is null)
+            if (media is null)
             {
                 return;
             }
 
-            IEnumerable<IMedia> descendants = _mediaService.GetPagedDescendants(content.Id, 0, int.MaxValue, out _);
-            foreach (IMedia descendant in content.Yield().Concat(descendants))
+            IEnumerable<IMedia> descendants = _mediaService.GetPagedDescendants(media.Id, 0, int.MaxValue, out _);
+            foreach (IMedia descendant in media.Yield().Concat(descendants))
             {
-                HandleNavigationForSingleContent(descendant);
+                HandleNavigationForSingleMedia(descendant);
             }
         }
     }
 
-    private void HandleNavigationForSingleContent(IMedia media)
+    private void HandleNavigationForSingleMedia(IMedia media)
     {
-
-        //First creation
-        if(ExistsInNavigation(media.Key) is false && ExistsInNavigationBin(media.Key) is false)
+        // First creation
+        if (ExistsInNavigation(media.Key) is false && ExistsInNavigationBin(media.Key) is false)
         {
             _mediaNavigationManagementService.Add(media.Key, GetParentKey(media));
             if (media.Trashed)
@@ -182,7 +183,8 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
                 // If created as trashed, move to bin
                 _mediaNavigationManagementService.MoveToBin(media.Key);
             }
-        }else if(ExistsInNavigation(media.Key) is true && ExistsInNavigationBin(media.Key) is false)
+        }
+        else if (ExistsInNavigation(media.Key) && ExistsInNavigationBin(media.Key) is false)
         {
             if (media.Trashed)
             {
@@ -191,7 +193,7 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
             }
             else
             {
-                // it most have been saved. Check if parent is different
+                // It must have been saved. Check if parent is different
                 if (_mediaNavigationQueryService.TryGetParentKey(media.Key, out var oldParentKey))
                 {
                     Guid? newParentKey = GetParentKey(media);
@@ -202,7 +204,7 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
                 }
             }
         }
-        else if (ExistsInNavigation(media.Key) is false && ExistsInNavigationBin(media.Key) is true)
+        else if (ExistsInNavigation(media.Key) is false && ExistsInNavigationBin(media.Key))
         {
             if (media.Trashed is false)
             {

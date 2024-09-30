@@ -59,5 +59,4 @@ public abstract class DocumentNavigationServiceTestsBase : UmbracoIntegrationTes
         builder.Services.AddUnique<IServerMessenger, ScopedRepositoryTests.LocalServerMessenger>();
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
     }
-
 }
