@@ -387,6 +387,10 @@ name: "icon-code",
 
 path: () => import("./icons/icon-code.js"),
 },{
+name: "icon-code-xml",
+
+path: () => import("./icons/icon-code-xml.js"),
+},{
 name: "icon-coffee",
 
 path: () => import("./icons/icon-coffee.js"),

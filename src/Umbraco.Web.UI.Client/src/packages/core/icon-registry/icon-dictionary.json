@@ -400,6 +400,10 @@
 			"file": "code.svg"
 		},
 		{
+			"name": "icon-code-xml",
+			"file": "code-xml.svg"
+		},
+		{
 			"name": "icon-coffee",
 			"file": "coffee.svg"
 		},
