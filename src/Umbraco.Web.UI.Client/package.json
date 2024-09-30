@@ -43,7 +43,7 @@
 		"./entity": "./dist-cms/packages/core/entity/index.js",
 		"./event": "./dist-cms/packages/core/event/index.js",
 		"./extension-registry": "./dist-cms/packages/core/extension-registry/index.js",
-		"./health-check": "./dist-cms/packages/core/health-check/index.js",
+		"./health-check": "./dist-cms/packages/health-check/index.js",
 		"./help": "./dist-cms/packages/help/index.js",
 		"./icon": "./dist-cms/packages/core/icon-registry/index.js",
 		"./id": "./dist-cms/packages/core/id/index.js",

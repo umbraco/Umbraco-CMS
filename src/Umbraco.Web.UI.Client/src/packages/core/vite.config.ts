@@ -26,7 +26,6 @@ export default defineConfig({
 			'entry-point': 'entry-point.ts',
 			'event/index': './event/index.ts',
 			'extension-registry/index': './extension-registry/index.ts',
-			'health-check/index': './health-check/index.ts',
 			'icon-registry/index': './icon-registry/index.ts',
 			'id/index': './id/index.ts',
 			'lit-element/index': './lit-element/index.ts',
