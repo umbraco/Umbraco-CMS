@@ -1,13 +1,8 @@
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
 import { UMB_DICTIONARY_TREE_ALIAS } from '../tree/index.js';
-import { UMB_DICTIONARY_MENU_ALIAS } from './constants.js';
+import { UMB_TRANSLATION_MENU_ALIAS } from '@umbraco-cms/backoffice/translation';
 
 export const manifests: Array<UmbExtensionManifest> = [
-	{
-		type: 'menu',
-		alias: UMB_DICTIONARY_MENU_ALIAS,
-		name: 'Dictionary Menu',
-	},
 	{
 		type: 'menuItem',
 		kind: 'tree',
@@ -18,7 +13,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Dictionary',
 			icon: 'icon-book-alt',
 			entityType: UMB_DICTIONARY_ENTITY_TYPE,
-			menus: [UMB_DICTIONARY_MENU_ALIAS],
+			menus: [UMB_TRANSLATION_MENU_ALIAS],
 			treeAlias: UMB_DICTIONARY_TREE_ALIAS,
 			hideTreeRoot: true,
 		},
