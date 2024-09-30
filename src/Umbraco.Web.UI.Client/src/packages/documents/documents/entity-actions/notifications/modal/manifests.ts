@@ -6,7 +6,7 @@ const modalManifest: ManifestModal = {
 	type: 'modal',
 	alias: UMB_DOCUMENT_NOTIFICATIONS_MODAL_ALIAS,
 	name: 'Document Notifications Modal',
-	js: () => import('./document-notifications-modal.element.js'),
+	element: () => import('./document-notifications-modal.element.js'),
 };
 
 export const manifests = [modalManifest];

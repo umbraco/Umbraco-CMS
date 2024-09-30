@@ -35,3 +35,11 @@ export interface ManifestMenuItemLinkKind extends ManifestMenuItem {
 export interface MetaMenuItemLinkKind extends MetaMenuItem {
 	href: string;
 }
+
+export type UmbMenuItemExtensions = ManifestMenuItem | ManifestMenuItemTreeKind | ManifestMenuItemLinkKind;
+
+declare global {
+	interface UmbExtensionManifestMap {
+		UmbMenuItemExtensions: UmbMenuItemExtensions;
+	}
+}
