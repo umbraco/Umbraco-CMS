@@ -42,8 +42,17 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 						weight: 40,
 						config: [{ alias: 'min', value: 0 }],
 					},
+					{
+						alias: 'overlaySize',
+						label: 'Overlay Size',
+						description: 'Select the width of the overlay (link picker)',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
+						weight: 50,
+					},
 				],
-				defaultData: [],
+				defaultData: [
+					{ alias: 'overlaySize', value: 'medium' },
+				],
 			},
 		},
 	},
