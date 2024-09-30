@@ -91,6 +91,9 @@ export abstract class UmbBlockManagerContext<
 	setContents(contents: Array<UmbBlockDataModel>) {
 		this.#contents.setValue(contents);
 	}
+	getContents() {
+		return this.#contents.value;
+	}
 	setSettings(settings: Array<UmbBlockDataModel>) {
 		this.#settings.setValue(settings);
 	}
