@@ -38,9 +38,8 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 						alias: 'maxImageSize',
 						label: 'Maximum size for inserted images',
 						description: 'Maximum width or height - enter 0 to disable resizing',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.MaxImageSizeConfiguration',
 						weight: 40,
-						config: [{ alias: 'min', value: 0 }],
 					},
 					{
 						alias: 'overlaySize',
@@ -50,7 +49,10 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 						weight: 50,
 					},
 				],
-				defaultData: [{ alias: 'overlaySize', value: 'medium' }],
+				defaultData: [
+					{ alias: 'maxImageSize', value: 500 },
+					{ alias: 'overlaySize', value: 'medium' },
+				],
 			},
 		},
 	},
