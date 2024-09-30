@@ -1,16 +1,21 @@
 @using Umbraco.Cms.Core
 @using Umbraco.Cms.Core.Models.PublishedContent
+@using Umbraco.Cms.Core.PublishedCache
 @using Umbraco.Cms.Core.Routing
+@using Umbraco.Cms.Core.Services.Navigation
 @using Umbraco.Extensions
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @inject IPublishedValueFallback PublishedValueFallback
 @inject IPublishedUrlProvider PublishedUrlProvider
+@inject IVariationContextAccessor VariationContextAccessor
+@inject IPublishedContentCache PublishedContentCache
+@inject IDocumentNavigationQueryService DocumentNavigationQueryService
 @*
     This snippet creates links for every single page (no matter how deep) below
     the page currently being viewed by the website visitor, displayed as nested unordered HTML lists.
 *@
 
-@{ var selection = Model?.Content.Children.Where(x => x.IsVisible(PublishedValueFallback)).ToArray(); }
+@{ var selection = Model?.Content.Children(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService).Where(x => x.IsVisible(PublishedValueFallback)).ToArray(); }
 
 @* Ensure that the Current Page has children *@
 @if (selection?.Length > 0)
@@ -28,7 +33,11 @@
 
                 @* if this child page has any children, where the property umbracoNaviHide is not True *@
                 @{
-                    var children = item.Children.Where(x => x.IsVisible(PublishedValueFallback)).ToArray();
+                    var children = item
+                        .Children(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService)
+                        .Where(x => x.IsVisible(PublishedValueFallback))
+                        .ToArray();
+
                     if (children.Length > 0)
                     {
                         @* Call a local method to display the children *@
@@ -58,7 +67,11 @@
 
                         @* if the page has any children, where the property umbracoNaviHide is not True *@
                         @{
-                            var children = item.Children.Where(x => x.IsVisible(PublishedValueFallback)).ToArray();
+                            var children = item
+                                .Children(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService)
+                                .Where(x => x.IsVisible(PublishedValueFallback))
+                                .ToArray();
+
                             if (children.Length > 0)
                             {
                                 @* Recurse and call the ChildPages method to display the children *@
