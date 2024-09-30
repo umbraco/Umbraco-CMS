@@ -263,6 +263,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 				.umb-embed-holder.ProseMirror-selectednode::before {
 					background: rgba(0, 0, 0, 0.025);
+				}
+
 				/* Table-specific styling */
 				.tableWrapper {
 					margin: 1.5rem 0;
@@ -317,7 +319,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 							width: 3px;
 						}
 					}
-				}
 
 				.resize-cursor {
 					cursor: ew-resize;
