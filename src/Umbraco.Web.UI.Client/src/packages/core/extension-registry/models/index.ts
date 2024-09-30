@@ -1,6 +1,5 @@
 import type { ManifestAuthProvider } from './auth-provider.model.js';
 import type { ManifestCurrentUserAction, ManifestCurrentUserActionDefaultKind } from './current-user-action.model.js';
-import type { ManifestDashboard } from './dashboard.model.js';
 import type {
 	ManifestEntityAction,
 	ManifestEntityActionDeleteKind,
@@ -47,7 +46,7 @@ export type * from './app-entry-point.model.js';
 export type * from './auth-provider.model.js';
 export type * from './backoffice-entry-point.model.js';
 export type * from './current-user-action.model.js';
-export type * from './dashboard.model.js';
+export type * from '../../dashboard/dashboard.model.js';
 export type * from './dynamic-root.model.js';
 export type * from './entity-action.model.js';
 export type * from './entity-bulk-action.model.js';
@@ -96,7 +95,6 @@ export type ManifestTypes =
 	| ManifestCondition
 	| ManifestCurrentUserAction
 	| ManifestCurrentUserActionDefaultKind
-	| ManifestDashboard
 	| ManifestDynamicRootOrigin
 	| ManifestDynamicRootQueryStep
 	| ManifestEntityActions
