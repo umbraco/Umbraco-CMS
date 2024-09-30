@@ -91,7 +91,7 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 			background-color: var(--uui-color-surface);
 			color: var(--color-text);
 			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(10px, 1fr));
+			grid-template-columns: repeat(auto-fill, 10px);
 			grid-auto-flow: row;
 			position: sticky;
 			top: -25px;

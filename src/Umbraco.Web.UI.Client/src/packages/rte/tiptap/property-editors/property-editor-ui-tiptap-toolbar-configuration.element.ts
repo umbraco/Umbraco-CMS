@@ -217,13 +217,6 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 
 	override render() {
 		return html`
-			<p style="margin-top: 0">
-				<uui-tag color="warning">WIP Feature</uui-tag>
-				Rows, groups, and item order currently have no effect.
-				<br />
-				However, items added to the toolbar will be saved and displayed in the editor according to their weight in the
-				manifest.
-			</p>
 			${repeat(this.#value, (row, rowIndex) => this.#renderRow(row, rowIndex))}
 			<uui-button look="secondary" @click=${() => this.#addRow(this.#value.length)}>+</uui-button>
 			${this.#renderExtensions()}
