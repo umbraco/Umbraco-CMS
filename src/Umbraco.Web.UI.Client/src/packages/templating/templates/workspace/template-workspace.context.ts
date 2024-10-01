@@ -8,6 +8,7 @@ import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from
 import {
 	UmbEntityDetailWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -56,6 +57,7 @@ export class UmbTemplateWorkspaceContext
 				path: 'edit/:unique',
 				component: UmbTemplateWorkspaceEditorElement,
 				setup: (component: PageComponent, info: IRoutingInfo): void => {
+					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
 					this.load(unique);
 				},
