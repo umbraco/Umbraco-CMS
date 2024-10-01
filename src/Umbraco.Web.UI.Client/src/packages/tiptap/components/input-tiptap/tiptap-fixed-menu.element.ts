@@ -1,5 +1,5 @@
 import type { UmbTiptapToolbarValue } from '../../extensions/types.js';
-import { css, customElement, html, map, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, map, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -65,14 +65,19 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 		return html`${map(this.toolbar, (row, rowIndex) =>
 			map(
 				row,
-				(group, groupIndex) =>
-					html`${map(group, (alias, aliasIndex) => {
-							const newRow = rowIndex !== 0 && groupIndex === 0 && aliasIndex === 0;
-							return html`<div class="item" ?data-new-row=${newRow} style="${newRow ? 'grid-column: 1 / span 3' : ''}">
-								${this._lookup?.get(alias)}
-							</div>`;
-						})}
-						<div class="separator"></div> `,
+				(group, groupIndex) => html`
+					${map(group, (alias, aliasIndex) => {
+						const newRow = rowIndex !== 0 && groupIndex === 0 && aliasIndex === 0;
+						const component = this._lookup?.get(alias);
+						if (!component) return nothing;
+						return html`
+							<div class="item" ?data-new-row=${newRow} style=${newRow ? 'grid-column: 1 / span 3' : ''}>
+								${component}
+							</div>
+						`;
+					})}
+					<div class="separator"></div>
+				`,
 			),
 		)} `;
 	}
