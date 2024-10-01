@@ -191,7 +191,6 @@ export class UmbDocumentWorkspaceContext
 			this.varies,
 			(varies) => {
 				this.#data.setVaries(varies);
-
 				this.#varies = varies;
 			},
 			null,

@@ -132,7 +132,14 @@ export class UmbMemberWorkspaceContext
 		super(host, UMB_MEMBER_WORKSPACE_ALIAS);
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
-		this.observe(this.varies, (varies) => (this.#varies = varies), null);
+		this.observe(
+			this.varies,
+			(varies) => {
+				this.#data.setVaries(varies);
+				this.#varies = varies;
+			},
+			null,
+		);
 		this.observe(
 			this.variesByCulture,
 			(varies) => {
