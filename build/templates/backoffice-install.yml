@@ -6,11 +6,15 @@ steps:
       versionSource: 'fromFile'
       versionFilePath: src/Umbraco.Web.UI.Client/.nvmrc
 
+  # Install nbgv and set the NPM version to the same as the NuGet package version
+  # This is required to ensure that the NuGet package version and the NPM package version are in sync
+  # (nbgv can also calculate the "NpmPackageVersion" directly, but that does not contain the build number for preview builds
+  # so the retention rules on MyGet would not work as expected)
   - bash: |
       echo "##[command]Install nbgv"
       dotnet tool install --tool-path . nbgv
       echo "##[command]Running nbgv get-version"
-      PACKAGE_VERSION=$(nbgv get-version -v NpmPackageVersion)
+      PACKAGE_VERSION=$(nbgv get-version -v NuGetPackageVersion)
       echo "##[command]Running npm version"
       echo "##[debug]Version: $PACKAGE_VERSION"
       cd src/Umbraco.Web.UI.Client
