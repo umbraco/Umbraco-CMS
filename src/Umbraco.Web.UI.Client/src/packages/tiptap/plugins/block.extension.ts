@@ -1,4 +1,4 @@
-import { UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '../../types.js';
+import { UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '@umbraco-cms/backoffice/rte';
 import { UmbTiptapExtensionApiBase } from '@umbraco-cms/backoffice/tiptap';
 import { Node } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

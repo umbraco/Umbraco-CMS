@@ -1,5 +1,5 @@
 import type { UmbInputTiptapElement } from '../../components/input-tiptap/input-tiptap.element.js';
-import { UmbRteBaseElement } from '../../../components/rte-base.element.js';
+import { UmbPropertyEditorUiRteElementBase } from '@umbraco-cms/backoffice/rte';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 
 import '../../components/input-tiptap/input-tiptap.element.js';
@@ -10,7 +10,7 @@ const elementName = 'umb-property-editor-ui-tiptap';
  * @element umb-property-editor-ui-tiptap
  */
 @customElement(elementName)
-export class UmbPropertyEditorUiTiptapElement extends UmbRteBaseElement {
+export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElementBase {
 	#onChange(event: CustomEvent & { target: UmbInputTiptapElement }) {
 		const value = event.target.value;
 

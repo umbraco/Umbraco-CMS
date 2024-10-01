@@ -1,4 +1,5 @@
-import { type UmbPropertyEditorUiValueType, UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../types.js';
+import type { UmbPropertyEditorUiValueType } from '../types.js';
+import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../constants.js';
 import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
@@ -13,7 +14,8 @@ import {
 } from '@umbraco-cms/backoffice/block-rte';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 
-export abstract class UmbRteBaseElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+// eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name
+export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement implements UmbPropertyEditorUiElement {
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 

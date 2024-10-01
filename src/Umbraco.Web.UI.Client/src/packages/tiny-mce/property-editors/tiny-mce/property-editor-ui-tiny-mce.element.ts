@@ -1,6 +1,5 @@
-import { UmbRteBaseElement } from '../../../components/rte-base.element.js';
-import { UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '../../../types.js';
 import type { UmbInputTinyMceElement } from '../../components/input-tiny-mce/input-tiny-mce.element.js';
+import { UmbPropertyEditorUiRteElementBase, UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '@umbraco-cms/backoffice/rte';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 
 import '../../components/input-tiny-mce/input-tiny-mce.element.js';
@@ -9,7 +8,7 @@ import '../../components/input-tiny-mce/input-tiny-mce.element.js';
  * @element umb-property-editor-ui-tiny-mce
  */
 @customElement('umb-property-editor-ui-tiny-mce')
-export class UmbPropertyEditorUITinyMceElement extends UmbRteBaseElement {
+export class UmbPropertyEditorUITinyMceElement extends UmbPropertyEditorUiRteElementBase {
 	#onChange(event: CustomEvent & { target: UmbInputTinyMceElement }) {
 		const value = typeof event.target.value === 'string' ? event.target.value : '';
 
