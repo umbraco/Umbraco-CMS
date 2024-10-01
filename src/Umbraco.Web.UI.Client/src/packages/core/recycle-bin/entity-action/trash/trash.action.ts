@@ -1,11 +1,11 @@
 import { UmbEntityActionBase } from '../../../entity-action/entity-action-base.js';
 import { UmbRequestReloadStructureForEntityEvent } from '../../../entity-action/request-reload-structure-for-entity.event.js';
 import type { UmbRecycleBinRepository } from '../../recycle-bin-repository.interface.js';
-import type { MetaEntityActionTrashKind } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import type { MetaEntityActionTrashKind } from '@umbraco-cms/backoffice/entity-action';
 
 /**
  * Entity action for trashing an item.
