@@ -1,12 +1,9 @@
-import { UmbEntityActionBase } from '../../../entity-action/entity-action-base.js';
 import type { UmbRecycleBinRepository } from '../../recycle-bin-repository.interface.js';
+import type { MetaEntityActionEmptyRecycleBinKind } from './types.js';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import {
-	UmbRequestReloadChildrenOfEntityEvent,
-	type MetaEntityActionEmptyRecycleBinKind,
-} from '@umbraco-cms/backoffice/entity-action';
+import { UmbEntityActionBase, UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 /**
  * Entity action for emptying the recycle bin.

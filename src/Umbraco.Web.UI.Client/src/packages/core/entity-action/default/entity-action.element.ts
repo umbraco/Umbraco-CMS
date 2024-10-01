@@ -1,6 +1,7 @@
 import type { UmbEntityAction } from '../entity-action.interface.js';
 import type { UmbEntityActionElement } from '../entity-action-element.interface.js';
-import type { ManifestEntityAction, MetaEntityActionDefaultKind } from '../entity-action.extension.js';
+import type { ManifestEntityAction } from '../entity-action.extension.js';
+import type { MetaEntityActionDefaultKind } from './types.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { html, nothing, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';

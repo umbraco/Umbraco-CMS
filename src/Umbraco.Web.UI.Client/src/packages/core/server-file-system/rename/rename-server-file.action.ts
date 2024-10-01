@@ -1,9 +1,6 @@
 import { UMB_RENAME_SERVER_FILE_MODAL } from './modal/rename-server-file-modal.token.js';
-import {
-	UmbEntityActionBase,
-	UmbRequestReloadStructureForEntityEvent,
-	type MetaEntityActionRenameServerFileKind,
-} from '@umbraco-cms/backoffice/entity-action';
+import type { MetaEntityActionRenameServerFileKind } from './types.js';
+import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
