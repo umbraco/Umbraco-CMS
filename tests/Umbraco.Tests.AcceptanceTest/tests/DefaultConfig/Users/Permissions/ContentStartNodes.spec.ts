@@ -7,6 +7,8 @@ const testUser = {
   password: 'verySecurePassword123',
 }
 
+const userGroupName = 'TestUserGroup';
+
 const rootDocumentTypeName = 'RootDocumentType';
 const childDocumentTypeOneName = 'ChildDocumentTypeOne';
 const childDocumentTypeTwoName = 'ChildDocumentTypeTwo';
@@ -24,6 +26,8 @@ test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(rootDocumentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeOneName);
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeTwoName);
+  await umbracoApi.user.ensureNameNotExists(testUser.name);
+  await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
 
   childDocumentTypeOneId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeOneName);
   childDocumentTypeTwoId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeTwoName);
@@ -34,10 +38,13 @@ test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoApi.document.createDefaultDocumentWithParent(childDocumentTwoName, childDocumentTypeTwoId, rootDocumentId);
 
   // Should be empty, is supposed to be tested in userGroups
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithDocumentAccessAndStartNode('Content Editor', rootDocumentId );
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithDocumentAccessAndStartNode(userGroupName, rootDocumentId );
 
   await umbracoApi.user.setUserSettingsToDefault(testUser.name, testUser.email, testUser.password, userGroupId);
 
+  await umbracoApi.user.loginToUser(testUser.name,testUser.email, testUser.password);
+
+  // Not working correctly yet
   await umbracoUi.goToBackOffice();
 });
 
