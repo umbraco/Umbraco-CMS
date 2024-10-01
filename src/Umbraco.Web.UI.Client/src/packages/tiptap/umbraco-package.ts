@@ -1,7 +1,7 @@
-export const name = 'Umbraco.Core.Rte';
+export const name = 'Umbraco.Core.Tiptap';
 export const extensions = [
 	{
-		name: 'Tip Tap Bundle',
+		name: 'Tiptap Bundle',
 		alias: 'Umb.Bundle.tiptap',
 		type: 'bundle',
 		js: () => import('./manifests.js'),

@@ -1,4 +1,4 @@
-export const name = 'Umbraco.Core.Rte';
+export const name = 'Umbraco.Core.TinyMCE';
 export const extensions = [
 	{
 		name: 'TinyMCE Bundle',
