@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import { rmSync } from 'fs';
 import { getDefaultConfig } from '../../vite-config-base';
 
-const dist = '../../../dist-cms/packages/rte';
+const dist = '../../../dist-cms/packages/tiptap';
 
 // delete the unbundled dist folder
 rmSync(dist, { recursive: true, force: true });
