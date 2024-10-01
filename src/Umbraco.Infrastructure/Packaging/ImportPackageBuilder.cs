@@ -38,7 +38,7 @@ internal class ImportPackageBuilder : ExpressionBuilderBase<ImportPackageBuilder
     public void Do() => Expression.Execute();
 
     public IExecutableBuilder FromEmbeddedResource<TPackageMigration>()
-        where TPackageMigration : PackageMigrationBase
+        where TPackageMigration : AsyncPackageMigrationBase
     {
         Expression.EmbeddedResourceMigrationType = typeof(TPackageMigration);
         return this;

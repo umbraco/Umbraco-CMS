@@ -50,7 +50,7 @@ public class AdvancedMigrationTests : UmbracoIntegrationTest
         ServiceScopeFactory);
 
     [Test]
-    public void CreateTableOfTDto()
+    public async Task CreateTableOfTDtoAsync()
     {
         var builder = Mock.Of<IMigrationBuilder>();
         Mock.Get(builder)
@@ -72,7 +72,7 @@ public class AdvancedMigrationTests : UmbracoIntegrationTest
                     .From(string.Empty)
                     .To<CreateTableOfTDtoMigration>("done"));
 
-            upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
+            await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>()).ConfigureAwait(false);
 
             var db = ScopeAccessor.AmbientScope.Database;
             var exists = ScopeAccessor.AmbientScope.SqlContext.SqlSyntax.DoesTableExist(db, "umbracoUser");
@@ -82,7 +82,7 @@ public class AdvancedMigrationTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void DeleteKeysAndIndexesOfTDto()
+    public async Task DeleteKeysAndIndexesOfTDtoAsync()
     {
         var builder = Mock.Of<IMigrationBuilder>();
         Mock.Get(builder)
@@ -108,13 +108,13 @@ public class AdvancedMigrationTests : UmbracoIntegrationTest
                     .To<CreateTableOfTDtoMigration>("a")
                     .To<DeleteKeysAndIndexesMigration>("done"));
 
-            upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
+            await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>()).ConfigureAwait(false);
             scope.Complete();
         }
     }
 
     [Test]
-    public void CreateKeysAndIndexesOfTDto()
+    public async Task CreateKeysAndIndexesOfTDtoAsync()
     {
         if (BaseTestDatabase.IsSqlite())
         {
@@ -150,13 +150,13 @@ public class AdvancedMigrationTests : UmbracoIntegrationTest
                     .To<DeleteKeysAndIndexesMigration>("b")
                     .To<CreateKeysAndIndexesOfTDtoMigration>("done"));
 
-            upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
+            await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>()).ConfigureAwait(false);
             scope.Complete();
         }
     }
 
     [Test]
-    public void CreateKeysAndIndexes()
+    public async Task CreateKeysAndIndexesAsync()
     {
         if (BaseTestDatabase.IsSqlite())
         {
@@ -192,13 +192,13 @@ public class AdvancedMigrationTests : UmbracoIntegrationTest
                     .To<DeleteKeysAndIndexesMigration>("b")
                     .To<CreateKeysAndIndexesMigration>("done"));
 
-            upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
+            await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>()).ConfigureAwait(false);
             scope.Complete();
         }
     }
 
     [Test]
-    public void AddColumn()
+    public async Task AddColumnAsync()
     {
         var builder = Mock.Of<IMigrationBuilder>();
         Mock.Get(builder)
@@ -224,7 +224,7 @@ public class AdvancedMigrationTests : UmbracoIntegrationTest
                     .To<CreateTableOfTDtoMigration>("a")
                     .To<AddColumnMigration>("done"));
 
-            upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
+            await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>()).ConfigureAwait(false);
 
             var db = ScopeAccessor.AmbientScope.Database;
 

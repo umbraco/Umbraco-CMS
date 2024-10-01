@@ -62,7 +62,7 @@ internal class MigrationContext : IMigrationContext
     /// <inheritdoc />
     [Obsolete("This will be removed in the V13, and replaced with a RebuildCache flag on the MigrationBase, and a UmbracoPlanExecutedNotification.")]
     public void AddPostMigration<TMigration>()
-        where TMigration : MigrationBase =>
+        where TMigration : AsyncMigrationBase =>
 
         // just adding - will be de-duplicated when executing
         _postMigrations.Add(typeof(TMigration));

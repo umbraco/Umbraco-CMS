@@ -55,10 +55,9 @@ public class PackageMigrationRunner
     /// </summary>
     /// <param name="packageName"></param>
     /// <returns></returns>
-    public IEnumerable<ExecutedMigrationPlan> RunPackageMigrationsIfPending(string packageName)
+    public async Task<IEnumerable<ExecutedMigrationPlan>> RunPackageMigrationsIfPendingAsync(string packageName)
     {
-        IReadOnlyDictionary<string, string?>? keyValues =
-            _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+        IReadOnlyDictionary<string, string?>? keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
         IReadOnlyList<string> pendingMigrations = _pendingPackageMigrations.GetPendingPackageMigrations(keyValues);
 
         IEnumerable<string> packagePlans = _packageMigrationPlans.Values
@@ -66,7 +65,7 @@ public class PackageMigrationRunner
             .Where(x => pendingMigrations.Contains(x.Name))
             .Select(x => x.Name);
 
-        return RunPackagePlans(packagePlans);
+        return await RunPackagePlansAsync(packagePlans).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -81,7 +80,7 @@ public class PackageMigrationRunner
         }
 
         // Run the migrations
-        IEnumerable<ExecutedMigrationPlan> executedMigrationPlans = RunPackageMigrationsIfPending(packageName);
+        IEnumerable<ExecutedMigrationPlan> executedMigrationPlans = await RunPackageMigrationsIfPendingAsync(packageName).ConfigureAwait(false);
 
         if (executedMigrationPlans.Any(plan => plan.Successful == false))
         {
@@ -98,7 +97,7 @@ public class PackageMigrationRunner
     /// <param name="plansToRun"></param>
     /// <returns></returns>
     /// <exception cref="Exception">If any plan fails it will throw an exception.</exception>
-    public IEnumerable<ExecutedMigrationPlan> RunPackagePlans(IEnumerable<string> plansToRun)
+    public async Task<IEnumerable<ExecutedMigrationPlan>> RunPackagePlansAsync(IEnumerable<string> plansToRun)
     {
         List<ExecutedMigrationPlan> results = new();
 
@@ -120,7 +119,7 @@ public class PackageMigrationRunner
                 Upgrader upgrader = new(plan);
 
                 // This may throw, if so the transaction will be rolled back
-                results.Add(upgrader.Execute(_migrationPlanExecutor, _scopeProvider, _keyValueService));
+                results.Add(await upgrader.ExecuteAsync(_migrationPlanExecutor, _scopeProvider, _keyValueService).ConfigureAwait(false));
             }
         }
 

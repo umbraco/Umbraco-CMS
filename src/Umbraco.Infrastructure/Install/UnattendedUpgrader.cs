@@ -38,7 +38,7 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
         _packageMigrationRunner = packageMigrationRunner;
     }
 
-    public Task HandleAsync(RuntimeUnattendedUpgradeNotification notification, CancellationToken cancellationToken)
+    public async Task HandleAsync(RuntimeUnattendedUpgradeNotification notification, CancellationToken cancellationToken)
     {
         if (_runtimeState.RunUnattendedBootLogic())
         {
@@ -47,53 +47,41 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
                 case RuntimeLevelReason.UpgradeMigrations:
                 {
                     var plan = new UmbracoPlan(_umbracoVersion);
-                    using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Verbose) ? null : _profilingLogger.TraceDuration<UnattendedUpgrader>(
-                               "Starting unattended upgrade.",
-                               "Unattended upgrade completed."))
+                    using (!_profilingLogger.IsEnabled(LogLevel.Verbose) ? null : _profilingLogger.TraceDuration<UnattendedUpgrader>("Starting unattended upgrade.", "Unattended upgrade completed."))
                     {
-                        DatabaseBuilder.Result? result = _databaseBuilder.UpgradeSchemaAndData(plan);
+                        DatabaseBuilder.Result? result = await _databaseBuilder.UpgradeSchemaAndDataAsync(plan).ConfigureAwait(false);
                         if (result?.Success == false)
                         {
-                            var innerException = new UnattendedInstallException(
-                                "An error occurred while running the unattended upgrade.\n" + result.Message);
+                            var innerException = new UnattendedInstallException($"An error occurred while running the unattended upgrade.\n{result.Message}");
                             _runtimeState.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, innerException);
                         }
 
-                        notification.UnattendedUpgradeResult =
-                            RuntimeUnattendedUpgradeNotification.UpgradeResult.CoreUpgradeComplete;
+                        notification.UnattendedUpgradeResult = RuntimeUnattendedUpgradeNotification.UpgradeResult.CoreUpgradeComplete;
                     }
                 }
 
                 break;
                 case RuntimeLevelReason.UpgradePackageMigrations:
                 {
-                    if (!_runtimeState.StartupState.TryGetValue(
-                        RuntimeState.PendingPackageMigrationsStateKey,
-                        out var pm)
-                        || pm is not IReadOnlyList<string> pendingMigrations)
+                    if (!_runtimeState.StartupState.TryGetValue(RuntimeState.PendingPackageMigrationsStateKey, out var pm) || pm is not IReadOnlyList<string> pendingMigrations)
                     {
-                        throw new InvalidOperationException(
-                            $"The required key {RuntimeState.PendingPackageMigrationsStateKey} does not exist in startup state");
+                        throw new InvalidOperationException($"The required key {RuntimeState.PendingPackageMigrationsStateKey} does not exist in startup state");
                     }
 
                     if (pendingMigrations.Count == 0)
                     {
-                        throw new InvalidOperationException(
-                            "No pending migrations found but the runtime level reason is " +
-                            RuntimeLevelReason.UpgradePackageMigrations);
+                        throw new InvalidOperationException($"No pending migrations found but the runtime level reason is {RuntimeLevelReason.UpgradePackageMigrations}");
                     }
 
                     try
                     {
-                        _packageMigrationRunner.RunPackagePlans(pendingMigrations);
-                        notification.UnattendedUpgradeResult = RuntimeUnattendedUpgradeNotification.UpgradeResult
-                            .PackageMigrationComplete;
+                        await _packageMigrationRunner.RunPackagePlansAsync(pendingMigrations).ConfigureAwait(false);
+                        notification.UnattendedUpgradeResult = RuntimeUnattendedUpgradeNotification.UpgradeResult.PackageMigrationComplete;
                     }
                     catch (Exception ex)
                     {
                         SetRuntimeError(ex);
-                        notification.UnattendedUpgradeResult =
-                            RuntimeUnattendedUpgradeNotification.UpgradeResult.HasErrors;
+                        notification.UnattendedUpgradeResult = RuntimeUnattendedUpgradeNotification.UpgradeResult.HasErrors;
                     }
                 }
 
@@ -102,13 +90,8 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
                 throw new InvalidOperationException("Invalid reason " + _runtimeState.Reason);
             }
         }
-
-        return Task.CompletedTask;
     }
 
     private void SetRuntimeError(Exception exception)
-        => _runtimeState.Configure(
-            RuntimeLevel.BootFailed,
-            RuntimeLevelReason.BootFailedOnException,
-            exception);
+        => _runtimeState.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, exception);
 }
