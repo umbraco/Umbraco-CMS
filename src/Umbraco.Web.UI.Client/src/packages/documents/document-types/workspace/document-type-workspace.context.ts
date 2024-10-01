@@ -18,6 +18,7 @@ import {
 import {
 	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbTemplateDetailRepository } from '@umbraco-cms/backoffice/template';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
@@ -132,7 +133,7 @@ export class UmbDocumentTypeWorkspaceContext
 				path: UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.toString(),
 				component: UmbDocumentTypeWorkspaceEditorElement,
 				setup: (_component, info) => {
-					this.removeUmbControllerByAlias('isNewRedirectController');
+					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
 					this.load(unique);
 				},

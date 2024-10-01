@@ -7,6 +7,8 @@ import type {
 	UmbDocumentBlueprintVariantModel,
 	UmbDocumentBlueprintVariantOptionModel,
 } from '../types.js';
+import { sortVariants } from '../utils.js';
+import { UMB_CREATE_DOCUMENT_BLUEPRINT_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS } from './manifests.js';
 import {
 	appendToFrozenArray,
@@ -17,6 +19,7 @@ import {
 import {
 	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceIsNewRedirectControllerAlias,
 	UmbWorkspaceSplitViewManager,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
@@ -35,8 +38,15 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UmbContentWorkspaceDataManager, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
-import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD } from '@umbraco-cms/backoffice/document';
+import {
+	UMB_DOCUMENT_COLLECTION_ALIAS,
+	UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
+	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
+} from '@umbraco-cms/backoffice/document';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
+import { Observable, map } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UMB_SETTINGS_SECTION_PATH } from '@umbraco-cms/backoffice/settings';
 
 type EntityModel = UmbDocumentBlueprintDetailModel;
 
@@ -119,27 +129,46 @@ export class UmbDocumentBlueprintWorkspaceContext
 			}
 			return [];
 		},
-	);
+	).pipe(map((results) => results.sort(sortVariants)));
+
+	// TODO: this should be set up for all entity workspace contexts in a base class
+	#entityContext = new UmbEntityContext(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS);
 
-		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
-
-		this.observe(this.variesByCulture, (varies) => {
-			this.#data.setVariesByCulture(varies);
-			this.#variesByCulture = varies;
-		});
-		this.observe(this.variesBySegment, (varies) => {
-			this.#data.setVariesBySegment(varies);
-			this.#variesBySegment = varies;
-		});
-		this.observe(this.varies, (varies) => (this.#varies = varies));
-
-		this.observe(this.structure.contentTypeDataTypeUniques, (dataTypeUniques: Array<string>) => {
-			this.#dataTypeItemManager.setUniques(dataTypeUniques);
-		});
-
+		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
+		this.observe(
+			this.varies,
+			(varies) => {
+				this.#data.setVaries(varies);
+				this.#varies = varies;
+			},
+			null,
+		);
+		this.observe(
+			this.variesByCulture,
+			(varies) => {
+				this.#data.setVariesByCulture(varies);
+				this.#variesByCulture = varies;
+			},
+			null,
+		);
+		this.observe(
+			this.variesBySegment,
+			(varies) => {
+				this.#data.setVariesBySegment(varies);
+				this.#variesBySegment = varies;
+			},
+			null,
+		);
+		this.observe(
+			this.structure.contentTypeDataTypeUniques,
+			(dataTypeUniques: Array<string>) => {
+				this.#dataTypeItemManager.setUniques(dataTypeUniques);
+			},
+			null,
+		);
 		this.observe(this.#dataTypeItemManager.items, (dataTypes) => {
 			// Make a map of the data type unique and editorAlias:
 			this.#dataTypeSchemaAliasMap = new Map(
@@ -148,14 +177,15 @@ export class UmbDocumentBlueprintWorkspaceContext
 				}),
 			);
 		});
+
 		this.loadLanguages();
 
 		this.routes.setRoutes([
 			{
-				path: 'create/parent/:entityType/:parentUnique/:documentTypeUnique',
+				path: UMB_CREATE_DOCUMENT_BLUEPRINT_WORKSPACE_PATH_PATTERN.toString(),
 				component: () => import('./document-blueprint-workspace-editor.element.js'),
 				setup: async (_component, info) => {
-					const parentEntityType = info.match.params.entityType;
+					const parentEntityType = info.match.params.parentEntityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 					const documentTypeUnique = info.match.params.documentTypeUnique;
 					this.create({ entityType: parentEntityType, unique: parentUnique }, documentTypeUnique);
@@ -168,10 +198,10 @@ export class UmbDocumentBlueprintWorkspaceContext
 				},
 			},
 			{
-				path: 'edit/:unique',
+				path: UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.toString(),
 				component: () => import('./document-blueprint-workspace-editor.element.js'),
 				setup: (_component, info) => {
-					this.removeUmbControllerByAlias('isNewRedirectController');
+					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
 					this.load(unique);
 				},
@@ -181,8 +211,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 
 	override resetState() {
 		super.resetState();
-		this.#data.setPersisted(undefined);
-		this.#data.setCurrent(undefined);
+		this.#data.clear();
 	}
 
 	async loadLanguages() {
@@ -194,40 +223,48 @@ export class UmbDocumentBlueprintWorkspaceContext
 	async load(unique: string) {
 		this.resetState();
 		this.#getDataPromise = this.repository.requestByUnique(unique);
-		const { data, asObservable } = await this.repository.requestByUnique(unique);
+		type GetDataType = Awaited<ReturnType<UmbDocumentBlueprintDetailRepository['requestByUnique']>>;
+		const { data, asObservable } = (await this.#getDataPromise) as GetDataType;
 
 		if (data) {
+			this.#entityContext.setEntityType(UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE);
+			this.#entityContext.setUnique(unique);
 			this.setIsNew(false);
 			this.#data.setPersisted(data);
 			this.#data.setCurrent(data);
 		}
 
-		if (asObservable) {
-			this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'UmbDocumentBlueprintStoreObserver');
-		}
+		this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'UmbDocumentBlueprintStoreObserver');
 	}
 
 	#onStoreChange(entity: EntityModel | undefined) {
 		if (!entity) {
 			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
-			history.pushState(null, '', 'section/document-blueprint');
+			history.pushState(null, '', UMB_SETTINGS_SECTION_PATH);
 		}
 	}
 
-	async create(parent: { entityType: string; unique: string | null }, documentTypeUnique: string) {
+	async create(parent: UmbEntityModel, documentTypeUnique: string) {
 		this.resetState();
 		this.#parent.setValue(parent);
 
-		const { data } = await this.repository.createScaffold({
+		this.#getDataPromise = this.repository.createScaffold({
 			documentType: { unique: documentTypeUnique, collection: null },
 		});
 
+		const { data } = await this.#getDataPromise;
 		if (!data) return undefined;
 
+		this.#entityContext.setEntityType(UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE);
+		this.#entityContext.setUnique(data.unique);
 		this.setIsNew(true);
 		this.#data.setPersisted(undefined);
 		this.#data.setCurrent(data);
 		return data;
+	}
+
+	getCollectionAlias() {
+		return UMB_DOCUMENT_COLLECTION_ALIAS;
 	}
 
 	getData() {
@@ -294,7 +331,10 @@ export class UmbDocumentBlueprintWorkspaceContext
 	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
 	 * @description Get an Observable for the value of this property.
 	 */
-	async propertyValueByAlias<PropertyValueType = unknown>(propertyAlias: string, variantId?: UmbVariantId) {
+	async propertyValueByAlias<PropertyValueType = unknown>(
+		propertyAlias: string,
+		variantId?: UmbVariantId,
+	): Promise<Observable<PropertyValueType | undefined> | undefined> {
 		return this.#data.createObservablePartOfCurrent(
 			(data) =>
 				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x as any) : true))
