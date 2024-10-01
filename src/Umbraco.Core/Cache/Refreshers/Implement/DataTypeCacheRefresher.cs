@@ -3,8 +3,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -14,15 +12,19 @@ namespace Umbraco.Cms.Core.Cache;
 public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeCacheRefresherNotification, DataTypeCacheRefresher.JsonPayload>
 {
     private readonly IIdKeyMap _idKeyMap;
+    private readonly IPublishedModelFactory _publishedModelFactory;
+
     public DataTypeCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
         IIdKeyMap idKeyMap,
         IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory)
+        ICacheRefresherNotificationFactory factory,
+        IPublishedModelFactory publishedModelFactory)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
+        _publishedModelFactory = publishedModelFactory;
     }
 
     #region Json
@@ -80,6 +82,9 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
                 dataTypeCache.Result?.Clear(RepositoryCacheKeys.GetKey<IDataType, int>(payload.Id));
             }
         }
+
+        // TODO: We need to clear the HybridCache of any content using the ContentType, but NOT the database cache here, and this should be done within the "WithSafeLiveFactoryReset" to ensure that the factory is locked in the meantime.
+        _publishedModelFactory.WithSafeLiveFactoryReset(() => { });
 
         base.Refresh(payloads);
     }
