@@ -72,12 +72,13 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public abstract bool IsPublished(string? culture = null);
 
         /// <inheritdoc />
-        [Obsolete("Please use IDocumentNavigationQueryService.TryGetParentKey() instead. Scheduled for removal in V16.")]
+        [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
         public abstract IPublishedContent? Parent { get; }
 
         // FIXME
         /// <inheritdoc />
-        public virtual IEnumerable<IPublishedContent> Children => this.Children(_variationContextAccessor, StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(), StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>());
+        [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
+        public virtual IEnumerable<IPublishedContent> Children => GetChildren();
 
 
         /// <inheritdoc cref="IPublishedElement.Properties"/>
@@ -85,5 +86,27 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
 
         /// <inheritdoc cref="IPublishedElement.GetProperty(string)"/>
         public abstract IPublishedProperty? GetProperty(string alias);
+
+        private IEnumerable<IPublishedContent> GetChildren()
+        {
+            INavigationQueryService? navigationQueryService;
+            IPublishedCache? publishedCache;
+
+            switch (ContentType.ItemType)
+            {
+                case PublishedItemType.Content:
+                    publishedCache = StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>();
+                    navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+                    break;
+                case PublishedItemType.Media:
+                    publishedCache = StaticServiceProvider.Instance.GetRequiredService<IPublishedMediaCache>();
+                    navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>();
+                    break;
+                default:
+                    throw new NotImplementedException("Level is not implemented for " + ContentType.ItemType);
+            }
+
+            return this.Children(_variationContextAccessor, publishedCache, navigationQueryService);
+        }
     }
 }

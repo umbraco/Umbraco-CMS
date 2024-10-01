@@ -142,5 +142,6 @@ public interface IPublishedContent : IPublishedElement
     /// <summary>
     ///     Gets the children of the content item that are available for the current culture.
     /// </summary>
+    [Obsolete("Please use IDocumentNavigationQueryService.TryGetChildrenKeys() instead. Scheduled for removal in V16.")]
     IEnumerable<IPublishedContent> Children { get; }
 }

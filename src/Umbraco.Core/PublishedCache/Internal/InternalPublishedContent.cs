@@ -69,14 +69,18 @@ public sealed class InternalPublishedContent : IPublishedContent
 
     public PublishedItemType ItemType => PublishedItemType.Content;
 
-    [Obsolete("Please use IDocumentNavigationQueryService.TryGetParentKey() instead. Scheduled for removal in V16.")]
+    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
     public IPublishedContent? Parent => this.Parent<IPublishedContent>(StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(), StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>());
 
     public bool IsDraft(string? culture = null) => false;
 
     public bool IsPublished(string? culture = null) => true;
 
-    public IEnumerable<IPublishedContent> Children { get; set; } = Enumerable.Empty<IPublishedContent>();
+    [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
+    public IEnumerable<IPublishedContent> Children => this.Children(
+        StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>(),
+        StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
+        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>());
 
     public IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
 
