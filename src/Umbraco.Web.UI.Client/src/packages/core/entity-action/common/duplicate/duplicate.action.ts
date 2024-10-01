@@ -1,11 +1,10 @@
 import { UmbEntityActionBase } from '../../entity-action-base.js';
 import { UmbRequestReloadStructureForEntityEvent } from '../../request-reload-structure-for-entity.event.js';
 import type { UmbDuplicateRepository } from './duplicate-repository.interface.js';
-import type { MetaEntityActionDuplicateToKind } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
-export class UmbDuplicateEntityAction extends UmbEntityActionBase<MetaEntityActionDuplicateToKind> {
+export class UmbDuplicateEntityAction extends UmbEntityActionBase<any> {
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
