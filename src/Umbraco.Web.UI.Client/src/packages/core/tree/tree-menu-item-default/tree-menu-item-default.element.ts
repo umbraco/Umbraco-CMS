@@ -1,11 +1,8 @@
 import { html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type {
-	ManifestMenuItemTreeKind,
-	UmbExtensionManifestKind,
-	UmbMenuItemElement,
-} from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestMenuItemTreeKind, UmbMenuItemElement } from '@umbraco-cms/backoffice/menu';
 
 // TODO: Move to separate file:
 const manifest: UmbExtensionManifestKind = {
