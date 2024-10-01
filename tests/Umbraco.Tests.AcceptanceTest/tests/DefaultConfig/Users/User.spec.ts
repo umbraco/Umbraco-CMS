@@ -507,16 +507,18 @@ test('can search for a user', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  const totalUsers = await umbracoApi.user.getTotalOfUsers();
   await umbracoUi.user.goToUsers();
 
   // Act
-  await umbracoUi.user.doesUserSectionContainUserAmount(2);
+  await umbracoUi.user.doesUserSectionContainUserAmount(totalUsers);
   await umbracoUi.user.searchInUserSection(nameOfTheUser);
 
   // Assert
   // Wait for filtering to be done
   await umbracoUi.waitForTimeout(200);
-  await umbracoUi.user.doesUserSectionContainUserAmount(1);
+  const userData = await umbracoApi.user.filterByText(nameOfTheUser);
+  await umbracoUi.user.doesUserSectionContainUserAmount(userData.total);
   await umbracoUi.user.doesUserSectionContainUserWithText(nameOfTheUser);
 });
 
@@ -525,16 +527,18 @@ test('can filter by status', async ({umbracoApi, umbracoUi}) => {
   const inactiveStatus = 'Inactive';
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  const totalUsers = await umbracoApi.user.getTotalOfUsers();
   await umbracoUi.user.goToUsers();
 
   // Act
-  await umbracoUi.user.doesUserSectionContainUserAmount(2);
+  await umbracoUi.user.doesUserSectionContainUserAmount(totalUsers);
   await umbracoUi.user.filterByStatusName(inactiveStatus);
 
   // Assert
   // Wait for filtering to be done
   await umbracoUi.waitForTimeout(200);
-  await umbracoUi.user.doesUserSectionContainUserAmount(1);
+  const userData = await umbracoApi.user.filterByUserStates(inactiveStatus);
+  await umbracoUi.user.doesUserSectionContainUserAmount(userData.total);
   await umbracoUi.user.doesUserSectionContainUserWithText(nameOfTheUser);
   await umbracoUi.user.doesUserSectionContainUserWithText(inactiveStatus);
 });
@@ -543,16 +547,18 @@ test('can filter by user groups', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  const totalUsers = await umbracoApi.user.getTotalOfUsers();
   await umbracoUi.user.goToUsers();
 
   // Act
-  await umbracoUi.user.doesUserSectionContainUserAmount(2);
+  await umbracoUi.user.doesUserSectionContainUserAmount(totalUsers);
   await umbracoUi.user.filterByGroupName(defaultUserGroupName);
 
   // Assert
   // Wait for filtering to be done
   await umbracoUi.waitForTimeout(200);
-  await umbracoUi.user.doesUserSectionContainUserAmount(1);
+  const userData = await umbracoApi.user.filterByUserGroupIds(userGroup.id);
+  await umbracoUi.user.doesUserSectionContainUserAmount(userData.total);
   await umbracoUi.user.doesUserSectionContainUserWithText(defaultUserGroupName);
 });
 
@@ -560,16 +566,17 @@ test('can order by newest user', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  const totalUsers = await umbracoApi.user.getTotalOfUsers();
   await umbracoUi.user.goToUsers();
 
   // Act
-  await umbracoUi.user.doesUserSectionContainUserAmount(2);
+  await umbracoUi.user.doesUserSectionContainUserAmount(totalUsers);
   await umbracoUi.user.orderByNewestUser();
 
   // Assert
   // Wait for filtering to be done
   await umbracoUi.waitForTimeout(200);
-  await umbracoUi.user.doesUserSectionContainUserAmount(2);
+  await umbracoUi.user.doesUserSectionContainUserAmount(totalUsers);
   await umbracoUi.user.isUserWithNameTheFirstUserInList(nameOfTheUser);
 });
 
