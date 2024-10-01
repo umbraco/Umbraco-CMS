@@ -44,7 +44,8 @@ import {
 	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 } from '@umbraco-cms/backoffice/document';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
-import { Observable, map } from '@umbraco-cms/backoffice/external/rxjs';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_SETTINGS_SECTION_PATH } from '@umbraco-cms/backoffice/settings';
 

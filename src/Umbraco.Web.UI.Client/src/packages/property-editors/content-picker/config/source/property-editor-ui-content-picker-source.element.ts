@@ -1,11 +1,11 @@
 import type { UmbContentPickerSource } from '../../types.js';
 import type { UmbInputContentPickerSourceElement } from './input-content-picker-source.element.js';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
-import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import {
+	type UmbPropertyEditorUiElement,
 	type UmbPropertyEditorConfigCollection,
 	UmbPropertyValueChangeEvent,
 } from '@umbraco-cms/backoffice/property-editor';
+import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 // import of local component

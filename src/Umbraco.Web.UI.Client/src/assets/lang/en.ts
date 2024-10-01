@@ -2633,5 +2633,5 @@ export default {
 		extGroup_interactive: 'Interactive elements',
 		extGroup_media: 'Embeds and media',
 		extGroup_structure: 'Content structure',
-	}
+	},
 } as UmbLocalizationDictionary;
