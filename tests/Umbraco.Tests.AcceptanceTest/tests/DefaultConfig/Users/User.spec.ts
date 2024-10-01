@@ -507,7 +507,7 @@ test('can search for a user', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
-  const totalUsers = await umbracoApi.user.getTotalOfUsers();
+  const totalUsers = await umbracoApi.user.getUsersCount();
   await umbracoUi.user.goToUsers();
 
   // Act
@@ -527,7 +527,7 @@ test('can filter by status', async ({umbracoApi, umbracoUi}) => {
   const inactiveStatus = 'Inactive';
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
-  const totalUsers = await umbracoApi.user.getTotalOfUsers();
+  const totalUsers = await umbracoApi.user.getUsersCount();
   await umbracoUi.user.goToUsers();
 
   // Act
@@ -547,7 +547,7 @@ test('can filter by user groups', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
-  const totalUsers = await umbracoApi.user.getTotalOfUsers();
+  const totalUsers = await umbracoApi.user.getUsersCount();
   await umbracoUi.user.goToUsers();
 
   // Act
@@ -566,7 +566,7 @@ test('can order by newest user', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
-  const totalUsers = await umbracoApi.user.getTotalOfUsers();
+  const totalUsers = await umbracoApi.user.getUsersCount();
   await umbracoUi.user.goToUsers();
 
   // Act
