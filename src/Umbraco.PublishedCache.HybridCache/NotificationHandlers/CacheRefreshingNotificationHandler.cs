@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Events;
+﻿using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -17,7 +18,8 @@ internal sealed class CacheRefreshingNotificationHandler :
     INotificationAsyncHandler<ContentDeletedNotification>,
     INotificationAsyncHandler<MediaRefreshNotification>,
     INotificationAsyncHandler<MediaDeletedNotification>,
-    INotificationAsyncHandler<ContentTypeRefreshedNotification>
+    INotificationAsyncHandler<ContentTypeRefreshedNotification>,
+    INotificationAsyncHandler<ContentTypeDeletedNotification>
 {
     private readonly IDocumentCacheService _documentCacheService;
     private readonly IMediaCacheService _mediaCacheService;
@@ -50,7 +52,7 @@ internal sealed class CacheRefreshingNotificationHandler :
     {
         foreach (IContent deletedEntity in notification.DeletedEntities)
         {
-            await RefreshElementsCacheAsync(deletedEntity);
+            RemoveFromElementsCache(deletedEntity);
             await _documentCacheService.DeleteItemAsync(deletedEntity);
         }
     }
@@ -65,7 +67,7 @@ internal sealed class CacheRefreshingNotificationHandler :
     {
         foreach (IMedia deletedEntity in notification.DeletedEntities)
         {
-            await RefreshElementsCacheAsync(deletedEntity);
+            RemoveFromElementsCache(deletedEntity);
             await _mediaCacheService.DeleteItemAsync(deletedEntity);
         }
     }
@@ -104,10 +106,23 @@ internal sealed class CacheRefreshingNotificationHandler :
         }
     }
 
+    private void RemoveFromElementsCache(IUmbracoEntity content)
+    {
+        // ClearByKey clears by "startsWith" so we'll clear by the cachekey prefix + contentKey
+        // This will clear any and all properties for this content item, this is important because
+        // we cannot resolve the PublishedContent for this entity since it and its content type is deleted.
+        _elementsCache.ClearByKey(GetContentWideCacheKey(content.Key, true));
+        _elementsCache.ClearByKey(GetContentWideCacheKey(content.Key, false));
+    }
+
+    private string GetContentWideCacheKey(Guid contentKey, bool isPreviewing) => isPreviewing
+        ? CacheKeys.PreviewPropertyCacheKeyPrefix + contentKey
+        : CacheKeys.PropertyCacheKeyPrefix + contentKey;
+
     public Task HandleAsync(ContentTypeRefreshedNotification notification, CancellationToken cancellationToken)
     {
         const ContentTypeChangeTypes types // only for those that have been refreshed
-            = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther | ContentTypeChangeTypes.Remove;
+            = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther;
         var contentTypeIds = notification.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id)
             .ToArray();
 
@@ -119,6 +134,16 @@ internal sealed class CacheRefreshingNotificationHandler :
             }
 
             _documentCacheService.Rebuild(contentTypeIds);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public Task HandleAsync(ContentTypeDeletedNotification notification, CancellationToken cancellationToken)
+    {
+        foreach (IContentType deleted in notification.DeletedEntities)
+        {
+            _publishedContentTypeCache.ClearContentType(deleted.Id);
         }
 
         return Task.CompletedTask;
