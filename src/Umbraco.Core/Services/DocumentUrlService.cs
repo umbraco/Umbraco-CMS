@@ -486,8 +486,7 @@ public class DocumentUrlService : IDocumentUrlService
             .Concat(_contentService.GetAncestors(documentIdAttempt.Result).Select(x => x.Key).Reverse());
 
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
-        IEnumerable<string> cultures = languages.Select(x=>x.IsoCode);
-
+        var cultures = languages.ToDictionary(x=>x.IsoCode);
 
         Guid[] ancestorsOrSelfKeysArray = ancestorsOrSelfKeys as Guid[] ?? ancestorsOrSelfKeys.ToArray();
         Dictionary<Guid, Task<Dictionary<string, IDomain>>> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToDictionary(x => x, async ancestorKey =>
@@ -496,7 +495,7 @@ public class DocumentUrlService : IDocumentUrlService
             return domains.ToDictionary(x => x.LanguageIsoCode!);
         });
 
-        foreach (var culture in cultures)
+        foreach ((string culture, ILanguage language) in cultures)
         {
            var urlSegments = new List<string>();
            IDomain? foundDomain = null;
@@ -523,6 +522,12 @@ public class DocumentUrlService : IDocumentUrlService
                     hasUrlInCulture = false;
                 }
             }
+
+           //If we did not find a domain and this is not the default language, then the content is not routable
+           if (foundDomain is null && language.IsDefault is false)
+           {
+               continue;
+           }
 
             var isRootFirstItem = GetTopMostRootKey() == ancestorsOrSelfKeysArray.Last();
             result.Add(new UrlInfo(
