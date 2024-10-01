@@ -1,6 +1,5 @@
 export type * from './app-entry-point.extension.js';
 export type * from './backoffice-entry-point.extension.js';
-export type * from './entity-action.extension.js';
 export type * from './entity-bulk-action.extension.js';
 export type * from './entry-point.extension.js';
 export type * from './external-login-provider-element.interface.js';
