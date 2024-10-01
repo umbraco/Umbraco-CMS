@@ -9,17 +9,20 @@ namespace Umbraco.Cms.Infrastructure.DeliveryApi;
 
 internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichTextMarkupParser
 {
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IPublishedContentCache _publishedContentCache;
+    private readonly IPublishedMediaCache _publishedMediaCache;
     private readonly ILogger<ApiRichTextMarkupParser> _logger;
 
     public ApiRichTextMarkupParser(
         IApiContentRouteBuilder apiContentRouteBuilder,
         IApiMediaUrlProvider mediaUrlProvider,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IPublishedContentCache publishedContentCache,
+        IPublishedMediaCache publishedMediaCache,
         ILogger<ApiRichTextMarkupParser> logger)
         : base(apiContentRouteBuilder, mediaUrlProvider)
     {
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
+        _publishedContentCache = publishedContentCache;
+        _publishedMediaCache = publishedMediaCache;
         _logger = logger;
     }
 
@@ -27,13 +30,12 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
     {
         try
         {
-            IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
 
-            ReplaceLocalLinks(doc, publishedSnapshot);
+            ReplaceLocalLinks(doc, _publishedContentCache, _publishedMediaCache);
 
-            ReplaceLocalImages(doc, publishedSnapshot);
+            ReplaceLocalImages(doc, _publishedMediaCache);
 
             CleanUpBlocks(doc);
 
@@ -46,13 +48,14 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
         }
     }
 
-    private void ReplaceLocalLinks(HtmlDocument doc, IPublishedSnapshot publishedSnapshot)
+    private void ReplaceLocalLinks(HtmlDocument doc, IPublishedContentCache contentCache, IPublishedMediaCache mediaCache)
     {
         HtmlNode[] links = doc.DocumentNode.SelectNodes("//a")?.ToArray() ?? Array.Empty<HtmlNode>();
         foreach (HtmlNode link in links)
         {
             ReplaceLocalLinks(
-                    publishedSnapshot,
+                    contentCache,
+                    mediaCache,
                 link.GetAttributeValue("href", string.Empty),
                 link.GetAttributeValue("type", "unknown"),
                 route =>
@@ -75,7 +78,7 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
         }
     }
 
-    private void ReplaceLocalImages(HtmlDocument doc, IPublishedSnapshot publishedSnapshot)
+    private void ReplaceLocalImages(HtmlDocument doc, IPublishedMediaCache mediaCache)
     {
         HtmlNode[] images = doc.DocumentNode.SelectNodes("//img")?.ToArray() ?? Array.Empty<HtmlNode>();
         foreach (HtmlNode image in images)
@@ -86,7 +89,7 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
                 continue;
             }
 
-            ReplaceLocalImages(publishedSnapshot, dataUdi, mediaUrl =>
+            ReplaceLocalImages(mediaCache, dataUdi, mediaUrl =>
             {
                 // the image source likely contains query string parameters for image cropping; we need to
                 // preserve those, so let's extract the image query string (if present).

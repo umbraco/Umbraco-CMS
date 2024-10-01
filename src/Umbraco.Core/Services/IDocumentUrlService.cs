@@ -33,4 +33,6 @@ public interface IDocumentUrlService
     Task CreateOrUpdateUrlSegmentsWithDescendantsAsync(Guid key);
     Task CreateOrUpdateUrlSegmentsAsync(Guid key);
     string GetLegacyRouteFormat(Guid key, string? culture, bool isDraft);
+
+    bool HasAny();
 }

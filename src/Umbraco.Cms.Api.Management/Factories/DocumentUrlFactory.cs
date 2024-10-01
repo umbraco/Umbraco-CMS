@@ -1,12 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
@@ -16,10 +17,9 @@ public class DocumentUrlFactory : IDocumentUrlFactory
 {
     private readonly IDocumentUrlService _documentUrlService;
 
-    public DocumentUrlFactory(
-        IDocumentUrlService documentUrlService)
-    {
 
+    public DocumentUrlFactory(IDocumentUrlService documentUrlService)
+    {
         _documentUrlService = documentUrlService;
     }
 

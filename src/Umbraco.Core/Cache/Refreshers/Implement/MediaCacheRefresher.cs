@@ -17,12 +17,10 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
     private readonly IMediaNavigationQueryService _mediaNavigationQueryService;
     private readonly IMediaNavigationManagementService _mediaNavigationManagementService;
     private readonly IMediaService _mediaService;
-    private readonly IPublishedSnapshotService _publishedSnapshotService;
 
     public MediaCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
-        IPublishedSnapshotService publishedSnapshotService,
         IIdKeyMap idKeyMap,
         IEventAggregator eventAggregator,
         ICacheRefresherNotificationFactory factory,
@@ -31,7 +29,6 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
         IMediaService mediaService)
         : base(appCaches, serializer, eventAggregator, factory)
     {
-        _publishedSnapshotService = publishedSnapshotService;
         _idKeyMap = idKeyMap;
         _mediaNavigationQueryService = mediaNavigationQueryService;
         _mediaNavigationManagementService = mediaNavigationManagementService;
@@ -113,12 +110,7 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
             HandleNavigation(payload);
         }
 
-        _publishedSnapshotService.Notify(payloads, out var hasPublishedDataChanged);
-        // we only need to clear this if the published cache has changed
-        if (hasPublishedDataChanged)
-        {
-            AppCaches.ClearPartialViewCache();
-        }
+        AppCaches.ClearPartialViewCache();
 
 
         base.Refresh(payloads);

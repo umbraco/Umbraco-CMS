@@ -14,20 +14,19 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private readonly IJsonSerializer _jsonSerializer;
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IPublishedMediaCache _publishedMediaCache;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IPublishedValueFallback _publishedValueFallback;
     private readonly IApiMediaWithCropsBuilder _apiMediaWithCropsBuilder;
 
     public MediaPickerWithCropsValueConverter(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IPublishedMediaCache publishedMediaCache,
         IPublishedUrlProvider publishedUrlProvider,
         IPublishedValueFallback publishedValueFallback,
         IJsonSerializer jsonSerializer,
         IApiMediaWithCropsBuilder apiMediaWithCropsBuilder)
     {
-        _publishedSnapshotAccessor = publishedSnapshotAccessor ??
-                                     throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
+        _publishedMediaCache = publishedMediaCache;
         _publishedUrlProvider = publishedUrlProvider;
         _publishedValueFallback = publishedValueFallback;
         _jsonSerializer = jsonSerializer;
@@ -70,10 +69,9 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
         IEnumerable<MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto> dtos =
             MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.Deserialize(_jsonSerializer, inter);
         MediaPicker3Configuration? configuration = propertyType.DataType.ConfigurationAs<MediaPicker3Configuration>();
-        IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
         foreach (MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto dto in dtos)
         {
-            IPublishedContent? mediaItem = publishedSnapshot.Media?.GetById(preview, dto.MediaKey);
+            IPublishedContent? mediaItem = _publishedMediaCache.GetById(preview, dto.MediaKey);
             if (mediaItem != null)
             {
                 var localCrops = new ImageCropperValue

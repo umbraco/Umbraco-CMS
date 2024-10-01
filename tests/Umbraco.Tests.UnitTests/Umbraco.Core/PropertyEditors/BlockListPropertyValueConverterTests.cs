@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Serialization;
 
@@ -22,12 +23,11 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
 
     private BlockListPropertyValueConverter CreateConverter()
     {
-        var publishedSnapshotAccessor = GetPublishedSnapshotAccessor();
         var publishedModelFactory = new NoopPublishedModelFactory();
         var blockVarianceHandler = new BlockEditorVarianceHandler(Mock.Of<ILanguageService>());
         var editor = new BlockListPropertyValueConverter(
             Mock.Of<IProfilingLogger>(),
-            new BlockEditorConverter(publishedSnapshotAccessor, publishedModelFactory, Mock.Of<IVariationContextAccessor>(), blockVarianceHandler),
+            new BlockEditorConverter(GetPublishedContentTypeCache(), Mock.Of<ICacheManager>(), publishedModelFactory, Mock.Of<IVariationContextAccessor>(), blockVarianceHandler),
             Mock.Of<IContentTypeService>(),
             new ApiElementBuilder(Mock.Of<IOutputExpansionStrategyAccessor>()),
             new SystemTextJsonSerializer(),

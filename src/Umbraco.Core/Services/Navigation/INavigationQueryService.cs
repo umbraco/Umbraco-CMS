@@ -44,4 +44,6 @@ public interface INavigationQueryService
     }
 
     bool TryGetSiblingsKeys(Guid key, out IEnumerable<Guid> siblingsKeys);
+
+    bool TryGetLevel(Guid contentKey, out int level);
 }

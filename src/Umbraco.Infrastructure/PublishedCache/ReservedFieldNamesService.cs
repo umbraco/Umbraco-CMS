@@ -44,8 +44,8 @@ internal class ReservedFieldNamesService : IReservedFieldNamesService
 
     public ISet<string> GetMemberReservedFieldNames()
     {
-        var reservedProperties = typeof(PublishedMember).GetPublicProperties().Select(x => x.Name).ToHashSet();
-        var reservedMethods = typeof(PublishedMember).GetPublicMethods().Select(x => x.Name).ToHashSet();
+        var reservedProperties = typeof(IPublishedMember).GetPublicProperties().Select(x => x.Name).ToHashSet();
+        var reservedMethods = typeof(IPublishedMember).GetPublicMethods().Select(x => x.Name).ToHashSet();
         reservedProperties.UnionWith(reservedMethods);
         reservedProperties.UnionWith(_memberPropertySettings.ReservedFieldNames);
 

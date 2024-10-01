@@ -13,18 +13,21 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 /// </summary>
 public sealed class BlockEditorConverter
 {
+    private readonly IPublishedContentTypeCache _publishedContentTypeCache;
+    private readonly ICacheManager _cacheManager;
     private readonly IPublishedModelFactory _publishedModelFactory;
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
 
     public BlockEditorConverter(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IPublishedContentTypeCache publishedContentTypeCache,
+        ICacheManager cacheManager,
         IPublishedModelFactory publishedModelFactory,
         IVariationContextAccessor variationContextAccessor,
         BlockEditorVarianceHandler blockEditorVarianceHandler)
     {
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
+        _publishedContentTypeCache = publishedContentTypeCache;
+        _cacheManager = cacheManager;
         _publishedModelFactory = publishedModelFactory;
         _variationContextAccessor = variationContextAccessor;
         _blockEditorVarianceHandler = blockEditorVarianceHandler;
@@ -32,11 +35,8 @@ public sealed class BlockEditorConverter
 
     public IPublishedElement? ConvertToElement(IPublishedElement owner, BlockItemData data, PropertyCacheLevel referenceCacheLevel, bool preview)
     {
-        IPublishedContentCache? publishedContentCache =
-            _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Content;
-
         // Only convert element types - content types will cause an exception when PublishedModelFactory creates the model
-        IPublishedContentType? publishedContentType = publishedContentCache?.GetContentType(data.ContentTypeKey);
+        IPublishedContentType? publishedContentType = _publishedContentTypeCache.Get(PublishedItemType.Element, data.ContentTypeKey);
         if (publishedContentType == null || publishedContentType.IsElement == false)
         {
             return null;
@@ -91,7 +91,7 @@ public sealed class BlockEditorConverter
             return null;
         }
 
-        IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview, referenceCacheLevel, _publishedSnapshotAccessor);
+        IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview, referenceCacheLevel, _cacheManager);
         element = _publishedModelFactory.CreateModel(element);
 
         return element;
@@ -99,9 +99,7 @@ public sealed class BlockEditorConverter
 
     public Type GetModelType(Guid contentTypeKey)
     {
-        IPublishedContentCache? publishedContentCache =
-            _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Content;
-        IPublishedContentType? publishedContentType = publishedContentCache?.GetContentType(contentTypeKey);
+        IPublishedContentType? publishedContentType = _publishedContentTypeCache.Get(PublishedItemType.Content, contentTypeKey);
         if (publishedContentType is not null && publishedContentType.IsElement)
         {
             return _publishedModelFactory.GetModelType(publishedContentType.Alias);

@@ -452,28 +452,30 @@ public class RichTextParserTests : PropertyValueConverterTests
 
     private ApiRichTextElementParser CreateRichTextElementParser()
     {
-        SetupTestContent(out var routeBuilder, out var snapshotAccessor, out var urlProvider);
+        SetupTestContent(out var routeBuilder, out var cacheManager, out var urlProvider);
 
         return new ApiRichTextElementParser(
             routeBuilder,
             urlProvider,
-            snapshotAccessor,
+            cacheManager.Content,
+            cacheManager.Media,
             new ApiElementBuilder(CreateOutputExpansionStrategyAccessor()),
             Mock.Of<ILogger<ApiRichTextElementParser>>());
     }
 
     private ApiRichTextMarkupParser CreateRichTextMarkupParser()
     {
-        SetupTestContent(out var routeBuilder, out var snapshotAccessor, out var urlProvider);
+        SetupTestContent(out var routeBuilder, out var cacheManager, out var urlProvider);
 
         return new ApiRichTextMarkupParser(
             routeBuilder,
             urlProvider,
-            snapshotAccessor,
+            cacheManager.Content,
+            cacheManager.Media,
             Mock.Of<ILogger<ApiRichTextMarkupParser>>());
     }
 
-    private void SetupTestContent(out IApiContentRouteBuilder routeBuilder, out IPublishedSnapshotAccessor snapshotAccessor, out IApiMediaUrlProvider apiMediaUrlProvider)
+    private void SetupTestContent(out IApiContentRouteBuilder routeBuilder, out ICacheManager cacheManager, out IApiMediaUrlProvider apiMediaUrlProvider)
     {
         var contentMock = new Mock<IPublishedContent>();
         contentMock.SetupGet(m => m.Key).Returns(_contentKey);
@@ -484,17 +486,14 @@ public class RichTextParserTests : PropertyValueConverterTests
         mediaMock.SetupGet(m => m.ItemType).Returns(PublishedItemType.Media);
 
         var contentCacheMock = new Mock<IPublishedContentCache>();
-        contentCacheMock.Setup(m => m.GetById(new GuidUdi(Constants.UdiEntityType.Document, _contentKey))).Returns(contentMock.Object);
+        contentCacheMock.Setup(m => m.GetById(_contentKey)).Returns(contentMock.Object);
         var mediaCacheMock = new Mock<IPublishedMediaCache>();
-        mediaCacheMock.Setup(m => m.GetById(new GuidUdi(Constants.UdiEntityType.Media, _mediaKey))).Returns(mediaMock.Object);
+        mediaCacheMock.Setup(m => m.GetById(_mediaKey)).Returns(mediaMock.Object);
 
-        var snapshotMock = new Mock<IPublishedSnapshot>();
-        snapshotMock.SetupGet(m => m.Content).Returns(contentCacheMock.Object);
-        snapshotMock.SetupGet(m => m.Media).Returns(mediaCacheMock.Object);
-
-        var snapshot = snapshotMock.Object;
-        var snapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
-        snapshotAccessorMock.Setup(m => m.TryGetPublishedSnapshot(out snapshot)).Returns(true);
+        var cacheManagerMock = new Mock<ICacheManager>();
+        cacheManagerMock.SetupGet(m => m.Content).Returns(contentCacheMock.Object);
+        cacheManagerMock.SetupGet(m => m.Media).Returns(mediaCacheMock.Object);
+        cacheManager = cacheManagerMock.Object;
 
         var routeBuilderMock = new Mock<IApiContentRouteBuilder>();
         routeBuilderMock
@@ -507,7 +506,6 @@ public class RichTextParserTests : PropertyValueConverterTests
             .Returns("/some-media-url");
 
         routeBuilder = routeBuilderMock.Object;
-        snapshotAccessor = snapshotAccessorMock.Object;
         apiMediaUrlProvider = apiMediaUrlProviderMock.Object;
     }
 
@@ -522,7 +520,7 @@ public class RichTextParserTests : PropertyValueConverterTests
         element.SetupGet(c => c.ContentType).Returns(elementType.Object);
 
         var numberPropertyType = SetupPublishedPropertyType(new IntegerValueConverter(), "number", Constants.PropertyEditors.Aliases.Label);
-        var property = new PublishedElementPropertyBase(numberPropertyType, element.Object, false, PropertyCacheLevel.None, propertyValue);
+        var property = new PublishedElementPropertyBase(numberPropertyType, element.Object, false, PropertyCacheLevel.None, CacheManager, propertyValue);
 
         element.SetupGet(c => c.Properties).Returns(new[] { property });
         return element.Object;

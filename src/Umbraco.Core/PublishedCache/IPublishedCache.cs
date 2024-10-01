@@ -67,7 +67,7 @@ public interface IPublishedCache
     /// <param name="culture">A culture.</param>
     /// <returns>The contents.</returns>
     /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
-    [Obsolete] // FIXME: Remove when replacing nucache
+    [Obsolete("Scheduled for removal, use IDocumentNavigationQueryService instead in v17")]
     IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null);
 
     /// <summary>
@@ -76,7 +76,7 @@ public interface IPublishedCache
     /// <param name="culture">A culture.</param>
     /// <returns>The contents.</returns>
     /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-    [Obsolete] // FIXME: Remove when replacing nucache
+    [Obsolete("Scheduled for removal, use IDocumentNavigationQueryService instead in v17")]
     IEnumerable<IPublishedContent> GetAtRoot(string? culture = null);
 
     /// <summary>
@@ -85,7 +85,7 @@ public interface IPublishedCache
     /// <param name="preview">A value indicating whether to consider unpublished content.</param>
     /// <returns>A value indicating whether the cache contains published content.</returns>
     /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
-    [Obsolete] // FIXME: Remove when replacing nucache
+    [Obsolete("Scheduled for removal in v17")]
     bool HasContent(bool preview);
 
     /// <summary>
@@ -93,7 +93,7 @@ public interface IPublishedCache
     /// </summary>
     /// <returns>A value indicating whether the cache contains published content.</returns>
     /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-    [Obsolete] // FIXME: Remove when replacing nucache
+    [Obsolete("Scheduled for removal in v17")]
     bool HasContent();
 
     /// <summary>
@@ -118,7 +118,7 @@ public interface IPublishedCache
     /// </summary>
     /// <param name="contentType">The content type.</param>
     /// <returns>The contents.</returns>
-    [Obsolete] // FIXME: Remove when replacing nucache
+    [Obsolete]
     IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType);
 
     /// <summary>
