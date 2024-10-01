@@ -91,7 +91,7 @@ export class UmbDocumentWorkspaceContext
 	public readonly repository = new UmbDocumentDetailRepository(this);
 	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);
 
-	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
+	#parent = new UmbObjectState<UmbEntityModel | undefined>(undefined);
 	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
 	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
 
@@ -106,7 +106,7 @@ export class UmbDocumentWorkspaceContext
 	#serverValidation = new UmbServerModelValidatorContext(this);
 	#validationRepository?: UmbDocumentValidationRepository;
 
-	public readOnlyState = new UmbReadOnlyVariantStateManager(this);
+	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
 
 	public isLoaded() {
 		return this.#getDataPromise;
@@ -124,9 +124,6 @@ export class UmbDocumentWorkspaceContext
 
 	readonly variants = this.#data.createObservablePartOfCurrent((data) => data?.variants ?? []);
 
-	readonly urls = this.#data.createObservablePartOfCurrent((data) => data?.urls || []);
-	readonly templateId = this.#data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
-
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbDocumentTypeDetailRepository(this));
 	readonly variesByCulture = this.structure.ownerContentTypeObservablePart((x) => x?.variesByCulture);
 	readonly variesBySegment = this.structure.ownerContentTypeObservablePart((x) => x?.variesBySegment);
@@ -136,6 +133,9 @@ export class UmbDocumentWorkspaceContext
 	#varies?: boolean;
 	#variesByCulture?: boolean;
 	#variesBySegment?: boolean;
+
+	readonly urls = this.#data.createObservablePartOfCurrent((data) => data?.urls || []);
+	readonly templateId = this.#data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	readonly #dataTypeItemManager = new UmbDataTypeItemRepositoryManager(this);
 	#dataTypeSchemaAliasMap = new Map<string, string>();
@@ -518,7 +518,6 @@ export class UmbDocumentWorkspaceContext
 
 			const { data, error } = await this.repository.create(saveData, parent.unique);
 			if (!data || error) {
-				console.error('Error creating document', error);
 				throw new Error('Error creating document');
 			}
 
@@ -547,7 +546,6 @@ export class UmbDocumentWorkspaceContext
 			// Save:
 			const { data, error } = await this.repository.save(saveData);
 			if (!data || error) {
-				console.error('Error saving document', error);
 				throw new Error('Error saving document');
 			}
 

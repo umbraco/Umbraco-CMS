@@ -6,6 +6,9 @@ import type {
 	UmbMemberVariantOptionModel,
 } from '../../types.js';
 import { UmbMemberPropertyDatasetContext } from '../../property-dataset-context/member-property-dataset-context.js';
+import { UMB_MEMBER_ENTITY_TYPE, UMB_MEMBER_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { sortVariants } from '../../utils.js';
+import { UMB_MEMBER_MANAGEMENT_SECTION_PATH } from '../../../section/index.js';
 import { UMB_MEMBER_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbMemberWorkspaceEditorElement } from './member-workspace-editor.element.js';
 import { UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD } from './constants.js';
@@ -13,10 +16,16 @@ import { UmbMemberTypeDetailRepository, type UmbMemberTypeDetailModel } from '@u
 import {
 	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceIsNewRedirectControllerAlias,
 	UmbWorkspaceSplitViewManager,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState, appendToFrozenArray, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
+import {
+	UmbArrayState,
+	UmbObjectState,
+	appendToFrozenArray,
+	mergeObservables,
+} from '@umbraco-cms/backoffice/observable-api';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
@@ -25,6 +34,13 @@ import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { UmbContentWorkspaceDataManager, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
+import { map } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import {
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 type EntityModel = UmbMemberDetailModel;
 export class UmbMemberWorkspaceContext
@@ -35,6 +51,10 @@ export class UmbMemberWorkspaceContext
 
 	public readonly repository = new UmbMemberDetailRepository(this);
 
+	#parent = new UmbObjectState<UmbEntityModel | undefined>({ entityType: UMB_MEMBER_ROOT_ENTITY_TYPE, unique: null });
+	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
+	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
+
 	readonly #data = new UmbContentWorkspaceDataManager<EntityModel>(this, UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD);
 	#getDataPromise?: Promise<UmbDataSourceResponse<UmbMemberDetailModel>>;
 
@@ -43,7 +63,7 @@ export class UmbMemberWorkspaceContext
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 	public readonly languages = this.#languages.asObservable();
 
-	readOnlyState = new UmbReadOnlyVariantStateManager(this);
+	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
 
 	public isLoaded() {
 		return this.#getDataPromise;
@@ -54,7 +74,8 @@ export class UmbMemberWorkspaceContext
 	readonly createDate = this.#data.createObservablePartOfCurrent((data) => data?.variants[0].createDate);
 	readonly updateDate = this.#data.createObservablePartOfCurrent((data) => data?.variants[0].updateDate);
 	readonly contentTypeUnique = this.#data.createObservablePartOfCurrent((data) => data?.memberType.unique);
-	readonly kind = this.#data.createObservablePartOfCurrent((data) => data?.kind);
+
+	readonly variants = this.#data.createObservablePartOfCurrent((data) => data?.variants ?? []);
 
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbMemberTypeDetailRepository(this));
 	readonly variesByCulture = this.structure.ownerContentTypeObservablePart((x) => x?.variesByCulture);
@@ -66,7 +87,7 @@ export class UmbMemberWorkspaceContext
 	#variesByCulture?: boolean;
 	#variesBySegment?: boolean;
 
-	readonly variants = this.#data.createObservablePartOfCurrent((data) => data?.variants ?? []);
+	readonly kind = this.#data.createObservablePartOfCurrent((data) => data?.kind);
 
 	readonly #dataTypeItemManager = new UmbDataTypeItemRepositoryManager(this);
 	#dataTypeSchemaAliasMap = new Map<string, string>();
@@ -102,35 +123,51 @@ export class UmbMemberWorkspaceContext
 			}
 			return [] as Array<UmbMemberVariantOptionModel>;
 		},
-	);
+	).pipe(map((results) => results.sort(sortVariants)));
+
+	// TODO: this should be set up for all entity workspace contexts in a base class
+	#entityContext = new UmbEntityContext(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MEMBER_WORKSPACE_ALIAS);
 
-		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
-
-		this.observe(this.variesByCulture, (varies) => {
-			this.#data.setVariesByCulture(varies);
-			this.#variesByCulture = varies;
-		});
-		this.observe(this.variesBySegment, (varies) => {
-			this.#data.setVariesBySegment(varies);
-			this.#variesBySegment = varies;
-		});
-		this.observe(this.varies, (varies) => (this.#varies = varies));
-
-		this.observe(this.structure.contentTypeDataTypeUniques, (dataTypeUniques: Array<string>) => {
-			this.#dataTypeItemManager.setUniques(dataTypeUniques);
-		});
-
-		this.observe(this.#dataTypeItemManager.items, (dataTypes) => {
-			// Make a map of the data type unique and editorAlias:
-			this.#dataTypeSchemaAliasMap = new Map(
-				dataTypes.map((dataType) => {
-					return [dataType.unique, dataType.propertyEditorSchemaAlias];
-				}),
-			);
-		});
+		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
+		this.observe(this.varies, (varies) => (this.#varies = varies), null);
+		this.observe(
+			this.variesByCulture,
+			(varies) => {
+				this.#data.setVariesByCulture(varies);
+				this.#variesByCulture = varies;
+			},
+			null,
+		);
+		this.observe(
+			this.variesBySegment,
+			(varies) => {
+				this.#data.setVariesBySegment(varies);
+				this.#variesBySegment = varies;
+			},
+			null,
+		);
+		this.observe(
+			this.structure.contentTypeDataTypeUniques,
+			(dataTypeUniques: Array<string>) => {
+				this.#dataTypeItemManager.setUniques(dataTypeUniques);
+			},
+			null,
+		);
+		this.observe(
+			this.#dataTypeItemManager.items,
+			(dataTypes) => {
+				// Make a map of the data type unique and editorAlias:
+				this.#dataTypeSchemaAliasMap = new Map(
+					dataTypes.map((dataType) => {
+						return [dataType.unique, dataType.propertyEditorSchemaAlias];
+					}),
+				);
+			},
+			null,
+		);
 		this.loadLanguages();
 
 		this.routes.setRoutes([
@@ -152,6 +189,7 @@ export class UmbMemberWorkspaceContext
 				path: 'edit/:unique',
 				component: () => new UmbMemberWorkspaceEditorElement(),
 				setup: (_component, info) => {
+					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
 					this.load(unique);
 				},
@@ -161,8 +199,7 @@ export class UmbMemberWorkspaceContext
 
 	override resetState() {
 		super.resetState();
-		this.#data.setPersisted(undefined);
-		this.#data.setCurrent(undefined);
+		this.#data.clear();
 	}
 
 	async loadLanguages() {
@@ -178,6 +215,8 @@ export class UmbMemberWorkspaceContext
 		const { data, asObservable } = (await this.#getDataPromise) as GetDataType;
 
 		if (data) {
+			this.#entityContext.setEntityType(UMB_MEMBER_ENTITY_TYPE);
+			this.#entityContext.setUnique(unique);
 			this.setIsNew(false);
 			this.#data.setPersisted(data);
 			this.#data.setCurrent(data);
@@ -189,7 +228,7 @@ export class UmbMemberWorkspaceContext
 	#onMemberStoreChange(member: EntityModel | undefined) {
 		if (!member) {
 			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
-			history.pushState(null, '', 'section/member-management');
+			history.pushState(null, '', UMB_MEMBER_MANAGEMENT_SECTION_PATH);
 		}
 	}
 
@@ -203,6 +242,8 @@ export class UmbMemberWorkspaceContext
 		const { data } = await this.#getDataPromise;
 		if (!data) return undefined;
 
+		this.#entityContext.setEntityType(UMB_MEMBER_ENTITY_TYPE);
+		this.#entityContext.setUnique(data.unique);
 		this.setIsNew(true);
 		this.#data.setPersisted(undefined);
 		this.#data.setCurrent(data);
@@ -214,11 +255,11 @@ export class UmbMemberWorkspaceContext
 	}
 
 	getUnique() {
-		return this.getData()?.unique || '';
+		return this.getData()?.unique;
 	}
 
 	getEntityType() {
-		return 'member';
+		return UMB_MEMBER_ENTITY_TYPE;
 	}
 
 	getContentTypeId() {
@@ -336,33 +377,54 @@ export class UmbMemberWorkspaceContext
 		this.#data.finishPropertyValueChange();
 	};
 
-	async submit() {
+	async #handleSave() {
 		const current = this.#data.getCurrent();
 		if (!current) throw new Error('Data is missing');
 		if (!current.unique) throw new Error('Unique is missing');
 
-		let newData = undefined;
-
 		if (this.getIsNew()) {
-			const { data } = await this.repository.create(current);
-			if (!data) {
-				throw new Error('Could not create member.');
-			}
-			newData = data;
-			this.setIsNew(false);
-		} else {
-			const { data } = await this.repository.save(current);
-			if (!data) {
-				throw new Error('Could not create member.');
-			}
-			newData = data;
-		}
+			// Create:
+			const parent = this.#parent.getValue();
+			if (!parent) throw new Error('Parent is not set');
 
-		if (newData) {
-			this.#data.setPersisted(newData);
-			// TODO: Only update the variants that was chosen to be saved:
-			//this.#data.setCurrentData(newData);
+			const { data, error } = await this.repository.create(current);
+			if (!data || error) {
+				throw new Error('Could not create member.');
+			}
+
+			this.setIsNew(false);
+			this.#data.setPersisted(data);
+			// TODO: Missing variant data filtering.
+			this.#data.setCurrent(data);
+
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadChildrenOfEntityEvent({
+				entityType: parent.entityType,
+				unique: parent.unique,
+			});
+			eventContext.dispatchEvent(event);
+		} else {
+			// Save:
+			const { data, error } = await this.repository.save(current);
+			if (!data || error) {
+				throw new Error('Could not update member.');
+			}
+			this.#data.setPersisted(data);
+			// TODO: Missing variant data filtering.
+			this.#data.setCurrent(data);
+
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadStructureForEntityEvent({
+				entityType: this.getEntityType(),
+				unique: this.getUnique()!,
+			});
+
+			eventContext.dispatchEvent(event);
 		}
+	}
+
+	async submit() {
+		return this.#handleSave();
 	}
 
 	async delete() {
