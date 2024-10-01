@@ -17,10 +17,10 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 	public readonly activeSectionAlias = this.#activeSectionAlias.asObservable();
 
 	// TODO: We need a class array state:
-	#allowedSections = new UmbBasicState<Array<UmbExtensionManifestInitializer<ManifestSection>>>([]);
+	readonly #allowedSections = new UmbBasicState<Array<UmbExtensionManifestInitializer<ManifestSection>>>([]);
 	public readonly allowedSections = this.#allowedSections.asObservable();
 
-	#version = new UmbStringState(undefined);
+	readonly #version = new UmbStringState(undefined);
 	public readonly version = this.#version.asObservable();
 
 	constructor(host: UmbControllerHost) {
