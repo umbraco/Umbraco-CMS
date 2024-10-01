@@ -1,7 +1,7 @@
-import type { UmbFolderModel } from '../../types.js';
+import type { MetaEntityActionFolderKind, UmbFolderModel } from '../../types.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbEntityActionArgs, MetaEntityActionFolderKind } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';

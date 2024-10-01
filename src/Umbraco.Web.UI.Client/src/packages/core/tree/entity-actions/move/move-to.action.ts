@@ -1,9 +1,6 @@
 import type { UmbMoveRepository } from './move-repository.interface.js';
-import {
-	UmbEntityActionBase,
-	UmbRequestReloadStructureForEntityEvent,
-	type MetaEntityActionMoveToKind,
-} from '@umbraco-cms/backoffice/entity-action';
+import type { MetaEntityActionMoveToKind } from './types.js';
+import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
