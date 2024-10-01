@@ -170,7 +170,7 @@ public class DocumentUrlService : IDocumentUrlService
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
-        IEnumerable<IContent> documents = _documentRepository.GetMany(Array.Empty<Guid>());
+        IEnumerable<IContent> documents = _documentRepository.GetMany(Array.Empty<int>());
 
         await CreateOrUpdateUrlSegmentsAsync(documents);
 
@@ -280,17 +280,26 @@ public class DocumentUrlService : IDocumentUrlService
 
     private IEnumerable<PublishedDocumentUrlSegment> GenerateModels(IContent document, string? culture, ILanguage language)
     {
-        var publishedUrlSegment = document.GetUrlSegment(_shortStringHelper, _urlSegmentProviderCollection, culture, true);
-        if(publishedUrlSegment.IsNullOrWhiteSpace())
+        if (document.ContentType.VariesByCulture() is false || document.PublishCultureInfos != null && document.PublishCultureInfos.Values.Any(x => x.Culture == culture))
         {
-            _logger.LogWarning("No published url segment found for document {DocumentKey} in culture {Culture}", document.Key, culture ?? "{null}");
-        }
-        else
-        {
-            yield return new PublishedDocumentUrlSegment()
+
+            var publishedUrlSegment =
+                document.GetUrlSegment(_shortStringHelper, _urlSegmentProviderCollection, culture, true);
+            if (publishedUrlSegment.IsNullOrWhiteSpace())
             {
-                DocumentKey = document.Key, LanguageId = language.Id, UrlSegment = publishedUrlSegment, IsDraft = false
-            };
+                _logger.LogWarning("No published url segment found for document {DocumentKey} in culture {Culture}",
+                    document.Key, culture ?? "{null}");
+            }
+            else
+            {
+                yield return new PublishedDocumentUrlSegment()
+                {
+                    DocumentKey = document.Key,
+                    LanguageId = language.Id,
+                    UrlSegment = publishedUrlSegment,
+                    IsDraft = false
+                };
+            }
         }
 
         var draftUrlSegment = document.GetUrlSegment(_shortStringHelper, _urlSegmentProviderCollection, culture, false);
