@@ -46,7 +46,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 									{ alias: 'alignleft', label: 'Align left', icon: 'align-left' },
 									{ alias: 'aligncenter', label: 'Align center', icon: 'align-center' },
 									{ alias: 'alignright', label: 'Align right', icon: 'align-right' },
-									{ alias: 'alignjustify', label: 'Justify justify', icon: 'align-justify' },
+									{ alias: 'alignjustify', label: 'Align justify', icon: 'align-justify' },
 									{ alias: 'bullist', label: 'Bullet list', icon: 'unordered-list' },
 									{ alias: 'numlist', label: 'Numbered list', icon: 'ordered-list' },
 									{ alias: 'outdent', label: 'Outdent', icon: 'outdent' },
