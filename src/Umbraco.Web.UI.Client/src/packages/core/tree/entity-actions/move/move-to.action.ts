@@ -1,7 +1,10 @@
 import type { UmbMoveRepository } from './move-repository.interface.js';
-import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import {
+	UmbEntityActionBase,
+	UmbRequestReloadStructureForEntityEvent,
+	type MetaEntityActionMoveToKind,
+} from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { MetaEntityActionMoveToKind } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/tree';
