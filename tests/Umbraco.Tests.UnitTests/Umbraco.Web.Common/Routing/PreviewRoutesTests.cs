@@ -52,13 +52,5 @@ public class PreviewRoutesTests
     }
 
     private PreviewRoutes GetRoutes(RuntimeLevel level)
-    {
-        var globalSettings = new GlobalSettings();
-        var routes = new PreviewRoutes(
-            Options.Create(globalSettings),
-            Mock.Of<IHostingEnvironment>(x =>
-                x.ToAbsolute(It.IsAny<string>()) == "/umbraco" && x.ApplicationVirtualPath == string.Empty),
-            Mock.Of<IRuntimeState>(x => x.Level == level));
-        return routes;
-    }
+        => new PreviewRoutes(Mock.Of<IRuntimeState>(x => x.Level == level));
 }

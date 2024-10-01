@@ -85,7 +85,7 @@ public static class HtmlHelperRenderExtensions
             var htmlBadge =
                 string.Format(
                     contentSettings.PreviewBadge,
-                    hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath),
+                    hostingEnvironment.GetBackOfficePath(),
                     WebUtility.UrlEncode(httpContextAccessor.GetRequiredHttpContext().Request.Path),
                     umbracoContext.PublishedRequest?.PublishedContent?.Key);
             return new HtmlString(htmlBadge);

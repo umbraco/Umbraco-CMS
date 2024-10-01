@@ -38,9 +38,8 @@ public class SurfaceControllerTests
     {
         var backofficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();
         Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
-        var globalSettings = new GlobalSettings();
 
-        var umbracoContextFactory = TestUmbracoContextFactory.Create(globalSettings, _umbracoContextAccessor);
+        var umbracoContextFactory = TestUmbracoContextFactory.Create(_umbracoContextAccessor);
 
         var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
         var umbracoContext = umbracoContextReference.UmbracoContext;
@@ -57,10 +56,9 @@ public class SurfaceControllerTests
     [Test]
     public void Umbraco_Context_Not_Null()
     {
-        var globalSettings = new GlobalSettings();
         var backofficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();
         Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
-        var umbracoContextFactory = TestUmbracoContextFactory.Create(globalSettings, _umbracoContextAccessor);
+        var umbracoContextFactory = TestUmbracoContextFactory.Create(_umbracoContextAccessor);
 
         var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
         var umbCtx = umbracoContextReference.UmbracoContext;
@@ -81,9 +79,8 @@ public class SurfaceControllerTests
         content.Setup(x => x.Id).Returns(2);
         var backofficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();
         Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
-        var globalSettings = new GlobalSettings();
 
-        var umbracoContextFactory = TestUmbracoContextFactory.Create(globalSettings, _umbracoContextAccessor);
+        var umbracoContextFactory = TestUmbracoContextFactory.Create(_umbracoContextAccessor);
 
         var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
         var umbracoContext = umbracoContextReference.UmbracoContext;
@@ -103,10 +100,9 @@ public class SurfaceControllerTests
     [Test]
     public void Mock_Current_Page()
     {
-        var globalSettings = new GlobalSettings();
         var backofficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();
         Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
-        var umbracoContextFactory = TestUmbracoContextFactory.Create(globalSettings, _umbracoContextAccessor);
+        var umbracoContextFactory = TestUmbracoContextFactory.Create(_umbracoContextAccessor);
 
         var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
         var umbracoContext = umbracoContextReference.UmbracoContext;

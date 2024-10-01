@@ -16,10 +16,12 @@ namespace Umbraco.Cms.Web.Common.Mvc;
 /// </remarks>
 public class UmbracoMvcConfigureOptions : IConfigureOptions<MvcOptions>
 {
-    private readonly GlobalSettings _globalSettings;
+    public UmbracoMvcConfigureOptions()
+    { }
 
+    [Obsolete("The global settings is not required anymore, use the default constructor instead. This constructor will be removed in a future version.")]
     public UmbracoMvcConfigureOptions(IOptions<GlobalSettings> globalSettings)
-        => _globalSettings = globalSettings.Value;
+    { }
 
     /// <inheritdoc />
     public void Configure(MvcOptions options)
@@ -32,7 +34,7 @@ public class UmbracoMvcConfigureOptions : IConfigureOptions<MvcOptions>
         if (options.Conventions.Any(convention => convention is UmbracoBackofficeToken) is false)
         {
             // Replace the BackOfficeToken in routes.
-            var backofficePath = _globalSettings.UmbracoPath.TrimStart(Core.Constants.CharArrays.TildeForwardSlash);
+            var backofficePath = Core.Constants.System.DefaultUmbracoPath.TrimStart(Core.Constants.CharArrays.TildeForwardSlash);
             options.Conventions.Add(new UmbracoBackofficeToken(Core.Constants.Web.AttributeRouting.BackOfficeToken, backofficePath));
         }
     }

@@ -1,13 +1,9 @@
-@using Microsoft.Extensions.Options
-@using Umbraco.Cms.Core.Configuration.Models
+@model Umbraco.Cms.Web.Website.Models.NoNodesViewModel
 @using Umbraco.Cms.Core.Hosting
 @using Umbraco.Cms.Core.Routing
-@using Umbraco.Extensions
-@model Umbraco.Cms.Web.Website.Models.NoNodesViewModel
-@inject IHostingEnvironment hostingEnvironment
-@inject IOptions<GlobalSettings> globalSettings
+@inject IHostingEnvironment HostingEnvironment
 @{
-    var backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
+    var backOfficePath = HostingEnvironment.GetBackOfficePath();
 }
 <!doctype html>
 <html class="no-js" lang="en">
@@ -18,7 +14,7 @@
 
     <title>Umbraco: No Published Content</title>
 
-    <link rel="stylesheet" href="@WebPath.Combine(backOfficePath.TrimStartExact("~") , "website", "/nonodes.css")" />
+    <link rel="stylesheet" href="@WebPath.Combine(backOfficePath , "website", "/nonodes.css")" />
 </head>
 <body>
 

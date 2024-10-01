@@ -1,17 +1,12 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Controllers;
@@ -61,20 +56,9 @@ public class BackOfficeAreaRoutesTests
     }
 
     private BackOfficeAreaRoutes GetBackOfficeAreaRoutes(RuntimeLevel level)
-    {
-        var globalSettings = new GlobalSettings();
-        var routes = new BackOfficeAreaRoutes(
-            Options.Create(globalSettings),
-            Mock.Of<IHostingEnvironment>(x =>
-                x.ToAbsolute(It.IsAny<string>()) == "/umbraco" && x.ApplicationVirtualPath == string.Empty),
-            Mock.Of<IRuntimeState>(x => x.Level == level),
-            new UmbracoApiControllerTypeCollection(() => new[] { typeof(Testing1Controller) }));
-
-        return routes;
-    }
+        => new BackOfficeAreaRoutes(Mock.Of<IRuntimeState>(x => x.Level == level));
 
     [IsBackOffice]
     private class Testing1Controller : UmbracoApiController
-    {
-    }
+    { }
 }

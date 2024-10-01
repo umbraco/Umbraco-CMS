@@ -461,7 +461,7 @@ public class NotificationService : INotificationService
         var protocol = _globalSettings.UseHttps ? "https" : "http";
 
         var subjectVars = new NotificationEmailSubjectParams(
-            string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(_globalSettings.UmbracoPath)),
+            string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(Constants.System.DefaultUmbracoPath)),
             actionName,
             content.Name);
 
@@ -479,7 +479,7 @@ public class NotificationService : INotificationService
                 string.Concat(content.Id, ".aspx"),
                 protocol),
             performingUser.Name,
-            string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(_globalSettings.UmbracoPath)),
+            string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(Constants.System.DefaultUmbracoPath)),
             summary.ToString());
 
         var fromMail = _contentSettings.Notifications.Email ?? _globalSettings.Smtp?.From;

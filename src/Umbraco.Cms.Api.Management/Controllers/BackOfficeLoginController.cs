@@ -24,7 +24,7 @@ public class BackOfficeLoginModel
     public bool UserIsAlreadyLoggedIn { get; set; }
 }
 
-[ApiExplorerSettings(IgnoreApi=true)]
+[ApiExplorerSettings(IgnoreApi = true)]
 [Route(LoginPath)]
 public class BackOfficeLoginController : Controller
 {
@@ -51,7 +51,7 @@ public class BackOfficeLoginController : Controller
 
         if (string.IsNullOrEmpty(model.UmbracoUrl))
         {
-            model.UmbracoUrl = _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoPath);
+            model.UmbracoUrl = _hostingEnvironment.GetBackOfficePath();
         }
 
         if (string.IsNullOrEmpty(model.ReturnUrl))
