@@ -1,4 +1,5 @@
 export * from './common/index.js';
+export * from './default/index.js';
 export * from './entity-action-base.js';
 export * from './entity-action-list.element.js';
 export * from './entity-action.event.js';
