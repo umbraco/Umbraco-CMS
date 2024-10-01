@@ -8,6 +8,7 @@ import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from
 import {
 	UmbEntityDetailWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -43,7 +44,7 @@ export class UmbTemplateWorkspaceContext
 				setup: (component: PageComponent, info: IRoutingInfo) => {
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
-					this.createScaffold({ parent: { entityType: parentEntityType, unique: parentUnique } });
+					this.create({ entityType: parentEntityType, unique: parentUnique });
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
@@ -56,11 +57,30 @@ export class UmbTemplateWorkspaceContext
 				path: 'edit/:unique',
 				component: UmbTemplateWorkspaceEditorElement,
 				setup: (component: PageComponent, info: IRoutingInfo): void => {
+					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
 					this.load(unique);
 				},
 			},
 		]);
+	}
+
+	override async load(unique: string) {
+		const response = await super.load(unique);
+		if (response.data) {
+			this.setMasterTemplate(response.data.masterTemplate?.unique ?? null);
+		}
+		return response;
+	}
+
+	async create(parent: any) {
+		const data = await this.createScaffold({ parent });
+
+		if (data) {
+			if (!parent) return;
+			await this.setMasterTemplate(parent.unique);
+		}
+		return data;
 	}
 
 	setName(value: string) {
