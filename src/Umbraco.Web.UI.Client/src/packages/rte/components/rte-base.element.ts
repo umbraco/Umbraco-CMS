@@ -14,7 +14,8 @@ import {
 } from '@umbraco-cms/backoffice/block-rte';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 
-export abstract class UmbRteBaseElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+// eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name
+export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement implements UmbPropertyEditorUiElement {
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
