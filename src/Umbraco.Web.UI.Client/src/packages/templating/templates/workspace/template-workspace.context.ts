@@ -72,11 +72,13 @@ export class UmbTemplateWorkspaceContext
 	}
 
 	async create(parent: any) {
-		const response = await this.createScaffold({ parent });
+		const data = await this.createScaffold({ parent });
 
-		if (!parent) return;
-		await this.setMasterTemplate(parent.unique);
-		return response;
+		if (data) {
+			if (!parent) return;
+			await this.setMasterTemplate(parent.unique);
+		}
+		return data;
 	}
 
 	setName(value: string) {
