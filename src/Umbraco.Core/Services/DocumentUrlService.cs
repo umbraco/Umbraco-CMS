@@ -170,7 +170,7 @@ public class DocumentUrlService : IDocumentUrlService
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
-        IEnumerable<IContent> documents = _documentRepository.GetMany(Array.Empty<Guid>());
+        IEnumerable<IContent> documents = _documentRepository.GetMany(Array.Empty<int>());
 
         await CreateOrUpdateUrlSegmentsAsync(documents);
 
