@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
@@ -363,6 +364,64 @@ public class RichTextElementLevelVariationTests : BlockEditorElementVariationTes
         }
     }
 
+    [Test]
+    public async Task Can_Publish_Without_Blocks_Variant()
+    {
+        var elementType = CreateElementType(ContentVariation.Culture);
+
+        var blockGridDataType = await CreateRichTextDataType(elementType);
+        var contentType = CreateContentType(blockGridDataType);
+        var richTextValue = new RichTextEditorValue { Markup = "<p>Markup here</p>", Blocks = null };
+        var content = CreateContent(contentType, richTextValue);
+
+        PublishContent(content, ["en-US", "da-DK"]);
+
+        AssertPropertyValues("en-US");
+        AssertPropertyValues("da-DK");
+
+        void AssertPropertyValues(string culture)
+        {
+            SetVariationContext(culture, null);
+            var publishedContent = GetPublishedContent(content.Key);
+            var property = publishedContent.GetProperty("blocks");
+            Assert.IsNotNull(property);
+
+            var propertyValue = property.GetDeliveryApiValue(false, culture) as RichTextModel;
+            Assert.IsNotNull(propertyValue);
+            Assert.AreEqual("<p>Markup here</p>", propertyValue.Markup);
+            Assert.IsEmpty(propertyValue.Blocks);
+        }
+    }
+
+    [Test]
+    public async Task Can_Publish_Without_Blocks_Invariant()
+    {
+        var elementType = CreateElementType(ContentVariation.Culture);
+
+        var blockGridDataType = await CreateRichTextDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Nothing, blockGridDataType);
+        var richTextValue = new RichTextEditorValue { Markup = "<p>Markup here</p>", Blocks = null };
+        var content = CreateContent(contentType, richTextValue);
+
+        PublishContent(content, ["*"]);
+
+        AssertPropertyValues("en-US");
+        AssertPropertyValues("da-DK");
+
+        void AssertPropertyValues(string culture)
+        {
+            SetVariationContext(culture, null);
+            var publishedContent = GetPublishedContent(content.Key);
+            var property = publishedContent.GetProperty("blocks");
+            Assert.IsNotNull(property);
+
+            var propertyValue = property.GetDeliveryApiValue(false, culture) as RichTextModel;
+            Assert.IsNotNull(propertyValue);
+            Assert.AreEqual("<p>Markup here</p>", propertyValue.Markup);
+            Assert.IsEmpty(propertyValue.Blocks);
+        }
+    }
+
     private async Task<IDataType> CreateRichTextDataType(IContentType elementType)
         => await CreateBlockEditorDataType(
             Constants.PropertyEditors.Aliases.RichText,
@@ -480,9 +539,18 @@ public class RichTextElementLevelVariationTests : BlockEditorElementVariationTes
     private IContent CreateContent(IContentType contentType, RichTextEditorValue richTextValue)
     {
         var contentBuilder = new ContentBuilder()
-            .WithContentType(contentType)
-            .WithCultureName("en-US", "Home (en)")
-            .WithCultureName("da-DK", "Home (da)");
+            .WithContentType(contentType);
+
+        if (contentType.VariesByCulture())
+        {
+            contentBuilder
+                .WithCultureName("en-US", "Home (en)")
+                .WithCultureName("da-DK", "Home (da)");
+        }
+        else
+        {
+            contentBuilder.WithName("Home");
+        }
 
         var content = contentBuilder.Build();
 
