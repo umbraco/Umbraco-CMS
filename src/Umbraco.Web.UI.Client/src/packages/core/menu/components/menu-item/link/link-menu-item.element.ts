@@ -1,5 +1,5 @@
 import type { UmbMenuItemElement } from '../../../menu-item-element.interface.js';
-import type { ManifestMenuItemLinkKind } from '../../../menu-item.extension.js';
+import type { ManifestMenuItemLinkKind } from './types.js';
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 

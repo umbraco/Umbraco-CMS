@@ -15,31 +15,8 @@ export interface MetaMenuItem {
 	icon?: string;
 }
 
-export interface ManifestMenuItemTreeKind extends ManifestMenuItem {
-	type: 'menuItem';
-	kind: 'tree';
-	meta: MetaMenuItemTreeKind;
-}
-
-export interface MetaMenuItemTreeKind extends MetaMenuItem {
-	treeAlias: string;
-	hideTreeRoot?: boolean;
-}
-
-export interface ManifestMenuItemLinkKind extends ManifestMenuItem {
-	type: 'menuItem';
-	kind: 'link';
-	meta: MetaMenuItemLinkKind;
-}
-
-export interface MetaMenuItemLinkKind extends MetaMenuItem {
-	href: string;
-}
-
-export type UmbMenuItemExtensions = ManifestMenuItem | ManifestMenuItemTreeKind | ManifestMenuItemLinkKind;
-
 declare global {
 	interface UmbExtensionManifestMap {
-		UmbMenuItemExtensions: UmbMenuItemExtensions;
+		umbMenuItem: ManifestMenuItem;
 	}
 }
