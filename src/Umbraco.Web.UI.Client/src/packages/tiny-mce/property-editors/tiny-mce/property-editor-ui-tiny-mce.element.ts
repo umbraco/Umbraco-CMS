@@ -1,6 +1,5 @@
-import { UmbRteBaseElement } from '../../../components/rte-base.element.js';
-import { UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '../../../types.js';
 import type { UmbInputTinyMceElement } from '../../components/input-tiny-mce/input-tiny-mce.element.js';
+import { UmbRteBaseElement, UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '@umbraco-cms/backoffice/rte';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 
 import '../../components/input-tiny-mce/input-tiny-mce.element.js';

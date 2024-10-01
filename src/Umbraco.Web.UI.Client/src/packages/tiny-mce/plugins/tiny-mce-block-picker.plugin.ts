@@ -1,4 +1,4 @@
-import { UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '../../types.js';
+import { UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '@umbraco-cms/backoffice/rte';
 import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/tiny-mce';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';

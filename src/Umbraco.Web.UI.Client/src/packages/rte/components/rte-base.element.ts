@@ -1,4 +1,5 @@
-import { type UmbPropertyEditorUiValueType, UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../types.js';
+import type { UmbPropertyEditorUiValueType } from '../types.js';
+import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../constants.js';
 import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';

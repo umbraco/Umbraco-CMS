@@ -1,4 +1,4 @@
-import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../types.js';
+import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../constants.js';
 import { UmbRteBlockValueResolver } from './rte-block-value-resolver.api.js';
 import type { ManifestPropertyValueResolver } from '@umbraco-cms/backoffice/property';
 

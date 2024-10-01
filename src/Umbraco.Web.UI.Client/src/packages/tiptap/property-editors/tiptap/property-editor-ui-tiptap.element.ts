@@ -1,5 +1,5 @@
 import type { UmbInputTiptapElement } from '../../components/input-tiptap/input-tiptap.element.js';
-import { UmbRteBaseElement } from '../../../components/rte-base.element.js';
+import { UmbRteBaseElement } from '@umbraco-cms/backoffice/rte';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 
 import '../../components/input-tiptap/input-tiptap.element.js';
