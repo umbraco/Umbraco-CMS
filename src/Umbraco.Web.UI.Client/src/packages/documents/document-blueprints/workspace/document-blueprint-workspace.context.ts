@@ -396,7 +396,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 		this.#data.finishPropertyValueChange();
 	};
 
-	async #createOrSave() {
+	async #handleSave() {
 		const current = this.#data.getCurrent();
 		if (!current?.unique) throw new Error('Unique is missing');
 
@@ -404,34 +404,49 @@ export class UmbDocumentBlueprintWorkspaceContext
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
 
-			if ((await this.repository.create(current, parent.unique)).data !== undefined) {
-				this.setIsNew(false);
-
-				// TODO: this might not be the right place to alert the tree, but it works for now
-				const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-				const event = new UmbRequestReloadChildrenOfEntityEvent({
-					entityType: parent.entityType,
-					unique: parent.unique,
-				});
-				eventContext.dispatchEvent(event);
+			const { data, error } = await this.repository.create(current, parent.unique);
+			if (!data || error) {
+				console.error('Error creating document', error);
+				throw new Error('Error creating document');
 			}
-		} else {
-			await this.repository.save(current);
 
-			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			this.setIsNew(false);
+			this.#data.setPersisted(data);
+			// We do not know about the variant IDs, so lets update everything.
+			this.#data.setCurrent(data);
+
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadChildrenOfEntityEvent({
+				entityType: parent.entityType,
+				unique: parent.unique,
+			});
+			eventContext.dispatchEvent(event);
+		} else {
+			// Save:
+			const { data, error } = await this.repository.save(current);
+			if (!data || error) {
+				console.error('Error saving document', error);
+				throw new Error('Error saving document');
+			}
+
+			this.#data.setPersisted(data);
+			// We do not know about the variant IDs, so lets update everything.
+			this.#data.setCurrent(data);
+
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
 				unique: this.getUnique()!,
 				entityType: this.getEntityType(),
 			});
 
-			actionEventContext.dispatchEvent(event);
+			eventContext.dispatchEvent(event);
 		}
 	}
 
 	async submit() {
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
-		await this.#createOrSave();
+		await this.#handleSave();
 	}
 
 	async delete() {
@@ -451,6 +466,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 	public override destroy(): void {
 		this.#data.destroy();
 		this.structure.destroy();
+		this.#languageRepository.destroy();
 		super.destroy();
 	}
 }

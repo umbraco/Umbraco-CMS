@@ -433,17 +433,6 @@ export class UmbDocumentWorkspaceContext
 					?.value as PropertyValueType,
 		);
 	}
-	// TODO: Re-evaluate if this is begin used, i wrote this as part of a POC... [NL]
-	/*
-	async propertyIndexByAlias(
-		propertyAlias: string,
-		variantId?: UmbVariantId,
-	): Promise<Observable<number | undefined> | undefined> {
-		return this.#data.current.asObservablePart((data) =>
-			data?.values?.findIndex((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true)),
-		);
-	}
-	*/
 
 	/**
 	 * Get the current value of the property with the given alias and variantId.
@@ -870,6 +859,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	public override destroy(): void {
+		this.#data.destroy();
 		this.structure.destroy();
 		this.#languageRepository.destroy();
 		super.destroy();
