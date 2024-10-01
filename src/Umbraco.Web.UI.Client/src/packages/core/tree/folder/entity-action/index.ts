@@ -1,3 +1,3 @@
-export * from './delete-folder/delete-folder.action.js';
-export * from './update-folder/update-folder.action.js';
-export * from './create-folder/create-folder.action.js';
+export * from './create-folder/index.js';
+export * from './delete-folder/index.js';
+export * from './update-folder/index.js';

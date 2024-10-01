@@ -1,7 +1,7 @@
 import { UmbEntityActionBase } from '../../../entity-action/entity-action-base.js';
 import { UmbRequestReloadStructureForEntityEvent } from '../../../entity-action/request-reload-structure-for-entity.event.js';
 import type { UmbRecycleBinRepository } from '../../recycle-bin-repository.interface.js';
-import type { MetaEntityActionTrashKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { MetaEntityActionTrashKind } from './types.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';

@@ -1,6 +1,7 @@
 import { UmbEntityActionBase } from '../../entity-action-base.js';
 import { UmbRequestReloadStructureForEntityEvent } from '../../request-reload-structure-for-entity.event.js';
-import { createExtensionApiByAlias, type MetaEntityActionDeleteKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { MetaEntityActionDeleteKind } from './types.js';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbDetailRepository, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
