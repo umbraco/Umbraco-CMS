@@ -1,5 +1,5 @@
-import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_CREATE_DICTIONARY_WORKSPACE_PATH_PATTERN } from '../../workspace/index.js';
+import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 
 export class UmbCreateDictionaryEntityAction extends UmbEntityActionBase<never> {
 	override async execute() {

@@ -2,8 +2,10 @@ import { css, customElement, html, ifDefined, property, state, styleMap } from '
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { StyleInfo } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+import type {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/property-editor';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 

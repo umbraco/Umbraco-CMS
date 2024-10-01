@@ -8,12 +8,16 @@ import type {
 	UmbMediaVariantModel,
 	UmbMediaVariantOptionModel,
 } from '../types.js';
+import { UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN, UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../paths.js';
+import { UMB_MEDIA_SECTION_PATH } from '../../media-section/paths.js';
+import { UMB_MEDIA_COLLECTION_ALIAS } from '../collection/index.js';
 import { UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD } from './constants.js';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceIsNewRedirectControllerAlias,
 	UmbWorkspaceSplitViewManager,
 } from '@umbraco-cms/backoffice/workspace';
 import {
@@ -133,35 +137,55 @@ export class UmbMediaWorkspaceContext
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.Media');
 
-		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
-
-		this.observe(this.variesByCulture, (varies) => {
-			this.#data.setVariesByCulture(varies);
-			this.#variesByCulture = varies;
-		});
-		this.observe(this.variesBySegment, (varies) => {
-			this.#data.setVariesBySegment(varies);
-			this.#variesBySegment = varies;
-		});
-		this.observe(this.varies, (varies) => (this.#varies = varies));
-
-		this.observe(this.structure.contentTypeDataTypeUniques, (dataTypeUniques: Array<string>) => {
-			this.#dataTypeItemManager.setUniques(dataTypeUniques);
-		});
-
-		this.observe(this.#dataTypeItemManager.items, (dataTypes) => {
-			// Make a map of the data type unique and editorAlias:
-			this.#dataTypeSchemaAliasMap = new Map(
-				dataTypes.map((dataType) => {
-					return [dataType.unique, dataType.propertyEditorSchemaAlias];
-				}),
-			);
-		});
+		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
+		this.observe(
+			this.varies,
+			(varies) => {
+				this.#data.setVaries(varies);
+				this.#varies = varies;
+			},
+			null,
+		);
+		this.observe(
+			this.variesByCulture,
+			(varies) => {
+				this.#data.setVariesByCulture(varies);
+				this.#variesByCulture = varies;
+			},
+			null,
+		);
+		this.observe(
+			this.variesBySegment,
+			(varies) => {
+				this.#data.setVariesBySegment(varies);
+				this.#variesBySegment = varies;
+			},
+			null,
+		);
+		this.observe(
+			this.structure.contentTypeDataTypeUniques,
+			(dataTypeUniques: Array<string>) => {
+				this.#dataTypeItemManager.setUniques(dataTypeUniques);
+			},
+			null,
+		);
+		this.observe(
+			this.#dataTypeItemManager.items,
+			(dataTypes) => {
+				// Make a map of the data type unique and editorAlias:
+				this.#dataTypeSchemaAliasMap = new Map(
+					dataTypes.map((dataType) => {
+						return [dataType.unique, dataType.propertyEditorSchemaAlias];
+					}),
+				);
+			},
+			null,
+		);
 		this.loadLanguages();
 
 		this.routes.setRoutes([
 			{
-				path: 'create/parent/:entityType/:parentUnique/:mediaTypeUnique',
+				path: UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN.toString(),
 				component: () => import('./media-workspace-editor.element.js'),
 				setup: async (_component, info) => {
 					const parentEntityType = info.match.params.entityType;
@@ -177,9 +201,10 @@ export class UmbMediaWorkspaceContext
 				},
 			},
 			{
-				path: 'edit/:unique',
+				path: UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.toString(),
 				component: () => import('./media-workspace-editor.element.js'),
 				setup: (_component, info) => {
+					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
 					this.load(unique);
 				},
@@ -189,8 +214,7 @@ export class UmbMediaWorkspaceContext
 
 	override resetState() {
 		super.resetState();
-		this.#data.setPersisted(undefined);
-		this.#data.setCurrent(undefined);
+		this.#data.clear();
 	}
 
 	async loadLanguages() {
@@ -220,7 +244,7 @@ export class UmbMediaWorkspaceContext
 	#onStoreChange(entity: ContentModel | undefined) {
 		if (!entity) {
 			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
-			history.pushState(null, '', 'section/media');
+			history.pushState(null, '', UMB_MEDIA_SECTION_PATH);
 		}
 	}
 
@@ -240,7 +264,7 @@ export class UmbMediaWorkspaceContext
 	}
 
 	getCollectionAlias() {
-		return 'Umb.Collection.Media';
+		return UMB_MEDIA_COLLECTION_ALIAS;
 	}
 
 	getData() {
@@ -288,7 +312,7 @@ export class UmbMediaWorkspaceContext
 	}
 
 	setName(name: string, variantId?: UmbVariantId) {
-		this.#updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
+		this.#data.updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
 	}
 
 	name(variantId?: UmbVariantId) {
@@ -310,22 +334,22 @@ export class UmbMediaWorkspaceContext
 	async propertyValueByAlias<PropertyValueType = unknown>(propertyAlias: string, variantId?: UmbVariantId) {
 		return this.#data.createObservablePartOfCurrent(
 			(data) =>
-				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x as any) : true))
+				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true))
 					?.value as PropertyValueType,
 		);
 	}
 
 	/**
 	 * Get the current value of the property with the given alias and variantId.
-	 * @param alias
-	 * @param variantId
+	 * @param {string} alias
+	 * @param {UmbVariantId} variantId
 	 * @returns The value or undefined if not set or found.
 	 */
 	getPropertyValue<ReturnType = unknown>(alias: string, variantId?: UmbVariantId) {
 		const currentData = this.#data.getCurrent();
 		if (currentData) {
 			const newDataSet = currentData.values?.find(
-				(x) => x.alias === alias && (variantId ? variantId.compare(x as any) : true),
+				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true),
 			);
 			return newDataSet?.value as ReturnType;
 		}
@@ -370,108 +394,47 @@ export class UmbMediaWorkspaceContext
 		this.#data.finishPropertyValueChange();
 	};
 
-	/* 	#calculateChangedVariants() {
-		const persisted = this.#persistedData.getValue();
-		const current = this.#data.current.getValue();
-		if (!current) throw new Error('Current data is missing');
-
-		const changedVariants = current?.variants.map((variant) => {
-			const persistedVariant = persisted?.variants.find((x) => UmbVariantId.Create(variant).compare(x));
-			return {
-				culture: variant.culture,
-				segment: variant.segment,
-				equal: persistedVariant ? jsonStringComparison(variant, persistedVariant) : false,
-			};
-		});
-
-		const changedProperties = current?.values.map((value) => {
-			const persistedValues = persisted?.values.find((x) => UmbVariantId.Create(value).compare(x));
-			return {
-				culture: value.culture,
-				segment: value.segment,
-				equal: persistedValues ? jsonStringComparison(value, persistedValues) : false,
-			};
-		});
-
-		// calculate the variantIds of those who either have a change in properties or in variants:
-		return (
-			changedVariants
-				?.concat(changedProperties ?? [])
-				.filter((x) => x.equal === false)
-				.map((x) => new UmbVariantId(x.culture, x.segment)) ?? []
-		);
-	} */
-
-	#updateVariantData(variantId: UmbVariantId, update?: Partial<UmbMediaVariantModel>) {
-		const currentData = this.getData();
-		if (!currentData) throw new Error('Data is missing');
-		if (this.#varies === true) {
-			// If variant Id is invariant, we don't to have the variant appended to our data.
-			if (variantId.isInvariant()) return;
-			const variant = currentData.variants.find((x) => variantId.compare(x));
-			const newVariants = appendToFrozenArray(
-				currentData.variants,
-				{
-					name: '',
-					createDate: null,
-					updateDate: null,
-					...variantId.toObject(),
-					...variant,
-					...update,
-				},
-				(x) => variantId.compare(x),
-			);
-			this.#data.updateCurrent({ variants: newVariants });
-		} else if (this.#varies === false) {
-			// TODO: Beware about segments, in this case we need to also consider segments, if its allowed to vary by segments.
-			const invariantVariantId = UmbVariantId.CreateInvariant();
-			const variant = currentData.variants.find((x) => invariantVariantId.compare(x));
-			// Cause we are invariant, we will just overwrite all variants with this one:
-			const newVariants = [
-				{
-					name: '',
-					createDate: null,
-					updateDate: null,
-					...invariantVariantId.toObject(),
-					...variant,
-					...update,
-				},
-			];
-			this.#data.updateCurrent({ variants: newVariants });
-		} else {
-			throw new Error('Varies by culture is missing');
-		}
-	}
-
-	async #createOrSave() {
-		const data = this.#data.getCurrent();
-		if (!data?.unique) throw new Error('Unique is missing');
+	async #handleSave() {
+		const saveData = this.#data.getCurrent();
+		if (!saveData?.unique) throw new Error('Unique is missing');
 
 		if (this.getIsNew()) {
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
 
-			if ((await this.repository.create(data, parent.unique)).data !== undefined) {
-				this.setIsNew(false);
-
-				// TODO: this might not be the right place to alert the tree, but it works for now
-				const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-				const event = new UmbRequestReloadChildrenOfEntityEvent({
-					entityType: parent.entityType,
-					unique: parent.unique,
-				});
-				eventContext.dispatchEvent(event);
+			const { data, error } = await this.repository.create(saveData, parent.unique);
+			if (!data || error) {
+				throw new Error('Error creating document');
 			}
-		} else {
-			await this.repository.save(data);
 
-			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			this.setIsNew(false);
+			this.#data.setPersisted(data);
+			this.#data.setCurrent(data);
+
+			// TODO: this might not be the right place to alert the tree, but it works for now
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadChildrenOfEntityEvent({
+				entityType: parent.entityType,
+				unique: parent.unique,
+			});
+			eventContext.dispatchEvent(event);
+		} else {
+			// Save:
+			const { data, error } = await this.repository.save(saveData);
+			if (!data || error) {
+				throw new Error('Error saving document');
+			}
+
+			this.#data.setPersisted(data);
+			this.#data.setCurrent(data);
+
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
 				unique: this.getUnique()!,
 				entityType: this.getEntityType(),
 			});
 
-			actionEventContext.dispatchEvent(event);
+			eventContext.dispatchEvent(event);
 		}
 	}
 
@@ -480,8 +443,7 @@ export class UmbMediaWorkspaceContext
 		if (!data) {
 			throw new Error('Data is missing');
 		}
-		await this.#createOrSave();
-		this.setIsNew(false);
+		await this.#handleSave();
 	}
 
 	async delete() {
@@ -490,14 +452,6 @@ export class UmbMediaWorkspaceContext
 			await this.repository.delete(id);
 		}
 	}
-
-	/*
-	concept notes:
-
-	public saveAndPreview() {
-
-	}
-	*/
 
 	public createPropertyDatasetContext(
 		host: UmbControllerHost,
@@ -509,6 +463,7 @@ export class UmbMediaWorkspaceContext
 	public override destroy(): void {
 		this.#data.destroy();
 		this.structure.destroy();
+		this.#languageRepository.destroy();
 		super.destroy();
 	}
 }

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Editor } from '@umbraco-cms/backoffice/external/tinymce';
 
 /**

@@ -12,9 +12,11 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UmbPropertyEditorConfigProperty } from '@umbraco-cms/backoffice/property-editor';
+import type {
+	UmbPropertyEditorConfigProperty,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyTypeAppearanceModel,
 	UmbPropertyTypeValidationModel,

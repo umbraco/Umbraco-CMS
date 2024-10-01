@@ -26,8 +26,9 @@ import {
 import { UMB_DOCUMENTS_SECTION_PATH } from '../../section/paths.js';
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
 import { sortVariants } from '../utils.js';
+import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../collection/index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
-import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
+import { UmbEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
@@ -35,6 +36,7 @@ import {
 	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceSplitViewManager,
+	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
@@ -72,6 +74,7 @@ import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/documen
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
+import type { UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 
 type EntityModel = UmbDocumentDetailModel;
 type EntityTypeModel = UmbDocumentTypeDetailModel;
@@ -88,13 +91,13 @@ export class UmbDocumentWorkspaceContext
 	public readonly repository = new UmbDocumentDetailRepository(this);
 	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);
 
-	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
+	#parent = new UmbObjectState<UmbEntityModel | undefined>(undefined);
 	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
 	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
 
 	readonly #data = new UmbContentWorkspaceDataManager<EntityModel>(this, UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD);
+	#getDataPromise?: Promise<UmbRepositoryResponse<EntityModel>>;
 
-	#getDataPromise?: Promise<any>;
 	// TODo: Optimize this so it uses either a App Language Context? [NL]
 	#languageRepository = new UmbLanguageCollectionRepository(this);
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
@@ -103,7 +106,7 @@ export class UmbDocumentWorkspaceContext
 	#serverValidation = new UmbServerModelValidatorContext(this);
 	#validationRepository?: UmbDocumentValidationRepository;
 
-	public readOnlyState = new UmbReadOnlyVariantStateManager(this);
+	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
 
 	public isLoaded() {
 		return this.#getDataPromise;
@@ -121,9 +124,6 @@ export class UmbDocumentWorkspaceContext
 
 	readonly variants = this.#data.createObservablePartOfCurrent((data) => data?.variants ?? []);
 
-	readonly urls = this.#data.createObservablePartOfCurrent((data) => data?.urls || []);
-	readonly templateId = this.#data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
-
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbDocumentTypeDetailRepository(this));
 	readonly variesByCulture = this.structure.ownerContentTypeObservablePart((x) => x?.variesByCulture);
 	readonly variesBySegment = this.structure.ownerContentTypeObservablePart((x) => x?.variesBySegment);
@@ -133,6 +133,9 @@ export class UmbDocumentWorkspaceContext
 	#varies?: boolean;
 	#variesByCulture?: boolean;
 	#variesBySegment?: boolean;
+
+	readonly urls = this.#data.createObservablePartOfCurrent((data) => data?.urls || []);
+	readonly templateId = this.#data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	readonly #dataTypeItemManager = new UmbDataTypeItemRepositoryManager(this);
 	#dataTypeSchemaAliasMap = new Map<string, string>();
@@ -183,34 +186,50 @@ export class UmbDocumentWorkspaceContext
 		new UmbVariantValuesValidationPathTranslator(this);
 		new UmbVariantsValidationPathTranslator(this);
 
-		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
-		this.observe(this.varies, (varies) => {
-			this.#data.setVaries(varies);
-		});
-		this.observe(this.variesByCulture, (varies) => {
-			this.#data.setVariesByCulture(varies);
-			this.#variesByCulture = varies;
-		});
-		this.observe(this.variesBySegment, (varies) => {
-			this.#data.setVariesBySegment(varies);
-			this.#variesBySegment = varies;
-		});
-		this.observe(this.varies, (varies) => {
-			this.#varies = varies;
-		});
-
-		this.observe(this.structure.contentTypeDataTypeUniques, (dataTypeUniques: Array<string>) => {
-			this.#dataTypeItemManager.setUniques(dataTypeUniques);
-		});
-
-		this.observe(this.#dataTypeItemManager.items, (dataTypes) => {
-			// Make a map of the data type unique and editorAlias:
-			this.#dataTypeSchemaAliasMap = new Map(
-				dataTypes.map((dataType) => {
-					return [dataType.unique, dataType.propertyEditorSchemaAlias];
-				}),
-			);
-		});
+		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
+		this.observe(
+			this.varies,
+			(varies) => {
+				this.#data.setVaries(varies);
+				this.#varies = varies;
+			},
+			null,
+		);
+		this.observe(
+			this.variesByCulture,
+			(varies) => {
+				this.#data.setVariesByCulture(varies);
+				this.#variesByCulture = varies;
+			},
+			null,
+		);
+		this.observe(
+			this.variesBySegment,
+			(varies) => {
+				this.#data.setVariesBySegment(varies);
+				this.#variesBySegment = varies;
+			},
+			null,
+		);
+		this.observe(
+			this.structure.contentTypeDataTypeUniques,
+			(dataTypeUniques: Array<string>) => {
+				this.#dataTypeItemManager.setUniques(dataTypeUniques);
+			},
+			null,
+		);
+		this.observe(
+			this.#dataTypeItemManager.items,
+			(dataTypes) => {
+				// Make a map of the data type unique and editorAlias:
+				this.#dataTypeSchemaAliasMap = new Map(
+					dataTypes.map((dataType) => {
+						return [dataType.unique, dataType.propertyEditorSchemaAlias];
+					}),
+				);
+			},
+			null,
+		);
 
 		this.loadLanguages();
 
@@ -253,6 +272,7 @@ export class UmbDocumentWorkspaceContext
 				path: UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.toString(),
 				component: () => import('./document-workspace-editor.element.js'),
 				setup: (_component, info) => {
+					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
 					this.load(unique);
 				},
@@ -262,8 +282,7 @@ export class UmbDocumentWorkspaceContext
 
 	override resetState() {
 		super.resetState();
-		this.#data.setPersisted(undefined);
-		this.#data.setCurrent(undefined);
+		this.#data.clear();
 	}
 
 	async loadLanguages() {
@@ -297,11 +316,7 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 
-	async create(
-		parent: { entityType: string; unique: string | null },
-		documentTypeUnique: string,
-		blueprintUnique?: string,
-	) {
+	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {
 		this.resetState();
 		this.#parent.setValue(parent);
 
@@ -336,7 +351,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	getCollectionAlias() {
-		return 'Umb.Collection.Document';
+		return UMB_DOCUMENT_COLLECTION_ALIAS;
 	}
 
 	getData() {
@@ -384,7 +399,6 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	setName(name: string, variantId?: UmbVariantId) {
-		// TODO: We should move this type of logic to the act of saving [NL]
 		this.#data.updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
 	}
 
@@ -419,17 +433,6 @@ export class UmbDocumentWorkspaceContext
 					?.value as PropertyValueType,
 		);
 	}
-	// TODO: Re-evaluate if this is begin used, i wrote this as part of a POC... [NL]
-	/*
-	async propertyIndexByAlias(
-		propertyAlias: string,
-		variantId?: UmbVariantId,
-	): Promise<Observable<number | undefined> | undefined> {
-		return this.#data.current.asObservablePart((data) =>
-			data?.values?.findIndex((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true)),
-		);
-	}
-	*/
 
 	/**
 	 * Get the current value of the property with the given alias and variantId.
@@ -438,7 +441,7 @@ export class UmbDocumentWorkspaceContext
 	 * @returns The value or undefined if not set or found.
 	 */
 	getPropertyValue<ReturnType = unknown>(alias: string, variantId?: UmbVariantId) {
-		const currentData = this.getData();
+		const currentData = this.#data.getCurrent();
 		if (currentData) {
 			const newDataSet = currentData.values?.find(
 				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true),
@@ -514,7 +517,6 @@ export class UmbDocumentWorkspaceContext
 
 			const { data, error } = await this.repository.create(saveData, parent.unique);
 			if (!data || error) {
-				console.error('Error creating document', error);
 				throw new Error('Error creating document');
 			}
 
@@ -543,7 +545,6 @@ export class UmbDocumentWorkspaceContext
 			// Save:
 			const { data, error } = await this.repository.save(saveData);
 			if (!data || error) {
-				console.error('Error saving document', error);
 				throw new Error('Error saving document');
 			}
 
@@ -856,6 +857,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	public override destroy(): void {
+		this.#data.destroy();
 		this.structure.destroy();
 		this.#languageRepository.destroy();
 		super.destroy();

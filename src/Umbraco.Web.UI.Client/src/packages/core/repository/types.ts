@@ -12,5 +12,5 @@ export interface UmbRepositoryResponse<T> extends UmbDataSourceResponse<T> {}
 export interface UmbRepositoryErrorResponse extends UmbDataSourceErrorResponse {}
 
 export interface UmbRepositoryResponseWithAsObservable<T> extends UmbRepositoryResponse<T> {
-	asObservable?: () => Observable<T | undefined>;
+	asObservable: () => Observable<T | undefined>;
 }

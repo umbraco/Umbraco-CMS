@@ -8,8 +8,10 @@ import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-ed
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 import { UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
 import { UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+import type {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/property-editor';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 // import of local component

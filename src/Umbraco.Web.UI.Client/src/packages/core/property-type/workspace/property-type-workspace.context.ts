@@ -10,6 +10,7 @@ import {
 	UmbSubmittableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -87,7 +88,7 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 	protected override resetState() {
 		super.resetState();
 		this.#data.setValue(undefined);
-		this.removeUmbControllerByAlias('isNewRedirectController');
+		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 		this.removeUmbControllerByAlias('observePropertyTypeData');
 	}
 

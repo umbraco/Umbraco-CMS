@@ -1,7 +1,7 @@
 const { rest } = window.MockServiceWorker;
 import { umbDocumentMockDb } from '../../data/document/document.db.js';
-import type { GetTreeDocumentAncestorsResponse } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_SLUG } from './slug.js';
+import type { GetTreeDocumentAncestorsResponse } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const treeHandlers = [

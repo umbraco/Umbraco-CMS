@@ -99,6 +99,7 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 
 	/**
 	 * If the URL is prefixed "www.", then prepend "http://" protocol scheme.
+	 * @param url
 	 */
 	#ensureHttpProtocol(url: string | null | undefined) {
 		if (!url) return null;
@@ -110,6 +111,7 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 
 	/**
 	 * If the URL is an email address, then prepend "mailto:" protocol scheme.
+	 * @param url
 	 */
 	#transformURLToMailto(url: string | null | undefined) {
 		if (!url) return null;
@@ -121,6 +123,7 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 
 	/**
 	 * If the URL contains an anchor, then return the anchor.
+	 * @param queryString
 	 */
 	#getAnchorFromQueryString(queryString: string | null) {
 		if (!queryString) return null;
@@ -129,6 +132,7 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 
 	/**
 	 * If the query string does not start with "?" or "#", then prepend it.
+	 * @param queryString
 	 */
 	#queryStringFromUrl(queryString: string | null | undefined) {
 		if (!queryString) return null;
