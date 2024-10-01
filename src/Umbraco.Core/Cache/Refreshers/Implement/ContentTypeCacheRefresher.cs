@@ -1,16 +1,19 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
 
 public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<ContentTypeCacheRefresherNotification, ContentTypeCacheRefresher.JsonPayload>
 {
     private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
+    private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IIdKeyMap _idKeyMap;
 
     public ContentTypeCacheRefresher(
@@ -19,11 +22,13 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         IIdKeyMap idKeyMap,
         IContentTypeCommonRepository contentTypeCommonRepository,
         IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory)
+        ICacheRefresherNotificationFactory factory,
+        IPublishedModelFactory publishedModelFactory)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
         _contentTypeCommonRepository = contentTypeCommonRepository;
+        _publishedModelFactory = publishedModelFactory;
     }
 
     #region Json
@@ -105,6 +110,9 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
             // don't try to be clever - refresh all
             MemberCacheRefresher.RefreshMemberTypes(AppCaches);
         }
+
+        // TODO: We need to clear the HybridCache of any content using the ContentType, but NOT the database cache here, and this should be done within the "WithSafeLiveFactoryReset" to ensure that the factory is locked in the meantime.
+        _publishedModelFactory.WithSafeLiveFactoryReset(() => { });
 
         // now we can trigger the event
         base.Refresh(payloads);
