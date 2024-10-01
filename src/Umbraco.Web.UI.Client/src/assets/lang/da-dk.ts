@@ -643,6 +643,8 @@ export default {
 		a11yCreateItem: 'Opret element',
 		a11yEdit: 'Rediger',
 		a11yName: 'Navn',
+		rteParagraph: 'Udfold din kreativitet...',
+		rteHeading: 'Hvad skal overskriften være?',
 	},
 	editcontenttype: {
 		createListView: 'Opret brugerdefineret listevisning',
