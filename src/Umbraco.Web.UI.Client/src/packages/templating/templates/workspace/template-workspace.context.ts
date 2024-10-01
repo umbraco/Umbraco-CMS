@@ -43,7 +43,7 @@ export class UmbTemplateWorkspaceContext
 				setup: (component: PageComponent, info: IRoutingInfo) => {
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
-					this.createScaffold({ parent: { entityType: parentEntityType, unique: parentUnique } });
+					this.create({ entityType: parentEntityType, unique: parentUnique });
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
@@ -61,6 +61,22 @@ export class UmbTemplateWorkspaceContext
 				},
 			},
 		]);
+	}
+
+	override async load(unique: string) {
+		const response = await super.load(unique);
+		if (response.data) {
+			this.setMasterTemplate(response.data.masterTemplate?.unique ?? null);
+		}
+		return response;
+	}
+
+	async create(parent: any) {
+		const response = await this.createScaffold({ parent });
+
+		if (!parent) return;
+		await this.setMasterTemplate(parent.unique);
+		return response;
 	}
 
 	setName(value: string) {
