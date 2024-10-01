@@ -8,8 +8,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
-import './tiptap-fixed-menu.element.js';
 import './tiptap-hover-menu.element.js';
+import './tiptap-toolbar.element.js';
 
 const elementName = 'umb-input-tiptap';
 
@@ -121,11 +121,11 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				!this._editor && !this._extensions?.length,
 				() => html`<div id="loader"><uui-loader></uui-loader></div>`,
 				() => html`
-					<umb-tiptap-fixed-menu
+					<umb-tiptap-toolbar
 						.toolbar=${this._toolbar}
 						.editor=${this._editor}
 						.configuration=${this.configuration}
-						?readonly=${this.readonly}></umb-tiptap-fixed-menu>
+						?readonly=${this.readonly}></umb-tiptap-toolbar>
 				`,
 			)}
 			<div id="editor"></div>

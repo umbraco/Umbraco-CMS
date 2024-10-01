@@ -8,10 +8,10 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 
 import '../toolbar/tiptap-toolbar-dropdown-base.element.js';
 
-const elementName = 'umb-tiptap-fixed-menu';
+const elementName = 'umb-tiptap-toolbar';
 
 @customElement(elementName)
-export class UmbTiptapFixedMenuElement extends UmbLitElement {
+export class UmbTiptapToolbarElement extends UmbLitElement {
 	#attached = false;
 	#extensionsController?: UmbExtensionsElementAndApiInitializer;
 
@@ -125,6 +125,6 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbTiptapFixedMenuElement;
+		[elementName]: UmbTiptapToolbarElement;
 	}
 }
