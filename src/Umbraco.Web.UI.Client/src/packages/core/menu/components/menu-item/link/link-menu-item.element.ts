@@ -1,6 +1,7 @@
+import type { UmbMenuItemElement } from '../../../menu-item-element.interface.js';
+import type { ManifestMenuItemLinkKind } from './types.js';
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { ManifestMenuItemLinkKind, UmbMenuItemElement } from '@umbraco-cms/backoffice/extension-registry';
 
 const elementName = 'umb-link-menu-item';
 @customElement(elementName)

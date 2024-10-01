@@ -1,7 +1,8 @@
+import type { UmbMenuItemElement } from '../../menu-item-element.interface.js';
+import type { ManifestMenuItem } from '../../menu-item.extension.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
-import type { ManifestMenuItem, UmbMenuItemElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-menu-item-default')
 export class UmbMenuItemDefaultElement extends UmbLitElement implements UmbMenuItemElement {

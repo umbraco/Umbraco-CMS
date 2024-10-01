@@ -2,7 +2,8 @@ import { UMB_HELP_MENU_ALIAS } from '../menu/index.js';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbHeaderAppButtonElement } from '@umbraco-cms/backoffice/components';
-import { umbExtensionsRegistry, type ManifestMenu } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestMenu } from '@umbraco-cms/backoffice/menu';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 const elementName = 'umb-help-header-app';

@@ -114,17 +114,17 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 
 	override render() {
 		return html`<ul>
-			${repeat(
-				this._toolbarConfig,
-				(v) => v.alias,
+				${repeat(
+					this._toolbarConfig,
+					(v) => v.alias,
 				(v) =>
 					html`<li>
-						<uui-checkbox label=${v.label} value=${v.alias} ?checked=${v.selected} @change=${this.onChange}>
-							<uui-icon .svg=${tinyIconSet?.icons[v.icon ?? 'alignjustify']}></uui-icon>
+							<uui-checkbox label=${v.label} value=${v.alias} ?checked=${v.selected} @change=${this.onChange}>
+								<uui-icon .svg=${tinyIconSet?.icons[v.icon ?? 'alignjustify']}></uui-icon>
 							${v.label}
-						</uui-checkbox>
+							</uui-checkbox>
 					</li>`,
-			)}
+				)}
 		</ul>`;
 	}
 
@@ -135,6 +135,12 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 				list-style: none;
 				padding: 0;
 				margin: 0;
+
+				uui-icon {
+					width: 1.5em;
+					height: 1.5em;
+					margin-right: 5px;
+				}
 			}
 		`,
 	];
