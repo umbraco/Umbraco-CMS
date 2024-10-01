@@ -1,4 +1,4 @@
-import type { ManifestMenu } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestMenu } from '../../menu.extension.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 
