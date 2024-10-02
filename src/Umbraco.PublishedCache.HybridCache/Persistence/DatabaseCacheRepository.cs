@@ -237,7 +237,7 @@ AND cmsContentNu.nodeId IS NULL
         return CreateContentNodeKit(dto, serializer, preview);
     }
 
-    private IEnumerable<ContentSourceDto> GetContentSourceByDocumentTypeKey(IEnumerable<Guid> documentTypeKeys)
+    private IEnumerable<ContentSourceDto> GetContentSourceByDocumentTypeKey(IEnumerable<Guid> documentTypeKeys, Guid objectType)
     {
         Guid[] keys = documentTypeKeys.ToArray();
         if (keys.Any() is false)
@@ -248,19 +248,27 @@ AND cmsContentNu.nodeId IS NULL
         Sql<ISqlContext>? sql = SqlContentSourcesSelect()
             .InnerJoin<NodeDto>("n")
             .On<NodeDto, ContentDto>((n, c) => n.NodeId == c.ContentTypeId, "n", "umbracoContent")
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+            .Append(SqlObjectTypeNotTrashed(SqlContext, objectType))
             .WhereIn<NodeDto>(x => x.UniqueId, keys,"n")
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
         return GetContentNodeDtos(sql);
     }
 
-    public IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys)
+    public IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys, ContentCacheDataSerializerEntityType entityType)
     {
-        IEnumerable<ContentSourceDto> dtos = GetContentSourceByDocumentTypeKey(keys);
+        Guid objectType = entityType switch
+        {
+            ContentCacheDataSerializerEntityType.Document => Constants.ObjectTypes.Document,
+            ContentCacheDataSerializerEntityType.Media => Constants.ObjectTypes.Media,
+            ContentCacheDataSerializerEntityType.Member => Constants.ObjectTypes.Member,
+            _ => throw new ArgumentOutOfRangeException(nameof(entityType), entityType, null),
+        };
+
+        IEnumerable<ContentSourceDto> dtos = GetContentSourceByDocumentTypeKey(keys, objectType);
 
         IContentCacheDataSerializer serializer =
-            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
+            _contentCacheDataSerializerFactory.Create(entityType);
 
         foreach (ContentSourceDto row in dtos)
         {
@@ -269,8 +277,8 @@ AND cmsContentNu.nodeId IS NULL
     }
 
     /// <inheritdoc />
-    public IEnumerable<Guid> GetContentKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false)
-        => GetContentSourceByDocumentTypeKey(keys).Where(x => x.Published == published).Select(x => x.Key);
+    public IEnumerable<Guid> GetDocumentKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false)
+        => GetContentSourceByDocumentTypeKey(keys, Constants.ObjectTypes.Document).Where(x => x.Published == published).Select(x => x.Key);
 
     public async Task<ContentCacheNode?> GetMediaSourceAsync(int id)
     {

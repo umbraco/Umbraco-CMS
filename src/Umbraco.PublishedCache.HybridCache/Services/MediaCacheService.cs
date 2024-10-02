@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
+using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
@@ -159,6 +160,26 @@ internal class MediaCacheService : IMediaCacheService
             {
                 await _hybridCache.RemoveAsync(cacheKey);
             }
+        }
+
+        scope.Complete();
+    }
+
+    public void Rebuild(IReadOnlyCollection<int> contentTypeIds)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        _databaseCacheRepository.Rebuild(contentTypeIds.ToList());
+
+        IEnumerable<Guid> mediaTypeKeys = contentTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.MediaType))
+            .Where(x => x.Success)
+            .Select(x => x.Result);
+
+        IEnumerable<ContentCacheNode> mediaCacheNodesByContentTypeKey =
+            _databaseCacheRepository.GetContentByContentTypeKey(mediaTypeKeys, ContentCacheDataSerializerEntityType.Media);
+
+        foreach (ContentCacheNode media in mediaCacheNodesByContentTypeKey)
+        {
+            _hybridCache.RemoveAsync(GetCacheKey(media.Key, false));
         }
 
         scope.Complete();
