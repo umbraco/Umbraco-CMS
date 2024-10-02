@@ -3,7 +3,7 @@ import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cm
 
 export interface ManifestSectionView
 	extends ManifestElement<UmbSectionViewElement>,
-		ManifestWithDynamicConditions<UmbExtensionCondition> {
+		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'sectionView';
 	meta: MetaSectionView;
 }

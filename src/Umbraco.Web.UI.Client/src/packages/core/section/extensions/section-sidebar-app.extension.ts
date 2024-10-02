@@ -3,6 +3,6 @@ import type { UmbSectionSidebarAppElement } from '@umbraco-cms/backoffice/sectio
 
 export interface ManifestSectionSidebarApp
 	extends ManifestElement<UmbSectionSidebarAppElement>,
-		ManifestWithDynamicConditions<UmbExtensionCondition> {
+		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'sectionSidebarApp';
 }

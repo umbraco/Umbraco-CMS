@@ -25,7 +25,7 @@ export type SectionAliasConditionConfig = UmbConditionConfigBase<'Umb.Condition.
 };
 
 declare global {
-	interface UmbExtensionConditionMap {
+	interface UmbExtensionConditionConfigMap {
 		UmbSectionUserPermissionConditionConfig: UmbSectionUserPermissionConditionConfig;
 		UmbSectionAliasConditionConfig: SectionAliasConditionConfig;
 	}

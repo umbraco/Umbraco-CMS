@@ -12,7 +12,7 @@ export interface BlockEntryIsExposedConditionConfig
 }
 
 declare global {
-	interface UmbExtensionConditionMap {
+	interface UmbExtensionConditionConfigMap {
 		umbBlock:
 			| BlockEntryShowContentEditConditionConfig
 			| BlockWorkspaceHasSettingsConditionConfig

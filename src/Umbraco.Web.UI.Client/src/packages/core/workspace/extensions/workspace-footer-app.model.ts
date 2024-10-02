@@ -3,7 +3,7 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
 
 export interface ManifestWorkspaceFooterApp
 	extends ManifestElementAndApi<UmbControllerHostElement, any>,
-		ManifestWithDynamicConditions<UmbExtensionCondition> {
+		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'workspaceFooterApp';
 }
 

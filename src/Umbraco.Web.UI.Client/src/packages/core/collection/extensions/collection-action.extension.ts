@@ -7,7 +7,7 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
 // TODO: create interface for API
 export interface ManifestCollectionAction
 	extends ManifestElementAndApi,
-		ManifestWithDynamicConditions<UmbExtensionCondition> {
+		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'collectionAction';
 	meta: MetaCollectionAction;
 }

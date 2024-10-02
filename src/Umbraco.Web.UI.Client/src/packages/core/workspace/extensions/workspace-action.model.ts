@@ -5,7 +5,7 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 
 export interface ManifestWorkspaceAction<MetaType extends MetaWorkspaceAction = MetaWorkspaceAction>
 	extends ManifestElementAndApi<UmbControllerHostElement, UmbWorkspaceAction<MetaType>>,
-		ManifestWithDynamicConditions<UmbExtensionCondition> {
+		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'workspaceAction';
 	meta: MetaType;
 }

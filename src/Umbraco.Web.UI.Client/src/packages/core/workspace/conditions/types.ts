@@ -51,7 +51,7 @@ export interface WorkspaceEntityIsNewConditionConfig
 }
 
 declare global {
-	interface UmbExtensionConditionMap {
+	interface UmbExtensionConditionConfigMap {
 		umbWorkspaceAlias: WorkspaceAliasConditionConfig;
 		umbWorkspaceContentTypeAlias: WorkspaceContentTypeAliasConditionConfig;
 		umbWorkspaceEntityType: WorkspaceEntityTypeConditionConfig;
