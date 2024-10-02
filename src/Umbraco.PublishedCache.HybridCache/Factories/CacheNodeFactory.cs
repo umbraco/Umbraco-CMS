@@ -60,8 +60,8 @@ internal class CacheNodeFactory : ICacheNodeFactory
         switch (content.PublishedState)
         {
             case PublishedState.Published:
-            case PublishedState.Publishing:
                 return preview ? content.TemplateId : content.PublishTemplateId;
+            case PublishedState.Publishing:
             case PublishedState.Unpublished:
             case PublishedState.Unpublishing:
                 return content.TemplateId;
