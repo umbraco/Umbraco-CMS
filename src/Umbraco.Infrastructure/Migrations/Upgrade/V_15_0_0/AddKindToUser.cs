@@ -19,6 +19,13 @@ public class AddKindToUser : UnscopedMigrationBase
 
     protected override void Migrate()
     {
+        // If the new column already exists we'll do nothing.
+        if (ColumnExists(Constants.DatabaseSchema.Tables.User, NewColumnName))
+        {
+            Context.Complete();
+            return;
+        }
+
         InvalidateBackofficeUserAccess = true;
 
         using IScope scope = _scopeProvider.CreateScope();
@@ -48,12 +55,6 @@ public class AddKindToUser : UnscopedMigrationBase
 
     private void MigrateSqlite()
     {
-        // If the new column already exists we'll do nothing.
-        if (ColumnExists(Constants.DatabaseSchema.Tables.User, NewColumnName))
-        {
-            return;
-        }
-
         /*
          * We commit the initial transaction started by the scope. This is required in order to disable the foreign keys.
          * We then begin a new transaction, this transaction will be committed or rolled back by the scope, like normal.

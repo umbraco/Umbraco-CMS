@@ -15,7 +15,6 @@ public class ApiRichTextMarkupParserTests
 {
     private Mock<IApiContentRouteBuilder> _apiContentRouteBuilder;
     private Mock<IApiMediaUrlProvider> _apiMediaUrlProvider;
-    private Mock<IPublishedSnapshotAccessor> _publishedSnapshotAccessor;
 
     [Test]
     public void Can_Parse_Legacy_LocalLinks()
@@ -128,18 +127,6 @@ public class ApiRichTextMarkupParserTests
         mediaCacheMock.Setup(cc => cc.GetById(It.IsAny<Udi>()))
             .Returns<Udi>(udi => mockData[((GuidUdi)udi).Guid].PublishedContent);
 
-        var snapshotMock = new Mock<IPublishedSnapshot>();
-        snapshotMock.SetupGet(ss => ss.Content)
-            .Returns(contentCacheMock.Object);
-        snapshotMock.SetupGet(ss => ss.Media)
-            .Returns(mediaCacheMock.Object);
-
-        var snapShot = snapshotMock.Object;
-
-        _publishedSnapshotAccessor = new Mock<IPublishedSnapshotAccessor>();
-        _publishedSnapshotAccessor.Setup(psa => psa.TryGetPublishedSnapshot(out snapShot))
-            .Returns(true);
-
         _apiMediaUrlProvider = new Mock<IApiMediaUrlProvider>();
         _apiMediaUrlProvider.Setup(mup => mup.GetUrl(It.IsAny<IPublishedContent>()))
             .Returns<IPublishedContent>(ipc => mockData[ipc.Key].MediaUrl);
@@ -151,7 +138,8 @@ public class ApiRichTextMarkupParserTests
         return new ApiRichTextMarkupParser(
             _apiContentRouteBuilder.Object,
             _apiMediaUrlProvider.Object,
-            _publishedSnapshotAccessor.Object,
+            contentCacheMock.Object,
+            mediaCacheMock.Object,
             Mock.Of<ILogger<ApiRichTextMarkupParser>>());
     }
 

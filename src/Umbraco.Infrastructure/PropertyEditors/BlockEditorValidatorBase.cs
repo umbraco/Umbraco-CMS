@@ -28,6 +28,8 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
             new { Path = nameof(BlockValue<TLayout>.SettingsData).ToFirstLowerInvariant(), Items = blockEditorData.BlockValue.SettingsData }
         };
 
+        var valuesJsonPathPart = nameof(BlockItemData.Values).ToFirstLowerInvariant();
+
         foreach (var group in itemDataGroups)
         {
             var allElementTypes = _elementTypeCache.GetAll(group.Items.Select(x => x.ContentTypeKey).ToArray()).ToDictionary(x => x.Key);
@@ -40,22 +42,21 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
                     throw new InvalidOperationException($"No element type found with key {item.ContentTypeKey}");
                 }
 
-                // now ensure missing properties
-                foreach (IPropertyType elementTypeProp in elementType.CompositionPropertyTypes)
-                {
-                    if (!item.PropertyValues.ContainsKey(elementTypeProp.Alias))
-                    {
-                        // set values to null
-                        item.PropertyValues[elementTypeProp.Alias] = new BlockItemData.BlockPropertyValue(null, elementTypeProp);
-                        item.RawPropertyValues[elementTypeProp.Alias] = null;
-                    }
-                }
-
+                // NOTE: for now this only validates the property data actually sent by the client, not all element properties.
+                //       we need to ensure that all properties for all languages have a matching "item" entry here, to handle validation of
+                //       required properties (see comment in the top of this method). a separate task has been created, get in touch with KJA.
                 var elementValidation = new ElementTypeValidationModel(item.ContentTypeAlias, item.Key);
-                foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in item.PropertyValues)
+                for (var j = 0; j < item.Values.Count; j++)
                 {
+                    BlockPropertyValue blockPropertyValue = item.Values[j];
+                    IPropertyType? propertyType = blockPropertyValue.PropertyType;
+                    if (propertyType is null)
+                    {
+                        throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to validate them.", nameof(blockEditorData));
+                    }
+
                     elementValidation.AddPropertyTypeValidation(
-                        new PropertyTypeValidationModel(prop.Value.PropertyType, prop.Value.Value, $"{group.Path}[{i}].{prop.Value.PropertyType.Alias}"));
+                        new PropertyTypeValidationModel(propertyType, blockPropertyValue.Value, $"{group.Path}[{i}].{valuesJsonPathPart}[{j}].value"));
                 }
 
                 yield return elementValidation;

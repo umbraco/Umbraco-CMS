@@ -1,7 +1,12 @@
-﻿using Umbraco.Cms.Core;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
@@ -34,31 +39,86 @@ public sealed class DocumentCache : IPublishedContentCache
 
     public IPublishedContentType? GetContentType(string alias) => _publishedContentTypeCache.Get(PublishedItemType.Content, alias);
 
-
     public IPublishedContentType? GetContentType(Guid key) => _publishedContentTypeCache.Get(PublishedItemType.Content, key);
 
-    // FIXME: These need to be refactored when removing nucache
-    // Thats the time where we can change the IPublishedContentCache interface.
+    // TODO: These are all obsolete and should be removed
 
-    public IPublishedContent? GetById(bool preview, Udi contentId) => throw new NotImplementedException();
+    [Obsolete("Scheduled for removal in v17")]
+    public IPublishedContent? GetById(bool preview, Udi contentId)
+    {
+        if(contentId is not GuidUdi guidUdi)
+        {
+            throw new NotSupportedException("Only GuidUdi is supported");
+        }
 
-    public IPublishedContent? GetById(Udi contentId) => throw new NotImplementedException();
+        return GetById(preview, guidUdi.Guid);
+    }
 
-    public IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null) => throw new NotImplementedException();
+    [Obsolete("Scheduled for removal in v17")]
+    public IPublishedContent? GetById(Udi contentId)
+    {
+        if(contentId is not GuidUdi guidUdi)
+        {
+            throw new NotSupportedException("Only GuidUdi is supported");
+        }
 
-    public IEnumerable<IPublishedContent> GetAtRoot(string? culture = null) => throw new NotImplementedException();
+        return GetById(guidUdi.Guid);
+    }
 
-    public bool HasContent(bool preview) => throw new NotImplementedException();
+    [Obsolete("Scheduled for removal, use IDocumentNavigationQueryService instead in v17")]
+    public IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null)
+    {
+        IDocumentNavigationQueryService navigationService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+        navigationService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
 
-    public bool HasContent() => throw new NotImplementedException();
+        IEnumerable<IPublishedContent> rootContent = rootKeys.Select(key => GetById(preview, key)).WhereNotNull();
+        return culture is null ? rootContent : rootContent.Where(x => x.IsInvariantOrHasCulture(culture));
+    }
 
-    public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType) => throw new NotImplementedException();
+    [Obsolete("Scheduled for removal, use IDocumentNavigationQueryService instead in v17")]
+    public IEnumerable<IPublishedContent> GetAtRoot(string? culture = null)
+    {
+        IDocumentNavigationQueryService navigationService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+        navigationService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
 
-    public IPublishedContent? GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string? culture = null) => throw new NotImplementedException();
+        IEnumerable<IPublishedContent> rootContent = rootKeys.Select(key => GetById(key)).WhereNotNull();
+        return culture is null ? rootContent : rootContent.Where(x => x.IsInvariantOrHasCulture(culture));
+    }
 
-    public IPublishedContent? GetByRoute(string route, bool? hideTopLevelNode = null, string? culture = null) => throw new NotImplementedException();
+    [Obsolete("Scheduled for removal in v17")]
+    public bool HasContent(bool preview) => HasContent();
 
-    public string? GetRouteById(bool preview, int contentId, string? culture = null) => throw new NotImplementedException();
+    [Obsolete("Scheduled for removal in v17")]
+    public bool HasContent() => StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>().HasAny();
 
-    public string? GetRouteById(int contentId, string? culture = null) => throw new NotImplementedException();
+    [Obsolete]
+    public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
+        => _documentCacheService.GetByContentType(contentType);
+
+    [Obsolete("Use IDocumentUrlService.GetDocumentKeyByRoute instead, scheduled for removal in v17")]
+    public IPublishedContent? GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string? culture = null)
+    {
+        IDocumentUrlService documentUrlService = StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>();
+        Guid? key = documentUrlService.GetDocumentKeyByRoute(route, culture, null, preview);
+        return key is not null ? GetById(preview, key.Value) : null;
+    }
+
+    [Obsolete("Use IDocumentUrlService.GetDocumentKeyByRoute instead, scheduled for removal in v17")]
+    public IPublishedContent? GetByRoute(string route, bool? hideTopLevelNode = null, string? culture = null)
+    {
+        IDocumentUrlService documentUrlService = StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>();
+        Guid? key = documentUrlService.GetDocumentKeyByRoute(route, culture, null, false);
+        return key is not null ? GetById(key.Value) : null;
+    }
+
+    [Obsolete("Use IDocumentUrlService.GetDocumentKeyByRoute instead, scheduled for removal in v17")]
+    public string? GetRouteById(bool preview, int contentId, string? culture = null)
+    {
+        IDocumentUrlService documentUrlService = StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>();
+        IPublishedContent? content = GetById(preview, contentId);
+        return content is not null ? documentUrlService.GetLegacyRouteFormat(content.Key, culture, preview) : null;
+    }
+
+    [Obsolete("Use IDocumentUrlService.GetDocumentKeyByRoute instead, scheduled for removal in v17")]
+    public string? GetRouteById(int contentId, string? culture = null) => GetRouteById(false, contentId, culture);
 }

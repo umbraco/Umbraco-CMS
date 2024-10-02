@@ -1,68 +1,83 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
 public sealed class ApiPublishedContentCache : IApiPublishedContentCache
 {
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IRequestPreviewService _requestPreviewService;
+    private readonly IRequestCultureService _requestCultureService;
+    private readonly IDocumentUrlService _documentUrlService;
+    private readonly IPublishedContentCache _publishedContentCache;
     private DeliveryApiSettings _deliveryApiSettings;
 
-    public ApiPublishedContentCache(IPublishedSnapshotAccessor publishedSnapshotAccessor, IRequestPreviewService requestPreviewService, IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings)
+    public ApiPublishedContentCache(
+        IRequestPreviewService requestPreviewService,
+        IRequestCultureService requestCultureService,
+        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings,
+        IDocumentUrlService documentUrlService,
+        IPublishedContentCache publishedContentCache)
     {
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _requestPreviewService = requestPreviewService;
+        _requestCultureService = requestCultureService;
+        _documentUrlService = documentUrlService;
+        _publishedContentCache = publishedContentCache;
         _deliveryApiSettings = deliveryApiSettings.CurrentValue;
         deliveryApiSettings.OnChange(settings => _deliveryApiSettings = settings);
     }
 
+
     public IPublishedContent? GetByRoute(string route)
     {
-        IPublishedContentCache? contentCache = GetContentCache();
-        if (contentCache == null)
+        var isPreviewMode = _requestPreviewService.IsPreview();
+
+
+        // Handle the nasty logic with domain document ids in front of paths.
+        int? documentStartNodeId = null;
+        if (route.StartsWith("/") is false)
         {
-            return null;
+            var index = route.IndexOf('/');
+
+            if (index > -1 && int.TryParse(route.Substring(0, index), out var nodeId))
+            {
+                documentStartNodeId = nodeId;
+                route = route.Substring(index);
+            }
         }
 
-        IPublishedContent? content = contentCache.GetByRoute(_requestPreviewService.IsPreview(), route);
+        Guid? documentKey = _documentUrlService.GetDocumentKeyByRoute(
+            route,
+            _requestCultureService.GetRequestedCulture(),
+            documentStartNodeId,
+            _requestPreviewService.IsPreview()
+        );
+        IPublishedContent? content = documentKey.HasValue
+            ? _publishedContentCache.GetById(isPreviewMode, documentKey.Value)
+            : null;
+
         return ContentOrNullIfDisallowed(content);
     }
 
     public IPublishedContent? GetById(Guid contentId)
     {
-        IPublishedContentCache? contentCache = GetContentCache();
-        if (contentCache == null)
-        {
-            return null;
-        }
-
-        IPublishedContent? content = contentCache.GetById(_requestPreviewService.IsPreview(), contentId);
+        IPublishedContent? content = _publishedContentCache.GetById(_requestPreviewService.IsPreview(), contentId);
         return ContentOrNullIfDisallowed(content);
     }
 
     public IEnumerable<IPublishedContent> GetByIds(IEnumerable<Guid> contentIds)
     {
-        IPublishedContentCache? contentCache = GetContentCache();
-        if (contentCache == null)
-        {
-            return Enumerable.Empty<IPublishedContent>();
-        }
-
         return contentIds
-            .Select(contentId => contentCache.GetById(_requestPreviewService.IsPreview(), contentId))
+            .Select(contentId => _publishedContentCache.GetById(_requestPreviewService.IsPreview(), contentId))
             .WhereNotNull()
             .Where(IsAllowedContentType)
             .ToArray();
     }
-
-    private IPublishedContentCache? GetContentCache() =>
-        _publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot)
-            ? publishedSnapshot?.Content
-            : null;
 
     private IPublishedContent? ContentOrNullIfDisallowed(IPublishedContent? content)
         => content != null && IsAllowedContentType(content)

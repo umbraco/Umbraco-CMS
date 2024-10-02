@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Linq.Expressions;
+using System.Runtime.Versioning;
 using System.Text;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
@@ -8,7 +9,9 @@ using Umbraco.Cms.Api.Management.ViewModels.Template.Query;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Models.TemplateQuery;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template.Query;
@@ -20,6 +23,8 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IPublishedValueFallback _publishedValueFallback;
     private readonly IContentTypeService _contentTypeService;
+    private readonly IPublishedContentCache _contentCache;
+    private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
 
     private static readonly string _indent = $"{Environment.NewLine}    ";
 
@@ -27,12 +32,16 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
         IPublishedContentQuery publishedContentQuery,
         IVariationContextAccessor variationContextAccessor,
         IPublishedValueFallback publishedValueFallback,
-        IContentTypeService contentTypeService)
+        IContentTypeService contentTypeService,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService documentNavigationQueryService)
     {
         _publishedContentQuery = publishedContentQuery;
         _variationContextAccessor = variationContextAccessor;
         _publishedValueFallback = publishedValueFallback;
         _contentTypeService = contentTypeService;
+        _contentCache = contentCache;
+        _documentNavigationQueryService = documentNavigationQueryService;
     }
 
     [HttpPost("execute")]
@@ -109,13 +118,13 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
             queryExpression.Append($".ChildrenOfType(\"{model.DocumentTypeAlias}\")");
             return rootContent == null
                 ? Enumerable.Empty<IPublishedContent>()
-                : rootContent.ChildrenOfType(_variationContextAccessor, model.DocumentTypeAlias);
+                : rootContent.ChildrenOfType(_variationContextAccessor, _contentCache, _documentNavigationQueryService, model.DocumentTypeAlias);
         }
 
         queryExpression.Append(".Children()");
         return rootContent == null
             ? Enumerable.Empty<IPublishedContent>()
-            : rootContent.Children(_variationContextAccessor);
+            : rootContent.Children(_variationContextAccessor, _contentCache, _documentNavigationQueryService);
     }
 
     private IEnumerable<IPublishedContent> ApplyFiltering(IEnumerable<TemplateQueryExecuteFilterPresentationModel>? filters, IEnumerable<IPublishedContent> contentQuery, StringBuilder queryExpression)

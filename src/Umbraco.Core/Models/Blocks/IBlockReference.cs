@@ -37,7 +37,7 @@ public interface IBlockReference<TSettings> : IBlockReference
     /// <value>
     ///     The settings.
     /// </value>
-    TSettings Settings { get; }
+    TSettings? Settings { get; }
 }
 
 

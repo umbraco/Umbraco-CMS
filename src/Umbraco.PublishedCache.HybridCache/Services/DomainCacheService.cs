@@ -17,6 +17,7 @@ public class DomainCacheService : IDomainCacheService
     private readonly IDomainService _domainService;
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly ConcurrentDictionary<int, Domain> _domains;
+    private bool _initialized = false;
 
     public DomainCacheService(IDomainService domainService, ICoreScopeProvider coreScopeProvider)
     {
@@ -27,17 +28,29 @@ public class DomainCacheService : IDomainCacheService
 
     public IEnumerable<Domain> GetAll(bool includeWildcards)
     {
+        InitializeIfMissing();
         return includeWildcards == false
             ? _domains.Select(x => x.Value).Where(x => x.IsWildcard == false).OrderBy(x => x.SortOrder)
             : _domains.Select(x => x.Value).OrderBy(x => x.SortOrder);
     }
 
+    private void InitializeIfMissing()
+    {
+        if (_initialized)
+        {
+            return;
+        }
+        _initialized = true;
+        LoadDomains();
+    }
+
     /// <inheritdoc />
     public IEnumerable<Domain> GetAssigned(int documentId, bool includeWildcards = false)
     {
+        InitializeIfMissing();
         // probably this could be optimized with an index
         // but then we'd need a custom DomainStore of some sort
-        IEnumerable<Domain> list = _domains.Select(x => x.Value).Where(x => x.ContentId == documentId);
+        IEnumerable<Domain> list = _domains.Values.Where(x => x.ContentId == documentId);
         if (includeWildcards == false)
         {
             list = list.Where(x => x.IsWildcard == false);
@@ -48,7 +61,10 @@ public class DomainCacheService : IDomainCacheService
 
     /// <inheritdoc />
     public bool HasAssigned(int documentId, bool includeWildcards = false)
-        => documentId > 0 && GetAssigned(documentId, includeWildcards).Any();
+    {
+        InitializeIfMissing();
+        return documentId > 0 && GetAssigned(documentId, includeWildcards).Any();
+    }
 
     public void Refresh(DomainCacheRefresher.JsonPayload[] payloads)
     {
@@ -100,12 +116,19 @@ public class DomainCacheService : IDomainCacheService
 
     private void LoadDomains()
     {
-        IEnumerable<IDomain> domains = _domainService.GetAll(true);
-        foreach (Domain domain in domains
-                     .Where(x => x.RootContentId.HasValue && x.LanguageIsoCode.IsNullOrWhiteSpace() == false)
-                     .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId!.Value, x.LanguageIsoCode!, x.IsWildcard, x.SortOrder)))
+        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
         {
-            _domains.AddOrUpdate(domain.Id, domain, (key, oldValue) => domain);
+            scope.ReadLock(Constants.Locks.Domains);
+            IEnumerable<IDomain> domains = _domainService.GetAll(true);
+            foreach (Domain domain in domains
+                         .Where(x => x.RootContentId.HasValue && x.LanguageIsoCode.IsNullOrWhiteSpace() == false)
+                         .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId!.Value, x.LanguageIsoCode!, x.IsWildcard, x.SortOrder)))
+            {
+                _domains.AddOrUpdate(domain.Id, domain, (key, oldValue) => domain);
+            }
+            scope.Complete();
         }
+
+
     }
 }

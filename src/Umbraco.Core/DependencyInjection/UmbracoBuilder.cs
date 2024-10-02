@@ -264,9 +264,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddSingleton<ISyncBootStateAccessor, NonRuntimeLevelBootStateAccessor>();
 
-            // register a basic/noop published snapshot service to be replaced
-            Services.AddSingleton<IPublishedSnapshotService, InternalPublishedSnapshotService>();
-
             // Register ValueEditorCache used for validation
             Services.AddSingleton<IValueEditorCache, ValueEditorCache>();
 
@@ -412,6 +409,10 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // add validation services
             Services.AddUnique<IElementSwitchValidator, ElementSwitchValidator>();
+
+            // Routing
+            Services.AddUnique<IDocumentUrlService, DocumentUrlService>();
+            Services.AddHostedService<DocumentUrlServiceInitializer>();
         }
     }
 }
