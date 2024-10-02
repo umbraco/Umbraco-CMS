@@ -11,7 +11,7 @@ public class ContentTypeEditingBuilder
         IBuildPropertyTypes
 {
     private Guid? _key;
-    private Guid? _containerKey;
+    private Guid? _containerKey = null;
     private ContentTypeCleanup _cleanup = new();
     private IEnumerable<Guid> _allowedTemplateKeys;
     private Guid? _defaultTemplateKey;
