@@ -19,7 +19,6 @@ public class ContentEditingBuilder
         IWithTemplateKeyBuilder,
         IBuildContentTypes
 {
-    private ContentTypeEditingBuilder _contentTypeEditingBuilder;
     private IEnumerable<PropertyValueModel> _invariantProperties = [];
     private IEnumerable<VariantModel> _variants = [];
     private Guid _contentTypeKey;
