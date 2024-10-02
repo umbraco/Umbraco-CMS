@@ -1,18 +1,10 @@
 import { toCamelCase } from '../to-camel-case/index.js';
 
 /**
- *
- * @param text
+ * @description Generate an alias from a string
+ * @param {string} text The text to generate the alias from
+ * @returns {string} The alias
  */
-export function generateAlias(text: string) {
-	//replace all spaces characters with a dash and remove all non-alphanumeric characters, except underscore. Allow a maximum of 1 dashes or underscores in a row.
-	//Do we really want that and not the original way of doing things (camelCase)?
-
+export function generateAlias(text: string): string {
 	return toCamelCase(text);
-
-	return text
-		.replace(/\s+/g, '-')
-		.replace(/[^a-zA-Z0-9_-]+/g, '')
-		.replace(/[-_]{2,}/g, (match) => match[0])
-		.toLowerCase();
 }
