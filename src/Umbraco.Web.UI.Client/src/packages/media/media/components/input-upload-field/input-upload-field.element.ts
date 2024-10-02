@@ -13,6 +13,7 @@ import {
 	property,
 	query,
 	state,
+	type PropertyValueMap,
 } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -20,17 +21,22 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends UmbLitElement {
 	@property({ type: Object })
 	set value(value: MediaValueType) {
-		if (!value?.src) return;
-		this.src = value.src;
+		this.#src = value?.src ?? '';
 	}
 	get value(): MediaValueType {
-		return !this.temporaryFile ? { src: this._src } : { temporaryFileId: this.temporaryFile.temporaryUnique };
+		return {
+			src: this.#src,
+			temporaryFileId: this.temporaryFile?.temporaryUnique,
+		};
 	}
+
+	#src = '';
 
 	/**
 	 * @description Allowed file extensions. Allow all if empty.
@@ -48,17 +54,6 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	@state()
 	public temporaryFile?: UmbTemporaryFileModel;
 
-	public set src(src: string) {
-		this._src = src;
-		this._previewAlias = this.#getPreviewElementAlias();
-	}
-	public get src() {
-		return this._src;
-	}
-
-	@state()
-	private _src = '';
-
 	@state()
 	private _extensions?: string[];
 
@@ -74,9 +69,23 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'fileUploadPreview', null, (manifests) => {
-			this.#manifests = manifests.map((manifest) => manifest.manifest);
-		});
+	}
+
+	override updated(changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
+		super.updated(changedProperties);
+		if (changedProperties.has('value') && changedProperties.get('value')?.src !== this.value.src) {
+			this.#setPreviewAlias();
+		}
+	}
+
+	async #getManifests() {
+		if (this.#manifests.length) return this.#manifests;
+
+		await new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'fileUploadPreview', null, (exts) => {
+			this.#manifests = exts.map((exts) => exts.manifest);
+		}).asPromise();
+
+		return this.#manifests;
 	}
 
 	#setExtensions(extensions: Array<string>) {
@@ -88,20 +97,28 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		this._extensions = extensions?.map((extension) => `.${extension}`);
 	}
 
-	#getPreviewElementAlias() {
-		const fallbackAlias = this.#manifests.find((manifest) => manifest.forMimeTypes.includes('*/*'))?.alias;
+	async #setPreviewAlias(): Promise<void> {
+		this._previewAlias = await this.#getPreviewElementAlias();
+	}
 
-		const mimeType = this.#getMimeTypeFromPath(this._src);
+	async #getPreviewElementAlias() {
+		if (!this.value.src) return;
+		const manifests = await this.#getManifests();
+		const fallbackAlias = manifests.find((manifest) =>
+			stringOrStringArrayContains(manifest.forMimeTypes, '*/*'),
+		)?.alias;
+
+		const mimeType = this.#getMimeTypeFromPath(this.value.src);
 		if (!mimeType) return fallbackAlias;
 
 		// Check for an exact match
-		const exactMatch = this.#manifests.find((manifest) => {
-			return manifest.forMimeTypes.includes(mimeType);
+		const exactMatch = manifests.find((manifest) => {
+			return stringOrStringArrayContains(manifest.forMimeTypes, mimeType);
 		});
 		if (exactMatch) return exactMatch.alias;
 
 		// Check for wildcard match (e.g. image/*)
-		const wildcardMatch = this.#manifests.find((manifest) => {
+		const wildcardMatch = manifests.find((manifest) => {
 			const forMimeTypes = Array.isArray(manifest.forMimeTypes) ? manifest.forMimeTypes : [manifest.forMimeTypes];
 			return forMimeTypes.find((type) => {
 				const snippet = type.replace(/\*/g, '');
@@ -140,7 +157,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 		const reader = new FileReader();
 		reader.onload = () => {
-			this.src = reader.result as string;
+			this.value = { src: reader.result as string };
 		};
 		reader.readAsDataURL(item.file);
 
@@ -158,8 +175,8 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	}
 
 	override render() {
-		if (this.src && this._previewAlias) {
-			return this.#renderFile(this.src, this._previewAlias, this.temporaryFile?.file);
+		if (this.value.src && this._previewAlias) {
+			return this.#renderFile(this.value.src, this._previewAlias, this.temporaryFile?.file);
 		} else {
 			return this.#renderDropzone();
 		}
@@ -178,7 +195,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		`;
 	}
 
-	#renderFile(src: string, previewAlias?: string, file?: File) {
+	#renderFile(src: string, previewAlias: string, file?: File) {
 		if (!previewAlias) return 'An error occurred. No previewer found for the file type.';
 		return html`
 			<div id="wrapper">
@@ -204,7 +221,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	}
 
 	#handleRemove() {
-		this.src = '';
+		this.value = { src: undefined };
 		this.temporaryFile = undefined;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
