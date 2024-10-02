@@ -79,6 +79,8 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	}
 
 	async #getManifests() {
+		if (this.#manifests.length) return this.#manifests;
+
 		await new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'fileUploadPreview', null, (exts) => {
 			this.#manifests = exts.map((exts) => exts.manifest);
 		}).asPromise();
