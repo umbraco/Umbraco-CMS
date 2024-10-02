@@ -18,7 +18,6 @@ public class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWithMediaEdi
 
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
 
-    // TODO: Currently failing, unsure if actual issue or test issue
     [Test]
     public async Task Cannot_Get_Property_From_Media_After_It_Is_Removed_From_MediaType_By_Id()
     {
@@ -38,7 +37,6 @@ public class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWithMediaEdi
         Assert.IsNull(newMedia.Value("testProperty"));
     }
 
-    // TODO: Currently failing, unsure if actual issue or test issue
     [Test]
     public async Task Cannot_Get_Property_From_Media_After_It_Is_Removed_From_MediaType_By_Key()
     {
