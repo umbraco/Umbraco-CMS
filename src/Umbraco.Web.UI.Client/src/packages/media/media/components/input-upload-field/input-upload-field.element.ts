@@ -27,12 +27,16 @@ import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 export class UmbInputUploadFieldElement extends UmbLitElement {
 	@property({ type: Object })
 	set value(value: MediaValueType) {
-		if (!value?.src) return;
-		this.src = value.src;
+		this.#src = value?.src ?? '';
 	}
 	get value(): MediaValueType {
-		return !this.temporaryFile ? { src: this._src } : { temporaryFileId: this.temporaryFile.temporaryUnique };
+		return {
+			src: this.#src,
+			temporaryFileId: this.temporaryFile?.temporaryUnique,
+		};
 	}
+
+	#src = '';
 
 	/**
 	 * @description Allowed file extensions. Allow all if empty.
@@ -49,17 +53,6 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 	@state()
 	public temporaryFile?: UmbTemporaryFileModel;
-
-	public set src(src: string) {
-		this._src = src;
-		this._previewAlias = this.#getPreviewElementAlias();
-	}
-	public get src() {
-		return this._src;
-	}
-
-	@state()
-	private _src = '';
 
 	@state()
 	private _extensions?: string[];
@@ -162,7 +155,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 		const reader = new FileReader();
 		reader.onload = () => {
-			this.src = reader.result as string;
+			this.value = { src: reader.result as string };
 		};
 		reader.readAsDataURL(item.file);
 
@@ -180,8 +173,8 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	}
 
 	override render() {
-		if (this.src && this._previewAlias) {
-			return this.#renderFile(this.src, this._previewAlias, this.temporaryFile?.file);
+		if (this.value.src && this._previewAlias) {
+			return this.#renderFile(this.value.src, this._previewAlias, this.temporaryFile?.file);
 		} else {
 			return this.#renderDropzone();
 		}
@@ -200,7 +193,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		`;
 	}
 
-	#renderFile(src: string, previewAlias?: string, file?: File) {
+	#renderFile(src: string, previewAlias: string, file?: File) {
 		if (!previewAlias) return 'An error occurred. No previewer found for the file type.';
 		return html`
 			<div id="wrapper">
@@ -226,7 +219,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	}
 
 	#handleRemove() {
-		this.src = '';
+		this.value = { src: undefined };
 		this.temporaryFile = undefined;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
