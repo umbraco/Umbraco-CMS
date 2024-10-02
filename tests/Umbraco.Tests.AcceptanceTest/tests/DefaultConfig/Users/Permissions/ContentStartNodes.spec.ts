@@ -16,6 +16,10 @@ let childDocumentTypeOneId = null;
 let childDocumentTypeTwoId = null;
 let rootDocumentTypeId = null
 
+let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""}
+
+let rootDocumentId = null;
+let childDocumentOneId = null;
 const rootDocumentName = 'RootDocument';
 const childDocumentOneName = 'ChildDocumentOne';
 const childDocumentTwoName = 'ChildDocumentTwo';
@@ -23,6 +27,8 @@ const childDocumentTwoName = 'ChildDocumentTwo';
 let userGroupId = null;
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
+  // Ensure we are logged in to admin
+  await umbracoApi.refreshAccessToken(process.env.UMBRACO_USER_LOGIN, process.env.UMBRACO_USER_PASSWORD);
   await umbracoApi.documentType.ensureNameNotExists(rootDocumentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeOneName);
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeTwoName);
@@ -33,38 +39,66 @@ test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   childDocumentTypeTwoId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeTwoName);
   rootDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedTwoChildNodes(rootDocumentTypeName, childDocumentTypeOneId, childDocumentTypeTwoId);
 
-  var rootDocumentId = await umbracoApi.document.createDefaultDocument(rootDocumentName, rootDocumentTypeId);
-  await umbracoApi.document.createDefaultDocumentWithParent(childDocumentOneName, childDocumentTypeOneId, rootDocumentId);
+  rootDocumentId = await umbracoApi.document.createDefaultDocument(rootDocumentName, rootDocumentTypeId);
+  childDocumentOneId = await umbracoApi.document.createDefaultDocumentWithParent(childDocumentOneName, childDocumentTypeOneId, rootDocumentId);
   await umbracoApi.document.createDefaultDocumentWithParent(childDocumentTwoName, childDocumentTypeTwoId, rootDocumentId);
 
-  // Should be empty, is supposed to be tested in userGroups
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithDocumentAccessAndStartNode(userGroupName, rootDocumentId );
+  userGroupId = await umbracoApi.userGroup.createSimpleUserGroupWithContentSection(userGroupName);
 
-  await umbracoApi.user.setUserSettingsToDefault(testUser.name, testUser.email, testUser.password, userGroupId);
-
-  await umbracoApi.user.loginToUser(testUser.name,testUser.email, testUser.password);
-
-  // Not working correctly yet
-  await umbracoUi.goToBackOffice();
 });
 
 test.afterEach(async ({umbracoApi}) => {
+  // Ensure we are logged in to admin
+  await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
   await umbracoApi.documentType.ensureNameNotExists(rootDocumentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeOneName);
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeTwoName);
 });
 
-test('test permissions', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
+
+//TODO: FIX NAMING
+test('can see root start node and children', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [rootDocumentId]);
+  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
 
-  await page.pause()
   // Act
-  await umbracoUi.user.clickCreateButton();
+  await umbracoUi.user.goToSection(ConstantHelper.sections.content, true);
 
+  // Assert
+  await umbracoUi.content.isContentVisible(rootDocumentName);
+  await umbracoUi.content.clickCaretButtonForContentName(rootDocumentName);
+  await umbracoUi.content.isChildContentVisible(rootDocumentName, childDocumentOneName);
+  await umbracoUi.content.isChildContentVisible(rootDocumentName, childDocumentTwoName);
 });
 
-// SETUP:
-// RootDocumentType
-// ChildDocumentTypeOne
-// ChildDocumentTypeTwo
+// Is this correct?
+test('can see parent and only child start node', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [childDocumentOneId]);
+  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+
+  // Act
+  await umbracoUi.user.goToSection(ConstantHelper.sections.content, true);
+
+  // Assert
+  await umbracoUi.content.isContentVisible(rootDocumentName);
+  await umbracoUi.content.clickCaretButtonForContentName(rootDocumentName);
+  await umbracoUi.content.isChildContentVisible(rootDocumentName, childDocumentOneName);
+  await umbracoUi.content.isChildContentVisible(rootDocumentName, childDocumentTwoName, false);
+});
+
+test('can not see any content when no start nodes specified', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+
+  // Act
+  await umbracoUi.user.goToSection(ConstantHelper.sections.content, true);
+
+  // Assert
+  await umbracoUi.content.isContentVisible(rootDocumentName, false);
+});
