@@ -32,17 +32,18 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 
 	@property({ attribute: false })
 	set value(value: UmbTiptapToolbarValue | undefined) {
-		if (!value) {
+		if (!this.#isValidTiptapToolbarValue(value)) {
 			this.#value = [[[]]];
-		} else {
-			// TODO: This can be optimized with cashing;
-			this.#value = value ? value.map((rows) => rows.map((groups) => [...groups])) : [[[]]];
+			return;
+		}
+
+		if (value.length > 0) {
+			this.#value = value.map((rows) => rows.map((groups) => [...groups]));
 			value.forEach((row) => row.forEach((group) => group.forEach((alias) => this.#inUse.add(alias))));
 		}
 	}
 	get value(): UmbTiptapToolbarValue {
-		// TODO: This can be optimized with cashing;
-		return this.#value.map((rows) => rows.map((groups) => [...groups]));
+		return this.#value;
 	}
 	#value: UmbTiptapToolbarValue = [[[]]];
 
@@ -53,6 +54,20 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 			this._extensions = extensions.map((ext) => ({ alias: ext.alias, label: ext.meta.label, icon: ext.meta.icon }));
 			this.#lookup = new Map(this._extensions.map((ext) => [ext.alias, ext]));
 		});
+	}
+
+	#isValidTiptapToolbarValue(value: unknown): value is UmbTiptapToolbarValue {
+		if (!Array.isArray(value)) return false;
+		for (const row of value) {
+			if (!Array.isArray(row)) return false;
+			for (const group of row) {
+				if (!Array.isArray(group)) return false;
+				for (const alias of group) {
+					if (typeof alias !== 'string') return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	#onDragStart(event: DragEvent, alias: string, fromPos?: [number, number, number]) {
