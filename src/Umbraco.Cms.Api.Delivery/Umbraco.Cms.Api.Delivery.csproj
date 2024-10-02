@@ -4,7 +4,8 @@
     <Description>Contains the presentation layer for the Umbraco CMS Delivery API.</Description>
   </PropertyGroup>
   <PropertyGroup>
-    <!--  TODO: [ASP0019] use IHeaderDictionary.Append or the indexer to append or set headers and remove this override -->
+    <!--  TODO: [ASP0019] use IHeaderDictionary.Append or the indexer to append or set headers,
+          and remove this override -->
     <WarningsNotAsErrors>ASP0019</WarningsNotAsErrors>
   </PropertyGroup>
   <ItemGroup>

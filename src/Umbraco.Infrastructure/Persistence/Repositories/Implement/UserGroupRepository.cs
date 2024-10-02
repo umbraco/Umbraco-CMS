@@ -434,8 +434,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 x => x.Name,
                 x => x.HasAccessToAllLanguages,
                 x => x.Key,
-                x => x.DefaultPermissions
-                )
+                x => x.DefaultPermissions)
             .AndBy<UserGroup2AppDto>(x => x.AppAlias, x => x.UserGroupId);
 
     protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.UserGroup}.id = @id";
@@ -504,7 +503,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
 
     private void PersistAllowedLanguages(IUserGroup entity)
     {
-        var userGroup = entity;
+        IUserGroup userGroup = entity;
 
         // First delete all
         Database.Delete<UserGroup2LanguageDto>("WHERE UserGroupId = @UserGroupId", new { UserGroupId = userGroup.Id });

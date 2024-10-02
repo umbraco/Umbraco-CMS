@@ -51,7 +51,8 @@ public interface IPackageDataInstallation
     /// <param name="dictionaryItemElementList">Xml to import</param>
     /// <param name="userId"></param>
     /// <returns>An enumerable list of dictionary items</returns>
-    IReadOnlyList<IDictionaryItem> ImportDictionaryItems(IEnumerable<XElement> dictionaryItemElementList,
+    IReadOnlyList<IDictionaryItem> ImportDictionaryItems(
+        IEnumerable<XElement> dictionaryItemElementList,
         int userId);
 
     IEnumerable<IDictionaryItem> ImportDictionaryItem(XElement dictionaryItemElement, int userId, Guid? parentId);

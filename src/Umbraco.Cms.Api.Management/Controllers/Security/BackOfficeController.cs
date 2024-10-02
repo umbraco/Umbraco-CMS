@@ -189,8 +189,10 @@ public class BackOfficeController : SecurityControllerBase
 
         await _backOfficeSignInManager.SignOutAsync();
 
-        _logger.LogInformation("User {UserName} from IP address {RemoteIpAddress} has logged out",
-            userName ?? "UNKNOWN", HttpContext.Connection.RemoteIpAddress);
+        _logger.LogInformation(
+            "User {UserName} from IP address {RemoteIpAddress} has logged out",
+            userName ?? "UNKNOWN",
+            HttpContext.Connection.RemoteIpAddress);
 
         // Returning a SignOutResult will ask OpenIddict to redirect the user agent
         // to the post_logout_redirect_uri specified by the client application.
