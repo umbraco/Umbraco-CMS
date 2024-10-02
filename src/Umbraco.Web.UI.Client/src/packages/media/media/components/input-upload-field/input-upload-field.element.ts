@@ -73,7 +73,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 	override updated(changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
 		super.updated(changedProperties);
-		if (changedProperties.has('value')) {
+		if (changedProperties.has('value') && changedProperties.get('value')?.src !== this.value.src) {
 			this.#setPreviewAlias();
 		}
 	}
