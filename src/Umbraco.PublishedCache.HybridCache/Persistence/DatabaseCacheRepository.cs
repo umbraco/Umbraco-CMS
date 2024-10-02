@@ -87,7 +87,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     public async Task RefreshMediaAsync(ContentCacheNode contentCacheNode)
     {
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
-        await OnRepositoryRefreshed(serializer, contentCacheNode, false);
+        await OnRepositoryRefreshed(serializer, contentCacheNode, true);
     }
 
     /// <inheritdoc/>
@@ -117,20 +117,10 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             }
         }
 
-        if (contentTypeIds != null)
-        {
-            RebuildContentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds);
-        }
+        RebuildContentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds);
+        RebuildMediaDbCache(serializer, _nucacheSettings.Value.SqlPageSize, mediaTypeIds);
+        RebuildMemberDbCache(serializer, _nucacheSettings.Value.SqlPageSize, memberTypeIds);
 
-        if (mediaTypeIds != null)
-        {
-            RebuildMediaDbCache(serializer, _nucacheSettings.Value.SqlPageSize, mediaTypeIds);
-        }
-
-        if (memberTypeIds != null)
-        {
-            RebuildMemberDbCache(serializer, _nucacheSettings.Value.SqlPageSize, memberTypeIds);
-        }
     }
 
     // assumes content tree lock
