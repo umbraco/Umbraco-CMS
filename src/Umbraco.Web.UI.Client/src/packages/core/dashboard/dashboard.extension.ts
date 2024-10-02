@@ -3,7 +3,7 @@ import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cm
 
 export interface ManifestDashboard
 	extends ManifestElement<UmbDashboardElement>,
-		ManifestWithDynamicConditions<UmbExtensionCondition> {
+		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'dashboard';
 	meta: MetaDashboard;
 }

@@ -1,6 +1,8 @@
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestTree extends ManifestElementAndApi, ManifestWithDynamicConditions<UmbExtensionCondition> {
+export interface ManifestTree
+	extends ManifestElementAndApi,
+		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'tree';
 	meta: MetaTree;
 }

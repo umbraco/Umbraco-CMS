@@ -2,11 +2,7 @@ import { UmbConditionBase } from '../../extension-registry/conditions/condition-
 import type { WorkspaceContentTypeAliasConditionConfig } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import type {
-	ManifestCondition,
-	UmbConditionControllerArguments,
-	UmbExtensionCondition,
-} from '@umbraco-cms/backoffice/extension-api';
+import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 
 const ObserveSymbol = Symbol();
 
@@ -49,7 +45,7 @@ export class UmbWorkspaceContentTypeAliasCondition
 	}
 }
 
-export const manifest: ManifestCondition = {
+export const manifest: UmbExtensionManifest = {
 	type: 'condition',
 	name: 'Workspace Content Type Alias Condition',
 	alias: 'Umb.Condition.WorkspaceContentTypeAlias',

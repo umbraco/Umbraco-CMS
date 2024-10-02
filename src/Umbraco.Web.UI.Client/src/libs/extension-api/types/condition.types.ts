@@ -4,23 +4,23 @@ export interface UmbConditionConfigBase<AliasType extends string = string> {
 	alias: AliasType;
 }
 
-export type ConditionTypeMap<ConditionTypes extends UmbConditionConfigBase> = {
-	[Condition in ConditionTypes as Condition['alias']]: Condition;
+export type ConditionTypeMap<ConditionConfigs extends UmbConditionConfigBase> = {
+	[Condition in ConditionConfigs as Condition['alias']]: Condition;
 } & {
 	[key: string]: UmbConditionConfigBase;
 };
 
 export type SpecificConditionTypeOrUmbConditionConfigBase<
-	ConditionTypes extends UmbConditionConfigBase,
-	T extends keyof ConditionTypeMap<ConditionTypes> | string,
-> = T extends keyof ConditionTypeMap<ConditionTypes> ? ConditionTypeMap<ConditionTypes>[T] : UmbConditionConfigBase;
+	ConditionConfigs extends UmbConditionConfigBase,
+	T extends keyof ConditionTypeMap<ConditionConfigs> | string,
+> = T extends keyof ConditionTypeMap<ConditionConfigs> ? ConditionTypeMap<ConditionConfigs>[T] : UmbConditionConfigBase;
 
-export interface ManifestWithDynamicConditions<ConditionTypes extends UmbConditionConfigBase = UmbConditionConfigBase>
+export interface ManifestWithDynamicConditions<ConditionConfigs extends UmbConditionConfigBase = UmbConditionConfigBase>
 	extends ManifestBase {
 	/**
 	 * Set the conditions for when the extension should be loaded
 	 */
-	conditions?: Array<ConditionTypes>;
+	conditions?: Array<ConditionConfigs>;
 	/**
 	 * Define one or more extension aliases that this extension should overwrite.
 	 */

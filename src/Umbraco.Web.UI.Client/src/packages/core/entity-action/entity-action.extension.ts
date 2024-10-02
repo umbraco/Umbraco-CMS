@@ -7,7 +7,7 @@ import type { UmbEntityAction, UmbEntityActionElement } from '@umbraco-cms/backo
  */
 export interface ManifestEntityAction<MetaType extends MetaEntityAction = MetaEntityAction>
 	extends ManifestElementAndApi<UmbEntityActionElement, UmbEntityAction<MetaType>>,
-		ManifestWithDynamicConditions<UmbExtensionCondition> {
+		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'entityAction';
 	forEntityTypes: Array<string>;
 	meta: MetaType;

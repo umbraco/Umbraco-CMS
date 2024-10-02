@@ -4,7 +4,7 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
 
 export interface ManifestPropertyAction<MetaType extends MetaPropertyAction = MetaPropertyAction>
 	extends ManifestElementAndApi<UmbControllerHostElement, UmbPropertyAction<MetaType>>,
-		ManifestWithDynamicConditions<UmbExtensionCondition> {
+		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'propertyAction';
 	forPropertyEditorUis: string[];
 	meta: MetaType;

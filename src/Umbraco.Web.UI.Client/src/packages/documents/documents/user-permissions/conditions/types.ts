@@ -18,7 +18,7 @@ export type UmbDocumentUserPermissionConditionConfig =
 	};
 
 declare global {
-	interface UmbExtensionConditionMap {
+	interface UmbExtensionConditionConfigMap {
 		UmbDocumentUserPermissionConditionConfig: UmbDocumentUserPermissionConditionConfig;
 	}
 }

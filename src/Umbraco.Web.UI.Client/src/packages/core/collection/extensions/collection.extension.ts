@@ -2,7 +2,7 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
 
 export interface ManifestCollection
 	extends ManifestElementAndApi,
-		ManifestWithDynamicConditions<UmbExtensionCondition> {
+		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'collection';
 	meta: MetaCollection;
 }

@@ -3,7 +3,7 @@ import type { ManifestWithDynamicConditions, ManifestElement } from '@umbraco-cm
 
 export interface ManifestMenuItem
 	extends ManifestElement<UmbMenuItemElement>,
-		ManifestWithDynamicConditions<UmbExtensionCondition> {
+		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'menuItem';
 	meta: MetaMenuItem;
 }
