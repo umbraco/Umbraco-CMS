@@ -301,7 +301,7 @@ public class PublishedRouter : IPublishedRouter
         }
 
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-        IDomainCache? domainsCache = umbracoContext.PublishedSnapshot.Domains;
+        IDomainCache? domainsCache = umbracoContext.Domains;
         var domains = domainsCache?.GetAll(false).ToList();
 
         // determines whether a domain corresponds to a published document, since some
@@ -311,7 +311,7 @@ public class PublishedRouter : IPublishedRouter
         bool IsPublishedContentDomain(Domain domain)
         {
             // just get it from content cache - optimize there, not here
-            IPublishedContent? domainDocument = umbracoContext.PublishedSnapshot.Content?.GetById(domain.ContentId);
+            IPublishedContent? domainDocument = umbracoContext.Content?.GetById(domain.ContentId);
 
             // not published - at all
             if (domainDocument == null)

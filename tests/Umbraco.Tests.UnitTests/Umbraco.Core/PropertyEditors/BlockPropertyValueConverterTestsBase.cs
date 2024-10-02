@@ -21,11 +21,7 @@ public abstract class BlockPropertyValueConverterTestsBase<TPropertyEditorConfig
     protected Guid SettingKey1 { get; } = Guid.NewGuid();
 
     protected Guid SettingKey2 { get; } = Guid.NewGuid();
-
-    /// <summary>
-    ///     Setup mocks for IPublishedSnapshotAccessor
-    /// </summary>
-    protected IPublishedSnapshotAccessor GetPublishedSnapshotAccessor()
+    protected IPublishedContentTypeCache GetPublishedContentTypeCache()
     {
         var test1ContentType = Mock.Of<IPublishedContentType>(x =>
             x.IsElement == true
@@ -43,15 +39,14 @@ public abstract class BlockPropertyValueConverterTestsBase<TPropertyEditorConfig
             x.IsElement == true
             && x.Key == SettingKey2
             && x.Alias == SettingAlias2);
-        var contentCache = new Mock<IPublishedContentCache>();
-        contentCache.Setup(x => x.GetContentType(ContentKey1)).Returns(test1ContentType);
-        contentCache.Setup(x => x.GetContentType(ContentKey2)).Returns(test2ContentType);
-        contentCache.Setup(x => x.GetContentType(SettingKey1)).Returns(test3ContentType);
-        contentCache.Setup(x => x.GetContentType(SettingKey2)).Returns(test4ContentType);
-        var publishedSnapshot = Mock.Of<IPublishedSnapshot>(x => x.Content == contentCache.Object);
-        var publishedSnapshotAccessor =
-            Mock.Of<IPublishedSnapshotAccessor>(x => x.TryGetPublishedSnapshot(out publishedSnapshot));
-        return publishedSnapshotAccessor;
+
+        var publishedContentTypeCacheMock = new Mock<IPublishedContentTypeCache>();
+        publishedContentTypeCacheMock.Setup(x => x.Get(PublishedItemType.Element, ContentKey1)).Returns(test1ContentType);
+        publishedContentTypeCacheMock.Setup(x => x.Get(PublishedItemType.Element, ContentKey2)).Returns(test2ContentType);
+        publishedContentTypeCacheMock.Setup(x => x.Get(PublishedItemType.Element, SettingKey1)).Returns(test3ContentType);
+        publishedContentTypeCacheMock.Setup(x => x.Get(PublishedItemType.Element, SettingKey2)).Returns(test4ContentType);
+
+        return publishedContentTypeCacheMock.Object;
     }
 
     protected IPublishedPropertyType GetPropertyType(TPropertyEditorConfig config)

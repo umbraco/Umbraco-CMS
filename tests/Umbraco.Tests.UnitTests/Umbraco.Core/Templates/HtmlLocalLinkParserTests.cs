@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers.Objects;
@@ -29,7 +30,7 @@ public class HtmlLocalLinkParserTests
 </p><p><img src='/media/234234.jpg' data-udi=""umb://media-type/B726D735E4C446D58F703F3FBCFC97A5"" />
 <a type=""media"" href=""/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}"" title=""media"">media</a>
 </p>";
-        
+
         var parser = new HtmlLocalLinkParser(Mock.Of<IPublishedUrlProvider>());
 
         var result = parser.FindUdisFromLocalLinks(input).ToList();
@@ -185,12 +186,11 @@ public class HtmlLocalLinkParserTests
             umbracoContextAccessor: umbracoContextAccessor);
 
         var webRoutingSettings = new WebRoutingSettings();
-        var publishedUrlProvider = new UrlProvider(
-            umbracoContextAccessor,
-            Options.Create(webRoutingSettings),
-            new UrlProviderCollection(() => new[] { contentUrlProvider.Object }),
-            new MediaUrlProviderCollection(() => new[] { mediaUrlProvider.Object }),
-            Mock.Of<IVariationContextAccessor>());
+
+        var navigationQueryService = new Mock<IDocumentNavigationQueryService>();
+        Guid? parentKey = null;
+        navigationQueryService.Setup(x => x.TryGetParentKey(It.IsAny<Guid>(), out parentKey)).Returns(true);
+
         using (var reference = umbracoContextFactory.EnsureUmbracoContext())
         {
             var contentCache = Mock.Get(reference.UmbracoContext.Content);
@@ -200,6 +200,15 @@ public class HtmlLocalLinkParserTests
             var mediaCache = Mock.Get(reference.UmbracoContext.Media);
             mediaCache.Setup(x => x.GetById(It.IsAny<int>())).Returns(media.Object);
             mediaCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(media.Object);
+
+            var publishedUrlProvider = new UrlProvider(
+                umbracoContextAccessor,
+                Options.Create(webRoutingSettings),
+                new UrlProviderCollection(() => new[] { contentUrlProvider.Object }),
+                new MediaUrlProviderCollection(() => new[] { mediaUrlProvider.Object }),
+                Mock.Of<IVariationContextAccessor>(),
+                contentCache.Object,
+                navigationQueryService.Object);
 
             var linkParser = new HtmlLocalLinkParser(publishedUrlProvider);
 

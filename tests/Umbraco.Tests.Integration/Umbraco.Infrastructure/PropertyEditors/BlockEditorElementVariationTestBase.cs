@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.HybridCache.Services;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -35,8 +36,6 @@ public abstract class BlockEditorElementVariationTestBase : UmbracoIntegrationTe
 
     protected PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
 
-    private IPublishedSnapshotService PublishedSnapshotService => GetRequiredService<IPublishedSnapshotService>();
-
     private IUmbracoContextAccessor UmbracoContextAccessor => GetRequiredService<IUmbracoContextAccessor>();
 
     private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
@@ -46,6 +45,8 @@ public abstract class BlockEditorElementVariationTestBase : UmbracoIntegrationTe
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer => GetRequiredService<IConfigurationEditorJsonSerializer>();
+
+    private IDocumentCacheService DocumentCacheService => GetRequiredService<IDocumentCacheService>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
@@ -59,7 +60,6 @@ public abstract class BlockEditorElementVariationTestBase : UmbracoIntegrationTe
         builder.Services.AddUnique<IUmbracoContextAccessor, TestUmbracoContextAccessor>();
         builder.Services.AddUnique(mockHttpContextAccessor.Object);
         builder.AddUmbracoHybridCache();
-        builder.AddNuCache();
 
         builder.Services.Configure<ContentSettings>(config =>
             config.AllowEditInvariantFromNonDefault = TestsRequiringAllowEditInvariantFromNonDefault.Contains(TestContext.CurrentContext.Test.Name));
@@ -74,18 +74,19 @@ public abstract class BlockEditorElementVariationTestBase : UmbracoIntegrationTe
         var publishResult = ContentService.Publish(content, culturesToPublish);
         Assert.IsTrue(publishResult.Success);
 
-        ContentCacheRefresher.JsonPayload[] payloads =
-        [
-            new ContentCacheRefresher.JsonPayload
-            {
-                ChangeTypes = TreeChangeTypes.RefreshNode,
-                Key = content.Key,
-                Id = content.Id,
-                Blueprint = false
-            }
-        ];
+        // ContentCacheRefresher.JsonPayload[] payloads =
+        // [
+        //     new ContentCacheRefresher.JsonPayload
+        //     {
+        //         ChangeTypes = TreeChangeTypes.RefreshNode,
+        //         Key = content.Key,
+        //         Id = content.Id,
+        //         Blueprint = false
+        //     }
+        // ];
 
-        PublishedSnapshotService.Notify(payloads, out _, out _);
+
+        DocumentCacheService.RefreshContentAsync(content);
     }
 
     protected IContentType CreateElementType(ContentVariation variation, string alias = "myElementType")
@@ -163,10 +164,10 @@ public abstract class BlockEditorElementVariationTestBase : UmbracoIntegrationTe
 
     protected void RefreshContentTypeCache(params IContentType[] contentTypes)
     {
-        ContentTypeCacheRefresher.JsonPayload[] payloads = contentTypes
-            .Select(contentType => new ContentTypeCacheRefresher.JsonPayload(nameof(IContentType), contentType.Id, ContentTypeChangeTypes.RefreshMain))
-            .ToArray();
+        // ContentTypeCacheRefresher.JsonPayload[] payloads = contentTypes
+        //     .Select(contentType => new ContentTypeCacheRefresher.JsonPayload(nameof(IContentType), contentType.Id, ContentTypeChangeTypes.RefreshMain))
+        //     .ToArray();
 
-        PublishedSnapshotService.Notify(payloads);
+        DocumentCacheService.Rebuild(contentTypes.Select(x => x.Id).ToArray());
     }
 }

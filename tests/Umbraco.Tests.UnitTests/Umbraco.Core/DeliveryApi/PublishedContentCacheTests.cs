@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.HybridCache;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
@@ -16,7 +17,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
 
     private readonly Guid _contentTwoId = Guid.Parse("4EF11E1E-FB50-4627-8A86-E10ED6F4DCE4");
 
-    private IPublishedSnapshotAccessor _publishedSnapshotAccessor = null!;
+    private IPublishedContentCache _contentCache;
     private IPublishedContentCache _contentCacheMock;
     private IDocumentUrlService _documentUrlService;
 
@@ -55,14 +56,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
             .Setup(m => m.GetById(It.IsAny<bool>(), _contentTwoId))
             .Returns(contentTwoMock.Object);
 
-        var publishedSnapshotMock = new Mock<IPublishedSnapshot>();
-        publishedSnapshotMock.Setup(m => m.Content).Returns(contentCacheMock.Object);
-
-        var publishedSnapshot = publishedSnapshotMock.Object;
-        var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
-        publishedSnapshotAccessorMock.Setup(m => m.TryGetPublishedSnapshot(out publishedSnapshot)).Returns(true);
-
-        _publishedSnapshotAccessor = publishedSnapshotAccessorMock.Object;
+        _contentCache = contentCacheMock.Object;
         _contentCacheMock = contentCacheMock.Object;
         _documentUrlService = documentUrlService.Object;
     }

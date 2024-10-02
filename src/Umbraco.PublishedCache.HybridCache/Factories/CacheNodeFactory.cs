@@ -1,4 +1,6 @@
-﻿using Umbraco.Cms.Core.Models;
+﻿using StackExchange.Profiling.Internal;
+using Umbraco.Cms.Core.Media.EmbedProviders;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -17,7 +19,14 @@ internal class CacheNodeFactory : ICacheNodeFactory
 
     public ContentCacheNode ToContentCacheNode(IContent content, bool preview)
     {
-        ContentData contentData = GetContentData(content, !preview, preview ? content.TemplateId : content.PublishTemplateId);
+
+
+        ContentData contentData = GetContentData(
+            content,
+              GetPublishedValue(content, preview),
+              GetTemplateId(content, preview),
+              content.PublishCultureInfos!.Values.Select(x=>x.Culture).ToHashSet()
+            );
         return new ContentCacheNode
         {
             Id = content.Id,
@@ -31,9 +40,39 @@ internal class CacheNodeFactory : ICacheNodeFactory
         };
     }
 
+    private bool GetPublishedValue(IContent content, bool preview)
+    {
+        switch (content.PublishedState)
+        {
+            case PublishedState.Published:
+                return preview;
+            case PublishedState.Publishing:
+                return preview is false || content.Published; // The type changes after this operation
+            case PublishedState.Unpublished:
+            case PublishedState.Unpublishing:
+            default:
+                return false;
+        }
+    }
+
+    private int? GetTemplateId(IContent content, bool preview)
+    {
+        switch (content.PublishedState)
+        {
+            case PublishedState.Published:
+                return preview ? content.TemplateId : content.PublishTemplateId;
+            case PublishedState.Publishing:
+                return content.TemplateId;// The type changes after this operation is we need to read the draft values
+            case PublishedState.Unpublished:
+            case PublishedState.Unpublishing:
+            default:
+                return null;
+        }
+    }
+
     public ContentCacheNode ToContentCacheNode(IMedia media)
     {
-        ContentData contentData = GetContentData(media, false, null);
+        ContentData contentData = GetContentData(media, false, null, new HashSet<string>());
         return new ContentCacheNode
         {
             Id = media.Id,
@@ -47,7 +86,7 @@ internal class CacheNodeFactory : ICacheNodeFactory
         };
     }
 
-    private ContentData GetContentData(IContentBase content, bool published, int? templateId)
+    private ContentData GetContentData(IContentBase content, bool published, int? templateId, ISet<string> publishedCultures)
     {
         var propertyData = new Dictionary<string, PropertyData[]>();
         foreach (IProperty prop in content.Properties)
@@ -62,7 +101,15 @@ internal class CacheNodeFactory : ICacheNodeFactory
                 }
 
                 // note: at service level, invariant is 'null', but here invariant becomes 'string.Empty'
-                var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
+                if (published && (string.IsNullOrEmpty(pvalue.Culture) is false && publishedCultures.Contains(pvalue.Culture) is false))
+                {
+                    continue;
+                }
+
+                var value = published
+                    ? pvalue.PublishedValue
+                    : pvalue.EditedValue;
+
                 if (value != null)
                 {
                     pdatas.Add(new PropertyData

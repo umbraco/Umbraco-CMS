@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
@@ -21,6 +22,8 @@ public class ContentFinderByUrlAlias : IContentFinder
     private readonly ILogger<ContentFinderByUrlAlias> _logger;
     private readonly IPublishedValueFallback _publishedValueFallback;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+    private readonly IPublishedContentCache _contentCache;
+    private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private readonly IVariationContextAccessor _variationContextAccessor;
 
     /// <summary>
@@ -30,11 +33,15 @@ public class ContentFinderByUrlAlias : IContentFinder
         ILogger<ContentFinderByUrlAlias> logger,
         IPublishedValueFallback publishedValueFallback,
         IVariationContextAccessor variationContextAccessor,
-        IUmbracoContextAccessor umbracoContextAccessor)
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService documentNavigationQueryService)
     {
         _publishedValueFallback = publishedValueFallback;
         _variationContextAccessor = variationContextAccessor;
         _umbracoContextAccessor = umbracoContextAccessor;
+        _contentCache = contentCache;
+        _documentNavigationQueryService = documentNavigationQueryService;
         _logger = logger;
     }
 
@@ -138,14 +145,14 @@ public class ContentFinderByUrlAlias : IContentFinder
         if (rootNodeId > 0)
         {
             IPublishedContent? rootNode = cache?.GetById(rootNodeId);
-            return rootNode?.Descendants(_variationContextAccessor).FirstOrDefault(x => IsMatch(x, test1, test2));
+            return rootNode?.Descendants(_variationContextAccessor, _contentCache, _documentNavigationQueryService).FirstOrDefault(x => IsMatch(x, test1, test2));
         }
 
         if (cache is not null)
         {
             foreach (IPublishedContent rootContent in cache.GetAtRoot())
             {
-                IPublishedContent? c = rootContent.DescendantsOrSelf(_variationContextAccessor)
+                IPublishedContent? c = rootContent.DescendantsOrSelf(_variationContextAccessor, _contentCache, _documentNavigationQueryService)
                     .FirstOrDefault(x => IsMatch(x, test1, test2));
                 if (c != null)
                 {

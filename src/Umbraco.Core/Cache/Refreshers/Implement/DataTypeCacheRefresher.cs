@@ -3,8 +3,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -15,21 +13,18 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
 {
     private readonly IIdKeyMap _idKeyMap;
     private readonly IPublishedModelFactory _publishedModelFactory;
-    private readonly IPublishedSnapshotService _publishedSnapshotService;
 
     public DataTypeCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
-        IPublishedSnapshotService publishedSnapshotService,
-        IPublishedModelFactory publishedModelFactory,
         IIdKeyMap idKeyMap,
         IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory)
+        ICacheRefresherNotificationFactory factory,
+        IPublishedModelFactory publishedModelFactory)
         : base(appCaches, serializer, eventAggregator, factory)
     {
-        _publishedSnapshotService = publishedSnapshotService;
-        _publishedModelFactory = publishedModelFactory;
         _idKeyMap = idKeyMap;
+        _publishedModelFactory = publishedModelFactory;
     }
 
     #region Json
@@ -88,9 +83,8 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
             }
         }
 
-        // refresh the models and cache
-        _publishedModelFactory.WithSafeLiveFactoryReset(() =>
-            _publishedSnapshotService.Notify(payloads));
+        // TODO: We need to clear the HybridCache of any content using the ContentType, but NOT the database cache here, and this should be done within the "WithSafeLiveFactoryReset" to ensure that the factory is locked in the meantime.
+        _publishedModelFactory.WithSafeLiveFactoryReset(() => { });
 
         base.Refresh(payloads);
     }

@@ -270,21 +270,20 @@ public class RichTextPropertyEditor : DataEditor
 
         internal override object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture)
         {
-            if (sourceValue is null)
+            if (sourceValue is null || TryParseEditorValue(sourceValue, out RichTextEditorValue? sourceRichTextEditorValue) is false)
             {
                 return null;
             }
 
-            if (TryParseEditorValue(sourceValue, out RichTextEditorValue? sourceRichTextEditorValue) is false
-                || sourceRichTextEditorValue.Blocks is null)
+            if (sourceRichTextEditorValue.Blocks is null)
             {
-                return null;
+                return sourceValue;
             }
 
             BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? sourceBlockEditorData = ConvertAndClean(sourceRichTextEditorValue.Blocks);
             if (sourceBlockEditorData?.Layout is null)
             {
-                return null;
+                return sourceValue;
             }
 
             TryParseEditorValue(targetValue, out RichTextEditorValue? targetRichTextEditorValue);

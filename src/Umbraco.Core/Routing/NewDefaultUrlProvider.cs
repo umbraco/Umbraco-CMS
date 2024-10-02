@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
@@ -21,6 +22,7 @@ public class NewDefaultUrlProvider : IUrlProvider
     private readonly IDomainCache _domainCache;
     private readonly IIdKeyMap _idKeyMap;
     private readonly IDocumentUrlService _documentUrlService;
+    private readonly IDocumentNavigationQueryService _navigationQueryService;
     private readonly ILocalizedTextService? _localizedTextService;
     private readonly ILogger<DefaultUrlProvider> _logger;
     private readonly ISiteDomainMapper _siteDomainMapper;
@@ -28,30 +30,32 @@ public class NewDefaultUrlProvider : IUrlProvider
     private readonly UriUtility _uriUtility;
     private RequestHandlerSettings _requestSettings;
 
-        public NewDefaultUrlProvider(
-            IOptionsMonitor<RequestHandlerSettings> requestSettings,
-            ILogger<DefaultUrlProvider> logger,
-            ISiteDomainMapper siteDomainMapper,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            UriUtility uriUtility,
-            ILocalizationService localizationService,
-            IPublishedContentCache publishedContentCache,
-            IDomainCache domainCache,
-            IIdKeyMap idKeyMap,
-            IDocumentUrlService documentUrlService)
-        {
-            _requestSettings = requestSettings.CurrentValue;
-            _logger = logger;
-            _siteDomainMapper = siteDomainMapper;
-            _umbracoContextAccessor = umbracoContextAccessor;
-            _uriUtility = uriUtility;
-            _localizationService = localizationService;
-            _publishedContentCache = publishedContentCache;
-            _domainCache = domainCache;
-            _idKeyMap = idKeyMap;
-            _documentUrlService = documentUrlService;
+    public NewDefaultUrlProvider(
+        IOptionsMonitor<RequestHandlerSettings> requestSettings,
+        ILogger<DefaultUrlProvider> logger,
+        ISiteDomainMapper siteDomainMapper,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        UriUtility uriUtility,
+        ILocalizationService localizationService,
+        IPublishedContentCache publishedContentCache,
+        IDomainCache domainCache,
+        IIdKeyMap idKeyMap,
+        IDocumentUrlService documentUrlService,
+        IDocumentNavigationQueryService navigationQueryService)
+    {
+        _requestSettings = requestSettings.CurrentValue;
+        _logger = logger;
+        _siteDomainMapper = siteDomainMapper;
+        _umbracoContextAccessor = umbracoContextAccessor;
+        _uriUtility = uriUtility;
+        _localizationService = localizationService;
+        _publishedContentCache = publishedContentCache;
+        _domainCache = domainCache;
+        _idKeyMap = idKeyMap;
+        _documentUrlService = documentUrlService;
+        _navigationQueryService = navigationQueryService;
 
-            requestSettings.OnChange(x => _requestSettings = x);
+        requestSettings.OnChange(x => _requestSettings = x);
     }
 
     #region GetOtherUrls
@@ -95,7 +99,7 @@ public class NewDefaultUrlProvider : IUrlProvider
         // n is null at root
         while (domainUris == null && n != null)
         {
-            n = n.Parent; // move to parent node
+            n = n.Parent<IPublishedContent>(_publishedContentCache, _navigationQueryService); // move to parent node
             domainUris = n == null
                 ? null
                 : DomainUtilities.DomainsForNode(_domainCache, _siteDomainMapper, n.Id, current);

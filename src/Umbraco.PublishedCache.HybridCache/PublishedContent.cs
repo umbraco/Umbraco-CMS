@@ -1,11 +1,13 @@
 ﻿using System.Text;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
@@ -77,8 +79,8 @@ internal class PublishedContent : PublishedContentBase
     {
         get
         {
-            var documentNavigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
-            var idKeyMap = StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>();
+            IDocumentNavigationQueryService documentNavigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+            IIdKeyMap idKeyMap = StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>();
 
 
             if (documentNavigationQueryService.TryGetAncestorsOrSelfKeys(Key, out var ancestorsOrSelfKeys))
@@ -86,7 +88,7 @@ internal class PublishedContent : PublishedContentBase
                 var sb = new StringBuilder("-1");
                 foreach (Guid ancestorsOrSelfKey in ancestorsOrSelfKeys.Reverse())
                 {
-                    var idAttempt = idKeyMap.GetIdForKey(ancestorsOrSelfKey, GetObjectType());
+                    Attempt<int> idAttempt = idKeyMap.GetIdForKey(ancestorsOrSelfKey, GetObjectType());
                     if (idAttempt.Success)
                     {
                         sb.AppendFormat(",{0}", idAttempt.Result);
@@ -130,12 +132,31 @@ internal class PublishedContent : PublishedContentBase
     // Needed for publishedProperty
     internal IVariationContextAccessor VariationContextAccessor { get; }
 
-    public override int Level { get; } = 0;
+    [Obsolete("Use the INavigationQueryService instead, scheduled for removal in v17")]
+    public override int Level
+    {
+        get
+        {
+            INavigationQueryService? navigationQueryService = null;
+            switch (_contentNode.ContentType.ItemType)
+            {
+                case PublishedItemType.Content:
+                    navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+                    break;
+                case PublishedItemType.Media:
+                    navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>();
+                    break;
+                default:
+                    throw new NotImplementedException("Level is not implemented for " + _contentNode.ContentType.ItemType);
+            }
 
-    public override IEnumerable<IPublishedContent> ChildrenForAllCultures { get; } = Enumerable.Empty<IPublishedContent>();
+            navigationQueryService.TryGetLevel(Key, out int level);
+            return level;
+        }
+    }
 
-    public override IPublishedContent? Parent { get; } = null!;
-
+    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
+    public override IPublishedContent? Parent => GetParent();
 
     /// <inheritdoc />
     public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures
@@ -237,5 +258,27 @@ internal class PublishedContent : PublishedContentBase
         // there is a 'published' published content, and varies
         // = depends on the culture
         return _contentNode.HasPublishedCulture(culture);
+    }
+
+    private IPublishedContent? GetParent()
+    {
+        INavigationQueryService? navigationQueryService;
+        IPublishedCache? publishedCache;
+
+        switch (ContentType.ItemType)
+        {
+            case PublishedItemType.Content:
+                publishedCache = StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>();
+                navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+                break;
+            case PublishedItemType.Media:
+                publishedCache = StaticServiceProvider.Instance.GetRequiredService<IPublishedMediaCache>();
+                navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>();
+                break;
+            default:
+                throw new NotImplementedException("Level is not implemented for " + ContentType.ItemType);
+        }
+
+        return this.Parent<IPublishedContent>(publishedCache, navigationQueryService);
     }
 }

@@ -170,7 +170,7 @@ public class DocumentUrlService : IDocumentUrlService
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
-        IEnumerable<IContent> documents = _documentRepository.GetMany(Array.Empty<Guid>());
+        IEnumerable<IContent> documents = _documentRepository.GetMany(Array.Empty<int>());
 
         await CreateOrUpdateUrlSegmentsAsync(documents);
 
@@ -280,17 +280,26 @@ public class DocumentUrlService : IDocumentUrlService
 
     private IEnumerable<PublishedDocumentUrlSegment> GenerateModels(IContent document, string? culture, ILanguage language)
     {
-        var publishedUrlSegment = document.GetUrlSegment(_shortStringHelper, _urlSegmentProviderCollection, culture, true);
-        if(publishedUrlSegment.IsNullOrWhiteSpace())
+        if (document.ContentType.VariesByCulture() is false || document.PublishCultureInfos != null && document.PublishCultureInfos.Values.Any(x => x.Culture == culture))
         {
-            _logger.LogWarning("No published url segment found for document {DocumentKey} in culture {Culture}", document.Key, culture ?? "{null}");
-        }
-        else
-        {
-            yield return new PublishedDocumentUrlSegment()
+
+            var publishedUrlSegment =
+                document.GetUrlSegment(_shortStringHelper, _urlSegmentProviderCollection, culture, true);
+            if (publishedUrlSegment.IsNullOrWhiteSpace())
             {
-                DocumentKey = document.Key, LanguageId = language.Id, UrlSegment = publishedUrlSegment, IsDraft = false
-            };
+                _logger.LogWarning("No published url segment found for document {DocumentKey} in culture {Culture}",
+                    document.Key, culture ?? "{null}");
+            }
+            else
+            {
+                yield return new PublishedDocumentUrlSegment()
+                {
+                    DocumentKey = document.Key,
+                    LanguageId = language.Id,
+                    UrlSegment = publishedUrlSegment,
+                    IsDraft = false
+                };
+            }
         }
 
         var draftUrlSegment = document.GetUrlSegment(_shortStringHelper, _urlSegmentProviderCollection, culture, false);
@@ -464,6 +473,12 @@ public class DocumentUrlService : IDocumentUrlService
         return GetFullUrl(isRootFirstItem, urlSegments, null);
     }
 
+    public bool HasAny()
+    {
+        ThrowIfNotInitialized();
+        return _cache.Any();
+    }
+
 
     public async Task<IEnumerable<UrlInfo>> ListUrlsAsync(Guid contentKey)
     {
@@ -480,8 +495,7 @@ public class DocumentUrlService : IDocumentUrlService
             .Concat(_contentService.GetAncestors(documentIdAttempt.Result).Select(x => x.Key).Reverse());
 
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
-        IEnumerable<string> cultures = languages.Select(x=>x.IsoCode);
-
+        var cultures = languages.ToDictionary(x=>x.IsoCode);
 
         Guid[] ancestorsOrSelfKeysArray = ancestorsOrSelfKeys as Guid[] ?? ancestorsOrSelfKeys.ToArray();
         Dictionary<Guid, Task<Dictionary<string, IDomain>>> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToDictionary(x => x, async ancestorKey =>
@@ -490,7 +504,7 @@ public class DocumentUrlService : IDocumentUrlService
             return domains.ToDictionary(x => x.LanguageIsoCode!);
         });
 
-        foreach (var culture in cultures)
+        foreach ((string culture, ILanguage language) in cultures)
         {
            var urlSegments = new List<string>();
            IDomain? foundDomain = null;
@@ -517,6 +531,12 @@ public class DocumentUrlService : IDocumentUrlService
                     hasUrlInCulture = false;
                 }
             }
+
+           //If we did not find a domain and this is not the default language, then the content is not routable
+           if (foundDomain is null && language.IsDefault is false)
+           {
+               continue;
+           }
 
             var isRootFirstItem = GetTopMostRootKey() == ancestorsOrSelfKeysArray.Last();
             result.Add(new UrlInfo(

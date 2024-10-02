@@ -10,8 +10,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 [TestFixture]
 public class CacheTests : DeliveryApiTests
 {
-    [TestCase(PropertyCacheLevel.Snapshot, false, 1)]
-    [TestCase(PropertyCacheLevel.Snapshot, true, 1)]
     [TestCase(PropertyCacheLevel.Elements, false, 1)]
     [TestCase(PropertyCacheLevel.Elements, true, 1)]
     [TestCase(PropertyCacheLevel.Element, false, 1)]
@@ -39,7 +37,7 @@ public class CacheTests : DeliveryApiTests
 
         var element = new Mock<IPublishedElement>();
 
-        var prop1 = new PublishedElementPropertyBase(propertyType, element.Object, false, cacheLevel);
+        var prop1 = new PublishedElementPropertyBase(propertyType, element.Object, false, cacheLevel, Mock.Of<ICacheManager>());
 
         var results = new List<string>();
         results.Add(prop1.GetDeliveryApiValue(expanding)!.ToString());

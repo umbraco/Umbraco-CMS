@@ -16,10 +16,10 @@ public class ByPathMediaApiController : MediaApiControllerBase
     private readonly IApiMediaQueryService _apiMediaQueryService;
 
     public ByPathMediaApiController(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IPublishedMediaCache publishedMediaCache,
         IApiMediaWithCropsResponseBuilder apiMediaWithCropsResponseBuilder,
         IApiMediaQueryService apiMediaQueryService)
-        : base(publishedSnapshotAccessor, apiMediaWithCropsResponseBuilder)
+        : base(publishedMediaCache, apiMediaWithCropsResponseBuilder)
         => _apiMediaQueryService = apiMediaQueryService;
 
     [HttpGet("item/{*path}")]
