@@ -10,7 +10,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-[Platform("Linux", Reason = "This uses too much memory when running both caches, should be removed when nucache is removed")]
 public class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWithMediaEditing
 {
     private IPublishedMediaCache PublishedMediaHybridCache => GetRequiredService<IPublishedMediaCache>();
@@ -19,7 +18,7 @@ public class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWithMediaEdi
 
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
 
-    // Currently failing, unsure if actual issue or test issue
+    // TODO: Currently failing, unsure if actual issue or test issue
     [Test]
     public async Task Cannot_Get_Property_From_Media_After_It_Is_Removed_From_MediaType_By_Id()
     {
@@ -39,7 +38,7 @@ public class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWithMediaEdi
         Assert.IsNull(newMedia.Value("testProperty"));
     }
 
-    // Currently failing, unsure if actual issue or test issue
+    // TODO: Currently failing, unsure if actual issue or test issue
     [Test]
     public async Task Cannot_Get_Property_From_Media_After_It_Is_Removed_From_MediaType_By_Key()
     {
