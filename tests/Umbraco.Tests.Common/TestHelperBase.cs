@@ -96,8 +96,7 @@ public abstract class TestHelperBase
                 Mock.Of<IMediaPathScheme>(),
                 loggerFactory.CreateLogger<MediaFileManager>(),
                 Mock.Of<IShortStringHelper>(),
-                Mock.Of<IServiceProvider>(),
-                Options.Create(new ContentSettings()));
+                Mock.Of<IServiceProvider>());
             var databaseFactory = new Mock<IUmbracoDatabaseFactory>();
             var database = new Mock<IUmbracoDatabase>();
             var sqlContext = new Mock<ISqlContext>();
