@@ -13,6 +13,7 @@ import {
 	property,
 	query,
 	state,
+	type PropertyValueMap,
 } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -20,6 +21,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends UmbLitElement {
