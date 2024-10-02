@@ -4,28 +4,30 @@ using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
-public class PropertyTypeEditingBuilder
-    : ChildBuilderBase<ContentTypeEditingBuilder, ContentTypePropertyTypeModel>, IBuildPropertyTypes, IWithKeyBuilder,
-        IWIthContainerKeyBuilder,
-        IWithSortOrderBuilder, IWithAliasBuilder, IWithNameBuilder, IWithDescriptionBuilder, IWithDataTypeKeyBuilder,
-        IWithVariesByCultureBuilder, IWithVariesBySegmentBuilder
+public class PropertyTypeEditingBuilder<TParent, TModel> : ChildBuilderBase<TParent, TModel>, IWithKeyBuilder,
+    IWithContainerKeyBuilder, IWithSortOrderBuilder, IWithAliasBuilder, IWithNameBuilder, IWithDescriptionBuilder,
+    IWithDataTypeKeyBuilder, IWithVariesByCultureBuilder,
+    IWithVariesBySegmentBuilder where TModel : PropertyTypeModelBase, new()
 {
+    private TModel _model;
     private Guid? _key;
     private Guid? _containerKey;
     private int? _sortOrder;
     private string _alias;
-    private string? _name;
+    private string _name;
     private string? _description;
     private Guid? _dataTypeKey;
     private bool _variesByCulture;
     private bool _variesBySegment;
-    private PropertyTypeValidationEditingBuilder _validationBuilder;
-    private PropertyTypeAppearanceBuilder _appearanceBuilder;
+    private PropertyTypeValidationEditingBuilder<TParent, TModel> _validationBuilder;
+    private PropertyTypeAppearanceBuilder<TParent, TModel> _appearanceBuilder;
 
-    public PropertyTypeEditingBuilder(ContentTypeEditingBuilder parentBuilder) : base(parentBuilder)
+    public PropertyTypeEditingBuilder(TParent parentBuilder)
+        : base(parentBuilder)
     {
-        _validationBuilder = new PropertyTypeValidationEditingBuilder(this);
-        _appearanceBuilder = new PropertyTypeAppearanceBuilder(this);
+        _model = new TModel();
+        _validationBuilder = new PropertyTypeValidationEditingBuilder<TParent, TModel>(this);
+        _appearanceBuilder = new PropertyTypeAppearanceBuilder<TParent, TModel>(this);
     }
 
     Guid? IWithKeyBuilder.Key
@@ -34,7 +36,7 @@ public class PropertyTypeEditingBuilder
         set => _key = value;
     }
 
-    Guid? IWIthContainerKeyBuilder.ContainerKey
+    Guid? IWithContainerKeyBuilder.ContainerKey
     {
         get => _containerKey;
         set => _containerKey = value;
@@ -58,7 +60,7 @@ public class PropertyTypeEditingBuilder
         set => _name = value;
     }
 
-    string IWithDescriptionBuilder.Description
+    string? IWithDescriptionBuilder.Description
     {
         get => _description;
         set => _description = value;
@@ -82,95 +84,34 @@ public class PropertyTypeEditingBuilder
         set => _variesBySegment = value;
     }
 
-    public PropertyTypeValidationEditingBuilder AddValidation()
+    public PropertyTypeValidationEditingBuilder<TParent, TModel> AddValidation()
     {
-        var builder = new PropertyTypeValidationEditingBuilder(this);
+        var builder = new PropertyTypeValidationEditingBuilder<TParent, TModel>(this);
         _validationBuilder = builder;
         return builder;
     }
 
-    public PropertyTypeAppearanceBuilder AddAppearance()
+    public PropertyTypeAppearanceBuilder<TParent, TModel> AddAppearance()
     {
-        var builder = new PropertyTypeAppearanceBuilder(this);
+        var builder = new PropertyTypeAppearanceBuilder<TParent, TModel>(this);
         _appearanceBuilder = builder;
         return builder;
     }
 
-    public PropertyTypeEditingBuilder WithContainerKey(Guid? containerKey)
+    public override TModel Build()
     {
-        _containerKey = containerKey;
-        return this;
-    }
+        _model.Key = _key ?? Guid.NewGuid();
+        _model.ContainerKey = _containerKey;
+        _model.SortOrder = _sortOrder ?? 0;
+        _model.Alias = _alias ?? "title";
+        _model.Name = _name ?? "Title";
+        _model.Description = _description;
+        _model.DataTypeKey = _dataTypeKey ?? Constants.DataTypes.Guids.TextareaGuid;
+        _model.VariesByCulture = _variesByCulture;
+        _model.VariesBySegment = _variesBySegment;
+        _model.Validation = _validationBuilder.Build();
+        _model.Appearance = _appearanceBuilder.Build();
 
-    public PropertyTypeEditingBuilder WithSortOrder(int sortOrder)
-    {
-        _sortOrder = sortOrder;
-        return this;
-    }
-
-    public PropertyTypeEditingBuilder WithAlias(string alias)
-    {
-        _alias = alias;
-        return this;
-    }
-
-    public PropertyTypeEditingBuilder WithName(string name)
-    {
-        _name = name;
-        return this;
-    }
-
-    public PropertyTypeEditingBuilder WithDescription(string description)
-    {
-        _description = description;
-        return this;
-    }
-
-    public PropertyTypeEditingBuilder WithDataTypeKey(Guid dataTypeKey)
-    {
-        _dataTypeKey = dataTypeKey;
-        return this;
-    }
-
-    public PropertyTypeEditingBuilder WithVariesByCulture(bool variesByCulture)
-    {
-        _variesByCulture = variesByCulture;
-        return this;
-    }
-
-    public PropertyTypeEditingBuilder WithVariesBySegment(bool variesBySegment)
-    {
-        _variesBySegment = variesBySegment;
-        return this;
-    }
-
-    public override ContentTypePropertyTypeModel Build()
-    {
-        var key = _key ?? Guid.NewGuid();
-        var containerKey = _containerKey;
-        var sortOrder = _sortOrder ?? 0;
-        var alias = _alias ?? "title";
-        var name = _name ?? "Title";
-        var description = _description;
-        var dataTypeKey = _dataTypeKey ?? Constants.DataTypes.Guids.TextareaGuid;
-        var variesByCulture = _variesByCulture;
-        var variesBySegment = _variesBySegment;
-        var validation = _validationBuilder.Build();
-        var appearance = _appearanceBuilder.Build();
-
-        return new ContentTypePropertyTypeModel
-        {
-            Key = key,
-            ContainerKey = containerKey,
-            SortOrder = sortOrder,
-            Alias = alias,
-            Name = name,
-            Description = description,
-            DataTypeKey = dataTypeKey,
-            VariesByCulture = variesByCulture,
-            VariesBySegment = variesBySegment,
-            Validation = validation,
-            Appearance = appearance,
-        };
+        return _model;
     }
 }

@@ -6,7 +6,7 @@
 // using Umbraco.Cms.Core.Services.OperationStatus;
 // using Umbraco.Cms.Tests.Common.Testing;
 // using Umbraco.Cms.Tests.Integration.Testing;
-// FIXME
+// FIXME: This is fixed in the release branch, uncomment this once that's merged in.
 // namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 //
 // [TestFixture]
@@ -37,7 +37,6 @@
 //         // Assert
 //         Assert.AreEqual(updateContentResult.Status, ContentEditingOperationStatus.Success);
 //         var textPageAfter = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
-//         // Should this not be null?
 //         Assert.AreEqual(textPageAfter.TemplateId, null);
 //     }
 // }
