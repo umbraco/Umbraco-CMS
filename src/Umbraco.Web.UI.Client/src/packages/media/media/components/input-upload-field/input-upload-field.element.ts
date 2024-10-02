@@ -74,6 +74,14 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 	constructor() {
 		super();
+	}
+
+	override updated(changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
+		super.updated(changedProperties);
+		if (changedProperties.has('value')) {
+			this.#setPreviewAlias();
+		}
+	}
 
 	async #getManifests() {
 		await new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'fileUploadPreview', null, (exts) => {
@@ -90,6 +98,10 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		}
 		// TODO: The dropzone uui component does not support file extensions without a dot. Remove this when it does.
 		this._extensions = extensions?.map((extension) => `.${extension}`);
+	}
+
+	async #setPreviewAlias(): Promise<void> {
+		this._previewAlias = await this.#getPreviewElementAlias();
 	}
 
 	async #getPreviewElementAlias() {
