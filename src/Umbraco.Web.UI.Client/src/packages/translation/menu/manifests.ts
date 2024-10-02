@@ -14,7 +14,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Translation Sidebar Menu',
 		weight: 100,
 		meta: {
-			label: '#sections_translation',
+			label: '#general_dictionary', // We are using dictionary here on purpose until dictionary has its own menu item.
 			menu: UMB_TRANSLATION_MENU_ALIAS,
 			entityType: 'dictionary-root', // hard-coded on purpose to avoid circular dependency. We need another way to add actions to a menu kind.
 		},
