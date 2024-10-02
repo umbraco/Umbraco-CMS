@@ -258,7 +258,8 @@ public class RichTextPropertyEditorHelperTests
         Guid[] itemGuids = [Guid.Parse("36cc710a-d8a6-45d0-a07f-7bbd8742cf02"), Guid.Parse("36cc710a-d8a6-45d0-a07f-7bbd8742cf03")];
 
         Assert.AreEqual(2, value.Blocks.ContentData.Count);
-        for (var i = 0; i < value.Blocks.ContentData.Count; i++) {
+        for (var i = 0; i < value.Blocks.ContentData.Count; i++)
+        {
             var item = value.Blocks.ContentData[i];
             Assert.AreEqual(contentTypeGuids[i], item.ContentTypeKey);
             Assert.AreEqual(itemGuids[i], item.Key);

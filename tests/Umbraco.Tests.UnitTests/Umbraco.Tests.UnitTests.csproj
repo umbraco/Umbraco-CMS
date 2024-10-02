@@ -12,10 +12,10 @@
           remove param, [SA1405] Debug.Assert message text, [ASP0019] header append, [CS0114] inherited
           member, [CS0661]/[CS0659], adjust overrides, [CS0414] unassigned field, [CS0252] confirm
           reference comparison, [IDE0060] remove parameter, [IDE1006] fix naming rule violation,
-          and remove overrides -->
+          [CS0612] obsolete, and remove overrides -->
     <WarningsNotAsErrors>
       SYSLIB0013,CS0618,CS1998,SA1117,CS0067,CA1822,CA1416,IDE0028,SA1401,SA1405
-      IDE0060,SA1405,ASP0019,CS0114,CS0661,CS0659,CS0414,CS0252,IDE0060,IDE1006
+      IDE0060,SA1405,ASP0019,CS0114,CS0661,CS0659,CS0414,CS0252,CS0612,IDE0060,IDE1006
     </WarningsNotAsErrors>
   </PropertyGroup>
   <ItemGroup>

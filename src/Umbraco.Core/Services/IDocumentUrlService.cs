@@ -6,10 +6,10 @@ namespace Umbraco.Cms.Core.Services;
 
 public interface IDocumentUrlService
 {
-
     /// <summary>
     /// Initializes the service and ensure the content in the database is correct with the current configuration.
     /// </summary>
+    /// <param name="forceEmpty"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task InitAsync(bool forceEmpty, CancellationToken cancellationToken);

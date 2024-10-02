@@ -59,11 +59,4 @@ public interface IUmbracoContext : IDisposable
     ///     Gets a value indicating whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
     /// </summary>
     bool InPreviewMode { get; }
-
-    // TODO: Do we need this?
-    /// <summary>
-    ///     Forces the context into preview
-    /// </summary>
-    /// <returns>A <see cref="IDisposable" /> instance to be disposed to exit the preview context</returns>
-    // IDisposable ForcedPreview(bool preview);
 }
