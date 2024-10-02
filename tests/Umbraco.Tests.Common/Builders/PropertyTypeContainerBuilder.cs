@@ -1,14 +1,12 @@
-﻿using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentTypeEditing;
+﻿using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
-public class PropertyTypeContainerBuilder<TParent>(TParent parentBuilder)
-    : ChildBuilderBase<TParent, ContentTypePropertyContainerModel>(parentBuilder),
-        IBuildPropertyTypes, IWithKeyBuilder, IWithParentKeyBuilder, IWithNameBuilder, IWithTypeBuilder,
-        IWithSortOrderBuilder
+public class PropertyTypeContainerBuilder<TParent, TModel>(TParent parentBuilder)
+    : ChildBuilderBase<TParent, TModel>(parentBuilder), IWithKeyBuilder, IWithParentKeyBuilder, IWithNameBuilder, IWithTypeBuilder, IWithSortOrderBuilder where TModel : PropertyTypeContainerModelBase, new()
 {
+    private readonly TModel _model = new();
     private Guid? _key;
     private Guid? _parentKey;
     private string _name;
@@ -45,22 +43,18 @@ public class PropertyTypeContainerBuilder<TParent>(TParent parentBuilder)
         set => _sortOrder = value;
     }
 
-    public override ContentTypePropertyContainerModel Build()
+    public override TModel Build()
     {
-        var key = _key ?? Guid.NewGuid();
-        var parentKey = _parentKey;
-        var name = _name ?? "Container";
-        var type = _type ?? "Group";
-        var sortOrder = _sortOrder ?? 0;
+        _model.Key = _key ?? Guid.NewGuid();
 
-
-        return new ContentTypePropertyContainerModel
+        if (_parentKey is not null)
         {
-            Key = key,
-            ParentKey = parentKey,
-            Name = name,
-            Type = type,
-            SortOrder = sortOrder,
-        };
+            _model.ParentKey = _parentKey;
+        }
+
+        _model.Name = _name ?? "Container";
+        _model.Type = _type ?? "Group";
+        _model.SortOrder = _sortOrder ?? 0;
+        return _model;
     }
 }
