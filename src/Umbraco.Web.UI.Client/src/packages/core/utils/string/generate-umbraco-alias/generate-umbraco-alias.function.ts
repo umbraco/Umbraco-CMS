@@ -1,4 +1,4 @@
-import { toCamelCase } from './to-camel-case/to-camel-case.function.js';
+import { toCamelCase } from '../to-camel-case/index.js';
 
 /**
  *

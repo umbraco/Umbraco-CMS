@@ -1,4 +1,4 @@
-import { splitStringToArray } from './string/split-string-to-array.js';
+import { splitStringToArray } from './split-string-to-array.function.js';
 import { expect } from '@open-wc/testing';
 
 describe('splitStringToArray', () => {
