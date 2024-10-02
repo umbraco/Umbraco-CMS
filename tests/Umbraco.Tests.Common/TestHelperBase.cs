@@ -206,7 +206,7 @@ public abstract class TestHelperBase
             throw new ArgumentException("relativePath must start with '~/'", nameof(relativePath));
         }
 
-        var codeBase = typeof(TestHelperBase).Assembly.CodeBase;
+        var codeBase = typeof(TestHelperBase).Assembly.Location;
         var uri = new Uri(codeBase);
         var path = uri.LocalPath;
         var bin = Path.GetDirectoryName(path);
