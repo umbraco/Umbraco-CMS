@@ -74,9 +74,13 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'fileUploadPreview', null, (manifests) => {
-			this.#manifests = manifests.map((manifest) => manifest.manifest);
-		});
+
+	async #getManifests() {
+		await new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'fileUploadPreview', null, (exts) => {
+			this.#manifests = exts.map((exts) => exts.manifest);
+		}).asPromise();
+
+		return this.#manifests;
 	}
 
 	#setExtensions(extensions: Array<string>) {
@@ -88,20 +92,24 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		this._extensions = extensions?.map((extension) => `.${extension}`);
 	}
 
-	#getPreviewElementAlias() {
-		const fallbackAlias = this.#manifests.find((manifest) => manifest.forMimeTypes.includes('*/*'))?.alias;
+	async #getPreviewElementAlias() {
+		if (!this.value.src) return;
+		const manifests = await this.#getManifests();
+		const fallbackAlias = manifests.find((manifest) =>
+			stringOrStringArrayContains(manifest.forMimeTypes, '*/*'),
+		)?.alias;
 
-		const mimeType = this.#getMimeTypeFromPath(this._src);
+		const mimeType = this.#getMimeTypeFromPath(this.value.src);
 		if (!mimeType) return fallbackAlias;
 
 		// Check for an exact match
-		const exactMatch = this.#manifests.find((manifest) => {
-			return manifest.forMimeTypes.includes(mimeType);
+		const exactMatch = manifests.find((manifest) => {
+			return stringOrStringArrayContains(manifest.forMimeTypes, mimeType);
 		});
 		if (exactMatch) return exactMatch.alias;
 
 		// Check for wildcard match (e.g. image/*)
-		const wildcardMatch = this.#manifests.find((manifest) => {
+		const wildcardMatch = manifests.find((manifest) => {
 			const forMimeTypes = Array.isArray(manifest.forMimeTypes) ? manifest.forMimeTypes : [manifest.forMimeTypes];
 			return forMimeTypes.find((type) => {
 				const snippet = type.replace(/\*/g, '');
