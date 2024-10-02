@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
+using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
@@ -97,7 +98,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        IEnumerable<ContentCacheNode> nodes = _databaseCacheRepository.GetContentByContentTypeKey([contentType.Key]);
+        IEnumerable<ContentCacheNode> nodes = _databaseCacheRepository.GetContentByContentTypeKey([contentType.Key], ContentCacheDataSerializerEntityType.Document);
         scope.Complete();
 
         return nodes
@@ -239,11 +240,11 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         scope.Complete();
     }
 
-    public void Rebuild(IReadOnlyCollection<int> contentTypeKeys)
+    public void Rebuild(IReadOnlyCollection<int> contentTypeIds)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        _databaseCacheRepository.Rebuild(contentTypeKeys.ToList());
-        IEnumerable<ContentCacheNode> contentByContentTypeKey = _databaseCacheRepository.GetContentByContentTypeKey(contentTypeKeys.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.DocumentType).Result));
+        _databaseCacheRepository.Rebuild(contentTypeIds.ToList());
+        IEnumerable<ContentCacheNode> contentByContentTypeKey = _databaseCacheRepository.GetContentByContentTypeKey(contentTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.DocumentType).Result), ContentCacheDataSerializerEntityType.Document);
 
         foreach (ContentCacheNode content in contentByContentTypeKey)
         {

@@ -17,7 +17,7 @@ public interface IDocumentCacheService
 
     Task DeleteItemAsync(IContentBase content);
 
-    void Rebuild(IReadOnlyCollection<int> contentTypeKeys);
+    void Rebuild(IReadOnlyCollection<int> contentTypeIds);
 
     internal IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType);
 }

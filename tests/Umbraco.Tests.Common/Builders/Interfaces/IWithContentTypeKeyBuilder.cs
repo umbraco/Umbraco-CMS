@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Tests.Common.Builders.Interfaces.ContentCreateModel;
+﻿namespace Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 public interface IWithContentTypeKeyBuilder
 {

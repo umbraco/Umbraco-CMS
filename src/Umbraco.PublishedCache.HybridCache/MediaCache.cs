@@ -18,17 +18,17 @@ public class MediaCache : IPublishedMediaCache
 
     public async Task<IPublishedContent?> GetByIdAsync(int id) => await _mediaCacheService.GetByIdAsync(id);
 
-    public async Task<IPublishedContent?> GetByKeyAsync(Guid key) => await _mediaCacheService.GetByKeyAsync(key);
+    public async Task<IPublishedContent?> GetByIdAsync(Guid key) => await _mediaCacheService.GetByKeyAsync(key);
 
     public IPublishedContent? GetById(bool preview, int contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
 
     public IPublishedContent? GetById(bool preview, Guid contentId) =>
-        GetByKeyAsync(contentId).GetAwaiter().GetResult();
+        GetByIdAsync(contentId).GetAwaiter().GetResult();
 
 
     public IPublishedContent? GetById(int contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
 
-    public IPublishedContent? GetById(Guid contentId) => GetByKeyAsync(contentId).GetAwaiter().GetResult();
+    public IPublishedContent? GetById(Guid contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
 
 
     public IPublishedContentType? GetContentType(Guid key) => _publishedContentTypeCache.Get(PublishedItemType.Media, key);

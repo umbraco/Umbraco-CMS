@@ -45,7 +45,7 @@ internal class CacheNodeFactory : ICacheNodeFactory
         switch (content.PublishedState)
         {
             case PublishedState.Published:
-                return preview;
+                return preview is false;
             case PublishedState.Publishing:
                 return preview is false || content.Published; // The type changes after this operation
             case PublishedState.Unpublished:
@@ -62,9 +62,10 @@ internal class CacheNodeFactory : ICacheNodeFactory
             case PublishedState.Published:
                 return preview ? content.TemplateId : content.PublishTemplateId;
             case PublishedState.Publishing:
-                return content.TemplateId;// The type changes after this operation is we need to read the draft values
             case PublishedState.Unpublished:
             case PublishedState.Unpublishing:
+                return content.TemplateId;
+
             default:
                 return null;
         }
