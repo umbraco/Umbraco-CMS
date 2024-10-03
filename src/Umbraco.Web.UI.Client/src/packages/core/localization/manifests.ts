@@ -251,4 +251,14 @@ export const manifests: Array<ManifestLocalization> = [
 		},
 		js: () => import('../../../assets/lang/zh-tw.js'),
 	},
+	{
+		type: 'localization',
+		alias: 'Umb.Localization.Ar',
+		weight: -100,
+		name: 'العربية',
+		meta: {
+			culture: 'ar',
+		},
+		js: () => import('../../../assets/lang/ar.js'),
+	}
 ];
