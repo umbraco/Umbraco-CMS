@@ -418,9 +418,9 @@ export class UmbDocumentWorkspaceContext
 
 	/**
 	 * @function propertyValueByAlias
-	 * @param {string} propertyAlias
-	 * @param {UmbVariantId} variantId
-	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @param {string} propertyAlias - The alias of the property
+	 * @param {UmbVariantId} variantId - The variant
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>} - An observable for the value of the property
 	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<PropertyValueType = unknown>(
@@ -436,9 +436,9 @@ export class UmbDocumentWorkspaceContext
 
 	/**
 	 * Get the current value of the property with the given alias and variantId.
-	 * @param alias
-	 * @param variantId
-	 * @returns The value or undefined if not set or found.
+	 * @param {string} alias - The alias of the property
+	 * @param {UmbVariantId | undefined} variantId - The variant id of the property
+	 * @returns {ReturnType | undefined} The value or undefined if not set or found.
 	 */
 	getPropertyValue<ReturnType = unknown>(alias: string, variantId?: UmbVariantId) {
 		const currentData = this.#data.getCurrent();
