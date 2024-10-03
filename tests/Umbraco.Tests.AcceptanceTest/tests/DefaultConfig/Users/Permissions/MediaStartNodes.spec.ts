@@ -11,7 +11,6 @@ const userGroupName = 'TestUserGroup';
 
 let rootFolderId = null
 let childFolderOneId = null;
-let childFolderTwoId = null;
 
 let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""}
 
@@ -32,7 +31,7 @@ test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   // The media name is redundant in the method, as well as default
   rootFolderId = await umbracoApi.media.createDefaultMediaFolder(rootFolderName);
   childFolderOneId = await umbracoApi.media.createDefaultMediaFolderAndParentId(childFolderOneName, rootFolderId);
-  childFolderTwoId = await umbracoApi.media.createDefaultMediaFolderAndParentId(childFolderTwoName, rootFolderId);
+  await umbracoApi.media.createDefaultMediaFolderAndParentId(childFolderTwoName, rootFolderId);
 
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMediaSection(userGroupName);
 
@@ -66,7 +65,6 @@ test('can see root media start node and children', async ({page, umbracoApi, umb
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderTwoName);
 });
 
-// Is this correct?
 test('can see parent and only child media start node', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId,  [], false, [childFolderOneId]);
@@ -78,6 +76,8 @@ test('can see parent and only child media start node', async ({page, umbracoApi,
 
   // Assert
   await umbracoUi.media.isMediaVisible(rootFolderName);
+  await umbracoUi.media.goToMediaWithName(rootFolderName);
+  await umbracoUi.media.isTextWithMessageVisible('The authenticated user do not have access to this resource');
   await umbracoUi.media.clickCaretButtonForMediaName(rootFolderName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderOneName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderTwoName, false);

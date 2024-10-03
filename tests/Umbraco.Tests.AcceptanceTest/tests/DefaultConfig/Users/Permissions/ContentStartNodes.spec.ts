@@ -58,7 +58,7 @@ test.afterEach(async ({umbracoApi}) => {
 
 
 //TODO: FIX NAMING
-test('can see root start node and children', async ({page, umbracoApi, umbracoUi}) => {
+test('can see root start node and children', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [rootDocumentId]);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
@@ -74,8 +74,7 @@ test('can see root start node and children', async ({page, umbracoApi, umbracoUi
   await umbracoUi.content.isChildContentVisible(rootDocumentName, childDocumentTwoName);
 });
 
-// Is this correct?
-test('can see parent and only child start node', async ({page, umbracoApi, umbracoUi}) => {
+test('can see parent and only child start node', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [childDocumentOneId]);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
@@ -86,6 +85,8 @@ test('can see parent and only child start node', async ({page, umbracoApi, umbra
 
   // Assert
   await umbracoUi.content.isContentVisible(rootDocumentName);
+  await umbracoUi.content.goToContentWithName(rootDocumentName);
+  await umbracoUi.content.isTextWithMessageVisible('The authenticated user do not have access to this resource');
   await umbracoUi.content.clickCaretButtonForContentName(rootDocumentName);
   await umbracoUi.content.isChildContentVisible(rootDocumentName, childDocumentOneName);
   await umbracoUi.content.isChildContentVisible(rootDocumentName, childDocumentTwoName, false);
