@@ -411,11 +411,11 @@ internal abstract class ContentNavigationServiceBase
     private static void BuildNavigationDictionary(ConcurrentDictionary<Guid, NavigationNode> nodesStructure, IList<Guid> roots, IEnumerable<INavigationModel> entities)
     {
         var entityList = entities.ToList();
-        IDictionary<int, Guid> idToKeyMap = entityList.ToDictionary(x => x.Id, x => x.Key);
+        var idToKeyMap = entityList.ToDictionary(x => x.Id, x => x.Key);
 
         foreach (INavigationModel entity in entityList)
         {
-            var node = new NavigationNode(entity.Key);
+            var node = new NavigationNode(entity.Key, entity.SortOrder);
             nodesStructure[entity.Key] = node;
 
             // We don't set the parent for items under root, it will stay null
@@ -433,7 +433,7 @@ internal abstract class ContentNavigationServiceBase
             // If the parent node exists in the nodesStructure, add the node to the parent's children (parent is set as well)
             if (nodesStructure.TryGetValue(parentKey, out NavigationNode? parentNode))
             {
-                parentNode.AddChild(node);
+                parentNode.AddChild(nodesStructure, entity.Key, entity.SortOrder);
             }
         }
     }
