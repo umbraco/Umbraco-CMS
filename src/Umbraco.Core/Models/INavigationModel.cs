@@ -18,6 +18,11 @@ public interface INavigationModel
     int ParentId { get; set; }
 
     /// <summary>
+    ///     Gets or sets the sort order of the entity.
+    /// </summary>
+    int SortOrder { get; set; }
+
+    /// <summary>
     ///     Gets or sets a value indicating whether this entity is in the recycle bin.
     /// </summary>
     bool Trashed { get; set; }
