@@ -4,16 +4,16 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AddRazorSupportForMvc Condition="'$(SupportPagesAndViews)' == 'True'">true</AddRazorSupportForMvc>
-    <RootNamespace Condition="'$(name)' != '$(name{-VALUE-FORMS-}safe_namespace)'">UmbracoPackage</RootNamespace>
-    <StaticWebAssetBasePath>App_Plugins/UmbracoPackage</StaticWebAssetBasePath>
+    <RootNamespace Condition="'$(name)' != '$(name{-VALUE-FORMS-}safe_namespace)'">UmbracoExtension</RootNamespace>
+    <StaticWebAssetBasePath>App_Plugins/UmbracoExtension</StaticWebAssetBasePath>
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>UmbracoPackage</PackageId>
-    <Product>UmbracoPackage</Product>
-    <Title>UmbracoPackage</Title>
+    <PackageId>UmbracoExtension</PackageId>
+    <Product>UmbracoExtension</Product>
+    <Title>UmbracoExtension</Title>
     <Description>...</Description>
-    <PackageTags>umbraco plugin package</PackageTags>
+    <PackageTags>umbraco plugin extension</PackageTags>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(SupportPagesAndViews)' == 'True'">
@@ -31,11 +31,13 @@
     <Content Update="tsconfig.json" Pack="False" />
   </ItemGroup>
 
+  <!-- DISCUSS -->
   <Target Name="NpmInstall" AfterTargets="Restore;Build" Inputs="package-lock.json" Outputs="node_modules\.package-lock.json">
     <Message Text="Installing NPM packages" Importance="High" />
     <Exec Command="npm ci --no-fund --no-audit --prefer-offline" />
   </Target>
 
+  <!-- DISCUSS -->
   <Target Name="NpmBuild" AfterTargets="Build;NpmInstall">
     <Message Text="Executing NPM build script" Importance="High" />
     <Exec Command="npm run build" />

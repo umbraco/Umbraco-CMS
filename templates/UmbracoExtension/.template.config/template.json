@@ -5,15 +5,15 @@
     "Web",
     "CMS",
     "Umbraco",
-    "Package",
+    "Extension",
     "Plugin",
     "Razor Class Library"
   ],
-  "name": "Umbraco Package",
-  "description": "An empty Umbraco package/plugin (Razor Class Library).",
-  "groupIdentity": "Umbraco.Templates.UmbracoPackage",
-  "identity": "Umbraco.Templates.UmbracoPackage.CSharp",
-  "shortName": "umbracopackage",
+  "name": "Umbraco Extension",
+  "description": "An empty Umbraco extension (Razor Class Library).",
+  "groupIdentity": "Umbraco.Templates.UmbracoExtension",
+  "identity": "Umbraco.Templates.UmbracoExtension",
+  "shortName": "umbraco-extension",
   "tags": {
     "language": "C#",
     "type": "project"

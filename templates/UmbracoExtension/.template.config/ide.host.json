@@ -3,8 +3,8 @@
   "order": 0,
   "icon": "../../icon.png",
   "description": {
-    "id": "UmbracoPackage",
-    "text": "Umbraco Package - An empty Umbraco package/plugin (Razor Class Library)."
+    "id": "UmbracoExtension",
+    "text": "Umbraco Extension - An empty Umbraco extension/plugin (Razor Class Library)."
   },
   "symbolInfo": [
     {
