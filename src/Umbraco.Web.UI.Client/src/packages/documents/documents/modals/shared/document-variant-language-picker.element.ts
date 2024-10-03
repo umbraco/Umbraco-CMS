@@ -104,7 +104,7 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 				? html`<div class="label-status">
 						<umb-localize key="languages_mandatoryLanguage">Mandatory language</umb-localize>
 					</div>`
-				: ''}
+				: nothing}
 		</div>`;
 	}
 
