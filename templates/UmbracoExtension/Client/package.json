@@ -1,18 +1,14 @@
 {
-  "name": "UmbracoPackage",
+  "name": "PROJECT_NAME_KEBABCASE_FOR_NPM",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "tsc && vite build --watch",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "lit": "^2.8.0"
+    "build": "tsc && vite build"
   },
   "devDependencies": {
-    "@umbraco-cms/backoffice": "^14.0.0--preview003",
+    "@umbraco-cms/backoffice": "^UMBRACO_VERSION_FROM_TEMPLATE",
     "typescript": "^5.2.2",
     "vite": "^4.4.9"
   }
