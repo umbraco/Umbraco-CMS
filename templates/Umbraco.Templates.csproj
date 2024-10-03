@@ -38,7 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="UmbracoExtension\Client\.vscode\extensions.ts" />
-    <None Include="UmbracoExtension\UmbracoPackage.csproj" />
+    <None Include="UmbracoExtension\UmbracoExtension.csproj" />
   </ItemGroup>
   <!-- Update template.json files with the default UmbracoVersion value set to the current build version -->
   <ItemGroup>

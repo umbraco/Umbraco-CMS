@@ -8,7 +8,7 @@
     {
       "name": "UmbracoExtension EntryPoint",
       "alias": "PROJECT_NAME_KEBABCASE_FOR_NPM.entrypoint",
-      "type": "entryPoint",
+      "type": "backofficeEntryPoint",
       "js": "/App_Plugins/UmbracoExtension/PROJECT_NAME_KEBABCASE_FOR_NPM.js"
     }
   ]
