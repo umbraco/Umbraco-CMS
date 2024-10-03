@@ -53,6 +53,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(rootDocumentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeOneName);
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeTwoName);
+  await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
 });
 
 
