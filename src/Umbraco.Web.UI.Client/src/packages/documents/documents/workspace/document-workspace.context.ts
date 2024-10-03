@@ -785,8 +785,6 @@ export class UmbDocumentWorkspaceContext
 
 		if (!result?.selection.length) return;
 
-		// TODO: Validate content & Save changes for the selected variants? — Or be clear that changes are not part of this action. [NL]
-
 		// Map to the correct format for the API (UmbDocumentVariantPublishModel)
 		const variants =
 			result?.selection.map<UmbDocumentVariantPublishModel>((x) => ({
@@ -795,6 +793,8 @@ export class UmbDocumentWorkspaceContext
 			})) ?? [];
 
 		if (!variants.length) return;
+
+		// TODO: Validate content & Save changes for the selected variants — This was how it worked in v.13 [NL]
 
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
@@ -833,7 +833,7 @@ export class UmbDocumentWorkspaceContext
 
 		if (!variantIds.length) return;
 
-		// TODO: Validate content & Save changes for the selected variants? — Or be clear that changes are not part of this action. [NL]
+		// TODO: Validate content & Save changes for the selected variants — This was how it worked in v.13 [NL]
 
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
