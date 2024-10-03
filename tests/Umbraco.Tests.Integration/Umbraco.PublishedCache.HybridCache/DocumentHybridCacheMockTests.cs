@@ -104,7 +104,8 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
             GetRequiredService<ICacheNodeFactory>(),
             GetSeedProviders(),
             Options.Create(new CacheSettings()),
-            GetRequiredService<IPublishedModelFactory>());
+            GetRequiredService<IPublishedModelFactory>(),
+            GetRequiredService<IPreviewService>());
 
         _mockedCache = new DocumentCache(_mockDocumentCacheService, GetRequiredService<IPublishedContentTypeCache>());
     }
