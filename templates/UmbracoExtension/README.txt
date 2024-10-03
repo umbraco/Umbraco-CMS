@@ -27,4 +27,4 @@
 * With the Umbraco website project running the Razor Class Library Project will refresh the browser when the build is complete
 
 == Other Resources ==
-* Umbraco Docs - https://docs.umbraco.com
+* Umbraco Docs - https://docs.umbraco.com/umbraco-cms/customizing/extend-and-customize-editing-experience
