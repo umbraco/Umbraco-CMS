@@ -19,6 +19,7 @@ using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 using Umbraco.Cms.Web.Common.Security;
 
@@ -64,11 +65,8 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
+        base.CustomTestSetup(builder);
         builder.Services.AddUnique<IBackOfficeExamineSearcher, BackOfficeExamineSearcher>();
-        builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
-        builder
-            .AddNotificationHandler<ContentTreeChangeNotification,
-                ContentTreeChangeDistributedCacheNotificationHandler>();
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddExamineIndexes();
         builder.Services.AddHostedService<QueuedHostedService>();

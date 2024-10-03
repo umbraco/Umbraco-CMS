@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -34,7 +35,7 @@ public class ContentService : RepositoryService, IContentService
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ICultureImpactFactory _cultureImpactFactory;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
-    private readonly IDocumentNavigationManagementService _documentNavigationManagementService;
+    private readonly PropertyEditorCollection _propertyEditorCollection;
     private IQuery<IContent>? _queryNotTrashed;
 
     #region Constructors
@@ -53,7 +54,7 @@ public class ContentService : RepositoryService, IContentService
         IShortStringHelper shortStringHelper,
         ICultureImpactFactory cultureImpactFactory,
         IUserIdKeyResolver userIdKeyResolver,
-        IDocumentNavigationManagementService documentNavigationManagementService)
+        PropertyEditorCollection propertyEditorCollection)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
@@ -66,7 +67,7 @@ public class ContentService : RepositoryService, IContentService
         _shortStringHelper = shortStringHelper;
         _cultureImpactFactory = cultureImpactFactory;
         _userIdKeyResolver = userIdKeyResolver;
-        _documentNavigationManagementService = documentNavigationManagementService;
+        _propertyEditorCollection = propertyEditorCollection;
         _logger = loggerFactory.CreateLogger<ContentService>();
     }
 
@@ -99,11 +100,11 @@ public class ContentService : RepositoryService, IContentService
             shortStringHelper,
             cultureImpactFactory,
             userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationManagementService>())
+            StaticServiceProvider.Instance.GetRequiredService<PropertyEditorCollection>())
     {
     }
 
-    [Obsolete("Use constructor that takes IUserIdKeyResolver as a parameter, scheduled for removal in V15")]
+    [Obsolete("Use non-obsolete constructor. Scheduled for removal in V16.")]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -131,7 +132,7 @@ public class ContentService : RepositoryService, IContentService
             shortStringHelper,
             cultureImpactFactory,
             StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationManagementService>())
+            StaticServiceProvider.Instance.GetRequiredService<PropertyEditorCollection>())
     {
     }
 
@@ -392,11 +393,9 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentNullException(nameof(parent));
         }
 
-        IContentType contentType = GetContentType(contentTypeAlias);
-        if (contentType == null)
-        {
-            throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias)); // causes rollback
-        }
+        IContentType contentType = GetContentType(contentTypeAlias)
+            // causes rollback
+            ?? throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
 
         var content = new Content(name, parent, contentType, userId);
 
@@ -420,11 +419,11 @@ public class ContentService : RepositoryService, IContentService
             // locking the content tree secures content types too
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            IContentType contentType = GetContentType(contentTypeAlias); // + locks
-            if (contentType == null)
-            {
-                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias)); // causes rollback
-            }
+            IContentType contentType = GetContentType(contentTypeAlias)
+                // + locks
+                ??
+                // causes rollback
+                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
 
             IContent? parent = parentId > 0 ? GetById(parentId) : null; // + locks
             if (parentId > 0 && parent == null)
@@ -466,11 +465,11 @@ public class ContentService : RepositoryService, IContentService
             // locking the content tree secures content types too
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            IContentType contentType = GetContentType(contentTypeAlias); // + locks
-            if (contentType == null)
-            {
-                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias)); // causes rollback
-            }
+            IContentType contentType = GetContentType(contentTypeAlias)
+            // + locks
+                ??
+                // causes rollback
+                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
 
             var content = new Content(name, parent, contentType, userId);
 
@@ -620,10 +619,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentOutOfRangeException(nameof(pageSize));
         }
 
-        if (ordering == null)
-        {
-            ordering = Ordering.By("sortOrder");
-        }
+        ordering ??= Ordering.By("sortOrder");
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -651,10 +647,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentOutOfRangeException(nameof(pageSize));
         }
 
-        if (ordering == null)
-        {
-            ordering = Ordering.By("sortOrder");
-        }
+        ordering ??= Ordering.By("sortOrder");
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -811,10 +804,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentOutOfRangeException(nameof(pageSize));
         }
 
-        if (ordering == null)
-        {
-            ordering = Ordering.By("sortOrder");
-        }
+        ordering ??= Ordering.By("sortOrder");
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -828,10 +818,7 @@ public class ContentService : RepositoryService, IContentService
     /// <inheritdoc />
     public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter = null, Ordering? ordering = null)
     {
-        if (ordering == null)
-        {
-            ordering = Ordering.By("Path");
-        }
+        ordering ??= Ordering.By("Path");
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -969,10 +956,7 @@ public class ContentService : RepositoryService, IContentService
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            if (ordering == null)
-            {
-                ordering = Ordering.By("Path");
-            }
+            ordering ??= Ordering.By("Path");
 
             scope.ReadLock(Constants.Locks.ContentTree);
             IQuery<IContent>? query = Query<IContent>()?
@@ -1072,11 +1056,6 @@ public class ContentService : RepositoryService, IContentService
             // have always changed if it's been saved in the back office but that's not really fail safe.
             _documentRepository.Save(content);
 
-            // Updates in-memory navigation structure - we only handle new items, other updates are not a concern
-            UpdateInMemoryNavigationStructure(
-                "Umbraco.Cms.Core.Services.ContentService.Save-with-contentSchedule",
-                () => _documentNavigationManagementService.Add(content.Key, GetParent(content)?.Key));
-
             if (contentSchedule != null)
             {
                 _documentRepository.PersistContentSchedule(content, contentSchedule);
@@ -1140,11 +1119,6 @@ public class ContentService : RepositoryService, IContentService
                 content.WriterId = userId;
 
                 _documentRepository.Save(content);
-
-                // Updates in-memory navigation structure - we only handle new items, other updates are not a concern
-                UpdateInMemoryNavigationStructure(
-                    "Umbraco.Cms.Core.Services.ContentService.Save",
-                    () => _documentNavigationManagementService.Add(content.Key, GetParent(content)?.Key));
             }
 
             scope.Notifications.Publish(
@@ -1242,9 +1216,10 @@ public class ContentService : RepositoryService, IContentService
 
             // publish the culture(s)
             // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
+            var publishTime = DateTime.Now;
             foreach (CultureImpact? impact in impacts)
             {
-                content.PublishCulture(impact);
+                content.PublishCulture(impact, publishTime, _propertyEditorCollection);
             }
 
             // Change state to publishing
@@ -1409,6 +1384,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="scope"></param>
     /// <param name="content"></param>
     /// <param name="allLangs"></param>
+    /// <param name="notificationState"></param>
     /// <param name="userId"></param>
     /// <param name="branchOne"></param>
     /// <param name="branchRoot"></param>
@@ -1879,8 +1855,8 @@ public class ContentService : RepositoryService, IContentService
 
                         // publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                         IProperty[]? invalidProperties = null;
-                        var impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(allLangs.Value, culture));
-                        var tryPublish = d.PublishCulture(impact) &&
+                        CultureImpact impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(allLangs.Value, culture));
+                        var tryPublish = d.PublishCulture(impact, date, _propertyEditorCollection) &&
                                          _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
                         if (invalidProperties != null && invalidProperties.Length > 0)
                         {
@@ -1957,17 +1933,19 @@ public class ContentService : RepositoryService, IContentService
     {
         // variant content type - publish specified cultures
         // invariant content type - publish only the invariant culture
+
+        var publishTime = DateTime.Now;
         if (content.ContentType.VariesByCulture())
         {
             return culturesToPublish.All(culture =>
             {
-                var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
-                return content.PublishCulture(impact) &&
+                CultureImpact? impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
+                return content.PublishCulture(impact, publishTime, _propertyEditorCollection) &&
                        _propertyValidationService.Value.IsPropertyDataValid(content, out _, impact);
             });
         }
 
-        return content.PublishCulture(_cultureImpactFactory.ImpactInvariant())
+        return content.PublishCulture(_cultureImpactFactory.ImpactInvariant(), publishTime, _propertyEditorCollection)
                && _propertyValidationService.Value.IsPropertyDataValid(content, out _, _cultureImpactFactory.ImpactInvariant());
     }
 
@@ -1977,10 +1955,7 @@ public class ContentService : RepositoryService, IContentService
         // if published, republish
         if (published)
         {
-            if (cultures == null)
-            {
-                cultures = new HashSet<string>(); // empty means 'already published'
-            }
+            cultures ??= new HashSet<string>(); // empty means 'already published'
 
             if (edited)
             {
@@ -1996,10 +1971,7 @@ public class ContentService : RepositoryService, IContentService
             return cultures; // null means 'nothing to do'
         }
 
-        if (cultures == null)
-        {
-            cultures = new HashSet<string>();
-        }
+        cultures ??= new HashSet<string>();
 
         cultures.Add(c); // <culture> means 'publish this culture'
         return cultures;
@@ -2065,7 +2037,7 @@ public class ContentService : RepositoryService, IContentService
     {
         // note: EditedValue and PublishedValue are objects here, so it is important to .Equals()
         // and not to == them, else we would be comparing references, and that is a bad thing
-        cultures = cultures ?? Array.Empty<string>();
+        cultures ??= Array.Empty<string>();
 
         if (content.ContentType.VariesByCulture() is false && cultures.Length == 0)
         {
@@ -2336,26 +2308,6 @@ public class ContentService : RepositoryService, IContentService
         }
 
         DoDelete(content);
-
-        if (content.Trashed)
-        {
-            // Updates in-memory navigation structure for recycle bin items
-            UpdateInMemoryNavigationStructure(
-                "Umbraco.Cms.Core.Services.ContentService.DeleteLocked-trashed",
-                () => _documentNavigationManagementService.RemoveFromBin(content.Key));
-        }
-        else
-        {
-            // Updates in-memory navigation structure for both documents and recycle bin items
-            // as the item needs to be deleted whether it is in the recycle bin or not
-            UpdateInMemoryNavigationStructure(
-                "Umbraco.Cms.Core.Services.ContentService.DeleteLocked",
-                () =>
-                {
-                    _documentNavigationManagementService.MoveToBin(content.Key);
-                    _documentNavigationManagementService.RemoveFromBin(content.Key);
-                });
-        }
     }
 
     // TODO: both DeleteVersions methods below have an issue. Sort of. They do NOT take care of files the way
@@ -2580,8 +2532,6 @@ public class ContentService : RepositoryService, IContentService
     // trash indicates whether we are trashing, un-trashing, or not changing anything
     private void PerformMoveLocked(IContent content, int parentId, IContent? parent, int userId, ICollection<(IContent, string)> moves, bool? trash)
     {
-        // Needed to update the in-memory navigation structure
-        var cameFromRecycleBin = content.ParentId == Constants.System.RecycleBinContent;
         content.WriterId = userId;
         content.ParentId = parentId;
 
@@ -2630,33 +2580,6 @@ public class ContentService : RepositoryService, IContentService
             }
         }
         while (total > pageSize);
-
-        if (parentId == Constants.System.RecycleBinContent)
-        {
-            // Updates in-memory navigation structure for both document items and recycle bin items
-            // as we are moving to recycle bin
-            UpdateInMemoryNavigationStructure(
-                "Umbraco.Cms.Core.Services.ContentService.PerformMoveLocked-to-recycle-bin",
-                () => _documentNavigationManagementService.MoveToBin(content.Key));
-        }
-        else
-        {
-            if (cameFromRecycleBin)
-            {
-                // Updates in-memory navigation structure for both document items and recycle bin items
-                // as we are restoring from recycle bin
-                UpdateInMemoryNavigationStructure(
-                    "Umbraco.Cms.Core.Services.ContentService.PerformMoveLocked-restore",
-                    () => _documentNavigationManagementService.RestoreFromBin(content.Key, parent?.Key));
-            }
-            else
-            {
-                // Updates in-memory navigation structure
-                UpdateInMemoryNavigationStructure(
-                    "Umbraco.Cms.Core.Services.ContentService.PerformMoveLocked",
-                    () => _documentNavigationManagementService.Move(content.Key, parent?.Key));
-            }
-        }
     }
 
     private void PerformMoveContentLocked(IContent content, int userId, bool? trash)
@@ -2751,7 +2674,6 @@ public class ContentService : RepositoryService, IContentService
     /// </summary>
     /// <param name="content">The <see cref="IContent" /> to copy</param>
     /// <param name="parentId">Id of the Content's new Parent</param>
-    /// <param name="parentKey">Key of the Content's new Parent</param>
     /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
     /// <param name="recursive">A value indicating whether to recursively copy children.</param>
     /// <param name="userId">Optional Id of the User copying the Content</param>
@@ -2860,20 +2782,6 @@ public class ContentService : RepositoryService, IContentService
                         idmap[descendant.Id] = descendantCopy.Id;
                     }
                 }
-            }
-
-            if (navigationUpdates.Count > 0)
-            {
-                // Updates in-memory navigation structure
-                UpdateInMemoryNavigationStructure(
-                    "Umbraco.Cms.Core.Services.ContentService.Copy",
-                    () =>
-                    {
-                        foreach (Tuple<Guid, Guid?> update in navigationUpdates)
-                        {
-                            _documentNavigationManagementService.Add(update.Item1, update.Item2);
-                        }
-                    });
             }
 
             // not handling tags here, because
@@ -3177,6 +3085,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="evtMsgs"></param>
     /// <param name="culturesPublishing"></param>
     /// <param name="allLangs"></param>
+    /// <param name="notificationState"></param>
     /// <returns></returns>
     private PublishResult StrategyCanPublish(
         ICoreScope scope,
@@ -3200,7 +3109,8 @@ public class ContentService : RepositoryService, IContentService
                     .ToArray();
 
         // publish the culture(s)
-        if (!impactsToPublish.All(content.PublishCulture))
+        var publishTime = DateTime.Now;
+        if (!impactsToPublish.All(impact => content.PublishCulture(impact, publishTime, _propertyEditorCollection)))
         {
             return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
         }
@@ -3420,6 +3330,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="scope"></param>
     /// <param name="content"></param>
     /// <param name="evtMsgs"></param>
+    /// <param name="notificationState"></param>
     /// <returns></returns>
     private PublishResult StrategyCanUnpublish(
         ICoreScope scope,
@@ -3428,7 +3339,7 @@ public class ContentService : RepositoryService, IContentService
         IDictionary<string, object?>? notificationState)
     {
         // raise Unpublishing notification
-        var notification = new ContentUnpublishingNotification(content, evtMsgs).WithState(notificationState);
+        ContentUnpublishingNotification notification = new ContentUnpublishingNotification(content, evtMsgs).WithState(notificationState);
         var notificationResult = scope.Notifications.PublishCancelable(notification);
 
         if (notificationResult)
@@ -3606,13 +3517,11 @@ public class ContentService : RepositoryService, IContentService
         scope.ReadLock(Constants.Locks.ContentTypes);
 
         IQuery<IContentType> query = Query<IContentType>().Where(x => x.Alias == contentTypeAlias);
-        IContentType? contentType = _contentTypeRepository.Get(query).FirstOrDefault();
-
-        if (contentType == null)
-        {
-            throw new Exception(
-                $"No ContentType matching the passed in Alias: '{contentTypeAlias}' was found"); // causes rollback
-        }
+        IContentType? contentType = _contentTypeRepository.Get(query).FirstOrDefault()
+            ??
+        // causes rollback
+            throw new Exception($"No ContentType matching the passed in Alias: '{contentTypeAlias}'" +
+            $" was found");
 
         return contentType;
     }
@@ -3818,28 +3727,4 @@ public class ContentService : RepositoryService, IContentService
 
     #endregion
 
-    /// <summary>
-    ///     Enlists an action in the current scope context to update the in-memory navigation structure
-    ///     when the scope completes successfully.
-    /// </summary>
-    /// <param name="enlistingActionKey">The unique key identifying the action to be enlisted.</param>
-    /// <param name="updateNavigation">The action to be performed for updating the in-memory navigation structure.</param>
-    /// <exception cref="NullReferenceException">Thrown when the scope context is null and therefore cannot be used.</exception>
-    private void UpdateInMemoryNavigationStructure(string enlistingActionKey, Action updateNavigation)
-    {
-        IScopeContext? scopeContext = ScopeProvider.Context;
-
-        if (scopeContext is null)
-        {
-            throw new NullReferenceException($"The {nameof(scopeContext)} is null and cannot be used.");
-        }
-
-        scopeContext.Enlist(enlistingActionKey, completed =>
-        {
-            if (completed)
-            {
-                updateNavigation();
-            }
-        });
-    }
 }

@@ -48,6 +48,7 @@ public class ExamineExternalIndexTests : ExamineBaseTest
         Services.DisposeIfDisposable();
     }
 
+
     private IExamineExternalIndexSearcherTest ExamineExternalIndexSearcher =>
         GetRequiredService<IExamineExternalIndexSearcherTest>();
 
@@ -66,11 +67,8 @@ public class ExamineExternalIndexTests : ExamineBaseTest
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
+        base.CustomTestSetup(builder);
         builder.Services.AddUnique<IExamineExternalIndexSearcherTest, ExamineExternalIndexSearcherTest>();
-        builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
-        builder
-            .AddNotificationHandler<ContentTreeChangeNotification,
-                ContentTreeChangeDistributedCacheNotificationHandler>();
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddExamineIndexes();
         builder.Services.AddHostedService<QueuedHostedService>();

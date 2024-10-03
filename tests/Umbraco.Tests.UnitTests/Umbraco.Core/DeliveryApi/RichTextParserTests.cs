@@ -259,7 +259,7 @@ public class RichTextParserTests : PropertyValueConverterTests
         var id = Guid.NewGuid();
 
         var tagName = $"umb-rte-block{(inlineBlock ? "-inline" : string.Empty)}";
-        var element = parser.Parse($"<p><{tagName} data-content-udi=\"umb://element/{id:N}\"><!--Umbraco-Block--></{tagName}></p>") as RichTextRootElement;
+        var element = parser.Parse($"<p><{tagName} data-content-key=\"{id:N}\"><!--Umbraco-Block--></{tagName}></p>") as RichTextRootElement;
         Assert.IsNotNull(element);
         var paragraph = element.Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(paragraph);
@@ -296,7 +296,7 @@ public class RichTextParserTests : PropertyValueConverterTests
             });
 
         var tagName = $"umb-rte-block{(inlineBlock ? "-inline" : string.Empty)}";
-        var element = parser.Parse($"<p><{tagName} data-content-udi=\"umb://element/{block1ContentId:N}\"><!--Umbraco-Block--></{tagName}><{tagName} data-content-udi=\"umb://element/{block2ContentId:N}\"><!--Umbraco-Block--></{tagName}></p>", richTextBlockModel) as RichTextRootElement;
+        var element = parser.Parse($"<p><{tagName} data-content-key=\"{block1ContentId:N}\"><!--Umbraco-Block--></{tagName}><{tagName} data-content-key=\"{block2ContentId:N}\"><!--Umbraco-Block--></{tagName}></p>", richTextBlockModel) as RichTextRootElement;
         Assert.IsNotNull(element);
         var paragraph = element.Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(paragraph);
@@ -333,7 +333,7 @@ public class RichTextParserTests : PropertyValueConverterTests
         var id1 = Guid.NewGuid();
         var id2 = Guid.NewGuid();
 
-        var element = parser.Parse($"<p><umb-rte-block-inline data-content-udi=\"umb://element/{id1:N}\"><!--Umbraco-Block--></umb-rte-block-inline></p><umb-rte-block data-content-udi=\"umb://element/{id2:N}\"><!--Umbraco-Block--></umb-rte-block>") as RichTextRootElement;
+        var element = parser.Parse($"<p><umb-rte-block-inline data-content-key=\"{id1:N}\"><!--Umbraco-Block--></umb-rte-block-inline></p><umb-rte-block data-content-key=\"{id2:N}\"><!--Umbraco-Block--></umb-rte-block>") as RichTextRootElement;
         Assert.IsNotNull(element);
         Assert.AreEqual(2, element.Elements.Count());
 
@@ -435,7 +435,7 @@ public class RichTextParserTests : PropertyValueConverterTests
         var id = Guid.NewGuid();
 
         var tagName = $"umb-rte-block{(inlineBlock ? "-inline" : string.Empty)}";
-        var result = parser.Parse($"<p><{tagName} data-content-udi=\"umb://element/{id:N}\"><!--Umbraco-Block--></{tagName}></p>");
+        var result = parser.Parse($"<p><{tagName} data-content-key=\"{id:N}\"><!--Umbraco-Block--></{tagName}></p>");
         Assert.AreEqual($"<p><{tagName} data-content-id=\"{id:D}\"></{tagName}></p>", result);
     }
 
@@ -446,34 +446,36 @@ public class RichTextParserTests : PropertyValueConverterTests
         var id1 = Guid.NewGuid();
         var id2 = Guid.NewGuid();
 
-        var result = parser.Parse($"<p><umb-rte-block-inline data-content-udi=\"umb://element/{id1:N}\"><!--Umbraco-Block--></umb-rte-block-inline></p><umb-rte-block data-content-udi=\"umb://element/{id2:N}\"><!--Umbraco-Block--></umb-rte-block>");
+        var result = parser.Parse($"<p><umb-rte-block-inline data-content-key=\"{id1:D}\"><!--Umbraco-Block--></umb-rte-block-inline></p><umb-rte-block data-content-key=\"{id2:D}\"><!--Umbraco-Block--></umb-rte-block>");
         Assert.AreEqual($"<p><umb-rte-block-inline data-content-id=\"{id1:D}\"></umb-rte-block-inline></p><umb-rte-block data-content-id=\"{id2:D}\"></umb-rte-block>", result);
     }
 
     private ApiRichTextElementParser CreateRichTextElementParser()
     {
-        SetupTestContent(out var routeBuilder, out var snapshotAccessor, out var urlProvider);
+        SetupTestContent(out var routeBuilder, out var cacheManager, out var urlProvider);
 
         return new ApiRichTextElementParser(
             routeBuilder,
             urlProvider,
-            snapshotAccessor,
+            cacheManager.Content,
+            cacheManager.Media,
             new ApiElementBuilder(CreateOutputExpansionStrategyAccessor()),
             Mock.Of<ILogger<ApiRichTextElementParser>>());
     }
 
     private ApiRichTextMarkupParser CreateRichTextMarkupParser()
     {
-        SetupTestContent(out var routeBuilder, out var snapshotAccessor, out var urlProvider);
+        SetupTestContent(out var routeBuilder, out var cacheManager, out var urlProvider);
 
         return new ApiRichTextMarkupParser(
             routeBuilder,
             urlProvider,
-            snapshotAccessor,
+            cacheManager.Content,
+            cacheManager.Media,
             Mock.Of<ILogger<ApiRichTextMarkupParser>>());
     }
 
-    private void SetupTestContent(out IApiContentRouteBuilder routeBuilder, out IPublishedSnapshotAccessor snapshotAccessor, out IApiMediaUrlProvider apiMediaUrlProvider)
+    private void SetupTestContent(out IApiContentRouteBuilder routeBuilder, out ICacheManager cacheManager, out IApiMediaUrlProvider apiMediaUrlProvider)
     {
         var contentMock = new Mock<IPublishedContent>();
         contentMock.SetupGet(m => m.Key).Returns(_contentKey);
@@ -484,17 +486,14 @@ public class RichTextParserTests : PropertyValueConverterTests
         mediaMock.SetupGet(m => m.ItemType).Returns(PublishedItemType.Media);
 
         var contentCacheMock = new Mock<IPublishedContentCache>();
-        contentCacheMock.Setup(m => m.GetById(new GuidUdi(Constants.UdiEntityType.Document, _contentKey))).Returns(contentMock.Object);
+        contentCacheMock.Setup(m => m.GetById(_contentKey)).Returns(contentMock.Object);
         var mediaCacheMock = new Mock<IPublishedMediaCache>();
-        mediaCacheMock.Setup(m => m.GetById(new GuidUdi(Constants.UdiEntityType.Media, _mediaKey))).Returns(mediaMock.Object);
+        mediaCacheMock.Setup(m => m.GetById(_mediaKey)).Returns(mediaMock.Object);
 
-        var snapshotMock = new Mock<IPublishedSnapshot>();
-        snapshotMock.SetupGet(m => m.Content).Returns(contentCacheMock.Object);
-        snapshotMock.SetupGet(m => m.Media).Returns(mediaCacheMock.Object);
-
-        var snapshot = snapshotMock.Object;
-        var snapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
-        snapshotAccessorMock.Setup(m => m.TryGetPublishedSnapshot(out snapshot)).Returns(true);
+        var cacheManagerMock = new Mock<ICacheManager>();
+        cacheManagerMock.SetupGet(m => m.Content).Returns(contentCacheMock.Object);
+        cacheManagerMock.SetupGet(m => m.Media).Returns(mediaCacheMock.Object);
+        cacheManager = cacheManagerMock.Object;
 
         var routeBuilderMock = new Mock<IApiContentRouteBuilder>();
         routeBuilderMock
@@ -507,7 +506,6 @@ public class RichTextParserTests : PropertyValueConverterTests
             .Returns("/some-media-url");
 
         routeBuilder = routeBuilderMock.Object;
-        snapshotAccessor = snapshotAccessorMock.Object;
         apiMediaUrlProvider = apiMediaUrlProviderMock.Object;
     }
 
@@ -522,7 +520,7 @@ public class RichTextParserTests : PropertyValueConverterTests
         element.SetupGet(c => c.ContentType).Returns(elementType.Object);
 
         var numberPropertyType = SetupPublishedPropertyType(new IntegerValueConverter(), "number", Constants.PropertyEditors.Aliases.Label);
-        var property = new PublishedElementPropertyBase(numberPropertyType, element.Object, false, PropertyCacheLevel.None, propertyValue);
+        var property = new PublishedElementPropertyBase(numberPropertyType, element.Object, false, PropertyCacheLevel.None, CacheManager, propertyValue);
 
         element.SetupGet(c => c.Properties).Returns(new[] { property });
         return element.Object;

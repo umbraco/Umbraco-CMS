@@ -77,7 +77,7 @@ public class MigrationPlanTests
             loggerFactory,
             migrationBuilder,
             databaseFactory,
-            Mock.Of<IPublishedSnapshotService>(), distributedCache, Mock.Of<IKeyValueService>(), Mock.Of<IServiceScopeFactory>());
+            Mock.Of<IDatabaseCacheRebuilder>(), distributedCache, Mock.Of<IKeyValueService>(), Mock.Of<IServiceScopeFactory>());
 
         var plan = new MigrationPlan("default")
             .From(string.Empty)

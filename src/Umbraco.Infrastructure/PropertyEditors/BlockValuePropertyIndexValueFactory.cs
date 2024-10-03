@@ -24,8 +24,10 @@ internal sealed class BlockValuePropertyIndexValueFactory :
     protected override IContentType? GetContentTypeOfNestedItem(BlockItemData input, IDictionary<Guid, IContentType> contentTypeDictionary)
         => contentTypeDictionary.TryGetValue(input.ContentTypeKey, out var result) ? result : null;
 
-    protected override IDictionary<string, object?> GetRawProperty(BlockItemData blockItemData) =>
-        blockItemData.RawPropertyValues;
+    protected override IDictionary<string, object?> GetRawProperty(BlockItemData blockItemData)
+        => blockItemData.Values
+            .Where(p => p.Culture is null && p.Segment is null)
+            .ToDictionary(p => p.Alias, p => p.Value);
 
     protected override IEnumerable<BlockItemData> GetDataItems(IndexValueFactoryBlockValue input) => input.ContentData;
 

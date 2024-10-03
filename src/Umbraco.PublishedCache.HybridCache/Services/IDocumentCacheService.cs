@@ -9,13 +9,15 @@ public interface IDocumentCacheService
 
     Task<IPublishedContent?> GetByIdAsync(int id, bool preview = false);
 
-    Task SeedAsync(IReadOnlyCollection<Guid> contentTypeKeys);
+    Task SeedAsync(CancellationToken cancellationToken);
 
     Task<bool> HasContentByIdAsync(int id, bool preview = false);
 
     Task RefreshContentAsync(IContent content);
 
-    Task DeleteItemAsync(int id);
+    Task DeleteItemAsync(IContentBase content);
 
-    void Rebuild(IReadOnlyCollection<int> contentTypeKeys);
+    void Rebuild(IReadOnlyCollection<int> contentTypeIds);
+
+    internal IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType);
 }

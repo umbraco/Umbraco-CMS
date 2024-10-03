@@ -11,6 +11,8 @@ using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
+using Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders.Document;
+using Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders.Media;
 using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
 
@@ -42,6 +44,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IPublishedContentFactory, PublishedContentFactory>();
         builder.Services.AddSingleton<ICacheNodeFactory, CacheNodeFactory>();
         builder.Services.AddSingleton<ICacheManager, CacheManager>();
+        builder.Services.AddSingleton<IDatabaseCacheRebuilder, DatabaseCacheRebuilder>();
         builder.Services.AddSingleton<IContentCacheDataSerializerFactory>(s =>
         {
             IOptions<NuCacheSettings> options = s.GetRequiredService<IOptions<NuCacheSettings>>();
@@ -60,8 +63,22 @@ public static class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<ContentDeletedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<MediaRefreshNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<MediaDeletedNotification, CacheRefreshingNotificationHandler>();
-        builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, SeedingNotificationHandler>();
         builder.AddNotificationAsyncHandler<ContentTypeRefreshedNotification, CacheRefreshingNotificationHandler>();
+        builder.AddNotificationAsyncHandler<ContentTypeDeletedNotification, CacheRefreshingNotificationHandler>();
+        builder.AddNotificationAsyncHandler<MediaTypeRefreshedNotification, CacheRefreshingNotificationHandler>();
+        builder.AddNotificationAsyncHandler<MediaTypeDeletedNotification, CacheRefreshingNotificationHandler>();
+        builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, SeedingNotificationHandler>();
+        builder.AddCacheSeeding();
+        return builder;
+    }
+
+    private static IUmbracoBuilder AddCacheSeeding(this IUmbracoBuilder builder)
+    {
+        builder.Services.AddSingleton<IDocumentSeedKeyProvider, ContentTypeSeedKeyProvider>();
+        builder.Services.AddSingleton<IDocumentSeedKeyProvider, DocumentBreadthFirstKeyProvider>();
+
+
+        builder.Services.AddSingleton<IMediaSeedKeyProvider, MediaBreadthFirstKeyProvider>();
         return builder;
     }
 }

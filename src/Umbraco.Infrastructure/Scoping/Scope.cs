@@ -565,8 +565,8 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 
             TryFinally(
                 HandleScopedFileSystems,
-                HandleScopedNotifications,
                 HandleScopeContext,
+                HandleScopedNotifications,
                 HandleDetachedScopes);
         }
 

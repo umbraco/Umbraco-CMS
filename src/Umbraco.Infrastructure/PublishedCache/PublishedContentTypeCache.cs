@@ -302,6 +302,9 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
             case PublishedItemType.Member:
                 k = "m";
                 break;
+            case PublishedItemType.Element:
+                k = "e";
+                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(itemType));
         }
@@ -314,6 +317,7 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
         IContentTypeComposition? contentType = itemType switch
         {
             PublishedItemType.Content => _contentTypeService?.Get(key),
+            PublishedItemType.Element => _contentTypeService?.Get(key),
             PublishedItemType.Media => _mediaTypeService?.Get(key),
             PublishedItemType.Member => _memberTypeService?.Get(key),
             _ => throw new ArgumentOutOfRangeException(nameof(itemType)),

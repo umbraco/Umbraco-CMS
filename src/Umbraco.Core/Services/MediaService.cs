@@ -29,7 +29,6 @@ namespace Umbraco.Cms.Core.Services
         private readonly IEntityRepository _entityRepository;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
-        private readonly IMediaNavigationManagementService _mediaNavigationManagementService;
 
         private readonly MediaFileManager _mediaFileManager;
 
@@ -45,8 +44,7 @@ namespace Umbraco.Cms.Core.Services
             IMediaTypeRepository mediaTypeRepository,
             IEntityRepository entityRepository,
             IShortStringHelper shortStringHelper,
-            IUserIdKeyResolver userIdKeyResolver,
-            IMediaNavigationManagementService mediaNavigationManagementService)
+            IUserIdKeyResolver userIdKeyResolver)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _mediaFileManager = mediaFileManager;
@@ -56,36 +54,7 @@ namespace Umbraco.Cms.Core.Services
             _entityRepository = entityRepository;
             _shortStringHelper = shortStringHelper;
             _userIdKeyResolver = userIdKeyResolver;
-            _mediaNavigationManagementService = mediaNavigationManagementService;
         }
-
-        [Obsolete("Use non-obsolete constructor. Scheduled for removal in V16.")]
-        public MediaService(
-            ICoreScopeProvider provider,
-            MediaFileManager mediaFileManager,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IMediaRepository mediaRepository,
-            IAuditRepository auditRepository,
-            IMediaTypeRepository mediaTypeRepository,
-            IEntityRepository entityRepository,
-            IShortStringHelper shortStringHelper,
-            IUserIdKeyResolver userIdKeyResolver)
-            : this(
-                provider,
-                mediaFileManager,
-                loggerFactory,
-                eventMessagesFactory,
-                mediaRepository,
-                auditRepository,
-                mediaTypeRepository,
-                entityRepository,
-                shortStringHelper,
-                userIdKeyResolver,
-                StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationManagementService>())
-        {
-        }
-
         [Obsolete("Use constructor that takes IUserIdKeyResolver as a parameter, scheduled for removal in V15")]
         public MediaService(
             ICoreScopeProvider provider,
@@ -107,8 +76,7 @@ namespace Umbraco.Cms.Core.Services
                 mediaTypeRepository,
                 entityRepository,
                 shortStringHelper,
-                StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>(),
-                StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationManagementService>())
+                StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
         {
         }
 
@@ -801,11 +769,6 @@ namespace Umbraco.Cms.Core.Services
 
                 _mediaRepository.Save(media);
 
-                // Updates in-memory navigation structure - we only handle new items, other updates are not a concern
-                UpdateInMemoryNavigationStructure(
-                    "Umbraco.Cms.Core.Services.MediaService.Save",
-                    () => _mediaNavigationManagementService.Add(media.Key, GetParent(media)?.Key));
-
                 scope.Notifications.Publish(new MediaSavedNotification(media, eventMessages).WithStateFrom(savingNotification));
                 // TODO: See note about suppressing events in content service
                 scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshNode, eventMessages));
@@ -847,11 +810,6 @@ namespace Umbraco.Cms.Core.Services
                     }
 
                     _mediaRepository.Save(media);
-
-                    // Updates in-memory navigation structure - we only handle new items, other updates are not a concern
-                    UpdateInMemoryNavigationStructure(
-                        "Umbraco.Cms.Core.Services.ContentService.Save-collection",
-                        () => _mediaNavigationManagementService.Add(media.Key, GetParent(media)?.Key));
                 }
 
                 scope.Notifications.Publish(new MediaSavedNotification(mediasA, messages).WithStateFrom(savingNotification));
@@ -923,26 +881,6 @@ namespace Umbraco.Cms.Core.Services
             }
 
             DoDelete(media);
-
-            if (media.Trashed)
-            {
-                // Updates in-memory navigation structure for recycle bin items
-                UpdateInMemoryNavigationStructure(
-                    "Umbraco.Cms.Core.Services.MediaService.DeleteLocked-trashed",
-                    () => _mediaNavigationManagementService.RemoveFromBin(media.Key));
-            }
-            else
-            {
-                // Updates in-memory navigation structure for both media and recycle bin items
-                // as the item needs to be deleted whether it is in the recycle bin or not
-                UpdateInMemoryNavigationStructure(
-                    "Umbraco.Cms.Core.Services.MediaService.DeleteLocked",
-                    () =>
-                    {
-                        _mediaNavigationManagementService.MoveToBin(media.Key);
-                        _mediaNavigationManagementService.RemoveFromBin(media.Key);
-                    });
-            }
         }
 
         //TODO: both DeleteVersions methods below have an issue. Sort of. They do NOT take care of files the way
@@ -1177,33 +1115,6 @@ namespace Umbraco.Cms.Core.Services
 
             }
             while (total > pageSize);
-
-            if (parentId == Constants.System.RecycleBinMedia)
-            {
-                // Updates in-memory navigation structure for both media items and recycle bin items
-                // as we are moving to recycle bin
-                UpdateInMemoryNavigationStructure(
-                    "Umbraco.Cms.Core.Services.MediaService.PerformMoveLocked-to-recycle-bin",
-                    () => _mediaNavigationManagementService.MoveToBin(media.Key));
-            }
-            else
-            {
-                if (cameFromRecycleBin)
-                {
-                    // Updates in-memory navigation structure for both media items and recycle bin items
-                    // as we are restoring from recycle bin
-                    UpdateInMemoryNavigationStructure(
-                        "Umbraco.Cms.Core.Services.MediaService.PerformMoveLocked-restore",
-                        () => _mediaNavigationManagementService.RestoreFromBin(media.Key, parent?.Key));
-                }
-                else
-                {
-                    // Updates in-memory navigation structure
-                    UpdateInMemoryNavigationStructure(
-                        "Umbraco.Cms.Core.Services.MediaService.PerformMoveLocked",
-                        () => _mediaNavigationManagementService.Move(media.Key, parent?.Key));
-                }
-            }
         }
 
         private void PerformMoveMediaLocked(IMedia media, bool? trash)
@@ -1511,29 +1422,5 @@ namespace Umbraco.Cms.Core.Services
 
         #endregion
 
-        /// <summary>
-        ///     Enlists an action in the current scope context to update the in-memory navigation structure
-        ///     when the scope completes successfully.
-        /// </summary>
-        /// <param name="enlistingActionKey">The unique key identifying the action to be enlisted.</param>
-        /// <param name="updateNavigation">The action to be performed for updating the in-memory navigation structure.</param>
-        /// <exception cref="NullReferenceException">Thrown when the scope context is null and therefore cannot be used.</exception>
-        private void UpdateInMemoryNavigationStructure(string enlistingActionKey, Action updateNavigation)
-        {
-            IScopeContext? scopeContext = ScopeProvider.Context;
-
-            if (scopeContext is null)
-            {
-                throw new NullReferenceException($"The {nameof(scopeContext)} is null and cannot be used.");
-            }
-
-            scopeContext.Enlist(enlistingActionKey, completed =>
-            {
-                if (completed)
-                {
-                    updateNavigation();
-                }
-            });
-        }
     }
 }

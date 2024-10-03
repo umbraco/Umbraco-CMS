@@ -3,7 +3,6 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-// TODO: Test that the descendants of the node have also been removed from both structures
 public partial class DocumentNavigationServiceTests
 {
     [Test]

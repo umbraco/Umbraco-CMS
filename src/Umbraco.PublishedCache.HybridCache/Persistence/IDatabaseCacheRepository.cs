@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 
@@ -8,9 +9,21 @@ internal interface IDatabaseCacheRepository
 
     Task<ContentCacheNode?> GetContentSourceAsync(int id, bool preview = false);
 
+    Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false);
+
     Task<ContentCacheNode?> GetMediaSourceAsync(int id);
 
-    IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys);
+    Task<ContentCacheNode?> GetMediaSourceAsync(Guid key);
+
+
+    IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys, ContentCacheDataSerializerEntityType entityType);
+
+    /// <summary>
+    /// Gets all content keys of specific document types
+    /// </summary>
+    /// <param name="keys">The document types to find content using.</param>
+    /// <returns>The keys of all content use specific document types.</returns>
+    IEnumerable<Guid> GetDocumentKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false);
 
     /// <summary>
     ///     Refreshes the nucache database row for the given cache node />

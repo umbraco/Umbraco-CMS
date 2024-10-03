@@ -1,10 +1,13 @@
-﻿using Umbraco.Cms.Core;
+﻿using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
+using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
@@ -16,6 +19,29 @@ internal class MediaCacheService : IMediaCacheService
     private readonly Microsoft.Extensions.Caching.Hybrid.HybridCache _hybridCache;
     private readonly IPublishedContentFactory _publishedContentFactory;
     private readonly ICacheNodeFactory _cacheNodeFactory;
+    private readonly IEnumerable<IMediaSeedKeyProvider> _seedKeyProviders;
+    private readonly CacheSettings _cacheSettings;
+
+    private HashSet<Guid>? _seedKeys;
+    private HashSet<Guid> SeedKeys
+    {
+        get
+        {
+            if (_seedKeys is not null)
+            {
+                return _seedKeys;
+            }
+
+            _seedKeys = [];
+
+            foreach (IMediaSeedKeyProvider provider in _seedKeyProviders)
+            {
+                _seedKeys.UnionWith(provider.GetSeedKeys());
+            }
+
+            return _seedKeys;
+        }
+    }
 
     public MediaCacheService(
         IDatabaseCacheRepository databaseCacheRepository,
@@ -23,7 +49,9 @@ internal class MediaCacheService : IMediaCacheService
         ICoreScopeProvider scopeProvider,
         Microsoft.Extensions.Caching.Hybrid.HybridCache hybridCache,
         IPublishedContentFactory publishedContentFactory,
-        ICacheNodeFactory cacheNodeFactory)
+        ICacheNodeFactory cacheNodeFactory,
+        IEnumerable<IMediaSeedKeyProvider> seedKeyProviders,
+        IOptions<CacheSettings> cacheSettings)
     {
         _databaseCacheRepository = databaseCacheRepository;
         _idKeyMap = idKeyMap;
@@ -31,6 +59,8 @@ internal class MediaCacheService : IMediaCacheService
         _hybridCache = hybridCache;
         _publishedContentFactory = publishedContentFactory;
         _cacheNodeFactory = cacheNodeFactory;
+        _seedKeyProviders = seedKeyProviders;
+        _cacheSettings = cacheSettings.Value;
     }
 
     public async Task<IPublishedContent?> GetByKeyAsync(Guid key)
@@ -100,21 +130,65 @@ internal class MediaCacheService : IMediaCacheService
         scope.Complete();
     }
 
-    public async Task DeleteItemAsync(int id)
+    public async Task DeleteItemAsync(IContentBase media)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        await _databaseCacheRepository.DeleteContentItemAsync(id);
-        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Media);
-        if (keyAttempt.Success)
-        {
-            await _hybridCache.RemoveAsync(keyAttempt.Result.ToString());
-        }
+        await _databaseCacheRepository.DeleteContentItemAsync(media.Id);
+        await _hybridCache.RemoveAsync(media.Key.ToString());
+        scope.Complete();
+    }
 
-        _idKeyMap.ClearCache(keyAttempt.Result);
-        _idKeyMap.ClearCache(id);
+    public async Task SeedAsync(CancellationToken cancellationToken)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        foreach (Guid key in SeedKeys)
+        {
+            if(cancellationToken.IsCancellationRequested)
+            {
+                break;
+            }
+
+            var cacheKey = GetCacheKey(key, false);
+
+            ContentCacheNode? cachedValue = await _hybridCache.GetOrCreateAsync<ContentCacheNode?>(
+                cacheKey,
+                async cancel => await _databaseCacheRepository.GetMediaSourceAsync(key),
+                GetSeedEntryOptions());
+
+            if (cachedValue is null)
+            {
+                await _hybridCache.RemoveAsync(cacheKey);
+            }
+        }
 
         scope.Complete();
     }
+
+    public void Rebuild(IReadOnlyCollection<int> contentTypeIds)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        _databaseCacheRepository.Rebuild(contentTypeIds.ToList());
+
+        IEnumerable<Guid> mediaTypeKeys = contentTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.MediaType))
+            .Where(x => x.Success)
+            .Select(x => x.Result);
+
+        IEnumerable<ContentCacheNode> mediaCacheNodesByContentTypeKey =
+            _databaseCacheRepository.GetContentByContentTypeKey(mediaTypeKeys, ContentCacheDataSerializerEntityType.Media);
+
+        foreach (ContentCacheNode media in mediaCacheNodesByContentTypeKey)
+        {
+            _hybridCache.RemoveAsync(GetCacheKey(media.Key, false));
+        }
+
+        scope.Complete();
+    }
+
+    private HybridCacheEntryOptions GetSeedEntryOptions() => new()
+    {
+        Expiration = _cacheSettings.SeedCacheDuration, LocalCacheExpiration = _cacheSettings.SeedCacheDuration,
+    };
 
     private string GetCacheKey(Guid key, bool preview) => preview ? $"{key}+draft" : $"{key}";
 }

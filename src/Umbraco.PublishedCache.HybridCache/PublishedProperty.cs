@@ -80,10 +80,10 @@ internal class PublishedProperty : PublishedPropertyBase
     {
         if (previewing)
         {
-            return "Cache.Property.CacheValues[D:" + contentUid + ":" + typeAlias + "]";
+            return CacheKeys.PreviewPropertyCacheKeyPrefix + contentUid + ":" + typeAlias + "]";
         }
 
-        return "Cache.Property.CacheValues[P:" + contentUid + ":" + typeAlias + "]";
+        return CacheKeys.PropertyCacheKeyPrefix + contentUid + ":" + typeAlias + "]";
     }
 
     // determines whether a property has value

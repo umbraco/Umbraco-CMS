@@ -12,8 +12,10 @@ namespace Umbraco.Cms.Api.Delivery.Controllers.Media;
 [ApiVersion("2.0")]
 public class ByIdMediaApiController : MediaApiControllerBase
 {
-    public ByIdMediaApiController(IPublishedSnapshotAccessor publishedSnapshotAccessor, IApiMediaWithCropsResponseBuilder apiMediaWithCropsResponseBuilder)
-        : base(publishedSnapshotAccessor, apiMediaWithCropsResponseBuilder)
+    public ByIdMediaApiController(
+        IPublishedMediaCache publishedMediaCache,
+        IApiMediaWithCropsResponseBuilder apiMediaWithCropsResponseBuilder)
+        : base(publishedMediaCache, apiMediaWithCropsResponseBuilder)
     {
     }
 

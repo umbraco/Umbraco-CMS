@@ -523,8 +523,6 @@ public class FileService : RepositoryService, IFileService
     /// </summary>
     /// <param name="templates">List of <see cref="Template" /> to save</param>
     /// <param name="userId">Optional id of the user</param>
-    // FIXME: we need to re-implement PackageDataInstallation.ImportTemplates so it imports templates in the correct order
-    //        instead of relying on being able to save invalid templates (child templates whose master has yet to be created)
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public void SaveTemplate(IEnumerable<ITemplate> templates, int userId = Constants.Security.SuperUserId)
     {
