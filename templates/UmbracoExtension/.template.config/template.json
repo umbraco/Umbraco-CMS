@@ -68,7 +68,7 @@
   },
   "primaryOutputs": [
     {
-      "path": "UmbracoPackage.csproj"
+      "path": "UmbracoExtension.csproj"
     }
   ],
   "postActions": [
