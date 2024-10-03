@@ -91,12 +91,12 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 				@deselected=${() => this.selectionManager.deselect(option.unique)}
 				?selected=${selected}>
 				<uui-icon slot="icon" name="icon-globe"></uui-icon>
-				${this.renderLabel(option, mustSelect)}
+				${UmbDocumentVariantLanguagePickerElement.renderLabel(option, mustSelect)}
 			</uui-menu-item>
 		`;
 	}
 
-	renderLabel(option: UmbDocumentVariantOptionModel, mustSelect: boolean) {
+	static renderLabel(option: UmbDocumentVariantOptionModel, mustSelect?: boolean) {
 		return html`<div class="label" slot="label">
 			<strong> ${option.language.name} </strong>
 			<div class="label-status">${UmbDocumentVariantLanguagePickerElement.renderVariantStatus(option)}</div>
