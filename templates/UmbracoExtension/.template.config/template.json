@@ -18,8 +18,8 @@
     "language": "C#",
     "type": "project"
   },
-  "sourceName": "UmbracoPackage",
-  "defaultName": "UmbracoPackage1",
+  "sourceName": "UmbracoExtension",
+  "defaultName": "UmbracoExtension1",
   "preferNameDirectory": true,
   "symbols": {
     "Framework": {
@@ -39,7 +39,7 @@
     },
     "UmbracoVersion": {
       "displayName": "Umbraco version",
-      "description": "The version of Umbraco.Cms to add as PackageReference.",
+      "description": "The version of Umbraco.Cms to add as PackageReference. By default it installs the latest non pre-release version",
       "type": "parameter",
       "datatype": "string",
       "defaultValue": "*",
@@ -58,6 +58,12 @@
       "defaultValue": "false",
       "displayName": "Support pages and views",
       "description": "Whether to support adding traditional Razor pages and Views to this library."
+    },
+    "kebabCasedName": {
+      "type": "derived",
+      "valueSource": "name",
+      "replaces": "PROJECT_NAME_KEBABCASE_FOR_NPM",
+      "valueTransform": "kebabCase"
     }
   },
   "primaryOutputs": [

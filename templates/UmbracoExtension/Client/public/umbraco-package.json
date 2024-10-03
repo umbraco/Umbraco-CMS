@@ -6,26 +6,10 @@
   "allowPackageTelemetry": false,
   "extensions": [
     {
-      "type": "dashboard",
-      "alias": "My.Dashboard.MyExtension",
-      "name": "My Dashboard",
-      "js": "/App_Plugins/UmbracoExtension/dist/my-welcome-dashboard.js",
-      "meta": {
-        "label": "My Dashboard",
-        "pathname": "my-dashboard"
-      }
-    },
-    {
-      "type": "propertyEditorUi",
-      "alias": "My.PropertyEditorUi",
-      "name": "My Property Editor UI",
-      "js": "/App_Plugins/UmbracoExtension/dist/my-property-editor-ui.js",
-      "meta": {
-        "label": "My Property Editor UI",
-        "icon": "umb:list",
-        "group": "common",
-        "propertyEditorSchemaAlias": "Umbraco.TextBox"
-      }
+      "name": "UmbracoExtension EntryPoint",
+      "alias": "PROJECT_NAME_KEBABCASE_FOR_NPM.entrypoint",
+      "type": "entryPoint",
+      "js": "/App_Plugins/UmbracoExtension/PROJECT_NAME_KEBABCASE_FOR_NPM.js"
     }
   ]
 }

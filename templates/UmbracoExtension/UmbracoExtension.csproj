@@ -5,15 +5,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AddRazorSupportForMvc Condition="'$(SupportPagesAndViews)' == 'True'">true</AddRazorSupportForMvc>
     <RootNamespace Condition="'$(name)' != '$(name{-VALUE-FORMS-}safe_namespace)'">UmbracoExtension</RootNamespace>
-    <StaticWebAssetBasePath>App_Plugins/UmbracoExtension</StaticWebAssetBasePath>
+    <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
   </PropertyGroup>
 
   <PropertyGroup>
     <PackageId>UmbracoExtension</PackageId>
     <Product>UmbracoExtension</Product>
     <Title>UmbracoExtension</Title>
-    <Description>...</Description>
-    <PackageTags>umbraco plugin extension</PackageTags>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(SupportPagesAndViews)' == 'True'">
@@ -26,21 +24,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="package.json" Pack="False" />
-    <Content Update="package-lock.json" Pack="False" />
-    <Content Update="tsconfig.json" Pack="False" />
+    <!-- Dont include the client folder as part of packaging nuget build -->
+    <Content Remove="Client\**" />
+
+    <!-- However make the Umbraco-package.json not part of the nuget package but visible to the solution -->
+    <None Include="Client\public\umbraco-package.json" Pack="false" />
   </ItemGroup>
-
-  <!-- DISCUSS -->
-  <Target Name="NpmInstall" AfterTargets="Restore;Build" Inputs="package-lock.json" Outputs="node_modules\.package-lock.json">
-    <Message Text="Installing NPM packages" Importance="High" />
-    <Exec Command="npm ci --no-fund --no-audit --prefer-offline" />
-  </Target>
-
-  <!-- DISCUSS -->
-  <Target Name="NpmBuild" AfterTargets="Build;NpmInstall">
-    <Message Text="Executing NPM build script" Importance="High" />
-    <Exec Command="npm run build" />
-  </Target>
-
+  
 </Project>

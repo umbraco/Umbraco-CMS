@@ -37,6 +37,7 @@
     <Content Include="UmbracoExtension\.template.config\template.json" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="UmbracoExtension\Client\.vscode\extensions.ts" />
     <None Include="UmbracoExtension\UmbracoPackage.csproj" />
   </ItemGroup>
   <!-- Update template.json files with the default UmbracoVersion value set to the current build version -->

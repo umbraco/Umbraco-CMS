@@ -3,12 +3,13 @@ import { defineConfig } from "vite";
 export default defineConfig({
   build: {
     lib: {
-      entry: ["src/property-editor/my-property-editor-ui.ts", "src/dashboard/my-welcome-dashboard.ts"], // your web component source file
+      entry: "src/entrypoint.ts", // Entrypoint file (registers other manifests)
       formats: ["es"],
+      fileName: "PROJECT_NAME_KEBABCASE_FOR_NPM",
     },
-    outDir: "wwwroot/dist", // your web component will be saved in this location
-    sourcemap: true,
+    outDir: "../wwwroot/App_Plugins/UmbracoExtension", // your web component will be saved in this location
     emptyOutDir: true,
+    sourcemap: true,
     rollupOptions: {
       external: [/^@umbraco/],
     },
