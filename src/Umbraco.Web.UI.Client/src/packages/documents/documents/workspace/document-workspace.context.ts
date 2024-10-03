@@ -489,23 +489,21 @@ export class UmbDocumentWorkspaceContext
 	};
 
 	async #determineVariantOptions() {
-		const activeVariants = this.splitView.getActiveVariants();
-
-		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
-		// TODO: We need to filter the selected array, so it only contains one of each variantId. [NL]
-		const changedVariantIds = this.#data.getChangedVariants();
-		const selected = activeVariantIds.concat(changedVariantIds);
-		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
-
-		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
-		const selectedCultures = selected.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i);
-		const writable = selectedCultures.filter((x) => readOnlyCultures.includes(x) === false);
-
 		const options = await firstValueFrom(this.variantOptions);
+
+		const activeVariants = this.splitView.getActiveVariants();
+		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
+		const changedVariantIds = this.#data.getChangedVariants();
+		const selectedVariantIds = activeVariantIds.concat(changedVariantIds);
+
+		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
+		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
+		let selected = selectedVariantIds.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i);
+		selected = selected.filter((x) => readOnlyCultures.includes(x) === false);
 
 		return {
 			options,
-			selected: writable,
+			selected,
 		};
 	}
 
@@ -787,6 +785,8 @@ export class UmbDocumentWorkspaceContext
 
 		if (!result?.selection.length) return;
 
+		// TODO: Validate content & Save changes for the selected variants? — Or be clear that changes are not part of this action. [NL]
+
 		// Map to the correct format for the API (UmbDocumentVariantPublishModel)
 		const variants =
 			result?.selection.map<UmbDocumentVariantPublishModel>((x) => ({
@@ -832,6 +832,8 @@ export class UmbDocumentWorkspaceContext
 		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 
 		if (!variantIds.length) return;
+
+		// TODO: Validate content & Save changes for the selected variants? — Or be clear that changes are not part of this action. [NL]
 
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
