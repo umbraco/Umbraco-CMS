@@ -158,7 +158,7 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 			}
 
 			uui-checkbox {
-				margin-bottom: var(--uui-size-space-2);
+				margin-bottom: var(--uui-size-space-3);
 			}
 		`,
 	];
