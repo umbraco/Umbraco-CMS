@@ -4,16 +4,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Common.TestHelpers;
 
-public class ContentTypeUpdateHelper
+public static class ContentTypeUpdateHelper
 {
-    public ContentTypeUpdateModel CreateContentTypeUpdateModel(IContentType contentType)
+    public static ContentTypeUpdateModel CreateContentTypeUpdateModel(IContentType contentType)
     {
         var updateModel = new ContentTypeUpdateModel();
         var model = MapBaseProperties<ContentTypeUpdateModel>(contentType, updateModel);
         return model;
     }
 
-    private T MapBaseProperties<T>(IContentType contentType, T model) where T : ContentTypeModelBase
+    private static T MapBaseProperties<T>(IContentType contentType, T model) where T : ContentTypeModelBase
     {
         model.Alias = contentType.Alias;
         model.Name = contentType.Name;
