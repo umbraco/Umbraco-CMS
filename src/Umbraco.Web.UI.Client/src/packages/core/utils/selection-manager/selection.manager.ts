@@ -60,6 +60,13 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 	public setSelection(value: Array<ValueType>) {
 		if (this.getSelectable() === false) return;
 		if (value === undefined) throw new Error('Value cannot be undefined');
+
+		value.forEach((unique) => {
+			if (this.#allow(unique) === false) {
+				throw new Error(`${unique} is now allowed to be selected`);
+			}
+		});
+
 		const newSelection = this.getMultiple() ? value : value.slice(0, 1);
 		this.#selection.setValue(newSelection);
 	}
