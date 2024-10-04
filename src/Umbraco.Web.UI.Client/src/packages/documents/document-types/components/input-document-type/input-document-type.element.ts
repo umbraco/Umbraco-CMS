@@ -1,6 +1,7 @@
 import type { UmbDocumentTypeItemModel } from '../../repository/index.js';
 import { UMB_DOCUMENT_TYPE_WORKSPACE_MODAL } from '../../workspace/document-type-workspace.modal-token.js';
 import type { UmbDocumentTypeTreeItemModel } from '../../tree/types.js';
+import { UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UmbDocumentTypePickerInputContext } from './input-document-type.context.js';
 import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
@@ -9,7 +10,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 
 @customElement('umb-input-document-type')
 export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -35,7 +35,6 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	/**
 	 * Limits to only select Element Types
 	 * @type {boolean}
-	 * @attr
 	 * @default false
 	 */
 	@property({ attribute: false })
@@ -44,7 +43,6 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	/**
 	 * Limits to only select Document Types
 	 * @type {boolean}
-	 * @attr
 	 * @default false
 	 */
 	@property({ attribute: false })
@@ -53,7 +51,6 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
-	 * @attr
 	 * @default
 	 */
 	@property({ type: Number })
@@ -67,7 +64,6 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	/**
 	 * Min validation message.
 	 * @type {boolean}
-	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
@@ -76,7 +72,6 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	/**
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
-	 * @attr
 	 * @default
 	 */
 	@property({ type: Number })
@@ -90,7 +85,6 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	/**
 	 * Max validation message.
 	 * @type {boolean}
-	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
