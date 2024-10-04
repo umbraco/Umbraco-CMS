@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0;
 
@@ -11,5 +12,10 @@ public class AddDocumentUrl : MigrationBase
     }
 
     protected override void Migrate()
-        => Create.Table<DocumentUrlDto>().Do();
+    {
+        if (TableExists(Constants.DatabaseSchema.Tables.DocumentUrl) is false)
+        {
+            Create.Table<DocumentUrlDto>().Do();
+        }
+    }
 }
