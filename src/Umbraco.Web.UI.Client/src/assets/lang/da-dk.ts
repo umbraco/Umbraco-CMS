@@ -310,7 +310,7 @@ export default {
 		publishRequiresVariants: 'De følgende varianter er krævet for at en udgivelse kan finde sted:',
 		notReadyToPublish: 'Vi er ikke klar til at udgive',
 		readyToPublish: 'Klar til at udgive?',
-		readyToSave: 'Klar til at gemme?',
+		readyToSave: 'Gem',
 		sendForApproval: 'Send til godkendelse',
 		schedulePublishHelp: 'Vælg dato og klokkeslæt for at udgive og/eller afpublicere indholdet.',
 		createEmpty: 'Opret ny',

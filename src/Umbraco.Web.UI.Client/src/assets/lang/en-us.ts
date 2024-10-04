@@ -321,7 +321,7 @@ export default {
 		publishRequiresVariants: 'The following variants is required for publishing to take place:',
 		notReadyToPublish: 'We are not ready to Publish',
 		readyToPublish: 'Ready to publish?',
-		readyToSave: 'Ready to Save?',
+		readyToSave: 'Save',
 		resetFocalPoint: 'Reset focal point',
 		sendForApproval: 'Send for approval',
 		schedulePublishHelp: 'Select the date and time to publish and/or unpublish the content item.',
