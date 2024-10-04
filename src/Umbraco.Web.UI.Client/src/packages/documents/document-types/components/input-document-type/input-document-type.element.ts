@@ -205,7 +205,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 		if (!item.unique) return;
 		const href = this._editPath + UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique });
 		return html`
-			<uui-ref-node-document-type name=${this.localize.string(item.name)} id=${item.unique} href=${href}>
+			<uui-ref-node-document-type name=${this.localize.string(item.name)} href=${href}>
 				${this.#renderIcon(item)}
 				<uui-action-bar slot="actions">
 					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
