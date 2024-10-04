@@ -203,7 +203,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 
 	#renderItem(item: UmbDocumentTypeItemModel) {
 		if (!item.unique) return;
-		const href = `${this._editPath}${UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique })}`;
+		const href = this._editPath + UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique });
 		return html`
 			<uui-ref-node-document-type name=${this.localize.string(item.name)} id=${item.unique} href=${href}>
 				${this.#renderIcon(item)}
