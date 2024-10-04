@@ -70,6 +70,13 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 		}
 	}
 
+	#isAllSelected() {
+		const allUniques = this.variantLanguageOptions.map((o) => o.unique);
+		const filter = this.selectionManager.getAllowLimitation();
+		const allowedUniques = allUniques.filter((unique) => filter(unique));
+		return this._selection.length === allowedUniques.length;
+	}
+
 	override render() {
 		if (this.variantLanguageOptions.length === 0) {
 			return html`<uui-box>
@@ -78,7 +85,10 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 		}
 
 		return html`
-			<uui-checkbox @change=${this.#onSelectAllChange} label="Select All"></uui-checkbox>
+			<uui-checkbox
+				@change=${this.#onSelectAllChange}
+				label="Select All"
+				.checked=${this.#isAllSelected()}></uui-checkbox>
 			${repeat(
 				this.variantLanguageOptions,
 				(option) => option.unique,
