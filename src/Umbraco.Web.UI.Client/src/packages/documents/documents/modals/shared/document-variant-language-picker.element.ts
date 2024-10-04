@@ -1,4 +1,5 @@
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
+import type { UUIBooleanInputElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
 	customElement,
@@ -57,16 +58,30 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 		}
 	}
 
+	#onSelectAllChange(event: Event) {
+		const allUniques = this.variantLanguageOptions.map((o) => o.unique);
+		if ((event.target as UUIBooleanInputElement).checked) {
+			this.selectionManager.setSelection(allUniques);
+		} else {
+			this.selectionManager.setSelection([]);
+		}
+	}
+
 	override render() {
-		return this.variantLanguageOptions.length
-			? repeat(
-					this.variantLanguageOptions,
-					(option) => option.unique,
-					(option) => html` ${this.#renderItem(option)} `,
-				)
-			: html`<uui-box>
-					<umb-localize key="content_noVariantsToProcess">There are no available variants</umb-localize>
-				</uui-box>`;
+		if (this.variantLanguageOptions.length === 0) {
+			return html`<uui-box>
+				<umb-localize key="content_noVariantsToProcess">There are no available variants</umb-localize>
+			</uui-box>`;
+		}
+
+		return html`
+			<uui-checkbox @change=${this.#onSelectAllChange} label="Select All"></uui-checkbox>
+			${repeat(
+				this.variantLanguageOptions,
+				(option) => option.unique,
+				(option) => html` ${this.#renderItem(option)} `,
+			)}
+		`;
 	}
 
 	#renderItem(option: UmbDocumentVariantOptionModel) {
@@ -123,6 +138,14 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 			}
 			.label-status {
 				font-size: 0.8rem;
+			}
+
+			uui-menu-item {
+				--uui-menu-item-flat-structure: 1;
+			}
+
+			uui-checkbox {
+				margin-bottom: var(--uui-size-space-2);
 			}
 		`,
 	];
