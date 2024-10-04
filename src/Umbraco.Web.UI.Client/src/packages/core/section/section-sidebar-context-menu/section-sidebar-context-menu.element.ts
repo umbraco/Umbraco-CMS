@@ -154,6 +154,9 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 				display: flex;
 				align-items: center;
 			}
+			#action-modal umb-entity-action-list{
+				--uui-menu-item-flat-structure: 0;
+			}
 		`,
 	];
 }
