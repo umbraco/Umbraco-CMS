@@ -26,7 +26,7 @@ const childDocumentTwoName = 'ChildDocumentTwo';
 
 let userGroupId = null;
 
-test.beforeEach(async ({umbracoUi, umbracoApi}) => {
+test.beforeEach(async ({umbracoApi}) => {
   // Ensure we are logged in to admin
   await umbracoApi.refreshAccessToken(process.env.UMBRACO_USER_LOGIN, process.env.UMBRACO_USER_PASSWORD);
   await umbracoApi.documentType.ensureNameNotExists(rootDocumentTypeName);
@@ -44,7 +44,6 @@ test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoApi.document.createDefaultDocumentWithParent(childDocumentTwoName, childDocumentTypeTwoId, rootDocumentId);
 
   userGroupId = await umbracoApi.userGroup.createSimpleUserGroupWithContentSection(userGroupName);
-
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -55,7 +54,6 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeTwoName);
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
 });
-
 
 //TODO: FIX NAMING
 test('can see root start node and children', async ({umbracoApi, umbracoUi}) => {
@@ -74,7 +72,7 @@ test('can see root start node and children', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.content.isChildContentVisible(rootDocumentName, childDocumentTwoName);
 });
 
-test('can see parent and only child start node', async ({umbracoApi, umbracoUi}) => {
+test('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [childDocumentOneId]);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
