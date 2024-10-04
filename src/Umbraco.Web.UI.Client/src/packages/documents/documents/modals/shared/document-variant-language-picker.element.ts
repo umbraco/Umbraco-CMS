@@ -60,8 +60,11 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 
 	#onSelectAllChange(event: Event) {
 		const allUniques = this.variantLanguageOptions.map((o) => o.unique);
+		const filter = this.selectionManager.getAllowLimitation();
+		const allowedUniques = allUniques.filter((unique) => filter(unique));
+
 		if ((event.target as UUIBooleanInputElement).checked) {
-			this.selectionManager.setSelection(allUniques);
+			this.selectionManager.setSelection(allowedUniques);
 		} else {
 			this.selectionManager.setSelection([]);
 		}
