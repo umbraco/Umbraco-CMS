@@ -52,6 +52,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		}
 
 		// Only display variants that are relevant to pick from, i.e. variants that are draft or published with pending changes:
+		// TODO:[NL] I would say we should change this, the act of scheduling should be equivalent to save & publishing. Resulting in content begin saved as part of carrying out the action. (But this requires a update in the workspace.)
 		this._options =
 			this.data?.options.filter(
 				(option) => option.variant && option.variant.state !== UmbDocumentVariantState.NOT_CREATED,
