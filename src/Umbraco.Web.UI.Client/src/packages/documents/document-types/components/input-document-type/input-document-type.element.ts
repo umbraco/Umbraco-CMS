@@ -9,6 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 
 @customElement('umb-input-document-type')
 export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -202,7 +203,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 
 	#renderItem(item: UmbDocumentTypeItemModel) {
 		if (!item.unique) return;
-		const href = `${this._editPath}edit/${item.unique}`;
+		const href = `${this._editPath}${UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique })}`;
 		return html`
 			<uui-ref-node-document-type name=${this.localize.string(item.name)} id=${item.unique} href=${href}>
 				${this.#renderIcon(item)}
