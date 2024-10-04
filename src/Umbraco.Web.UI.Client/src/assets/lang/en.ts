@@ -950,6 +950,7 @@ export default {
 		addChild: 'Add child',
 		editDataType: 'Edit data type',
 		navigateSections: 'Navigate sections',
+		selectAll: 'Select all',
 		shortcut: 'Shortcuts',
 		showShortcuts: 'show shortcuts',
 		toggleListView: 'Toggle list view',

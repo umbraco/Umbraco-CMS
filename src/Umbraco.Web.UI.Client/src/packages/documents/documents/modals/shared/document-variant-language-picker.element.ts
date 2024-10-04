@@ -87,7 +87,7 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 		return html`
 			<uui-checkbox
 				@change=${this.#onSelectAllChange}
-				label="Select All"
+				label=${this.localize.term('general_selectAll')}
 				.checked=${this.#isAllSelected()}></uui-checkbox>
 			${repeat(
 				this.variantLanguageOptions,

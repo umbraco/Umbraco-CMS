@@ -917,6 +917,7 @@ export default {
 		header: 'Header',
 		systemField: 'system field',
 		lastUpdated: 'Last Updated',
+		selectAll: 'Select all',
 		skipToMenu: 'Skip to menu',
 		skipToContent: 'Skip to content',
 		restore: 'Restore',
