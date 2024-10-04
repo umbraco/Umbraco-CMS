@@ -3,7 +3,7 @@
   "id": "UmbracoExtension",
   "name": "UmbracoExtension",
   "version": "0.0.0",
-  "allowPackageTelemetry": false,
+  "allowPackageTelemetry": true,
   "extensions": [
     {
       "name": "UmbracoExtension EntryPoint",
