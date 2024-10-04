@@ -25,7 +25,7 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 		this.#selectionManager = value;
 		this.observe(
 			this.selectionManager.selection,
-			async (selection) => {
+			(selection) => {
 				this._selection = selection;
 			},
 			'_selectionManager',
@@ -45,6 +45,14 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 	 */
 	@property({ attribute: false })
 	public pickableFilter?: (item: UmbDocumentVariantOptionModel) => boolean;
+
+	/**
+	 * A filter function that determines if an item should be highlighted as a must select.
+	 * @memberof UmbDocumentVariantLanguagePickerElement
+	 * @returns {boolean} - True if the item is pickableFilter, false otherwise.
+	 */
+	@property({ attribute: false })
+	public requiredFilter?: (item: UmbDocumentVariantOptionModel) => boolean;
 
 	protected override updated(_changedProperties: PropertyValues): void {
 		super.updated(_changedProperties);
@@ -71,29 +79,32 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 
 	#renderItem(option: UmbDocumentVariantOptionModel) {
 		const pickable = this.pickableFilter ? this.pickableFilter(option) : () => true;
+		const selected = this._selection.includes(option.unique);
+		const mustSelect = (!selected && this.requiredFilter?.(option)) ?? false;
 		return html`
 			<uui-menu-item
+				class=${mustSelect ? 'required' : ''}
 				?selectable=${pickable}
 				?disabled=${!pickable}
 				label=${option.variant?.name ?? option.language.name}
 				@selected=${() => this.selectionManager.select(option.unique)}
 				@deselected=${() => this.selectionManager.deselect(option.unique)}
-				?selected=${this._selection.includes(option.unique)}>
+				?selected=${selected}>
 				<uui-icon slot="icon" name="icon-globe"></uui-icon>
-				${UmbDocumentVariantLanguagePickerElement.renderLabel(option)}
+				${UmbDocumentVariantLanguagePickerElement.renderLabel(option, mustSelect)}
 			</uui-menu-item>
 		`;
 	}
 
-	static renderLabel(option: UmbDocumentVariantOptionModel) {
+	static renderLabel(option: UmbDocumentVariantOptionModel, mustSelect?: boolean) {
 		return html`<div class="label" slot="label">
 			<strong> ${option.language.name} </strong>
 			<div class="label-status">${UmbDocumentVariantLanguagePickerElement.renderVariantStatus(option)}</div>
-			${option.language.isMandatory && option.variant?.state !== UmbDocumentVariantState.PUBLISHED
+			${option.language.isMandatory && mustSelect
 				? html`<div class="label-status">
 						<umb-localize key="languages_mandatoryLanguage">Mandatory language</umb-localize>
 					</div>`
-				: ''}
+				: nothing}
 		</div>`;
 	}
 
@@ -106,17 +117,17 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 			case UmbDocumentVariantState.DRAFT:
 				return html`<umb-localize key="content_unpublished">Draft</umb-localize>`;
 			case UmbDocumentVariantState.NOT_CREATED:
-				return html`<umb-localize key="content_notCreated">Not created</umb-localize>`;
 			default:
-				return nothing;
+				return html`<umb-localize key="content_notCreated">Not created</umb-localize>`;
 		}
 	}
 
 	static override styles = [
 		UmbTextStyles,
 		css`
-			#subtitle {
-				margin-top: 0;
+			.required {
+				color: var(--uui-color-danger);
+				--uui-menu-item-color-hover: var(--uui-color-danger-emphasis);
 			}
 			.label {
 				padding: 0.5rem 0;
