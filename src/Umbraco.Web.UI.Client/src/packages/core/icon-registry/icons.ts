@@ -147,6 +147,10 @@ name: "icon-binarycode",
 
 path: () => import("./icons/icon-binarycode.js"),
 },{
+name: "icon-binoculars",
+legacy: true,
+path: () => import("./icons/icon-binoculars.js"),
+},{
 name: "icon-bird",
 
 path: () => import("./icons/icon-bird.js"),
@@ -159,6 +163,10 @@ name: "icon-block",
 
 path: () => import("./icons/icon-block.js"),
 },{
+name: "icon-blockquote",
+
+path: () => import("./icons/icon-blockquote.js"),
+},{
 name: "icon-bluetooth",
 
 path: () => import("./icons/icon-bluetooth.js"),
@@ -166,6 +174,10 @@ path: () => import("./icons/icon-bluetooth.js"),
 name: "icon-boat-shipping",
 
 path: () => import("./icons/icon-boat-shipping.js"),
+},{
+name: "icon-bold",
+
+path: () => import("./icons/icon-bold.js"),
 },{
 name: "icon-bones",
 
@@ -374,6 +386,10 @@ path: () => import("./icons/icon-cocktail.js"),
 name: "icon-code",
 
 path: () => import("./icons/icon-code.js"),
+},{
+name: "icon-code-xml",
+
+path: () => import("./icons/icon-code-xml.js"),
 },{
 name: "icon-coffee",
 
@@ -627,6 +643,10 @@ name: "icon-edit",
 
 path: () => import("./icons/icon-edit.js"),
 },{
+name: "icon-embed",
+
+path: () => import("./icons/icon-embed.js"),
+},{
 name: "icon-employee",
 legacy: true,
 path: () => import("./icons/icon-employee.js"),
@@ -855,6 +875,18 @@ name: "icon-hard-drive",
 legacy: true,
 path: () => import("./icons/icon-hard-drive.js"),
 },{
+name: "icon-heading-1",
+
+path: () => import("./icons/icon-heading-1.js"),
+},{
+name: "icon-heading-2",
+
+path: () => import("./icons/icon-heading-2.js"),
+},{
+name: "icon-heading-3",
+
+path: () => import("./icons/icon-heading-3.js"),
+},{
 name: "icon-headphones",
 
 path: () => import("./icons/icon-headphones.js"),
@@ -879,9 +911,17 @@ name: "icon-help",
 
 path: () => import("./icons/icon-help.js"),
 },{
+name: "icon-history",
+
+path: () => import("./icons/icon-history.js"),
+},{
 name: "icon-home",
 
 path: () => import("./icons/icon-home.js"),
+},{
+name: "icon-horizontal-rule",
+
+path: () => import("./icons/icon-horizontal-rule.js"),
 },{
 name: "icon-hourglass",
 
@@ -890,6 +930,10 @@ path: () => import("./icons/icon-hourglass.js"),
 name: "icon-imac",
 legacy: true,
 path: () => import("./icons/icon-imac.js"),
+},{
+name: "icon-image-up",
+
+path: () => import("./icons/icon-image-up.js"),
 },{
 name: "icon-inbox-full",
 legacy: true,
@@ -922,6 +966,10 @@ path: () => import("./icons/icon-ipad.js"),
 name: "icon-iphone",
 legacy: true,
 path: () => import("./icons/icon-iphone.js"),
+},{
+name: "icon-italic",
+
+path: () => import("./icons/icon-italic.js"),
 },{
 name: "icon-item-arrangement",
 legacy: true,
@@ -1668,7 +1716,7 @@ name: "icon-shipping",
 path: () => import("./icons/icon-shipping.js"),
 },{
 name: "icon-shoe",
-
+legacy: true,
 path: () => import("./icons/icon-shoe.js"),
 },{
 name: "icon-shopping-basket-alt-2",
@@ -1688,8 +1736,12 @@ name: "icon-shuffle",
 path: () => import("./icons/icon-shuffle.js"),
 },{
 name: "icon-sience",
-
+legacy: true,
 path: () => import("./icons/icon-sience.js"),
+},{
+name: "icon-science",
+
+path: () => import("./icons/icon-science.js"),
 },{
 name: "icon-single-note",
 
@@ -1799,6 +1851,18 @@ name: "icon-stream",
 legacy: true,
 path: () => import("./icons/icon-stream.js"),
 },{
+name: "icon-strikethrough",
+
+path: () => import("./icons/icon-strikethrough.js"),
+},{
+name: "icon-subscript",
+
+path: () => import("./icons/icon-subscript.js"),
+},{
+name: "icon-superscript",
+
+path: () => import("./icons/icon-superscript.js"),
+},{
 name: "icon-sunny",
 
 path: () => import("./icons/icon-sunny.js"),
@@ -1818,6 +1882,10 @@ path: () => import("./icons/icon-t-shirt.js"),
 name: "icon-tab-key",
 
 path: () => import("./icons/icon-tab-key.js"),
+},{
+name: "icon-table",
+
+path: () => import("./icons/icon-table.js"),
 },{
 name: "icon-tag",
 
@@ -1846,6 +1914,22 @@ path: () => import("./icons/icon-temperature.js"),
 name: "icon-terminal",
 
 path: () => import("./icons/icon-terminal.js"),
+},{
+name: "icon-text-align-center",
+
+path: () => import("./icons/icon-text-align-center.js"),
+},{
+name: "icon-text-align-justify",
+
+path: () => import("./icons/icon-text-align-justify.js"),
+},{
+name: "icon-text-align-left",
+
+path: () => import("./icons/icon-text-align-left.js"),
+},{
+name: "icon-text-align-right",
+
+path: () => import("./icons/icon-text-align-right.js"),
 },{
 name: "icon-theater",
 
@@ -1963,9 +2047,21 @@ name: "icon-undo",
 
 path: () => import("./icons/icon-undo.js"),
 },{
+name: "icon-underline",
+
+path: () => import("./icons/icon-underline.js"),
+},{
+name: "icon-unlink",
+
+path: () => import("./icons/icon-unlink.js"),
+},{
 name: "icon-unlocked",
 
 path: () => import("./icons/icon-unlocked.js"),
+},{
+name: "icon-unplug",
+
+path: () => import("./icons/icon-unplug.js"),
 },{
 name: "icon-untitled",
 legacy: true,
@@ -2099,6 +2195,10 @@ name: "icon-database",
 
 path: () => import("./icons/icon-database.js"),
 },{
+name: "icon-umb-manifest",
+
+path: () => import("./icons/icon-umb-manifest.js"),
+},{
 name: "icon-facebook",
 
 path: () => import("./icons/icon-facebook.js"),
@@ -2131,10 +2231,6 @@ name: "icon-twitter-x",
 
 path: () => import("./icons/icon-twitter-x.js"),
 },{
-name: "icon-umbraco",
-
-path: () => import("./icons/icon-umbraco.js"),
-},{
 name: "icon-art-easel",
 legacy: true,
 path: () => import("./icons/icon-art-easel.js"),
@@ -2147,14 +2243,6 @@ name: "icon-auction-hammer",
 legacy: true,
 path: () => import("./icons/icon-auction-hammer.js"),
 },{
-name: "icon-azure",
-legacy: true,
-path: () => import("./icons/icon-azure.js"),
-},{
-name: "icon-baby-stroller",
-legacy: true,
-path: () => import("./icons/icon-baby-stroller.js"),
-},{
 name: "icon-badge-count",
 legacy: true,
 path: () => import("./icons/icon-badge-count.js"),
@@ -2162,6 +2250,10 @@ path: () => import("./icons/icon-badge-count.js"),
 name: "icon-band-aid",
 legacy: true,
 path: () => import("./icons/icon-band-aid.js"),
+},{
+name: "icon-baby-stroller",
+legacy: true,
+path: () => import("./icons/icon-baby-stroller.js"),
 },{
 name: "icon-bill-dollar",
 legacy: true,
@@ -2206,10 +2298,6 @@ path: () => import("./icons/icon-bills-yen.js"),
 name: "icon-bills",
 legacy: true,
 path: () => import("./icons/icon-bills.js"),
-},{
-name: "icon-binoculars",
-legacy: true,
-path: () => import("./icons/icon-binoculars.js"),
 },{
 name: "icon-blueprint",
 legacy: true,
@@ -2347,10 +2435,6 @@ name: "icon-male-symbol",
 legacy: true,
 path: () => import("./icons/icon-male-symbol.js"),
 },{
-name: "icon-microsoft",
-legacy: true,
-path: () => import("./icons/icon-microsoft.js"),
-},{
 name: "icon-molecular-network",
 legacy: true,
 path: () => import("./icons/icon-molecular-network.js"),
@@ -2358,6 +2442,18 @@ path: () => import("./icons/icon-molecular-network.js"),
 name: "icon-molecular",
 legacy: true,
 path: () => import("./icons/icon-molecular.js"),
+},{
+name: "icon-umbraco",
+
+path: () => import("./icons/icon-umbraco.js"),
+},{
+name: "icon-azure",
+legacy: true,
+path: () => import("./icons/icon-azure.js"),
+},{
+name: "icon-microsoft",
+legacy: true,
+path: () => import("./icons/icon-microsoft.js"),
 },{
 name: "icon-os-x",
 legacy: true,

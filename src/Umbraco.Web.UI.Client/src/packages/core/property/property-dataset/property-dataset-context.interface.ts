@@ -25,6 +25,9 @@ export interface UmbPropertyDatasetContext extends UmbContext {
 	getName(): string | undefined;
 	readonly name: Observable<string | undefined>;
 
+	getReadOnly(): boolean;
+	readonly readOnly: Observable<boolean>;
+
 	// Should it be possible to get the properties as a list of property aliases?
 	//readonly properties: Observable<Array<string>>;
 
@@ -33,6 +36,5 @@ export interface UmbPropertyDatasetContext extends UmbContext {
 	propertyValueByAlias<ReturnType = unknown>(
 		propertyAlias: string,
 	): Promise<Observable<ReturnType | undefined> | undefined>;
-	// TODO: Append the andCulture method as well..
 	setPropertyValue(propertyAlias: string, value: unknown): void;
 }

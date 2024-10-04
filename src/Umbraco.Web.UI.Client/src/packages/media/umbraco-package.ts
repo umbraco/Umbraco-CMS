@@ -9,7 +9,7 @@ export const extensions = [
 	{
 		name: 'Media Management Entry Point',
 		alias: 'Umb.EntryPoint.MediaManagement',
-		type: 'entryPoint',
+		type: 'backofficeEntryPoint',
 		js: () => import('./entry-point.js'),
 	},
 ];

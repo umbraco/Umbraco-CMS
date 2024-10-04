@@ -2,8 +2,10 @@ import type { UmbInputToggleElement } from '@umbraco-cms/backoffice/components';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * @element umb-property-editor-ui-toggle
@@ -12,6 +14,15 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
 export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Boolean })
 	value: undefined | boolean = undefined;
+
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
 
 	@state()
 	_labelOff?: string;
@@ -42,7 +53,8 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 				.labelOff=${this._labelOff}
 				?checked=${this.value}
 				?showLabels=${this._showLabels}
-				@change=${this.#onChange}>
+				@change=${this.#onChange}
+				?readonly=${this.readonly}>
 			</umb-input-toggle>
 		`;
 	}

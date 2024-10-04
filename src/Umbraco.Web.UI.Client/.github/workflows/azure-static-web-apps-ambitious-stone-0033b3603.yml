@@ -5,11 +5,13 @@ on:
     branches:
       - main
       - release/*
+      - v*/dev
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
       - release/*
+      - v*/dev
   workflow_dispatch:
     inputs:
       issue_number:

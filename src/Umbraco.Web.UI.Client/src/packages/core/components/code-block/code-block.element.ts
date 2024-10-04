@@ -5,8 +5,7 @@ import { css, customElement, html, property, state, when, LitElement } from '@um
 
 /**
  *  A simple styled box for showing code-based error messages or blocks od code.
- *  @slot the full message
- *
+ *  @slot - the default slot where the full message resides
  */
 @customElement('umb-code-block')
 export class UmbCodeBlockElement extends LitElement {
@@ -45,7 +44,7 @@ export class UmbCodeBlockElement extends LitElement {
 				${when(
 					this.copy,
 					() => html`
-						<uui-button compat color=${this._copyState === 'idle' ? 'default' : 'positive'} @click=${this.copyCode}>
+						<uui-button color=${this._copyState === 'idle' ? 'default' : 'positive'} @click=${this.copyCode}>
 							${when(
 								this._copyState === 'idle',
 								() => html`<uui-icon name="copy"></uui-icon> <umb-localize key="general_copy">Copy</umb-localize>`,
@@ -59,7 +58,7 @@ export class UmbCodeBlockElement extends LitElement {
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			:host {

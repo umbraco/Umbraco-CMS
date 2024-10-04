@@ -8,9 +8,8 @@ import {
 	UMB_COLLECTION_BULK_ACTION_PERMISSION_CONDITION,
 } from '@umbraco-cms/backoffice/collection';
 import type { UmbCollectionBulkActionPermissions } from '@umbraco-cms/backoffice/collection';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const bulkMoveAction: ManifestTypes = {
+const bulkMoveAction: UmbExtensionManifest = {
 	type: 'entityBulkAction',
 	kind: 'moveTo',
 	alias: 'Umb.EntityBulkAction.Media.MoveTo',
@@ -33,4 +32,4 @@ const bulkMoveAction: ManifestTypes = {
 	],
 };
 
-export const manifests: Array<ManifestTypes> = [bulkMoveAction, ...repositoryManifests];
+export const manifests: Array<UmbExtensionManifest> = [bulkMoveAction, ...repositoryManifests];

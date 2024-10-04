@@ -1,5 +1,5 @@
 import type { UmbImageCropperCrop } from '../../components/index.js';
-import type { UmbCropModel } from '../../property-editors/index.js';
+import type { UmbCropModel } from '../../property-editors/types.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbImageCropperEditorModalData<ItemType> {

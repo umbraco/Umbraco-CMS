@@ -4,16 +4,15 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A repository for uploading temporary files
- * @export
  * @class UmbTemporaryFileRepository
- * @extends {UmbRepositoryBase}
+ * @augments {UmbRepositoryBase}
  */
 export class UmbTemporaryFileRepository extends UmbRepositoryBase {
 	#source: UmbTemporaryFileServerDataSource;
 
 	/**
 	 * Creates an instance of UmbTemporaryFileRepository.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbTemporaryFileRepository
 	 */
 	constructor(host: UmbControllerHost) {
@@ -25,7 +24,7 @@ export class UmbTemporaryFileRepository extends UmbRepositoryBase {
 	 * Uploads a temporary file
 	 * @param {string} id
 	 * @param {File} file
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTemporaryFileRepository
 	 */
 	upload(id: string, file: File) {
@@ -35,7 +34,7 @@ export class UmbTemporaryFileRepository extends UmbRepositoryBase {
 	/**
 	 * Deletes a temporary file
 	 * @param {string} id
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTemporaryFileRepository
 	 */
 	delete(id: string) {
@@ -45,7 +44,7 @@ export class UmbTemporaryFileRepository extends UmbRepositoryBase {
 	/**
 	 * Gets a temporary file
 	 * @param {string} id
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTemporaryFileRepository
 	 */
 	requestById(id: string) {

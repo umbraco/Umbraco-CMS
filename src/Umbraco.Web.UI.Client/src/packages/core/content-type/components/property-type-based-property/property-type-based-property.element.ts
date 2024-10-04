@@ -8,6 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_UNSUPPORTED_EDITOR_SCHEMA_ALIASES } from '@umbraco-cms/backoffice/property';
 
 @customElement('umb-property-type-based-property')
 export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
@@ -27,8 +28,25 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	@property({ type: String, attribute: 'data-path' })
 	public dataPath?: string;
 
+	@property({ type: String })
+	public get ownerEntityType(): string | undefined {
+		return this._ownerEntityType;
+	}
+	public set ownerEntityType(value: string | undefined) {
+		// Change this to ownerSchemaEditorAlias and retrieve the correct information.
+		this._ownerEntityType = value;
+	}
+
+	private _ownerEntityType?: string;
+
 	@state()
 	private _propertyEditorUiAlias?: string;
+
+	@state()
+	private _propertyEditorSchemaAlias?: string;
+
+	@state()
+	private _isUnsupported?: boolean;
 
 	@state()
 	private _dataTypeData?: UmbPropertyEditorConfig;
@@ -37,6 +55,16 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	private _dataTypeObserver?: UmbObserverController<UmbDataTypeDetailModel | undefined>;
 
 	#contentPropertyContext = new UmbContentPropertyContext(this);
+
+	private async _checkSchemaSupport() {
+		if (!this._ownerEntityType || !this._propertyEditorSchemaAlias) return;
+
+		if (this._ownerEntityType in UMB_UNSUPPORTED_EDITOR_SCHEMA_ALIASES) {
+			this._isUnsupported = UMB_UNSUPPORTED_EDITOR_SCHEMA_ALIASES[this._ownerEntityType].includes(
+				this._propertyEditorSchemaAlias,
+			);
+		}
+	}
 
 	private async _observeDataType(dataTypeUnique?: string) {
 		this._dataTypeObserver?.destroy();
@@ -51,6 +79,9 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 
 					this._dataTypeData = dataType?.values;
 					this._propertyEditorUiAlias = dataType?.editorUiAlias || undefined;
+					this._propertyEditorSchemaAlias = dataType?.editorAlias || undefined;
+					this._checkSchemaSupport();
+
 					// If there is no UI, we will look up the Property editor model to find the default UI alias:
 					if (!this._propertyEditorUiAlias && dataType?.editorAlias) {
 						//use 'dataType.editorAlias' to look up the extension in the registry:
@@ -75,6 +106,12 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 
 	override render() {
 		if (!this._propertyEditorUiAlias || !this._property?.alias) return;
+		if (this._isUnsupported) {
+			return html`<umb-unsupported-property
+				.alias=${this._property.alias}
+				.ownerEntityType=${this._ownerEntityType}
+				.schema=${this._propertyEditorSchemaAlias!}></umb-unsupported-property>`;
+		}
 		return html`
 			<umb-property
 				.dataPath=${this.dataPath}

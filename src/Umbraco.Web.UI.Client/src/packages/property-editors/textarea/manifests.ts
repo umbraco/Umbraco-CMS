@@ -1,7 +1,6 @@
 import { manifest as schemaManifest } from './Umbraco.TextArea.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.TextArea',
@@ -12,6 +11,7 @@ export const manifests: Array<ManifestTypes> = [
 			propertyEditorSchemaAlias: 'Umbraco.TextArea',
 			icon: 'icon-edit',
 			group: 'common',
+			supportsReadOnly: true,
 			settings: {
 				properties: [
 					{

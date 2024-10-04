@@ -1,7 +1,4 @@
-import { UMB_RELATION_TYPE_ROOT_ENTITY_TYPE } from '../relation-types/index.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menuItem',
 		alias: 'Umb.MenuItem.Relations',
@@ -10,7 +7,7 @@ export const manifests: Array<ManifestTypes> = [
 		meta: {
 			label: '#treeHeaders_relations',
 			icon: 'icon-trafic',
-			entityType: UMB_RELATION_TYPE_ROOT_ENTITY_TYPE,
+			entityType: 'relations-root',
 			menus: ['Umb.Menu.AdvancedSettings'],
 		},
 	},

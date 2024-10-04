@@ -16,12 +16,11 @@ export class UmbContentHasPropertiesWorkspaceCondition
 
 		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (context) => {
 			this.observe(
-				context.structure.contentTypes,
-				(contentTypes) => {
-					const hasProperties = contentTypes.some((contentType) => contentType.properties.length > 0);
+				context.structure.contentTypeHasProperties,
+				(hasProperties) => {
 					this.permitted = hasProperties;
 				},
-				'contentTypesObserver',
+				'hasPropertiesObserver',
 			);
 		});
 	}

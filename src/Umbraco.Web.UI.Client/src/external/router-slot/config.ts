@@ -1,4 +1,4 @@
-import { PathMatch } from './model.js';
+import type { PathMatch } from './model.js';
 
 export const CATCH_ALL_WILDCARD: string = '**';
 export const TRAVERSE_FLAG: string = '\\.\\.\\/';

@@ -4,13 +4,13 @@ import type { UmbPropertyDatasetContext } from './property-dataset-context.inter
 import type { UmbNameablePropertyDatasetContext } from './nameable-property-dataset-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
  * A base property dataset context implementation.
  * @class UmbPropertyDatasetContextBase
- * @extends {UmbContextBase}
+ * @augments {UmbContextBase}
  */
 export class UmbPropertyDatasetContextBase
 	extends UmbContextBase<typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE>
@@ -23,6 +23,9 @@ export class UmbPropertyDatasetContextBase
 	public readonly values = this.#values.asObservable();
 	private _entityType!: string;
 	private _unique!: string;
+
+	#readOnly = new UmbBooleanState(false);
+	public readOnly = this.#readOnly.asObservable();
 
 	getEntityType() {
 		return this._entityType;
@@ -47,7 +50,10 @@ export class UmbPropertyDatasetContextBase
 	}
 
 	/**
-	 * TODO: Write proper JSDocs here.
+	 * @function propertyValueByAlias
+	 * @param {string} propertyAlias
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		return this.#values.asObservablePart((values) => {
@@ -57,7 +63,11 @@ export class UmbPropertyDatasetContextBase
 	}
 
 	/**
-	 * TODO: Write proper JSDocs here.
+	 * @function setPropertyValue
+	 * @param {string} alias
+	 * @param {PromiseLike<unknown>} value - value can be a promise resolving into the actual value or the raw value it self.
+	 * @returns {Promise<void>}
+	 * @description Set the value of this property.
 	 */
 	setPropertyValue(alias: string, value: unknown) {
 		this.#values.appendOne({ alias, value });
@@ -68,5 +78,14 @@ export class UmbPropertyDatasetContextBase
 	}
 	setValues(map: Array<UmbPropertyValueData>) {
 		this.#values.setValue(map);
+	}
+
+	/**
+	 * Gets the read-only state of the current variant culture.
+	 * @returns {*}  {boolean}
+	 * @memberof UmbBlockGridInlinePropertyDatasetContext
+	 */
+	getReadOnly(): boolean {
+		return this.#readOnly.getValue();
 	}
 }

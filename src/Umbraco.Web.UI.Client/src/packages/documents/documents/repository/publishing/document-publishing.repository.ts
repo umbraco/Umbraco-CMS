@@ -26,7 +26,9 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	 * Publish one or more variants of a Document
 	 * @param {string} id
 	 * @param {Array<UmbVariantId>} variantIds
-	 * @return {*}
+	 * @param unique
+	 * @param variants
+	 * @returns {*}
 	 * @memberof UmbDocumentPublishingRepository
 	 */
 	async publish(unique: string, variants: Array<UmbDocumentVariantPublishModel>) {
@@ -48,7 +50,7 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	 * Unpublish one or more variants of a Document
 	 * @param {string} id
 	 * @param {Array<UmbVariantId>} variantIds
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentPublishingRepository
 	 */
 	async unpublish(id: string, variantIds: Array<UmbVariantId>) {
@@ -68,6 +70,9 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 
 	/**
 	 * Publish variants of a document including its descendants
+	 * @param id
+	 * @param variantIds
+	 * @param includeUnpublishedDescendants
 	 * @memberof UmbDocumentPublishingRepository
 	 */
 	async publishWithDescendants(id: string, variantIds: Array<UmbVariantId>, includeUnpublishedDescendants: boolean) {

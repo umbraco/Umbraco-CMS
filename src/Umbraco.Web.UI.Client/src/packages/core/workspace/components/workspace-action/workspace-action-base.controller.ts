@@ -5,10 +5,9 @@ import { UmbActionBase } from '@umbraco-cms/backoffice/action';
 
 /**
  * Base class for an workspace action.
- * @export
  * @abstract
  * @class UmbWorkspaceActionBase
- * @extends {UmbActionBase}
+ * @augments {UmbActionBase}
  * @implements {UmbEntityAction}
  * @template RepositoryType
  */

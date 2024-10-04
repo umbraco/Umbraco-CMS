@@ -13,7 +13,6 @@ import type { UmbPropertyContainerTypes } from '@umbraco-cms/backoffice/content-
 
 /**
  * A data source for the Member Type that fetches data from the server
- * @export
  * @class UmbMemberTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -22,7 +21,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 
 	/**
 	 * Creates an instance of UmbMemberTypeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMemberTypeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -32,7 +31,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 	/**
 	 * Creates a new Member Type scaffold
 	 * @param {Partial<UmbMemberTypeDetailModel>} [preset]
-	 * @return { CreateMemberTypeRequestModel }
+	 * @returns { CreateMemberTypeRequestModel }
 	 * @memberof UmbMemberTypeServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbMemberTypeDetailModel> = {}) {
@@ -61,7 +60,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 	/**
 	 * Fetches a Member Type with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberTypeServerDataSource
 	 */
 	async read(unique: string) {
@@ -98,6 +97,8 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 					variesBySegment: property.variesBySegment,
 					validation: property.validation,
 					appearance: property.appearance,
+					visibility: property.visibility,
+					isSensitive: property.isSensitive,
 				};
 			}),
 			containers: data.containers.map((container) => {
@@ -125,7 +126,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 	/**
 	 * Inserts a new Member Type on the server
 	 * @param {UmbMemberTypeDetailModel} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberTypeServerDataSource
 	 */
 	async create(model: UmbMemberTypeDetailModel) {
@@ -147,8 +148,8 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 					container: property.container ? { id: property.container.id } : null,
 					sortOrder: property.sortOrder,
 					alias: property.alias,
-					isSensitive: false,
-					visibility: { memberCanEdit: true, memberCanView: true },
+					isSensitive: property.isSensitive ?? false,
+					visibility: property.visibility ?? { memberCanEdit: false, memberCanView: false },
 					name: property.name,
 					description: property.description,
 					dataType: { id: property.dataType.unique },
@@ -185,7 +186,8 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 	/**
 	 * Updates a MemberType on the server
 	 * @param {UmbMemberTypeDetailModel} MemberType
-	 * @return {*}
+	 * @param model
+	 * @returns {*}
 	 * @memberof UmbMemberTypeServerDataSource
 	 */
 	async update(model: UmbMemberTypeDetailModel) {
@@ -206,8 +208,8 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 					id: property.id,
 					container: property.container ? { id: property.container.id } : null,
 					sortOrder: property.sortOrder,
-					isSensitive: false,
-					visibility: { memberCanEdit: true, memberCanView: true },
+					isSensitive: property.isSensitive ?? false,
+					visibility: property.visibility ?? { memberCanEdit: false, memberCanView: false },
 					alias: property.alias,
 					name: property.name,
 					description: property.description,
@@ -245,7 +247,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 	/**
 	 * Deletes a Member Type on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberTypeServerDataSource
 	 */
 	async delete(unique: string) {

@@ -25,8 +25,8 @@ export interface UmbUploadableExtensionModel {
 
 /**
  * Manages the dropzone and uploads files to the server.
- * @method createFilesAsMedia - Upload files to the server and creates the items using corresponding media type.
- * @method createFilesAsTemporary - Upload the files as temporary files and returns the data.
+ * @function createFilesAsMedia - Upload files to the server and creates the items using corresponding media type.
+ * @function createFilesAsTemporary - Upload the files as temporary files and returns the data.
  * @observable completed - Emits an array of completed uploads.
  */
 export class UmbDropzoneManager extends UmbControllerBase {
@@ -71,6 +71,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	 * Allows the user to pick a media type option if multiple types are allowed.
 	 * @param files
 	 * @param parentUnique
+	 * @returns Promise<void>
 	 */
 	public async createFilesAsMedia(files: Array<File>, parentUnique: string | null) {
 		if (!files.length) return;
@@ -118,11 +119,8 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		}
 
 		notAllowedFiles.forEach((file) => {
-			try {
-				throw new Error(`File ${file.name} of type ${file.type} is not allowed here.`);
-			} catch (e) {
-				undefined;
-			}
+			// TODO: It seems like some implementation(user feedback) is missing here? [NL]
+			console.error(`File ${file.name} of type ${file.type} is not allowed here.`);
 		});
 
 		if (!uploadableFiles.length) return;
@@ -226,6 +224,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 
 			if (upload.status === TemporaryFileStatus.SUCCESS) {
 				// Upload successful. Create media item.
+				// TODO: Use a scaffolding feature to ensure consistency. [NL]
 				const preset: Partial<UmbMediaDetailModel> = {
 					unique: file.unique,
 					mediaType: {
@@ -243,6 +242,8 @@ export class UmbDropzoneManager extends UmbControllerBase {
 					],
 					values: [
 						{
+							// We do not need to parse the right editorAlias here, because the server does not read it. If we need to parse it we would need to load the contentType to make this happen properly. [NL]
+							editorAlias: null as any,
 							alias: 'umbracoFile',
 							value: { temporaryFileId: upload.temporaryUnique },
 							culture: null,

@@ -1,5 +1,10 @@
+import type { UmbExtensionManifestKind } from '../extension-registry/registry.js';
 import { manifest as collectionAliasCondition } from './collection-alias.manifest.js';
 import { manifest as collectionBulkActionPermissionCondition } from './collection-bulk-action-permission.manifest.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as workspaceViewManifests } from './workspace-view/manifests.js';
 
-export const manifests: Array<ManifestTypes> = [collectionAliasCondition, collectionBulkActionPermissionCondition];
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
+	...workspaceViewManifests,
+	collectionAliasCondition,
+	collectionBulkActionPermissionCondition,
+];

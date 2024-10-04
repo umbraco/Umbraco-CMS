@@ -5,7 +5,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Document Public Access that fetches data from the server
- * @export
  * @class UmbDocumentPublicAccessServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -14,7 +13,7 @@ export class UmbDocumentPublicAccessServerDataSource {
 
 	/**
 	 * Creates an instance of UmbDocumentPublicAccessServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentPublicAccessServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -49,6 +48,7 @@ export class UmbDocumentPublicAccessServerDataSource {
 	 * Updates Public Access for the given Document unique
 	 * @param {string} unique
 	 * @param {PublicAccessRequestModel} data
+	 * @param requestBody
 	 * @memberof UmbDocumentPublicAccessServerDataSource
 	 */
 	async update(unique: string, requestBody: PublicAccessRequestModel) {

@@ -6,13 +6,14 @@ import { html, customElement, property, state, ifDefined } from '@umbraco-cms/ba
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import { removeInitialSlashFromPath, transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
+import { removeLastSlashFromPath, transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
+import { UUICardEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-block-type-card')
 export class UmbBlockTypeCardElement extends UmbLitElement {
 	//
 	#init: Promise<void>;
-	#appUrl?: string;
+	#appUrl: string = '';
 
 	#itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
 		this,
@@ -20,7 +21,7 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 		(x) => x.unique,
 	);
 
-	@property({ type: String, attribute: false })
+	@property({ type: String })
 	href?: string;
 
 	@property({ type: String, attribute: false })
@@ -28,7 +29,7 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 		value = transformServerPathToClientPath(value);
 		if (value) {
 			this.#init.then(() => {
-				this._iconFile = this.#appUrl + removeInitialSlashFromPath(value);
+				this._iconFile = removeLastSlashFromPath(this.#appUrl) + value;
 			});
 		} else {
 			this._iconFile = undefined;
@@ -89,11 +90,16 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 		});
 	}
 
+	#onOpen = () => {
+		this.dispatchEvent(new UUICardEvent(UUICardEvent.OPEN));
+	};
+
 	// TODO: Support image files instead of icons.
 	override render() {
 		return html`
 			<uui-card-block-type
 				href=${ifDefined(this.href)}
+				@open=${this.#onOpen}
 				.name=${this._name ?? 'Unknown'}
 				.description=${this._description}
 				.background=${this.backgroundColor}>

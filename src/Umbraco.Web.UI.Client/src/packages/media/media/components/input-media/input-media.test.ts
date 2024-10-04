@@ -1,6 +1,7 @@
 import { UmbInputMediaElement } from './input-media.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
+
 describe('UmbInputMediaElement', () => {
 	let element: UmbInputMediaElement;
 

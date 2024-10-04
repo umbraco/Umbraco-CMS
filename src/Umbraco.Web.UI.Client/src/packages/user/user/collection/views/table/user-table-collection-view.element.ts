@@ -1,6 +1,7 @@
 import type { UmbUserCollectionContext } from '../../user-collection.context.js';
 import type { UmbUserDetailModel } from '../../../types.js';
 import { UMB_USER_COLLECTION_CONTEXT } from '../../user-collection.context-token.js';
+import { UmbUserKind } from '../../../utils/index.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
@@ -114,7 +115,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 		this._tableItems = this._users.map((user) => {
 			return {
 				id: user.unique,
-				icon: 'icon-user',
+				icon: user.kind === UmbUserKind.API ? 'icon-unplug' : 'icon-user',
 				data: [
 					{
 						columnAlias: 'userName',
@@ -122,6 +123,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 							unique: user.unique,
 							name: user.name,
 							avatarUrls: user.avatarUrls,
+							kind: user.kind,
 						},
 					},
 					{

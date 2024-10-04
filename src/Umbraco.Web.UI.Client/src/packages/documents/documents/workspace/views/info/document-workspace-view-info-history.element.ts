@@ -1,13 +1,10 @@
-import { UMB_ROLLBACK_MODAL } from '../../../modals/rollback/index.js';
 import type { UmbDocumentAuditLogModel } from '../../../audit-log/types.js';
 import { UmbDocumentAuditLogRepository } from '../../../audit-log/index.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
 import { TimeOptions, getDocumentHistoryTagStyleAndText } from './utils.js';
-import { css, html, customElement, state, nothing, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
@@ -66,16 +63,6 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 		this.#requestAuditLogs();
 	}
 
-	#onRollbackModalOpen = async () => {
-		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManagerContext.open(this, UMB_ROLLBACK_MODAL, {});
-
-		await modalContext.onSubmit();
-		// TODO: This notification won't actually show at the moment because we perform a full page reload after rollback. However, when we can do it without a full page reload, this should be used.
-		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-		notificationContext.peek('positive', { data: { message: this.localize.term('rollback_documentRolledBack') } });
-	};
-
 	async #requestAndCacheUserItems() {
 		const allUsers = this._items?.map((item) => item.user.unique).filter(Boolean) as string[];
 		const uniqueUsers = [...new Set(allUsers)];
@@ -97,16 +84,12 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 
 	override render() {
 		return html`<uui-box>
-			<div id="rollback" slot="header">
-				<h2><umb-localize key="general_history">History</umb-localize></h2>
-				<uui-button
-					label=${this.localize.term('actions_rollback')}
-					look="secondary"
-					slot="actions"
-					@click=${this.#onRollbackModalOpen}>
-					<uui-icon name="icon-undo"></uui-icon> ${this.localize.term('actions_rollback')}
-				</uui-button>
-			</div>
+			<umb-localize slot="headline" key="general_history">History</umb-localize>
+			<umb-extension-with-api-slot
+				slot="header-actions"
+				type="entityAction"
+				.filter=${(manifest: any) => manifest.alias === 'Umb.EntityAction.Document.Rollback'}></umb-extension-with-api-slot>
+			</uui-button>
 			${this._items ? this.#renderHistory() : html`<uui-loader-circle></uui-loader-circle> `}
 			${this.#renderPagination()}
 		</uui-box> `;
@@ -122,13 +105,15 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 						(item) => {
 							const { text, style } = getDocumentHistoryTagStyleAndText(item.logType);
 							const user = this.#userMap.get(item.user.unique);
-							const userName = user?.name ?? 'Unknown';
-							const avatarUrl = user && Array.isArray(user.avatarUrls) ? user.avatarUrls[1] : undefined;
 
 							return html`<umb-history-item
-								.name=${userName}
+								.name=${user?.name ?? 'Unknown'}
 								.detail=${this.localize.date(item.timestamp, TimeOptions)}>
-								<uui-avatar slot="avatar" .name="${userName}" img-src=${ifDefined(avatarUrl)}></uui-avatar>
+								<umb-user-avatar
+									slot="avatar"
+									.name=${user?.name}
+									.kind=${user?.kind}
+									.imgUrls=${user?.avatarUrls ?? []}></umb-user-avatar>
 
 								<span class="log-type">
 									<uui-tag look=${style.look} color=${style.color}>
@@ -165,18 +150,6 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 		css`
 			uui-loader-circle {
 				font-size: 2rem;
-			}
-
-			#rollback {
-				display: flex;
-				width: 100%;
-				align-items: center;
-				justify-content: space-between;
-			}
-
-			#rollback h2 {
-				font-size: var(--uui-type-h5-size);
-				margin: 0;
 			}
 
 			uui-tag uui-icon {

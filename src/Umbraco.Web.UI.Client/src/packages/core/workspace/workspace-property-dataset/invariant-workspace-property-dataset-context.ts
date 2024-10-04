@@ -4,6 +4,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbInvariantDatasetWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * A property dataset context that hooks directly into the workspace context.
@@ -14,6 +15,9 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 	extends UmbContextBase<UmbPropertyDatasetContext>
 	implements UmbPropertyDatasetContext, UmbNameablePropertyDatasetContext
 {
+	#readOnly = new UmbBooleanState(false);
+	public readOnly = this.#readOnly.asObservable();
+
 	#workspace: WorkspaceType;
 
 	name;
@@ -44,7 +48,10 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 	}
 
 	/**
-	 * TODO: Write proper JSDocs here.
+	 * @function propertyValueByAlias
+	 * @param {string} propertyAlias
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		return await this.#workspace.propertyValueByAlias<ReturnType>(propertyAlias);
@@ -52,8 +59,14 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 
 	/**
 	 * TODO: Write proper JSDocs here.
+	 * @param propertyAlias
+	 * @param value
 	 */
 	async setPropertyValue(propertyAlias: string, value: unknown) {
 		return this.#workspace.setPropertyValue(propertyAlias, value);
+	}
+
+	getReadOnly() {
+		return this.#readOnly.getValue();
 	}
 }

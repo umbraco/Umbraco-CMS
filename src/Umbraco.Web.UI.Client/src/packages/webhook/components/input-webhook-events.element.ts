@@ -47,23 +47,29 @@ export class UmbInputWebhookEventsElement extends UmbLitElement {
 		if (!this.events.length) return nothing;
 
 		return html`
-			${repeat(
-				this.events,
-				(item) => item.alias,
-				(item) => html`
-					<span>${item.eventName}</span>
-					<uui-button
-						label=${this.localize.term('general_remove')}
-						@click=${() => this.#removeEvent(item.alias)}></uui-button>
-				`,
-			)}
+			<uui-ref-list>
+				${repeat(
+					this.events,
+					(item) => item.alias,
+					(item) => html`
+						<uui-ref-node name=${item.eventName} @open=${this.#openModal}>
+							<umb-icon slot="icon" name="icon-globe"></umb-icon>
+							<uui-action-bar slot="actions">
+								<uui-button
+									label=${this.localize.term('general_remove')}
+									@click=${() => this.#removeEvent(item.alias)}></uui-button>
+							</uui-action-bar>
+						</uui-ref-node>
+					`,
+				)}
+			</uui-ref-list>
 		`;
 	}
 
 	override render() {
 		return html`${this.#renderEvents()}
 			<uui-button
-				id="choose"
+				id="btn-add"
 				look="placeholder"
 				label=${this.localize.term('general_choose')}
 				@click=${this.#openModal}></uui-button>`;
@@ -72,15 +78,8 @@ export class UmbInputWebhookEventsElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
-			:host {
-				display: grid;
-				grid-template-columns: 1fr auto;
-				gap: var(--uui-size-space-2) var(--uui-size-space-2);
-				align-items: center;
-			}
-
-			#choose {
-				grid-column: -1 / 1;
+			#btn-add {
+				display: block;
 			}
 		`,
 	];

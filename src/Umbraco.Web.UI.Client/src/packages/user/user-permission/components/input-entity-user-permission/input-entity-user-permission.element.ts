@@ -1,5 +1,5 @@
+import type { ManifestEntityUserPermission } from '../../entity-user-permission.extension.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
@@ -53,7 +53,11 @@ export class UmbInputEntityUserPermissionElement extends UmbFormControlMixin(Umb
 	#onChangeUserPermission(event: UmbChangeEvent, permissionVerbs: Array<string>) {
 		event.stopPropagation();
 		const target = event.target as UmbUserPermissionVerbElement;
-		target.allowed ? this.#addUserPermission(permissionVerbs) : this.#removeUserPermission(permissionVerbs);
+		if (target.allowed) {
+			this.#addUserPermission(permissionVerbs);
+		} else {
+			this.#removeUserPermission(permissionVerbs);
+		}
 	}
 
 	#addUserPermission(permissionVerbs: Array<string>) {

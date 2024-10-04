@@ -3,8 +3,10 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * @element umb-property-editor-ui-member-group-picker
@@ -21,6 +23,15 @@ export class UmbPropertyEditorUIMemberGroupPickerElement extends UmbLitElement i
 		this._min = minMax?.min ?? 0;
 		this._max = minMax?.max ?? Infinity;
 	}
+
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
 
 	@state()
 	_min = 0;
@@ -40,7 +51,8 @@ export class UmbPropertyEditorUIMemberGroupPickerElement extends UmbLitElement i
 				.max=${this._max}
 				.value=${this.value}
 				?showOpenButton=${true}
-				@change=${this.#onChange}></umb-input-member-group>
+				@change=${this.#onChange}
+				?readonly=${this.readonly}></umb-input-member-group>
 		`;
 	}
 }

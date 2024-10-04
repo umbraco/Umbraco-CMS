@@ -3,9 +3,9 @@ import type {
 	UmbDataTypePickerFlowDataTypePickerModalData,
 	UmbDataTypePickerFlowDataTypePickerModalValue,
 } from './data-type-picker-flow-data-type-picker-modal.token.js';
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbDataTypeItemModel } from '@umbraco-cms/backoffice/data-type';
 
 @customElement('umb-data-type-picker-flow-data-type-picker-modal')
@@ -25,10 +25,10 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 
 		this._propertyEditorUiAlias = this.data.propertyEditorUiAlias;
 
-		this._observeDataTypesOf(this._propertyEditorUiAlias);
+		this.#observeDataTypesOf(this._propertyEditorUiAlias);
 	}
 
-	private async _observeDataTypesOf(propertyEditorUiAlias: string) {
+	async #observeDataTypesOf(propertyEditorUiAlias: string) {
 		if (!this.data) return;
 
 		const dataTypeCollectionRepository = new UmbDataTypeCollectionRepository(this);
@@ -40,64 +40,65 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 		});
 
 		this.observe(collection.asObservable(), (dataTypes) => {
-			this._dataTypes = dataTypes;
+			this._dataTypes = dataTypes.sort((a, b) => a.name.localeCompare(b.name));
 		});
 	}
 
-	private _handleClick(dataType: UmbDataTypeItemModel) {
+	#handleClick(dataType: UmbDataTypeItemModel) {
 		if (dataType.unique) {
 			this.value = { dataTypeId: dataType.unique };
 			this.modalContext?.submit();
 		}
 	}
 
-	private _handleCreate() {
+	#handleCreate() {
 		this.value = { createNewWithPropertyEditorUiAlias: this._propertyEditorUiAlias };
 		this.modalContext?.submit();
 	}
 
-	private _close() {
+	#close() {
 		this.modalContext?.reject();
 	}
 
 	override render() {
 		return html`
-			<umb-body-layout headline="Select a configuration">
-				<uui-box> ${this._renderDataTypes()} ${this._renderCreate()}</uui-box>
+			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectEditorConfiguration')}>
+				<uui-box>${this.#renderDataTypes()} ${this.#renderCreate()}</uui-box>
 				<div slot="actions">
-					<uui-button label=${this.localize.term('general_close')} @click=${this._close}></uui-button>
+					<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
 	}
 
-	private _renderDataTypes() {
-		return this._dataTypes && this._dataTypes.length > 0
-			? html`<ul id="item-grid">
-					${repeat(
-						this._dataTypes!,
-						(dataType) => dataType.unique,
-						(dataType) =>
-							dataType.unique
-								? html` <li class="item">
-										<uui-button label="dataType.name" type="button" @click="${() => this._handleClick(dataType)}">
-											<div class="item-content">
-												<umb-icon name=${dataType.icon ?? 'icon-circle-dotted'} class="icon"></umb-icon>
-												${dataType.name}
-											</div>
-										</uui-button>
-									</li>`
-								: '',
-					)}
-				</ul>`
-			: '';
-	}
-	private _renderCreate() {
+	#renderDataTypes() {
+		if (!this._dataTypes?.length) return;
 		return html`
-			<uui-button id="create-button" type="button" look="placeholder" @click="${this._handleCreate}">
+			<ul id="item-grid">
+				${repeat(
+					this._dataTypes,
+					(dataType) => dataType.unique,
+					(dataType) => html`
+						<li class="item">
+							<uui-button label=${dataType.name} @click=${() => this.#handleClick(dataType)}>
+								<div class="item-content">
+									<umb-icon name=${dataType.icon ?? 'icon-circle-dotted'} class="icon"></umb-icon>
+									${dataType.name}
+								</div>
+							</uui-button>
+						</li>
+					`,
+				)}
+			</ul>
+		`;
+	}
+
+	#renderCreate() {
+		return html`
+			<uui-button id="create-button" look="placeholder" @click=${this.#handleCreate}>
 				<div class="content">
 					<uui-icon name="icon-add" class="icon"></uui-icon>
-					Create new
+					<umb-localize key="contentTypeEditor_availableEditors">Create new</umb-localize>
 				</div>
 			</uui-button>
 		`;
@@ -174,12 +175,6 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 				margin: auto;
 			}
 
-			#category-name {
-				text-align: center;
-				display: block;
-				text-transform: capitalize;
-				font-size: 1.2rem;
-			}
 			#create-button {
 				max-width: 100px;
 				--uui-button-padding-left-factor: 0;

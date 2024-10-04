@@ -1,4 +1,4 @@
-import type { UmbWorkspaceContext } from './workspace-context.interface.js';
+import type { UmbWorkspaceContext } from '../../workspace-context.interface.js';
 import type { UmbVariantDatasetWorkspaceContext } from './variant-dataset-workspace-context.interface.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 

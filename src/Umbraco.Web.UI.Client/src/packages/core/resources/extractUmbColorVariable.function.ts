@@ -22,6 +22,10 @@ export const umbracoColors = [
 	{ alias: 'deep-orange', legacy: true, varName: '--uui-palette-cocoa-brown' },
 ];
 
+/**
+ *
+ * @param colorAlias
+ */
 export function extractUmbColorVariable(colorAlias: string): string | undefined {
 	const found = umbracoColors.find((umbColor) => umbColor.alias === colorAlias);
 	return found?.varName;

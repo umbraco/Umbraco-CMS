@@ -6,9 +6,9 @@ import { manifests as appLanguageSelect } from './app-language-select/manifests.
 import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as globalContextManifests } from './global-contexts/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { manifest as conditionsManifest } from './conditions/multiple-app-languages.condition.js';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	...repositoryManifests,
 	...entityActions,
 	...menuManifests,
@@ -17,4 +17,17 @@ export const manifests: Array<ManifestTypes> = [
 	...modalManifests,
 	...collectionManifests,
 	...globalContextManifests,
+	conditionsManifest,
+	{
+		type: 'workspaceContext',
+		name: 'Document Language Access Workspace Context',
+		alias: 'Umb.WorkspaceContext.DocumentLanguageAccess',
+		api: () => import('./permissions/language-access.workspace-context.js'),
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: 'Umb.Workspace.Document',
+			},
+		],
+	},
 ];

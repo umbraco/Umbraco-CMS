@@ -3,6 +3,10 @@ export type UmbObjectWithVariantProperties = {
 	segment: string | null;
 };
 
+/**
+ *
+ * @param variant
+ */
 export function variantPropertiesObjectToString(variant: UmbObjectWithVariantProperties): string {
 	// Currently a direct copy of the toString method of variantId.
 	return (variant.culture || UMB_INVARIANT_CULTURE) + (variant.segment ? `_${variant.segment}` : '');
@@ -16,6 +20,10 @@ export const UMB_INVARIANT_CULTURE = 'invariant';
  */
 export class UmbVariantId {
 	public static Create(variantData: UmbObjectWithVariantProperties): UmbVariantId {
+		return Object.freeze(new UmbVariantId(variantData.culture, variantData.segment));
+	}
+
+	public static CreateFromPartial(variantData: Partial<UmbObjectWithVariantProperties>): UmbVariantId {
 		return Object.freeze(new UmbVariantId(variantData.culture, variantData.segment));
 	}
 
@@ -75,17 +83,28 @@ export class UmbVariantId {
 		return { culture: this.culture, segment: this.segment };
 	}
 
+	public toSegmentInvariant(): UmbVariantId {
+		return Object.freeze(new UmbVariantId(this.culture, null));
+	}
+	public toCultureInvariant(): UmbVariantId {
+		return Object.freeze(new UmbVariantId(null, this.culture));
+	}
+
 	// TODO: needs localization option:
 	// TODO: Consider if this should be handled else where, it does not seem like the responsibility of this class, since it contains wordings:
-	public toDifferencesString(variantId: UmbVariantId): string {
+	public toDifferencesString(
+		variantId: UmbVariantId,
+		invariantMessage: string = 'Invariant',
+		unsegmentedMessage: string = 'Unsegmented',
+	): string {
 		let r = '';
 
 		if (variantId.culture !== this.culture) {
-			r = 'Invariant';
+			r = invariantMessage;
 		}
 
 		if (variantId.segment !== this.segment) {
-			r = (r !== '' ? ' ' : '') + 'Unsegmented';
+			r = (r !== '' ? ' ' : '') + unsegmentedMessage;
 		}
 
 		return r;

@@ -22,6 +22,7 @@ export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
 	/**
 	 * Requests the items for the given uniques
 	 * @param {Array<string>} uniques
+	 * @param imagingModel
 	 * @memberof UmbImagingRepository
 	 */
 	async requestResizedItems(

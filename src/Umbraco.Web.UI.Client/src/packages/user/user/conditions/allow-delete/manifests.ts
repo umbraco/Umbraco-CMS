@@ -1,6 +1,4 @@
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'condition',
 		name: 'User Allow Delete Action Condition',

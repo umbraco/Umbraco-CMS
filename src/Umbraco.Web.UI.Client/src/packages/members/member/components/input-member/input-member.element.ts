@@ -1,10 +1,10 @@
 import type { UmbMemberItemModel } from '../../repository/index.js';
-import { UmbMemberPickerContext } from './input-member.context.js';
+import { UmbMemberPickerInputContext } from './input-member.context.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -35,7 +35,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default 0
+	 * @default
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
@@ -58,7 +58,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default Infinity
+	 * @default
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
@@ -102,13 +102,34 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 	@property({ type: Object, attribute: false })
 	public filter: (member: UmbMemberItemModel) => boolean = () => true;
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: Boolean, reflect: true })
+	public get readonly() {
+		return this.#readonly;
+	}
+	public set readonly(value) {
+		this.#readonly = value;
+
+		if (this.#readonly) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
+	}
+	#readonly = false;
+
 	@state()
 	private _editMemberPath = '';
 
 	@state()
 	private _items?: Array<UmbMemberItemModel>;
 
-	#pickerContext = new UmbMemberPickerContext(this);
+	#pickerContext = new UmbMemberPickerInputContext(this);
 
 	constructor() {
 		super();
@@ -175,24 +196,28 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 
 	#renderAddButton() {
 		if (this.selection.length >= this.max) return nothing;
-		return html`
-			<uui-button
-				id="btn-add"
-				look="placeholder"
-				@click=${this.#openPicker}
-				label=${this.localize.term('general_choose')}></uui-button>
-		`;
+		if (this.readonly && this.selection.length > 0) {
+			return nothing;
+		} else {
+			return html`
+				<uui-button
+					id="btn-add"
+					look="placeholder"
+					@click=${this.#openPicker}
+					label=${this.localize.term('general_choose')}
+					?disabled=${this.readonly}></uui-button>
+			`;
+		}
 	}
 
 	#renderItem(item: UmbMemberItemModel) {
 		if (!item.unique) return nothing;
 		return html`
-			<uui-ref-node name=${item.name} id=${item.unique}>
+			<uui-ref-node-member name=${item.name} id=${item.unique} ?readonly=${this.readonly}>
 				<uui-action-bar slot="actions">
-					${this.#renderOpenButton(item)}
-					<uui-button @click=${() => this.#onRemove(item)} label=${this.localize.term('general_remove')}></uui-button>
+					${this.#renderOpenButton(item)} ${this.#renderRemoveButton(item)}
 				</uui-action-bar>
-			</uui-ref-node>
+			</uui-ref-node-member>
 		`;
 	}
 
@@ -204,6 +229,13 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 				label="${this.localize.term('general_open')} ${item.name}">
 				${this.localize.term('general_open')}
 			</uui-button>
+		`;
+	}
+
+	#renderRemoveButton(item: UmbMemberItemModel) {
+		if (this.readonly) return nothing;
+		return html`
+			<uui-button @click=${() => this.#onRemove(item)} label=${this.localize.term('general_remove')}></uui-button>
 		`;
 	}
 

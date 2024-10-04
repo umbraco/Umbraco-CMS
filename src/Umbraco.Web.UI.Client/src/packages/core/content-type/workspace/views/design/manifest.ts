@@ -1,6 +1,6 @@
-import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const contentTypeDesignEditorManifest: UmbBackofficeManifestKind = {
+export const contentTypeDesignEditorManifest: UmbExtensionManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.WorkspaceView.ContentTypeDesignEditor',
 	matchKind: 'contentTypeDesignEditor',

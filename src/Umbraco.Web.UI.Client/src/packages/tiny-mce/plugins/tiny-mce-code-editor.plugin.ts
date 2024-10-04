@@ -1,6 +1,7 @@
 import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '../components/input-tiny-mce/tiny-mce-plugin.js';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
-import { UMB_CODE_EDITOR_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_CODE_EDITOR_MODAL } from '@umbraco-cms/backoffice/code-editor';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export default class UmbTinyMceCodeEditorPlugin extends UmbTinyMcePluginBase {
 	constructor(args: TinyMcePluginArguments) {

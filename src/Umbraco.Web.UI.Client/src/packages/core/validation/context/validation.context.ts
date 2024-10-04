@@ -1,114 +1,32 @@
-import type { UmbValidator } from '../interfaces/validator.interface.js';
-import { UmbValidationMessagesManager } from './validation-messages.manager.js';
+import { UmbValidationController } from '../controllers/validation.controller.js';
 import { UMB_VALIDATION_CONTEXT } from './validation.context-token.js';
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-
-export class UmbValidationContext extends UmbContextBase<UmbValidationContext> implements UmbValidator {
-	#validators: Array<UmbValidator> = [];
-	#validationMode: boolean = false;
-	#isValid: boolean = false;
-
-	public readonly messages = new UmbValidationMessagesManager();
-
+/**
+ * Validation Context is the core of Validation.
+ * It hosts Validators that has to validate for the context to be valid.
+ * It can also be used as a Validator as part of a parent Validation Context.
+ */
+export class UmbValidationContext extends UmbValidationController {
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_VALIDATION_CONTEXT);
+		// This is overridden to avoid setting a controllerAlias, this might make sense, but currently i want to leave it out. [NL]
+		super(host);
+		this.provideContext(UMB_VALIDATION_CONTEXT, this);
 	}
-
-	get isValid(): boolean {
-		return this.#isValid;
-	}
-
-	addValidator(validator: UmbValidator): void {
-		if (this.#validators.includes(validator)) return;
-		this.#validators.push(validator);
-		//validator.addEventListener('change', this.#onValidatorChange);
-		if (this.#validationMode) {
-			this.validate();
-		}
-	}
-	removeValidator(validator: UmbValidator): void {
-		const index = this.#validators.indexOf(validator);
-		if (index !== -1) {
-			// Remove the validator:
-			this.#validators.splice(index, 1);
-			// If we are in validation mode then we should re-validate to focus next invalid element:
-			if (this.#validationMode) {
-				this.validate();
-			}
-		}
-	}
-
-	/*#onValidatorChange = (e: Event) => {
-		const target = e.target as unknown as UmbValidator | undefined;
-		if (!target) {
-			console.error('Validator did not exist.');
-			return;
-		}
-		const dataPath = target.dataPath;
-		if (!dataPath) {
-			console.error('Validator did not exist or did not provide a data-path.');
-			return;
-		}
-
-		if (target.isValid) {
-			this.messages.removeMessagesByTypeAndPath('client', dataPath);
-		} else {
-			this.messages.addMessages('client', dataPath, target.getMessages());
-		}
-	};*/
 
 	/**
-	 *
-	 * @returns succeed {Promise<boolean>} - Returns a promise that resolves to true if the validator succeeded, this depends on the validators and wether forceSucceed is set.
+	 * Provides the validation context to the current host, if not already provided to a different host.
+	 * @deprecated No need to provide, this happens automatically. (Do notice this was necessary in 14.3.-rc, but removed in 14.3 release)
+	 * @returns instance {UmbValidationController} - Returns it self.
 	 */
-	async validate(): Promise<void> {
-		// TODO: clear server messages here?, well maybe only if we know we will get new server messages? Do the server messages hook into the system like another validator?
-		this.#validationMode = true;
+	provide(): UmbValidationController {
+		return this;
+	}
 
-		const resultsStatus = await Promise.all(this.#validators.map((v) => v.validate())).then(
-			() => Promise.resolve(true),
-			() => Promise.resolve(false),
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	override provideAt(controllerHost: UmbClassInterface): void {
+		throw new Error(
+			'UmbValidationContext cannot be used to provide at a different host. Use the UmbValidationController instead.',
 		);
-
-		// If we have any messages then we are not valid, otherwise lets check the validation results: [NL]
-		// This enables us to keep client validations though UI is not present anymore — because the client validations got defined as messages. [NL]
-		const isValid = this.messages.getHasAnyMessages() ? false : resultsStatus;
-
-		this.#isValid = isValid;
-
-		if (isValid === false) {
-			// Focus first invalid element:
-			this.focusFirstInvalidElement();
-			return Promise.reject();
-		}
-
-		return Promise.resolve();
-	}
-
-	focusFirstInvalidElement(): void {
-		const firstInvalid = this.#validators.find((v) => !v.isValid);
-		if (firstInvalid) {
-			firstInvalid.focusFirstInvalidElement();
-		}
-	}
-
-	reset(): void {
-		this.#validationMode = false;
-		this.#validators.forEach((v) => v.reset());
-	}
-
-	#destroyValidators(): void {
-		if (this.#validators === undefined || this.#validators.length === 0) return;
-		this.#validators.forEach((validator) => {
-			validator.destroy();
-			//validator.removeEventListener('change', this.#runValidate);
-		});
-		this.#validators = [];
-	}
-
-	override destroy(): void {
-		this.#destroyValidators();
-		super.destroy();
 	}
 }

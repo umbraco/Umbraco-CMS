@@ -5,15 +5,14 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
- * @export
  * @class UmbWebhookEventStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Data Store for Webhook Events
  */
 export class UmbWebhookEventStore extends UmbStoreBase<UmbWebhookEventModel> {
 	/**
 	 * Creates an instance of UmbWebhookEventStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbWebhookEventStore
 	 */
 	constructor(host: UmbControllerHost) {

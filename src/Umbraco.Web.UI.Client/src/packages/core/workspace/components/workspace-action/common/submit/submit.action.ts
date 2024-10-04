@@ -37,3 +37,8 @@ export class UmbSubmitWorkspaceAction extends UmbWorkspaceActionBase<UmbSubmitta
 		return await workspaceContext.requestSubmit();
 	}
 }
+
+/*
+ * @deprecated Use UmbSubmitWorkspaceAction instead
+ */
+export { UmbSubmitWorkspaceAction as UmbSaveWorkspaceAction };

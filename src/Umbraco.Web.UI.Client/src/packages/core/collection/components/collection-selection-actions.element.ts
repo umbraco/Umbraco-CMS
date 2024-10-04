@@ -5,6 +5,10 @@ import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffic
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestEntityBulkAction, MetaEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 
+/**
+ *
+ * @param manifest
+ */
 function apiArgsMethod(manifest: ManifestEntityBulkAction<MetaEntityBulkAction>) {
 	return [{ meta: manifest.meta }] as unknown[];
 }

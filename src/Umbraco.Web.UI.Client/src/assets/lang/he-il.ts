@@ -469,11 +469,7 @@ export default {
 	},
 	notifications: {
 		editNotifications: 'ערוך את ההתראות עבור %0%',
-		mailBody:
-			'\n      שלום, %0%\n\n      זוהי הודעה אוטומטית המיידעת אותך שהמשימה %1%\n\t  בוצעה בעמוד %2% על ידי המשתמש %3%\n\n      לעריכה, יש ללחוץ על הלינק הבא://%4%/actions/editContent.aspx?id=%5% .\n\n      המשך יום נעים!\n    ',
-		mailBodyHtml:
-			'<p>Hi %0%</p>\n\n\t\t  <p>This is an automated mail to inform you that the task <strong>\'%1%\'</strong>\n\t\t  has been performed on the page <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>\'%2%\'</strong></a>\n\t\t  by the user <strong>\'%3%\'</strong>\n\t  </p>\n\t\t  <div style="margin: 8px 0; padding: 8px; display: block;">\n\t\t\t\t<br />\n\t\t\t\t<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;\n\t\t\t\t<br />\n\t\t  </div>\n\t\t  <p>\n\t\t\t  <h3>Update summary:</h3>\n\t\t\t  <table style="width: 100%;">\n\t\t\t\t\t\t   %6%\n\t\t\t\t</table>\n\t\t\t </p>\n\n\t\t  <div style="margin: 8px 0; padding: 8px; display: block;">\n\t\t\t\t<br />\n\t\t\t\t<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;\n\t\t\t\t<br />\n\t\t  </div>\n\n\t\t  <p>Have a nice day!<br /><br />\n\t\t\t  Cheers from the Umbraco robot\n\t\t  </p>',
-		mailSubject: '[%0%] התראות  %1% בוצעו ב %2%',
+		notificationsSavedFor: 'ההתראות נשמרו עבור %0%',
 		notifications: 'התראות',
 	},
 	packager: {

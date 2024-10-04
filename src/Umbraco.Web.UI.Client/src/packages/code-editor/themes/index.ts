@@ -7,8 +7,7 @@ import type { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
 
 /**
  * 4 themes for the code editor.
- *
- * @type {*} */
+  @type {*} */
 const themes: Record<CodeEditorTheme, monaco.editor.IStandaloneThemeData> = {
 	'umb-dark': UmbCodeEditorThemeDark,
 	'umb-light': UmbCodeEditorThemeLight,

@@ -54,8 +54,8 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 				this._unique = values[0];
 				this._entityType = values[1];
 			},
-		),
-			'_observeEntityModel';
+			'_observeEntityModel',
+		);
 	}
 
 	#closeContextMenu() {
@@ -153,6 +153,9 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 				box-sizing: border-box;
 				display: flex;
 				align-items: center;
+			}
+			#action-modal umb-entity-action-list{
+				--uui-menu-item-flat-structure: 0;
 			}
 		`,
 	];

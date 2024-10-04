@@ -1,5 +1,9 @@
 import { EventMessageTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
+/**
+ *
+ * @param notification
+ */
 function objectIsUmbNotification(notification: unknown): notification is UmbNotificationsEventModel {
 	if (typeof notification !== 'object' || notification === null) {
 		return false;
@@ -19,6 +23,10 @@ export interface UmbNotificationsEventModel {
 	type: EventMessageTypeModel;
 }
 
+/**
+ *
+ * @param notifications
+ */
 export function isUmbNotifications(notifications: Array<unknown>): notifications is Array<UmbNotificationsEventModel> {
 	return notifications.every(objectIsUmbNotification);
 }

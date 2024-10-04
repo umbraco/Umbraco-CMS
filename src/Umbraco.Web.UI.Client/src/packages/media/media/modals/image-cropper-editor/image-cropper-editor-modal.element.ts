@@ -1,6 +1,6 @@
 import { UmbMediaUrlRepository } from '../../repository/index.js';
 import { UMB_MEDIA_PICKER_MODAL } from '../media-picker/media-picker-modal.token.js';
-import type { UmbCropModel } from '../../property-editors/index.js';
+import type { UmbCropModel } from '../../types.js';
 import type { UmbInputImageCropperFieldElement } from '../../components/input-image-cropper/image-cropper-field.element.js';
 import type { UmbImageCropperPropertyEditorValue } from '../../components/index.js';
 import type {
@@ -9,7 +9,8 @@ import type {
 } from './image-cropper-editor-modal.token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UMB_MODAL_MANAGER_CONTEXT, UMB_WORKSPACE_MODAL, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import './components/image-cropper-editor-field.element.js';
 
@@ -79,10 +80,21 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		const item = data?.[0];
 
 		if (!item?.url) return;
+
+		/**
+		 * Combine the crops from the property editor with the stored crops and ignore any invalid crops
+		 * (e.g. crops that have been removed from the property editor)
+		 * @remark If a crop is removed from the property editor, it will be ignored and not saved
+		 */
+		const crops: Array<UmbCropModel> = this._crops.map((crop) => {
+			const existingCrop = this.value.crops?.find((c) => c.alias === crop.alias);
+			return existingCrop ? { ...crop, ...existingCrop } : crop;
+		});
+
 		const value: UmbImageCropperPropertyEditorValue = {
 			...this.value,
 			src: item.url,
-			crops: this.value.crops?.length ? this.value.crops : this._crops,
+			crops,
 			focalPoint: this.value.focalPoint ?? { left: 0.5, top: 0.5 },
 		};
 		this._imageCropperValue = value;

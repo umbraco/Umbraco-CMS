@@ -39,6 +39,7 @@ export class UmbResourceController extends UmbControllerBase {
 
 	/**
 	 * Base execute function with a try/catch block and return a tuple with the result and the error.
+	 * @param promise
 	 */
 	static async tryExecute<T>(promise: Promise<T>): Promise<UmbDataSourceResponse<T>> {
 		try {
@@ -56,6 +57,7 @@ export class UmbResourceController extends UmbControllerBase {
 	/**
 	 * Wrap the {tryExecute} function in a try/catch block and return the result.
 	 * If the executor function throws an error, then show the details in a notification.
+	 * @param options
 	 */
 	async tryExecuteAndNotify<T>(options?: UmbNotificationOptions): Promise<UmbDataSourceResponse<T>> {
 		const { data, error } = await UmbResourceController.tryExecute<T>(this.#promise);
@@ -171,7 +173,6 @@ export class UmbResourceController extends UmbControllerBase {
 	 * This works by checking if the promise is a CancelablePromise and if so, it will call the cancel method.
 	 *
 	 * This is useful when the controller is being disconnected from the DOM.
-	 *
 	 * @see CancelablePromise
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController

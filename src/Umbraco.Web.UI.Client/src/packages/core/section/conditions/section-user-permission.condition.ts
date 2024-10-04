@@ -1,10 +1,7 @@
+import type { UmbSectionUserPermissionConditionConfig } from './types.js';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type {
-	UmbConditionConfigBase,
-	UmbConditionControllerArguments,
-	UmbExtensionCondition,
-} from '@umbraco-cms/backoffice/extension-api';
+import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbSectionUserPermissionCondition extends UmbControllerBase implements UmbExtensionCondition {
@@ -30,13 +27,3 @@ export class UmbSectionUserPermissionCondition extends UmbControllerBase impleme
 		});
 	}
 }
-
-export type UmbSectionUserPermissionConditionConfig = UmbConditionConfigBase<'Umb.Condition.SectionUserPermission'> & {
-	/**
-	 *
-	 *
-	 * @example
-	 * "Umb.Section.Content"
-	 */
-	match: string;
-};

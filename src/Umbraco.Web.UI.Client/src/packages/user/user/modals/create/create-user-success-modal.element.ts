@@ -1,6 +1,7 @@
 import { UmbUserItemRepository } from '../../repository/item/index.js';
 import { UmbNewUserPasswordRepository } from '../../repository/new-password/index.js';
 import type { UmbUserItemModel } from '../../repository/item/types.js';
+import { UMB_USER_WORKSPACE_PATH } from '../../paths.js';
 import type {
 	UmbCreateUserSuccessModalData,
 	UmbCreateUserSuccessModalValue,
@@ -69,10 +70,8 @@ export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
 		this._rejectModal({ type: 'createAnotherUser' });
 	};
 
-	#onGoToProfile = (event: Event) => {
-		event.stopPropagation();
+	#onGoToProfile = () => {
 		this._submitModal();
-		history.pushState(null, '', 'section/user-management/view/users/user/edit/' + this.data?.user.unique); //TODO: URL Should be dynamic
 	};
 
 	override render() {
@@ -98,7 +97,8 @@ export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
 				slot="actions"
 				label="Go to profile"
 				look="primary"
-				color="positive"></uui-button>
+				color="positive"
+				href=${UMB_USER_WORKSPACE_PATH + '/edit/' + this.data?.user.unique}></uui-button>
 		</uui-dialog-layout>`;
 	}
 

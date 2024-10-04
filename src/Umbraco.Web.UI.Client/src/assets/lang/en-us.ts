@@ -364,12 +364,15 @@ export default {
 		createNewMember: 'Create a new member',
 		allMembers: 'All Members',
 		duplicateMemberLogin: 'A member with this login already exists',
+		kind: 'Kind',
 		memberGroupNoProperties: 'Member groups have no additional properties for editing.',
 		memberHasGroup: "The member is already in group '%0%'",
 		memberHasPassword: 'The member already has a password set',
 		memberLockoutNotEnabled: 'Lockout is not enabled for this member',
 		memberNotInGroup: "The member is not in group '%0%'",
 		'2fa': 'Two-Factor Authentication',
+		memberKindDefault: 'Member',
+		memberKindApi: 'API Member',
 	},
 	contentType: {
 		copyFailed: 'Failed to copy content type',
@@ -444,8 +447,7 @@ export default {
 		stay: 'Stay',
 		discardChanges: 'Discard changes',
 		unsavedChanges: 'You have unsaved changes',
-		unsavedChangesWarning:
-			'Are you sure you want to navigate away from this page? - you have unsaved\n      changes\n    ',
+		unsavedChangesWarning: 'Are you sure you want to navigate away from this page? You have unsaved changes',
 		confirmListViewPublish: 'Publishing will make the selected items visible on the site.',
 		confirmListViewUnpublish:
 			'Unpublishing will remove the selected items and all their descendants from the\n      site.\n    ',
@@ -820,6 +822,7 @@ export default {
 		logout: 'Logout',
 		macro: 'Macro',
 		mandatory: 'Mandatory',
+		manifest: 'Manifest',
 		media: 'Media',
 		message: 'Message',
 		move: 'Move',
@@ -917,6 +920,7 @@ export default {
 		skipToMenu: 'Skip to menu',
 		skipToContent: 'Skip to content',
 		restore: 'Restore',
+		newVersionAvailable: 'New version available',
 	},
 	colors: {
 		blue: 'Blue',
@@ -1083,8 +1087,8 @@ export default {
 		relateToOriginal: 'Relate copied items to original',
 	},
 	notifications: {
-		editNotifications: 'Select your notification for <strong>%0%</strong>',
-		notificationsSavedFor: 'Notification settings saved for',
+		editNotifications: 'Select your notification for %0%',
+		notificationsSavedFor: 'Notification settings saved for %0%',
 		notifications: 'Notifications',
 	},
 	packager: {
@@ -1305,7 +1309,7 @@ export default {
 		packages: 'Packages',
 		marketplace: 'Marketplace',
 		settings: 'Settings',
-		translation: 'Dictionary',
+		translation: 'Translation',
 		users: 'Users',
 	},
 	help: {
@@ -1641,12 +1645,12 @@ export default {
 		andAllMediaItems: 'and all media items using this type',
 		andAllMembers: 'and all members using this type',
 		memberCanEdit: 'Member can edit',
-		memberCanEditDescription: 'Allow this property value to be edited by the member on their profile page\n    ',
+		memberCanEditDescription: 'Allow this property value to be edited by the member on their profile page',
 		isSensitiveData: 'Is sensitive data',
 		isSensitiveDataDescription:
-			"Hide this property value from content editors that don't have access to view\n      sensitive information\n    ",
+			"Hide this property value from content editors that don't have access to view sensitive information",
 		showOnMemberProfile: 'Show on member profile',
-		showOnMemberProfileDescription: 'Allow this property value to be displayed on the member profile page\n    ',
+		showOnMemberProfileDescription: 'Allow this property value to be displayed on the member profile page',
 		tabHasNoSortOrder: 'tab has no sort order',
 		compositionUsageHeading: 'Where is this composition used?',
 		compositionUsageSpecification:
@@ -1838,8 +1842,16 @@ export default {
 		assignAccess: 'Assign access',
 		administrators: 'Administrator',
 		categoryField: 'Category field',
-		createDate: 'User created',
-		changePassword: 'Change your password',
+		createDate: 'Created',
+		createUserHeadline: (kind: string) => {
+			return kind === 'Api' ? 'Create API user' : 'Create user';
+		},
+		createUserDescription: (kind: string) => {
+			const defaultUserText = `Create a user to give them access to Umbraco. When a user is created a password will be generated that you can share with them.`;
+			const apiUserText = `Create an Api User to allow external services to authenticate with the Umbraco Management API.`;
+			return kind === 'Api' ? apiUserText : defaultUserText;
+		},
+		changePassword: 'Change password',
 		changePhoto: 'Change photo',
 		configureMfa: 'Configure MFA',
 		emailRequired: 'Required - enter an email address for this user',
@@ -1848,6 +1860,7 @@ export default {
 				? 'The email address is used for notifications, password recovery, and as the username for logging in'
 				: 'The email address is used for notifications and password recovery';
 		},
+		kind: 'Kind',
 		newPassword: 'New password',
 		newPasswordFormatLengthTip: 'Minimum %0% character(s) to go!',
 		newPasswordFormatNonAlphaTip: 'There should be at least %0% special character(s) in there.',
@@ -1934,7 +1947,7 @@ export default {
 		startnodehelp: 'Limit the content tree to a specific start node',
 		startnodes: 'Content start nodes',
 		startnodeshelp: 'Limit the content tree to specific start nodes',
-		updateDate: 'User last updated',
+		updateDate: 'Updated',
 		userCreated: 'has been created',
 		userCreatedSuccessHelp:
 			'The new user has successfully been created. To log in to Umbraco use the\n      password below.\n    ',
@@ -1981,6 +1994,8 @@ export default {
 		sortCreateDateDescending: 'Newest',
 		sortCreateDateAscending: 'Oldest',
 		sortLastLoginDateDescending: 'Last login',
+		userKindDefault: 'User',
+		userKindApi: 'API User',
 		noUserGroupsAdded: 'No user groups have been added',
 		'2faDisableText':
 			'If you wish to disable this two-factor provider, then you must enter the code shown on your authentication device:',
@@ -2287,6 +2302,7 @@ export default {
 		labelForArrayOfItems: 'Collection of %0%',
 		labelForRemoveAllEntries: 'Remove all items',
 		labelForClearClipboard: 'Clear clipboard',
+		labelForCopyToClipboard: 'Copy to clipboard',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Open Property Actions',
@@ -2403,6 +2419,7 @@ export default {
 		tabClipboard: 'Clipboard',
 		tabBlockSettings: 'Settings',
 		headlineAdvanced: 'Advanced',
+		headlineCustomView: 'Custom View',
 		forceHideContentEditor: 'Hide content editor',
 		forceHideContentEditorHelp: 'Hide the content edit button and the content editor from the Block Editor overlay',
 		gridInlineEditing: 'Inline editing',

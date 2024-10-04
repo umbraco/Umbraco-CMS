@@ -12,7 +12,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Template that fetches data from the server
- * @export
  * @class UmbTemplateServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -21,7 +20,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 
 	/**
 	 * Creates an instance of UmbTemplateServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbTemplateServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -31,7 +30,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	/**
 	 * Creates a new Template scaffold
 	 * @param {Partial<UmbTemplateDetailModel>} [preset]
-	 * @return { CreateTemplateRequestModel }
+	 * @returns { CreateTemplateRequestModel }
 	 * @memberof UmbTemplateServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbTemplateDetailModel> = {}) {
@@ -54,7 +53,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	/**
 	 * Fetches a Template with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTemplateServerDataSource
 	 */
 	async read(unique: string) {
@@ -82,7 +81,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	/**
 	 * Inserts a new Template on the server
 	 * @param {UmbTemplateDetailModel} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTemplateServerDataSource
 	 */
 	async create(model: UmbTemplateDetailModel) {
@@ -113,7 +112,8 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	/**
 	 * Updates a Template on the server
 	 * @param {UmbTemplateDetailModel} Template
-	 * @return {*}
+	 * @param model
+	 * @returns {*}
 	 * @memberof UmbTemplateServerDataSource
 	 */
 	async update(model: UmbTemplateDetailModel) {
@@ -144,7 +144,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	/**
 	 * Deletes a Template on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTemplateServerDataSource
 	 */
 	async delete(unique: string) {

@@ -1,9 +1,8 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_USER_PERMISSION_DOCUMENT_PUBLIC_ACCESS } from '../../user-permissions/index.js';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
@@ -15,6 +14,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-lock',
 			label: '#actions_protect',
+			additionalOptions: true,
 		},
 		conditions: [
 			{
@@ -30,15 +30,10 @@ const entityActions: Array<ManifestTypes> = [
 			},
 		],
 	},
-];
-
-const manifestModals: Array<ManifestTypes> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.PublicAccess',
 		name: 'Public Access Modal',
-		js: () => import('./modal/public-access-modal.element.js'),
+		element: () => import('./modal/public-access-modal.element.js'),
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...entityActions, ...manifestModals];

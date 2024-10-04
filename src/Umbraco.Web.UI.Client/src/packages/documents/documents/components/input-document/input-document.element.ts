@@ -1,11 +1,20 @@
-import { UmbDocumentPickerContext } from './input-document.context.js';
-import { classMap, css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbDocumentPickerInputContext } from './input-document.context.js';
+import {
+	classMap,
+	css,
+	customElement,
+	html,
+	nothing,
+	property,
+	repeat,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
@@ -36,7 +45,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default 0
+	 * @default
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
@@ -59,7 +68,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default Infinity
+	 * @default
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
@@ -103,13 +112,34 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: Boolean, reflect: true })
+	public get readonly() {
+		return this.#readonly;
+	}
+	public set readonly(value) {
+		this.#readonly = value;
+
+		if (this.#readonly) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
+	}
+	#readonly = false;
+
 	@state()
 	private _editDocumentPath = '';
 
 	@state()
 	private _items?: Array<UmbDocumentItemModel>;
 
-	#pickerContext = new UmbDocumentPickerContext(this);
+	#pickerContext = new UmbDocumentPickerInputContext(this);
 
 	constructor() {
 		super();
@@ -167,14 +197,17 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	}
 
 	#renderAddButton() {
-		if (this.selection.length >= this.max) return;
-		return html`
-			<uui-button
+		if (this.selection.length >= this.max) return nothing;
+		if (this.readonly && this.selection.length > 0) {
+			return nothing;
+		} else {
+			return html` <uui-button
 				id="btn-add"
 				look="placeholder"
 				@click=${this.#openPicker}
-				label=${this.localize.term('general_choose')}></uui-button>
-		`;
+				label=${this.localize.term('general_choose')}
+				?disabled=${this.readonly}></uui-button>`;
+		}
 	}
 
 	#renderItems() {
@@ -193,11 +226,14 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	#renderItem(item: UmbDocumentItemModel) {
 		if (!item.unique) return;
 		return html`
-			<uui-ref-node name=${item.name} id=${item.unique} class=${classMap({ draft: this.#isDraft(item) })}>
+			<uui-ref-node
+				name=${item.name}
+				id=${item.unique}
+				class=${classMap({ draft: this.#isDraft(item) })}
+				?readonly=${this.readonly}>
 				${this.#renderIcon(item)} ${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
-					${this.#renderOpenButton(item)}
-					<uui-button @click=${() => this.#onRemove(item)} label=${this.localize.term('general_remove')}></uui-button>
+					${this.#renderOpenButton(item)} ${this.#renderRemoveButton(item)}
 				</uui-action-bar>
 			</uui-ref-node>
 		`;
@@ -213,8 +249,16 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
 	}
 
+	#renderRemoveButton(item: UmbDocumentItemModel) {
+		if (this.readonly) return nothing;
+		return html`
+			<uui-button @click=${() => this.#onRemove(item)} label=${this.localize.term('general_remove')}></uui-button>
+		`;
+	}
+
 	#renderOpenButton(item: UmbDocumentItemModel) {
-		if (!this.showOpenButton) return;
+		if (this.readonly) return nothing;
+		if (!this.showOpenButton) return nothing;
 		return html`
 			<uui-button
 				href="${this._editDocumentPath}edit/${item.unique}"

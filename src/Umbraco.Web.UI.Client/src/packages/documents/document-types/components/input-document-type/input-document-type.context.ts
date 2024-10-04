@@ -6,7 +6,7 @@ import { UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS } from '../../repository/index.
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbDocumentTypePickerContext extends UmbPickerInputContext<
+export class UmbDocumentTypePickerInputContext extends UmbPickerInputContext<
 	UmbDocumentTypeItemModel,
 	UmbDocumentTypeTreeItemModel,
 	UmbDocumentTypePickerModalData,
@@ -16,3 +16,6 @@ export class UmbDocumentTypePickerContext extends UmbPickerInputContext<
 		super(host, UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS, UMB_DOCUMENT_TYPE_PICKER_MODAL);
 	}
 }
+
+/** @deprecated Use `UmbDocumentTypePickerInputContext` instead. This method will be removed in Umbraco 15. */
+export { UmbDocumentTypePickerInputContext as UmbDocumentTypePickerContext };

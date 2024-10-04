@@ -476,11 +476,7 @@ export default {
 	},
 	notifications: {
 		editNotifications: 'Editar sua notificação para %0%',
-		mailBody:
-			"\n Olá %0%\n\n      Esta é uma mensagem automatizada de email para informar que a tarefa '%1%' foi realizada na página '%2%' pelo usuário '%3%'\n\nVá até http://%4%/#/content/content/edit/%5% para editar.\n\n      Tenha um bom dia!\n\n      Saudações do robô Umbraco",
-		mailBodyHtml:
-			'<p>Olá %0%</p>\n\n\t\t  <p>Esta é uma mensagem automatizada para informar que a tarefa <strong>\'%1%\'</strong>\n\t\t  foi completada na página <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>\'%2%\'</strong></a>\n\t\t  pelo usuário <strong>\'%3%\'</strong>\n\t  </p>\n\t\t  <div style="margin: 8px 0; padding: 8px; display: block;">\n\t\t\t\t<br />\n\t\t\t\t<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;\n\t\t\t\t<br />\n\t\t  </div>\n\t\t  <p>\n\t\t\t  <h3>Resumo da Atualização:</h3>\n\t\t\t  <table style="width: 100%;">\n\t\t\t\t\t\t   %6%\n\t\t\t\t</table>\n\t\t\t </p>\n\n\t\t  <div style="margin: 8px 0; padding: 8px; display: block;">\n\t\t\t\t<br />\n\t\t\t\t<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;\n\t\t\t\t<br />\n\t\t  </div>\n\n\t\t  <p>Tenha um bom dia!<br /><br />\n\t\t\t  Saudações do robô Umbraco\n\t\t  </p>\n    ',
-		mailSubject: '[%0%] Notificação sobre %1% realizada em %2%',
+		notificationsSavedFor: 'Notificações salvas para %0%',
 		notifications: 'Notificações',
 	},
 	packager: {

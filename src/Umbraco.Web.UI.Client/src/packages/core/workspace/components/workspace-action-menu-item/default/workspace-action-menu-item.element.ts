@@ -5,7 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
 	ManifestWorkspaceActionMenuItemDefaultKind,
 	MetaWorkspaceActionMenuItemDefaultKind,
-} from '@umbraco-cms/backoffice/extension-registry';
+} from '@umbraco-cms/backoffice/workspace';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-workspace-action-menu-item')

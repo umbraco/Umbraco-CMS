@@ -1,6 +1,4 @@
-import type { ManifestModal, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-const modals: Array<ManifestModal> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.Examine.FieldsSettings',
@@ -14,5 +12,3 @@ const modals: Array<ManifestModal> = [
 		js: () => import('./fields-viewer/examine-fields-viewer-modal.element.js'),
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...modals];

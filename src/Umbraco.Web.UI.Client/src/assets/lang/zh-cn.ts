@@ -603,11 +603,7 @@ export default {
 	},
 	notifications: {
 		editNotifications: '为 %0% 编写通知',
-		mailBody:
-			"\n%0%：\n\n  您好！这是一封自动邮件，提醒您用户'%3%'\n  执行'%1%'任务\n  已经在完成'%2%'。\n\n      转到 http://%4%/#/content/content/edit/%5% 进行编辑\n\n      Have a nice day!\n\n      来自Umbraco机器人\n    ",
-		mailBodyHtml:
-			'<p>%0%：</p>\n\n\t\t  <p>您好！这是一封自动发送的邮件，告诉您任务<strong>\'%1%\'</strong>\n\t\t  已在<a href="http://%4%/actions/preview.aspx?id=%5%"><strong>\'%2%\'</strong></a>\n\t\t  被用户<strong>\'%3%\'</strong>执行\n\t\t  </p>\n\t\t  <div style="margin: 8px 0; padding: 8px; display: block;">\n\t\t\t\t<br />\n\t\t\t\t<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编辑&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;\n\t\t\t\t<br />\n\t\t  </div>\n\t\t  <p>\n                          <h3>更新概况：</h3>\n\t\t\t  <table style="width: 100%;">\n\t\t\t\t\t\t   %6%\n\t\t\t\t</table>\n\t\t\t </p>\n\n\t\t  <div style="margin: 8px 0; padding: 8px; display: block;">\n\t\t\t\t<br />\n                                <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编辑&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;\n                                <br />\n                  </div>\n\n                  <p>祝您愉快！<br /><br />\n                          该信息由系统自动发送\n                  </p>',
-		mailSubject: '在 %2%，[%0%] 关于 %1% 的通告已执行。',
+		notificationsSavedFor: '通知已保存为 %0%',
 		notifications: '通知',
 	},
 	packager: {

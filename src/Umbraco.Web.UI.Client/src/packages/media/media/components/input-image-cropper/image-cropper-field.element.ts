@@ -15,9 +15,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-image-cropper-field')
 export class UmbInputImageCropperFieldElement extends UmbLitElement {
 	@property({ attribute: false })
-	get value() {
-		return this.#value;
-	}
 	set value(value) {
 		if (!value) {
 			this.crops = [];
@@ -33,6 +30,9 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 		}
 
 		this.requestUpdate();
+	}
+	get value() {
+		return this.#value;
 	}
 	#value?: UmbImageCropperPropertyEditorValue;
 

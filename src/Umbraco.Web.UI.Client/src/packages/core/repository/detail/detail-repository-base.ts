@@ -1,4 +1,5 @@
 import { UmbRepositoryBase } from '../repository-base.js';
+import type { UmbRepositoryResponse, UmbRepositoryResponseWithAsObservable } from '../types.js';
 import type { UmbDetailDataSource, UmbDetailDataSourceConstructor } from './detail-data-source.interface.js';
 import type { UmbDetailRepository } from './detail-repository.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -7,9 +8,10 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export abstract class UmbDetailRepositoryBase<
-		DetailModelType extends { unique: string; entityType: string },
+		DetailModelType extends UmbEntityModel,
 		UmbDetailDataSourceType extends UmbDetailDataSource<DetailModelType> = UmbDetailDataSource<DetailModelType>,
 	>
 	extends UmbRepositoryBase
@@ -28,6 +30,9 @@ export abstract class UmbDetailRepositoryBase<
 	) {
 		super(host);
 
+		if (!detailSource) throw new Error('Detail source is missing');
+		if (!detailStoreContextAlias) throw new Error('Detail store context alias is missing');
+
 		this.detailDataSource = new detailSource(host) as UmbDetailDataSourceType;
 
 		this.#init = Promise.all([
@@ -44,20 +49,20 @@ export abstract class UmbDetailRepositoryBase<
 	/**
 	 * Creates a scaffold
 	 * @param {Partial<DetailModelType>} [preset]
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
-	async createScaffold(preset?: Partial<DetailModelType>) {
+	async createScaffold(preset?: Partial<DetailModelType>): Promise<UmbRepositoryResponse<DetailModelType>> {
 		return this.detailDataSource.createScaffold(preset);
 	}
 
 	/**
 	 * Requests the detail for the given unique
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
-	async requestByUnique(unique: string) {
+	async requestByUnique(unique: string): Promise<UmbRepositoryResponseWithAsObservable<DetailModelType>> {
 		if (!unique) throw new Error('Unique is missing');
 		await this.#init;
 
@@ -67,17 +72,21 @@ export abstract class UmbDetailRepositoryBase<
 			this.#detailStore!.append(data);
 		}
 
-		return { data, error, asObservable: () => this.#detailStore!.byUnique(unique) };
+		return {
+			data,
+			error,
+			asObservable: () => this.#detailStore!.byUnique(unique),
+		};
 	}
 
 	/**
 	 * Returns a promise with an observable of the detail for the given unique
 	 * @param {DetailModelType} model
-	 * @param {string | null} [parentUnique=null]
-	 * @return {*}
+	 * @param {string | null} [parentUnique]
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
-	async create(model: DetailModelType, parentUnique: string | null) {
+	async create(model: DetailModelType, parentUnique: string | null): Promise<UmbRepositoryResponse<DetailModelType>> {
 		if (!model) throw new Error('Data is missing');
 		await this.#init;
 
@@ -97,7 +106,7 @@ export abstract class UmbDetailRepositoryBase<
 	/**
 	 * Saves the given data
 	 * @param {DetailModelType} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async save(model: DetailModelType) {
@@ -121,7 +130,7 @@ export abstract class UmbDetailRepositoryBase<
 	/**
 	 * Deletes the detail for the given unique
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async delete(unique: string) {
@@ -144,7 +153,7 @@ export abstract class UmbDetailRepositoryBase<
 	/**
 	 * Returns a promise with an observable of the detail for the given unique
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async byUnique(unique: string) {
@@ -155,7 +164,7 @@ export abstract class UmbDetailRepositoryBase<
 
 	override destroy(): void {
 		this.#detailStore = undefined;
-		(this.detailDataSource as any) = undefined;
+		(this.detailDataSource as unknown) = undefined;
 		super.destroy();
 	}
 }

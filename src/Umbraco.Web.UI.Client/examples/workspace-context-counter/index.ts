@@ -1,11 +1,9 @@
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspaceContext',
 		name: 'Example Counter Workspace Context',
 		alias: 'example.workspaceCounter.counter',
-		js: () => import('./counter-workspace-context.js'),
+		api: () => import('./counter-workspace-context.js'),
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',

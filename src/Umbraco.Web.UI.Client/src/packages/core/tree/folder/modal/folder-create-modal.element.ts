@@ -1,11 +1,6 @@
 import { UmbFolderModalElementBase } from './folder-modal-element-base.js';
 import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import type {
-	UmbCreateFolderModel,
-	UmbFolderCreateModalData,
-	UmbFolderCreateModalValue,
-	UmbFolderModel,
-} from '@umbraco-cms/backoffice/tree';
+import type { UmbFolderCreateModalData, UmbFolderCreateModalValue, UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-folder-create-modal')
 export class UmbFolderCreateModalElement extends UmbFolderModalElementBase<
@@ -35,13 +30,12 @@ export class UmbFolderCreateModalElement extends UmbFolderModalElementBase<
 		if (!this._folderScaffold) throw new Error('The folder scaffold was not initialized correctly');
 		if (!this.data?.parent) throw new Error('A parent is required to create folder');
 
-		const createFolderModel: UmbCreateFolderModel = {
+		const folder: UmbFolderModel = {
 			...this._folderScaffold,
-			parentUnique: this.data.parent.unique,
 			name,
 		};
 
-		const { data: createdFolder } = await this.folderRepository.create(createFolderModel);
+		const { data: createdFolder } = await this.folderRepository.create(folder, this.data.parent.unique);
 
 		if (createdFolder) {
 			this.value = { folder: createdFolder };

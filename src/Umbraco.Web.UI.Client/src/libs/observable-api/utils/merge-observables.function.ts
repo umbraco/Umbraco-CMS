@@ -9,8 +9,7 @@ type ArrayToObservableTypes<T extends Array<Observable<any>>> = {
 };
 
 /**
- * @export
- * @method mergeObservables
+ * @function mergeObservables
  * @param {Array<Observable<T>>} sources - an Array of Observables to merge for this Observable.
  * @param {(mappable: Array<T>) => R} mergeFunction - Merge method to return the part for this Observable to return.
  * @param {(previousResult: R, currentResult: R) => boolean} [memoizationFunction] - Method to Compare if the merged data has changed. Should return true when data is different.

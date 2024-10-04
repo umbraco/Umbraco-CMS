@@ -2,14 +2,8 @@ import {
 	UMB_CONTENT_PICKER_DOCUMENT_ROOT_ORIGIN_PICKER_MODAL_ALIAS,
 	UMB_CONTENT_PICKER_DOCUMENT_ROOT_QUERY_STEP_PICKER_MODAL_ALIAS,
 } from './constants.js';
-import type {
-	ManifestDynamicRootOrigin,
-	ManifestDynamicRootQueryStep,
-	ManifestModal,
-	ManifestTypes,
-} from '@umbraco-cms/backoffice/extension-registry';
 
-const modals: Array<ManifestModal> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'modal',
 		alias: UMB_CONTENT_PICKER_DOCUMENT_ROOT_ORIGIN_PICKER_MODAL_ALIAS,
@@ -22,9 +16,6 @@ const modals: Array<ManifestModal> = [
 		name: 'Append step to query',
 		element: () => import('./dynamic-root-query-step-picker-modal.element.js'),
 	},
-];
-
-const origins: Array<ManifestDynamicRootOrigin> = [
 	{
 		type: 'dynamicRootOrigin',
 		alias: 'Umb.DynamicRootOrigin.Root',
@@ -85,9 +76,6 @@ const origins: Array<ManifestDynamicRootOrigin> = [
 		},
 		weight: 60,
 	},
-];
-
-const querySteps: Array<ManifestDynamicRootQueryStep> = [
 	{
 		type: 'dynamicRootQueryStep',
 		alias: 'Umb.DynamicRootQueryStep.NearestAncestorOrSelf',
@@ -137,5 +125,3 @@ const querySteps: Array<ManifestDynamicRootQueryStep> = [
 		weight: 70,
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...modals, ...origins, ...querySteps];

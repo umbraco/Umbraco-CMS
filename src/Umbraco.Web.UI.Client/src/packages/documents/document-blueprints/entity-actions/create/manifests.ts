@@ -1,7 +1,6 @@
 import { UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE, UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE } from '../../entity.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
@@ -13,11 +12,9 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-add',
 			label: '#actions_createblueprint',
+			additionalOptions: true,
 		},
 	},
-];
-
-const manifestModals: Array<ManifestTypes> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.DocumentBlueprintOptionsCreate',
@@ -25,5 +22,3 @@ const manifestModals: Array<ManifestTypes> = [
 		element: () => import('./modal/document-blueprint-options-create-modal.element.js'),
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...entityActions, ...manifestModals];

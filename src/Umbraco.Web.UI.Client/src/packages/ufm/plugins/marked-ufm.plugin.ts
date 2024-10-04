@@ -10,6 +10,11 @@ export interface UfmToken extends Tokens.Generic {
 	text?: string;
 }
 
+/**
+ *
+ * @param {Array<UfmPlugin>} plugins - An array of UFM plugins.
+ * @returns {MarkedExtension} A Marked extension object.
+ */
 export function ufm(plugins: Array<UfmPlugin> = []): MarkedExtension {
 	return {
 		extensions: plugins.map(({ alias, marker, render }) => {

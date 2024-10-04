@@ -18,6 +18,7 @@ export function retrieveStoredPath(): URL | null {
 
 /**
  * Store the path in the session storage.
+ * @param path
  * @remark This is used to redirect the user to the correct page after login.
  * @remark The path must be a local path, otherwise it is not stored.
  */

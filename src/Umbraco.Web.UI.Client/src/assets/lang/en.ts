@@ -664,6 +664,8 @@ export default {
 		a11yCreateItem: 'Create item',
 		a11yEdit: 'Edit',
 		a11yName: 'Name',
+		rteParagraph: 'Write something amazing...',
+		rteHeading: "What's the title?",
 	},
 	editcontenttype: {
 		createListView: 'Create custom list view',
@@ -695,6 +697,7 @@ export default {
 		hasReferencesDeleteConsequence:
 			'Deleting <strong>%0%</strong> will delete the properties and their data from the following items',
 		acceptDeleteConsequence: 'I understand this action will delete the properties and data based on this Data Type',
+		noConfiguration: 'There is no configuration for this property editor.',
 	},
 	errorHandling: {
 		errorButDataWasSaved:
@@ -830,6 +833,7 @@ export default {
 		logout: 'Logout',
 		macro: 'Macro',
 		mandatory: 'Mandatory',
+		manifest: 'Manifest',
 		message: 'Message',
 		move: 'Move',
 		name: 'Name',
@@ -932,6 +936,7 @@ export default {
 		media: 'Media',
 		revert: 'Revert',
 		validate: 'Validate',
+		newVersionAvailable: 'New version available',
 	},
 	colors: {
 		blue: 'Blue',
@@ -1102,8 +1107,8 @@ export default {
 		relateToOriginal: 'Relate copied items to original',
 	},
 	notifications: {
-		editNotifications: 'Select your notification for <strong>%0%</strong>',
-		notificationsSavedFor: 'Notification settings saved for',
+		editNotifications: 'Select your notification for %0%',
+		notificationsSavedFor: 'Notification settings saved for %0%',
 		notifications: 'Notifications',
 	},
 	packager: {
@@ -1324,7 +1329,7 @@ export default {
 		packages: 'Packages',
 		marketplace: 'Marketplace',
 		settings: 'Settings',
-		translation: 'Dictionary',
+		translation: 'Translation',
 		users: 'Users',
 	},
 	help: {
@@ -1561,6 +1566,7 @@ export default {
 		ascending: 'ascending',
 		descending: 'descending',
 		template: 'Template',
+		systemFields: 'System fields',
 	},
 	grid: {
 		media: 'Image',
@@ -1664,12 +1670,12 @@ export default {
 		andAllMediaItems: 'and all media items using this type',
 		andAllMembers: 'and all members using this type',
 		memberCanEdit: 'Member can edit',
-		memberCanEditDescription: 'Allow this property value to be edited by the member on their profile page\n    ',
+		memberCanEditDescription: 'Allow this property value to be edited by the member on their profile page',
 		isSensitiveData: 'Is sensitive data',
 		isSensitiveDataDescription:
-			"Hide this property value from content editors that don't have access to view\n      sensitive information\n    ",
+			"Hide this property value from content editors that don't have access to view sensitive information",
 		showOnMemberProfile: 'Show on member profile',
-		showOnMemberProfileDescription: 'Allow this property value to be displayed on the member profile page\n    ',
+		showOnMemberProfileDescription: 'Allow this property value to be displayed on the member profile page',
 		tabHasNoSortOrder: 'tab has no sort order',
 		compositionUsageHeading: 'Where is this composition used?',
 		compositionUsageSpecification:
@@ -1734,11 +1740,11 @@ export default {
 		enabled: 'Enabled',
 		events: 'Events',
 		event: 'Event',
-		url: 'Url',
+		url: 'URL',
 		types: 'Types',
 		webhookKey: 'Webhook key',
 		retryCount: 'Retry count',
-		urlDescription: 'The url to call when the webhook is triggered.',
+		urlDescription: 'The URL to call when the webhook is triggered.',
 		eventDescription: 'The events for which the webhook should be triggered.',
 		contentTypeDescription: 'Only trigger the webhook for a specific content type.',
 		enabledDescription: 'Is the webhook enabled?',
@@ -1746,6 +1752,7 @@ export default {
 		contentType: 'Content Type',
 		headers: 'Headers',
 		selectEventFirst: 'Please select an event first.',
+		selectEvents: 'Select events',
 	},
 	languages: {
 		addLanguage: 'Add language',
@@ -2350,6 +2357,7 @@ export default {
 		labelForArrayOfItems: 'Collection of %0%',
 		labelForRemoveAllEntries: 'Remove all items',
 		labelForClearClipboard: 'Clear clipboard',
+		labelForCopyToClipboard: 'Copy to clipboard',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Open Property Actions',
@@ -2468,6 +2476,7 @@ export default {
 		tabClipboard: 'Clipboard',
 		tabBlockSettings: 'Settings',
 		headlineAdvanced: 'Advanced',
+		headlineCustomView: 'Custom View',
 		forceHideContentEditor: 'Hide content editor',
 		forceHideContentEditorHelp: 'Hide the content edit button and the content editor from the Block Editor overlay.',
 		gridInlineEditing: 'Inline editing',
@@ -2618,5 +2627,11 @@ export default {
 		minimapConfigDescription: 'Show a minimap in the code editor.',
 		wordWrapConfigLabel: 'Word wrap',
 		wordWrapConfigDescription: 'Enable word wrapping in the code editor.',
+	},
+	tiptap: {
+		extGroup_formatting: 'Text formatting',
+		extGroup_interactive: 'Interactive elements',
+		extGroup_media: 'Embeds and media',
+		extGroup_structure: 'Content structure',
 	},
 } as UmbLocalizationDictionary;

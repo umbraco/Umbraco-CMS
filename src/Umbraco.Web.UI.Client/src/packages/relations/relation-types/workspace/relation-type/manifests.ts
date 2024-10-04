@@ -1,21 +1,16 @@
-import type {
-	ManifestTypes,
-	ManifestWorkspaces,
-	ManifestWorkspaceView,
-} from '@umbraco-cms/backoffice/extension-registry';
+export const UMB_RELATION_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.RelationType';
 
-const workspace: ManifestWorkspaces = {
-	type: 'workspace',
-	kind: 'routable',
-	alias: 'Umb.Workspace.RelationType',
-	name: 'Relation Type Workspace',
-	api: () => import('./relation-type-workspace.context.js'),
-	meta: {
-		entityType: 'relation-type',
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'workspace',
+		kind: 'routable',
+		alias: UMB_RELATION_TYPE_WORKSPACE_ALIAS,
+		name: 'Relation Type Workspace',
+		api: () => import('./relation-type-workspace.context.js'),
+		meta: {
+			entityType: 'relation-type',
+		},
 	},
-};
-
-const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.RelationType.Details',
@@ -30,10 +25,8 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				match: UMB_RELATION_TYPE_WORKSPACE_ALIAS,
 			},
 		],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews];

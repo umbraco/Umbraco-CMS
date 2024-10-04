@@ -1,4 +1,5 @@
 import type { UmbMemberEntityType } from '../../entity.js';
+import type { UmbMemberKindType } from '../../utils/index.js';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 export interface UmbMemberItemModel {
@@ -11,6 +12,7 @@ export interface UmbMemberItemModel {
 		collection: UmbReferenceByUnique | null;
 	};
 	variants: Array<UmbMemberVariantItemModel>;
+	kind: UmbMemberKindType;
 }
 
 export interface UmbMemberVariantItemModel {

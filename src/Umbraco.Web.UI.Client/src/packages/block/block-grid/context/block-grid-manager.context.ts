@@ -1,12 +1,13 @@
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
-import type { UmbBlockGridWorkspaceData } from '../index.js';
+import type { UmbBlockGridWorkspaceOriginData } from '../index.js';
 import { UmbArrayState, appendToFrozenArray, pushAtToUniqueArray } from '@umbraco-cms/backoffice/observable-api';
-import { removeInitialSlashFromPath, transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
+import { removeLastSlashFromPath, transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { type UmbBlockDataType, UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
+import { type UmbBlockDataModel, UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 
 export const UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET = '/umbraco/backoffice/css/umbraco-blockgridlayout.css';
 
@@ -15,7 +16,7 @@ export const UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET = '/umbraco/backoffice/css
  */
 export class UmbBlockGridManagerContext<
 	BlockLayoutType extends UmbBlockGridLayoutModel = UmbBlockGridLayoutModel,
-> extends UmbBlockManagerContext<UmbBlockGridTypeModel, UmbBlockGridLayoutModel> {
+> extends UmbBlockManagerContext<UmbBlockGridTypeModel, UmbBlockGridLayoutModel, UmbBlockGridWorkspaceOriginData> {
 	//
 	#initAppUrl: Promise<void>;
 	#appUrl?: string;
@@ -29,7 +30,7 @@ export class UmbBlockGridManagerContext<
 
 		if (layoutStylesheet) {
 			// Cause we await initAppUrl in setting the _editorConfiguration, we can trust the appUrl begin here.
-			return this.#appUrl! + removeInitialSlashFromPath(transformServerPathToClientPath(layoutStylesheet));
+			return removeLastSlashFromPath(this.#appUrl!) + transformServerPathToClientPath(layoutStylesheet);
 		}
 		return undefined;
 	});
@@ -37,6 +38,16 @@ export class UmbBlockGridManagerContext<
 		const value = x?.getValueByAlias('gridColumns') as string | undefined;
 		return parseInt(value && value !== '' ? value : '12');
 	});
+
+	getMinAllowed() {
+		return this._editorConfiguration.getValue()?.getValueByAlias<UmbNumberRangeValueType>('validationLimit')?.min ?? 0;
+	}
+
+	getMaxAllowed() {
+		return (
+			this._editorConfiguration.getValue()?.getValueByAlias<UmbNumberRangeValueType>('validationLimit')?.max ?? Infinity
+		);
+	}
 
 	override setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
 		this.#initAppUrl.then(() => {
@@ -51,6 +62,9 @@ export class UmbBlockGridManagerContext<
 	getBlockGroups() {
 		return this.#blockGroups.value;
 	}
+	getBlockGroupName(unique: string) {
+		return this.#blockGroups.getValue().find((group) => group.key === unique)?.name;
+	}
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -62,23 +76,24 @@ export class UmbBlockGridManagerContext<
 
 	create(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
-		// TODO: [v15] Ignore unused parameter to avoid breaking changes
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
+		// This property is used by some implementations, but not used in this.
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		modalData?: UmbBlockGridWorkspaceData,
+		originData?: UmbBlockGridWorkspaceOriginData,
 	) {
-		return super.createBlockData(contentElementTypeKey, partialLayoutEntry);
+		return super._createBlockData(contentElementTypeKey, partialLayoutEntry);
 	}
 
 	/**
 	 * Inserts a layout entry into an area of a layout entry.
 	 * @param layoutEntry The layout entry to insert.
+	 * @param insert
 	 * @param entries The layout entries to search within.
 	 * @param parentUnique The parentUnique to search for.
+	 * @param parentId
 	 * @param areaKey The areaKey to insert the layout entry into.
 	 * @param index The index to insert the layout entry at.
 	 * @returns a updated layout entries array if the insert was successful.
-	 *
 	 * @remarks
 	 * This method is recursive and will search for the parentUnique in the layout entries.
 	 * If the parentUnique is found, the layout entry will be inserted into the items of the area that matches the areaKey.
@@ -97,13 +112,13 @@ export class UmbBlockGridManagerContext<
 		while (i--) {
 			const currentEntry = entries[i];
 			// Lets check if we found the right parent layout entry:
-			if (currentEntry.contentUdi === parentId) {
+			if (currentEntry.contentKey === parentId) {
 				// Append the layout entry to be inserted and unfreeze the rest of the data:
 				const areas = currentEntry.areas.map((x) =>
 					x.key === areaKey
 						? {
 								...x,
-								items: pushAtToUniqueArray([...x.items], insert, (x) => x.contentUdi === insert.contentUdi, index),
+								items: pushAtToUniqueArray([...x.items], insert, (x) => x.contentKey === insert.contentKey, index),
 							}
 						: x,
 				);
@@ -113,7 +128,7 @@ export class UmbBlockGridManagerContext<
 						...currentEntry,
 						areas,
 					},
-					(x) => x.contentUdi === currentEntry.contentUdi,
+					(x) => x.contentKey === currentEntry.contentKey,
 				);
 			}
 			// Otherwise check if any items of the areas are the parent layout entry we are looking for. We do so based on parentId, recursively:
@@ -140,7 +155,7 @@ export class UmbBlockGridManagerContext<
 								(z) => z.key === area.key,
 							),
 						},
-						(x) => x.contentUdi === currentEntry.contentUdi,
+						(x) => x.contentKey === currentEntry.contentKey,
 					);
 				}
 			}
@@ -151,26 +166,26 @@ export class UmbBlockGridManagerContext<
 	// TODO: Remove dependency on modalData object here. [NL] Maybe change it into requiring the originData object instead.
 	insert(
 		layoutEntry: BlockLayoutType,
-		content: UmbBlockDataType,
-		settings: UmbBlockDataType | undefined,
-		modalData: UmbBlockGridWorkspaceData,
+		content: UmbBlockDataModel,
+		settings: UmbBlockDataModel | undefined,
+		originData: UmbBlockGridWorkspaceOriginData,
 	) {
-		this.setOneLayout(layoutEntry, modalData);
-		this.insertBlockData(layoutEntry, content, settings, modalData);
+		this.setOneLayout(layoutEntry, originData);
+		this.insertBlockData(layoutEntry, content, settings);
 
 		return true;
 	}
 
-	override setOneLayout(layoutEntry: BlockLayoutType, modalData?: UmbBlockGridWorkspaceData) {
-		const index = modalData?.originData.index ?? -1;
+	override setOneLayout(layoutEntry: BlockLayoutType, originData?: UmbBlockGridWorkspaceOriginData) {
+		const index = originData?.index ?? -1;
 
-		if (modalData?.originData.parentUnique && modalData?.originData.areaKey) {
+		if (originData?.parentUnique && originData?.areaKey) {
 			// Find layout entry based on parentUnique, recursively, as it needs to check layout of areas as well:
 			const layoutEntries = this.#appendLayoutEntryToArea(
 				layoutEntry,
 				this._layouts.getValue(),
-				modalData.originData.parentUnique,
-				modalData.originData.areaKey,
+				originData?.parentUnique,
+				originData?.areaKey,
 				index,
 			);
 

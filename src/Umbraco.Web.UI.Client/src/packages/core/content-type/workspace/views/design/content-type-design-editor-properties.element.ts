@@ -53,7 +53,8 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 				throw new Error('ContainerId is not set, we have not made a local duplicated of this container.');
 				return;
 			}
-			/** Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
+			/**
+			 * Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
 			 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
 			 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
 			 */
@@ -106,8 +107,14 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 		this.#editPropertyModal?.setUniquePathValue('container-id', value === null ? 'root' : value);
 	}
 
-	#addPropertyModal?: UmbModalRouteRegistrationController;
-	#editPropertyModal?: UmbModalRouteRegistrationController;
+	#addPropertyModal?: UmbModalRouteRegistrationController<
+		typeof UMB_PROPERTY_TYPE_WORKSPACE_MODAL.DATA,
+		typeof UMB_PROPERTY_TYPE_WORKSPACE_MODAL.VALUE
+	>;
+	#editPropertyModal?: UmbModalRouteRegistrationController<
+		typeof UMB_PROPERTY_TYPE_WORKSPACE_MODAL.DATA,
+		typeof UMB_PROPERTY_TYPE_WORKSPACE_MODAL.VALUE
+	>;
 
 	#propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
 

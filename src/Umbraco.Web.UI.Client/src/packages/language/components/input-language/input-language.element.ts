@@ -1,5 +1,5 @@
 import type { UmbLanguageItemModel } from '../../repository/index.js';
-import { UmbLanguagePickerContext } from './input-language.context.js';
+import { UmbLanguagePickerInputContext } from './input-language.context.js';
 import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -29,7 +29,7 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default 0
+	 * @default
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
@@ -52,7 +52,7 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default Infinity
+	 * @default
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
@@ -94,7 +94,7 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 	@state()
 	private _items: Array<UmbLanguageItemModel> = [];
 
-	#pickerContext = new UmbLanguagePickerContext(this);
+	#pickerContext = new UmbLanguagePickerInputContext(this);
 
 	constructor() {
 		super();

@@ -6,7 +6,9 @@
 		"combobox",
 		"ctrls",
 		"devs",
+		"Dropcursor",
 		"Elementable",
+		"Gapcursor",
 		"iframes",
 		"invariantable",
 		"lucide",
@@ -19,13 +21,20 @@
 		"svgs",
 		"templating",
 		"tinymce",
+		"tiptap",
 		"umbraco",
 		"Uncategorized",
 		"uninitialize",
+		"unprovide",
+		"unpublishing",
 		"variantable"
 	],
 	"exportall.config.folderListener": [],
 	"exportall.config.relExclusion": [],
 	"conventionalCommits.scopes": ["partial views"],
-	"typescript.tsdk": "node_modules/typescript/lib"
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"sonarlint.connectedMode.project": {
+		"connectionId": "umbraco",
+		"projectKey": "umbraco_Umbraco.CMS.Backoffice"
+	}
 }

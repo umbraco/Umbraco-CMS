@@ -2,17 +2,21 @@ import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import type {
-	ManifestBlockEditorCustomView,
-	UmbBlockEditorCustomViewProperties,
-	UmbPropertyEditorUiElement,
-} from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UMB_BLOCK_GRID, type UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 
 import '../block-grid-block-inline/index.js';
 import '../block-grid-block/index.js';
 import '../block-scale-handler/index.js';
+import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
+import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import type {
+	ManifestBlockEditorCustomView,
+	UmbBlockEditorCustomViewProperties,
+} from '@umbraco-cms/backoffice/block-custom-view';
+import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 /**
  * @element umb-block-grid-entry
  */
@@ -28,17 +32,27 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	@property({ attribute: false })
-	public get contentUdi(): string | undefined {
-		return this._contentUdi;
+	public get contentKey(): string | undefined {
+		return this._contentKey;
 	}
-	public set contentUdi(value: string | undefined) {
-		if (!value || value === this._contentUdi) return;
-		this._contentUdi = value;
-		this._blockViewProps.contentUdi = value;
-		this.setAttribute('data-element-udi', value);
-		this.#context.setContentUdi(value);
+	public set contentKey(value: string | undefined) {
+		if (!value || value === this._contentKey) return;
+		this._contentKey = value;
+		this._blockViewProps.contentKey = value;
+		this.setAttribute('data-element-key', value);
+		this.#context.setContentKey(value);
+
+		new UmbObserveValidationStateController(
+			this,
+			`$.contentData[${UmbDataPathBlockElementDataQuery({ key: value })}]`,
+			(hasMessages) => {
+				this._contentInvalid = hasMessages;
+				this._blockViewProps.contentInvalid = hasMessages;
+			},
+			'observeMessagesForContent',
+		);
 	}
-	private _contentUdi?: string | undefined;
+	private _contentKey?: string | undefined;
 	//
 
 	#context = new UmbBlockGridEntryContext(this);
@@ -71,6 +85,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	_icon?: string;
 
 	@state()
+	_exposed?: boolean;
+
+	@state()
 	_workspaceEditContentPath?: string;
 
 	@state()
@@ -89,9 +106,17 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	_inlineCreateAboveWidth?: string;
 
+	// 'content-invalid' attribute is used for styling purpose.
+	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
+	_contentInvalid?: boolean;
+
+	// 'settings-invalid' attribute is used for styling purpose.
+	@property({ type: Boolean, attribute: 'settings-invalid', reflect: true })
+	_settingsInvalid?: boolean;
+
 	@state()
 	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockGridLayoutModel> = {
-		contentUdi: undefined!,
+		contentKey: undefined!,
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
 
@@ -152,6 +177,14 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			null,
 		);
 		this.observe(
+			this.#context.hasExpose,
+			(exposed) => {
+				this.#updateBlockViewProps({ unpublished: !exposed });
+				this._exposed = exposed;
+			},
+			null,
+		);
+		this.observe(
 			this.#context.inlineEditingMode,
 			(mode) => {
 				this._inlineEditingMode = mode;
@@ -167,17 +200,24 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
+		this.#observeData();
+
 		this.observe(
-			this.#context.content,
-			(content) => {
-				this.#updateBlockViewProps({ content });
-			},
-			null,
-		);
-		this.observe(
-			this.#context.settings,
-			(settings) => {
-				this.#updateBlockViewProps({ settings });
+			this.#context.settingsKey,
+			(settingsKey) => {
+				this.removeUmbControllerByAlias('observeMessagesForSettings');
+				if (settingsKey) {
+					// Observe settings validation state:
+					new UmbObserveValidationStateController(
+						this,
+						`$.settingsData[${UmbDataPathBlockElementDataQuery({ key: settingsKey })}]`,
+						(hasMessages) => {
+							this._settingsInvalid = hasMessages;
+							this._blockViewProps.settingsInvalid = hasMessages;
+						},
+						'observeMessagesForSettings',
+					);
+				}
 			},
 			null,
 		);
@@ -214,6 +254,23 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			(path) => {
 				this._workspaceEditSettingsPath = path;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editSettingsPath: path } });
+			},
+			null,
+		);
+	}
+
+	async #observeData() {
+		this.observe(
+			await this.#context.contentValues(),
+			(content) => {
+				this.#updateBlockViewProps({ content });
+			},
+			null,
+		);
+		this.observe(
+			await this.#context.settingsValues(),
+			(settings) => {
+				this.#updateBlockViewProps({ settings });
 			},
 			null,
 		);
@@ -318,16 +375,35 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		return true;
 	};
 
+	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
+		if (ext.component) {
+			ext.component.classList.add('umb-block-grid__block--view');
+		}
+		return ext.component;
+	};
+
 	#renderInlineEditBlock() {
-		return html`<umb-block-grid-block-inline .label=${this._label}></umb-block-grid-block-inline>`;
+		return html`<umb-block-grid-block-inline
+			class="umb-block-grid__block--view"
+			.label=${this._label}
+			.icon=${this._icon}
+			.unpublished=${!this._exposed}
+			.content=${this._blockViewProps.content}
+			.settings=${this._blockViewProps.settings}></umb-block-grid-block-inline>`;
 	}
 
 	#renderRefBlock() {
-		return html`<umb-block-grid-block .label=${this._label}></umb-block-grid-block>`;
+		return html`<umb-block-grid-block
+			class="umb-block-grid__block--view"
+			.label=${this._label}
+			.icon=${this._icon}
+			.unpublished=${!this._exposed}
+			.content=${this._blockViewProps.content}
+			.settings=${this._blockViewProps.settings}></umb-block-grid-block>`;
 	}
 
 	#renderBlock() {
-		return this.contentUdi && this._contentTypeAlias
+		return this.contentKey && this._contentTypeAlias
 			? html`
 					${this._createBeforePath && this._showInlineCreateBefore
 						? html`<uui-button-inline-create
@@ -339,28 +415,47 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						: nothing}
 					<div class="umb-block-grid__block" part="umb-block-grid__block">
 						<umb-extension-slot
-							type="blockEditorCustomView"
-							default-element="umb-block-grid-block"
-							.props=${this._blockViewProps}
 							.filter=${this.#extensionSlotFilterMethod}
+							.renderMethod=${this.#extensionSlotRenderMethod}
+							.props=${this._blockViewProps}
+							default-element=${this._inlineEditingMode ? 'umb-block-grid-block-inline' : 'umb-block-grid-block'}
+							type="blockEditorCustomView"
+							single
 							>${this._inlineEditingMode ? this.#renderInlineEditBlock() : this.#renderRefBlock()}</umb-extension-slot
 						>
 						<uui-action-bar>
 							${this._showContentEdit && this._workspaceEditContentPath
-								? html`<uui-button label="edit" compact href=${this._workspaceEditContentPath}>
+								? html`<uui-button
+										label="edit"
+										look="secondary"
+										color=${this._contentInvalid ? 'danger' : ''}
+										href=${this._workspaceEditContentPath}>
 										<uui-icon name="icon-edit"></uui-icon>
+										${this._contentInvalid
+											? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+											: nothing}
 									</uui-button>`
 								: nothing}
 							${this._hasSettings && this._workspaceEditSettingsPath
-								? html`<uui-button label="Edit settings" compact href=${this._workspaceEditSettingsPath}>
+								? html`<uui-button
+										label="Edit settings"
+										look="secondary"
+										color=${this._settingsInvalid ? 'danger' : ''}
+										href=${this._workspaceEditSettingsPath}>
 										<uui-icon name="icon-settings"></uui-icon>
+										${this._settingsInvalid
+											? html`<uui-badge attention color="danger" label="Invalid settings">!</uui-badge>`
+											: nothing}
 									</uui-button>`
 								: nothing}
-							<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
+							<uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()}>
 								<uui-icon name="icon-remove"></uui-icon>
 							</uui-button>
 						</uui-action-bar>
 
+						${!this._showContentEdit && this._contentInvalid
+							? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+							: nothing}
 						${this._canScale
 							? html` <umb-block-scale-handler
 									@mousedown=${(e: MouseEvent) => this.#context.scaleManager.onScaleMouseDown(e)}>
@@ -383,21 +478,31 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	static override styles = [
+		UUIBlinkKeyframes,
 		css`
 			:host {
 				position: relative;
 				display: block;
+				--umb-block-grid-entry-actions-opacity: 0;
 			}
+			:host([settings-invalid]),
+			:host([content-invalid]),
+			:host(:hover),
+			:host(:focus-within) {
+				--umb-block-grid-entry-actions-opacity: 1;
+			}
+
 			uui-action-bar {
 				position: absolute;
 				top: var(--uui-size-2);
 				right: var(--uui-size-2);
+				opacity: var(--umb-block-grid-entry-actions-opacity, 0);
+				transition: opacity 120ms;
 			}
 			uui-button-inline-create {
 				top: 0px;
 				position: absolute;
 
-				// Avoid showing inline-create in dragging-mode
 				--umb-block-grid__block--inline-create-button-display--condition: var(--umb-block-grid--dragging-mode) none;
 				display: var(--umb-block-grid__block--inline-create-button-display--condition);
 			}
@@ -412,35 +517,60 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				right: calc(1px - (var(--umb-block-grid--column-gap, 0px) * 0.5));
 			}
 
-			:host([drag-placeholder]) {
-				opacity: 0.2;
+			.umb-block-grid__block {
+				height: 100%;
 			}
 
-			:host(::after) {
+			:host::after {
 				content: '';
 				position: absolute;
 				z-index: 1;
 				pointer-events: none;
-				display: none;
 				inset: 0;
 				border: 1px solid transparent;
-				border-radius: 3px;
+				border-radius: var(--uui-border-radius);
 				box-shadow:
 					0 0 0 1px rgba(255, 255, 255, 0.7),
 					inset 0 0 0 1px rgba(255, 255, 255, 0.7);
 
 				transition: border-color 240ms ease-in;
 			}
-
-			:host(:hover::after) {
-				// TODO: Look at the feature I out-commented here, what was that suppose to do [NL]:
-				//display: var(--umb-block-grid--block-ui-display, block);
+			:host(:hover):not(:drop)::after {
 				display: block;
-				border-color: var(--uui-color-interactive);
+				border-color: var(--uui-color-interactive-emphasis);
 			}
 
-			.umb-block-grid__block {
-				height: 100%;
+			:host([drag-placeholder])::after {
+				display: block;
+				border-width: 2px;
+				border-color: var(--uui-color-interactive-emphasis);
+				animation: ${UUIBlinkAnimationValue};
+			}
+			:host([drag-placeholder])::before {
+				content: '';
+				position: absolute;
+				pointer-events: none;
+				inset: 0;
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-interactive-emphasis);
+				opacity: 0.12;
+			}
+			:host([drag-placeholder]) .umb-block-grid__block {
+				transition: opacity 50ms 16ms;
+				opacity: 0;
+			}
+
+			:host([settings-invalid])::after,
+			:host([content-invalid])::after {
+				border-color: var(--uui-color-danger);
+			}
+			:host([settings-invalid])::before,
+			:host([content-invalid])::before {
+				background-color: var(--uui-color-danger);
+			}
+
+			uui-badge {
+				z-index: 2;
 			}
 		`,
 	];

@@ -1,7 +1,6 @@
 import { manifest as schemaManifest } from './Umbraco.Tags.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.Tags',
@@ -12,6 +11,7 @@ export const manifests: Array<ManifestTypes> = [
 			propertyEditorSchemaAlias: 'Umbraco.Tags',
 			icon: 'icon-tags',
 			group: 'common',
+			supportsReadOnly: true,
 		},
 	},
 	schemaManifest,

@@ -8,6 +8,7 @@ export interface UmbMediaCreateOptionsModalData {
 	} | null;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbMediaCreateOptionsModalValue {}
 
 export const UMB_MEDIA_CREATE_OPTIONS_MODAL = new UmbModalToken<

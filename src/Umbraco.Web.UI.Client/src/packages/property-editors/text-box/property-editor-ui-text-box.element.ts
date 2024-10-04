@@ -1,19 +1,19 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, ifDefined, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
+	type UmbPropertyEditorUiElement,
 	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 type UuiInputTypeType = typeof UUIInputElement.prototype.type;
 
 @customElement('umb-property-editor-ui-text-box')
 export class UmbPropertyEditorUITextBoxElement
-	extends UmbFormControlMixin<string>(UmbLitElement, undefined)
+	extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
 	/**
@@ -24,6 +24,15 @@ export class UmbPropertyEditorUITextBoxElement
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
+
+	/**
+	 * Sets the input to mandatory, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	mandatory?: boolean;
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	#defaultType: UuiInputTypeType = 'text';
 
@@ -50,6 +59,10 @@ export class UmbPropertyEditorUITextBoxElement
 		this.addFormControlElement(this.shadowRoot!.querySelector('uui-input')!);
 	}
 
+	override focus() {
+		return this.shadowRoot?.querySelector<UUIInputElement>('uui-input')?.focus();
+	}
+
 	#onInput(e: InputEvent) {
 		const newValue = (e.target as HTMLInputElement).value;
 		if (newValue === this.value) return;
@@ -65,10 +78,12 @@ export class UmbPropertyEditorUITextBoxElement
 			inputMode=${ifDefined(this._inputMode)}
 			maxlength=${ifDefined(this._maxChars)}
 			@input=${this.#onInput}
+			?required=${this.mandatory}
+			.requiredMessage=${this.mandatoryMessage}
 			?readonly=${this.readonly}></uui-input>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-input {

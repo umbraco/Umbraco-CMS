@@ -1,18 +1,25 @@
 import { UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT } from '../../../index.js';
-import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
-import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
-import type { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, state, nothing, query } from '@umbraco-cms/backoffice/external/lit';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
+import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
+import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
+import type {
+	UUIBooleanInputEvent,
+	UUIInputEvent,
+	UUIInputLockElement,
+	UUISelectEvent,
+} from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-property-type-workspace-view-settings')
 export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	#context?: typeof UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT.TYPE;
 
-	@state() private _customValidationOptions: Array<Option> = [
+	@state()
+	private _customValidationOptions: Array<Option> = [
 		{
 			name: this.localize.term('validation_validateNothing'),
 			value: '!NOVALIDATION!',
@@ -43,24 +50,42 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 	private _aliasLocked = true;
 
 	@state()
+	private _autoGenerateAlias = true;
+
+	@state()
 	private _contentTypeVariesByCulture?: boolean;
 
 	@state()
 	private _contentTypeVariesBySegment?: boolean;
+
+	@query('#alias-input')
+	private _aliasInput!: UUIInputLockElement;
+
+	@state()
+	private _entityType?: string;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#context = instance;
-			this.observe(instance.data, (data) => {
-				this._data = data;
-			});
+			this.observe(
+				instance.data,
+				(data) => {
+					if (!this._data && data?.alias) {
+						// Initial. Loading existing property
+						this._autoGenerateAlias = false;
+					}
+					this._data = data;
+				},
+				'observeData',
+			);
 		});
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.observe(instance.variesByCulture, (variesByCulture) => (this._contentTypeVariesByCulture = variesByCulture));
 			this.observe(instance.variesBySegment, (variesBySegment) => (this._contentTypeVariesBySegment = variesBySegment));
+			this._entityType = instance.getEntityType();
 		}).passContextAliasMatches();
 	}
 
@@ -69,23 +94,16 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 	}
 
 	#onNameChange(event: UUIInputEvent) {
-		const oldName = this._data?.name;
-		const oldAlias = this._data?.alias;
 		this.updateValue({ name: event.target.value.toString() });
-		if (this._aliasLocked) {
-			const expectedOldAlias = generateAlias(oldName ?? '');
-			// Only update the alias if the alias matches a generated alias of the old name (otherwise the alias is considered one written by the user.) [NL]
-			if (expectedOldAlias === oldAlias) {
-				this.updateValue({ alias: generateAlias(this._data?.name ?? '') });
-			}
+		if (this._aliasLocked && this._autoGenerateAlias) {
+			this.updateValue({ alias: generateAlias(this._data?.name ?? '') });
 		}
 	}
 
-	#onAliasChange(event: UUIInputEvent) {
-		const alias = generateAlias(event.target.value.toString());
-		if (this._aliasLocked) {
-			this.updateValue({ alias });
-		}
+	#onAliasChange() {
+		// TODO: Why can I not get the correct value via event? Is it an issue in uui library too?
+		const alias = generateAlias(this._aliasInput.value.toString());
+		this.updateValue({ alias });
 	}
 
 	#onDescriptionChange(event: UUIInputEvent) {
@@ -128,8 +146,28 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		});
 	}
 
+	#onToggleShowOnMemberProfile(e: UUIBooleanInputEvent) {
+		const memberCanEdit = this._data?.visibility?.memberCanEdit ?? false;
+		this.updateValue({ visibility: { memberCanView: e.target.checked, memberCanEdit } });
+	}
+
+	#onToggleMemberCanEdit(e: UUIBooleanInputEvent) {
+		const memberCanView = this._data?.visibility?.memberCanView ?? false;
+		this.updateValue({ visibility: { memberCanEdit: e.target.checked, memberCanView } });
+	}
+
+	#onToggleIsSensitiveData(e: UUIBooleanInputEvent) {
+		this.updateValue({ isSensitive: e.target.checked });
+	}
+
 	#onToggleAliasLock() {
 		this._aliasLocked = !this._aliasLocked;
+		if (this._aliasLocked && !this._data?.alias) {
+			// Reenable auto-generate if alias is empty and locked.
+			this._autoGenerateAlias = true;
+		} else {
+			this._autoGenerateAlias = false;
+		}
 	}
 
 	#onCustomValidationChange(event: UUISelectEvent) {
@@ -171,65 +209,114 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 	}
 
 	override render() {
-		return this._data
-			? html`
-					<uui-box class="uui-text">
-						<div class="container">
-							<!-- TODO: Align styling across this and the property of document type workspace editor, or consider if this can go away for a different UX flow -->
-							<uui-input
-								id="name-input"
-								name="name"
-								label=${this.localize.term('placeholders_entername')}
-								@input=${this.#onNameChange}
-								.value=${this._data?.name}
-								placeholder=${this.localize.term('placeholders_entername')}
-								${umbFocus()}>
-								<!-- TODO: validation for bad characters -->
-							</uui-input>
-							<uui-input
-								id="alias-input"
-								name="alias"
-								@input=${this.#onAliasChange}
-								.value=${this._data?.alias}
-								label=${this.localize.term('placeholders_enterAlias')}
-								placeholder=${this.localize.term('placeholders_enterAlias')}
-								?disabled=${this._aliasLocked}>
-								<!-- TODO: validation for bad characters -->
-								<div @click=${this.#onToggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
-									<uui-icon name=${this._aliasLocked ? 'icon-lock' : 'icon-unlocked'}></uui-icon>
-								</div>
-							</uui-input>
-							<uui-textarea
-								id="description-input"
-								name="description"
-								@input=${this.#onDescriptionChange}
-								label=${this.localize.term('placeholders_enterDescription')}
-								placeholder=${this.localize.term('placeholders_enterDescription')}
-								.value=${this._data?.description}></uui-textarea>
-						</div>
-						<umb-data-type-flow-input
-							.value=${this._data?.dataType?.unique ?? ''}
-							@change=${this.#onDataTypeIdChange}></umb-data-type-flow-input>
-						<hr />
-						<div class="container">
-							<b><umb-localize key="validation_validation">Validation</umb-localize></b>
-							${this.#renderMandatory()}
-							<p style="margin-bottom: 0">
-								<umb-localize key="validation_customValidation">Custom validation</umb-localize>
-							</p>
-							${this.#renderCustomValidation()}
-						</div>
-						<hr />
-						${this.#renderVariationControls()}
-						<div class="container">
-							<b style="margin-bottom: var(--uui-size-space-3)">
-								<umb-localize key="contentTypeEditor_displaySettingsHeadline">Appearance</umb-localize>
-							</b>
-							<div id="appearances">${this.#renderAlignLeftIcon()} ${this.#renderAlignTopIcon()}</div>
-						</div>
-					</uui-box>
-				`
-			: '';
+		if (!this._data) return;
+		return html`
+			<uui-box class="uui-text">
+				<div class="container">
+					<umb-form-validation-message>
+						<uui-input
+							id="name-input"
+							name="name"
+							label=${this.localize.term('placeholders_entername')}
+							placeholder=${this.localize.term('placeholders_entername')}
+							.value=${this._data?.name}
+							@input=${this.#onNameChange}
+							required
+							${umbBindToValidation(this, '$.name')}
+							${umbFocus()}>
+							<!-- TODO: validation for bad characters -->
+						</uui-input>
+					</umb-form-validation-message>
+					<umb-form-validation-message>
+						<uui-input-lock
+							id="alias-input"
+							name="alias"
+							label=${this.localize.term('placeholders_enterAlias')}
+							placeholder=${this.localize.term('placeholders_enterAlias')}
+							.value=${this._data?.alias}
+							?locked=${this._aliasLocked}
+							required
+							${umbBindToValidation(this, '$.alias')}
+							@input=${this.#onAliasChange}
+							@lock-change=${this.#onToggleAliasLock}>
+						</uui-input-lock>
+					</umb-form-validation-message>
+					<uui-textarea
+						id="description-input"
+						name="description"
+						@input=${this.#onDescriptionChange}
+						label=${this.localize.term('placeholders_enterDescription')}
+						placeholder=${this.localize.term('placeholders_enterDescription')}
+						.value=${this._data?.description}></uui-textarea>
+				</div>
+				<umb-form-validation-message>
+					<umb-data-type-flow-input
+						.value=${this._data?.dataType?.unique ?? ''}
+						@change=${this.#onDataTypeIdChange}
+						required
+						${umbBindToValidation(this, '$.dataType.unique')}></umb-data-type-flow-input>
+				</umb-form-validation-message>
+				<hr />
+				<div class="container">
+					<b><umb-localize key="validation_validation">Validation</umb-localize></b>
+					${this.#renderMandatory()}
+					<p style="margin-bottom: 0">
+						<umb-localize key="validation_customValidation">Custom validation</umb-localize>
+					</p>
+					${this.#renderCustomValidation()}
+				</div>
+				<hr />
+				${this.#renderVariationControls()}
+				<div class="container">
+					<b style="margin-bottom: var(--uui-size-space-3)">
+						<umb-localize key="contentTypeEditor_displaySettingsHeadline">Appearance</umb-localize>
+					</b>
+					<div id="appearances">${this.#renderAlignLeftIcon()} ${this.#renderAlignTopIcon()}</div>
+				</div>
+				${this.#renderMemberTypeOptions()}
+			</uui-box>
+		`;
+	}
+
+	#renderMemberTypeOptions() {
+		if (this._entityType !== 'member-type') return nothing;
+		return html` <hr />
+			<div class="container">
+				<b style="margin-bottom: var(--uui-size-space-3)">
+					<umb-localize key="general_options">Options</umb-localize>
+				</b>
+				<div class="options">
+					<uui-toggle
+						?checked=${this._data?.visibility?.memberCanView}
+						@change=${this.#onToggleShowOnMemberProfile}
+						label=${this.localize.term('contentTypeEditor_showOnMemberProfile')}></uui-toggle>
+					<small>
+						<umb-localize key="contentTypeEditor_showOnMemberProfileDescription">
+							Allow this property value to be displayed on the member profile page
+						</umb-localize>
+					</small>
+
+					<uui-toggle
+						?checked=${this._data?.visibility?.memberCanEdit}
+						@change=${this.#onToggleMemberCanEdit}
+						label=${this.localize.term('contentTypeEditor_memberCanEdit')}></uui-toggle>
+					<small>
+						<umb-localize key="contentTypeEditor_memberCanEditDescription">
+							Allow this property value to be edited by the member on their profile page
+						</umb-localize>
+					</small>
+
+					<uui-toggle
+						?checked=${this._data?.isSensitive}
+						@change=${this.#onToggleIsSensitiveData}
+						label=${this.localize.term('contentTypeEditor_isSensitiveData')}></uui-toggle>
+					<small>
+						<umb-localize key="contentTypeEditor_isSensitiveDataDescription">
+							Hide this property value from content editors that don't have access to view sensitive information
+						</umb-localize>
+					</small>
+				</div>
+			</div>`;
 	}
 
 	#renderAlignLeftIcon() {
@@ -357,16 +444,6 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				--uui-input-border-color: transparent;
 			}
 
-			#alias-lock {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				cursor: pointer;
-			}
-			#alias-lock uui-icon {
-				margin-bottom: 2px;
-				/* margin: 0; */
-			}
 			#description-input {
 				--uui-textarea-border-color: transparent;
 				font-weight: 0.5rem; /* TODO: Cant change font size of UUI textarea yet */
@@ -439,14 +516,11 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 			uui-input {
 				width: 100%;
 			}
-			#alias-lock {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				cursor: pointer;
+			uui-input:focus-within {
+				z-index: 1;
 			}
-			#alias-lock uui-icon {
-				margin-bottom: 2px;
+			uui-input-lock:focus-within {
+				z-index: 1;
 			}
 			.container {
 				display: flex;

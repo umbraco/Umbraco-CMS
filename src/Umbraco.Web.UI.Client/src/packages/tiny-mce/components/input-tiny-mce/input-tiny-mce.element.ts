@@ -6,7 +6,7 @@ import type { UmbTinyMcePluginBase } from './tiny-mce-plugin.js';
 import { type ClassConstructor, loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { css, customElement, html, property, query } from '@umbraco-cms/backoffice/external/lit';
 import { getProcessedImageUrl, umbDeepMerge } from '@umbraco-cms/backoffice/utils';
-import { type ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbStylesheetDetailRepository, UmbStylesheetRuleManager } from '@umbraco-cms/backoffice/stylesheet';
@@ -18,11 +18,13 @@ import {
 	renderEditor,
 } from '@umbraco-cms/backoffice/external/tinymce';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { ManifestTinyMcePlugin } from '@umbraco-cms/backoffice/tiny-mce';
 
 /**
  * Handles the resize event
+ * @param e
  */
-// TODO: This does somehow not belong as a utility method as it is very specific to this implementation. [NL]
 async function onResize(
 	e: EditorEvent<{
 		target: HTMLElement;
@@ -41,7 +43,7 @@ async function onResize(
 	const resizedPath = await getProcessedImageUrl(path, {
 		width: e.width,
 		height: e.height,
-		mode: 'max',
+		mode: ImageCropModeModel.MAX,
 	});
 
 	e.target.setAttribute('data-mce-src', resizedPath);
@@ -54,8 +56,8 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 
 	#plugins: Array<ClassConstructor<UmbTinyMcePluginBase> | undefined> = [];
 	#editorRef?: Editor | null = null;
-	#stylesheetRepository = new UmbStylesheetDetailRepository(this);
-	#umbStylesheetRuleManager = new UmbStylesheetRuleManager();
+	readonly #stylesheetRepository = new UmbStylesheetDetailRepository(this);
+	readonly #umbStylesheetRuleManager = new UmbStylesheetRuleManager();
 
 	protected override getFormElement() {
 		return this._editorElement?.querySelector('iframe') ?? undefined;
@@ -63,7 +65,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 
 	override set value(newValue: FormDataEntryValue | FormData) {
 		super.value = newValue;
-		const newContent = newValue?.toString() ?? '';
+		const newContent = typeof newValue === 'string' ? newValue : '';
 
 		if (this.#editorRef && this.#editorRef.getContent() != newContent) {
 			this.#editorRef.setContent(newContent);
@@ -74,16 +76,32 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		return super.value;
 	}
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: Boolean, reflect: true })
+	public get readonly() {
+		return this.#readonly;
+	}
+	public set readonly(value) {
+		this.#readonly = value;
+		const editor = this.getEditor();
+		const mode = value ? 'readonly' : 'design';
+		editor?.mode.set(mode);
+	}
+	#readonly = false;
+
 	@query('.editor', true)
-	private _editorElement?: HTMLElement;
+	private readonly _editorElement?: HTMLElement;
 
 	getEditor() {
 		return this.#editorRef;
 	}
 
-	constructor() {
-		super();
-
+	override firstUpdated() {
 		this.#loadEditor();
 	}
 
@@ -114,6 +132,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	 * need the editor instance as a ctor argument. If we load them in the editor
 	 * setup method, the asynchronous nature means the editor is loaded before
 	 * the plugins are ready and so are not associated with the editor.
+	 * @param manifests
 	 */
 	async #loadPlugins(manifests: Array<ManifestTinyMcePlugin>) {
 		const promises = [];
@@ -208,8 +227,8 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 
 		// set the configured toolbar if any, otherwise false
 		const toolbar = this.configuration?.getValueByAlias<string[]>('toolbar');
-		if (toolbar && toolbar.length) {
-			configurationOptions.toolbar = toolbar?.join(' ');
+		if (toolbar?.length) {
+			configurationOptions.toolbar = toolbar.join(' ');
 		} else {
 			configurationOptions.toolbar = false;
 		}
@@ -244,6 +263,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 			language: this.#getLanguage(),
 			promotion: false,
 			convert_unsafe_embeds: true, // [JOV] Workaround for CVE-2024-29881
+			readonly: this.#readonly,
 
 			// Extend with configuration options
 			...configurationOptions,
@@ -265,7 +285,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 
 	/**
 	 * Gets the language to use for TinyMCE
-	 **/
+	 */
 	#getLanguage() {
 		const localeId = this.localize.lang();
 		//try matching the language using full locale format
@@ -316,13 +336,12 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 			/**
 			 * Prevent injecting arbitrary JavaScript execution in on-attributes.
 			 *
-			 * TODO: This used to be toggleable through server variables with window.Umbraco?.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce
 			 */
 			const allNodes = Array.from(editor.dom.doc.getElementsByTagName('*'));
 			allNodes.forEach((node) => {
-				for (let i = 0; i < node.attributes.length; i++) {
-					if (node.attributes[i].name.startsWith('on')) {
-						node.removeAttribute(node.attributes[i].name);
+				for (const attr of node.attributes) {
+					if (attr.name.startsWith('on')) {
+						node.removeAttribute(attr.name);
 					}
 				}
 			});
@@ -344,7 +363,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		//enable browser based spell checking
 		editor.getBody().setAttribute('spellcheck', 'true');
 		uriAttributeSanitizer(editor);
-		editor.setContent(this.value?.toString() ?? '');
+		editor.setContent(typeof this.value === 'string' ? this.value : '');
 	}
 
 	#onChange(value: string) {
@@ -360,7 +379,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		return html`<div class="editor"></div>`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			.tox-tinymce {
 				position: relative;

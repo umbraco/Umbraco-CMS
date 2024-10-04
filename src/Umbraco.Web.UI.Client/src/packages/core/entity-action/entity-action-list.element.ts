@@ -1,7 +1,7 @@
 import type { UmbEntityActionArgs } from './types.js';
+import type { ManifestEntityAction, MetaEntityAction } from './entity-action.extension.js';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
-import type { ManifestEntityAction, MetaEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
 

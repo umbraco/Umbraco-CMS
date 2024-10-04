@@ -1,10 +1,10 @@
 import { UmbPackageRepository } from '../../package/repository/index.js';
 import type { UmbCreatedPackageDefinition } from '../../types.js';
-import { UmbDictionaryPickerContext } from '@umbraco-cms/backoffice/dictionary';
-import { UmbPartialViewPickerContext } from '@umbraco-cms/backoffice/partial-view';
-import { UmbScriptPickerContext } from '@umbraco-cms/backoffice/script';
-import { UmbStylesheetPickerContext } from '@umbraco-cms/backoffice/stylesheet';
-import { UmbTemplatePickerContext } from '@umbraco-cms/backoffice/template';
+import { UmbDictionaryPickerInputContext } from '@umbraco-cms/backoffice/dictionary';
+import { UmbPartialViewPickerInputContext } from '@umbraco-cms/backoffice/partial-view';
+import { UmbScriptPickerInputContext } from '@umbraco-cms/backoffice/script';
+import { UmbStylesheetPickerInputContext } from '@umbraco-cms/backoffice/stylesheet';
+import { UmbTemplatePickerInputContext } from '@umbraco-cms/backoffice/template';
 import type { UmbDataTypeInputElement } from '@umbraco-cms/backoffice/data-type';
 import type { UmbInputLanguageElement } from '@umbraco-cms/backoffice/language';
 import {
@@ -307,7 +307,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 				<div slot="editor">
 					<umb-input-entity
 						.getIcon=${() => 'icon-book-alt'}
-						.pickerContext=${UmbDictionaryPickerContext}
+						.pickerContext=${UmbDictionaryPickerInputContext}
 						.selection=${this._package.dictionaryItems ?? []}
 						@change=${this.#onDictionaryChange}>
 					</umb-input-entity>
@@ -344,7 +344,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 				<div slot="editor">
 					<umb-input-entity
 						.getIcon=${() => 'icon-newspaper'}
-						.pickerContext=${UmbTemplatePickerContext}
+						.pickerContext=${UmbTemplatePickerInputContext}
 						.selection=${this._package.templates ?? []}
 						@change=${this.#onTemplateChange}>
 					</umb-input-entity>
@@ -368,7 +368,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 				<div slot="editor">
 					<umb-input-entity
 						.getIcon=${() => 'icon-brush-alt'}
-						.pickerContext=${UmbStylesheetPickerContext}
+						.pickerContext=${UmbStylesheetPickerInputContext}
 						.selection=${this._package.stylesheets.map((path) => this.#serverFilePathUniqueSerializer.toUnique(path)) ??
 						[]}
 						@change=${this.#onStylesheetsChange}>
@@ -393,7 +393,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 				<div slot="editor">
 					<umb-input-entity
 						.getIcon=${() => 'icon-diploma'}
-						.pickerContext=${UmbScriptPickerContext}
+						.pickerContext=${UmbScriptPickerInputContext}
 						.selection=${this._package.scripts.map((path) => this.#serverFilePathUniqueSerializer.toUnique(path)) ?? []}
 						@change=${this.#onScriptsChange}>
 					</umb-input-entity>
@@ -417,7 +417,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 				<div slot="editor">
 					<umb-input-entity
 						.getIcon=${() => 'icon-notepad'}
-						.pickerContext=${UmbPartialViewPickerContext}
+						.pickerContext=${UmbPartialViewPickerInputContext}
 						.selection=${this._package.partialViews.map((path) =>
 							this.#serverFilePathUniqueSerializer.toUnique(path),
 						) ?? []}

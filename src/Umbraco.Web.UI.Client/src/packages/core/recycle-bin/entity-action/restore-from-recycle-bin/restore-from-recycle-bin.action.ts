@@ -1,15 +1,13 @@
-import { UmbEntityActionBase } from '../../../entity-action/entity-action-base.js';
 import { UMB_RESTORE_FROM_RECYCLE_BIN_MODAL } from './modal/restore-from-recycle-bin-modal.token.js';
+import type { MetaEntityActionRestoreFromRecycleBinKind } from './types.js';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import type { MetaEntityActionRestoreFromRecycleBinKind } from '@umbraco-cms/backoffice/extension-registry';
 
 /**
  * Entity action for restoring an item from the recycle bin.
- * @export
  * @class UmbRestoreFromRecycleBinEntityAction
- * @extends {UmbEntityActionBase<MetaEntityActionRestoreFromRecycleBinKind>}
+ * @augments {UmbEntityActionBase<MetaEntityActionRestoreFromRecycleBinKind>}
  */
 export class UmbRestoreFromRecycleBinEntityAction extends UmbEntityActionBase<MetaEntityActionRestoreFromRecycleBinKind> {
 	/**

@@ -1,23 +1,47 @@
 import { UMB_BLOCK_WORKSPACE_ALIAS } from './index.js';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspaceAction',
 		kind: 'default',
-		alias: 'Umb.WorkspaceAction.Block.Save',
-		name: 'Save Block Type Workspace Action',
+		alias: 'Umb.WorkspaceAction.Block.SubmitCreate',
+		name: 'Submit Create Block Workspace Action',
 		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: '#general_submit',
+			label: '#general_create',
 			look: 'primary',
 			color: 'positive',
 		},
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				oneOf: [UMB_BLOCK_WORKSPACE_ALIAS],
+				match: UMB_BLOCK_WORKSPACE_ALIAS,
+			},
+			{
+				alias: 'Umb.Condition.BlockWorkspaceIsExposed',
+				match: false,
+			},
+		],
+	},
+	{
+		type: 'workspaceAction',
+		kind: 'default',
+		alias: 'Umb.WorkspaceAction.Block.SubmitUpdate',
+		name: 'Submit Update Block Workspace Action',
+		api: UmbSubmitWorkspaceAction,
+		meta: {
+			label: '#general_update',
+			look: 'primary',
+			color: 'positive',
+		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: UMB_BLOCK_WORKSPACE_ALIAS,
+			},
+			{
+				alias: 'Umb.Condition.BlockWorkspaceIsExposed',
 			},
 		],
 	},
@@ -35,7 +59,7 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Block.Content',
 		name: 'Block Workspace Content View',
-		js: () => import('./views/edit/block-workspace-view-edit.element.js'),
+		element: () => import('./views/edit/block-workspace-view-edit.element.js'),
 		weight: 1000,
 		meta: {
 			label: '#general_content',
@@ -60,7 +84,7 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Block.Settings',
 		name: 'Block Workspace Settings View',
-		js: () => import('./views/edit/block-workspace-view-edit.element.js'),
+		element: () => import('./views/edit/block-workspace-view-edit.element.js'),
 		weight: 900,
 		meta: {
 			label: '#general_settings',

@@ -3,9 +3,8 @@ import { loadManifestPlainJs } from '@umbraco-cms/backoffice/extension-api';
 import { type UUIIconHost, UUIIconRegistry } from '@umbraco-cms/backoffice/external/uui';
 
 /**
- * @export
  * @class UmbIconRegistry
- * @extends {UUIIconRegistry}
+ * @augments {UUIIconRegistry}
  * @description - Icon Registry. Provides icons from the icon manifest. Icons are loaded on demand. All icons are prefixed with 'icon-'
  */
 export class UmbIconRegistry extends UUIIconRegistry {
@@ -41,7 +40,7 @@ export class UmbIconRegistry extends UUIIconRegistry {
 	}
 	/**
 	 * @param {string} iconName
-	 * @return {*}  {boolean}
+	 * @returns {*}  {boolean}
 	 * @memberof UmbIconStore
 	 */
 	override acceptIcon(iconName: string): boolean {

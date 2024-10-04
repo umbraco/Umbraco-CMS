@@ -6,7 +6,7 @@ import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbContentTypeModel, UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 
@@ -33,7 +33,8 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				throw new Error('OwnerTabId is not set, we have not made a local duplicated of this container.');
 				return;
 			}*/
-			/** Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
+			/**
+			 * Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
 			 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
 			 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
 			 */
@@ -71,7 +72,10 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 		},
 	});
 
-	#workspaceModal?: UmbModalRouteRegistrationController;
+	#workspaceModal?: UmbModalRouteRegistrationController<
+		typeof UMB_WORKSPACE_MODAL.DATA,
+		typeof UMB_WORKSPACE_MODAL.VALUE
+	>;
 	#containerId?: string | null;
 
 	@property({ type: String })

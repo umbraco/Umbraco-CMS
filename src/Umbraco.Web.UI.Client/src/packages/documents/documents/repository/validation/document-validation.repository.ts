@@ -1,5 +1,6 @@
 import type { UmbDocumentDetailModel } from '../../types.js';
 import { UmbDocumentValidationServerDataSource } from './document-validation.server.data-source.js';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
@@ -17,8 +18,8 @@ export class UmbDocumentValidationRepository extends UmbRepositoryBase {
 	/**
 	 * Returns a promise with an observable of the detail for the given unique
 	 * @param {DetailModelType} model
-	 * @param {string | null} [parentUnique=null]
-	 * @return {*}
+	 * @param {string | null} [parentUnique]
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async validateCreate(model: DetailModelType, parentUnique: string | null) {
@@ -30,14 +31,15 @@ export class UmbDocumentValidationRepository extends UmbRepositoryBase {
 	/**
 	 * Saves the given data
 	 * @param {DetailModelType} model
-	 * @return {*}
+	 * @param variantIds
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
-	async validateSave(model: DetailModelType) {
+	async validateSave(model: DetailModelType, variantIds: Array<UmbVariantId>) {
 		if (!model) throw new Error('Data is missing');
 		if (!model.unique) throw new Error('Unique is missing');
 
-		return this.#validationDataSource.validateUpdate(model);
+		return this.#validationDataSource.validateUpdate(model, variantIds);
 	}
 }
 

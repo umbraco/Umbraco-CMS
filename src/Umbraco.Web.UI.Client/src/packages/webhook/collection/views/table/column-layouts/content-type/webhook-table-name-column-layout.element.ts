@@ -32,7 +32,7 @@ export class UmbWebhookTableContentTypeColumnLayoutElement extends UmbLitElement
 
 		if (this.value?.contentTypeName && this.#repository) {
 			const { data } = await this.#repository.requestItems(this.value.contentTypes);
-			this._contentTypes = data?.map((item) => item.name).join(', ') ?? '';
+			this._contentTypes = data?.map((item) => this.localize.string(item.name)).join(', ') ?? '';
 		}
 	}
 

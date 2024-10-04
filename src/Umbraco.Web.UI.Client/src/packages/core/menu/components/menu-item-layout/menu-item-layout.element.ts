@@ -37,6 +37,15 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 	@property({ type: String })
 	public href?: string;
 
+	/**
+	 * Set an anchor tag target, only used when using href.
+	 * @type {string}
+	 * @attr
+	 * @default undefined
+	 */
+	@property({ type: String })
+	public target?: '_blank' | '_parent' | '_self' | '_top';
+
 	@state()
 	private _isActive = false;
 
@@ -63,7 +72,8 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 			label=${this.label}
 			.caretLabel=${this.localize.term('visuallyHiddenTexts_expandChildItems') + ' ' + this.label}
 			?active=${this._isActive}
-			?has-children=${this.hasChildren}>
+			?has-children=${this.hasChildren}
+			target=${ifDefined(this.href && this.target ? this.target : undefined)}>
 			<umb-icon slot="icon" name=${this.iconName}></umb-icon>
 			${this.entityType
 				? html`<umb-entity-actions-bundle

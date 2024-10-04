@@ -89,6 +89,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 
 	/**
 	 * Render a provider with a toggle to enable/disable it
+	 * @param item
 	 */
 	#renderProvider(item: UmbMfaLoginProviderOption) {
 		return html`
@@ -137,6 +138,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	 * Open the provider modal.
 	 * This will show the QR code and/or other means of validation for the given provider and return the activation code.
 	 * The activation code is then used to either enable the provider.
+	 * @param item
 	 */
 	async #onProviderEnable(item: UmbMfaLoginProviderOption) {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
@@ -152,6 +154,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	 * Open the provider modal.
 	 * This will show the QR code and/or other means of validation for the given provider and return the activation code.
 	 * The activation code is then used to disable the provider.
+	 * @param item
 	 */
 	async #onProviderDisable(item: UmbMfaLoginProviderOption) {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);

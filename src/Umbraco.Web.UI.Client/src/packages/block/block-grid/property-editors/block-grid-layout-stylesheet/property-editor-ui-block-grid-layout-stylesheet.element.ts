@@ -4,12 +4,12 @@ import type { UmbInputStaticFileElement } from '@umbraco-cms/backoffice/static-f
 
 import '@umbraco-cms/backoffice/static-file';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
+	type UmbPropertyEditorUiElement,
 	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
@@ -79,7 +79,9 @@ export class UmbPropertyEditorUIBlockGridLayoutStylesheetElement
 				.min=${this._limitMin}
 				.max=${this._limitMax}></umb-input-static-file>
 			<br />
-			<a href="/umbraco/backoffice/assets/css/umbraco-blockgridlayout.css">Link to default layout stylesheet</a>
+			<a href="/umbraco/backoffice/css/umbraco-blockgridlayout.css" target="_blank"
+				>Link to default layout stylesheet</a
+			>
 		`;
 	}
 

@@ -1,14 +1,14 @@
 import '../../../block-type/components/input-block-type/index.js';
-import type { UmbInputBlockTypeElement } from '../../../block-type/index.js';
 import { UMB_BLOCK_LIST_TYPE } from '../../types.js';
-import type { UmbBlockTypeBaseModel, UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbBlockTypeBaseModel, UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
 import {
+	type UmbPropertyEditorUiElement,
 	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 
 /**

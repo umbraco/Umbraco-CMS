@@ -1,9 +1,8 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT } from '../../user-permissions/constants.js';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
@@ -15,6 +14,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-blueprint',
 			label: '#actions_createblueprint',
+			additionalOptions: true,
 		},
 		conditions: [
 			{
@@ -26,15 +26,10 @@ const entityActions: Array<ManifestTypes> = [
 			},
 		],
 	},
-];
-
-const manifestModals: Array<ManifestTypes> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.CreateBlueprint',
 		name: 'Create Blueprint Modal',
-		js: () => import('./modal/create-blueprint-modal.element.js'),
+		element: () => import('./modal/create-blueprint-modal.element.js'),
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...entityActions, ...manifestModals];

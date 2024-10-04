@@ -5,7 +5,7 @@ import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from '../../mo
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbMediaPickerContext extends UmbPickerInputContext<
+export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 	UmbMediaItemModel,
 	UmbMediaItemModel,
 	UmbMediaPickerModalData<UmbMediaItemModel>,

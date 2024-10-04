@@ -129,7 +129,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 			case StatusResultTypeModel.SUCCESS:
 				return html`<uui-icon style="color: var(--uui-color-positive);" name="check"></uui-icon>`;
 			case StatusResultTypeModel.WARNING:
-				return html`<uui-icon style="color: var(--uui-color-warning);" name="alert"></uui-icon>`;
+				return html`<uui-icon style="color: var(--uui-color-warning-standalone);" name="alert"></uui-icon>`;
 			case StatusResultTypeModel.ERROR:
 				return html`<uui-icon style="color: var(--uui-color-danger);" name="remove"></uui-icon>`;
 			case StatusResultTypeModel.INFO:

@@ -1,12 +1,17 @@
 import type { UmbPropertyActionArgs } from '../property-action/types.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { ManifestPropertyAction, MetaPropertyAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyAction, MetaPropertyAction } from '@umbraco-cms/backoffice/property-action';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
+/**
+ *
+ * @param manifest
+ * @returns
+ */
 function ExtensionApiArgsMethod(manifest: ManifestPropertyAction): [UmbPropertyActionArgs<MetaPropertyAction>] {
 	return [{ meta: manifest.meta }];
 }

@@ -5,7 +5,7 @@ import type { UmbPartialViewTreeItemModel } from '../../tree/types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 
-export class UmbPartialViewPickerContext extends UmbPickerInputContext<
+export class UmbPartialViewPickerInputContext extends UmbPickerInputContext<
 	UmbPartialViewItemModel,
 	UmbPartialViewTreeItemModel
 > {
@@ -13,3 +13,6 @@ export class UmbPartialViewPickerContext extends UmbPickerInputContext<
 		super(host, UMB_PARTIAL_VIEW_ITEM_REPOSITORY_ALIAS, UMB_PARTIAL_VIEW_PICKER_MODAL);
 	}
 }
+
+/** @deprecated Use `UmbPartialViewPickerInputContext` instead. This method will be removed in Umbraco 15. */
+export { UmbPartialViewPickerInputContext as UmbPartialViewPickerContext };

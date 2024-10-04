@@ -145,7 +145,11 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		const currentItems = [...this.items];
 		const index = currentItems.findIndex((x) => x === tag);
 		currentItems.splice(index, 1);
-		currentItems.length ? (this.items = [...currentItems]) : (this.items = []);
+		if (currentItems.length) {
+			this.items = currentItems;
+		} else {
+			this.items = [];
+		}
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 

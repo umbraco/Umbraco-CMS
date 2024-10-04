@@ -12,16 +12,31 @@ import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 
 import '../shared/document-variant-language-picker.element.js';
 
+/**
+ * @function isPublished
+ * @param {UmbDocumentVariantOptionModel} option - the option to check.
+ * @returns {boolean} boolean
+ */
+export function isPublished(option: UmbDocumentVariantOptionModel): boolean {
+	return (
+		option.variant?.state === UmbDocumentVariantState.PUBLISHED ||
+		option.variant?.state === UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES
+	);
+}
+
 @customElement('umb-document-unpublish-modal')
 export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	UmbDocumentUnpublishModalData,
 	UmbDocumentUnpublishModalValue
 > {
-	#selectionManager = new UmbSelectionManager<string>(this);
+	protected readonly _selectionManager = new UmbSelectionManager<string>(this);
 	#referencesRepository = new UmbDocumentReferenceRepository(this);
 
 	@state()
 	_options: Array<UmbDocumentVariantOptionModel> = [];
+
+	@state()
+	_selection: Array<string> = [];
 
 	@state()
 	_hasReferences = false;
@@ -29,31 +44,40 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	@state()
 	_hasUnpublishPermission = true;
 
+	@state()
+	_hasInvalidSelection = true;
+
 	override firstUpdated() {
 		this.#configureSelectionManager();
 		this.#getReferences();
 	}
 
 	async #configureSelectionManager() {
-		this.#selectionManager.setMultiple(true);
-		this.#selectionManager.setSelectable(true);
+		this._selectionManager.setMultiple(true);
+		this._selectionManager.setSelectable(true);
 
 		// Only display variants that are relevant to pick from, i.e. variants that are draft or published with pending changes:
-		this._options =
-			this.data?.options.filter(
-				(option) =>
-					option.variant &&
-					(!option.variant.state ||
-						option.variant.state === UmbDocumentVariantState.PUBLISHED ||
-						option.variant.state === UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES),
-			) ?? [];
+		this._options = this.data?.options.filter((option) => isPublished(option)) ?? [];
 
 		let selected = this.value?.selection ?? [];
 
 		// Filter selection based on options:
 		selected = selected.filter((s) => this._options.some((o) => o.unique === s));
 
-		this.#selectionManager.setSelection(selected);
+		this._selectionManager.setSelection(selected);
+
+		this.observe(
+			this._selectionManager.selection,
+			(selection) => {
+				this._selection = selection;
+				const selectionHasMandatory = this._options.some((o) => o.language.isMandatory && selection.includes(o.unique));
+				const selectionDoesNotHaveAllMandatory = this._options.some(
+					(o) => o.language.isMandatory && !selection.includes(o.unique),
+				);
+				this._hasInvalidSelection = selectionHasMandatory && selectionDoesNotHaveAllMandatory;
+			},
+			'observeSelection',
+		);
 	}
 
 	async #getReferences() {
@@ -80,7 +104,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 
 	#submit() {
 		if (this._hasUnpublishPermission) {
-			this.value = { selection: this.#selectionManager.getSelection() };
+			this.value = { selection: this._selection };
 			this.modalContext?.submit();
 			return;
 		}
@@ -91,6 +115,10 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
+	private _requiredFilter = (variantOption: UmbDocumentVariantOptionModel): boolean => {
+		return variantOption.language.isMandatory && !this._selection.includes(variantOption.unique);
+	};
+
 	override render() {
 		return html`<umb-body-layout headline=${this.localize.term('content_unpublish')}>
 			<p id="subtitle">
@@ -100,8 +128,10 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 			</p>
 
 			<umb-document-variant-language-picker
-				.selectionManager=${this.#selectionManager}
-				.variantLanguageOptions=${this._options}></umb-document-variant-language-picker>
+				.selectionManager=${this._selectionManager}
+				.variantLanguageOptions=${this._options}
+				.requiredFilter=${this._hasInvalidSelection ? this._requiredFilter : undefined}
+				.pickableFilter=${this.data?.pickableFilter}></umb-document-variant-language-picker>
 
 			<p>
 				<umb-localize key="prompt_confirmUnpublish">
@@ -129,7 +159,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				<uui-button
 					label="${this.localize.term('actions_unpublish')}"
-					?disabled=${!this._hasUnpublishPermission || !this.#selectionManager.getSelection().length}
+					?disabled=${this._hasInvalidSelection || !this._hasUnpublishPermission || this._selection.length === 0}
 					look="primary"
 					color="warning"
 					@click=${this.#submit}></uui-button>

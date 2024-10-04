@@ -10,7 +10,7 @@ import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 /**
  *  @element umb-router-slot
  *  @description - Component for wrapping Router Slot element, providing some local events for implementation.
- *  @extends UmbLitElement
+ *  @augments UmbLitElement
  * @fires {UmbRouterSlotInitEvent} init - fires when the router is connected
  * @fires {UmbRouterSlotChangeEvent} change - fires when a path of this router is changed
  */

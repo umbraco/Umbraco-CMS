@@ -1,5 +1,5 @@
 import type { UmbSectionItemModel } from '../../repository/index.js';
-import { UmbSectionPickerContext } from './input-section.context.js';
+import { UmbSectionPickerInputContext } from './input-section.context.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
@@ -13,7 +13,7 @@ export class UmbInputSectionElement extends UmbFormControlMixin<string | undefin
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default 0
+	 * @default
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
@@ -36,7 +36,7 @@ export class UmbInputSectionElement extends UmbFormControlMixin<string | undefin
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default Infinity
+	 * @default
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
@@ -73,7 +73,7 @@ export class UmbInputSectionElement extends UmbFormControlMixin<string | undefin
 	@state()
 	private _items?: Array<UmbSectionItemModel>;
 
-	#pickerContext = new UmbSectionPickerContext(this);
+	#pickerContext = new UmbSectionPickerInputContext(this);
 
 	constructor() {
 		super();

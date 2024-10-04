@@ -21,6 +21,18 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		return this.#pagedTreeResult({ items, skip, take });
 	}
 
+	getAncestorsOf({ descendantId }: { descendantId: string }): Array<T> {
+		const items = [];
+		let currentId: string | undefined = descendantId;
+		while (currentId) {
+			const item = this.#db.read(currentId);
+			if (!item) break;
+			items.push(item);
+			currentId = item.parent?.id;
+		}
+		return items.reverse();
+	}
+
 	#pagedTreeResult({ items, skip, take }: { items: Array<T>; skip: number; take: number }) {
 		const paged = pagedResult(items, skip, take);
 		const treeItems = paged.items.map((item) => this.#treeItemMapper(item));
@@ -62,7 +74,7 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		const destinationItem = this.#db.read(destinationId);
 		if (!destinationItem) throw new Error(`Destination item with id ${destinationId} not found`);
 
-		// TODO: Notice we don't add numbers to the 'copy' name.
+		// Notice we don't add numbers to the 'copy' name.
 		const items: Array<any> = [];
 
 		ids.forEach((id) => {

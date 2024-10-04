@@ -8,7 +8,6 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 const elementName = 'umb-input-content';
-
 @customElement(elementName)
 export class UmbInputContentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
 	UmbLitElement,
@@ -79,6 +78,15 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 		return this.#selection.length > 0 ? this.#selection.join(',') : undefined;
 	}
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	#entityTypeLookup = { content: 'document', media: 'media', member: 'member' };
 
 	#selection: Array<string> = [];
@@ -117,6 +125,7 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 				.max=${this.max}
 				.maxMessage=${this.maxMessage}
 				?showOpenButton=${this.showOpenButton}
+				?readonly=${this.readonly}
 				@change=${this.#onChange}></umb-input-document>
 		`;
 	}
@@ -131,6 +140,7 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 				.max=${this.max}
 				.maxMessage=${this.maxMessage}
 				?showOpenButton=${this.showOpenButton}
+				?readonly=${this.readonly}
 				@change=${this.#onChange}></umb-input-media>
 		`;
 	}
@@ -145,6 +155,7 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 				.max=${this.max}
 				.maxMessage=${this.maxMessage}
 				?showOpenButton=${this.showOpenButton}
+				?readonly=${this.readonly}
 				@change=${this.#onChange}></umb-input-member>
 		`;
 	}

@@ -14,7 +14,7 @@
  * @generic T - The object to make partial.
  * @returns A type with all properties of objects made optional.
  */
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export type UmbDeepPartialObject<T> = T extends Function
 	? T
 	: // Thing extends Array<infer InferredArrayMember>

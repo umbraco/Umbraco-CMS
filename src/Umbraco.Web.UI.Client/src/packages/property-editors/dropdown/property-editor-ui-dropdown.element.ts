@@ -2,8 +2,10 @@ import { css, customElement, html, map, property, state } from '@umbraco-cms/bac
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/property-editor';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
@@ -20,6 +22,15 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 	public get value(): Array<string> | undefined {
 		return this.#selection;
 	}
+
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -68,6 +79,10 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 	}
 
 	#renderDropdownMultiple() {
+		if (this.readonly) {
+			return html`<div>${this.value?.join(', ')}</div>`;
+		}
+
 		return html`
 			<select id="native" multiple @change=${this.#onChangeMulitple}>
 				${map(
@@ -80,7 +95,10 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 
 	#renderDropdownSingle() {
 		return html`
-			<umb-input-dropdown-list .options=${this._options} @change=${this.#onChange}></umb-input-dropdown-list>
+			<umb-input-dropdown-list
+				.options=${this._options}
+				@change=${this.#onChange}
+				?readonly=${this.readonly}></umb-input-dropdown-list>
 		`;
 	}
 

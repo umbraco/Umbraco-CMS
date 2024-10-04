@@ -1,7 +1,6 @@
 import { manifest as memberGroupSchemaManifest } from './Umbraco.MemberGroupPicker.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.MemberGroupPicker',
@@ -12,6 +11,7 @@ export const manifests: Array<ManifestTypes> = [
 			propertyEditorSchemaAlias: 'Umbraco.MemberGroupPicker',
 			icon: 'icon-users-alt',
 			group: 'people',
+			supportsReadOnly: true,
 		},
 	},
 	memberGroupSchemaManifest,

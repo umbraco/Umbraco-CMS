@@ -1,4 +1,4 @@
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_BLOCK_ENTRY_CONTEXT } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
@@ -11,28 +11,26 @@ import '@umbraco-cms/backoffice/ufm';
 @customElement('umb-ref-list-block')
 export class UmbRefListBlockElement extends UmbLitElement {
 	//
-	@property({ type: String })
+	@property({ type: String, reflect: false })
 	label?: string;
 
-	@state()
-	_content?: UmbBlockDataType;
+	@property({ type: String, reflect: false })
+	icon?: string;
 
-	@state()
+	@property({ type: Boolean, reflect: true })
+	unpublished?: boolean;
+
+	@property({ attribute: false })
+	content?: UmbBlockDataType;
+
+	@property()
 	_workspaceEditPath?: string;
 
 	constructor() {
 		super();
 
 		// UMB_BLOCK_LIST_ENTRY_CONTEXT
-		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
-			this.observe(
-				context.content,
-				(content) => {
-					this._content = content;
-				},
-				'observeContent',
-			);
-
+		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, async (context) => {
 			this.observe(
 				context.workspaceEditContentPath,
 				(workspaceEditPath) => {
@@ -46,7 +44,8 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	override render() {
 		return html`
 			<uui-ref-node standalone href=${this._workspaceEditPath ?? '#'}>
-				<umb-ufm-render inline .markdown=${this.label} .value=${this._content}></umb-ufm-render>
+				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
+				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
 			</uui-ref-node>
 		`;
 	}
@@ -55,6 +54,10 @@ export class UmbRefListBlockElement extends UmbLitElement {
 		css`
 			uui-ref-node {
 				min-height: var(--uui-size-16);
+			}
+			:host([unpublished]) umb-icon,
+			:host([unpublished]) umb-ufm-render {
+				opacity: 0.6;
 			}
 		`,
 	];

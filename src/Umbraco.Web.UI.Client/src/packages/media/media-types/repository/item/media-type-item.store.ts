@@ -4,16 +4,15 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
- * @export
  * @class UmbMediaTypeItemStore
- * @extends {UmbItemStoreBase}
+ * @augments {UmbItemStoreBase}
  * @description - Data Store for Media Type items
  */
 
 export class UmbMediaTypeItemStore extends UmbItemStoreBase<UmbMediaTypeItemModel> {
 	/**
 	 * Creates an instance of UmbMediaTypeItemStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaTypeItemStore
 	 */
 	constructor(host: UmbControllerHost) {

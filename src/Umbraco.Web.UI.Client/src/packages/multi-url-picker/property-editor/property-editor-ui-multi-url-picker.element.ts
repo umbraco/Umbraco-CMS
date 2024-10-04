@@ -4,8 +4,10 @@ import { customElement, html, property, state } from '@umbraco-cms/backoffice/ex
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/property-editor';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 import '../components/input-multi-url/index.js';
@@ -26,6 +28,15 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 		this._max = this.#parseInt(config.getValueByAlias('maxNumber'), Infinity);
 		this._overlaySize = config.getValueByAlias<UUIModalSidebarSize>('overlaySize') ?? 'small';
 	}
+
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
 
 	#parseInt(value: unknown, fallback: number): number {
 		const num = Number(value);
@@ -74,6 +85,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 				.urls=${this.value ?? []}
 				.variantId=${this._variantId}
 				?hide-anchor=${this._hideAnchor}
+				?readonly=${this.readonly}
 				@change=${this.#onChange}>
 			</umb-input-multi-url>
 		`;

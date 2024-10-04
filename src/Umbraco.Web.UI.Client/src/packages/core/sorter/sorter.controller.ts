@@ -5,6 +5,11 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 const autoScrollSensitivity = 50;
 const autoScrollSpeed = 16;
 
+/**
+ *
+ * @param el
+ * @param includeSelf
+ */
 function getParentScrollElement(el: Element, includeSelf: boolean) {
 	if (!el || !el.getBoundingClientRect) return null;
 
@@ -38,20 +43,38 @@ function getParentScrollElement(el: Element, includeSelf: boolean) {
 	return null;
 }
 
+/**
+ *
+ * @param element
+ * @param ignorerSelectors
+ */
 function setupIgnorerElements(element: HTMLElement, ignorerSelectors: string) {
 	ignorerSelectors.split(',').forEach(function (criteria) {
 		element.querySelectorAll(criteria.trim()).forEach(setupPreventEvent);
 	});
 }
+/**
+ *
+ * @param element
+ * @param ignorerSelectors
+ */
 function destroyIgnorerElements(element: HTMLElement, ignorerSelectors: string) {
 	ignorerSelectors.split(',').forEach(function (criteria: string) {
 		element.querySelectorAll(criteria.trim()).forEach(destroyPreventEvent);
 	});
 }
+/**
+ *
+ * @param element
+ */
 function setupPreventEvent(element: Element) {
 	(element as HTMLElement).draggable = false;
 	//(element as HTMLElement).setAttribute('draggable', 'false');
 }
+/**
+ *
+ * @param element
+ */
 function destroyPreventEvent(element: Element) {
 	(element as HTMLElement).draggable = false;
 	//element.removeAttribute('draggable');
@@ -76,7 +99,7 @@ type UniqueType = string | symbol | number;
 
 /**
  * Internal type, which is adjusted to become the public one.
- * @internal */
+  @internal */
 type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	/**
 	 * Define how to retrive the unique identifier of an element. If this method returns undefined, the move will be cancelled.
@@ -180,7 +203,7 @@ export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = 
 	Partial<Pick<INTERNAL_UmbSorterConfig<T, ElementType>, 'ignorerSelector' | 'containerSelector' | 'identifier'>>;
 
 /**
- * @export
+ 
  * @class UmbSorterController
  * @implements {UmbControllerInterface}
  * @description This controller can make user able to sort items.
@@ -237,6 +260,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	#dragX = 0;
 	#dragY = 0;
 
+	#items = Array<ElementType>();
+
 	public get identifier() {
 		return this.#config.identifier;
 	}
@@ -271,6 +296,11 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		});
 	}
 
+	/**
+	 * Enables the sorter, this will allow sorting to happen.
+	 * @returns {*}  {void}
+	 * @memberof UmbSorterController
+	 */
 	enable(): void {
 		if (this.#enabled) return;
 		this.#enabled = true;
@@ -278,6 +308,12 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			this.#initialize();
 		}
 	}
+
+	/**
+	 * Disables the sorter, this will prevent any sorting to happen.
+	 * @returns {*}  {void}
+	 * @memberof UmbSorterController
+	 */
 	disable(): void {
 		if (!this.#enabled) return;
 		this.#enabled = false;
@@ -291,6 +327,15 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			// TODO: Some updates might need to be done, as the model is about to change? Do make the changes after setting the model?.. [NL]
 			this.#model = model;
 		}
+	}
+
+	/**
+	 * Returns the model of the sorter.
+	 * @returns {Array<T>}
+	 * @memberof UmbSorterController
+	 */
+	getModel(): Array<T> {
+		return this.#model;
 	}
 
 	hasItem(unique: UniqueType) {
@@ -307,12 +352,14 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			requestAnimationFrame(this.#initialize);
 		}
 	}
+
 	override hostDisconnected() {
 		this.#isConnected = false;
 		if (this.#enabled) {
 			this.#uninitialize();
 		}
 	}
+
 	#initialize = () => {
 		const containerEl =
 			(this.#config.containerSelector
@@ -342,6 +389,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			subtree: false,
 		});
 	};
+
 	#uninitialize() {
 		// TODO: Is there more clean up to do??
 		this.#observer.disconnect();
@@ -352,8 +400,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				: this.#containerElement;
 
 			containerElement.removeEventListener('dragover', this._itemDraggedOver as unknown as EventListener);
-			(this.#containerElement as any) = undefined;
+			(this.#containerElement as unknown) = undefined;
 		}
+
+		this.#items.forEach((item) => this.destroyItem(item));
 	}
 
 	_itemDraggedOver = (e: DragEvent) => {
@@ -419,6 +469,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				}
 			}
 		}
+
+		this.#items.push(element);
+		this.#items = Array.from(new Set(this.#items));
 	}
 
 	destroyItem(element: HTMLElement) {
@@ -430,6 +483,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		draggableElement.removeEventListener('dragstart', this.#handleDragStart);
 		// We are not ready to remove the dragend or drop, as this is might be the active one just moving container:
 		//draggableElement.removeEventListener('dragend', this.#handleDragEnd);
+
+		(draggableElement as HTMLElement).draggable = false;
+
+		this.#items = this.#items.filter((x) => x !== element);
 	}
 
 	#setupPlaceholderStyle() {

@@ -13,7 +13,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A data source for the Script tree that fetches data from the server
- * @export
  * @class UmbScriptTreeServerDataSource
  * @implements {UmbTreeDataSource}
  */
@@ -23,7 +22,7 @@ export class UmbScriptTreeServerDataSource extends UmbTreeServerDataSourceBase<
 > {
 	/**
 	 * Creates an instance of UmbScriptTreeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbScriptTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

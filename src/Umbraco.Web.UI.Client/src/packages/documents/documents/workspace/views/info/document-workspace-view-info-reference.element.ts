@@ -3,7 +3,7 @@ import { css, html, customElement, state, nothing, repeat, property } from '@umb
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import {
 	isDefaultReference,
@@ -175,6 +175,9 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 	static override styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				display: contents;
+			}
 			uui-table-cell:not(.link-cell) {
 				color: var(--uui-color-text-alt);
 			}

@@ -11,8 +11,7 @@ interface UmbControllerHostBaseDeclaration extends Omit<UmbControllerHost, 'getH
 /**
  * This mixin enables a class to host controllers.
  * This enables controllers to be added to the life cycle of this element.
- *
- * @param {Object} superClass - superclass to be extended.
+ * @param {object} superClass - superclass to be extended.
  * @mixin
  */
 export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T) => {

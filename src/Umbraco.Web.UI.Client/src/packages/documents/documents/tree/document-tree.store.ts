@@ -3,15 +3,14 @@ import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
- * @export
  * @class UmbDocumentTreeStore
- * @extends {UmbUniqueTreeStore}
+ * @augments {UmbUniqueTreeStore}
  * @description - Tree Data Store for Document Items
  */
 export class UmbDocumentTreeStore extends UmbUniqueTreeStore {
 	/**
 	 * Creates an instance of UmbDocumentTreeStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentTreeStore
 	 */
 	constructor(host: UmbControllerHost) {

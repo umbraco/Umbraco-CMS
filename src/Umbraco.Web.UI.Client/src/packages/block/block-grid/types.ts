@@ -45,6 +45,7 @@ export interface UmbBlockGridTypeGroupType {
 
 // Content models:
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbBlockGridValueModel extends UmbBlockValueType<UmbBlockGridLayoutModel> {}
 
 export interface UmbBlockGridLayoutModel extends UmbBlockLayoutBaseModel {

@@ -16,10 +16,10 @@ export class UmbPropertyDatasetElement extends UmbLitElement {
 
 	public readonly context: UmbPropertyDatasetContextBase;
 
+	@property({ attribute: false })
 	/**
 	 * The value of the dataset.
-	 * @returns {Array<UmbPropertyValueData>}
-	 * @memberof UmbBasicVariantElement
+	 * @returns {Array<UmbPropertyValueData>} - The value of the dataset
 	 * @example
 	 * ```ts
 	 * const dataSet = [
@@ -46,7 +46,6 @@ export class UmbPropertyDatasetElement extends UmbLitElement {
 	 * `
 	 * ```
 	 */
-	@property({ attribute: false })
 	public set value(value: Array<UmbPropertyValueData>) {
 		this.#allowChangeEvent = false;
 		this.context.setValues(value);
@@ -57,11 +56,12 @@ export class UmbPropertyDatasetElement extends UmbLitElement {
 		return this.context.getValues();
 	}
 
+	@property({ attribute: false })
 	/**
 	 * The name of the dataset, this name varies depending on the use-case. But this is either
+	 * @property name
 	 * @type {string}
 	 * @returns {string}
-	 * @memberof UmbBasicVariantElement
 	 * @example
 	 * ```ts
 	 * html`
@@ -70,7 +70,6 @@ export class UmbPropertyDatasetElement extends UmbLitElement {
 	 * </umb-property-dataset>
 	 * `
 	 */
-	@property({ attribute: false })
 	public set name(value: string | undefined) {
 		this.#allowChangeEvent = false;
 		this.context.setName(value);

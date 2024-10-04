@@ -44,6 +44,13 @@ export interface UmbPropertyTypeModel {
 	variesBySegment: boolean;
 	validation: UmbPropertyTypeValidationModel;
 	appearance: UmbPropertyTypeAppearanceModel;
+	visibility?: UmbPropertyTypeVisibilityModel;
+	isSensitive?: boolean;
+}
+
+export interface UmbPropertyTypeVisibilityModel {
+	memberCanEdit: boolean;
+	memberCanView: boolean;
 }
 
 export interface UmbPropertyTypeValidationModel {

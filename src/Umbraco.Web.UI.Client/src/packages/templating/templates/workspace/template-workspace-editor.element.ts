@@ -1,17 +1,15 @@
+import { getQuerySnippet } from '../../utils/index.js';
+import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '../modals/query-builder/index.js';
 import { UMB_TEMPLATING_SECTION_PICKER_MODAL } from '../../modals/templating-section-picker/templating-section-picker-modal.token.js';
 import type { UmbTemplatingInsertMenuElement } from '../../local-components/insert-menu/insert-menu.element.js';
-import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '../modals/query-builder/index.js';
-import { getQuerySnippet } from '../../utils/index.js';
 import { UMB_TEMPLATE_WORKSPACE_CONTEXT } from './template-workspace.context-token.js';
-import { toCamelCase } from '@umbraco-cms/backoffice/utils';
-import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, query, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { css, customElement, html, nothing, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
-import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_TEMPLATE_PICKER_MODAL } from '@umbraco-cms/backoffice/template';
+import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
+import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 
 import '@umbraco-cms/backoffice/code-editor';
 import '../../local-components/insert-menu/index.js';
@@ -21,13 +19,13 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	#modalContext?: UmbModalManagerContext;
 
 	@state()
-	private _name?: string | null = '';
+	private _name?: string = '';
 
 	@state()
 	private _content?: string | null = '';
 
 	@state()
-	private _alias?: string | null = '';
+	private _alias?: string = '';
 
 	@state()
 	private _masterTemplateName?: string | null = null;
@@ -39,9 +37,6 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	#isNew = false;
 
 	#masterTemplateUnique: string | null = null;
-
-	// TODO: Revisit this code, to not use RxJS directly:
-	private inputQuery$ = new Subject<string>();
 
 	constructor() {
 		super();
@@ -72,25 +67,12 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			this.observe(this.#templateWorkspaceContext.isNew, (isNew) => {
 				this.#isNew = !!isNew;
 			});
-
-			this.inputQuery$.pipe(debounceTime(250)).subscribe((nameInputValue) => {
-				this.#templateWorkspaceContext?.setName(nameInputValue);
-				if (this.#isNew) this.#templateWorkspaceContext?.setAlias(toCamelCase(nameInputValue));
-			});
 		});
 	}
 
-	#onNameInput(event: Event) {
-		const target = event.target as UUIInputElement;
-		const value = target.value as string;
-		this.inputQuery$.next(value);
-	}
-
-	#onAliasInput(event: Event) {
-		event.stopPropagation();
-		const target = event.target as UUIInputElement;
-		const value = target.value as string;
-		this.#templateWorkspaceContext?.setAlias(value);
+	#onNameAndAliasChange(event: InputEvent & { target: UmbInputWithAliasElement }) {
+		this.#templateWorkspaceContext?.setName(event.target.value ?? '');
+		this.#templateWorkspaceContext?.setAlias(event.target.alias ?? '');
 	}
 
 	#onCodeEditorInput(event: Event) {
@@ -179,15 +161,17 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 		// TODO: add correct UI elements
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.Template">
-				<uui-input
-					placeholder=${this.localize.term('placeholders_entername')}
+				<umb-input-with-alias
 					slot="header"
+					id="name"
+					label=${this.localize.term('placeholders_entername')}
+					placeholder=${this.localize.term('placeholders_entername')}
 					.value=${this._name}
-					@input=${this.#onNameInput}
-					label=${this.localize.term('template_template')}
+					.alias=${this._alias}
+					?auto-generate-alias=${this.#isNew}
+					@change=${this.#onNameAndAliasChange}
 					${umbFocus()}>
-					<uui-input-lock slot="append" value=${ifDefined(this._alias!)} @input=${this.#onAliasInput}></uui-input-lock>
-				</uui-input>
+				</umb-input-with-alias>
 
 				<uui-box>
 					<div slot="header" id="code-editor-menu-container">${this.#renderMasterTemplatePicker()}</div>
@@ -251,9 +235,8 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				--uui-color-divider-standalone: transparent;
 			}
 
-			uui-input {
+			umb-input-with-alias {
 				width: 100%;
-				margin: 1em;
 			}
 
 			#code-editor-menu-container uui-icon:not([name='icon-delete']) {

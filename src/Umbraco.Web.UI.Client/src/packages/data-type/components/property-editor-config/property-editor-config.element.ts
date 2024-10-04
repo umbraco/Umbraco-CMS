@@ -1,9 +1,9 @@
 import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../workspace/data-type-workspace.context-token.js';
 import { html, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/extension-registry';
+import type { PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/property-editor';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbDataPathPropertyValueFilter } from '@umbraco-cms/backoffice/validation';
+import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-property-editor-config
@@ -12,7 +12,7 @@ import { UmbDataPathPropertyValueFilter } from '@umbraco-cms/backoffice/validati
  */
 @customElement('umb-property-editor-config')
 export class UmbPropertyEditorConfigElement extends UmbLitElement {
-	// TODO: Make this element generic, so its not bound to DATA-TYPEs. This will require moving some functionality of Data-Type-Context to this. and this might need to self provide a variant Context for its inner property editor UIs.
+	// TODO: Make this element generic, so its not bound to DATA-TYPEs. This will require moving some functionality of Data-Type-Context to this. and this might need to self provide a variant Context for its inner property editor UIs. [NL]
 	#workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
@@ -46,14 +46,16 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 					(property) => property.alias,
 					(property) =>
 						html`<umb-property
-							.dataPath="$.values[${UmbDataPathPropertyValueFilter(property)}].value"
+							data-path="$.values[${UmbDataPathPropertyValueQuery(property)}].value"
 							label=${property.label}
 							description=${ifDefined(property.description)}
 							alias=${property.alias}
 							property-editor-ui-alias=${property.propertyEditorUiAlias}
 							.config=${property.config}></umb-property>`,
 				)
-			: html`<div>No configuration</div>`;
+			: html`<umb-localize key="editdatatype_noConfiguration"
+					>There is no configuration for this property editor.</umb-localize
+				>`;
 	}
 
 	static override styles = [UmbTextStyles];

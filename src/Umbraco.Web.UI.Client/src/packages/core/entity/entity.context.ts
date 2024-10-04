@@ -1,24 +1,24 @@
 import { UMB_ENTITY_CONTEXT } from './entity.context-token.js';
+import type { UmbEntityUnique } from './types.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * Provides the entity context
- * @export
  * @class UmbEntityContext
- * @extends {UmbContextBase<UmbEntityContext>}
+ * @augments {UmbContextBase<UmbEntityContext>}
  */
 export class UmbEntityContext extends UmbContextBase<UmbEntityContext> {
 	#entityType = new UmbStringState<string | undefined>(undefined);
 	public readonly entityType = this.#entityType.asObservable();
 
-	#unique = new UmbStringState<string | null | undefined>(undefined);
+	#unique = new UmbStringState<UmbEntityUnique>(null);
 	public readonly unique = this.#unique.asObservable();
 
 	/**
 	 * Creates an instance of UmbEntityContext.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbEntityContext
 	 */
 	constructor(host: UmbControllerHost) {
@@ -45,16 +45,16 @@ export class UmbEntityContext extends UmbContextBase<UmbEntityContext> {
 
 	/**
 	 * Set the unique
-	 * @param {string | null | undefined} unique
+	 * @param {string | null} unique
 	 * @memberof UmbEntityContext
 	 */
-	setUnique(unique: string | null | undefined) {
+	setUnique(unique: string | null) {
 		this.#unique.setValue(unique);
 	}
 
 	/**
 	 * Get the unique
-	 * @returns {string | null | undefined}
+	 * @returns {string | null}
 	 * @memberof UmbEntityContext
 	 */
 	getUnique() {

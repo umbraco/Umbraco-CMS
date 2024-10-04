@@ -7,24 +7,35 @@ import type { UmbTemplateFieldDropdownListElement } from './components/template-
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIBooleanInputEvent, UUIButtonState, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 // import of local components
 import './components/template-field-dropdown-list/index.js';
+import { UmbValidationContext, umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-templating-page-field-builder-modal')
 export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseElement<
 	UmbTemplatingPageFieldBuilderModalData,
 	UmbTemplatingPageFieldBuilderModalValue
 > {
-	private _close() {
+	#validation = new UmbValidationContext(this);
+
+	#close() {
 		this.modalContext?.reject();
 	}
 
-	private _submit() {
-		if (!this._field) return;
-		this.value = { output: getUmbracoFieldSnippet(this._field, this._default, this._recursive) };
-		this.modalContext?.submit();
+	async #submit() {
+		this._submitButtonState = 'waiting';
+
+		try {
+			await this.#validation.validate();
+			this._submitButtonState = 'success';
+
+			this.value = { output: getUmbracoFieldSnippet(this._field!, this._default, this._recursive) };
+			this.modalContext?.submit();
+		} catch {
+			this._submitButtonState = 'failed';
+		}
 	}
 
 	@state()
@@ -39,6 +50,9 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 	@state()
 	private _recursive: boolean = false;
 
+	@state()
+	private _submitButtonState: UUIButtonState;
+
 	/** TODO: Implement "Choose field" */
 
 	#onChangeFieldValue(e: Event) {
@@ -50,12 +64,14 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 			<umb-body-layout headline=${this.localize.term('template_insert')}>
 				<uui-box>
 					<div>
-						<uui-label for="page-field-value">
-							<umb-localize key="templateEditor_chooseField">Choose field</umb-localize>
-						</uui-label>
-						<umb-template-field-dropdown-list
-							@change=${this.#onChangeFieldValue}
-							exclude-media-type></umb-template-field-dropdown-list>
+						<umb-property-layout orientation="vertical" label=${this.localize.term('templateEditor_chooseField')}>
+							<umb-template-field-dropdown-list
+								slot="editor"
+								required
+								${umbBindToValidation(this)}
+								@change=${this.#onChangeFieldValue}
+								exclude-media-type></umb-template-field-dropdown-list>
+						</umb-property-layout>
 
 						<uui-label for="page-field-default-value">
 							<umb-localize key="templateEditor_defaultValue">Default value</umb-localize>
@@ -85,14 +101,15 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 				</uui-box>
 				<uui-button
 					slot="actions"
-					@click=${this._close}
+					@click=${this.#close}
 					look="secondary"
 					label=${this.localize.term('general_close')}></uui-button>
 				<uui-button
 					slot="actions"
-					@click=${this._submit}
+					@click=${this.#submit}
 					color="positive"
 					look="primary"
+					.state=${this._submitButtonState}
 					label=${this.localize.term('general_submit')}></uui-button>
 			</umb-body-layout>
 		`;

@@ -1,9 +1,11 @@
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/property-editor';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
 /**
  * This property editor allows the user to pick a date, datetime-local, or time.
@@ -22,11 +24,19 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
  * data editor with one exception: the "T" character in "datetime-local". To be backwards compatible, we are
  * replacing the T character with a whitespace, which also happens to work just fine
  * with the "datetime-local" type.
- *
  * @element umb-property-editor-ui-date-picker
  */
 @customElement('umb-property-editor-ui-date-picker')
 export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly: boolean = false;
+
 	@state()
 	private _inputType: UmbInputDateElement['type'] = 'datetime-local';
 
@@ -97,6 +107,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 
 	/**
 	 * Formats the value depending on the input type.
+	 * @param value
 	 */
 	#formatValue(value: string) {
 		this._inputValue = undefined;
@@ -141,7 +152,8 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 				.max=${this._max}
 				.step=${this._step}
 				.type=${this._inputType}
-				@change=${this.#onChange}>
+				@change=${this.#onChange}
+				?readonly=${this.readonly}>
 			</umb-input-date>
 		`;
 	}

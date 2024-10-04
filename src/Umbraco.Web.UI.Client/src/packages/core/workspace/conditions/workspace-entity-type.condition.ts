@@ -1,11 +1,7 @@
-import { UMB_WORKSPACE_CONTEXT } from '../contexts/index.js';
+import { UMB_WORKSPACE_CONTEXT } from '../workspace.context-token.js';
+import type { WorkspaceEntityTypeConditionConfig } from './types.js';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
-import type {
-	ManifestCondition,
-	UmbConditionConfigBase,
-	UmbConditionControllerArguments,
-	UmbExtensionCondition,
-} from '@umbraco-cms/backoffice/extension-api';
+import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbWorkspaceEntityTypeCondition
@@ -20,17 +16,7 @@ export class UmbWorkspaceEntityTypeCondition
 	}
 }
 
-export type WorkspaceEntityTypeConditionConfig = UmbConditionConfigBase<'Umb.Condition.WorkspaceEntityType'> & {
-	/**
-	 * Define the workspace that this extension should be available in
-	 *
-	 * @example
-	 * "Document"
-	 */
-	match: string;
-};
-
-export const manifest: ManifestCondition = {
+export const manifest: UmbExtensionManifest = {
 	type: 'condition',
 	name: 'Workspace Entity Type Condition',
 	alias: 'Umb.Condition.WorkspaceEntityType',

@@ -22,7 +22,7 @@ export class UmbRenamePartialViewServerDataSource {
 	 * Rename Partial View
 	 * @param {string} unique
 	 * @param {string} name
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbRenamePartialViewServerDataSource
 	 */
 	async rename(unique: string, name: string) {

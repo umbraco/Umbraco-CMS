@@ -1,8 +1,7 @@
 import { UMB_MEDIA_TREE_ALIAS } from '../tree/index.js';
 import { UMB_MEDIA_MENU_ALIAS } from './constants.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menu',
 		alias: UMB_MEDIA_MENU_ALIAS,

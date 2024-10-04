@@ -12,7 +12,6 @@ import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '
 
 /**
  * A data source for a data type tree that fetches data from the server
- * @export
  * @class UmbDocumentBlueprintTreeServerDataSource
  * @implements {DocumentTreeDataSource}
  */
@@ -22,7 +21,7 @@ export class UmbDocumentBlueprintTreeServerDataSource extends UmbTreeServerDataS
 > {
 	/**
 	 * Creates an instance of UmbDocumentBlueprintTreeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentBlueprintTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
