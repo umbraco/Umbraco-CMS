@@ -14,4 +14,11 @@ export default defineConfig({
       external: [/^@umbraco/],
     },
   },
+
+  // Used to allow serving SVG, images & other assets from /Client/public
+  // Such as <img src="/logo.jpg" />
+  // or
+  // import imageUrl from '/logo.jpg';
+  // <img src=${imageUrl} />
+  base: '/App_Plugins/UmbracoExtension', 
 });
