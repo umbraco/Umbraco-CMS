@@ -530,6 +530,30 @@ public class ContentNavigationServiceBaseTests
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
+    [TestCase("A1B1B217-B02F-4307-862C-A5E22DB729EB")] // Grandchild 2
+    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96")] // Child 2
+    [TestCase("D63C1621-C74A-4106-8587-817DEE5FB732")] // Grandchild 3
+    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7")] // Great-grandchild 1
+    public void Moving_Node_To_Bin_Adds_It_To_Recycle_Bin_Root_As_The_Last_Item(Guid keyOfNodeToRemove)
+    {
+        // Arrange
+        Guid nodeInRecycleBin1 = Grandchild1;
+        Guid nodeInRecycleBin2 = Child3;
+        _navigationService.MoveToBin(nodeInRecycleBin1);
+        _navigationService.MoveToBin(nodeInRecycleBin2);
+
+        // Act
+        _navigationService.MoveToBin(keyOfNodeToRemove);
+
+        // Assert
+        _navigationService.TryGetSiblingsKeysInBin(nodeInRecycleBin1, out IEnumerable<Guid> siblingsInBin);
+
+        Assert.AreEqual(siblingsInBin.Last(), keyOfNodeToRemove);
+    }
+
+    [Test]
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
+    [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
     [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF")] // Child 3
     [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7")] // Great-grandchild 1
     public void Moving_Node_To_Bin_Adds_Its_Descendants_To_Recycle_Bin_As_Well(Guid keyOfNodeToRemove)
@@ -627,6 +651,30 @@ public class ContentNavigationServiceBaseTests
             Assert.AreEqual(currentChildrenCount + 1, newChildrenList.Count);
             Assert.IsTrue(newChildrenList.Any(childKey => childKey == newNodeKey));
         });
+    }
+
+    [Test]
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
+    [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
+    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573")] // Grandchild 1
+    [TestCase("A1B1B217-B02F-4307-862C-A5E22DB729EB")] // Grandchild 2
+    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96")] // Child 2
+    [TestCase("D63C1621-C74A-4106-8587-817DEE5FB732")] // Grandchild 3
+    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7")] // Great-grandchild 1
+    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF")] // Child 3
+    [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8")] // Grandchild 4
+    public void Adding_Node_To_Parent_Adds_It_As_The_Last_Child(Guid parentKey)
+    {
+        // Arrange
+        var newNodeKey = Guid.NewGuid();
+
+        // Act
+        _navigationService.Add(newNodeKey, parentKey: parentKey);
+
+        // Assert
+        _navigationService.TryGetChildrenKeys(parentKey, out IEnumerable<Guid> childrenKeys);
+
+        Assert.AreEqual(newNodeKey, childrenKeys.Last());
     }
 
     [Test]
@@ -789,6 +837,28 @@ public class ContentNavigationServiceBaseTests
             CollectionAssert.Contains(childrenList, nodeToMove);
             Assert.AreEqual(targetParentChildrenCount + 1, childrenList.Count);
         });
+    }
+
+    [Test]
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
+    [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
+    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573")] // Grandchild 1
+    [TestCase("A1B1B217-B02F-4307-862C-A5E22DB729EB")] // Grandchild 2
+    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96")] // Child 2
+    [TestCase("D63C1621-C74A-4106-8587-817DEE5FB732")] // Grandchild 3
+    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7")] // Great-grandchild 1
+    public void Moving_Node_To_Parent_Adds_It_As_The_Last_Child(Guid targetParentKey)
+    {
+        // Arrange
+        Guid nodeToMove = Grandchild4;
+
+        // Act
+        _navigationService.Move(nodeToMove, 4, targetParentKey);
+
+        // Assert
+        _navigationService.TryGetChildrenKeys(targetParentKey, out IEnumerable<Guid> childrenKeys);
+
+        Assert.AreEqual(nodeToMove, childrenKeys.Last());
     }
 
     [Test]
