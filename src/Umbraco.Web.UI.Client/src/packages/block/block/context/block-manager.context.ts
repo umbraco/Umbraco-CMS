@@ -3,13 +3,21 @@ import type { UmbBlockLayoutBaseModel, UmbBlockDataModel, UmbBlockExposeModel } 
 import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState, UmbBooleanState, UmbClassState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	observeMultiple,
+	UmbArrayState,
+	UmbBooleanState,
+	UmbClassState,
+	UmbStringState,
+} from '@umbraco-cms/backoffice/observable-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbContentTypeStructureManager, type UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
+import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
 	layout: LayoutEntryType;
@@ -58,6 +66,8 @@ export abstract class UmbBlockManagerContext<
 
 	readonly #settings = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly settings = this.#settings.asObservable();
+
+	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
 
 	readonly #exposes = new UmbArrayState(
 		<Array<UmbBlockExposeModel>>[],
