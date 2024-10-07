@@ -206,7 +206,7 @@ export default {
 	},
 	dictionaryItem: {
 		description:
-			"Editar as diferente versões de linguagem para o item de dicionário '<em>%0%</em>' abaixo <br /> Você pode adicionar mais linguagens sob 'linguagens' no menu à esquerda",
+			"Editar as diferente versões de linguagem para o item de dicionário '%0%' abaixo. Você pode adicionar mais linguagens sob 'linguagens' no menu à esquerda.",
 		displayName: 'Nome da Cultura',
 	},
 	editdatatype: {

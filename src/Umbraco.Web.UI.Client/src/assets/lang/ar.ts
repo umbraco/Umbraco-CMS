@@ -547,9 +547,9 @@ export default {
 		createNew: 'إنشاء عنصر قاموس جديد',
 	},
 	dictionaryItem: {
-		description: "\n      تحرير الإصدارات اللغوية المختلفة لعنصر القاموس '<em>%0%</em>' أدناه\n   ",
+		description: "تحرير الإصدارات اللغوية المختلفة لعنصر القاموس '%0%' أدناه",
 		displayName: 'اسم الثقافة',
-		changeKeyError: "\n      المفتاح '%0%' موجود بالفعل.\n   ",
+		changeKeyError: "المفتاح '%0%' موجود بالفعل.",
 		overviewTitle: 'نظرة عامة على القاموس',
 	},
 	examineManagement: {

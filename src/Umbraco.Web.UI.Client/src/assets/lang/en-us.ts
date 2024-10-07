@@ -597,9 +597,9 @@ export default {
 		createNew: 'Create dictionary item',
 	},
 	dictionaryItem: {
-		description: "\n      Edit the different language versions for the dictionary item '<em>%0%</em>' below\n   ",
+		description: "Edit the different language versions for the dictionary item '%0%' below",
 		displayName: 'Culture Name',
-		changeKeyError: "\n      The key '%0%' already exists.\n   ",
+		changeKeyError: "The key '%0%' already exists.",
 		overviewTitle: 'Dictionary overview',
 	},
 	examineManagement: {
