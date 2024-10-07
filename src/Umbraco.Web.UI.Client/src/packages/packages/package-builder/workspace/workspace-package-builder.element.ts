@@ -343,7 +343,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			<umb-property-layout label="Templates">
 				<div slot="editor">
 					<umb-input-entity
-						.getIcon=${() => 'icon-newspaper'}
+						.getIcon=${() => 'icon-document-html'}
 						.pickerContext=${UmbTemplatePickerInputContext}
 						.selection=${this._package.templates ?? []}
 						@change=${this.#onTemplateChange}>
