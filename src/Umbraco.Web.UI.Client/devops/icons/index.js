@@ -163,7 +163,7 @@ const writeIconsToDisk = (icons) => {
 			}
 
 			// eslint-disable-next-line no-undef
-			console.log(`icon: ${icon.name} generated`);
+			//console.log(`icon: ${icon.name} generated`);
 		});
 	});
 };
@@ -188,7 +188,7 @@ const generateJS = (icons) => {
 		}
 
 		// eslint-disable-next-line no-undef
-		console.log('icon manifests generated');
+		console.log('Icons outputted and Icon Manifests generated!');
 	});
 };
 
