@@ -2333,40 +2333,6 @@
 		{
 			"name": "icon-umb-manifest",
 			"file": "puzzle.svg"
-		}
-	],
-	"simpleIcons": [
-		{
-			"name": "icon-facebook",
-			"file": "facebook.svg"
-		},
-		{
-			"name": "icon-gitbook",
-			"file": "gitbook.svg"
-		},
-		{
-			"name": "icon-github",
-			"file": "github.svg"
-		},
-		{
-			"name": "icon-gitlab",
-			"file": "gitlab.svg"
-		},
-		{
-			"name": "icon-google",
-			"file": "google.svg"
-		},
-		{
-			"name": "icon-linkedin",
-			"file": "linkedin.svg"
-		},
-		{
-			"name": "icon-mastodon",
-			"file": "mastodon.svg"
-		},
-		{
-			"name": "icon-twitter-x",
-			"file": "x.svg"
 		},
 		{
 			"name": "icon-document-3d",
@@ -2435,6 +2401,40 @@
 		{
 			"name": "icon-document-play",
 			"file": "file-video.svg"
+		}
+	],
+	"simpleIcons": [
+		{
+			"name": "icon-facebook",
+			"file": "facebook.svg"
+		},
+		{
+			"name": "icon-gitbook",
+			"file": "gitbook.svg"
+		},
+		{
+			"name": "icon-github",
+			"file": "github.svg"
+		},
+		{
+			"name": "icon-gitlab",
+			"file": "gitlab.svg"
+		},
+		{
+			"name": "icon-google",
+			"file": "google.svg"
+		},
+		{
+			"name": "icon-linkedin",
+			"file": "linkedin.svg"
+		},
+		{
+			"name": "icon-mastodon",
+			"file": "mastodon.svg"
+		},
+		{
+			"name": "icon-twitter-x",
+			"file": "x.svg"
 		}
 	],
 	"umbraco": [
