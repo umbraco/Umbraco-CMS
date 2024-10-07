@@ -370,13 +370,16 @@ export default {
 		uploadNotAllowed: 'Upload is not allowed in this location.',
 	},
 	member: {
-		createNewMember: 'Create a new member',
-		allMembers: 'All Members',
-		memberGroupNoProperties: 'Member groups have no additional properties for editing.',
 		'2fa': 'Two-Factor Authentication',
+		allMembers: 'All Members',
+		createNewMember: 'Create a new member',
 		duplicateMemberLogin: 'A member with this login already exists',
+		kind: 'Kind',
+		memberGroupNoProperties: 'Member groups have no additional properties for editing.',
 		memberHasGroup: "The member is already in group '%0%'",
 		memberHasPassword: 'The member already has a password set',
+		memberKindDefault: 'Member',
+		memberKindApi: 'API Member',
 		memberLockoutNotEnabled: 'Lockout is not enabled for this member',
 		memberNotInGroup: "The member is not in group '%0%'",
 	},
@@ -1901,6 +1904,14 @@ export default {
 		administrators: 'Administrator',
 		categoryField: 'Category field',
 		createDate: 'User created',
+		createUserHeadline: (kind: string) => {
+			return kind === 'Api' ? 'Create API user' : 'Create user';
+		},
+		createUserDescription: (kind: string) => {
+			const defaultUserText = `Create a user to give them access to Umbraco. When a user is created a password will be generated that you can share with them.`;
+			const apiUserText = `Create an Api User to allow external services to authenticate with the Umbraco Management API.`;
+			return kind === 'Api' ? apiUserText : defaultUserText;
+		},
 		changePassword: 'Change your password',
 		changePhoto: 'Change photo',
 		configureMfa: 'Configure MFA',
@@ -1910,6 +1921,7 @@ export default {
 				? 'The email address is used for notifications, password recovery, and as the username for logging in'
 				: 'The email address is used for notifications and password recovery';
 		},
+		kind: 'Kind',
 		newPassword: 'New password',
 		newPasswordFormatLengthTip: 'Minimum %0% character(s) to go!',
 		newPasswordFormatNonAlphaTip: 'There should be at least %0% special character(s) in there.',
@@ -2043,6 +2055,8 @@ export default {
 		sortCreateDateDescending: 'Newest',
 		sortCreateDateAscending: 'Oldest',
 		sortLastLoginDateDescending: 'Last login',
+		userKindDefault: 'User',
+		userKindApi: 'API User',
 		noUserGroupsAdded: 'No user groups have been added',
 		'2faDisableText':
 			'If you wish to disable this two-factor provider, then you must enter the code shown on your authentication device:',
