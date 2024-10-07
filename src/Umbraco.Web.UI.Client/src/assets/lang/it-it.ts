@@ -569,7 +569,7 @@ export default {
 		noItems: 'Non ci sono oggetti nel Dizionario.',
 	},
 	dictionaryItem: {
-		description: "Modifica le lingue per l'elemento '<em>%0%</em>' qui sotto.",
+		description: "Modifica le lingue per l'elemento '%0%' qui sotto.",
 		displayName: 'Nome della cultura',
 		changeKeyError: "La chiave '%0%' esiste già.",
 		overviewTitle: 'Panoramica del Dizionario',

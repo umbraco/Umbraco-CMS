@@ -529,9 +529,9 @@ export default {
 	},
 	dictionaryItem: {
 		description:
-			"\n      Wijzig de verschillende taalversies voor het woordenboek item '%0%'. Je kunt extra talen toevoegen bij 'talen' in het menu links\n    ",
+			"Wijzig de verschillende taalversies voor het woordenboek item '%0%'. Je kunt extra talen toevoegen bij 'talen' in het menu links",
 		displayName: 'Cultuurnaam',
-		changeKeyError: "\n      De key '%0%' bestaat al.\n    ",
+		changeKeyError: "De key '%0%' bestaat al.",
 		overviewTitle: 'Woordenboek overzicht',
 	},
 	examineManagement: {
