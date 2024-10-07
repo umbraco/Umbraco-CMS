@@ -26,6 +26,10 @@ export class UmbUfmLabelValueElement extends UmbUfmElementBase {
 			);
 		});
 	}
+
+	override createRenderRoot() {
+		return this;
+	}
 }
 
 export { UmbUfmLabelValueElement as element };
