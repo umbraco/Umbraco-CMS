@@ -17,7 +17,7 @@ public static class TypeHelper
 
     private static readonly ConcurrentDictionary<Type, FieldInfo[]> GetFieldsCache = new();
 
-    private static readonly Assembly[] EmptyAssemblies = new Assembly[0];
+    private static readonly Assembly[] EmptyAssemblies = [];
 
     /// <summary>
     ///     Based on a type we'll check if it is IEnumerable{T} (or similar) and if so we'll return a List{T}, this will also

@@ -26,7 +26,7 @@ public static class UserExtensions
     {
         if (user.Avatar.IsNullOrWhiteSpace() || user.Avatar == "none")
         {
-            return new string[0];
+            return [];
         }
 
         // use the custom avatar

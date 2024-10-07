@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Composing;
 ///     Borrowed and modified from
 ///     https://github.com/dotnet/aspnetcore-tooling/blob/master/src/Razor/src/Microsoft.NET.Sdk.Razor/ReferenceResolver.cs
 /// </remarks>
-internal class ReferenceResolver
+internal sealed class ReferenceResolver
 {
     private readonly IReadOnlyList<Assembly> _assemblies;
     private readonly Dictionary<Assembly, Classification> _classifications;
@@ -34,7 +34,7 @@ internal class ReferenceResolver
         }
     }
 
-    protected enum Classification
+    private enum Classification
     {
         Unknown,
         DoesNotReferenceUmbraco,
@@ -119,7 +119,7 @@ internal class ReferenceResolver
         return applicationParts;
     }
 
-    protected virtual IEnumerable<Assembly> GetReferences(Assembly assembly)
+    private IEnumerable<Assembly> GetReferences(Assembly assembly)
     {
         foreach (AssemblyName referenceName in assembly.GetReferencedAssemblies())
         {
@@ -143,11 +143,11 @@ internal class ReferenceResolver
         }
     }
 
-    private IEnumerable<string?> GetAssemblyFolders(IEnumerable<Assembly> assemblies) =>
+    private static IEnumerable<string?> GetAssemblyFolders(IEnumerable<Assembly> assemblies) =>
         assemblies.Select(x => Path.GetDirectoryName(GetAssemblyLocation(x))).Distinct();
 
     // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Mvc/Mvc.Core/src/ApplicationParts/RelatedAssemblyAttribute.cs
-    private string GetAssemblyLocation(Assembly assembly)
+    private static string GetAssemblyLocation(Assembly assembly)
     {
         if (Uri.TryCreate(assembly.Location, UriKind.Absolute, out Uri? result) &&
             result.IsFile && string.IsNullOrWhiteSpace(result.Fragment))
