@@ -462,6 +462,12 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.setIsNew(false);
 	}
 
+	expose() {
+		const contentKey = this.#layout.value?.contentKey;
+		if (!contentKey) throw new Error('Cannot expose block that does not exist.');
+		this.#expose(contentKey);
+	}
+
 	#expose(unique: string) {
 		const variantId = this.#variantId.getValue();
 		if (!variantId) {
