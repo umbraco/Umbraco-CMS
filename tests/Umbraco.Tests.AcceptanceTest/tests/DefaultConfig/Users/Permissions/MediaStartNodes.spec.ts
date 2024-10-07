@@ -70,6 +70,7 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
 
   // Assert
   await umbracoUi.media.isMediaVisible(rootFolderName);
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.media.goToMediaWithName(rootFolderName);
   await umbracoUi.media.isTextWithMessageVisible('The authenticated user do not have access to this resource');
   await umbracoUi.media.clickCaretButtonForMediaName(rootFolderName);
