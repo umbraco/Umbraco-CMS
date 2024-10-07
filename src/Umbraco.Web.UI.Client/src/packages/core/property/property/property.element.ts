@@ -32,7 +32,6 @@ export class UmbPropertyElement extends UmbLitElement {
 	/**
 	 * Label. Name of the property
 	 * @type {string}
-	 * @attr
 	 * @default
 	 */
 	@property({ type: String })
@@ -46,7 +45,6 @@ export class UmbPropertyElement extends UmbLitElement {
 	/**
 	 * Description: render a description underneath the label.
 	 * @type {string}
-	 * @attr
 	 * @default
 	 */
 	@property({ type: String })
@@ -72,7 +70,6 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * Alias
 	 * @public
 	 * @type {string}
-	 * @attr
 	 * @default
 	 */
 	@property({ type: String })
@@ -87,7 +84,6 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * Property Editor UI Alias. Render the Property Editor UI registered for this alias.
 	 * @public
 	 * @type {string}
-	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'property-editor-ui-alias' })
@@ -104,7 +100,6 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * Config. Configuration to pass to the Property Editor UI. This is also the configuration data stored on the Data Type.
 	 * @public
 	 * @type {string}
-	 * @attr
 	 * @default
 	 */
 	@property({ type: Array, attribute: false })
@@ -130,7 +125,6 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * DataPath, declare the path to the value of the data that this property represents.
 	 * @public
 	 * @type {string}
-	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'data-path' })
@@ -235,10 +229,14 @@ export class UmbPropertyElement extends UmbLitElement {
 			null,
 		);
 
-		this.observe(this.#propertyContext.isReadOnly, (value) => {
-			this._isReadOnly = value;
-			this._element?.toggleAttribute('readonly', value);
-		});
+		this.observe(
+			this.#propertyContext.isReadOnly,
+			(value) => {
+				this._isReadOnly = value;
+				this._element?.toggleAttribute('readonly', value);
+			},
+			null,
+		);
 	}
 
 	private _onPropertyEditorChange = (e: CustomEvent): void => {
