@@ -2,7 +2,7 @@ import { UmbSubmittableWorkspaceContextBase } from '../submittable/index.js';
 import { UmbEntityWorkspaceDataManager } from '../entity/entity-workspace-data-manager.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbEntityModel, UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import { UmbEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { UMB_DISCARD_CHANGES_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import {
@@ -41,6 +41,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	public readonly entityType = this._data.createObservablePartOfCurrent((data) => data?.entityType);
 	public readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
 
+	#entityContext = new UmbEntityContext(this);
+
 	protected _getDataPromise?: Promise<any>;
 
 	protected _detailRepository?: DetailRepositoryType;
@@ -65,6 +67,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	constructor(host: UmbControllerHost, args: UmbEntityWorkspaceContextArgs) {
 		super(host, args.workspaceAlias);
 		this.#entityType = args.entityType;
+		this.#entityContext.setEntityType(this.#entityType);
 		window.addEventListener('willchangestate', this.#onWillNavigate);
 		this.#observeRepository(args.detailRepositoryAlias);
 	}
@@ -82,6 +85,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	async load(unique: string) {
+		this.#entityContext.setUnique(unique);
 		await this.#init;
 		this.resetState();
 		this._getDataPromise = this._detailRepository!.requestByUnique(unique);
