@@ -603,7 +603,7 @@ export class UmbDocumentWorkspaceContext
 			previewUrl.searchParams.set('culture', culture);
 		}
 
-		const previewWindow = window.open(previewUrl.toString(), 'umbpreview');
+		const previewWindow = window.open(previewUrl.toString(), `umbpreview-${unique}`);
 		previewWindow?.focus();
 	}
 
