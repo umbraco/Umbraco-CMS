@@ -416,7 +416,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			<umb-property-layout label="Partial Views">
 				<div slot="editor">
 					<umb-input-entity
-						.getIcon=${() => 'icon-notepad'}
+						.getIcon=${() => 'icon-document-html'}
 						.pickerContext=${UmbPartialViewPickerInputContext}
 						.selection=${this._package.partialViews.map((path) =>
 							this.#serverFilePathUniqueSerializer.toUnique(path),
