@@ -367,7 +367,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			<umb-property-layout label="Stylesheets">
 				<div slot="editor">
 					<umb-input-entity
-						.getIcon=${() => 'icon-brush-alt'}
+						.getIcon=${() => 'icon-palette'}
 						.pickerContext=${UmbStylesheetPickerInputContext}
 						.selection=${this._package.stylesheets.map((path) => this.#serverFilePathUniqueSerializer.toUnique(path)) ??
 						[]}
