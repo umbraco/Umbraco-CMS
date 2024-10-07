@@ -392,7 +392,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			<umb-property-layout label="Scripts">
 				<div slot="editor">
 					<umb-input-entity
-						.getIcon=${() => 'icon-diploma'}
+						.getIcon=${() => 'icon-document-js'}
 						.pickerContext=${UmbScriptPickerInputContext}
 						.selection=${this._package.scripts.map((path) => this.#serverFilePathUniqueSerializer.toUnique(path)) ?? []}
 						@change=${this.#onScriptsChange}>
