@@ -2367,7 +2367,75 @@
 		{
 			"name": "icon-twitter-x",
 			"file": "x.svg"
-		}
+		},
+		{
+			"name": "icon-document-3d",
+			"file": "file-axis-3d.svg",
+		},
+		{
+			"name": "icon-document-medal",
+			"file": "file-badge-2.svg",
+		},
+		{
+			"name": "icon-document-chart-bar",
+			"file": "file-chart-column.svg",
+		},
+		{
+			"name": "icon-document-chart-graph",
+			"file": "file-chart-line.svg",
+		},
+		{
+			"name": "icon-document-html",
+			"file": "file-code.svg",
+		},
+		{
+			"name": "icon-document-js",
+			"file": "file-json.svg",
+		},
+		{
+			"name": "icon-document-key",
+			"file": "file-key.svg",
+		},
+		{
+			"name": "icon-document-search",
+			"file": "file-search-2.svg",
+		},
+		{
+			"name": "icon-document-settings",
+			"file": "file-sliders.svg",
+		},
+		{
+			"name": "icon-document-spreadsheet",
+			"file": "file-spreadsheet.svg",
+		},
+		{
+			"name": "icon-document-command",
+			"file": "file-terminal.svg",
+		},
+		{
+			"name": "icon-document-command",
+			"file": "file-terminal.svg",
+		},
+		{
+			"name": "icon-document-font",
+			"file": "file-type.svg",
+		},
+		{
+			"name": "icon-document-user",
+			"file": "file-user.svg",
+		},
+		{
+			"name": "icon-document-image",
+			"file": "file-image.svg",
+		},
+		{
+			"name": "icon-document-play",
+			"file": "file-video.svg",
+		},
+		{
+			"name": "icon-document-play",
+			"file": "file-video.svg",
+		},
 	],
 	"umbraco": [
 		{
