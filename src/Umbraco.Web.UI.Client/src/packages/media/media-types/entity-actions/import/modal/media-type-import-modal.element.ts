@@ -33,19 +33,19 @@ export class UmbMediaTypeImportModalLayout extends UmbModalBaseElement<
 		this.#fileReader.onload = (e) => {
 			if (typeof e.target?.result === 'string') {
 				const fileContent = e.target.result;
-				this.#MediaTypePreviewBuilder(fileContent);
+				this.#mediaTypePreviewBuilder(fileContent);
 			} else {
 				this.#requestReset();
 			}
 		};
 	}
 
-	#onFileDropped() {
-		const data = this.dropzone?.getFiles()[0];
-		if (!data) return;
+	#onUploadCompleted() {
+		const data = this.dropzone?.getItems()[0];
+		if (!data?.temporaryFile) return;
 
-		this.#temporaryUnique = data.temporaryUnique;
-		this.#fileReader.readAsText(data.file);
+		this.#temporaryUnique = data.temporaryFile.temporaryUnique;
+		this.#fileReader.readAsText(data.temporaryFile.file);
 	}
 
 	async #onFileImport() {
@@ -55,7 +55,7 @@ export class UmbMediaTypeImportModalLayout extends UmbModalBaseElement<
 		this._submitModal();
 	}
 
-	#MediaTypePreviewBuilder(htmlString: string) {
+	#mediaTypePreviewBuilder(htmlString: string) {
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(htmlString, 'text/xml');
 		const childNodes = doc.childNodes;
@@ -68,10 +68,10 @@ export class UmbMediaTypeImportModalLayout extends UmbModalBaseElement<
 			}
 		});
 
-		this._fileContent = this.#MediaTypePreviewItemBuilder(elements);
+		this._fileContent = this.#mediaTypePreviewItemBuilder(elements);
 	}
 
-	#MediaTypePreviewItemBuilder(elements: Array<Element>) {
+	#mediaTypePreviewItemBuilder(elements: Array<Element>) {
 		const mediaTypes: Array<UmbMediaTypePreview> = [];
 		elements.forEach((MediaType) => {
 			const info = MediaType.getElementsByTagName('Info')[0];
@@ -129,7 +129,11 @@ export class UmbMediaTypeImportModalLayout extends UmbModalBaseElement<
 					html`<div id="wrapper">
 						Drag and drop your file here
 						<uui-button look="primary" label="or click here to choose a file" @click=${this.#onBrowse}></uui-button>
-						<umb-dropzone id="dropzone" createAsTemporary @change=${this.#onFileDropped}> </umb-dropzone>
+						<umb-dropzone
+							id="dropzone"
+							accept=".udt"
+							@complete=${this.#onUploadCompleted}
+							createAsTemporary></umb-dropzone>
 					</div>`,
 			)}
 		`;

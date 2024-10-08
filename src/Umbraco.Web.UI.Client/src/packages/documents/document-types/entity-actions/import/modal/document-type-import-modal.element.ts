@@ -43,12 +43,12 @@ export class UmbDocumentTypeImportModalLayout extends UmbModalBaseElement<
 		};
 	}
 
-	#onFileDropped() {
-		const data = this.dropzone?.getFiles()[0];
-		if (!data) return;
+	#onUploadComplete() {
+		const data = this.dropzone?.getItems()[0];
+		if (!data?.temporaryFile) return;
 
-		this.#temporaryUnique = data.temporaryUnique;
-		this.#fileReader.readAsText(data.file);
+		this.#temporaryUnique = data.temporaryFile.temporaryUnique;
+		this.#fileReader.readAsText(data.temporaryFile.file);
 	}
 
 	async #onFileImport() {
@@ -136,7 +136,11 @@ export class UmbDocumentTypeImportModalLayout extends UmbModalBaseElement<
 					html`<div id="wrapper">
 						Drag and drop your file here
 						<uui-button look="primary" label="or click here to choose a file" @click=${this.#onBrowse}></uui-button>
-						<umb-dropzone id="dropzone" createAsTemporary @change=${this.#onFileDropped}> </umb-dropzone>
+						<umb-dropzone
+							id="dropzone"
+							accept=".udt"
+							@complete=${this.#onUploadComplete}
+							createAsTemporary></umb-dropzone>
 					</div>`,
 			)}
 		`;
