@@ -1,7 +1,7 @@
 ﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
+namespace Umbraco.Cms.Core.PublishedCache;
 
 public interface IDocumentCacheService
 {
@@ -19,5 +19,5 @@ public interface IDocumentCacheService
 
     void Rebuild(IReadOnlyCollection<int> contentTypeIds);
 
-    internal IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType);
+    IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType);
 }
