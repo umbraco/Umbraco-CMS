@@ -5,6 +5,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Block Editor Custom View Test',
 		element: () => import('./block-custom-view.js'),
 		forContentTypeAlias: 'headlineUmbracoDemoBlock',
-		forBlockEditor: 'block-list',
+		forBlockEditor: ['block-list', 'block-grid'],
 	},
 ];

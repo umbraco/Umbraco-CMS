@@ -363,6 +363,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	};
 
 	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
+		// We do have _contentTypeAlias at this stage, cause we do use the filter method in the extension slot which first gets rendered when we have the _contentTypeAlias. [NL]
 		if (
 			manifest.forContentTypeAlias &&
 			!stringOrStringArrayContains(manifest.forContentTypeAlias, this._contentTypeAlias!)
