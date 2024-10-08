@@ -34,8 +34,7 @@ export class UmbUfmRenderElement extends UmbLitElement {
 		});
 	}
 
-	getAsText(): string {
-		console.log(this.shadowRoot);
+	override toString(): string {
 		return this.shadowRoot?.textContent ?? '';
 	}
 

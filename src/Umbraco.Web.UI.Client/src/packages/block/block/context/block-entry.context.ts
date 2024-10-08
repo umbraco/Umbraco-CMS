@@ -375,7 +375,7 @@ export abstract class UmbBlockEntryContext<
 	 * @returns {string} - the value of the label.
 	 */
 	getLabel() {
-		return this.#labelRender.getAsText();
+		return this.#labelRender.toString();
 	}
 
 	#updateCreatePaths() {

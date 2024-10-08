@@ -34,8 +34,8 @@ export class UmbUfmVirtualRenderController extends UmbControllerBase {
 
 	override hostConnected(): void {}
 
-	getAsText(): string {
-		return this.#element.getAsText();
+	override toString(): string {
+		return this.#element.toString();
 	}
 
 	override destroy(): void {
