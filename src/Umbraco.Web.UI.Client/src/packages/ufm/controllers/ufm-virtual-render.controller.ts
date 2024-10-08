@@ -8,12 +8,35 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 export class UmbUfmVirtualRenderController extends UmbControllerBase {
 	#element: UmbUfmRenderElement;
 
+	#getTextFromDescendants(element?: Element | null): string {
+		if (!element) return '';
+
+		const items: Array<string> = [];
+
+		items.push(element.shadowRoot?.textContent ?? element.textContent ?? '');
+
+		if (element.shadowRoot !== null) {
+			Array.from(element.shadowRoot.children).forEach((element) => {
+				items.push(this.#getTextFromDescendants(element));
+			});
+		}
+
+		if (element.children !== null) {
+			Array.from(element.children).forEach((element) => {
+				items.push(this.#getTextFromDescendants(element));
+			});
+		}
+
+		return items.filter((x) => x).join(' ');
+	}
+
 	set markdown(markdown: string | undefined) {
 		this.#element.markdown = markdown;
 	}
 	get markdown(): string | undefined {
 		return this.#element.markdown;
 	}
+
 	set value(value: unknown | undefined) {
 		this.#element.value = value;
 	}
@@ -27,7 +50,6 @@ export class UmbUfmVirtualRenderController extends UmbControllerBase {
 		const element = new UmbUfmRenderElement();
 		element.inline = true;
 		element.style.visibility = 'hidden';
-		console.log(this.getHostElement());
 		this.getHostElement().appendChild(element);
 		this.#element = element;
 	}
@@ -35,7 +57,7 @@ export class UmbUfmVirtualRenderController extends UmbControllerBase {
 	override hostConnected(): void {}
 
 	override toString(): string {
-		return this.#element.toString();
+		return this.#getTextFromDescendants(this.#element);
 	}
 
 	override destroy(): void {
