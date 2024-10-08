@@ -23,7 +23,7 @@ test('can create a data type folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.createFolder(dataTypeFolderName);
 
   // Assert
-  expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesFolderExist(dataTypeFolderName)).toBeTruthy();
 });
 
 test('can rename a data type folder', async ({umbracoApi, umbracoUi}) => {
