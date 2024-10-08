@@ -80,7 +80,7 @@ test('can rename a partial view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   await umbracoUi.partialView.rename(partialViewName);
 
   // Assert
-  await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.renamed);
   expect(await umbracoApi.partialView.doesNameExist(partialViewFileName)).toBeTruthy();
   expect(await umbracoApi.partialView.doesNameExist(wrongPartialViewFileName)).toBeFalsy();
   // Verify the old partial view is NOT displayed under the Partial Views section

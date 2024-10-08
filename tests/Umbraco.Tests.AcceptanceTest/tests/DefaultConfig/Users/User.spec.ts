@@ -441,7 +441,7 @@ test('can enable a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.clickConfirmEnableButton();
 
   // Assert
-  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.userDisabled);
   await umbracoUi.user.isUserActiveTextVisible();
   // The state of the user is not enabled. The reason for this is that the user has not logged in, resulting in the state Inactive.
   const userData = await umbracoApi.user.getByName(nameOfTheUser);
@@ -460,7 +460,7 @@ test('can add an avatar to a user', {tag: '@smoke'}, async ({umbracoApi, umbraco
   await umbracoUi.user.changePhotoWithFileChooser(filePath);
 
   // Assert
-  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.avatarUploaded);
   const userData = await umbracoApi.user.getByName(nameOfTheUser);
   expect(userData.avatarUrls).not.toHaveLength(0);
 });

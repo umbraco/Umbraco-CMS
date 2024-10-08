@@ -121,7 +121,7 @@ test('can rename a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
   await umbracoUi.stylesheet.rename(stylesheetName);
 
   // Assert
-  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.renamed);
   expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeTruthy();
   expect(await umbracoApi.stylesheet.doesNameExist(wrongStylesheetName)).toBeFalsy();
 });
