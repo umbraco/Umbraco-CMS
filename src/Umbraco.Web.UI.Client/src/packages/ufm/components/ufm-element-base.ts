@@ -36,6 +36,10 @@ export abstract class UmbUfmElementBase extends UmbLitElement {
 		});
 	}
 
+	override createRenderRoot() {
+		return this;
+	}
+
 	override render() {
 		if (!this.#ufmContext) return nothing;
 
