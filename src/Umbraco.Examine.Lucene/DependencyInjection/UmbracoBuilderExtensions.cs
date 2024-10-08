@@ -2,6 +2,7 @@ using Examine;
 using Examine.Lucene.Directories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
@@ -38,7 +39,11 @@ public static class UmbracoBuilderExtensions
                     s,
                     new object[]
                     {
-                        new DirectoryInfo(tempDir), s.GetRequiredService<IApplicationRoot>().ApplicationRoot
+                        new DirectoryInfo(tempDir),
+                        s.GetRequiredService<IApplicationRoot>().ApplicationRoot,
+                        s.GetRequiredService<ILockFactory>(),
+                        s.GetRequiredService<ILoggerFactory>(),
+                        true,
                     });
             });
 
