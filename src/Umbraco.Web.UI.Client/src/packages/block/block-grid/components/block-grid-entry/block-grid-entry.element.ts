@@ -125,6 +125,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.requestUpdate('_blockViewProps');
 	}
 
+	@state()
+	private _isReadOnly = false;
+
 	constructor() {
 		super();
 
@@ -256,6 +259,12 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editSettingsPath: path } });
 			},
 			null,
+		);
+
+		this.observe(
+			this.#context.readOnlyState.isReadOnly,
+			(isReadOnly) => (this._isReadOnly = isReadOnly),
+			'umbReadonlyObserver',
 		);
 	}
 
