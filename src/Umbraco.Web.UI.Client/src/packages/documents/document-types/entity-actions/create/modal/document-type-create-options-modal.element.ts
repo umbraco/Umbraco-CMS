@@ -32,7 +32,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 			preset: 'template',
 			label: this.localize.term('create_documentTypeWithTemplate'),
 			description: this.localize.term('create_documentTypeWithTemplateDescription'),
-			icon: 'icon-notepad',
+			icon: 'icon-document-html',
 		},
 		{
 			preset: 'element',

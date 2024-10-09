@@ -118,19 +118,19 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			);
 
 			this.observe(
-				observeMultiple([this.variantId, this.contentKey]),
-				([variantId, contentKey]) => {
-					if (!variantId || !contentKey) return;
+				this.contentKey,
+				(contentKey) => {
+					if (!contentKey) return;
 
 					this.observe(
-						manager.hasExposeOf(contentKey, variantId),
+						manager.hasExposeOf(contentKey),
 						(exposed) => {
 							this.#exposed.setValue(exposed);
 						},
 						'observeHasExpose',
 					);
 				},
-				'observeVariantIdContentKey',
+				'observeContentKey',
 			);
 		}).asPromise();
 
@@ -462,13 +462,14 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.setIsNew(false);
 	}
 
+	expose() {
+		const contentKey = this.#layout.value?.contentKey;
+		if (!contentKey) throw new Error('Cannot expose block that does not exist.');
+		this.#expose(contentKey);
+	}
+
 	#expose(unique: string) {
-		const variantId = this.#variantId.getValue();
-		if (!variantId) {
-			throw new Error('Block could not bre exposed cause we where missing a variant ID.');
-		}
-		// expose
-		this.#blockManager?.setOneExpose(unique, variantId);
+		this.#blockManager?.setOneExpose(unique);
 	}
 
 	#modalRejected = () => {

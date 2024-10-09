@@ -45,12 +45,9 @@ export class UmbContentTypeStructureManager<
 	readonly ownerContentType = this.#contentTypes.asObservablePart((x) =>
 		x.find((y) => y.unique === this.#ownerContentTypeUnique),
 	);
-	readonly ownerContentTypeAlias = this.#contentTypes.asObservablePart(
-		(x) => x.find((y) => y.unique === this.#ownerContentTypeUnique)?.alias,
-	);
-	readonly ownerContentTypeCompositions = this.#contentTypes.asObservablePart(
-		(x) => x.find((y) => y.unique === this.#ownerContentTypeUnique)?.compositions,
-	);
+	readonly ownerContentTypeAlias = createObservablePart(this.ownerContentType, (x) => x?.alias);
+	readonly ownerContentTypeName = createObservablePart(this.ownerContentType, (x) => x?.name);
+	readonly ownerContentTypeCompositions = createObservablePart(this.ownerContentType, (x) => x?.compositions);
 
 	readonly #contentTypeContainers = this.#contentTypes.asObservablePart((contentTypes) => {
 		// Notice this may need to use getValue to avoid resetting it self. [NL]
