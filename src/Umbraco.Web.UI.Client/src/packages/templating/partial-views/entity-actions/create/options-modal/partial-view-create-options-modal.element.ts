@@ -69,11 +69,11 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 				<uui-box>
 					<!-- TODO: construct url -->
 					<uui-menu-item href=${this.#getCreateHref()} label="New empty partial view" @click=${this.#onNavigate}>
-						<uui-icon slot="icon" name="icon-article"></uui-icon>}
+						<uui-icon slot="icon" name="icon-document-html"></uui-icon>}
 					</uui-menu-item>
 
 					<uui-menu-item @click=${this.#onCreateFromSnippetClick} label="New partial view from snippet...">
-						<uui-icon slot="icon" name="icon-article"></uui-icon>}
+						<uui-icon slot="icon" name="icon-document-html"></uui-icon>}
 					</uui-menu-item>
 
 					<uui-menu-item @click=${this.#onCreateFolderClick} label="New Folder...">

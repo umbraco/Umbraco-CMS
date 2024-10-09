@@ -141,7 +141,11 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 		originData: UmbBlockListWorkspaceOriginData,
 	) {
 		await this._retrieveManager;
-		return this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
+		const success = this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
+		if (success) {
+			this._manager?.setOneExpose(layoutEntry.contentKey);
+		}
+		return success;
 	}
 
 	// create Block?

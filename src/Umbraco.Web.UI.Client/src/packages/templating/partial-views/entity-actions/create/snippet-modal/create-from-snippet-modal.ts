@@ -49,7 +49,7 @@ export class UmbPartialViewCreateFromSnippetModalElement extends UmbModalBaseEle
 					${this._snippets.map(
 						(snippet) =>
 							html` <uui-menu-item label="${snippet.name}" href=${snippet.path} @click=${this.#onNavigate}>
-								<uui-icon name="icon-article" slot="icon"></uui-icon
+								<uui-icon name="icon-document-html" slot="icon"></uui-icon
 							></uui-menu-item>`,
 					)}
 				</uui-box>

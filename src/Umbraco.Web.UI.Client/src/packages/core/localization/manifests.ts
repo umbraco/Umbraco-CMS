@@ -260,5 +260,5 @@ export const manifests: Array<ManifestLocalization> = [
 			culture: 'zh-tw',
 		},
 		js: () => import('../../../assets/lang/zh-tw.js'),
-	},
+	}
 ];
