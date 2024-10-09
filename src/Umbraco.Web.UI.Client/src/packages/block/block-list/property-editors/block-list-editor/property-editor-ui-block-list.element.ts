@@ -274,7 +274,6 @@ export class UmbPropertyEditorUIBlockListElement
 					<umb-block-list-entry
 						.contentKey=${layoutEntry.contentKey}
 						.layout=${layoutEntry}
-						?readonly=${this.readonly}
 						${umbDestroyOnDisconnect()}>
 					</umb-block-list-entry>
 				`,
