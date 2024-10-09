@@ -1,11 +1,15 @@
 import type { UmbContentWorkspaceContext } from '../workspace/index.js';
 import type { UmbContentDetailModel } from '../types.js';
-import type { UmbNameablePropertyDatasetContext, UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import type {
+	UmbNameablePropertyDatasetContext,
+	UmbPropertyDatasetContext,
+	UmbPropertyValueData,
+} from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { type Observable, map } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, UmbObjectState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
@@ -89,6 +93,25 @@ export class UmbContentPropertyDatasetContext<
 			culture: property.variesByCulture ? this.#variantId.culture : null,
 			segment: property.variesBySegment ? this.#variantId.segment : null,
 		});
+	}
+
+	#propertiesObservable?: Observable<Array<UmbPropertyValueData>>;
+	// Should it be possible to get the properties as a list of property aliases?
+	get properties(): Observable<Array<UmbPropertyValueData>> {
+		if (!this.#propertiesObservable) {
+			const propertiesObservable = this.#workspace.structure.contentTypeProperties;
+			const propertyVariantIds = createObservablePart(propertiesObservable, (props: UmbPropertyTypeModel[]) =>
+				props.map((prop) => this.#createPropertyVariantId(prop)),
+			);
+		}
+
+		return this.#propertiesObservable;
+	}
+	getProperties(): Array<UmbPropertyValueData> {
+		return [];
+	}
+	setProperties(properties: Array<UmbPropertyValueData>): void {
+		throw new Error('not implemented');
 	}
 
 	/**
