@@ -346,23 +346,8 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 
 	#renderCreateButtonGroup() {
 		if (this._areaKey === null || this._layoutEntries.length === 0) {
-			return html`<uui-button-group id="createButton">
-				<uui-button
-					look="placeholder"
-					label=${this._singleBlockTypeName
-						? this.localize.term('blockEditor_addThis', [this._singleBlockTypeName])
-						: this.localize.term('blockEditor_addBlock')}
-					href=${this.#context.getPathForCreateBlock(-1) ?? ''}
-					?disabled=${this._isReadOnly}></uui-button>
-				${this._areaKey === null
-					? html` <uui-button
-							label=${this.localize.term('content_createFromClipboard')}
-							look="placeholder"
-							href=${this.#context.getPathForClipboard(-1) ?? ''}
-							?disabled=${this._isReadOnly}>
-							<uui-icon name="icon-paste-in"></uui-icon>
-						</uui-button>`
-					: nothing}
+			return html` <uui-button-group id="createButton">
+				${this.#renderCreateButton()} ${this.#renderPasteButton()}
 			</uui-button-group>`;
 		} else {
 			return html`
@@ -371,6 +356,35 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 					label=${this.localize.term('blockEditor_addBlock')}></uui-button-inline-create>
 			`;
 		}
+	}
+
+	#renderCreateButton() {
+		if (this._isReadOnly && this._layoutEntries.length > 0) return nothing;
+
+		return html`
+			<uui-button
+				look="placeholder"
+				label=${this._singleBlockTypeName
+					? this.localize.term('blockEditor_addThis', [this._singleBlockTypeName])
+					: this.localize.term('blockEditor_addBlock')}
+				href=${this.#context.getPathForCreateBlock(-1) ?? ''}
+				?disabled=${this._isReadOnly}></uui-button>
+		`;
+	}
+
+	#renderPasteButton() {
+		if (this._areaKey) return nothing;
+		if (this._isReadOnly && this._layoutEntries.length > 0) return nothing;
+
+		return html`
+			<uui-button
+				label=${this.localize.term('content_createFromClipboard')}
+				look="placeholder"
+				href=${this.#context.getPathForClipboard(-1) ?? ''}
+				?disabled=${this._isReadOnly}>
+				<uui-icon name="icon-paste-in"></uui-icon>
+			</uui-button>
+		`;
 	}
 
 	static override styles = [
