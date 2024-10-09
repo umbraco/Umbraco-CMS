@@ -326,6 +326,7 @@ export default {
 		variantSendForApprovalNotAllowed: 'Send for approval is not allowed',
 		variantScheduleNotAllowed: 'Schedule is not allowed',
 		variantUnpublishNotAllowed: 'Unpublish is not allowed',
+		saveModalTitle: 'Gem',
 	},
 	blueprints: {
 		createBlueprintFrom: "Opret en ny indholdsskabelon fra '%0%'",

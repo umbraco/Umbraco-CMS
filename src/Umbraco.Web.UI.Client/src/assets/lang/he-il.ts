@@ -113,6 +113,7 @@ export default {
 		updateDate: 'נערך לאחרונה',
 		uploadClear: 'הסר קובץ',
 		urls: 'קשר למסמך',
+		saveModalTitle: 'שמור',
 	},
 	create: {
 		chooseNode: 'היכן ברצונך ליצור את %0%',
