@@ -93,7 +93,7 @@ export class UmbContentPropertyDatasetContext<
 
 	/**
 	 * @function propertyVariantId
-	 * @param {string} propertyAlias
+	 * @param {string} propertyAlias - The property alias to observe the variantId of.
 	 * @returns {Promise<Observable<UmbVariantId | undefined> | undefined>}
 	 * @description Get an Observable for the variant id of this property.
 	 */
@@ -105,8 +105,8 @@ export class UmbContentPropertyDatasetContext<
 
 	/**
 	 * @function propertyValueByAlias
-	 * @param {string} propertyAlias
-	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @param {string} propertyAlias  The alias of the property
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>} - An observable of the property value
 	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(
@@ -130,10 +130,10 @@ export class UmbContentPropertyDatasetContext<
 
 	/**
 	 * @function setPropertyValueByVariant
-	 * @param {string} propertyAlias
+	 * @param {string} propertyAlias - The alias of the property
 	 * @param {unknown} value - value can be a promise resolving into the actual value or the raw value it self.
 	 * @param {UmbVariantId} propertyVariantId - The variant id for the value to be set for.
-	 * @returns {Promise<unknown>}
+	 * @returns {Promise<unknown>} - A promise that resolves once the value has been set.
 	 * @description Get the value of this property.
 	 */
 	setPropertyValueByVariant(propertyAlias: string, value: unknown, propertyVariantId: UmbVariantId): Promise<void> {
@@ -142,7 +142,7 @@ export class UmbContentPropertyDatasetContext<
 
 	/**
 	 * @function setPropertyValue
-	 * @param {string} propertyAlias
+	 * @param {string} propertyAlias - The alias for the value to be set
 	 * @param {PromiseLike<unknown>} value - value can be a promise resolving into the actual value or the raw value it self.
 	 * @returns {Promise<void>}
 	 * @description Set the value of this property.
@@ -155,7 +155,7 @@ export class UmbContentPropertyDatasetContext<
 			const variantId = this.#createPropertyVariantId(property);
 
 			// This is not reacting to if the property variant settings changes while running.
-			this.#workspace.setPropertyValue(propertyAlias, await value, variantId);
+			await this.#workspace.setPropertyValue(propertyAlias, await value, variantId);
 		}
 		this.#workspace.finishPropertyValueChange();
 	}
