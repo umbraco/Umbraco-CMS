@@ -136,7 +136,7 @@ export class UmbPropertyEditorUIBlockGridElement
 			this.observe(
 				observeMultiple([propertyContext.isReadOnly, propertyContext.variantId]),
 				([isReadOnly, variantId]) => {
-					const unique = 'UMB_PROPERTY_CONTEXT';
+					const unique = 'UMB_PROPERTY_EDITOR_UI';
 					if (variantId === undefined) return;
 
 					if (isReadOnly) {
