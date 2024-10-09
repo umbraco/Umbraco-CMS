@@ -517,10 +517,9 @@ export default {
 		createNew: 'Créer un élément de dictionnaire',
 	},
 	dictionaryItem: {
-		description:
-			"\n      Editez les différentes versions de langues pour l'élément de dictionnaire '<em>%0%</em>' ci-dessous.\n   ",
+		description: "Editez les différentes versions de langues pour l'élément de dictionnaire '%0%' ci-dessous.",
 		displayName: 'Nom de Culture',
-		changeKeyError: "\n      La clé '%0%' existe déjà.\n   ",
+		changeKeyError: "La clé '%0%' existe déjà.",
 		overviewTitle: 'Aperçu du dictionaire',
 	},
 	examineManagement: {

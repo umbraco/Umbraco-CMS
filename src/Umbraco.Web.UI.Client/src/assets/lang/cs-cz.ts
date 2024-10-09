@@ -498,9 +498,9 @@ export default {
 	},
 	dictionaryItem: {
 		description:
-			"\n      Editujte různé jazykové verze pro položku slovníku '<em>%0%</em>' níže.<br/>Můžete přidat další jazyky v nabídce 'jazyky' nalevo.",
+			"Editujte různé jazykové verze pro položku slovníku '%0%' níže.<br/>Můžete přidat další jazyky v nabídce 'jazyky' nalevo.",
 		displayName: 'Název jazyka',
-		changeKeyError: "\n      Klíč '%0%' již existuje.\n   ",
+		changeKeyError: "Klíč '%0%' již existuje.",
 		overviewTitle: 'Přehled slovníku',
 	},
 	examineManagement: {
