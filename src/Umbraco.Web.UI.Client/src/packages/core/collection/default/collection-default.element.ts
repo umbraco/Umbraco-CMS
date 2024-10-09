@@ -26,6 +26,9 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	@state()
 	private _routes: Array<UmbRoute> = [];
 
+	@state()
+	private _hasItems = false;
+
 	#collectionContext?: UmbDefaultCollectionContext<any, any>;
 
 	constructor() {
@@ -34,6 +37,7 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 			this.#collectionContext = context;
 			this.#collectionContext?.requestCollection();
 			this.#observeCollectionRoutes();
+			this.#observeTotalItems();
 		});
 	}
 
@@ -49,12 +53,22 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		);
 	}
 
+	#observeTotalItems() {
+		if (!this.#collectionContext) return;
+
+		this.observe(
+			this.#collectionContext.totalItems,
+			(totalItems) => {
+				this._hasItems = totalItems > 0;
+			},
+			'umbCollectionTotalItemsObserver',
+		);
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout header-transparent>
-				${this.renderToolbar()}
-				<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>
-				${this.renderPagination()} ${this.renderSelectionActions()}
+				${this.renderToolbar()} ${this._hasItems ? this.#renderContent() : this.#renderEmptyState()}
 			</umb-body-layout>
 		`;
 	}
@@ -71,6 +85,19 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		return html`<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>`;
 	}
 
+	#renderContent() {
+		return html`
+			<umb-router-slot .routes=${this._routes}></umb-router-slot>
+			${this.renderPagination()} ${this.renderSelectionActions()}
+		`;
+	}
+
+	#renderEmptyState() {
+		return html` <div id="empty-state" class="uui-text">
+			<h4><umb-localize key="collection_noItemsTitle"></umb-localize></h4>
+		</div>`;
+	}
+
 	static override styles = [
 		UmbTextStyles,
 		css`
@@ -81,6 +108,13 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 				gap: var(--uui-size-space-5);
 				height: 100%;
 			}
+
+			#empty-state {
+				height: 100%;
+				align-content: center;
+				text-align: center;
+			}
+
 			router-slot {
 				width: 100%;
 				height: 100%;
