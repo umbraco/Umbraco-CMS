@@ -294,7 +294,7 @@ export default {
 		languagesToUnpublish:
 			'Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.',
 		readyToPublish: 'Ready to Publish?',
-		readyToSave: 'Save',
+		readyToSave: 'Ready to Save?',
 		sendForApproval: 'Send for approval',
 		schedulePublishHelp: 'Select the date and time to publish and/or unpublish the content item.',
 		createEmpty: 'Create new',
