@@ -343,7 +343,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			<umb-property-layout label="Templates">
 				<div slot="editor">
 					<umb-input-entity
-						.getIcon=${() => 'icon-newspaper'}
+						.getIcon=${() => 'icon-document-html'}
 						.pickerContext=${UmbTemplatePickerInputContext}
 						.selection=${this._package.templates ?? []}
 						@change=${this.#onTemplateChange}>
@@ -367,7 +367,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			<umb-property-layout label="Stylesheets">
 				<div slot="editor">
 					<umb-input-entity
-						.getIcon=${() => 'icon-brush-alt'}
+						.getIcon=${() => 'icon-palette'}
 						.pickerContext=${UmbStylesheetPickerInputContext}
 						.selection=${this._package.stylesheets.map((path) => this.#serverFilePathUniqueSerializer.toUnique(path)) ??
 						[]}
@@ -392,7 +392,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			<umb-property-layout label="Scripts">
 				<div slot="editor">
 					<umb-input-entity
-						.getIcon=${() => 'icon-diploma'}
+						.getIcon=${() => 'icon-document-js'}
 						.pickerContext=${UmbScriptPickerInputContext}
 						.selection=${this._package.scripts.map((path) => this.#serverFilePathUniqueSerializer.toUnique(path)) ?? []}
 						@change=${this.#onScriptsChange}>
@@ -416,7 +416,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			<umb-property-layout label="Partial Views">
 				<div slot="editor">
 					<umb-input-entity
-						.getIcon=${() => 'icon-notepad'}
+						.getIcon=${() => 'icon-document-html'}
 						.pickerContext=${UmbPartialViewPickerInputContext}
 						.selection=${this._package.partialViews.map((path) =>
 							this.#serverFilePathUniqueSerializer.toUnique(path),

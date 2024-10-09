@@ -278,8 +278,7 @@ export default {
 		selectEditor: '選擇編輯器',
 	},
 	dictionaryItem: {
-		description:
-			"\n      為此字典項目 '<em>%0%</em>' 編輯不同語言版本，<br />您可以在左方選單「語言」中增添新的語言\n   ",
+		description: "為此字典項目 '%0%' 編輯不同語言版本，您可以在左方選單「語言」中增添新的語言",
 		displayName: '語言名稱',
 	},
 	placeholders: {

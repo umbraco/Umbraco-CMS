@@ -24,6 +24,8 @@ export default class UmbInputUploadFieldFileElement extends UmbLitElement {
 
 	#serverUrl = '';
 
+	#loadingText = `(${this.localize.term('general_loading')}...)`;
+
 	/**
 	 *
 	 */
@@ -37,8 +39,8 @@ export default class UmbInputUploadFieldFileElement extends UmbLitElement {
 	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 		if (_changedProperties.has('file') && this.file) {
-			this.extension = this.#getExtensionFromMime(this.file.type) ?? '';
-			this.label = this.file.name || 'loading...';
+			this.extension = this.file.name.split('.').pop() ?? '';
+			this.label = this.file.name || this.#loadingText;
 		}
 
 		if (_changedProperties.has('path')) {
@@ -46,19 +48,8 @@ export default class UmbInputUploadFieldFileElement extends UmbLitElement {
 				if (this.file) return;
 
 				this.extension = this.path.split('.').pop() ?? '';
-				this.label = this.#serverUrl ? this.path.substring(this.#serverUrl.length) : 'loading...';
+				this.label = this.#serverUrl ? this.path.substring(this.#serverUrl.length) : this.#loadingText;
 			}
-		}
-	}
-
-	#getExtensionFromMime(mime: string): string {
-		if (!mime) return ''; //folders
-
-		const extension = mime.split('/')[1];
-		if (extension === 'svg+xml') {
-			return 'svg';
-		} else {
-			return extension;
 		}
 	}
 

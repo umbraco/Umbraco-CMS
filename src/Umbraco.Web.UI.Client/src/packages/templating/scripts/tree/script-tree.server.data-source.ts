@@ -77,6 +77,6 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbScriptTreeItemMod
 		name: item.name,
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
-		icon: item.isFolder ? undefined : 'icon-diploma',
+		icon: item.isFolder ? undefined : 'icon-document-js',
 	};
 };

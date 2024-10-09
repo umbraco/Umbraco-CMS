@@ -4,11 +4,11 @@ import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
-	observeMultiple,
 	UmbArrayState,
 	UmbBooleanState,
 	UmbClassState,
 	UmbStringState,
+	mergeObservables,
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbContentTypeStructureManager, type UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
@@ -17,7 +17,6 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
-import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
 	layout: LayoutEntryType;
@@ -180,12 +179,18 @@ export abstract class UmbBlockManagerContext<
 	settingsOf(key: string) {
 		return this.#settings.asObservablePart((source) => source.find((x) => x.key === key));
 	}
-	exposeOf(contentKey: string, variantId: UmbVariantId) {
-		return this.#exposes.asObservablePart((source) =>
-			source.filter((x) => x.contentKey === contentKey && variantId.compare(x)),
+	currentExposeOf(contentKey: string) {
+		const variantId = this.#variantId.getValue();
+		if (!variantId) return;
+		return mergeObservables(
+			[this.#exposes.asObservablePart((source) => source.filter((x) => x.contentKey === contentKey)), this.variantId],
+			([exposes, variantId]) => (variantId ? exposes.find((x) => variantId.compare(x)) : undefined),
 		);
 	}
-	hasExposeOf(contentKey: string, variantId: UmbVariantId) {
+
+	hasExposeOf(contentKey: string) {
+		const variantId = this.#variantId.getValue();
+		if (!variantId) return;
 		return this.#exposes.asObservablePart((source) =>
 			source.some((x) => x.contentKey === contentKey && variantId.compare(x)),
 		);
@@ -206,7 +211,9 @@ export abstract class UmbBlockManagerContext<
 	setOneSettings(settingsData: UmbBlockDataModel) {
 		this.#settings.appendOne(settingsData);
 	}
-	setOneExpose(contentKey: string, variantId: UmbVariantId) {
+	setOneExpose(contentKey: string) {
+		const variantId = this.#variantId.getValue();
+		if (!variantId) return;
 		this.#exposes.appendOne({ contentKey, ...variantId.toObject() });
 	}
 
@@ -219,7 +226,9 @@ export abstract class UmbBlockManagerContext<
 	removeExposesOf(contentKey: string) {
 		this.#exposes.filter((x) => x.contentKey !== contentKey);
 	}
-	removeOneExpose(contentKey: string, variantId: UmbVariantId) {
+	removeCurrentExpose(contentKey: string) {
+		const variantId = this.#variantId.getValue();
+		if (!variantId) return;
 		this.#exposes.filter((x) => !(x.contentKey === contentKey && variantId.compare(x)));
 	}
 

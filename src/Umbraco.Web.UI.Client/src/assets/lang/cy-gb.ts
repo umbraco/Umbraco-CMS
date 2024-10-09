@@ -591,9 +591,9 @@ export default {
 	},
 	dictionaryItem: {
 		description:
-			"\n            Golygwch y fersiynau iaith gwahanol ar gyfer yr eitem geiriadur '<em>%0%</em>' islaw<br/>Gallwch ychwanegu ieithoedd ychwanegol o dan 'ieithoedd' yn y ddewislen ar y chwith\n            ",
+			"Golygwch y fersiynau iaith gwahanol ar gyfer yr eitem geiriadur '%0%' islaw<br/>Gallwch ychwanegu ieithoedd ychwanegol o dan 'ieithoedd' yn y ddewislen ar y chwith",
 		displayName: 'Enw Diwylliant',
-		changeKeyError: "\n            Mae'r allwedd '%0%' yn bodoli eisoes.\n            ",
+		changeKeyError: "Mae'r allwedd '%0%' yn bodoli eisoes.",
 		overviewTitle: 'Trosolwg Geiriadur',
 	},
 	examineManagement: {

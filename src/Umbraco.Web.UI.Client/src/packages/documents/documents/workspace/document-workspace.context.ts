@@ -101,6 +101,10 @@ export class UmbDocumentWorkspaceContext
 	// TODo: Optimize this so it uses either a App Language Context? [NL]
 	#languageRepository = new UmbLanguageCollectionRepository(this);
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
+	/**
+	 * @private
+	 * @description - Should not be used by external code.
+	 */
 	public readonly languages = this.#languages.asObservable();
 
 	#serverValidation = new UmbServerModelValidatorContext(this);
@@ -418,9 +422,9 @@ export class UmbDocumentWorkspaceContext
 
 	/**
 	 * @function propertyValueByAlias
-	 * @param {string} propertyAlias
-	 * @param {UmbVariantId} variantId
-	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @param {string} propertyAlias - The alias of the property
+	 * @param {UmbVariantId} variantId - The variant
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>} - An observable for the value of the property
 	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<PropertyValueType = unknown>(
@@ -436,9 +440,9 @@ export class UmbDocumentWorkspaceContext
 
 	/**
 	 * Get the current value of the property with the given alias and variantId.
-	 * @param alias
-	 * @param variantId
-	 * @returns The value or undefined if not set or found.
+	 * @param {string} alias - The alias of the property
+	 * @param {UmbVariantId | undefined} variantId - The variant id of the property
+	 * @returns {ReturnType | undefined} The value or undefined if not set or found.
 	 */
 	getPropertyValue<ReturnType = unknown>(alias: string, variantId?: UmbVariantId) {
 		const currentData = this.#data.getCurrent();
@@ -489,23 +493,21 @@ export class UmbDocumentWorkspaceContext
 	};
 
 	async #determineVariantOptions() {
-		const activeVariants = this.splitView.getActiveVariants();
-
-		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
-		// TODO: We need to filter the selected array, so it only contains one of each variantId. [NL]
-		const changedVariantIds = this.#data.getChangedVariants();
-		const selected = activeVariantIds.concat(changedVariantIds);
-		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
-
-		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
-		const selectedCultures = selected.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i);
-		const writable = selectedCultures.filter((x) => readOnlyCultures.includes(x) === false);
-
 		const options = await firstValueFrom(this.variantOptions);
+
+		const activeVariants = this.splitView.getActiveVariants();
+		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
+		const changedVariantIds = this.#data.getChangedVariants();
+		const selectedVariantIds = activeVariantIds.concat(changedVariantIds);
+
+		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
+		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
+		let selected = selectedVariantIds.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i);
+		selected = selected.filter((x) => readOnlyCultures.includes(x) === false);
 
 		return {
 			options,
-			selected: writable,
+			selected,
 		};
 	}
 
@@ -596,8 +598,15 @@ export class UmbDocumentWorkspaceContext
 		// Tell the server that we're entering preview mode.
 		await new UmbDocumentPreviewRepository(this).enter();
 
-		const preview = window.open(`preview?id=${unique}&culture=${culture}`, 'umbpreview');
-		preview?.focus();
+		const previewUrl = new URL('preview', window.location.origin);
+		previewUrl.searchParams.set('id', unique);
+
+		if (culture && culture !== UMB_INVARIANT_CULTURE) {
+			previewUrl.searchParams.set('culture', culture);
+		}
+
+		const previewWindow = window.open(previewUrl.toString(), `umbpreview-${unique}`);
+		previewWindow?.focus();
 	}
 
 	async #handleSaveAndPublish() {
@@ -796,6 +805,8 @@ export class UmbDocumentWorkspaceContext
 
 		if (!variants.length) return;
 
+		// TODO: Validate content & Save changes for the selected variants — This was how it worked in v.13 [NL]
+
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 		await this.publishingRepository.publish(unique, variants);
@@ -832,6 +843,8 @@ export class UmbDocumentWorkspaceContext
 		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 
 		if (!variantIds.length) return;
+
+		// TODO: Validate content & Save changes for the selected variants — This was how it worked in v.13 [NL]
 
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');

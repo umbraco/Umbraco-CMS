@@ -370,9 +370,9 @@ export default {
 		createNew: 'Crear elemento de diccionario',
 	},
 	dictionaryItem: {
-		description: "Editar las diferentes versiones lingüísticas para la entrada en el diccionario '% 0%' debajo",
-		displayName: 'nombre de la cultura\n',
-		changeKeyError: "\n      La clave '%0%' ya existe.\n   ",
+		description: "Editar las diferentes versiones lingüísticas para la entrada en el diccionario '%0%' debajo",
+		displayName: 'nombre de la cultura',
+		changeKeyError: "La clave '%0%' ya existe.",
 	},
 	placeholders: {
 		username: 'Escribe tu nombre de usuario',

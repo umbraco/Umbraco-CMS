@@ -510,9 +510,9 @@ export default {
 		noItems: 'Sözlük öğesi yok.',
 	},
 	dictionaryItem: {
-		description: "\n      Aşağıdaki sözlük öğesi '<em>%0%</em>' için farklı dil sürümlerini düzenleyin\n   ",
+		description: "Aşağıdaki sözlük öğesi '%0%' için farklı dil sürümlerini düzenleyin",
 		displayName: 'Kültür Adı',
-		changeKeyError: "\n      '%0%' anahtarı zaten var.\n   ",
+		changeKeyError: "'%0%' anahtarı zaten var.",
 		overviewTitle: 'Sözlüğe genel bakış',
 	},
 	examineManagement: {

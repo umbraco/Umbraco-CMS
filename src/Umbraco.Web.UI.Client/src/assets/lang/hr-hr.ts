@@ -568,9 +568,9 @@ export default {
 		createNew: 'Kreirajte stavku iz rječnika',
 	},
 	dictionaryItem: {
-		description: "\n      Uredite različite jezičke varijante za stavku rječnika '<em>%0%</em>' ispod\n   ",
+		description: "Uredite različite jezičke varijante za stavku rječnika '%0%' ispod",
 		displayName: 'Kultura',
-		changeKeyError: "\n      Stavka '%0%' već postoji.\n   ",
+		changeKeyError: "Stavka '%0%' već postoji.",
 		overviewTitle: 'Pregled riječnika',
 	},
 	examineManagement: {

@@ -49,6 +49,7 @@ export class UmbInstallerLayoutElement extends LitElement {
 				top: var(--uui-size-space-5);
 				left: var(--uui-size-space-5);
 				height: 30px;
+				z-index: 10;
 			}
 
 			#logo img {
