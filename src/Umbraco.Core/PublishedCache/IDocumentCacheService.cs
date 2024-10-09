@@ -21,5 +21,9 @@ public interface IDocumentCacheService
 
     IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType);
 
-    Task ClearContentMemoryCacheAsync(CancellationToken cancellationToken);
+    Task ClearMemoryCacheAsync(CancellationToken cancellationToken);
+
+    Task RefreshMemoryCacheAsync(Guid key);
+
+    Task RemoveFromMemoryCacheAsync(Guid key);
 }

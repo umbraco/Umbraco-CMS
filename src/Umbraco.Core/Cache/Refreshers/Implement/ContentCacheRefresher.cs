@@ -145,12 +145,36 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     private void HandleMemoryCache(JsonPayload payload)
     {
-        if (payload.Key is null)
+        Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
         {
-            return;
+            _documentCacheService.RefreshMemoryCacheAsync(key).GetAwaiter().GetResult();
         }
 
-        _documentCacheService.ClearContentMemoryCacheAsync(CancellationToken.None).GetAwaiter().GetResult();
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
+        {
+            if (_documentNavigationQueryService.TryGetDescendantsKeys(key, out IEnumerable<Guid> descendantsKeys))
+            {
+                var branchKeys = descendantsKeys.ToList();
+                branchKeys.Add(key);
+
+                foreach (Guid branchKey in branchKeys)
+                {
+                    _documentCacheService.RefreshMemoryCacheAsync(branchKey).GetAwaiter().GetResult();
+                }
+            }
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
+        {
+            _documentCacheService.ClearMemoryCacheAsync(CancellationToken.None).GetAwaiter().GetResult();
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+        {
+            _documentCacheService.RemoveFromMemoryCacheAsync(key).GetAwaiter().GetResult();
+        }
     }
 
     private void HandleNavigation(JsonPayload payload)

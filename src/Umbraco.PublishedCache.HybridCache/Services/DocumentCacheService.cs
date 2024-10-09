@@ -119,7 +119,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             .WhereNotNull();
     }
 
-    public async Task ClearContentMemoryCacheAsync(CancellationToken cancellationToken)
+    public async Task ClearMemoryCacheAsync(CancellationToken cancellationToken)
     {
         // TODO: This should be done with tags, however this is not implemented yet, so for now we have to naively get all content keys and clear them all.
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
@@ -143,6 +143,33 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         await SeedAsync(cancellationToken);
 
         scope.Complete();
+    }
+
+    public async Task RefreshMemoryCacheAsync(Guid key)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        bool isSeeded = SeedKeys.Contains(key);
+
+        ContentCacheNode? draftNode = await _databaseCacheRepository.GetContentSourceAsync(key, true);
+        if (draftNode is not null)
+        {
+            await RefreshHybridCacheAsync(draftNode, GetCacheKey(draftNode.Key, true), isSeeded);
+        }
+
+        ContentCacheNode? publishedNode = await _databaseCacheRepository.GetContentSourceAsync(key, false);
+        if (publishedNode is not null)
+        {
+            await RefreshHybridCacheAsync(publishedNode, GetCacheKey(publishedNode.Key, false), isSeeded);
+        }
+
+        scope.Complete();
+    }
+
+    public async Task RemoveFromMemoryCacheAsync(Guid key)
+    {
+        await _hybridCache.RemoveAsync(GetCacheKey(key, true));
+        await _hybridCache.RemoveAsync(GetCacheKey(key, false));
     }
 
     public async Task SeedAsync(CancellationToken cancellationToken)
@@ -230,7 +257,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
                 return;
             }
 
-            RefreshHybridCache(draftCacheNode, GetCacheKey(content.Key, true), isSeeded).GetAwaiter().GetResult();
+            RefreshHybridCacheAsync(draftCacheNode, GetCacheKey(content.Key, true), isSeeded).GetAwaiter().GetResult();
         }, 1);
 
         if (content.PublishedState == PublishedState.Publishing)
@@ -245,14 +272,14 @@ internal sealed class DocumentCacheService : IDocumentCacheService
                     return;
                 }
 
-                RefreshHybridCache(publishedCacheNode, GetCacheKey(content.Key, false), isSeeded).GetAwaiter().GetResult();
+                RefreshHybridCacheAsync(publishedCacheNode, GetCacheKey(content.Key, false), isSeeded).GetAwaiter().GetResult();
             }, 1);
         }
 
         scope.Complete();
     }
 
-    private async Task RefreshHybridCache(ContentCacheNode cacheNode, string cacheKey, bool isSeeded)
+    private async Task RefreshHybridCacheAsync(ContentCacheNode cacheNode, string cacheKey, bool isSeeded)
     {
         // If it's seeded we want it to stick around the cache for longer.
         if (isSeeded)
