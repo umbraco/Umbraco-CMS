@@ -349,12 +349,12 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			return html` <uui-button-group id="createButton">
 				${this.#renderCreateButton()} ${this.#renderPasteButton()}
 			</uui-button-group>`;
+		} else if (this._isReadOnly === false) {
+			return html`<uui-button-inline-create
+				href=${this.#context.getPathForCreateBlock(-1) ?? ''}
+				label=${this.localize.term('blockEditor_addBlock')}></uui-button-inline-create> `;
 		} else {
-			return html`
-				<uui-button-inline-create
-					href=${this.#context.getPathForCreateBlock(-1) ?? ''}
-					label=${this.localize.term('blockEditor_addBlock')}></uui-button-inline-create>
-			`;
+			return nothing;
 		}
 	}
 
