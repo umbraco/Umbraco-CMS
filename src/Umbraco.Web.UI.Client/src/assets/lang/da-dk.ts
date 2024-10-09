@@ -588,9 +588,9 @@ export default {
 	},
 	dictionaryItem: {
 		description:
-			"\n      Rediger de forskellige sprogversioner for ordbogselementet '%0%' herunder.<br />Du tilføjer flere sprog under 'sprog' i menuen til venstre </key>\n      ",
+			"Rediger de forskellige sprogversioner for ordbogselementet '%0%' herunder. Du tilføjer flere sprog under 'sprog' i menuen til venstre.",
 		displayName: 'Kulturnavn',
-		changeKeyError: "\n      Navnet '%0%' eksisterer allerede.\n   ",
+		changeKeyError: "Navnet '%0%' eksisterer allerede.",
 		overviewTitle: 'Ordbogsoversigt',
 	},
 	examineManagement: {

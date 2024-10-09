@@ -101,7 +101,6 @@ export class UmbBlockElementManager extends UmbControllerBase {
 	/**
 	 * @function propertyValueByAlias
 	 * @param {string} propertyAlias - Property Alias to observe the value of.
-	 * @param {UmbVariantId | undefined} variantId - Optional variantId to filter by.
 	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>} - Promise which resolves to an Observable
 	 * @description Get an Observable for the value of this property.
 	 */

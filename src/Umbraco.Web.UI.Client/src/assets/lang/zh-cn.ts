@@ -280,9 +280,9 @@ export default {
 		selectEditor: '选择编辑器',
 	},
 	dictionaryItem: {
-		description: '\n       为字典项编辑不同语言的版本‘<em>%0%</em>’<br/>您可以在左侧的“语言”中添加一种语言\n    ',
+		description: '为字典项编辑不同语言的版本‘%0%’, 您可以在左侧的“语言”中添加一种语言',
 		displayName: '语言名称',
-		changeKeyError: "\n      关键字 '%0%' 已经存在。\n   ",
+		changeKeyError: "关键字 '%0%' 已经存在。",
 	},
 	placeholders: {
 		username: '输入您的用户名',

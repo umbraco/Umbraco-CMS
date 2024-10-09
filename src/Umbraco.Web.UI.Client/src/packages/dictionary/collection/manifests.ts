@@ -9,6 +9,7 @@ const collectionManifest: ManifestCollection = {
 	type: 'collection',
 	kind: 'default',
 	alias: UMB_DICTIONARY_COLLECTION_ALIAS,
+	element: () => import('./dictionary-collection.element.js'),
 	name: 'Dictionary Collection',
 	meta: {
 		repositoryAlias: UMB_DICTIONARY_COLLECTION_REPOSITORY_ALIAS,

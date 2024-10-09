@@ -156,7 +156,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 
 	/**
 	 * Set the alias of this property.
-	 * @param {(string | undefined)} alias
+	 * @param {string | undefined} alias - The alias of the property
 	 * @memberof UmbPropertyContext
 	 */
 	public setAlias(alias: string | undefined): void {
@@ -174,7 +174,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 
 	/**
 	 * Set the label of this property.
-	 * @param {(string | undefined)} label
+	 * @param {(string | undefined)} label - The label of the property
 	 * @memberof UmbPropertyContext
 	 */
 	public setLabel(label: string | undefined): void {
@@ -183,7 +183,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 
 	/**
 	 * Get the label of this property.
-	 * @returns {*}  {(string | undefined)}
+	 * @returns {(string | undefined)} - the label
 	 * @memberof UmbPropertyContext
 	 */
 	public getLabel(): string | undefined {
@@ -210,7 +210,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 
 	/**
 	 * Set the appearance of this property.
-	 * @param {(UmbPropertyTypeAppearanceModel | undefined)} appearance
+	 * @param {UmbPropertyTypeAppearanceModel | undefined} appearance - the appearance properties of this property
 	 * @memberof UmbPropertyContext
 	 */
 	public setAppearance(appearance: UmbPropertyTypeAppearanceModel | undefined): void {
@@ -219,7 +219,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 
 	/**
 	 * Get the appearance of this property.
-	 * @returns {*}  {(UmbPropertyTypeAppearanceModel | undefined)}
+	 * @returns {UmbPropertyTypeAppearanceModel | undefined}- the appearance properties of this property
 	 * @memberof UmbPropertyContext
 	 */
 	public getAppearance(): UmbPropertyTypeAppearanceModel | undefined {
@@ -228,7 +228,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 
 	/**
 	 * Set the value of this property.
-	 * @param value {ValueType} the whole value to be set
+	 * @param {unknown} value - the whole value to be set
 	 */
 	public setValue(value: ValueType | undefined): void {
 		const alias = this.#alias.getValue();
@@ -239,7 +239,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 	/**
 	 * Gets the current value of this property.
 	 * Notice this is not reactive, you should us the `value` observable for that.
-	 * @returns {ValueType}
+	 * @returns {unknown} - the current value of this property
 	 */
 	public getValue(): ValueType | undefined {
 		return this.#value.getValue();
@@ -247,7 +247,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 
 	/**
 	 * Set the config of this property.
-	 * @param {(Array<UmbPropertyEditorConfigProperty> | undefined)} config
+	 * @param {Array<UmbPropertyEditorConfigProperty> | undefined} config - Array of configurations for this property
 	 * @memberof UmbPropertyContext
 	 */
 	public setConfig(config: Array<UmbPropertyEditorConfigProperty> | undefined): void {
@@ -256,7 +256,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 
 	/**
 	 * Get the config of this property.
-	 * @returns {*}  {(Array<UmbPropertyEditorConfigProperty> | undefined)}
+	 * @returns {Array<UmbPropertyEditorConfigProperty> | undefined} - Array of configurations for this property
 	 * @memberof UmbPropertyContext
 	 */
 	public getConfig(): Array<UmbPropertyEditorConfigProperty> | undefined {
@@ -265,7 +265,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 
 	/**
 	 * Set the variant ID of this property.
-	 * @param {(UmbVariantId | undefined)} variantId
+	 * @param {UmbVariantId | undefined} variantId - The property Variant ID, not necessary the same as the Property Dataset Context VariantId.
 	 * @memberof UmbPropertyContext
 	 */
 	public setVariantId(variantId: UmbVariantId | undefined): void {
@@ -274,7 +274,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 
 	/**
 	 * Get the variant ID of this property.
-	 * @returns {*}  {(UmbVariantId | undefined)}
+	 * @returns {UmbVariantId | undefined} - The property Variant ID, not necessary the same as the Property Dataset Context VariantId.
 	 * @memberof UmbPropertyContext
 	 */
 	public getVariantId(): UmbVariantId | undefined {
@@ -283,7 +283,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 
 	/**
 	 * Set the validation of this property.
-	 * @param {(UmbPropertyTypeValidationModel | undefined)} validation
+	 * @param {UmbPropertyTypeValidationModel | undefined} validation - Object holding the Validation Properties.
 	 * @memberof UmbPropertyContext
 	 */
 	public setValidation(validation: UmbPropertyTypeValidationModel | undefined): void {
@@ -292,7 +292,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 
 	/**
 	 * Get the validation of this property.
-	 * @returns {*}  {(UmbPropertyTypeValidationModel | undefined)}
+	 * @returns {UmbPropertyTypeValidationModel | undefined} - Object holding the Validation Properties.
 	 * @memberof UmbPropertyContext
 	 */
 	public getValidation(): UmbPropertyTypeValidationModel | undefined {
@@ -301,7 +301,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 
 	/**
 	 * Get the read only state of this property
-	 * @returns {*}  {boolean}
+	 * @returns {boolean} - If property is in read-only mode.
 	 * @memberof UmbPropertyContext
 	 */
 	public getIsReadOnly(): boolean {

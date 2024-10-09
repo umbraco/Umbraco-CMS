@@ -1,12 +1,10 @@
 import type { UmbAllowedMediaTypeModel } from './types.js';
-import { UmbContentTypeStructureServerDataSourceBase } from '@umbraco-cms/backoffice/content-type';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { AllowedMediaTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbContentTypeStructureServerDataSourceBase } from '@umbraco-cms/backoffice/content-type';
+import type { AllowedMediaTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
- *
- 
  * @class UmbMediaTypeStructureServerDataSource
  * @augments {UmbContentTypeStructureServerDataSourceBase}
  */
@@ -20,6 +18,10 @@ export class UmbMediaTypeStructureServerDataSource extends UmbContentTypeStructu
 
 	getMediaTypesOfFileExtension({ fileExtension, skip, take }: { fileExtension: string; skip: number; take: number }) {
 		return getAllowedMediaTypesOfExtension({ fileExtension, skip, take });
+	}
+
+	getMediaTypesOfFolders({ skip, take }: { skip: number; take: number }) {
+		return getAllowedMediaTypesOfFolders({ skip, take });
 	}
 }
 
@@ -40,6 +42,12 @@ const mapper = (item: AllowedMediaTypeModel): UmbAllowedMediaTypeModel => {
 		description: item.description || null,
 		icon: item.icon || null,
 	};
+};
+
+const getAllowedMediaTypesOfFolders = async ({ skip, take }: { skip: number; take: number }) => {
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	const { items } = await MediaTypeService.getItemMediaTypeFolders({ skip, take });
+	return items.map((item) => mapper(item));
 };
 
 const getAllowedMediaTypesOfExtension = async ({

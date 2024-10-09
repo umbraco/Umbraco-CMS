@@ -109,7 +109,6 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 		if (this._isUnsupported) {
 			return html`<umb-unsupported-property
 				.alias=${this._property.alias}
-				.ownerEntityType=${this._ownerEntityType}
 				.schema=${this._propertyEditorSchemaAlias!}></umb-unsupported-property>`;
 		}
 		return html`
