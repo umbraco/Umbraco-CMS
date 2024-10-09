@@ -119,6 +119,32 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             .WhereNotNull();
     }
 
+    public async Task ClearContentMemoryCacheAsync(CancellationToken cancellationToken)
+    {
+        // TODO: This should be done with tags, however this is not implemented yet, so for now we have to naively get all content keys and clear them all.
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        // We have to get ALL document keys in order to be able to remove them from the cache,
+        IEnumerable<Guid> documentKeys = await _databaseCacheRepository.GetContentKeysAsync(Constants.ObjectTypes.Document);
+
+        foreach (Guid documentKey in documentKeys)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            // We'll remove both the draft and published cache
+            await _hybridCache.RemoveAsync(GetCacheKey(documentKey, false), cancellationToken);
+            await _hybridCache.RemoveAsync(GetCacheKey(documentKey, true), cancellationToken);
+        }
+
+        // We have to run seeding again after the cache is cleared
+        await SeedAsync(cancellationToken);
+
+        scope.Complete();
+    }
+
     public async Task SeedAsync(CancellationToken cancellationToken)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();

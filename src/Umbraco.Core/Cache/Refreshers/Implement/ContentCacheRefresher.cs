@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -22,6 +20,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private readonly IDocumentNavigationManagementService _documentNavigationManagementService;
     private readonly IContentService _contentService;
+    private readonly IDocumentCacheService _documentCacheService;
     private readonly IIdKeyMap _idKeyMap;
 
     public ContentCacheRefresher(
@@ -35,7 +34,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         IDomainCacheService domainCacheService,
         IDocumentNavigationQueryService documentNavigationQueryService,
         IDocumentNavigationManagementService documentNavigationManagementService,
-        IContentService contentService)
+        IContentService contentService,
+        IDocumentCacheService documentCacheService)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
@@ -45,6 +45,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         _documentNavigationQueryService = documentNavigationQueryService;
         _documentNavigationManagementService = documentNavigationManagementService;
         _contentService = contentService;
+        _documentCacheService = documentCacheService;
     }
 
     #region Indirect
@@ -106,6 +107,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             }
 
 
+            HandleMemoryCache(payload);
             HandleRouting(payload);
 
             HandleNavigation(payload);
@@ -139,6 +141,16 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         }
 
         base.Refresh(payloads);
+    }
+
+    private void HandleMemoryCache(JsonPayload payload)
+    {
+        if (payload.Key is null)
+        {
+            return;
+        }
+
+        _documentCacheService.ClearContentMemoryCacheAsync(CancellationToken.None).GetAwaiter().GetResult();
     }
 
     private void HandleNavigation(JsonPayload payload)

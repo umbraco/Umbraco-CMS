@@ -161,6 +161,16 @@ AND cmsContentNu.nodeId IS NULL
         return count == 0;
     }
 
+    public async Task<IEnumerable<Guid>> GetContentKeysAsync(Guid nodeObjectType)
+    {
+        Sql<ISqlContext> sql = Sql()
+            .Select<NodeDto>(x => x.UniqueId)
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.NodeObjectType == nodeObjectType);
+
+        return await Database.FetchAsync<Guid>(sql);
+    }
+
     // assumes member tree lock
     public bool VerifyMemberDbCache()
     {

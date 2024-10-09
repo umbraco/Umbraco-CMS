@@ -20,4 +20,6 @@ public interface IDocumentCacheService
     void Rebuild(IReadOnlyCollection<int> contentTypeIds);
 
     IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType);
+
+    Task ClearContentMemoryCacheAsync(CancellationToken cancellationToken);
 }
