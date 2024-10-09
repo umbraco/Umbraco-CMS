@@ -339,12 +339,12 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 						</umb-block-grid-entry>`,
 				)}
 			</div>
-			${this._canCreate ? this.#renderCreateButton() : nothing}
+			${this._canCreate ? this.#renderCreateButtonGroup() : nothing}
 			${this._areaKey ? html` <uui-form-validation-message .for=${this}></uui-form-validation-message>` : nothing}
 		`;
 	}
 
-	#renderCreateButton() {
+	#renderCreateButtonGroup() {
 		if (this._areaKey === null || this._layoutEntries.length === 0) {
 			return html`<uui-button-group id="createButton">
 				<uui-button
