@@ -81,6 +81,6 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbStylesheetTreeIte
 		name: item.name,
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
-		icon: item.isFolder ? undefined : 'icon-brush-alt',
+		icon: item.isFolder ? undefined : 'icon-palette',
 	};
 };
