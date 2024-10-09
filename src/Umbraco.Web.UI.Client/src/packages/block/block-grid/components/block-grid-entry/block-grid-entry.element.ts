@@ -423,36 +423,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 							single
 							>${this._inlineEditingMode ? this.#renderInlineEditBlock() : this.#renderRefBlock()}</umb-extension-slot
 						>
-						<uui-action-bar>
-							${this._showContentEdit && this._workspaceEditContentPath
-								? html`<uui-button
-										label="edit"
-										look="secondary"
-										color=${this._contentInvalid ? 'danger' : ''}
-										href=${this._workspaceEditContentPath}>
-										<uui-icon name="icon-edit"></uui-icon>
-										${this._contentInvalid
-											? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
-											: nothing}
-									</uui-button>`
-								: nothing}
-							${this._hasSettings && this._workspaceEditSettingsPath
-								? html`<uui-button
-										label="Edit settings"
-										look="secondary"
-										color=${this._settingsInvalid ? 'danger' : ''}
-										href=${this._workspaceEditSettingsPath}>
-										<uui-icon name="icon-settings"></uui-icon>
-										${this._settingsInvalid
-											? html`<uui-badge attention color="danger" label="Invalid settings">!</uui-badge>`
-											: nothing}
-									</uui-button>`
-								: nothing}
-							<uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()}>
-								<uui-icon name="icon-remove"></uui-icon>
-							</uui-button>
-						</uui-action-bar>
-
+						${this.#renderActionBar()}
 						${!this._showContentEdit && this._contentInvalid
 							? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
 							: nothing}
@@ -471,6 +442,57 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						: nothing}
 				`
 			: nothing;
+	}
+
+	#renderActionBar() {
+		return html`
+			<uui-action-bar>
+				${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderDeleteAction()}</uui-action-bar
+			>
+		`;
+	}
+
+	#renderEditAction() {
+		return html`
+			${this._showContentEdit && this._workspaceEditContentPath
+				? html`<uui-button
+						label="edit"
+						look="secondary"
+						color=${this._contentInvalid ? 'danger' : ''}
+						href=${this._workspaceEditContentPath}>
+						<uui-icon name="icon-edit"></uui-icon>
+						${this._contentInvalid
+							? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+							: nothing}
+					</uui-button>`
+				: nothing}
+		`;
+	}
+
+	#renderEditSettingsAction() {
+		return html`
+			${this._hasSettings && this._workspaceEditSettingsPath
+				? html`<uui-button
+						label="Edit settings"
+						look="secondary"
+						color=${this._settingsInvalid ? 'danger' : ''}
+						href=${this._workspaceEditSettingsPath}>
+						<uui-icon name="icon-settings"></uui-icon>
+						${this._settingsInvalid
+							? html`<uui-badge attention color="danger" label="Invalid settings">!</uui-badge>`
+							: nothing}
+					</uui-button>`
+				: nothing}
+		`;
+	}
+
+	#renderDeleteAction() {
+		if (this._isReadOnly) return nothing;
+		return html`
+			<uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()}>
+				<uui-icon name="icon-remove"></uui-icon>
+			</uui-button>
+		`;
 	}
 
 	override render() {
