@@ -1,5 +1,4 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../../../entity.js';
-import { UMB_DOCUMENT_TYPE_TREE_ITEM_CHILDREN_COLLECTION_ALIAS } from '../../tree-item-children-collection/constants.js';
 import { UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS } from './constants.js';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
@@ -13,24 +12,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			entityType: UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
 		},
-	},
-	{
-		type: 'workspaceView',
-		kind: 'collection',
-		alias: 'Umb.WorkspaceView.DocumentType.Folder.Collection',
-		name: 'Document Type Folder Collection Workspace View',
-		meta: {
-			label: '#general_design',
-			pathname: 'design',
-			icon: 'icon-member-dashed-line',
-			collectionAlias: UMB_DOCUMENT_TYPE_TREE_ITEM_CHILDREN_COLLECTION_ALIAS,
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS,
-			},
-		],
 	},
 	{
 		type: 'workspaceAction',
