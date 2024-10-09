@@ -3,7 +3,9 @@ using Examine.Lucene.Directories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 
@@ -31,7 +33,7 @@ public static class UmbracoBuilderExtensions
             s =>
             {
                 var baseDir = s.GetRequiredService<IApplicationRoot>().ApplicationRoot;
-
+                IOptions<IndexCreatorSettings> settings = s.GetRequiredService<IOptions<IndexCreatorSettings>>();
                 var tempDir = UmbracoTempEnvFileSystemDirectoryFactory.GetTempPath(
                     s.GetRequiredService<IApplicationIdentifier>(), s.GetRequiredService<IHostingEnvironment>());
 
@@ -43,7 +45,7 @@ public static class UmbracoBuilderExtensions
                         s.GetRequiredService<IApplicationRoot>().ApplicationRoot,
                         s.GetRequiredService<ILockFactory>(),
                         s.GetRequiredService<ILoggerFactory>(),
-                        true,
+                        settings.Value.EnableRecovery,
                     });
             });
 

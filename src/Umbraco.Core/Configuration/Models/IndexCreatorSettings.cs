@@ -13,4 +13,9 @@ public class IndexCreatorSettings
     ///     Gets or sets a value for lucene directory factory type.
     /// </summary>
     public LuceneDirectoryFactory LuceneDirectoryFactory { get; set; }
+
+    /// <summary>
+    ///     Enable main index recovery when it gets corrupted
+    /// </summary>
+    public bool EnableRecovery { get; set; } = true;
 }
