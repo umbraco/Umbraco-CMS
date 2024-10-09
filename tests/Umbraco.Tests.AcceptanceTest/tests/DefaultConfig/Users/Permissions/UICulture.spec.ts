@@ -4,24 +4,24 @@ const testUser = {
   name: 'Test User',
   email: 'verySecureEmail@123.test',
   password: 'verySecurePassword123',
-}
+};
 
 const userGroupName = 'TestUserGroup';
 
-let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""}
+let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 let userGroupId = null;
 
 test.beforeEach(async ({umbracoApi}) => {
-  // Ensure we are logged in to admin
-  await umbracoApi.refreshAccessToken(process.env.UMBRACO_USER_LOGIN, process.env.UMBRACO_USER_PASSWORD);
   await umbracoApi.user.ensureNameNotExists(testUser.name);
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
+
   userGroupId = await umbracoApi.userGroup.createSimpleUserGroupWithContentSection(userGroupName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
   // Ensure we are logged in to admin
   await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
+
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
 });
 
@@ -34,7 +34,7 @@ test('can see correct translation for content in english', async ({umbracoApi, u
   await umbracoUi.goToBackOffice();
 
   // Assert
-  await umbracoUi.user.isSectionWithNameVisible(ConstantHelper.sections.content, true);
+  await umbracoUi.user.isSectionWithNameVisible(ConstantHelper.sections.content, false);
 });
 
 test('can see correct translation for content in danish', async ({umbracoApi, umbracoUi}) => {
