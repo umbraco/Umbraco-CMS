@@ -265,7 +265,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 								standalone
 								name=${ifDefined(this._templateName)}
 								href=${editTemplatePath + 'edit/' + this._templateUnique}>
-								<uui-icon slot="icon" name="icon-newspaper"></uui-icon>
+								<uui-icon slot="icon" name="icon-document-html"></uui-icon>
 								<uui-action-bar slot="actions">
 									<uui-button
 										label=${this.localize.term('general_choose')}

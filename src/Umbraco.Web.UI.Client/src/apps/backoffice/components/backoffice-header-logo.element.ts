@@ -73,12 +73,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 
 						<a href="https://umbraco.com" target="_blank" rel="noopener">Umbraco.com</a>
 
-						${this._isUserAdmin
-							? html`<uui-button
-									@click=${this.#openSystemInformation}
-									look="secondary"
-									label="System information"></uui-button>`
-							: ''}
+						<uui-button @click=${this.#openSystemInformation} look="secondary" label="System information"></uui-button>
 					</div>
 				</umb-popover-layout>
 			</uui-popover-container>

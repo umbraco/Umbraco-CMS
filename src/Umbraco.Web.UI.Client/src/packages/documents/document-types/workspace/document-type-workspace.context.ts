@@ -228,7 +228,7 @@ export class UmbDocumentTypeWorkspaceContext
 
 		switch (presetAlias) {
 			case UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PRESET_TEMPLATE satisfies UmbCreateDocumentTypeWorkspacePresetType: {
-				this.setIcon('icon-notepad');
+				this.setIcon('icon-document-html');
 				this.createTemplateMode = true;
 				break;
 			}

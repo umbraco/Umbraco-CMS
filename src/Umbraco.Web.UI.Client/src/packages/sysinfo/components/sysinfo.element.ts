@@ -4,6 +4,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import { UmbCurrentUserRepository } from '@umbraco-cms/backoffice/current-user';
 
 type ServerKeyValue = {
 	name: string;
@@ -21,23 +22,18 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 	@state()
 	private _buttonState?: UUIButtonState;
 
-	#serverKeyValues: Array<ServerKeyValue> = [];
-	#sysinfoRepository = new UmbSysinfoRepository(this);
-	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+	readonly #serverKeyValues: Array<ServerKeyValue> = [];
+	readonly #sysinfoRepository = new UmbSysinfoRepository(this);
+	readonly #currentUserRepository = new UmbCurrentUserRepository(this);
 
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
-			this.#notificationContext = context;
-		});
-
+	override connectedCallback(): void {
+		super.connectedCallback();
 		this.#populate();
 	}
 
 	async #populate() {
 		this._loading = true;
-		this.#serverKeyValues = [];
+		this.#serverKeyValues.length = 0;
 
 		const [serverTroubleshooting, serverInformation] = await Promise.all([
 			this.#sysinfoRepository.requestTroubleShooting(),
@@ -45,7 +41,7 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 		]);
 
 		if (serverTroubleshooting) {
-			this.#serverKeyValues = serverTroubleshooting.items;
+			this.#serverKeyValues.push(...serverTroubleshooting.items);
 		}
 
 		if (serverInformation) {
@@ -58,6 +54,22 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 		this.#serverKeyValues.push({ name: 'Browser (user agent)', data: navigator.userAgent });
 		this.#serverKeyValues.push({ name: 'Browser language', data: navigator.language });
 		this.#serverKeyValues.push({ name: 'Browser location', data: location.href });
+
+		// User information
+		const { data: currentUser } = await this.#currentUserRepository.requestCurrentUser();
+		if (currentUser) {
+			this.#serverKeyValues.push({ name: 'User is admin', data: currentUser.isAdmin ? 'Yes' : 'No' });
+			this.#serverKeyValues.push({ name: 'User sections', data: currentUser.allowedSections.join(', ') });
+			this.#serverKeyValues.push({ name: 'User culture', data: currentUser.languageIsoCode });
+			this.#serverKeyValues.push({
+				name: 'User languages',
+				data: currentUser.hasAccessToAllLanguages ? 'All' : currentUser.languages.join(', '),
+			});
+			this.#serverKeyValues.push({
+				name: 'User document start nodes',
+				data: currentUser.documentStartNodeUniques.length ? currentUser.documentStartNodeUniques.join(', ') : 'None',
+			});
+		}
 
 		this._systemInformation = this.#renderServerKeyValues();
 		this._loading = false;
@@ -100,6 +112,8 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 	}
 
 	async #copyToClipboard() {
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+
 		try {
 			this._buttonState = 'waiting';
 			const text = `Umbraco system information
@@ -109,7 +123,7 @@ ${this._systemInformation}`;
 			await navigator.clipboard.writeText(textAsCode);
 
 			setTimeout(() => {
-				this.#notificationContext?.peek('positive', {
+				notificationContext?.peek('positive', {
 					data: {
 						headline: 'System information',
 						message: this.localize.term('speechBubbles_copySuccessMessage'),
@@ -119,7 +133,7 @@ ${this._systemInformation}`;
 			}, 250);
 		} catch {
 			this._buttonState = 'failed';
-			this.#notificationContext?.peek('danger', {
+			notificationContext?.peek('danger', {
 				data: {
 					headline: 'System information',
 					message: this.localize.term('speechBubbles_cannotCopyInformation'),

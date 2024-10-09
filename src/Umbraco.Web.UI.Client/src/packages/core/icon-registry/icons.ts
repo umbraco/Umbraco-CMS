@@ -2199,6 +2199,74 @@ name: "icon-umb-manifest",
 
 path: () => import("./icons/icon-umb-manifest.js"),
 },{
+name: "icon-document-3d",
+
+path: () => import("./icons/icon-document-3d.js"),
+},{
+name: "icon-document-medal",
+
+path: () => import("./icons/icon-document-medal.js"),
+},{
+name: "icon-document-chart-bar",
+
+path: () => import("./icons/icon-document-chart-bar.js"),
+},{
+name: "icon-document-chart-graph",
+
+path: () => import("./icons/icon-document-chart-graph.js"),
+},{
+name: "icon-document-html",
+
+path: () => import("./icons/icon-document-html.js"),
+},{
+name: "icon-document-js",
+
+path: () => import("./icons/icon-document-js.js"),
+},{
+name: "icon-document-key",
+
+path: () => import("./icons/icon-document-key.js"),
+},{
+name: "icon-document-search",
+
+path: () => import("./icons/icon-document-search.js"),
+},{
+name: "icon-document-settings",
+
+path: () => import("./icons/icon-document-settings.js"),
+},{
+name: "icon-document-spreadsheet",
+
+path: () => import("./icons/icon-document-spreadsheet.js"),
+},{
+name: "icon-document-command",
+
+path: () => import("./icons/icon-document-command.js"),
+},{
+name: "icon-document-command",
+
+path: () => import("./icons/icon-document-command.js"),
+},{
+name: "icon-document-font",
+
+path: () => import("./icons/icon-document-font.js"),
+},{
+name: "icon-document-user",
+
+path: () => import("./icons/icon-document-user.js"),
+},{
+name: "icon-document-image",
+
+path: () => import("./icons/icon-document-image.js"),
+},{
+name: "icon-document-play",
+
+path: () => import("./icons/icon-document-play.js"),
+},{
+name: "icon-document-play",
+
+path: () => import("./icons/icon-document-play.js"),
+},{
 name: "icon-facebook",
 
 path: () => import("./icons/icon-facebook.js"),

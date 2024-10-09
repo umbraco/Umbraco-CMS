@@ -101,6 +101,10 @@ export class UmbDocumentWorkspaceContext
 	// TODo: Optimize this so it uses either a App Language Context? [NL]
 	#languageRepository = new UmbLanguageCollectionRepository(this);
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
+	/**
+	 * @private
+	 * @description - Should not be used by external code.
+	 */
 	public readonly languages = this.#languages.asObservable();
 
 	#serverValidation = new UmbServerModelValidatorContext(this);
@@ -594,8 +598,15 @@ export class UmbDocumentWorkspaceContext
 		// Tell the server that we're entering preview mode.
 		await new UmbDocumentPreviewRepository(this).enter();
 
-		const preview = window.open(`preview?id=${unique}&culture=${culture}`, 'umbpreview');
-		preview?.focus();
+		const previewUrl = new URL('preview', window.location.origin);
+		previewUrl.searchParams.set('id', unique);
+
+		if (culture && culture !== UMB_INVARIANT_CULTURE) {
+			previewUrl.searchParams.set('culture', culture);
+		}
+
+		const previewWindow = window.open(previewUrl.toString(), `umbpreview-${unique}`);
+		previewWindow?.focus();
 	}
 
 	async #handleSaveAndPublish() {

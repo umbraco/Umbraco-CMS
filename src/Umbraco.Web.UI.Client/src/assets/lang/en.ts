@@ -2573,6 +2573,7 @@ export default {
 		configureArea: 'Configure area',
 		deleteArea: 'Delete area',
 		addColumnSpanOption: 'Add spanning %0% columns option',
+		createThisFor: 'Create %0% for %1%',
 		insertBlock: 'Insert Block',
 		labelInlineMode: 'Display inline with text',
 	},
