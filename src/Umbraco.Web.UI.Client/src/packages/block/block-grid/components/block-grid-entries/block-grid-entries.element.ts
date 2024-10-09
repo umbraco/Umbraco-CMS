@@ -179,6 +179,9 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	@state()
 	private _layoutEntries: Array<UmbBlockGridLayoutModel> = [];
 
+	@state()
+	private _isReadOnly: boolean = false;
+
 	constructor() {
 		super();
 
@@ -238,6 +241,12 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 					this._styleElement.href = stylesheet;
 				},
 				'observeStylesheet',
+			);
+
+			this.observe(
+				manager.readOnlyState.isReadOnly,
+				(isReadOnly) => (this._isReadOnly = isReadOnly),
+				'observeIsReadOnly',
 			);
 		});
 
