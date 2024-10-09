@@ -101,6 +101,10 @@ export class UmbDocumentWorkspaceContext
 	// TODo: Optimize this so it uses either a App Language Context? [NL]
 	#languageRepository = new UmbLanguageCollectionRepository(this);
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
+	/**
+	 * @private
+	 * @description - Should not be used by external code.
+	 */
 	public readonly languages = this.#languages.asObservable();
 
 	#serverValidation = new UmbServerModelValidatorContext(this);
