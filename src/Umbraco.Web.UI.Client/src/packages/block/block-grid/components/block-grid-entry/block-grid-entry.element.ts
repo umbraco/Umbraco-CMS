@@ -414,14 +414,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	#renderBlock() {
 		return this.contentKey && this._contentTypeAlias
 			? html`
-					${this._createBeforePath && this._showInlineCreateBefore
-						? html`<uui-button-inline-create
-								href=${this._createBeforePath}
-								label=${this.localize.term('blockEditor_addBlock')}
-								style=${this._inlineCreateAboveWidth
-									? `width: ${this._inlineCreateAboveWidth}`
-									: ''}></uui-button-inline-create>`
-						: nothing}
+					${this.#renderCreateBeforeInlineButton()}
 					<div class="umb-block-grid__block" part="umb-block-grid__block">
 						<umb-extension-slot
 							.filter=${this.#extensionSlotFilterMethod}
@@ -443,14 +436,35 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 								</umb-block-scale-handler>`
 							: nothing}
 					</div>
-					${this._createAfterPath && this._showInlineCreateAfter
-						? html`<uui-button-inline-create
-								vertical
-								label=${this.localize.term('blockEditor_addBlock')}
-								href=${this._createAfterPath}></uui-button-inline-create>`
-						: nothing}
+					${this.#renderCreateAfterInlineButton()}
 				`
 			: nothing;
+	}
+
+	#renderCreateBeforeInlineButton() {
+		if (this._isReadOnly) return nothing;
+		if (!this._createBeforePath) return nothing;
+		if (!this._showInlineCreateBefore) return nothing;
+
+		return html`<uui-button-inline-create
+			href=${this._createBeforePath}
+			label=${this.localize.term('blockEditor_addBlock')}
+			style=${this._inlineCreateAboveWidth
+				? `width: ${this._inlineCreateAboveWidth}`
+				: ''}></uui-button-inline-create>`;
+	}
+
+	#renderCreateAfterInlineButton() {
+		if (this._isReadOnly) return nothing;
+		if (!this._createAfterPath) return nothing;
+		if (!this._showInlineCreateAfter) return nothing;
+
+		return html`
+			<uui-button-inline-create
+				vertical
+				label=${this.localize.term('blockEditor_addBlock')}
+				href=${this._createAfterPath}></uui-button-inline-create>
+		`;
 	}
 
 	#renderActionBar() {
