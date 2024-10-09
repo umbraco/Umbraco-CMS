@@ -24,7 +24,6 @@ import {
 	type UmbBlockWorkspaceOriginData,
 	type UmbBlockWorkspaceData,
 } from '@umbraco-cms/backoffice/block';
-import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
