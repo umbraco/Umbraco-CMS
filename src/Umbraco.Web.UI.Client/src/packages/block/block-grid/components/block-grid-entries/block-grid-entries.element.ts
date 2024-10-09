@@ -352,12 +352,14 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 					label=${this._singleBlockTypeName
 						? this.localize.term('blockEditor_addThis', [this._singleBlockTypeName])
 						: this.localize.term('blockEditor_addBlock')}
-					href=${this.#context.getPathForCreateBlock(-1) ?? ''}></uui-button>
+					href=${this.#context.getPathForCreateBlock(-1) ?? ''}
+					?disabled=${this._isReadOnly}></uui-button>
 				${this._areaKey === null
 					? html` <uui-button
 							label=${this.localize.term('content_createFromClipboard')}
 							look="placeholder"
-							href=${this.#context.getPathForClipboard(-1) ?? ''}>
+							href=${this.#context.getPathForClipboard(-1) ?? ''}
+							?disabled=${this._isReadOnly}>
 							<uui-icon name="icon-paste-in"></uui-icon>
 						</uui-button>`
 					: nothing}
