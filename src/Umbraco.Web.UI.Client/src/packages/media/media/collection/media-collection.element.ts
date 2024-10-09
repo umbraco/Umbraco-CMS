@@ -54,6 +54,7 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 			<umb-media-collection-toolbar slot="header"></umb-media-collection-toolbar>
 			${when(this._progress >= 0, () => html`<uui-loader-bar progress=${this._progress}></uui-loader-bar>`)}
 			<umb-dropzone
+				multiple
 				.parentUnique=${this._unique}
 				@complete=${this.#onComplete}
 				@progress=${this.#onProgress}></umb-dropzone>

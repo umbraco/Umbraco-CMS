@@ -10,13 +10,13 @@ export class UmbDropzoneElement extends UmbLitElement {
 	parentUnique: string | null = null;
 
 	@property({ type: Boolean })
-	multiple: boolean = true;
-
-	@property({ type: Boolean })
 	createAsTemporary: boolean = false;
 
 	@property({ type: String })
 	accept?: string;
+
+	@property({ type: Boolean, reflect: true })
+	multiple: boolean = false;
 
 	@property({ type: Boolean, reflect: true })
 	disabled = false;

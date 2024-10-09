@@ -346,7 +346,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	#renderDropzone() {
 		if (this.readonly) return nothing;
 		if (this._cards && this._cards.length >= this.max) return;
-		return html`<umb-dropzone @complete=${this.#onUploadCompleted}></umb-dropzone>`;
+		return html`<umb-dropzone ?multiple=${this.max > 1} @complete=${this.#onUploadCompleted}></umb-dropzone>`;
 	}
 
 	#renderItems() {

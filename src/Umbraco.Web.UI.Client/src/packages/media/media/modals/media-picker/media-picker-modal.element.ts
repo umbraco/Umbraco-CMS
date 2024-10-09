@@ -168,7 +168,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 
 	#renderBody() {
 		return html`${this.#renderToolbar()}
-		<umb-dropzone id="dropzone" @complete=${() => this.#loadMediaFolder()} .parentUnique=${this._currentMediaEntity.unique}></umb-dropzone>
+		<umb-dropzone id="dropzone" multiple @complete=${() => this.#loadMediaFolder()} .parentUnique=${this._currentMediaEntity.unique}></umb-dropzone>
 				${
 					!this._mediaFilteredList.length
 						? html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`
