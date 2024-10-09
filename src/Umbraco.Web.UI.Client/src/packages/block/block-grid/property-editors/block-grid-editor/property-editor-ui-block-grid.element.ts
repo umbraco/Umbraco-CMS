@@ -146,8 +146,6 @@ export class UmbPropertyEditorUIBlockGridElement
 							message: '',
 						};
 
-						debugger;
-
 						this.#managerContext.readOnlyState.addState(state);
 					} else {
 						this.#managerContext.readOnlyState.removeState(unique);
