@@ -67,7 +67,8 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<umb-body-layout header-transparent>
+			<umb-body-layout header-transparent class=${this._hasItems ? 'has-items' : ''}>
+				<umb-router-slot id="router" .routes=${this._routes}></umb-router-slot>
 				${this.renderToolbar()} ${this._hasItems ? this.#renderContent() : this.#renderEmptyState()}
 			</umb-body-layout>
 		`;
@@ -86,10 +87,7 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	}
 
 	#renderContent() {
-		return html`
-			<umb-router-slot .routes=${this._routes}></umb-router-slot>
-			${this.renderPagination()} ${this.renderSelectionActions()}
-		`;
+		return html` ${this.renderPagination()} ${this.renderSelectionActions()} `;
 	}
 
 	#renderEmptyState() {
@@ -109,8 +107,16 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 				height: 100%;
 			}
 
+			#router {
+				display: none;
+			}
+
+			.has-items #router {
+				display: block;
+			}
+
 			#empty-state {
-				height: 100%;
+				height: 80%;
 				align-content: center;
 				text-align: center;
 			}
