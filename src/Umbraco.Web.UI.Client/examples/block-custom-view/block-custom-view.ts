@@ -32,7 +32,8 @@ export class ExampleBlockCustomView extends UmbElementMixin(LitElement) implemen
 				display: block;
 				height: 100%;
 				box-sizing: border-box;
-				background-color: #dddddd;
+				background-color: red;
+				color: white;
 				border-radius: 9px;
 				padding: 12px;
 			}

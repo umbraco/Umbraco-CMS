@@ -588,9 +588,9 @@ export default {
 	},
 	dictionaryItem: {
 		description:
-			"\n      Rediger de forskellige sprogversioner for ordbogselementet '%0%' herunder.<br />Du tilføjer flere sprog under 'sprog' i menuen til venstre </key>\n      ",
+			"Rediger de forskellige sprogversioner for ordbogselementet '%0%' herunder. Du tilføjer flere sprog under 'sprog' i menuen til venstre.",
 		displayName: 'Kulturnavn',
-		changeKeyError: "\n      Navnet '%0%' eksisterer allerede.\n   ",
+		changeKeyError: "Navnet '%0%' eksisterer allerede.",
 		overviewTitle: 'Ordbogsoversigt',
 	},
 	examineManagement: {
@@ -2285,7 +2285,7 @@ export default {
 		forceHideContentEditorHelp: 'Skjul indholds redigerings knappen samt indholdseditoren i Blok Redigerings vinduet',
 		gridInlineEditing: 'Direkte redigering',
 		gridInlineEditingHelp:
-			'Tilføjer direkte redigering a det første felt. Yderligere felter optræder kun i redigerings vinduet.',
+			'Tilføjer direkte redigering af det første felt. Yderligere felter optræder kun i redigerings vinduet.',
 		blockHasChanges: 'Du har lavet ændringer til dette indhold. Er du sikker på at du vil kassere dem?',
 		confirmCancelBlockCreationHeadline: 'Annuller oprettelse?',
 		confirmCancelBlockCreationMessage: 'Er du sikker på at du vil annullere oprettelsen.',
@@ -2361,6 +2361,9 @@ export default {
 		allowBlockInAreas: 'Allow in areas',
 		allowBlockInAreasHelp:
 			'Make this block available by default within the areas of other Blocks (unless explicit permissions are set for these areas).',
+		createThisFor: 'Opret %0% for %1%',
+		insertBlock: 'Indsæt Block',
+		labelInlineMode: 'Indsæt på linje med tekst',
 	},
 	contentTemplatesDashboard: {
 		whatHeadline: 'Hvad er Indholdsskabeloner?',

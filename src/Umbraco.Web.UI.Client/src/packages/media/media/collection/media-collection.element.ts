@@ -4,8 +4,6 @@ import type { UmbMediaCollectionContext } from './media-collection.context.js';
 import { UMB_MEDIA_COLLECTION_CONTEXT } from './media-collection.context-token.js';
 import { customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
-import type { UmbProgressEvent } from '@umbraco-cms/backoffice/event';
-
 import './media-collection-toolbar.element.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -32,7 +30,7 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		});
 	}
 
-	async #onChange() {
+	async #onComplete() {
 		this._progress = -1;
 		this.#mediaCollection?.requestCollection();
 
@@ -44,8 +42,11 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		eventContext.dispatchEvent(event);
 	}
 
-	#onProgress(event: UmbProgressEvent) {
-		this._progress = event.progress;
+	#onProgress(event: ProgressEvent) {
+		this._progress = (event.loaded / event.total) * 100;
+		if (this._progress >= 100) {
+			this._progress = -1;
+		}
 	}
 
 	protected override renderToolbar() {
@@ -53,8 +54,9 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 			<umb-media-collection-toolbar slot="header"></umb-media-collection-toolbar>
 			${when(this._progress >= 0, () => html`<uui-loader-bar progress=${this._progress}></uui-loader-bar>`)}
 			<umb-dropzone
+				multiple
 				.parentUnique=${this._unique}
-				@change=${this.#onChange}
+				@complete=${this.#onComplete}
 				@progress=${this.#onProgress}></umb-dropzone>
 		`;
 	}

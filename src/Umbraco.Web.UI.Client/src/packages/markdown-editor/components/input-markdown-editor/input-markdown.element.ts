@@ -12,7 +12,6 @@ import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { marked } from '@umbraco-cms/backoffice/external/marked';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { DOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
 import { UmbChangeEvent, type UmbInputEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -22,6 +21,7 @@ import { UmbCodeEditorLoadedEvent } from '@umbraco-cms/backoffice/code-editor';
 import type { UmbCodeEditorController, UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { sanitizeHTML } from '@umbraco-cms/backoffice/utils';
 
 const elementName = 'umb-input-markdown';
 
@@ -560,7 +560,7 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, 
 	#renderPreview() {
 		if (!this.preview || !this.value) return;
 		const markdownAsHtml = marked.parse(this.value as string) as string;
-		const sanitizedHtml = markdownAsHtml ? DOMPurify.sanitize(markdownAsHtml) : '';
+		const sanitizedHtml = markdownAsHtml ? sanitizeHTML(markdownAsHtml) : '';
 		return html`<uui-scroll-container id="preview">${unsafeHTML(sanitizedHtml)}</uui-scroll-container>`;
 	}
 

@@ -364,9 +364,9 @@ export default {
 	},
 	dictionaryItem: {
 		description:
-			'\n    Edytuj różne wersje językowe dla elementu słownika \'<em>%0%</em>\' poniżej.<br/>\n    Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.',
+			'Edytuj różne wersje językowe dla elementu słownika \'%0%\' poniżej. Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.',
 		displayName: 'Nazwa języka',
-		changeKeyError: "\n      Klucz '%0%' już istnieje.\n   ",
+		changeKeyError: "Klucz '%0%' już istnieje.",
 	},
 	placeholders: {
 		username: 'Wpisz nazwę użytkownika',

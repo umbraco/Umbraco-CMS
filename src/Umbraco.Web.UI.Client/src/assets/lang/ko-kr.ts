@@ -204,7 +204,7 @@ export default {
 	},
 	dictionaryItem: {
 		description:
-			"\n    '<em>%0%</em>'사전 항목 아래에 다른 언어버전들을 편집하세요<br/>왼쪽 '언어'메뉴를 사용하여 추가 언어들을 설정할 수 있습니다.\n ",
+			"'%0%'사전 항목 아래에 다른 언어버전들을 편집하세요<br/>왼쪽 '언어'메뉴를 사용하여 추가 언어들을 설정할 수 있습니다.",
 		displayName: '국가명',
 	},
 	editdatatype: {

@@ -71,6 +71,6 @@ const mapper = (item: NamedEntityTreeItemResponseModel): UmbTemplateTreeItemMode
 		entityType: UMB_TEMPLATE_ENTITY_TYPE,
 		hasChildren: item.hasChildren,
 		isFolder: false,
-		icon: 'icon-newspaper',
+		icon: 'icon-document-html',
 	};
 };

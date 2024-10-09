@@ -590,9 +590,9 @@ export default {
 	},
 	dictionaryItem: {
 		description:
-			"\n    Bearbeiten Sie nachfolgend die verschiedenen Sprachversionen für den Wörterbucheintrag '<em>%0%</em>'.\n    <br/>Unter dem links angezeigten Menüpunkt 'Sprachen' können Sie weitere hinzufügen.",
+			"Bearbeiten Sie nachfolgend die verschiedenen Sprachversionen für den Wörterbucheintrag '%0%'.<br/>Unter dem links angezeigten Menüpunkt 'Sprachen' können Sie weitere hinzufügen.",
 		displayName: 'Name der Kultur',
-		changeKeyError: "\n      Der Wert '%0%' ist bereits vorhanden.\n   ",
+		changeKeyError: "Der Wert '%0%' ist bereits vorhanden.",
 		overviewTitle: 'Wörterbuch Übersicht',
 	},
 	examineManagement: {

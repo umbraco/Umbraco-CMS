@@ -51,7 +51,7 @@ export class UmbScriptCreateOptionsModalElement extends UmbModalBaseElement<UmbS
 				<uui-box>
 					<!-- TODO: construct url -->
 					<uui-menu-item href=${this.#getCreateHref()} label="New Javascript file" @click=${this.#onNavigate}>
-						<uui-icon slot="icon" name="icon-article"></uui-icon>}
+						<uui-icon slot="icon" name="icon-document-js"></uui-icon>}
 					</uui-menu-item>
 
 					<uui-menu-item @click=${this.#onCreateFolderClick} label="New Folder...">

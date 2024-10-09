@@ -250,8 +250,10 @@ export default {
 	},
 	dictionaryItem: {
 		description:
-			"Rediger de forskjellige språkversjonene for ordbokelementet '<em>%0%</em>' under.<br/>Du kan legge til flere språk under 'språk' i menyen til venstre.",
+			"Rediger de forskjellige språkversjonene for ordbokelementet '%0%' under. Du kan legge til flere språk under 'språk' i menyen til venstre.",
 		displayName: 'Språk',
+		changeKeyError: "Kan ikke endre nøkkel for '%0%' fordi det allerede finnes en oversettelse for denne nøkkelen",
+		overviewTitle: 'Ordbok',
 	},
 	placeholders: {
 		username: 'Skriv inn ditt brukernavn',
