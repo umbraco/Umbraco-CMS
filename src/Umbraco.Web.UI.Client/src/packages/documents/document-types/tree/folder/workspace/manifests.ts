@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../../../entity.js';
-import { UMB_DOCUMENT_TYPE_FOLDER_COLLECTION_ALIAS } from '../collection/constants.js';
+import { UMB_DOCUMENT_TYPE_TREE_ITEM_CHILDREN_COLLECTION_ALIAS } from '../../tree-item-children-collection/constants.js';
 import { UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS } from './constants.js';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
@@ -23,7 +23,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: '#general_design',
 			pathname: 'design',
 			icon: 'icon-member-dashed-line',
-			collectionAlias: UMB_DOCUMENT_TYPE_FOLDER_COLLECTION_ALIAS,
+			collectionAlias: UMB_DOCUMENT_TYPE_TREE_ITEM_CHILDREN_COLLECTION_ALIAS,
 		},
 		conditions: [
 			{

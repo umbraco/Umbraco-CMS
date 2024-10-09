@@ -1,10 +1,13 @@
-import { UmbDocumentTypeTreeRepository } from '../../document-type-tree.repository.js';
+import { UmbDocumentTypeTreeRepository } from '../document-type-tree.repository.js';
 import type { UmbCollectionFilterModel, UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_ENTITY_CONTEXT, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
-export class UmbDocumentTypeFolderCollectionRepository extends UmbRepositoryBase implements UmbCollectionRepository {
+export class UmbDocumentTypeTreeItemChildrenCollectionRepository
+	extends UmbRepositoryBase
+	implements UmbCollectionRepository
+{
 	#treeRepository = new UmbDocumentTypeTreeRepository(this);
 
 	constructor(host: UmbControllerHost) {
@@ -40,4 +43,4 @@ export class UmbDocumentTypeFolderCollectionRepository extends UmbRepositoryBase
 	}
 }
 
-export { UmbDocumentTypeFolderCollectionRepository as api };
+export { UmbDocumentTypeTreeItemChildrenCollectionRepository as api };
