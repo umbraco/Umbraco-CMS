@@ -4,6 +4,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import { UmbCurrentUserRepository } from '@umbraco-cms/backoffice/current-user';
 
 type ServerKeyValue = {
 	name: string;
@@ -23,6 +24,7 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 
 	readonly #serverKeyValues: Array<ServerKeyValue> = [];
 	readonly #sysinfoRepository = new UmbSysinfoRepository(this);
+	readonly #currentUserRepository = new UmbCurrentUserRepository(this);
 
 	override connectedCallback(): void {
 		super.connectedCallback();
@@ -52,6 +54,22 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 		this.#serverKeyValues.push({ name: 'Browser (user agent)', data: navigator.userAgent });
 		this.#serverKeyValues.push({ name: 'Browser language', data: navigator.language });
 		this.#serverKeyValues.push({ name: 'Browser location', data: location.href });
+
+		// User information
+		const { data: currentUser } = await this.#currentUserRepository.requestCurrentUser();
+		if (currentUser) {
+			this.#serverKeyValues.push({ name: 'User is admin', data: currentUser.isAdmin ? 'Yes' : 'No' });
+			this.#serverKeyValues.push({ name: 'User sections', data: currentUser.allowedSections.join(', ') });
+			this.#serverKeyValues.push({ name: 'User culture', data: currentUser.languageIsoCode });
+			this.#serverKeyValues.push({
+				name: 'User languages',
+				data: currentUser.hasAccessToAllLanguages ? 'All' : currentUser.languages.join(', '),
+			});
+			this.#serverKeyValues.push({
+				name: 'User document start nodes',
+				data: currentUser.documentStartNodeUniques.length ? currentUser.documentStartNodeUniques.join(', ') : 'None',
+			});
+		}
 
 		this._systemInformation = this.#renderServerKeyValues();
 		this._loading = false;
