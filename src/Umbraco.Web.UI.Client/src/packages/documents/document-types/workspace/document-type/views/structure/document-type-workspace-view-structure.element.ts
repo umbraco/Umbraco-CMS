@@ -1,5 +1,5 @@
 import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
-import type { UmbInputDocumentTypeElement } from '../../../components/input-document-type/input-document-type.element.js';
+import type { UmbInputDocumentTypeElement } from '../../../../components/input-document-type/input-document-type.element.js';
 import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from '../../document-type-workspace.context-token.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
