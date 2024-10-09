@@ -21,23 +21,17 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 	@state()
 	private _buttonState?: UUIButtonState;
 
-	#serverKeyValues: Array<ServerKeyValue> = [];
-	#sysinfoRepository = new UmbSysinfoRepository(this);
-	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+	readonly #serverKeyValues: Array<ServerKeyValue> = [];
+	readonly #sysinfoRepository = new UmbSysinfoRepository(this);
 
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
-			this.#notificationContext = context;
-		});
-
+	override connectedCallback(): void {
+		super.connectedCallback();
 		this.#populate();
 	}
 
 	async #populate() {
 		this._loading = true;
-		this.#serverKeyValues = [];
+		this.#serverKeyValues.length = 0;
 
 		const [serverTroubleshooting, serverInformation] = await Promise.all([
 			this.#sysinfoRepository.requestTroubleShooting(),
@@ -45,7 +39,7 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 		]);
 
 		if (serverTroubleshooting) {
-			this.#serverKeyValues = serverTroubleshooting.items;
+			this.#serverKeyValues.push(...serverTroubleshooting.items);
 		}
 
 		if (serverInformation) {
@@ -100,6 +94,8 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 	}
 
 	async #copyToClipboard() {
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+
 		try {
 			this._buttonState = 'waiting';
 			const text = `Umbraco system information
@@ -109,7 +105,7 @@ ${this._systemInformation}`;
 			await navigator.clipboard.writeText(textAsCode);
 
 			setTimeout(() => {
-				this.#notificationContext?.peek('positive', {
+				notificationContext?.peek('positive', {
 					data: {
 						headline: 'System information',
 						message: this.localize.term('speechBubbles_copySuccessMessage'),
@@ -119,7 +115,7 @@ ${this._systemInformation}`;
 			}, 250);
 		} catch {
 			this._buttonState = 'failed';
-			this.#notificationContext?.peek('danger', {
+			notificationContext?.peek('danger', {
 				data: {
 					headline: 'System information',
 					message: this.localize.term('speechBubbles_cannotCopyInformation'),
