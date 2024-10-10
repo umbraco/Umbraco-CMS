@@ -16,6 +16,9 @@ export class UmbExampleValidationContextDashboard extends UmbLitElement {
 	@state()
   messages? : any[]
 
+	@state()
+	errors : number = 0;
+
 	/**
 	 *
 	 */
@@ -29,6 +32,9 @@ export class UmbExampleValidationContextDashboard extends UmbLitElement {
         this.messages = messages;
       },'observeValidationMessages')
 
+			this.validation.messages.messagesOfPathAndDescendant('$.form').subscribe((value)=>{
+				this.errors = value.length;
+			})
 
     });
 	}
@@ -42,14 +48,16 @@ export class UmbExampleValidationContextDashboard extends UmbLitElement {
 	}
 
 	#handleAddServerValidationError() {
-		this.validation.messages.addMessage('server','$.name','Name server-error message','4875e113-cd0c-4c57-ac92-53d677ba31ec');
-		this.validation.messages.addMessage('server','$.email','Email server-error message','4a9e5219-2dbd-4ce3-8a79-014eb6b12428');
+		this.validation.messages.addMessage('server','$.form.name','Name server-error message','4875e113-cd0c-4c57-ac92-53d677ba31ec');
+		this.validation.messages.addMessage('server','$.form.email','Email server-error message','4a9e5219-2dbd-4ce3-8a79-014eb6b12428');
 	}
 
 	override render() {
 		return html`
 			<uui-box>
 				This is a element with a Validation Context.
+				<hr/>
+				Errors: ${this.errors}
 
 				<uui-form>
 					<form>
@@ -60,7 +68,7 @@ export class UmbExampleValidationContextDashboard extends UmbLitElement {
 								type="text"
 								.value=${this.name}
 								@input=${(e: InputEvent)=>this.name = (e.target as HTMLInputElement).value}
-								${umbBindToValidation(this,'$.name',this.name)}
+								${umbBindToValidation(this,'$.form.name',this.name)}
 								required></uui-input>
 						</uui-form-validation-message>
 						</div>
@@ -70,18 +78,15 @@ export class UmbExampleValidationContextDashboard extends UmbLitElement {
 								type="email"
 								.value=${this.email}
 								@input=${(e: InputEvent)=>this.email = (e.target as HTMLInputElement).value}
-								${umbBindToValidation(this,'$.email',this.email)}
+								${umbBindToValidation(this,'$.form.email',this.email)}
 								required></uui-input>
 						</uui-form-validation-message>
 					</form>
 				</uui-form>
 				<button @click=${this.#handleValidateNow} title="Click to trigger validation on the validation context">Validate now</button>
 				<button @click=${this.#handleAddServerValidationError} title="">Add server error</button>
-
 				<hr/>
 				<pre>${JSON.stringify(this.messages ?? [],null,3)}</pre>
-
-
 			</uui-box>
 		`
 	}
