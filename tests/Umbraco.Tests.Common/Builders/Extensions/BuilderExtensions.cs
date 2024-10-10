@@ -233,8 +233,8 @@ public static class BuilderExtensions
     }
 
     public static T WithPropertyValues<T>(
-        this T builder, 
-        object propertyValues, 
+        this T builder,
+        object propertyValues,
         string? culture = null,
         string? segment = null)
         where T : IWithPropertyValues
