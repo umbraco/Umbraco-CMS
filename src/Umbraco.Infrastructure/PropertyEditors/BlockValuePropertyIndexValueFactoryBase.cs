@@ -9,12 +9,11 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-// TODO KJA: rename to BlockValuePropertyIndexValueFactoryBase
-internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized> : JsonPropertyIndexValueFactoryBase<TSerialized>
+internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : JsonPropertyIndexValueFactoryBase<TSerialized>
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
 
-    protected NestedPropertyIndexValueFactoryBase(
+    protected BlockValuePropertyIndexValueFactoryBase(
         PropertyEditorCollection propertyEditorCollection,
         IJsonSerializer jsonSerializer,
         IOptionsMonitor<IndexingSettings> indexingSettings)

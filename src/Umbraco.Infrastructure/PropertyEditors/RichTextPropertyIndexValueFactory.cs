@@ -8,7 +8,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal class RichTextPropertyIndexValueFactory : NestedPropertyIndexValueFactoryBase<RichTextEditorValue>, IRichTextPropertyIndexValueFactory
+internal class RichTextPropertyIndexValueFactory : BlockValuePropertyIndexValueFactoryBase<RichTextEditorValue>, IRichTextPropertyIndexValueFactory
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ILogger<RichTextPropertyIndexValueFactory> _logger;

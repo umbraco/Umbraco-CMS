@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Serialization;
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 internal class BlockValuePropertyIndexValueFactory :
-    NestedPropertyIndexValueFactoryBase<BlockValuePropertyIndexValueFactory.IndexValueFactoryBlockValue>,
+    BlockValuePropertyIndexValueFactoryBase<BlockValuePropertyIndexValueFactory.IndexValueFactoryBlockValue>,
     IBlockValuePropertyIndexValueFactory
 {
     public BlockValuePropertyIndexValueFactory(
