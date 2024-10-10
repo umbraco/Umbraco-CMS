@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PublishedCache;
@@ -36,7 +36,6 @@ public class DocumentHybridCacheTemplateTests : UmbracoIntegrationTestWithConten
         // Assert
         Assert.AreEqual(updateContentResult.Status, ContentEditingOperationStatus.Success);
         var textPageAfter = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
-        // Should this not be null?
         Assert.AreEqual(textPageAfter.TemplateId, null);
     }
 }
