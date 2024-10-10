@@ -22,8 +22,14 @@ public static class FriendlyPublishedContentExtensions
     private static IPublishedContentCache PublishedContentCache { get; } =
         StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>();
 
+    private static IPublishedMediaCache PublishedMediaCache { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IPublishedMediaCache>();
+
     private static IDocumentNavigationQueryService DocumentNavigationQueryService { get; } =
         StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+
+    private static IMediaNavigationQueryService MediaNavigationQueryService { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>();
 
     private static IPublishedModelFactory PublishedModelFactory { get; } =
         StaticServiceProvider.Instance.GetRequiredService<IPublishedModelFactory>();
@@ -60,6 +66,33 @@ public static class FriendlyPublishedContentExtensions
 
     private static IMemberTypeService MemberTypeService { get; } =
         StaticServiceProvider.Instance.GetRequiredService<IMemberTypeService>();
+
+    private static INavigationQueryService GetNavigationQueryService(IPublishedContent content)
+    {
+        switch (content.ContentType.ItemType)
+        {
+            case PublishedItemType.Content:
+                return DocumentNavigationQueryService;
+            case PublishedItemType.Media:
+                return MediaNavigationQueryService;
+            default:
+                throw new NotSupportedException("Unsupported content type.");
+        }
+
+    }
+
+    private static IPublishedCache GetPublishedCache(IPublishedContent content)
+    {
+        switch (content.ContentType.ItemType)
+        {
+            case PublishedItemType.Content:
+                return PublishedContentCache;
+            case PublishedItemType.Media:
+                return PublishedMediaCache;
+            default:
+                throw new NotSupportedException("Unsupported content type.");
+        }
+    }
 
     /// <summary>
     ///     Creates a strongly typed published content model for an internal published content.
@@ -207,7 +240,7 @@ public static class FriendlyPublishedContentExtensions
     ///     set to 1.
     /// </remarks>
     public static IPublishedContent Root(this IPublishedContent content)
-        => content.Root(PublishedContentCache, DocumentNavigationQueryService);
+        => content.Root(GetPublishedCache(content), GetNavigationQueryService(content));
 
     /// <summary>
     ///     Gets the root content (ancestor or self at level 1) for the specified <paramref name="content" /> if it's of the
@@ -226,7 +259,7 @@ public static class FriendlyPublishedContentExtensions
     /// </remarks>
     public static T? Root<T>(this IPublishedContent content)
         where T : class, IPublishedContent
-        => content.Root<T>(PublishedContentCache, DocumentNavigationQueryService);
+        => content.Root<T>(GetPublishedCache(content), GetNavigationQueryService(content));
 
     /// <summary>
     ///     Gets the parent of the content item.
@@ -236,7 +269,7 @@ public static class FriendlyPublishedContentExtensions
     /// <returns>The parent of content of the specified content type or <c>null</c>.</returns>
     public static T? Parent<T>(this IPublishedContent content)
         where T : class, IPublishedContent
-        => content.Parent<T>(PublishedContentCache, DocumentNavigationQueryService);
+        => content.Parent<T>(GetPublishedCache(content), GetNavigationQueryService(content));
 
     /// <summary>
     ///     Gets the ancestors of the content.
@@ -245,7 +278,7 @@ public static class FriendlyPublishedContentExtensions
     /// <returns>The ancestors of the content, in down-top order.</returns>
     /// <remarks>Does not consider the content itself.</remarks>
     public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content)
-        => content.Ancestors(PublishedContentCache, DocumentNavigationQueryService);
+        => content.Ancestors(GetPublishedCache(content), GetNavigationQueryService(content));
 
     /// <summary>
     ///     Gets the content and its ancestors.
@@ -253,7 +286,7 @@ public static class FriendlyPublishedContentExtensions
     /// <param name="content">The content.</param>
     /// <returns>The content and its ancestors, in down-top order.</returns>
     public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content)
-        => content.AncestorsOrSelf(PublishedContentCache, DocumentNavigationQueryService);
+        => content.AncestorsOrSelf(GetPublishedCache(content), GetNavigationQueryService(content));
 
     /// <summary>
     ///     Gets the content and its ancestors, of a specified content type.
@@ -264,7 +297,7 @@ public static class FriendlyPublishedContentExtensions
     /// <remarks>May or may not begin with the content itself, depending on its content type.</remarks>
     public static IEnumerable<T> AncestorsOrSelf<T>(this IPublishedContent content)
         where T : class, IPublishedContent
-        => content.AncestorsOrSelf<T>(PublishedContentCache, DocumentNavigationQueryService);
+        => content.AncestorsOrSelf<T>(GetPublishedCache(content), GetNavigationQueryService(content));
 
     /// <summary>
     ///     Gets the ancestor of the content, i.e. its parent.
@@ -272,7 +305,7 @@ public static class FriendlyPublishedContentExtensions
     /// <param name="content">The content.</param>
     /// <returns>The ancestor of the content.</returns>
     public static IPublishedContent? Ancestor(this IPublishedContent content)
-        => content.Ancestor(PublishedContentCache, DocumentNavigationQueryService);
+        => content.Ancestor(GetPublishedCache(content), GetNavigationQueryService(content));
 
     /// <summary>
     ///     Gets the nearest ancestor of the content, of a specified content type.
@@ -283,7 +316,7 @@ public static class FriendlyPublishedContentExtensions
     /// <remarks>Does not consider the content itself. May return <c>null</c>.</remarks>
     public static T? Ancestor<T>(this IPublishedContent content)
         where T : class, IPublishedContent
-        => content.Ancestor<T>(PublishedContentCache, DocumentNavigationQueryService);
+        => content.Ancestor<T>(GetPublishedCache(content), GetNavigationQueryService(content));
 
     /// <summary>
     ///     Gets the content or its nearest ancestor, of a specified content type.
@@ -294,7 +327,7 @@ public static class FriendlyPublishedContentExtensions
     /// <remarks>May or may not return the content itself depending on its content type. May return <c>null</c>.</remarks>
     public static T? AncestorOrSelf<T>(this IPublishedContent content)
         where T : class, IPublishedContent
-        => content.AncestorOrSelf<T>(PublishedContentCache, DocumentNavigationQueryService);
+        => content.AncestorOrSelf<T>(GetPublishedCache(content), GetNavigationQueryService(content));
 
     /// <summary>
     ///     Returns all DescendantsOrSelf of all content referenced
@@ -311,7 +344,7 @@ public static class FriendlyPublishedContentExtensions
     /// </remarks>
     public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(
         this IEnumerable<IPublishedContent> parentNodes, string docTypeAlias, string? culture = null)
-        => parentNodes.DescendantsOrSelfOfType(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, docTypeAlias, culture);
+        => parentNodes.DescendantsOrSelfOfType(VariationContextAccessor, GetPublishedCache(parentNodes.First()), GetNavigationQueryService(parentNodes.First()), docTypeAlias, culture);
 
     /// <summary>
     ///     Returns all DescendantsOrSelf of all content referenced
@@ -329,77 +362,77 @@ public static class FriendlyPublishedContentExtensions
         this IEnumerable<IPublishedContent> parentNodes,
         string? culture = null)
         where T : class, IPublishedContent
-        => parentNodes.DescendantsOrSelf<T>(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, culture);
+        => parentNodes.DescendantsOrSelf<T>(VariationContextAccessor, GetPublishedCache(parentNodes.First()), GetNavigationQueryService(parentNodes.First()), culture);
 
     public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, string? culture = null)
-        => content.Descendants(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, culture);
+        => content.Descendants(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
 
     public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, int level, string? culture = null)
-        => content.Descendants(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, level, culture);
+        => content.Descendants(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), level, culture);
 
     public static IEnumerable<IPublishedContent> DescendantsOfType(this IPublishedContent content, string contentTypeAlias, string? culture = null)
-        => content.DescendantsOfType(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, contentTypeAlias, culture);
+        => content.DescendantsOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), contentTypeAlias, culture);
 
     public static IEnumerable<T> Descendants<T>(this IPublishedContent content, string? culture = null)
         where T : class, IPublishedContent
-        => content.Descendants<T>(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, culture);
+        => content.Descendants<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
 
     public static IEnumerable<T> Descendants<T>(this IPublishedContent content, int level, string? culture = null)
         where T : class, IPublishedContent
-        => content.Descendants<T>(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, level, culture);
+        => content.Descendants<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), level, culture);
 
     public static IEnumerable<IPublishedContent> DescendantsOrSelf(
         this IPublishedContent content,
         string? culture = null)
-        => content.DescendantsOrSelf(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, culture);
+        => content.DescendantsOrSelf(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
 
     public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, int level, string? culture = null)
-        => content.DescendantsOrSelf(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, level, culture);
+        => content.DescendantsOrSelf(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), level, culture);
 
     public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(this IPublishedContent content, string contentTypeAlias, string? culture = null)
-        => content.DescendantsOrSelfOfType(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, contentTypeAlias, culture);
+        => content.DescendantsOrSelfOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), contentTypeAlias, culture);
 
     public static IEnumerable<T> DescendantsOrSelf<T>(this IPublishedContent content, string? culture = null)
         where T : class, IPublishedContent
-        => content.DescendantsOrSelf<T>(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, culture);
+        => content.DescendantsOrSelf<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
 
     public static IEnumerable<T> DescendantsOrSelf<T>(this IPublishedContent content, int level, string? culture = null)
         where T : class, IPublishedContent
-        => content.DescendantsOrSelf<T>(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, level, culture);
+        => content.DescendantsOrSelf<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), level, culture);
 
     public static IPublishedContent? Descendant(this IPublishedContent content, string? culture = null)
-        => content.Descendant(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, culture);
+        => content.Descendant(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
 
     public static IPublishedContent? Descendant(this IPublishedContent content, int level, string? culture = null)
-        => content.Descendant(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, level, culture);
+        => content.Descendant(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), level, culture);
 
     public static IPublishedContent? DescendantOfType(this IPublishedContent content, string contentTypeAlias, string? culture = null)
-        => content.DescendantOfType(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, contentTypeAlias, culture);
+        => content.DescendantOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), contentTypeAlias, culture);
 
     public static T? Descendant<T>(this IPublishedContent content, string? culture = null)
         where T : class, IPublishedContent
-        => content.Descendant<T>(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, culture);
+        => content.Descendant<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
 
     public static T? Descendant<T>(this IPublishedContent content, int level, string? culture = null)
         where T : class, IPublishedContent
-        => content.Descendant<T>(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, level, culture);
+        => content.Descendant<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), level, culture);
 
     public static IPublishedContent DescendantOrSelf(this IPublishedContent content, string? culture = null)
         => content.DescendantOrSelf(VariationContextAccessor, culture);
 
     public static IPublishedContent? DescendantOrSelf(this IPublishedContent content, int level, string? culture = null)
-        => content.DescendantOrSelf(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, level, culture);
+        => content.DescendantOrSelf(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), level, culture);
 
     public static IPublishedContent? DescendantOrSelfOfType(this IPublishedContent content, string contentTypeAlias, string? culture = null)
-        => content.DescendantOrSelfOfType(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, contentTypeAlias, culture);
+        => content.DescendantOrSelfOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), contentTypeAlias, culture);
 
     public static T? DescendantOrSelf<T>(this IPublishedContent content, string? culture = null)
         where T : class, IPublishedContent
-        => content.DescendantOrSelf<T>(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, culture);
+        => content.DescendantOrSelf<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
 
     public static T? DescendantOrSelf<T>(this IPublishedContent content, int level, string? culture = null)
         where T : class, IPublishedContent
-        => content.DescendantOrSelf<T>(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, level, culture);
+        => content.DescendantOrSelf<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), level, culture);
 
     /// <summary>
     ///     Gets the children of the content item.
@@ -427,7 +460,7 @@ public static class FriendlyPublishedContentExtensions
     ///     </para>
     /// </remarks>
     public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, string? culture = null)
-        => content.Children(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, culture);
+        => content.Children(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
 
     /// <summary>
     ///     Gets the children of the content, filtered by a predicate.
@@ -446,7 +479,7 @@ public static class FriendlyPublishedContentExtensions
         this IPublishedContent content,
         Func<IPublishedContent, bool> predicate,
         string? culture = null)
-        => content.Children(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, predicate, culture);
+        => content.Children(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), predicate, culture);
 
     /// <summary>
     ///     Gets the children of the content, of any of the specified types.
@@ -459,7 +492,7 @@ public static class FriendlyPublishedContentExtensions
     /// <param name="contentTypeAlias">The content type alias.</param>
     /// <returns>The children of the content, of any of the specified types.</returns>
     public static IEnumerable<IPublishedContent>? ChildrenOfType(this IPublishedContent content, string contentTypeAlias, string? culture = null)
-        => content.ChildrenOfType(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, contentTypeAlias, culture);
+        => content.ChildrenOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), contentTypeAlias, culture);
 
     /// <summary>
     ///     Gets the children of the content, of a given content type.
@@ -476,30 +509,30 @@ public static class FriendlyPublishedContentExtensions
     /// </remarks>
     public static IEnumerable<T>? Children<T>(this IPublishedContent content, string? culture = null)
         where T : class, IPublishedContent
-        => content.Children<T>(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, culture);
+        => content.Children<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
 
     public static IPublishedContent? FirstChild(this IPublishedContent content, string? culture = null)
-        => content.FirstChild(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, culture);
+        => content.FirstChild(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
 
     /// <summary>
     ///     Gets the first child of the content, of a given content type.
     /// </summary>
     public static IPublishedContent? FirstChildOfType(this IPublishedContent content, string contentTypeAlias, string? culture = null)
-        => content.FirstChildOfType(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, contentTypeAlias, culture);
+        => content.FirstChildOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), contentTypeAlias, culture);
 
     public static IPublishedContent? FirstChild(this IPublishedContent content, Func<IPublishedContent, bool> predicate, string? culture = null)
-        => content.FirstChild(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, predicate, culture);
+        => content.FirstChild(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), predicate, culture);
 
     public static IPublishedContent? FirstChild(this IPublishedContent content, Guid uniqueId, string? culture = null)
-        => content.FirstChild(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, uniqueId, culture);
+        => content.FirstChild(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), uniqueId, culture);
 
     public static T? FirstChild<T>(this IPublishedContent content, string? culture = null)
         where T : class, IPublishedContent
-        => content.FirstChild<T>(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, culture);
+        => content.FirstChild<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
 
     public static T? FirstChild<T>(this IPublishedContent content, Func<T, bool> predicate, string? culture = null)
         where T : class, IPublishedContent
-        => content.FirstChild(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, predicate, culture);
+        => content.FirstChild(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), predicate, culture);
 
     /// <summary>
     ///     Gets the siblings of the content.
@@ -514,7 +547,7 @@ public static class FriendlyPublishedContentExtensions
     ///     <para>Note that in V7 this method also return the content node self.</para>
     /// </remarks>
     public static IEnumerable<IPublishedContent>? Siblings(this IPublishedContent content, string? culture = null)
-        => content.Siblings(PublishedContentCache, DocumentNavigationQueryService, VariationContextAccessor, culture);
+        => content.Siblings(GetPublishedCache(content), GetNavigationQueryService(content), VariationContextAccessor, culture);
 
     /// <summary>
     ///     Gets the siblings of the content, of a given content type.
@@ -530,7 +563,7 @@ public static class FriendlyPublishedContentExtensions
     ///     <para>Note that in V7 this method also return the content node self.</para>
     /// </remarks>
     public static IEnumerable<IPublishedContent>? SiblingsOfType(this IPublishedContent content, string contentTypeAlias, string? culture = null)
-        => content.SiblingsOfType(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, contentTypeAlias, culture);
+        => content.SiblingsOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), contentTypeAlias, culture);
 
     /// <summary>
     ///     Gets the siblings of the content, of a given content type.
@@ -547,7 +580,7 @@ public static class FriendlyPublishedContentExtensions
     /// </remarks>
     public static IEnumerable<T>? Siblings<T>(this IPublishedContent content, string? culture = null)
         where T : class, IPublishedContent
-        => content.Siblings<T>(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, culture);
+        => content.Siblings<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
 
     /// <summary>
     ///     Gets the siblings of the content including the node itself to indicate the position.
@@ -561,7 +594,7 @@ public static class FriendlyPublishedContentExtensions
     public static IEnumerable<IPublishedContent>? SiblingsAndSelf(
         this IPublishedContent content,
         string? culture = null)
-        => content.SiblingsAndSelf(PublishedContentCache, DocumentNavigationQueryService, VariationContextAccessor, culture);
+        => content.SiblingsAndSelf(GetPublishedCache(content), GetNavigationQueryService(content), VariationContextAccessor, culture);
 
     /// <summary>
     ///     Gets the siblings of the content including the node itself to indicate the position, of a given content type.
@@ -577,7 +610,7 @@ public static class FriendlyPublishedContentExtensions
         this IPublishedContent content,
         string contentTypeAlias,
         string? culture = null)
-        => content.SiblingsAndSelfOfType(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, contentTypeAlias, culture);
+        => content.SiblingsAndSelfOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), contentTypeAlias, culture);
 
     /// <summary>
     ///     Gets the siblings of the content including the node itself to indicate the position, of a given content type.
@@ -591,7 +624,7 @@ public static class FriendlyPublishedContentExtensions
     /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
     public static IEnumerable<T>? SiblingsAndSelf<T>(this IPublishedContent content, string? culture = null)
         where T : class, IPublishedContent
-        => content.SiblingsAndSelf<T>(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService, culture);
+        => content.SiblingsAndSelf<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
 
     /// <summary>
     ///     Gets the url of the content item.
@@ -626,8 +659,8 @@ public static class FriendlyPublishedContentExtensions
         =>
             content.ChildrenAsTable(
                 VariationContextAccessor,
-                PublishedContentCache,
-                DocumentNavigationQueryService,
+                GetPublishedCache(content),
+                GetNavigationQueryService(content),
                 ContentTypeService,
                 MediaTypeService,
                 MemberTypeService,
@@ -700,4 +733,5 @@ public static class FriendlyPublishedContentExtensions
         string term,
         string? indexName = null)
         => content.SearchChildren(ExamineManager, UmbracoContextAccessor, term, indexName);
+
 }
