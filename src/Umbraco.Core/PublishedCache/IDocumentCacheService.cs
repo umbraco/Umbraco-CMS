@@ -26,4 +26,6 @@ public interface IDocumentCacheService
     Task RefreshMemoryCacheAsync(Guid key);
 
     Task RemoveFromMemoryCacheAsync(Guid key);
+
+    Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> contentTypeIds, UmbracoObjectTypes objectType);
 }

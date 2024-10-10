@@ -120,6 +120,14 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
         }
     }
 
+    public void ClearContentTypes(IEnumerable<int> ids)
+    {
+        foreach (var id in ids)
+        {
+            ClearContentType(id);
+        }
+    }
+
     /// <summary>
     ///     Clears all cached content types referencing a data type.
     /// </summary>

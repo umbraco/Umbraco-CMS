@@ -290,7 +290,22 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         _databaseCacheRepository.Rebuild(contentTypeIds.ToList());
-        IEnumerable<ContentCacheNode> contentByContentTypeKey = _databaseCacheRepository.GetContentByContentTypeKey(contentTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.DocumentType).Result), ContentCacheDataSerializerEntityType.Document);
+        RebuildMemoryCacheByContentTypeAsync(contentTypeIds, UmbracoObjectTypes.DocumentType).GetAwaiter().GetResult();
+        scope.Complete();
+    }
+
+    public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> contentTypeIds, UmbracoObjectTypes objectType)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        ContentCacheDataSerializerEntityType serializerType = objectType switch
+        {
+            UmbracoObjectTypes.DocumentType => ContentCacheDataSerializerEntityType.Document,
+            UmbracoObjectTypes.MediaType => ContentCacheDataSerializerEntityType.Media,
+            _ => throw new NotSupportedException($"Object type {objectType} is not supported")
+        };
+
+        IEnumerable<ContentCacheNode> contentByContentTypeKey = _databaseCacheRepository.GetContentByContentTypeKey(contentTypeIds.Select(x => _idKeyMap.GetKeyForId(x, objectType).Result), serializerType);
 
         foreach (ContentCacheNode content in contentByContentTypeKey)
         {
@@ -301,7 +316,6 @@ internal sealed class DocumentCacheService : IDocumentCacheService
                 _hybridCache.RemoveAsync(GetCacheKey(content.Key, false)).GetAwaiter().GetResult();
             }
         }
-
         scope.Complete();
     }
 }
