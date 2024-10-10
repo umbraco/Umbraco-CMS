@@ -1,6 +1,6 @@
 import { UmbDefaultCollectionContext } from './collection-default.context.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -29,15 +29,19 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	@state()
 	private _hasItems = false;
 
+	@state()
+	private _isDoneLoading = false;
+
 	#collectionContext?: UmbDefaultCollectionContext<any, any>;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, async (context) => {
 			this.#collectionContext = context;
-			this.#collectionContext?.requestCollection();
 			this.#observeCollectionRoutes();
 			this.#observeTotalItems();
+			await this.#collectionContext?.requestCollection();
+			this._isDoneLoading = true;
 		});
 	}
 
@@ -91,6 +95,7 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	}
 
 	#renderEmptyState() {
+		if (!this._isDoneLoading) return nothing;
 		return html` <div id="empty-state" class="uui-text">
 			<h4><umb-localize key="collection_noItemsTitle"></umb-localize></h4>
 		</div>`;
