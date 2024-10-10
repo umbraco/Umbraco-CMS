@@ -29,7 +29,9 @@ public static class UmbracoBuilderExtensions
     /// </summary>
     public static IUmbracoBuilder AddUmbracoHybridCache(this IUmbracoBuilder builder)
     {
+#pragma warning disable EXTEXP0018
         builder.Services.AddHybridCache();
+#pragma warning restore EXTEXP0018
         builder.Services.AddSingleton<IDatabaseCacheRepository, DatabaseCacheRepository>();
         builder.Services.AddSingleton<IPublishedContentCache, DocumentCache>();
         builder.Services.AddSingleton<IPublishedMediaCache, MediaCache>();
