@@ -1,5 +1,6 @@
 export * from './append-to-frozen-array.function.js';
 export * from './assign-to-frozen-object.function.js';
+export * from './class-equal-memoization.function.js';
 export * from './create-observable-part.function.js';
 export * from './deep-freeze.function.js';
 export * from './default-memoization.function.js';
