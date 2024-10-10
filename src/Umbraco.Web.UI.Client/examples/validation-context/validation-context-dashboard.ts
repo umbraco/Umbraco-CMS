@@ -33,8 +33,12 @@ export class UmbExampleValidationContextDashboard extends UmbLitElement {
     });
 	}
 
-	#handleValidateNow() {
-		this.validation.validate();
+	async #handleValidateNow() {
+
+		await this.validation.validate().catch(()=>{});
+
+		console.log('Valid', this.validation.isValid);
+
 	}
 
 	#handleAddServerValidationError() {
@@ -52,12 +56,22 @@ export class UmbExampleValidationContextDashboard extends UmbLitElement {
 						<div>
 						<label>Name</label>
 						<uui-form-validation-message>
-							<uui-input type="text" ${umbBindToValidation(this,'$.name',this.name)} required></uui-input>
+							<uui-input
+								type="text"
+								.value=${this.name}
+								@input=${(e: InputEvent)=>this.name = (e.target as HTMLInputElement).value}
+								${umbBindToValidation(this,'$.name',this.name)}
+								required></uui-input>
 						</uui-form-validation-message>
 						</div>
 						<label>E-mail</label>
 						<uui-form-validation-message>
-							<uui-input type="email" ${umbBindToValidation(this,'$.email',this.email)} required></uui-input>
+							<uui-input
+								type="email"
+								.value=${this.email}
+								@input=${(e: InputEvent)=>this.email = (e.target as HTMLInputElement).value}
+								${umbBindToValidation(this,'$.email',this.email)}
+								required></uui-input>
 						</uui-form-validation-message>
 					</form>
 				</uui-form>
