@@ -337,7 +337,7 @@ public class DocumentUrlService : IDocumentUrlService
         if (runnerKey.HasValue)
         {
             // if the domain node is unpublished, we need to return null.
-            if (isDraft is false && IsContentPublished(runnerKey.Value) is false)
+            if (isDraft is false && IsContentPublished(runnerKey.Value, culture) is false)
             {
                 return null;
             }
@@ -362,7 +362,7 @@ public class DocumentUrlService : IDocumentUrlService
                     break;
                 }
                 //if part of the path is unpublished, we need to break
-                if (isDraft is false && IsContentPublished(runnerKey.Value) is false)
+                if (isDraft is false && IsContentPublished(runnerKey.Value, culture) is false)
                 {
                     return null;
                 }
@@ -380,7 +380,7 @@ public class DocumentUrlService : IDocumentUrlService
             //     return null;
             // }
 
-            return GetTopMostRootKey(isDraft);
+            return GetTopMostRootKey(isDraft, culture);
         }
 
         // Otherwise we have to find the root items (or child of the first root when hideTopLevelNodeFromPath is true) and follow the url segments in them to get to correct document key
@@ -390,7 +390,7 @@ public class DocumentUrlService : IDocumentUrlService
             IEnumerable<Guid> runnerKeys;
             if (index == 0)
             {
-                runnerKeys = GetKeysInRoot(hideTopLevelNodeFromPath);
+                runnerKeys = GetKeysInRoot(hideTopLevelNodeFromPath, isDraft, culture);
             }
             else
             {
@@ -405,7 +405,7 @@ public class DocumentUrlService : IDocumentUrlService
             runnerKey = GetChildWithUrlSegment(runnerKeys, urlSegment, culture, isDraft);
         }
 
-        if (isDraft is false && runnerKey.HasValue && IsContentPublished(runnerKey.Value) is false)
+        if (isDraft is false && runnerKey.HasValue && IsContentPublished(runnerKey.Value, culture) is false)
         {
             return null;
         }
@@ -413,11 +413,16 @@ public class DocumentUrlService : IDocumentUrlService
         return runnerKey;
     }
 
-    private bool IsContentPublished(Guid contentKey)
+    private bool IsContentPublished(Guid contentKey, string culture)
     {
         // TODO: This is not the best way to check if a content is published. We should have a better way to do this.
         IContent? content = _contentService.GetById(contentKey);
-        return content is not null && _contentService.IsPathPublished(content);
+        if (content is null)
+        {
+            return false;
+        }
+        var variesByCulture = content.ContentType.VariesByCulture();
+        return (content.Published && variesByCulture is false) || (variesByCulture && content.PublishedCultures.Contains(culture));
 
     }
 
@@ -477,7 +482,7 @@ public class DocumentUrlService : IDocumentUrlService
             return foundDomain.RootContentId + "/" + string.Join("/", urlSegments);
         }
 
-        var isRootFirstItem = GetTopMostRootKey(isDraft) == ancestorsOrSelfKeysArray.Last();
+        var isRootFirstItem = GetTopMostRootKey(isDraft, cultureOrDefault) == ancestorsOrSelfKeysArray.Last();
         return GetFullUrl(isRootFirstItem, urlSegments, null);
     }
 
@@ -546,7 +551,7 @@ public class DocumentUrlService : IDocumentUrlService
                continue;
            }
 
-            var isRootFirstItem = GetTopMostRootKey(false) == ancestorsOrSelfKeysArray.Last();
+            var isRootFirstItem = GetTopMostRootKey(false, culture) == ancestorsOrSelfKeysArray.Last();
             result.Add(new UrlInfo(
                 text: GetFullUrl(isRootFirstItem, urlSegments, foundDomain),
                 isUrl: hasUrlInCulture,
@@ -607,7 +612,7 @@ public class DocumentUrlService : IDocumentUrlService
 
     // - All of the above when having Constants.Conventions.Content.UrlName set to a value
 
-    private IEnumerable<Guid> GetKeysInRoot(bool addFirstLevelChildren)
+    private IEnumerable<Guid> GetKeysInRoot(bool addFirstLevelChildren, bool isDraft, string culture)
     {
         //TODO replace with something more performand - Should be possible with navigationservice..
         IEnumerable<Guid> rootKeys = _contentService.GetRootContent().Select(x=>x.Key).ToArray();
@@ -621,6 +626,11 @@ public class DocumentUrlService : IDocumentUrlService
         {
             foreach (Guid rootKey in rootKeys)
             {
+                if (isDraft is false && IsContentPublished(rootKey, culture) is false)
+                {
+                    continue;
+                }
+
                 IEnumerable<Guid> childKeys = GetChildKeys(rootKey);
 
                 foreach (Guid childKey in childKeys)
@@ -666,13 +676,13 @@ public class DocumentUrlService : IDocumentUrlService
     /// Gets the top most root key.
     /// </summary>
     /// <returns>The top most root key.</returns>
-    private Guid? GetTopMostRootKey(bool isDraft)
+    private Guid? GetTopMostRootKey(bool isDraft, string culture)
     {
         if (_documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys))
         {
             foreach (Guid rootKey in rootKeys)
             {
-                if (isDraft || IsContentPublished(rootKey))
+                if (isDraft || IsContentPublished(rootKey, culture))
                 {
                     return rootKey;
                 }
