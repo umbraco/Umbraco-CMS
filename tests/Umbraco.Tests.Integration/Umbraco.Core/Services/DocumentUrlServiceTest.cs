@@ -63,9 +63,9 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
     {
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
-        var actual = DocumentUrlService.GetUrlSegment(Trashed.Key, isoCode, true);
+        Assert.IsNull(DocumentUrlService.GetUrlSegment(Trashed.Key, isoCode, true));
+        Assert.IsNull(DocumentUrlService.GetUrlSegment(Trashed.Key, isoCode, false));
 
-        Assert.IsNull(actual);
     }
 
     //TODO test with the urlsegment property value!
@@ -120,7 +120,38 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
     [Test]
     public void No_Published_Route_when_not_published()
     {
+        Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, true));
         Assert.IsNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, false));
+    }
+
+    [Test]
+    public void Unpublished_Pages_Are_not_available()
+    {
+        //Arrange
+        ContentService.PublishBranch(Textpage, true, new[] { "*" });
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/", "en-US", null, true));
+            Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/", "en-US", null, false));
+            Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, true));
+            Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, false));
+        });
+
+        //Act
+        ContentService.Unpublish(Textpage );
+
+        Assert.Multiple(() =>
+        {
+            //The unpublished page self
+            Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/", "en-US", null, true));
+            Assert.IsNull(DocumentUrlService.GetDocumentKeyByRoute("/", "en-US", null, false));
+
+            //A descendant of the unpublished page
+            Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, true));
+            Assert.IsNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, false));
+        });
+
     }
 
 

@@ -135,13 +135,13 @@ public class DocumentUrlService : IDocumentUrlService
 
     }
 
-    private void RemoveFromCache(IScopeContext scopeContext, Guid documentKey, string isoCode)
+    private void RemoveFromCache(IScopeContext scopeContext, Guid documentKey, string isoCode, bool isDraft)
     {
-        var cacheKeyDraft = CreateCacheKey(documentKey, isoCode, true);
+        var cacheKey = CreateCacheKey(documentKey, isoCode, isDraft);
 
-        scopeContext.Enlist("RemoveFromCache_" + cacheKeyDraft, () =>
+        scopeContext.Enlist("RemoveFromCache_" + cacheKey, () =>
         {
-            if (_cache.TryRemove(cacheKeyDraft, out _) is false)
+            if (_cache.TryRemove(cacheKey, out _) is false)
             {
                 _logger.LogDebug("Could not remove the document url cache. But the important thing is that it is not there.");
                 return false;
@@ -149,20 +149,6 @@ public class DocumentUrlService : IDocumentUrlService
 
             return true;
         });
-
-        var cacheKeyPublished = CreateCacheKey(documentKey, isoCode, false);
-
-        scopeContext.Enlist("RemoveFromCache_" + cacheKeyPublished, () =>
-        {
-            if (_cache.TryRemove(cacheKeyPublished, out _) is false)
-            {
-                _logger.LogDebug("Could not remove the document url cache. But the important thing is that it is not there.");
-                return false;
-            }
-
-            return true;
-        });
-
     }
 
     public async Task RebuildAllUrlsAsync()
@@ -222,8 +208,6 @@ public class DocumentUrlService : IDocumentUrlService
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         var toSave = new List<PublishedDocumentUrlSegment>();
-        var toDelete = new List<Guid>();
-        var allCultures = documents.SelectMany(x => x.AvailableCultures ).Distinct();
 
         var languages = await _languageService.GetAllAsync();
         var languageDictionary = languages.ToDictionary(x=>x.IsoCode);
@@ -237,7 +221,7 @@ public class DocumentUrlService : IDocumentUrlService
 
             foreach ((string culture, ILanguage language) in languageDictionary)
             {
-                HandleCaching(_coreScopeProvider.Context!, document, document.ContentType.VariesByCulture() ? culture : null, language, toDelete, toSave);
+                HandleCaching(_coreScopeProvider.Context!, document, document.ContentType.VariesByCulture() ? culture : null, language, toSave);
             }
         }
 
@@ -246,29 +230,18 @@ public class DocumentUrlService : IDocumentUrlService
             _documentUrlRepository.Save(toSave);
         }
 
-        if(toDelete.Any())
-        {
-            _documentUrlRepository.DeleteByDocumentKey(toDelete);
-        }
-
         scope.Complete();
     }
 
-    private void HandleCaching(IScopeContext scopeContext, IContent document, string? culture, ILanguage language, List<Guid> toDelete, List<PublishedDocumentUrlSegment> toSave)
+    private void HandleCaching(IScopeContext scopeContext, IContent document, string? culture, ILanguage language, List<PublishedDocumentUrlSegment> toSave)
     {
-        var models = GenerateModels(document, culture, language);
+        var modelsAndStatus = GenerateModels(document, culture, language);
 
-        foreach (PublishedDocumentUrlSegment model in models)
+        foreach ((PublishedDocumentUrlSegment model, bool cache) in modelsAndStatus)
         {
-            if (document.Published is false && model.IsDraft is false)
+            if (cache is false)
             {
-                continue;
-            }
-
-            if (document.Trashed)
-            {
-                toDelete.Add(model.DocumentKey);
-                RemoveFromCache(scopeContext, model.DocumentKey, language.IsoCode);
+                RemoveFromCache(scopeContext, model.DocumentKey, language.IsoCode, model.IsDraft);
             }
             else
             {
@@ -278,11 +251,10 @@ public class DocumentUrlService : IDocumentUrlService
         }
     }
 
-    private IEnumerable<PublishedDocumentUrlSegment> GenerateModels(IContent document, string? culture, ILanguage language)
+    private IEnumerable<(PublishedDocumentUrlSegment, bool)> GenerateModels(IContent document, string? culture, ILanguage language)
     {
-        if (document.ContentType.VariesByCulture() is false || document.PublishCultureInfos != null && document.PublishCultureInfos.Values.Any(x => x.Culture == culture))
+        if (document.Trashed is false && ((document.ContentType.VariesByCulture() is false && document.Published ) ||(document.PublishCultureInfos != null && document.PublishCultureInfos.Values.Any(x => x.Culture == culture))))
         {
-
             var publishedUrlSegment =
                 document.GetUrlSegment(_shortStringHelper, _urlSegmentProviderCollection, culture, true);
             if (publishedUrlSegment.IsNullOrWhiteSpace())
@@ -292,14 +264,24 @@ public class DocumentUrlService : IDocumentUrlService
             }
             else
             {
-                yield return new PublishedDocumentUrlSegment()
+                yield return (new PublishedDocumentUrlSegment()
                 {
                     DocumentKey = document.Key,
                     LanguageId = language.Id,
                     UrlSegment = publishedUrlSegment,
                     IsDraft = false
-                };
+                }, true);
             }
+        }
+        else
+        {
+            yield return (new PublishedDocumentUrlSegment()
+            {
+                DocumentKey = document.Key,
+                LanguageId = language.Id,
+                UrlSegment = string.Empty,
+                IsDraft = false
+            }, false);
         }
 
         var draftUrlSegment = document.GetUrlSegment(_shortStringHelper, _urlSegmentProviderCollection, culture, false);
@@ -310,10 +292,10 @@ public class DocumentUrlService : IDocumentUrlService
         }
         else
         {
-            yield return new PublishedDocumentUrlSegment()
+            yield return (new PublishedDocumentUrlSegment()
             {
                 DocumentKey = document.Key, LanguageId = language.Id, UrlSegment = draftUrlSegment, IsDraft = true
-            };
+            }, document.Trashed is false);
         }
     }
 
@@ -327,7 +309,8 @@ public class DocumentUrlService : IDocumentUrlService
         {
             foreach (Guid documentKey in documentKeys)
             {
-                RemoveFromCache(_coreScopeProvider.Context!, documentKey, language.IsoCode);
+                RemoveFromCache(_coreScopeProvider.Context!, documentKey, language.IsoCode, true);
+                RemoveFromCache(_coreScopeProvider.Context!, documentKey, language.IsoCode, false);
             }
         }
 
@@ -353,6 +336,12 @@ public class DocumentUrlService : IDocumentUrlService
         // If a domain is assigned to this route, we need to follow the url segments
         if (runnerKey.HasValue)
         {
+            // if the domain node is unpublished, we need to return null.
+            if (isDraft is false && IsContentPublished(runnerKey.Value) is false)
+            {
+                return null;
+            }
+
             // If there is no url segments it means the domain root has been requested
             if (urlSegments.Length == 0)
             {
@@ -367,9 +356,15 @@ public class DocumentUrlService : IDocumentUrlService
 
                 runnerKey = GetChildWithUrlSegment(childKeys, urlSegment, culture, isDraft);
 
+
                 if (runnerKey is null)
                 {
                     break;
+                }
+                //if part of the path is unpublished, we need to break
+                if (isDraft is false && IsContentPublished(runnerKey.Value) is false)
+                {
+                    return null;
                 }
             }
 
@@ -385,7 +380,7 @@ public class DocumentUrlService : IDocumentUrlService
             //     return null;
             // }
 
-            return GetTopMostRootKey();
+            return GetTopMostRootKey(isDraft);
         }
 
         // Otherwise we have to find the root items (or child of the first root when hideTopLevelNodeFromPath is true) and follow the url segments in them to get to correct document key
@@ -410,7 +405,20 @@ public class DocumentUrlService : IDocumentUrlService
             runnerKey = GetChildWithUrlSegment(runnerKeys, urlSegment, culture, isDraft);
         }
 
+        if (isDraft is false && runnerKey.HasValue && IsContentPublished(runnerKey.Value) is false)
+        {
+            return null;
+        }
+
         return runnerKey;
+    }
+
+    private bool IsContentPublished(Guid contentKey)
+    {
+        // TODO: This is not the best way to check if a content is published. We should have a better way to do this.
+        IContent? content = _contentService.GetById(contentKey);
+        return content is not null && _contentService.IsPathPublished(content);
+
     }
 
     public string GetLegacyRouteFormat(Guid docuemntKey, string? culture, bool isDraft)
@@ -469,7 +477,7 @@ public class DocumentUrlService : IDocumentUrlService
             return foundDomain.RootContentId + "/" + string.Join("/", urlSegments);
         }
 
-        var isRootFirstItem = GetTopMostRootKey() == ancestorsOrSelfKeysArray.Last();
+        var isRootFirstItem = GetTopMostRootKey(isDraft) == ancestorsOrSelfKeysArray.Last();
         return GetFullUrl(isRootFirstItem, urlSegments, null);
     }
 
@@ -538,7 +546,7 @@ public class DocumentUrlService : IDocumentUrlService
                continue;
            }
 
-            var isRootFirstItem = GetTopMostRootKey() == ancestorsOrSelfKeysArray.Last();
+            var isRootFirstItem = GetTopMostRootKey(false) == ancestorsOrSelfKeysArray.Last();
             result.Add(new UrlInfo(
                 text: GetFullUrl(isRootFirstItem, urlSegments, foundDomain),
                 isUrl: hasUrlInCulture,
@@ -658,11 +666,17 @@ public class DocumentUrlService : IDocumentUrlService
     /// Gets the top most root key.
     /// </summary>
     /// <returns>The top most root key.</returns>
-    private Guid? GetTopMostRootKey()
+    private Guid? GetTopMostRootKey(bool isDraft)
     {
         if (_documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys))
         {
-            return rootKeys.FirstOrDefault();
+            foreach (Guid rootKey in rootKeys)
+            {
+                if (isDraft || IsContentPublished(rootKey))
+                {
+                    return rootKey;
+                }
+            }
         }
         return null;
     }
