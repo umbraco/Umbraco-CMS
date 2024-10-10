@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorUICollectionColumnConfigurationElement } from './column-configuration.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './column-configuration.element.js';
@@ -10,6 +10,6 @@ export default {
 	id: 'umb-property-editor-ui-collection-column-configuration',
 } as Meta;
 
-export const AAAOverview: Story<UmbPropertyEditorUICollectionColumnConfigurationElement> = () =>
+export const AAAOverview: StoryFn<UmbPropertyEditorUICollectionColumnConfigurationElement> = () =>
 	html`<umb-property-editor-ui-collection-column-configuration></umb-property-editor-ui-collection-column-configuration>`;
 AAAOverview.storyName = 'Overview';

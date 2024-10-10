@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 //import type { UmbDashboardExamineManagementElement } from './dashboard-examine-management.element.js';
 import './dashboard-examine-management.element.js';
 import type { UmbDashboardExamineOverviewElement } from './views/section-view-examine-overview.js';
@@ -15,12 +15,12 @@ export default {
 	id: 'umb-dashboard-examine-management',
 } as Meta;
 
-export const AAAOverview: Story<UmbDashboardExamineOverviewElement> = () =>
+export const AAAOverview: StoryFn<UmbDashboardExamineOverviewElement> = () =>
 	html` <umb-dashboard-examine-overview></umb-dashboard-examine-overview>`;
 AAAOverview.storyName = 'Overview';
 
-export const Index: Story<UmbDashboardExamineIndexElement> = () =>
+export const Index: StoryFn<UmbDashboardExamineIndexElement> = () =>
 	html` <umb-dashboard-examine-index indexName="InternalIndex"></umb-dashboard-examine-index>`;
 
-export const Searcher: Story<UmbDashboardExamineSearcherElement> = () =>
+export const Searcher: StoryFn<UmbDashboardExamineSearcherElement> = () =>
 	html` <umb-dashboard-examine-searcher searcherName="InternalSearcher"></umb-dashboard-examine-searcher>`;

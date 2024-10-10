@@ -1,5 +1,5 @@
 import type { UmbCodeEditorModalData } from './code-editor-modal.token.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
@@ -14,7 +14,7 @@ const data: UmbCodeEditorModalData = {
 	language: 'html',
 };
 
-export const Overview: Story<UmbCodeEditorModalData> = () => html`
+export const Overview: StoryFn<UmbCodeEditorModalData> = () => html`
 	<!-- TODO: figure out if generics are allowed for properties:
 	https://github.com/runem/lit-analyzer/issues/149
 	https://github.com/runem/lit-analyzer/issues/163 -->

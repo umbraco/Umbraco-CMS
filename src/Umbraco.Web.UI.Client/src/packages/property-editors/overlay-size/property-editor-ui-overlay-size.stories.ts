@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorUIOverlaySizeElement } from './property-editor-ui-overlay-size.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-overlay-size.element.js';
@@ -10,6 +10,6 @@ export default {
 	id: 'umb-property-editor-ui-overlay-size',
 } as Meta;
 
-export const AAAOverview: Story<UmbPropertyEditorUIOverlaySizeElement> = () =>
+export const AAAOverview: StoryFn<UmbPropertyEditorUIOverlaySizeElement> = () =>
 	html`<umb-property-editor-ui-overlay-size></umb-property-editor-ui-overlay-size>`;
 AAAOverview.storyName = 'Overview';

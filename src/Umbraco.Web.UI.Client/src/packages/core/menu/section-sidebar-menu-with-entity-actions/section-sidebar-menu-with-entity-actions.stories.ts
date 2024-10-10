@@ -1,5 +1,5 @@
 import type { UmbSectionSidebarMenuWithEntityActionsElement } from './section-sidebar-menu-with-entity-actions.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './section-sidebar-menu-with-entity-actions.element.js';
@@ -10,6 +10,6 @@ export default {
 	id: 'umb-section-sidebar-menu-with-entity-actions',
 } as Meta;
 
-export const AAAOverview: Story<UmbSectionSidebarMenuWithEntityActionsElement> = () =>
+export const AAAOverview: StoryFn<UmbSectionSidebarMenuWithEntityActionsElement> = () =>
 	html` <umb-section-sidebar-menu-with-entity-actions></umb-section-sidebar-menu-with-entity-actions>`;
 AAAOverview.storyName = 'Overview';
