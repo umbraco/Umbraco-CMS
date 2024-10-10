@@ -147,6 +147,11 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     {
         Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
 
+        if (payload.Blueprint)
+        {
+            return;
+        }
+
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
         {
             _documentCacheService.RefreshMemoryCacheAsync(key).GetAwaiter().GetResult();
