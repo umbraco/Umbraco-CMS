@@ -1,4 +1,5 @@
 import { UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
+import { UMB_EDIT_DOCUMENT_TYPE_FOLDER_WORKSPACE_PATH_PATTERN } from '../../folder/index.js';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
@@ -41,11 +42,6 @@ export class UmbTreeItemChildrenTableCollectionViewElement extends UmbLitElement
 		this.#registerModalRoute();
 	}
 
-	#observeCollectionItems() {
-		if (!this.#collectionContext) return;
-		this.observe(this.#collectionContext.items, (items) => this.#createTableItems(items), 'umbCollectionItemsObserver');
-	}
-
 	#registerModalRoute() {
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath(':entityType')
@@ -61,12 +57,22 @@ export class UmbTreeItemChildrenTableCollectionViewElement extends UmbLitElement
 			});
 	}
 
+	#observeCollectionItems() {
+		if (!this.#collectionContext) return;
+		this.observe(this.#collectionContext.items, (items) => this.#createTableItems(items), 'umbCollectionItemsObserver');
+	}
+
 	#createTableItems(items: Array<UmbTreeItemModel>) {
+		const routeBuilder = this.#routeBuilder;
+		if (!routeBuilder) throw new Error('Route builder not ready');
+
 		this._tableItems = items.map((item) => {
-			const editPath = this.#routeBuilder
-				? this.#routeBuilder({ entityType: item.entityType }) +
-					UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique })
-				: '';
+			const modalEditPath =
+				routeBuilder({ entityType: item.entityType }) +
+				UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique });
+			const inlineEditPath = UMB_EDIT_DOCUMENT_TYPE_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({
+				unique: item.unique,
+			});
 
 			return {
 				id: item.unique,
@@ -74,7 +80,9 @@ export class UmbTreeItemChildrenTableCollectionViewElement extends UmbLitElement
 				data: [
 					{
 						columnAlias: 'name',
-						value: html`<uui-button href=${editPath} label=${item.name}></uui-button>`,
+						value: html`<uui-button
+							href=${item.isFolder ? inlineEditPath : modalEditPath}
+							label=${item.name}></uui-button>`,
 					},
 				],
 			};
