@@ -1,5 +1,5 @@
 import type { UmbWorkspaceViewDictionaryEditorElement } from './workspace-view-dictionary-editor.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 //import { data } from '../../../../../core/mocks/data/dictionary.data.js';
 import './workspace-view-dictionary-editor.element.js';
@@ -19,7 +19,7 @@ export default {
 	],
 } as Meta;
 
-export const AAAOverview: Story<UmbWorkspaceViewDictionaryEditorElement> = () =>
+export const AAAOverview: StoryFn<UmbWorkspaceViewDictionaryEditorElement> = () =>
 	html` <umb-workspace-view-dictionary-editor></umb-workspace-view-dictionary-editor>`;
 
 AAAOverview.storyName = 'Overview';

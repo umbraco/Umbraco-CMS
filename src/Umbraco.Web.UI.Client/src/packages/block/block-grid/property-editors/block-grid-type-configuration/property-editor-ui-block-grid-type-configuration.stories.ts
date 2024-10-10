@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorUIBlockGridTypeConfigurationElement } from './property-editor-ui-block-grid-type-configuration.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-block-grid-type-configuration.element.js';
@@ -10,6 +10,6 @@ export default {
 	id: 'umb-property-editor-ui-block-grid-type-configuration',
 } as Meta;
 
-export const AAAOverview: Story<UmbPropertyEditorUIBlockGridTypeConfigurationElement> = () =>
+export const AAAOverview: StoryFn<UmbPropertyEditorUIBlockGridTypeConfigurationElement> = () =>
 	html`<umb-property-editor-ui-block-grid-type-configuration></umb-property-editor-ui-block-grid-type-configuration>`;
 AAAOverview.storyName = 'Overview';

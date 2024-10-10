@@ -1,7 +1,7 @@
 import './workspace-view-data-type-info.element.js';
 
 import type { UmbWorkspaceViewDataTypeInfoElement } from './workspace-view-data-type-info.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 //import { data } from '../../../../../core/mocks/data/data-type.data.js';
@@ -21,6 +21,6 @@ export default {
 	],
 } as Meta;
 
-export const AAAOverview: Story<UmbWorkspaceViewDataTypeInfoElement> = () =>
+export const AAAOverview: StoryFn<UmbWorkspaceViewDataTypeInfoElement> = () =>
 	html` <umb-workspace-view-data-type-info></umb-workspace-view-data-type-info>`;
 AAAOverview.storyName = 'Overview';

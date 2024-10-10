@@ -2,7 +2,7 @@ import './icon-picker-modal.element.js';
 
 import type { UmbIconPickerModalElement } from './icon-picker-modal.element.js';
 import type { UmbIconPickerModalValue } from './icon-picker-modal.token.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
@@ -16,7 +16,7 @@ const value: UmbIconPickerModalValue = {
 	icon: undefined,
 };
 
-export const Overview: Story<UmbIconPickerModalElement> = () => html`
+export const Overview: StoryFn<UmbIconPickerModalElement> = () => html`
 	<!-- TODO: figure out if generics are allowed for properties:
 	https://github.com/runem/lit-analyzer/issues/149
 	https://github.com/runem/lit-analyzer/issues/163 -->
