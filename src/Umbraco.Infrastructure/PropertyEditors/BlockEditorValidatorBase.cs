@@ -32,7 +32,7 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
 
         foreach (var group in itemDataGroups)
         {
-            var allElementTypes = _elementTypeCache.GetAll(group.Items.Select(x => x.ContentTypeKey).ToArray()).ToDictionary(x => x.Key);
+            var allElementTypes = _elementTypeCache.GetMany(group.Items.Select(x => x.ContentTypeKey).ToArray()).ToDictionary(x => x.Key);
 
             for (var i = 0; i < group.Items.Count; i++)
             {
