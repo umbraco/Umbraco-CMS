@@ -242,38 +242,18 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
-        bool isSeeded = SeedKeys.Contains(content.Key);
-
         // Always set draft node
         // We have nodes seperate in the cache, cause 99% of the time, you are only using one
         // and thus we won't get too much data when retrieving from the cache.
         ContentCacheNode draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
 
         await _databaseCacheRepository.RefreshContentAsync(draftCacheNode, content.PublishedState);
-        _scopeProvider.Context?.Enlist($"UpdateMemoryCache_Draft_{content.Key}", completed =>
-        {
-            if(completed is false)
-            {
-                return;
-            }
-
-            RefreshHybridCacheAsync(draftCacheNode, GetCacheKey(content.Key, true), isSeeded).GetAwaiter().GetResult();
-        }, 1);
 
         if (content.PublishedState == PublishedState.Publishing)
         {
             var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
 
             await _databaseCacheRepository.RefreshContentAsync(publishedCacheNode, content.PublishedState);
-            _scopeProvider.Context?.Enlist($"UpdateMemoryCache_{content.Key}", completed =>
-            {
-                if(completed is false)
-                {
-                    return;
-                }
-
-                RefreshHybridCacheAsync(publishedCacheNode, GetCacheKey(content.Key, false), isSeeded).GetAwaiter().GetResult();
-            }, 1);
         }
 
         scope.Complete();
