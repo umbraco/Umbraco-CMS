@@ -7,6 +7,15 @@
     <!--  TODO: [IDE0270] Simplify null checks, [CS0108] resolve hiding inherited members, [CS1998]
           remove async or make method synchronous, and remove these overrides -->
     <WarningsNotAsErrors>IDE0270,CS0108,CS1998</WarningsNotAsErrors>
+    <!--  TODO: [IDE0270] Simplify null checks, [CS0108] resolve hiding inherited members, [CS1998] remove async or make method synchronous,
+          and remove this override. Ensure NuGet vulnerability warnings are not errors in non-Release mode -->
+    <WarningsNotAsErrors>IDE0270,CS0108,CS1998,NU1901,NU1902,NU1903,NU1904</WarningsNotAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <!-- Ensure NuGet vulnerability warnings are errors for Release mode -->
+    <WarningsAsErrors>
+      NU1901,NU1902,NU1903,NU1904
+    </WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
 

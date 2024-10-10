@@ -6,8 +6,15 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <!--  TODO: [SA1119] Correct unnecessary parenthesis and remove this override -->
-    <WarningsNotAsErrors>SA1119</WarningsNotAsErrors>
+    <!--  TODO: [SA1119] Correct unnecessary parenthesis and remove this override.
+    Ensure NuGet vulnerability warnings are not errors in non-Release mode -->
+    <WarningsNotAsErrors>SA1119,NU1901,NU1902,NU1903,NU1904</WarningsNotAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <!-- Ensure NuGet vulnerability warnings are errors for Release mode -->
+    <WarningsAsErrors>
+      NU1901,NU1902,NU1903,NU1904
+    </WarningsAsErrors>
   </PropertyGroup>
   <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.props" />
   <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.targets" />
