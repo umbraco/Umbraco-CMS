@@ -113,11 +113,11 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 			}
 
 			#router {
-				display: none;
+				visibility: hidden;
 			}
 
 			.has-items #router {
-				display: block;
+				visibility: visible;
 			}
 
 			#empty-state {
