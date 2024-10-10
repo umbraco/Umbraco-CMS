@@ -22,6 +22,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     private readonly ICacheNodeFactory _cacheNodeFactory;
     private readonly IEnumerable<IDocumentSeedKeyProvider> _seedKeyProviders;
     private readonly IPublishedModelFactory _publishedModelFactory;
+    private readonly IPreviewService _previewService;
     private readonly CacheSettings _cacheSettings;
 
     private HashSet<Guid>? _seedKeys;
@@ -54,7 +55,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         ICacheNodeFactory cacheNodeFactory,
         IEnumerable<IDocumentSeedKeyProvider> seedKeyProviders,
         IOptions<CacheSettings> cacheSettings,
-        IPublishedModelFactory publishedModelFactory)
+        IPublishedModelFactory publishedModelFactory,
+        IPreviewService previewService)
     {
         _databaseCacheRepository = databaseCacheRepository;
         _idKeyMap = idKeyMap;
@@ -64,22 +66,30 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         _cacheNodeFactory = cacheNodeFactory;
         _seedKeyProviders = seedKeyProviders;
         _publishedModelFactory = publishedModelFactory;
+        _previewService = previewService;
         _cacheSettings = cacheSettings.Value;
     }
 
-    public async Task<IPublishedContent?> GetByKeyAsync(Guid key, bool preview = false)
+    public async Task<IPublishedContent?> GetByKeyAsync(Guid key, bool? preview = null)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
+        bool calculatedPreview = preview ?? GetPreview();
+
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
-            GetCacheKey(key, preview), // Unique key to the cache entry
-            async cancel => await _databaseCacheRepository.GetContentSourceAsync(key, preview));
+            GetCacheKey(key, calculatedPreview), // Unique key to the cache entry
+            async cancel => await _databaseCacheRepository.GetContentSourceAsync(key, calculatedPreview));
 
         scope.Complete();
-        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview).CreateModel(_publishedModelFactory);
+        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, calculatedPreview).CreateModel(_publishedModelFactory);
     }
 
-    public async Task<IPublishedContent?> GetByIdAsync(int id, bool preview = false)
+    private bool GetPreview()
+    {
+        return _previewService.IsInPreview();
+    }
+
+    public async Task<IPublishedContent?> GetByIdAsync(int id, bool? preview = null)
     {
         Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
         if (keyAttempt.Success is false)
@@ -87,12 +97,14 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             return null;
         }
 
+        bool calculatedPreview = preview ?? GetPreview();
+
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
-            GetCacheKey(keyAttempt.Result, preview), // Unique key to the cache entry
-            async cancel => await _databaseCacheRepository.GetContentSourceAsync(id, preview));
+            GetCacheKey(keyAttempt.Result, calculatedPreview), // Unique key to the cache entry
+            async cancel => await _databaseCacheRepository.GetContentSourceAsync(id, calculatedPreview));
         scope.Complete();
-        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview).CreateModel(_publishedModelFactory);;
+        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, calculatedPreview).CreateModel(_publishedModelFactory);;
     }
 
     public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
