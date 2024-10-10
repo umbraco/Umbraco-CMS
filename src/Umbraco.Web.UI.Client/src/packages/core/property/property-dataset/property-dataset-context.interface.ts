@@ -30,9 +30,9 @@ export interface UmbPropertyDatasetContext extends UmbContext {
 	readonly readOnly: Observable<boolean>;
 
 	// Should it be possible to get the properties as a list of property aliases?
-	readonly properties: Observable<Array<UmbPropertyValueData>>;
-	getProperties(): Array<UmbPropertyValueData>;
-	setProperties(properties: Array<UmbPropertyValueData>): void;
+	readonly properties: Observable<Array<UmbPropertyValueData> | undefined>;
+	getProperties(): Promise<Array<UmbPropertyValueData> | undefined>;
+	//setProperties(properties: Array<UmbPropertyValueData>): void;
 
 	// Property methods:
 	propertyVariantId?: (propertyAlias: string) => Promise<Observable<UmbVariantId | undefined>>;

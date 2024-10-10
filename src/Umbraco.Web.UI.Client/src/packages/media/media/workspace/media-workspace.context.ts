@@ -81,6 +81,11 @@ export class UmbMediaWorkspaceContext
 
 	readonly variants = this.#data.createObservablePartOfCurrent((data) => data?.variants || []);
 
+	readonly values = this.#data.createObservablePartOfCurrent((data) => data?.values);
+	getValues() {
+		return this.#data.getCurrent()?.values;
+	}
+
 	readonly urls = this.#data.createObservablePartOfCurrent((data) => data?.urls || []);
 
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbMediaTypeDetailRepository(this));

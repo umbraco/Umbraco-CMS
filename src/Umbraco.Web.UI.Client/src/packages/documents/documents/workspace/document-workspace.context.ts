@@ -120,6 +120,10 @@ export class UmbDocumentWorkspaceContext
 	readonly unique = this.#data.createObservablePartOfCurrent((data) => data?.unique);
 	readonly entityType = this.#data.createObservablePartOfCurrent((data) => data?.entityType);
 	readonly isTrashed = this.#data.createObservablePartOfCurrent((data) => data?.isTrashed);
+	readonly values = this.#data.createObservablePartOfCurrent((data) => data?.values);
+	getValues() {
+		return this.#data.getCurrent()?.values;
+	}
 
 	readonly contentTypeUnique = this.#data.createObservablePartOfCurrent((data) => data?.documentType.unique);
 	readonly contentTypeHasCollection = this.#data.createObservablePartOfCurrent(

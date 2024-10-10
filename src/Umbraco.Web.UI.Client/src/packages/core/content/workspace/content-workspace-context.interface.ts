@@ -18,6 +18,8 @@ export interface UmbContentWorkspaceContext<
 		UmbPropertyStructureWorkspaceContext<ContentTypeModel> {
 	readonly IS_CONTENT_WORKSPACE_CONTEXT: true;
 	readonly readOnlyState: UmbReadOnlyVariantStateManager;
+	readonly values: Observable<ContentModel['values'] | undefined>;
+	getValues(): ContentModel['values'] | undefined;
 
 	// Data:
 	getData(): ContentModel | undefined;

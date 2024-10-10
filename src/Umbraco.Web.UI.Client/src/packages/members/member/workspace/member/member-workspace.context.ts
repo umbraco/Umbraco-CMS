@@ -18,6 +18,7 @@ import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 	UmbWorkspaceSplitViewManager,
+	umbObjectToPropertyValueArray,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -34,7 +35,7 @@ import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { UmbContentWorkspaceDataManager, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
+import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
@@ -76,6 +77,11 @@ export class UmbMemberWorkspaceContext
 	readonly contentTypeUnique = this.#data.createObservablePartOfCurrent((data) => data?.memberType.unique);
 
 	readonly variants = this.#data.createObservablePartOfCurrent((data) => data?.variants ?? []);
+
+	readonly values = this.#data.createObservablePartOfCurrent((data) => data?.values);
+	getValues() {
+		return this.#data.getCurrent()?.values;
+	}
 
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbMemberTypeDetailRepository(this));
 	readonly variesByCulture = this.structure.ownerContentTypeObservablePart((x) => x?.variesByCulture);

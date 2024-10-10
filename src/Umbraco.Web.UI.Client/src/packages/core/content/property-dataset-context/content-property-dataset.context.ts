@@ -1,19 +1,24 @@
 import type { UmbContentWorkspaceContext } from '../workspace/index.js';
 import type { UmbContentDetailModel } from '../types.js';
-import type {
-	UmbNameablePropertyDatasetContext,
-	UmbPropertyDatasetContext,
-	UmbPropertyValueData,
-} from '@umbraco-cms/backoffice/property';
+import type { UmbNameablePropertyDatasetContext, UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { type Observable, map } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbBooleanState, UmbObjectState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
+import {
+	UmbBasicState,
+	UmbBooleanState,
+	UmbObjectState,
+	classEqualMemoization,
+	createObservablePart,
+	mergeObservables,
+} from '@umbraco-cms/backoffice/observable-api';
 import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbWorkspaceUniqueType } from '@umbraco-cms/backoffice/workspace';
+
+type UmbPropertyVariantIdMapType = Array<{ alias: string; variantId: UmbVariantId }>;
 
 export class UmbContentPropertyDatasetContext<
 		ContentModel extends UmbContentDetailModel = UmbContentDetailModel,
@@ -35,6 +40,12 @@ export class UmbContentPropertyDatasetContext<
 	name = this.#currentVariant.asObservablePart((x) => x?.name);
 	culture = this.#currentVariant.asObservablePart((x) => x?.culture);
 	segment = this.#currentVariant.asObservablePart((x) => x?.segment);
+
+	// eslint-disable-next-line no-unused-private-class-members
+	#propertyVariantIdPromise?: Promise<never>;
+	#propertyVariantIdPromiseResolver?: () => void;
+	#propertyVariantIdMap = new UmbBasicState<UmbPropertyVariantIdMapType>([]);
+	private readonly _propertyVariantIdMap = this.#propertyVariantIdMap.asObservable();
 
 	#readOnly = new UmbBooleanState(false);
 	public readOnly = this.#readOnly.asObservable();
@@ -86,6 +97,21 @@ export class UmbContentPropertyDatasetContext<
 			},
 			'umbObserveReadOnlyStates',
 		);
+
+		// TODO: Refactor this into a separate manager/controller of some sort? [NL]
+		this.observe(this.#workspace.structure.contentTypeProperties, (props: UmbPropertyTypeModel[]) => {
+			this.#propertyVariantIdPromise ??= new Promise((resolve) => {
+				this.#propertyVariantIdPromiseResolver = resolve as any;
+			});
+			const map = props.map((prop) => ({ alias: prop.alias, variantId: this.#createPropertyVariantId(prop) }));
+			this.#propertyVariantIdMap.setValue(map);
+			// Resolve promise, to let the once waiting on this know.
+			if (this.#propertyVariantIdPromiseResolver) {
+				this.#propertyVariantIdPromise = undefined;
+				this.#propertyVariantIdPromiseResolver();
+				this.#propertyVariantIdPromiseResolver = undefined;
+			}
+		});
 	}
 
 	#createPropertyVariantId(property: UmbPropertyTypeModel) {
@@ -95,34 +121,53 @@ export class UmbContentPropertyDatasetContext<
 		});
 	}
 
-	#propertiesObservable?: Observable<Array<UmbPropertyValueData>>;
+	#propertiesObservable?: Observable<ContentModel['values']>;
 	// Should it be possible to get the properties as a list of property aliases?
-	get properties(): Observable<Array<UmbPropertyValueData>> {
+	get properties(): Observable<ContentModel['values']> {
 		if (!this.#propertiesObservable) {
-			const propertiesObservable = this.#workspace.structure.contentTypeProperties;
-			const propertyVariantIds = createObservablePart(propertiesObservable, (props: UmbPropertyTypeModel[]) =>
-				props.map((prop) => this.#createPropertyVariantId(prop)),
+			this.#propertiesObservable = mergeObservables(
+				[this._propertyVariantIdMap, this.#workspace.values],
+				this.#mergeVariantIdsAndValues,
 			);
 		}
 
 		return this.#propertiesObservable;
 	}
-	getProperties(): Array<UmbPropertyValueData> {
-		return [];
+
+	#mergeVariantIdsAndValues([props, values]: [UmbPropertyVariantIdMapType, ContentModel['values'] | undefined]) {
+		const r: ContentModel['values'] = [];
+		if (values) {
+			for (const prop of props) {
+				const f = values.find((v) => prop.alias === v.alias && prop.variantId.compare(v));
+				if (f) {
+					r.push(f);
+				}
+			}
+		}
+		return r;
 	}
-	setProperties(properties: Array<UmbPropertyValueData>): void {
-		throw new Error('not implemented');
+
+	async getProperties(): Promise<ContentModel['values']> {
+		await this.#propertyVariantIdPromise;
+		return this.#mergeVariantIdsAndValues([this.#propertyVariantIdMap.getValue(), this.#workspace.getValues()]);
 	}
 
 	/**
 	 * @function propertyVariantId
 	 * @param {string} propertyAlias - The property alias to observe the variantId of.
-	 * @returns {Promise<Observable<UmbVariantId | undefined> | undefined>}
+	 * @returns {Promise<Observable<UmbVariantId | undefined> | undefined>} - The observable for this properties variantId.
 	 * @description Get an Observable for the variant id of this property.
 	 */
 	async propertyVariantId(propertyAlias: string) {
+		/*
 		return (await this.#workspace.structure.propertyStructureByAlias(propertyAlias)).pipe(
 			map((property) => (property ? this.#createPropertyVariantId(property) : undefined)),
+		);
+		*/
+		return createObservablePart(
+			this._propertyVariantIdMap,
+			(x) => x.find((v) => v.alias === propertyAlias)?.variantId,
+			classEqualMemoization,
 		);
 	}
 
@@ -136,9 +181,10 @@ export class UmbContentPropertyDatasetContext<
 		propertyAlias: string,
 	): Promise<Observable<ReturnType | undefined> | undefined> {
 		await this.#workspace.isLoaded();
-		const structure = await this.#workspace.structure.getPropertyStructureByAlias(propertyAlias);
-		if (structure) {
-			return this.#workspace.propertyValueByAlias<ReturnType>(propertyAlias, this.#createPropertyVariantId(structure));
+		await this.#propertyVariantIdPromise;
+		const propVariantId = this.#propertyVariantIdMap.getValue().find((x) => x.alias === propertyAlias);
+		if (propVariantId) {
+			return this.#workspace.propertyValueByAlias<ReturnType>(propertyAlias, propVariantId.variantId);
 		}
 		return;
 	}
@@ -172,13 +218,10 @@ export class UmbContentPropertyDatasetContext<
 	 */
 	async setPropertyValue(propertyAlias: string, value: PromiseLike<unknown>) {
 		this.#workspace.initiatePropertyValueChange();
-		// This is not reacting to if the property variant settings changes while running.
-		const property = await this.#workspace.structure.getPropertyStructureByAlias(propertyAlias);
-		if (property) {
-			const variantId = this.#createPropertyVariantId(property);
-
-			// This is not reacting to if the property variant settings changes while running.
-			await this.#workspace.setPropertyValue(propertyAlias, await value, variantId);
+		await this.#propertyVariantIdPromise;
+		const propVariantId = this.#propertyVariantIdMap.getValue().find((x) => x.alias === propertyAlias);
+		if (propVariantId) {
+			return this.#workspace.setPropertyValue(propertyAlias, await value, propVariantId.variantId);
 		}
 		this.#workspace.finishPropertyValueChange();
 	}

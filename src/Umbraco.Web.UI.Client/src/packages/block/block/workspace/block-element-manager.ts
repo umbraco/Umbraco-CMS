@@ -30,6 +30,11 @@ export class UmbBlockElementManager extends UmbControllerBase {
 	readonly unique = this.#data.asObservablePart((data) => data?.key);
 	readonly contentTypeId = this.#data.asObservablePart((data) => data?.contentTypeKey);
 
+	readonly values = this.#data.asObservablePart((data) => data?.values);
+	getValues() {
+		return this.#data.getValue()?.values;
+	}
+
 	readonly structure = new UmbContentTypeStructureManager<UmbContentTypeModel>(
 		this,
 		new UmbDocumentTypeDetailRepository(this),
