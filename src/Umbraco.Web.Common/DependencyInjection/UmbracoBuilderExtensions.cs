@@ -1,7 +1,6 @@
 using System.Data.Common;
 using System.Net.Http.Headers;
 using System.Reflection;
-using Dazinator.Extensions.FileProviders.GlobPatternFilter;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
@@ -12,7 +11,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Serilog.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Blocks;
@@ -29,6 +27,7 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Templates;
@@ -49,10 +48,12 @@ using Umbraco.Cms.Web.Common.Configuration;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.FileProviders;
+using Umbraco.Cms.Web.Common.Helpers;
 using Umbraco.Cms.Web.Common.Localization;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Cms.Web.Common.Mvc;
+using Umbraco.Cms.Web.Common.Preview;
 using Umbraco.Cms.Web.Common.Profiler;
 using Umbraco.Cms.Web.Common.Repositories;
 using Umbraco.Cms.Web.Common.Security;
@@ -165,6 +166,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
         builder.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
         builder.Services.AddTransient<IIpAddressUtilities, IpAddressUtilities>();
+        builder.Services.AddUnique<IPreviewTokenGenerator, UserBasedPreviewTokenGenerator>();
 
         return builder;
     }
@@ -176,7 +178,6 @@ public static partial class UmbracoBuilderExtensions
     {
         // Add background jobs
         builder.Services.AddRecurringBackgroundJob<HealthCheckNotifierJob>();
-        builder.Services.AddRecurringBackgroundJob<KeepAliveJob>();
         builder.Services.AddRecurringBackgroundJob<LogScrubberJob>();
         builder.Services.AddRecurringBackgroundJob<ContentVersionCleanupJob>();
         builder.Services.AddRecurringBackgroundJob<ScheduledPublishingJob>();
@@ -269,7 +270,6 @@ public static partial class UmbracoBuilderExtensions
 
         // AspNetCore specific services
         builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
-        builder.AddNotificationHandler<UmbracoRequestBeginNotification, AspNetCoreRequestAccessor>();
         builder.AddNotificationHandler<UmbracoRequestBeginNotification, ApplicationUrlRequestBeginNotificationHandler>();
 
         // Password hasher
@@ -311,6 +311,13 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddScoped<IBackOfficeSecurity, BackOfficeSecurity>();
 
         builder.AddHttpClients();
+
+        return builder;
+    }
+
+    public static IUmbracoBuilder AddHelpers(this IUmbracoBuilder builder)
+    {
+        builder.Services.AddSingleton<OAuthOptionsHelper>();
 
         return builder;
     }

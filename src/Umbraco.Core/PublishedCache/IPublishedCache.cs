@@ -1,13 +1,11 @@
-using System.Xml.XPath;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Xml;
 
 namespace Umbraco.Cms.Core.PublishedCache;
 
 /// <summary>
 ///     Provides access to cached contents.
 /// </summary>
-public interface IPublishedCache : IXPathNavigable
+public interface IPublishedCache
 {
     /// <summary>
     ///     Gets a content identified by its unique identifier.
@@ -93,120 +91,6 @@ public interface IPublishedCache : IXPathNavigable
     /// <returns>The contents.</returns>
     /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
     IEnumerable<IPublishedContent> GetAtRoot(string? culture = null);
-
-    /// <summary>
-    ///     Gets a content resulting from an XPath query.
-    /// </summary>
-    /// <param name="preview">A value indicating whether to consider unpublished content.</param>
-    /// <param name="xpath">The XPath query.</param>
-    /// <param name="vars">Optional XPath variables.</param>
-    /// <returns>The content, or null.</returns>
-    /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    IPublishedContent? GetSingleByXPath(bool preview, string xpath, params XPathVariable[] vars);
-
-    /// <summary>
-    ///     Gets a content resulting from an XPath query.
-    /// </summary>
-    /// <param name="xpath">The XPath query.</param>
-    /// <param name="vars">Optional XPath variables.</param>
-    /// <returns>The content, or null.</returns>
-    /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    IPublishedContent? GetSingleByXPath(string xpath, params XPathVariable[] vars);
-
-    /// <summary>
-    ///     Gets a content resulting from an XPath query.
-    /// </summary>
-    /// <param name="preview">A value indicating whether to consider unpublished content.</param>
-    /// <param name="xpath">The XPath query.</param>
-    /// <param name="vars">Optional XPath variables.</param>
-    /// <returns>The content, or null.</returns>
-    /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    IPublishedContent? GetSingleByXPath(bool preview, XPathExpression xpath, params XPathVariable[] vars);
-
-    /// <summary>
-    ///     Gets a content resulting from an XPath query.
-    /// </summary>
-    /// <param name="xpath">The XPath query.</param>
-    /// <param name="vars">Optional XPath variables.</param>
-    /// <returns>The content, or null.</returns>
-    /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    IPublishedContent? GetSingleByXPath(XPathExpression xpath, params XPathVariable[] vars);
-
-    /// <summary>
-    ///     Gets contents resulting from an XPath query.
-    /// </summary>
-    /// <param name="preview">A value indicating whether to consider unpublished content.</param>
-    /// <param name="xpath">The XPath query.</param>
-    /// <param name="vars">Optional XPath variables.</param>
-    /// <returns>The contents.</returns>
-    /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, params XPathVariable[] vars);
-
-    /// <summary>
-    ///     Gets contents resulting from an XPath query.
-    /// </summary>
-    /// <param name="xpath">The XPath query.</param>
-    /// <param name="vars">Optional XPath variables.</param>
-    /// <returns>The contents.</returns>
-    /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    IEnumerable<IPublishedContent> GetByXPath(string xpath, params XPathVariable[] vars);
-
-    /// <summary>
-    ///     Gets contents resulting from an XPath query.
-    /// </summary>
-    /// <param name="preview">A value indicating whether to consider unpublished content.</param>
-    /// <param name="xpath">The XPath query.</param>
-    /// <param name="vars">Optional XPath variables.</param>
-    /// <returns>The contents.</returns>
-    /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    IEnumerable<IPublishedContent> GetByXPath(bool preview, XPathExpression xpath, params XPathVariable[] vars);
-
-    /// <summary>
-    ///     Gets contents resulting from an XPath query.
-    /// </summary>
-    /// <param name="xpath">The XPath query.</param>
-    /// <param name="vars">Optional XPath variables.</param>
-    /// <returns>The contents.</returns>
-    /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    IEnumerable<IPublishedContent> GetByXPath(XPathExpression xpath, params XPathVariable[] vars);
-
-    /// <summary>
-    ///     Creates an XPath navigator that can be used to navigate contents.
-    /// </summary>
-    /// <param name="preview">A value indicating whether to consider unpublished content.</param>
-    /// <returns>The XPath navigator.</returns>
-    /// <remarks>
-    ///     <para>The value of <paramref name="preview" /> overrides the context.</para>
-    ///     <para>The navigator is already a safe clone (no need to clone it again).</para>
-    /// </remarks>
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    XPathNavigator CreateNavigator(bool preview);
-
-    /// <summary>
-    ///     Creates an XPath navigator that can be used to navigate one node.
-    /// </summary>
-    /// <param name="id">The node identifier.</param>
-    /// <param name="preview">A value indicating whether to consider unpublished content.</param>
-    /// <returns>The XPath navigator, or null.</returns>
-    /// <remarks>
-    ///     <para>The value of <paramref name="preview" /> overrides the context.</para>
-    ///     <para>The navigator is already a safe clone (no need to clone it again).</para>
-    ///     <para>
-    ///         Navigates over the node - and only the node, ie no children. Exists only for backward
-    ///         compatibility + transition reasons, we should obsolete that one as soon as possible.
-    ///     </para>
-    ///     <para>If the node does not exist, returns null.</para>
-    /// </remarks>
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    XPathNavigator? CreateNodeNavigator(int id, bool preview);
 
     /// <summary>
     ///     Gets a value indicating whether the cache contains published content.

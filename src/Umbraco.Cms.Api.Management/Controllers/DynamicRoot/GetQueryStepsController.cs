@@ -21,7 +21,7 @@ public class GetQueryStepsController : DynamicRootControllerBase
     [HttpGet($"steps")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<string>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetQuerySteps()
+    public async Task<IActionResult> GetQuerySteps(CancellationToken cancellationToken)
     {
         IEnumerable<string> querySteps = _dynamicRootQueryStepCollection.Select(x => x.SupportedDirectionAlias);
 

@@ -47,6 +47,7 @@ public class FilterUserFilterController : UserFilterControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Filter(
+        CancellationToken cancellationToken,
         int skip = 0,
         int take = 100,
         UserOrder orderBy = UserOrder.UserName,

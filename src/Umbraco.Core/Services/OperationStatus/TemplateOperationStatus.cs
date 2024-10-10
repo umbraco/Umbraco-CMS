@@ -7,5 +7,6 @@ public enum TemplateOperationStatus
     InvalidAlias,
     DuplicateAlias,
     TemplateNotFound,
-    MasterTemplateNotFound
+    MasterTemplateNotFound,
+    CircularMasterTemplateReference
 }

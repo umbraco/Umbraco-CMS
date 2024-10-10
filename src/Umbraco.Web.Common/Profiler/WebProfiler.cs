@@ -38,6 +38,7 @@ public class WebProfiler : IProfiler
 
     public IDisposable? Step(string name) =>
         MiniProfiler.Current?.Step(name);
+    bool IsEnabled => true;
 
     public void Start()
     {
@@ -108,7 +109,7 @@ public class WebProfiler : IProfiler
                     && !location.Contains("://"))
                 {
                     MiniProfilerContext.Value.Root.Name = "Before Redirect";
-                    cookieManager.SetCookieValue(WebProfileCookieKey, MiniProfilerContext.Value.ToJson());
+                    cookieManager.SetCookieValue(WebProfileCookieKey, MiniProfilerContext.Value.ToJson(), false);
                 }
             }
         }
@@ -124,7 +125,7 @@ public class WebProfiler : IProfiler
             return false;
         }
 
-        var miniprofilerOptions = _httpContextAccessor.HttpContext?.RequestServices?.GetService<IOptions<MiniProfilerOptions>>();
+        IOptions<MiniProfilerOptions>? miniprofilerOptions = _httpContextAccessor.HttpContext?.RequestServices?.GetService<IOptions<MiniProfilerOptions>>();
         if (miniprofilerOptions is not null && miniprofilerOptions.Value.IgnoredPaths.Contains(request.Path))
         {
             return false;

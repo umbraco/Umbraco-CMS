@@ -23,16 +23,6 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         private readonly IApiElementBuilder _apiElementBuilder;
         private readonly BlockGridPropertyValueConstructorCache _constructorCache;
 
-        [Obsolete("Please use non-obsolete construtor. This will be removed in Umbraco 14.")]
-        public BlockGridPropertyValueConverter(
-            IProfilingLogger proflog,
-            BlockEditorConverter blockConverter,
-            IJsonSerializer jsonSerializer)
-            : this(proflog, blockConverter, jsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IApiElementBuilder>())
-        {
-
-        }
-
         [Obsolete("Please use non-obsolete construtor. This will be removed in Umbraco 15.")]
         public BlockGridPropertyValueConverter(
             IProfilingLogger proflog,

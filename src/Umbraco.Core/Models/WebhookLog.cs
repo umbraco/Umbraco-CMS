@@ -27,4 +27,6 @@ public class WebhookLog
     public string ResponseBody { get; set; } = string.Empty;
 
     public bool ExceptionOccured { get; set; }
+
+    public bool IsSuccessStatusCode { get; set; }
 }

@@ -1,5 +1,4 @@
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Xml.XPath;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.Navigable;
 
@@ -62,15 +61,8 @@ internal class NavigableContent : INavigableContent
             return _builtInValues[index];
         }
 
-        index -= NavigableContentType.BuiltinProperties.Length;
-        IPublishedProperty[] properties = _content.PropertiesArray;
-        if (index >= properties.Length)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-
         // custom property, ie element
-        return properties[index].GetXPathValue();
+        return null;
     }
 
     #endregion

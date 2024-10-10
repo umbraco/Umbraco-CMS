@@ -229,8 +229,4 @@ public abstract class IOHelper : IIOHelper
             ? CleanFolderResult.FailedWithErrors(errors)
             : CleanFolderResult.Success();
     }
-
-    [Obsolete("Use Path.IsPathFullyQualified instead. This will be removed in Umbraco 13.")]
-
-    public virtual bool IsPathFullyQualified(string path) => Path.IsPathFullyQualified(path);
 }

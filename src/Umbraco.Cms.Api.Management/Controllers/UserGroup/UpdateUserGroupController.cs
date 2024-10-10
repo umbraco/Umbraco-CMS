@@ -32,7 +32,10 @@ public class UpdateUserGroupController : UserGroupControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, UpdateUserGroupRequestModel updateUserGroupRequestModel)
+    public async Task<IActionResult> Update(
+        CancellationToken cancellationToken,
+        Guid id,
+        UpdateUserGroupRequestModel updateUserGroupRequestModel)
     {
         IUserGroup? existingUserGroup = await _userGroupService.GetAsync(id);
 

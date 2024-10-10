@@ -19,10 +19,10 @@ public class ChildrenDictionaryTreeController : DictionaryTreeControllerBase
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<NamedEntityTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<NamedEntityTreeItemResponseModel>>> Children(Guid parentId, int skip = 0, int take = 100)
+    public async Task<ActionResult<PagedViewModel<NamedEntityTreeItemResponseModel>>> Children(CancellationToken cancellationToken, Guid parentId, int skip = 0, int take = 100)
     {
         PagedModel<IDictionaryItem> paginatedItems = await DictionaryItemService.GetPagedAsync(parentId, skip, take);
 
-        return Ok(PagedViewModel(await MapTreeItemViewModels(parentId, paginatedItems.Items), paginatedItems.Total));
+        return Ok(PagedViewModel(await MapTreeItemViewModels(paginatedItems.Items), paginatedItems.Total));
     }
 }

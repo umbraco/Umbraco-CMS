@@ -16,7 +16,8 @@ test.describe('Relation type tests', () => {
     await umbracoApi.relationType.ensureNameNotExists(relationTypeName);
   });
 
-  test('can create a relation type', async ({umbracoApi}) => {
+  // Skip this test because there is currently no endpoint available for creating a relation type anymore.
+  test.skip('can create a relation type', async ({umbracoApi}) => {
     // Act
     relationTypeId = await umbracoApi.relationType.create(relationTypeName, false, false, objectTypeId, objectTypeId);
 
@@ -24,7 +25,8 @@ test.describe('Relation type tests', () => {
     expect(await umbracoApi.relationType.doesExist(relationTypeId)).toBeTruthy();
   });
 
-  test('can update a relation type', async ({umbracoApi}) => {
+  // Skip this test because there is currently no endpoint available for updating a relation type anymore.
+  test.skip('can update a relation type', async ({umbracoApi}) => {
     // Arrange
     const wrongRelationTypeName = 'Updated Relation Type';
     relationTypeId = await umbracoApi.relationType.create(wrongRelationTypeName, false, false, objectTypeId, objectTypeId);
@@ -41,7 +43,8 @@ test.describe('Relation type tests', () => {
     expect(updatedRelationType.name).toEqual(relationTypeName);
   });
 
-  test('can delete a relation type', async ({umbracoApi}) => {
+  // Skip this test because there is currently no endpoint available for deleting a relation type anymore.
+  test.skip('can delete a relation type', async ({umbracoApi}) => {
     // Arrange
     relationTypeId = await umbracoApi.relationType.create(relationTypeName, false, false, objectTypeId, objectTypeId);
     expect(await umbracoApi.relationType.doesExist(relationTypeId)).toBeTruthy();

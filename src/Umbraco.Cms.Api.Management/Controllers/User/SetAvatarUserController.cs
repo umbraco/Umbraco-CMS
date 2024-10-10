@@ -29,7 +29,7 @@ public class SetAvatarUserController : UserControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> SetAvatar(Guid id, SetAvatarRequestModel model)
+    public async Task<IActionResult> SetAvatar(CancellationToken cancellationToken, Guid id, SetAvatarRequestModel model)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,

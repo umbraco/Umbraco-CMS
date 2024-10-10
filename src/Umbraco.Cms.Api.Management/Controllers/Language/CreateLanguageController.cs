@@ -36,7 +36,9 @@ public class CreateLanguageController : LanguageControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create(CreateLanguageRequestModel createLanguageRequestModel)
+    public async Task<IActionResult> Create(
+        CancellationToken cancellationToken,
+        CreateLanguageRequestModel createLanguageRequestModel)
     {
         ILanguage created = _umbracoMapper.Map<ILanguage>(createLanguageRequestModel)!;
 

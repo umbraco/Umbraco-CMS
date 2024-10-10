@@ -18,18 +18,15 @@ public class CreateUserController : UserControllerBase
 {
     private readonly IUserService _userService;
     private readonly IUserPresentationFactory _presentationFactory;
-    private readonly IUmbracoMapper _mapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public CreateUserController(
         IUserService userService,
         IUserPresentationFactory presentationFactory,
-        IUmbracoMapper mapper,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _userService = userService;
         _presentationFactory = presentationFactory;
-        _mapper = mapper;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -38,7 +35,7 @@ public class CreateUserController : UserControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(CreateUserRequestModel model)
+    public async Task<IActionResult> Create(CancellationToken cancellationToken, CreateUserRequestModel model)
     {
         UserCreateModel createModel = await _presentationFactory.CreateCreationModelAsync(model);
 

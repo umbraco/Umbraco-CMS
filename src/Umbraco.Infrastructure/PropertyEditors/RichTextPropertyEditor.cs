@@ -2,12 +2,16 @@
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -45,6 +49,8 @@ public class RichTextPropertyEditor : DataEditor
 
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => _richTextPropertyIndexValueFactory;
 
+    public override bool SupportsConfigurableElements => true;
+
     /// <summary>
     ///     Create a custom value editor
     /// </summary>
@@ -62,13 +68,55 @@ public class RichTextPropertyEditor : DataEditor
     internal class RichTextPropertyValueEditor : BlockValuePropertyValueEditorBase<RichTextBlockValue, RichTextBlockLayoutItem>
     {
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+        private readonly ILocalizedTextService _localizedTextService;
         private readonly IHtmlSanitizer _htmlSanitizer;
         private readonly HtmlImageSourceParser _imageSourceParser;
         private readonly HtmlLocalLinkParser _localLinkParser;
         private readonly RichTextEditorPastedImages _pastedImages;
         private readonly IJsonSerializer _jsonSerializer;
-        private readonly IContentTypeService _contentTypeService;
+        private readonly IBlockEditorElementTypeCache _elementTypeCache;
+        private readonly IRichTextRequiredValidator _richTextRequiredValidator;
         private readonly ILogger<RichTextPropertyValueEditor> _logger;
+
+        [Obsolete("Use non-obsolete constructor. This is schedules for removal in v16.")]
+        public RichTextPropertyValueEditor(
+            DataEditorAttribute attribute,
+            PropertyEditorCollection propertyEditors,
+            IDataTypeConfigurationCache dataTypeReadCache,
+            ILogger<RichTextPropertyValueEditor> logger,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper,
+            HtmlImageSourceParser imageSourceParser,
+            HtmlLocalLinkParser localLinkParser,
+            RichTextEditorPastedImages pastedImages,
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
+            IHtmlSanitizer htmlSanitizer,
+            IBlockEditorElementTypeCache elementTypeCache,
+            IPropertyValidationService propertyValidationService,
+            DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection)
+            : this(
+                attribute,
+                propertyEditors,
+                dataTypeReadCache,
+                logger,
+                backOfficeSecurityAccessor,
+                localizedTextService,
+                shortStringHelper,
+                imageSourceParser,
+                localLinkParser,
+                pastedImages,
+                jsonSerializer,
+                ioHelper,
+                htmlSanitizer,
+                elementTypeCache,
+                propertyValidationService,
+                dataValueReferenceFactoryCollection,
+                StaticServiceProvider.Instance.GetRequiredService<IRichTextRequiredValidator>())
+        {
+
+        }
 
         public RichTextPropertyValueEditor(
             DataEditorAttribute attribute,
@@ -84,22 +132,27 @@ public class RichTextPropertyEditor : DataEditor
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             IHtmlSanitizer htmlSanitizer,
-            IContentTypeService contentTypeService,
+            IBlockEditorElementTypeCache elementTypeCache,
             IPropertyValidationService propertyValidationService,
-            DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection)
+            DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection,
+            IRichTextRequiredValidator richTextRequiredValidator)
             : base(attribute, propertyEditors, dataTypeReadCache, localizedTextService, logger, shortStringHelper, jsonSerializer, ioHelper, dataValueReferenceFactoryCollection)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+            _localizedTextService = localizedTextService;
             _imageSourceParser = imageSourceParser;
             _localLinkParser = localLinkParser;
             _pastedImages = pastedImages;
             _htmlSanitizer = htmlSanitizer;
-            _contentTypeService = contentTypeService;
+            _elementTypeCache = elementTypeCache;
+            _richTextRequiredValidator = richTextRequiredValidator;
             _jsonSerializer = jsonSerializer;
             _logger = logger;
 
-            Validators.Add(new RichTextEditorBlockValidator(propertyValidationService, CreateBlockEditorValues(), contentTypeService, jsonSerializer, logger));
+            Validators.Add(new RichTextEditorBlockValidator(propertyValidationService, CreateBlockEditorValues(), elementTypeCache, jsonSerializer, logger));
         }
+
+        public override IValueRequiredValidator RequiredValidator => _richTextRequiredValidator;
 
         /// <inheritdoc />
         public override object? ConfigurationObject
@@ -214,18 +267,15 @@ public class RichTextPropertyEditor : DataEditor
                           Constants.Security.SuperUserKey;
 
             var config = editorValue.DataTypeConfiguration as RichTextConfiguration;
-            GuidUdi? mediaParent = config?.MediaParentId;
-            Guid mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
+            Guid mediaParentId = config?.MediaParentId ?? Guid.Empty;
 
             if (string.IsNullOrWhiteSpace(richTextEditorValue.Markup))
             {
                 return null;
             }
 
-            var parseAndSaveBase64Images = _pastedImages.FindAndPersistEmbeddedImages(
-                richTextEditorValue.Markup, mediaParentId, userKey);
             var parseAndSavedTempImages = _pastedImages
-                .FindAndPersistPastedTempImagesAsync(parseAndSaveBase64Images, mediaParentId, userKey)
+                .FindAndPersistPastedTempImagesAsync(richTextEditorValue.Markup, mediaParentId, userKey)
                 .GetAwaiter()
                 .GetResult();
             var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
@@ -237,6 +287,12 @@ public class RichTextPropertyEditor : DataEditor
 
             // return json
             return RichTextPropertyEditorHelper.SerializeRichTextEditorValue(cleanedUpRichTextEditorValue, _jsonSerializer);
+        }
+
+        public override IEnumerable<Guid> ConfiguredElementTypeKeys()
+        {
+            var configuration = ConfigurationObject as RichTextConfiguration;
+            return configuration?.Blocks?.SelectMany(ConfiguredElementTypeKeys) ?? Enumerable.Empty<Guid>();
         }
 
         private bool TryParseEditorValue(object? value, [NotNullWhen(true)] out RichTextEditorValue? richTextEditorValue)
@@ -257,7 +313,8 @@ public class RichTextPropertyEditor : DataEditor
                 handleMapping(blockEditorData.BlockValue);
                 return new RichTextEditorValue
                 {
-                    Markup = richTextEditorValue.Markup, Blocks = blockEditorData.BlockValue
+                    Markup = richTextEditorValue.Markup,
+                    Blocks = blockEditorData.BlockValue,
                 };
             }
 
@@ -266,7 +323,8 @@ public class RichTextPropertyEditor : DataEditor
 
             RichTextEditorValue MarkupWithEmptyBlocks() => new()
             {
-                Markup = richTextEditorValue.Markup, Blocks = new RichTextBlockValue()
+                Markup = richTextEditorValue.Markup,
+                Blocks = new RichTextBlockValue(),
             };
         }
 
@@ -277,6 +335,6 @@ public class RichTextPropertyEditor : DataEditor
         }
 
         private BlockEditorValues<RichTextBlockValue, RichTextBlockLayoutItem> CreateBlockEditorValues()
-            => new(new RichTextEditorBlockDataConverter(), _contentTypeService, _logger);
+            => new(new RichTextEditorBlockDataConverter(_jsonSerializer), _elementTypeCache, _logger);
     }
 }

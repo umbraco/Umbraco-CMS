@@ -285,11 +285,6 @@ public static partial class Constants
             public static readonly Guid ListViewMediaGuid = new(ListViewMedia);
 
             /// <summary>
-            ///     Guid for List View - Members
-            /// </summary>
-            public static readonly Guid ListViewMembersGuid = new(ListViewMembers);
-
-            /// <summary>
             ///     Guid for Date Picker with time
             /// </summary>
             public static readonly Guid DatePickerWithTimeGuid = new(DatePickerWithTime);

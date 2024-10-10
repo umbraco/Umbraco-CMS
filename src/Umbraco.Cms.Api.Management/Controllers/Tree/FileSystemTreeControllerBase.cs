@@ -12,8 +12,6 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
 {
     protected abstract IFileSystem FileSystem { get; }
 
-    protected abstract string ItemType(string path);
-
     protected async Task<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>> GetRoot(int skip, int take)
     {
         FileSystemTreeItemPresentationModel[] viewModels = GetPathViewModels(string.Empty, skip, take, out var totalItems);
@@ -28,6 +26,30 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
 
         PagedViewModel<FileSystemTreeItemPresentationModel> result = PagedViewModel(viewModels, totalItems);
         return await Task.FromResult(Ok(result));
+    }
+
+    protected virtual async Task<ActionResult<IEnumerable<FileSystemTreeItemPresentationModel>>> GetAncestors(string path, bool includeSelf = true)
+    {
+        path = path.VirtualPathToSystemPath();
+        FileSystemTreeItemPresentationModel[] models = GetAncestorModels(path, includeSelf);
+
+        return await Task.FromResult(Ok(models));
+    }
+
+    protected virtual FileSystemTreeItemPresentationModel[] GetAncestorModels(string path, bool includeSelf)
+    {
+        var directories = path.Split(Path.DirectorySeparatorChar).Take(Range.EndAt(Index.FromEnd(1))).ToArray();
+        var result = directories
+            .Select((directory, index) => MapViewModel(string.Join(Path.DirectorySeparatorChar, directories.Take(index + 1)), directory, true))
+            .ToList();
+
+        if (includeSelf)
+        {
+            var selfIsFolder = FileSystem.FileExists(path) is false;
+            result.Add(MapViewModel(path, GetFileSystemItemName(selfIsFolder, path), selfIsFolder));
+        }
+
+        return result.ToArray();
     }
 
     protected virtual string[] GetDirectories(string path) => FileSystem
@@ -56,7 +78,7 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
         FileSystemTreeItemPresentationModel ViewModel(string itemPath, bool isFolder)
             => MapViewModel(
                 itemPath,
-                isFolder ? Path.GetFileName(itemPath) : FileSystem.GetFileName(itemPath),
+                GetFileSystemItemName(isFolder, itemPath),
                 isFolder);
 
         return allItems
@@ -65,6 +87,10 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
             .Select(item => ViewModel(item.Path, item.IsFolder))
             .ToArray();
     }
+
+    private string GetFileSystemItemName(bool isFolder, string itemPath) => isFolder
+        ? Path.GetFileName(itemPath)
+        : FileSystem.GetFileName(itemPath);
 
     private PagedViewModel<FileSystemTreeItemPresentationModel> PagedViewModel(IEnumerable<FileSystemTreeItemPresentationModel> viewModels, long totalItems)
         => new() { Total = totalItems, Items = viewModels };
@@ -77,7 +103,6 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
             Path = path.SystemPathToVirtualPath(),
             Name = name,
             HasChildren = isFolder && DirectoryHasChildren(path),
-            Type = ItemType(path),
             IsFolder = isFolder,
             Parent = parentPath.IsNullOrWhiteSpace()
                 ? null

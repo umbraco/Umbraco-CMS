@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using Umbraco.Cms.Core.Services.AuthorizationStatus;
-using Umbraco.Cms.Core.Services.OperationStatus;
-
 namespace Umbraco.Extensions
 {
     /// <summary>
@@ -29,29 +25,5 @@ namespace Umbraco.Extensions
 
             return (v & f) > 0;
         }
-
-        /// <summary>
-        ///     Converts from <see cref="UserGroupAuthorizationStatus" /> to <see cref="UserGroupOperationStatus" />.
-        /// </summary>
-        /// <param name="from">The authorization status to convert from.</param>
-        /// <returns>The corresponding operation status.</returns>
-        /// <exception cref="NotImplementedException">Thrown if an authorization status does not have a corresponding operation status.</exception>
-        internal static UserGroupOperationStatus ToUserGroupOperationStatus(this UserGroupAuthorizationStatus from) =>
-            from switch
-            {
-                UserGroupAuthorizationStatus.Success
-                    => UserGroupOperationStatus.Success,
-                UserGroupAuthorizationStatus.UnauthorizedMissingAllowedSectionAccess
-                    => UserGroupOperationStatus.UnauthorizedMissingAllowedSectionAccess,
-                UserGroupAuthorizationStatus.UnauthorizedMissingContentStartNodeAccess
-                    => UserGroupOperationStatus.UnauthorizedMissingContentStartNodeAccess,
-                UserGroupAuthorizationStatus.UnauthorizedMissingMediaStartNodeAccess
-                    => UserGroupOperationStatus.UnauthorizedMissingMediaStartNodeAccess,
-                UserGroupAuthorizationStatus.UnauthorizedMissingUserGroupAccess
-                    => UserGroupOperationStatus.UnauthorizedMissingUserGroupAccess,
-                UserGroupAuthorizationStatus.UnauthorizedMissingUsersSectionAccess
-                    => UserGroupOperationStatus.UnauthorizedMissingUsersSectionAccess,
-                _ => throw new NotImplementedException("UserGroupAuthorizationStatus does not map to a corresponding UserGroupOperationStatus")
-            };
     }
 }

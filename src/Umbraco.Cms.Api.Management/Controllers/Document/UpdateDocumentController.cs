@@ -36,7 +36,10 @@ public class UpdateDocumentController : UpdateDocumentControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, UpdateDocumentRequestModel requestModel)
+    public async Task<IActionResult> Update(
+        CancellationToken cancellationToken,
+        Guid id,
+        UpdateDocumentRequestModel requestModel)
         => await HandleRequest(id, requestModel, async () =>
         {
             ContentUpdateModel model = _documentEditingPresentationFactory.MapUpdateModel(requestModel);

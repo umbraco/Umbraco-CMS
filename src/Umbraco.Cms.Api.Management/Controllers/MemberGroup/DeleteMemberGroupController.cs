@@ -20,7 +20,7 @@ public class DeleteMemberGroupController : MemberGroupControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
     {
         Attempt<IMemberGroup?, MemberGroupOperationStatus> result = await _memberGroupService.DeleteAsync(id);
         return result.Success

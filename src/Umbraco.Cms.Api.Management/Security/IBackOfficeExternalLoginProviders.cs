@@ -19,13 +19,6 @@ public interface IBackOfficeExternalLoginProviders
     Task<IEnumerable<BackOfficeExternaLoginProviderScheme>> GetBackOfficeProvidersAsync();
 
     /// <summary>
-    ///     Returns the authentication type for the last registered external login (oauth) provider that specifies an
-    ///     auto-login redirect option
-    /// </summary>
-    /// <returns></returns>
-    string? GetAutoLoginProvider();
-
-    /// <summary>
     ///     Returns true if there is any external provider that has the Deny Local Login option configured
     /// </summary>
     /// <returns></returns>

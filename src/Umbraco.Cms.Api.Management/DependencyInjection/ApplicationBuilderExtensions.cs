@@ -27,13 +27,13 @@ internal static class ApplicationBuilderExtensions
                 var officePath = settings.GetBackOfficePath(hostingEnvironment);
 
                 // Only use the API exception handler when we are requesting an API
-                // FIXME: magic string "management/api" is used several times across the codebase
-                return httpContext.Request.Path.Value?.StartsWith($"{officePath}/management/api/") ?? false;
+                return httpContext.Request.Path.Value?.StartsWith($"{officePath}{Constants.Web.ManagementApiPath}") ?? false;
             },
             innerBuilder =>
             {
                 innerBuilder.UseExceptionHandler(exceptionBuilder => exceptionBuilder.Run(async context =>
                 {
+                    var isDebug = context.RequestServices.GetRequiredService<IHostingEnvironment>().IsDebugMode;
                     Exception? exception = context.Features.Get<IExceptionHandlerPathFeature>()?.Error;
                     if (exception is null)
                     {
@@ -43,16 +43,16 @@ internal static class ApplicationBuilderExtensions
                     var response = new ProblemDetails
                     {
                         Title = exception.Message,
-                        Detail = exception.StackTrace,
+                        Detail = isDebug ? exception.StackTrace : null,
                         Status = StatusCodes.Status500InternalServerError,
-                        Instance = exception.GetType().Name,
+                        Instance = isDebug ? exception.GetType().Name : null,
                         Type = "Error"
                     };
                     await context.Response.WriteAsJsonAsync(response);
                 }));
             });
 
-    internal static IApplicationBuilder UseEndpoints(this IApplicationBuilder applicationBuilder)
+internal static IApplicationBuilder UseEndpoints(this IApplicationBuilder applicationBuilder)
     {
         IServiceProvider provider = applicationBuilder.ApplicationServices;
 
@@ -65,8 +65,7 @@ internal static class ApplicationBuilderExtensions
             endpoints.MapControllers();
 
             // Serve contract
-            // FIXME: magic string "management/api" is used several times across the codebase
-            endpoints.MapGet($"{officePath}/management/api/openapi.json", async context =>
+            endpoints.MapGet($"{officePath}{Constants.Web.ManagementApiPath}openapi.json", async context =>
             {
                 await context.Response.SendFileAsync(new EmbeddedFileProvider(typeof(ManagementApiComposer).Assembly).GetFileInfo("OpenApi.json"));
             });

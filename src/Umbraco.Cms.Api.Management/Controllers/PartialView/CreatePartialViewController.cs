@@ -34,7 +34,9 @@ public class CreatePartialViewController : PartialViewControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(CreatePartialViewRequestModel requestModel)
+    public async Task<IActionResult> Create(
+        CancellationToken cancellationToken,
+        CreatePartialViewRequestModel requestModel)
     {
         PartialViewCreateModel createModel = _umbracoMapper.Map<PartialViewCreateModel>(requestModel)!;
         Attempt<IPartialView?, PartialViewOperationStatus> createAttempt = await _partialViewService.CreateAsync(createModel, CurrentUserKey(_backOfficeSecurityAccessor));

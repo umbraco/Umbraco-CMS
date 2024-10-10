@@ -30,7 +30,10 @@ public class AllIndexerController : IndexerControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<IndexResponseModel>), StatusCodes.Status200OK)]
-    public Task<PagedViewModel<IndexResponseModel>> All(int skip = 0, int take = 100)
+    public Task<PagedViewModel<IndexResponseModel>> All(
+        CancellationToken cancellationToken,
+        int skip = 0,
+        int take = 100)
     {
         IndexResponseModel[] indexes = _examineManager.Indexes
             .Select(_indexPresentationFactory.Create)

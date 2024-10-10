@@ -28,7 +28,10 @@ public class EnableTwoFactorProviderCurrentUserController : CurrentUserControlle
     [ProducesResponseType(typeof(ISetupTwoFactorModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> EnableTwoFactorProvider(string providerName, EnableTwoFactorRequestModel model)
+    public async Task<IActionResult> EnableTwoFactorProvider(
+        CancellationToken cancellationToken,
+        string providerName,
+        EnableTwoFactorRequestModel model)
     {
         Guid userKey = CurrentUserKey(_backOfficeSecurityAccessor);
 

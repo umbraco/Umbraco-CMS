@@ -22,7 +22,7 @@ public class CreateDataTypeFolderController : DataTypeFolderControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(CreateFolderRequestModel createFolderRequestModel)
+    public async Task<IActionResult> Create(CancellationToken cancellationToken, CreateFolderRequestModel createFolderRequestModel)
         => await CreateFolderAsync<ByKeyDataTypeFolderController>(
             createFolderRequestModel,
             controller => nameof(controller.ByKey));

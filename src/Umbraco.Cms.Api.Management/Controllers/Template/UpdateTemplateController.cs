@@ -33,7 +33,10 @@ public class UpdateTemplateController : TemplateControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, UpdateTemplateRequestModel requestModel)
+    public async Task<IActionResult> Update(
+        CancellationToken cancellationToken,
+        Guid id,
+        UpdateTemplateRequestModel requestModel)
     {
         ITemplate? template = await _templateService.GetAsync(id);
         if (template == null)

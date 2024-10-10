@@ -18,6 +18,4 @@ public class ScriptTreeControllerBase : FileSystemTreeControllerBase
                         throw new ArgumentException("Missing scripts file system", nameof(fileSystems));
 
     protected override IFileSystem FileSystem { get; }
-
-    protected override string ItemType(string path) => Constants.UdiEntityType.Script;
 }

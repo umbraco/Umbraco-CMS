@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -455,5 +455,5 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         return new PublishedElementPropertyBase(elementPropertyType, parent, false, PropertyCacheLevel.None);
     }
 
-    protected IApiContentRouteBuilder ApiContentRouteBuilder() => CreateContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings());
+    protected IApiContentRouteBuilder ApiContentRouteBuilder() => CreateContentRouteBuilder(ApiContentPathProvider, CreateGlobalSettings());
 }

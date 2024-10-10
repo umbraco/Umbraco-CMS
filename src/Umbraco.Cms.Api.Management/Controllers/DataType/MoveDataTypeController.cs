@@ -26,7 +26,7 @@ public class MoveDataTypeController : DataTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Move(Guid id, MoveDataTypeRequestModel moveDataTypeRequestModel)
+    public async Task<IActionResult> Move(CancellationToken cancellationToken, Guid id, MoveDataTypeRequestModel moveDataTypeRequestModel)
     {
         IDataType? source = await _dataTypeService.GetAsync(id);
         if (source is null)

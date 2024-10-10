@@ -20,7 +20,7 @@ public class AuthorizeUpgradeController : UpgradeControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Authorize()
+    public async Task<IActionResult> Authorize(CancellationToken cancellationToken)
     {
         Attempt<InstallationResult?, UpgradeOperationStatus> result = await _upgradeService.UpgradeAsync();
         return UpgradeOperationResult(result.Status, result.Result);

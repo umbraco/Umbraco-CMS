@@ -23,4 +23,10 @@ internal sealed class DataTypeContainerService : EntityTypeContainerService<IDat
     protected override Guid ContainedObjectType => Constants.ObjectTypes.DataType;
 
     protected override UmbracoObjectTypes ContainerObjectType => UmbracoObjectTypes.DataTypeContainer;
+
+    // data types do not have read/write locks (yet)
+    protected override int[] ReadLockIds => [];
+
+    // data types do not have read/write locks (yet)
+    protected override int[] WriteLockIds => [];
 }

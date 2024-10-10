@@ -54,7 +54,7 @@ public interface ITrackedReferencesService
     ///     Gets a paged result of items which are in relation with the current item.
     ///     Basically, shows the items which depend on the current item.
     /// </summary>
-    /// <param name="id">The identifier of the entity to retrieve relations for.</param>
+    /// <param name="key">The identifier of the entity to retrieve relations for.</param>
     /// <param name="skip">The amount of items to skip</param>
     /// <param name="take">The amount of items to take.</param>
     /// <param name="filterMustBeIsDependency">

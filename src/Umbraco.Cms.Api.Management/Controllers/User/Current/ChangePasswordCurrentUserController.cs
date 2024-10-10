@@ -29,7 +29,9 @@ public class ChangePasswordCurrentUserController : CurrentUserControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> ChangePassword(ChangePasswordCurrentUserRequestModel model)
+    public async Task<IActionResult> ChangePassword(
+        CancellationToken cancellationToken,
+        ChangePasswordCurrentUserRequestModel model)
     {
         Guid userKey = CurrentUserKey(_backOfficeSecurityAccessor);
 

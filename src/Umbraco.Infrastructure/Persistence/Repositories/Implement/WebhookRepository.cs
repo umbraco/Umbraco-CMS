@@ -61,11 +61,9 @@ public class WebhookRepository : IWebhookRepository
     public async Task<PagedModel<IWebhook>> GetByIdsAsync(IEnumerable<Guid> keys)
     {
         Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
-            .SelectAll()
+            .Select<WebhookDto>()
             .From<WebhookDto>()
-            .InnerJoin<Webhook2EventsDto>()
-            .On<WebhookDto, Webhook2EventsDto>(left => left.Id, right => right.WebhookId)
-            .WhereIn<Webhook2EventsDto>(x => x.WebhookId, keys);
+            .WhereIn<WebhookDto>(x => x.Key, keys);
 
         List<WebhookDto>? webhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<WebhookDto>(sql)!;
 

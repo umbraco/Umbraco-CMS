@@ -1,12 +1,9 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers.Content;
@@ -17,32 +14,6 @@ public class ByIdsContentApiController : ContentApiItemControllerBase
 {
     private readonly IRequestMemberAccessService _requestMemberAccessService;
 
-    [Obsolete($"Please use the constructor that does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
-    public ByIdsContentApiController(
-        IApiPublishedContentCache apiPublishedContentCache,
-        IApiContentResponseBuilder apiContentResponseBuilder,
-        IPublicAccessService publicAccessService)
-        : this(
-            apiPublishedContentCache,
-            apiContentResponseBuilder,
-            StaticServiceProvider.Instance.GetRequiredService<IRequestMemberAccessService>())
-    {
-    }
-
-    [Obsolete($"Please use the constructor that does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
-    public ByIdsContentApiController(
-        IApiPublishedContentCache apiPublishedContentCache,
-        IApiContentResponseBuilder apiContentResponseBuilder,
-        IPublicAccessService publicAccessService,
-        IRequestMemberAccessService requestMemberAccessService)
-        : this(
-            apiPublishedContentCache,
-            apiContentResponseBuilder,
-            requestMemberAccessService)
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
     public ByIdsContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilder,

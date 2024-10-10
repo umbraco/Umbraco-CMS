@@ -28,7 +28,9 @@ public class ValidateDatabaseInstallController : InstallControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> ValidateDatabase(DatabaseInstallRequestModel viewModel)
+    public async Task<IActionResult> ValidateDatabase(
+        CancellationToken cancellationToken,
+        DatabaseInstallRequestModel viewModel)
     {
         DatabaseModel databaseModel = _mapper.Map<DatabaseModel>(viewModel)!;
 

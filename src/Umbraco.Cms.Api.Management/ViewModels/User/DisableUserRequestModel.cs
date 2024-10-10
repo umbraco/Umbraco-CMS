@@ -2,5 +2,5 @@
 
 public class DisableUserRequestModel
 {
-    public HashSet<Guid> UserIds { get; set; } = new();
+    public HashSet<ReferenceByIdModel> UserIds { get; set; } = new();
 }

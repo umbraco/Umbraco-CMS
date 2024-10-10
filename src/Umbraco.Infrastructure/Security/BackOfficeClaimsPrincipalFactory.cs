@@ -17,11 +17,11 @@ public class BackOfficeClaimsPrincipalFactory : UserClaimsPrincipalFactory<BackO
     /// </summary>
     /// <param name="userManager">The user manager</param>
     /// <param name="optionsAccessor">The <see cref="BackOfficeIdentityOptions" /></param>
+    /// <param name="backOfficeAuthenticationTypeSettings"></param>
     public BackOfficeClaimsPrincipalFactory(
         UserManager<BackOfficeIdentityUser> userManager,
         IOptions<BackOfficeIdentityOptions> optionsAccessor,
-        IOptions<BackOfficeAuthenticationTypeSettings> backOfficeAuthenticationTypeSettings
-        )
+        IOptions<BackOfficeAuthenticationTypeSettings> backOfficeAuthenticationTypeSettings)
         : base(userManager, optionsAccessor)
     {
         _backOfficeAuthenticationTypeSettings = backOfficeAuthenticationTypeSettings;
@@ -51,6 +51,7 @@ public class BackOfficeClaimsPrincipalFactory : UserClaimsPrincipalFactory<BackO
         // ensure our required claims are there
         id.AddRequiredClaims(
             user.Id,
+            user.Key,
             user.UserName!,
             user.Name!,
             user.CalculatedContentStartNodeIds,

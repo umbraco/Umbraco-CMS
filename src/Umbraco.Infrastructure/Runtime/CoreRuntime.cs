@@ -179,6 +179,26 @@ public class CoreRuntime : IRuntime
             throw new InvalidOperationException($"An instance of {typeof(IApplicationShutdownRegistry)} could not be resolved from the container, ensure that one if registered in your runtime before calling {nameof(IRuntime)}.{nameof(StartAsync)}");
         }
 
+        var premigrationUpgradeNotification = new RuntimePremigrationsUpgradeNotification();
+        await _eventAggregator.PublishAsync(premigrationUpgradeNotification, cancellationToken);
+        switch (premigrationUpgradeNotification.UpgradeResult)
+        {
+            case RuntimePremigrationsUpgradeNotification.PremigrationUpgradeResult.HasErrors:
+                if (State.BootFailedException is null)
+                {
+                    throw new InvalidOperationException($"Premigration upgrade result was {RuntimePremigrationsUpgradeNotification.PremigrationUpgradeResult.HasErrors} but no {nameof(BootFailedException)} was registered");
+                }
+
+                // We cannot continue here, the exception will be rethrown by BootFailedMiddelware
+                return;
+            case RuntimePremigrationsUpgradeNotification.PremigrationUpgradeResult.CoreUpgradeComplete:
+                // Upgrade is done, set reason to Run
+                DetermineRuntimeLevel();
+                break;
+            case RuntimePremigrationsUpgradeNotification.PremigrationUpgradeResult.NotRequired:
+                break;
+        }
+
         // If level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
         var unattendedUpgradeNotification = new RuntimeUnattendedUpgradeNotification();
         await _eventAggregator.PublishAsync(unattendedUpgradeNotification, cancellationToken);

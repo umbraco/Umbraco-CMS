@@ -34,7 +34,7 @@ public class CreateScriptController : ScriptControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(CreateScriptRequestModel requestModel)
+    public async Task<IActionResult> Create(CancellationToken cancellationToken, CreateScriptRequestModel requestModel)
     {
         ScriptCreateModel createModel = _umbracoMapper.Map<ScriptCreateModel>(requestModel)!;
         Attempt<IScript?, ScriptOperationStatus> createAttempt = await _scriptService.CreateAsync(createModel, CurrentUserKey(_backOfficeSecurityAccessor));

@@ -202,10 +202,44 @@ public interface IEntityService
     IEnumerable<IEntitySlim> GetDescendants(int id, UmbracoObjectTypes objectType);
 
     IEnumerable<IEntitySlim> GetPagedChildren(
-        Guid? key,
-        UmbracoObjectTypes objectType,
+        Guid? parentKey,
+        UmbracoObjectTypes childObjectType,
         int skip,
         int take,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+        => GetPagedChildren(
+            parentKey,
+            new[] { childObjectType },
+            childObjectType,
+            skip,
+            take,
+            out totalRecords,
+            filter,
+            ordering);
+
+    IEnumerable<IEntitySlim> GetPagedChildren(
+        Guid? parentKey,
+        IEnumerable<UmbracoObjectTypes> parentObjectTypes,
+        UmbracoObjectTypes childObjectType,
+        int skip,
+        int take,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+    {
+        totalRecords = 0;
+        return Array.Empty<IEntitySlim>();
+    }
+
+    IEnumerable<IEntitySlim> GetPagedChildren(
+        Guid? parentKey,
+        IEnumerable<UmbracoObjectTypes> parentObjectTypes,
+        IEnumerable<UmbracoObjectTypes> childObjectTypes,
+        int skip,
+        int take,
+        bool trashed,
         out long totalRecords,
         IQuery<IUmbracoEntity>? filter = null,
         Ordering? ordering = null)
@@ -348,11 +382,4 @@ public interface IEntityService
     /// <returns>The identifier.</returns>
     /// <remarks>When a new content or a media is saved with the key, it will have the reserved identifier.</remarks>
     int ReserveId(Guid key);
-
-    /// <summary>
-    ///     Counts the children of an entity
-    /// </summary>
-    int CountChildren(int id, UmbracoObjectTypes objectType, IQuery<IUmbracoEntity>? filter = null);
-
-    public int CountChildren(Guid? key, UmbracoObjectTypes objectType, IQuery<IUmbracoEntity>? filter = null) => 0;
 }

@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -29,11 +29,15 @@ public class ByRelationTypeKeyRelationController : RelationControllerBase
     /// <remarks>
     /// Use case: On a relation type page you can see all created relations of this type.
     /// </remarks>
-    [HttpGet("type/{id:guid}")]
+    [HttpGet("type/{id:guid}", Name = "GetRelationByRelationTypeId")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<RelationResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(PagedViewModel<ProblemDetails>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByRelationTypeKey(Guid id, int skip = 0, int take = 100)
+    public async Task<IActionResult> ByRelationTypeKey(
+        CancellationToken cancellationToken,
+        Guid id,
+        int skip = 0,
+        int take = 100)
     {
         Attempt<PagedModel<IRelation>, RelationOperationStatus> relationsAttempt = await _relationService.GetPagedByRelationTypeKeyAsync(id, skip, take);
 

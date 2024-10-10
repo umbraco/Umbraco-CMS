@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -93,15 +94,15 @@ public class PackageManifestReaderTests
         var first = result.First();
 
         // Ensure that the extensions are deserialized as JsonElement
-        Assert.IsTrue(first.Extensions.All(e => e is JsonElement));
+        Assert.IsTrue(first.Extensions.All(e => e is JsonObject));
 
         // Test the deserialization of the first extension to make sure we don't break the JSON parsing
-        JsonElement firstExtension = (JsonElement)first.Extensions.First();
-        Assert.AreEqual("tree", firstExtension.GetProperty("type").GetString());
-        var meta = firstExtension.GetProperty("meta");
-        Assert.AreEqual("My Tree", meta.GetProperty("label").GetString());
-        var someArray = meta.GetProperty("someArray");
-        Assert.AreEqual(1, someArray[0].GetInt32());
+        JsonObject firstExtension = (JsonObject)first.Extensions.First();
+         Assert.AreEqual("tree", firstExtension["type"].GetValue<string>());
+         var meta = firstExtension["meta"];
+         Assert.AreEqual("My Tree", meta["label"].GetValue<string>());
+         var someArray = meta["someArray"];
+         Assert.AreEqual(1, someArray[0].GetValue<int>());
     }
 
     [Test]

@@ -26,7 +26,7 @@ public class ListTwoFactorProvidersCurrentUserController : CurrentUserController
     [MapToApiVersion("1.0")]
     [HttpGet("2fa")]
     [ProducesResponseType(typeof(IEnumerable<UserTwoFactorProviderModel>),StatusCodes.Status200OK)]
-    public async Task<IActionResult> ListTwoFactorProvidersForCurrentUser()
+    public async Task<IActionResult> ListTwoFactorProvidersForCurrentUser(CancellationToken cancellationToken)
     {
         Guid userKey = CurrentUserKey(_backOfficeSecurityAccessor);
 

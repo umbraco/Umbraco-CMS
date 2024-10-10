@@ -35,7 +35,7 @@ public class NotificationsController : DocumentControllerBase
     [HttpGet("{id:guid}/notifications")]
     [ProducesResponseType(typeof(IEnumerable<DocumentNotificationResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Notifications(Guid id)
+    public async Task<IActionResult> Notifications(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,

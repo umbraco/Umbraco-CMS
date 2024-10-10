@@ -437,7 +437,6 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
     [TestCase(Constants.DataTypes.Guids.Checkbox)]
     [TestCase(Constants.DataTypes.Guids.ListViewContent)]
     [TestCase(Constants.DataTypes.Guids.ListViewMedia)]
-    [TestCase(Constants.DataTypes.Guids.ListViewMembers)]
     public async Task Cannot_Delete_NonDeletable_DataType(string dataTypeKey)
     {
         var dataType = await DataTypeService.GetAsync(Guid.Parse(dataTypeKey));

@@ -1,14 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Deploy;
-using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreThings;
 
@@ -203,6 +199,21 @@ public class UdiTests
 
         // cannot create invalid ranges
         Assert.Throws<ArgumentException>(() => new UdiRange(guidUdi, "x"));
+    }
+
+    [Test]
+    [TestCase(Constants.DeploySelector.This)]
+    [TestCase(Constants.DeploySelector.ThisAndChildren)]
+    [TestCase(Constants.DeploySelector.ThisAndDescendants)]
+    [TestCase(Constants.DeploySelector.ChildrenOfThis)]
+    [TestCase(Constants.DeploySelector.DescendantsOfThis)]
+    [TestCase(Constants.DeploySelector.EntitiesOfType)]
+    public void RangeParseTest(string selector)
+    {
+        var expected = new UdiRange(Udi.Create(Constants.UdiEntityType.AnyGuid, Guid.NewGuid()), selector);
+        var actual = UdiRange.Parse(expected.ToString());
+
+        Assert.AreEqual(expected, actual);
     }
 
     [Test]

@@ -77,7 +77,8 @@ internal static class UmbracoDatabaseExtensions
 
     public static long Count(this IUmbracoDatabase database, Sql sql)
     {
-        var query = new Sql().Select("COUNT(*)").From().Append("(").Append(sql).Append(")");
+        // We need to copy the sql into a new object, to avoid this method from changing the sql.
+        var query = new Sql().Select("COUNT(*)").From().Append("(").Append(new Sql(sql.SQL, sql.Arguments)).Append(") as count_query");
 
         return database.ExecuteScalar<long>(query);
     }

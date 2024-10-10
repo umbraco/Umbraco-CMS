@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Models;
 namespace Umbraco.Cms.Core.Notifications;
 
 /// <summary>
+/// A notification that is used to trigger the IContentService when the Publishing method is called in the API.
 /// Called while publishing content but before content has been published. Cancel the operation to prevent the publish.
 /// </summary>
 public sealed class ContentPublishingNotification : CancelableEnumerableObjectNotification<IContent>

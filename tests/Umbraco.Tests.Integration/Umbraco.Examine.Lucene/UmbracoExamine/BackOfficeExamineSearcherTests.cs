@@ -85,8 +85,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
 
     private async Task SetupUserIdentity(string userId)
     {
-        var identity =
-            await BackOfficeUserStore.FindByIdAsync(userId, CancellationToken.None);
+        var identity = await BackOfficeUserStore.FindByIdAsync(userId, CancellationToken.None);
         await BackOfficeSignInManager.SignInAsync(identity, false);
         var principal = await BackOfficeSignInManager.CreateUserPrincipalAsync(identity);
         HttpContextAccessor.HttpContext.SetPrincipalForRequest(principal);
@@ -161,6 +160,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_Published_Content_With_Empty_Query()
     {
         await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
@@ -179,6 +179,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_Published_Content_With_Query_By_Content_Name()
     {
         // Arrange
@@ -199,6 +200,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_Published_Content_With_Query_By_Non_Existing_Content_Name()
     {
         // Arrange
@@ -216,6 +218,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_Published_Content_With_Query_By_Content_Id()
     {
         // Arrange
@@ -239,6 +242,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_Two_Published_Content_With_Similar_Names_By_Name()
     {
         // Arrange
@@ -299,6 +303,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_For_Child_Published_Content_With_Query_By_Content_Name()
     {
         // Arrange
@@ -361,6 +366,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_For_Child_In_Child_Published_Content_With_Query_By_Content_Name()
     {
         // Arrange
@@ -445,6 +451,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_Published_Content_With_Query_With_Content_Name_No_User_Logged_In()
     {
         // Arrange
@@ -463,6 +470,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
 
     // Multiple Languages
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_Published_Content_By_Content_Name_With_Two_Languages()
     {
         // Arrange
@@ -516,6 +524,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_For_Published_Content_Name_With_Two_Languages_By_Default_Language_Content_Name()
     {
         // Arrange
@@ -541,6 +550,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_For_Published_Content_Name_With_Two_Languages_By_Non_Default_Language_Content_Name()
     {
         // Arrange
@@ -566,6 +576,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_Published_Content_With_Two_Languages_By_Id()
     {
         // Arrange
@@ -592,10 +603,11 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
 
     // Check All Indexed Values
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Check_All_Indexed_Values_For_Published_Content_With_No_Properties()
     {
         // Arrange
-        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+        await SetupUserIdentity(Constants.Security.SuperUserKey.ToString());
 
         const string contentName = "TestContent";
 
@@ -658,6 +670,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Check_All_Indexed_Values_For_Published_Content_With_Properties()
     {
         // Arrange

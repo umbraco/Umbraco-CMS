@@ -9,7 +9,16 @@
     <EnablePackageValidation>$(BaseEnablePackageValidation)</EnablePackageValidation>
     <NoWarn>NU5100</NoWarn>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <!--  TODO: Fix [CS0108] hidden inherited members, fix [SYSLIB0012] and [CS0618] obsolete references,
+          [CS1998] async, [SA1116] and [SA1117] parameter formatting, [CS0162] unreachable code, [CS0169]
+          unused fields, [SA1134] attribute on each line of code, [SA1405] Debug.Assert provide message text,
+          [CS4014]/[CS1998] await call, [CS0649] field not assigned to, [CS0168] unused variable,
+          and remove overrides -->
+    <WarningsNotAsErrors>
+      SYSLIB0012,SA1117,SA1116,CS0162,CS0169,SA1134,SA1405,CS0108,CS0618,CS4014,CS1998,CS0649,CS0168
+    </WarningsNotAsErrors>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Bogus" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
@@ -52,10 +61,13 @@
     </Compile>
     <EmbeddedResource Include="Umbraco.Web.BackOffice\UrlAndDomains\package.xml" />
     <Content Include="appsettings.Tests.json" CopyToOutputDirectory="PreserveNewest" />
+    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Copy.cs">
+      <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Create.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Copy.cs">
+    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Delete.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.DeleteFromRecycleBin.cs">
@@ -70,13 +82,16 @@
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.MoveToRecycleBin.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Update.cs">
-      <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
-    </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Sort.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Update.cs">
+      <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentPublishingServiceTests.Publish.cs">
+      <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentPublishingServiceTests.Scheduling.cs">
       <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentPublishingServiceTests.Unpublish.cs">
@@ -121,8 +136,32 @@
     <Compile Update="Umbraco.Core\Services\MediaTypeEditingServiceTests.Update.cs">
       <DependentUpon>MediaTypeEditingServiceTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.MoveToRecyleBin.cs">
-      <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.Create.cs">
+      <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.CreateFromContent.cs">
+      <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.Delete.cs">
+      <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.Get.cs">
+      <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.GetPagedByContentTypeKey.cs">
+      <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.Move.cs">
+      <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.Update.cs">
+      <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaTypeEditingServiceTests.GetMediaTypesForFileExtension.cs">
+      <DependentUpon>MediaTypeEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaTypeEditingServiceTests.GetFolderMediaTypes.cs">
+      <DependentUpon>MediaTypeEditingServiceTests.cs</DependentUpon>
     </Compile>
   </ItemGroup>
 

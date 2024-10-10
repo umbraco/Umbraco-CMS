@@ -27,7 +27,7 @@ public class ByPathScriptController : ScriptControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ScriptResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByPath(string path)
+    public async Task<IActionResult> ByPath(CancellationToken cancellationToken, string path)
     {
         path = DecodePath(path).VirtualPathToSystemPath();
         IScript? script = await _scriptService.GetAsync(path);

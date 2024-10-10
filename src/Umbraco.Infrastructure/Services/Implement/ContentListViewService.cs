@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Persistence;
 

@@ -20,7 +20,7 @@ public class BackOfficeAuthenticationBuilder : AuthenticationBuilder
         : base(services)
         => _loginProviderOptions = loginProviderOptions ?? (x => { });
 
-    public string? SchemeForBackOffice(string scheme)
+    public static string? SchemeForBackOffice(string scheme)
         => scheme?.EnsureStartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix);
 
     /// <summary>
@@ -32,8 +32,10 @@ public class BackOfficeAuthenticationBuilder : AuthenticationBuilder
     /// <param name="displayName"></param>
     /// <param name="configureOptions"></param>
     /// <returns></returns>
-    public override AuthenticationBuilder AddRemoteScheme<TOptions, THandler>(string authenticationScheme,
-        string? displayName, Action<TOptions>? configureOptions)
+    public override AuthenticationBuilder AddRemoteScheme<TOptions, THandler>(
+        string authenticationScheme,
+        string? displayName,
+        Action<TOptions>? configureOptions)
     {
         // Validate that the prefix is set
         if (!authenticationScheme.StartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix))

@@ -36,7 +36,11 @@ public class RootDocumentTreeController : DocumentTreeControllerBase
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DocumentTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<DocumentTreeItemResponseModel>>> Root(int skip = 0, int take = 100, Guid? dataTypeId = null)
+    public async Task<ActionResult<PagedViewModel<DocumentTreeItemResponseModel>>> Root(
+        CancellationToken cancellationToken,
+        int skip = 0,
+        int take = 100,
+        Guid? dataTypeId = null)
     {
         IgnoreUserStartNodesForDataType(dataTypeId);
         return await GetRoot(skip, take);

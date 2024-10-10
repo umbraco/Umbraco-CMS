@@ -3,4 +3,6 @@
 public class MediaTypeTreeItemResponseModel : FolderTreeItemResponseModel
 {
     public string Icon { get; set; } = string.Empty;
+
+    public bool IsDeletable { get; set; }
 }

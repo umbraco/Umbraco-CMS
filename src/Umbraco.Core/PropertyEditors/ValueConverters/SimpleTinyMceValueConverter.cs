@@ -30,10 +30,4 @@ public class SimpleTinyMceValueConverter : PropertyValueConverterBase
 
         // source should come from ConvertSource and be a string (or null) already
         new HtmlEncodedString(inter == null ? string.Empty : (string)inter);
-
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview) =>
-
-        // source should come from ConvertSource and be a string (or null) already
-        inter;
 }

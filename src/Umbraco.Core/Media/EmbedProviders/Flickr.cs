@@ -20,10 +20,16 @@ public class Flickr : OEmbedProviderBase
 
     public override Dictionary<string, string> RequestParams => new();
 
-    public override string GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
+    [Obsolete("Use GetMarkupAsync instead. This will be removed in Umbraco 15.")]
+    public override string? GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
+    {
+        return GeOEmbedDataAsync(url, maxWidth, maxHeight, CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+    public override async Task<string?> GeOEmbedDataAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken)
     {
         var requestUrl = base.GetEmbedProviderUrl(url, maxWidth, maxHeight);
-        XmlDocument xmlDocument = base.GetXmlResponse(requestUrl);
+        XmlDocument xmlDocument = await base.GetXmlResponseAsync(requestUrl, cancellationToken);
 
         var imageUrl = GetXmlProperty(xmlDocument, "/oembed/url");
         var imageWidth = GetXmlProperty(xmlDocument, "/oembed/width");

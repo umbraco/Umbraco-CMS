@@ -16,7 +16,7 @@ public class ConfigurationPackageController : PackageControllerBase
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PackageConfigurationResponseModel), StatusCodes.Status200OK)]
-    public Task<IActionResult> Configuration()
+    public Task<IActionResult> Configuration(CancellationToken cancellationToken)
     {
         PackageConfigurationResponseModel responseModel = _packagePresentationFactory.CreateConfigurationResponseModel();
         return Task.FromResult<IActionResult>(Ok(responseModel));

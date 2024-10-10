@@ -54,7 +54,7 @@ public interface ITrackedReferencesRepository
     ///     Gets a page of items which are in relation with the current item.
     ///     Basically, shows the items which depend on the current item.
     /// </summary>
-    /// <param name="id">The identifier of the entity to retrieve relations for.</param>
+    /// <param name="key">The identifier of the entity to retrieve relations for.</param>
     /// <param name="skip">The amount of items to skip.</param>
     /// <param name="take">The amount of items to take.</param>
     /// <param name="filterMustBeIsDependency">
@@ -68,8 +68,7 @@ public interface ITrackedReferencesRepository
         long skip,
         long take,
         bool filterMustBeIsDependency,
-        out long totalRecords) =>
-        throw new NotImplementedException();
+        out long totalRecords);
 
     [Obsolete("Use overload that takes key instead of id. This will be removed in Umbraco 15.")]
     IEnumerable<RelationItemModel> GetPagedRelationsForItem(
@@ -77,13 +76,12 @@ public interface ITrackedReferencesRepository
         long skip,
         long take,
         bool filterMustBeIsDependency,
-        out long totalRecords) =>
-        throw new NotImplementedException();
+        out long totalRecords);
 
     /// <summary>
     ///     Gets a page of items used in any kind of relation from selected integer ids.
     /// </summary>
-    /// <param name="ids">The identifiers of the entities to check for relations.</param>
+    /// <param name="keys">The identifiers of the entities to check for relations.</param>
     /// <param name="skip">The amount of items to skip.</param>
     /// <param name="take">The amount of items to take.</param>
     /// <param name="filterMustBeIsDependency">

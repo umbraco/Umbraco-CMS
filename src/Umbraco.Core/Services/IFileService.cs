@@ -308,12 +308,4 @@ public interface IFileService : IService
     /// <returns>The size of the template.</returns>
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     long GetTemplateFileSize(string filepath);
-
-    /// <summary>
-    ///     Gets the content of a partial view snippet as a string.
-    /// </summary>
-    /// <param name="snippetName">The name of the snippet</param>
-    /// <returns>The content of the partial view.</returns>
-    [Obsolete("Please use SnippetCollection.GetPartialViewSnippetContent instead. Scheduled for removal in V12.")]
-    string GetPartialViewSnippetContent(string snippetName);
 }

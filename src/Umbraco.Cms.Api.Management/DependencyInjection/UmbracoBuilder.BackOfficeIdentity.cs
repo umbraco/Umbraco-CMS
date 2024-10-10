@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Security;
+using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.Telemetry;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -51,8 +52,7 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IUserRepository>(),
                 factory.GetRequiredService<IRuntimeState>(),
                 factory.GetRequiredService<IEventMessagesFactory>(),
-                factory.GetRequiredService<ILogger<BackOfficeUserStore>>()
-            ))
+                factory.GetRequiredService<ILogger<BackOfficeUserStore>>()))
             .AddUserManager<IBackOfficeUserManager, BackOfficeUserManager>()
             .AddSignInManager<IBackOfficeSignInManager, BackOfficeSignInManager>()
             .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory>()
@@ -61,6 +61,7 @@ public static partial class UmbracoBuilderExtensions
         // We also need to register the store as a core-friendly interface that doesn't leak technology.
         services.AddScoped<IBackOfficeUserStore, BackOfficeUserStore>();
         services.AddScoped<ICoreBackOfficeUserManager, BackOfficeUserManager>();
+        services.AddScoped<ICoreBackOfficeSignInManager, BackOfficeSignInManager>();
         services.AddScoped<IInviteUriProvider, InviteUriProvider>();
         services.AddScoped<IForgotPasswordUriProvider, ForgotPasswordUriProvider>();
         services.AddScoped<IBackOfficePasswordChanger, BackOfficePasswordChanger>();
@@ -69,6 +70,8 @@ public static partial class UmbracoBuilderExtensions
 
         // Configure the options specifically for the UmbracoBackOfficeIdentityOptions instance
         services.ConfigureOptions<ConfigureBackOfficeIdentityOptions>();
+
+        services.AddScoped<IBackOfficeExternalLoginService, BackOfficeExternalLoginService>();
 
         return builder;
     }
@@ -90,14 +93,16 @@ public static partial class UmbracoBuilderExtensions
     /// <summary>
     ///     Adds support for external login providers in Umbraco
     /// </summary>
-    public static IUmbracoBuilder AddBackOfficeExternalLogins(this IUmbracoBuilder umbracoBuilder,
+    public static IUmbracoBuilder AddBackOfficeExternalLogins(
+        this IUmbracoBuilder umbracoBuilder,
         Action<BackOfficeExternalLoginsBuilder> builder)
     {
         builder(new BackOfficeExternalLoginsBuilder(umbracoBuilder.Services));
         return umbracoBuilder;
     }
 
-    public static BackOfficeIdentityBuilder AddTwoFactorProvider<T>(this BackOfficeIdentityBuilder identityBuilder,
+    public static BackOfficeIdentityBuilder AddTwoFactorProvider<T>(
+        this BackOfficeIdentityBuilder identityBuilder,
         string providerName) where T : class, ITwoFactorProvider
     {
         identityBuilder.Services.AddSingleton<ITwoFactorProvider, T>();

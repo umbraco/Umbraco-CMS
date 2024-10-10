@@ -10,8 +10,10 @@ public static partial class Constants
         public static class Migrations
         {
             public const string UmbracoUpgradePlanName = "Umbraco.Core";
+            public const string UmbracoUpgradePlanPremigrationsName = "Umbraco.Core.Premigrations";
             public const string KeyValuePrefix = "Umbraco.Core.Upgrader.State+";
             public const string UmbracoUpgradePlanKey = KeyValuePrefix + UmbracoUpgradePlanName;
+            public const string UmbracoUpgradePlanPremigrationsKey = KeyValuePrefix + UmbracoUpgradePlanPremigrationsName;
         }
 
         public static class PermissionCategories

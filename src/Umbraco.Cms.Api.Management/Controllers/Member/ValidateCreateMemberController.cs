@@ -29,7 +29,9 @@ public class ValidateCreateMemberController : MemberControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Validate(CreateMemberRequestModel requestModel)
+    public async Task<IActionResult> Validate(
+        CancellationToken cancellationToken,
+        CreateMemberRequestModel requestModel)
     {
         MemberCreateModel model = _memberEditingPresentationFactory.MapCreateModel(requestModel);
         Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await _memberEditingService.ValidateCreateAsync(model);

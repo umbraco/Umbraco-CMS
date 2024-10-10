@@ -37,7 +37,7 @@ public class GetCurrentUserController : CurrentUserControllerBase
     [MapToApiVersion("1.0")]
     [HttpGet]
     [ProducesResponseType(typeof(CurrentUserResponseModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetCurrentUser()
+    public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
     {
         var currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);
 

@@ -25,7 +25,7 @@ public class SetStatusRedirectUrlManagementController : RedirectUrlManagementCon
     // But maybe there is a valid use case for doing it on the fly.
     [HttpPost("status")]
     [MapToApiVersion("1.0")]
-    public async Task<IActionResult> SetStatus([FromQuery] RedirectStatus status)
+    public async Task<IActionResult> SetStatus(CancellationToken cancellationToken, [FromQuery] RedirectStatus status)
     {
         // TODO: uncomment this when auth is implemented.
         // var userIsAdmin = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.IsAdmin();

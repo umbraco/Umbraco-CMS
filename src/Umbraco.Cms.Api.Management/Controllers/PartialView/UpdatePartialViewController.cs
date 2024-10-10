@@ -34,7 +34,10 @@ public class UpdatePartialViewController : PartialViewControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(string path, UpdatePartialViewRequestModel updateViewModel)
+    public async Task<IActionResult> Update(
+        CancellationToken cancellationToken,
+        string path,
+        UpdatePartialViewRequestModel updateViewModel)
     {
         path = DecodePath(path).VirtualPathToSystemPath();
         PartialViewUpdateModel updateModel = _mapper.Map<PartialViewUpdateModel>(updateViewModel)!;

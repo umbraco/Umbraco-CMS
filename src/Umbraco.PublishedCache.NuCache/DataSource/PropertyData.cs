@@ -12,7 +12,7 @@ public class PropertyData
     private string? _segment;
 
     [DataMember(Order = 0)]
-    [JsonConverter(typeof(AutoInterningStringConverter))]
+    [JsonConverter(typeof(JsonStringInternConverter))]
     [DefaultValue("")]
     [JsonPropertyName("c")]
     public string? Culture
@@ -24,7 +24,7 @@ public class PropertyData
     }
 
     [DataMember(Order = 1)]
-    [JsonConverter(typeof(AutoInterningStringConverter))]
+    [JsonConverter(typeof(JsonStringInternConverter))]
     [DefaultValue("")]
     [JsonPropertyName("s")]
     public string? Segment

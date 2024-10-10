@@ -40,7 +40,7 @@ public class ResetPasswordUserController : UserControllerBase
     [ProducesResponseType(typeof(ResetPasswordUserResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> ResetPassword(Guid id)
+    public async Task<IActionResult> ResetPassword(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,

@@ -48,17 +48,6 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
 
     }
 
-    [Obsolete($"Use the {nameof(ExecuteQuery)} method that accepts {nameof(ProtectedAccess)}. Will be removed in V14.")]
-    public PagedModel<Guid> ExecuteQuery(
-        SelectorOption selectorOption,
-        IList<FilterOption> filterOptions,
-        IList<SortOption> sortOptions,
-        string culture,
-        bool preview,
-        int skip,
-        int take)
-        => ExecuteQuery(selectorOption, filterOptions, sortOptions, culture, ProtectedAccess.None, preview, skip, take);
-
     /// <inheritdoc/>
     public PagedModel<Guid> ExecuteQuery(
         SelectorOption selectorOption,

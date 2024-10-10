@@ -37,7 +37,7 @@ public class MoveDocumentController : DocumentControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Move(Guid id, MoveDocumentRequestModel moveDocumentRequestModel)
+    public async Task<IActionResult> Move(CancellationToken cancellationToken, Guid id, MoveDocumentRequestModel moveDocumentRequestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,

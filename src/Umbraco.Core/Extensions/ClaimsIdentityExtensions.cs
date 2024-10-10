@@ -34,8 +34,6 @@ public static class ClaimsIdentityExtensions
         ClaimTypes.Name, // username
         ClaimTypes.GivenName,
 
-        // Constants.Security.StartContentNodeIdClaimType, These seem to be able to be null...
-        // Constants.Security.StartMediaNodeIdClaimType,
         ClaimTypes.Locality, Constants.Security.SecurityStampClaimType,
     };
 
@@ -65,7 +63,7 @@ public static class ClaimsIdentityExtensions
         if (identity is ClaimsIdentity claimsIdentity)
         {
             userId = claimsIdentity.FindFirstValue(ClaimTypes.NameIdentifier)
-                     ?? claimsIdentity.FindFirstValue("sub");
+                     ?? claimsIdentity.FindFirstValue(Constants.Security.OpenIdDictSubClaimType);
         }
 
         return userId;
@@ -88,7 +86,7 @@ public static class ClaimsIdentityExtensions
         string? userKey = null;
         if (identity is ClaimsIdentity claimsIdentity)
         {
-            userKey = claimsIdentity.FindFirstValue("sub");
+            userKey = claimsIdentity.FindFirstValue(Constants.Security.OpenIdDictSubClaimType);
         }
 
         return Guid.TryParse(userKey, out Guid result)
@@ -193,6 +191,7 @@ public static class ClaimsIdentityExtensions
     /// </summary>
     /// <param name="identity">this</param>
     /// <param name="userId">The users Id</param>
+    /// <param name="userKey">The users key</param>
     /// <param name="username">Username</param>
     /// <param name="realName">Real name</param>
     /// <param name="startContentNodes">Start content nodes</param>
@@ -201,7 +200,7 @@ public static class ClaimsIdentityExtensions
     /// <param name="securityStamp">Security stamp</param>
     /// <param name="allowedApps">Allowed apps</param>
     /// <param name="roles">Roles</param>
-    public static void AddRequiredClaims(this ClaimsIdentity identity, string userId, string username, string realName, IEnumerable<int>? startContentNodes, IEnumerable<int>? startMediaNodes, string culture, string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
+    public static void AddRequiredClaims(this ClaimsIdentity identity, string userId, Guid userKey, string username, string realName, IEnumerable<int>? startContentNodes, IEnumerable<int>? startMediaNodes, string culture, string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
     {
         // This is the id that 'identity' uses to check for the user id
         if (identity.HasClaim(x => x.Type == ClaimTypes.NameIdentifier) == false)
@@ -209,6 +208,18 @@ public static class ClaimsIdentityExtensions
             identity.AddClaim(new Claim(
                 ClaimTypes.NameIdentifier,
                 userId,
+                ClaimValueTypes.String,
+                AuthenticationType,
+                AuthenticationType,
+                identity));
+        }
+
+        // This is the id that 'identity' uses to check for the user id
+        if (identity.HasClaim(x => x.Type == Constants.Security.OpenIdDictSubClaimType) == false)
+        {
+            identity.AddClaim(new Claim(
+                Constants.Security.OpenIdDictSubClaimType,
+                userKey.ToString(),
                 ClaimValueTypes.String,
                 AuthenticationType,
                 AuthenticationType,
@@ -237,6 +248,7 @@ public static class ClaimsIdentityExtensions
                 identity));
         }
 
+        // NOTE: this can be removed when the obsolete claim type has been deleted
         if (identity.HasClaim(x => x.Type == Constants.Security.StartContentNodeIdClaimType) == false &&
             startContentNodes != null)
         {
@@ -252,6 +264,7 @@ public static class ClaimsIdentityExtensions
             }
         }
 
+        // NOTE: this can be removed when the obsolete claim type has been deleted
         if (identity.HasClaim(x => x.Type == Constants.Security.StartMediaNodeIdClaimType) == false &&
             startMediaNodes != null)
         {
@@ -291,6 +304,7 @@ public static class ClaimsIdentityExtensions
         }
 
         // Add each app as a separate claim
+        // NOTE: this can be removed when the obsolete claim type has been deleted
         if (identity.HasClaim(x => x.Type == Constants.Security.AllowedApplicationsClaimType) == false && allowedApps != null)
         {
             foreach (var application in allowedApps)
@@ -330,6 +344,7 @@ public static class ClaimsIdentityExtensions
     /// </summary>
     /// <param name="identity"></param>
     /// <returns>Array of start content nodes</returns>
+    [Obsolete("Please use the UserExtensions class to access user start node info. Will be removed in V15.")]
     public static int[] GetStartContentNodes(this ClaimsIdentity identity) =>
         identity.FindAll(x => x.Type == Constants.Security.StartContentNodeIdClaimType)
             .Select(node => int.TryParse(node.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)
@@ -342,6 +357,7 @@ public static class ClaimsIdentityExtensions
     /// </summary>
     /// <param name="identity"></param>
     /// <returns>Array of start media nodes</returns>
+    [Obsolete("Please use the UserExtensions class to access user start node info. Will be removed in V15.")]
     public static int[] GetStartMediaNodes(this ClaimsIdentity identity) =>
         identity.FindAll(x => x.Type == Constants.Security.StartMediaNodeIdClaimType)
             .Select(node => int.TryParse(node.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)
@@ -354,6 +370,7 @@ public static class ClaimsIdentityExtensions
     /// </summary>
     /// <param name="identity"></param>
     /// <returns></returns>
+    [Obsolete("Please use IUser.AllowedSections instead. Will be removed in V15.")]
     public static string[] GetAllowedApplications(this ClaimsIdentity identity) => identity
         .FindAll(x => x.Type == Constants.Security.AllowedApplicationsClaimType).Select(app => app.Value).ToArray();
 

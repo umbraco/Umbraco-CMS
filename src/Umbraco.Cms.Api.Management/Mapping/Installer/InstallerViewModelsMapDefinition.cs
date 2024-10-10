@@ -11,9 +11,9 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<InstallRequestModel, InstallData>((source, context) => new InstallData(), Map);
-        mapper.Define<UserInstallPresentationModel, UserInstallData>((source, context) => new UserInstallData(), Map);
-        mapper.Define<DatabaseInstallPresentationModel, DatabaseInstallData>((source, context) => new DatabaseInstallData(), Map);
-        mapper.Define<DatabaseInstallPresentationModel, DatabaseModel>((source, context) => new DatabaseModel(), Map);
+        mapper.Define<UserInstallRequestModel, UserInstallData>((source, context) => new UserInstallData(), Map);
+        mapper.Define<DatabaseInstallRequestModel, DatabaseInstallData>((source, context) => new DatabaseInstallData(), Map);
+        mapper.Define<DatabaseInstallRequestModel, DatabaseModel>((source, context) => new DatabaseModel(), Map);
         mapper.Define<DatabaseInstallData, DatabaseModel>((source, context) => new DatabaseModel(), Map);
         mapper.Define<InstallSettingsModel, InstallSettingsResponseModel>((source, context) => new InstallSettingsResponseModel(), Map);
         mapper.Define<UserSettingsModel, UserSettingsPresentationModel>((source, context) => new UserSettingsPresentationModel(), Map);
@@ -33,7 +33,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private void Map(DatabaseInstallPresentationModel source, DatabaseModel target, MapperContext context)
+    private void Map(DatabaseInstallRequestModel source, DatabaseModel target, MapperContext context)
     {
         target.ConnectionString = source.ConnectionString;
         target.DatabaseName = source.Name ?? string.Empty;
@@ -55,7 +55,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(UserInstallPresentationModel source, UserInstallData target, MapperContext context)
+    private static void Map(UserInstallRequestModel source, UserInstallData target, MapperContext context)
     {
         target.Email = source.Email;
         target.Name = source.Name;
@@ -64,7 +64,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(DatabaseInstallPresentationModel source, DatabaseInstallData target, MapperContext context)
+    private static void Map(DatabaseInstallRequestModel source, DatabaseInstallData target, MapperContext context)
     {
         target.Id = source.Id;
         target.ProviderName = source.ProviderName;

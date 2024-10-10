@@ -10,7 +10,6 @@ using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Services;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 namespace Umbraco.Extensions;
@@ -23,8 +22,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<BackOfficeAreaRoutes>();
         builder.Services.AddSingleton<BackOfficeExternalLoginProviderErrorMiddleware>();
         builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
+        builder.AddUmbracoApiOpenApiUI();
 
-        if (!services.Any(x => x.ImplementationType == typeof(JsonPatchService)))
+        if (!services.Any(x => !x.IsKeyedService && x.ImplementationType == typeof(JsonPatchService)))
         {
             ModelsBuilderBuilderExtensions.AddModelsBuilder(builder)
                 .AddJson()
@@ -33,6 +33,7 @@ public static partial class UmbracoBuilderExtensions
                 .AddSearchManagement()
                 .AddTrees()
                 .AddAuditLogs()
+                .AddConfigurationFactories()
                 .AddDocuments()
                 .AddDocumentTypes()
                 .AddMedia()
@@ -54,8 +55,8 @@ public static partial class UmbracoBuilderExtensions
                 .AddLogViewer()
                 .AddUsers()
                 .AddUserGroups()
-                .AddTours()
                 .AddPackages()
+                .AddManifests()
                 .AddEntities()
                 .AddScripts()
                 .AddPartialViews()
@@ -66,7 +67,11 @@ public static partial class UmbracoBuilderExtensions
                 .AddWebhooks()
                 .AddPreview()
                 .AddPasswordConfiguration()
-                .AddSupplemenataryLocalizedTextFileSources();
+                .AddSupplemenataryLocalizedTextFileSources()
+                .AddUserData()
+                .AddSegment()
+                .AddExport()
+                .AddImport();
 
             services
                 .ConfigureOptions<ConfigureApiBehaviorOptions>()
@@ -85,8 +90,8 @@ public static partial class UmbracoBuilderExtensions
                 options.AddFilter(new UmbracoPipelineFilter(
                     "BackOfficeManagementApiFilter",
                     applicationBuilder => applicationBuilder.UseProblemDetailsExceptionHandling(),
-                    applicationBuilder => { },
-                    applicationBuilder => applicationBuilder.UseEndpoints()));
+                    postPipeline: _ => { },
+                    endpoints: applicationBuilder => applicationBuilder.UseEndpoints()));
             });
         }
 

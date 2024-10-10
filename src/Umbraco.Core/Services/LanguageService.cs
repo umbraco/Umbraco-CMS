@@ -43,6 +43,15 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
     }
 
     /// <inheritdoc />
+    public async Task<ILanguage?> GetDefaultLanguageAsync()
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return await Task.FromResult(_languageRepository.GetByIsoCode(_languageRepository.GetDefaultIsoCode()));
+        }
+    }
+
+    /// <inheritdoc />
     public async Task<string> GetDefaultIsoCodeAsync()
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))

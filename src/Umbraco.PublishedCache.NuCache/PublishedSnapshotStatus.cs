@@ -18,9 +18,6 @@ internal class PublishedSnapshotStatus : IPublishedSnapshotStatus
     }
 
     /// <inheritdoc />
-    public virtual string StatusUrl => "views/dashboard/settings/publishedsnapshotcache.html";
-
-    /// <inheritdoc />
     public string GetStatus()
     {
         if (_service == null)

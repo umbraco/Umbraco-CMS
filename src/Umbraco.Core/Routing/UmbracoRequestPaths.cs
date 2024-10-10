@@ -1,8 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing;
@@ -24,12 +22,6 @@ public class UmbracoRequestPaths
     private readonly string _surfaceMvcPath;
     private readonly IOptions<UmbracoRequestPathsOptions> _umbracoRequestPathsOptions;
 
-    [Obsolete("Use constructor that takes IOptions<UmbracoRequestPathsOptions> - Will be removed in Umbraco 13")]
-    public UmbracoRequestPaths(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
-        : this(globalSettings, hostingEnvironment, StaticServiceProvider.Instance.GetRequiredService<IOptions<UmbracoRequestPathsOptions>>())
-    {
-    }
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="UmbracoRequestPaths" /> class.
     /// </summary>
@@ -48,7 +40,7 @@ public class UmbracoRequestPaths
         _previewMvcPath = "/" + mvcArea + "/Preview/";
         _surfaceMvcPath = "/" + mvcArea + "/Surface/";
         _apiMvcPath = "/" + mvcArea + "/Api/";
-        _managementApiPath = "/" + mvcArea + "/management/api/";
+        _managementApiPath = "/" + mvcArea + Constants.Web.ManagementApiPath;
         _installPath = hostingEnvironment.ToAbsolute(Constants.SystemDirectories.Install);
         _umbracoRequestPathsOptions = umbracoRequestPathsOptions;
     }
@@ -151,7 +143,7 @@ public class UmbracoRequestPaths
     /// <summary>
     ///     Checks if the current uri is an install request
     /// </summary>
-    public bool IsInstallerRequest(string absPath) => absPath.InvariantStartsWith(_installPath);
+    public bool IsInstallerRequest(string absPath) => absPath.InvariantStartsWith(_managementApiPath);
 
     /// <summary>
     ///     Rudimentary check to see if it's not a server side request

@@ -1,16 +1,11 @@
-import type {UUIButtonState, UUIInputPasswordElement} from '@umbraco-ui/uui';
-import {LitElement, html} from 'lit';
-import {customElement, query, state} from 'lit/decorators.js';
-import {until} from 'lit/directives/until.js';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-import {umbAuthContext} from '../../context/auth.context.js';
-import {umbLocalizationContext} from '../../external/localization/localization-context.js';
+import { UMB_AUTH_CONTEXT } from "../../contexts";
 
 @customElement('umb-new-password-page')
-export default class UmbNewPasswordPageElement extends LitElement {
-  @query('#confirmPassword')
-  confirmPasswordElement!: UUIInputPasswordElement;
-
+export default class UmbNewPasswordPageElement extends UmbLitElement {
   @state()
   state: UUIButtonState = undefined;
 
@@ -21,37 +16,81 @@ export default class UmbNewPasswordPageElement extends LitElement {
   error = '';
 
   @state()
-  userId: string | null = null;
+  userId = '';
 
   @state()
-  resetCode: string | null = null;
+  resetCode = '';
+
+  @state()
+  loading = true;
+
+  #authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 
   constructor() {
     super();
+    this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
+      this.#authContext = authContext;
+      this.#init();
+    });
+  }
 
+  async #init() {
     const urlParams = new URLSearchParams(window.location.search);
-    this.resetCode = urlParams.get('resetCode');
-    this.userId = urlParams.get('userId');
+    const resetCode = urlParams.get('resetCode');
+    const userId = urlParams.get('userId');
 
-    if (!this.userId || !this.resetCode) {
+    if (!userId || !resetCode) {
       this.page = 'error';
+      this.loading = false;
+      return;
     }
+
+    if (!this.#authContext) return;
+
+    this.resetCode = resetCode;
+    this.userId = userId;
+
+    const verifyResponse = await this.#authContext.validatePasswordResetCode(this.userId, this.resetCode);
+
+    if (verifyResponse.error) {
+      this.page = 'error';
+      this.error = verifyResponse.error;
+      this.loading = false;
+      return;
+    }
+
+    if (!verifyResponse.passwordConfiguration) {
+      this.page = 'error';
+      this.error = 'Password configuration is missing';
+      this.loading = false;
+      return;
+    }
+
+    this.#authContext.passwordConfiguration = verifyResponse.passwordConfiguration;
+
+    this.loading = false;
   }
 
   async #onSubmit(event: CustomEvent) {
     event.preventDefault();
-    const urlParams = new URLSearchParams(window.location.search);
-    const resetCode = urlParams.get('resetCode');
-    const userId = urlParams.get('userId');
+
+    this.error = '';
+
+    if (!this.#authContext) return;
+
     const password = event.detail.password;
 
-    if (!resetCode || !userId) return;
-
     this.state = 'waiting';
-    const response = await umbAuthContext.newPassword(password, resetCode, userId);
-    this.state = response.status === 200 ? 'success' : 'failed';
-    this.page = response.status === 200 ? 'done' : 'new';
-    this.error = response.error || '';
+    const response = await this.#authContext.newPassword(password, this.resetCode, this.userId);
+
+    if (response.error) {
+      this.state = 'failed';
+      this.error = response.error;
+      return;
+    }
+
+    this.state = 'success';
+    this.page = 'done';
   }
 
   #renderRoutes() {
@@ -66,36 +105,20 @@ export default class UmbNewPasswordPageElement extends LitElement {
       case 'error':
         return html`
           <umb-error-layout
-            header=${until(umbLocalizationContext.localize('general_error', undefined, 'Error'))}
-            message=${until(
-              umbLocalizationContext.localize('errors_defaultError', undefined, 'An unknown failure has occured')
-            )}>
+            header=${this.localize.term('auth_error')}
+            message=${this.error ?? this.localize.term('auth_defaultError')}>
           </umb-error-layout>`;
       case 'done':
         return html`
           <umb-confirmation-layout
-            header=${until(umbLocalizationContext.localize('general_success', undefined, 'Success'))}
-            message=${until(
-              umbLocalizationContext.localize(
-                'login_setPasswordConfirmation',
-                undefined,
-                'Your new password has been set and you may now use it to log in.'
-              )
-            )}>
+            header=${this.localize.term('auth_success')}
+            message=${this.localize.term('auth_setPasswordConfirmation')}>
           </umb-confirmation-layout>`;
     }
   }
 
   render() {
-    return this.userId && this.resetCode
-      ? this.#renderRoutes()
-      : html`
-        <umb-error-layout
-          header=${until(umbLocalizationContext.localize('general_error', undefined, 'Error'))}
-          message=${until(
-            umbLocalizationContext.localize('errors_defaultError', undefined, 'An unknown failure has occured')
-          )}>
-        </umb-error-layout>`;
+    return this.loading ? html`<uui-loader-bar></uui-loader-bar>` : this.#renderRoutes();
   }
 }
 

@@ -10,6 +10,17 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 /// </summary>
 public class BlockItemData
 {
+    public BlockItemData()
+    {
+    }
+
+    public BlockItemData(Udi udi, Guid contentTypeKey, string contentTypeAlias)
+    {
+        ContentTypeAlias = contentTypeAlias;
+        Udi = udi;
+        ContentTypeKey = contentTypeKey;
+    }
+
     public Guid ContentTypeKey { get; set; }
 
     /// <summary>

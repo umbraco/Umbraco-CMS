@@ -18,14 +18,13 @@ public class ConfigurationDataTypeController : DataTypeControllerBase
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DatatypeConfigurationResponseModel), StatusCodes.Status200OK)]
-    public Task<IActionResult> Configuration()
+    public Task<IActionResult> Configuration(CancellationToken cancellationToken)
     {
         var responseModel = new DatatypeConfigurationResponseModel
         {
             CanBeChanged = _dataTypesSettings.CanBeChanged,
             DocumentListViewId = Constants.DataTypes.Guids.ListViewContentGuid,
             MediaListViewId = Constants.DataTypes.Guids.ListViewMediaGuid,
-            MemberListViewId = Constants.DataTypes.Guids.ListViewMembersGuid,
         };
         return Task.FromResult<IActionResult>(Ok(responseModel));
     }

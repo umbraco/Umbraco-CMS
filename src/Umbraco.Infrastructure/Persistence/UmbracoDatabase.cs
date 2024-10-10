@@ -223,6 +223,14 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
         return databaseSchemaValidationResult ?? new DatabaseSchemaResult();
     }
 
+    public int ExecuteNonQuery(DbCommand command)
+    {
+        OnExecutingCommand(command);
+        var i = command.ExecuteNonQuery();
+        OnExecutedCommand(command);
+        return i;
+    }
+
     /// <summary>
     ///     Returns true if Umbraco database tables are detected to be installed
     /// </summary>

@@ -22,28 +22,13 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
     private const string TextNodeName = "#text";
     private const string CommentNodeName = "#comment";
 
-    [Obsolete($"Please use the constructor that accepts {nameof(IApiElementBuilder)}. Will be removed in V15.")]
     public ApiRichTextElementParser(
         IApiContentRouteBuilder apiContentRouteBuilder,
-        IPublishedUrlProvider publishedUrlProvider,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        ILogger<ApiRichTextElementParser> logger)
-        : this(
-            apiContentRouteBuilder,
-            publishedUrlProvider,
-            publishedSnapshotAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IApiElementBuilder>(),
-            logger)
-    {
-    }
-
-    public ApiRichTextElementParser(
-        IApiContentRouteBuilder apiContentRouteBuilder,
-        IPublishedUrlProvider publishedUrlProvider,
+        IApiMediaUrlProvider mediaUrlProvider,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IApiElementBuilder apiElementBuilder,
         ILogger<ApiRichTextElementParser> logger)
-        : base(apiContentRouteBuilder, publishedUrlProvider)
+        : base(apiContentRouteBuilder, mediaUrlProvider)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _apiElementBuilder = apiElementBuilder;
@@ -147,9 +132,15 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
             return;
         }
 
+        if (attributes.ContainsKey("type") is false || attributes["type"] is not string type)
+        {
+            type = "unknown";
+        }
+
         ReplaceLocalLinks(
             publishedSnapshot,
             href,
+            type,
             route =>
             {
                 attributes["route"] = route;

@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Tree;
 
-public class DocumentBlueprintTreeItemResponseModel : NamedEntityTreeItemResponseModel
+public class DocumentBlueprintTreeItemResponseModel : FolderTreeItemResponseModel
 {
-    public DocumentTypeReferenceResponseModel DocumentType { get; set; } = new();
+    public DocumentTypeReferenceResponseModel? DocumentType { get; set; }
 }

@@ -1,9 +1,6 @@
 using System.Data;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
@@ -63,29 +60,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             _fileSystems.IsScoped = () => AmbientScope != null && AmbientScope.ScopedFileSystems;
 
             coreDebugSettings.OnChange(x => _coreDebugSettings = x);
-        }
-
-        [Obsolete("Please use an alternative constructor. This constructor is due for removal in v12.")]
-        public ScopeProvider(
-            IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
-            IUmbracoDatabaseFactory databaseFactory,
-            FileSystems fileSystems,
-            IOptionsMonitor<CoreDebugSettings> coreDebugSettings,
-            MediaFileManager mediaFileManager,
-            ILoggerFactory loggerFactory,
-            IRequestCache requestCache,
-            IEventAggregator eventAggregator)
-        : this(
-            StaticServiceProvider.Instance.GetRequiredService<IAmbientScopeStack>(),
-            StaticServiceProvider.Instance.GetRequiredService<IAmbientScopeContextStack>(),
-            distributedLockingMechanismFactory,
-            databaseFactory,
-            fileSystems,
-            coreDebugSettings,
-            mediaFileManager,
-            loggerFactory,
-            eventAggregator)
-        {
         }
 
         public IDistributedLockingMechanismFactory DistributedLockingMechanismFactory { get; }
@@ -185,11 +159,8 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         /// <inheritdoc />
         public IScope DetachScope()
         {
-            Scope? ambientScope = AmbientScope;
-            if (ambientScope == null)
-            {
-                throw new InvalidOperationException("There is no ambient scope.");
-            }
+            Scope? ambientScope = AmbientScope
+                ?? throw new InvalidOperationException("There is no ambient scope.");
 
             if (ambientScope.Detachable == false)
             {
@@ -415,7 +386,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false) =>
-            (Cms.Core.Scoping.IScope) CreateScope(
+            (Cms.Core.Scoping.IScope)CreateScope(
                 isolationLevel,
                 repositoryCacheMode,
                 eventDispatcher,
@@ -425,9 +396,12 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 autoComplete);
 
         /// <inheritdoc />
-        Core.Scoping.IScope Core.Scoping.IScopeProvider.CreateDetachedScope(IsolationLevel isolationLevel,
-            RepositoryCacheMode repositoryCacheMode, IEventDispatcher? eventDispatcher,
-            IScopedNotificationPublisher? scopedNotificationPublisher, bool? scopeFileSystems) =>
+        Core.Scoping.IScope Core.Scoping.IScopeProvider.CreateDetachedScope(
+            IsolationLevel isolationLevel,
+            RepositoryCacheMode repositoryCacheMode,
+            IEventDispatcher? eventDispatcher,
+            IScopedNotificationPublisher? scopedNotificationPublisher,
+            bool? scopeFileSystems) =>
             (Core.Scoping.IScope)CreateDetachedScope(
                 isolationLevel,
                 repositoryCacheMode,

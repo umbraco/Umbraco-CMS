@@ -21,7 +21,7 @@ public class IsUsedDataTypeController : DataTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> IsUsed(Guid id)
+    public async Task<IActionResult> IsUsed(CancellationToken cancellationToken, Guid id)
     {
         Attempt<bool, DataTypeOperationStatus> result = await _dataTypeUsageService.HasSavedValuesAsync(id);
 

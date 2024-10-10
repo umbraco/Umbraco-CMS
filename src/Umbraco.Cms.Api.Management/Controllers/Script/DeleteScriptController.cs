@@ -27,7 +27,7 @@ public class DeleteScriptController : ScriptControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(string path)
+    public async Task<IActionResult> Delete(CancellationToken cancellationToken, string path)
     {
         path = DecodePath(path).VirtualPathToSystemPath();
         ScriptOperationStatus operationStatus = await _scriptService.DeleteAsync(path, CurrentUserKey(_backOfficeSecurityAccessor));

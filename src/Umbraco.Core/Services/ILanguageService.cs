@@ -15,6 +15,14 @@ public interface ILanguageService
     Task<ILanguage?> GetAsync(string isoCode);
 
     /// <summary>
+    ///     Gets the default <see cref="ILanguage" />
+    /// </summary>
+    /// <returns>
+    ///     <see cref="ILanguage" />
+    /// </returns>
+    Task<ILanguage?> GetDefaultLanguageAsync();
+
+    /// <summary>
     ///     Gets the default language ISO code.
     /// </summary>
     /// <remarks>

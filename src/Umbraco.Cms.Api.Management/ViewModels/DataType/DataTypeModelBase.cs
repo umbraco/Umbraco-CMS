@@ -10,7 +10,7 @@ public abstract class DataTypeModelBase
     [Required]
     public string EditorAlias { get; set; } = string.Empty;
 
-    public string? EditorUiAlias { get; set; }
+    public string EditorUiAlias { get; set; } = string.Empty;
 
     public IEnumerable<DataTypePropertyPresentationModel> Values { get; set; } = Enumerable.Empty<DataTypePropertyPresentationModel>();
 }

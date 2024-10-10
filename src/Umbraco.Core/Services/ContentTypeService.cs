@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Locking;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -64,10 +65,9 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
             StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
     { }
 
-    // beware! order is important to avoid deadlocks
-    protected override int[] ReadLockIds { get; } = { Constants.Locks.ContentTypes };
+    protected override int[] ReadLockIds => ContentTypeLocks.ReadLockIds;
 
-    protected override int[] WriteLockIds { get; } = { Constants.Locks.ContentTree, Constants.Locks.ContentTypes };
+    protected override int[] WriteLockIds => ContentTypeLocks.WriteLockIds;
 
     protected override Guid ContainedObjectType => Constants.ObjectTypes.DocumentType;
 

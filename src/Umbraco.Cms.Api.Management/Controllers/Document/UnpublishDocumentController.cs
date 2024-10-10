@@ -37,7 +37,7 @@ public class UnpublishDocumentController : DocumentControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Unpublish(Guid id, UnpublishDocumentRequestModel requestModel)
+    public async Task<IActionResult> Unpublish(CancellationToken cancellationToken, Guid id, UnpublishDocumentRequestModel requestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,

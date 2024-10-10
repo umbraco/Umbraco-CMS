@@ -107,15 +107,6 @@ public abstract class ServerMessengerBase : IServerMessenger
         Deliver(refresher, payload);
     }
 
-    [Obsolete("This method is unused and not part of the contract. This will be removed in Umbraco 13.")]
-    public void PerformRefresh(ICacheRefresher refresher, string jsonPayload)
-    {
-        ArgumentNullException.ThrowIfNull(refresher);
-        ArgumentNullException.ThrowIfNull(jsonPayload);
-
-        Deliver(refresher, MessageType.RefreshByJson, json: jsonPayload);
-    }
-
     /// <inheritdoc />
     public void QueueRefresh<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
     {

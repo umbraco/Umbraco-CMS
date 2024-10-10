@@ -2,13 +2,13 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using StaticServiceProvider = Umbraco.Cms.Core.DependencyInjection.StaticServiceProvider;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -18,17 +18,13 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public abstract class BlockListPropertyEditorBase : DataEditor
 {
-
     private readonly IBlockValuePropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
     private readonly IJsonSerializer _jsonSerializer;
-
-
 
     [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 15.")]
     protected BlockListPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory, IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
         : this(dataValueEditorFactory,blockValuePropertyIndexValueFactory, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>())
     {
-
     }
 
     protected BlockListPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory, IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory, IJsonSerializer jsonSerializer)
@@ -60,7 +56,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor
             PropertyEditorCollection propertyEditors,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
             IDataTypeConfigurationCache dataTypeConfigurationCache,
-            IContentTypeService contentTypeService,
+            IBlockEditorElementTypeCache elementTypeCache,
             ILocalizedTextService textService,
             ILogger<BlockListEditorPropertyValueEditor> logger,
             IShortStringHelper shortStringHelper,
@@ -69,8 +65,8 @@ public abstract class BlockListPropertyEditorBase : DataEditor
             IPropertyValidationService propertyValidationService) :
             base(attribute, propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
         {
-            BlockEditorValues = new BlockEditorValues<BlockListValue, BlockListLayoutItem>(blockEditorDataConverter, contentTypeService, logger);
-            Validators.Add(new BlockEditorValidator<BlockListValue, BlockListLayoutItem>(propertyValidationService, BlockEditorValues, contentTypeService));
+            BlockEditorValues = new BlockEditorValues<BlockListValue, BlockListLayoutItem>(blockEditorDataConverter, elementTypeCache, logger);
+            Validators.Add(new BlockEditorValidator<BlockListValue, BlockListLayoutItem>(propertyValidationService, BlockEditorValues, elementTypeCache));
             Validators.Add(new MinMaxValidator(BlockEditorValues, textService));
         }
 
@@ -96,6 +92,12 @@ public abstract class BlockListPropertyEditorBase : DataEditor
 
                 return ValidateNumberOfBlocks(blockEditorData, validationLimit.Min, validationLimit.Max);
             }
+        }
+
+        public override IEnumerable<Guid> ConfiguredElementTypeKeys()
+        {
+            var configuration = ConfigurationObject as BlockListConfiguration;
+            return configuration?.Blocks.SelectMany(ConfiguredElementTypeKeys) ?? Enumerable.Empty<Guid>();
         }
     }
 

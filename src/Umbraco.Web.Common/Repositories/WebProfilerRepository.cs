@@ -21,7 +21,7 @@ internal class WebProfilerRepository : IWebProfilerRepository
     {
         if (status)
         {
-            _httpContextAccessor.GetRequiredHttpContext().Response.Cookies.Append(CookieName, string.Empty, new CookieOptions { Expires = DateTime.Now.AddYears(1) });
+            _httpContextAccessor.GetRequiredHttpContext().Response.Cookies.Append(CookieName, "1", new CookieOptions { Expires = DateTime.Now.AddYears(1) });
         }
         else
         {

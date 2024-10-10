@@ -18,8 +18,15 @@ public class ItemStaticFileItemController : StaticFileItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<StaticFileItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item([FromQuery(Name = "path")] HashSet<string> paths)
+    public async Task<IActionResult> Item(
+        CancellationToken cancellationToken,
+        [FromQuery(Name = "path")] HashSet<string> paths)
     {
+        if (paths.Count is 0)
+        {
+            return Ok(Enumerable.Empty<StaticFileItemResponseModel>());
+        }
+
         paths = paths.Select(path => path.VirtualPathToSystemPath()).ToHashSet();
         IEnumerable<StaticFileItemResponseModel> responseModels = _fileItemPresentationFactory.CreateStaticFileItemResponseModels(paths);
         return await Task.FromResult(Ok(responseModels));

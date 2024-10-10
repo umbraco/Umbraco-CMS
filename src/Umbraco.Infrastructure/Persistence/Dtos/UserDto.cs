@@ -111,14 +111,6 @@ public class UserDto
     [Length(500)]
     public string? Avatar { get; set; }
 
-    /// <summary>
-    ///     A Json blob stored for recording tour data for a user
-    /// </summary>
-    [Column("tourData")]
-    [NullSetting(NullSetting = NullSettings.Null)]
-    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
-    public string? TourData { get; set; }
-
     [ResultColumn]
     [Reference(ReferenceType.Many, ReferenceMemberName = "UserId")]
     public List<UserGroupDto> UserGroupDtos { get; set; }

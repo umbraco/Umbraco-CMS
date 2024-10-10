@@ -34,6 +34,7 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(
+        CancellationToken cancellationToken,
         Guid id,
         Guid? dataTypeId = null,
         string orderBy = "updateDate",

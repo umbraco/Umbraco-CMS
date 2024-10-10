@@ -34,7 +34,9 @@ public class CreateStylesheetController : StylesheetControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(CreateStylesheetRequestModel requestModel)
+    public async Task<IActionResult> Create(
+        CancellationToken cancellationToken,
+        CreateStylesheetRequestModel requestModel)
     {
         StylesheetCreateModel createModel = _umbracoMapper.Map<StylesheetCreateModel>(requestModel)!;
         Attempt<IStylesheet?, StylesheetOperationStatus> createAttempt = await _stylesheetService.CreateAsync(createModel, CurrentUserKey(_backOfficeSecurityAccessor));

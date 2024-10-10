@@ -123,6 +123,14 @@ public enum UmbracoObjectTypes
     DataTypeContainer,
 
     /// <summary>
+    ///     Document blueprint container.
+    /// </summary>
+    [UmbracoObjectType(Constants.ObjectTypes.Strings.DocumentBlueprintContainer)]
+    [FriendlyName("Document Blueprint Container")]
+    [UmbracoUdiType(Constants.UdiEntityType.DocumentBlueprintContainer)]
+    DocumentBlueprintContainer,
+
+    /// <summary>
     ///     Relation type
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.RelationType)]

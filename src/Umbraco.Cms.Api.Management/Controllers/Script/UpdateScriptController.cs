@@ -34,7 +34,10 @@ public class UpdateScriptController : ScriptControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(string path, UpdateScriptRequestModel requestModel)
+    public async Task<IActionResult> Update(
+        CancellationToken cancellationToken,
+        string path,
+        UpdateScriptRequestModel requestModel)
     {
         path = DecodePath(path).VirtualPathToSystemPath();
         ScriptUpdateModel updateModel = _umbracoMapper.Map<ScriptUpdateModel>(requestModel)!;

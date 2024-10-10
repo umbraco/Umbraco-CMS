@@ -17,7 +17,7 @@ public class SettingsTemplateQueryController : TemplateQueryControllerBase
     [HttpGet("settings")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TemplateQuerySettingsResponseModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<TemplateQuerySettingsResponseModel>> Settings()
+    public async Task<ActionResult<TemplateQuerySettingsResponseModel>> Settings(CancellationToken cancellationToken)
     {
         var contentTypeAliases = _contentTypeService
             .GetAll()

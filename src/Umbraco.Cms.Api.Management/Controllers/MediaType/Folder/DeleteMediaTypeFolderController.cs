@@ -21,5 +21,6 @@ public class DeleteMediaTypeFolderController : MediaTypeFolderControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(Guid id) => await DeleteFolderAsync(id);
+    public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
+        => await DeleteFolderAsync(id);
 }

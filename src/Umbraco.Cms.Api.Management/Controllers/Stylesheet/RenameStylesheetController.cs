@@ -31,7 +31,10 @@ public class RenameStylesheetController : StylesheetControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Rename(string path, RenameStylesheetRequestModel requestModel)
+    public async Task<IActionResult> Rename(
+        CancellationToken cancellationToken,
+        string path,
+        RenameStylesheetRequestModel requestModel)
     {
         StylesheetRenameModel renameModel = _umbracoMapper.Map<StylesheetRenameModel>(requestModel)!;
 

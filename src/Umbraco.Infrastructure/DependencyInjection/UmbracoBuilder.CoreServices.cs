@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -25,6 +26,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
@@ -85,6 +87,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<PendingPackageMigrations>();
         builder.AddNotificationAsyncHandler<RuntimeUnattendedInstallNotification, UnattendedInstaller>();
         builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
+        builder.AddNotificationAsyncHandler<RuntimePremigrationsUpgradeNotification, PremigrationUpgrader>();
 
         // Add runtime mode validation
         builder.Services.AddSingleton<IRuntimeModeValidationService, RuntimeModeValidationService>();
@@ -92,7 +95,6 @@ public static partial class UmbracoBuilderExtensions
             .Add<JITOptimizerValidator>()
             .Add<UmbracoApplicationUrlValidator>()
             .Add<UseHttpsValidator>()
-            .Add<RuntimeMinificationValidator>()
             .Add<ModelsBuilderModeValidator>();
 
         // composers
@@ -233,6 +235,10 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IPasswordChanger<BackOfficeIdentityUser>, PasswordChanger<BackOfficeIdentityUser>>();
         builder.Services.AddUnique<IPasswordChanger<MemberIdentityUser>, PasswordChanger<MemberIdentityUser>>();
         builder.Services.AddTransient<IMemberEditingService, MemberEditingService>();
+
+        builder.Services.AddSingleton<IBlockEditorElementTypeCache, BlockEditorElementTypeCache>();
+
+        builder.Services.AddSingleton<IRichTextRequiredValidator, RichTextRequiredValidator>();
 
         return builder;
     }
@@ -400,6 +406,15 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<UserGroupWithUsersSavedNotification, AuditNotificationsHandler>()
             .AddNotificationHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>();
 
+        // Handlers for publish warnings
+        builder
+            .AddNotificationHandler<ContentPublishedNotification, AddDomainWarningsWhenPublishingNotificationHandler>();
+
+        // Handlers for save warnings
+        builder
+            .AddNotificationAsyncHandler<ContentTypeSavingNotification, WarnDocumentTypeElementSwitchNotificationHandler>()
+            .AddNotificationAsyncHandler<ContentTypeSavedNotification, WarnDocumentTypeElementSwitchNotificationHandler>();
+
         return builder;
     }
 
@@ -424,6 +439,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiMediaQueryService, NoopApiMediaQueryService>();
         builder.Services.AddSingleton<IApiMediaUrlProvider, ApiMediaUrlProvider>();
         builder.Services.AddSingleton<IApiContentRouteBuilder, ApiContentRouteBuilder>();
+        builder.Services.AddSingleton<IApiContentPathProvider, ApiContentPathProvider>();
+        builder.Services.AddSingleton<IApiContentPathResolver, ApiContentPathResolver>();
         builder.Services.AddSingleton<IApiPublishedContentCache, ApiPublishedContentCache>();
         builder.Services.AddSingleton<IApiRichTextElementParser, ApiRichTextElementParser>();
         builder.Services.AddSingleton<IApiRichTextMarkupParser, ApiRichTextMarkupParser>();

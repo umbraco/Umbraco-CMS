@@ -38,7 +38,9 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
     [HttpPost("execute")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TemplateQueryResultResponseModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<TemplateQueryResultResponseModel>> Execute(TemplateQueryExecuteModel query)
+    public async Task<ActionResult<TemplateQueryResultResponseModel>> Execute(
+        CancellationToken cancellationToken,
+        TemplateQueryExecuteModel query)
     {
         var queryExpression = new StringBuilder();
         IEnumerable<IPublishedContent> contents = BuildQuery(query, queryExpression);

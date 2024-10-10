@@ -36,7 +36,10 @@ public class UpdateMediaController : UpdateMediaControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, UpdateMediaRequestModel requestModel)
+    public async Task<IActionResult> Update(
+        CancellationToken cancellationToken,
+        Guid id,
+        UpdateMediaRequestModel requestModel)
         => await HandleRequest(id, async () =>
         {
             MediaUpdateModel model = _mediaEditingPresentationFactory.MapUpdateModel(requestModel);

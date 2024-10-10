@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -8,7 +6,6 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Infrastructure.DeliveryApi;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -21,50 +18,6 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IPublishedValueFallback _publishedValueFallback;
     private readonly IApiMediaWithCropsBuilder _apiMediaWithCropsBuilder;
-
-    [Obsolete($"Use constructor that takes {nameof(IApiMediaWithCropsBuilder)}, scheduled for removal in V14")]
-    public MediaPickerWithCropsValueConverter(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IPublishedUrlProvider publishedUrlProvider,
-        IPublishedValueFallback publishedValueFallback,
-        IJsonSerializer jsonSerializer)
-        : this(
-            publishedSnapshotAccessor,
-            publishedUrlProvider,
-            publishedValueFallback,
-            jsonSerializer,
-            StaticServiceProvider.Instance.GetRequiredService<IApiMediaWithCropsBuilder>()
-        )
-    {
-    }
-
-    [Obsolete($"Use constructor that takes {nameof(IApiMediaWithCropsBuilder)}, scheduled for removal in V14")]
-    public MediaPickerWithCropsValueConverter(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IPublishedUrlProvider publishedUrlProvider,
-        IPublishedValueFallback publishedValueFallback,
-        IJsonSerializer jsonSerializer,
-        IApiMediaBuilder apiMediaBuilder)
-        : this(
-            publishedSnapshotAccessor,
-            publishedUrlProvider,
-            publishedValueFallback,
-            jsonSerializer,
-            StaticServiceProvider.Instance.GetRequiredService<IApiMediaWithCropsBuilder>())
-    {
-    }
-
-    [Obsolete($"Use constructor that takes {nameof(IApiMediaWithCropsBuilder)} and no {nameof(IApiMediaBuilder)}, scheduled for removal in V14")]
-    public MediaPickerWithCropsValueConverter(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IPublishedUrlProvider publishedUrlProvider,
-        IPublishedValueFallback publishedValueFallback,
-        IJsonSerializer jsonSerializer,
-        IApiMediaBuilder apiMediaBuilder,
-        IApiMediaWithCropsBuilder apiMediaWithCropsBuilder)
-        : this(publishedSnapshotAccessor, publishedUrlProvider, publishedValueFallback, jsonSerializer, apiMediaWithCropsBuilder)
-    {
-    }
 
     public MediaPickerWithCropsValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,

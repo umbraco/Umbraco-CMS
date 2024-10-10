@@ -34,7 +34,7 @@ public class CreateMemberController : MemberControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create(CreateMemberRequestModel createRequestModel)
+    public async Task<IActionResult> Create(CancellationToken cancellationToken, CreateMemberRequestModel createRequestModel)
     {
         MemberCreateModel model = _memberEditingPresentationFactory.MapCreateModel(createRequestModel);
         Attempt<MemberCreateResult, MemberEditingStatus> result = await _memberEditingService.CreateAsync(model, CurrentUser(_backOfficeSecurityAccessor));

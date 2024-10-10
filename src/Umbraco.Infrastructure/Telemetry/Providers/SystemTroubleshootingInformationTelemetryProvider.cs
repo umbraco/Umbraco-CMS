@@ -25,21 +25,6 @@ internal class SystemTroubleshootingInformationTelemetryProvider : IDetailedTele
     private readonly IServerRoleAccessor _serverRoleAccessor;
     private readonly RuntimeSettings _runtimeSettings;
 
-    [Obsolete($"Use the constructor that does not take an IOptionsMonitor<GlobalSettings> parameter, scheduled for removal in V12")]
-    public SystemTroubleshootingInformationTelemetryProvider(
-        IUmbracoVersion version,
-        ILocalizationService localizationService,
-        IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
-        IOptionsMonitor<HostingSettings> hostingSettings,
-        IOptionsMonitor<GlobalSettings> globalSettings,
-        IHostEnvironment hostEnvironment,
-        IUmbracoDatabaseFactory umbracoDatabaseFactory,
-        IServerRoleAccessor serverRoleAccessor,
-        IOptionsMonitor<RuntimeSettings> runtimeSettings)
-        : this(version, localizationService, modelsBuilderSettings, hostingSettings, hostEnvironment, umbracoDatabaseFactory, serverRoleAccessor, runtimeSettings)
-    {
-    }
-
     public SystemTroubleshootingInformationTelemetryProvider(
         IUmbracoVersion version,
         ILocalizationService localizationService,

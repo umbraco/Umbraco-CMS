@@ -1,5 +1,3 @@
-using Umbraco.Cms.Core.Xml.XPath;
-
 namespace Umbraco.Cms.Infrastructure.PublishedCache.Navigable;
 
 internal class NavigablePropertyType : INavigableFieldType

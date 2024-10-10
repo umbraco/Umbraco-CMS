@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
-using Umbraco.Cms.Infrastructure.Extensions;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security;

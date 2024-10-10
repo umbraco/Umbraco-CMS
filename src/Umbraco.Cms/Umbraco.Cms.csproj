@@ -5,7 +5,6 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.Targets\Umbraco.Cms.Targets.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Imaging.ImageSharp\Umbraco.Cms.Imaging.ImageSharp.csproj" />

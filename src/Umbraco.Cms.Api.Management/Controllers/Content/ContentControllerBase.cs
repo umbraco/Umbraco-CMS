@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -7,8 +9,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Content;
 
-public class ContentControllerBase : ManagementApiControllerBase
+public abstract class ContentControllerBase : ManagementApiControllerBase
 {
+
     protected IActionResult ContentEditingOperationStatusResult(ContentEditingOperationStatus status)
         => OperationStatusResult(status, problemDetailsBuilder => status switch
         {
@@ -17,7 +20,7 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .WithDetail("A notification handler prevented the content operation.")
                 .Build()),
             ContentEditingOperationStatus.ContentTypeNotFound => NotFound(problemDetailsBuilder
-                .WithTitle("The requested content could not be found")
+                .WithTitle("The requested content type could not be found")
                 .Build()),
             ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch => BadRequest(problemDetailsBuilder
                 .WithTitle("Content type culture variance mismatch")
@@ -68,6 +71,10 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid Id")
                 .WithDetail("The supplied id is already in use.")
                 .Build()),
+            ContentEditingOperationStatus.DuplicateName => BadRequest(problemDetailsBuilder
+                .WithTitle("Duplicate name")
+                .WithDetail("The supplied name is already in use for the same content type.")
+                .Build()),
             ContentEditingOperationStatus.Unknown => StatusCode(
                 StatusCodes.Status500InternalServerError,
                 problemDetailsBuilder
@@ -92,7 +99,8 @@ public class ContentControllerBase : ManagementApiControllerBase
         }
 
         var errors = new SortedDictionary<string, string[]>();
-        var missingPropertyAliases = new List<string>();
+
+        var missingPropertyModels = new List<PropertyValidationResponseModel>();
         foreach (PropertyValidationError validationError in validationResult.ValidationErrors)
         {
             TValueModel? requestValue = requestModel.Values.FirstOrDefault(value =>
@@ -101,7 +109,7 @@ public class ContentControllerBase : ManagementApiControllerBase
                 && value.Segment == validationError.Segment);
             if (requestValue is null)
             {
-                missingPropertyAliases.Add(validationError.Alias);
+                missingPropertyModels.Add(MapMissingProperty(validationError));
                 continue;
             }
 
@@ -115,7 +123,16 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Validation failed")
                 .WithDetail("One or more properties did not pass validation")
                 .WithRequestModelErrors(errors)
-                .WithExtension("missingProperties", missingPropertyAliases.ToArray())
+                .WithExtension("missingValues", missingPropertyModels.ToArray())
                 .Build()));
     }
+
+    private PropertyValidationResponseModel MapMissingProperty(PropertyValidationError source) =>
+        new()
+        {
+            Alias = source.Alias,
+            Segment = source.Segment,
+            Culture = source.Culture,
+            Messages = source.ErrorMessages,
+        };
 }

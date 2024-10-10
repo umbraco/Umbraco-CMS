@@ -21,16 +21,13 @@ test.describe('DataTypeFolder tests', () => {
     expect(umbracoApi.dataType.doesFolderExist(dataTypeFolderId)).toBeTruthy();
   });
 
-  test('can update a dataType folder', async ({umbracoApi}) => {
+  test('can rename a dataType folder', async ({umbracoApi}) => {
     // Arrange
-    const oldDataTypeFolderName = 'Oldie';
-
-    dataTypeFolderId = await umbracoApi.dataType.createFolder(oldDataTypeFolderName);
-    const dataTypeFolder = await umbracoApi.dataType.getFolder(dataTypeFolderId);
-    dataTypeFolder.name = dataTypeFolderName;
+    const wrongDataTypeFolderName = 'WrongFolderName';
+    dataTypeFolderId = await umbracoApi.dataType.createFolder(wrongDataTypeFolderName);
 
     // Act
-    await umbracoApi.dataType.updateFolder(dataTypeFolderId, dataTypeFolder);
+    await umbracoApi.dataType.renameFolder(dataTypeFolderId, dataTypeFolderName);
 
     // Assert
     expect(umbracoApi.dataType.doesFolderExist(dataTypeFolderId)).toBeTruthy();

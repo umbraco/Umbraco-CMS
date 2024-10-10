@@ -17,6 +17,7 @@ public interface IFileSource
     /// <para>Returns null if no content could be read.</para>
     /// <para>The caller should ensure that the stream is properly closed/disposed.</para>
     /// </remarks>
+    [Obsolete("Use GetFileStreamAsync() instead. This method will be removed in a future version.")]
     Stream GetFileStream(StringUdi udi);
 
     /// <summary>
@@ -43,6 +44,7 @@ public interface IFileSource
     /// <remarks>
     /// Returns null if no content could be read.
     /// </remarks>
+    [Obsolete("Use GetFileContentAsync() instead. This method will be removed in a future version.")]
     string GetFileContent(StringUdi udi);
 
     /// <summary>
@@ -65,6 +67,7 @@ public interface IFileSource
     /// <returns>
     /// The length of the file, or -1 if the file does not exist.
     /// </returns>
+    [Obsolete("Use GetFileLengthAsync() instead. This method will be removed in a future version.")]
     long GetFileLength(StringUdi udi);
 
     /// <summary>
@@ -77,38 +80,14 @@ public interface IFileSource
     /// </returns>
     Task<long> GetFileLengthAsync(StringUdi udi, CancellationToken token);
 
-    // TODO (V14): Remove obsolete methods and default implementations for GetFiles and GetFilesAsync overloads.
-
-    /// <summary>
-    /// Gets files and store them using a file store.
-    /// </summary>
-    /// <param name="udis">The UDIs of the files to get.</param>
-    /// <param name="fileTypes">A collection of file types which can store the files.</param>
-    [Obsolete("Please use the method overload taking all parameters. This method overload will be removed in Umbraco 14.")]
-    void GetFiles(IEnumerable<StringUdi> udis, IFileTypeCollection fileTypes);
-
     /// <summary>
     /// Gets files and store them using a file store.
     /// </summary>
     /// <param name="udis">The UDIs of the files to get.</param>
     /// <param name="continueOnFileNotFound">A flag indicating whether to continue if a file isn't found or to stop and throw a FileNotFoundException.</param>
     /// <param name="fileTypes">A collection of file types which can store the files.</param>
-    void GetFiles(IEnumerable<StringUdi> udis, bool continueOnFileNotFound, IFileTypeCollection fileTypes)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => GetFiles(udis, fileTypes);
-#pragma warning restore CS0618 // Type or member is obsolete
-
-    /// <summary>
-    /// Gets files and store them using a file store.
-    /// </summary>
-    /// <param name="udis">The UDIs of the files to get.</param>
-    /// <param name="fileTypes">A collection of file types which can store the files.</param>
-    /// <param name="token">A cancellation token.</param>
-    /// <returns>
-    /// The task object representing the asynchronous operation.
-    /// </returns>
-    [Obsolete("Please use the method overload taking all parameters. This method overload will be removed in Umbraco 14.")]
-    Task GetFilesAsync(IEnumerable<StringUdi> udis, IFileTypeCollection fileTypes, CancellationToken token);
+    [Obsolete("Use GetFilesAsync() instead. This method will be removed in a future version.")]
+    void GetFiles(IEnumerable<StringUdi> udis, bool continueOnFileNotFound, IFileTypeCollection fileTypes);
 
     /// <summary>
     /// Gets files and store them using a file store.
@@ -120,8 +99,5 @@ public interface IFileSource
     /// <returns>
     /// The task object representing the asynchronous operation.
     /// </returns>
-    Task GetFilesAsync(IEnumerable<StringUdi> udis, IFileTypeCollection fileTypes, bool continueOnFileNotFound, CancellationToken token)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => GetFilesAsync(udis, fileTypes, token);
-#pragma warning restore CS0618 // Type or member is obsolete
+    Task GetFilesAsync(IEnumerable<StringUdi> udis, IFileTypeCollection fileTypes, bool continueOnFileNotFound, CancellationToken token);
 }

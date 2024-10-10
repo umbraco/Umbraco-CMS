@@ -39,11 +39,6 @@ public interface IUser : IMembershipUser, IRememberBeingDirty
     /// </summary>
     string? Avatar { get; set; }
 
-    /// <summary>
-    ///     A Json blob stored for recording tour data for a user
-    /// </summary>
-    string? TourData { get; set; }
-
     void RemoveGroup(string group);
 
     void ClearGroups();

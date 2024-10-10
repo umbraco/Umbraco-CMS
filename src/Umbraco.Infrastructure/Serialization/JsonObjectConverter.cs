@@ -1,43 +1,43 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.Serialization;
 
-public class JsonObjectConverter : JsonConverter<object>
+/// <summary>
+/// Converts an object to or from JSON.
+/// </summary>
+public sealed class JsonObjectConverter : JsonConverter<object>
 {
-    public override object? Read(
-        ref Utf8JsonReader reader,
-        Type typeToConvert,
-        JsonSerializerOptions options) =>
-        ParseObject(ref reader);
+    /// <inheritdoc />
+    public override object? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        => ParseObject(ref reader);
 
-    public override void Write(
-        Utf8JsonWriter writer,
-        object objectToWrite,
-        JsonSerializerOptions options)
+    /// <inheritdoc />
+    public override void Write(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
     {
-        if (objectToWrite is null)
+        if (value is null)
         {
             return;
         }
 
-        // If an object is equals "new object()", Json.Serialize would recurse forever and cause a stack overflow
+        // If the value equals an empty object, Json.Serialize would recurse forever and cause a stack overflow
         // We have no good way of checking if its an empty object
         // which is why we try to check if the object has any properties, and thus will be empty.
-        if (objectToWrite.GetType().Name is "Object" && !objectToWrite.GetType().GetProperties().Any())
+        Type inputType = value.GetType();
+        if (inputType == typeof(object) && inputType.GetProperties().Length == 0)
         {
             writer.WriteStartObject();
             writer.WriteEndObject();
         }
         else
         {
-            JsonSerializer.Serialize(writer, objectToWrite, objectToWrite.GetType(), options);
+            JsonSerializer.Serialize(writer, value, inputType, options);
         }
     }
 
-    private object? ParseObject(ref Utf8JsonReader reader)
+    private static object? ParseObject(ref Utf8JsonReader reader)
     {
         if (reader.TokenType == JsonTokenType.StartArray)
         {
@@ -101,8 +101,9 @@ public class JsonObjectConverter : JsonConverter<object>
             JsonTokenType.Number when reader.TryGetInt32(out int i) => i,
             JsonTokenType.Number when reader.TryGetInt64(out long l) => l,
             JsonTokenType.Number => reader.GetDouble(),
+            JsonTokenType.String when reader.TryGetDateTimeOffset(out DateTimeOffset datetime) => datetime,
             JsonTokenType.String when reader.TryGetDateTime(out DateTime datetime) => datetime,
-            JsonTokenType.String => reader.GetString()!,
+            JsonTokenType.String => reader.GetString(),
             _ => JsonDocument.ParseValue(ref reader).RootElement.Clone()
         };
     }

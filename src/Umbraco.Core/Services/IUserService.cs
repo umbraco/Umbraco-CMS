@@ -322,8 +322,6 @@ public interface IUserService : IMembershipUserService
     /// </returns>
     IEnumerable<IUser> GetAllNotInGroup(int groupId);
 
-    IEnumerable<IUser> GetNextUsers(int id, int count);
-
     #region User groups
 
     /// <summary>

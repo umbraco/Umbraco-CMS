@@ -14,8 +14,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Tree;
 
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.DocumentBlueprint}")]
 [ApiExplorerSettings(GroupName = "Document Blueprint")]
-[Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
-public class DocumentBlueprintTreeControllerBase : NamedEntityTreeControllerBase<DocumentBlueprintTreeItemResponseModel>
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
+public class DocumentBlueprintTreeControllerBase : FolderTreeControllerBase<DocumentBlueprintTreeItemResponseModel>
 {
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
@@ -25,18 +25,28 @@ public class DocumentBlueprintTreeControllerBase : NamedEntityTreeControllerBase
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.DocumentBlueprint;
 
-    protected override DocumentBlueprintTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentId, IEntitySlim[] entities)
-    {
-        IDocumentEntitySlim[] documentEntities = entities
-            .OfType<IDocumentEntitySlim>()
-            .ToArray();
+    protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.DocumentBlueprintContainer;
 
-        return documentEntities.Select(entity =>
+    protected override Ordering ItemOrdering
+    {
+        get
         {
-            DocumentBlueprintTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentId, entity);
-            responseModel.HasChildren = false;
-            responseModel.DocumentType = _documentPresentationFactory.CreateDocumentTypeReferenceResponseModel(entity);
+            var ordering = Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.NodeObjectType), Direction.Descending); // We need to override to change direction
+            ordering.Next = Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.Text));
+
+            return ordering;
+        }
+    }
+
+    protected override DocumentBlueprintTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentId, IEntitySlim[] entities)
+        => entities.Select(entity =>
+        {
+            DocumentBlueprintTreeItemResponseModel responseModel = MapTreeItemViewModel(parentId, entity);
+            if (entity is IDocumentEntitySlim documentEntitySlim)
+            {
+                responseModel.HasChildren = false;
+                responseModel.DocumentType = _documentPresentationFactory.CreateDocumentTypeReferenceResponseModel(documentEntitySlim);
+            }
             return responseModel;
         }).ToArray();
-    }
 }

@@ -16,16 +16,6 @@ public class RelationTypeBaseModel
     public bool IsBidirectional { get; set; }
 
     /// <summary>
-    ///     Gets or sets the parent object type ID.
-    /// </summary>
-    public Guid? ParentObjectType { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the child object type ID.
-    /// </summary>
-    public Guid? ChildObjectType { get; set; }
-
-    /// <summary>
     ///     Gets or sets a boolean indicating whether the RelationType should be returned in "Used by"-queries.
     /// </summary>
     public bool IsDependency { get; set; }

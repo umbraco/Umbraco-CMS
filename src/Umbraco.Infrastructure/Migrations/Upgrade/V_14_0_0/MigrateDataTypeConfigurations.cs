@@ -93,7 +93,7 @@ public class MigrateDataTypeConfigurations : MigrationBase
                     PropertyEditorAliases.DropDownListFlexible => HandleDropDown(ref configurationData),
                     PropertyEditorAliases.EmailAddress => HandleEmailAddress(ref configurationData),
                     PropertyEditorAliases.Label => HandleLabel(ref configurationData),
-                    PropertyEditorAliases.ListView => HandleListView(ref configurationData, dataTypeDto.NodeDto?.UniqueId, allMediaTypes, allMemberTypes),
+                    PropertyEditorAliases.ListView => HandleListView(ref configurationData, dataTypeDto.NodeDto?.UniqueId, allMediaTypes),
                     PropertyEditorAliases.MediaPicker3 => HandleMediaPicker(ref configurationData, allMediaTypes),
                     PropertyEditorAliases.MultiNodeTreePicker => HandleMultiNodeTreePicker(ref configurationData, allContentTypes, allMediaTypes, allMemberTypes),
                     PropertyEditorAliases.MultiUrlPicker => HandleMultiUrlPicker(ref configurationData),
@@ -308,13 +308,11 @@ public class MigrateDataTypeConfigurations : MigrationBase
 
     // ensure that list view configs have all configurations, as some have never been added by means of migration.
     // also performs a re-formatting of "layouts" and "includeProperties" to a V14 format
-    private bool HandleListView(ref Dictionary<string, object> configurationData, Guid? dataTypeKey, IMediaType[] allMediaTypes, IMemberType[] allMemberTypes)
+    private bool HandleListView(ref Dictionary<string, object> configurationData, Guid? dataTypeKey, IMediaType[] allMediaTypes)
     {
         var collectionViewType = dataTypeKey == Constants.DataTypes.Guids.ListViewMediaGuid || allMediaTypes.Any(mt => mt.ListView == dataTypeKey)
             ? "Media"
-            : dataTypeKey == Constants.DataTypes.Guids.ListViewMembersGuid || allMemberTypes.Any(mt => mt.ListView == dataTypeKey)
-                ? "Member"
-                : "Document";
+            : "Document";
 
         string? LayoutPathToCollectionView(string? path)
             => "views/propertyeditors/listview/layouts/list/list.html".InvariantEquals(path)

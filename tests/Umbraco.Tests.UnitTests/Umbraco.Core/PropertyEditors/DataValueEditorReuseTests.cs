@@ -2,6 +2,7 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -43,7 +44,7 @@ public class DataValueEditorReuseTests
                 _propertyEditorCollection,
                 _dataValueReferenceFactories,
                 Mock.Of<IDataTypeConfigurationCache>(),
-                Mock.Of<IContentTypeService>(),
+                Mock.Of<IBlockEditorElementTypeCache>(),
                 Mock.Of<ILocalizedTextService>(),
                 Mock.Of<ILogger<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>>(),
                 Mock.Of<IShortStringHelper>(),

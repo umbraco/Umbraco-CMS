@@ -53,6 +53,7 @@ public static partial class Constants
             public const string User2UserGroup = TableNamePrefix + "User2UserGroup";
             public const string User2NodeNotify = TableNamePrefix + "User2NodeNotify";
             public const string UserGroup2App = TableNamePrefix + "UserGroup2App";
+            public const string UserData = TableNamePrefix + "UserData";
 
             [Obsolete("Will be removed in Umbraco 18 as this table haven't existed since Umbraco 14.")]
             public const string UserGroup2Node = TableNamePrefix + "UserGroup2Node";

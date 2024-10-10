@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -24,6 +24,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     private readonly IUserGroupPermissionService _userGroupPermissionService;
     private readonly IEntityService _entityService;
     private readonly IUserService _userService;
+    private readonly ILogger<UserGroupService> _logger;
 
     public UserGroupService(
         ICoreScopeProvider provider,
@@ -32,13 +33,15 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         IUserGroupRepository userGroupRepository,
         IUserGroupPermissionService userGroupPermissionService,
         IEntityService entityService,
-        IUserService userService)
+        IUserService userService,
+        ILogger<UserGroupService> logger)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userGroupRepository = userGroupRepository;
         _userGroupPermissionService = userGroupPermissionService;
         _entityService = entityService;
         _userService = userService;
+        _logger = logger;
     }
 
     /// <inheritdoc/>
@@ -132,6 +135,35 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     }
 
     /// <inheritdoc/>
+    public async Task<Attempt<PagedModel<IUserGroup>, UserGroupOperationStatus>> FilterAsync(Guid userKey, string? filter, int skip, int take)
+    {
+        IUser? requestingUser = await _userService.GetAsync(userKey);
+        if (requestingUser is null)
+        {
+            return Attempt.FailWithStatus(UserGroupOperationStatus.MissingUser, new PagedModel<IUserGroup>());
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        var groups = _userGroupRepository
+            .GetMany()
+            .Where(group => filter.IsNullOrWhiteSpace() || group.Name?.InvariantContains(filter) is true)
+            .OrderBy(group => group.Name)
+            .ToList();
+
+        if (requestingUser.IsAdmin() is false)
+        {
+            var requestingUserGroups = requestingUser.Groups.Select(group => group.Alias).ToArray();
+            groups.RemoveAll(group =>
+                group.Alias is Constants.Security.AdminGroupAlias
+                || requestingUserGroups.Contains(group.Alias) is false);
+        }
+
+        return Attempt.SucceedWithStatus(
+            UserGroupOperationStatus.Success,
+            new PagedModel<IUserGroup> { Items = groups.Skip(skip).Take(take), Total = groups.Count });
+    }
+
+    /// <inheritdoc/>
     public async Task<Attempt<UserGroupOperationStatus>> DeleteAsync(ISet<Guid> keys)
     {
         if (keys.Any() is false)
@@ -178,7 +210,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
-    public async Task<UserGroupOperationStatus> UpdateUserGroupsOnUsersAsync(
+    public async Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsersAsync(
         ISet<Guid> userGroupKeys,
         ISet<Guid> userKeys)
     {
@@ -201,7 +233,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
                 if (adminGroup is not null && adminGroup.UserCount <= usersToDeAdmin.Length)
                 {
                     scope.Complete();
-                    return UserGroupOperationStatus.AdminGroupCannotBeEmpty;
+                    return Attempt.Fail(UserGroupOperationStatus.AdminGroupCannotBeEmpty);
                 }
             }
         }
@@ -219,7 +251,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         scope.Complete();
 
-        return UserGroupOperationStatus.Success;
+        return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
     private Attempt<UserGroupOperationStatus> ValidateUserGroupDeletion(IUserGroup? userGroup)
@@ -231,7 +263,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         if (userGroup.IsSystemUserGroup())
         {
-            return Attempt.Fail(UserGroupOperationStatus.IsSystemUserGroup);
+            return Attempt.Fail(UserGroupOperationStatus.CanNotDeleteIsSystemUserGroup);
         }
 
         return Attempt.Succeed(UserGroupOperationStatus.Success);
@@ -262,9 +294,8 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             await _userGroupPermissionService.AuthorizeCreateAsync(performingUser, userGroup);
         if (isAuthorized != UserGroupAuthorizationStatus.Success)
         {
-            // Convert from UserGroupAuthorizationStatus to UserGroupOperationStatus
-            UserGroupOperationStatus operationStatus = isAuthorized.ToUserGroupOperationStatus();
-            return Attempt.FailWithStatus(operationStatus, userGroup);
+            _logger.LogInformation("The performing user is not allowed to create the user group. The authorization status returned was: {AuthorizationStatus}", isAuthorized);
+            return Attempt.FailWithStatus(UserGroupOperationStatus.Unauthorized, userGroup);
         }
 
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -283,8 +314,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         // Since this is a brand new creation we don't have to be worried about what users were added and removed
         // simply put all members that are requested to be in the group will be "added"
         var userGroupWithUsers = new UserGroupWithUsers(userGroup, usersToAdd, Array.Empty<IUser>());
-        var savingUserGroupWithUsersNotification =
-            new UserGroupWithUsersSavingNotification(userGroupWithUsers, eventMessages);
+        var savingUserGroupWithUsersNotification = new UserGroupWithUsersSavingNotification(userGroupWithUsers, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingUserGroupWithUsersNotification))
         {
             scope.Complete();
@@ -292,6 +322,11 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         }
 
         _userGroupRepository.AddOrUpdateGroupWithUsers(userGroup, usersToAdd.Select(x => x.Id).ToArray());
+
+        scope.Notifications.Publish(
+            new UserGroupSavedNotification(userGroup, eventMessages).WithStateFrom(savingNotification));
+        scope.Notifications.Publish(
+            new UserGroupWithUsersSavedNotification(userGroupWithUsers, eventMessages).WithStateFrom(savingUserGroupWithUsersNotification));
 
         scope.Complete();
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
@@ -342,9 +377,8 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             await _userGroupPermissionService.AuthorizeUpdateAsync(performingUser, userGroup);
         if (isAuthorized != UserGroupAuthorizationStatus.Success)
         {
-            // Convert from UserGroupAuthorizationStatus to UserGroupOperationStatus
-            UserGroupOperationStatus operationStatus = isAuthorized.ToUserGroupOperationStatus();
-            return Attempt.FailWithStatus(operationStatus, userGroup);
+            _logger.LogInformation("The performing user is not allowed to update the user group. The authorization status returned was: {AuthorizationStatus}", isAuthorized);
+            return Attempt.FailWithStatus(UserGroupOperationStatus.Unauthorized, userGroup);
         }
 
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -355,15 +389,29 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return Attempt.FailWithStatus(UserGroupOperationStatus.CancelledByNotification, userGroup);
         }
 
+        // We need to fire this notification - both for backwards compat, and to ensure caches across all servers.
+        // Since we are not adding or removing any users, we'll just fire the notification with empty collections
+        // for "added" and "removed" users.
+        var userGroupWithUsers = new UserGroupWithUsers(userGroup, [], []);
+        var savingUserGroupWithUsersNotification = new UserGroupWithUsersSavingNotification(userGroupWithUsers, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(savingUserGroupWithUsersNotification))
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus(UserGroupOperationStatus.CancelledByNotification, userGroup);
+        }
+
         _userGroupRepository.Save(userGroup);
+
         scope.Notifications.Publish(
             new UserGroupSavedNotification(userGroup, eventMessages).WithStateFrom(savingNotification));
+        scope.Notifications.Publish(
+            new UserGroupWithUsersSavedNotification(userGroupWithUsers, eventMessages).WithStateFrom(savingUserGroupWithUsersNotification));
 
         scope.Complete();
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
     }
 
-    public async Task<UserGroupOperationStatus> AddUsersToUserGroupAsync(UsersToUserGroupManipulationModel addUsersModel, Guid performingUserKey)
+    public async Task<Attempt<UserGroupOperationStatus>> AddUsersToUserGroupAsync(UsersToUserGroupManipulationModel addUsersModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -371,16 +419,13 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         if (resolveAttempt.Success is false)
         {
-            return resolveAttempt.Status;
+            return Attempt.Fail(resolveAttempt.Status);
         }
 
-        ResolvedUserToUserGroupManipulationModel? resolvedModel = resolveAttempt.Result;
+        ResolvedUserToUserGroupManipulationModel? resolvedModel = resolveAttempt.Result ??
 
-        // This should never happen, but we need to check it to avoid null reference exceptions
-        if (resolvedModel is null)
-        {
+            // This should never happen, but we need to check it to avoid null reference exceptions
             throw new InvalidOperationException("The resolved model should not be null.");
-        }
 
         IReadOnlyUserGroup readOnlyGroup = resolvedModel.UserGroup.ToReadOnlyGroup();
 
@@ -393,10 +438,10 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         scope.Complete();
 
-        return UserGroupOperationStatus.Success;
+        return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
-    public async Task<UserGroupOperationStatus> RemoveUsersFromUserGroupAsync(UsersToUserGroupManipulationModel removeUsersModel, Guid performingUserKey)
+    public async Task<Attempt<UserGroupOperationStatus>> RemoveUsersFromUserGroupAsync(UsersToUserGroupManipulationModel removeUsersModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -404,23 +449,20 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         if (resolveAttempt.Success is false)
         {
-            return resolveAttempt.Status;
+            return Attempt.Fail(resolveAttempt.Status);
         }
 
-        ResolvedUserToUserGroupManipulationModel? resolvedModel = resolveAttempt.Result;
+        ResolvedUserToUserGroupManipulationModel? resolvedModel = resolveAttempt.Result
 
         // This should never happen, but we need to check it to avoid null reference exceptions
-        if (resolvedModel is null)
-        {
-            throw new InvalidOperationException("The resolved model should not be null.");
-        }
+            ?? throw new InvalidOperationException("The resolved model should not be null.");
 
         foreach (IUser user in resolvedModel.Users)
         {
             // We can't remove a user from a group they're not part of.
             if (user.Groups.Select(x => x.Key).Contains(resolvedModel.UserGroup.Key) is false)
             {
-                return UserGroupOperationStatus.UserNotInGroup;
+                return Attempt.Fail(UserGroupOperationStatus.UserNotInGroup);
             }
 
             user.RemoveGroup(resolvedModel.UserGroup.Alias);
@@ -431,14 +473,14 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         if (resolvedModel.UserGroup.Key == Constants.Security.AdminGroupKey
             && resolvedModel.UserGroup.UserCount <= resolvedModel.Users.Length)
         {
-            return UserGroupOperationStatus.AdminGroupCannotBeEmpty;
+            return Attempt.Fail(UserGroupOperationStatus.AdminGroupCannotBeEmpty);
         }
 
         _userService.Save(resolvedModel.Users);
 
         scope.Complete();
 
-        return UserGroupOperationStatus.Success;
+        return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
     /// <summary>
@@ -490,10 +532,16 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return UserGroupOperationStatus.NotFound;
         }
 
-        IUserGroup? existing = _userGroupRepository.Get(userGroup.Alias);
-        if (existing is not null && existing.Key != userGroup.Key)
+        IUserGroup? existingByAlias = _userGroupRepository.Get(userGroup.Alias);
+        if (existingByAlias is not null && existingByAlias.Key != userGroup.Key)
         {
             return UserGroupOperationStatus.DuplicateAlias;
+        }
+
+        IUserGroup? existingByKey = await GetAsync(userGroup.Key);
+        if (existingByKey is not null && existingByKey.IsSystemUserGroup() && existingByKey.Alias != userGroup.Alias)
+        {
+            return UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup;
         }
 
         return UserGroupOperationStatus.Success;
@@ -588,7 +636,8 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     /// <remarks>
     /// This is to ensure that the user can access the group they themselves created at a later point and modify it.
     /// </remarks>
-    private IEnumerable<Guid> EnsureNonAdminUserIsInSavedUserGroup(IUser performingUser,
+    private IEnumerable<Guid> EnsureNonAdminUserIsInSavedUserGroup(
+        IUser performingUser,
         IEnumerable<Guid> groupMembersUserKeys)
     {
         var userKeys = groupMembersUserKeys.ToList();

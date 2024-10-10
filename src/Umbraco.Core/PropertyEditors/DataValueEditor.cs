@@ -211,7 +211,7 @@ public class DataValueEditor : IDataValueEditor
             case ValueStorageType.Ntext:
             case ValueStorageType.Nvarchar:
                 // If it is a string type, we will attempt to see if it is JSON stored data, if it is we'll try to convert
-                // to a real JSON object so we can pass the true JSON object directly to Angular!
+                // to a real JSON object so we can pass the true JSON object directly to the client
                 var stringValue = value as string ?? value.ToString();
                 if (stringValue!.DetectIsJson())
                 {
@@ -355,6 +355,10 @@ public class DataValueEditor : IDataValueEditor
                 throw new ArgumentOutOfRangeException();
         }
     }
+
+    // Adding a virtual method that wraps the default implementation allows derived classes
+    // to override the default implementation without having to explicitly inherit the interface.
+    public virtual IEnumerable<Guid> ConfiguredElementTypeKeys() => Enumerable.Empty<Guid>();
 
     /// <summary>
     ///     Used to try to convert the string value to the correct CLR type based on the <see cref="ValueType" /> specified for

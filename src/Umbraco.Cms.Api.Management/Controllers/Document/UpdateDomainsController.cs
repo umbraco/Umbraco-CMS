@@ -28,10 +28,14 @@ public class UpdateDomainsController : DocumentControllerBase
 
     [MapToApiVersion("1.0")]
     [HttpPut("{id:guid}/domains")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> Update(Guid id, UpdateDomainsRequestModel updateModel)
+    public async Task<IActionResult> Update(
+        CancellationToken cancellationToken,
+        Guid id,
+        UpdateDomainsRequestModel updateModel)
     {
         DomainsUpdateModel domainsUpdateModel = _umbracoMapper.Map<DomainsUpdateModel>(updateModel)!;
 
@@ -61,6 +65,10 @@ public class UpdateDomainsController : DocumentControllerBase
                     .WithTitle("Conflicting domain name detected")
                     .WithDetail("One or more of the specified domain names were conflicting with domain assignments to other content items.")
                     .WithExtension("conflictingDomainNames", _domainPresentationFactory.CreateDomainAssignmentModels(result.Result.ConflictingDomains.EmptyNull()))
+                    .Build()),
+                DomainOperationStatus.InvalidDomainName => BadRequest(problemDetailsBuilder
+                    .WithTitle("Invalid domain name detected")
+                    .WithDetail("One or more of the specified domain names were invalid.")
                     .Build()),
                 _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                     .WithTitle("Unknown domain update operation status.")

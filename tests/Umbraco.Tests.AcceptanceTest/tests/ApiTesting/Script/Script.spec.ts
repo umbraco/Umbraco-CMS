@@ -39,7 +39,7 @@ test.describe('Script tests', () => {
 
   test('can update script content', async ({umbracoApi}) => {
     // Arrange
-    const newContent = 'Howdy';
+    const newContent = 'BetterContent';
     scriptPath = await umbracoApi.script.create(scriptName, 'test');
     await umbracoApi.script.get(scriptPath);
 

@@ -177,9 +177,8 @@ public interface IRelationService : IService
     ///     Gets a paged result of <see cref="IRelation" />
     /// </summary>
     /// <param name="key"></param>
-    /// <param name="pageIndex"></param>
-    /// <param name="pageSize"></param>
-    /// <param name="totalRecords"></param>
+    /// <param name="skip"></param>
+    /// <param name="take"></param>
     /// <param name="ordering"></param>
     /// <returns></returns>
     Task<Attempt<PagedModel<IRelation>, RelationOperationStatus>> GetPagedByRelationTypeKeyAsync(Guid key, int skip, int take, Ordering? ordering = null);
@@ -403,6 +402,8 @@ public interface IRelationService : IService
     /// Gets the Relation types in a paged manner.
     /// Currently implements the paging in memory on the name attribute because the underlying repository does not support paging yet
     /// </summary>
+    /// <param name="skip"></param>
+    /// <param name="take"></param>
     /// <param name="ids"></param>
     /// <returns></returns>
     Task<PagedModel<IRelationType>> GetPagedRelationTypesAsync(int skip, int take, params int[] ids);

@@ -38,7 +38,7 @@ public class PublishDocumentWithDescendantsController : DocumentControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> PublishWithDescendants(Guid id, PublishDocumentWithDescendantsRequestModel requestModel)
+    public async Task<IActionResult> PublishWithDescendants(CancellationToken cancellationToken, Guid id, PublishDocumentWithDescendantsRequestModel requestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,

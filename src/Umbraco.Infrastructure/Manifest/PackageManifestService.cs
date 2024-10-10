@@ -10,19 +10,21 @@ internal sealed class PackageManifestService : IPackageManifestService
 {
     private readonly IEnumerable<IPackageManifestReader> _packageManifestReaders;
     private readonly IAppPolicyCache _cache;
-    private readonly PackageManifestSettings _packageManifestSettings;
+    private RuntimeSettings _runtimeSettings;
+
 
     public PackageManifestService(
         IEnumerable<IPackageManifestReader> packageManifestReaders,
         AppCaches appCaches,
-        IOptions<PackageManifestSettings> packageManifestSettings)
+        IOptionsMonitor<RuntimeSettings> runtimeSettingsOptionsMonitor)
     {
         _packageManifestReaders = packageManifestReaders;
-        _packageManifestSettings = packageManifestSettings.Value;
         _cache = appCaches.RuntimeCache;
+        _runtimeSettings = runtimeSettingsOptionsMonitor.CurrentValue;
+        runtimeSettingsOptionsMonitor.OnChange(runtimeSettings => _runtimeSettings = runtimeSettings);
     }
 
-    public async Task<IEnumerable<PackageManifest>> GetPackageManifestsAsync()
+    public async Task<IEnumerable<PackageManifest>> GetAllPackageManifestsAsync()
         => await _cache.GetCacheItemAsync(
                $"{nameof(PackageManifestService)}-PackageManifests",
                async () =>
@@ -34,12 +36,20 @@ internal sealed class PackageManifestService : IPackageManifestService
 
                    return tasks.SelectMany(x => x.Result);
                },
-               _packageManifestSettings.CacheTimeout)
+               _runtimeSettings.Mode == RuntimeMode.Production
+                   ? TimeSpan.FromDays(30)
+                   : TimeSpan.FromSeconds(10))
            ?? Array.Empty<PackageManifest>();
+
+    public async Task<IEnumerable<PackageManifest>> GetPublicPackageManifestsAsync()
+        => (await GetAllPackageManifestsAsync()).Where(manifest => manifest.AllowPublicAccess);
+
+    public async Task<IEnumerable<PackageManifest>> GetPrivatePackageManifestsAsync()
+        => (await GetAllPackageManifestsAsync()).Where(manifest => manifest.AllowPublicAccess == false);
 
     public async Task<PackageManifestImportmap> GetPackageManifestImportmapAsync()
     {
-        IEnumerable<PackageManifest> packageManifests = await GetPackageManifestsAsync();
+        IEnumerable<PackageManifest> packageManifests = await GetAllPackageManifestsAsync();
         var manifests = packageManifests.Select(x => x.Importmap).WhereNotNull().ToList();
 
         var importDict = manifests

@@ -3,11 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Web.Common.Authorization;
 
@@ -23,13 +21,6 @@ public class FeatureAuthorizeHandler : AuthorizationHandler<FeatureAuthorizeRequ
     {
         _umbracoFeatures = umbracoFeatures;
         _runtimeState = runtimeState;
-    }
-
-    [Obsolete("Use ctor that is not obsolete. This will be removed in v13.")]
-    public FeatureAuthorizeHandler(UmbracoFeatures umbracoFeatures)
-        :this(umbracoFeatures, StaticServiceProvider.Instance.GetRequiredService<IRuntimeState>())
-    {
-
     }
 
     protected override Task HandleRequirementAsync(

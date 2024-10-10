@@ -18,6 +18,4 @@ public class StylesheetTreeControllerBase : FileSystemTreeControllerBase
                         throw new ArgumentException("Missing stylesheets file system", nameof(fileSystems));
 
     protected override IFileSystem FileSystem { get; }
-
-    protected override string ItemType(string path) => Constants.UdiEntityType.Stylesheet;
 }

@@ -18,6 +18,4 @@ public class PartialViewTreeControllerBase : FileSystemTreeControllerBase
                         throw new ArgumentException("Missing partial views file system", nameof(fileSystems));
 
     protected override IFileSystem FileSystem { get; }
-
-    protected override string ItemType(string path) => Constants.UdiEntityType.PartialView;
 }

@@ -22,6 +22,10 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
 
     protected abstract UmbracoObjectTypes ContainerObjectType { get; }
 
+    protected abstract int[] ReadLockIds { get; }
+
+    protected abstract int[] WriteLockIds { get; }
+
     protected EntityTypeContainerService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -42,6 +46,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
     public async Task<EntityContainer?> GetAsync(Guid id)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        ReadLock(scope);
         return await Task.FromResult(_entityContainerRepository.Get(id));
     }
 
@@ -120,7 +125,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
 
                 if (container.IsPropertyDirty(nameof(EntityContainer.ParentId)))
                 {
-                    LoggerFactory.CreateLogger<DataTypeContainerService>().LogWarning(
+                    LoggerFactory.CreateLogger(GetType()).LogWarning(
                         $"Cannot use {nameof(UpdateAsync)} to change the container parent. Move the container instead.");
                     return EntityContainerOperationStatus.ParentNotFound;
                 }
@@ -134,6 +139,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
     public async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> DeleteAsync(Guid id, Guid userKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        WriteLock(scope);
 
         EntityContainer? container = _entityContainerRepository.Get(id);
         if (container == null)
@@ -178,6 +184,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
         }
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        WriteLock(scope);
 
         EntityContainerOperationStatus operationValidationStatus = operationValidation();
         if (operationValidationStatus != EntityContainerOperationStatus.Success)
@@ -212,9 +219,26 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
         }
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        ReadLock(scope);
         return _entityContainerRepository.Get(treeEntity.ParentId);
     }
 
     private void Audit(AuditType type, int userId, int objectId)
         => _auditRepository.Save(new AuditItem(objectId, type, userId, ContainerObjectType.GetName()));
+
+    private void ReadLock(ICoreScope scope)
+    {
+        if (ReadLockIds.Any())
+        {
+            scope.ReadLock(ReadLockIds);
+        }
+    }
+
+    private void WriteLock(ICoreScope scope)
+    {
+        if (WriteLockIds.Any())
+        {
+            scope.WriteLock(WriteLockIds);
+        }
+    }
 }

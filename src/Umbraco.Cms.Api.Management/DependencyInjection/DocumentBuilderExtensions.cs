@@ -14,12 +14,15 @@ internal static class DocumentBuilderExtensions
         builder.Services.AddTransient<IDocumentNotificationPresentationFactory, DocumentNotificationPresentationFactory>();
         builder.Services.AddTransient<IDocumentUrlFactory, DocumentUrlFactory>();
         builder.Services.AddTransient<IDocumentEditingPresentationFactory, DocumentEditingPresentationFactory>();
+        builder.Services.AddTransient<IDocumentBlueprintEditingPresentationFactory, DocumentBlueprintEditingPresentationFactory>();
         builder.Services.AddTransient<IPublicAccessPresentationFactory, PublicAccessPresentationFactory>();
         builder.Services.AddTransient<IDomainPresentationFactory, DomainPresentationFactory>();
+        builder.Services.AddTransient<IDocumentVersionPresentationFactory, DocumentVersionPresentationFactory>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
             .Add<DocumentMapDefinition>()
-            .Add<DomainMapDefinition>();
+            .Add<DomainMapDefinition>()
+            .Add<DocumentVersionMapDefinition>();
 
         return builder;
     }

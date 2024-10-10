@@ -2,5 +2,5 @@
 
 public class UnlockUsersRequestModel
 {
-    public ISet<Guid> UserIds { get; set; } = new HashSet<Guid>();
+    public ISet<ReferenceByIdModel> UserIds { get; set; } = new HashSet<ReferenceByIdModel>();
 }

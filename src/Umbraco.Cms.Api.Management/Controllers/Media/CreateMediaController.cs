@@ -36,7 +36,9 @@ public class CreateMediaController : CreateMediaControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(CreateMediaRequestModel requestModel)
+    public async Task<IActionResult> Create(
+        CancellationToken cancellationToken,
+        CreateMediaRequestModel requestModel)
         => await HandleRequest(requestModel.Parent?.Id, async () =>
         {
             MediaCreateModel model = _mediaEditingPresentationFactory.MapCreateModel(requestModel);

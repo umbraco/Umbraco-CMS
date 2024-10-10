@@ -9,6 +9,4 @@ public class DatatypeConfigurationResponseModel
     public required Guid DocumentListViewId { get; init; }
 
     public required Guid MediaListViewId { get; init; }
-
-    public required Guid MemberListViewId { get; init; }
 }

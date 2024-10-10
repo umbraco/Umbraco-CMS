@@ -22,7 +22,7 @@ public class InformationServerController : ServerControllerBase
     [HttpGet("information")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ServerInformationResponseModel), StatusCodes.Status200OK)]
-    public Task<IActionResult> Information()
+    public Task<IActionResult> Information(CancellationToken cancellationToken)
     {
         ServerInformationResponseModel responseModel = _umbracoMapper.Map<ServerInformationResponseModel>(_serverInformationService.GetServerInformation())!;
 

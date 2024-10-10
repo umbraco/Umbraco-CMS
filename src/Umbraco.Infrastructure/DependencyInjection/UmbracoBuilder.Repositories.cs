@@ -28,6 +28,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IDataTypeContainerRepository, DataTypeContainerRepository>();
         builder.Services.AddUnique<IDataTypeRepository, DataTypeRepository>();
         builder.Services.AddUnique<IDictionaryRepository, DictionaryRepository>();
+        builder.Services.AddUnique<IDocumentBlueprintContainerRepository, DocumentBlueprintContainerRepository>();
         builder.Services.AddUnique<IDocumentBlueprintRepository, DocumentBlueprintRepository>();
         builder.Services.AddUnique<IDocumentRepository, DocumentRepository>();
         builder.Services.AddUnique<IDocumentVersionRepository, DocumentVersionRepository>();
@@ -77,6 +78,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IPropertyTypeUsageRepository, PropertyTypeUsageRepository>();
         builder.Services.AddUnique<IDataTypeUsageRepository, DataTypeUsageRepository>();
         builder.Services.AddUnique<ILogViewerRepository, LogViewerRepository>();
+        builder.Services.AddUnique<IUserDataRepository, UserDataRepository>();
 
         return builder;
     }

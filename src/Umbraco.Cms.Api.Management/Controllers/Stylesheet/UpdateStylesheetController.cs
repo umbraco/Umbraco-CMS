@@ -34,7 +34,10 @@ public class UpdateStylesheetController : StylesheetControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(string path, UpdateStylesheetRequestModel requestModel)
+    public async Task<IActionResult> Update(
+        CancellationToken cancellationToken,
+        string path,
+        UpdateStylesheetRequestModel requestModel)
     {
         path = DecodePath(path).VirtualPathToSystemPath();
         StylesheetUpdateModel updateModel = _umbracoMapper.Map<StylesheetUpdateModel>(requestModel)!;

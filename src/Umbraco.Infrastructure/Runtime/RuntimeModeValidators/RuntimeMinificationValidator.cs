@@ -8,6 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 /// Validates whether the runtime minification cache buster is not set to <see cref="RuntimeMinificationCacheBuster.Timestamp" /> when in production runtime mode.
 /// </summary>
 /// <seealso cref="Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators.RuntimeModeProductionValidatorBase" />
+[Obsolete("Runtime minification is no longer supported, so this is no longer relevant. Will be removed entirely in V16.")]
 public class RuntimeMinificationValidator : RuntimeModeProductionValidatorBase
 {
     private readonly IOptionsMonitor<RuntimeMinificationSettings> _runtimeMinificationSettings;

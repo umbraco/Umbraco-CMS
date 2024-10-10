@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -10,10 +11,12 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
 [ApiVersion("1.0")]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
 public class UpdateDocumentTypeController : DocumentTypeControllerBase
 {
     private readonly IDocumentTypeEditingPresentationFactory _documentTypeEditingPresentationFactory;
@@ -38,7 +41,10 @@ public class UpdateDocumentTypeController : DocumentTypeControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, UpdateDocumentTypeRequestModel requestModel)
+    public async Task<IActionResult> Update(
+        CancellationToken cancellationToken,
+        Guid id,
+        UpdateDocumentTypeRequestModel requestModel)
     {
         IContentType? contentType = await _contentTypeService.GetAsync(id);
         if (contentType is null)

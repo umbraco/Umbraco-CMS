@@ -22,28 +22,6 @@ namespace Umbraco.Extensions;
 public static class UrlHelperExtensions
 {
     /// <summary>
-    /// Gets the Umbraco backoffice URL (if Umbraco is installed).
-    /// </summary>
-    /// <param name="urlHelper">The URL helper.</param>
-    /// <returns>
-    /// The Umbraco backoffice URL.
-    /// </returns>
-    public static string? GetUmbracoBackOfficeUrl(this IUrlHelper urlHelper)
-        => urlHelper.Action("Default", "BackOffice", new { area = Constants.Web.Mvc.BackOfficeArea });
-
-    /// <summary>
-    ///     Return the back office url if the back office is installed
-    /// </summary>
-    /// <param name="url"></param>
-    /// <returns></returns>
-    /// <remarks>
-    /// This method contained a bug that would result in always returning "/".
-    /// </remarks>
-    [Obsolete("Use the GetUmbracoBackOfficeUrl extension method instead. This method will be removed in Umbraco 13.")]
-    public static string? GetBackOfficeUrl(this IUrlHelper url)
-        => "/";
-
-    /// <summary>
     ///     Return the Url for a Web Api service
     /// </summary>
     /// <typeparam name="T"></typeparam>
@@ -52,6 +30,7 @@ public static class UrlHelperExtensions
     /// <param name="actionName"></param>
     /// <param name="id"></param>
     /// <returns></returns>
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiService<T>(
         this IUrlHelper url,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
@@ -60,6 +39,7 @@ public static class UrlHelperExtensions
         where T : UmbracoApiController =>
         url.GetUmbracoApiService(umbracoApiControllerTypeCollection, actionName, typeof(T), id);
 
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiService<T>(
         this IUrlHelper url,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
@@ -91,6 +71,7 @@ public static class UrlHelperExtensions
     /// <param name="apiControllerType"></param>
     /// <param name="id"></param>
     /// <returns></returns>
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiService(
         this IUrlHelper url,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
@@ -210,6 +191,7 @@ public static class UrlHelperExtensions
     /// <param name="umbracoApiControllerTypeCollection"></param>
     /// <param name="actionName"></param>
     /// <returns></returns>
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiServiceBaseUrl<T>(
         this IUrlHelper url,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
@@ -217,6 +199,7 @@ public static class UrlHelperExtensions
         where T : UmbracoApiController =>
         url.GetUmbracoApiService<T>(umbracoApiControllerTypeCollection, actionName)?.TrimEnd(actionName);
 
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiServiceBaseUrl<T>(
         this IUrlHelper url,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,

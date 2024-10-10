@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Management.Services.OperationStatus;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.Scoping;
@@ -16,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Services;
 internal sealed class DictionaryItemImportService : IDictionaryItemImportService
 {
     private readonly IDictionaryItemService _dictionaryItemService;
-    private readonly PackageDataInstallation _packageDataInstallation;
+    private readonly IPackageDataInstallation _packageDataInstallation;
     private readonly ILogger<DictionaryItemImportService> _logger;
     private readonly ITemporaryFileService _temporaryFileService;
     private readonly IUserService _userService;
@@ -24,7 +25,7 @@ internal sealed class DictionaryItemImportService : IDictionaryItemImportService
 
     public DictionaryItemImportService(
         IDictionaryItemService dictionaryItemService,
-        PackageDataInstallation packageDataInstallation,
+        IPackageDataInstallation packageDataInstallation,
         ILogger<DictionaryItemImportService> logger,
         ITemporaryFileService temporaryFileService,
         IUserService userService,
@@ -70,7 +71,7 @@ internal sealed class DictionaryItemImportService : IDictionaryItemImportService
         }
 
         // import the UDT file
-        (IDictionaryItem? DictionaryItem, DictionaryImportOperationStatus Status) importResult = ImportUdtFile(loadResult.Document, userKey, parentKey, temporaryFile);
+        (IDictionaryItem? DictionaryItem, DictionaryImportOperationStatus Status) importResult = await ImportUdtFile(loadResult.Document, userKey, parentKey, temporaryFile);
 
         scope.Complete();
 
@@ -97,7 +98,7 @@ internal sealed class DictionaryItemImportService : IDictionaryItemImportService
         }
     }
 
-    private (IDictionaryItem? DictionaryItem, DictionaryImportOperationStatus Status) ImportUdtFile(XDocument udtFileContent, Guid userKey, Guid? parentKey, TemporaryFileModel temporaryFileModel)
+    private async Task<(IDictionaryItem? DictionaryItem, DictionaryImportOperationStatus Status)> ImportUdtFile(XDocument udtFileContent, Guid userKey, Guid? parentKey, TemporaryFileModel temporaryFileModel)
     {
         if (udtFileContent.Root == null)
         {
@@ -106,7 +107,7 @@ internal sealed class DictionaryItemImportService : IDictionaryItemImportService
 
         try
         {
-            var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            var currentUserId = (await _userService.GetRequiredUserAsync(userKey)).Id;
             IEnumerable<IDictionaryItem> dictionaryItems = _packageDataInstallation.ImportDictionaryItem(udtFileContent.Root, currentUserId, parentKey);
             IDictionaryItem? importedDictionaryItem = dictionaryItems.FirstOrDefault();
             return importedDictionaryItem != null

@@ -9,14 +9,12 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Preview;
 public class EndPreviewTests : ManagementApiTest<EndPreviewController>
 {
     protected override Expression<Func<EndPreviewController, object>> MethodSelector =>
-        x => x.End();
+        x => x.End(CancellationToken.None);
 
 
     [Test]
-    public virtual async Task As_Admin_I_Have_Access()
+    public virtual async Task As_Anonymous_I_Can_End_Preview_Mode()
     {
-        await AuthenticateClientAsync(Client, "admin@umbraco.com", "1234567890", true);
-
         var response = await Client.DeleteAsync(Url);
 
         // Check if the set cookie header is sent
@@ -26,5 +24,4 @@ public class EndPreviewTests : ManagementApiTest<EndPreviewController>
         Assert.IsTrue(doesHeaderExist);
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode,  await response.Content.ReadAsStringAsync());
     }
-
 }

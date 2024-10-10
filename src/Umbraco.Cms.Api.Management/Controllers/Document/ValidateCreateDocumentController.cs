@@ -32,7 +32,7 @@ public class ValidateCreateDocumentController : CreateDocumentControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Validate(CreateDocumentRequestModel requestModel)
+    public async Task<IActionResult> Validate(CancellationToken cancellationToken, CreateDocumentRequestModel requestModel)
         => await HandleRequest(requestModel, async () =>
         {
             ContentCreateModel model = _documentEditingPresentationFactory.MapCreateModel(requestModel);

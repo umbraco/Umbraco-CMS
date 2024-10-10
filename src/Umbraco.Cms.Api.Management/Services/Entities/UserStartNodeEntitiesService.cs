@@ -19,7 +19,9 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
         // root entities for users without root access should include:
         // - the start nodes that are actual root entities (level == 1)
         // - the root level ancestors to the rest of the start nodes (required for browsing to the actual start nodes - will be marked as "no access")
-        IEntitySlim[] userStartEntities = _entityService.GetAll(umbracoObjectType, userStartNodeIds).ToArray();
+        IEntitySlim[] userStartEntities = userStartNodeIds.Any()
+            ? _entityService.GetAll(umbracoObjectType, userStartNodeIds).ToArray()
+            : Array.Empty<IEntitySlim>();
 
         // find the start nodes that are at root level (level == 1)
         IEntitySlim[] allowedTopmostEntities = userStartEntities.Where(entity => entity.Level == 1).ToArray();

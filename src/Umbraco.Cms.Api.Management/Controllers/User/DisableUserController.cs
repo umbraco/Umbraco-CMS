@@ -35,11 +35,11 @@ public class DisableUserController : UserControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DisableUsers(DisableUserRequestModel model)
+    public async Task<IActionResult> DisableUsers(CancellationToken cancellationToken, DisableUserRequestModel model)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            UserPermissionResource.WithKeys(model.UserIds),
+            UserPermissionResource.WithKeys(model.UserIds.Select(x => x.Id)),
             AuthorizationPolicies.UserPermissionByResource);
 
         if (!authorizationResult.Succeeded)
@@ -47,7 +47,7 @@ public class DisableUserController : UserControllerBase
             return Forbidden();
         }
 
-        UserOperationStatus result = await _userService.DisableAsync(CurrentUserKey(_backOfficeSecurityAccessor), model.UserIds);
+        UserOperationStatus result = await _userService.DisableAsync(CurrentUserKey(_backOfficeSecurityAccessor), model.UserIds.Select(x => x.Id).ToHashSet());
 
         return result is UserOperationStatus.Success
             ? Ok()

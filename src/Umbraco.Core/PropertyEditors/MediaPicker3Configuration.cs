@@ -15,7 +15,7 @@ public class MediaPicker3Configuration : IIgnoreUserStartNodesConfig
     public NumberRange ValidationLimit { get; set; } = new();
 
     [ConfigurationField("startNodeId")]
-    public Udi? StartNodeId { get; set; }
+    public Guid? StartNodeId { get; set; }
 
     [ConfigurationField("enableLocalFocalPoint")]
     public bool EnableLocalFocalPoint { get; set; }

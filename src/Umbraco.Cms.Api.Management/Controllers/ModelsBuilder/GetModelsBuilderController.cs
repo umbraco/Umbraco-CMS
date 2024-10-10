@@ -16,5 +16,6 @@ public class GetModelsBuilderController : ModelsBuilderControllerBase
     [HttpGet("dashboard")]
     [ProducesResponseType(typeof(ModelsBuilderResponseModel), StatusCodes.Status200OK)]
     [MapToApiVersion("1.0")]
-    public async Task<ActionResult<ModelsBuilderResponseModel>> GetDashboard() => await Task.FromResult(Ok(_modelsBuilderPresentationFactory.Create()));
+    public async Task<ActionResult<ModelsBuilderResponseModel>> GetDashboard(CancellationToken cancellationToken)
+        => await Task.FromResult(Ok(_modelsBuilderPresentationFactory.Create()));
 }

@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
@@ -252,8 +252,7 @@ public partial class ContentTypeEditingServiceTests
                 CompositionType = CompositionType.Composition,
                 Key = compositionType.Key,
                 },
-            }
-        );
+            });
 
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
@@ -295,8 +294,7 @@ public partial class ContentTypeEditingServiceTests
             compositions: new[]
             {
                 new Composition { CompositionType = CompositionType.Composition, Key = compositionType.Key, },
-            }
-        );
+            });
 
         var tab = ContentTypePropertyContainerModel("Composition Tab", type: TabContainerType);
         var group = ContentTypePropertyContainerModel("Composition Group", type: GroupContainerType);
@@ -774,7 +772,7 @@ public partial class ContentTypeEditingServiceTests
 
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.InvalidPropertyTypeAlias, result.Status);
+        Assert.AreEqual(ContentTypeOperationStatus.PropertyTypeAliasCannotEqualContentTypeAlias, result.Status);
     }
 
     [Test]
@@ -866,8 +864,7 @@ public partial class ContentTypeEditingServiceTests
             compositions: new[]
             {
                 new Composition { CompositionType = CompositionType.Composition, Key = compositionType.Key, },
-            }
-        );
+            });
 
         // this is invalid; the model should not contain the composition container definitions (they will be resolved by ContentTypeEditingService)
         createModel.Containers = new[] { compositionContainer };
@@ -901,8 +898,7 @@ public partial class ContentTypeEditingServiceTests
             compositions: new[]
             {
                 new Composition { CompositionType = CompositionType.Composition, Key = compositionType.Key, },
-            }
-        );
+            });
 
         // this is invalid; cannot reuse the container key
         var container = ContentTypePropertyContainerModel("My Group", type: GroupContainerType, key: compositionContainer.Key);
@@ -954,8 +950,7 @@ public partial class ContentTypeEditingServiceTests
             compositions: new[]
             {
                 new Composition { CompositionType = CompositionType.Composition, Key = compositionType.Key, },
-            }
-        );
+            });
 
         // this is invalid; cannot add properties to non-existing containers
         var property = ContentTypePropertyTypeModel("My Property", "myProperty", containerKey: Guid.NewGuid());
@@ -1008,8 +1003,7 @@ public partial class ContentTypeEditingServiceTests
             compositions: new[]
             {
                 new Composition { CompositionType = CompositionType.Composition, Key = compositionType.Key, },
-            }
-        );
+            });
 
         // this is invalid; cannot add a property on a container that belongs to the composition (the container must be duplicated to the content type itself)
         var property = ContentTypePropertyTypeModel("My Property", "myProperty", containerKey: compositionContainer.Key);
@@ -1043,8 +1037,7 @@ public partial class ContentTypeEditingServiceTests
             compositions: new[]
             {
                 new Composition { CompositionType = CompositionType.Composition, Key = compositionType.Key, },
-            }
-        );
+            });
 
         // this is invalid; cannot create a new container within a parent container that belongs to the composition (the parent container must be duplicated to the content type itself)
         var container = ContentTypePropertyContainerModel("My Group", type: GroupContainerType);
@@ -1079,11 +1072,27 @@ public partial class ContentTypeEditingServiceTests
             compositions: new[]
             {
                 new Composition { CompositionType = CompositionType.Composition, Key = compositionType.Key, },
-            }
-        );
+            });
 
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidComposition, result.Status);
+    }
+
+    [TestCase("something")]
+    [TestCase("tab")]
+    [TestCase("group")]
+    public async Task Cannot_Create_Container_With_Unknown_Type(string containerType)
+    {
+        var createModel = ContentTypeCreateModel("Test", "test");
+        var container = ContentTypePropertyContainerModel(name: containerType, type: containerType);
+        createModel.Containers = new[] { container };
+
+        var propertyType = ContentTypePropertyTypeModel("Test Property", "testProperty", containerKey: container.Key);
+        createModel.Properties = new[] { propertyType };
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidContainerType, result.Status);
     }
 }

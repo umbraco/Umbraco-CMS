@@ -36,7 +36,7 @@ public class SortMediaController : MediaControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Sort(SortingRequestModel sortingRequestModel)
+    public async Task<IActionResult> Sort(CancellationToken cancellationToken, SortingRequestModel sortingRequestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,

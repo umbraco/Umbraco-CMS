@@ -20,7 +20,7 @@ public class DeleteStylesheetFolderController : StylesheetFolderControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(string path)
+    public async Task<IActionResult> Delete(CancellationToken cancellationToken, string path)
     {
         path = DecodePath(path).VirtualPathToSystemPath();
         StylesheetFolderOperationStatus result = await _stylesheetFolderService.DeleteAsync(path);

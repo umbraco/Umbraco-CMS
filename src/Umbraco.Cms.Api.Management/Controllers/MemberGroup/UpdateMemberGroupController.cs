@@ -24,10 +24,13 @@ public class UpdateMemberGroupController : MemberGroupControllerBase
 
     [HttpPut($"{{{nameof(id)}:guid}}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(MemberGroupResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, UpdateMemberGroupRequestModel model)
+    public async Task<IActionResult> Update(
+        CancellationToken cancellationToken,
+        Guid id,
+        UpdateMemberGroupRequestModel model)
     {
         IMemberGroup? current = await _memberGroupService.GetAsync(id);
         if (current is null)
@@ -39,7 +42,7 @@ public class UpdateMemberGroupController : MemberGroupControllerBase
 
         Attempt<IMemberGroup?, MemberGroupOperationStatus> result = await _memberGroupService.UpdateAsync(updated);
         return result.Success
-            ? Ok(_mapper.Map<MemberGroupResponseModel>(result.Result))
+            ? Ok()
             : MemberGroupOperationStatusResult(result.Status);
     }
 }
