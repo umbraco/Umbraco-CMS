@@ -229,7 +229,6 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 	}
 
 	public override destroy(): void {
-		this.#data.destroy();
 		this.structure.destroy();
 		super.destroy();
 	}

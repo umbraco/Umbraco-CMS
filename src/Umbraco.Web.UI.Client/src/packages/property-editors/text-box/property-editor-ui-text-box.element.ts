@@ -34,6 +34,13 @@ export class UmbPropertyEditorUITextBoxElement
 	@property({ type: String })
 	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
+	/**
+	 * The alias of this field.
+	 * @type {string}
+	 */
+	@property({ type: String })
+	alias?: string;
+
 	#defaultType: UuiInputTypeType = 'text';
 
 	@state()
@@ -72,6 +79,7 @@ export class UmbPropertyEditorUITextBoxElement
 
 	override render() {
 		return html`<uui-input
+			.label=${this.localize.term('general_fieldFor', [this.alias])}
 			.value=${this.value ?? ''}
 			.type=${this._type}
 			placeholder=${ifDefined(this._placeholder)}

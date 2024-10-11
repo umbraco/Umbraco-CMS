@@ -876,7 +876,6 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	public override destroy(): void {
-		this.#data.destroy();
 		this.structure.destroy();
 		this.#languageRepository.destroy();
 		super.destroy();

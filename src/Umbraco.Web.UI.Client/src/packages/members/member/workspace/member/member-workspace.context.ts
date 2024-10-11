@@ -454,7 +454,6 @@ export class UmbMemberWorkspaceContext
 	}
 
 	public override destroy(): void {
-		this.#data.destroy();
 		super.destroy();
 	}
 
