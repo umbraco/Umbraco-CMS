@@ -6,8 +6,6 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-import './extension-table-entity-actions-column-layout.element.js';
-
 @customElement('umb-extension-table-collection-view')
 export class UmbExtensionTableCollectionViewElement extends UmbLitElement {
 	@state()
@@ -36,7 +34,6 @@ export class UmbExtensionTableCollectionViewElement extends UmbLitElement {
 		{
 			name: '',
 			alias: 'extensionAction',
-			elementName: 'umb-extension-table-entity-actions-column-layout',
 		},
 	];
 
@@ -82,7 +79,11 @@ export class UmbExtensionTableCollectionViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'extensionAction',
-						value: extension,
+						value: html`<umb-entity-actions-table-column-layout
+							.value=${{
+								entityType: extension.entityType,
+								unique: extension.unique,
+							}}></umb-entity-actions-table-column-layout>`,
 					},
 				],
 			};
