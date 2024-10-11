@@ -1,7 +1,7 @@
 import type { UmbMemberEntityType } from './entity.js';
 import type { UmbMemberKindType } from './utils/index.js';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
-import type { UmbContentDetailModel, UmbContentValueModel } from '@umbraco-cms/backoffice/content';
+import type { UmbContentDetailModel, UmbElementValueModel } from '@umbraco-cms/backoffice/content';
 
 export interface UmbMemberDetailModel extends UmbContentDetailModel {
 	email: string;
@@ -28,7 +28,7 @@ export interface UmbMemberDetailModel extends UmbContentDetailModel {
 export interface UmbMemberVariantModel extends UmbEntityVariantModel {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbMemberValueModel<ValueType = unknown> extends UmbContentValueModel<ValueType> {}
+export interface UmbMemberValueModel<ValueType = unknown> extends UmbElementValueModel<ValueType> {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbMemberVariantOptionModel extends UmbEntityVariantOptionModel<UmbMemberVariantModel> {}

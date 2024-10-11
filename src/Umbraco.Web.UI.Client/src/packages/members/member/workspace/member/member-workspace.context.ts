@@ -18,7 +18,6 @@ import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 	UmbWorkspaceSplitViewManager,
-	umbObjectToPropertyValueArray,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -35,7 +34,7 @@ import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { UmbContentWorkspaceDataManager, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
-import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
+import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,

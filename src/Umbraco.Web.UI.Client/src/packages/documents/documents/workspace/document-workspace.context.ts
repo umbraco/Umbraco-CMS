@@ -302,6 +302,7 @@ export class UmbDocumentWorkspaceContext
 	async load(unique: string) {
 		this.resetState();
 		this.#getDataPromise = this.repository.requestByUnique(unique);
+
 		type GetDataType = Awaited<ReturnType<UmbDocumentDetailRepository['requestByUnique']>>;
 		const { data, asObservable } = (await this.#getDataPromise) as GetDataType;
 

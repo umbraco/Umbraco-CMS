@@ -57,7 +57,6 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 			this.#blockWorkspace = context;
 			this.#tabsStructureHelper.setStructureManager(context.content.structure);
 
-			context.content.setup(this);
 			this.#observeRootGroups();
 
 			this.observe(
@@ -72,6 +71,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 				context.variantId,
 				async (variantId) => {
 					if (variantId) {
+						context.content.setup(this, variantId);
 						// TODO: Support segment name?
 						const culture = variantId.culture;
 						if (culture) {

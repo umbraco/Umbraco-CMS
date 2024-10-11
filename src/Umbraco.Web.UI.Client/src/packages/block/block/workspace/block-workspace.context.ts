@@ -204,8 +204,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.#initialLayout = undefined;
 		this.#initialContent = undefined;
 		this.#initialSettings = undefined;
-		this.content.reset();
-		this.settings.reset();
+		this.content.resetState();
+		this.settings.resetState();
 		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 	}
 

@@ -1,6 +1,5 @@
 import type { UmbWorkspaceDataManager } from '../data-manager/workspace-data-manager.interface.js';
 import { jsonStringComparison, UmbObjectState, type MappingFunction } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
@@ -10,7 +9,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
  * @implements {UmbWorkspaceDataManager<ModelType>}
  * @template ModelType
  */
-export class UmbEntityWorkspaceDataManager<ModelType extends UmbEntityModel>
+export class UmbEntityWorkspaceDataManager<ModelType>
 	extends UmbControllerBase
 	implements UmbWorkspaceDataManager<ModelType>
 {

@@ -6,7 +6,7 @@ import type {
 } from '@umbraco-cms/backoffice/variant';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { DocumentVariantStateModel as UmbDocumentVariantState } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbContentDetailModel, UmbContentValueModel } from '@umbraco-cms/backoffice/content';
+import type { UmbContentDetailModel, UmbElementValueModel } from '@umbraco-cms/backoffice/content';
 export { UmbDocumentVariantState };
 
 export interface UmbDocumentDetailModel extends UmbContentDetailModel {
@@ -34,7 +34,7 @@ export interface UmbDocumentUrlInfoModel {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbDocumentValueModel<ValueType = unknown> extends UmbContentValueModel<ValueType> {}
+export interface UmbDocumentValueModel<ValueType = unknown> extends UmbElementValueModel<ValueType> {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbDocumentVariantOptionModel extends UmbEntityVariantOptionModel<UmbDocumentVariantModel> {}

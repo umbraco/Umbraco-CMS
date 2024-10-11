@@ -94,7 +94,7 @@ export class UmbPropertyDatasetContextBase
 	/**
 	 * @returns {Array<UmbPropertyValueData>} - Array of properties as objects with alias and value properties.
 	 */
-	getProperties() {
+	async getProperties() {
 		return this.#properties.getValue();
 	}
 	/**

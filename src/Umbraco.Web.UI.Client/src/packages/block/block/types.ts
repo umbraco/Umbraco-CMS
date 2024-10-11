@@ -1,4 +1,4 @@
-import type { UmbContentValueModel } from '@umbraco-cms/backoffice/content';
+import type { UmbElementValueModel } from '@umbraco-cms/backoffice/content';
 
 export interface UmbBlockLayoutBaseModel {
 	contentKey: string;
@@ -6,7 +6,7 @@ export interface UmbBlockLayoutBaseModel {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbBlockDataValueModel<ValueType = unknown> extends UmbContentValueModel<ValueType> {}
+export interface UmbBlockDataValueModel<ValueType = unknown> extends UmbElementValueModel<ValueType> {}
 
 export interface UmbBlockDataModel {
 	key: string;

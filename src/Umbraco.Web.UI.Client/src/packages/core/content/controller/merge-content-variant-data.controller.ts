@@ -1,5 +1,5 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbContentDetailModel, UmbPotentialContentValueModel } from '@umbraco-cms/backoffice/content';
+import type { UmbContentLikeDetailModel, UmbPotentialContentValueModel } from '@umbraco-cms/backoffice/content';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbVariantId, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
@@ -17,13 +17,13 @@ function defaultCompareVariantMethod(a: UmbVariantDataModel, b: UmbVariantDataMo
 export class UmbMergeContentVariantDataController extends UmbControllerBase {
 	/**
 	 * Merges content variant data based on selected variants and variants to store.
-	 * @param {UmbContentDetailModel | undefined} persistedData - The persisted content variant data.
-	 * @param {UmbContentDetailModel} currentData - The current content variant data.
+	 * @param {UmbContentLikeDetailModel | undefined} persistedData - The persisted content variant data.
+	 * @param {UmbContentLikeDetailModel} currentData - The current content variant data.
 	 * @param {Array<UmbVariantId>} selectedVariants - The selected variants.
 	 * @param {Array<UmbVariantId>} variantsToStore - The variants to store, we sometimes have additional variants that we like to process. This is typically the invariant variant, which we do not want to have as part of the variants data therefore a difference.
-	 * @returns {Promise<UmbContentDetailModel>} - A promise that resolves to the merged content variant data.
+	 * @returns {Promise<UmbContentLikeDetailModel>} - A promise that resolves to the merged content variant data.
 	 */
-	async process<ModelType extends UmbContentDetailModel>(
+	async process<ModelType extends UmbContentLikeDetailModel>(
 		persistedData: ModelType | undefined,
 		currentData: ModelType,
 		selectedVariants: Array<UmbVariantId>,
@@ -39,14 +39,17 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 				currentData.values,
 				variantsToStore,
 			),
+		};
+
+		if (currentData.variants) {
 			// Notice for variants we do not want to include all the variants that we are processing. but just the once selected for the process. (Not include invariant if we are in a variant document) [NL]
-			variants: this.#processVariants(
+			result.variants = this.#processVariants(
 				persistedData?.variants,
 				currentData.variants,
 				selectedVariants,
 				defaultCompareVariantMethod,
-			),
-		};
+			);
+		}
 
 		this.destroy();
 
