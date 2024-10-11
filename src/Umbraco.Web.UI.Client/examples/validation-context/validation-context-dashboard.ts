@@ -1,7 +1,6 @@
 import { html, customElement, css, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_VALIDATION_CONTEXT, umbBindToValidation, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
-import type { UmbValidationMessage } from 'src/packages/core/validation/context/validation-messages.manager';
 
 @customElement('umb-example-validation-context-dashboard')
 export class UmbExampleValidationContextDashboard extends UmbLitElement {
@@ -9,16 +8,16 @@ export class UmbExampleValidationContextDashboard extends UmbLitElement {
 	readonly validation = new UmbValidationContext(this);
 
 	@state()
-	name = ''; //'Lorem Ipsum'
+	name = '';
 
 	@state()
-	email = ''; //'lorem.ipsum@test.com'
+	email = '';
 
 	@state()
-	city = ''; //'Odense'
+	city = '';
 
 	@state()
-	country = ''; //'Denmark'
+	country = '';
 
 	@state()
   messages? : any[]
@@ -35,27 +34,26 @@ export class UmbExampleValidationContextDashboard extends UmbLitElement {
 	@state()
 	tab = "1";
 
-	/**
-	 *
-	 */
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_VALIDATION_CONTEXT,(validationContext)=>{
-      console.log('validation ctx',validationContext);
 
       this.observe(validationContext.messages.messages,(messages)=>{
         this.messages = messages;
       },'observeValidationMessages')
 
+			// Observe all errors
 			this.validation.messages.messagesOfPathAndDescendant('$.form').subscribe((value)=>{
 				this.totalErrorCount = [...new Set(value.map(x=>x.path))].length;
 			});
 
+			// Observe errors for tab1, note that we only use part of the full JSONPath
 			this.validation.messages.messagesOfPathAndDescendant('$.form.tab1').subscribe((value)=>{
 				this.tab1ErrorCount = [...new Set(value.map(x=>x.path))].length;
 			});
 
+			// Observe errors for tab2, note that we only use part of the full JSONPath
 			this.validation.messages.messagesOfPathAndDescendant('$.form.tab2').subscribe((value)=>{
 				this.tab2ErrorCount = [...new Set(value.map(x=>x.path))].length;
 			});
@@ -63,29 +61,13 @@ export class UmbExampleValidationContextDashboard extends UmbLitElement {
     });
 	}
 
-	async #handleValidateNow() {
-
-		await this.validation.validate().catch(()=>{});
-
-		console.log('Valid', this.validation.isValid);
-
-	}
-
-	#handleAddServerValidationError() {
-		this.validation.messages.addMessage('server','$.form.tab1.name','Name server-error message','4875e113-cd0c-4c57-ac92-53d677ba31ec');
-		this.validation.messages.addMessage('server','$.form.tab1.email','Email server-error message','4a9e5219-2dbd-4ce3-8a79-014eb6b12428');
-	}
-
 	#onTabChange(e:Event) {
-		var tab = (e.target as HTMLElement).getAttribute('data-tab') as string;
-		this.tab = tab;
+		this.tab = (e.target as HTMLElement).getAttribute('data-tab') as string;
 	}
 
 	#handleSave() {
 
-		console.log('validation');
-
-		// fake server validation
+		// fake server validation-errors for all fields
 		if(this.name == '')
 			this.validation.messages.addMessage('server','$.form.tab1.name','Name server-error message','4875e113-cd0c-4c57-ac92-53d677ba31ec');
 		if(this.email == '')
@@ -96,14 +78,10 @@ export class UmbExampleValidationContextDashboard extends UmbLitElement {
 			this.validation.messages.addMessage('server','$.form.tab2.country','Country server-error message','d98624f6-82a2-4e94-822a-776b44b01495');
 	}
 
-	#countErrorsForPath(path : string) {
-
-	}
-
 	override render() {
 		return html`
 			<uui-box>
-				This is a element with a Validation Context.
+				This is a demo of how the Validation Context can be used to validate a form with multiple steps. Start typing in the form or press Save to trigger validation.
 				<hr/>
 				Total errors: ${this.totalErrorCount}
 				<hr/>
@@ -123,19 +101,15 @@ export class UmbExampleValidationContextDashboard extends UmbLitElement {
         </uui-tab-group>
 
 				${when(this.tab=='1',()=>html`
-					<h2>Tab 1</h2>
 					${this.#renderTab1()}
 				`)}
 				${when(this.tab=='2',()=>html`
-					<h2>Tab 2</h2>
 					${this.#renderTab2()}
 				`)}
+
+				<uui-button look="primary" color="positive" @click=${this.#handleSave}>Save</uui-button>
 				<hr/>
-				<button @click=${this.#handleSave}>Save</button>
-				<hr/>
-				<!-- <button @click=${this.#handleValidateNow} title="Click to trigger validation on the validation context">Validate now</button>
-				<button @click=${this.#handleAddServerValidationError} title="">Add server error</button> -->
-				<hr/>
+				<h3>Validation Context Messages</h3>
 				<pre>${JSON.stringify(this.messages ?? [],null,3)}</pre>
 			</uui-box>
 		`
@@ -220,6 +194,10 @@ export class UmbExampleValidationContextDashboard extends UmbLitElement {
       margin:20px;
     }
 
+		uui-button {
+			margin-top:1rem;
+		}
+
 		pre {
       text-align:left;
       padding:10px;
@@ -230,7 +208,6 @@ export class UmbExampleValidationContextDashboard extends UmbLitElement {
     }
 
   `]
-
 }
 
 export default UmbExampleValidationContextDashboard;

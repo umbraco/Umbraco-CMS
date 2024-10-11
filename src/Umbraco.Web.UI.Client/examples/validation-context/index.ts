@@ -7,13 +7,13 @@ const dashboard : ManifestDashboard = {
 	weight: 1000,
 	element: () => import('./validation-context-dashboard.js'),
 	meta: {
-			label: 'Demo',
+			label: 'Validation Context Demo',
 			pathname: 'demo'
 	},
 	conditions : [
 			{
 					alias : "Umb.Condition.SectionAlias",
-					match : "Umb.Section.Translation"
+					match : "Umb.Section.Content"
 			}
 	]
 }
