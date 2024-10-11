@@ -202,6 +202,7 @@ export default {
 		addTextBox: 'Añadir otra caja de texto',
 		removeTextBox: 'Eliminar caja de texto',
 		contentRoot: 'Raíz de contenido',
+		saveModalTitle: 'Guardar',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Crear nueva Plantilla de Contenido desde <em>%0%</em>',

@@ -113,6 +113,7 @@ export default {
 		updateDate: '마지막 수정일',
 		uploadClear: '파일 삭제',
 		urls: '문서에 링크',
+		saveModalTitle: '저장',
 	},
 	create: {
 		chooseNode: '새로운 %0% (을)를 생성할 위치를 지정하십시오',

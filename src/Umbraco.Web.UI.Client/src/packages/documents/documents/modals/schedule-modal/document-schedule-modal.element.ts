@@ -6,6 +6,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';
+import type { UUIBooleanInputElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-document-schedule-modal')
 export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
@@ -20,6 +21,9 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	@state()
 	_selection: UmbDocumentScheduleModalValue['selection'] = [];
 
+	@state()
+	_isAllSelected?: boolean;
+
 	constructor() {
 		super();
 		this.observe(
@@ -28,6 +32,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				this._selection = selection.map((unique) => {
 					return { unique, schedule: {} };
 				});
+				this._isAllSelected = this.#isAllSelected();
 			},
 			'_selection',
 		);
@@ -78,6 +83,25 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		return this._selection.some((s) => s.unique === unique);
 	}
 
+	#onSelectAllChange(event: Event) {
+		const allUniques = this._options.map((o) => o.unique);
+		const filter = this.#selectionManager.getAllowLimitation();
+		const allowedUniques = allUniques.filter((unique) => filter(unique));
+
+		if ((event.target as UUIBooleanInputElement).checked) {
+			this.#selectionManager.setSelection(allowedUniques);
+		} else {
+			this.#selectionManager.setSelection([]);
+		}
+	}
+
+	#isAllSelected() {
+		const allUniques = this._options.map((o) => o.unique);
+		const filter = this.#selectionManager.getAllowLimitation();
+		const allowedUniques = allUniques.filter((unique) => filter(unique));
+		return this._selection.length === allowedUniques.length;
+	}
+
 	override render() {
 		return html`<umb-body-layout headline=${this.localize.term('general_scheduledPublishing')}>
 			<p id="subtitle">
@@ -108,11 +132,18 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	#renderOptions() {
-		return repeat(
-			this._options,
-			(option) => option.unique,
-			(option) => this.#renderItem(option),
-		);
+		return html`
+			<uui-checkbox
+				@change=${this.#onSelectAllChange}
+				label=${this.localize.term('general_selectAll')}
+				.checked=${this._isAllSelected}></uui-checkbox>
+
+			${repeat(
+				this._options,
+				(option) => option.unique,
+				(option) => this.#renderItem(option),
+			)}
+		`;
 	}
 
 	#renderItem(option: UmbDocumentVariantOptionModel) {
@@ -209,6 +240,14 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 			.publish-date > uui-form-layout-item:first-child {
 				border-right: 1px dashed var(--uui-color-border);
+			}
+
+			uui-checkbox {
+				margin-bottom: var(--uui-size-space-3);
+			}
+
+			uui-menu-item {
+				--uui-menu-item-flat-structure: 1;
 			}
 		`,
 	];
