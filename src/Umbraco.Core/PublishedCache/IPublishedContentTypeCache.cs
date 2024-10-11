@@ -34,6 +34,17 @@ public interface IPublishedContentTypeCache
     public void ClearDataType(int id);
 
     /// <summary>
+    /// Clears all cached content types referencing a data type.
+    /// </summary>
+    /// <param name="id">The data type id to remove content types by</param>
+    /// <returns>The removed content types</returns>
+    public IEnumerable<IPublishedContentType> ClearByDataTypeId(int id)
+    {
+        ClearDataType(id);
+        return [];
+    }
+
+    /// <summary>
     ///     Gets a published content type.
     /// </summary>
     /// <param name="itemType">An item type.</param>

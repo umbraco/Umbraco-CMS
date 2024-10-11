@@ -121,10 +121,8 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
             MemberCacheRefresher.RefreshMemberTypes(AppCaches);
         }
 
-
         _publishedContentTypeCache.ClearContentTypes(payloads.Select(x => x.Id));
         _publishedContentTypeFactory.NotifyDataTypeChanges();
-        // TODO: We need to clear the HybridCache of any content using the ContentType, but NOT the database cache here, and this should be done within the "WithSafeLiveFactoryReset" to ensure that the factory is locked in the meantime.
         _publishedModelFactory.WithSafeLiveFactoryReset(() =>
         {
             IEnumerable<int> documentTypeIds = payloads.Where(x => x.ItemType == nameof(IContentType)).Select(x => x.Id);
