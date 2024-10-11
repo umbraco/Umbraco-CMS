@@ -1,12 +1,12 @@
 import { UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN } from '../../../../paths.js';
 import { UMB_EDIT_DOCUMENT_TYPE_FOLDER_WORKSPACE_PATH_PATTERN } from '../../../folder/index.js';
+import type { UmbDocumentTypeTreeItemModel } from '../../../types.js';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 import { UmbModalRouteRegistrationController, type UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 
@@ -23,6 +23,10 @@ export class UmbDocumentTypeTreeItemTableCollectionViewElement extends UmbLitEle
 		{
 			name: 'Name',
 			alias: 'name',
+		},
+		{
+			name: 'Element Type',
+			alias: 'isElementType',
 		},
 	];
 
@@ -62,7 +66,7 @@ export class UmbDocumentTypeTreeItemTableCollectionViewElement extends UmbLitEle
 		this.observe(this.#collectionContext.items, (items) => this.#createTableItems(items), 'umbCollectionItemsObserver');
 	}
 
-	#createTableItems(items: Array<UmbTreeItemModel>) {
+	#createTableItems(items: Array<UmbDocumentTypeTreeItemModel>) {
 		const routeBuilder = this.#routeBuilder;
 		if (!routeBuilder) throw new Error('Route builder not ready');
 
@@ -83,6 +87,10 @@ export class UmbDocumentTypeTreeItemTableCollectionViewElement extends UmbLitEle
 						value: html`<uui-button
 							href=${item.isFolder ? inlineEditPath : modalEditPath}
 							label=${item.name}></uui-button>`,
+					},
+					{
+						columnAlias: 'isElementType',
+						value: item.isElement ? html`<uui-icon name="icon-check"></uui-icon>` : nothing,
 					},
 				],
 			};
