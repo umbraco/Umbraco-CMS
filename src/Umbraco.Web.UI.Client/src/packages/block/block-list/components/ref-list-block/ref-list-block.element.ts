@@ -5,9 +5,6 @@ import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 import '@umbraco-cms/backoffice/ufm';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 
-/**
- * @element umb-ref-list-block
- */
 @customElement('umb-ref-list-block')
 export class UmbRefListBlockElement extends UmbLitElement {
 	//
@@ -28,7 +25,7 @@ export class UmbRefListBlockElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			href=${(this.config?.showContentEdit ? this.config?.editContentPath : undefined) ?? ''}>
+			<uui-ref-node standalone href=${(this.config?.showContentEdit ? this.config?.editContentPath : undefined) ?? ''}>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
 				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
 			</uui-ref-node>
