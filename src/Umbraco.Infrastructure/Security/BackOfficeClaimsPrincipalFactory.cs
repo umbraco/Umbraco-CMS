@@ -21,8 +21,7 @@ public class BackOfficeClaimsPrincipalFactory : UserClaimsPrincipalFactory<BackO
     public BackOfficeClaimsPrincipalFactory(
         UserManager<BackOfficeIdentityUser> userManager,
         IOptions<BackOfficeIdentityOptions> optionsAccessor,
-        IOptions<BackOfficeAuthenticationTypeSettings> backOfficeAuthenticationTypeSettings
-        )
+        IOptions<BackOfficeAuthenticationTypeSettings> backOfficeAuthenticationTypeSettings)
         : base(userManager, optionsAccessor)
     {
         _backOfficeAuthenticationTypeSettings = backOfficeAuthenticationTypeSettings;

@@ -133,7 +133,8 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             {
                 scope.Complete();
                 return Task.FromResult(IdentityResult.Failed(
-                    new IdentityError {
+                    new IdentityError
+                    {
                         Code = CancelledIdentityErrorCode,
                         Description = string.Empty
 
