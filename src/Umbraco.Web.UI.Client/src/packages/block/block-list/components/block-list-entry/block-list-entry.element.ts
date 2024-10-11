@@ -267,6 +267,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			.label=${this._label}
 			.icon=${this._icon}
 			.unpublished=${!this._exposed}
+			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
 			.settings=${this._blockViewProps.settings}></umb-ref-list-block>`;
 	}
@@ -276,6 +277,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			.label=${this._label}
 			.icon=${this._icon}
 			.unpublished=${!this._exposed}
+			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
 			.settings=${this._blockViewProps.settings}></umb-inline-list-block>`;
 	}

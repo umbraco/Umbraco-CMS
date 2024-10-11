@@ -1,9 +1,9 @@
 import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_BLOCK_ENTRY_CONTEXT } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 
 import '@umbraco-cms/backoffice/ufm';
+import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 
 /**
  * @element umb-ref-list-block
@@ -23,27 +23,12 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
 
-	@property()
-	_workspaceEditPath?: string;
-
-	constructor() {
-		super();
-
-		// UMB_BLOCK_LIST_ENTRY_CONTEXT
-		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, async (context) => {
-			this.observe(
-				context.workspaceEditContentPath,
-				(workspaceEditPath) => {
-					this._workspaceEditPath = workspaceEditPath;
-				},
-				'observeWorkspaceEditPath',
-			);
-		});
-	}
+	@property({ attribute: false })
+	config?: UmbBlockEditorCustomViewConfiguration;
 
 	override render() {
 		return html`
-			<uui-ref-node standalone href=${this._workspaceEditPath ?? '#'}>
+			href=${(this.config?.showContentEdit ? this.config?.editContentPath : undefined) ?? ''}>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
 				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
 			</uui-ref-node>
