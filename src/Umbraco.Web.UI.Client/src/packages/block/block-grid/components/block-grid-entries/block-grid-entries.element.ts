@@ -204,7 +204,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 					this.observe(
 						this.#context.firstAllowedBlockTypeName(),
 						(firstAllowedName) => {
-							this._createLabel = this.localize.term('blockEditor_addThis', [firstAllowedName]);
+							this._createLabel = this.localize.term('blockEditor_addThis', this.localize.string(firstAllowedName));
 						},
 						'observeSingleBlockTypeName',
 					);

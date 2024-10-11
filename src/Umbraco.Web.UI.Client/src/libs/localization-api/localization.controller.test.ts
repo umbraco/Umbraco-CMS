@@ -290,6 +290,12 @@ describe('UmbLocalizeController', () => {
 			const str = '#missing_translation_key';
 			expect(controller.string(str)).to.equal('#missing_translation_key');
 		});
+
+		it('should return an empty string if the input is not a string', async () => {
+			expect(controller.string(123)).to.equal('');
+			expect(controller.string({})).to.equal('');
+			expect(controller.string(undefined)).to.equal('');
+		});
 	});
 
 	describe('host element', () => {
