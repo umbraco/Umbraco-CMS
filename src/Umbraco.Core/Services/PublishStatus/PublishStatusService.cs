@@ -10,7 +10,7 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
     private readonly ILogger<PublishStatusService> _logger;
     private readonly IPublishStatusRepository _publishStatusRepository;
     private readonly ICoreScopeProvider _coreScopeProvider;
-    private static IDictionary<Guid, ISet<string>> _publishedCultures = new Dictionary<Guid, ISet<string>>();
+    private readonly IDictionary<Guid, ISet<string>> _publishedCultures = new Dictionary<Guid, ISet<string>>();
     public PublishStatusService(
         ILogger<PublishStatusService> logger,
         IPublishStatusRepository publishStatusRepository,
