@@ -11,7 +11,7 @@ let userGroupId = null;
 
 let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 
-let rootFolderId = null
+let rootFolderId = null;
 let childFolderOneId = null;
 const rootFolderName = 'RootFolder';
 const childFolderOneName = 'ChildFolderOne';
