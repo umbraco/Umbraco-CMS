@@ -11,14 +11,14 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 > {
 	#inlineEditingMode = new UmbBooleanState(undefined);
 	readonly inlineEditingMode = this.#inlineEditingMode.asObservable();
-	readonly forceHideContentEditorInOverlay = this._blockType.asObservablePart(
-		(x) => !!x?.forceHideContentEditorInOverlay,
+	readonly forceHideContentEditorInOverlay = this._blockType.asObservablePart((x) =>
+		x ? (x.forceHideContentEditorInOverlay ?? false) : undefined,
 	);
 
 	readonly showContentEdit = mergeObservables(
-		[this.forceHideContentEditorInOverlay, this.inlineEditingMode],
-		([forceHide, inlineMode]): boolean => {
-			return !forceHide && !inlineMode;
+		[this._contentStructureHasProperties, this.forceHideContentEditorInOverlay, this.inlineEditingMode],
+		([a, b, c]): boolean => {
+			return a === true && b === false && c === false;
 		},
 	);
 
