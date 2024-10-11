@@ -65,6 +65,10 @@ export abstract class UmbElementPropertyDatasetContext<
 		this._dataOwner = dataOwner;
 		this.#variantId = variantId ?? UmbVariantId.CreateInvariant();
 
+		this.#propertyVariantIdPromise = new Promise((resolve) => {
+			this.#propertyVariantIdPromiseResolver = resolve as any;
+		});
+
 		this.observe(
 			this._dataOwner.readOnlyState.states,
 			(states) => {
@@ -76,16 +80,13 @@ export abstract class UmbElementPropertyDatasetContext<
 
 		// TODO: Refactor this into a separate manager/controller of some sort? [NL]
 		this.observe(this._dataOwner.structure.contentTypeProperties, (props: UmbPropertyTypeModel[]) => {
-			this.#propertyVariantIdPromise ??= new Promise((resolve) => {
-				this.#propertyVariantIdPromiseResolver = resolve as any;
-			});
 			const map = props.map((prop) => ({ alias: prop.alias, variantId: this.#createPropertyVariantId(prop) }));
 			this.#propertyVariantIdMap.setValue(map);
 			// Resolve promise, to let the once waiting on this know.
 			if (this.#propertyVariantIdPromiseResolver) {
-				this.#propertyVariantIdPromise = undefined;
 				this.#propertyVariantIdPromiseResolver();
 				this.#propertyVariantIdPromiseResolver = undefined;
+				this.#propertyVariantIdPromise = undefined;
 			}
 		});
 	}

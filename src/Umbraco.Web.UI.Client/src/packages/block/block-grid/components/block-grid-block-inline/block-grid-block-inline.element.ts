@@ -17,6 +17,7 @@ import {
 	type UmbApiConstructorArgumentsMethodType,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
@@ -49,9 +50,6 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 
 	@state()
 	private _exposed?: boolean;
-
-	@state()
-	_isOpen = false;
 
 	@state()
 	_inlineProperty?: UmbPropertyTypeModel;
@@ -150,18 +148,34 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	};
 
 	override render() {
-		return html`<umb-ref-grid-block
-			standalone
-			href=${(this.config?.showContentEdit ? this.config?.editContentPath : undefined) ?? ''}>
-			<umb-icon slot="icon" .name=${this.icon}></umb-icon>
-			<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
-			${this.#renderInside()}
-		</umb-ref-grid-block>`;
+		return html`
+			<div id="host">
+				<button id="open-part" tabindex="0">
+					${this.#renderBlockInfo()}
+					<slot></slot>
+					<slot name="tag"></slot>
+				</button>
+				<div id="inside">${this.#renderInside()}</div>
+			</div>
+		`;
+	}
+
+	#renderBlockInfo() {
+		return html`
+			<span id="content">
+				<span id="icon">
+					<umb-icon .name=${this.icon}></umb-icon>
+				</span>
+				<div id="info">
+					<umb-ufm-render id="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
+				</div>
+			</span>
+		`;
 	}
 
 	#renderInside() {
 		if (this._exposed === false) {
-			return html`<uui-button style="position:absolute; inset:0;" @click=${this.#expose}
+			return html`<uui-button id="exposeButton" @click=${this.#expose}
 				><uui-icon name="icon-add"></uui-icon>
 				<umb-localize
 					key="blockEditor_createThisFor"
@@ -176,6 +190,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	}
 
 	static override styles = [
+		UmbTextStyles,
 		css`
 			umb-block-grid-areas-container {
 				margin-top: calc(var(--uui-size-2) + 1px);
@@ -183,9 +198,113 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 			umb-block-grid-areas-container::part(area) {
 				margin: var(--uui-size-2);
 			}
-			:host([unpublished]) umb-icon,
-			:host([unpublished]) umb-ufm-render {
+
+			#exposeButton {
+				width: 100%;
+				min-height: var(--uui-size-layout-3);
+			}
+
+			#host {
+				position: relative;
+				display: block;
+				width: 100%;
+
+				box-sizing: border-box;
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-surface);
+
+				border: 1px solid var(--uui-color-border);
+				transition: border-color 80ms;
+
+				min-width: 250px;
+			}
+			#open-part + * {
+				border-top: 1px solid var(--uui-color-border);
+			}
+			:host([disabled]) #open-part {
+				cursor: default;
+				transition: border-color 80ms;
+			}
+			:host(:not([disabled])) #host:has(#open-part:hover) {
+				border-color: var(--uui-color-border-emphasis);
+			}
+			:host(:not([disabled])) #open-part:hover + * {
+				border-color: var(--uui-color-border-emphasis);
+			}
+			:host([disabled]) #host {
+				border-color: var(--uui-color-disabled-standalone);
+			}
+
+			:host([unpublished]) #open-part {
 				opacity: 0.6;
+			}
+
+			slot[name='tag'] {
+				flex-grow: 1;
+
+				display: flex;
+				justify-content: flex-end;
+				align-items: center;
+			}
+
+			button {
+				font-size: inherit;
+				font-family: inherit;
+				border: 0;
+				padding: 0;
+				background-color: transparent;
+				text-align: left;
+				color: var(--uui-color-text);
+			}
+
+			#content {
+				align-self: stretch;
+				line-height: normal;
+				display: flex;
+				position: relative;
+				align-items: center;
+			}
+
+			#open-part {
+				color: inherit;
+				text-decoration: none;
+				cursor: pointer;
+
+				display: flex;
+				text-align: left;
+				align-items: center;
+				justify-content: flex-start;
+				width: 100%;
+				border: none;
+				background: none;
+
+				min-height: var(--uui-size-16);
+				padding: calc(var(--uui-size-2) + 1px);
+			}
+
+			#icon {
+				font-size: 1.2em;
+				margin-left: var(--uui-size-2);
+				margin-right: var(--uui-size-1);
+			}
+
+			:host(:not([disabled])) #open-part:hover #icon {
+				color: var(--uui-color-interactive-emphasis);
+			}
+			:host(:not([disabled])) #open-part:hover #name {
+				color: var(--uui-color-interactive-emphasis);
+			}
+
+			:host([disabled]) #icon {
+				color: var(--uui-color-disabled-contrast);
+			}
+			:host([disabled]) #name {
+				color: var(--uui-color-disabled-contrast);
+			}
+
+			#inside {
+				position: relative;
+				display: block;
 			}
 		`,
 	];

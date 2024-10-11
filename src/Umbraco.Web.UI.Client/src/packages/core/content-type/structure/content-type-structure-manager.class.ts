@@ -109,6 +109,8 @@ export class UmbContentTypeStructureManager<
 
 		this.#ownerContentTypeUnique = unique;
 
+		console.log('loadType', unique);
+
 		const promise = this.#loadType(unique);
 		this.#init = promise;
 		await this.#init;

@@ -2573,7 +2573,8 @@ export default {
 		configureArea: 'Configure area',
 		deleteArea: 'Delete area',
 		addColumnSpanOption: 'Add spanning %0% columns option',
-		createThisFor: 'Create %0% for %1%',
+		createThisFor: (name: string, variantName: string) =>
+			variantName ? `Create ${name} for ${variantName}` : `Create ${name}`,
 		insertBlock: 'Insert Block',
 		labelInlineMode: 'Display inline with text',
 	},
