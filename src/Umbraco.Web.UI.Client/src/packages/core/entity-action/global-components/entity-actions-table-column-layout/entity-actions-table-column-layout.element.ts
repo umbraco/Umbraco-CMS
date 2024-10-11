@@ -15,7 +15,7 @@ export class UmbEntityActionsTableColumnLayoutElement extends UmbLitElement {
 		this._isOpen = false;
 	}
 
-	#onClick(event) {
+	#onClick(event: Event) {
 		event.stopPropagation();
 	}
 

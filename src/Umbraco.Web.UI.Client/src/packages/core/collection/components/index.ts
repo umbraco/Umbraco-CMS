@@ -4,7 +4,6 @@ import './collection-toolbar.element.js';
 import './collection-view-bundle.element.js';
 import './collection-action-bundle.element.js';
 import './boolean-table-column-layout/boolean-table-column-layout.element.js';
-import './entity-actions-table-column-layout/entity-actions-table-column-layout.element.js';
 
 export * from './pagination/collection-pagination.element.js';
 export * from './collection-selection-actions.element.js';
