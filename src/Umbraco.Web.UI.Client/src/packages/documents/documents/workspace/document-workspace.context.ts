@@ -291,6 +291,7 @@ export class UmbDocumentWorkspaceContext
 	override resetState() {
 		super.resetState();
 		this.#data.clear();
+		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 	}
 
 	async loadLanguages() {

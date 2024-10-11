@@ -205,4 +205,9 @@ export abstract class UmbElementPropertyDatasetContext<
 		}
 		this._dataOwner.finishPropertyValueChange();
 	}
+
+	override destroy() {
+		super.destroy();
+		this.#propertyVariantIdMap.destroy();
+	}
 }
