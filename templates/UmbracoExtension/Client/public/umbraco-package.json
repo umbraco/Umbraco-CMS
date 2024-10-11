@@ -6,9 +6,9 @@
   "allowPackageTelemetry": true,
   "extensions": [
     {
-      "name": "UmbracoExtension EntryPoint",
-      "alias": "PROJECT_NAME_KEBABCASE_FOR_NPM.entrypoint",
-      "type": "backofficeEntryPoint",
+      "name": "UmbracoExtension Bundle",
+      "alias": "PROJECT_NAME_KEBABCASE_FOR_NPM.bundle",
+      "type": "bundle",
       "js": "/App_Plugins/UmbracoExtension/PROJECT_NAME_KEBABCASE_FOR_NPM.js"
     }
   ]

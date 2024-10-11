@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "tsc && vite build --watch",
+    "watch": "tsc && vite build --watch",
     "build": "tsc && vite build"
   },
   "devDependencies": {
@@ -13,3 +13,16 @@
     "vite": "^5.4.8"
   }
 }
+
+
+// When toggle enabled
+// scripts (new generate-api)
+// "generate-api": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 openapi-ts"
+
+// Add following devDependencies
+//"@hey-api/client-fetch": "^0.4.0",
+//"@hey-api/openapi-ts": "^0.53.9",
+//"cross-env": "^7.0.3",
+
+
+// 

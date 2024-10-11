@@ -28,6 +28,9 @@
       <Link>UmbracoProject\Views\Partials\blockgrid\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <PackagePath>UmbracoProject\Views\Partials\blockgrid</PackagePath>
     </Content>
+    <Compile Remove="UmbracoExtension\obj\**" />
+    <EmbeddedResource Remove="UmbracoExtension\obj\**" />
+    <None Remove="UmbracoExtension\obj\**" />
     <Content Include="..\src\Umbraco.Web.UI\Views\_ViewImports.cshtml">
       <Link>UmbracoProject\Views\_ViewImports.cshtml</Link>
       <PackagePath>UmbracoProject\Views</PackagePath>

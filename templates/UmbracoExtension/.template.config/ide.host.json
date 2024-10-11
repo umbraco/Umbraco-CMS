@@ -3,7 +3,7 @@
   "order": 0,
   "icon": "../../icon.png",
   "description": {
-    "id": "UmbracoExtension",
+    "id": "umbraco-extension",
     "text": "Umbraco Extension - An empty Umbraco extension/plugin (Razor Class Library)."
   },
   "symbolInfo": [
