@@ -53,6 +53,9 @@ export class UmbPropertyEditorUIBlockGridElement
 		const blockGroups = config.getValueByAlias<Array<UmbBlockTypeGroup>>('blockGroups') ?? [];
 		this.#managerContext.setBlockGroups(blockGroups);
 
+		const useInlineEditingAsDefault = config.getValueByAlias<boolean>('useInlineEditingAsDefault');
+		this.#managerContext.setInlineEditingMode(useInlineEditingAsDefault);
+
 		this.style.maxWidth = config.getValueByAlias<string>('maxPropertyWidth') ?? '';
 
 		//config.useLiveEditing, is covered by the EditorConfiguration of context. [NL]

@@ -29,6 +29,7 @@ export interface UmbBlockGridTypeAreaType {
 	minAllowed?: number;
 	maxAllowed?: number;
 	specifiedAllowance?: Array<UmbBlockGridTypeAreaTypePermission>;
+	createLabel?: string;
 }
 
 export interface UmbBlockGridTypeAreaTypePermission {

@@ -120,6 +120,9 @@ export abstract class UmbBlockEntryContext<
 		};
 	});
 
+	#contentStructureHasProperties = new UmbBooleanState(undefined);
+	_contentStructureHasProperties = this.#contentStructureHasProperties.asObservable();
+
 	#settingsStructure?: UmbContentTypeStructureManager;
 	#settingsStructurePromiseResolve?: () => void;
 	#settingsStructurePromise = new Promise((resolve) => {
@@ -512,6 +515,14 @@ export abstract class UmbBlockEntryContext<
 				this._gotContentType(contentType);
 			},
 			'observeContentElementType',
+		);
+
+		this.observe(
+			this.#contentStructure?.contentTypeHasProperties,
+			(has) => {
+				this.#contentStructureHasProperties.setValue(has);
+			},
+			'observeContentTypeHasProperties',
 		);
 	}
 
