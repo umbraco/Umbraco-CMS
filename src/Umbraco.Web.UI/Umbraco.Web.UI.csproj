@@ -6,9 +6,13 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <!--  TODO: [SA1119] Correct unnecessary parenthesis and remove this override -->
-    <WarningsNotAsErrors>SA1119</WarningsNotAsErrors>
+    <!--
+      TODO: Fix the following warnings and remove overrides:
+      [SA1119] Correct unnecessary parenthesis
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),SA1119</WarningsNotAsErrors>
   </PropertyGroup>
+
   <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.props" />
   <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.targets" />
   <ItemGroup>
