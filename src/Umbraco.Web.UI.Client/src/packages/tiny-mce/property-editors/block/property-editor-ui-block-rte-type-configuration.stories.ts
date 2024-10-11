@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorUIBlockRteBlockConfigurationElement } from './property-editor-ui-block-rte-type-configuration.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-block-rte-type-configuration.element.js';
@@ -10,6 +10,6 @@ export default {
 	id: 'umb-property-editor-ui-block-rte-type-configuration',
 } as Meta;
 
-export const AAAOverview: Story<UmbPropertyEditorUIBlockRteBlockConfigurationElement> = () =>
+export const AAAOverview: StoryFn<UmbPropertyEditorUIBlockRteBlockConfigurationElement> = () =>
 	html`<umb-property-editor-ui-block-rte-type-configuration></umb-property-editor-ui-block-rte-type-configuration>`;
 AAAOverview.storyName = 'Overview';

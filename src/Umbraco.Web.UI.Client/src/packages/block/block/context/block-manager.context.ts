@@ -8,6 +8,7 @@ import {
 	UmbBooleanState,
 	UmbClassState,
 	UmbStringState,
+	type MappingFunction,
 	mergeObservables,
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
@@ -79,6 +80,9 @@ export abstract class UmbBlockManagerContext<
 	}
 	getEditorConfiguration(): UmbPropertyEditorConfigCollection | undefined {
 		return this._editorConfiguration.getValue();
+	}
+	editorConfigurationPart(method: MappingFunction<UmbPropertyEditorConfigCollection | undefined, unknown>) {
+		return this._editorConfiguration.asObservablePart(method);
 	}
 
 	setBlockTypes(blockTypes: Array<BlockType>) {

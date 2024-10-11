@@ -3,7 +3,7 @@ import './history-item.element.js';
 
 import type { UmbHistoryListElement } from './history-list.element.js';
 import type { UmbHistoryItemElement } from './history-item.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
@@ -12,7 +12,7 @@ export default {
 	id: 'umb-history-list',
 } as Meta;
 
-export const AAAOverview: Story<UmbHistoryListElement> = () =>
+export const AAAOverview: StoryFn<UmbHistoryListElement> = () =>
 	html` <umb-history-list>
 		<umb-history-item name="Name attribute" detail="Detail attribute">
 			Default slot
@@ -29,7 +29,7 @@ export const AAAOverview: Story<UmbHistoryListElement> = () =>
 	</umb-history-list>`;
 AAAOverview.storyName = 'Overview';
 
-export const Node: Story<UmbHistoryItemElement> = () =>
+export const Node: StoryFn<UmbHistoryItemElement> = () =>
 	html`<umb-history-item name="Name attribute" detail="Detail attribute">
 		Default slot
 		<uui-button slot="actions" label="action">Action slot</uui-button>

@@ -3,7 +3,7 @@ import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from './block-rte-manager.context-token
 import { UMB_BLOCK_RTE_ENTRIES_CONTEXT } from './block-rte-entries.context-token.js';
 import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { mergeObservables, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 	typeof UMB_BLOCK_RTE_MANAGER_CONTEXT,
 	typeof UMB_BLOCK_RTE_MANAGER_CONTEXT.TYPE,
@@ -15,11 +15,16 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 	readonly displayInline = this._layout.asObservablePart((x) => (x ? (x.displayInline ?? false) : undefined));
 	readonly displayInlineConfig = this._blockType.asObservablePart((x) => (x ? (x.displayInline ?? false) : undefined));
 
-	readonly forceHideContentEditorInOverlay = this._blockType.asObservablePart(
-		(x) => !!x?.forceHideContentEditorInOverlay,
+	readonly forceHideContentEditorInOverlay = this._blockType.asObservablePart((x) =>
+		x ? (x.forceHideContentEditorInOverlay ?? false) : undefined,
 	);
 
-	readonly showContentEdit = this._blockType.asObservablePart((x) => !x?.forceHideContentEditorInOverlay);
+	readonly showContentEdit = mergeObservables(
+		[this._contentStructureHasProperties, this.forceHideContentEditorInOverlay],
+		([a, b]): boolean => {
+			return a === true && b === false;
+		},
+	);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_RTE_MANAGER_CONTEXT, UMB_BLOCK_RTE_ENTRIES_CONTEXT);
