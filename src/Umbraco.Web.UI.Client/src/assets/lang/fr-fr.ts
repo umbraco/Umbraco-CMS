@@ -297,6 +297,7 @@ export default {
 		schedulePublishHelp: "Sélectionnez la date et l'heure de publication/dépublication de l'élément de contenu.",
 		createEmpty: 'Créer nouveau',
 		createFromClipboard: 'Copier du clipboard',
+		saveModalTitle: 'Sauver',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Créer un nouveau Modèle de Contenu à partir de <em>%0%</em>',

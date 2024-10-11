@@ -250,6 +250,7 @@ export default {
 		urls: 'Ссылка на документ',
 		addTextBox: 'Добавить новое поле текста',
 		removeTextBox: 'Удалить это поле текста',
+		saveModalTitle: 'Сохранить',
 	},
 	contentPicker: {
 		pickedTrashedItem: 'Выбран элемент содержимого, который в настоящее время удален или находится в корзине',
