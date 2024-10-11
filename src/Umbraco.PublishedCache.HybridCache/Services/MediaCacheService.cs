@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
@@ -166,6 +167,83 @@ internal class MediaCacheService : IMediaCacheService
             }
         }
 
+        scope.Complete();
+    }
+
+    private async Task RefreshHybridCacheAsync(ContentCacheNode cacheNode, string cacheKey, bool isSeeded)
+    {
+        // If it's seeded we want it to stick around the cache for longer.
+        if (isSeeded)
+        {
+            await _hybridCache.SetAsync(
+                cacheKey,
+                cacheNode,
+                GetSeedEntryOptions());
+        }
+        else
+        {
+            await _hybridCache.SetAsync(cacheKey, cacheNode);
+        }
+    }
+
+    public async Task RefreshMemoryCacheAsync(Guid key)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        bool isSeeded = SeedKeys.Contains(key);
+
+        ContentCacheNode? publishedNode = await _databaseCacheRepository.GetMediaSourceAsync(key);
+        if (publishedNode is not null)
+        {
+            await RefreshHybridCacheAsync(publishedNode, GetCacheKey(publishedNode.Key, false), isSeeded);
+        }
+
+        scope.Complete();
+    }
+
+    public async Task ClearMemoryCacheAsync(CancellationToken cancellationToken)
+    {
+        // TODO: This should be done with tags, however this is not implemented yet, so for now we have to naively get all content keys and clear them all.
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        // We have to get ALL document keys in order to be able to remove them from the cache,
+        IEnumerable<Guid> documentKeys = await _databaseCacheRepository.GetContentKeysAsync(Constants.ObjectTypes.Media);
+
+        foreach (Guid documentKey in documentKeys)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            // We'll remove both the draft and published cache
+            await _hybridCache.RemoveAsync(GetCacheKey(documentKey, false), cancellationToken);
+        }
+
+        // We have to run seeding again after the cache is cleared
+        await SeedAsync(cancellationToken);
+
+        scope.Complete();
+    }
+
+    public async Task RemoveFromMemoryCacheAsync(Guid key)
+        => await _hybridCache.RemoveAsync(GetCacheKey(key, false));
+
+    public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> mediaTypeIds)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        IEnumerable<ContentCacheNode> contentByContentTypeKey = _databaseCacheRepository.GetContentByContentTypeKey(mediaTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.MediaType).Result), ContentCacheDataSerializerEntityType.Media);
+
+        foreach (ContentCacheNode content in contentByContentTypeKey)
+        {
+            _hybridCache.RemoveAsync(GetCacheKey(content.Key, true)).GetAwaiter().GetResult();
+
+            if (content.IsDraft is false)
+            {
+                _hybridCache.RemoveAsync(GetCacheKey(content.Key, false)).GetAwaiter().GetResult();
+            }
+        }
         scope.Complete();
     }
 

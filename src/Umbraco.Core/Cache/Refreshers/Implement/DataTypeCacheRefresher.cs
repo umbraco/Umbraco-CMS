@@ -17,6 +17,7 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
     private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
     private readonly IDocumentCacheService _documentCacheService;
+    private readonly IMediaCacheService _mediaCacheService;
 
     public DataTypeCacheRefresher(
         AppCaches appCaches,
@@ -27,7 +28,8 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
         IPublishedModelFactory publishedModelFactory,
         IPublishedContentTypeFactory publishedContentTypeFactory,
         IPublishedContentTypeCache publishedContentTypeCache,
-        IDocumentCacheService documentCacheService)
+        IDocumentCacheService documentCacheService,
+        IMediaCacheService mediaCacheService)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
@@ -35,6 +37,7 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
         _publishedContentTypeFactory = publishedContentTypeFactory;
         _publishedContentTypeCache = publishedContentTypeCache;
         _documentCacheService = documentCacheService;
+        _mediaCacheService = mediaCacheService;
     }
 
     #region Json
@@ -104,7 +107,12 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
             IEnumerable<int> documentTypeIds = removedContentTypes
                 .Where(x => x.ItemType == PublishedItemType.Content)
                 .Select(x => x.Id);
-            _documentCacheService.RebuildMemoryCacheByContentTypeAsync(documentTypeIds, UmbracoObjectTypes.DocumentType).GetAwaiter().GetResult();
+            _documentCacheService.RebuildMemoryCacheByContentTypeAsync(documentTypeIds).GetAwaiter().GetResult();
+
+            IEnumerable<int> mediaTypeIds = removedContentTypes
+                .Where(x => x.ItemType == PublishedItemType.Media)
+                .Select(x => x.Id);
+            _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds);
         });
         base.Refresh(payloads);
     }

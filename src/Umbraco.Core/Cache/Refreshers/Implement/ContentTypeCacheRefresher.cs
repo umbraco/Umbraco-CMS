@@ -18,6 +18,7 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
     private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
     private readonly IDocumentCacheService _documentCacheService;
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
+    private readonly IMediaCacheService _mediaCacheService;
     private readonly IIdKeyMap _idKeyMap;
 
     public ContentTypeCacheRefresher(
@@ -30,7 +31,8 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         IPublishedModelFactory publishedModelFactory,
         IPublishedContentTypeFactory publishedContentTypeFactory,
         IDocumentCacheService documentCacheService,
-        IPublishedContentTypeCache publishedContentTypeCache)
+        IPublishedContentTypeCache publishedContentTypeCache,
+        IMediaCacheService mediaCacheService)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
@@ -39,6 +41,7 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         _publishedContentTypeFactory = publishedContentTypeFactory;
         _documentCacheService = documentCacheService;
         _publishedContentTypeCache = publishedContentTypeCache;
+        _mediaCacheService = mediaCacheService;
     }
 
     #region Json
@@ -128,8 +131,8 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
             IEnumerable<int> documentTypeIds = payloads.Where(x => x.ItemType == nameof(IContentType)).Select(x => x.Id);
             IEnumerable<int> mediaTypeIds = payloads.Where(x => x.ItemType == nameof(IMediaType)).Select(x => x.Id);
 
-            _documentCacheService.RebuildMemoryCacheByContentTypeAsync(documentTypeIds, UmbracoObjectTypes.DocumentType);
-            _documentCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds, UmbracoObjectTypes.MediaType);
+            _documentCacheService.RebuildMemoryCacheByContentTypeAsync(documentTypeIds);
+            _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds);
         });
 
         // now we can trigger the event

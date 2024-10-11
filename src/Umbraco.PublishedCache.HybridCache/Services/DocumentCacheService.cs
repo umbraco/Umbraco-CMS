@@ -290,22 +290,15 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         _databaseCacheRepository.Rebuild(contentTypeIds.ToList());
-        RebuildMemoryCacheByContentTypeAsync(contentTypeIds, UmbracoObjectTypes.DocumentType).GetAwaiter().GetResult();
+        RebuildMemoryCacheByContentTypeAsync(contentTypeIds).GetAwaiter().GetResult();
         scope.Complete();
     }
 
-    public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> contentTypeIds, UmbracoObjectTypes objectType)
+    public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> contentTypeIds)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
-        ContentCacheDataSerializerEntityType serializerType = objectType switch
-        {
-            UmbracoObjectTypes.DocumentType => ContentCacheDataSerializerEntityType.Document,
-            UmbracoObjectTypes.MediaType => ContentCacheDataSerializerEntityType.Media,
-            _ => throw new NotSupportedException($"Object type {objectType} is not supported")
-        };
-
-        IEnumerable<ContentCacheNode> contentByContentTypeKey = _databaseCacheRepository.GetContentByContentTypeKey(contentTypeIds.Select(x => _idKeyMap.GetKeyForId(x, objectType).Result), serializerType);
+        IEnumerable<ContentCacheNode> contentByContentTypeKey = _databaseCacheRepository.GetContentByContentTypeKey(contentTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.DocumentType).Result), ContentCacheDataSerializerEntityType.Document);
 
         foreach (ContentCacheNode content in contentByContentTypeKey)
         {
