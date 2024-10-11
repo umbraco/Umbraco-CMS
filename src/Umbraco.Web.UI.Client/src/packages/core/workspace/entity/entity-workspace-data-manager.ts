@@ -135,6 +135,9 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	override destroy() {
 		this._persisted.destroy();
 		this._current.destroy();
+
+		(this._persisted as any) = undefined;
+		(this._current as any) = undefined;
 		super.destroy();
 	}
 }
