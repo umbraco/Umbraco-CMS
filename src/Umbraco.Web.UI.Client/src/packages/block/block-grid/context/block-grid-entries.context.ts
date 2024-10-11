@@ -51,7 +51,9 @@ export class UmbBlockGridEntriesContext
 	#layoutColumns = new UmbNumberState(undefined);
 	readonly layoutColumns = this.#layoutColumns.asObservable();
 
-	#areaType?: UmbBlockGridTypeAreaType;
+	#areaType = new UmbObjectState<UmbBlockGridTypeAreaType | undefined>(undefined);
+	areaType = this.#areaType.asObservable();
+	areaTypeCreateLabel = this.#areaType.asObservablePart((x) => x?.createLabel);
 
 	#parentUnique?: string | null;
 	#areaKey?: string | null;
@@ -117,14 +119,14 @@ export class UmbBlockGridEntriesContext
 
 	getMinAllowed() {
 		if (this.#areaKey) {
-			return this.#areaType?.minAllowed ?? 0;
+			return this.#areaType.getValue()?.minAllowed ?? 0;
 		}
 		return this._manager?.getMinAllowed() ?? 0;
 	}
 
 	getMaxAllowed() {
 		if (this.#areaKey) {
-			return this.#areaType?.maxAllowed ?? Infinity;
+			return this.#areaType.getValue()?.maxAllowed ?? Infinity;
 		}
 		return this._manager?.getMaxAllowed() ?? Infinity;
 	}
@@ -147,15 +149,16 @@ export class UmbBlockGridEntriesContext
 			.addUniquePaths(['propertyAlias', 'variantId', 'parentUnique', 'areaKey'])
 			.addAdditionalPath(':view/:index')
 			.onSetup((routingInfo) => {
+				if (!this._manager) return false;
 				// Idea: Maybe on setup should be async, so it can retrieve the values when needed? [NL]
 				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
 				return {
 					data: {
 						blocks: this.#allowedBlockTypes.getValue(),
-						blockGroups: this._manager?.getBlockGroups() ?? [],
+						blockGroups: this._manager.getBlockGroups() ?? [],
 						openClipboard: routingInfo.view === 'clipboard',
 						originData: { index: index, areaKey: this.#areaKey, parentUnique: this.#parentUnique },
-						createBlockInWorkspace: true,
+						createBlockInWorkspace: this._manager.getInlineEditingMode() === false,
 					},
 				};
 			})
@@ -301,7 +304,7 @@ export class UmbBlockGridEntriesContext
 			this.observe(
 				this.#parentEntry.areaType(this.#areaKey),
 				(areaType) => {
-					this.#areaType = areaType;
+					this.#areaType.setValue(areaType);
 					const hostEl = this.getHostElement() as HTMLElement | undefined;
 					if (!hostEl) return;
 					hostEl.setAttribute('data-area-alias', areaType?.alias ?? '');
@@ -327,13 +330,14 @@ export class UmbBlockGridEntriesContext
 		if (!this._manager) return;
 		//const range = this.#retrieveRangeLimits();
 		if (this.#areaKey != null) {
+			const areaType = this.#areaType.getValue();
 			this.removeUmbControllerByAlias('observeConfigurationRootLimits');
 			// Area entries:
-			if (!this.#areaType) return undefined;
+			if (!areaType) return undefined;
 			// No need to observe as this method is called every time the area is changed.
 			this.#rangeLimits.setValue({
-				min: this.#areaType.minAllowed ?? 0,
-				max: this.#areaType.maxAllowed ?? Infinity,
+				min: areaType.minAllowed ?? 0,
+				max: areaType.maxAllowed ?? Infinity,
 			});
 		} else if (this.#areaKey === null) {
 			if (!this._manager) return undefined;
@@ -402,18 +406,19 @@ export class UmbBlockGridEntriesContext
 
 	/**
 	 * @internal
-	 * @returns an Array of ElementTypeKeys that are allowed in the current area. Or undefined if not ready jet.
+	 * @returns {Array<UmbBlockGridTypeModel>} an Array of ElementTypeKeys that are allowed in the current area. Or undefined if not ready jet.
 	 */
 	#retrieveAllowedElementTypes() {
 		if (!this._manager) return [];
 
 		if (this.#areaKey) {
+			const areaType = this.#areaType.getValue();
 			// Area entries:
-			if (!this.#areaType) return [];
+			if (!areaType) return [];
 
-			if (this.#areaType.specifiedAllowance && this.#areaType.specifiedAllowance?.length > 0) {
+			if (areaType.specifiedAllowance && areaType.specifiedAllowance?.length > 0) {
 				return (
-					this.#areaType.specifiedAllowance
+					areaType.specifiedAllowance
 						.flatMap((permission) => {
 							if (permission.groupKey) {
 								return (
@@ -449,10 +454,11 @@ export class UmbBlockGridEntriesContext
 		if (!this._manager) return;
 
 		if (this.#areaKey) {
+			const areaType = this.#areaType.getValue();
 			// Area entries:
-			if (!this.#areaType) return;
+			if (!areaType) return;
 
-			if (this.#areaType.specifiedAllowance && this.#areaType.specifiedAllowance?.length > 0) {
+			if (areaType.specifiedAllowance && areaType.specifiedAllowance?.length > 0) {
 				this.#hasTypeLimits.setValue(true);
 			}
 		} else if (this.#areaKey === null) {
@@ -470,11 +476,12 @@ export class UmbBlockGridEntriesContext
 	 * @returns {boolean} - True if the block type limits are valid, otherwise false.
 	 */
 	checkBlockTypeLimitsValidity(): boolean {
-		if (!this.#areaType || !this.#areaType.specifiedAllowance) return false;
+		const areaType = this.#areaType.getValue();
+		if (!areaType || !areaType.specifiedAllowance) return false;
 
 		const layoutEntries = this._layoutEntries.getValue();
 
-		this.#invalidBlockTypeLimits = this.#areaType.specifiedAllowance
+		this.#invalidBlockTypeLimits = areaType.specifiedAllowance
 			.map((rule) => {
 				const minAllowed = rule.minAllowed || 0;
 				const maxAllowed = rule.maxAllowed || 0;
@@ -531,7 +538,7 @@ export class UmbBlockGridEntriesContext
 
 	/**
 	 * Check if given contentKey is allowed in the current area.
-	 * @param contentKey {string} - The contentKey of the content to check.
+	 * @param {string} contentKey - The contentKey of the content to check.
 	 * @returns {boolean} - True if the content is allowed in the current area, otherwise false.
 	 */
 	allowDrop(contentKey: string) {

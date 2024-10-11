@@ -1,7 +1,7 @@
 import { installerContextProvider } from '../shared/utils.story-helpers.js';
 import { UmbInstallerContext } from '../installer.context.js';
 import type { UmbInstallerErrorElement } from './installer-error.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './installer-error.element.js';
@@ -30,5 +30,5 @@ export default {
 	decorators: [(story) => installerContextProvider(story, installerContext)],
 } as Meta;
 
-export const Step5Error: Story<UmbInstallerErrorElement> = () => html`<umb-installer-error></umb-installer-error>`;
+export const Step5Error: StoryFn<UmbInstallerErrorElement> = () => html`<umb-installer-error></umb-installer-error>`;
 Step5Error.storyName = 'Step 5: Error';

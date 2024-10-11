@@ -219,6 +219,9 @@ export default {
 		createFolderIllegalChars: 'The folder name cannot contain illegal characters.',
 		deleteItemFailed: 'Failed to delete item: %0%',
 	},
+	collection: {
+		noItemsTitle: 'No items',
+	},
 	content: {
 		isPublished: 'Is Published',
 		about: 'About this page',
