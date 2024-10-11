@@ -75,20 +75,24 @@ export abstract class UmbElementPropertyDatasetContext<
 				const isReadOnly = states.some((state) => state.variantId.equal(this.#variantId));
 				this.#readOnly.setValue(isReadOnly);
 			},
-			'umbObserveReadOnlyStates',
+			null,
 		);
 
 		// TODO: Refactor this into a separate manager/controller of some sort? [NL]
-		this.observe(this._dataOwner.structure.contentTypeProperties, (props: UmbPropertyTypeModel[]) => {
-			const map = props.map((prop) => ({ alias: prop.alias, variantId: this.#createPropertyVariantId(prop) }));
-			this.#propertyVariantIdMap.setValue(map);
-			// Resolve promise, to let the once waiting on this know.
-			if (this.#propertyVariantIdPromiseResolver) {
-				this.#propertyVariantIdPromiseResolver();
-				this.#propertyVariantIdPromiseResolver = undefined;
-				this.#propertyVariantIdPromise = undefined;
-			}
-		});
+		this.observe(
+			this._dataOwner.structure.contentTypeProperties,
+			(props: UmbPropertyTypeModel[]) => {
+				const map = props.map((prop) => ({ alias: prop.alias, variantId: this.#createPropertyVariantId(prop) }));
+				this.#propertyVariantIdMap.setValue(map);
+				// Resolve promise, to let the once waiting on this know.
+				if (this.#propertyVariantIdPromiseResolver) {
+					this.#propertyVariantIdPromiseResolver();
+					this.#propertyVariantIdPromiseResolver = undefined;
+					this.#propertyVariantIdPromise = undefined;
+				}
+			},
+			null,
+		);
 	}
 
 	#createPropertyVariantId(property: UmbPropertyTypeModel) {
