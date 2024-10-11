@@ -126,12 +126,35 @@ export class UmbPropertyEditorUIBlockGridElement
 				},
 				'motherObserver',
 			);
+
 			this.observe(
 				propertyContext?.alias,
 				(alias) => {
 					this.#managerContext.setPropertyAlias(alias);
 				},
 				'observePropertyAlias',
+			);
+
+			// If the current property is readonly all inner block content should also be readonly.
+			this.observe(
+				observeMultiple([propertyContext.isReadOnly, propertyContext.variantId]),
+				([isReadOnly, variantId]) => {
+					const unique = 'UMB_PROPERTY_EDITOR_UI';
+					if (variantId === undefined) return;
+
+					if (isReadOnly) {
+						const state = {
+							unique,
+							variantId,
+							message: '',
+						};
+
+						this.#managerContext.readOnlyState.addState(state);
+					} else {
+						this.#managerContext.readOnlyState.removeState(unique);
+					}
+				},
+				'observeIsReadOnly',
 			);
 		});
 
