@@ -3,16 +3,7 @@
     <Title>Umbraco CMS - Persistence - Entity Framework Core - SQLite migrations</Title>
     <Description>Adds support for Entity Framework Core SQLite migrations to Umbraco CMS.</Description>
   </PropertyGroup>
-  <PropertyGroup>
-    <!-- Ensure NuGet vulnerability warnings are not errors in non-Release mode -->
-    <WarningsNotAsErrors>NU1901,NU1902,NU1903,NU1904</WarningsNotAsErrors>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <!-- Ensure NuGet vulnerability warnings are errors for Release mode -->
-    <WarningsAsErrors>
-      NU1901,NU1902,NU1903,NU1904
-    </WarningsAsErrors>
-  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
   </ItemGroup>

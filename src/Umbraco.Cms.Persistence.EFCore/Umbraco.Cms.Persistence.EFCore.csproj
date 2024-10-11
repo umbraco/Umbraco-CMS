@@ -3,33 +3,30 @@
     <Title>Umbraco CMS - Persistence - Entity Framework Core</Title>
     <Description>Adds support for Entity Framework Core to Umbraco CMS.</Description>
   </PropertyGroup>
-  <PropertyGroup>
-    <!--  TODO: [IDE0270] Simplify null checks, [CS0108] resolve hiding inherited members, [CS1998]
-          remove async or make method synchronous, and remove these overrides -->
-    <WarningsNotAsErrors>IDE0270,CS0108,CS1998</WarningsNotAsErrors>
-    <!--  TODO: [IDE0270] Simplify null checks, [CS0108] resolve hiding inherited members, [CS1998] remove async or make method synchronous,
-          and remove this override. Ensure NuGet vulnerability warnings are not errors in non-Release mode -->
-    <WarningsNotAsErrors>IDE0270,CS0108,CS1998,NU1901,NU1902,NU1903,NU1904</WarningsNotAsErrors>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <!-- Ensure NuGet vulnerability warnings are errors for Release mode -->
-    <WarningsAsErrors>
-      NU1901,NU1902,NU1903,NU1904
-    </WarningsAsErrors>
-  </PropertyGroup>
-  <ItemGroup>
 
+  <PropertyGroup>
+    <!--
+      TODO: Fix the following warnings and remove overrides:
+      [IDE0270] Simplify null checks
+      [CS0108] resolve hiding inherited members
+      [CS1998] remove async or make method synchronous
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),IDE0270,CS0108,CS1998</WarningsNotAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" />
+  </ItemGroup>
 
+  <ItemGroup>
     <!-- Take top-level depedendency on Azure.Identity, because Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
     <PackageReference Include="Azure.Identity" />
     <!-- Take top-level depedendency on System.Runtime.Caching, because Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
     <PackageReference Include="System.Runtime.Caching" />
-
-    <!-- Both  Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer, Dazinator.Extensions.FileProviders bring in legacy versions of System.Text.Encodings.Web  -->
-    <PackageReference Include="System.Text.Encodings.Web"/>
+    <!-- Both  Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer, Dazinator.Extensions.FileProviders bring in legacy versions of System.Text.Encodings.Web -->
+    <PackageReference Include="System.Text.Encodings.Web" />
   </ItemGroup>
 
   <ItemGroup>

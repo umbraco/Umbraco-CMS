@@ -3,27 +3,18 @@
     <Title>Umbraco CMS - Persistence - Entity Framework Core - SQL Server migrations</Title>
     <Description>Adds support for Entity Framework Core SQL Server migrations to Umbraco CMS.</Description>
   </PropertyGroup>
-  <PropertyGroup>
-    <!-- Ensure NuGet vulnerability warnings are not errors in non-Release mode -->
-    <WarningsNotAsErrors>NU1901,NU1902,NU1903,NU1904</WarningsNotAsErrors>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <!-- Ensure NuGet vulnerability warnings are errors for Release mode -->
-    <WarningsAsErrors>
-      NU1901,NU1902,NU1903,NU1904
-    </WarningsAsErrors>
-  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+  </ItemGroup>
+
   <ItemGroup>
     <!-- Take top-level depedendency on Azure.Identity, because Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
     <PackageReference Include="Azure.Identity" />
     <!-- Take top-level depedendency on System.Runtime.Caching, because Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
     <PackageReference Include="System.Runtime.Caching" />
-
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
-
-
     <!-- Both OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer bring in a vulnerable version of Microsoft.IdentityModel.JsonWebTokens -->
-    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens"/>
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" />
   </ItemGroup>
 
   <ItemGroup>

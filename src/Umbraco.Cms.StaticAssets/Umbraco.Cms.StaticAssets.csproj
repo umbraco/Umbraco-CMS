@@ -7,8 +7,11 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <!--  TODO: [NU5123] Rename files so path is shorter and remove this override -->
-    <WarningsNotAsErrors>NU5123</WarningsNotAsErrors>
+    <!--
+      TODO: Fix the following warnings and remove overrides:
+      [NU5123] Rename files so path is shorter
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),NU5123</WarningsNotAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

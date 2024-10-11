@@ -3,17 +3,15 @@
     <Title>Umbraco CMS - Persistence - SQLite</Title>
     <Description>Adds support for SQLite to Umbraco CMS.</Description>
   </PropertyGroup>
+  
   <PropertyGroup>
-    <!--  TODO: [CS0114] Resolve hiding inherited members and remove this override.
-    Ensure NuGet vulnerability warnings are not errors in non-Release mode -->
-    <WarningsNotAsErrors>CS0114,NU1901,NU1902,NU1903,NU1904</WarningsNotAsErrors>
+    <!--
+      TODO: Fix the following warnings and remove overrides:
+      [CS0114] Resolve hiding inherited members
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),CS0114</WarningsNotAsErrors>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <!-- Ensure NuGet vulnerability warnings are errors for Release mode -->
-    <WarningsAsErrors>
-      NU1901,NU1902,NU1903,NU1904
-    </WarningsAsErrors>
-  </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" />
   </ItemGroup>
