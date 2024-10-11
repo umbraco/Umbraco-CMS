@@ -1,3 +1,1 @@
 export const UMB_DOCUMENT_TYPE_TREE_ITEM_CHILDREN_COLLECTION_ALIAS = 'Umb.Collection.DocumentType.TreeItemChildren';
-export const UMB_DOCUMENT_TYPE_TREE_ITEM_CHILDREN_COLLECTION_REPOSITORY_ALIAS =
-	'Umb.Repository.DocumentType.TreeItemChildrenCollection';

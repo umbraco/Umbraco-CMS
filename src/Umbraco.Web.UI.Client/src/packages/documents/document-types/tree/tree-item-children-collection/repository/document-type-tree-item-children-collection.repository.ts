@@ -1,4 +1,4 @@
-import { UmbDocumentTypeTreeRepository } from '../document-type-tree.repository.js';
+import { UmbDocumentTypeTreeRepository } from '../../document-type-tree.repository.js';
 import type { UmbCollectionFilterModel, UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

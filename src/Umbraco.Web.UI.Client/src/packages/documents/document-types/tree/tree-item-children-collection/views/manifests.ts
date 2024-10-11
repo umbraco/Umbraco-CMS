@@ -4,9 +4,9 @@ import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collecti
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'collectionView',
-		alias: 'Umb.CollectionView.DocumentType.Folder.Table',
-		name: 'Document Type Folder Children Table Collection View',
-		element: () => import('./table.element.js'),
+		alias: 'Umb.CollectionView.DocumentType.TreeItem.Table',
+		name: 'Document Type Tree Item Table Collection View',
+		element: () => import('./document-type-tree-item-table-collection-view.element.js'),
 		weight: 300,
 		meta: {
 			label: 'Table',

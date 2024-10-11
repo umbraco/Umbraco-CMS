@@ -10,9 +10,9 @@ import type { UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 import { UmbModalRouteRegistrationController, type UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 
-const elementName = 'umb-tree-item-children-table-collection-view';
+const elementName = 'umb-document-type-tree-item-table-collection-view';
 @customElement(elementName)
-export class UmbTreeItemChildrenTableCollectionViewElement extends UmbLitElement {
+export class UmbDocumentTypeTreeItemTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableConfig: UmbTableConfig = {
 		allowSelection: false,
@@ -106,10 +106,10 @@ export class UmbTreeItemChildrenTableCollectionViewElement extends UmbLitElement
 	];
 }
 
-export default UmbTreeItemChildrenTableCollectionViewElement;
+export { UmbDocumentTypeTreeItemTableCollectionViewElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbTreeItemChildrenTableCollectionViewElement;
+		[elementName]: UmbDocumentTypeTreeItemTableCollectionViewElement;
 	}
 }
