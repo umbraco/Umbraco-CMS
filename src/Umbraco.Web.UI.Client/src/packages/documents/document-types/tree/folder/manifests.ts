@@ -1,4 +1,4 @@
-import { manifests as collectionManifests } from '../tree-item-children-collection/manifests.js';
+import { manifests as collectionManifests } from '../tree-item-children/collection/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS } from './repository/constants.js';
