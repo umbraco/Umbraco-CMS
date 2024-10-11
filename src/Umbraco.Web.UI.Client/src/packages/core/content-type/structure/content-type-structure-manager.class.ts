@@ -105,9 +105,8 @@ export class UmbContentTypeStructureManager<
 	 * @returns {Promise} - Promise resolved
 	 */
 	public async loadType(unique?: string) {
-		if (!unique) return;
-		if (this.#ownerContentTypeUnique === unique) return;
-		console.log('loadType', unique);
+		//if (!unique) return;
+		//if (this.#ownerContentTypeUnique === unique) return;
 		this._reset();
 
 		this.#ownerContentTypeUnique = unique;
