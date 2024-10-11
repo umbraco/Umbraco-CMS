@@ -202,7 +202,30 @@ export class UmbPropertyEditorUIBlockListElement
 				},
 				'motherObserver',
 			);
+
+			// If the current property is readonly all inner block content should also be readonly.
+			this.observe(
+				observeMultiple([context.isReadOnly, context.variantId]),
+				([isReadOnly, variantId]) => {
+					const unique = 'UMB_PROPERTY_EDITOR_UI';
+					if (variantId === undefined) return;
+
+					if (isReadOnly) {
+						const state = {
+							unique,
+							variantId,
+							message: '',
+						};
+
+						this.#managerContext.readOnlyState.addState(state);
+					} else {
+						this.#managerContext.readOnlyState.removeState(unique);
+					}
+				},
+				'observeIsReadOnly',
+			);
 		});
+
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
 			this.#managerContext.setVariantId(context.getVariantId());
 		});
@@ -241,7 +264,8 @@ export class UmbPropertyEditorUIBlockListElement
 	}
 
 	override render() {
-		return html` ${repeat(
+		return html`
+			${repeat(
 				this._layouts,
 				(x) => x.contentKey,
 				(layoutEntry, index) => html`
@@ -249,12 +273,20 @@ export class UmbPropertyEditorUIBlockListElement
 					<umb-block-list-entry
 						.contentKey=${layoutEntry.contentKey}
 						.layout=${layoutEntry}
-						?readonly=${this.readonly}
 						${umbDestroyOnDisconnect()}>
 					</umb-block-list-entry>
 				`,
 			)}
-			<uui-button-group> ${this.#renderCreateButton()} ${this.#renderPasteButton()} </uui-button-group>`;
+			${this.#renderCreateButtonGroup()}
+		`;
+	}
+
+	#renderCreateButtonGroup() {
+		if (this.readonly && this._layouts.length > 0) {
+			return nothing;
+		} else {
+			return html` <uui-button-group> ${this.#renderCreateButton()} ${this.#renderPasteButton()} </uui-button-group> `;
+		}
 	}
 
 	#renderInlineCreateButton(index: number) {
@@ -265,8 +297,6 @@ export class UmbPropertyEditorUIBlockListElement
 	}
 
 	#renderCreateButton() {
-		if (this.readonly) return nothing;
-
 		let createPath: string | undefined;
 		if (this._blocks?.length === 1) {
 			const elementKey = this._blocks[0].contentElementTypeKey;
@@ -276,17 +306,21 @@ export class UmbPropertyEditorUIBlockListElement
 			createPath = this._catalogueRouteBuilder?.({ view: 'create', index: -1 });
 		}
 		return html`
-			<uui-button look="placeholder" label=${this._createButtonLabel} href=${createPath ?? ''}></uui-button>
+			<uui-button
+				look="placeholder"
+				label=${this._createButtonLabel}
+				href=${createPath ?? ''}
+				?disabled=${this.readonly}></uui-button>
 		`;
 	}
 
 	#renderPasteButton() {
-		if (this.readonly) return nothing;
 		return html`
 			<uui-button
 				label=${this.localize.term('content_createFromClipboard')}
 				look="placeholder"
-				href=${this._catalogueRouteBuilder?.({ view: 'clipboard', index: -1 }) ?? ''}>
+				href=${this._catalogueRouteBuilder?.({ view: 'clipboard', index: -1 }) ?? ''}
+				?disabled=${this.readonly}>
 				<uui-icon name="icon-paste-in"></uui-icon>
 			</uui-button>
 		`;

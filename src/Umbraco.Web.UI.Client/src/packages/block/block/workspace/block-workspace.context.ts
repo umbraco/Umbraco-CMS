@@ -25,8 +25,8 @@ import {
 	type UmbBlockWorkspaceData,
 	UMB_BLOCK_ENTRY_CONTEXT,
 } from '@umbraco-cms/backoffice/block';
-import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
@@ -117,6 +117,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				'observeBlockType',
 			);
 
+			this.removeUmbControllerByAlias('observeHasExpose');
 			this.observe(
 				this.contentKey,
 				(contentKey) => {
@@ -132,23 +133,11 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				},
 				'observeContentKey',
 			);
-		}).asPromise();
 
-		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
-			this.#blockEntries = context;
-		}).asPromise();
-
-		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
-			this.#name.setValue(context.getName());
-		});
-
-		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			// TODO: Ideally we move this into the Block Manager [NL] To avoid binding the Block Manager to a Property...
-			// If the current property is readonly all inner block content should also be readonly.
 			this.observe(
-				observeMultiple([context.isReadOnly, this.variantId]),
+				observeMultiple([manager.readOnlyState.isReadOnly, this.variantId]),
 				([isReadOnly, variantId]) => {
-					const unique = 'UMB_PROPERTY_CONTEXT';
+					const unique = 'UMB_BLOCK_MANAGER_CONTEXT';
 					if (variantId === undefined) return;
 
 					if (isReadOnly) {
@@ -165,6 +154,14 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				},
 				'observeIsReadOnly',
 			);
+		});
+
+		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
+			this.#blockEntries = context;
+		}).asPromise();
+
+		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
+			this.#name.setValue(context.getName());
 		});
 
 		this.observe(this.variantId, (variantId) => {
