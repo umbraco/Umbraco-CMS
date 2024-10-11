@@ -1,5 +1,5 @@
 import type { UmbEditableMediaCollectionItemModel } from '../../../types.js';
-import { css, customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import type { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
@@ -24,7 +24,7 @@ export class UmbMediaTableColumnNameElement extends UmbLitElement implements Umb
 			<uui-button
 				compact
 				href=${this.value.editPath}
-				label=${this.value.item.name}
+				label=${ifDefined(this.value.item.name)}
 				@click=${this.#onClick}></uui-button>
 		`;
 	}

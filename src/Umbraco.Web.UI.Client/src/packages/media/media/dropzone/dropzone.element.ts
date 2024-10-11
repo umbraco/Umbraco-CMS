@@ -26,14 +26,14 @@ export class UmbDropzoneElement extends UmbLitElement {
 		return this._disableFolderUpload;
 	}
 	public set disableFolderUpload(isAllowed: boolean) {
-		this.dropzoneManager.setIsFoldersAllowed(!isAllowed);
+		this.#dropzoneManager.setIsFoldersAllowed(!isAllowed);
 	}
 	private readonly _disableFolderUpload = false;
 
 	@state()
 	private _progressItems: Array<UmbUploadableItem> = [];
 
-	public dropzoneManager: UmbDropzoneManager;
+	#dropzoneManager: UmbDropzoneManager;
 
 	/**
 	 * @deprecated Please use `getItems()` instead; this method will be removed in Umbraco 17.
@@ -47,6 +47,9 @@ export class UmbDropzoneElement extends UmbLitElement {
 		return this._progressItems;
 	}
 
+	public progressItems = () => this.#dropzoneManager.progressItems;
+	public progress = () => this.#dropzoneManager.progress;
+
 	public browse() {
 		if (this.disabled) return;
 		const element = this.shadowRoot?.querySelector('#dropzone') as UUIFileDropzoneElement;
@@ -55,15 +58,34 @@ export class UmbDropzoneElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.dropzoneManager = new UmbDropzoneManager(this);
+		this.#dropzoneManager = new UmbDropzoneManager(this);
 		document.addEventListener('dragenter', this.#handleDragEnter.bind(this));
 		document.addEventListener('dragleave', this.#handleDragLeave.bind(this));
 		document.addEventListener('drop', this.#handleDrop.bind(this));
+
+		this.observe(
+			this.#dropzoneManager.progress,
+			(progress) =>
+				this.dispatchEvent(new ProgressEvent('progress', { loaded: progress.completed, total: progress.total })),
+			'_observeProgress',
+		);
+
+		this.observe(
+			this.#dropzoneManager.progressItems,
+			(progressItems: Array<UmbUploadableItem>) => {
+				this._progressItems = progressItems;
+				const waiting = progressItems.find((item) => item.status === UmbFileDropzoneItemStatus.WAITING);
+				if (progressItems.length && !waiting) {
+					this.dispatchEvent(new CustomEvent('complete', { detail: progressItems }));
+				}
+			},
+			'_observeProgressItems',
+		);
 	}
 
 	override disconnectedCallback(): void {
 		super.disconnectedCallback();
-		this.dropzoneManager.destroy();
+		this.#dropzoneManager.destroy();
 		document.removeEventListener('dragenter', this.#handleDragEnter.bind(this));
 		document.removeEventListener('dragleave', this.#handleDragLeave.bind(this));
 		document.removeEventListener('drop', this.#handleDrop.bind(this));
@@ -93,28 +115,12 @@ export class UmbDropzoneElement extends UmbLitElement {
 		if (this.disabled) return;
 		if (!event.detail.files.length && !event.detail.folders.length) return;
 
-		// TODO Create some placeholder items while files are being uploaded? Could update them as they get completed.
-		// We can observe progressItems and check for any files that did not succeed, then show some kind of dialog to the user with the information.
-
-		this.observe(
-			this.dropzoneManager.progress,
-			(progress) =>
-				this.dispatchEvent(new ProgressEvent('progress', { loaded: progress.completed, total: progress.total })),
-			'_observeProgress',
-		);
-
-		this.observe(this.dropzoneManager.progressItems, (progressItems: Array<UmbUploadableItem>) => {
-			this._progressItems = progressItems;
-			const waiting = progressItems.find((item) => item.status === UmbFileDropzoneItemStatus.WAITING);
-			if (progressItems.length && !waiting) {
-				this.dispatchEvent(new CustomEvent('complete', { detail: progressItems }));
-			}
-		});
-
 		if (this.createAsTemporary) {
-			this.dropzoneManager.createTemporaryFiles(event.detail.files);
+			const uploadable = this.#dropzoneManager.createTemporaryFiles(event.detail.files);
+			this.dispatchEvent(new CustomEvent('submitted', { detail: await uploadable }));
 		} else {
-			this.dropzoneManager.createMediaItems(event.detail, this.parentUnique);
+			const uploadable = this.#dropzoneManager.createMediaItems(event.detail, this.parentUnique);
+			this.dispatchEvent(new CustomEvent('submitted', { detail: await uploadable }));
 		}
 	}
 
