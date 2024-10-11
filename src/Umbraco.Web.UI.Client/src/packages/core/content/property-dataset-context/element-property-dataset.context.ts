@@ -82,6 +82,7 @@ export abstract class UmbElementPropertyDatasetContext<
 		this.observe(
 			this._dataOwner.structure.contentTypeProperties,
 			(props: UmbPropertyTypeModel[]) => {
+				console.log('props', props);
 				const map = props.map((prop) => ({ alias: prop.alias, variantId: this.#createPropertyVariantId(prop) }));
 				this.#propertyVariantIdMap.setValue(map);
 				// Resolve promise, to let the once waiting on this know.
@@ -166,11 +167,14 @@ export abstract class UmbElementPropertyDatasetContext<
 	): Promise<Observable<ReturnType | undefined> | undefined> {
 		await this._dataOwner.isLoaded();
 		await this.#propertyVariantIdPromise;
-		const propVariantId = this.#propertyVariantIdMap.getValue().find((x) => x.alias === propertyAlias);
-		if (propVariantId) {
-			return this._dataOwner.propertyValueByAlias<ReturnType>(propertyAlias, propVariantId.variantId);
-		}
-		return;
+		return mergeObservables(
+			[await this.propertyVariantId(propertyAlias), this._dataOwner.values],
+			([variantId, values]) => {
+				return variantId
+					? (values?.find((x) => x?.alias === propertyAlias && variantId.compare(x))?.value as ReturnType)
+					: undefined;
+			},
+		);
 	}
 
 	// TODO: Refactor: Not used currently, but should investigate if we can implement this, to spare some energy.
@@ -203,9 +207,9 @@ export abstract class UmbElementPropertyDatasetContext<
 	async setPropertyValue(propertyAlias: string, value: PromiseLike<unknown>) {
 		this._dataOwner.initiatePropertyValueChange();
 		await this.#propertyVariantIdPromise;
-		const propVariantId = this.#propertyVariantIdMap.getValue().find((x) => x.alias === propertyAlias);
+		const propVariantId = this.#propertyVariantIdMap.getValue().find((x) => x.alias === propertyAlias)?.variantId;
 		if (propVariantId) {
-			return this._dataOwner.setPropertyValue(propertyAlias, await value, propVariantId.variantId);
+			await this._dataOwner.setPropertyValue(propertyAlias, await value, propVariantId);
 		}
 		this._dataOwner.finishPropertyValueChange();
 	}
@@ -213,5 +217,6 @@ export abstract class UmbElementPropertyDatasetContext<
 	override destroy() {
 		super.destroy();
 		this.#propertyVariantIdMap.destroy();
+		(this.#propertyVariantIdMap as unknown) = undefined;
 	}
 }
