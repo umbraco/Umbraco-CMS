@@ -12,7 +12,7 @@ const meta: Meta<UmbLocalizeElement> = {
 	argTypes: {
 		args: {
 			control: {
-				type: 'array',
+				type: 'array' as any,
 			},
 		},
 	},
