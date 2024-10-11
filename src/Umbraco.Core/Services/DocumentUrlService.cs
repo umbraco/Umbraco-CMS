@@ -33,6 +33,7 @@ public class DocumentUrlService : IDocumentUrlService
     private readonly IIdKeyMap _idKeyMap;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private readonly IDomainService _domainService;
+    private readonly IPublishStatusQueryService _publishStatusQueryService;
 
     private readonly ConcurrentDictionary<string, PublishedDocumentUrlSegment> _cache = new();
     private bool _isInitialized = false;
@@ -50,7 +51,8 @@ public class DocumentUrlService : IDocumentUrlService
         IKeyValueService keyValueService,
         IIdKeyMap idKeyMap,
         IDocumentNavigationQueryService documentNavigationQueryService,
-        IDomainService domainService)
+        IDomainService domainService,
+        IPublishStatusQueryService publishStatusQueryService)
     {
         _logger = logger;
         _documentUrlRepository = documentUrlRepository;
@@ -65,6 +67,7 @@ public class DocumentUrlService : IDocumentUrlService
         _idKeyMap = idKeyMap;
         _documentNavigationQueryService = documentNavigationQueryService;
         _domainService = domainService;
+        _publishStatusQueryService = publishStatusQueryService;
     }
 
     public async Task InitAsync(bool forceEmpty, CancellationToken cancellationToken)
@@ -413,18 +416,7 @@ public class DocumentUrlService : IDocumentUrlService
         return runnerKey;
     }
 
-    private bool IsContentPublished(Guid contentKey, string culture)
-    {
-        // TODO: This is not the best way to check if a content is published. We should have a better way to do this.
-        IContent? content = _contentService.GetById(contentKey);
-        if (content is null)
-        {
-            return false;
-        }
-        var variesByCulture = content.ContentType.VariesByCulture();
-        return (content.Published && variesByCulture is false) || (variesByCulture && content.PublishedCultures.Contains(culture));
-
-    }
+    private bool IsContentPublished(Guid contentKey, string culture) => _publishStatusQueryService.IsDocumentPublished(contentKey, culture);
 
     public string GetLegacyRouteFormat(Guid docuemntKey, string? culture, bool isDraft)
     {
