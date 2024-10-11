@@ -1,6 +1,6 @@
 import type { UmbPropertyEditorUIPickerModalElement } from './property-editor-ui-picker-modal.element.js';
 import type { UmbPropertyEditorUIPickerModalValue } from './property-editor-ui-picker-modal.token.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-picker-modal.element.js';
@@ -14,6 +14,6 @@ export default {
 
 const data: UmbPropertyEditorUIPickerModalValue = { selection: [] };
 
-export const Overview: Story<UmbPropertyEditorUIPickerModalElement> = () => html`
+export const Overview: StoryFn<UmbPropertyEditorUIPickerModalElement> = () => html`
 	<umb-property-editor-ui-picker-modal .value=${data as any}></umb-property-editor-ui-picker-modal>
 `;

@@ -171,7 +171,10 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	private _canCreate?: boolean;
 
 	@state()
-	private _singleBlockTypeName?: string;
+	private _createLabel?: string;
+
+	@state()
+	private _configCreateLabel?: string;
 
 	@state()
 	private _styleElement?: HTMLLinkElement;
@@ -204,12 +207,13 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 					this.observe(
 						this.#context.firstAllowedBlockTypeName(),
 						(firstAllowedName) => {
-							this._singleBlockTypeName = firstAllowedName;
+							this._createLabel = this.localize.term('blockEditor_addThis', this.localize.string(firstAllowedName));
 						},
 						'observeSingleBlockTypeName',
 					);
 				} else {
 					this.removeUmbControllerByAlias('observeSingleBlockTypeName');
+					this._createLabel = this.localize.term('blockEditor_addBlock');
 				}
 			},
 			null,
@@ -248,6 +252,20 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				(isReadOnly) => (this._isReadOnly = isReadOnly),
 				'observeIsReadOnly',
 			);
+
+			if (this.areaKey) {
+				this.observe(
+					this.#context.areaTypeCreateLabel,
+					(label) => (this._configCreateLabel = label),
+					'observeConfigCreateLabel',
+				);
+			} else {
+				this.observe(
+					manager.editorConfigurationPart((x) => x?.find((y) => y.alias === 'createLabel')?.value),
+					(label) => (this._configCreateLabel = label as string | undefined),
+					'observeConfigCreateLabel',
+				);
+			}
 		});
 
 		new UmbFormControlValidator(this, this /*, this.#dataPath*/);
@@ -364,9 +382,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 		return html`
 			<uui-button
 				look="placeholder"
-				label=${this._singleBlockTypeName
-					? this.localize.term('blockEditor_addThis', [this._singleBlockTypeName])
-					: this.localize.term('blockEditor_addBlock')}
+				label=${this._configCreateLabel ?? this._createLabel ?? ''}
 				href=${this.#context.getPathForCreateBlock(-1) ?? ''}
 				?disabled=${this._isReadOnly}></uui-button>
 		`;

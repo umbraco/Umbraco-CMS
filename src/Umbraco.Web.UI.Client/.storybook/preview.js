@@ -116,7 +116,6 @@ export const parameters = {
 			],
 		},
 	},
-	actions: { argTypesRegex: '^on.*' },
 	controls: {
 		expanded: true,
 		matchers: {
@@ -140,3 +139,4 @@ export const parameters = {
 };
 
 setCustomElements(customElementManifests);
+export const tags = ['autodocs'];

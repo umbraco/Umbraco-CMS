@@ -1,5 +1,5 @@
 import type { UmbDashboardPerformanceProfilingElement } from './dashboard-performance-profiling.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './dashboard-performance-profiling.element.js';
@@ -10,6 +10,6 @@ export default {
 	id: 'umb-dashboard-performance-profiling',
 } as Meta;
 
-export const AAAOverview: Story<UmbDashboardPerformanceProfilingElement> = () =>
+export const AAAOverview: StoryFn<UmbDashboardPerformanceProfilingElement> = () =>
 	html` <umb-dashboard-performance-profiling></umb-dashboard-performance-profiling>`;
 AAAOverview.storyName = 'Overview';

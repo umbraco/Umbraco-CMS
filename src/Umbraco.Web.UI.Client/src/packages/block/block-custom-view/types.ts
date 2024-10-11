@@ -16,7 +16,7 @@ export interface UmbBlockEditorCustomViewProperties<
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 > {
 	manifest?: ManifestBlockEditorCustomView;
-	config?: Partial<UmbBlockEditorCustomViewConfiguration>;
+	config?: UmbBlockEditorCustomViewConfiguration;
 	blockType?: BlockType;
 	contentKey?: string;
 	label?: string;

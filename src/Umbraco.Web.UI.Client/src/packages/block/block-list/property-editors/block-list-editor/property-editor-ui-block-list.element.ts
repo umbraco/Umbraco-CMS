@@ -43,15 +43,14 @@ export class UmbPropertyEditorUIBlockListElement
 	extends UmbFormControlMixin<UmbBlockListValueModel | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
-	//
-	#sorter = new UmbSorterController<UmbBlockListLayoutModel, UmbBlockListEntryElement>(this, {
+	readonly #sorter = new UmbSorterController<UmbBlockListLayoutModel, UmbBlockListEntryElement>(this, {
 		...SORTER_CONFIG,
 		onChange: ({ model }) => {
 			this.#entriesContext.setLayouts(model);
 		},
 	});
 
-	#validationContext = new UmbValidationContext(this);
+	readonly #validationContext = new UmbValidationContext(this);
 	#contentDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 	#settingsDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 
@@ -106,11 +105,11 @@ export class UmbPropertyEditorUIBlockListElement
 
 		const customCreateButtonLabel = config.getValueByAlias<string>('createLabel');
 		if (customCreateButtonLabel) {
-			this._createButtonLabel = customCreateButtonLabel;
+			this._createButtonLabel = this.localize.string(customCreateButtonLabel);
 		} else if (blocks.length === 1) {
 			this.#managerContext.contentTypesLoaded.then(() => {
 				const firstContentTypeName = this.#managerContext.getContentTypeNameOf(blocks[0].contentElementTypeKey);
-				this._createButtonLabel = `${this.localize.term('general_add')} ${firstContentTypeName}`;
+				this._createButtonLabel = this.localize.term('blockEditor_addThis', this.localize.string(firstContentTypeName));
 			});
 		}
 	}
@@ -122,9 +121,6 @@ export class UmbPropertyEditorUIBlockListElement
 	 * @default
 	 */
 	@property({ type: Boolean, reflect: true })
-	public get readonly() {
-		return this.#readonly;
-	}
 	public set readonly(value) {
 		this.#readonly = value;
 
@@ -133,6 +129,9 @@ export class UmbPropertyEditorUIBlockListElement
 		} else {
 			this.#sorter.enable();
 		}
+	}
+	public get readonly() {
+		return this.#readonly;
 	}
 	#readonly = false;
 
@@ -150,8 +149,8 @@ export class UmbPropertyEditorUIBlockListElement
 	@state()
 	private _catalogueRouteBuilder?: UmbModalRouteBuilder;
 
-	#managerContext = new UmbBlockListManagerContext(this);
-	#entriesContext = new UmbBlockListEntriesContext(this);
+	readonly #managerContext = new UmbBlockListManagerContext(this);
+	readonly #entriesContext = new UmbBlockListEntriesContext(this);
 
 	constructor() {
 		super();
@@ -306,7 +305,6 @@ export class UmbPropertyEditorUIBlockListElement
 		} else {
 			createPath = this._catalogueRouteBuilder?.({ view: 'create', index: -1 });
 		}
-
 		return html`
 			<uui-button
 				look="placeholder"
@@ -328,7 +326,7 @@ export class UmbPropertyEditorUIBlockListElement
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 
 		css`

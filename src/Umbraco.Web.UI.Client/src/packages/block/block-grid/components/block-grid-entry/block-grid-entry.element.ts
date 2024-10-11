@@ -136,7 +136,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.#context.showContentEdit,
 			(showContentEdit) => {
 				this._showContentEdit = showContentEdit;
-				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showContentEdit } });
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showContentEdit } });
 			},
 			null,
 		);
@@ -144,7 +144,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.#context.settingsElementTypeKey,
 			(key) => {
 				this._hasSettings = !!key;
-				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showSettingsEdit: !!key } });
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showSettingsEdit: !!key } });
 			},
 			null,
 		);
@@ -248,7 +248,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.#context.workspaceEditContentPath,
 			(path) => {
 				this._workspaceEditContentPath = path;
-				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editContentPath: path } });
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editContentPath: path } });
 			},
 			null,
 		);
@@ -256,7 +256,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.#context.workspaceEditSettingsPath,
 			(path) => {
 				this._workspaceEditSettingsPath = path;
-				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editSettingsPath: path } });
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editSettingsPath: path } });
 			},
 			null,
 		);
@@ -398,6 +398,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			.label=${this._label}
 			.icon=${this._icon}
 			.unpublished=${!this._exposed}
+			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
 			.settings=${this._blockViewProps.settings}></umb-block-grid-block-inline>`;
 	}
@@ -408,6 +409,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			.label=${this._label}
 			.icon=${this._icon}
 			.unpublished=${!this._exposed}
+			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
 			.settings=${this._blockViewProps.settings}></umb-block-grid-block>`;
 	}
