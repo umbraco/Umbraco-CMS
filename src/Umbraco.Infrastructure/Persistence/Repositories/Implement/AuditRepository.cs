@@ -14,9 +14,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRepository
 {
+    private readonly ICollection<int> _cachedUserIds;
     public AuditRepository(IScopeAccessor scopeAccessor, ILogger<AuditRepository> logger)
         : base(scopeAccessor, AppCaches.NoCache, logger)
     {
+        _cachedUserIds = new List<int>();
     }
 
     public IEnumerable<IAuditItem> Get(AuditType type, IQuery<IAuditItem> query)
@@ -69,10 +71,7 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
         AuditType[]? auditTypeFilter,
         IQuery<IAuditItem>? customFilter)
     {
-        if (auditTypeFilter == null)
-        {
-            auditTypeFilter = Array.Empty<AuditType>();
-        }
+        auditTypeFilter ??= Array.Empty<AuditType>();
 
         Sql<ISqlContext> sql = GetBaseQuery(false);
 
@@ -187,4 +186,17 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
     protected override string GetBaseWhereClause() => "id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses() => throw new NotImplementedException();
+
+    public override void Save(IAuditItem entity)
+    {
+        if (!_cachedUserIds.Any(x => x == entity.UserId))
+        {
+
+            int? userIdQueryResult = Database.FirstOrDefault<int?>(
+            " select id from umbracoUser where " + GetBaseWhereClause(),
+            new { id = entity.UserId }) ?? throw new InvalidOperationException("The user id does not exist");
+            _cachedUserIds.Add(userIdQueryResult.Value);
+        }
+        base.Save(entity);
+    }
 }
