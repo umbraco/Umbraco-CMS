@@ -154,6 +154,7 @@ export default {
 		scheduledPublishServerTime: '这将转换到服务器上的以下时间:',
 		scheduledPublishDocumentation:
 			'<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">这是什么意思？</a>',
+		saveModalTitle: '保存',
 	},
 	media: {
 		clickToUpload: '点击上传',

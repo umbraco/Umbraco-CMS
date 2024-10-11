@@ -300,6 +300,7 @@ export default {
 		createEmpty: 'Create new',
 		createFromClipboard: 'Paste from clipboard',
 		nodeIsInTrash: 'This item is in the Recycle Bin',
+		saveModalTitle: 'Uložit',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Vytvořit novou šablonu obsahu z <em>%0%</em>',

@@ -331,6 +331,7 @@ export default {
 		createEmpty: 'Crea nuovo/a',
 		createFromClipboard: 'Incolla dagli appunti',
 		nodeIsInTrash: 'Questo articolo è nel cestino',
+		saveModalTitle: 'Salva',
 	},
 	blueprints: {
 		createBlueprintFrom: "Crea un nuovo modello di contenuto da '%0%'",
