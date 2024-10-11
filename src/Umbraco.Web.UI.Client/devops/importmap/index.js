@@ -8,14 +8,14 @@ export const createImportMap = (args) => {
 	// Iterate over the exports in package.json
 	for (const [key, value] of Object.entries(packageJsonExports || {})) {
 		// remove leading ./
-		if (value) {
+		if (value && value.endsWith('.js')) {
 			const moduleName = key.replace(/^\.\//, '');
 
 			// replace ./dist-cms with src and remove /index.js
 			let modulePath = value;
 			if (typeof args.rootDir !== 'undefined') modulePath = modulePath.replace(/^\.\/dist-cms/, args.rootDir);
 			if (args.replaceModuleExtensions) modulePath = modulePath.replace('.js', '.ts');
-			console.log('replacing', value, 'with', modulePath)
+			console.log('replacing', value, 'with', modulePath);
 			const importAlias = `${packageJsonName}/${moduleName}`;
 
 			imports[importAlias] = modulePath;

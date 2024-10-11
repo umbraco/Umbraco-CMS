@@ -13,7 +13,7 @@ import {
 	mergeObservables,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
-import { encodeFilePath } from '@umbraco-cms/backoffice/utils';
+import { encodeFilePath, UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type {
 	UmbContentTypeModel,
@@ -50,6 +50,8 @@ export abstract class UmbBlockEntryContext<
 
 	#hasExpose = new UmbBooleanState(undefined);
 	hasExpose = this.#hasExpose.asObservable();
+
+	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
 
 	// Workspace alike methods, to enables editing of data without the need of a workspace (Custom views and block grid inline editing mode for example).
 	getEntityType() {
@@ -122,6 +124,9 @@ export abstract class UmbBlockEntryContext<
 			this.#contentStructurePromiseResolve = undefined;
 		};
 	});
+
+	#contentStructureHasProperties = new UmbBooleanState(undefined);
+	_contentStructureHasProperties = this.#contentStructureHasProperties.asObservable();
 
 	#settingsStructure?: UmbContentTypeStructureManager;
 	#settingsStructurePromiseResolve?: () => void;
@@ -423,6 +428,7 @@ export abstract class UmbBlockEntryContext<
 		this.#observeBlockType();
 		this.#observeContentData();
 		this.#observeSettingsData();
+		this.#observeReadOnlyState();
 	}
 
 	abstract _gotManager(): void;
@@ -505,6 +511,31 @@ export abstract class UmbBlockEntryContext<
 		);
 	}
 
+	#observeReadOnlyState() {
+		if (!this._manager) return;
+
+		this.observe(
+			observeMultiple([this._manager.readOnlyState.isReadOnly, this._manager.variantId]),
+			([isReadOnly, variantId]) => {
+				const unique = 'UMB_BLOCK_MANAGER_CONTEXT';
+				if (variantId === undefined) return;
+
+				if (isReadOnly) {
+					const state = {
+						unique,
+						variantId,
+						message: '',
+					};
+
+					this.readOnlyState?.addState(state);
+				} else {
+					this.readOnlyState?.removeState(unique);
+				}
+			},
+			'observeIsReadOnly',
+		);
+	}
+
 	#getContentStructure() {
 		if (!this._manager) return;
 
@@ -526,6 +557,14 @@ export abstract class UmbBlockEntryContext<
 				this._gotContentType(contentType);
 			},
 			'observeContentElementType',
+		);
+
+		this.observe(
+			this.#contentStructure?.contentTypeHasProperties,
+			(has) => {
+				this.#contentStructureHasProperties.setValue(has);
+			},
+			'observeContentTypeHasProperties',
 		);
 	}
 

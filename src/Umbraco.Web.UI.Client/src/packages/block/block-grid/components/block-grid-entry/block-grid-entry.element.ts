@@ -125,6 +125,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.requestUpdate('_blockViewProps');
 	}
 
+	@state()
+	private _isReadOnly = false;
+
 	constructor() {
 		super();
 
@@ -133,7 +136,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.#context.showContentEdit,
 			(showContentEdit) => {
 				this._showContentEdit = showContentEdit;
-				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showContentEdit } });
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showContentEdit } });
 			},
 			null,
 		);
@@ -141,7 +144,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.#context.settingsElementTypeKey,
 			(key) => {
 				this._hasSettings = !!key;
-				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showSettingsEdit: !!key } });
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showSettingsEdit: !!key } });
 			},
 			null,
 		);
@@ -245,7 +248,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.#context.workspaceEditContentPath,
 			(path) => {
 				this._workspaceEditContentPath = path;
-				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editContentPath: path } });
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editContentPath: path } });
 			},
 			null,
 		);
@@ -253,9 +256,15 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.#context.workspaceEditSettingsPath,
 			(path) => {
 				this._workspaceEditSettingsPath = path;
-				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editSettingsPath: path } });
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editSettingsPath: path } });
 			},
 			null,
+		);
+
+		this.observe(
+			this.#context.readOnlyState.isReadOnly,
+			(isReadOnly) => (this._isReadOnly = isReadOnly),
+			'umbReadonlyObserver',
 		);
 	}
 
@@ -389,6 +398,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			.label=${this._label}
 			.icon=${this._icon}
 			.unpublished=${!this._exposed}
+			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
 			.settings=${this._blockViewProps.settings}></umb-block-grid-block-inline>`;
 	}
@@ -399,6 +409,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			.label=${this._label}
 			.icon=${this._icon}
 			.unpublished=${!this._exposed}
+			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
 			.settings=${this._blockViewProps.settings}></umb-block-grid-block>`;
 	}
@@ -406,14 +417,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	#renderBlock() {
 		return this.contentKey && this._contentTypeAlias
 			? html`
-					${this._createBeforePath && this._showInlineCreateBefore
-						? html`<uui-button-inline-create
-								href=${this._createBeforePath}
-								label=${this.localize.term('blockEditor_addBlock')}
-								style=${this._inlineCreateAboveWidth
-									? `width: ${this._inlineCreateAboveWidth}`
-									: ''}></uui-button-inline-create>`
-						: nothing}
+					${this.#renderCreateBeforeInlineButton()}
 					<div class="umb-block-grid__block" part="umb-block-grid__block">
 						<umb-extension-slot
 							.filter=${this.#extensionSlotFilterMethod}
@@ -424,36 +428,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 							single
 							>${this._inlineEditingMode ? this.#renderInlineEditBlock() : this.#renderRefBlock()}</umb-extension-slot
 						>
-						<uui-action-bar>
-							${this._showContentEdit && this._workspaceEditContentPath
-								? html`<uui-button
-										label="edit"
-										look="secondary"
-										color=${this._contentInvalid ? 'danger' : ''}
-										href=${this._workspaceEditContentPath}>
-										<uui-icon name="icon-edit"></uui-icon>
-										${this._contentInvalid
-											? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
-											: nothing}
-									</uui-button>`
-								: nothing}
-							${this._hasSettings && this._workspaceEditSettingsPath
-								? html`<uui-button
-										label="Edit settings"
-										look="secondary"
-										color=${this._settingsInvalid ? 'danger' : ''}
-										href=${this._workspaceEditSettingsPath}>
-										<uui-icon name="icon-settings"></uui-icon>
-										${this._settingsInvalid
-											? html`<uui-badge attention color="danger" label="Invalid settings">!</uui-badge>`
-											: nothing}
-									</uui-button>`
-								: nothing}
-							<uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()}>
-								<uui-icon name="icon-remove"></uui-icon>
-							</uui-button>
-						</uui-action-bar>
-
+						${this.#renderActionBar()}
 						${!this._showContentEdit && this._contentInvalid
 							? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
 							: nothing}
@@ -464,14 +439,86 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 								</umb-block-scale-handler>`
 							: nothing}
 					</div>
-					${this._createAfterPath && this._showInlineCreateAfter
-						? html`<uui-button-inline-create
-								vertical
-								label=${this.localize.term('blockEditor_addBlock')}
-								href=${this._createAfterPath}></uui-button-inline-create>`
-						: nothing}
+					${this.#renderCreateAfterInlineButton()}
 				`
 			: nothing;
+	}
+
+	#renderCreateBeforeInlineButton() {
+		if (this._isReadOnly) return nothing;
+		if (!this._createBeforePath) return nothing;
+		if (!this._showInlineCreateBefore) return nothing;
+
+		return html`<uui-button-inline-create
+			href=${this._createBeforePath}
+			label=${this.localize.term('blockEditor_addBlock')}
+			style=${this._inlineCreateAboveWidth
+				? `width: ${this._inlineCreateAboveWidth}`
+				: ''}></uui-button-inline-create>`;
+	}
+
+	#renderCreateAfterInlineButton() {
+		if (this._isReadOnly) return nothing;
+		if (!this._createAfterPath) return nothing;
+		if (!this._showInlineCreateAfter) return nothing;
+
+		return html`
+			<uui-button-inline-create
+				vertical
+				label=${this.localize.term('blockEditor_addBlock')}
+				href=${this._createAfterPath}></uui-button-inline-create>
+		`;
+	}
+
+	#renderActionBar() {
+		return html`
+			<uui-action-bar>
+				${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderDeleteAction()}</uui-action-bar
+			>
+		`;
+	}
+
+	#renderEditAction() {
+		return html`
+			${this._showContentEdit && this._workspaceEditContentPath
+				? html`<uui-button
+						label="edit"
+						look="secondary"
+						color=${this._contentInvalid ? 'danger' : ''}
+						href=${this._workspaceEditContentPath}>
+						<uui-icon name="icon-edit"></uui-icon>
+						${this._contentInvalid
+							? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+							: nothing}
+					</uui-button>`
+				: nothing}
+		`;
+	}
+
+	#renderEditSettingsAction() {
+		return html`
+			${this._hasSettings && this._workspaceEditSettingsPath
+				? html`<uui-button
+						label="Edit settings"
+						look="secondary"
+						color=${this._settingsInvalid ? 'danger' : ''}
+						href=${this._workspaceEditSettingsPath}>
+						<uui-icon name="icon-settings"></uui-icon>
+						${this._settingsInvalid
+							? html`<uui-badge attention color="danger" label="Invalid settings">!</uui-badge>`
+							: nothing}
+					</uui-button>`
+				: nothing}
+		`;
+	}
+
+	#renderDeleteAction() {
+		if (this._isReadOnly) return nothing;
+		return html`
+			<uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()}>
+				<uui-icon name="icon-remove"></uui-icon>
+			</uui-button>
+		`;
 	}
 
 	override render() {

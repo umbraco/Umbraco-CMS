@@ -178,7 +178,18 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 		return new Intl.RelativeTimeFormat(this.lang(), options).format(value, unit);
 	}
 
-	string(text: string): string {
+	/**
+	 * Translates a string containing one or more terms. The terms should be prefixed with a `#` character.
+	 * If the term is found in the localization set, it will be replaced with the localized term.
+	 * If the term is not found, the original term will be returned.
+	 * @param {string} text The text to translate.
+	 * @returns {string} The translated text.
+	 */
+	string(text: unknown): string {
+		if (typeof text !== 'string') {
+			return '';
+		}
+
 		// find all words starting with #
 		const regex = /#\w+/g;
 

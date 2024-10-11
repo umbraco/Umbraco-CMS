@@ -1,4 +1,5 @@
 import type { UmbMediaCollectionFilterModel, UmbMediaCollectionItemModel } from '../types.js';
+import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { DirectionModel, MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { MediaCollectionResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -32,7 +33,7 @@ export class UmbMediaCollectionServerDataSource implements UmbCollectionDataSour
 
 				const model: UmbMediaCollectionItemModel = {
 					unique: item.id,
-					entityType: 'media',
+					entityType: UMB_MEDIA_ENTITY_TYPE,
 					contentTypeAlias: item.mediaType.alias,
 					createDate: new Date(variant.createDate),
 					creator: item.creator,

@@ -11,11 +11,10 @@ import { UUICardEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-block-type-card')
 export class UmbBlockTypeCardElement extends UmbLitElement {
-	//
-	#init: Promise<void>;
+	readonly #init: Promise<void>;
 	#appUrl: string = '';
 
-	#itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
+	readonly #itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
 		this,
 		UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
 		(x) => x.unique,
@@ -51,9 +50,6 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 	// TODO: support custom icon/image file
 
 	@property({ type: String, attribute: false })
-	public get contentElementTypeKey(): string | undefined {
-		return this._elementTypeKey;
-	}
 	public set contentElementTypeKey(value: string | undefined) {
 		this._elementTypeKey = value;
 		if (value) {
@@ -62,10 +58,13 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 			this.#itemManager.setUniques([]);
 		}
 	}
-	private _elementTypeKey?: string | undefined;
+	public get contentElementTypeKey(): string | undefined {
+		return this._elementTypeKey;
+	}
+	private _elementTypeKey?: string;
 
 	@state()
-	_name?: string;
+	_name = '';
 
 	@state()
 	_description?: string;
@@ -84,13 +83,13 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 			const item = items[0];
 			if (item) {
 				this._fallbackIcon = item.icon;
-				this._name = item.name;
-				this._description = item.description ?? undefined;
+				this._name = item.name ? this.localize.string(item.name) : this.localize.term('general_unknown');
+				this._description = this.localize.string(item.description);
 			}
 		});
 	}
 
-	#onOpen = () => {
+	readonly #onOpen = () => {
 		this.dispatchEvent(new UUICardEvent(UUICardEvent.OPEN));
 	};
 
@@ -100,7 +99,7 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 			<uui-card-block-type
 				href=${ifDefined(this.href)}
 				@open=${this.#onOpen}
-				.name=${this._name ?? 'Unknown'}
+				.name=${this._name}
 				.description=${this._description}
 				.background=${this.backgroundColor}>
 				${this._iconFile
