@@ -1,4 +1,4 @@
-import type { UmbPropertyValueData } from '../../property/types';
+import type { UmbPropertyValueData } from '../../property/types.js';
 
 /**
  * @function UmbObjectToPropertyValueArray

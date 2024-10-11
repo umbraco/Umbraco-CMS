@@ -1,10 +1,10 @@
+import type { ManifestMenu } from '../menu.extension.js';
 import type { ManifestSectionSidebarAppBaseMenu, ManifestSectionSidebarAppMenuKind } from './types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { ManifestMenu } from '../menu.extension.js';
 
 // TODO: Move to separate file:
 const manifest: UmbExtensionManifestKind = {

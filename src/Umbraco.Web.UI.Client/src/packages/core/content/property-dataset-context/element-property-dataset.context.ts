@@ -39,7 +39,6 @@ export abstract class UmbElementPropertyDatasetContext<
 	abstract culture: Observable<string | null | undefined>;
 	abstract segment: Observable<string | null | undefined>;
 
-	// eslint-disable-next-line no-unused-private-class-members
 	#propertyVariantIdPromise?: Promise<never>;
 	#propertyVariantIdPromiseResolver?: () => void;
 	#propertyVariantIdMap = new UmbBasicState<UmbPropertyVariantIdMapType>([]);
