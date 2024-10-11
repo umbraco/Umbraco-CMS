@@ -26,7 +26,6 @@ import {
 	UMB_BLOCK_ENTRY_CONTEXT,
 } from '@umbraco-cms/backoffice/block';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
