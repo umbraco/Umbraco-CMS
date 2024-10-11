@@ -201,6 +201,7 @@ test('can use query builder with Where statement for a template', async ({umbrac
 
   // Act
   await umbracoUi.template.goToTemplate(templateName);
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.template.addQueryBuilderWithWhereStatement(propertyAliasValue, operatorValue, constrainValue);
   // Verify that the code is shown
   await umbracoUi.template.isQueryBuilderCodeShown(expectedCode);
