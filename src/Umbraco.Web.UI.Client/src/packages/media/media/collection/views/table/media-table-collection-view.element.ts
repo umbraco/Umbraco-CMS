@@ -179,7 +179,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 			case 'updater':
 				return item.updater;
 			default:
-				return item.values.find((value) => value.alias === alias)?.value ?? '';
+				return item.values?.find((value) => value.alias === alias)?.value ?? '';
 		}
 	}
 

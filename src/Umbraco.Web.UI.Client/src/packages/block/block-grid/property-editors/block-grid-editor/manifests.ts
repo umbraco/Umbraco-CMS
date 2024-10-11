@@ -15,6 +15,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
 			icon: 'icon-layout',
 			group: 'richContent',
+			supportsReadOnly: true,
 			settings: {
 				properties: [
 					{

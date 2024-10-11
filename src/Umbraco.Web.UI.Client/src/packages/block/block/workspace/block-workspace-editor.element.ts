@@ -6,7 +6,6 @@ import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-block-workspace-editor')
 export class UmbBlockWorkspaceEditorElement extends UmbLitElement {
-	//
 	@property({ type: String, attribute: false })
 	workspaceAlias?: string;
 
@@ -19,7 +18,8 @@ export class UmbBlockWorkspaceEditorElement extends UmbLitElement {
 					context.content.structure.ownerContentTypeObservablePart((contentType) => contentType?.name),
 				]),
 				([isNew, name]) => {
-					this._headline = this.localize.term(isNew ? 'general_add' : 'general_edit') + ' ' + name;
+					this._headline =
+						this.localize.term(isNew ? 'general_add' : 'general_edit') + ' ' + this.localize.string(name);
 				},
 				'observeOwnerContentElementTypeName',
 			);
@@ -35,7 +35,7 @@ export class UmbBlockWorkspaceEditorElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -68,18 +68,20 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	/**
 	 * Uploads files and folders to the server and creates the media items with corresponding media type.\
 	 * Allows the user to pick a media type option if multiple types are allowed.
-	 * @param {UmbFileDropzoneDroppedItems} items - The files and folders to upload
-	 * @param {string | null} parentUnique - Where the items should be uploaded
+	 * @param {UmbFileDropzoneDroppedItems} items - The files and folders to upload.
+	 * @param {string | null} parentUnique - Where the items should be uploaded.
+	 * @returns {Promise<Array<UmbUploadableItem>>} - The items about to be uploaded.
 	 */
 	public async createMediaItems(items: UmbFileDropzoneDroppedItems, parentUnique: string | null = null) {
 		const uploadableItems = await this.#setupProgress(items, parentUnique);
 		if (uploadableItems.length === 1) {
 			// When there is only one item being uploaded, allow the user to pick the media type, if more than one is allowed.
-			await this.#createOneMediaItem(uploadableItems[0]);
+			this.#createOneMediaItem(uploadableItems[0]);
 		} else {
 			// When there are multiple items being uploaded, automatically pick the media types for each item. We probably want to allow the user to pick the media type in the future.
-			await this.#createMediaItems(uploadableItems);
+			this.#createMediaItems(uploadableItems);
 		}
+		return uploadableItems;
 	}
 
 	/** @deprecated Please use `createTemporaryFiles()` instead; this method will be removed in Umbraco 17. */
