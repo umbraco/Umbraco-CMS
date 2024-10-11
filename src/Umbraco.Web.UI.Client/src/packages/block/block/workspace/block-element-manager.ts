@@ -1,5 +1,6 @@
-import type { UmbBlockDataModel, UmbBlockDataValueModel } from '../types.js';
+import type { UmbBlockDataModel, UmbBlockDataValueModel, UmbBlockLayoutBaseModel } from '../types.js';
 import { UmbBlockElementPropertyDatasetContext } from './block-element-property-dataset.context.js';
+import type { UmbBlockWorkspaceContext } from './block-workspace.context.js';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
@@ -18,7 +19,7 @@ import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 
-export class UmbBlockElementManager
+export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
 	extends UmbControllerBase
 	implements UmbElementPropertyDataOwner<UmbBlockDataModel, UmbContentTypeModel>
 {
@@ -37,6 +38,8 @@ export class UmbBlockElementManager
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	readonly variantId = this.#variantId.asObservable();
 
+	readonly name;
+	readonly getName;
 	readonly unique = this.#data.createObservablePartOfCurrent((data) => data?.key);
 	readonly contentTypeId = this.#data.createObservablePartOfCurrent((data) => data?.contentTypeKey);
 
@@ -55,8 +58,12 @@ export class UmbBlockElementManager
 
 	readonly validation = new UmbValidationController(this);
 
-	constructor(host: UmbControllerHost, dataPathPropertyName: string) {
+	constructor(host: UmbBlockWorkspaceContext<LayoutDataType>, dataPathPropertyName: string) {
 		super(host);
+
+		// Ugly, but we just inherit these from the workspace context: [NL]
+		this.name = host.name;
+		this.getName = host.getName;
 
 		this.observe(this.contentTypeId, (id) => this.structure.loadType(id));
 		this.observe(this.unique, (key) => {

@@ -9,13 +9,11 @@ import {
 	UmbArrayState,
 	UmbBooleanState,
 	UmbNumberState,
-	UmbObjectState,
 	appendToFrozenArray,
 	mergeObservables,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockGridTypeModel, UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 
@@ -67,9 +65,6 @@ export class UmbBlockGridEntryContext
 		[this._contentStructureHasProperties, this.forceHideContentEditorInOverlay],
 		([a, b]) => a === true && b === false,
 	);
-
-	#firstPropertyType = new UmbObjectState<UmbPropertyTypeModel | undefined>(undefined);
-	readonly firstPropertyType = this.#firstPropertyType.asObservable();
 
 	readonly scaleManager = new UmbBlockGridScaleManager(this);
 
@@ -253,9 +248,7 @@ export class UmbBlockGridEntryContext
 		);
 	}
 
-	_gotContentType(contentType: UmbContentTypeModel | undefined) {
-		this.#firstPropertyType.setValue(contentType?.properties[0]);
-	}
+	_gotContentType() {}
 
 	#calcColumnSpan(columnSpan: number, relevantColumnSpanOptions: number[], layoutColumns: number) {
 		if (relevantColumnSpanOptions.length > 0) {

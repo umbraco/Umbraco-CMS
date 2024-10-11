@@ -107,7 +107,6 @@ export class UmbPropertyDatasetContextBase
 	/**
 	 * Gets the read-only state of the current variant culture.
 	 * @returns {*}  {boolean}
-	 * @memberof UmbBlockGridInlinePropertyDatasetContext
 	 */
 	getReadOnly(): boolean {
 		return this.#readOnly.getValue();

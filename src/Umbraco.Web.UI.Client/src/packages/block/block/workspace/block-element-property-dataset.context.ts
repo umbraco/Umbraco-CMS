@@ -9,19 +9,18 @@ export class UmbBlockElementPropertyDatasetContext
 	extends UmbElementPropertyDatasetContext
 	implements UmbPropertyDatasetContext
 {
-	name;
-	culture;
-	segment;
-
-	getName(): string {
-		return 'Block';
-	}
+	readonly name;
+	readonly culture;
+	readonly segment;
+	readonly getName;
 
 	constructor(host: UmbControllerHost, elementManager: UmbBlockElementManager, variantId?: UmbVariantId) {
 		// The controller alias, is a very generic name cause we want only one of these for this controller host.
 		super(host, elementManager, variantId);
 
+		// Ugly, but we just inherit these from the workspace context: [NL]
 		this.name = elementManager.name;
+		this.getName = elementManager.getName;
 		this.culture = createObservablePart(elementManager.variantId, (v) => v?.culture);
 		this.segment = createObservablePart(elementManager.variantId, (v) => v?.segment);
 	}
