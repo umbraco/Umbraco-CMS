@@ -120,23 +120,48 @@ public class AlignUpgradedDatabase : MigrationBase
         // We need to do this to ensure we don't try to rename the constraint if it doesn't exist.
         const string tableName = "umbracoContentVersion";
         const string columnName = "VersionDate";
+        const string newColumnName = "versionDate";
+        const string expectedConstraintName = "DF_umbracoContentVersion_versionDate";
+
         ColumnInfo? versionDateColumn = columns
             .FirstOrDefault(x => x is { TableName: tableName, ColumnName: columnName });
 
-        if (versionDateColumn is null)
+        // we only want to rename the column if necessary
+        if (versionDateColumn is not null)
         {
             // The column was not found I.E. the column is correctly named
-            return;
+            RenameColumn(tableName, columnName, newColumnName, columns);
         }
-
-        RenameColumn(tableName, columnName, "versionDate", columns);
 
         // Renames the default constraint for the column,
         // apparently the content version table used to be prefixed with cms and not umbraco
         // We don't have a fluid way to rename the default constraint so we have to use raw SQL
         // This should be okay though since we are only running this migration on SQL Server
+        Sql<ISqlContext> constraintNameQuery = Database.SqlContext.Sql(@$"
+SELECT obj_Constraint.NAME AS 'constraintName'
+    FROM   sys.objects obj_table
+        JOIN sys.objects obj_Constraint
+            ON obj_table.object_id = obj_Constraint.parent_object_id
+        JOIN sys.sysconstraints constraints
+             ON constraints.constid = obj_Constraint.object_id
+        JOIN sys.columns columns
+             ON columns.object_id = obj_table.object_id
+            AND columns.column_id = constraints.colid
+    WHERE obj_table.NAME = '{tableName}'
+	AND columns.NAME = '{newColumnName}'
+	AND obj_Constraint.type = 'D'
+");
+        var currentConstraintName = Database.ExecuteScalar<string>(constraintNameQuery);
+
+
+        // only rename the constraint if necessary
+        if (currentConstraintName == expectedConstraintName)
+        {
+            return;
+        }
+
         Sql<ISqlContext> renameConstraintQuery = Database.SqlContext.Sql(
-            "EXEC sp_rename N'DF_cmsContentVersion_VersionDate', N'DF_umbracoContentVersion_versionDate', N'OBJECT'");
+            $"EXEC sp_rename N'{currentConstraintName}', N'{expectedConstraintName}', N'OBJECT'");
         Database.Execute(renameConstraintQuery);
     }
 

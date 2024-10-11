@@ -398,11 +398,14 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Segments
             Services.AddUnique<ISegmentService, NoopSegmentService>();
-            
+
             // definition Import/export
             Services.AddUnique<ITemporaryFileToXmlImportService, TemporaryFileToXmlImportService>();
             Services.AddUnique<IContentTypeImportService, ContentTypeImportService>();
             Services.AddUnique<IMediaTypeImportService, MediaTypeImportService>();
+
+            // add validation services
+            Services.AddUnique<IElementSwitchValidator, ElementSwitchValidator>();
         }
     }
 }

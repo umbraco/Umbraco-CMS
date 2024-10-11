@@ -13,7 +13,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.redirectManagement.setStatus(enableStatus);
   await umbracoUi.goToBackOffice();
   // Create a content
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName); 
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
   contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   // Publish the content
@@ -36,10 +36,10 @@ test('can disable URL tracker', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.redirectManagement.clickDisableButton();
 
   // Assert
-  // Verfiy that if renaming a published page, there are no redirects have been made
-  // rename the published content 
+  // Verify that if renaming a published page, there are no redirects have been made
+  // rename the published content
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-  await umbracoUi.content.openContent(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterContentName(updatedContentName);
   await umbracoUi.content.clickSaveAndPublishButton();
   // verify that there is no redirects have been made
@@ -63,10 +63,10 @@ test.skip('can re-enable URL tracker', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.redirectManagement.clickEnableURLTrackerButton();
 
   // Assert
-  // Verfiy that if renaming a published page, there are one redirects have been made
-  // rename the published content 
+  // Verify that if renaming a published page, there are one redirects have been made
+  // rename the published content
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-  await umbracoUi.content.openContent(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterContentName(updatedContentName);
   await umbracoUi.content.clickSaveAndPublishButton();
   // verify that there is one redirects have been made
@@ -90,7 +90,7 @@ test.skip('can search for original URL', async ({umbracoUi}) => {
   await umbracoUi.redirectManagement.clickRedirectManagementTab();
   await umbracoUi.redirectManagement.enterOriginalUrl(searchKeyword);
   await umbracoUi.redirectManagement.clickSearchButton();
-  
+
   // Assert
   // TODO: verify the search result
 });
@@ -98,9 +98,9 @@ test.skip('can search for original URL', async ({umbracoUi}) => {
 // TODO: Remove skip when the frond-end is ready. Currently there is no redirect have been made after renaming a published page
 test.skip('can delete a redirect', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  // Rename the published content 
+  // Rename the published content
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-  await umbracoUi.content.openContent(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterContentName(updatedContentName);
   await umbracoUi.content.clickSaveAndPublishButton();
 

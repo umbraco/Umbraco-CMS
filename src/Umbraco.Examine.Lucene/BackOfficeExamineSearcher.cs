@@ -356,8 +356,16 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
             throw new ArgumentNullException(nameof(entityService));
         }
 
-        UdiParser.TryParse(searchFrom, true, out Udi? udi);
-        searchFrom = udi == null ? searchFrom : entityService.GetId(udi).Result.ToString();
+        if (Guid.TryParse(searchFrom, out Guid guid))
+        {
+            searchFrom = entityService.GetId(guid, objectType).Result.ToString();
+        }
+        else
+        {
+            // fallback to Udi for legacy reasons as the calling methods take string?
+            UdiParser.TryParse(searchFrom, true, out Udi? udi);
+            searchFrom = udi == null ? searchFrom : entityService.GetId(udi).Result.ToString();
+        }
 
         TreeEntityPath? entityPath =
             int.TryParse(searchFrom, NumberStyles.Integer, CultureInfo.InvariantCulture, out var searchFromId) &&

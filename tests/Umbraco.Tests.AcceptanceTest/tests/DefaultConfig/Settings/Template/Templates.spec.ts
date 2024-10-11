@@ -176,7 +176,6 @@ test.skip('can use query builder with Order By statement for a template', async 
 
 test('can use query builder with Where statement for a template', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  //Arrange
   const propertyAliasValue = 'Name';
   const operatorValue = 'is';
   const constrainValue = 'Test Content';
@@ -202,8 +201,7 @@ test('can use query builder with Where statement for a template', async ({umbrac
 
   // Act
   await umbracoUi.template.goToTemplate(templateName);
-  // TODO: refactor later
-  await umbracoUi.waitForTimeout(1000);
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.template.addQueryBuilderWithWhereStatement(propertyAliasValue, operatorValue, constrainValue);
   // Verify that the code is shown
   await umbracoUi.template.isQueryBuilderCodeShown(expectedCode);
@@ -370,4 +368,18 @@ test.skip('can show returned items in query builder ', async ({umbracoApi, umbra
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+});
+
+test('cannot create a template with an empty name', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.template.clickActionsMenuAtRoot();
+  await umbracoUi.template.clickCreateButton();
+  await umbracoUi.template.clickSaveButton();
+
+  // Assert
+  await umbracoUi.template.isErrorNotificationVisible();
+  expect(await umbracoApi.template.doesNameExist(templateName)).toBeFalsy();
 });

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json.schemastore.org/ide.host.json",
+  "order": 0,
+  "icon": "../../icon.png",
+  "description": {
+    "id": "UmbracoDockerCompose",
+    "text": "Umbraco Docker Compose - Docker compose for Umbraco CMS and associated database"
+  },
+  "symbolInfo": [
+    {
+      "id": "ProjectName",
+      "isVisible": true
+    },
+    {
+      "id": "DatabasePassword",
+      "isVisible": true
+    },
+    {
+      "id": "Port",
+      "isVisible": true
+    }
+  ]
+}

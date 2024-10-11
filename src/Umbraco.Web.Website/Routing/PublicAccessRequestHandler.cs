@@ -148,9 +148,10 @@ public class PublicAccessRequestHandler : IPublicAccessRequestHandler
                     _logger.LogDebug("EnsurePublishedContentAccess: Page is not protected");
                 }
             }
+        }
 
-            // loop until we have access or reached max loops
-        } while (publicAccessStatus != PublicAccessStatus.AccessAccepted && i++ < maxLoop);
+        // loop until we have access or reached max loops
+        while (publicAccessStatus != PublicAccessStatus.AccessAccepted && i++ < maxLoop);
 
         if (i == maxLoop)
         {

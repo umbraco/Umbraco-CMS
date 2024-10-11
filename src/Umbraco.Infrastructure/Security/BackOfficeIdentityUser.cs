@@ -62,10 +62,7 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
         get => _startContentIds;
         set
         {
-            if (value == null)
-            {
-                value = new int[0];
-            }
+            value ??= new int[0];
 
             BeingDirty.SetPropertyValueAndDetectChanges(value, ref _startContentIds!, nameof(StartContentIds), _startIdsComparer);
         }
@@ -79,10 +76,7 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
         get => _startMediaIds;
         set
         {
-            if (value == null)
-            {
-                value = new int[0];
-            }
+            value ??= Array.Empty<int>();
 
             BeingDirty.SetPropertyValueAndDetectChanges(value, ref _startMediaIds!, nameof(StartMediaIds), _startIdsComparer);
         }
@@ -123,6 +117,7 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
     /// <param name="email">This is allowed to be null (but would need to be filled in if trying to persist this instance)</param>
     /// <param name="culture"></param>
     /// <param name="name"></param>
+    /// <param name="id"></param>
     public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string? username, string email, string culture, string? name = null, Guid? id = null)
     {
         if (string.IsNullOrWhiteSpace(username))

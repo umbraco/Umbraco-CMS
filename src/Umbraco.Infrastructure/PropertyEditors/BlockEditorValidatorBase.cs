@@ -6,7 +6,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorValidator
+public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorValidator
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
 {

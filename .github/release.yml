@@ -17,6 +17,7 @@ changelog:
       labels:
         - type/bug
         - category/bug
+        - type/improvement
     - title: 📄 Documentation
       labels:
         - category/documentation
@@ -30,5 +31,8 @@ changelog:
       labels:
         - category/accessibility
     - title: 🚀 New Features
+      labels:
+        - type/feature
+    - title: Other Changes
       labels:
         - '*'

@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -10,6 +11,7 @@ using Umbraco.Cms.Api.Management.Controllers;
 using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;

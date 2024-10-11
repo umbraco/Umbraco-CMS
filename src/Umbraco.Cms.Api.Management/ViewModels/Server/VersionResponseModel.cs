@@ -2,6 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Server;
 
+[Obsolete("Not used. Will be removed in V15.")]
 public class VersionResponseModel
 {
     [Required]

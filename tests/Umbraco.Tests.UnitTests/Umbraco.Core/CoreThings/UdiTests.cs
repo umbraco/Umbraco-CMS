@@ -202,6 +202,21 @@ public class UdiTests
     }
 
     [Test]
+    [TestCase(Constants.DeploySelector.This)]
+    [TestCase(Constants.DeploySelector.ThisAndChildren)]
+    [TestCase(Constants.DeploySelector.ThisAndDescendants)]
+    [TestCase(Constants.DeploySelector.ChildrenOfThis)]
+    [TestCase(Constants.DeploySelector.DescendantsOfThis)]
+    [TestCase(Constants.DeploySelector.EntitiesOfType)]
+    public void RangeParseTest(string selector)
+    {
+        var expected = new UdiRange(Udi.Create(Constants.UdiEntityType.AnyGuid, Guid.NewGuid()), selector);
+        var actual = UdiRange.Parse(expected.ToString());
+
+        Assert.AreEqual(expected, actual);
+    }
+
+    [Test]
     public void TryParseTest()
     {
         // try parse to "Udi"

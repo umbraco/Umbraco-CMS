@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
+using Umbraco.Cms.Api.Management.Security.Authorization.User;
 
 namespace Umbraco.Cms.Api.Management.Security.Authorization.DenyLocalLogin;
 
@@ -24,12 +25,12 @@ public class DenyLocalLoginHandler : MustSatisfyRequirementAuthorizationHandler<
 
         if (isDenied is false)
         {
-            // AuthorizationPolicies.BackOfficeAccess policy adds this requirement by policy.RequireAuthenticatedUser()
+            // AuthorizationPolicies.BackOfficeAccess policy adds this requirement by policy.Requirements.Add(new BackOfficeRequirement());
             // Since we want to "allow anonymous" for some endpoints (i.e. BackOfficeController.Login()), it is necessary to succeed this requirement
-            IEnumerable<DenyAnonymousAuthorizationRequirement> denyAnonymousUserRequirements = context.PendingRequirements.OfType<DenyAnonymousAuthorizationRequirement>();
-            foreach (DenyAnonymousAuthorizationRequirement denyAnonymousUserRequirement in denyAnonymousUserRequirements)
+            IEnumerable<BackOfficeRequirement> backOfficeRequirements = context.PendingRequirements.OfType<BackOfficeRequirement>();
+            foreach (BackOfficeRequirement backOfficeRequirement in backOfficeRequirements)
             {
-                context.Succeed(denyAnonymousUserRequirement);
+                context.Succeed(backOfficeRequirement);
             }
         }
 

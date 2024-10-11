@@ -29,6 +29,7 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         builder.Services.AddSingleton<IAuthorizationHandler, UserGroupPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, UserPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, AllowedApplicationHandler>();
+        builder.Services.AddSingleton<IAuthorizationHandler, BackOfficeHandler>();
 
         builder.Services.AddAuthorization(CreatePolicies);
         return builder;
@@ -46,7 +47,7 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         options.AddPolicy(AuthorizationPolicies.BackOfficeAccess, policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
-            policy.RequireAuthenticatedUser();
+            policy.Requirements.Add(new BackOfficeRequirement());
         });
 
         options.AddPolicy(AuthorizationPolicies.RequireAdminAccess, policy =>
@@ -57,13 +58,16 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
 
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessContent, Constants.Applications.Content);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessContentOrMedia, Constants.Applications.Content, Constants.Applications.Media);
-        AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessForContentTree,
+        AddAllowedApplicationsPolicy(
+            AuthorizationPolicies.SectionAccessForContentTree,
             Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Users,
             Constants.Applications.Settings, Constants.Applications.Packages, Constants.Applications.Members);
-        AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessForMediaTree,
+        AddAllowedApplicationsPolicy(
+            AuthorizationPolicies.SectionAccessForMediaTree,
             Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Users,
             Constants.Applications.Settings, Constants.Applications.Packages, Constants.Applications.Members);
-        AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessForMemberTree,
+        AddAllowedApplicationsPolicy(
+            AuthorizationPolicies.SectionAccessForMemberTree,
             Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessMedia, Constants.Applications.Media);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessMembers, Constants.Applications.Members);
@@ -76,6 +80,7 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDictionaryOrTemplates, Constants.Applications.Translation, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocuments, Constants.Applications.Content);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes, Constants.Applications.Content, Constants.Applications.Settings);
+        AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocumentOrMediaOrContentTypes, Constants.Applications.Content, Constants.Applications.Settings, Constants.Applications.Media);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocumentTypes, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessLanguages, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessMediaTypes, Constants.Applications.Settings);

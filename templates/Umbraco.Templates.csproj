@@ -11,7 +11,6 @@
     <ContentTargetFolders>.</ContentTargetFolders>
     <NoWarn>NU5128</NoWarn>
   </PropertyGroup>
-
   <ItemGroup>
     <Content Include="..\src\Umbraco.Web.UI\Program.cs">
       <Link>UmbracoProject\Program.cs</Link>
@@ -20,6 +19,7 @@
     <Content Include="UmbracoPackage\**" Exclude="bin;obj" />
     <Content Include="UmbracoPackageRcl\**" Exclude="bin;obj" />
     <Content Include="UmbracoProject\**" Exclude="bin;obj" />
+    <Content Include="UmbracoDockerCompose\**" Exclude="bin;obj"/>
     <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blocklist\**">
       <Link>UmbracoProject\Views\Partials\blocklist\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <PackagePath>UmbracoProject\Views\Partials\blocklist</PackagePath>
@@ -32,13 +32,7 @@
       <Link>UmbracoProject\Views\_ViewImports.cshtml</Link>
       <PackagePath>UmbracoProject\Views</PackagePath>
     </Content>
-    <Content Include="..\src\Umbraco.Web.UI\wwwroot\favicon.ico">
-      <Link>UmbracoProject\wwwroot\favicon.ico</Link>
-      <PackagePath>UmbracoProject\wwwroot</PackagePath>
-    </Content>
   </ItemGroup>
-
-
   <!-- Update template.json files with the default UmbracoVersion value set to the current build version -->
   <ItemGroup>
     <PackageReference Include="Umbraco.JsonSchema.Extensions" PrivateAssets="all" />
@@ -54,7 +48,7 @@
       </_TemplateJsonFiles>
     </ItemGroup>
     <Copy SourceFiles="@(_TemplateJsonFiles)" DestinationFiles="%(DestinationFile)" />
-    <JsonPathUpdateValue JsonFile="%(_TemplateJsonFiles.DestinationFile)" Path="$.symbols.UmbracoVersion.defaultValue" Value="&quot;$(PackageVersion)&quot;" />
+    <JsonPathUpdateValue JsonFile="%(_TemplateJsonFiles.DestinationFile)" Path="$.symbols.FinalVersion.parameters.cases.[0].value" Value="&quot;$(PackageVersion)&quot;" />
     <ItemGroup>
       <_PackageFiles Include="%(_TemplateJsonFiles.DestinationFile)">
         <PackagePath>%(_TemplateJsonFiles.RelativeDir)</PackagePath>

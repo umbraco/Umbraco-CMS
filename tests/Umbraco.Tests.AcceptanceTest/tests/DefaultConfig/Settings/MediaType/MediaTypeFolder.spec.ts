@@ -44,6 +44,7 @@ test('can delete a media type folder', async ({umbracoApi, umbracoUi}) => {
 test('can rename a media type folder', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const oldFolderName = 'OldName';
+  await umbracoApi.mediaType.ensureNameNotExists(oldFolderName);
   await umbracoApi.mediaType.createFolder(oldFolderName);
 
   // Act
@@ -51,7 +52,7 @@ test('can rename a media type folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.mediaType.clickActionsMenuForName(oldFolderName);
   await umbracoUi.mediaType.clickRenameFolderButton();
   await umbracoUi.mediaType.enterFolderName(mediaTypeFolderName);
-  await umbracoUi.mediaType.clickUpdateFolderButton();
+  await umbracoUi.mediaType.clickConfirmRenameFolderButton();
 
   // Assert
   await umbracoUi.mediaType.isSuccessNotificationVisible();

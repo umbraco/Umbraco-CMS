@@ -6,6 +6,11 @@
     <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!--  TODO: [NU5123] Rename files so path is shorter and remove this override -->
+    <WarningsNotAsErrors>NU5123</WarningsNotAsErrors>
+  </PropertyGroup>
+
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <ProjectReference Include="..\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj" />
@@ -35,9 +40,14 @@
     <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm run build:for:cms" />
   </Target>
 
-  <Target Name="BuildLogin" DependsOnTargets="BuildBellissima">
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Login\" Command="npm ci --no-fund --no-audit --prefer-offline" />
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Login\" Command="npm run build" />
+  <Target Name="BuildBelle">
+    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm ci --no-fund --no-audit --prefer-offline" Timeout="600000" />
+    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm run build:skip-tests" Timeout="600000" />
+  </Target>
+
+  <Target Name="BuildLogin">
+    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Login\" Command="npm ci --no-fund --no-audit --prefer-offline" Timeout="600000" />
+    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Login\" Command="npm run build" Timeout="600000" />
   </Target>
 
   <Target Name="CleanStaticAssetsPreconditions" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
