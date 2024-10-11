@@ -113,6 +113,7 @@ export default {
 		updateDate: 'Última edição',
 		uploadClear: 'Remover arquivo',
 		urls: 'Link ao documento',
+		saveModalTitle: 'Salvar',
 	},
 	create: {
 		chooseNode: 'Onde você quer criar seu novo(a) %0%',

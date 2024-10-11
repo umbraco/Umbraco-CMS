@@ -46,7 +46,7 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
-		return html`<umb-body-layout headline=${this.localize.term('content_readyToSave')}>
+		return html`<umb-body-layout headline=${this.localize.term('content_saveModalTitle')}>
 			<p id="subtitle">
 				<umb-localize key="content_variantsToSave">Choose which variants to be saved.</umb-localize>
 			</p>

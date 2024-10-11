@@ -199,6 +199,7 @@ export default {
 		addTextBox: 'Dodaj kolejne pole tekstowe',
 		removeTextBox: 'Usuń te pole tekstowe',
 		contentRoot: 'Korzeń zawartości',
+		saveModalTitle: 'Zapisz',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Stwórz nowy Szablon Zawartości z <em>%0%</em>',
