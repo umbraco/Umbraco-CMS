@@ -28,6 +28,10 @@ export class UmbDocumentTypeTreeItemTableCollectionViewElement extends UmbLitEle
 			name: 'Element Type',
 			alias: 'isElementType',
 		},
+		{
+			name: '',
+			alias: 'entityActions',
+		},
 	];
 
 	@state()
@@ -90,7 +94,15 @@ export class UmbDocumentTypeTreeItemTableCollectionViewElement extends UmbLitEle
 					},
 					{
 						columnAlias: 'isElementType',
-						value: item.isElement ? html`<uui-icon name="icon-check"></uui-icon>` : nothing,
+						value: html`<umb-boolean-table-column-layout .value=${item.isElement}></umb-boolean-table-column-layout>`,
+					},
+					{
+						columnAlias: 'entityActions',
+						value: html`<umb-entity-actions-table-column-layout
+							.value=${{
+								entityType: item.entityType,
+								unique: item.unique,
+							}}></umb-entity-actions-table-column-layout>`,
 					},
 				],
 			};
