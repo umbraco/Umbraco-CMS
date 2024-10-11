@@ -19,11 +19,16 @@ export class UmbTemporaryFileBadgeElement extends UmbLitElement {
 		return this._progress;
 	}
 
+	@property({ type: Boolean, reflect: true })
+	public complete = false;
+
 	override render() {
 		return html`<uui-badge>
 			<div id="wrapper">
-				<uui-loader-circle progress=${this.progress}></uui-loader-circle>
-				<uui-icon name="icon-arrow-up"></uui-icon>
+				<uui-loader-circle .progress=${this.complete ? 100 : this.progress}></uui-loader-circle>
+				${this.complete
+					? html`<uui-icon name="icon-check"></uui-icon>`
+					: html`<uui-icon name="icon-arrow-up"></uui-icon>`}
 			</div>
 		</uui-badge>`;
 	}
@@ -42,8 +47,16 @@ export class UmbTemporaryFileBadgeElement extends UmbLitElement {
 			font-size: var(--uui-size-6);
 		}
 
+		:host([complete]) #wrapper {
+			background-color: var(--uui-color-positive);
+		}
+		:host([complete]) uui-loader-circle {
+			color: var(--uui-color-positive);
+		}
+
 		uui-loader-circle {
 			display: absolute;
+			z-index: 2;
 			inset: 0;
 			color: var(--uui-color-focus);
 			font-size: var(--uui-size-12);
