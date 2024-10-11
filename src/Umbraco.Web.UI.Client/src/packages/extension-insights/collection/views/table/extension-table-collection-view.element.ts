@@ -33,7 +33,7 @@ export class UmbExtensionTableCollectionViewElement extends UmbLitElement {
 		},
 		{
 			name: '',
-			alias: 'extensionAction',
+			alias: 'entityActions',
 		},
 	];
 
@@ -78,7 +78,7 @@ export class UmbExtensionTableCollectionViewElement extends UmbLitElement {
 						value: extension.weight,
 					},
 					{
-						columnAlias: 'extensionAction',
+						columnAlias: 'entityActions',
 						value: html`<umb-entity-actions-table-column-layout
 							.value=${{
 								entityType: extension.entityType,
