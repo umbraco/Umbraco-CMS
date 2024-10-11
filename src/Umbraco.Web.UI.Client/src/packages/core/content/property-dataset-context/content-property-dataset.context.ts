@@ -51,7 +51,7 @@ export class UmbContentPropertyDatasetContext<
 				if (!variantInfo) return;
 				this.#currentVariant.setValue(variantInfo);
 			},
-			'_observeActiveVariant',
+			null,
 		);
 	}
 }

@@ -5,4 +5,5 @@ export interface UmbPropertyEditorUiElement extends HTMLElement {
 	config?: UmbPropertyEditorConfigCollection;
 	mandatory?: boolean;
 	mandatoryMessage?: string;
+	destroy?: () => void;
 }

@@ -1,5 +1,5 @@
 import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context.js';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
@@ -400,7 +400,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}></umb-block-grid-block-inline>`;
+			.settings=${this._blockViewProps.settings}
+			${umbDestroyOnDisconnect()}></umb-block-grid-block-inline>`;
 	}
 
 	#renderRefBlock() {
@@ -411,7 +412,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}></umb-block-grid-block>`;
+			.settings=${this._blockViewProps.settings}
+			${umbDestroyOnDisconnect()}></umb-block-grid-block>`;
 	}
 
 	#renderBlock() {

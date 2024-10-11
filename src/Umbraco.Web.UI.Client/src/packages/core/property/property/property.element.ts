@@ -285,6 +285,7 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#controlValidator?.destroy();
 			oldElement?.removeEventListener('change', this._onPropertyEditorChange as any as EventListener);
 			oldElement?.removeEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
+			oldElement?.destroy?.();
 
 			this._element = el as ManifestPropertyEditorUi['ELEMENT_TYPE'];
 
