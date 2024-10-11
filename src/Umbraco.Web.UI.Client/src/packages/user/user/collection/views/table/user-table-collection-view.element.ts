@@ -48,6 +48,10 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 			alias: 'userStatus',
 			elementName: 'umb-user-table-status-column-layout',
 		},
+		{
+			name: '',
+			alias: 'entityActions',
+		},
 	];
 
 	@state()
@@ -139,6 +143,14 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 						value: {
 							status: user.state,
 						},
+					},
+					{
+						columnAlias: 'entityActions',
+						value: html`<umb-entity-actions-table-column-layout
+							.value=${{
+								entityType: user.entityType,
+								unique: user.unique,
+							}}></umb-entity-actions-table-column-layout>`,
 					},
 				],
 			};
