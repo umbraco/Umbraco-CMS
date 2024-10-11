@@ -16,7 +16,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.template.ensureNameNotExists(templateName);
 });
 
-const textStrings = [
+const textstrings = [
   {type: 'an empty textstring', value: ''},
   {type: 'a non-empty textstring', value: 'Welcome to Umbraco site'},
   {type: 'a textstring contains special characters', value: '@#^&*()_+[]{};:"<>,./?'},
@@ -25,19 +25,19 @@ const textStrings = [
   {type: 'a textstring contains a cross-site scripting', value: "<script>alert('XSS')</script>"}
 ];
 
-for (const textString of textStrings) {
-  test(`can render content with ${textString.type}`, async ({umbracoApi, umbracoUi}) => {
+for (const textstring of textstrings) {
+  test(`can render content with ${textstring.type}`, async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const textStringValue = textString.value;
-    await umbracoApi.document.createPublishedDocumentWithValue(contentName, textStringValue, dataTypeData.id, templateName);
+    const textstringValue = textstring.value;
+    await umbracoApi.document.createPublishedDocumentWithValue(contentName, textstringValue, dataTypeData.id, documentTypeName, templateName);
     const contentData = await umbracoApi.document.getByName(contentName);
     const contentURL = contentData.urls[0].url;
 
     // Act
-    await umbracoUi.contentRender.goToContentRenderPage(contentURL);
+    await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
     // Assert
-    await umbracoUi.contentRender.doesContentRenderValueHaveText(textStringValue);
+    await umbracoUi.contentRender.doesContentRenderValueHaveText(textstringValue);
   });
 }
 
