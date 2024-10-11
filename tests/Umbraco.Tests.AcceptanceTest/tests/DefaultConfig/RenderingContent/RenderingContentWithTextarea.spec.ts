@@ -1,0 +1,43 @@
+﻿import {test} from '@umbraco/playwright-testhelpers';
+
+const contentName = 'Test Rendering Content';
+const documentTypeName = 'TestDocumentTypeForContent';
+const dataTypeName = 'Textarea';
+const templateName = 'TestTemplateForContent';
+let dataTypeData;
+
+test.beforeEach(async ({umbracoApi}) => {
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName); 
+});
+
+test.afterEach(async ({umbracoApi}) => {
+  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.template.ensureNameNotExists(templateName);
+});
+
+const textareas = [
+  {type: 'an empty textarea', value: ''},
+  {type: 'a non-empty textarea', value: 'Welcome to Umbraco site'},
+  {type: 'a textarea contains special characters', value: '@#^&*()_+[]{};:"<>,./?'},
+  {type: 'a textarea contains multiple lines', value: 'First line\n Second line\n Third line'},
+  {type: 'a textarea contains an SQL injection', value: "' OR '1'='1'; --"},
+  {type: 'a textarea contains a cross-site scripting', value: "<script>alert('XSS')</script>"}
+];
+
+for (const textarea of textareas) {
+  test(`can render content with ${textarea.type}`, async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const textareaValue = textarea.value;
+    await umbracoApi.document.createPublishedDocumentWithValue(contentName, textareaValue, dataTypeData.id, documentTypeName, templateName);
+    const contentData = await umbracoApi.document.getByName(contentName);
+    const contentURL = contentData.urls[0].url;
+
+    // Act
+    await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
+
+    // Assert
+    await umbracoUi.contentRender.doesContentRenderValueHaveText(textareaValue);
+  });
+}
+
