@@ -105,6 +105,9 @@ export class UmbContentTypeStructureManager<
 	 * @returns {Promise} - Promise resolved
 	 */
 	public async loadType(unique?: string) {
+		if (!unique) return;
+		if (this.#ownerContentTypeUnique === unique) return;
+		console.log('loadType', unique);
 		this._reset();
 
 		this.#ownerContentTypeUnique = unique;
@@ -724,6 +727,7 @@ export class UmbContentTypeStructureManager<
 	}
 
 	private _reset() {
+		this.#contentTypes.setValue([]);
 		this.#contentTypeObservers.forEach((observer) => observer.destroy());
 		this.#contentTypeObservers = [];
 		this.#contentTypes.setValue([]);

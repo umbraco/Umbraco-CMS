@@ -805,6 +805,7 @@ export default {
 		email: 'Email',
 		error: 'Error',
 		field: 'Field',
+		fieldFor: 'Field for %0%',
 		findDocument: 'Find',
 		first: 'First',
 		focalPoint: 'Focal point',

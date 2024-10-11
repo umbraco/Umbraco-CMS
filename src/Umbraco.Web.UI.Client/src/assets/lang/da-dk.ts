@@ -783,6 +783,7 @@ export default {
 		email: 'E-mail',
 		error: 'Fejl',
 		field: 'Felt',
+		fieldFor: 'Felt for %0%',
 		findDocument: 'Find',
 		first: 'Første',
 		focalPoint: 'Fokuspunkt',
