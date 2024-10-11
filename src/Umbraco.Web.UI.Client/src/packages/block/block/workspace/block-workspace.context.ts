@@ -23,6 +23,7 @@ import {
 	UMB_BLOCK_MANAGER_CONTEXT,
 	type UmbBlockWorkspaceOriginData,
 	type UmbBlockWorkspaceData,
+	UMB_BLOCK_ENTRY_CONTEXT,
 } from '@umbraco-cms/backoffice/block';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -60,9 +61,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	readonly settings = new UmbBlockElementManager(this, 'settingsData');
 
-	// TODO: Get the name from the content element type. Or even better get the Label, but that has to be re-actively updated.
-	#label = new UmbStringState<string | undefined>(undefined);
-	readonly name = this.#label.asObservable();
+	#name = new UmbStringState<string | undefined>(undefined);
+	readonly name = this.#name.asObservable();
 
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	readonly variantId = this.#variantId.asObservable();
@@ -138,6 +138,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			this.#blockEntries = context;
 		}).asPromise();
 
+		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
+			this.#name.setValue(context.getName());
+		});
+
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			// TODO: Ideally we move this into the Block Manager [NL] To avoid binding the Block Manager to a Property...
 			// If the current property is readonly all inner block content should also be readonly.
@@ -199,7 +203,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	protected override resetState() {
 		super.resetState();
-		this.#label.setValue(undefined);
+		this.#name.setValue(undefined);
 		this.#layout.setValue(undefined);
 		this.#initialLayout = undefined;
 		this.#initialContent = undefined;
@@ -500,7 +504,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	public override destroy(): void {
 		super.destroy();
 		this.#layout.destroy();
-		this.#label.destroy();
+		this.#name.destroy();
 		this.#blockManager = undefined;
 		this.#modalContext = undefined;
 	}
