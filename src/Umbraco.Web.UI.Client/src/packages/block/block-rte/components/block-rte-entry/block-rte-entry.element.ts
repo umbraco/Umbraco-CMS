@@ -74,11 +74,11 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 		this.observe(this.#context.showContentEdit, (showContentEdit) => {
 			this._showContentEdit = showContentEdit;
-			this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showContentEdit } });
+			this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showContentEdit } });
 		});
 		this.observe(this.#context.settingsElementTypeKey, (key) => {
 			this._hasSettings = !!key;
-			this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showSettingsEdit: !!key } });
+			this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showSettingsEdit: !!key } });
 		});
 		this.observe(this.#context.contentElementTypeAlias, (alias) => {
 			this._contentElementTypeAlias = alias;
@@ -152,7 +152,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			this.#context.workspaceEditContentPath,
 			(path) => {
 				this._workspaceEditContentPath = path;
-				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editContentPath: path } });
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editContentPath: path } });
 			},
 			null,
 		);
@@ -160,7 +160,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			this.#context.workspaceEditSettingsPath,
 			(path) => {
 				this._workspaceEditSettingsPath = path;
-				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editSettingsPath: path } });
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editSettingsPath: path } });
 			},
 			null,
 		);

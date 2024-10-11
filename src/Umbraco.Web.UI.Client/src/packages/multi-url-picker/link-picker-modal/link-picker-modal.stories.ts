@@ -2,7 +2,7 @@ import '../../core/components/body-layout/body-layout.element.js';
 import './link-picker-modal.element.js';
 
 import type { UmbLinkPickerModalElement } from './link-picker-modal.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
@@ -11,7 +11,7 @@ export default {
 	id: 'umb-link-picker-modal',
 } as Meta;
 
-export const Overview: Story<UmbLinkPickerModalElement> = () => html`
+export const Overview: StoryFn<UmbLinkPickerModalElement> = () => html`
 	<!-- TODO: figure out if generics are allowed for properties:
 	https://github.com/runem/lit-analyzer/issues/149
 	https://github.com/runem/lit-analyzer/issues/163 -->

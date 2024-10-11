@@ -29,7 +29,9 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	content?: UmbBlockDataType;
 
 	override render() {
-		return html`<umb-ref-grid-block standalone href=${this.config?.editContentPath ?? ''}>
+		return html`<umb-ref-grid-block
+			standalone
+			href=${(this.config?.showContentEdit ? this.config?.editContentPath : undefined) ?? ''}>
 			<umb-icon slot="icon" .name=${this.icon}></umb-icon>
 			<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
 			<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>

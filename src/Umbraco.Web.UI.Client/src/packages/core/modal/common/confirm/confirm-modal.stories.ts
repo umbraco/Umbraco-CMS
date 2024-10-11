@@ -1,7 +1,7 @@
 import './confirm-modal.element.js';
 
 import type { UmbConfirmModalElement } from './confirm-modal.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
@@ -19,7 +19,7 @@ const positiveData: UmbConfirmModalData = {
 	confirmLabel: 'Publish',
 };
 
-export const Positive: Story<UmbConfirmModalElement> = () => html`
+export const Positive: StoryFn<UmbConfirmModalElement> = () => html`
 	<!-- TODO: figure out if generics are allowed for properties:
 	https://github.com/runem/lit-analyzer/issues/149
 	https://github.com/runem/lit-analyzer/issues/163 -->
@@ -33,7 +33,7 @@ const dangerData: UmbConfirmModalData = {
 	confirmLabel: 'Delete',
 };
 
-export const Danger: Story<UmbConfirmModalElement> = () => html`
+export const Danger: StoryFn<UmbConfirmModalElement> = () => html`
 	<!-- TODO: figure out if generics are allowed for properties:
 	https://github.com/runem/lit-analyzer/issues/149
 	https://github.com/runem/lit-analyzer/issues/163 -->

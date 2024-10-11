@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorUITextBoxElement } from './property-editor-ui-text-box.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-text-box.element.js';
@@ -10,6 +10,6 @@ export default {
 	id: 'umb-property-editor-ui-text-box',
 } as Meta;
 
-export const AAAOverview: Story<UmbPropertyEditorUITextBoxElement> = () =>
+export const AAAOverview: StoryFn<UmbPropertyEditorUITextBoxElement> = () =>
 	html` <umb-property-editor-ui-text-box></umb-property-editor-ui-text-box>`;
 AAAOverview.storyName = 'Overview';
