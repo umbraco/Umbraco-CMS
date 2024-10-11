@@ -13,6 +13,7 @@ interface UmbControllerHostBaseDeclaration extends Omit<UmbControllerHost, 'getH
  * This enables controllers to be added to the life cycle of this element.
  * @param {object} superClass - superclass to be extended.
  * @mixin
+ * @returns {UmbControllerHost} - A class which extends the given superclass.
  */
 export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T) => {
 	class UmbControllerHostBaseClass extends superClass implements UmbControllerHostBaseDeclaration {
@@ -26,7 +27,8 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 
 		/**
 		 * Tests if a controller is assigned to this element.
-		 * @param {UmbController} ctrl
+		 * @param {UmbController} ctrl - The controller to check for.
+		 * @returns {boolean} - true if the controller is assigned
 		 */
 		hasUmbController(ctrl: UmbController): boolean {
 			return this.#controllers.indexOf(ctrl) !== -1;
@@ -34,15 +36,16 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 
 		/**
 		 * Retrieve controllers matching a filter of this element.
-		 * @param {method} filterMethod
+		 * @param {Function} filterMethod - filter method
+		 * @returns {Array<UmbController>} - currently assigned controllers passing the filter method.
 		 */
-		getUmbControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[] {
+		getUmbControllers(filterMethod: (ctrl: UmbController) => boolean): Array<UmbController> {
 			return this.#controllers.filter(filterMethod);
 		}
 
 		/**
 		 * Append a controller to this element.
-		 * @param {UmbController} ctrl
+		 * @param {UmbController} ctrl - the controller to append to this host.
 		 */
 		addUmbController(ctrl: UmbController): void {
 			// If this specific class is already added, then skip out.
@@ -68,7 +71,7 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 		/**
 		 * Remove a controller from this element.
 		 * Notice this will also destroy the controller.
-		 * @param {UmbController} ctrl
+		 * @param {UmbController} ctrl - The controller to remove and destroy from this host.
 		 */
 		removeUmbController(ctrl: UmbController): void {
 			const index = this.#controllers.indexOf(ctrl);

@@ -1,5 +1,5 @@
 import type { UmbDashboardTelemetryElement } from './dashboard-telemetry.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './dashboard-telemetry.element.js';
@@ -10,6 +10,6 @@ export default {
 	id: 'umb-dashboard-telemetry',
 } as Meta;
 
-export const AAAOverview: Story<UmbDashboardTelemetryElement> = () =>
+export const AAAOverview: StoryFn<UmbDashboardTelemetryElement> = () =>
 	html` <umb-dashboard-telemetry></umb-dashboard-telemetry>`;
 AAAOverview.storyName = 'Overview';

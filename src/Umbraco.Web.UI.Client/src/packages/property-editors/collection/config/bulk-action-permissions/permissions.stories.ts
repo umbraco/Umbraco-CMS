@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorUICollectionPermissionsElement } from './permissions.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './permissions.element.js';
@@ -10,6 +10,6 @@ export default {
 	id: 'umb-property-editor-ui-collection-permissions',
 } as Meta;
 
-export const AAAOverview: Story<UmbPropertyEditorUICollectionPermissionsElement> = () =>
+export const AAAOverview: StoryFn<UmbPropertyEditorUICollectionPermissionsElement> = () =>
 	html`<umb-property-editor-ui-collection-permissions></umb-property-editor-ui-collection-permissions>`;
 AAAOverview.storyName = 'Overview';

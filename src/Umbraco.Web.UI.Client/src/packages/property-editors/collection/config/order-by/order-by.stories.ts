@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorUICollectionOrderByElement } from './order-by.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './order-by.element.js';
@@ -10,6 +10,6 @@ export default {
 	id: 'umb-property-editor-ui-collection-order-by',
 } as Meta;
 
-export const AAAOverview: Story<UmbPropertyEditorUICollectionOrderByElement> = () =>
+export const AAAOverview: StoryFn<UmbPropertyEditorUICollectionOrderByElement> = () =>
 	html`<umb-property-editor-ui-collection-order-by></umb-property-editor-ui-collection-order-by>`;
 AAAOverview.storyName = 'Overview';
