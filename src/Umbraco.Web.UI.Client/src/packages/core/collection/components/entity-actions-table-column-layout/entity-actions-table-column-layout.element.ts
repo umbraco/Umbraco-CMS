@@ -15,11 +15,15 @@ export class UmbEntityActionsTableColumnLayoutElement extends UmbLitElement {
 		this._isOpen = false;
 	}
 
+	#onClick(event) {
+		event.stopPropagation();
+	}
+
 	override render() {
 		if (!this.value) return nothing;
 
 		return html`
-			<umb-dropdown .open=${this._isOpen} compact hide-expand>
+			<umb-dropdown .open=${this._isOpen} @click=${this.#onClick} compact hide-expand>
 				<uui-symbol-more slot="label"></uui-symbol-more>
 				<umb-entity-action-list
 					@action-executed=${this.#onActionExecuted}
