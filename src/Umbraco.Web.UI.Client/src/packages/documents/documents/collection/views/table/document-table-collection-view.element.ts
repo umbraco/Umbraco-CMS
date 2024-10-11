@@ -136,7 +136,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				};
 			});
 
-			this._tableColumns = [...this.#systemColumns, ...userColumns];
+			this._tableColumns = [...this.#systemColumns, ...userColumns, { name: '', alias: 'entityActions' }];
 		}
 	}
 
@@ -146,6 +146,17 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 
 			const data =
 				this._tableColumns?.map((column) => {
+					if (column.alias === 'entityActions') {
+						return {
+							columnAlias: 'entityActions',
+							value: html`<umb-entity-actions-table-column-layout
+								.value=${{
+									entityType: item.entityType,
+									unique: item.unique,
+								}}></umb-entity-actions-table-column-layout>`,
+						};
+					}
+
 					const editPath = this.#routeBuilder
 						? this.#routeBuilder({ entityType: item.entityType }) +
 							UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique })

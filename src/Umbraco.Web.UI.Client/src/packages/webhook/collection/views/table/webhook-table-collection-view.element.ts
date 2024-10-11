@@ -5,9 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
 
-import './column-layouts/boolean/webhook-table-boolean-column-layout.element.js';
 import './column-layouts/name/webhook-table-name-column-layout.element.js';
-import './column-layouts/entity-actions/webhook-table-entity-actions-column-layout.element.js';
 import './column-layouts/content-type/webhook-table-name-column-layout.element.js';
 
 @customElement('umb-webhook-table-collection-view')
@@ -27,7 +25,6 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 		{
 			name: this.localize.term('webhooks_enabled'),
 			alias: 'enabled',
-			elementName: 'umb-webhook-table-boolean-column-layout',
 		},
 		{
 			name: this.localize.term('webhooks_url'),
@@ -45,7 +42,6 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 		{
 			name: '',
 			alias: 'entityActions',
-			elementName: 'umb-webhook-table-entity-actions-column-layout',
 		},
 	];
 
@@ -85,7 +81,7 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'enabled',
-						value: webhook.enabled,
+						value: html`<umb-boolean-table-column-layout .value=${webhook.enabled}></umb-boolean-table-column-layout>`,
 					},
 					{
 						columnAlias: 'events',
@@ -97,7 +93,11 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'entityActions',
-						value: webhook,
+						value: html`<umb-entity-actions-table-column-layout
+							.value=${{
+								entityType: webhook.entityType,
+								unique: webhook.unique,
+							}}></umb-entity-actions-table-column-layout>`,
 					},
 				],
 			};
