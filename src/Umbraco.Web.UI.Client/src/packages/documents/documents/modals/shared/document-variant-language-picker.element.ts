@@ -28,6 +28,7 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 			this.selectionManager.selection,
 			(selection) => {
 				this._selection = selection;
+				this._isAllSelected = this.#isAllSelected();
 			},
 			'_selectionManager',
 		);
@@ -38,6 +39,9 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 
 	@state()
 	_selection: Array<string> = [];
+
+	@state()
+	_isAllSelected?: boolean;
 
 	/**
 	 * A filter function that determines if an item is pickableFilter or not.
@@ -96,7 +100,7 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 			<uui-checkbox
 				@change=${this.#onSelectAllChange}
 				label=${this.localize.term('general_selectAll')}
-				.checked=${this.#isAllSelected()}></uui-checkbox>
+				.checked=${this._isAllSelected}></uui-checkbox>
 			${repeat(
 				this.variantLanguageOptions,
 				(option) => option.unique,
