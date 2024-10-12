@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
@@ -15,17 +17,16 @@ internal sealed class RequestContextOutputExpansionStrategyV2 : IOutputExpansion
 
     private readonly IApiPropertyRenderer _propertyRenderer;
     private readonly ILogger<RequestContextOutputExpansionStrategyV2> _logger;
+    private readonly DeliveryApiSettings _deliveryApiSettings;
 
     private readonly Stack<Node?> _expandProperties;
     private readonly Stack<Node?> _includeProperties;
 
-    public RequestContextOutputExpansionStrategyV2(
-        IHttpContextAccessor httpContextAccessor,
-        IApiPropertyRenderer propertyRenderer,
-        ILogger<RequestContextOutputExpansionStrategyV2> logger)
+    public RequestContextOutputExpansionStrategyV2(IHttpContextAccessor httpContextAccessor, IApiPropertyRenderer propertyRenderer, ILogger<RequestContextOutputExpansionStrategyV2> logger, IOptions<DeliveryApiSettings> deliveryApiSettings)
     {
         _propertyRenderer = propertyRenderer;
         _logger = logger;
+        _deliveryApiSettings = deliveryApiSettings.Value;
         _expandProperties = new Stack<Node?>();
         _includeProperties = new Stack<Node?>();
 
@@ -50,7 +51,7 @@ internal sealed class RequestContextOutputExpansionStrategyV2 : IOutputExpansion
             .ToArray();
 
         return properties.Any()
-            ? MapProperties(properties)
+            ? MapProperties(properties, _deliveryApiSettings.AlwaysExpandMediaProperties)
             : new Dictionary<string, object?>();
     }
 

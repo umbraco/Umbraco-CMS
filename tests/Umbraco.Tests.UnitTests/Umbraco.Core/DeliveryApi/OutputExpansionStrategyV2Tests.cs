@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Delivery.Rendering;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -343,7 +345,8 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         IOutputExpansionStrategy outputExpansionStrategy = new RequestContextOutputExpansionStrategyV2(
             httpContextAccessorMock.Object,
             new ApiPropertyRenderer(new NoopPublishedValueFallback()),
-            Mock.Of<ILogger<RequestContextOutputExpansionStrategyV2>>());
+            Mock.Of<ILogger<RequestContextOutputExpansionStrategyV2>>(),
+            CreateDeliveryApiSettings());
         var outputExpansionStrategyAccessorMock = new Mock<IOutputExpansionStrategyAccessor>();
         outputExpansionStrategyAccessorMock.Setup(s => s.TryGetValue(out outputExpansionStrategy)).Returns(true);
 
@@ -352,4 +355,12 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
 
     protected override string? FormatExpandSyntax(bool expandAll = false, string[]? expandPropertyAliases = null)
         => expandAll ? "$all" : expandPropertyAliases?.Any() is true ? $"properties[{string.Join(",", expandPropertyAliases)}]" : null;
+
+    private IOptions<DeliveryApiSettings> CreateDeliveryApiSettings()
+    {
+        var deliveryApiSettings = new DeliveryApiSettings();
+        var deliveryApiOptionsMonitorMock = new Mock<IOptions<DeliveryApiSettings>>();
+        deliveryApiOptionsMonitorMock.Setup(s => s.Value).Returns(deliveryApiSettings);
+        return deliveryApiOptionsMonitorMock.Object;
+    }
 }
