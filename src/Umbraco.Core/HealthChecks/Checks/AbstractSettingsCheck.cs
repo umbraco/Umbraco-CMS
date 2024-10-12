@@ -63,7 +63,7 @@ public abstract class AbstractSettingsCheck : HealthCheck
                 "healthcheck", "checkErrorMessageUnexpectedValue", new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, ItemPath });
 
     /// <inheritdoc />
-    public override Task<IEnumerable<HealthCheckStatus>> GetStatus()
+    public override Task<IEnumerable<HealthCheckStatus>> GetStatusAsync()
     {
         // update the successMessage with the CurrentValue
         var successMessage = string.Format(CheckSuccessMessage, ItemPath, Values, CurrentValue);
