@@ -15,18 +15,21 @@ public static class MethodInfoApiCommonExtensions
         return string.Join("|", mapToApis.SelectMany(x=>x.Versions));
     }
 
-    public static string? GetMapToApiAttributeValue(this MethodInfo methodInfo)
-    {
-        MapToApiAttribute[] mapToApis = (methodInfo.DeclaringType?.GetCustomAttributes(typeof(MapToApiAttribute), inherit: true) ?? Array.Empty<object>()).Cast<MapToApiAttribute>().ToArray();
+    public static MapToApiAttribute? GetMapToApiAttribute(this MethodInfo methodInfo) => methodInfo.DeclaringType?.GetCustomAttributes<MapToApiAttribute>(inherit: true).SingleOrDefault();
 
-        return mapToApis.SingleOrDefault()?.ApiName;
-    }
+    [Obsolete("Use GetMapToApiAttribute instead and get the value from .ApiName")]
+    public static string? GetMapToApiAttributeValue(this MethodInfo methodInfo) => GetMapToApiAttribute(methodInfo)?.ApiName;
 
+    [Obsolete("Use GetMapToApiAttribute instead.")]
     public static bool HasMapToApiAttribute(this MethodInfo methodInfo, string apiName)
     {
-        var value = methodInfo.GetMapToApiAttributeValue();
+        MapToApiAttribute? mapToApiAttribute = GetMapToApiAttribute(methodInfo);
 
-        return value == apiName
-               || (value is null && apiName == DefaultApiConfiguration.ApiName);
+        if (mapToApiAttribute is null)
+        {
+            return apiName == DefaultApiConfiguration.ApiName;
+        }
+
+        return mapToApiAttribute.ApiName == apiName;
     }
 }
