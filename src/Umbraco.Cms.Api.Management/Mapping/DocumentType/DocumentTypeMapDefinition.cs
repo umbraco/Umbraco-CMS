@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.Mapping.ContentType;
+using Umbraco.Cms.Api.Management.Mapping.ContentType;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Mapping;
@@ -39,6 +39,7 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
         target.Properties = MapPropertyTypes(source);
         target.AllowedDocumentTypes = source.AllowedContentTypes?.Select(ct =>
                 new DocumentTypeSort { DocumentType = new ReferenceByIdModel(ct.Key), SortOrder = ct.SortOrder })
+            .OrderBy(ct => ct.SortOrder)
             .ToArray() ?? Enumerable.Empty<DocumentTypeSort>();
         target.Compositions = MapNestedCompositions(
             source.ContentTypeComposition,
