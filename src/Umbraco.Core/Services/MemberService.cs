@@ -776,7 +776,6 @@ namespace Umbraco.Cms.Core.Services
             var savingNotification = new MemberSavingNotification(member, evtMsgs);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return OperationResult.Attempt.Cancel(evtMsgs);
             }
 
@@ -811,7 +810,6 @@ namespace Umbraco.Cms.Core.Services
             var savingNotification = new MemberSavingNotification(membersA, evtMsgs);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return OperationResult.Attempt.Cancel(evtMsgs);
             }
 
@@ -851,7 +849,6 @@ namespace Umbraco.Cms.Core.Services
             var deletingNotification = new MemberDeletingNotification(member, evtMsgs);
             if (scope.Notifications.PublishCancelable(deletingNotification))
             {
-                scope.Complete();
                 return OperationResult.Attempt.Cancel(evtMsgs);
             }
 
@@ -1172,7 +1169,6 @@ namespace Umbraco.Cms.Core.Services
 
             if (scope.Notifications.PublishCancelable(new MemberDeletingNotification(members, evtMsgs)))
             {
-                scope.Complete();
                 return;
             }
 

@@ -73,7 +73,6 @@ public class TemplateService : RepositoryService, ITemplateService
             var savingEvent = new TemplateSavingNotification(template, eventMessages, true, contentTypeAlias!);
             if (scope.Notifications.PublishCancelable(savingEvent))
             {
-                scope.Complete();
                 return Attempt.FailWithStatus(TemplateOperationStatus.CancelledByNotification, template);
             }
 
@@ -261,7 +260,6 @@ public class TemplateService : RepositoryService, ITemplateService
             var savingNotification = new TemplateSavingNotification(template, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return Attempt.FailWithStatus(TemplateOperationStatus.CancelledByNotification, template);
             }
 
@@ -408,7 +406,6 @@ public class TemplateService : RepositoryService, ITemplateService
             var deletingNotification = new TemplateDeletingNotification(template, eventMessages);
             if (scope.Notifications.PublishCancelable(deletingNotification))
             {
-                scope.Complete();
                 return Attempt.FailWithStatus<ITemplate?, TemplateOperationStatus>(TemplateOperationStatus.CancelledByNotification, template);
             }
 

@@ -446,7 +446,6 @@ public class RelationService : RepositoryService, IRelationService
             var savingNotification = new RelationSavingNotification(relation, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return relation; // TODO: returning sth that does not exist here?!
             }
 
@@ -546,7 +545,6 @@ public class RelationService : RepositoryService, IRelationService
             var savingNotification = new RelationSavingNotification(relation, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return;
             }
 
@@ -567,7 +565,6 @@ public class RelationService : RepositoryService, IRelationService
             var savingNotification = new RelationSavingNotification(relationsA, messages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return;
             }
 
@@ -587,7 +584,6 @@ public class RelationService : RepositoryService, IRelationService
             var savingNotification = new RelationTypeSavingNotification(relationType, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return;
             }
 
@@ -651,7 +647,6 @@ public class RelationService : RepositoryService, IRelationService
             var savingNotification = new RelationTypeSavingNotification(relationType, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return Attempt.FailWithStatus(RelationTypeOperationStatus.CancelledByNotification, relationType);
             }
 
@@ -675,7 +670,6 @@ public class RelationService : RepositoryService, IRelationService
             var deletingNotification = new RelationDeletingNotification(relation, eventMessages);
             if (scope.Notifications.PublishCancelable(deletingNotification))
             {
-                scope.Complete();
                 return;
             }
 
@@ -695,7 +689,6 @@ public class RelationService : RepositoryService, IRelationService
             var deletingNotification = new RelationTypeDeletingNotification(relationType, eventMessages);
             if (scope.Notifications.PublishCancelable(deletingNotification))
             {
-                scope.Complete();
                 return;
             }
 
@@ -720,7 +713,6 @@ public class RelationService : RepositoryService, IRelationService
             var deletingNotification = new RelationTypeDeletingNotification(relationType, eventMessages);
             if (scope.Notifications.PublishCancelable(deletingNotification))
             {
-                scope.Complete();
                 return Attempt.FailWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.CancelledByNotification, null);
             }
 

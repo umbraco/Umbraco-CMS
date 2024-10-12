@@ -195,7 +195,6 @@ public class BackOfficeUserStore :
         var savingNotification = new UserSavingNotification(user, eventMessages);
         if (scope.Notifications.PublishCancelable(savingNotification))
         {
-            scope.Complete();
             return Task.FromResult(UserOperationStatus.CancelledByNotification);
         }
 
