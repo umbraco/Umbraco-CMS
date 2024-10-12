@@ -1,254 +1,312 @@
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, type CSSResultGroup, html, nothing, when, customElement, property, queryAssignedElements, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	type CSSResultGroup,
+	html,
+	nothing,
+	when,
+	customElement,
+	property,
+	queryAssignedElements,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 
 import { UMB_AUTH_CONTEXT } from '../../contexts';
 
 @customElement('umb-login-page')
 export default class UmbLoginPageElement extends UmbLitElement {
-  @property({type: Boolean, attribute: 'username-is-email'})
-  usernameIsEmail = false;
+	protected fromId = 'umb-login-form';
 
-  @queryAssignedElements({flatten: true})
-  protected slottedElements?: HTMLFormElement[];
+	@property({ type: Boolean, attribute: 'username-is-email' })
+	usernameIsEmail = false;
 
-  @property({type: Boolean, attribute: 'allow-password-reset'})
-  allowPasswordReset = false;
+	@queryAssignedElements({ flatten: true })
+	protected slottedElements?: HTMLFormElement[];
 
-  @state()
-  private _loginState?: UUIButtonState;
+	@property({ type: Boolean, attribute: 'allow-password-reset' })
+	allowPasswordReset = false;
 
-  @state()
-  private _loginError = '';
+	@property({ type: Boolean, attribute: 'allow-show-password-check-box' })
+	allowShowPasswordCheckBox = false;
 
-  @state()
-  supportPersistLogin = false;
+	@state()
+	private _loginState?: UUIButtonState;
 
-  #formElement?: HTMLFormElement;
+	@state()
+	private _loginError = '';
 
-  #authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
+	@state()
+	supportPersistLogin = false;
 
-  constructor() {
-    super();
+	#formElement?: HTMLFormElement;
 
-    this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
-      this.#authContext = authContext;
-      this.supportPersistLogin = authContext.supportsPersistLogin;
-    });
-  }
+	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 
-  async #onSlotChanged() {
-    this.#formElement = this.slottedElements?.find((el) => el.id === 'umb-login-form');
+	constructor() {
+		super();
 
-    if (!this.#formElement) return;
+		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
+			this.#authContext = authContext;
+			this.supportPersistLogin = authContext.supportsPersistLogin;
+		});
+	}
 
-    // We need to listen for the enter key to submit the form, because the uui-button does not support the native input fields submit event
-    this.#formElement.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        this.#onSubmitClick();
-      }
-    });
-    this.#formElement.onsubmit = this.#handleSubmit;
-  }
+	async #onSlotChanged() {
+		this.#formElement = this.slottedElements?.find((el) => el.id === this.fromId);
 
-  #handleSubmit = async (e: SubmitEvent) => {
-    e.preventDefault();
+		if (!this.#formElement) return;
 
-    if (!this.#authContext) return;
+		// We need to listen for the enter key to submit the form, because the uui-button does not support the native input fields submit event
+		this.#formElement.addEventListener('keypress', (e) => {
+			if (e.key === 'Enter') {
+				this.#onSubmitClick();
+			}
+		});
+		this.#formElement.onsubmit = this.#handleSubmit;
+	}
 
-    const form = e.target as HTMLFormElement;
-    if (!form) return;
+	#togglePasswordVisibility() {
+		const exPasswordElement = document.querySelector<HTMLFormElement>('.was-password');
+		if (exPasswordElement) {
+			exPasswordElement.type = 'password';
+			exPasswordElement.classList.remove('was-password');
+			return;
+		}
+		const loginForm = document.querySelector('#umb-login-form');
+		if (loginForm) {
+			const passwordField = loginForm.querySelector<HTMLFormElement>('input[type="password"]');
+			if (passwordField) {
+				passwordField.type = 'text';
+				passwordField.classList.add('was-password');
+			}
+		}
+	}
 
-    const formData = new FormData(form);
+	#handleSubmit = async (e: SubmitEvent) => {
+		e.preventDefault();
 
-    const username = formData.get('username') as string;
-    const password = formData.get('password') as string;
-    const persist = formData.has('persist');
+		if (!this.#authContext) return;
 
-    if (!username || !password) {
-      this._loginError = this.localize.term('auth_userFailedLogin');
-      this._loginState = 'failed';
-      return;
-    }
+		const form = e.target as HTMLFormElement;
+		if (!form) return;
 
-    this._loginState = 'waiting';
+		const formData = new FormData(form);
 
-    const response = await this.#authContext.login({
-      username,
-      password,
-      persist,
-    });
+		const username = formData.get('username') as string;
+		const password = formData.get('password') as string;
+		const persist = formData.has('persist');
 
-    this._loginError = response.error || '';
-    this._loginState = response.error ? 'failed' : 'success';
+		if (!username || !password) {
+			this._loginError = this.localize.term('auth_userFailedLogin');
+			this._loginState = 'failed';
+			return;
+		}
 
-    // Check for 402 status code indicating that MFA is required
-    if (response.status === 402) {
-      this.#authContext.isMfaEnabled = true;
-      if (response.twoFactorView) {
-        this.#authContext.twoFactorView = response.twoFactorView;
-      }
-      if (response.twoFactorProviders) {
-        this.#authContext.mfaProviders = response.twoFactorProviders;
-      }
+		this._loginState = 'waiting';
 
-      this.dispatchEvent(new CustomEvent('umb-login-flow', {composed: true, detail: {flow: 'mfa'}}));
-      return;
-    }
+		const response = await this.#authContext.login({
+			username,
+			password,
+			persist,
+		});
 
-    if (response.error) {
-      return;
-    }
+		this._loginError = response.error || '';
+		this._loginState = response.error ? 'failed' : 'success';
 
-    const returnPath = this.#authContext.returnPath;
+		// Check for 402 status code indicating that MFA is required
+		if (response.status === 402) {
+			this.#authContext.isMfaEnabled = true;
+			if (response.twoFactorView) {
+				this.#authContext.twoFactorView = response.twoFactorView;
+			}
+			if (response.twoFactorProviders) {
+				this.#authContext.mfaProviders = response.twoFactorProviders;
+			}
 
-    if (returnPath) {
-      location.href = returnPath;
-    }
-  };
+			this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: 'mfa' } }));
+			return;
+		}
 
-  get #greetingLocalizationKey() {
-    return [
-      'auth_greeting0',
-      'auth_greeting1',
-      'auth_greeting2',
-      'auth_greeting3',
-      'auth_greeting4',
-      'auth_greeting5',
-      'auth_greeting6',
-    ][new Date().getDay()];
-  }
+		if (response.error) {
+			return;
+		}
 
-  #onSubmitClick = () => {
-    this.#formElement?.requestSubmit();
-  };
+		const returnPath = this.#authContext.returnPath;
 
-  render() {
-    return html`
-      <header id="header">
-        <h1 id="greeting">
-          <umb-localize .key=${this.#greetingLocalizationKey}>Welcome</umb-localize>
-        </h1>
-        <slot name="subheadline"></slot>
-      </header>
-      <slot @slotchange=${this.#onSlotChanged}></slot>
-      <div id="secondary-actions">
-        ${when(
-          this.supportPersistLogin,
-          () => html`
-            <uui-form-layout-item>
-              <uui-checkbox
-                name="persist"
-                .label=${this.localize.term('auth_rememberMe')}>
-                <umb-localize key="auth_rememberMe">Remember me</umb-localize>
-              </uui-checkbox>
-            </uui-form-layout-item>`
-        )}
-        ${when(
-          this.allowPasswordReset,
-          () =>
-            html`
-              <button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
-                <umb-localize key="auth_forgottenPassword">Forgotten password?</umb-localize>
-              </button>`
-        )}
-      </div>
-      <uui-button
-        type="submit"
-        id="umb-login-button"
-        look="primary"
-        @click=${this.#onSubmitClick}
-        .label=${this.localize.term('auth_login')}
-        color="default"
-        .state=${this._loginState}></uui-button>
+		if (returnPath) {
+			location.href = returnPath;
+		}
+	};
 
-      ${this.#renderErrorMessage()}
-    `;
-  }
+	get #greetingLocalizationKey() {
+		return [
+			'auth_greeting0',
+			'auth_greeting1',
+			'auth_greeting2',
+			'auth_greeting3',
+			'auth_greeting4',
+			'auth_greeting5',
+			'auth_greeting6',
+		][new Date().getDay()];
+	}
 
-  #renderErrorMessage() {
-    if (!this._loginError || this._loginState !== 'failed') return nothing;
+	#onSubmitClick = () => {
+		this.#formElement?.requestSubmit();
+	};
 
-    return html`<span class="text-error text-danger">${this._loginError}</span>`;
-  }
+	render() {
+		return html`
+			<header id="header">
+				<h1 id="greeting">
+					<umb-localize .key=${this.#greetingLocalizationKey}>Welcome</umb-localize>
+				</h1>
+				<slot name="subheadline"></slot>
+			</header>
+			<slot @slotchange=${this.#onSlotChanged}></slot>
+			<div id="secondary-actions">
+				${when(
+					this.allowShowPasswordCheckBox,
+					() => html` <div class="secondary-action">
+						<uui-checkbox
+							@change="${this.#togglePasswordVisibility}"
+							name="persist"
+							.label=${this.localize.term('auth_rememberMe')}>
+							<umb-localize key="auth_showPassword">Show password</umb-localize>
+						</uui-checkbox>
+					</div>`
+				)}
+				${when(
+					this.allowPasswordReset,
+					() =>
+						html` <div class="secondary-action">
+							<button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
+								<umb-localize key="auth_forgottenPassword">Forgotten password?</umb-localize>
+							</button>
+						</div>`
+				)}
+			</div>
+			${when(
+				this.supportPersistLogin,
+				() => html` <uui-form-layout-item class="mb-0">
+					<uui-checkbox name="persist" .label=${this.localize.term('auth_rememberMe')}>
+						<umb-localize key="auth_rememberMe">Remember me</umb-localize>
+					</uui-checkbox>
+				</uui-form-layout-item>`
+			)}
+			<uui-button
+				class="	${when(
+				this.supportPersistLogin,
+				() =>'mt-0')}"
+				type="submit"
+				id="umb-login-button"
+				look="primary"
+				@click=${this.#onSubmitClick}
+				.label=${this.localize.term('auth_login')}
+				color="default"
+				.state=${this._loginState}></uui-button>
 
-  #handleForgottenPassword() {
-    this.dispatchEvent(new CustomEvent('umb-login-flow', {composed: true, detail: {flow: 'reset'}}));
-  }
+			${this.#renderErrorMessage()}
+		`;
+	}
 
-  static styles: CSSResultGroup = [
-    css`
-      :host {
-        display: flex;
-        flex-direction: column;
-      }
+	#renderErrorMessage() {
+		if (!this._loginError || this._loginState !== 'failed') return nothing;
 
-      #header {
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        gap: var(--uui-size-space-5);
-      }
+		return html`<span class="text-error text-danger">${this._loginError}</span>`;
+	}
 
-      #header span {
-        color: var(--uui-color-text-alt); /* TODO Change to uui color when uui gets a muted text variable */
-        font-size: 14px;
-      }
+	#handleForgottenPassword() {
+		this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: 'reset' } }));
+	}
 
-      #greeting {
-        color: var(--uui-color-interactive);
-        text-align: center;
-        font-weight: 400;
-        font-size: var(--header-font-size);
-        margin: 0 0 var(--uui-size-layout-1);
-        line-height: 1.2;
-      }
+	static styles: CSSResultGroup = [
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+			}
 
-      #umb-login-button {
-        margin-top: var(--uui-size-space-4);
-        width: 100%;
-      }
+			#header {
+				text-align: center;
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-5);
+			}
 
-      #forgot-password {
-        cursor: pointer;
-        background: none;
-        border: 0;
-        height: 1rem;
-        color: var(--uui-color-text-alt); /* TODO Change to uui color when uui gets a muted text variable */
-        gap: var(--uui-size-space-1);
-        align-self: center;
-        text-decoration: none;
-        display: inline-flex;
-        line-height: 1;
-        font-size: 14px;
-        font-family: var(--uui-font-family),sans-serif;
-        margin-left: auto;
-        margin-bottom: var(--uui-size-space-3);
-      }
+			#header span {
+				color: var(--uui-color-text-alt); /* TODO Change to uui color when uui gets a muted text variable */
+				font-size: 14px;
+			}
 
-      #forgot-password:hover {
-        color: var(--uui-color-interactive-emphasis);
-      }
+			#greeting {
+				color: var(--uui-color-interactive);
+				text-align: center;
+				font-weight: 400;
+				font-size: var(--header-font-size);
+				margin: 0 0 var(--uui-size-layout-1);
+				line-height: 1.2;
+			}
 
-      .text-error {
-        margin-top: var(--uui-size-space-4);
-      }
+			#umb-login-button {
+				margin-top: var(--uui-size-space-4);
+				width: 100%;
+			}
 
-      .text-danger {
-        color: var(--uui-color-danger-standalone);
-      }
+			.mb-0 {
+				margin-bottom: 0px;
+			}
+			.mt-0 {
+				margin-top: 0px !important;
+			}
 
-      #secondary-actions {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-    `,
-  ];
+			#forgot-password {
+				cursor: pointer;
+				background: none;
+				border: 0;
+				height: 1rem;
+				color: var(--uui-color-text-alt); /* TODO Change to uui color when uui gets a muted text variable */
+				gap: var(--uui-size-space-1);
+				align-self: center;
+				text-decoration: none;
+				display: inline-flex;
+				line-height: 1;
+				font-size: 14px;
+				font-family: var(--uui-font-family), sans-serif;
+				margin-left: auto;
+				margin-bottom: var(--uui-size-space-3);
+			}
+
+			.secondary-action {
+				margin-top: -10px;
+				font-weight: 500;
+				font-size: 13px;
+				color: #666;
+				cursor: pointer;
+			}
+			#forgot-password:hover {
+				color: var(--uui-color-interactive-emphasis);
+			}
+
+			.text-error {
+				margin-top: var(--uui-size-space-4);
+			}
+
+			.text-danger {
+				color: var(--uui-color-danger-standalone);
+			}
+
+			#secondary-actions {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+		`,
+	];
 }
 
 declare global {
-  interface HTMLElementTagNameMap {
-    'umb-login-page': UmbLoginPageElement;
-  }
+	interface HTMLElementTagNameMap {
+		'umb-login-page': UmbLoginPageElement;
+	}
 }

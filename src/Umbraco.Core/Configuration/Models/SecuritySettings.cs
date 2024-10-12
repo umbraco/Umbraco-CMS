@@ -12,6 +12,7 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 public class SecuritySettings
 {
     internal const bool StaticMemberBypassTwoFactorForExternalLogins = true;
+    internal const bool StaticAllowShowPasswordCheckBox = true;
     internal const bool StaticUserBypassTwoFactorForExternalLogins = true;
     internal const bool StaticKeepUserLoggedIn = false;
     internal const bool StaticHideDisabledUsersInBackOffice = false;
@@ -68,6 +69,12 @@ public class SecuritySettings
     /// </summary>
     [DefaultValue(StaticAllowedUserNameCharacters)]
     public string AllowedUserNameCharacters { get; set; } = StaticAllowedUserNameCharacters;
+
+    /// <summary>
+    ///     Gets or sets the set the ablity to show/hide show password functionality
+    /// </summary>
+    [DefaultValue(StaticAllowShowPasswordCheckBox)]
+    public bool AllowShowPasswordCheckBox { get; set; } = StaticAllowShowPasswordCheckBox;
 
     /// <summary>
     ///     Gets or sets a value indicating whether to bypass the two factor requirement in Umbraco when using external login
