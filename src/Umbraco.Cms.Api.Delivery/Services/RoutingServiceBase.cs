@@ -36,7 +36,7 @@ internal abstract class RoutingServiceBase
     }
 
     protected static string GetContentRoute(DomainAndUri domainAndUri, Uri contentRoute)
-        => $"{domainAndUri.ContentId}{DomainUtilities.PathRelativeToDomain(domainAndUri.Uri, contentRoute.AbsolutePath)}";
+        => $"{domainAndUri.ContentId}{DomainUtilities.PathRelativeToDomain(domainAndUri.Uri, contentRoute.GetAbsolutePathDecoded())}";
 
     protected DomainAndUri? GetDomainAndUriForRoute(Uri contentUrl)
     {
