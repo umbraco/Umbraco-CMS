@@ -81,6 +81,11 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         {
             query = "\"" + g + "\"";
         }
+        else
+        {
+            // No Guid so no need to search the __Key field to prevent irrelevant results
+            fields.Remove(UmbracoExamineFieldNames.NodeKeyFieldName);
+        }
 
         IUser? currentUser = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser;
 
