@@ -63,6 +63,7 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
         swaggerGenOptions.TagActionsBy(api => new[] { api.GroupName });
         swaggerGenOptions.OrderActionsBy(ActionOrderBy);
         swaggerGenOptions.SchemaFilter<EnumSchemaFilter>();
+        swaggerGenOptions.SchemaFilter<SupportedDerivedTypesSchemaFilter>();
         swaggerGenOptions.CustomSchemaIds(_schemaIdSelector.SchemaId);
         swaggerGenOptions.SelectSubTypesUsing(_subTypesSelector.SubTypes);
         swaggerGenOptions.SupportNonNullableReferenceTypes();
