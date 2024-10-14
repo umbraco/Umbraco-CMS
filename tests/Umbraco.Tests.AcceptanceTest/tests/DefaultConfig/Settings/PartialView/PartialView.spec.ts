@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const partialViewName = 'TestPartialView';
@@ -26,7 +26,7 @@ test('can create an empty partial view', {tag: '@smoke'}, async ({umbracoApi, um
   await umbracoUi.partialView.clickSaveButton();
 
   // Assert
-  await umbracoUi.partialView.isSuccessNotificationVisible();
+  await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.partialView.doesNameExist(partialViewFileName)).toBeTruthy();
   // Verify the new partial view is displayed under the Partial Views section
   await umbracoUi.partialView.isPartialViewRootTreeItemVisible(partialViewFileName);
@@ -46,7 +46,7 @@ test('can create a partial view from snippet', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.partialView.clickSaveButton();
 
   // Assert
-  await umbracoUi.partialView.isSuccessNotificationVisible();
+  await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
   const partialViewData = await umbracoApi.partialView.getByName(partialViewFileName);
 
@@ -80,7 +80,7 @@ test('can rename a partial view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   await umbracoUi.partialView.rename(partialViewName);
 
   // Assert
-  await umbracoUi.partialView.isSuccessNotificationVisible();
+  await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.renamed);
   expect(await umbracoApi.partialView.doesNameExist(partialViewFileName)).toBeTruthy();
   expect(await umbracoApi.partialView.doesNameExist(wrongPartialViewFileName)).toBeFalsy();
   // Verify the old partial view is NOT displayed under the Partial Views section
@@ -107,7 +107,7 @@ test.skip('can update a partial view content', {tag: '@smoke'}, async ({umbracoA
   await umbracoUi.partialView.clickSaveButton();
 
   // Assert
-  await umbracoUi.partialView.isSuccessNotificationVisible();
+  await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const updatedPartialView = await umbracoApi.partialView.getByName(partialViewFileName);
   expect(updatedPartialView.content).toBe(updatedPartialViewContent);
 });
@@ -147,7 +147,7 @@ test.skip('can use query builder with Order By statement for a partial view', as
   await umbracoUi.partialView.clickSaveButton();
 
   // Assert
-  await umbracoUi.partialView.isSuccessNotificationVisible();
+  await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const updatedPartialView = await umbracoApi.partialView.getByName(partialViewFileName);
   expect(updatedPartialView.content).toBe(expectedTemplateContent);
 });
@@ -188,7 +188,7 @@ test('can use query builder with Where statement for a partial view', async ({um
   await umbracoUi.partialView.clickSaveButton();
 
   // Assert
-  await umbracoUi.partialView.isSuccessNotificationVisible();
+  await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const updatedPartialView = await umbracoApi.partialView.getByName(partialViewFileName);
   expect(updatedPartialView.content).toBe(expectedTemplateContent);
 });
@@ -210,7 +210,7 @@ test.skip('can insert dictionary item into a partial view', async ({umbracoApi, 
   await umbracoUi.partialView.clickSaveButton();
 
   // Assert
-  await umbracoUi.partialView.isSuccessNotificationVisible();
+  await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const partialViewData = await umbracoApi.partialView.getByName(partialViewFileName);
   expect(partialViewData.content).toBe(partialViewContent);
 });
@@ -230,7 +230,7 @@ test.skip('can insert value into a partial view', async ({umbracoApi, umbracoUi}
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  await umbracoUi.partialView.isSuccessNotificationVisible();
+  await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const partialViewData = await umbracoApi.partialView.getByName(partialViewFileName);
   expect(partialViewData.content).toBe(partialViewContent);
 });
@@ -246,7 +246,7 @@ test('can delete a partial view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   await umbracoUi.partialView.clickDeleteAndConfirmButton();
 
   // Assert
-  await umbracoUi.partialView.isSuccessNotificationVisible();
+  await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
   expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeFalsy();
   // Verify the partial view is NOT displayed under the Partial Views section
   await umbracoUi.partialView.clickRootFolderCaretButton();
