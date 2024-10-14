@@ -22,8 +22,8 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 					},
 					{
 						alias: 'extensions',
-						label: 'Extensions',
-						description: 'Extensions to enable',
+						label: 'Capabilities',
+						description: 'Enable extensions enhance the capabilities of the Tiptap editor.',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Tiptap.ExtensionsConfiguration',
 						weight: 10,
 					},
