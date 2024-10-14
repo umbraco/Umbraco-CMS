@@ -51,11 +51,7 @@ export class UmbInputColorElement extends UUIFormControlMixin(UmbLitElement, '')
 		return map(
 			this.swatches,
 			(swatch) => html`
-				<uui-color-swatch
-					?readonly=${this.readonly}
-					label=${swatch.label}
-					value=${swatch.value}
-					.showLabel=${this.showLabels}></uui-color-swatch>
+				<uui-color-swatch label=${swatch.label} value=${swatch.value} .showLabel=${this.showLabels}></uui-color-swatch>
 			`,
 		);
 	}
