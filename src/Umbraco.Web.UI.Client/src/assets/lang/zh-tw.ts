@@ -153,6 +153,7 @@ export default {
 		scheduledPublishServerTime: '預計發表的時間（伺服器端）',
 		scheduledPublishDocumentation:
 			'<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">這是什麼意思？</a>',
+		saveModalTitle: '保存',
 	},
 	media: {
 		clickToUpload: '點選以便上傳',

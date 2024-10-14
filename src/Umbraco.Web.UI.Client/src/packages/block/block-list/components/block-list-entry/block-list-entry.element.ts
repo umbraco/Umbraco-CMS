@@ -48,15 +48,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 	private _contentKey?: string | undefined;
 
-	/**
-	 * Sets the element to readonly mode, meaning value cannot be changed but still able to read and select its content.
-	 * @type {boolean}
-	 * @attr
-	 * @default false
-	 */
-	@property({ type: Boolean, reflect: true })
-	public readonly = false;
-
 	#context = new UmbBlockListEntryContext(this);
 
 	@state()
@@ -104,6 +95,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.requestUpdate('_blockViewProps');
 	}
 
+	@state()
+	private _isReadOnly = false;
+
 	constructor() {
 		super();
 
@@ -111,7 +105,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			this.#context.showContentEdit,
 			(showContentEdit) => {
 				this._showContentEdit = showContentEdit;
-				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showContentEdit } });
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showContentEdit } });
 			},
 			null,
 		);
@@ -119,7 +113,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			this.#context.settingsElementTypeKey,
 			(key) => {
 				this._hasSettings = !!key;
-				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showSettingsEdit: !!key } });
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showSettingsEdit: !!key } });
 			},
 			null,
 		);
@@ -195,7 +189,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			this.#context.workspaceEditContentPath,
 			(path) => {
 				this._workspaceEditContentPath = path;
-				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editContentPath: path } });
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editContentPath: path } });
 			},
 			null,
 		);
@@ -203,9 +197,14 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			this.#context.workspaceEditSettingsPath,
 			(path) => {
 				this._workspaceEditSettingsPath = path;
-				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editSettingsPath: path } });
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editSettingsPath: path } });
 			},
 			null,
+		);
+		this.observe(
+			this.#context.readOnlyState.isReadOnly,
+			(isReadOnly) => (this._isReadOnly = isReadOnly),
+			'umbReadonlyObserver',
 		);
 	}
 
@@ -333,7 +332,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderDeleteAction() {
-		if (this.readonly) return nothing;
+		if (this._isReadOnly) return nothing;
 		return html` <uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()}>
 			<uui-icon name="icon-remove"></uui-icon>
 		</uui-button>`;

@@ -189,7 +189,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 				${this._createPath
 					? html` <uui-button
-							label=${this.localize.string(this._createLabel ?? 'general_create')}
+							label=${this.localize.string(this._createLabel ?? '#general_create')}
 							look="secondary"
 							href=${this._createPath}></uui-button>`
 					: nothing}

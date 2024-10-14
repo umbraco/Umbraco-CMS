@@ -171,13 +171,19 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	private _canCreate?: boolean;
 
 	@state()
-	private _singleBlockTypeName?: string;
+	private _createLabel?: string;
+
+	@state()
+	private _configCreateLabel?: string;
 
 	@state()
 	private _styleElement?: HTMLLinkElement;
 
 	@state()
 	private _layoutEntries: Array<UmbBlockGridLayoutModel> = [];
+
+	@state()
+	private _isReadOnly: boolean = false;
 
 	constructor() {
 		super();
@@ -201,12 +207,13 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 					this.observe(
 						this.#context.firstAllowedBlockTypeName(),
 						(firstAllowedName) => {
-							this._singleBlockTypeName = firstAllowedName;
+							this._createLabel = this.localize.term('blockEditor_addThis', this.localize.string(firstAllowedName));
 						},
 						'observeSingleBlockTypeName',
 					);
 				} else {
 					this.removeUmbControllerByAlias('observeSingleBlockTypeName');
+					this._createLabel = this.localize.term('blockEditor_addBlock');
 				}
 			},
 			null,
@@ -239,6 +246,26 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				},
 				'observeStylesheet',
 			);
+
+			this.observe(
+				manager.readOnlyState.isReadOnly,
+				(isReadOnly) => (this._isReadOnly = isReadOnly),
+				'observeIsReadOnly',
+			);
+
+			if (this.areaKey) {
+				this.observe(
+					this.#context.areaTypeCreateLabel,
+					(label) => (this._configCreateLabel = label),
+					'observeConfigCreateLabel',
+				);
+			} else {
+				this.observe(
+					manager.editorConfigurationPart((x) => x?.find((y) => y.alias === 'createLabel')?.value),
+					(label) => (this._configCreateLabel = label as string | undefined),
+					'observeConfigCreateLabel',
+				);
+			}
 		});
 
 		new UmbFormControlValidator(this, this /*, this.#dataPath*/);
@@ -330,36 +357,50 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 						</umb-block-grid-entry>`,
 				)}
 			</div>
-			${this._canCreate ? this.#renderCreateButton() : nothing}
+			${this._canCreate ? this.#renderCreateButtonGroup() : nothing}
 			${this._areaKey ? html` <uui-form-validation-message .for=${this}></uui-form-validation-message>` : nothing}
 		`;
 	}
 
-	#renderCreateButton() {
+	#renderCreateButtonGroup() {
 		if (this._areaKey === null || this._layoutEntries.length === 0) {
-			return html`<uui-button-group id="createButton">
-				<uui-button
-					look="placeholder"
-					label=${this._singleBlockTypeName
-						? this.localize.term('blockEditor_addThis', [this._singleBlockTypeName])
-						: this.localize.term('blockEditor_addBlock')}
-					href=${this.#context.getPathForCreateBlock(-1) ?? ''}></uui-button>
-				${this._areaKey === null
-					? html` <uui-button
-							label=${this.localize.term('content_createFromClipboard')}
-							look="placeholder"
-							href=${this.#context.getPathForClipboard(-1) ?? ''}>
-							<uui-icon name="icon-paste-in"></uui-icon>
-						</uui-button>`
-					: nothing}
+			return html` <uui-button-group id="createButton">
+				${this.#renderCreateButton()} ${this.#renderPasteButton()}
 			</uui-button-group>`;
+		} else if (this._isReadOnly === false) {
+			return html`<uui-button-inline-create
+				href=${this.#context.getPathForCreateBlock(-1) ?? ''}
+				label=${this.localize.term('blockEditor_addBlock')}></uui-button-inline-create> `;
 		} else {
-			return html`
-				<uui-button-inline-create
-					href=${this.#context.getPathForCreateBlock(-1) ?? ''}
-					label=${this.localize.term('blockEditor_addBlock')}></uui-button-inline-create>
-			`;
+			return nothing;
 		}
+	}
+
+	#renderCreateButton() {
+		if (this._isReadOnly && this._layoutEntries.length > 0) return nothing;
+
+		return html`
+			<uui-button
+				look="placeholder"
+				label=${this._configCreateLabel ?? this._createLabel ?? ''}
+				href=${this.#context.getPathForCreateBlock(-1) ?? ''}
+				?disabled=${this._isReadOnly}></uui-button>
+		`;
+	}
+
+	#renderPasteButton() {
+		if (this._areaKey) return nothing;
+		if (this._isReadOnly && this._layoutEntries.length > 0) return nothing;
+
+		return html`
+			<uui-button
+				label=${this.localize.term('content_createFromClipboard')}
+				look="placeholder"
+				href=${this.#context.getPathForClipboard(-1) ?? ''}
+				?disabled=${this._isReadOnly}>
+				<uui-icon name="icon-paste-in"></uui-icon>
+			</uui-button>
+		`;
 	}
 
 	static override styles = [

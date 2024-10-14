@@ -332,6 +332,7 @@ export default {
 		variantSendForApprovalNotAllowed: 'Zur Genehmigung senden ist nicht erlaubt.',
 		variantScheduleNotAllowed: 'Plannung ist nicht erlaubt',
 		variantUnpublishNotAllowed: 'Veröffentlichung zurücknehmen ist nicht erlaubt.',
+		saveModalTitle: 'Speichern',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Erzeuge eine neue Inhaltsvorlage von <em>%0%</em>',

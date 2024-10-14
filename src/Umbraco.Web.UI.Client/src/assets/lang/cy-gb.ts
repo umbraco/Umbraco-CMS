@@ -331,6 +331,7 @@ export default {
 		variantSendForApprovalNotAllowed: 'Ni chaniateir anfon am gymeradwyaeth',
 		variantScheduleNotAllowed: 'Ni chaniateir amserlennu',
 		variantUnpublishNotAllowed: 'Ni chaniateir dad-gyhoeddi',
+		saveModalTitle: 'Achub',
 	},
 	blueprints: {
 		createBlueprintFrom: "Creu Templed Cynnwys newydd o '%0%'",

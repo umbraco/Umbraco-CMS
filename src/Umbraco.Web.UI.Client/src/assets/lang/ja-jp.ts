@@ -148,6 +148,7 @@ export default {
 		notmemberof: 'グループのメンバーではありません',
 		childItems: '子コンテンツ',
 		target: 'ターゲット',
+		saveModalTitle: '保存',
 	},
 	media: {
 		clickToUpload: 'クリックしてアップロードする',

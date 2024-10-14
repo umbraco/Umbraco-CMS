@@ -91,7 +91,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 							.value=${this._name}
 							.alias=${this._alias}
 							?auto-generate-alias=${this._isNew}
-							@change="${this.#onNameAndAliasChange}"
+							@change=${this.#onNameAndAliasChange}
 							required
 							${umbBindToValidation(this, '$.name', this._name)}
 							${umbFocus()}>

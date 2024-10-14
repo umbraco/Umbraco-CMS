@@ -146,6 +146,7 @@ export default {
 		notmemberof: 'Ikke medlem av gruppe(ne)',
 		childItems: 'Undersider',
 		target: 'Åpne i vindu',
+		saveModalTitle: 'Lagre',
 	},
 	media: {
 		clickToUpload: 'Klikk for å laste opp',

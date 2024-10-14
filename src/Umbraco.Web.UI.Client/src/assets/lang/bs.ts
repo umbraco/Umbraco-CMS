@@ -318,6 +318,7 @@ export default {
 		createEmpty: 'Napravi novi',
 		createFromClipboard: 'Zalijepi iz međuspremnika',
 		nodeIsInTrash: 'Ova stavka je u korpi za otpatke',
+		saveModalTitle: 'Spremi',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Kreirajte novi predložak sadržaja iz <em>%0%</em>',

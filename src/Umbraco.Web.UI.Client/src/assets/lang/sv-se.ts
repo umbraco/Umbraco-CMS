@@ -233,6 +233,7 @@ export default {
 		listViewNoContent: 'Inga undernoder har lagts till',
 		noChanges: 'Inga ändringar har gjorts',
 		notCreated: 'Ej skapad',
+		saveModalTitle: 'Spara',
 	},
 	contentTypeEditor: {
 		yesDelete: 'Ja, ta bort',

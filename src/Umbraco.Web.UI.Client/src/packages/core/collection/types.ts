@@ -26,10 +26,8 @@ export interface UmbCollectionConfiguration {
 export interface UmbCollectionColumnConfiguration {
 	alias: string;
 	header: string;
-	// TODO: [LK] Figure out why the server API needs an int (1|0) instead of a boolean.
 	isSystem: 1 | 0;
 	elementName?: string;
-	// TODO: [LK] Remove `nameTemplate`, to be replaced with `elementName`.
 	nameTemplate?: string;
 }
 

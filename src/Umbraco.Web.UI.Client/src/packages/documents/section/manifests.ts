@@ -1,4 +1,4 @@
-import { UMB_CONTENT_SECTION_ALIAS } from './constants.js';
+import { UMB_CONTENT_SECTION_ALIAS } from '@umbraco-cms/backoffice/content';
 import { UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_CONTENT_MENU_ALIAS } from '@umbraco-cms/backoffice/document';
 
 export const manifests: Array<UmbExtensionManifest> = [

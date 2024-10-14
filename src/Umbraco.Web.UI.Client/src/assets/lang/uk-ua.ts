@@ -250,6 +250,7 @@ export default {
 		urls: 'Посилання на документ',
 		addTextBox: 'Додати нове текстове поле',
 		removeTextBox: 'Видалити це текстове поле',
+		saveModalTitle: 'Зберегти',
 	},
 	contentPicker: {
 		pickedTrashedItem: 'Вибрано елемент вмісту, який вилучено або знаходиться в корзині.',

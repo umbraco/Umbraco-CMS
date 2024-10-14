@@ -238,6 +238,12 @@ describe('UmbSelectionManager', () => {
 			expect(manager.getSelection()).to.deep.equal(['1', '2']);
 		});
 
+		it('cant do the selection if the selection contains an item that is not allowed', () => {
+			manager.setAllowLimitation((item) => item !== '2');
+			expect(() => manager.setSelection(['1', '2'])).to.throw();
+			expect(manager.getSelection()).to.deep.equal([]);
+		});
+
 		it('deselects multiple items', () => {
 			manager.setSelection(['1', '2', '3']);
 			manager.deselect('1');

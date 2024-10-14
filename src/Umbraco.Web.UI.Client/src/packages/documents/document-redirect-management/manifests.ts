@@ -1,3 +1,5 @@
+import { UMB_CONTENT_SECTION_ALIAS } from '@umbraco-cms/backoffice/content';
+
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'dashboard',
@@ -12,7 +14,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.SectionAlias',
-				match: 'Umb.Section.Content',
+				match: UMB_CONTENT_SECTION_ALIAS,
 			},
 		],
 	},

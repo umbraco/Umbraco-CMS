@@ -1,4 +1,5 @@
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
+import type { UUIBooleanInputElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
 	customElement,
@@ -27,6 +28,7 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 			this.selectionManager.selection,
 			(selection) => {
 				this._selection = selection;
+				this._isAllSelected = this.#isAllSelected();
 			},
 			'_selectionManager',
 		);
@@ -37,6 +39,9 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 
 	@state()
 	_selection: Array<string> = [];
+
+	@state()
+	_isAllSelected?: boolean;
 
 	/**
 	 * A filter function that determines if an item is pickableFilter or not.
@@ -65,16 +70,43 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 		}
 	}
 
+	#onSelectAllChange(event: Event) {
+		const allUniques = this.variantLanguageOptions.map((o) => o.unique);
+		const filter = this.selectionManager.getAllowLimitation();
+		const allowedUniques = allUniques.filter((unique) => filter(unique));
+
+		if ((event.target as UUIBooleanInputElement).checked) {
+			this.selectionManager.setSelection(allowedUniques);
+		} else {
+			this.selectionManager.setSelection([]);
+		}
+	}
+
+	#isAllSelected() {
+		const allUniques = this.variantLanguageOptions.map((o) => o.unique);
+		const filter = this.selectionManager.getAllowLimitation();
+		const allowedUniques = allUniques.filter((unique) => filter(unique));
+		return this._selection.length === allowedUniques.length;
+	}
+
 	override render() {
-		return this.variantLanguageOptions.length
-			? repeat(
-					this.variantLanguageOptions,
-					(option) => option.unique,
-					(option) => html` ${this.#renderItem(option)} `,
-				)
-			: html`<uui-box>
-					<umb-localize key="content_noVariantsToProcess">There are no available variants</umb-localize>
-				</uui-box>`;
+		if (this.variantLanguageOptions.length === 0) {
+			return html`<uui-box>
+				<umb-localize key="content_noVariantsToProcess">There are no available variants</umb-localize>
+			</uui-box>`;
+		}
+
+		return html`
+			<uui-checkbox
+				@change=${this.#onSelectAllChange}
+				label=${this.localize.term('general_selectAll')}
+				.checked=${this._isAllSelected}></uui-checkbox>
+			${repeat(
+				this.variantLanguageOptions,
+				(option) => option.unique,
+				(option) => html` ${this.#renderItem(option)} `,
+			)}
+		`;
 	}
 
 	#renderItem(option: UmbDocumentVariantOptionModel) {
@@ -134,6 +166,14 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 			}
 			.label-status {
 				font-size: 0.8rem;
+			}
+
+			uui-menu-item {
+				--uui-menu-item-flat-structure: 1;
+			}
+
+			uui-checkbox {
+				margin-bottom: var(--uui-size-space-3);
 			}
 		`,
 	];

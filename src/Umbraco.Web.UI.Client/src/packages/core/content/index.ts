@@ -5,4 +5,5 @@ export * from './controller/merge-content-variant-data.controller.js';
 export * from './property-dataset-context/content-property-dataset.context.js';
 export * from './workspace/index.js';
 export * from './collection/index.js';
+export * from './constants.js';
 export type * from './types.js';

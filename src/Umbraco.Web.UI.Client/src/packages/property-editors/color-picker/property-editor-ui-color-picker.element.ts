@@ -25,6 +25,15 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement impleme
 	}
 	#value?: UmbSwatchDetails | undefined;
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@state()
 	private _showLabels = this.#defaultShowLabels;
 
@@ -59,7 +68,8 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement impleme
 			value=${this.value?.value ?? ''}
 			.swatches=${this._swatches}
 			?showLabels=${this._showLabels}
-			@change=${this.#onChange}></umb-input-color>`;
+			@change=${this.#onChange}
+			?readonly=${this.readonly}></umb-input-color>`;
 	}
 }
 

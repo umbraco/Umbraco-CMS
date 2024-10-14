@@ -305,6 +305,7 @@ export default {
 		createEmpty: 'Yeni oluştur',
 		createFromClipboard: 'Panodan yapıştır',
 		nodeIsInTrash: "Bu öğe Geri Dönüşüm Kutusu'nda",
+		saveModalTitle: 'Kaydet',
 	},
 	blueprints: {
 		createBlueprintFrom: '<em>%0%</em> den yeni bir İçerik Şablonu oluşturun',

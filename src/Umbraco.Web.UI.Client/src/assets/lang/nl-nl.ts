@@ -317,6 +317,7 @@ export default {
 		createEmpty: 'Maak nieuw',
 		createFromClipboard: 'Plakken vanaf het klembord',
 		nodeIsInTrash: 'Dit item is in de prullenbak',
+		saveModalTitle: 'Opslaan',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Nieuw Inhoudssjabloon aanmaken voor <em>%0%</em>',

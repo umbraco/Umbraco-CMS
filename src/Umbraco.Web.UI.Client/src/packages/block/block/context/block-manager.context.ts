@@ -8,6 +8,7 @@ import {
 	UmbBooleanState,
 	UmbClassState,
 	UmbStringState,
+	type MappingFunction,
 	mergeObservables,
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
@@ -16,6 +17,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
+import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
 	layout: LayoutEntryType;
@@ -65,6 +67,8 @@ export abstract class UmbBlockManagerContext<
 	readonly #settings = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly settings = this.#settings.asObservable();
 
+	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
+
 	readonly #exposes = new UmbArrayState(
 		<Array<UmbBlockExposeModel>>[],
 		(x) => x.contentKey + '_' + x.culture + '_' + x.segment,
@@ -79,6 +83,9 @@ export abstract class UmbBlockManagerContext<
 	}
 	getEditorConfiguration(): UmbPropertyEditorConfigCollection | undefined {
 		return this._editorConfiguration.getValue();
+	}
+	editorConfigurationPart(method: MappingFunction<UmbPropertyEditorConfigCollection | undefined, unknown>) {
+		return this._editorConfiguration.asObservablePart(method);
 	}
 
 	setBlockTypes(blockTypes: Array<BlockType>) {

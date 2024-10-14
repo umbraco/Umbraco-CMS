@@ -1,3 +1,4 @@
+import { UMB_CONTENT_SECTION_ALIAS } from '@umbraco-cms/backoffice/content';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'sectionSidebarApp',
@@ -8,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.SectionAlias',
-				match: 'Umb.Section.Content',
+				match: UMB_CONTENT_SECTION_ALIAS,
 			},
 			{
 				alias: 'Umb.Condition.MultipleAppLanguages',
