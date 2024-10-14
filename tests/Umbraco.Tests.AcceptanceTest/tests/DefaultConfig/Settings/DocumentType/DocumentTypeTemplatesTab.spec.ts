@@ -16,7 +16,6 @@ test.afterEach(async ({umbracoApi}) => {
 test('can add an allowed template to a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
-  await umbracoApi.template.ensureNameNotExists(templateName);
   const templateId = await umbracoApi.template.createDefaultTemplate(templateName);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
 
@@ -39,28 +38,27 @@ test('can add an allowed template to a document type', {tag: '@smoke'}, async ({
 
 test('can set an allowed template as default for document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.template.ensureNameNotExists(templateName);
-  const templateId = await umbracoApi.template.createDefaultTemplate(templateName);
-  await umbracoApi.documentType.createDocumentTypeWithAllowedTemplate(documentTypeName, templateId);
+  const secondTemplateName = 'Test Second Template';
+  const firstTemplateId = await umbracoApi.template.createDefaultTemplate(templateName);
+  const secondTemplateId = await umbracoApi.template.createDefaultTemplate(secondTemplateName);
+  await umbracoApi.documentType.createDocumentTypeWithTwoAllowedTemplates(documentTypeName, firstTemplateId, secondTemplateId, true, firstTemplateId);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickDocumentTypeTemplatesTab();
-  await umbracoUi.documentType.clickDefaultTemplateButton();
+  await umbracoUi.documentType.clickSetAsDefaultButton();
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
   await umbracoUi.documentType.isSuccessNotificationVisible();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.allowedTemplates[0].id).toBe(templateId);
-  expect(documentTypeData.defaultTemplate.id).toBe(templateId);
+  expect(documentTypeData.defaultTemplate.id).toBe(secondTemplateId);
 });
 
 // When removing a template, the defaultTemplateId is set to "" which is not correct
 test.skip('can remove an allowed template from a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.template.ensureNameNotExists(templateName);
   const templateId = await umbracoApi.template.createDefaultTemplate(templateName);
   await umbracoApi.documentType.createDocumentTypeWithAllowedTemplate(documentTypeName, templateId);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
