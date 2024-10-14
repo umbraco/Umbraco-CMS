@@ -95,7 +95,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 							value=${this._name}
 							alias=${this._alias}
 							?auto-generate-alias=${this._isNew}
-							@change="${this.#onNameAndAliasChange}"
+							@change=${this.#onNameAndAliasChange}
 							${umbFocus()}>
 						</umb-input-with-alias>
 

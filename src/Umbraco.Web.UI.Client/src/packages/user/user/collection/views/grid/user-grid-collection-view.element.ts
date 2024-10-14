@@ -131,8 +131,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 
 		return html`<div class="user-login-time">
 			<umb-localize key="user_lastLogin"></umb-localize>
-			${this.localize.date(user.lastLoginDate)}
-			${formattedTime}
+			${this.localize.date(user.lastLoginDate)} ${formattedTime}
 		</div>`;
 	}
 
