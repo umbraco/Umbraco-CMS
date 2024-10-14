@@ -1,4 +1,5 @@
 import type { UserGroupItemResponseModel, UserGroupResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UMB_CONTENT_SECTION_ALIAS } from '@umbraco-cms/backoffice/content';
 
 export type UmbMockUserGroupModel = UserGroupResponseModel & UserGroupItemResponseModel;
 
@@ -34,7 +35,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 			},
 		],
 		sections: [
-			'Umb.Section.Content',
+			UMB_CONTENT_SECTION_ALIAS,
 			'Umb.Section.Media',
 			'Umb.Section.Settings',
 			'Umb.Section.Members',
@@ -71,7 +72,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 			'Umb.Document.Rollback',
 		],
 		permissions: [],
-		sections: ['Umb.Section.Content', 'Umb.Section.Media'],
+		sections: [UMB_CONTENT_SECTION_ALIAS, 'Umb.Section.Media'],
 		languages: [],
 		hasAccessToAllLanguages: true,
 		documentRootAccess: true,
@@ -124,7 +125,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 			'Umb.Document.Notifications',
 		],
 		permissions: [],
-		sections: ['Umb.Section.Content'],
+		sections: [UMB_CONTENT_SECTION_ALIAS],
 		languages: [],
 		hasAccessToAllLanguages: true,
 		documentRootAccess: true,
