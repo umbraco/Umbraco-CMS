@@ -18,12 +18,12 @@ public class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEd
 
     private IContentPublishingService ContentPublishingService => GetRequiredService<IContentPublishingService>();
 
-    private ICoreScopeProvider ICoreScopeProvider => GetRequiredService<ICoreScopeProvider>();
+    private ICoreScopeProvider CoreScopeProvider => GetRequiredService<ICoreScopeProvider>();
 
     [Test]
     public async Task Can_Get_Correct_Content_After_Rollback_With_Id()
     {
-        using (ICoreScopeProvider.CreateCoreScope())
+        using (CoreScopeProvider.CreateCoreScope())
         {
             await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
         }
@@ -38,7 +38,7 @@ public class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEd
     [Test]
     public async Task Can_Get_Correct_Content_After_Rollback_With_Key()
     {
-        using (ICoreScopeProvider.CreateCoreScope())
+        using (CoreScopeProvider.CreateCoreScope())
         {
             await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
         }
@@ -53,7 +53,7 @@ public class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEd
     [Test]
     public async Task Can_Get_Document_After_Scope_Complete_With_Id()
     {
-        using (var scope = ICoreScopeProvider.CreateCoreScope())
+        using (var scope = CoreScopeProvider.CreateCoreScope())
         {
             await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
             scope.Complete();
@@ -69,7 +69,7 @@ public class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEd
     [Test]
     public async Task Can_Get_Document_After_Scope_Completes_With_Key()
     {
-        using (var scope = ICoreScopeProvider.CreateCoreScope())
+        using (var scope = CoreScopeProvider.CreateCoreScope())
         {
             await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
             scope.Complete();

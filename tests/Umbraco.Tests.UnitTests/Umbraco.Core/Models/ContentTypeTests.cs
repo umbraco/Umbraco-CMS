@@ -61,7 +61,8 @@ public class ContentTypeTests
 
     private ContentTypeSort BuildContentTypeSort()
     {
-        var builder = new ContentTypeSortBuilder();
+        ContentTypeBuilder contentTypeBuilder = new ContentTypeBuilder();
+        var builder = new ContentTypeSortBuilder<ContentTypeBuilder>(contentTypeBuilder);
         return builder
             .WithKey(new Guid("4CAE063E-0BE1-4972-B10C-A3D9BB7DE856"))
             .WithSortOrder(4)

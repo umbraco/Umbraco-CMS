@@ -34,7 +34,7 @@ public class SearchMemberTypeItemController : MemberTypeItemControllerBase
             return await Task.FromResult(Ok(new PagedModel<MemberTypeItemResponseModel> { Total = searchResult.Total }));
         }
 
-        IEnumerable<IMemberType> memberTypes = _memberTypeService.GetAll(searchResult.Items.Select(item => item.Key).ToArray());
+        IEnumerable<IMemberType> memberTypes = _memberTypeService.GetMany(searchResult.Items.Select(item => item.Key).ToArray());
         var result = new PagedModel<MemberTypeItemResponseModel>
         {
             Items = _mapper.MapEnumerable<IMemberType, MemberTypeItemResponseModel>(memberTypes),

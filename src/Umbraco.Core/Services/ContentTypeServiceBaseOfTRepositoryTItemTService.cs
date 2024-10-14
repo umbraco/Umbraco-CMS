@@ -339,16 +339,28 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <inheritdoc />
     public Task<TItem?> GetAsync(Guid guid) => Task.FromResult(Get(guid));
 
-    public IEnumerable<TItem> GetAll(params int[] ids)
+    public IEnumerable<TItem> GetAll()
     {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(ReadLockIds);
+        return Repository.GetMany(Array.Empty<Guid>());
+    }
+
+    public IEnumerable<TItem> GetMany(params int[] ids)
+    {
+        if (ids.Any() is false)
+        {
+            return Enumerable.Empty<TItem>();
+        }
+
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(ReadLockIds);
         return Repository.GetMany(ids);
     }
 
-    public IEnumerable<TItem> GetAll(IEnumerable<Guid>? ids)
+    public IEnumerable<TItem> GetMany(IEnumerable<Guid>? ids)
     {
-        if (ids is null)
+        if (ids is null || ids.Any() is false)
         {
             return Enumerable.Empty<TItem>();
         }
@@ -471,7 +483,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     {
         // GetAll is cheap, repository has a full dataset cache policy
         // TODO: still, because it uses the cache, race conditions!
-        IEnumerable<TItem> allContentTypes = GetAll(Array.Empty<int>());
+        IEnumerable<TItem> allContentTypes = GetAll();
         return GetComposedOf(id, allContentTypes);
     }
 
@@ -1149,7 +1161,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         }
         else
         {
-            TItem[] allowedChildren = GetAll(parent.AllowedContentTypes.Select(x => x.Key)).ToArray();
+            TItem[] allowedChildren = GetMany(parent.AllowedContentTypes.Select(x => x.Key)).ToArray();
             result = new PagedModel<TItem>
             {
                 Items = allowedChildren.Take(take).Skip(skip),

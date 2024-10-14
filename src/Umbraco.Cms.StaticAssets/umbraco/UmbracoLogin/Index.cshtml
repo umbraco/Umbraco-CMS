@@ -31,6 +31,7 @@
     var allowPasswordReset = SecuritySettings.Value.AllowPasswordReset && EmailSender.CanSendRequiredEmail();
     var disableLocalLogin = ExternalLogins.HasDenyLocalLogin();
 }
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 <!DOCTYPE html>
 <html lang="@GlobalSettings.Value.DefaultUILanguage">
@@ -44,7 +45,7 @@
     <meta name="pinterest" content="nopin"/>
     <title>Umbraco</title>
 
-    <link rel="stylesheet" href="~/umbraco/backoffice/css/uui-css.css" />
+    <link rel="stylesheet" href="~/umbraco/backoffice/css/uui-css.css" asp-append-version="true" />
     <style>
       body {
         margin: 0;
@@ -54,7 +55,7 @@
     </style>
 
     @await Html.BackOfficeImportMapScriptAsync(JsonSerializer, BackOfficePathGenerator, PackageManifestService)
-    <script type="module" src="~/umbraco/login/login.js"></script>
+    <script type="module" src="~/umbraco/login/login.js" asp-append-version="true"></script>
 </head>
 
 <body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">

@@ -11,7 +11,7 @@ public interface IPublishedContentCache : IPublishedCache
     /// <param name="preview">A value indicating whether to consider unpublished content.</param>
     /// <returns>The content, or null.</returns>
     /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-    Task<IPublishedContent?> GetByIdAsync(int id, bool preview = false);
+    Task<IPublishedContent?> GetByIdAsync(int id, bool? preview = null);
 
     /// <summary>
     ///     Gets a content identified by its unique identifier.
@@ -20,7 +20,7 @@ public interface IPublishedContentCache : IPublishedCache
     /// <param name="preview">A value indicating whether to consider unpublished content.</param>
     /// <returns>The content, or null.</returns>
     /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-    Task<IPublishedContent?> GetByIdAsync(Guid key, bool preview = false);
+    Task<IPublishedContent?> GetByIdAsync(Guid key, bool? preview = null);
 
     // FIXME: All these routing methods needs to be removed, as they are no longer part of the content cache
     /// <summary>

@@ -1,70 +1,33 @@
 ﻿using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
-public class ContentTypeEditingBuilder
-    : ContentTypeBaseBuilder<ContentEditingBuilder, ContentTypeCreateModel>,
-        IBuildPropertyTypes
+public class ContentTypeEditingBuilder : ContentTypeEditingBaseBuilder<ContentTypeEditingBuilder, ContentTypeCreateModel, ContentTypePropertyTypeModel, ContentTypePropertyContainerModel>, IWithKeyBuilder, IWithContainerKeyBuilder, IWithDefaultTemplateKeyBuilder
 {
     private Guid? _key;
     private Guid? _containerKey;
-    private ContentTypeCleanup _cleanup = new();
-    private IEnumerable<Guid> _allowedTemplateKeys;
+    private IEnumerable<Guid> _allowedTemplateKeys = Array.Empty<Guid>();
     private Guid? _defaultTemplateKey;
-    private bool? _allowAtRoot;
-    private bool? _isElement;
-    private bool? _variesByCulture;
-    private bool? _variesBySegment;
-    private readonly List<PropertyTypeEditingBuilder> _propertyTypeBuilders = [];
-    private readonly List<PropertyTypeContainerBuilder<ContentTypeEditingBuilder>> _propertyTypeContainerBuilders = [];
-    private readonly List<ContentTypeSortBuilder> _allowedContentTypeBuilders = [];
 
-    public ContentTypeEditingBuilder()
-        : base(null)
+    Guid? IWithKeyBuilder.Key
     {
+        get => _key;
+        set => _key = value;
     }
 
-    public ContentTypeEditingBuilder(ContentEditingBuilder parentBuilder)
-        : base(parentBuilder)
+    Guid? IWithContainerKeyBuilder.ContainerKey
     {
+        get => _containerKey;
+        set => _containerKey = value;
     }
 
-    public ContentTypeEditingBuilder WithDefaultTemplateKey(Guid templateKey)
+    Guid? IWithDefaultTemplateKeyBuilder.DefaultTemplateKey
     {
-        _defaultTemplateKey = templateKey;
-        return this;
-    }
-
-    public ContentTypeEditingBuilder WithIsElement(bool isElement)
-    {
-        _isElement = isElement;
-        return this;
-    }
-
-    public PropertyTypeContainerBuilder<ContentTypeEditingBuilder> AddPropertyGroup()
-    {
-        var builder = new PropertyTypeContainerBuilder<ContentTypeEditingBuilder>(this);
-        _propertyTypeContainerBuilders.Add(builder);
-        return builder;
-    }
-
-    public PropertyTypeEditingBuilder AddPropertyType()
-    {
-        var builder = new PropertyTypeEditingBuilder(this);
-        _propertyTypeBuilders.Add(builder);
-        return builder;
-    }
-
-
-    public ContentTypeSortBuilder AddAllowedContentType()
-    {
-        var builder = new ContentTypeSortBuilder(this);
-        _allowedContentTypeBuilders.Add(builder);
-        return builder;
+        get => _defaultTemplateKey;
+        set => _defaultTemplateKey = value;
     }
 
     public ContentTypeEditingBuilder AddAllowedTemplateKeys(IEnumerable<Guid> templateKeys)
@@ -73,64 +36,33 @@ public class ContentTypeEditingBuilder
         return this;
     }
 
-    public ContentTypeEditingBuilder WithAllowAtRoot(bool allowAtRoot)
+    protected override ContentTypeCreateModel Build()
     {
-        _allowAtRoot = allowAtRoot;
-        return this;
+        _model.Key = _key ?? Guid.NewGuid();
+        _model.ContainerKey = _containerKey;
+        _model.AllowedTemplateKeys = _allowedTemplateKeys;
+        _model.DefaultTemplateKey = _defaultTemplateKey;
+        base.Build();
+        return _model;
     }
 
-    public ContentTypeEditingBuilder WithVariesByCulture(bool variesByCulture)
-    {
-        _variesByCulture = variesByCulture;
-        return this;
-    }
-
-    public ContentTypeEditingBuilder WithVariesBySegment(bool variesBySegment)
-    {
-        _variesBySegment = variesBySegment;
-        return this;
-    }
-
-    public override ContentTypeCreateModel Build()
-    {
-        ContentTypeCreateModel contentType = new ContentTypeCreateModel();
-        contentType.Name = GetName();
-        contentType.Alias = GetAlias();
-        contentType.Key = GetKey();
-        contentType.ContainerKey = _containerKey;
-        contentType.Cleanup = _cleanup;
-        contentType.AllowedTemplateKeys = _allowedTemplateKeys ?? Array.Empty<Guid>();
-        contentType.DefaultTemplateKey = _defaultTemplateKey;
-        contentType.IsElement = _isElement ?? false;
-        contentType.VariesByCulture = _variesByCulture ?? false;
-        contentType.VariesBySegment = _variesBySegment ?? false;
-        contentType.AllowedAsRoot = _allowAtRoot ?? false;
-        contentType.Properties = _propertyTypeBuilders.Select(x => x.Build());
-        contentType.Containers = _propertyTypeContainerBuilders.Select(x => x.Build());
-        contentType.AllowedContentTypes = _allowedContentTypeBuilders.Select(x => x.Build());
-
-        return contentType;
-    }
-
-    public static ContentTypeCreateModel CreateBasicContentType(string alias = "umbTextpage", string name = "TextPage", IContentType parent = null)
+    public static ContentTypeCreateModel CreateBasicContentType(string alias = "umbTextpage", string name = "TextPage")
     {
         var builder = new ContentTypeEditingBuilder();
         return (ContentTypeCreateModel)builder
             .WithAlias(alias)
             .WithName(name)
-            .WithParentContentType(parent)
             .Build();
     }
 
-    public static ContentTypeCreateModel CreateSimpleContentType(string alias = "umbTextpage", string name = "TextPage", IContentType parent = null, string propertyGroupName = "Content", Guid? defaultTemplateKey = null)
+    public static ContentTypeCreateModel CreateSimpleContentType(string alias = "umbTextpage", string name = "TextPage", string propertyGroupName = "Content", Guid? defaultTemplateKey = null)
     {
         var containerKey = Guid.NewGuid();
         var builder = new ContentTypeEditingBuilder();
         return (ContentTypeCreateModel)builder
             .WithAlias(alias)
             .WithName(name)
-            .WithAllowAtRoot(true)
-            .WithParentContentType(parent)
+            .WithAllowAsRoot(true)
             .AddPropertyGroup()
                 .WithKey(containerKey)
                 .WithName(propertyGroupName)
@@ -155,7 +87,7 @@ public class ContentTypeEditingBuilder
         return (ContentTypeCreateModel)builder
             .WithAlias(alias)
             .WithName(name)
-            .WithAllowAtRoot(true)
+            .WithAllowAsRoot(true)
             .AddPropertyGroup()
                 .WithName("Content")
                 .WithKey(containerKeyOne)
@@ -217,7 +149,7 @@ public class ContentTypeEditingBuilder
             .Build();
     }
 
-    public static ContentTypeCreateModel CreateContentTypeWithDataTypeKey(Guid dataTypeKey, string alias = "textElement", string name = "Text Element" )
+    public static ContentTypeCreateModel CreateContentTypeWithDataTypeKey(Guid dataTypeKey, string alias = "textElement", string name = "Text Element")
     {
         var containerKey = Guid.NewGuid();
         var builder = new ContentTypeEditingBuilder();
@@ -233,6 +165,55 @@ public class ContentTypeEditingBuilder
                 .WithDataTypeKey(dataTypeKey)
                 .WithAlias("dataType")
                 .WithName("Data Type")
+                .WithContainerKey(containerKey)
+                .Done()
+            .Build();
+    }
+
+    public static ContentTypeCreateModel CreateContentTypeWithContentPicker(string alias = "test", string name = "TestName", Guid templateKey = default)
+    {
+        var containerKey = Guid.NewGuid();
+        var builder = new ContentTypeEditingBuilder();
+        return (ContentTypeCreateModel)builder
+            .WithAlias(alias)
+            .WithName(name)
+            .WithAllowAsRoot(true)
+            .AddAllowedTemplateKeys([templateKey])
+            .AddPropertyGroup()
+                .WithName("Content")
+                .WithKey(containerKey)
+                .Done()
+            .AddPropertyType()
+                .WithAlias("contentPicker")
+                .WithName("Content Picker")
+                .WithDataTypeKey(Constants.DataTypes.Guids.ContentPickerGuid)
+                .WithContainerKey(containerKey)
+                .Done()
+            .Build();
+    }
+
+        public static ContentTypeCreateModel CreateContentTypeWithTwoPropertiesOneVariantAndOneInvariant(string alias = "test", string name = "TestName", string variantPropertyAlias = "variant", string variantPropertyName = "Variant", string invariantAlias = "invariant", string invariantName = "Invariant")
+    {
+        var containerKey = Guid.NewGuid();
+        var builder = new ContentTypeEditingBuilder();
+        return (ContentTypeCreateModel)builder
+            .WithAlias(alias)
+            .WithName(name)
+            .WithAllowAsRoot(true)
+            .WithVariesByCulture(true)
+            .AddPropertyGroup()
+                .WithName("Content")
+                .WithKey(containerKey)
+                .Done()
+            .AddPropertyType()
+                .WithAlias(variantPropertyAlias)
+                .WithName(variantPropertyName)
+                .WithVariesByCulture(true)
+                .WithContainerKey(containerKey)
+                .Done()
+            .AddPropertyType()
+                .WithAlias(invariantAlias)
+                .WithName(invariantName)
                 .WithContainerKey(containerKey)
                 .Done()
             .Build();

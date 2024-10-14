@@ -13,6 +13,7 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
 {
     private readonly IIdKeyMap _idKeyMap;
     private readonly IPublishedModelFactory _publishedModelFactory;
+    private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
 
     public DataTypeCacheRefresher(
         AppCaches appCaches,
@@ -20,11 +21,13 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
         IIdKeyMap idKeyMap,
         IEventAggregator eventAggregator,
         ICacheRefresherNotificationFactory factory,
-        IPublishedModelFactory publishedModelFactory)
+        IPublishedModelFactory publishedModelFactory,
+        IPublishedContentTypeFactory publishedContentTypeFactory)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
         _publishedModelFactory = publishedModelFactory;
+        _publishedContentTypeFactory = publishedContentTypeFactory;
     }
 
     #region Json
@@ -85,6 +88,9 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
 
         // TODO: We need to clear the HybridCache of any content using the ContentType, but NOT the database cache here, and this should be done within the "WithSafeLiveFactoryReset" to ensure that the factory is locked in the meantime.
         _publishedModelFactory.WithSafeLiveFactoryReset(() => { });
+
+        var changedIds = payloads.Select(x => x.Id).ToArray();
+        _publishedContentTypeFactory.NotifyDataTypeChanges(changedIds);
 
         base.Refresh(payloads);
     }

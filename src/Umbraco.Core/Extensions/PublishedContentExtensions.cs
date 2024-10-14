@@ -2,7 +2,9 @@
 // See LICENSE for more details.
 
 using System.Data;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -1898,5 +1900,491 @@ public static class PublishedContentExtensions
     private static Dictionary<string, string> GetAliasesAndNames(IContentTypeBase? contentType) =>
         contentType?.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name) ?? new Dictionary<string, string>();
 
+
+
     #endregion
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IPublishedContent? Ancestor(this IPublishedContent content, int maxLevel)
+    {
+        return content.Ancestor(GetPublishedCache(content), GetNavigationQueryService(content), maxLevel);
+    }
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IPublishedContent? Ancestor(this IPublishedContent content, string contentTypeAlias)
+    {
+        return content.Ancestor(GetPublishedCache(content), GetNavigationQueryService(content), contentTypeAlias);
+    }
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static T? Ancestor<T>(this IPublishedContent content, int maxLevel)
+        where T : class, IPublishedContent
+    {
+        return Ancestor<T>(content, GetPublishedCache(content), GetNavigationQueryService(content), maxLevel);
+    }
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, int maxLevel)
+    {
+        return content.Ancestors(GetPublishedCache(content), GetNavigationQueryService(content), maxLevel);
+    }
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, string contentTypeAlias)
+    {
+        return content.Ancestors(GetPublishedCache(content), GetNavigationQueryService(content), contentTypeAlias);
+    }
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<T> Ancestors<T>(this IPublishedContent content)
+        where T : class, IPublishedContent
+    {
+        return Ancestors<T>(content, GetPublishedCache(content), GetNavigationQueryService(content));
+    }
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<T> Ancestors<T>(this IPublishedContent content, int maxLevel)
+        where T : class, IPublishedContent
+    {
+        return Ancestors<T>(content, GetPublishedCache(content), GetNavigationQueryService(content), maxLevel);
+    }
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IPublishedContent AncestorOrSelf(this IPublishedContent content, int maxLevel)
+    {
+        return AncestorOrSelf(content, GetPublishedCache(content), GetNavigationQueryService(content), maxLevel);
+    }
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IPublishedContent AncestorOrSelf(this IPublishedContent content, string contentTypeAlias)
+    {
+        return AncestorOrSelf(content, GetPublishedCache(content), GetNavigationQueryService(content), contentTypeAlias);
+    }
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static T? AncestorOrSelf<T>(this IPublishedContent content, int maxLevel)
+        where T : class, IPublishedContent
+    {
+        return AncestorOrSelf<T>(content, GetPublishedCache(content), GetNavigationQueryService(content), maxLevel);
+    }
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, int maxLevel)
+    {
+        return content.AncestorsOrSelf(GetPublishedCache(content), GetNavigationQueryService(content), maxLevel);
+    }
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, string contentTypeAlias)
+    {
+        return content.Ancestors(GetPublishedCache(content), GetNavigationQueryService(content), contentTypeAlias);
+    }
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<T> AncestorsOrSelf<T>(this IPublishedContent content, int maxLevel)
+        where T : class, IPublishedContent
+    {
+        return AncestorsOrSelf<T>(content, GetPublishedCache(content), GetNavigationQueryService(content), maxLevel);
+    }
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, bool orSelf,
+        Func<IPublishedContent, bool>? func)
+    {
+        return AncestorsOrSelf(content, GetPublishedCache(content), GetNavigationQueryService(content), orSelf, func);
+    }
+
+    [Obsolete(
+        "Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> Breadcrumbs(
+        this IPublishedContent content,
+        bool andSelf = true) =>
+        content.Breadcrumbs(GetPublishedCache(content), GetNavigationQueryService(content), andSelf);
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> Breadcrumbs(
+        this IPublishedContent content,
+        int minLevel,
+        bool andSelf = true) =>
+        content.Breadcrumbs(GetPublishedCache(content), GetNavigationQueryService(content), minLevel, andSelf);
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> Breadcrumbs<T>(
+        this IPublishedContent content,
+        bool andSelf = true)
+        where T : class, IPublishedContent=>
+        content.Breadcrumbs<T>(GetPublishedCache(content), GetNavigationQueryService(content), andSelf);
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> Children(
+        this IPublishedContent content,
+        IVariationContextAccessor? variationContextAccessor,
+        string? culture = null)
+        => Children(content, variationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> Children(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        Func<IPublishedContent, bool> predicate,
+        string? culture = null) =>
+        content.Children(variationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture).Where(predicate);
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> ChildrenOfType(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string? contentTypeAlias,
+        string? culture = null) =>
+        content.Children(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), x => x.ContentType.Alias.InvariantEquals(contentTypeAlias),
+            culture);
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<T> Children<T>(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string? culture = null)
+        where T : class, IPublishedContent =>
+        content.Children(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), culture).OfType<T>();
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static DataTable ChildrenAsTable(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        IContentTypeService contentTypeService,
+        IMediaTypeService mediaTypeService,
+        IMemberTypeService memberTypeService,
+        IPublishedUrlProvider publishedUrlProvider,
+        string contentTypeAliasFilter = "",
+        string? culture = null)
+        => GenerateDataTable(content, variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), contentTypeService, mediaTypeService, memberTypeService, publishedUrlProvider, contentTypeAliasFilter, culture);
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(
+        this IEnumerable<IPublishedContent> parentNodes,
+        IVariationContextAccessor variationContextAccessor,
+        string docTypeAlias,
+        string? culture = null) => parentNodes.SelectMany(x =>
+        x.DescendantsOrSelfOfType(variationContextAccessor, GetPublishedCache(parentNodes.First()),
+            GetNavigationQueryService(parentNodes.First()), docTypeAlias, culture));
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<T> DescendantsOrSelf<T>(
+        this IEnumerable<IPublishedContent> parentNodes,
+        IVariationContextAccessor variationContextAccessor,
+        string? culture = null)
+        where T : class, IPublishedContent =>
+        parentNodes.SelectMany(x => x.DescendantsOrSelf<T>(variationContextAccessor, GetPublishedCache(parentNodes.First()),
+            GetNavigationQueryService(parentNodes.First()), culture));
+
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> Descendants(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string? culture = null) =>
+        content.DescendantsOrSelf(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), false, null, culture);
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> Descendants(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        int level,
+        string? culture = null) =>
+        content.DescendantsOrSelf(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), false, p => p.Level >= level, culture);
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> DescendantsOfType(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string contentTypeAlias, string? culture = null) =>
+        content.DescendantsOrSelf(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), false, p => p.ContentType.Alias.InvariantEquals(contentTypeAlias), culture);
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<T> Descendants<T>(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string? culture = null)
+        where T : class, IPublishedContent =>
+        content.Descendants(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), culture).OfType<T>();
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<T> Descendants<T>(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        int level,
+        string? culture = null)
+        where T : class, IPublishedContent =>
+        content.Descendants(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), level, culture).OfType<T>();
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> DescendantsOrSelf(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string? culture = null) =>
+        content.DescendantsOrSelf(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), true, null, culture);
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> DescendantsOrSelf(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        int level,
+        string? culture = null) =>
+        content.DescendantsOrSelf(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), true, p => p.Level >= level, culture);
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string contentTypeAlias,
+        string? culture = null) =>
+        content.DescendantsOrSelf(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), true, p => p.ContentType.Alias.InvariantEquals(contentTypeAlias), culture);
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<T> DescendantsOrSelf<T>(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string? culture = null)
+        where T : class, IPublishedContent =>
+        content.DescendantsOrSelf(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), culture).OfType<T>();
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<T> DescendantsOrSelf<T>(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        int level,
+        string? culture = null)
+        where T : class, IPublishedContent =>
+        content.DescendantsOrSelf(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), level, culture).OfType<T>();
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IPublishedContent? Descendant(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string? culture = null) =>
+        content.Children(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), culture)?.FirstOrDefault();
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IPublishedContent? Descendant(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        int level,
+        string? culture = null) => content
+        .EnumerateDescendants(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), false, culture).FirstOrDefault(x => x.Level == level);
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IPublishedContent? DescendantOfType(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string contentTypeAlias,
+        string? culture = null) => content
+        .EnumerateDescendants(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), false, culture)
+        .FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias));
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static T? Descendant<T>(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string? culture = null)
+        where T : class, IPublishedContent =>
+        content.EnumerateDescendants(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), false, culture).FirstOrDefault(x => x is T) as T;
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static T? Descendant<T>(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        int level,
+        string? culture = null)
+        where T : class, IPublishedContent =>
+        content.Descendant(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), level, culture) as T;
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IPublishedContent? DescendantOrSelf(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        int level,
+        string? culture = null) => content
+        .EnumerateDescendants(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), true, culture).FirstOrDefault(x => x.Level == level);
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IPublishedContent? DescendantOrSelfOfType(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string contentTypeAlias,
+        string? culture = null) => content
+        .EnumerateDescendants(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), true, culture)
+        .FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias));
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static T? DescendantOrSelf<T>(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string? culture = null)
+        where T : class, IPublishedContent =>
+        content.EnumerateDescendants(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), true, culture).FirstOrDefault(x => x is T) as T;
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static T? DescendantOrSelf<T>(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        int level,
+        string? culture = null)
+        where T : class, IPublishedContent =>
+        content.DescendantOrSelf(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), level, culture) as T;
+
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IPublishedContent? FirstChild(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string? culture = null) =>
+        content.Children(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), culture)?.FirstOrDefault();
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IPublishedContent? FirstChildOfType(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string contentTypeAlias,
+        string? culture = null) =>
+        content.ChildrenOfType(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), contentTypeAlias, culture)?.FirstOrDefault();
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IPublishedContent? FirstChild(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        Func<IPublishedContent, bool> predicate,
+        string? culture = null)
+        => content.Children(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), predicate, culture)?.FirstOrDefault();
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IPublishedContent? FirstChild(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        Guid uniqueId,
+        string? culture = null) => content
+        .Children(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), x => x.Key == uniqueId, culture)?.FirstOrDefault();
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static T? FirstChild<T>(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string? culture = null)
+        where T : class, IPublishedContent =>
+        content.Children<T>(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), culture)?.FirstOrDefault();
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static T? FirstChild<T>(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        Func<T, bool> predicate,
+        string? culture = null)
+        where T : class, IPublishedContent =>
+        content.Children<T>(variationContextAccessor, GetPublishedCache(content),
+            GetNavigationQueryService(content), culture)?.FirstOrDefault(predicate);
+
+    [Obsolete(
+        "Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> Siblings(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string? culture = null) =>
+        Siblings(content, GetPublishedCache(content), GetNavigationQueryService(content), variationContextAccessor, culture);
+
+    [Obsolete(
+        "Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> SiblingsOfType(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string contentTypeAlias,
+        string? culture = null) =>
+        SiblingsOfType(content, variationContextAccessor,
+            GetPublishedCache(content), GetNavigationQueryService(content), contentTypeAlias, culture);
+
+    [Obsolete(
+        "Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<T> Siblings<T>(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string? culture = null)
+        where T : class, IPublishedContent =>
+        Siblings<T>(content, variationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
+
+    [Obsolete(
+        "Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent>? SiblingsAndSelf(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string? culture = null) => SiblingsAndSelf(content, GetPublishedCache(content), GetNavigationQueryService(content), variationContextAccessor, culture);
+
+    [Obsolete(
+        "Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<IPublishedContent> SiblingsAndSelfOfType(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string contentTypeAlias,
+        string? culture = null) => SiblingsAndSelfOfType(content, variationContextAccessor, GetPublishedCache(content),
+        GetNavigationQueryService(content), contentTypeAlias, culture);
+
+    [Obsolete("Please use IPublishedCache and IDocumentNavigationQueryService or IMediaNavigationQueryService directly. This will be removed in a future version of Umbraco")]
+    public static IEnumerable<T> SiblingsAndSelf<T>(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string? culture = null)
+        where T : class, IPublishedContent => SiblingsAndSelf<T>(content, variationContextAccessor, GetPublishedCache(content),
+        GetNavigationQueryService(content), culture);
+
+
+    private static INavigationQueryService GetNavigationQueryService(IPublishedContent content)
+    {
+        switch (content.ContentType.ItemType)
+        {
+            case PublishedItemType.Content:
+                return StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+            case PublishedItemType.Media:
+                return StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>();
+            default:
+                throw new NotSupportedException("Unsupported content type.");
+        }
+
+    }
+
+    private static IPublishedCache GetPublishedCache(IPublishedContent content)
+    {
+        switch (content.ContentType.ItemType)
+        {
+            case PublishedItemType.Content:
+                return StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>();
+            case PublishedItemType.Media:
+                return StaticServiceProvider.Instance.GetRequiredService<IPublishedMediaCache>();
+            default:
+                throw new NotSupportedException("Unsupported content type.");
+        }
+    }
 }

@@ -5,9 +5,9 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 public interface IDocumentCacheService
 {
-    Task<IPublishedContent?> GetByKeyAsync(Guid key, bool preview = false);
+    Task<IPublishedContent?> GetByKeyAsync(Guid key, bool? preview = null);
 
-    Task<IPublishedContent?> GetByIdAsync(int id, bool preview = false);
+    Task<IPublishedContent?> GetByIdAsync(int id, bool? preview = null);
 
     Task SeedAsync(CancellationToken cancellationToken);
 
@@ -17,7 +17,7 @@ public interface IDocumentCacheService
 
     Task DeleteItemAsync(IContentBase content);
 
-    void Rebuild(IReadOnlyCollection<int> contentTypeKeys);
+    void Rebuild(IReadOnlyCollection<int> contentTypeIds);
 
     internal IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType);
 }
