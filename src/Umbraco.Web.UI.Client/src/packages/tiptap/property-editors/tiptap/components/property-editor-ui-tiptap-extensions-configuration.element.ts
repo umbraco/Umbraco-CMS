@@ -97,6 +97,19 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 					<div class="group">
 						<uui-label>${this.localize.string(group.group)}</uui-label>
 						<ul>
+							${when(
+								group.group === '#tiptap_extGroup_formatting',
+								() => html`
+									<li title="This is a core extension, it must be enabled">
+										<uui-checkbox checked disabled label="Rich Text Essentials">
+											<div class="inner">
+												<umb-icon name="icon-browser-window"></umb-icon>
+												<span>Rich Text Essentials</span>
+											</div>
+										</uui-checkbox>
+									</li>
+								`,
+							)}
 							${repeat(
 								group.extensions,
 								(item) => html`
