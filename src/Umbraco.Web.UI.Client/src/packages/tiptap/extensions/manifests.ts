@@ -174,6 +174,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		alias: 'Umb.Tiptap.Toolbar.Underline',
 		name: 'Underline Tiptap Extension',
 		api: () => import('./toolbar/underline.extension.js'),
+		forExtensions: ['Umb.Tiptap.Underline'],
 		meta: {
 			alias: 'underline',
 			icon: 'icon-underline',
@@ -198,6 +199,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		alias: 'Umb.Tiptap.Toolbar.TextAlignLeft',
 		name: 'Text Align Left Tiptap Extension',
 		api: () => import('./toolbar/text-align-left.extension.js'),
+		forExtensions: ['Umb.Tiptap.TextAlign'],
 		meta: {
 			alias: 'text-align-left',
 			icon: 'icon-text-align-left',
@@ -210,6 +212,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		alias: 'Umb.Tiptap.Toolbar.TextAlignCenter',
 		name: 'Text Align Center Tiptap Extension',
 		api: () => import('./toolbar/text-align-center.extension.js'),
+		forExtensions: ['Umb.Tiptap.TextAlign'],
 		meta: {
 			alias: 'text-align-center',
 			icon: 'icon-text-align-center',
@@ -222,6 +225,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		alias: 'Umb.Tiptap.Toolbar.TextAlignRight',
 		name: 'Text Align Right Tiptap Extension',
 		api: () => import('./toolbar/text-align-right.extension.js'),
+		forExtensions: ['Umb.Tiptap.TextAlign'],
 		meta: {
 			alias: 'text-align-right',
 			icon: 'icon-text-align-right',
@@ -234,6 +238,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		alias: 'Umb.Tiptap.Toolbar.TextAlignJustify',
 		name: 'Text Align Justify Tiptap Extension',
 		api: () => import('./toolbar/text-align-justify.extension.js'),
+		forExtensions: ['Umb.Tiptap.TextAlign'],
 		meta: {
 			alias: 'text-align-justify',
 			icon: 'icon-text-align-justify',
@@ -318,6 +323,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		alias: 'Umb.Tiptap.Toolbar.Link',
 		name: 'Link Tiptap Extension',
 		api: () => import('./toolbar/link.extension.js'),
+		forExtensions: ['Umb.Tiptap.Link'],
 		meta: {
 			alias: 'umbLink',
 			icon: 'icon-link',
@@ -331,6 +337,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		name: 'Unlink Tiptap Extension',
 		api: () => import('./toolbar/unlink.extension.js'),
 		element: () => import('../components/toolbar/tiptap-toolbar-button-disabled.element.js'),
+		forExtensions: ['Umb.Tiptap.Link'],
 		meta: {
 			alias: 'unlink',
 			icon: 'icon-unlink',
@@ -355,6 +362,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		alias: 'Umb.Tiptap.Toolbar.Subscript',
 		name: 'Subscript Tiptap Extension',
 		api: () => import('./toolbar/subscript.extension.js'),
+		forExtensions: ['Umb.Tiptap.Subscript'],
 		meta: {
 			alias: 'subscript',
 			icon: 'icon-subscript',
@@ -367,6 +375,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		alias: 'Umb.Tiptap.Toolbar.Superscript',
 		name: 'Superscript Tiptap Extension',
 		api: () => import('./toolbar/superscript.extension.js'),
+		forExtensions: ['Umb.Tiptap.Superscript'],
 		meta: {
 			alias: 'superscript',
 			icon: 'icon-superscript',
@@ -417,6 +426,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		alias: 'Umb.Tiptap.Toolbar.MediaPicker',
 		name: 'Media Picker Tiptap Extension',
 		api: () => import('./toolbar/media-picker.extension.js'),
+		forExtensions: ['Umb.Tiptap.Figure', 'Umb.Tiptap.Image'],
 		meta: {
 			alias: 'umbMedia',
 			icon: 'icon-picture',
@@ -429,6 +439,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		alias: 'Umb.Tiptap.Toolbar.EmbeddedMedia',
 		name: 'Embedded Media Tiptap Extension',
 		api: () => import('./toolbar/embedded-media.extension.js'),
+		forExtensions: ['Umb.Tiptap.Embed'],
 		meta: {
 			alias: 'umbEmbeddedMedia',
 			icon: 'icon-embed',
@@ -441,6 +452,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		alias: 'Umb.Tiptap.Toolbar.Table',
 		name: 'Table Tiptap Extension',
 		api: () => import('./toolbar/table.extension.js'),
+		forExtensions: ['Umb.Tiptap.Table'],
 		meta: {
 			alias: 'table',
 			icon: 'icon-table',
