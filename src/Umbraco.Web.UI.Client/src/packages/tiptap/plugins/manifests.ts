@@ -19,7 +19,6 @@ export const manifests: Array<ManifestTiptapExtension | ManifestTiptapToolbarExt
 		alias: 'Umb.Tiptap.Toolbar.BlockPicker',
 		name: 'Block Picker Tiptap Extension Button',
 		api: () => import('./block-picker-toolbar.extension.js'),
-		weight: 90,
 		meta: {
 			alias: 'umbblockpicker',
 			icon: 'icon-plugin',
