@@ -118,7 +118,7 @@ public sealed class HtmlLocalLinkParser
     }
 
     // todo remove at some point?
-    private IEnumerable<LocalLinkTag> FindLegacyLocalLinkIds(string text)
+    public IEnumerable<LocalLinkTag> FindLegacyLocalLinkIds(string text)
     {
         // Parse internal links
         MatchCollection tags = LocalLinkPattern.Matches(text);
@@ -146,7 +146,7 @@ public sealed class HtmlLocalLinkParser
         }
     }
 
-    private class LocalLinkTag
+    public class LocalLinkTag
     {
         public LocalLinkTag(int? intId, GuidUdi? udi, string tagHref)
         {
