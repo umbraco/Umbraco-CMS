@@ -1,4 +1,4 @@
-import type { UmbTiptapToolbarValue } from '../../extensions/types.js';
+import type { UmbTiptapToolbarValue } from '../types.js';
 import { css, customElement, html, map, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';

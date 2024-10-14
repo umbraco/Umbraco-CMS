@@ -1,6 +1,6 @@
-import type { UmbTiptapToolbarValue } from '../../../extensions/types.js';
 import { customElement, css, html, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbTiptapToolbarValue } from '../../../components/types.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPropertyValueChangeEvent, type UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
