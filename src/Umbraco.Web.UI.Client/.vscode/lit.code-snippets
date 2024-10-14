@@ -1,30 +1,30 @@
 {
-	"Create Lit Component": {
-		"prefix": "lit new",
+	"UmbNewLitElement": {
+		"prefix": "new umb element",
 		"scope": "typescript",
 		"body": [
-			"import { UmbTextStyles } from '@umbraco-ui/backoffice/style';",
-			"import { css, html } from 'lit';",
-			"import { customElement } from 'lit/decorators.js';",
+			"import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';",
 			"import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';",
+			"import { UmbTextStyles } from '@umbraco-cms/backoffice/style';",
 			"",
 			"@customElement('umb-${TM_FILENAME_BASE/(.*)\\..+$/$1/}')",
-			"export class Umb${TM_FILENAME_BASE/(.*)\\..+$/${1:/pascalcase}/}Element extends UmbLitElement {",
-			"\trender() {",
-			"\t\treturn html`${0:umb-${TM_FILENAME_BASE/(.*)\\..+$/$1/}}`;",
+			"export class Umb${TM_FILENAME_BASE/(.*)$/${1:/pascalcase}/}Element extends UmbLitElement {",
+			"\toverride render() {",
+			"\t\treturn html`$0`;",
 			"\t}",
 			"",
-			"\tstatic styles = [UmbTextStyles, css``];",
+			"\tstatic override readonly styles = [UmbTextStyles, css``];",
 			"}",
 			"",
-			"export default Umb${TM_FILENAME_BASE/(.*)\\..+$/${1:/pascalcase}/}Element",
+			"export { Umb${TM_FILENAME_BASE/(.*)$/${1:/pascalcase}/}Element as element };",
 			"",
 			"declare global {",
 			"\tinterface HTMLElementTagNameMap {",
-			"\t\t'umb-${TM_FILENAME_BASE/(.*)\\..+$/$1/}': Umb${TM_FILENAME_BASE/(.*)\\..+$/${1:/pascalcase}/}Element;",
+			"\t\t'umb-${TM_FILENAME_BASE/(.*)\\..+$/$1/}': Umb${TM_FILENAME_BASE/(.*)$/${1:/pascalcase}/}Element;",
 			"\t}",
-			"}"
+			"}",
+			"",
 		],
-		"description": "Create a new Lit Component"
-	}
+		"description": "Create a new Umbraco Lit element",
+	},
 }
