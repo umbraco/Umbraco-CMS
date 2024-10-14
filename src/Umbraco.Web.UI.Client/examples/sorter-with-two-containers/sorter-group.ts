@@ -1,10 +1,10 @@
+import type ExampleSorterItem from './sorter-item.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, LitElement, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
-import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 import './sorter-item.js';
-import ExampleSorterItem from './sorter-item.js';
 
 export type ModelEntryType = {
 	name: string;
@@ -48,7 +48,7 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 		this.#sorter.setModel(this._items);
 	};
 
-	render() {
+	override render() {
 		return html`
 			<div class="sorter-container">
 				${repeat(
@@ -63,7 +63,7 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

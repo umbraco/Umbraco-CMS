@@ -18,11 +18,11 @@
 		},
 		{
 			"name": "icon-alert-alt",
-			"file": "alert-triangle.svg"
+			"file": "triangle-alert.svg"
 		},
 		{
 			"name": "icon-alert",
-			"file": "alert-triangle.svg"
+			"file": "triangle-alert.svg"
 		},
 		{
 			"name": "icon-alt",
@@ -38,7 +38,7 @@
 		},
 		{
 			"name": "icon-application-error",
-			"file": "application-error.svg"
+			"file": "circle-x.svg"
 		},
 		{
 			"name": "icon-application-window-alt",
@@ -69,20 +69,8 @@
 			"file": "arrow-up.svg"
 		},
 		{
-			"_name": "icon-art-easel",
-			"_file": "wallpaper.svg"
-		},
-		{
-			"_name": "icon-article",
-			"_file": "article.svg"
-		},
-		{
 			"name": "icon-attachment",
 			"file": "paperclip.svg"
-		},
-		{
-			"_name": "icon-auction-hammer",
-			"___file": "auction-hammer.svg"
 		},
 		{
 			"name": "icon-autofill",
@@ -105,24 +93,16 @@
 			"file": "refresh-ccw.svg"
 		},
 		{
-			"_name": "icon-baby-stroller",
-			"___file": "baby.svg"
-		},
-		{
 			"name": "icon-backspace",
 			"file": "delete.svg"
 		},
 		{
 			"name": "icon-badge-add",
-			"file": "plus-circle.svg"
-		},
-		{
-			"_name": "icon-badge-count",
-			"___file": "badge-count.svg"
+			"file": "circle-plus.svg"
 		},
 		{
 			"name": "icon-badge-remove",
-			"file": "minus-circle.svg"
+			"file": "circle-minus.svg"
 		},
 		{
 			"name": "icon-badge-restricted",
@@ -131,15 +111,11 @@
 		},
 		{
 			"name": "icon-ball",
-			"file": "dribble.svg"
-		},
-		{
-			"_name": "icon-band-aid",
-			"____file": ""
+			"file": "dribbble.svg"
 		},
 		{
 			"name": "icon-bar-chart",
-			"file": "bar-chart-2.svg"
+			"file": "chart-no-axes-column.svg"
 		},
 		{
 			"name": "icon-barcode",
@@ -147,7 +123,7 @@
 		},
 		{
 			"name": "icon-bars",
-			"file": "bar-chart.svg"
+			"file": "chart-no-axes-column-increasing.svg"
 		},
 		{
 			"name": "icon-battery-full",
@@ -170,56 +146,13 @@
 			"file": "bell.svg"
 		},
 		{
-			"_name": "icon-bill-dollar",
-			"____file": "circle-dollar-sign.svg"
-		},
-		{
-			"_name": "icon-bill-euro",
-			"____file": "bill-euro.svg"
-		},
-		{
-			"_name": "icon-bill-pound",
-			"____file": "bill-pound.svg"
-		},
-		{
-			"_name": "icon-bill-yen",
-			"____file": "bill-yen.svg"
-		},
-		{
-			"_name": "icon-bill",
-			"____file": "bill.svg"
-		},
-		{
-			"_name": "icon-billboard",
-			"____file": "billboard.svg"
-		},
-		{
-			"_name": "icon-bills-dollar",
-			"____file": "bills-dollar.svg"
-		},
-		{
-			"_name": "icon-bills-euro",
-			"____file": "bills-euro.svg"
-		},
-		{
-			"_name": "icon-bills-pound",
-			"____file": "bills-pound.svg"
-		},
-		{
-			"_name": "icon-bills-yen",
-			"____file": "bills-yen.svg"
-		},
-		{
-			"_name": "icon-bills",
-			"____file": "bills.svg"
-		},
-		{
 			"name": "icon-binarycode",
 			"file": "binary.svg"
 		},
 		{
-			"_name": "icon-binoculars",
-			"___file": "binoculars.svg"
+			"name": "icon-binoculars",
+			"file": "binoculars.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-bird",
@@ -234,6 +167,10 @@
 			"file": "ban.svg"
 		},
 		{
+			"name": "icon-blockquote",
+			"file": "text-quote.svg"
+		},
+		{
 			"_name": "icon-blueprint",
 			"____file": "blueprint.svg"
 		},
@@ -246,8 +183,8 @@
 			"file": "ship.svg"
 		},
 		{
-			"_name": "icon-bomb",
-			"____file": "bomb.svg"
+			"name": "icon-bold",
+			"file": "bold.svg"
 		},
 		{
 			"name": "icon-bones",
@@ -303,7 +240,7 @@
 		},
 		{
 			"name": "icon-brush-alt-2",
-			"file": "paintbrush-2.svg"
+			"file": "paintbrush-vertical.svg"
 		},
 		{
 			"name": "icon-brush-alt",
@@ -363,10 +300,6 @@
 			"file": "car.svg"
 		},
 		{
-			"_name": "icon-cash-register",
-			"____file": "cash-register.svg"
-		},
-		{
 			"name": "icon-categories",
 			"file": "archive.svg"
 		},
@@ -376,11 +309,11 @@
 		},
 		{
 			"name": "icon-chart-curve",
-			"file": "area-chart.svg"
+			"file": "chart-no-axes-combined.svg"
 		},
 		{
 			"name": "icon-chart",
-			"file": "line-chart.svg"
+			"file": "chart-line.svg"
 		},
 		{
 			"name": "icon-chat-active",
@@ -396,10 +329,6 @@
 			"file": "check.svg"
 		},
 		{
-			"_name": "icon-checkbox-dotted-active",
-			"____file": "checkbox-dotted-active.svg"
-		},
-		{
 			"name": "icon-checkbox-dotted",
 			"file": "box-select.svg"
 		},
@@ -410,11 +339,7 @@
 		},
 		{
 			"name": "icon-checkbox",
-			"file": "check-square.svg"
-		},
-		{
-			"_name": "icon-chess",
-			"____file": "chess.svg"
+			"file": "square-check.svg"
 		},
 		{
 			"name": "icon-chip-alt",
@@ -431,7 +356,7 @@
 		},
 		{
 			"name": "icon-circle-dotted-active",
-			"file": "check-circle.svg"
+			"file": "circle-check.svg"
 		},
 		{
 			"name": "icon-circle-dotted",
@@ -442,17 +367,9 @@
 			"file": "circuit-board.svg"
 		},
 		{
-			"_name": "icon-circus",
-			"____file": "circus.svg"
-		},
-		{
 			"name": "icon-client",
 			"file": "user.svg",
 			"legacy": true
-		},
-		{
-			"_name": "icon-clothes-hanger",
-			"____file": "clothes-hanger.svg"
 		},
 		{
 			"name": "icon-cloud-drive",
@@ -460,7 +377,7 @@
 		},
 		{
 			"name": "icon-cloud-upload",
-			"file": "upload-cloud.svg"
+			"file": "cloud-upload.svg"
 		},
 		{
 			"name": "icon-cloud",
@@ -483,12 +400,16 @@
 			"file": "code.svg"
 		},
 		{
+			"name": "icon-code-xml",
+			"file": "code-xml.svg"
+		},
+		{
 			"name": "icon-coffee",
 			"file": "coffee.svg"
 		},
 		{
 			"name": "icon-coin-dollar",
-			"file": "dollar.svg"
+			"file": "dollar-sign.svg"
 		},
 		{
 			"name": "icon-coin-euro",
@@ -496,52 +417,16 @@
 		},
 		{
 			"name": "icon-coin-pound",
-			"file": "pound.svg"
+			"file": "pound-sterling.svg"
 		},
 		{
 			"name": "icon-coin-yen",
 			"file": "japanese-yen.svg"
 		},
 		{
-			"_name": "icon-coin",
-			"____file": "coin.svg"
-		},
-		{
 			"name": "icon-coins-alt",
 			"file": "coins.svg",
 			"legacy": true
-		},
-		{
-			"_name": "icon-coins-dollar-alt",
-			"____file": "coins-dollar-alt.svg"
-		},
-		{
-			"_name": "icon-coins-dollar",
-			"____file": "coins-dollar.svg"
-		},
-		{
-			"_name": "icon-coins-euro-alt",
-			"____file": "coins-euro-alt.svg"
-		},
-		{
-			"_name": "icon-coins-euro",
-			"____file": "coins-euro.svg"
-		},
-		{
-			"_name": "icon-coins-pound-alt",
-			"____file": "coins-pound-alt.svg"
-		},
-		{
-			"_name": "icon-coins-pound",
-			"____file": "coins-pound.svg"
-		},
-		{
-			"_name": "icon-coins-yen-alt",
-			"____file": "coins-yen-alt.svg"
-		},
-		{
-			"_name": "icon-coins-yen",
-			"____file": "coins-yen.svg"
 		},
 		{
 			"name": "icon-coins",
@@ -560,12 +445,8 @@
 			"file": "tally-3.svg"
 		},
 		{
-			"_name": "icon-comb",
-			"____file": "comb.svg"
-		},
-		{
 			"name": "icon-combination-lock-open",
-			"file": "unlock-keyhole.svg"
+			"file": "lock-keyhole-open.svg"
 		},
 		{
 			"name": "icon-combination-lock",
@@ -589,7 +470,7 @@
 		},
 		{
 			"name": "icon-console",
-			"file": "terminal-square.svg"
+			"file": "square-terminal.svg"
 		},
 		{
 			"name": "icon-contrast",
@@ -653,7 +534,7 @@
 		},
 		{
 			"name": "icon-defrag",
-			"file": "scatter-chart.svg"
+			"file": "chart-scatter.svg"
 		},
 		{
 			"name": "icon-delete-key",
@@ -666,10 +547,6 @@
 		{
 			"name": "icon-departure",
 			"file": "plane-takeoff.svg"
-		},
-		{
-			"_name": "icon-desk",
-			"____file": "desk.svg"
 		},
 		{
 			"name": "icon-desktop",
@@ -751,12 +628,8 @@
 			"file": "files.svg"
 		},
 		{
-			"_name": "icon-dollar-bag",
-			"____file": "dollar-bag.svg"
-		},
-		{
 			"name": "icon-donate",
-			"file": "helping-hand.svg",
+			"file": "hand-helping.svg",
 			"legacy": true
 		},
 		{
@@ -794,8 +667,8 @@
 			"file": "pencil.svg"
 		},
 		{
-			"_name": "icon-eject",
-			"____file": "eject.svg"
+			"name": "icon-embed",
+			"file": "monitor-play.svg"
 		},
 		{
 			"name": "icon-employee",
@@ -816,15 +689,11 @@
 		},
 		{
 			"name": "icon-escape",
-			"file": "arrow-up-left-from-circle.svg"
+			"file": "circle-arrow-out-up-left.svg"
 		},
 		{
 			"name": "icon-ethernet",
 			"file": "network.svg"
-		},
-		{
-			"_name": "icon-euro-bag",
-			"____file": "euro-bag.svg"
 		},
 		{
 			"name": "icon-eye",
@@ -832,7 +701,7 @@
 		},
 		{
 			"name": "icon-exit-fullscreen",
-			"file": "exit-fullscreen.svg"
+			"file": "minimize-2.svg"
 		},
 		{
 			"name": "icon-facebook-like",
@@ -847,12 +716,8 @@
 			"file": "heart.svg"
 		},
 		{
-			"_name": "icon-female-symbol",
-			"____file": "female-symbol.svg"
-		},
-		{
 			"name": "icon-file-cabinet",
-			"file": "library-square.svg"
+			"file": "square-library.svg"
 		},
 		{
 			"name": "icon-files",
@@ -860,7 +725,7 @@
 		},
 		{
 			"name": "icon-filter-arrows",
-			"file": "filter-arrows.svg"
+			"file": "arrow-down-a-z.svg"
 		},
 		{
 			"name": "icon-filter",
@@ -873,10 +738,6 @@
 		{
 			"name": "icon-fire",
 			"file": "flame-kindling.svg"
-		},
-		{
-			"_name": "icon-firewall",
-			"____file": "firewall.svg"
 		},
 		{
 			"name": "icon-firewire",
@@ -902,14 +763,6 @@
 		{
 			"name": "icon-flowerpot",
 			"file": "flower-2.svg"
-		},
-		{
-			"_name": "icon-folder-open",
-			"____file": "folder-open.svg"
-		},
-		{
-			"_name": "icon-folder-outline",
-			"____file": "folder-outline.svg"
 		},
 		{
 			"name": "icon-folder",
@@ -1037,10 +890,6 @@
 			"file": "pointer.svg"
 		},
 		{
-			"_name": "icon-handprint",
-			"____file": "handprint.svg"
-		},
-		{
 			"name": "icon-handshake",
 			"file": "heart-handshake.svg"
 		},
@@ -1064,12 +913,16 @@
 			"legacy": true
 		},
 		{
-			"_name": "icon-hat",
-			"____file": "hat.svg"
+			"name": "icon-heading-1",
+			"file": "heading-1.svg"
 		},
 		{
-			"_name": "icon-hd",
-			"____file": "hd.svg"
+			"name": "icon-heading-2",
+			"file": "heading-2.svg"
+		},
+		{
+			"name": "icon-heading-3",
+			"file": "heading-3.svg"
 		},
 		{
 			"name": "icon-headphones",
@@ -1090,15 +943,23 @@
 		},
 		{
 			"name": "icon-help-alt",
-			"file": "help-circle.svg"
+			"file": "circle-help.svg"
 		},
 		{
 			"name": "icon-help",
 			"file": "life-buoy.svg"
 		},
 		{
+			"name": "icon-history",
+			"file": "history.svg"
+		},
+		{
 			"name": "icon-home",
-			"file": "home.svg"
+			"file": "house.svg"
+		},
+		{
+			"name": "icon-horizontal-rule",
+			"file": "separator-horizontal.svg"
 		},
 		{
 			"name": "icon-hourglass",
@@ -1110,8 +971,8 @@
 			"legacy": true
 		},
 		{
-			"_name": "icon-inactive-line",
-			"____file": "inactive-line.svg"
+			"name": "icon-image-up",
+			"file": "image-up.svg"
 		},
 		{
 			"name": "icon-inbox-full",
@@ -1124,7 +985,7 @@
 		},
 		{
 			"name": "icon-indent",
-			"file": "indent.svg"
+			"file": "indent-increase.svg"
 		},
 		{
 			"name": "icon-infinity",
@@ -1150,6 +1011,10 @@
 			"legacy": true
 		},
 		{
+			"name": "icon-italic",
+			"file": "italic.svg"
+		},
+		{
 			"name": "icon-item-arrangement",
 			"file": "table-properties.svg",
 			"legacy": true
@@ -1165,14 +1030,6 @@
 		{
 			"name": "icon-keyboard",
 			"file": "keyboard.svg"
-		},
-		{
-			"_name": "icon-keychain",
-			"____file": "keychain.svg"
-		},
-		{
-			"_name": "icon-keyhole",
-			"____file": "keyhole.svg"
 		},
 		{
 			"name": "icon-lab",
@@ -1193,7 +1050,7 @@
 		},
 		{
 			"name": "icon-layout",
-			"file": "layout.svg"
+			"file": "layout-dashboard.svg"
 		},
 		{
 			"name": "icon-left-double-arrow",
@@ -1222,11 +1079,11 @@
 		},
 		{
 			"name": "icon-lightbulb-active",
-			"file": "bulb.svg"
+			"file": "lightbulb.svg"
 		},
 		{
 			"name": "icon-lightbulb",
-			"file": "bulb.svg",
+			"file": "lightbulb-off.svg",
 			"legacy": true
 		},
 		{
@@ -1236,10 +1093,6 @@
 		{
 			"name": "icon-link",
 			"file": "link.svg"
-		},
-		{
-			"_name": "icon-linux-tux",
-			"____file": "linux-tux.svg"
 		},
 		{
 			"name": "icon-list",
@@ -1257,11 +1110,11 @@
 		},
 		{
 			"name": "icon-locate",
-			"file": "locate"
+			"file": "locate.svg"
 		},
 		{
 			"name": "icon-location-near-me",
-			"file": "map-pinned",
+			"file": "map-pinned.svg",
 			"legacy": true
 		},
 		{
@@ -1293,14 +1146,6 @@
 		{
 			"name": "icon-mailbox",
 			"file": "mailbox.svg"
-		},
-		{
-			"_name": "icon-male-and-female",
-			"____file": "users-2.svg"
-		},
-		{
-			"_name": "icon-male-symbol",
-			"____file": "male-symbol.svg"
 		},
 		{
 			"name": "icon-map-alt",
@@ -1371,14 +1216,6 @@
 			"file": "smartphone.svg"
 		},
 		{
-			"_name": "icon-molecular-network",
-			"____file": "molecular-network.svg"
-		},
-		{
-			"_name": "icon-molecular",
-			"____file": "molecular.svg"
-		},
-		{
 			"name": "icon-mountain",
 			"file": "mountain-snow.svg"
 		},
@@ -1404,7 +1241,7 @@
 		},
 		{
 			"name": "icon-multiple-windows",
-			"file": "multiple-windows.svg"
+			"file": "book-copy.svg"
 		},
 		{
 			"name": "icon-music",
@@ -1457,7 +1294,7 @@
 		},
 		{
 			"name": "icon-navigation-top",
-			"file": "arrow-up-to-line",
+			"file": "arrow-up-to-line.svg",
 			"legacy": true
 		},
 		{
@@ -1486,7 +1323,7 @@
 		{
 			"name": "icon-newspaper-alt",
 			"file": "newspaper.svg",
-			"legacy":true
+			"legacy": true
 		},
 		{
 			"name": "icon-newspaper",
@@ -1544,7 +1381,7 @@
 		},
 		{
 			"name": "icon-outdent",
-			"file": "outdent.svg"
+			"file": "indent-decrease.svg"
 		},
 		{
 			"name": "icon-page-add",
@@ -1664,7 +1501,7 @@
 		},
 		{
 			"name": "icon-pie-chart",
-			"file": "pie-chart.svg"
+			"file": "chart-pie.svg"
 		},
 		{
 			"name": "icon-piggy-bank",
@@ -1715,7 +1552,7 @@
 		},
 		{
 			"name": "icon-power-outlet",
-			"file": "power-square.svg",
+			"file": "square-power.svg",
 			"legacy": true
 		},
 		{
@@ -1737,22 +1574,22 @@
 		{
 			"name": "icon-price-dollar",
 			"file": "badge-dollar-sign.svg",
-			"legacy":true
+			"legacy": true
 		},
 		{
 			"name": "icon-price-euro",
 			"file": "badge-euro.svg",
-			"legacy":true
+			"legacy": true
 		},
 		{
 			"name": "icon-price-pound",
 			"file": "badge-pound-sterling.svg",
-			"legacy":true
+			"legacy": true
 		},
 		{
 			"name": "icon-price-yen",
-			"file": "badge-japanese-yen",
-			"legacy":true
+			"file": "badge-japanese-yen.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-print",
@@ -1810,8 +1647,7 @@
 		},
 		{
 			"name": "icon-readonly",
-			"file": "ban.svg",
-			"legacy": true
+			"file": "pencil-off.svg"
 		},
 		{
 			"name": "icon-receipt-alt",
@@ -1825,6 +1661,10 @@
 			"name": "icon-record",
 			"file": "disc-3.svg",
 			"legacy": true
+		},
+		{
+			"name": "icon-rectangle-ellipsis",
+			"file": "rectangle-ellipsis.svg"
 		},
 		{
 			"name": "icon-redo",
@@ -1857,7 +1697,7 @@
 		},
 		{
 			"name": "icon-resize",
-			"file": "resize.svg"
+			"file": "scaling.svg"
 		},
 		{
 			"name": "icon-return-to-top",
@@ -1904,7 +1744,7 @@
 		},
 		{
 			"name": "icon-school",
-			"file": "school-2.svg"
+			"file": "school.svg"
 		},
 		{
 			"name": "icon-screensharing",
@@ -1980,7 +1820,7 @@
 		{
 			"name": "icon-shoe",
 			"file": "footprints.svg",
-			"legay": true
+			"legacy": true
 		},
 		{
 			"name": "icon-shopping-basket-alt-2",
@@ -2001,6 +1841,11 @@
 		},
 		{
 			"name": "icon-sience",
+			"file": "atom.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-science",
 			"file": "atom.svg"
 		},
 		{
@@ -2065,11 +1910,11 @@
 		},
 		{
 			"name": "icon-speed-gauge",
-			"file": "gauge-circle.svg"
+			"file": "circle-gauge.svg"
 		},
 		{
 			"name": "icon-split-alt",
-			"file": "split-alt.svg"
+			"file": "square-split-horizontal.svg"
 		},
 		{
 			"name": "icon-split",
@@ -2101,7 +1946,7 @@
 		},
 		{
 			"name": "icon-stop-alt",
-			"file": "x-octagon.svg"
+			"file": "octagon-x.svg"
 		},
 		{
 			"name": "icon-stop-hand",
@@ -2118,8 +1963,20 @@
 		},
 		{
 			"name": "icon-stream",
-			"file": "activity-square.svg",
+			"file": "square-activity.svg",
 			"legacy": true
+		},
+		{
+			"name": "icon-strikethrough",
+			"file": "strikethrough.svg"
+		},
+		{
+			"name": "icon-subscript",
+			"file": "subscript.svg"
+		},
+		{
+			"name": "icon-superscript",
+			"file": "superscript.svg"
 		},
 		{
 			"name": "icon-sunny",
@@ -2141,6 +1998,10 @@
 		{
 			"name": "icon-tab-key",
 			"file": "arrow-right-to-line.svg"
+		},
+		{
+			"name": "icon-table",
+			"file": "table.svg"
 		},
 		{
 			"name": "icon-tag",
@@ -2169,7 +2030,23 @@
 		},
 		{
 			"name": "icon-terminal",
-			"file": "terminal-square.svg"
+			"file": "square-terminal.svg"
+		},
+		{
+			"name": "icon-text-align-center",
+			"file": "align-center.svg"
+		},
+		{
+			"name": "icon-text-align-justify",
+			"file": "align-justify.svg"
+		},
+		{
+			"name": "icon-text-align-left",
+			"file": "align-left.svg"
+		},
+		{
+			"name": "icon-text-align-right",
+			"file": "align-right.svg"
 		},
 		{
 			"name": "icon-theater",
@@ -2290,10 +2167,6 @@
 			"legacy": true
 		},
 		{
-			"_name": "icon-umbraco",
-			"____file": "umbraco.svg"
-		},
-		{
 			"name": "icon-umbrella",
 			"file": "umbrella.svg"
 		},
@@ -2302,8 +2175,20 @@
 			"file": "undo-2.svg"
 		},
 		{
+			"name": "icon-underline",
+			"file": "underline.svg"
+		},
+		{
+			"name": "icon-unlink",
+			"file": "unlink.svg"
+		},
+		{
 			"name": "icon-unlocked",
-			"file": "unlock.svg"
+			"file": "lock-open.svg"
+		},
+		{
+			"name": "icon-unplug",
+			"file": "unplug.svg"
 		},
 		{
 			"name": "icon-untitled",
@@ -2378,7 +2263,7 @@
 		},
 		{
 			"name": "icon-wand",
-			"file": "wand-2.svg"
+			"file": "wand-sparkles.svg"
 		},
 		{
 			"name": "icon-webhook",
@@ -2398,7 +2283,11 @@
 		},
 		{
 			"name": "icon-window-popin",
-			"file": "arrow-down-left-square.svg"
+			"file": "square-arrow-down-left.svg"
+		},
+		{
+			"name": "icon-window-popout",
+			"file": "square-arrow-up-right.svg"
 		},
 		{
 			"name": "icon-window-sizes",
@@ -2414,7 +2303,7 @@
 		},
 		{
 			"name": "icon-wrong",
-			"file": "x-circle.svg"
+			"file": "circle-x.svg"
 		},
 		{
 			"name": "icon-zip",
@@ -2429,10 +2318,6 @@
 			"name": "icon-zoom-in",
 			"file": "zoom-in.svg"
 		},
-
-
-
-
 		{
 			"name": "icon-zoom-out",
 			"file": "zoom-out.svg"
@@ -2444,9 +2329,380 @@
 		{
 			"name": "icon-database",
 			"file": "database.svg"
+		},
+		{
+			"name": "icon-umb-manifest",
+			"file": "puzzle.svg"
+		},
+		{
+			"name": "icon-document-3d",
+			"file": "file-axis-3d.svg"
+		},
+		{
+			"name": "icon-document-medal",
+			"file": "file-badge-2.svg"
+		},
+		{
+			"name": "icon-document-chart-bar",
+			"file": "file-chart-column.svg"
+		},
+		{
+			"name": "icon-document-chart-graph",
+			"file": "file-chart-line.svg"
+		},
+		{
+			"name": "icon-document-html",
+			"file": "file-code.svg"
+		},
+		{
+			"name": "icon-document-js",
+			"file": "file-json.svg"
+		},
+		{
+			"name": "icon-document-key",
+			"file": "file-key.svg"
+		},
+		{
+			"name": "icon-document-search",
+			"file": "file-search-2.svg"
+		},
+		{
+			"name": "icon-document-settings",
+			"file": "file-sliders.svg"
+		},
+		{
+			"name": "icon-document-spreadsheet",
+			"file": "file-spreadsheet.svg"
+		},
+		{
+			"name": "icon-document-command",
+			"file": "file-terminal.svg"
+		},
+		{
+			"name": "icon-document-command",
+			"file": "file-terminal.svg"
+		},
+		{
+			"name": "icon-document-font",
+			"file": "file-type.svg"
+		},
+		{
+			"name": "icon-document-user",
+			"file": "file-user.svg"
+		},
+		{
+			"name": "icon-document-image",
+			"file": "file-image.svg"
+		},
+		{
+			"name": "icon-document-play",
+			"file": "file-video.svg"
+		},
+		{
+			"name": "icon-document-play",
+			"file": "file-video.svg"
+		}
+	],
+	"simpleIcons": [
+		{
+			"name": "icon-facebook",
+			"file": "facebook.svg"
+		},
+		{
+			"name": "icon-gitbook",
+			"file": "gitbook.svg"
+		},
+		{
+			"name": "icon-github",
+			"file": "github.svg"
+		},
+		{
+			"name": "icon-gitlab",
+			"file": "gitlab.svg"
+		},
+		{
+			"name": "icon-google",
+			"file": "google.svg"
+		},
+		{
+			"name": "icon-linkedin",
+			"file": "linkedin.svg"
+		},
+		{
+			"name": "icon-mastodon",
+			"file": "mastodon.svg"
+		},
+		{
+			"name": "icon-twitter-x",
+			"file": "x.svg"
 		}
 	],
 	"umbraco": [
+		{
+			"name": "icon-art-easel",
+			"file": "icon-art-easel.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-article",
+			"file": "icon-article.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-auction-hammer",
+			"file": "icon-auction-hammer.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-badge-count",
+			"file": "icon-badge-count.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-band-aid",
+			"file": "icon-band-aid.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-baby-stroller",
+			"file": "icon-baby-stroller.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-bill-dollar",
+			"file": "icon-bill-dollar.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-bill-euro",
+			"file": "icon-bill-euro.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-bill-pound",
+			"file": "icon-bill-pound.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-bill-yen",
+			"file": "icon-bill-yen.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-bill",
+			"file": "icon-bill.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-billboard",
+			"file": "icon-billboard.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-bills-dollar",
+			"file": "icon-bills-dollar.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-bills-euro",
+			"file": "icon-bills-euro.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-bills-pound",
+			"file": "icon-bills-pound.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-bills-yen",
+			"file": "icon-bills-yen.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-bills",
+			"file": "icon-bills.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-blueprint",
+			"file": "icon-blueprint.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-bomb",
+			"file": "icon-bomb.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-cash-register",
+			"file": "icon-cash-register.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-checkbox-dotted-active",
+			"file": "icon-checkbox-dotted-active.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-chess",
+			"file": "icon-chess.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-circus",
+			"file": "icon-circus.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-clothes-hanger",
+			"file": "icon-clothes-hanger.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-coin",
+			"file": "icon-coin.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-coins-dollar-alt",
+			"file": "icon-coins-dollar-alt.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-coins-dollar",
+			"file": "icon-coins-dollar.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-coins-euro-alt",
+			"file": "icon-coins-euro-alt.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-coins-euro",
+			"file": "icon-coins-euro.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-coins-pound-alt",
+			"file": "icon-coins-pound-alt.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-coins-pound",
+			"file": "icon-coins-pound.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-coins-yen-alt",
+			"file": "icon-coins-yen-alt.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-coins-yen",
+			"file": "icon-coins-yen.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-comb",
+			"file": "icon-comb.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-desk",
+			"file": "icon-desk.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-dollar-bag",
+			"file": "icon-dollar-bag.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-eject",
+			"file": "icon-eject.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-euro-bag",
+			"file": "icon-euro-bag.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-female-symbol",
+			"file": "icon-female-symbol.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-firewall",
+			"file": "icon-firewall.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-folder-open",
+			"file": "icon-folder-open.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-folder-outline",
+			"file": "icon-folder-outline.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-handprint",
+			"file": "icon-handprint.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-hat",
+			"file": "icon-hat.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-hd",
+			"file": "icon-hd.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-inactive-line",
+			"file": "icon-inactive-line.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-keychain",
+			"file": "icon-keychain.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-keyhole",
+			"file": "icon-keyhole.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-linux-tux",
+			"file": "icon-linux-tux.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-male-and-female",
+			"file": "icon-users.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-male-symbol",
+			"file": "icon-male-symbol.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-molecular-network",
+			"file": "icon-molecular-network.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-molecular",
+			"file": "icon-molecular.svg",
+			"legacy": true
+		},
 		{
 			"name": "icon-umbraco",
 			"file": "icon-umbraco.svg"

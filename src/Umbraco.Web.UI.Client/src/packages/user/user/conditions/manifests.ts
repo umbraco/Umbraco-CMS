@@ -1,11 +1,17 @@
-import { manifest as userAllowDisableActionManifest } from './user-allow-disable-action.condition.js';
-import { manifest as userAllowEnableActionManifest } from './user-allow-enable-action.condition.js';
-import { manifest as userAllowUnlockActionManifest } from './user-allow-unlock-action.condition.js';
-import { manifest as userAllowDeleteActionManifest } from './user-allow-delete-action.condition.js';
+import { manifests as userAllowChangePasswordActionManifests } from './allow-change-password/manifests.js';
+import { manifests as userAllowDeleteActionManifests } from './allow-delete/manifests.js';
+import { manifests as userAllowDisableActionManifests } from './allow-disable/manifests.js';
+import { manifests as userAllowEnableActionManifests } from './allow-enable/manifests.js';
+import { manifests as userAllowExternalLoginActionManifests } from './allow-external-login/manifests.js';
+import { manifests as userAllowMfaActionManifests } from './allow-mfa/manifests.js';
+import { manifests as userAllowUnlockActionManifests } from './allow-unlock/manifests.js';
 
-export const manifests = [
-	userAllowDisableActionManifest,
-	userAllowEnableActionManifest,
-	userAllowUnlockActionManifest,
-	userAllowDeleteActionManifest,
+export const manifests: Array<UmbExtensionManifest> = [
+	...userAllowChangePasswordActionManifests,
+	...userAllowDeleteActionManifests,
+	...userAllowDisableActionManifests,
+	...userAllowEnableActionManifests,
+	...userAllowExternalLoginActionManifests,
+	...userAllowMfaActionManifests,
+	...userAllowUnlockActionManifests,
 ];

@@ -1,15 +1,9 @@
 import type { UmbContextDiscriminator, UmbContextToken } from '../token/context-token.js';
-import {
-	isUmbContextProvideEventType,
-	//isUmbContextUnprovidedEventType,
-	UMB_CONTEXT_PROVIDE_EVENT_TYPE,
-	//umbContextUnprovidedEventType,
-} from '../provide/context-provide.event.js';
+import { isUmbContextProvideEventType, UMB_CONTEXT_PROVIDE_EVENT_TYPE } from '../provide/context-provide.event.js';
 import type { UmbContextCallback } from './context-request.event.js';
 import { UmbContextRequestEventImplementation } from './context-request.event.js';
 
 /**
- * @export
  * @class UmbContextConsumer
  */
 export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType = BaseType> {
@@ -33,9 +27,9 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 
 	/**
 	 * Creates an instance of UmbContextConsumer.
-	 * @param {Element} host
-	 * @param {string} contextIdentifier
-	 * @param {UmbContextCallback} callback
+	 * @param {Element} host - The host element.
+	 * @param {string} contextIdentifier - The context identifier, an alias or a Context Token.
+	 * @param {UmbContextCallback} callback - The callback.
 	 * @memberof UmbContextConsumer
 	 */
 	constructor(
@@ -55,6 +49,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	 * @public
 	 * @memberof UmbContextConsumer
 	 * @description Make the consumption skip the contexts provided by the Host element.
+	 * @returns {UmbContextConsumer} - The current instance of the UmbContextConsumer.
 	 */
 	public skipHost() {
 		this.#skipHost = true;
@@ -66,6 +61,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	 * @memberof UmbContextConsumer
 	 * @description Pass beyond any context aliases that matches this.
 	 * The default behavior is to stop at first Context Alias match, this is to avoid receiving unforeseen descending contexts.
+	 * @returns {UmbContextConsumer} - The current instance of the UmbContextConsumer.
 	 */
 	public passContextAliasMatches() {
 		this.#stopAtContextMatch = false;
@@ -91,9 +87,10 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 
 	protected setInstance(instance: ResultType): void {
 		this.#instance = instance;
-		this.#callback?.(instance);
-		if (instance !== undefined) {
-			this.#promiseResolver?.(instance);
+		const promiseResolver = this.#promiseResolver; // Get the promise resolver, as it might be destroyed as a reaction of the callback [NL]
+		this.#callback?.(instance); // Resolve callback first as it might perform something you like completed before resolving the promise, as the promise might be used to determine when things are ready/initiated [NL]
+		if (promiseResolver && instance !== undefined) {
+			promiseResolver(instance);
 			this.#promise = undefined;
 		}
 	}
@@ -102,12 +99,17 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	 * @public
 	 * @memberof UmbContextConsumer
 	 * @description Get the context as a promise.
+	 * @returns {UmbContextConsumer} - A promise that resolves when the context is consumed.
 	 */
 	public asPromise(): Promise<ResultType> {
 		return (
 			this.#promise ??
 			(this.#promise = new Promise<ResultType>((resolve) => {
-				this.#instance ? resolve(this.#instance) : (this.#promiseResolver = resolve);
+				if (this.#instance) {
+					resolve(this.#instance);
+				} else {
+					this.#promiseResolver = resolve;
+				}
 			}))
 		);
 	}
@@ -170,6 +172,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 
 	public destroy(): void {
 		this.hostDisconnected();
+		this._host = undefined as any;
 		this.#callback = undefined;
 		this.#promise = undefined;
 		this.#promiseResolver = undefined;

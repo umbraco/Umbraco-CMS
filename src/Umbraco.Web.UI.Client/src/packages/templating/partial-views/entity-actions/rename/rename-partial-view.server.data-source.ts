@@ -4,7 +4,7 @@ import {
 	appendFileExtensionIfNeeded,
 } from '@umbraco-cms/backoffice/server-file-system';
 import type { RenameStylesheetRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { PartialViewResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -22,7 +22,7 @@ export class UmbRenamePartialViewServerDataSource {
 	 * Rename Partial View
 	 * @param {string} unique
 	 * @param {string} name
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbRenamePartialViewServerDataSource
 	 */
 	async rename(unique: string, name: string) {
@@ -38,7 +38,7 @@ export class UmbRenamePartialViewServerDataSource {
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			PartialViewResource.putPartialViewByPathRename({
+			PartialViewService.putPartialViewByPathRename({
 				path: encodeURIComponent(path),
 				requestBody,
 			}),

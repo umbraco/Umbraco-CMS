@@ -1,10 +1,9 @@
-import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A server data source for changing the password of a user
- * @export
  * @class UmbChangeUserPasswordServerDataSource
  */
 export class UmbChangeUserPasswordServerDataSource {
@@ -12,7 +11,7 @@ export class UmbChangeUserPasswordServerDataSource {
 
 	/**
 	 * Creates an instance of UmbChangeUserPasswordServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbChangeUserPasswordServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -23,7 +22,7 @@ export class UmbChangeUserPasswordServerDataSource {
 	 * Change the password of a user
 	 * @param {string} id
 	 * @param {string} newPassword
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbChangeUserPasswordServerDataSource
 	 */
 	async changePassword(id: string, newPassword: string) {
@@ -31,7 +30,7 @@ export class UmbChangeUserPasswordServerDataSource {
 
 		return tryExecuteAndNotify(
 			this.#host,
-			UserResource.postUserByIdChangePassword({
+			UserService.postUserByIdChangePassword({
 				id,
 				requestBody: {
 					newPassword,

@@ -49,10 +49,10 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		}
 	}
 
-	// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
 	#onPopoverToggle(event: ToggleEvent) {
+		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this._isOpen = event.newState === 'open';
 		if (this._isOpen && !this.#languagesObserver) {
 			if (this._popoverElement) {
@@ -77,7 +77,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		this._popoverElement?.hidePopover();
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderTrigger()} ${this.#renderContent()}`;
 	}
 
@@ -105,7 +105,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		</uui-popover-container>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;
@@ -114,7 +114,8 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 			}
 
 			#toggle {
-				width: var(--umb-section-sidebar-width);
+				color: var(--uui-color-text);
+				width: 100%;
 				text-align: left;
 				background: none;
 				border: none;
@@ -131,6 +132,10 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 			#toggle:hover {
 				background-color: var(--uui-color-surface-emphasis);
+			}
+
+			uui-menu-item {
+				color: var(--uui-color-text);
 			}
 		`,
 	];

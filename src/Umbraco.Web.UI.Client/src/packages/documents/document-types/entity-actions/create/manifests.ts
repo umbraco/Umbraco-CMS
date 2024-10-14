@@ -1,35 +1,24 @@
-import {
-	UMB_DOCUMENT_TYPE_ENTITY_TYPE,
-	UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
-	UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
-} from '../../entity.js';
-import { UmbCreateDataTypeEntityAction } from './create.action.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE, UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE } from '../../entity.js';
 
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.DocumentType.Create',
 		name: 'Create Document Type Entity Action',
-		weight: 1000,
-		api: UmbCreateDataTypeEntityAction,
-		forEntityTypes: [
-			UMB_DOCUMENT_TYPE_ENTITY_TYPE,
-			UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
-			UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
-		],
+		weight: 1200,
+		api: () => import('./create.action.js'),
+		forEntityTypes: [UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE, UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
-			label: 'Create...',
+			label: '#actions_create',
+			additionalOptions: true,
 		},
 	},
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.DocumentTypeCreateOptions',
 		name: 'Document Type Create Options Modal',
-		js: () => import('./modal/document-type-create-options-modal.element.js'),
+		element: () => import('./modal/document-type-create-options-modal.element.js'),
 	},
 ];
-
-export const manifests = [...entityActions];

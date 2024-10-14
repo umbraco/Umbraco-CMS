@@ -46,11 +46,12 @@ export class UmbTemplateQueryBuilderFilterElement extends UmbLitElement {
 	#resetOperator() {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		this.filter = { ...this.filter, operator: undefined };
+		this.filter = { ...this.filter, operator: undefined, constraintValue: undefined };
 	}
 
 	#resetFilter() {
 		this.filter = <TemplateQueryExecuteFilterPresentationModel>{};
+		this.dispatchEvent(new Event('remove-filter'));
 	}
 
 	#removeOrReset() {
@@ -66,7 +67,7 @@ export class UmbTemplateQueryBuilderFilterElement extends UmbLitElement {
 		return Object.keys(this.filter).length === 3 && Object.values(this.filter).every((v) => !!v);
 	}
 
-	protected willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		if (_changedProperties.has('filter')) {
 			if (this.isFilterValid) {
 				this.dispatchEvent(new Event('update-query'));
@@ -108,7 +109,7 @@ export class UmbTemplateQueryBuilderFilterElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		const properties = localizePropertyType(this.settings?.properties);
 		return html`
 			<span>${this.unremovable ? this.localize.term('template_where') : this.localize.term('template_and')}</span>
@@ -144,7 +145,7 @@ export class UmbTemplateQueryBuilderFilterElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

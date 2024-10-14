@@ -1,5 +1,5 @@
-import type { Meta, Story } from '@storybook/web-components';
 import type { UmbPropertyElement } from './property.element.js';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property.element.js';
@@ -10,7 +10,7 @@ export default {
 	id: 'umb-property',
 } as Meta;
 
-export const AAAOverview: Story<UmbPropertyElement> = () =>
+export const AAAOverview: StoryFn<UmbPropertyElement> = () =>
 	html` <umb-property
 		label="Property"
 		description="Description"

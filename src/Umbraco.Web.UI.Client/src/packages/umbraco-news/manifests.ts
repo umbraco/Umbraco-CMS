@@ -1,13 +1,13 @@
-import type { ManifestDashboard } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestDashboard } from '@umbraco-cms/backoffice/dashboard';
 
 export const dashboard: ManifestDashboard = {
 	type: 'dashboard',
 	alias: 'Umb.Dashboard.UmbracoNews',
 	name: 'Umbraco News Dashboard',
-	js: () => import('./umbraco-news-dashboard.element.js'),
+	element: () => import('./umbraco-news-dashboard.element.js'),
 	weight: 20,
 	meta: {
-		label: 'Welcome',
+		label: '#dashboardTabs_contentIntro',
 	},
 	conditions: [
 		{

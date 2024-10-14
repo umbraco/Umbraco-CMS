@@ -1,9 +1,9 @@
-import type { ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_CREATE_USER_MODAL_ALIAS } from './create/constants.js';
 
-const modals: Array<ManifestModal> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.User.Create',
+		alias: UMB_CREATE_USER_MODAL_ALIAS,
 		name: 'Create User Modal',
 		js: () => import('./create/create-user-modal.element.js'),
 	},
@@ -19,6 +19,10 @@ const modals: Array<ManifestModal> = [
 		name: 'User Picker Modal',
 		js: () => import('./user-picker/user-picker-modal.element.js'),
 	},
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.User.Mfa',
+		name: 'User Mfa Modal',
+		js: () => import('./user-mfa/user-mfa-modal.element.js'),
+	},
 ];
-
-export const manifests = [...modals];

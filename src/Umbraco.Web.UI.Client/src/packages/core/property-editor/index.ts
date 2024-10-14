@@ -1,5 +1,6 @@
 export * from './components/index.js';
 export * from './config/index.js';
+export * from './constants.js';
 export * from './events/index.js';
-
-export const UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT = 'Umbraco.Label';
+export * from './extensions/index.js';
+export * from './ui-picker-modal/index.js';

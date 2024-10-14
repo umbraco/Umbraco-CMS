@@ -1,14 +1,12 @@
+import type { ManifestMenuItemTreeKind } from './types.js';
 import { html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type {
-	ManifestMenuItemTreeKind,
-	UmbBackofficeManifestKind,
-	UmbMenuItemElement,
-} from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbMenuItemElement } from '@umbraco-cms/backoffice/menu';
 
 // TODO: Move to separate file:
-const manifest: UmbBackofficeManifestKind = {
+const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.Tree',
 	matchKind: 'tree',
@@ -25,7 +23,7 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 	@property({ type: Object })
 	manifest?: ManifestMenuItemTreeKind;
 
-	render() {
+	override render() {
 		return this.manifest
 			? html`
 					<umb-tree
@@ -37,7 +35,7 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 								multiple: false,
 							},
 						}}></umb-tree>
-			  `
+				`
 			: nothing;
 	}
 }

@@ -1,8 +1,8 @@
-export const name = 'Umbraco.Core.TinyMce';
+export const name = 'Umbraco.Core.TinyMCE';
 export const extensions = [
 	{
-		name: 'TinyMce Bundle',
-		alias: 'Umb.Bundle.TinyMce',
+		name: 'TinyMCE Bundle',
+		alias: 'Umb.Bundle.TinyMCE',
 		type: 'bundle',
 		js: () => import('./manifests.js'),
 	},

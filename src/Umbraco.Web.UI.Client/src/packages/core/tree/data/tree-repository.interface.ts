@@ -1,4 +1,4 @@
-import type { UmbTreeItemModelBase } from '../types.js';
+import type { UmbTreeItemModel, UmbTreeRootModel } from '../types.js';
 import type {
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeAncestorsOfRequestArgs,
@@ -11,15 +11,17 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * Interface for a tree repository.
- * @export
  * @interface UmbTreeRepository
- * @extends {UmbApi}
+ * @augments {UmbApi}
  * @template TreeItemType
  * @template TreeRootType
  */
 export interface UmbTreeRepository<
-	TreeItemType extends UmbTreeItemModelBase = UmbTreeItemModelBase,
-	TreeRootType extends UmbTreeItemModelBase = UmbTreeItemModelBase,
+	TreeItemType extends UmbTreeItemModel = UmbTreeItemModel,
+	TreeRootType extends UmbTreeRootModel = UmbTreeRootModel,
+	TreeRootItemsRequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
+	TreeChildrenOfRequestArgsType extends UmbTreeChildrenOfRequestArgs = UmbTreeChildrenOfRequestArgs,
+	TreeAncestorsOfRequestArgsType extends UmbTreeAncestorsOfRequestArgs = UmbTreeAncestorsOfRequestArgs,
 > extends UmbApi {
 	/**
 	 * Requests the root of the tree.
@@ -35,7 +37,7 @@ export interface UmbTreeRepository<
 	 * @param {UmbTreeRootItemsRequestArgs} args
 	 * @memberof UmbTreeRepository
 	 */
-	requestRootTreeItems: (args: UmbTreeRootItemsRequestArgs) => Promise<{
+	requestTreeRootItems: (args: TreeRootItemsRequestArgsType) => Promise<{
 		data?: UmbPagedModel<TreeItemType>;
 		error?: ProblemDetails;
 		asObservable?: () => Observable<TreeItemType[]>;
@@ -46,7 +48,7 @@ export interface UmbTreeRepository<
 	 * @param {UmbTreeChildrenOfRequestArgs} args
 	 * @memberof UmbTreeRepository
 	 */
-	requestTreeItemsOf: (args: UmbTreeChildrenOfRequestArgs) => Promise<{
+	requestTreeItemsOf: (args: TreeChildrenOfRequestArgsType) => Promise<{
 		data?: UmbPagedModel<TreeItemType>;
 		error?: ProblemDetails;
 		asObservable?: () => Observable<TreeItemType[]>;
@@ -58,7 +60,7 @@ export interface UmbTreeRepository<
 	 * @memberof UmbTreeRepository
 	 */
 	requestTreeItemAncestors: (
-		args: UmbTreeAncestorsOfRequestArgs,
+		args: TreeAncestorsOfRequestArgsType,
 	) => Promise<{ data?: TreeItemType[]; error?: ProblemDetails; asObservable?: () => Observable<TreeItemType[]> }>;
 
 	/**

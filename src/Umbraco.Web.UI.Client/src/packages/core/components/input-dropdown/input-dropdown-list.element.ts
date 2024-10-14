@@ -1,11 +1,11 @@
 import { css, html, customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-dropdown-list')
-export class UmbInputDropdownListElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputDropdownListElement extends UUIFormControlMixin(UmbLitElement, undefined) {
 	@property({ type: Array })
 	public options?: Array<Option>;
 
@@ -16,10 +16,19 @@ export class UmbInputDropdownListElement extends FormControlMixin(UmbLitElement)
 	@property({ type: Boolean })
 	public multiple?: boolean;
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@query('uui-select')
 	private selectEle!: HTMLInputElement;
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return this.selectEle;
 	}
 
@@ -29,15 +38,16 @@ export class UmbInputDropdownListElement extends FormControlMixin(UmbLitElement)
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<uui-select
 			label=${this.localize.term('formProviderFieldTypes_dropdownName')}
 			.placeholder=${this.placeholder ?? ''}
 			.options=${this.options ?? []}
-			@change=${this.#onChange}></uui-select>`;
+			@change=${this.#onChange}
+			?readonly=${this.readonly}></uui-select>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

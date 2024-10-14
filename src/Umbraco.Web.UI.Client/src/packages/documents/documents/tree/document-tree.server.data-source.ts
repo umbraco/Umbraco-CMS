@@ -1,28 +1,29 @@
-import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
-import type { UmbDocumentTreeItemModel } from './types.js';
+import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../entity.js';
 import type {
-	UmbTreeAncestorsOfRequestArgs,
-	UmbTreeChildrenOfRequestArgs,
-	UmbTreeRootItemsRequestArgs,
-} from '@umbraco-cms/backoffice/tree';
+	UmbDocumentTreeChildrenOfRequestArgs,
+	UmbDocumentTreeItemModel,
+	UmbDocumentTreeRootItemsRequestArgs,
+} from './types.js';
+import type { UmbTreeAncestorsOfRequestArgs } from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A data source for the Document tree that fetches data from the server
- * @export
  * @class UmbDocumentTreeServerDataSource
- * @extends {UmbTreeServerDataSourceBase}
+ * @augments {UmbTreeServerDataSourceBase}
  */
 export class UmbDocumentTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	DocumentTreeItemResponseModel,
-	UmbDocumentTreeItemModel
+	UmbDocumentTreeItemModel,
+	UmbDocumentTreeRootItemsRequestArgs,
+	UmbDocumentTreeChildrenOfRequestArgs
 > {
 	/**
 	 * Creates an instance of UmbDocumentTreeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -35,31 +36,41 @@ export class UmbDocumentTreeServerDataSource extends UmbTreeServerDataSourceBase
 	}
 }
 
-const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
+const getRootItems = (args: UmbDocumentTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	DocumentResource.getTreeDocumentRoot({ skip: args.skip, take: args.take });
+	DocumentService.getTreeDocumentRoot({
+		dataTypeId: args.dataType?.unique,
+		skip: args.skip,
+		take: args.take,
+	});
 
-const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
-	if (args.parentUnique === null) {
+const getChildrenOf = (args: UmbDocumentTreeChildrenOfRequestArgs) => {
+	if (args.parent.unique === null) {
 		return getRootItems(args);
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return DocumentResource.getTreeDocumentChildren({
-			parentId: args.parentUnique,
+		return DocumentService.getTreeDocumentChildren({
+			parentId: args.parent.unique,
+			dataTypeId: args.dataType?.unique,
+			skip: args.skip,
+			take: args.take,
 		});
 	}
 };
 
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	DocumentResource.getTreeDocumentAncestors({
-		descendantId: args.descendantUnique,
+	DocumentService.getTreeDocumentAncestors({
+		descendantId: args.treeItem.unique,
 	});
 
 const mapper = (item: DocumentTreeItemResponseModel): UmbDocumentTreeItemModel => {
 	return {
 		unique: item.id,
-		parentUnique: item.parent ? item.parent.id : null,
+		parent: {
+			unique: item.parent ? item.parent.id : null,
+			entityType: item.parent ? UMB_DOCUMENT_ENTITY_TYPE : UMB_DOCUMENT_ROOT_ENTITY_TYPE,
+		},
 		entityType: UMB_DOCUMENT_ENTITY_TYPE,
 		noAccess: item.noAccess,
 		isTrashed: item.isTrashed,

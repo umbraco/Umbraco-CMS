@@ -30,7 +30,7 @@ export class UmbDocumentReferenceTableElement extends UmbLitElement {
 	@state()
 	_errorMessage = '';
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#getReferences();
 	}
 
@@ -49,7 +49,7 @@ export class UmbDocumentReferenceTableElement extends UmbLitElement {
 		this._hasMoreReferences = data.total > this.#pageSize ? data.total - this.#pageSize : 0;
 	}
 
-	render() {
+	override render() {
 		return html` ${this.#renderErrorMessage()} ${this.#renderTable()} `;
 	}
 
@@ -125,7 +125,7 @@ export class UmbDocumentReferenceTableElement extends UmbLitElement {
 		return nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#error {

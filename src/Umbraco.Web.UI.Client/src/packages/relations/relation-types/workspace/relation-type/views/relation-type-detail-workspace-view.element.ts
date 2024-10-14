@@ -4,7 +4,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRelationDetailModel } from '@umbraco-cms/backoffice/relations';
 import { UmbRelationCollectionRepository } from '@umbraco-cms/backoffice/relations';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
@@ -34,6 +34,9 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 	@state()
 	_totalPages = 1;
 
+	@state()
+	_loading = false;
+
 	#workspaceContext?: typeof UMB_RELATION_TYPE_WORKSPACE_CONTEXT.TYPE;
 	#relationCollectionRepository = new UmbRelationCollectionRepository(this);
 	#paginationManager = new UmbPaginationManager();
@@ -45,8 +48,6 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 
 		this.observe(this.#paginationManager.currentPage, (number) => (this._currentPageNumber = number));
 		this.observe(this.#paginationManager.totalPages, (number) => (this._totalPages = number));
-
-		this.#paginationManager.addEventListener('change', () => {});
 
 		this.consumeContext(UMB_RELATION_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
@@ -75,6 +76,8 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 	}
 
 	async #requestRelations() {
+		this._loading = true;
+
 		const relationTypeUnique = this.#workspaceContext?.getUnique();
 		if (!relationTypeUnique) throw new Error('Relation type unique is required');
 
@@ -89,6 +92,7 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 		if (data) {
 			this._relations = data.items;
 			this.#paginationManager.setTotalItems(data.total);
+			this._loading = false;
 		}
 	}
 
@@ -161,11 +165,12 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 		this.#requestRelations();
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderRelations()}${this.#renderDetails()}`;
 	}
 
 	#renderRelations() {
+		if (this._loading) return html`<uui-loader></uui-loader>`;
 		return html`
 			<div>
 				<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
@@ -199,7 +204,7 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 		</uui-box>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
@@ -207,6 +212,10 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 				gap: var(--uui-size-layout-1);
 				padding: var(--uui-size-layout-1);
 				grid-template-columns: 1fr 350px;
+			}
+
+			uui-loader {
+				text-align: center;
 			}
 
 			uui-pagination {

@@ -1,13 +1,12 @@
 import type { UmbWebhookCollectionFilterModel } from '../types.js';
 import type { UmbWebhookDetailModel } from '../../types.js';
 import { UMB_WEBHOOK_ENTITY_TYPE } from '../../entity.js';
-import { WebhookResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { WebhookService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source that fetches the webhook collection data from the server.
- * @export
  * @class UmbWebhookCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */
@@ -16,7 +15,7 @@ export class UmbWebhookCollectionServerDataSource implements UmbWebhookCollectio
 
 	/**
 	 * Creates an instance of UmbWebhookCollectionServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbWebhookCollectionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -24,32 +23,33 @@ export class UmbWebhookCollectionServerDataSource implements UmbWebhookCollectio
 	}
 
 	/**
-	 * Gets the Wwbhook collection filtered by the given filter.
+	 * Gets the Webhook collection filtered by the given filter.
 	 * @param {UmbWebhookCollectionFilterModel} filter
-	 * @return {*}
+	 * @param _filter
+	 * @returns {*}
 	 * @memberof UmbWebhookCollectionServerDataSource
 	 */
 	async getCollection(_filter: UmbWebhookCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(this.#host, WebhookResource.getWebhookItem({}));
+		const { data, error } = await tryExecuteAndNotify(this.#host, WebhookService.getWebhook(_filter));
 
-		if (data) {
-			const items = data.map((item) => {
-				const model: UmbWebhookDetailModel = {
-					entityType: UMB_WEBHOOK_ENTITY_TYPE,
-					unique: item.url,
-					name: item.name,
-					url: item.url,
-					enabled: item.enabled,
-					events: item.events.split(','),
-					types: item.types.split(','),
-				};
-
-				return model;
-			});
-
-			return { data: { items, total: data.length } };
+		if (error || !data) {
+			return { error };
 		}
 
-		return { error };
+		const items = data.items.map((item) => {
+			const model: UmbWebhookDetailModel = {
+				entityType: UMB_WEBHOOK_ENTITY_TYPE,
+				unique: item.id,
+				url: item.url,
+				enabled: item.enabled,
+				headers: item.headers,
+				events: item.events,
+				contentTypes: item.contentTypeKeys,
+			};
+
+			return model;
+		});
+
+		return { data: { items, total: data.items.length } };
 	}
 }

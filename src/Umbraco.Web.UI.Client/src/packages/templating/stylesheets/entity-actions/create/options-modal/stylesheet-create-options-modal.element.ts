@@ -11,7 +11,7 @@ export class UmbStylesheetCreateOptionsModalElement extends UmbModalBaseElement<
 > {
 	#createFolderAction?: UmbCreateFolderEntityAction;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
 
@@ -48,20 +48,20 @@ export class UmbStylesheetCreateOptionsModalElement extends UmbModalBaseElement<
 		}`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Create Stylesheet">
 				<uui-box>
 					<!-- TODO: construct url -->
 					<uui-menu-item href=${`${this.#getCreateHref()}/view/code`} label="New Stylesheet" @click=${this.#onNavigate}>
-						<uui-icon slot="icon" name="icon-article"></uui-icon>}
+						<uui-icon slot="icon" name="icon-palette"></uui-icon>}
 					</uui-menu-item>
 
 					<uui-menu-item
 						href=${`${this.#getCreateHref()}/view/rich-text-editor`}
 						label="New Rich Text Editor Stylesheet"
 						@click=${this.#onNavigate}>
-						<uui-icon slot="icon" name="icon-article"></uui-icon>}
+						<uui-icon slot="icon" name="icon-palette"></uui-icon>}
 					</uui-menu-item>
 
 					<uui-menu-item @click=${this.#onCreateFolderClick} label="New Folder...">

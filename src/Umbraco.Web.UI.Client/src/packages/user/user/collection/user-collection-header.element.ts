@@ -1,29 +1,22 @@
 import type { UmbUserCollectionContext } from './user-collection.context.js';
-import type {
-	UUIBooleanInputEvent,
-	UUICheckboxElement,
-	UUIRadioGroupElement,
-	UUIRadioGroupEvent,
-} from '@umbraco-cms/backoffice/external/uui';
+import type { UmbUserOrderByOption } from './types.js';
+import type { UmbUserStateFilterType } from './utils/index.js';
+import { UmbUserStateFilter } from './utils/index.js';
+import { UMB_USER_COLLECTION_CONTEXT } from './user-collection.context-token.js';
+import type { UUIBooleanInputEvent, UUICheckboxElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import type { UserOrderModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbUserGroupDetailModel } from '@umbraco-cms/backoffice/user-group';
 import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-user-collection-header')
 export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	@state()
-	private _stateFilterOptions: Array<UserStateModel> = Object.values(UserStateModel);
+	private _stateFilterOptions: Array<UmbUserStateFilterType> = Object.values(UmbUserStateFilter);
 
 	@state()
-	private _stateFilterSelection: Array<UserStateModel> = [];
-
-	@state()
-	private _orderBy?: UserOrderModel;
+	private _stateFilterSelection: Array<UmbUserStateFilterType> = [];
 
 	@state()
 	private _userGroups: Array<UmbUserGroupDetailModel> = [];
@@ -31,7 +24,12 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	@state()
 	private _userGroupFilterSelection: Array<UmbUserGroupDetailModel> = [];
 
-	#modalContext?: UmbModalManagerContext;
+	@state()
+	private _orderByOptions: Array<UmbUserOrderByOption> = [];
+
+	@state()
+	_activeOrderByOption?: UmbUserOrderByOption;
+
 	#collectionContext?: UmbUserCollectionContext;
 	#inputTimer?: NodeJS.Timeout;
 	#inputTimerAmount = 500;
@@ -41,12 +39,31 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
-			this.#collectionContext = instance as UmbUserCollectionContext;
+		this.consumeContext(UMB_USER_COLLECTION_CONTEXT, (instance) => {
+			this.#collectionContext = instance;
+			this.#observeOrderByOptions();
 		});
 	}
 
-	protected firstUpdated() {
+	#observeOrderByOptions() {
+		if (!this.#collectionContext) return;
+		this.observe(
+			observeMultiple([this.#collectionContext.orderByOptions, this.#collectionContext.activeOrderByOption]),
+			([options, activeOption]) => {
+				// the options are hardcoded in the context, so we can just compare the length
+				if (this._orderByOptions.length !== options.length) {
+					this._orderByOptions = options;
+				}
+
+				if (activeOption && activeOption !== this._activeOrderByOption?.unique) {
+					this._activeOrderByOption = this._orderByOptions.find((option) => option.unique === activeOption);
+				}
+			},
+			'_umbObserveUserOrderByOptions',
+		);
+	}
+
+	protected override firstUpdated() {
 		this.#requestUserGroups();
 	}
 
@@ -68,7 +85,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	#onStateFilterChange(event: UUIBooleanInputEvent) {
 		event.stopPropagation();
 		const target = event.currentTarget as UUICheckboxElement;
-		const value = target.value as UserStateModel;
+		const value = target.value as UmbUserStateFilterType;
 		const isChecked = target.checked;
 
 		this._stateFilterSelection = isChecked
@@ -76,34 +93,6 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 			: this._stateFilterSelection.filter((v) => v !== value);
 
 		this.#collectionContext?.setStateFilter(this._stateFilterSelection);
-	}
-
-	#onOrderByChange(event: UUIRadioGroupEvent) {
-		event.stopPropagation();
-		const target = event.currentTarget as UUIRadioGroupElement | null;
-
-		if (target) {
-			this._orderBy = target.value as UserOrderModel;
-			this.#collectionContext?.setOrderByFilter(this._orderBy);
-		}
-	}
-
-	render() {
-		return html`
-			<umb-collection-action-bundle></umb-collection-action-bundle>
-			${this.#renderSearch()}
-			<div>${this.#renderFilters()} ${this.#renderCollectionViews()}</div>
-		`;
-	}
-
-	#renderSearch() {
-		return html`
-			<uui-input
-				@input=${this._updateSearch}
-				label=${this.localize.term('visuallyHiddenTexts_userSearchLabel')}
-				placeholder=${this.localize.term('visuallyHiddenTexts_userSearchLabel')}
-				id="input-search"></uui-input>
-		`;
 	}
 
 	#onUserGroupFilterChange(event: UUIBooleanInputEvent) {
@@ -120,6 +109,10 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 
 		const uniques = this._userGroupFilterSelection.map((group) => group.unique);
 		this.#collectionContext?.setUserGroupFilter(uniques);
+	}
+
+	#onOrderByChange(option: UmbUserOrderByOption) {
+		this.#collectionContext?.setActiveOrderByOption(option.unique);
 	}
 
 	#getUserGroupFilterLabel() {
@@ -146,8 +139,26 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 					.join(', ') + (length > max ? ' + ' + (length - max) : '');
 	}
 
+	override render() {
+		return html`
+			<umb-collection-action-bundle></umb-collection-action-bundle>
+			${this.#renderSearch()}
+			<div>${this.#renderFilters()} ${this.#renderCollectionViews()}</div>
+		`;
+	}
+
+	#renderSearch() {
+		return html`
+			<uui-input
+				@input=${this._updateSearch}
+				label=${this.localize.term('visuallyHiddenTexts_userSearchLabel')}
+				placeholder=${this.localize.term('visuallyHiddenTexts_userSearchLabel')}
+				id="input-search"></uui-input>
+		`;
+	}
+
 	#renderFilters() {
-		return html` ${this.#renderStatusFilter()} ${this.#renderUserGroupFilter()} `;
+		return html` ${this.#renderStatusFilter()} ${this.#renderUserGroupFilter()} ${this.#renderOrderBy()} `;
 	}
 
 	#renderStatusFilter() {
@@ -196,11 +207,34 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		`;
 	}
 
+	#renderOrderBy() {
+		return html`
+			<uui-button popovertarget="popover-order-by-filter" label="order by">
+				<umb-localize key="general_orderBy"></umb-localize>:
+				<b> ${this._activeOrderByOption ? this.localize.string(this._activeOrderByOption.label) : ''}</b>
+			</uui-button>
+			<uui-popover-container id="popover-order-by-filter" placement="bottom">
+				<umb-popover-layout>
+					<div class="filter-dropdown">
+						${this._orderByOptions.map(
+							(option) => html`
+								<uui-menu-item
+									label=${this.localize.string(option.label)}
+									@click-label=${() => this.#onOrderByChange(option)}
+									?active=${this._activeOrderByOption?.unique === option.unique}></uui-menu-item>
+							`,
+						)}
+					</div>
+				</umb-popover-layout>
+			</uui-popover-container>
+		`;
+	}
+
 	#renderCollectionViews() {
 		return html` <umb-collection-view-bundle></umb-collection-view-bundle> `;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				height: 100%;
@@ -224,6 +258,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 				display: flex;
 				gap: var(--uui-size-space-3);
 				flex-direction: column;
+				padding: var(--uui-size-space-3);
 			}
 		`,
 	];

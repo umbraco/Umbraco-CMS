@@ -31,7 +31,7 @@ export class UmbExportDictionaryModalElement extends UmbModalBaseElement<
 		this.modalContext?.submit();
 	}
 
-	render() {
+	override render() {
 		return html` <umb-body-layout headline="Export">
 			<uui-form>
 				<form id="form" name="form" @submit=${this.#handleSubmit}>
@@ -46,7 +46,7 @@ export class UmbExportDictionaryModalElement extends UmbModalBaseElement<
 		</umb-body-layout>`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbExportDictionaryModalElement;

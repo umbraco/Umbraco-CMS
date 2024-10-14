@@ -1,40 +1,29 @@
-import { UmbDictionaryDetailRepository } from '../repository/index.js';
 import type { UmbDictionaryDetailModel } from '../types.js';
+import { UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS, type UmbDictionaryDetailRepository } from '../repository/index.js';
+import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
 import { UmbDictionaryWorkspaceEditorElement } from './dictionary-workspace-editor.element.js';
+import { UMB_DICTIONARY_WORKSPACE_ALIAS } from './manifests.js';
 import {
-	type UmbSaveableWorkspaceContext,
-	UmbSaveableWorkspaceContextBase,
-	UmbWorkspaceRouteManager,
+	type UmbSubmittableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
+	UmbEntityDetailWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 
 export class UmbDictionaryWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<UmbDictionaryDetailModel>
-	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
+	extends UmbEntityDetailWorkspaceContextBase<UmbDictionaryDetailModel, UmbDictionaryDetailRepository>
+	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	//
-	public readonly detailRepository = new UmbDictionaryDetailRepository(this);
-
-	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
-	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
-
-	#data = new UmbObjectState<UmbDictionaryDetailModel | undefined>(undefined);
-	readonly data = this.#data.asObservable();
-
-	readonly unique = this.#data.asObservablePart((data) => data?.unique);
-	readonly name = this.#data.asObservablePart((data) => data?.name);
-	readonly dictionary = this.#data.asObservablePart((data) => data);
-
-	readonly routes = new UmbWorkspaceRouteManager(this);
+	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
+	readonly dictionary = this._data.createObservablePartOfCurrent((data) => data);
 
 	constructor(host: UmbControllerHost) {
-		super(host, 'Umb.Workspace.Dictionary');
+		super(host, {
+			workspaceAlias: UMB_DICTIONARY_WORKSPACE_ALIAS,
+			entityType: UMB_DICTIONARY_ENTITY_TYPE,
+			detailRepositoryAlias: UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS,
+		});
 
 		this.routes.setRoutes([
 			{
@@ -43,7 +32,7 @@ export class UmbDictionaryWorkspaceContext
 				setup: async (_component, info) => {
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
-					this.create({ entityType: parentEntityType, unique: parentUnique });
+					this.createScaffold({ parent: { entityType: parentEntityType, unique: parentUnique } });
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
@@ -63,34 +52,22 @@ export class UmbDictionaryWorkspaceContext
 		]);
 	}
 
-	protected resetState(): void {
-		super.resetState();
-		this.#data.setValue(undefined);
-	}
-
-	getData() {
-		return this.#data.getValue();
-	}
-
-	getUnique() {
-		return this.getData()?.unique;
-	}
-
-	getEntityType() {
-		return 'dictionary';
-	}
-
 	setName(name: string) {
-		this.#data.update({ name });
+		this._data.updateCurrent({ name });
+	}
+
+	getName() {
+		return this._data.getCurrent()?.name;
 	}
 
 	setPropertyValue(isoCode: string, translation: string) {
-		if (!this.#data.value) return;
+		const currentData = this._data.getCurrent();
+		if (!currentData) return;
 
 		// TODO: This can use some of our own methods, to make it simpler. see appendToFrozenArray()
 		// update if the code already exists
 		const updatedValue =
-			this.#data.value.translations?.map((translationItem) => {
+			currentData.translations?.map((translationItem) => {
 				if (translationItem.isoCode === isoCode) {
 					return { ...translationItem, translation };
 				}
@@ -102,70 +79,7 @@ export class UmbDictionaryWorkspaceContext
 			updatedValue?.push({ isoCode, translation });
 		}
 
-		this.#data.setValue({ ...this.#data.value, translations: updatedValue });
-	}
-
-	async load(unique: string) {
-		this.resetState();
-		const { data } = await this.detailRepository.requestByUnique(unique);
-		if (data) {
-			this.setIsNew(false);
-			this.#data.setValue(data);
-		}
-	}
-
-	async create(parent: { entityType: string; unique: string | null }) {
-		this.resetState();
-		this.#parent.setValue(parent);
-		const { data } = await this.detailRepository.createScaffold();
-		if (!data) return;
-		this.setIsNew(true);
-		this.#data.setValue(data);
-	}
-
-	async save() {
-		if (!this.#data.value) return;
-		if (!this.#data.value.unique) return;
-
-		if (this.getIsNew()) {
-			const parent = this.#parent.getValue();
-			if (!parent) throw new Error('Parent is not set');
-			const { error } = await this.detailRepository.create(this.#data.value, parent.unique);
-			if (error) {
-				return;
-			}
-
-			// TODO: this might not be the right place to alert the tree, but it works for now
-			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
-				entityType: parent.entityType,
-				unique: parent.unique,
-			});
-			eventContext.dispatchEvent(event);
-
-			this.setIsNew(false);
-		} else {
-			await this.detailRepository.save(this.#data.value);
-
-			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadStructureForEntityEvent({
-				unique: this.getUnique()!,
-				entityType: this.getEntityType(),
-			});
-
-			actionEventContext.dispatchEvent(event);
-		}
-
-		const data = this.getData();
-		if (!data) return;
-
-		this.setIsNew(false);
-		this.workspaceComplete(data);
-	}
-
-	public destroy(): void {
-		this.#data.destroy();
-		super.destroy();
+		this._data.setCurrent({ ...currentData, translations: updatedValue });
 	}
 }
 

@@ -1,8 +1,7 @@
 import type { UmbSectionPickerModalData, UmbSectionPickerModalValue } from './section-picker-modal.token.js';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestSection } from '@umbraco-cms/backoffice/section';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
@@ -22,19 +21,19 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 	constructor() {
 		super();
 		this.#selectionManager.setSelectable(true);
-		this.observe(this.#selectionManager.selectable, (selectable) => (this._selectable = selectable));
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
-		this.#selectionManager.setSelection(this.value?.selection ?? []);
+		this.observe(this.#selectionManager.selectable, (selectable) => (this._selectable = selectable), null);
 
 		this.observe(
 			umbExtensionsRegistry.byType('section'),
 			(sections: Array<ManifestSection>) => (this._sections = sections),
-		),
-			'umbSectionsObserver';
+			null,
+		);
+	}
+
+	override connectedCallback(): void {
+		super.connectedCallback();
+		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
+		this.#selectionManager.setSelection(this.value?.selection ?? []);
 	}
 
 	#submit() {
@@ -42,14 +41,14 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 		this._submitModal();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Select sections">
 				<uui-box>
 					${this._sections.map(
 						(item) => html`
 							<uui-menu-item
-								label=${item.meta.label}
+								label=${this.localize.string(item.meta.label)}
 								?selectable=${this._selectable}
 								?selected=${this.#selectionManager.isSelected(item.alias)}
 								@selected=${() => this.#selectionManager.select(item.alias)}

@@ -5,6 +5,7 @@ import { UmbBasicState, appendToFrozenArray } from '@umbraco-cms/backoffice/obse
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
 
 export type UmbModalType = 'dialog' | 'sidebar' | 'custom';
 
@@ -13,8 +14,15 @@ export interface UmbModalConfig {
 	type?: UmbModalType;
 	size?: UUIModalSidebarSize;
 
-	/** When type is custom and factory is provided the returned element will be used as the modal element */
-	elementFactory? : () => UUIModalElement;
+	/**
+	 * Used to provide a custom modal element
+	 */
+	element?: ElementLoaderProperty<UUIModalElement>;
+
+	/**
+	 * Set the background property of the modal backdrop
+	 */
+	backdropBackground?: string;
 }
 
 export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContext> {
@@ -32,11 +40,11 @@ export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContex
 	 * @param {UmbControllerHost} host - The host that the modal should be attached to, this is usually the controller/element that is opening the modal. This additionally acts as the modal origin for the context api.
 	 * @param {(string | UmbModalToken)} modalAlias - The alias or token of the modal to open
 	 * @param {UmbModalContextClassArgs} args - The arguments for this setup.
-	 * @return {*}  {UmbModalHandler}
+	 * @returns {*}  {UmbModalHandler}
 	 * @memberof UmbModalManagerContext
 	 */
 	public open<
-		ModalData extends object = object,
+		ModalData extends { [key: string]: any } = { [key: string]: any },
 		ModalValue = unknown,
 		ModalAliasTypeAsToken extends UmbModalToken = UmbModalToken<ModalData, ModalValue>,
 	>(

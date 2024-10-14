@@ -1,7 +1,7 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
-import type { ModelEntryType } from './sorter-group.js';
+import type { ExampleSorterGroup, ModelEntryType } from './sorter-group.js';
 
 import './sorter-group.js';
 @customElement('example-sorter-dashboard')
@@ -53,19 +53,26 @@ export class ExampleSorterDashboard extends UmbElementMixin(LitElement) {
 		},
 	];
 
-	render() {
+	override render() {
 		return html`
 			<uui-box class="uui-text">
 				<div class="outer-wrapper">
-					<h5>Notice this example still only support single group of Sorter.</h5>
-					<example-sorter-group .initialItems=${this.groupOneItems}></example-sorter-group>
-					<example-sorter-group .initialItems=${this.groupTwoItems}></example-sorter-group>
+					<example-sorter-group
+						.value=${this.groupOneItems}
+						@change=${(e: Event) => {
+							this.groupOneItems = (e.target as ExampleSorterGroup).value;
+						}}></example-sorter-group>
+					<example-sorter-group
+						.value=${this.groupTwoItems}
+						@change=${(e: Event) => {
+							this.groupTwoItems = (e.target as ExampleSorterGroup).value;
+						}}></example-sorter-group>
 				</div>
 			</uui-box>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -8,6 +8,7 @@ import { handlers as changePasswordHandlers } from './change-password.handlers.j
 import { handlers as unlockHandlers } from './unlock.handlers.js';
 import { handlers as inviteHandlers } from './invite.handlers.js';
 import { handlers as filterHandlers } from './filter.handlers.js';
+import { handlers as mfaHandlers } from './mfa.handlers.js';
 
 export const handlers = [
 	...itemHandlers,
@@ -20,4 +21,5 @@ export const handlers = [
 	...filterHandlers,
 	...inviteHandlers,
 	...detailHandlers,
+	...mfaHandlers,
 ];

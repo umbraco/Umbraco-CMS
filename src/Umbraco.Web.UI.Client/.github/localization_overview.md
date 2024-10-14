@@ -75,7 +75,7 @@ Before you start:
 	- [ ] Section: Info
 - [ ] Relation Types
 - [ ] Log Viewer
-- [ ] Document Blueprints
+- [x] Document Blueprints
 - [ ] Languages
 - [ ] Extensions
 - [ ] Templates
@@ -201,6 +201,7 @@ Then we need your help! With Bellissima we added new localization keys, and we s
 - documentationHeader
 - documentationDescription
 - communityHeader
+- communityDescription
 - trainingHeader
 - trainingDescription
 - supportHeader

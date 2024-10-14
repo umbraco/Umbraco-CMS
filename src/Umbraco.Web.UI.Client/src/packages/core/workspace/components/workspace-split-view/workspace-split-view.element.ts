@@ -1,8 +1,11 @@
 import { UmbWorkspaceSplitViewContext } from './workspace-split-view.context.js';
+import { css, html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import '../variant-selector/index.js';
+
+// import local components
+import './workspace-split-view-variant-selector.element.js';
+
 /**
  *
  * Example. Document Workspace would use a Variant-component(variant component would talk directly to the workspace-context)
@@ -17,6 +20,9 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 	@property({ type: Boolean })
 	displayNavigation = false;
 
+	@property({ attribute: 'back-path' })
+	public backPath?: string;
+
 	@property({ type: Number })
 	public set splitViewIndex(index: number) {
 		this.splitViewContext.setSplitViewIndex(index);
@@ -27,11 +33,15 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 
 	splitViewContext = new UmbWorkspaceSplitViewContext(this);
 
-	render() {
+	override render() {
 		return html`
-			<umb-workspace-editor alias=${this.alias} .hideNavigation=${!this.displayNavigation} .enforceNoFooter=${true}>
+			<umb-workspace-editor
+				alias=${this.alias}
+				back-path=${ifDefined(this.backPath)}
+				.hideNavigation=${!this.displayNavigation}
+				.enforceNoFooter=${true}>
 				<div id="header" slot="header">
-					<umb-variant-selector></umb-variant-selector>
+					<umb-workspace-split-view-variant-selector></umb-workspace-split-view-variant-selector>
 				</div>
 				${this.displayNavigation
 					? html`<umb-workspace-entity-action-menu slot="action-menu"></umb-workspace-entity-action-menu>`
@@ -41,7 +51,7 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

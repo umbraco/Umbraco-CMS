@@ -3,9 +3,8 @@ import type { UmbMemberTypeDetailModel } from '../types.js';
 import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '../index.js';
 import { UmbMemberTypeWorkspaceEditorElement } from './member-type-workspace-editor.element.js';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
-	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -15,13 +14,15 @@ import {
 	type UmbContentTypeWorkspaceContext,
 } from '@umbraco-cms/backoffice/content-type';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import {
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
 
 type EntityType = UmbMemberTypeDetailModel;
 export class UmbMemberTypeWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<EntityType>
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements UmbContentTypeWorkspaceContext<EntityType>, UmbRoutableWorkspaceContext
 {
 	readonly IS_CONTENT_TYPE_WORKSPACE_CONTEXT = true;
@@ -30,6 +31,7 @@ export class UmbMemberTypeWorkspaceContext
 
 	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
 	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
+	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
 
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 
@@ -37,6 +39,9 @@ export class UmbMemberTypeWorkspaceContext
 	readonly data;
 	readonly unique;
 	readonly name;
+	getName(): string | undefined {
+		return this.structure.getOwnerContentType()?.name;
+	}
 	readonly alias;
 	readonly description;
 	readonly icon;
@@ -48,7 +53,6 @@ export class UmbMemberTypeWorkspaceContext
 	readonly allowedContentTypes;
 	readonly compositions;
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
 	readonly structure = new UmbContentTypeStructureManager<EntityType>(this, this.repository);
 
 	constructor(host: UmbControllerHost) {
@@ -100,7 +104,7 @@ export class UmbMemberTypeWorkspaceContext
 		this.structure.updateOwnerContentType({ [propertyName]: value });
 	}
 
-	protected resetState(): void {
+	protected override resetState(): void {
 		super.resetState();
 		this.#persistedData.setValue(undefined);
 	}
@@ -170,22 +174,28 @@ export class UmbMemberTypeWorkspaceContext
 		}
 	}
 
-	async save() {
+	/**
+	 * Save or creates the member type, based on wether its a new one or existing.
+	 */
+	async submit() {
 		const data = this.getData();
-		if (data === undefined) throw new Error('Cannot save, no data');
+		if (!data) {
+			throw new Error('Something went wrong, there is no data for media type you want to save...');
+		}
 
 		if (this.getIsNew()) {
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
-			await this.repository.create(data, parent.unique);
 
-			// TODO: this might not be the right place to alert the tree, but it works for now
+			await this.structure.create(parent.unique);
+
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+			const event = new UmbRequestReloadChildrenOfEntityEvent({
 				entityType: parent.entityType,
 				unique: parent.unique,
 			});
 			eventContext.dispatchEvent(event);
+			this.setIsNew(false);
 		} else {
 			await this.structure.save();
 
@@ -197,12 +207,9 @@ export class UmbMemberTypeWorkspaceContext
 
 			actionEventContext.dispatchEvent(event);
 		}
-
-		this.setIsNew(false);
-		this.workspaceComplete(data);
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#persistedData.destroy();
 		this.structure.destroy();
 		this.repository.destroy();

@@ -3,13 +3,13 @@ import type {
 	UmbDocumentTypeFolderEntityType,
 	UmbDocumentTypeRootEntityType,
 } from '../entity.js';
-import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
-export interface UmbDocumentTypeTreeItemModel extends UmbUniqueTreeItemModel {
+export interface UmbDocumentTypeTreeItemModel extends UmbTreeItemModel {
 	entityType: UmbDocumentTypeEntityType | UmbDocumentTypeFolderEntityType;
 	isElement: boolean;
 }
 
-export interface UmbDocumentTypeTreeRootModel extends UmbUniqueTreeRootModel {
+export interface UmbDocumentTypeTreeRootModel extends UmbTreeRootModel {
 	entityType: UmbDocumentTypeRootEntityType;
 }

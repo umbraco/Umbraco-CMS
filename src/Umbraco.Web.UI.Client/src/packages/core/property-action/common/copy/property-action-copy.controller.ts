@@ -3,7 +3,7 @@ import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationDefaultData } from '@umbr
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 export class UmbCopyPropertyAction extends UmbPropertyActionBase {
-	async execute() {
+	override async execute() {
 		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
 		const value = propertyContext.getValue();
 

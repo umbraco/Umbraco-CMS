@@ -1,20 +1,21 @@
 import type { UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
-import type { UmbWorkspaceData, UmbWorkspaceValue } from '@umbraco-cms/backoffice/modal';
+import type { UmbWorkspaceModalData, UmbWorkspaceModalValue } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-export interface UmbBlockRTEWorkspaceData
-	extends UmbBlockWorkspaceData<{
-		index: number;
-	}> {}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbBlockRteWorkspaceOriginData {}
 
-export const UMB_BLOCK_RTE_WORKSPACE_MODAL = new UmbModalToken<UmbBlockRTEWorkspaceData, UmbWorkspaceValue>(
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbBlockRteWorkspaceData extends UmbBlockWorkspaceData<UmbBlockRteWorkspaceOriginData> {}
+
+export const UMB_BLOCK_RTE_WORKSPACE_MODAL = new UmbModalToken<UmbBlockRteWorkspaceData, UmbWorkspaceModalValue>(
 	'Umb.Modal.Workspace',
 	{
 		modal: {
 			type: 'sidebar',
 			size: 'medium',
 		},
-		data: { entityType: 'block', preset: {}, originData: { index: -1 } },
-		// Recast the type, so the entityType data prop is not required:
+		data: { entityType: 'block', preset: {}, originData: {}, baseDataPath: undefined as unknown as string },
 	},
-) as UmbModalToken<Omit<UmbWorkspaceData, 'entityType'>, UmbWorkspaceValue>;
+	// Recast the type, so the entityType data prop is not required:
+) as UmbModalToken<Omit<UmbWorkspaceModalData, 'entityType'>, UmbWorkspaceModalValue>;

@@ -1,4 +1,3 @@
-import { expect, fixture, html } from '@open-wc/testing';
 //TODO: Test has been commented out while we figure out how to setup import maps for the test environment
 // import { UmbPickerLayoutUserGroupElement } from './picker-layout-user-group.element.js';
 // import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';

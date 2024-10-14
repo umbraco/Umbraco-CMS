@@ -6,4 +6,3 @@ export * from './input.event.js';
 export * from './progress.event.js';
 export * from './selected.event.js';
 export * from './selection-change.event.js';
-export * from './request-reload-structure-for-entity.event.js';

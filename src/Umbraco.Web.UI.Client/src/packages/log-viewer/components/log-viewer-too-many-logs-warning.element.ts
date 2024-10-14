@@ -2,7 +2,7 @@ import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/ex
 
 @customElement('umb-log-viewer-too-many-logs-warning')
 export class UmbLogViewerTooManyLogsWarningElement extends LitElement {
-	render() {
+	override render() {
 		return html`<uui-box id="to-many-logs-warning">
 			<h3>Unable to view logs</h3>
 			<p>Today's log file is too large to be viewed and would cause performance problems.</p>
@@ -10,7 +10,7 @@ export class UmbLogViewerTooManyLogsWarningElement extends LitElement {
 		</uui-box>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				text-align: center;

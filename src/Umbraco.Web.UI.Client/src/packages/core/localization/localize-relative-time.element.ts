@@ -37,11 +37,11 @@ export class UmbLocalizeRelativeTimeElement extends UmbLitElement {
 		return this.localize.relativeTime(this.time, this.unit, this.options);
 	}
 
-	protected render() {
+	override render() {
 		return this.time ? html`${unsafeHTML(this.text)}` : html`<slot></slot>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: contents;

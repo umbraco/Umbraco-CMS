@@ -1,7 +1,7 @@
 import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '../../default/default.action.kind.js';
-import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifest: UmbBackofficeManifestKind = {
+export const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.EntityAction.Duplicate',
 	matchKind: 'duplicate',
@@ -11,14 +11,14 @@ export const manifest: UmbBackofficeManifestKind = {
 		type: 'entityAction',
 		kind: 'duplicate',
 		api: () => import('./duplicate.action.js'),
-		weight: 600,
+		weight: 650,
 		forEntityTypes: [],
 		meta: {
-			icon: 'icon-documents',
-			label: 'Duplicate to...',
-			itemRepositoryAlias: '',
+			icon: 'icon-enter',
+			label: '#actions_copy',
+			additionalOptions: true,
+			treeRepositoryAlias: '',
 			duplicateRepositoryAlias: '',
-			pickerModal: '',
 		},
 	},
 };

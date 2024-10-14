@@ -7,8 +7,10 @@ export class UmbLanguageCreateEntityAction extends UmbEntityActionBase<never> {
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		// TODO: Generate the href or retrieve it from something?
 		history.pushState(null, '', `section/settings/workspace/language/create`);
 	}
 }
+
+export { UmbLanguageCreateEntityAction as api };

@@ -1,4 +1,4 @@
-import { RuntimeLevelModel, ServerResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { RuntimeLevelModel, ServerService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
@@ -24,7 +24,7 @@ export class UmbServerConnection {
 
 	/**
 	 * Gets the URL of the server.
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbServerConnection
 	 */
 	getUrl() {
@@ -33,7 +33,7 @@ export class UmbServerConnection {
 
 	/**
 	 * Gets the status of the server.
-	 * @return {string}
+	 * @returns {string}
 	 * @memberof UmbServerConnection
 	 */
 	getStatus() {
@@ -43,7 +43,7 @@ export class UmbServerConnection {
 
 	/**
 	 * Checks if the server is connected.
-	 * @return {boolean}
+	 * @returns {boolean}
 	 * @memberof UmbServerConnection
 	 */
 	getIsConnected() {
@@ -51,7 +51,7 @@ export class UmbServerConnection {
 	}
 
 	async #setStatus() {
-		const { data, error } = await tryExecute(ServerResource.getServerStatus());
+		const { data, error } = await tryExecute(ServerService.getServerStatus());
 		if (error) {
 			throw error;
 		}

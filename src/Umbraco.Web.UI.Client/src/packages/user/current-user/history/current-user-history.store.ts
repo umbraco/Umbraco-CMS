@@ -1,4 +1,4 @@
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_CURRENT_USER_HISTORY_STORE_CONTEXT } from './current-user-history.store.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -60,10 +60,6 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 		this._data.setValue([]);
 	}
 }
-
-export const UMB_CURRENT_USER_HISTORY_STORE_CONTEXT = new UmbContextToken<UmbCurrentUserHistoryStore>(
-	'UmbCurrentUserHistoryStore',
-);
 
 // Default export for the globalContext manifest:
 export default UmbCurrentUserHistoryStore;

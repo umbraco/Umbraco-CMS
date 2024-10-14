@@ -5,7 +5,7 @@ import './user-collection-header.element.js';
 
 @customElement('umb-user-collection')
 export class UmbUserCollectionElement extends UmbCollectionDefaultElement {
-	protected renderToolbar() {
+	protected override renderToolbar() {
 		return html`<umb-user-collection-header slot="header"></umb-user-collection-header> `;
 	}
 }

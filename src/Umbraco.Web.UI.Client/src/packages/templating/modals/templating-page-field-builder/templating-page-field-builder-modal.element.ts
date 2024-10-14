@@ -3,24 +3,39 @@ import type {
 	UmbTemplatingPageFieldBuilderModalData,
 	UmbTemplatingPageFieldBuilderModalValue,
 } from './templating-page-field-builder-modal.token.js';
+import type { UmbTemplateFieldDropdownListElement } from './components/template-field-dropdown-list/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UmbFieldDropdownListElement } from '@umbraco-cms/backoffice/components';
+import type { UUIBooleanInputEvent, UUIButtonState, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+
+// import of local components
+import './components/template-field-dropdown-list/index.js';
+import { UmbValidationContext, umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-templating-page-field-builder-modal')
 export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseElement<
 	UmbTemplatingPageFieldBuilderModalData,
 	UmbTemplatingPageFieldBuilderModalValue
 > {
-	private _close() {
+	#validation = new UmbValidationContext(this);
+
+	#close() {
 		this.modalContext?.reject();
 	}
 
-	private _submit() {
-		if (!this._field) return;
-		this.value = { output: getUmbracoFieldSnippet(this._field, this._default, this._recursive) };
-		this.modalContext?.submit();
+	async #submit() {
+		this._submitButtonState = 'waiting';
+
+		try {
+			await this.#validation.validate();
+			this._submitButtonState = 'success';
+
+			this.value = { output: getUmbracoFieldSnippet(this._field!, this._default, this._recursive) };
+			this.modalContext?.submit();
+		} catch {
+			this._submitButtonState = 'failed';
+		}
 	}
 
 	@state()
@@ -35,21 +50,28 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 	@state()
 	private _recursive: boolean = false;
 
+	@state()
+	private _submitButtonState: UUIButtonState;
+
 	/** TODO: Implement "Choose field" */
 
 	#onChangeFieldValue(e: Event) {
-		this._field = (e.target as UmbFieldDropdownListElement).value?.alias;
+		this._field = (e.target as UmbTemplateFieldDropdownListElement).value?.alias;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('template_insert')}>
 				<uui-box>
 					<div>
-						<uui-label for="page-field-value">
-							<umb-localize key="templateEditor_chooseField">Choose field</umb-localize>
-						</uui-label>
-						<umb-field-dropdown-list @change=${this.#onChangeFieldValue} exclude-media-type></umb-field-dropdown-list>
+						<umb-property-layout orientation="vertical" label=${this.localize.term('templateEditor_chooseField')}>
+							<umb-template-field-dropdown-list
+								slot="editor"
+								required
+								${umbBindToValidation(this)}
+								@change=${this.#onChangeFieldValue}
+								exclude-media-type></umb-template-field-dropdown-list>
+						</umb-property-layout>
 
 						<uui-label for="page-field-default-value">
 							<umb-localize key="templateEditor_defaultValue">Default value</umb-localize>
@@ -61,12 +83,14 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 									@click=${() => (this._haveDefault = true)}></uui-button>`
 							: html`<uui-input
 									id="page-field-default-value"
+									@change=${(e: UUIInputEvent) => (this._default = e.target.value as string)}
 									label=${this.localize.term('templateEditor_defaultValue')}></uui-input>`}
 
 						<uui-label for="recursive"><umb-localize key="templateEditor_recursive">Recursive</umb-localize></uui-label>
 						<uui-checkbox
 							id="recursive"
 							label=${this.localize.term('templateEditor_recursiveDescr')}
+							@change=${(e: UUIBooleanInputEvent) => (this._recursive = e.target.checked)}
 							?disabled=${this._field ? false : true}></uui-checkbox>
 
 						<uui-label><umb-localize key="templateEditor_outputSample">Output sample</umb-localize></uui-label>
@@ -77,24 +101,26 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 				</uui-box>
 				<uui-button
 					slot="actions"
-					@click=${this._close}
+					@click=${this.#close}
 					look="secondary"
 					label=${this.localize.term('general_close')}></uui-button>
 				<uui-button
 					slot="actions"
-					@click=${this._submit}
+					@click=${this.#submit}
 					color="positive"
 					look="primary"
+					.state=${this._submitButtonState}
 					label=${this.localize.term('general_submit')}></uui-button>
 			</umb-body-layout>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-box > div {
-				display: grid;
+				display: flex;
+				flex-direction: column;
 				gap: var(--uui-size-space-2);
 			}
 

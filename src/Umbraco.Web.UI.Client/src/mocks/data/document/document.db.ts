@@ -18,6 +18,7 @@ import type {
 	DocumentTreeItemResponseModel,
 	DomainsResponseModel,
 	DocumentConfigurationResponseModel,
+	DocumentValueResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel> {
@@ -33,11 +34,11 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 	}
 
 	// permissions
-	getUserPermissionsForDocument(id: string): Array<any> {
+	getUserPermissionsForDocument(): Array<any> {
 		return [];
 	}
 
-	getDomainsForDocument(id: string): DomainsResponseModel {
+	getDomainsForDocument(): DomainsResponseModel {
 		return { defaultIsoCode: 'en-us', domains: [] };
 	}
 
@@ -48,7 +49,6 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 			disableDeleteWhenReferenced: true,
 			disableUnpublishWhenReferenced: true,
 			reservedFieldNames: [],
-			sanitizeTinyMce: true,
 		};
 	}
 }
@@ -90,7 +90,8 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 		isTrashed: false,
 		noAccess: false,
 		parent: request.parent,
-		values: request.values,
+		// TODO: Currently trusting we did send the editorAlias to the create end point:
+		values: request.values as DocumentValueResponseModel[],
 		variants: request.variants.map((variantRequest) => {
 			return {
 				culture: variantRequest.culture,

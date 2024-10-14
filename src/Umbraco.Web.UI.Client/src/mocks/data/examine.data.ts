@@ -5,6 +5,10 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthStatusModel } from '@umbraco-cms/backoffice/external/backend-api';
 
+/**
+ *
+ * @param indexName
+ */
 export function getIndexByName(indexName: string) {
 	return Indexers.find((index) => {
 		if (index.name) return index.name.toLocaleLowerCase() == indexName.toLocaleLowerCase();
@@ -12,6 +16,9 @@ export function getIndexByName(indexName: string) {
 	});
 }
 
+/**
+ *
+ */
 export function getSearchResultsMockData(): SearchResultResponseModel[] {
 	return searchResultMockData;
 }
@@ -20,7 +27,7 @@ export const Indexers: IndexResponseModel[] = [
 	{
 		name: 'ExternalIndex',
 		canRebuild: true,
-		healthStatus: HealthStatusModel.HEALTHY,
+		healthStatus: { status: HealthStatusModel.HEALTHY },
 		documentCount: 0,
 		fieldCount: 0,
 		searcherName: '',
@@ -40,7 +47,7 @@ export const Indexers: IndexResponseModel[] = [
 	{
 		name: 'InternalIndex',
 		canRebuild: true,
-		healthStatus: HealthStatusModel.HEALTHY,
+		healthStatus: { status: HealthStatusModel.HEALTHY },
 		documentCount: 0,
 		fieldCount: 0,
 		searcherName: '',
@@ -60,7 +67,7 @@ export const Indexers: IndexResponseModel[] = [
 	{
 		name: 'MemberIndex',
 		canRebuild: true,
-		healthStatus: HealthStatusModel.HEALTHY,
+		healthStatus: { status: HealthStatusModel.HEALTHY },
 		fieldCount: 0,
 		documentCount: 0,
 		searcherName: '',

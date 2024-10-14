@@ -1,11 +1,15 @@
 import { getPropertyValueByAlias } from '../index.js';
-import type { UmbCollectionColumnConfiguration } from '../../../../../core/collection/types.js';
+import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 import type { UmbDocumentCollectionItemModel } from '../../types.js';
 import type { UmbDocumentCollectionContext } from '../../document-collection.context.js';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../../document-collection.context-token.js';
+import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
+import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -21,9 +25,6 @@ import './column-layouts/document-table-column-state.element.js';
 
 @customElement('umb-document-table-collection-view')
 export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
-	@state()
-	private _loading = false;
-
 	@state()
 	private _userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
 
@@ -41,15 +42,15 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	#systemColumns: Array<UmbTableColumn> = [
 		{
 			name: this.localize.term('general_name'),
-			alias: 'entityName',
+			alias: 'name',
 			elementName: 'umb-document-table-column-name',
 			allowSorting: true,
 		},
 		{
 			name: this.localize.term('content_publishStatus'),
-			alias: 'entityState',
+			alias: 'state',
 			elementName: 'umb-document-table-column-state',
-			allowSorting: true,
+			allowSorting: false,
 		},
 	];
 
@@ -59,17 +60,38 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [];
 
-	@state()
-	private _skip: number = 0;
-
 	#collectionContext?: UmbDocumentCollectionContext;
+
+	#routeBuilder?: UmbModalRouteBuilder;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (collectionContext) => {
+		this.consumeContext(UMB_DOCUMENT_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
-			this.#observeCollectionContext();
 		});
+
+		this.#registerModalRoute();
+	}
+
+	#registerModalRoute() {
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath(':entityType')
+			.onSetup((params) => {
+				return { data: { entityType: params.entityType, preset: {} } };
+			})
+			.onReject(() => {
+				this.#collectionContext?.requestCollection();
+			})
+			.onSubmit(() => {
+				this.#collectionContext?.requestCollection();
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this.#routeBuilder = routeBuilder;
+
+				// NOTE: Configuring the observations AFTER the route builder is ready,
+				// otherwise there is a race condition and `#collectionContext.items` tends to win. [LK]
+				this.#observeCollectionContext();
+			});
 	}
 
 	#observeCollectionContext() {
@@ -81,7 +103,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				this._userDefinedProperties = userDefinedProperties;
 				this.#createTableHeadings();
 			},
-			'umbCollectionUserDefinedPropertiesObserver',
+			'_observeUserDefinedProperties',
 		);
 
 		this.observe(
@@ -90,7 +112,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				this._items = items;
 				this.#createTableItems(this._items);
 			},
-			'umbCollectionItemsObserver',
+			'_observeItems',
 		);
 
 		this.observe(
@@ -98,15 +120,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 			(selection) => {
 				this._selection = selection as string[];
 			},
-			'umbCollectionSelectionObserver',
-		);
-
-		this.observe(
-			this.#collectionContext.pagination.skip,
-			(skip) => {
-				this._skip = skip;
-			},
-			'umbCollectionSkipObserver',
+			'_observeSelection',
 		);
 	}
 
@@ -117,6 +131,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 					name: item.header,
 					alias: item.alias,
 					elementName: item.elementName,
+					labelTemplate: item.nameTemplate,
 					allowSorting: true,
 				};
 			});
@@ -126,22 +141,26 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	}
 
 	#createTableItems(items: Array<UmbDocumentCollectionItemModel>) {
-		this._tableItems = items.map((item, rowIndex) => {
+		this._tableItems = items.map((item) => {
 			if (!item.unique) throw new Error('Item id is missing.');
-
-			const sortOrder = this._skip + rowIndex;
 
 			const data =
 				this._tableColumns?.map((column) => {
+					const editPath = this.#routeBuilder
+						? this.#routeBuilder({ entityType: item.entityType }) +
+							UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique })
+						: '';
+
 					return {
 						columnAlias: column.alias,
-						value: column.elementName ? item : getPropertyValueByAlias(sortOrder, item, column.alias),
+						value: column.elementName ? { item, editPath } : getPropertyValueByAlias(item, column.alias),
 					};
 				}) ?? [];
 
 			return {
 				id: item.unique,
 				icon: item.icon,
+				entityType: 'document',
 				data: data,
 			};
 		});
@@ -171,28 +190,20 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 		});
 	}
 
-	render() {
-		if (this._loading) {
-			return html`<div class="container"><uui-loader></uui-loader></div>`;
-		}
-
-		if (this._tableItems.length === 0) {
-			return html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`;
-		}
-
+	override render() {
 		return html`
 			<umb-table
 				.config=${this._tableConfig}
 				.columns=${this._tableColumns}
 				.items=${this._tableItems}
 				.selection=${this._selection}
-				@selected="${this.#handleSelect}"
-				@deselected="${this.#handleDeselect}"
-				@ordered="${this.#handleOrdering}"></umb-table>
+				@selected=${this.#handleSelect}
+				@deselected=${this.#handleDeselect}
+				@ordered=${this.#handleOrdering}></umb-table>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

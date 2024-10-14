@@ -9,5 +9,5 @@ export abstract class UmbEntityBulkActionBase<ArgsMetaType extends MetaEntityBul
 {
 	selection: Array<string> = [];
 
-	abstract execute(): Promise<void>;
+	abstract override execute(): Promise<void>;
 }

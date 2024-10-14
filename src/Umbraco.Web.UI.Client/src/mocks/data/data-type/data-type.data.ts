@@ -14,6 +14,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: true,
 		hasChildren: false,
 		editorAlias: '',
+		editorUiAlias: '',
 		values: [],
 		isDeletable: true,
 		canIgnoreStartNodes: false,
@@ -25,6 +26,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: true,
 		hasChildren: true,
 		editorAlias: '',
+		editorUiAlias: '',
 		values: [],
 		isDeletable: true,
 		canIgnoreStartNodes: false,
@@ -234,7 +236,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		id: 'dt-multiNodeTreePicker',
 		parent: null,
 		editorAlias: 'Umbraco.MultiNodeTreePicker',
-		editorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
+		editorUiAlias: 'Umb.PropertyEditorUi.ContentPicker',
 		hasChildren: false,
 		isFolder: false,
 		isDeletable: true,
@@ -308,6 +310,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		id: 'dt-datePicker-time',
 		parent: null,
 		editorAlias: 'Umbraco.DateTime',
+		editorUiAlias: 'Umb.PropertyEditorUi.DatePicker',
 		hasChildren: false,
 		isFolder: false,
 		isDeletable: true,
@@ -404,6 +407,27 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
+		name: 'Dropdown Alignment Options',
+		id: 'dt-dropdown-align',
+		parent: null,
+		editorAlias: 'Umbraco.DropDown.Flexible',
+		editorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		values: [
+			{
+				alias: 'multiple',
+				value: false,
+			},
+			{
+				alias: 'items',
+				value: ['left', 'center', 'right'],
+			},
+		],
+	},
+	{
 		name: 'Slider',
 		id: 'dt-slider',
 		parent: null,
@@ -491,6 +515,23 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
+		name: 'Code Editor',
+		id: 'dt-codeEditor',
+		parent: null,
+		editorAlias: 'Umbraco.Plain.String',
+		editorUiAlias: 'Umb.PropertyEditorUi.CodeEditor',
+		hasChildren: false,
+		isFolder: false,
+		canIgnoreStartNodes: false,
+		isDeletable: true,
+		values: [
+			{
+				alias: 'language',
+				value: 'html',
+			},
+		],
+	},
+	{
 		name: 'Markdown Editor',
 		id: 'dt-markdownEditor',
 		parent: null,
@@ -567,6 +608,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 					{
 						label: 'Headline',
 						contentElementTypeKey: 'headline-umbraco-demo-block-id',
+						settingsElementTypeKey: 'headline-settings-demo-block-id',
 						backgroundColor: 'gold',
 						editorSize: 'medium',
 						icon: 'icon-edit',
@@ -593,7 +635,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 			},
 			{
 				alias: 'useInlineEditingAsDefault',
-				value: true,
+				value: false,
 			},
 			{
 				alias: 'useLiveEditing',
@@ -605,7 +647,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		name: 'Media Picker',
 		id: 'dt-mediaPicker',
 		parent: null,
-		editorAlias: 'Umbraco.MediaPicker',
+		editorAlias: 'Umbraco.MediaPicker3',
 		editorUiAlias: 'Umb.PropertyEditorUi.MediaPicker',
 		hasChildren: false,
 		isFolder: false,
@@ -681,6 +723,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{
 				alias: 'blockGroups',
 				value: [{ key: 'demo-block-group-id', name: 'Demo Blocks' }],
+			},
+			{
+				alias: 'layoutStylesheet',
+				value: '/wwwroot/css/umbraco-blockgridlayout.css',
 			},
 			{
 				alias: 'blocks',
@@ -791,7 +837,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		id: 'dt-collectionView',
 		parent: null,
 		editorAlias: 'Umbraco.ListView',
-		editorUiAlias: 'Umb.PropertyEditorUi.CollectionView',
+		editorUiAlias: 'Umb.PropertyEditorUi.Collection',
 		hasChildren: false,
 		isFolder: false,
 		isDeletable: false,
@@ -804,7 +850,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: [
 					{ alias: 'sortOrder', header: 'Sort order', isSystem: true, nameTemplate: '' },
 					{ alias: 'updateDate', header: 'Last edited', isSystem: true },
-					{ alias: 'owner', header: 'Created by', isSystem: true },
+					{ alias: 'creator', header: 'Created by', isSystem: true },
 				],
 			},
 			{ alias: 'orderBy', value: 'updateDate' },
@@ -828,7 +874,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{ alias: 'icon', value: 'icon-layers' },
 			{ alias: 'tabName', value: 'Children' },
 			{ alias: 'showContentFirst', value: true },
-			{ alias: 'useInfiniteEditor', value: true },
 		],
 	},
 	{
@@ -836,7 +881,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		id: '3a0156c4-3b8c-4803-bdc1-6871faa83fff',
 		parent: null,
 		editorAlias: 'Umbraco.ListView',
-		editorUiAlias: 'Umb.PropertyEditorUi.CollectionView',
+		editorUiAlias: 'Umb.PropertyEditorUi.Collection',
 		hasChildren: false,
 		isFolder: false,
 		isDeletable: false,
@@ -849,7 +894,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: [
 					{ alias: 'sortOrder', header: 'Sort order', isSystem: true, nameTemplate: '' },
 					{ alias: 'updateDate', header: 'Last edited', isSystem: true },
-					{ alias: 'owner', header: 'Created by', isSystem: true },
+					{ alias: 'creator', header: 'Created by', isSystem: true },
 				],
 			},
 			{ alias: 'orderBy', value: 'updateDate' },
@@ -873,7 +918,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{ alias: 'icon', value: 'icon-layers' },
 			{ alias: 'tabName', value: 'Items' },
 			{ alias: 'showContentFirst', value: false },
-			{ alias: 'useInfiniteEditor', value: true },
 		],
 	},
 	{
@@ -890,7 +934,23 @@ export const data: Array<UmbMockDataTypeModel> = [
 	},
 	{
 		name: 'Rich Text Editor',
-		id: 'dt-richTextEditor',
+		id: 'dt-richTextEditorTiptap',
+		parent: null,
+		editorAlias: 'Umbraco.RichText',
+		editorUiAlias: 'Umb.PropertyEditorUi.Tiptap',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		values: [
+			{ alias: 'dimensions', value: { height: 500 } },
+			{ alias: 'maxImageSize', value: 500 },
+			{ alias: 'ignoreUserStartNodes', value: false },
+		],
+	},
+	{
+		name: 'Rich Text Editor (TinyMCE)',
+		id: 'dt-richTextEditorTinyMce',
 		parent: null,
 		editorAlias: 'Umbraco.RichText',
 		editorUiAlias: 'Umb.PropertyEditorUi.TinyMCE',

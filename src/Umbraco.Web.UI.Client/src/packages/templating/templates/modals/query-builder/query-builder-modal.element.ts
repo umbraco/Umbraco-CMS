@@ -167,16 +167,23 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 	};
 
 	#updateFilters = () => {
-		this.#updateQueryRequest({ filters: Array.from(this._filterElements)?.map((filter) => filter.filter) ?? [] });
+		// Only use the filter from elements that have everything set
+		const ready = Array.from(this._filterElements)?.filter((element) => element.isFilterValid);
+		this.#updateQueryRequest({ filters: ready?.map((element) => element.filter) ?? [] });
 	};
 
 	#removeFilter = (event: Event) => {
-		const target = event.target as UmbTemplateQueryBuilderFilterElement;
-		this._filterContainer?.removeChild(target);
+		if (this._filterElements.length > 1) {
+			const target = event.target as UmbTemplateQueryBuilderFilterElement;
+			this._filterContainer?.removeChild(target);
+			if (this._filterElements.length === 1) {
+				this._filterElements[0].unremovable = true;
+			}
+		}
 		this.#updateFilters();
 	};
 
-	render() {
+	override render() {
 		const properties = localizePropertyType(this._queryBuilderSettings?.properties);
 		const sort = localizeSort(this._queryRequest.sort);
 		return html`
@@ -234,7 +241,7 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 										<umb-localize key=${ifDefined(sort.localizeKey)}>
 											${sort.direction ?? this._defaultSortDirection}
 										</umb-localize>
-								  </uui-button>`
+									</uui-button>`
 								: ''}
 						</div>
 						<div class="row query-results">
@@ -266,7 +273,7 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

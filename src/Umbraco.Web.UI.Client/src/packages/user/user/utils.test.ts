@@ -1,5 +1,5 @@
-import { expect } from '@open-wc/testing';
 import { getDisplayStateFromUserStatus } from './utils.js';
+import { expect } from '@open-wc/testing';
 import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
 import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 

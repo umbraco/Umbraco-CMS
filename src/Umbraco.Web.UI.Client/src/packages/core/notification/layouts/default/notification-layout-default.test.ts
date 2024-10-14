@@ -1,6 +1,6 @@
-import { fixture, expect, html } from '@open-wc/testing';
 import type { UmbNotificationDefaultData } from './notification-layout-default.element.js';
 import { UmbNotificationLayoutDefaultElement } from './notification-layout-default.element.js';
+import { fixture, expect, html } from '@open-wc/testing';
 import type { UUIToastNotificationLayoutElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbNotificationHandler } from '@umbraco-cms/backoffice/notification';
 import type { UmbTestRunnerWindow } from '@umbraco-cms/internal/test-utils';

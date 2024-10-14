@@ -1,10 +1,10 @@
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 
 export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.BlockTypeGroupConfiguration',
 	name: 'Block Grid Group Configuration Property Editor UI',
-	js: () => import('./property-editor-ui-block-grid-group-configuration.element.js'),
+	element: () => import('./property-editor-ui-block-grid-group-configuration.element.js'),
 	meta: {
 		label: '',
 		icon: 'icon-box-alt',

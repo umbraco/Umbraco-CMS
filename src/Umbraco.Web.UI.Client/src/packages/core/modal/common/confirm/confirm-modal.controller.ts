@@ -1,8 +1,9 @@
-import { UMB_CONFIRM_MODAL, type UmbConfirmModalData } from '../../token/confirm-modal.token.js';
-import { UMB_MODAL_MANAGER_CONTEXT } from '../../context/modal-manager.context.js';
+import { UMB_MODAL_MANAGER_CONTEXT } from '../../context/index.js';
+import { UMB_CONFIRM_MODAL, type UmbConfirmModalData } from './confirm-modal.token.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbConfirmModalArgs extends UmbConfirmModalData {}
 
 export class UmbConfirmModalController extends UmbControllerBase {
@@ -22,11 +23,16 @@ export class UmbConfirmModalController extends UmbControllerBase {
 		// This is a one time off, so we can destroy our selfs.
 		this.destroy();
 
-		// Map back into UmbVariantId instances:
 		return;
 	}
 }
 
+/**
+ *
+ * @param host {UmbControllerHost} - The host controller
+ * @param args {UmbConfirmModalArgs} - The data to pass to the modal
+ * @returns {UmbConfirmModalController} The modal controller instance
+ */
 export function umbConfirmModal(host: UmbControllerHost, args: UmbConfirmModalArgs) {
 	return new UmbConfirmModalController(host).open(args);
 }

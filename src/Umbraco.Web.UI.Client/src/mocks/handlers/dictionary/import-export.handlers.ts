@@ -1,9 +1,10 @@
 const { rest } = window.MockServiceWorker;
-import type { UmbMockDictionaryModel } from '../../data/dictionary/dictionary.data.js';
+//import type { UmbMockDictionaryModel } from '../../data/dictionary/dictionary.data.js';
 import { umbDictionaryMockDb } from '../../data/dictionary/dictionary.db.js';
 import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
+/*
 const importResponse: UmbMockDictionaryModel = {
 	parent: null,
 	name: 'Uploaded dictionary',
@@ -21,6 +22,7 @@ const importResponse: UmbMockDictionaryModel = {
 		},
 	],
 };
+*/
 
 export const importExportHandlers = [
 	rest.post(umbracoPath(`${UMB_SLUG}/import`), async (req, res, ctx) => {

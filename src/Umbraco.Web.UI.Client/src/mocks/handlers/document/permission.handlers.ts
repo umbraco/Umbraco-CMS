@@ -8,7 +8,7 @@ export const permissionHandlers = [
 	rest.get(umbracoPath(`${UMB_SLUG}/:id/permissions`), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return;
-		const response = umbDocumentMockDb.getUserPermissionsForDocument(id);
+		const response = umbDocumentMockDb.getUserPermissionsForDocument();
 		return res(ctx.status(200), ctx.json(response));
 	}),
 ];

@@ -1,32 +1,26 @@
 import { UMB_DOCUMENT_TYPE_COMPOSITION_REPOSITORY_ALIAS } from '../repository/composition/index.js';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import type {
-	ManifestWorkspace,
-	ManifestWorkspaceActions,
-	ManifestWorkspaceViews,
-} from '@umbraco-cms/backoffice/extension-registry';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.DocumentType';
 
-const workspace: ManifestWorkspace = {
-	type: 'workspace',
-	kind: 'routable',
-	alias: UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS,
-	name: 'Document Type Workspace',
-	api: () => import('./document-type-workspace.context.js'),
-	meta: {
-		entityType: 'document-type',
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'workspace',
+		kind: 'routable',
+		alias: UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS,
+		name: 'Document Type Workspace',
+		api: () => import('./document-type-workspace.context.js'),
+		meta: {
+			entityType: 'document-type',
+		},
 	},
-};
-
-const workspaceViews: Array<ManifestWorkspaceViews> = [
 	{
 		type: 'workspaceView',
 		kind: 'contentTypeDesignEditor',
 		alias: 'Umb.WorkspaceView.DocumentType.Design',
 		name: 'Document Type Workspace Design View',
 		meta: {
-			label: 'Design',
+			label: '#general_design',
 			pathname: 'design',
 			icon: 'icon-document-dashed-line',
 			compositionRepositoryAlias: UMB_DOCUMENT_TYPE_COMPOSITION_REPOSITORY_ALIAS,
@@ -45,7 +39,7 @@ const workspaceViews: Array<ManifestWorkspaceViews> = [
 		element: () => import('./views/structure/document-type-workspace-view-structure.element.js'),
 		weight: 800,
 		meta: {
-			label: 'Structure',
+			label: '#contentTypeEditor_structure',
 			pathname: 'structure',
 			icon: 'icon-mindmap',
 		},
@@ -63,7 +57,7 @@ const workspaceViews: Array<ManifestWorkspaceViews> = [
 		element: () => import('./views/settings/document-type-workspace-view-settings.element.js'),
 		weight: 600,
 		meta: {
-			label: 'Settings',
+			label: '#general_settings',
 			pathname: 'settings',
 			icon: 'icon-settings',
 		},
@@ -81,7 +75,7 @@ const workspaceViews: Array<ManifestWorkspaceViews> = [
 		element: () => import('./views/templates/document-type-workspace-view-templates.element.js'),
 		weight: 400,
 		meta: {
-			label: 'Templates',
+			label: '#treeHeaders_templates',
 			pathname: 'templates',
 			icon: 'icon-layout',
 		},
@@ -92,17 +86,14 @@ const workspaceViews: Array<ManifestWorkspaceViews> = [
 			},
 		],
 	},
-];
-
-const workspaceActions: Array<ManifestWorkspaceActions> = [
 	{
 		type: 'workspaceAction',
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.DocumentType.Save',
 		name: 'Save Document Type Workspace Action',
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Save',
+			label: '#buttons_save',
 			look: 'primary',
 			color: 'positive',
 		},
@@ -114,5 +105,3 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		],
 	},
 ];
-
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions];

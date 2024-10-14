@@ -25,7 +25,7 @@ export class UmbDocumentPublicAccessRepository extends UmbControllerBase impleme
 		if (!unique) throw new Error('unique is missing');
 		if (!data) throw new Error('Data is missing');
 
-		const { error } = await this.#dataSource.update(unique, data);
+		const { error } = await this.#dataSource.create(unique, data);
 		if (!error) {
 			const notification = { data: { message: `Public acccess setting created` } };
 			this.#notificationContext?.peek('positive', notification);
@@ -63,3 +63,5 @@ export class UmbDocumentPublicAccessRepository extends UmbControllerBase impleme
 		return { error };
 	}
 }
+
+export { UmbDocumentPublicAccessRepository as api };

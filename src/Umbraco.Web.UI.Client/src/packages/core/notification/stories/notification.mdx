@@ -72,7 +72,7 @@ class MyElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`<button @click="${this._handleClick}">Open Notification</button>`;
 	}
 }
@@ -87,7 +87,7 @@ The default layout will cover most cases, but there might be situations where we
 ```ts
 import { html, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbNotificationHandler } from '@umbraco-cms/notification';
 
 export interface UmbNotificationCustomData {
@@ -110,7 +110,7 @@ export class UmbNotificationLayoutCustom extends LitElement {
 		this.notificationHandler.close(true);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-toast-notification-layout headline="${this.data.headline}" class="uui-text">
 				${this.data.user.name}
@@ -158,12 +158,12 @@ class MyElement extends LitElement {
 
 		notificationHandler.onClose().then((result) => {
 			if (result) {
-				console.log('He agreed!');
+				console.log('She agreed!');
 			}
 		});
 	}
 
-	render() {
+	override render() {
 		return html`<button @click="${this._handleClick}">Open Notification</button>`;
 	}
 }

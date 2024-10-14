@@ -1,11 +1,3 @@
-export type UmbEntityUnique = string | null;
-
-/** Tried to find a common base of our entities — used by Entity Workspace Context */
-export type UmbEntityBase = {
-	id?: string;
-	name?: string;
-};
-
 export interface UmbSwatchDetails {
 	label: string;
 	value: string;
@@ -17,7 +9,7 @@ export interface ServertimeOffset {
 	offset: number;
 }
 
-export interface NumberRangeValueType {
+export interface UmbNumberRangeValueType {
 	min?: number;
 	max?: number;
 }
@@ -29,4 +21,10 @@ export interface UmbReferenceByUnique {
 export interface UmbReferenceByUniqueAndType {
 	type: string;
 	unique: string;
+}
+
+export interface UmbUniqueItemModel {
+	unique: string;
+	name: string;
+	icon?: string;
 }

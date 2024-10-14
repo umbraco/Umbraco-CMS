@@ -1,9 +1,10 @@
 import { UMB_SCRIPT_WORKSPACE_CONTEXT } from './script-workspace.context-token.js';
-import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+
+import '@umbraco-cms/backoffice/code-editor';
 
 @customElement('umb-script-workspace-editor')
 export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
@@ -14,10 +15,7 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 	private _content?: string | null = '';
 
 	@state()
-	private _ready?: boolean = false;
-
-	@state()
-	private _isNew?: boolean = false;
+	private _isNew?: boolean;
 
 	#context?: typeof UMB_SCRIPT_WORKSPACE_CONTEXT.TYPE;
 
@@ -33,10 +31,6 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 
 			this.observe(this.#context.content, (content) => {
 				this._content = content;
-			});
-
-			this.observe(this.#context.isCodeEditorReady, (isReady) => {
-				this._ready = isReady;
 			});
 
 			this.observe(this.#context.isNew, (isNew) => {
@@ -57,48 +51,44 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 		this.#context?.setContent(value);
 	}
 
+	override render() {
+		if (this._isNew === undefined) return;
+		return html`
+			<umb-workspace-editor alias="Umb.Workspace.Script">
+				<div id="workspace-header" slot="header">
+					<uui-input
+						placeholder=${this.localize.term('placeholders_entername')}
+						.value=${this._name}
+						@input=${this.#onNameInput}
+						label=${this.localize.term('placeholders_entername')}
+						?readonly=${this._isNew === false}
+						${umbFocus()}>
+					</uui-input>
+				</div>
+				<uui-box>
+					<!-- the div below in the header is to make the box display nicely with code editor -->
+					<div slot="header"></div>
+					${this.#renderCodeEditor()}
+				</uui-box>
+			</umb-workspace-editor>
+		`;
+	}
+
 	#renderCodeEditor() {
-		return html`<umb-code-editor
-			language="javascript"
-			id="content"
-			.code=${this._content ?? ''}
-			@input=${this.#onCodeEditorInput}></umb-code-editor>`;
+		return html`
+			<umb-code-editor
+				id="content"
+				language="javascript"
+				.code=${this._content ?? ''}
+				@input=${this.#onCodeEditorInput}></umb-code-editor>
+		`;
 	}
 
-	render() {
-		return html`<umb-workspace-editor alias="Umb.Workspace.Script">
-			<div id="workspace-header" slot="header">
-				<uui-input
-					placeholder="Enter name..."
-					.value=${this._name}
-					@input=${this.#onNameInput}
-					label="Script name"
-					?readonly=${this._isNew === false}></uui-input>
-			</div>
-			<uui-box>
-				<!-- the div below in the header is to make the box display nicely with code editor -->
-				<div slot="header"></div>
-				${this._ready
-					? this.#renderCodeEditor()
-					: html`<div id="loader-container">
-							<uui-loader></uui-loader>
-						</div>`}
-			</uui-box>
-		</umb-workspace-editor>`;
-	}
-
-	static styles = [
-		UmbTextStyles,
+	static override styles = [
 		css`
 			:host {
 				display: block;
 				width: 100%;
-			}
-
-			#loader-container {
-				display: grid;
-				place-items: center;
-				min-height: calc(100dvh - 260px);
 			}
 
 			umb-code-editor {

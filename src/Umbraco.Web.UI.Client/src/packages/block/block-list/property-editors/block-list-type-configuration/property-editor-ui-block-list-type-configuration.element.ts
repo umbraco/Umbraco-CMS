@@ -1,14 +1,15 @@
-import type { UmbBlockTypeBaseModel, UmbInputBlockTypeElement } from '../../../block-type/index.js';
 import '../../../block-type/components/input-block-type/index.js';
 import { UMB_BLOCK_LIST_TYPE } from '../../types.js';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbBlockTypeBaseModel, UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
 import {
+	type UmbPropertyEditorUiElement,
 	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 
 /**
  * @element umb-property-editor-ui-block-list-type-configuration
@@ -22,6 +23,12 @@ export class UmbPropertyEditorUIBlockListBlockConfigurationElement
 		typeof UMB_WORKSPACE_MODAL.DATA,
 		typeof UMB_WORKSPACE_MODAL.VALUE
 	>;
+
+	@property({ attribute: false })
+	value: UmbBlockTypeBaseModel[] = [];
+
+	@property({ type: Object, attribute: false })
+	public config?: UmbPropertyEditorConfigCollection;
 
 	@state()
 	private _workspacePath?: string;
@@ -41,12 +48,6 @@ export class UmbPropertyEditorUIBlockListBlockConfigurationElement
 			});
 	}
 
-	@property({ attribute: false })
-	value: UmbBlockTypeBaseModel[] = [];
-
-	@property({ type: Object, attribute: false })
-	public config?: UmbPropertyEditorConfigCollection;
-
 	#onCreate(e: CustomEvent) {
 		const selectedElementType = e.detail.contentElementTypeKey;
 		if (selectedElementType) {
@@ -60,7 +61,7 @@ export class UmbPropertyEditorUIBlockListBlockConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<umb-input-block-type
 			.value=${this.value}
 			.workspacePath=${this._workspacePath}

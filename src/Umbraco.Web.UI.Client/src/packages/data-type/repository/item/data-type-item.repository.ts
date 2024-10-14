@@ -9,3 +9,5 @@ export class UmbDataTypeItemRepository extends UmbItemRepositoryBase<UmbDataType
 		super(host, UmbDataTypeItemServerDataSource, UMB_DATA_TYPE_ITEM_STORE_CONTEXT);
 	}
 }
+
+export { UmbDataTypeItemRepository as api };

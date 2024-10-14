@@ -74,7 +74,7 @@ export class UmbStoreBase<StoreItemType = any> extends UmbContextBase<any> imple
 	 * @returns {Array<StoreItemType>}
 	 * @memberof UmbStoreBase
 	 */
-	getItems(uniques: Array<string>) {
+	getItems(uniques: Array<string>): Array<StoreItemType> {
 		return this._data.getValue().filter((item) => uniques.includes(this._data.getUniqueMethod(item) as string));
 	}
 

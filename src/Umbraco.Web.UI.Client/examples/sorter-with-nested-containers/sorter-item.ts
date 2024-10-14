@@ -1,7 +1,6 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, LitElement, state, repeat, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, LitElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
-import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 @customElement('example-sorter-item')
 export class ExampleSorterItem extends UmbElementMixin(LitElement) {
@@ -12,7 +11,7 @@ export class ExampleSorterItem extends UmbElementMixin(LitElement) {
 	@property({ type: Boolean, reflect: true, attribute: 'drag-placeholder' })
 	umbDragPlaceholder = false;
 
-	render() {
+	override render() {
 		return html`
 			<div>
 				${this.name}
@@ -23,7 +22,7 @@ export class ExampleSorterItem extends UmbElementMixin(LitElement) {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

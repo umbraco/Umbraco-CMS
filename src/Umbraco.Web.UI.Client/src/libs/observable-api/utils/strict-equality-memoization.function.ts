@@ -1,6 +1,5 @@
 /**
- * @export
- * @method strictEqualityMemoization
+ * @function strictEqualityMemoization
  * @param {unknown} previousValue - The previous value to compare.
  * @param {unknown} currentValue - The current value to compare.
  * @returns {boolean} - Returns true if the values are identical.

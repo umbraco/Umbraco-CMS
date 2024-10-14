@@ -1,11 +1,16 @@
-import { UMB_MEDIA_CAPTION_ALT_TEXT_MODAL } from '../modals/media-caption-alt-text/media-caption-alt-text-modal.token.js';
 import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '../components/input-tiny-mce/tiny-mce-plugin.js';
-import { UMB_MEDIA_TREE_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserModel } from '@umbraco-cms/backoffice/current-user';
+import { getGuidFromUdi } from '@umbraco-cms/backoffice/utils';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
 import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { sizeImageInEditor, uploadBlobImages } from '@umbraco-cms/backoffice/media';
+import {
+	sizeImageInEditor,
+	uploadBlobImages,
+	UMB_MEDIA_PICKER_MODAL,
+	UMB_MEDIA_CAPTION_ALT_TEXT_MODAL,
+} from '@umbraco-cms/backoffice/media';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 interface MediaPickerTargetData {
 	altText?: string;
@@ -25,13 +30,12 @@ interface MediaPickerResultData {
 }
 
 export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
-	#currentUser?: UmbCurrentUserModel;
-	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#modalManager?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
-	#temporaryFileRepository;
+	readonly #temporaryFileRepository;
 
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
+		const localize = new UmbLocalizationController(args.host);
 
 		this.#temporaryFileRepository = new UmbTemporaryFileRepository(args.host);
 
@@ -39,16 +43,9 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 			this.#modalManager = instance;
 		});
 
-		// TODO => this breaks tests. disabling for now
-		// will ignore user media start nodes
-		// this.host.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
-		// 	this.#currentUserContext = instance;
-		// 	this.#observeCurrentUser();
-		// });
-
 		this.editor.ui.registry.addToggleButton('umbmediapicker', {
 			icon: 'image',
-			tooltip: 'Media Picker',
+			tooltip: localize.term('general_mediaPicker'),
 			onAction: () => this.#onAction(),
 			onSetup: (api) => {
 				const changed = this.editor.selection.selectorChangedWithUnbind('img[data-udi]', (state) =>
@@ -120,7 +117,6 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 
 	async #showMediaPicker(currentTarget: MediaPickerTargetData) {
 		/*
-		// TODO: I dont think we should parse this one... it should be up to the modal to get this information, and then we could parse some configs on to affect this.
 		let startNodeId;
 		let startNodeIsVirtual;
 
@@ -135,37 +131,39 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 		}
 		*/
 
-		// TODO => startNodeId and startNodeIsVirtual do not exist on ContentTreeItemResponseModel
-
-		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_TREE_PICKER_MODAL, {
+		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_PICKER_MODAL, {
 			data: {
 				multiple: false,
-				hideTreeRoot: true,
-
-				//startNodeId,
 				//startNodeIsVirtual,
 			},
 			value: {
-				selection: currentTarget.udi ? [...currentTarget.udi] : [],
+				selection: currentTarget.udi ? [getGuidFromUdi(currentTarget.udi)] : [],
 			},
 		});
 
 		if (!modalHandler) return;
 
 		const { selection } = await modalHandler.onSubmit().catch(() => ({ selection: undefined }));
-		if (!selection || !selection.length) return;
+		if (!selection?.length) return;
 
-		this.#showMediaCaptionAltText(selection[0]);
+		this.#showMediaCaptionAltText(selection[0], currentTarget);
 		this.editor.dispatch('Change');
 	}
 
-	async #showMediaCaptionAltText(mediaUnique: string | null) {
+	async #showMediaCaptionAltText(mediaUnique: string | null, currentTarget: MediaPickerTargetData) {
 		if (!mediaUnique) return;
 
-		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, { data: { mediaUnique } });
+		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, {
+			data: { mediaUnique },
+			value: {
+				url: '',
+				altText: currentTarget.altText,
+				caption: currentTarget.caption,
+			},
+		});
 
-		await modalHandler?.onSubmit().catch(() => undefined);
-		const mediaData = modalHandler?.getValue();
+		const mediaData = await modalHandler?.onSubmit().catch(() => null);
+		if (!mediaData) return;
 
 		const media: MediaPickerTargetData = {
 			altText: mediaData?.altText,
@@ -202,13 +200,11 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 			} else {
 				parentElement.innerHTML = combined;
 			}
-		} else {
+		} else if (parentElement?.nodeName === 'FIGURE' && parentElement.parentElement) {
 			//if caption is removed, remove the figure element
-			if (parentElement?.nodeName === 'FIGURE' && parentElement.parentElement) {
-				parentElement.parentElement.innerHTML = newImage;
-			} else {
-				this.editor.selection.setContent(newImage);
-			}
+			parentElement.parentElement.innerHTML = newImage;
+		} else {
+			this.editor.selection.setContent(newImage);
 		}
 
 		// Using settimeout to wait for a DoM-render, so we can find the new element by ID.
@@ -233,7 +229,7 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 		});
 	}
 
-	#uploadImageHandler: RawEditorOptions['images_upload_handler'] = (blobInfo, progress) => {
+	readonly #uploadImageHandler: RawEditorOptions['images_upload_handler'] = (blobInfo, progress) => {
 		return new Promise((resolve, reject) => {
 			// Fetch does not support progress, so we need to fake it.
 			progress(0);

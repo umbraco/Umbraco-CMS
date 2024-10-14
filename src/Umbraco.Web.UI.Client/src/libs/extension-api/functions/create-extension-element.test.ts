@@ -1,6 +1,6 @@
-import { expect } from '@open-wc/testing';
 import type { ManifestElement, ManifestElementAndApi } from '../types/index.js';
 import { createExtensionElement } from './create-extension-element.function.js';
+import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 

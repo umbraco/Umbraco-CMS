@@ -3,6 +3,8 @@ import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-act
 export class UmbSetGroupUserEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {
 		//TODO: Implement
-		alert('Bulk set group is not implemented yet');
+		throw new Error('Bulk set group is not implemented yet');
 	}
 }
+
+export { UmbSetGroupUserEntityBulkAction as api };

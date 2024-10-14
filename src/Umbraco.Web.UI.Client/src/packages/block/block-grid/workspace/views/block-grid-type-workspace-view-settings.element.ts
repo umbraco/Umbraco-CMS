@@ -1,7 +1,7 @@
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbInputNumberRangeElement } from '@umbraco-cms/backoffice/components';
 import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/data-type';
@@ -48,7 +48,7 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 					if (Array.isArray(value) && value.length > 0) {
 						this._showSizeOptions = true;
 					}
-					this.removeControllerByAlias('_observeColumnSpanOptions');
+					this.removeUmbControllerByAlias('_observeColumnSpanOptions');
 				},
 				'observeColumnSpanOptions',
 			);
@@ -76,7 +76,7 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 		this.#datasetContext?.setPropertyValue('rowMaxSpan', (e.target as UmbInputNumberRangeElement).maxValue);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box headline=${this.localize.term('general_general')}>
 				<umb-property
@@ -107,7 +107,7 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 			<uui-box headline=${this.localize.term('blockEditor_headlineAllowance')}>
 				<umb-property
 					label=${this.localize.term('blockEditor_allowBlockInRoot')}
-					alias="allowInRoot"
+					alias="allowAtRoot"
 					property-editor-ui-alias="Umb.PropertyEditorUi.Toggle"></umb-property>
 
 				<umb-property
@@ -152,7 +152,7 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 		}
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

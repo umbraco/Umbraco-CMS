@@ -1,10 +1,9 @@
 import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbContentTypeModel, UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 import './block-workspace-view-edit-properties.element.js';
 // eslint-disable-next-line import/order
@@ -43,7 +42,7 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 	hideSingleGroup = false;
 
 	@state()
-	_groups: Array<PropertyTypeContainerModelBaseModel> = [];
+	_groups: Array<UmbPropertyTypeContainerModel> = [];
 
 	@state()
 	_hasProperties = false;
@@ -76,7 +75,7 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 		);
 	}
 
-	render() {
+	override render() {
 		return html`
 			${this._hasProperties
 				? html` <umb-block-workspace-view-edit-properties
@@ -84,21 +83,26 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 						class="properties"
 						.containerId=${this._containerId}></umb-block-workspace-view-edit-properties>`
 				: ''}
-			${repeat(
-				this._groups,
-				(group) => group.id,
-				(group) =>
-					html` <uui-box .headline=${group.name || ''}
-						><umb-block-workspace-view-edit-properties
-							.managerName=${this.#managerName}
-							class="properties"
-							.containerId=${group.id}></umb-block-workspace-view-edit-properties
-					></uui-box>`,
-			)}
+			${this.hideSingleGroup && this._groups.length === 1
+				? this.renderGroup(this._groups[0])
+				: repeat(
+						this._groups,
+						(group) => group.id,
+						(group) => html` <uui-box .headline=${group.name}>${this.renderGroup(group)}</uui-box>`,
+					)}
 		`;
 	}
 
-	static styles = [
+	renderGroup(group: UmbPropertyTypeContainerModel) {
+		return html`
+			<umb-block-workspace-view-edit-properties
+				.managerName=${this.#managerName}
+				class="properties"
+				.containerId=${group.id}></umb-block-workspace-view-edit-properties>
+		`;
+	}
+
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-box {

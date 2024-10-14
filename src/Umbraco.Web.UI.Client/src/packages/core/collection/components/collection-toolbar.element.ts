@@ -4,14 +4,15 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-collection-toolbar')
 export class UmbCollectionToolbarElement extends UmbLitElement {
-	render() {
+	override render() {
 		return html`
 			<umb-collection-action-bundle></umb-collection-action-bundle>
+			<div id="slot"><slot></slot></div>
 			<umb-collection-view-bundle></umb-collection-view-bundle>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
@@ -19,6 +20,9 @@ export class UmbCollectionToolbarElement extends UmbLitElement {
 				gap: var(--uui-size-space-5);
 				justify-content: space-between;
 				width: 100%;
+			}
+			#slot {
+				flex: 1;
 			}
 		`,
 	];

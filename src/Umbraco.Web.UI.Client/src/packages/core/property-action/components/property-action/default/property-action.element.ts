@@ -1,11 +1,12 @@
 import type { UmbPropertyAction } from '../index.js';
-import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
-import { html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
 	ManifestPropertyActionDefaultKind,
 	MetaPropertyActionDefaultKind,
-} from '@umbraco-cms/backoffice/extension-registry';
+} from '../../../extensions/property-action.extension.js';
+import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
+import { html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-property-action')
@@ -45,7 +46,7 @@ export class UmbPropertyActionElement<
 		event.stopPropagation();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-menu-item
 				label=${ifDefined(this.manifest?.meta.label)}

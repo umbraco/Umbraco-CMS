@@ -1,16 +1,7 @@
 import type { UmbImageCropperCrop, UmbImageCropperFocalPoint } from './index.js';
 import { calculateExtrapolatedValue, clamp, inverseLerp, lerp } from '@umbraco-cms/backoffice/utils';
-import type {
-	PropertyValueMap} from '@umbraco-cms/backoffice/external/lit';
-import {
-	customElement,
-	property,
-	query,
-	state,
-	LitElement,
-	css,
-	html,
-} from '@umbraco-cms/backoffice/external/lit';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, query, state, LitElement, css, html } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-image-cropper')
 export class UmbImageCropperElement extends LitElement {
@@ -51,13 +42,13 @@ export class UmbImageCropperElement extends LitElement {
 		return lerp(this.#minImageScale, this.#maxImageScale, this._zoom);
 	}
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		this.#initializeCrop();
 		this.#addEventListeners();
 	}
 
-	disconnectedCallback() {
+	override disconnectedCallback() {
 		super.disconnectedCallback();
 		this.#removeEventListeners();
 	}
@@ -73,7 +64,7 @@ export class UmbImageCropperElement extends LitElement {
 		this.removeEventListener('wheel', this.#onWheel);
 	}
 
-	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 
 		if (_changedProperties.has('value')) {
@@ -324,7 +315,7 @@ export class UmbImageCropperElement extends LitElement {
 		this.#updateImageScale(event.deltaY * -this.#SCROLL_ZOOM_SPEED, event.clientX, event.clientY);
 	};
 
-	render() {
+	override render() {
 		return html`
 			<div id="viewport">
 				<img id="image" src=${this.src} alt="" />
@@ -348,7 +339,7 @@ export class UmbImageCropperElement extends LitElement {
 		`;
 	}
 
-	static styles = css`
+	static override styles = css`
 		:host {
 			display: grid;
 			grid-template-rows: 1fr auto auto;
@@ -385,6 +376,7 @@ export class UmbImageCropperElement extends LitElement {
 		#image {
 			display: block;
 			position: absolute;
+			user-select: none;
 		}
 
 		#slider {

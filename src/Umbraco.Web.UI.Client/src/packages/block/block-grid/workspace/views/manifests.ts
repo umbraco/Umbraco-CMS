@@ -1,15 +1,14 @@
 import { UMB_BLOCK_GRID_TYPE_WORKSPACE_ALIAS } from '../index.js';
-import type { ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
 
-export const workspaceViews: Array<ManifestWorkspaceView> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.BlockType.Grid.Settings',
 		name: 'Block Grid Type Workspace Settings View',
-		js: () => import('./block-grid-type-workspace-view-settings.element.js'),
+		element: () => import('./block-grid-type-workspace-view-settings.element.js'),
 		weight: 1000,
 		meta: {
-			label: 'Settings',
+			label: '#general_settings',
 			pathname: 'settings',
 			icon: 'icon-settings',
 		},
@@ -24,10 +23,10 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.BlockType.Grid.Areas',
 		name: 'Block Grid Type Workspace Areas View',
-		js: () => import('./block-grid-type-workspace-view-areas.element.js'),
+		element: () => import('./block-grid-type-workspace-view-areas.element.js'),
 		weight: 1000,
 		meta: {
-			label: 'Areas',
+			label: '#blockEditor_tabAreas',
 			pathname: 'areas',
 			icon: 'icon-grid',
 		},
@@ -42,10 +41,10 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.BlockType.Grid.Advance',
 		name: 'Block Grid Type Workspace Advance View',
-		js: () => import('./block-grid-type-workspace-view-advanced.element.js'),
+		element: () => import('./block-grid-type-workspace-view-advanced.element.js'),
 		weight: 1000,
 		meta: {
-			label: 'Advanced',
+			label: '#blockEditor_tabAdvanced',
 			pathname: 'advanced',
 			icon: 'icon-wrench',
 		},
@@ -57,5 +56,3 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		],
 	},
 ];
-
-export const manifests = [...workspaceViews];

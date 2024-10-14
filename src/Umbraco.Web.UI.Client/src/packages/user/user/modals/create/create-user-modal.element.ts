@@ -1,12 +1,15 @@
 import { UmbUserDetailRepository } from '../../repository/index.js';
+import { UmbUserKind } from '../../utils/index.js';
 import { UMB_CREATE_USER_SUCCESS_MODAL } from './create-user-success-modal.token.js';
+import type { UmbCreateUserModalData } from './create-user-modal.token.js';
 import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-create-user-modal')
-export class UmbCreateUserModalElement extends UmbModalBaseElement {
+export class UmbCreateUserModalElement extends UmbModalBaseElement<UmbCreateUserModalData> {
 	#userDetailRepository = new UmbUserDetailRepository(this);
 
 	@query('#CreateUserForm')
@@ -27,21 +30,28 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 		const email = formData.get('email') as string;
 
 		const userGroupPicker = form.querySelector('#userGroups') as UmbUserGroupInputElement;
-		const userGroups = userGroupPicker?.selection;
+		const userGroupReferences: Array<UmbReferenceByUnique> = userGroupPicker?.selection.map((unique) => {
+			return { unique };
+		});
 
 		const { data: userScaffold } = await this.#userDetailRepository.createScaffold();
 		if (!userScaffold) return;
 
+		userScaffold.kind = this.data?.user.kind ?? UmbUserKind.DEFAULT;
 		userScaffold.name = name;
 		userScaffold.email = email;
 		userScaffold.userName = email;
-		userScaffold.userGroupUniques = userGroups;
+		userScaffold.userGroupUniques = userGroupReferences;
 
 		// TODO: figure out when to use email or username
 		const { data } = await this.#userDetailRepository.create(userScaffold);
 
 		if (data) {
-			this.#openSuccessModal(data.unique);
+			if (data.kind === UmbUserKind.DEFAULT) {
+				this.#openSuccessModal(data.unique);
+			} else {
+				this._submitModal();
+			}
 		}
 	}
 
@@ -69,12 +79,9 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 			});
 	}
 
-	render() {
-		return html`<uui-dialog-layout headline="Create user">
-			<p>
-				Create new users to give them access to Umbraco. When a user is created a password will be generated that you
-				can share with the user.
-			</p>
+	override render() {
+		return html`<uui-dialog-layout headline=${this.localize.term('user_createUserHeadline', this.data?.user.kind)}>
+			<p>${this.localize.term('user_createUserDescription', this.data?.user.kind)}</p>
 
 			${this.#renderForm()}
 			<uui-button @click=${this._rejectModal} slot="actions" label="Cancel" look="secondary"></uui-button>
@@ -108,11 +115,12 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 		</uui-form>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-input,
-			uui-input-password {
+			uui-input-password,
+			uui-combobox {
 				width: 100%;
 			}
 

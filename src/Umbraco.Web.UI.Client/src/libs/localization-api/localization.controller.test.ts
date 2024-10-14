@@ -1,26 +1,28 @@
-import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testing';
 import type { UmbLocalizationSet, UmbLocalizationSetBase } from './localization.manager.js';
 import { umbLocalizationManager } from './localization.manager.js';
 import { UmbLocalizationController } from './localization.controller.js';
+import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testing';
 import { LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+const initialLanguage = 'en-us';
+
 @customElement('umb-localize-controller-host')
 class UmbLocalizeControllerHostElement extends UmbElementMixin(LitElement) {
-	@property() lang = 'en-us';
+	@property() override lang = initialLanguage;
 }
 
 @customElement('umb-localization-render-count')
 class UmbLocalizationRenderCountElement extends UmbElementMixin(LitElement) {
 	amountOfUpdates = 0;
 
-	requestUpdate() {
+	override requestUpdate() {
 		super.requestUpdate();
 		this.amountOfUpdates++;
 	}
 
-	render() {
+	override render() {
 		return html`${this.localize.term('logout')}`;
 	}
 }
@@ -36,7 +38,7 @@ interface TestLocalization extends UmbLocalizationSetBase {
 
 //#region Localizations
 const english: TestLocalization = {
-	$code: 'en-us',
+	$code: 'en',
 	$dir: 'ltr',
 	close: 'Close',
 	logout: 'Log out',
@@ -81,16 +83,16 @@ describe('UmbLocalizeController', () => {
 
 	beforeEach(async () => {
 		umbLocalizationManager.registerManyLocalizations([english, danish, danishRegional]);
-		document.documentElement.lang = english.$code;
-		document.documentElement.dir = english.$dir;
+		document.documentElement.lang = initialLanguage;
+		document.documentElement.dir = 'ltr';
 		await aTimeout(0);
 		const host = {
 			getHostElement: () => document.createElement('div'),
-			addController: () => {},
-			removeController: () => {},
-			hasController: () => false,
-			getControllers: () => [],
-			removeControllerByAlias: () => {},
+			addUmbController: () => {},
+			removeUmbController: () => {},
+			hasUmbController: () => false,
+			getUmbControllers: () => [],
+			removeUmbControllerByAlias: () => {},
 		} satisfies UmbControllerHost;
 		controller = new UmbLocalizationController(host);
 	});
@@ -101,7 +103,7 @@ describe('UmbLocalizeController', () => {
 	});
 
 	it('should have a default language', () => {
-		expect(controller.lang()).to.equal(english.$code);
+		expect(controller.lang()).to.equal(initialLanguage);
 	});
 
 	it('should update the language when the language changes', async () => {
@@ -271,6 +273,22 @@ describe('UmbLocalizeController', () => {
 			await aTimeout(0);
 
 			expect(controller.relativeTime(2, 'days')).to.equal('om 2 dage');
+		});
+	});
+
+	describe('string', () => {
+		it('should replace words prefixed with a # with translated value', async () => {
+			const str = '#close';
+			const str2 = '#logout #close';
+			const str3 = '#logout #missing_translation_key #close';
+			expect(controller.string(str)).to.equal('Close');
+			expect(controller.string(str2)).to.equal('Log out Close');
+			expect(controller.string(str3)).to.equal('Log out #missing_translation_key Close');
+		});
+
+		it('should return the word with a # if the word is not found', async () => {
+			const str = '#missing_translation_key';
+			expect(controller.string(str)).to.equal('#missing_translation_key');
 		});
 	});
 

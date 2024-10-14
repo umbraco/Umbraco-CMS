@@ -1,18 +1,23 @@
 import { UMB_CONTENT_MENU_ALIAS } from '../../menu/manifests.js';
-import type { ManifestMenuItemTreeKind } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_DOCUMENT_RECYCLE_BIN_TREE_ALIAS } from '../tree/index.js';
 
-const menuItem: ManifestMenuItemTreeKind = {
-	type: 'menuItem',
-	kind: 'tree',
-	alias: 'Umb.MenuItem.DocumentRecycleBin',
-	name: 'Document Recycle Bin Menu Item',
-	weight: 100,
-	meta: {
-		treeAlias: 'Umb.Tree.DocumentRecycleBin',
-		label: 'Recycle Bin',
-		icon: 'icon-trash',
-		menus: [UMB_CONTENT_MENU_ALIAS],
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'menuItem',
+		kind: 'tree',
+		alias: 'Umb.MenuItem.Document.RecycleBin',
+		name: 'Document Recycle Bin Menu Item',
+		weight: 100,
+		meta: {
+			treeAlias: UMB_DOCUMENT_RECYCLE_BIN_TREE_ALIAS,
+			label: 'Recycle Bin',
+			icon: 'icon-trash',
+			menus: [UMB_CONTENT_MENU_ALIAS],
+		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.CurrentUser.AllowDocumentRecycleBin',
+			},
+		],
 	},
-};
-
-export const manifests = [menuItem];
+];

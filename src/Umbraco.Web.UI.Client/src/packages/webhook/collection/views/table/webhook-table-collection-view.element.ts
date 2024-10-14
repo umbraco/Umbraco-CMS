@@ -1,14 +1,14 @@
 import type { UmbWebhookDetailModel } from '../../../types.js';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
 
 import './column-layouts/boolean/webhook-table-boolean-column-layout.element.js';
 import './column-layouts/name/webhook-table-name-column-layout.element.js';
 import './column-layouts/entity-actions/webhook-table-entity-actions-column-layout.element.js';
+import './column-layouts/content-type/webhook-table-name-column-layout.element.js';
 
 @customElement('umb-webhook-table-collection-view')
 export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
@@ -20,21 +20,27 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableColumns: Array<UmbTableColumn> = [
 		{
-			name: 'Enabled',
+			name: this.localize.term('general_name'),
+			alias: 'name',
+			elementName: 'umb-webhook-table-name-column-layout',
+		},
+		{
+			name: this.localize.term('webhooks_enabled'),
 			alias: 'enabled',
 			elementName: 'umb-webhook-table-boolean-column-layout',
 		},
 		{
-			name: 'URL',
+			name: this.localize.term('webhooks_url'),
 			alias: 'url',
 		},
 		{
-			name: 'Events',
+			name: this.localize.term('webhooks_events'),
 			alias: 'events',
 		},
 		{
-			name: 'Types',
+			name: this.localize.term('webhooks_types'),
 			alias: 'types',
+			elementName: 'umb-webhook-table-content-type-column-layout',
 		},
 		{
 			name: '',
@@ -51,7 +57,7 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
 			this.#observeCollectionItems();
 		});
@@ -63,26 +69,31 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 	}
 
 	#createTableItems(webhooks: Array<UmbWebhookDetailModel>) {
-		this._tableItems = webhooks.map((webhook) => {
+		this._tableItems = webhooks.map((webhook, index) => {
 			return {
 				id: webhook.unique,
 				icon: 'icon-webhook',
 				data: [
 					{
-						columnAlias: 'enabled',
-						value: webhook.enabled,
+						columnAlias: 'name',
+						value: { name: `Webhook ${index + 1}`, unique: webhook.unique },
 					},
 					{
 						columnAlias: 'url',
 						value: webhook.url,
+						path: webhook.url,
+					},
+					{
+						columnAlias: 'enabled',
+						value: webhook.enabled,
 					},
 					{
 						columnAlias: 'events',
-						value: webhook.events,
+						value: webhook.events.map((event) => event.eventName).join(', ') || 'None',
 					},
 					{
 						columnAlias: 'types',
-						value: webhook.types,
+						value: { contentTypeName: webhook.events[0].eventType, contentTypes: webhook.contentTypes },
 					},
 					{
 						columnAlias: 'entityActions',
@@ -93,14 +104,13 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
 		`;
 	}
 
-	static styles = [
-		UmbTextStyles,
+	static override styles = [
 		css`
 			:host {
 				display: flex;

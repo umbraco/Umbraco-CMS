@@ -1,5 +1,5 @@
 import type { UmbStylesheetRule } from '../../../types.js';
-import type { UmbStylesheetRuleInputElement } from '../../../components/index.js';
+import type { UmbStylesheetRuleInputElement } from '../../../global-components/index.js';
 import { UmbStylesheetRuleManager } from '../../../utils/index.js';
 import { UMB_STYLESHEET_WORKSPACE_CONTEXT } from '../../stylesheet-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -54,7 +54,7 @@ export class UmbStylesheetRichTextRuleWorkspaceViewElement extends UmbLitElement
 		this.#context?.setContent(newContent);
 	}
 
-	render() {
+	override render() {
 		return html`<uui-box headline="Rich text editor styles">
 			<umb-property-layout
 				description="Define the styles that should be available in the rich text editor for this stylesheet.">
@@ -65,7 +65,7 @@ export class UmbStylesheetRichTextRuleWorkspaceViewElement extends UmbLitElement
 		</uui-box>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

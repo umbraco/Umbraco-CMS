@@ -33,7 +33,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		);
 	}
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#configureSelectionManager();
 	}
 
@@ -41,7 +41,17 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setMultiple(true);
 		this.#selectionManager.setSelectable(true);
 
+		const pickableFilter = this.data?.pickableFilter;
+
+		if (pickableFilter) {
+			this.#selectionManager.setAllowLimitation((unique) => {
+				const option = this.data?.options.find((o) => o.unique === unique);
+				return option ? pickableFilter(option) : true;
+			});
+		}
+
 		// Only display variants that are relevant to pick from, i.e. variants that are draft or published with pending changes:
+		// TODO:[NL] I would say we should change this, the act of scheduling should be equivalent to save & publishing. Resulting in content begin saved as part of carrying out the action. (But this requires a update in the workspace.)
 		this._options =
 			this.data?.options.filter(
 				(option) => option.variant && option.variant.state !== UmbDocumentVariantState.NOT_CREATED,
@@ -68,7 +78,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		return this._selection.some((s) => s.unique === unique);
 	}
 
-	render() {
+	override render() {
 		return html`<umb-body-layout headline=${this.localize.term('general_scheduledPublishing')}>
 			<p id="subtitle">
 				${when(
@@ -101,19 +111,26 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		return repeat(
 			this._options,
 			(option) => option.unique,
-			(option) => html`
-				<uui-menu-item
-					selectable
-					label=${option.variant?.name ?? option.language.name}
-					@selected=${() => this.#selectionManager.select(option.unique)}
-					@deselected=${() => this.#selectionManager.deselect(option.unique)}
-					?selected=${this.#isSelected(option.unique)}>
-					<uui-icon slot="icon" name="icon-globe"></uui-icon>
-					${UmbDocumentVariantLanguagePickerElement.renderLabel(option)}
-				</uui-menu-item>
-				${when(this.#isSelected(option.unique), () => this.#renderPublishDateInput(option))}
-			`,
+			(option) => this.#renderItem(option),
 		);
+	}
+
+	#renderItem(option: UmbDocumentVariantOptionModel) {
+		const pickable = this.data?.pickableFilter ? this.data.pickableFilter(option) : () => true;
+
+		return html`
+			<uui-menu-item
+				?selectable=${pickable}
+				?disabled=${!pickable}
+				label=${option.variant?.name ?? option.language.name}
+				@selected=${() => this.#selectionManager.select(option.unique)}
+				@deselected=${() => this.#selectionManager.deselect(option.unique)}
+				?selected=${this.#isSelected(option.unique)}>
+				<uui-icon slot="icon" name="icon-globe"></uui-icon>
+				${UmbDocumentVariantLanguagePickerElement.renderLabel(option)}
+			</uui-menu-item>
+			${when(this.#isSelected(option.unique), () => this.#renderPublishDateInput(option))}
+		`;
 	}
 
 	#renderPublishDateInput(option: UmbDocumentVariantOptionModel) {
@@ -159,7 +176,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		}
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

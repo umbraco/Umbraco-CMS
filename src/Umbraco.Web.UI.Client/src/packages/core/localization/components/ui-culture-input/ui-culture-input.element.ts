@@ -1,9 +1,9 @@
+import type { ManifestLocalization } from '../../extensions/localization.extension.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { css, html, customElement, query, state, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { ManifestLocalization } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 interface UmbCultureInputOption {
@@ -12,7 +12,7 @@ interface UmbCultureInputOption {
 }
 
 @customElement('umb-ui-culture-input')
-export class UmbUiCultureInputElement extends FormControlMixin(UmbLitElement) {
+export class UmbUiCultureInputElement extends UUIFormControlMixin(UmbLitElement, '') {
 	@state()
 	private _options: Array<UmbCultureInputOption> = [];
 
@@ -20,13 +20,13 @@ export class UmbUiCultureInputElement extends FormControlMixin(UmbLitElement) {
 	private _selectElement!: HTMLInputElement;
 
 	@property({ type: String })
-	get value() {
-		return this._value;
+	override get value() {
+		return super.value;
 	}
-	set value(value: FormDataEntryValue | FormData) {
+	override set value(value: FormDataEntryValue | FormData) {
 		if (typeof value === 'string') {
-			const oldValue = this._value;
-			this._value = value.toLowerCase();
+			const oldValue = super.value;
+			super.value = value.toLowerCase();
 			this.requestUpdate('value', oldValue);
 		}
 	}
@@ -55,31 +55,29 @@ export class UmbUiCultureInputElement extends FormControlMixin(UmbLitElement) {
 			}));
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return this._selectElement;
 	}
 
-	#onChange(event: UUIComboboxEvent) {
-		event.stopPropagation();
-		const target = event.target as UUIComboboxElement;
-
-		if (typeof target?.value === 'string') {
-			this.value = target.value;
-			this.dispatchEvent(new UmbChangeEvent());
-		}
+	#onCustomValidationChange(event: UUISelectEvent) {
+		this.value = event.target.value.toString();
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
-		return html` <uui-combobox value="${this._value}" @change=${this.#onChange}>
-			<uui-combobox-list>
-				${this._options.map(
-					(option) => html`<uui-combobox-list-option value="${option.value}">${option.name}</uui-combobox-list-option>`,
-				)}
-			</uui-combobox-list>
-		</uui-combobox>`;
+	override render() {
+		return html`
+			<uui-select
+				style="margin-top: var(--uui-size-space-1)"
+				@change=${this.#onCustomValidationChange}
+				.options=${this._options.map((e) => ({
+					name: e.name,
+					value: e.value,
+					selected: e.value == this.value,
+				}))}></uui-select>
+		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

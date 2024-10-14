@@ -23,3 +23,5 @@ export const getDisplayStateFromUserStatus = (status: UserStateModel): UmbUserDi
 			...state,
 			key: 'state' + state.key,
 		}))[0];
+
+export const TimeFormatOptions: Intl.DateTimeFormatOptions = { dateStyle: 'long', timeStyle: 'short' };

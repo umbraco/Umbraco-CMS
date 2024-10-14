@@ -1,11 +1,10 @@
 import type { UmbDisableUserDataSource } from './types.js';
-import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A server data source for disabling users
- * @export
  * @class UmbDisableUserServerDataSource
  */
 export class UmbDisableUserServerDataSource implements UmbDisableUserDataSource {
@@ -13,7 +12,7 @@ export class UmbDisableUserServerDataSource implements UmbDisableUserDataSource 
 
 	/**
 	 * Creates an instance of UmbDisableUserServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDisableUserServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -31,9 +30,9 @@ export class UmbDisableUserServerDataSource implements UmbDisableUserDataSource 
 
 		return tryExecuteAndNotify(
 			this.#host,
-			UserResource.postUserDisable({
+			UserService.postUserDisable({
 				requestBody: {
-					userIds,
+					userIds: userIds.map((id) => ({ id })),
 				},
 			}),
 		);

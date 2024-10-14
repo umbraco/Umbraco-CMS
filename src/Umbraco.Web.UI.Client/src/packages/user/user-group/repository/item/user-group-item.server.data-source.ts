@@ -1,12 +1,11 @@
 import type { UmbUserGroupItemModel } from './types.js';
 import type { UserGroupItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UserGroupResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserGroupService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A server data source for User Group items
- * @export
  * @class UmbUserGroupItemServerDataSource
  * @implements {DocumentTreeDataSource}
  */
@@ -16,7 +15,7 @@ export class UmbUserGroupItemServerDataSource extends UmbItemServerDataSourceBas
 > {
 	/**
 	 * Creates an instance of UmbUserGroupItemServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbUserGroupItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -28,7 +27,7 @@ export class UmbUserGroupItemServerDataSource extends UmbItemServerDataSourceBas
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => UserGroupResource.getItemUserGroup({ id: uniques });
+const getItems = (uniques: Array<string>) => UserGroupService.getItemUserGroup({ id: uniques });
 
 const mapper = (item: UserGroupItemResponseModel): UmbUserGroupItemModel => {
 	return {

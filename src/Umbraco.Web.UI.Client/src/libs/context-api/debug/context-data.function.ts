@@ -1,14 +1,13 @@
 /* eslint-disable no-case-declarations */
 /**
  * Change the collection of Contexts into a simplified array of data
- *
  * @param contexts This is a map of the collected contexts from umb-debug
  * @returns An array of simplified context data
  */
-export function contextData(contexts: Map<any, any>): Array<DebugContextData> {
-	const contextData = new Array<DebugContextData>();
+export function contextData(contexts: Map<any, any>): Array<UmbDebugContextData> {
+	const contextData = new Array<UmbDebugContextData>();
 	for (const [alias, instance] of contexts) {
-		const data: DebugContextItemData = contextItemData(instance);
+		const data = contextItemData(instance);
 		contextData.push({ alias: alias, type: typeof instance, data });
 	}
 	return contextData;
@@ -16,12 +15,11 @@ export function contextData(contexts: Map<any, any>): Array<DebugContextData> {
 
 /**
  * Used to find the methods and properties of a context
- *
  * @param contextInstance The instance of the context
  * @returns A simplied object contain the properties and methods of the context
  */
-function contextItemData(contextInstance: any): DebugContextItemData {
-	let contextItemData: DebugContextItemData = { type: 'unknown' };
+function contextItemData(contextInstance: any): UmbDebugContextItemData {
+	let contextItemData: UmbDebugContextItemData = { type: 'unknown' };
 
 	if (typeof contextInstance === 'function') {
 		contextItemData = { ...contextItemData, type: 'function' };
@@ -50,7 +48,7 @@ function contextItemData(contextInstance: any): DebugContextItemData {
 
 					case 'object':
 						// Check if the object is an observable (by checking if it has a subscribe method/function)
-						const isSubscribeLike = 'subscribe' in value && typeof value['subscribe'] === 'function';
+						const isSubscribeLike = value && 'subscribe' in value && typeof value['subscribe'] === 'function';
 						const isWebComponent = value instanceof HTMLElement;
 
 						let valueToDisplay = 'Complex Object';
@@ -59,7 +57,7 @@ function contextItemData(contextInstance: any): DebugContextItemData {
 
 							valueToDisplay = `Web Component <${tagName}>`;
 						} else if (isSubscribeLike) {
-							valueToDisplay = 'Subscribable';
+							valueToDisplay = 'Observable';
 						}
 
 						props.push({ key: key, type: typeof value, value: valueToDisplay });
@@ -71,7 +69,7 @@ function contextItemData(contextInstance: any): DebugContextItemData {
 				}
 			}
 
-			contextItemData = { ...contextItemData, properties: props };
+			contextItemData = { ...contextItemData, properties: props.sort((a, b) => a.key.localeCompare(b.key)) };
 		}
 	} else {
 		contextItemData = { ...contextItemData, type: 'primitive', value: contextInstance };
@@ -82,8 +80,8 @@ function contextItemData(contextInstance: any): DebugContextItemData {
 
 /**
  * Gets a list of methods from a class
- *
- * @param klass The class to get the methods from
+ * @param class The class to get the methods from
+ * @param klass
  * @returns An array of method names as strings
  */
 function getClassMethodNames(klass: any) {
@@ -98,64 +96,58 @@ function getClassMethodNames(klass: any) {
 
 	const allMethods =
 		typeof klass.prototype === 'undefined' ? distinctDeepFunctions(klass) : Object.getOwnPropertyNames(klass.prototype);
-	return allMethods.filter((name: any) => name !== 'constructor' && !name.startsWith('_'));
+	return allMethods.filter((name: any) => name !== 'constructor' && !name.startsWith('_')).sort();
 }
 
-export interface DebugContextData {
+export interface UmbDebugContextData {
 	/**
 	 * The alias of the context
-	 *
 	 * @type {string}
-	 * @memberof DebugContextData
+	 * @memberof UmbDebugContextData
 	 */
 	alias: string;
 
 	/**
 	 * The type of the context such as object or string
-	 *
 	 * @type {("string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function")}
-	 * @memberof DebugContextData
+	 * @memberof UmbDebugContextData
 	 */
 	type: 'string' | 'number' | 'bigint' | 'boolean' | 'symbol' | 'undefined' | 'object' | 'function';
 
 	/**
 	 * Data about the context that includes method and property names
-	 *
-	 * @type {DebugContextItemData}
-	 * @memberof DebugContextData
+	 * @type {UmbDebugContextItemData}
+	 * @memberof UmbDebugContextData
 	 */
-	data: DebugContextItemData;
+	data: UmbDebugContextItemData;
 }
 
-export interface DebugContextItemData {
+export interface UmbDebugContextItemData {
 	type: string;
 	methods?: Array<unknown>;
-	properties?: Array<DebugContextItemPropertyData>;
+	properties?: Array<UmbDebugContextItemPropertyData>;
 	value?: unknown;
 }
 
-export interface DebugContextItemPropertyData {
+export interface UmbDebugContextItemPropertyData {
 	/**
 	 * The name of the property
-	 *
 	 * @type {string}
-	 * @memberof DebugContextItemPropertyData
+	 * @memberof UmbDebugContextItemPropertyData
 	 */
 	key: string;
 
 	/**
 	 * The type of the property's value such as string or number
-	 *
 	 * @type {("string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function")}
-	 * @memberof DebugContextItemPropertyData
+	 * @memberof UmbDebugContextItemPropertyData
 	 */
 	type: 'string' | 'number' | 'bigint' | 'boolean' | 'symbol' | 'undefined' | 'object' | 'function';
 
 	/**
 	 * Simple types such as string or number can have their value displayed stored inside the property
-	 *
 	 * @type {("string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function")}
-	 * @memberof DebugContextItemPropertyData
+	 * @memberof UmbDebugContextItemPropertyData
 	 */
 	value?: unknown;
 }

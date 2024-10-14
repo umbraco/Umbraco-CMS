@@ -1,8 +1,8 @@
 import { UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS, UMB_DICTIONARY_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
-import type { ManifestModal, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as moveManifests } from './move-to/manifests.js';
 
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
@@ -13,17 +13,8 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
-			label: 'Create',
-		},
-	},
-	{
-		type: 'entityAction',
-		kind: 'move',
-		alias: 'Umb.EntityAction.Dictionary.Move',
-		name: 'Move Dictionary Entity Action',
-		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
-		meta: {
-			moveRepositoryAlias: UMB_DICTIONARY_ITEM_REPOSITORY_ALIAS,
+			label: '#general_create',
+			additionalOptions: true,
 		},
 	},
 	{
@@ -36,7 +27,8 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-download-alt',
-			label: 'Export',
+			label: '#actions_export',
+			additionalOptions: true,
 		},
 	},
 	{
@@ -49,7 +41,8 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-page-up',
-			label: 'Import',
+			label: '#actions_import',
+			additionalOptions: true,
 		},
 	},
 	{
@@ -63,9 +56,6 @@ const entityActions: Array<ManifestTypes> = [
 			detailRepositoryAlias: UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS,
 		},
 	},
-];
-
-const modals: Array<ManifestModal> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.Dictionary.Export',
@@ -78,6 +68,5 @@ const modals: Array<ManifestModal> = [
 		name: 'Import Dictionary Modal',
 		element: () => import('./import/import-dictionary-modal.element.js'),
 	},
+	...moveManifests,
 ];
-
-export const manifests = [...entityActions, ...modals];

@@ -1,5 +1,5 @@
-import type { Meta, Story } from '@storybook/web-components';
 import type { UmbPropertyEditorConfigElement } from './property-editor-config.element.js';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-config.element.js';
@@ -17,7 +17,7 @@ const data = [
 	},
 ];
 
-export const AAAOverview: Story<UmbPropertyEditorConfigElement> = () =>
+export const AAAOverview: StoryFn<UmbPropertyEditorConfigElement> = () =>
 	html`<umb-property-editor-config
 		property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"
 		.data="${data}"></umb-property-editor-config>`;

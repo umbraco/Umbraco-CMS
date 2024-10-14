@@ -1,6 +1,7 @@
 import type { UmbDictionaryCollectionModel } from '../../types.js';
+import { UMB_EDIT_DICTIONARY_WORKSPACE_PATH_PATTERN } from '../../../workspace/paths.js';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -32,7 +33,7 @@ export class UmbDictionaryTableCollectionViewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
 			this.#observeCollectionItems();
 		});
@@ -74,17 +75,17 @@ export class UmbDictionaryTableCollectionViewElement extends UmbLitElement {
 
 	#createTableItems(dictionaries: Array<UmbDictionaryCollectionModel>, languages: Array<UmbLanguageDetailModel>) {
 		this._tableItems = dictionaries.map((dictionary) => {
+			const editPath = UMB_EDIT_DICTIONARY_WORKSPACE_PATH_PATTERN.generateAbsolute({
+				unique: dictionary.unique,
+			});
+
 			return {
 				id: dictionary.unique,
 				icon: 'icon-book-alt-2',
 				data: [
 					{
 						columnAlias: 'name',
-						value: html`<a
-							style="font-weight:bold"
-							href="section/dictionary/workspace/dictionary/edit/${dictionary.unique}">
-							${dictionary.name}</a
-						> `,
+						value: html`<a style="font-weight:bold" href=${editPath}> ${dictionary.name}</a> `,
 					},
 					...languages.map((language) => {
 						return {
@@ -113,13 +114,13 @@ export class UmbDictionaryTableCollectionViewElement extends UmbLitElement {
 			style="color:var(--uui-color-danger-standalone);display:inline-block"></uui-icon>`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -1,9 +1,11 @@
 import { getDisplayStateFromUserStatus } from '../../../utils.js';
 import type { UmbUserCollectionContext } from '../../user-collection.context.js';
 import type { UmbUserDetailModel } from '../../../types.js';
+import { UMB_USER_COLLECTION_CONTEXT } from '../../user-collection.context-token.js';
+import { UMB_USER_WORKSPACE_PATH } from '../../../paths.js';
+import { UmbUserKind } from '../../../utils/index.js';
 import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbUserGroupDetailModel } from '@umbraco-cms/backoffice/user-group';
@@ -29,8 +31,8 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
-			this.#collectionContext = instance as UmbUserCollectionContext;
+		this.consumeContext(UMB_USER_COLLECTION_CONTEXT, (instance) => {
+			this.#collectionContext = instance;
 			this.observe(
 				this.#collectionContext.selection.selection,
 				(selection) => (this._selection = selection),
@@ -50,12 +52,6 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 		this._loading = false;
 	}
 
-	//TODO How should we handle url stuff?
-	private _handleOpenCard(unique: string) {
-		//TODO this will not be needed when cards works as links with href
-		history.pushState(null, '', 'section/user-management/view/users/user/edit/' + unique); //TODO Change to a tag with href and make dynamic
-	}
-
 	#onSelect(user: UmbUserDetailModel) {
 		this.#collectionContext?.selection.select(user.unique ?? '');
 	}
@@ -64,8 +60,8 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 		this.#collectionContext?.selection.deselect(user.unique ?? '');
 	}
 
-	render() {
-		if (this._loading) nothing;
+	override render() {
+		if (this._loading) return nothing;
 		return html`
 			<div id="user-grid">
 				${repeat(
@@ -78,43 +74,24 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	}
 
 	#renderUserCard(user: UmbUserDetailModel) {
-		const avatarUrls = [
-			{
-				scale: '1x',
-				url: user.avatarUrls?.[0],
-			},
-			{
-				scale: '2x',
-				url: user.avatarUrls?.[1],
-			},
-			{
-				scale: '3x',
-				url: user.avatarUrls?.[2],
-			},
-		];
-
-		let avatarSrcset = '';
-
-		avatarUrls.forEach((url) => {
-			avatarSrcset += `${url.url} ${url.scale},`;
-		});
+		const href = UMB_USER_WORKSPACE_PATH + '/edit/' + user.unique;
 
 		return html`
 			<uui-card-user
 				.name=${user.name ?? 'Unnamed user'}
+				href=${href}
 				selectable
 				?select-only=${this._selection.length > 0}
 				?selected=${this.#collectionContext?.selection.isSelected(user.unique)}
-				@open=${() => this._handleOpenCard(user.unique)}
 				@selected=${() => this.#onSelect(user)}
 				@deselected=${() => this.#onDeselect(user)}>
 				${this.#renderUserTag(user)} ${this.#renderUserGroupNames(user)} ${this.#renderUserLoginDate(user)}
-
-				<uui-avatar
+				<umb-user-avatar
 					slot="avatar"
-					.name=${user.name || 'Unknown'}
-					img-src=${ifDefined(user.avatarUrls.length > 0 ? avatarUrls[0].url : undefined)}
-					img-srcset=${ifDefined(user.avatarUrls.length > 0 ? avatarSrcset : undefined)}></uui-avatar>
+					.name=${user.name}
+					.kind=${user.kind}
+					.imgUrls=${user.avatarUrls}
+					style="font-size: 1.6rem;"></umb-user-avatar>
 			</uui-card-user>
 		`;
 	}
@@ -136,7 +113,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 
 	#renderUserGroupNames(user: UmbUserDetailModel) {
 		const userGroupNames = this.#userGroups
-			.filter((userGroup) => user.userGroupUniques?.includes(userGroup.unique))
+			.filter((userGroup) => user.userGroupUniques?.map((reference) => reference.unique).includes(userGroup.unique))
 			.map((userGroup) => userGroup.name)
 			.join(', ');
 
@@ -144,17 +121,22 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	}
 
 	#renderUserLoginDate(user: UmbUserDetailModel) {
+		if (user.kind === UmbUserKind.API) return nothing;
+
 		if (!user.lastLoginDate) {
 			return html`<div class="user-login-time">${`${user.name} ${this.localize.term('user_noLogin')}`}</div>`;
 		}
+		const lastLoggedinLocalTime: Date = new Date(user.lastLoginDate);
+		const formattedTime = lastLoggedinLocalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
 		return html`<div class="user-login-time">
-			<umb-localize key="user_lastLogin"></umb-localize><br />
+			<umb-localize key="user_lastLogin"></umb-localize>
 			${this.localize.date(user.lastLoginDate)}
+			${formattedTime}
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
@@ -171,6 +153,8 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 			uui-card-user {
 				width: 100%;
 				height: 180px;
+				justify-content: normal;
+				padding-top: var(--uui-size-space-5);
 			}
 
 			.user-login-time {

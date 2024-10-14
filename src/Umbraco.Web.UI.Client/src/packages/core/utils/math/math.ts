@@ -1,46 +1,12 @@
-/**
- * Clamps a value to be within a specified range defined by a minimum and maximum value.
- *
- * @param {number} value - The value to be clamped.
- * @param {number} min - The minimum value allowed in the range.
- * @param {number} max - The maximum value allowed in the range.
- *
- * @returns {number} The clamped value, which is limited to the range between `min` and `max`.
- *   - If `value` is less than `min`, it is set to `min`.
- *   - If `value` is greater than `max`, it is set to `max`.
- *   - If `value` is already within the range [min, max], it remains unchanged.
- *
- * @example
- * // Clamp a value to ensure it falls within a specific range.
- * const inputValue = 15;
- * const minValue = 10;
- * const maxValue = 20;
- * const result = clamp(inputValue, minValue, maxValue);
- * // result is 15, as it falls within the range [minValue, maxValue].
- *
- * // Clamp a value that is outside the specified range.
- * const outsideValue = 5;
- * const result2 = clamp(outsideValue, minValue, maxValue);
- * // result2 is 10, as it's clamped to the minimum value (minValue).
- *
- * // Clamp a value that exceeds the maximum limit.
- * const exceedingValue = 25;
- * const result3 = clamp(exceedingValue, minValue, maxValue);
- * // result3 is 20, as it's clamped to the maximum value (maxValue).
- */
-export function clamp(value: number, min: number, max: number): number {
-	return Math.min(Math.max(value, min), max);
-}
+import { clamp } from '@umbraco-cms/backoffice/external/uui';
+export { clamp };
 
 /**
  * Performs linear interpolation (lerp) between two numbers based on a blending factor.
- *
  * @param {number} start - The starting value.
  * @param {number} end - The ending value.
  * @param {number} alpha - The blending factor, clamped to the range [0, 1].
- *
  * @returns {number} The result of linear interpolation between `start` and `end` using `alpha`.
- *
  * @example
  * // Interpolate between two values.
  * const value1 = 10;
@@ -69,17 +35,14 @@ export function lerp(start: number, end: number, alpha: number): number {
  * The inverse lerp factor indicates where the given `value` falls between `start` and `end`.
  *
  * If `value` is equal to `start`, the function returns 0. If `value` is equal to `end`, the function returns 1.
- *
  * @param {number} start - The starting value.
  * @param {number} end - The ending value.
  * @param {number} value - The value to calculate the inverse lerp factor for.
- *
  * @returns {number} The inverse lerp factor, a value in the range [0, 1], indicating where `value` falls between `start` and `end`.
  *   - If `start` and `end` are equal, the function returns 0.
  *   - If `value` is less than `start`, the factor is less than 0, indicating it's before `start`.
  *   - If `value` is greater than `end`, the factor is greater than 1, indicating it's after `end`.
  *   - If `value` is between `start` and `end`, the factor is between 0 and 1, indicating where `value` is along that range.
- *
  * @example
  * // Calculate the inverse lerp factor for a value between two points.
  * const startValue = 10;
@@ -103,12 +66,9 @@ export function inverseLerp(start: number, end: number, value: number): number {
 
 /**
  * Calculates the absolute difference between two numbers.
- *
  * @param {number} a - The first number.
  * @param {number} b - The second number.
- *
  * @returns {number} The absolute difference between `a` and `b`.
- *
  * @example
  * // Calculate the distance between two points on a number line.
  * const point1 = 5;
@@ -128,14 +88,11 @@ export function distance(a: number, b: number): number {
 
 /**
  * Calculates the extrapolated final value based on an initial value and an increase factor.
- *
  * @param {number} initialValue - The starting value.
  * @param {number} increaseFactor - The factor by which the value should increase
  *   (must be in the range [0(inclusive), 1(exclusive)] where 0 means no increase and 1 means no limit).
- *
  * @returns {number} The extrapolated final value.
  *   Returns NaN if the increase factor is not within the valid range.
- *
  * @example
  * // Valid input
  * const result = calculateExtrapolatedValue(100, 0.2);

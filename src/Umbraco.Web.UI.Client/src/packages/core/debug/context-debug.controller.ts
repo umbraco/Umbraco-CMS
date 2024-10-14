@@ -8,7 +8,7 @@ export class UmbContextDebugController extends UmbControllerBase {
 		super(host);
 	}
 
-	hostConnected(): void {
+	override hostConnected(): void {
 		super.hostConnected();
 		// Maybe this could be part of the context-api? When we create a new root, we could attach the debugger to it?
 		// Listen for the debug event from the <umb-debug> component
@@ -39,7 +39,7 @@ export class UmbContextDebugController extends UmbControllerBase {
 		this.getHostElement().dispatchEvent(new CustomEvent('umb:debug-contexts:data', { detail: data, bubbles: true }));
 	};
 
-	hostDisconnected(): void {
+	override hostDisconnected(): void {
 		super.hostDisconnected();
 		this.getHostElement().removeEventListener(
 			UMB_DEBUG_CONTEXT_EVENT_TYPE,

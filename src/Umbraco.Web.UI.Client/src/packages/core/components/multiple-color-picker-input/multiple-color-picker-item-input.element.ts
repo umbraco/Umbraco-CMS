@@ -7,20 +7,21 @@ import {
 	query,
 	ifDefined,
 	state,
+	when,
 } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIColorPickerElement, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent, UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIColorPickerElement, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * @element umb-multiple-color-picker-item-input
  */
 @customElement('umb-multiple-color-picker-item-input')
-export class UmbMultipleColorPickerItemInputElement extends FormControlMixin(UmbLitElement) {
+export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(UmbLitElement, '') {
 	@property({ type: String })
-	public set value(value: string) {
+	public override set value(value: string) {
 		if (value.startsWith('#')) {
 			this._valueHex = value;
 			super.value = value.substring(1);
@@ -29,7 +30,7 @@ export class UmbMultipleColorPickerItemInputElement extends FormControlMixin(Umb
 			this._valueHex = `#${value}`;
 		}
 	}
-	public get value() {
+	public override get value() {
 		return super.value as string;
 	}
 
@@ -64,7 +65,7 @@ export class UmbMultipleColorPickerItemInputElement extends FormControlMixin(Umb
 	protected _colorPicker!: UUIColorPickerElement;
 
 	@property({ type: Boolean })
-	showLabels = true;
+	showLabels = false;
 
 	async #onDelete() {
 		await umbConfirmModal(this, {
@@ -83,10 +84,23 @@ export class UmbMultipleColorPickerItemInputElement extends FormControlMixin(Umb
 		this.dispatchEvent(new UmbInputEvent());
 	}
 
+	#onLabelKeydown(event: KeyboardEvent) {
+		event.stopPropagation();
+		const target = event.currentTarget as UUIInputElement;
+		if (event.key === 'Enter' && target.value) {
+			this.dispatchEvent(new CustomEvent('enter'));
+		}
+	}
+
 	#onLabelChange(event: UUIInputEvent) {
 		event.stopPropagation();
 		this.label = event.target.value as string;
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	#onValueKeydown(event: KeyboardEvent) {
+		event.stopPropagation();
+		if (event.key === 'Enter') this.#onColorClick();
 	}
 
 	#onValueChange(event: UUIInputEvent) {
@@ -101,7 +115,7 @@ export class UmbMultipleColorPickerItemInputElement extends FormControlMixin(Umb
 		this.dispatchEvent(new UmbInputEvent());
 	}
 
-	#onColorInput(event: InputEvent) {
+	#onColorChange(event: Event) {
 		event.stopPropagation();
 		this.value = this._colorPicker.value;
 		this.dispatchEvent(new UmbChangeEvent());
@@ -117,12 +131,12 @@ export class UmbMultipleColorPickerItemInputElement extends FormControlMixin(Umb
 		event.stopPropagation();
 	}
 
-	public async focus() {
+	public override async focus() {
 		await this.updateComplete;
 		this._input?.focus();
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
@@ -130,10 +144,10 @@ export class UmbMultipleColorPickerItemInputElement extends FormControlMixin(Umb
 		this._colorPicker.click();
 	}
 
-	render() {
+	override render() {
 		//TODO: Using native input=color element instead of uui-color-picker due to its huge size and bad adaptability as a pop up
 		return html`
-			<uui-form-validation-message id="validation-message" @invalid=${this.#onInvalid} @valid=${this.#onValid}>
+			<umb-form-validation-message id="validation-message" @invalid=${this.#onInvalid} @valid=${this.#onValid}>
 				<div id="item">
 					${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-navigation"></uui-icon>`}
 					<div class="color-wrapper">
@@ -142,45 +156,53 @@ export class UmbMultipleColorPickerItemInputElement extends FormControlMixin(Umb
 							value=${this.value}
 							label=${this.localize.term('general_value')}
 							placeholder=${this.localize.term('general_value')}
-							@input="${this.#onValueInput}"
-							@change="${this.#onValueChange}"
-							required="${this.required}"
-							required-message="Value is missing">
+							required=${this.required}
+							required-message="Value is missing"
+							@keydown=${this.#onValueKeydown}
+							@input=${this.#onValueInput}
+							@change=${this.#onValueChange}>
 							<uui-color-swatch
 								slot="prepend"
 								label=${this.value}
-								value="${this._valueHex}"
+								value=${this._valueHex}
 								@click=${this.#onColorClick}></uui-color-swatch>
 						</uui-input>
-						<input aria-hidden="${true}" type="color" id="color" value=${this.value} @input=${this.#onColorInput} />
+						<input aria-hidden="${true}" type="color" id="color" value=${this.value} @change=${this.#onColorChange} />
 					</div>
-					${this.showLabels
-						? html` <uui-input
+					${when(
+						this.showLabels,
+						() => html`
+							<uui-input
 								label=${this.localize.term('placeholders_label')}
 								placeholder=${this.localize.term('placeholders_label')}
 								value=${ifDefined(this.label)}
+								@keydown=${this.#onLabelKeydown}
 								@input="${this.#onLabelInput}"
 								@change="${this.#onLabelChange}"
 								?disabled=${this.disabled}
-								?readonly=${this.readonly}></uui-input>`
-						: nothing}
-					${this.readonly
-						? nothing
-						: html`<uui-button
-								label="${this.localize.term('actions_delete')} ${this.value}"
-								look="primary"
+								?readonly=${this.readonly}></uui-input>
+						`,
+					)}
+					${when(
+						!this.readonly,
+						() => html`
+							<uui-button
+								compact
 								color="danger"
-								@click="${this.#onDelete}"
+								label=${this.localize.term('actions_delete')}
+								look="primary"
 								?disabled=${this.disabled}
-								compact>
+								@click=${this.#onDelete}>
 								<uui-icon name="icon-trash"></uui-icon>
-						  </uui-button>`}
+							</uui-button>
+						`,
+					)}
 				</div>
-			</uui-form-validation-message>
+			</umb-form-validation-message>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;
@@ -201,6 +223,12 @@ export class UmbMultipleColorPickerItemInputElement extends FormControlMixin(Umb
 
 			uui-color-swatch {
 				padding: var(--uui-size-1);
+			}
+
+			uui-color-swatch:focus-within {
+				outline: 2px solid var(--uui-color-selected);
+				outline-offset: 0;
+				border-radius: var(--uui-border-radius);
 			}
 
 			.color-wrapper {

@@ -1,5 +1,5 @@
-import { expect } from '@open-wc/testing';
 import { appendFileExtensionIfNeeded } from './append-file-extension.function.js';
+import { expect } from '@open-wc/testing';
 
 describe('append-file-extension-if-needed', () => {
 	it('should append extension if not present', () => {

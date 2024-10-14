@@ -1,15 +1,16 @@
 import type { UmbDataTypeCollectionFilterModel } from '../types.js';
 import type { UmbDataTypeItemModel } from '../../repository/index.js';
+import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { DataTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { type ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * A data source that fetches the data-type collection data from the server.
- * @export
  * @class UmbDataTypeCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */
@@ -19,7 +20,7 @@ export class UmbDataTypeCollectionServerDataSource implements UmbCollectionDataS
 
 	/**
 	 * Creates an instance of UmbDataTypeCollectionServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @DataTypeof UmbDataTypeCollectionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -35,11 +36,11 @@ export class UmbDataTypeCollectionServerDataSource implements UmbCollectionDataS
 	/**
 	 * Gets the DataType collection filtered by the given filter.
 	 * @param {UmbDataTypeCollectionFilterModel} filter
-	 * @return {*}
+	 * @returns {*}
 	 * @DataTypeof UmbDataTypeCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbDataTypeCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(this.#host, DataTypeResource.getFilterDataType(filter));
+		const { data, error } = await tryExecuteAndNotify(this.#host, DataTypeService.getFilterDataType(filter));
 
 		if (error) {
 			return { error };
@@ -53,8 +54,10 @@ export class UmbDataTypeCollectionServerDataSource implements UmbCollectionDataS
 
 		const mappedItems: Array<UmbDataTypeItemModel> = items.map((item: DataTypeItemResponseModel) => {
 			const dataTypeDetail: UmbDataTypeItemModel = {
+				entityType: UMB_DATA_TYPE_ENTITY_TYPE,
 				unique: item.id,
 				name: item.name,
+				propertyEditorSchemaAlias: item.editorAlias,
 				propertyEditorUiAlias: item.editorUiAlias!,
 				icon: this.#manifestPropertyEditorUis.find((ui) => ui.alias === item.editorUiAlias!)?.meta.icon,
 			};

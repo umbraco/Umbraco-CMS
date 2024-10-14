@@ -1,7 +1,7 @@
-import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from '../../context/block-grid-manager.context.js';
+import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from '../../context/block-grid-manager.context-token.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_BLOCK_GRID_ENTRY_CONTEXT, type UmbBlockGridTypeAreaType } from '@umbraco-cms/backoffice/block-grid';
 import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_BLOCK_GRID_ENTRY_CONTEXT, type UmbBlockGridTypeAreaType } from '@umbraco-cms/backoffice/block-grid';
 
 import '../block-grid-entries/index.js';
 /**
@@ -12,7 +12,8 @@ import '../block-grid-entries/index.js';
 @customElement('umb-block-grid-areas-container')
 export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 	//
-	#styleElement?: HTMLLinkElement;
+	@state()
+	_styleElement?: HTMLLinkElement;
 
 	@state()
 	_areas?: Array<UmbBlockGridTypeAreaType> = [];
@@ -44,18 +45,20 @@ export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 			this.observe(
 				manager.layoutStylesheet,
 				(stylesheet) => {
-					this.#styleElement = document.createElement('link');
-					this.#styleElement.setAttribute('rel', 'stylesheet');
-					this.#styleElement.setAttribute('href', stylesheet);
+					// Do not re-render stylesheet if its the same href.
+					if (!stylesheet || this._styleElement?.href === stylesheet) return;
+					this._styleElement = document.createElement('link');
+					this._styleElement.rel = 'stylesheet';
+					this._styleElement.href = stylesheet;
 				},
 				'observeStylesheet',
 			);
 		});
 	}
 
-	render() {
+	override render() {
 		return this._areas && this._areas.length > 0
-			? html` ${this.#styleElement}
+			? html` ${this._styleElement}
 					<div
 						class="umb-block-grid__area-container"
 						style="--umb-block-grid--area-grid-columns: ${this._areaGridColumns}">
@@ -73,7 +76,7 @@ export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 			: '';
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

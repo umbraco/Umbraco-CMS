@@ -1,18 +1,13 @@
+import type { ManifestSectionView, UmbSectionViewElement } from '../extensions/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
-import type {
-	ManifestDashboard,
-	ManifestSectionView,
-	UmbDashboardElement,
-	UmbSectionViewElement,
-} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestDashboard, UmbDashboardElement } from '@umbraco-cms/backoffice/dashboard';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { pathFolderName } from '@umbraco-cms/backoffice/utils';
 
-// TODO: this might need a new name, since it's both views and dashboards
 @customElement('umb-section-main-views')
 export class UmbSectionMainViewElement extends UmbLitElement {
 	@property({ type: String, attribute: 'section-alias' })
@@ -48,12 +43,12 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 	}
 
 	#constructDashboardPath(manifest: ManifestDashboard) {
-		const dashboardName = manifest.meta.label ?? manifest.name;
+		const dashboardName = manifest.meta.label ?? manifest.name ?? manifest.alias;
 		return 'dashboard/' + (manifest.meta.pathname ? manifest.meta.pathname : pathFolderName(dashboardName));
 	}
 
 	#constructViewPath(manifest: ManifestSectionView) {
-		const viewName = manifest.meta.label ?? manifest.name;
+		const viewName = manifest.meta.label ?? manifest.name ?? manifest.alias;
 		return 'view/' + (manifest.meta.pathname ? manifest.meta.pathname : pathFolderName(viewName));
 	}
 
@@ -79,10 +74,18 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 		});
 
 		const routes = [...dashboardRoutes, ...viewRoutes];
-		this._routes = routes?.length > 0 ? [...routes, { path: '', redirectTo: routes?.[0]?.path }] : [];
+		if (routes.length > 0) {
+			routes.push({ path: '', redirectTo: routes?.[0]?.path });
+
+			routes.push({
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+			});
+		}
+		this._routes = routes;
 	}
 
-	render() {
+	override render() {
 		return this._routes.length > 0
 			? html`
 					<umb-body-layout main-no-padding>
@@ -97,8 +100,8 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 							}}>
 						</umb-router-slot>
 					</umb-body-layout>
-			  `
-			: html`${nothing}`;
+				`
+			: nothing;
 	}
 
 	#renderDashboards() {
@@ -107,18 +110,19 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			? html`
 					<uui-tab-group slot="header" id="dashboards">
 						${this._dashboards.map((dashboard) => {
-							const dashboardName = dashboard.meta.label ?? dashboard.name;
 							const dashboardPath = this.#constructDashboardPath(dashboard);
 							return html`
 								<uui-tab
 									href="${this._routerPath}/${dashboardPath}"
-									label="${dashboardName}"
+									label="${dashboard.meta.label
+										? this.localize.string(dashboard.meta.label)
+										: (dashboard.name ?? dashboard.alias)}"
 									?active="${this._activePath === dashboardPath}"></uui-tab>
 							`;
 						})}
 					</uui-tab-group>
-			  `
-			: '';
+				`
+			: nothing;
 	}
 
 	#renderViews() {
@@ -127,7 +131,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			? html`
 					<uui-tab-group slot="navigation" id="views">
 						${this._views.map((view) => {
-							const viewName = view.meta.label ?? view.name;
+							const viewName = view.meta.label ? this.localize.string(view.meta.label) : (view.name ?? view.alias);
 							const viewPath = this.#constructViewPath(view);
 							return html`
 								<uui-tab
@@ -140,11 +144,11 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 							`;
 						})}
 					</uui-tab-group>
-			  `
-			: '';
+				`
+			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

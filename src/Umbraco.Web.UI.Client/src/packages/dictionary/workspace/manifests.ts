@@ -1,63 +1,54 @@
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import type {
-	ManifestWorkspaces,
-	ManifestWorkspaceActions,
-	ManifestWorkspaceView,
-} from '@umbraco-cms/backoffice/extension-registry';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
-const workspace: ManifestWorkspaces = {
-	type: 'workspace',
-	kind: 'routable',
-	alias: 'Umb.Workspace.Dictionary',
-	name: 'Dictionary Workspace',
-	api: () => import('./dictionary-workspace.context.js'),
-	meta: {
-		entityType: UMB_DICTIONARY_ENTITY_TYPE,
+export const UMB_DICTIONARY_WORKSPACE_ALIAS = 'Umb.Workspace.Dictionary';
+
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'workspace',
+		kind: 'routable',
+		alias: UMB_DICTIONARY_WORKSPACE_ALIAS,
+		name: 'Dictionary Workspace',
+		api: () => import('./dictionary-workspace.context.js'),
+		meta: {
+			entityType: UMB_DICTIONARY_ENTITY_TYPE,
+		},
 	},
-};
-
-const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Dictionary.Edit',
 		name: 'Dictionary Workspace Edit View',
-		js: () => import('./views/workspace-view-dictionary-editor.element.js'),
+		element: () => import('./views/workspace-view-dictionary-editor.element.js'),
 		weight: 100,
 		meta: {
-			label: 'Edit',
+			label: '#general_edit',
 			pathname: 'edit',
 			icon: 'edit',
 		},
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				match: UMB_DICTIONARY_WORKSPACE_ALIAS,
 			},
 		],
 	},
-];
-
-const workspaceActions: Array<ManifestWorkspaceActions> = [
 	{
 		type: 'workspaceAction',
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Dictionary.Save',
 		name: 'Save Dictionary Workspace Action',
 		weight: 90,
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Save',
+			label: '#buttons_save',
 			look: 'primary',
 			color: 'positive',
 		},
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: 'Umb.Workspace.Dictionary',
+				match: UMB_DICTIONARY_WORKSPACE_ALIAS,
 			},
 		],
 	},
 ];
-
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions];

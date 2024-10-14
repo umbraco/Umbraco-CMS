@@ -1,6 +1,6 @@
 import { UMB_TEMPLATE_TREE_ALIAS } from '../tree/index.js';
 
-export const manifests = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menuItem',
 		kind: 'tree',

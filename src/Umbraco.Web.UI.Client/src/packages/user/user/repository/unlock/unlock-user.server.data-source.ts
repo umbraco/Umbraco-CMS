@@ -1,11 +1,10 @@
 import type { UmbUnlockUserDataSource } from './types.js';
-import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A server data source for unlocking users
- * @export
  * @class UmbUnlockUserServerDataSource
  */
 export class UmbUnlockUserServerDataSource implements UmbUnlockUserDataSource {
@@ -13,7 +12,7 @@ export class UmbUnlockUserServerDataSource implements UmbUnlockUserDataSource {
 
 	/**
 	 * Creates an instance of UmbUnlockUserServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbUnlockUserServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -31,9 +30,9 @@ export class UmbUnlockUserServerDataSource implements UmbUnlockUserDataSource {
 
 		return tryExecuteAndNotify(
 			this.#host,
-			UserResource.postUserUnlock({
+			UserService.postUserUnlock({
 				requestBody: {
-					userIds,
+					userIds: userIds.map((id) => ({ id })),
 				},
 			}),
 		);

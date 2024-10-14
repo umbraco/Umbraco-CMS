@@ -6,7 +6,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbInputCollectionConfigurationElement } from '@umbraco-cms/backoffice/components';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-media-type-workspace-view-structure')
@@ -20,7 +20,7 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 	private _allowedContentTypeIDs?: Array<string>;
 
 	@state()
-	private _collection?: string | null;
+	private _collection?: string;
 
 	constructor() {
 		super();
@@ -62,7 +62,7 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 		);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box headline=${this.localize.term('contentTypeEditor_structure')}>
 				<umb-property-layout alias="Root" label=${this.localize.term('contentTypeEditor_allowAtRootHeading')}>
@@ -82,10 +82,8 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 						<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
 						<umb-input-media-type
 							.selection=${this._allowedContentTypeIDs ?? []}
-							@change="${(e: CustomEvent) => {
-								const sortedContentTypesList: Array<UmbContentTypeSortModel> = (
-									e.target as UmbInputMediaTypeElement
-								).selection.map((id, index) => ({
+							@change="${(e: CustomEvent & { target: UmbInputMediaTypeElement }) => {
+								const sortedContentTypesList: Array<UmbContentTypeSortModel> = e.target.selection.map((id, index) => ({
 									contentType: { unique: id },
 									sortOrder: index,
 								}));
@@ -101,7 +99,7 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 					<div slot="editor">
 						<umb-input-collection-configuration
 							default-value="3a0156c4-3b8c-4803-bdc1-6871faa83fff"
-							.value=${this._collection ?? ''}
+							.value=${this._collection}
 							@change=${(e: CustomEvent) => {
 								const unique = (e.target as UmbInputCollectionConfigurationElement).value as string;
 								this.#workspaceContext?.setCollection({ unique });
@@ -113,7 +111,7 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -7,7 +7,6 @@ import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-fi
 export class UmbUserAvatarRepository extends UmbUserRepositoryBase {
 	#temporaryFileRepository: UmbTemporaryFileRepository;
 	#avatarSource: UmbUserAvatarServerDataSource;
-	#avatarFile: File | null = null;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -20,7 +19,7 @@ export class UmbUserAvatarRepository extends UmbUserRepositoryBase {
 	 * Uploads an avatar for the user with the given id
 	 * @param {string} userUnique
 	 * @param {File} file
-	 * @return {Promise<UmbDataSourceErrorResponse>}
+	 * @returns {Promise<UmbDataSourceErrorResponse>}
 	 * @memberof UmbUserRepository
 	 */
 	async uploadAvatar(userUnique: string, file: File) {
@@ -51,7 +50,7 @@ export class UmbUserAvatarRepository extends UmbUserRepositoryBase {
 	/**
 	 * Removes the avatar for the user with the given id
 	 * @param {string} userUnique
-	 * @return {Promise<UmbDataSourceErrorResponse>}
+	 * @returns {Promise<UmbDataSourceErrorResponse>}
 	 * @memberof UmbUserRepository
 	 */
 	async deleteAvatar(userUnique: string) {
@@ -70,7 +69,7 @@ export class UmbUserAvatarRepository extends UmbUserRepositoryBase {
 		return { error };
 	}
 
-	destroy() {
+	override destroy() {
 		super.destroy();
 	}
 }

@@ -15,14 +15,19 @@ export class UmbDataTypeTreeRepository
 	}
 
 	async requestTreeRoot() {
+		const { data: treeRootData } = await this._treeSource.getRootItems({ skip: 0, take: 1 });
+		const hasChildren = treeRootData ? treeRootData.total > 0 : false;
+
 		const data: UmbDataTypeTreeRootModel = {
 			unique: null,
 			entityType: UMB_DATA_TYPE_ROOT_ENTITY_TYPE,
-			name: 'Data Types',
-			hasChildren: true,
+			name: '#treeHeaders_dataTypes',
+			hasChildren,
 			isFolder: true,
 		};
 
 		return { data };
 	}
 }
+
+export { UmbDataTypeTreeRepository as api };

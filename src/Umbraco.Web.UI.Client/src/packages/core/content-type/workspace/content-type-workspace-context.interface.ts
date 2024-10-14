@@ -1,13 +1,14 @@
 import type { UmbContentTypeCompositionModel, UmbContentTypeModel, UmbContentTypeSortModel } from '../types.js';
 import type { UmbContentTypeStructureManager } from '../structure/index.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbSaveableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 export interface UmbContentTypeWorkspaceContext<ContentTypeType extends UmbContentTypeModel = UmbContentTypeModel>
-	extends UmbSaveableWorkspaceContext {
+	extends UmbSubmittableWorkspaceContext {
 	readonly IS_CONTENT_TYPE_WORKSPACE_CONTEXT: true;
 
 	readonly name: Observable<string | undefined>;
+	getName(): string | undefined;
 	readonly alias: Observable<string | undefined>;
 	readonly description: Observable<string | undefined>;
 	readonly icon: Observable<string | undefined>;

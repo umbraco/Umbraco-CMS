@@ -1,7 +1,7 @@
-import type { Meta, Story } from '@storybook/web-components';
+import type { UmbDashboardHealthCheckOverviewElement } from './views/health-check-overview.element.js';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbDashboardHealthCheckOverviewElement } from './views/health-check-overview.element.js';
 import './views/health-check-overview.element.js';
 
 import type { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.element.js';
@@ -13,9 +13,9 @@ export default {
 	id: 'umb-dashboard-health-check',
 } as Meta;
 
-export const AAAOverview: Story<UmbDashboardHealthCheckOverviewElement> = () =>
+export const AAAOverview: StoryFn<UmbDashboardHealthCheckOverviewElement> = () =>
 	html` <umb-dashboard-health-check-overview></umb-dashboard-health-check-overview>`;
 AAAOverview.storyName = 'Overview';
 
-export const Group: Story<UmbDashboardHealthCheckGroupElement> = () =>
+export const Group: StoryFn<UmbDashboardHealthCheckGroupElement> = () =>
 	html` <umb-dashboard-health-check-group></umb-dashboard-health-check-group>`;

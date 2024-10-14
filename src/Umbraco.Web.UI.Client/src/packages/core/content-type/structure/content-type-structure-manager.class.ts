@@ -3,7 +3,6 @@ import type {
 	UmbPropertyContainerTypes,
 	UmbPropertyTypeContainerModel,
 	UmbPropertyTypeModel,
-	UmbPropertyTypeScaffoldModel,
 } from '../types.js';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -19,6 +18,11 @@ import {
 import { incrementString } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
+type UmbPropertyTypeId = UmbPropertyTypeModel['id'];
+
+const UmbFilterDuplicateStrings = (value: string, index: number, array: Array<string>) =>
+	array.indexOf(value) === index;
+
 /**
  * Manages a structure of a Content Type and its properties and containers.
  * This loads and merges the structures of the Content Type and its inherited and composed Content Types.
@@ -26,7 +30,9 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
  * - {@link UmbContentTypePropertyStructureHelper} for managing the structure of properties, optional of another container or root.
  * - {@link UmbContentTypeContainerStructureHelper} for managing the structure of containers, optional of another container or root.
  */
-export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> extends UmbControllerBase {
+export class UmbContentTypeStructureManager<
+	T extends UmbContentTypeModel = UmbContentTypeModel,
+> extends UmbControllerBase {
 	#init!: Promise<unknown>;
 
 	#repository: UmbDetailRepository<T>;
@@ -39,9 +45,36 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 	readonly ownerContentType = this.#contentTypes.asObservablePart((x) =>
 		x.find((y) => y.unique === this.#ownerContentTypeUnique),
 	);
-	private readonly _contentTypeContainers = this.#contentTypes.asObservablePart((x) =>
-		x.flatMap((x) => x.containers ?? []),
-	);
+	readonly ownerContentTypeAlias = createObservablePart(this.ownerContentType, (x) => x?.alias);
+	readonly ownerContentTypeName = createObservablePart(this.ownerContentType, (x) => x?.name);
+	readonly ownerContentTypeCompositions = createObservablePart(this.ownerContentType, (x) => x?.compositions);
+
+	readonly #contentTypeContainers = this.#contentTypes.asObservablePart((contentTypes) => {
+		// Notice this may need to use getValue to avoid resetting it self. [NL]
+		return contentTypes.flatMap((x) => x.containers ?? []);
+	});
+	readonly contentTypeProperties = this.#contentTypes.asObservablePart((contentTypes) => {
+		// Notice this may need to use getValue to avoid resetting it self. [NL]
+		return contentTypes.flatMap((x) => x.properties ?? []);
+	});
+	readonly contentTypeDataTypeUniques = this.#contentTypes.asObservablePart((contentTypes) => {
+		// Notice this may need to use getValue to avoid resetting it self. [NL]
+		return contentTypes
+			.flatMap((x) => x.properties?.map((p) => p.dataType.unique) ?? [])
+			.filter(UmbFilterDuplicateStrings);
+	});
+	readonly contentTypeHasProperties = this.#contentTypes.asObservablePart((contentTypes) => {
+		// Notice this may need to use getValue to avoid resetting it self. [NL]
+		return contentTypes.some((x) => x.properties.length > 0);
+	});
+	readonly contentTypePropertyAliases = this.#contentTypes.asObservablePart((contentTypes) => {
+		return contentTypes.flatMap((x) => x.properties ?? []).map((x) => x.alias);
+	});
+	readonly contentTypeUniques = this.#contentTypes.asObservablePart((x) => x.map((y) => y.unique));
+	readonly contentTypeAliases = this.#contentTypes.asObservablePart((x) => x.map((y) => y.alias));
+
+	readonly variesByCulture = createObservablePart(this.ownerContentType, (x) => x?.variesByCulture);
+	readonly variesBySegment = createObservablePart(this.ownerContentType, (x) => x?.variesBySegment);
 
 	#containers: UmbArrayState<UmbPropertyTypeContainerModel> = new UmbArrayState<UmbPropertyTypeContainerModel>(
 		[],
@@ -55,12 +88,12 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 		super(host);
 		this.#repository = typeRepository;
 
-		this.observe(this.contentTypes, (contentTypes) => {
-			contentTypes.forEach((contentType) => {
-				this._loadContentTypeCompositions(contentType);
-			});
+		// Observe owner content type compositions, as we only allow one level of compositions at this moment. [NL]
+		// But, we could support more, we would just need to flatMap all compositions and make sure the entries are unique and then base the observation on that. [NL]
+		this.observe(this.ownerContentTypeCompositions, (ownerContentTypeCompositions) => {
+			this.#loadContentTypeCompositions(ownerContentTypeCompositions);
 		});
-		this.observe(this._contentTypeContainers, (contentTypeContainers) => {
+		this.observe(this.#contentTypeContainers, (contentTypeContainers) => {
 			this.#containers.setValue(contentTypeContainers);
 		});
 	}
@@ -68,13 +101,15 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 	/**
 	 * loadType will load the ContentType and all inherited and composed ContentTypes.
 	 * This will give us all the structure for properties and containers.
+	 * @param {string} unique - The unique of the ContentType to load.
+	 * @returns {Promise} - Promise resolved
 	 */
 	public async loadType(unique?: string) {
 		this._reset();
 
 		this.#ownerContentTypeUnique = unique;
 
-		const promise = this._loadType(unique);
+		const promise = this.#loadType(unique);
 		this.#init = promise;
 		await this.#init;
 		return promise;
@@ -95,86 +130,101 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 
 	/**
 	 * Save the owner content type. Notice this is for a Content Type that is already stored on the server.
-	 * @returns boolean
+	 * @returns {Promise} - A promise that will be resolved when the content type is saved.
 	 */
 	public async save() {
 		const contentType = this.getOwnerContentType();
-		if (!contentType || !contentType.unique) return false;
+		if (!contentType || !contentType.unique) throw new Error('Could not find the Content Type to save');
 
-		const { data } = await this.#repository.save(contentType);
-		if (!data) return false;
+		const { error, data } = await this.#repository.save(contentType);
+		if (error || !data) {
+			throw error?.message ?? 'Repository did not return data after save.';
+		}
 
 		// Update state with latest version:
 		this.#contentTypes.updateOne(contentType.unique, data);
 
-		return true;
+		return data;
 	}
 
 	/**
 	 * Create the owner content type. Notice this is for a Content Type that is NOT already stored on the server.
-	 * @returns boolean
+	 * @param {string | null} parentUnique - The unique of the parent content type
+	 * @returns {Promise} - a promise that is resolved when the content type has been created.
 	 */
 	public async create(parentUnique: string | null) {
 		const contentType = this.getOwnerContentType();
-		if (!contentType || !contentType.unique) return false;
+		if (!contentType || !contentType.unique) {
+			throw new Error('Could not find the Content Type to create');
+		}
 
 		const { data } = await this.#repository.create(contentType, parentUnique);
-		if (!data) return false;
+		if (!data) return Promise.reject();
 
 		// Update state with latest version:
 		this.#contentTypes.updateOne(contentType.unique, data);
 
 		// Start observe the new content type in the store, as we did not do that when it was a scaffold/local-version.
-		this._observeContentType(data);
-
-		return true;
+		this.#observeContentType(data);
 	}
 
-	private async _loadContentTypeCompositions(contentType: T) {
-		contentType.compositions?.forEach((composition) => {
-			this._ensureType(composition.contentType.unique);
+	async #loadContentTypeCompositions(ownerContentTypeCompositions: T['compositions'] | undefined) {
+		if (!ownerContentTypeCompositions) {
+			// Owner content type was undefined, so we can not load compositions. But at this point we neither offload existing compositions, this is most likely not a case that needs to be handled.
+			return;
+		}
+
+		const ownerUnique = this.getOwnerContentTypeUnique();
+		// Remove content types that does not exist as compositions anymore:
+		this.#contentTypes.getValue().forEach((x) => {
+			if (
+				x.unique !== ownerUnique &&
+				!ownerContentTypeCompositions.find((comp) => comp.contentType.unique === x.unique)
+			) {
+				this.#contentTypeObservers.find((y) => y.controllerAlias === 'observeContentType_' + x.unique)?.destroy();
+				this.#contentTypes.removeOne(x.unique);
+			}
+		});
+		ownerContentTypeCompositions.forEach((composition) => {
+			this.#ensureType(composition.contentType.unique);
 		});
 	}
 
-	private async _ensureType(unique?: string) {
+	async #ensureType(unique?: string) {
 		if (!unique) return;
 		if (this.#contentTypes.getValue().find((x) => x.unique === unique)) return;
-		await this._loadType(unique);
+		await this.#loadType(unique);
 	}
 
-	private async _loadType(unique?: string) {
+	async #loadType(unique?: string) {
 		if (!unique) return {};
 
 		// Lets initiate the content type:
 		const { data, asObservable } = await this.#repository.requestByUnique(unique);
 		if (!data) return {};
 
-		await this._observeContentType(data);
+		await this.#observeContentType(data);
 		return { data, asObservable };
 	}
 
-	private async _observeContentType(data: T) {
+	async #observeContentType(data: T) {
 		if (!data.unique) return;
 
 		// Notice we do not store the content type in the store here, cause it will happen shortly after when the observations gets its first initial callback. [NL]
-
-		// Load inherited and composed types:
-		//this._loadContentTypeCompositions(data);// Should not be necessary as this will be done when appended to the contentTypes state. [NL]
 
 		const ctrl = this.observe(
 			// Then lets start observation of the content type:
 			await this.#repository.byUnique(data.unique),
 			(docType) => {
 				if (docType) {
-					// TODO: Handle if there was changes made to the owner document type in this context. [NL]
-					/*
-					possible easy solutions could be to notify user wether they want to update(Discard the changes to accept the new ones). [NL]
-					 */
 					this.#contentTypes.appendOne(docType);
+				} else {
+					// Remove the content type from the store, if it does not exist anymore.
+					this.#contentTypes.removeOne(data.unique);
 				}
-				// TODO: Do we need to handle the undefined case? [NL]
 			},
 			'observeContentType_' + data.unique,
+			// Controller Alias is used to stop observation when no longer needed. [NL]
 		);
 
 		this.#contentTypeObservers.push(ctrl);
@@ -182,12 +232,24 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 
 	/** Public methods for consuming structure: */
 
-	ownerContentTypePart<R>(mappingFunction: MappingFunction<T | undefined, R>) {
+	ownerContentTypeObservablePart<R>(mappingFunction: MappingFunction<T | undefined, R>) {
 		return createObservablePart(this.ownerContentType, mappingFunction);
 	}
 
 	getOwnerContentType() {
 		return this.#contentTypes.getValue().find((y) => y.unique === this.#ownerContentTypeUnique);
+	}
+
+	getOwnerContentTypeUnique() {
+		return this.#ownerContentTypeUnique;
+	}
+
+	/**
+	 * Figure out if any of the Content Types has a Property.
+	 * @returns {boolean} - true if any of the Content Type in this composition has a Property.
+	 */
+	getHasProperties() {
+		return this.#contentTypes.getValue().some((y) => y.properties.length > 0);
 	}
 
 	updateOwnerContentType(entry: Partial<T>) {
@@ -197,14 +259,20 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 	getContentTypes() {
 		return this.#contentTypes.getValue();
 	}
+	getContentTypeUniques() {
+		return this.#contentTypes.getValue().map((x) => x.unique);
+	}
+	getContentTypeAliases() {
+		return this.#contentTypes.getValue().map((x) => x.alias);
+	}
 
 	// TODO: We could move the actions to another class?
 
 	/**
 	 * Ensure a container exists for a specific Content Type. Otherwise clone it.
-	 * @param containerId - The container to ensure exists on the given ContentType.
-	 * @param contentTypeUnique - The content type to ensure the container for.
-	 * @returns Promise<UmbPropertyTypeContainerModel | undefined>
+	 * @param {string} containerId - The container to ensure exists on the given ContentType.
+	 * @param {string} contentTypeUnique - The content type to ensure the container for.
+	 * @returns {Promise<UmbPropertyTypeContainerModel | undefined>} - The container found or created for the owner ContentType.
 	 */
 	async ensureContainerOf(
 		containerId: string,
@@ -225,9 +293,9 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 
 	/**
 	 * Clone a container to a specific Content Type.
-	 * @param containerId - The container to clone, assuming it does not already exist on the given Content Type.
-	 * @param toContentTypeUnique - The content type to clone to.
-	 * @returns Promise<UmbPropertyTypeContainerModel | undefined>
+	 * @param {string} containerId - The container to clone, assuming it does not already exist on the given Content Type.
+	 * @param {string} toContentTypeUnique - The content type to clone to.
+	 * @returns {Promise<UmbPropertyTypeContainerModel | undefined>} - The container cloned or found for the owner ContentType.
 	 */
 	async cloneContainerTo(
 		containerId: string,
@@ -270,6 +338,22 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 		return clonedContainer;
 	}
 
+	ensureContainerNames(
+		contentTypeUnique: string | null,
+		type: UmbPropertyContainerTypes,
+		parentId: string | null = null,
+	) {
+		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
+		this.getOwnerContainers(type, parentId)?.forEach((container) => {
+			if (container.name === '') {
+				const newName = 'Unnamed';
+				this.updateContainer(null, container.id, {
+					name: this.makeContainerNameUniqueForOwnerContentType(container.id, newName, type, parentId) ?? newName,
+				});
+			}
+		});
+	}
+
 	async createContainer(
 		contentTypeUnique: string | null,
 		parentId: string | null = null,
@@ -287,9 +371,11 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 			sortOrder: sortOrder ?? 0,
 		};
 
-		const containers = [
-			...(this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.containers ?? []),
-		];
+		// Ensure
+		this.ensureContainerNames(contentTypeUnique, type, parentId);
+
+		const contentTypes = this.#contentTypes.getValue();
+		const containers = [...(contentTypes.find((x) => x.unique === contentTypeUnique)?.containers ?? [])];
 		containers.push(container);
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -300,7 +386,7 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 		return container;
 	}
 
-	async insertContainer(contentTypeUnique: string | null, container: UmbPropertyTypeContainerModel) {
+	/*async insertContainer(contentTypeUnique: string | null, container: UmbPropertyTypeContainerModel) {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
 
@@ -322,24 +408,34 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 		// @ts-ignore
 		// TODO: fix TS partial complaint
 		this.#contentTypes.updateOne(contentTypeUnique, { containers });
-	}
+	}*/
 
+	makeEmptyContainerName(
+		containerId: string,
+		containerType: UmbPropertyContainerTypes,
+		parentId: string | null = null,
+	) {
+		return (
+			this.makeContainerNameUniqueForOwnerContentType(containerId, 'Unnamed', containerType, parentId) ?? 'Unnamed'
+		);
+	}
 	makeContainerNameUniqueForOwnerContentType(
+		containerId: string,
 		newName: string,
-		containerType: UmbPropertyContainerTypes = 'Tab',
+		containerType: UmbPropertyContainerTypes,
 		parentId: string | null = null,
 	) {
 		const ownerRootContainers = this.getOwnerContainers(containerType, parentId); //getRootContainers() can't differentiates between compositions and locals
+		if (!ownerRootContainers) {
+			return null;
+		}
 
 		let changedName = newName;
-		if (ownerRootContainers) {
-			while (ownerRootContainers.find((tab) => tab.name === changedName && tab.id !== parentId)) {
-				changedName = incrementString(changedName);
-			}
-
-			return changedName === newName ? null : changedName;
+		while (ownerRootContainers.find((con) => con.name === changedName && con.id !== containerId)) {
+			changedName = incrementString(changedName);
 		}
-		return null;
+
+		return changedName === newName ? null : changedName;
 	}
 
 	async updateContainer(
@@ -384,76 +480,32 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
 
-		const frozenContainers =
-			this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.containers ?? [];
-		const containers = frozenContainers.filter((x) => x.id !== containerId);
-
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		// TODO: fix TS partial complaint
-		this.#contentTypes.updateOne(contentTypeUnique, { containers });
-	}
-
-	createPropertyScaffold(containerId: string | null = null) {
-		const property: UmbPropertyTypeScaffoldModel = {
-			id: UmbId.new(),
-			container: containerId ? { id: containerId } : null,
-			alias: '',
-			name: '',
-			description: '',
-			variesByCulture: false,
-			variesBySegment: false,
-			validation: {
-				mandatory: false,
-				mandatoryMessage: null,
-				regEx: null,
-				regExMessage: null,
-			},
-			appearance: {
-				labelOnTop: false,
-			},
-			sortOrder: 0,
-		};
-
-		return property;
-	}
-
-	async createProperty(contentTypeUnique: string | null, containerId: string | null = null, sortOrder?: number) {
-		await this.#init;
-		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
-
-		// If we have a container, we need to ensure it exists, and then update the container with the new parent id.
-		if (containerId) {
-			const container = await this.ensureContainerOf(containerId, contentTypeUnique);
-			if (!container) {
-				throw new Error('Container for inserting property could not be found or created');
-			}
-			// Correct containerId to the local one: [NL]
-			containerId = container.id;
+		const contentType = this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique);
+		if (!contentType) {
+			throw new Error('Could not find the Content Type to remove container from');
 		}
+		const frozenContainers = contentType.containers ?? [];
+		const removedContainerIds = frozenContainers
+			.filter((x) => x.id === containerId || x.parent?.id === containerId)
+			.map((x) => x.id);
+		const containers = frozenContainers.filter((x) => x.id !== containerId && x.parent?.id !== containerId);
 
-		const property = this.createPropertyScaffold(containerId);
-		property.sortOrder = sortOrder ?? 0;
-
-		const properties: Array<UmbPropertyTypeScaffoldModel | UmbPropertyTypeModel> = [
-			...(this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.properties ?? []),
-		];
-
-		properties.push(property);
+		const frozenProperties = contentType.properties;
+		const properties = frozenProperties.filter((x) =>
+			x.container ? !removedContainerIds.some((ids) => ids === x.container?.id) : true,
+		);
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		// TODO: fix TS partial complaint
-		this.#contentTypes.updateOne(contentTypeUnique, { properties });
-
-		return property;
+		this.#contentTypes.updateOne(contentTypeUnique, { containers, properties });
 	}
 
 	async insertProperty(contentTypeUnique: string | null, property: UmbPropertyTypeModel) {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
 
-		// If we have a container, we need to ensure it exists, and then update the container with the new parent id.
+		// If we have a container, we need to ensure it exists, and then update the container with the new parent id. [NL]
 		if (property.container) {
 			const container = await this.ensureContainerOf(property.container.id, contentTypeUnique);
 			if (!container) {
@@ -461,6 +513,10 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 			}
 			// Unfreeze object, while settings container.id
 			property = { ...property, container: { id: container.id } };
+		}
+
+		if (property.sortOrder === undefined) {
+			property.sortOrder = 0;
 		}
 
 		const frozenProperties =
@@ -499,7 +555,6 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 
 		const frozenProperties =
 			this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.properties ?? [];
-
 		const properties = partialUpdateFrozenArray(frozenProperties, partialUpdate, (x) => x.id === propertyId);
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -556,13 +611,6 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 		return undefined;
 	}
 
-	ownerContentTypeObservablePart<PartResult>(mappingFunction: MappingFunction<T, PartResult>) {
-		return this.#contentTypes.asObservablePart((docTypes) => {
-			const docType = docTypes.find((x) => x.unique === this.#ownerContentTypeUnique);
-			return docType ? mappingFunction(docType) : undefined;
-		});
-	}
-
 	hasPropertyStructuresOf(containerId: string | null) {
 		return this.#contentTypes.asObservablePart((docTypes) => {
 			return (
@@ -601,7 +649,7 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 		return this.#containers.getValue().filter((x) => x.parent === null && x.type === containerType);
 	}
 
-	hasRootContainers(containerType: UmbPropertyContainerTypes) {
+	async hasRootContainers(containerType: UmbPropertyContainerTypes) {
 		return this.#containers.asObservablePart((data) => {
 			return data.filter((x) => x.parent === null && x.type === containerType).length > 0;
 		});
@@ -610,7 +658,7 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 	ownerContainersOf(containerType: UmbPropertyContainerTypes, parentId: string | null) {
 		return this.ownerContentTypeObservablePart(
 			(x) =>
-				x.containers?.filter(
+				x?.containers?.filter(
 					(x) => (parentId ? x.parent?.id === parentId : x.parent === null) && x.type === containerType,
 				) ?? [],
 		);
@@ -652,7 +700,7 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 					x.name === name &&
 					x.type === containerType &&
 					// If we look for a parent name, then we need to match that as well:
-					(parentName
+					(parentName !== null
 						? // And we have a parent on this container, then we need to match the parent name and type as well
 							x.parent
 							? data.some((y) => x.parent!.id === y.id && y.name === parentName && y.type === parentType)
@@ -663,13 +711,25 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 		});
 	}
 
+	getContentTypeOfContainer(containerId: string) {
+		return this.#contentTypes
+			.getValue()
+			.find((contentType) => contentType.containers.some((c) => c.id === containerId));
+	}
+
+	contentTypeOfProperty(propertyId: UmbPropertyTypeId) {
+		return this.#contentTypes.asObservablePart((contentTypes) =>
+			contentTypes.find((contentType) => contentType.properties.some((p) => p.id === propertyId)),
+		);
+	}
+
 	private _reset() {
 		this.#contentTypeObservers.forEach((observer) => observer.destroy());
 		this.#contentTypeObservers = [];
 		this.#contentTypes.setValue([]);
 		this.#containers.setValue([]);
 	}
-	public destroy() {
+	public override destroy() {
 		this.#contentTypes.destroy();
 		this.#containers.destroy();
 		super.destroy();

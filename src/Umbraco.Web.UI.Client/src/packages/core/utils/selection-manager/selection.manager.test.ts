@@ -1,5 +1,5 @@
-import { expect } from '@open-wc/testing';
 import { UmbSelectionManager } from './selection.manager.js';
+import { expect } from '@open-wc/testing';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
@@ -76,6 +76,10 @@ describe('UmbSelectionManager', () => {
 			it('has a clearSelection method', () => {
 				expect(manager).to.have.property('clearSelection').that.is.a('function');
 			});
+
+			it('has a setAllowLimitation method', () => {
+				expect(manager).to.have.property('setAllowLimitation').that.is.a('function');
+			});
 		});
 	});
 
@@ -149,6 +153,15 @@ describe('UmbSelectionManager', () => {
 			manager.setSelectable(false);
 			manager.select('3');
 			expect(manager.getSelection()).to.deep.equal([]);
+		});
+
+		it('can not select an item if it does not pass the allow function', () => {
+			manager.setAllowLimitation((item) => item !== '2');
+			expect(() => manager.select('2')).to.throw();
+			expect(manager.getSelection()).to.deep.equal([]);
+
+			manager.select('1');
+			expect(manager.getSelection()).to.deep.equal(['1']);
 		});
 	});
 

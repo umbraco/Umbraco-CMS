@@ -3,13 +3,12 @@ import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { MediaResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Media that fetches data from the server
- * @export
  * @class UmbMediaServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -18,7 +17,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 
 	/**
 	 * Creates an instance of UmbMediaServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -28,7 +27,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 	/**
 	 * Creates a new Media scaffold
 	 * @param {Partial<UmbMediaDetailModel>} [preset]
-	 * @return { UmbMediaDetailModel }
+	 * @returns { UmbMediaDetailModel }
 	 * @memberof UmbMediaServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbMediaDetailModel> = {}) {
@@ -60,13 +59,13 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 	/**
 	 * Fetches a Media with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMediaServerDataSource
 	 */
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, MediaResource.getMediaById({ id: unique }));
+		const { data, error } = await tryExecuteAndNotify(this.#host, MediaService.getMediaById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -101,7 +100,8 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 	/**
 	 * Inserts a new Media on the server
 	 * @param {UmbMediaDetailModel} model
-	 * @return {*}
+	 * @param parentUnique
+	 * @returns {*}
 	 * @memberof UmbMediaServerDataSource
 	 */
 	async create(model: UmbMediaDetailModel, parentUnique: string | null = null) {
@@ -123,7 +123,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			MediaResource.postMedia({
+			MediaService.postMedia({
 				requestBody,
 			}),
 		);
@@ -138,7 +138,8 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 	/**
 	 * Updates a Media on the server
 	 * @param {UmbMediaDetailModel} Media
-	 * @return {*}
+	 * @param model
+	 * @returns {*}
 	 * @memberof UmbMediaServerDataSource
 	 */
 	async update(model: UmbMediaDetailModel) {
@@ -152,7 +153,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			MediaResource.putMediaById({
+			MediaService.putMediaById({
 				id: model.unique,
 				requestBody,
 			}),
@@ -168,13 +169,12 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 	/**
 	 * Deletes a Media on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMediaServerDataSource
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		// TODO: update to delete when implemented
-		return tryExecuteAndNotify(this.#host, MediaResource.putMediaByIdMoveToRecycleBin({ id: unique }));
+		return tryExecuteAndNotify(this.#host, MediaService.deleteMediaById({ id: unique }));
 	}
 }

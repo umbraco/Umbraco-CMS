@@ -3,11 +3,11 @@ import type { UmbControllerHost } from './controller-host.interface.js';
 import type { UmbController } from './controller.interface.js';
 
 export interface UmbControllerHostElement extends HTMLElement, UmbControllerHost {
-	hasController(controller: UmbController): boolean;
-	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
-	addController(controller: UmbController): void;
-	removeControllerByAlias(alias: UmbControllerAlias): void;
-	removeController(controller: UmbController): void;
+	hasUmbController(controller: UmbController): boolean;
+	getUmbControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
+	addUmbController(controller: UmbController): void;
+	removeUmbControllerByAlias(alias: UmbControllerAlias): void;
+	removeUmbController(controller: UmbController): void;
 	getHostElement(): Element;
 
 	destroy(): void;

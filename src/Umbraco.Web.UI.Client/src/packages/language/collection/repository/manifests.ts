@@ -1,12 +1,10 @@
-import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_LANGUAGE_COLLECTION_REPOSITORY_ALIAS } from './constants.js';
 
-export const UMB_LANGUAGE_COLLECTION_REPOSITORY_ALIAS = 'Umb.Repository.LanguageCollection';
-
-const repository: ManifestRepository = {
-	type: 'repository',
-	alias: UMB_LANGUAGE_COLLECTION_REPOSITORY_ALIAS,
-	name: 'Language Collection Repository',
-	api: () => import('./language-collection.repository.js'),
-};
-
-export const manifests = [repository];
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'repository',
+		alias: UMB_LANGUAGE_COLLECTION_REPOSITORY_ALIAS,
+		name: 'Language Collection Repository',
+		api: () => import('./language-collection.repository.js'),
+	},
+];

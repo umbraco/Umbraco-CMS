@@ -3,7 +3,8 @@ import { css, html, customElement, state, nothing, repeat, property } from '@umb
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import {
 	isDefaultReference,
 	isDocumentReference,
@@ -45,7 +46,7 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 			});
 	}
 
-	protected firstUpdated(): void {
+	protected override firstUpdated(): void {
 		this.#getReferences();
 	}
 
@@ -111,7 +112,7 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 		return '';
 	}
 
-	render() {
+	override render() {
 		if (this._items && this._items.length > 0) {
 			return html` <uui-box
 					headline=${this.localize.term('references_labelUsedByItems')}
@@ -171,9 +172,12 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				display: contents;
+			}
 			uui-table-cell:not(.link-cell) {
 				color: var(--uui-color-text-alt);
 			}

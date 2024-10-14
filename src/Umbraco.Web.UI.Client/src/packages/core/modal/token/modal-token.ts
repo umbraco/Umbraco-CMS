@@ -1,15 +1,20 @@
 import type { UmbModalConfig } from '../context/modal-manager.context.js';
 
-export interface UmbModalTokenDefaults<ModalDataType extends object = object, ModalValueType = unknown> {
+export interface UmbModalTokenDefaults<
+	ModalDataType extends { [key: string]: any } = { [key: string]: any },
+	ModalValueType = unknown,
+> {
 	modal?: UmbModalConfig;
 	data?: ModalDataType;
 	value?: ModalValueType;
 }
 
-export class UmbModalToken<ModalDataType extends object = object, ModalValueType = unknown> {
+export class UmbModalToken<
+	ModalDataType extends { [key: string]: any } = { [key: string]: any },
+	ModalValueType = unknown,
+> {
 	/**
 	 * Get the data type of the token's data.
-	 *
 	 * @public
 	 * @type      {ModalDataType}
 	 * @memberOf  UmbModalToken
@@ -20,7 +25,6 @@ export class UmbModalToken<ModalDataType extends object = object, ModalValueType
 
 	/**
 	 * Get the value type of the token
-	 *
 	 * @public
 	 * @type      {ModalValueType}
 	 * @memberOf  UmbModalToken
@@ -44,7 +48,6 @@ export class UmbModalToken<ModalDataType extends object = object, ModalValueType
 	/**
 	 * This method must always return the unique alias of the token since that
 	 * will be used to look up the token in the injector.
-	 *
 	 * @returns the unique alias of the token
 	 */
 	toString(): string {

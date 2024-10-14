@@ -29,11 +29,11 @@ export class UmbLocalizeDateElement extends UmbLitElement {
 		return this.localize.date(this.date!, this.options);
 	}
 
-	protected render() {
+	override render() {
 		return this.date ? html`${unsafeHTML(this.text)}` : html`<slot></slot>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: contents;

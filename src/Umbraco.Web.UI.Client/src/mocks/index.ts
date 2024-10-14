@@ -1,6 +1,6 @@
 const { setupWorker } = window.MockServiceWorker;
-import type { MockedRequest, setupWorker as setupWorkType, rest, StartOptions } from 'msw';
 import { handlers } from './browser-handlers.js';
+import type { MockedRequest, setupWorker as setupWorkType, rest, StartOptions } from 'msw';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 const worker = setupWorker(...handlers);

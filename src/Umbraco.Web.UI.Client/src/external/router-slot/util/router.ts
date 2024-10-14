@@ -1,5 +1,5 @@
-import { CATCH_ALL_WILDCARD, DEFAULT_PATH_MATCH, PARAM_IDENTIFIER, TRAVERSE_FLAG } from '../config';
-import {
+import { CATCH_ALL_WILDCARD, DEFAULT_PATH_MATCH, PARAM_IDENTIFIER, TRAVERSE_FLAG } from '../config.js';
+import type {
 	IComponentRoute,
 	IRedirectRoute,
 	IResolverRoute,
@@ -12,8 +12,8 @@ import {
 	PathFragment,
 	RouterTree,
 	IRoutingInfo,
-} from '../model';
-import { constructPathWithBasePath, path as getPath, queryString, stripSlash } from './url';
+} from '../model.js';
+import { constructPathWithBasePath, path as getPath, queryString, stripSlash } from './url.js';
 
 /**
  * Determines whether the path is active.
@@ -74,7 +74,7 @@ export function matchRoute<D = any>(route: IRoute<D>, path: string | PathFragmen
 						default:
 							return new RegExp(`^[\/]?${routePath}(?:\/|$)`);
 					}
-			  })();
+				})();
 
 	// Check if there's a match
 	const match = path.match(regex);
@@ -147,8 +147,13 @@ export async function resolvePageComponent(route: IComponentRoute, info: IRoutin
 
 	// Instantiate the component
 	let component!: PageComponent;
+
 	if (!(moduleClassOrPage instanceof HTMLElement)) {
-		component = new (moduleClassOrPage.default ? moduleClassOrPage.default : moduleClassOrPage)() as PageComponent;
+		component = new (moduleClassOrPage.default
+			? moduleClassOrPage.default
+			: moduleClassOrPage.element
+				? moduleClassOrPage.element
+				: moduleClassOrPage)() as PageComponent;
 	} else {
 		component = moduleClassOrPage as PageComponent;
 	}

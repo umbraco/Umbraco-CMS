@@ -13,8 +13,6 @@ import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-a
 /**
  * This abstract Controller holds the core to manage a single Extension.
  * When the extension is permitted to be used, then the extender of this class can instantiate what is relevant for this type and thereby make it available for the consumer.
- *
- * @export
  * @abstract
  * @class UmbBaseExtensionInitializer
  */
@@ -97,7 +95,11 @@ export abstract class UmbBaseExtensionInitializer<
 
 	asPromise(): Promise<void> {
 		return new Promise((resolve) => {
-			this.#isPermitted === true ? resolve() : this.#promiseResolvers.push(resolve);
+			if (this.#isPermitted === true) {
+				resolve();
+			} else {
+				this.#promiseResolvers.push(resolve);
+			}
 		});
 	}
 
@@ -105,7 +107,7 @@ export abstract class UmbBaseExtensionInitializer<
 		if (this.#conditionControllers === undefined || this.#conditionControllers.length === 0) return;
 		this.#conditionControllers.forEach((controller) => controller.destroy());
 		this.#conditionControllers = [];
-		this.removeControllerByAlias('_observeConditions');
+		this.removeUmbControllerByAlias('_observeConditions');
 	}
 
 	#gotManifest() {
@@ -149,7 +151,7 @@ export abstract class UmbBaseExtensionInitializer<
 				'_observeConditions',
 			);
 		} else {
-			this.removeControllerByAlias('_observeConditions');
+			this.removeUmbControllerByAlias('_observeConditions');
 		}
 
 		if (noChangeInConditions) {
@@ -175,6 +177,12 @@ export abstract class UmbBaseExtensionInitializer<
 		const newConditionControllers = await Promise.all(
 			configsOfThisType.map((conditionConfig) => this.#createConditionController(conditionManifest, conditionConfig)),
 		);
+
+		// If we got destroyed in the mean time, then we don't need to continue:
+		if (!this.#extensionRegistry) {
+			newConditionControllers.forEach((controller) => controller?.destroy());
+			return;
+		}
 
 		const oldLength = this.#conditionControllers.length;
 
@@ -205,6 +213,7 @@ export abstract class UmbBaseExtensionInitializer<
 		// Check if we already have a controller for this config:
 		const existing = this.#conditionControllers.find((controller) => controller.config === conditionConfig);
 		if (!existing) {
+			// TODO: Be aware that we might not have a host element any longer at this moment, but I did not want to make a fix for it jet, as its a good indication to if something else is terrible wrong [NL]
 			const conditionController = await createExtensionApi(this, conditionManifest, [
 				{
 					manifest: conditionManifest,
@@ -287,13 +296,13 @@ export abstract class UmbBaseExtensionInitializer<
 	}
 	*/
 
-	public hostDisconnected(): void {
+	public override hostDisconnected(): void {
 		super.hostDisconnected();
 		this._isConditionsPositive = false;
 		if (this.#isPermitted === true) {
 			this._conditionsAreBad();
 			this.#isPermitted = false;
-			this.#onPermissionChanged?.(false, this as any);
+			this.#onPermissionChanged?.(false, this as unknown as SubClassType);
 		}
 	}
 
@@ -301,11 +310,11 @@ export abstract class UmbBaseExtensionInitializer<
 		if (this.#isPermitted === true) {
 			this.#isPermitted = undefined;
 			this._conditionsAreBad();
-			this.#onPermissionChanged?.(false, this as any);
+			this.#onPermissionChanged?.(false, this as unknown as SubClassType);
 		}
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		if (!this.#extensionRegistry) return;
 		this.#manifest = undefined;
 		this.#promiseResolvers = [];
@@ -315,7 +324,7 @@ export abstract class UmbBaseExtensionInitializer<
 		this.#overwrites = [];
 		this.#cleanConditions();
 		this.#onPermissionChanged = undefined;
-		(this.#extensionRegistry as any) = undefined;
+		(this.#extensionRegistry as unknown) = undefined;
 		super.destroy();
 	}
 }

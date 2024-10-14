@@ -67,9 +67,9 @@ export class UmbExtensionsElementInitializer<
 		return extController;
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		super.destroy();
 		this.#props = undefined;
-		(this.#extensionRegistry as any) = undefined;
+		(this.#extensionRegistry as unknown) = undefined;
 	}
 }

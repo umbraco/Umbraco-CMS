@@ -9,3 +9,5 @@ export class UmbInviteUserCollectionAction extends UmbCollectionActionBase {
 		await modalContext?.onSubmit();
 	}
 }
+
+export { UmbInviteUserCollectionAction as api };

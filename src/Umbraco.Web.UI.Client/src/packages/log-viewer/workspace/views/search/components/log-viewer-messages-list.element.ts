@@ -97,7 +97,7 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 				`}`;
 	}
 
-	render() {
+	override render() {
 		// TODO: the table should scroll instead of the whole main div
 		return html`<uui-box>
 				<div id="header" slot="header">
@@ -122,7 +122,7 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 			${this._renderPagination()} `;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-pagination {
 				display: block;

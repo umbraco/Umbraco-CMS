@@ -1,3 +1,3 @@
 import { manifests as detailManifests } from './detail/manifests.js';
 
-export const manifests = [...detailManifests];
+export const manifests: Array<UmbExtensionManifest> = [...detailManifests];

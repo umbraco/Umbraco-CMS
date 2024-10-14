@@ -3,6 +3,7 @@ import { UmbInviteUserRepository } from '../../repository/invite-user.repository
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-invite-user-modal')
 export class UmbInviteUserModalElement extends UmbModalBaseElement {
@@ -24,7 +25,9 @@ export class UmbInviteUserModalElement extends UmbModalBaseElement {
 
 		//TODO: How should we handle pickers forms?
 		const userGroupPicker = form.querySelector('#userGroups') as UmbUserGroupInputElement;
-		const userGroupUniques = userGroupPicker?.selection;
+		const userGroupUniques: Array<UmbReferenceByUnique> = userGroupPicker?.selection.map((unique) => {
+			return { unique };
+		});
 
 		const message = formData.get('message') as string;
 
@@ -42,7 +45,7 @@ export class UmbInviteUserModalElement extends UmbModalBaseElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`<uui-dialog-layout headline="Invite User">
 			${this.#renderForm()}
 			<uui-button @click=${this._rejectModal} slot="actions" label="Cancel" look="secondary"></uui-button>
@@ -84,7 +87,7 @@ export class UmbInviteUserModalElement extends UmbModalBaseElement {
 			</uui-form>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -4,13 +4,12 @@ import type { UmbMemberCollectionFilterModel } from '../types.js';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { MemberResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { MemberResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { MemberService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
+import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 
 /**
  * A data source that fetches the member collection data from the server.
- * @export
  * @class UmbMemberCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */
@@ -19,7 +18,7 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 
 	/**
 	 * Creates an instance of UmbMemberCollectionServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMemberCollectionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -29,11 +28,11 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 	/**
 	 * Gets the member collection filtered by the given filter.
 	 * @param {UmbMemberCollectionFilterModel} filter
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbMemberCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(this.#host, MemberResource.getFilterMember(filter));
+		const { data, error } = await tryExecuteAndNotify(this.#host, MemberService.getFilterMember(filter));
 
 		if (error) {
 			return { error };
@@ -49,8 +48,9 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 			const memberDetail: UmbMemberDetailModel = {
 				entityType: UMB_MEMBER_ENTITY_TYPE,
 				email: item.email,
-				variants: item.variants as UmbVariantModel[],
+				variants: item.variants as UmbEntityVariantModel[],
 				unique: item.id,
+				kind: item.kind,
 				lastLoginDate: item.lastLoginDate || null,
 				lastLockoutDate: item.lastLockoutDate || null,
 				lastPasswordChangeDate: item.lastPasswordChangeDate || null,

@@ -1,15 +1,15 @@
+import { UMB_BLOCK_GRID_AREA_TYPE_ENTRIES_CONTEXT } from '../../property-editors/block-grid-areas-config/block-grid-area-type-entries.context-token.js';
 import {
 	UmbBlockGridScaleManager,
 	type UmbBlockGridScalableContext,
 } from '../../context/block-grid-scale-manager/block-grid-scale-manager.controller.js';
-import { UMB_BLOCK_GRID_AREA_TYPE_ENTRIES_CONTEXT } from '../../property-editors/block-grid-areas-config/block-grid-area-type-entries.context-token.js';
 import { UMB_BLOCK_GRID_AREA_CONFIG_ENTRY_CONTEXT } from './block-grid-area-config-entry.context-token.js';
-import type { UmbBlockGridTypeAreaType } from '@umbraco-cms/backoffice/block-grid';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import type { UmbBlockGridTypeAreaType } from '@umbraco-cms/backoffice/block-grid';
 export class UmbBlockGridAreaConfigEntryContext
 	extends UmbContextBase<UmbBlockGridAreaConfigEntryContext>
 	implements UmbBlockGridScalableContext
@@ -21,6 +21,7 @@ export class UmbBlockGridAreaConfigEntryContext
 	//
 	#areaKey?: string;
 	#area = new UmbObjectState<UmbBlockGridTypeAreaType | undefined>(undefined);
+	readonly area = this.#area.asObservable();
 	readonly alias = this.#area.asObservablePart((x) => x?.alias);
 	readonly columnSpan = this.#area.asObservablePart((x) => x?.columnSpan);
 	readonly rowSpan = this.#area.asObservablePart((x) => x?.rowSpan ?? 1);
@@ -44,6 +45,9 @@ export class UmbBlockGridAreaConfigEntryContext
 	}
 	getRowSpan() {
 		return this.#area.getValue()?.rowSpan;
+	}
+	getAlias() {
+		return this.#area.getValue()?.alias;
 	}
 	public getRelevantColumnSpanOptions() {
 		const layoutColumns = this.#entriesContext?.getLayoutColumns();
@@ -82,13 +86,25 @@ export class UmbBlockGridAreaConfigEntryContext
 					this.#area.setValue(areaType);
 				}
 			},
-			'observeAreaKey',
+			'observeAreaData',
+		);
+		this.observe(
+			this.area,
+			(area) => {
+				if (area && this.#propertyContext) {
+					const value = this.#propertyContext.getValue() as Array<UmbBlockGridTypeAreaType> | undefined;
+					if (!value) return;
+					const newValue = appendToFrozenArray(value, area, (x) => x.key === this.#areaKey);
+					this.#propertyContext?.setValue(newValue);
+				}
+			},
+			'observeInternalArea',
 		);
 	}
 
 	async requestDelete() {
 		await umbConfirmModal(this, {
-			headline: `Delete ${this.alias}`,
+			headline: `Delete ${this.getAlias()}`,
 			content: 'Are you sure you want to delete this Area?',
 			confirmLabel: 'Delete',
 			color: 'danger',
@@ -102,7 +118,7 @@ export class UmbBlockGridAreaConfigEntryContext
 		this.#propertyContext.setValue(value.filter((x) => x.key !== this.#areaKey));
 	}
 
-	destroy() {
+	override destroy() {
 		super.destroy();
 		this.#area.destroy();
 	}

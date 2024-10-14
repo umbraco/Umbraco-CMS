@@ -1,4 +1,4 @@
-import type { UmbWorkspaceContext } from './workspace-context.interface.js';
+import type { UmbWorkspaceContext } from '../../workspace-context.interface.js';
 import type { UmbWorkspaceUniqueType } from './../../types.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 

@@ -1,5 +1,5 @@
-import { GLOBAL_ROUTER_EVENTS_TARGET } from '../config';
-import { EventListenerSubscription, GlobalRouterEvent, IRoute, IRoutingInfo } from '../model';
+import { GLOBAL_ROUTER_EVENTS_TARGET } from '../config.js';
+import type { EventListenerSubscription, GlobalRouterEvent, IRoute, IRoutingInfo } from '../model.js';
 
 /**
  * Dispatches a did change route event.
@@ -17,9 +17,6 @@ export function dispatchRouteChangeEvent<D = any>($elem: HTMLElement, detail: IR
  */
 export function dispatchGlobalRouterEvent<D = any>(name: GlobalRouterEvent, detail?: IRoutingInfo<D>) {
 	GLOBAL_ROUTER_EVENTS_TARGET.dispatchEvent(new CustomEvent(name, { detail }));
-	// if ("debugRouterSlot" in window) {
-	// 	console.log(`%c [router-slot]: ${name}`, `color: #286ee0`, detail);
-	// }
 }
 
 /**

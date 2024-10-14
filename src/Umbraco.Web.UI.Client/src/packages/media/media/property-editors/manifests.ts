@@ -1,5 +1,13 @@
-import { manifest as mediaPicker } from '../../../media/media/property-editors/media-picker/manifests.js';
-import { manifest as imageCropsConfiguration } from '../../../media/media/property-editors/image-crops-configuration/manifests.js';
-import { manifest as imageCropper } from '../../../media/media/property-editors/image-cropper/manifests.js';
+import { manifest as imageCropsConfiguration } from './image-crops/manifests.js';
+import { manifest as mediaEntityPicker } from './media-entity-picker/manifests.js';
+import { manifests as imageCropperManifests } from './image-cropper/manifests.js';
+import { manifests as mediaPickerManifests } from './media-picker/manifests.js';
+import { manifests as uploadFieldManifests } from './upload-field/manifests.js';
 
-export const manifests = [mediaPicker, imageCropsConfiguration, imageCropper];
+export const manifests: Array<UmbExtensionManifest> = [
+	...imageCropperManifests,
+	...mediaPickerManifests,
+	...uploadFieldManifests,
+	imageCropsConfiguration,
+	mediaEntityPicker,
+];

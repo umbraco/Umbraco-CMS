@@ -6,7 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-logviewer-workspace')
 export class UmbLogViewerWorkspaceElement extends UmbLitElement {
-	render() {
+	override render() {
 		return html`
 			<umb-workspace-editor
 				headline=${this.localize.term('treeHeaders_logViewer')}
@@ -14,7 +14,7 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

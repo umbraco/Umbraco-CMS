@@ -1,5 +1,5 @@
 import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../types.js';
-import { DirectionModel, DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DirectionModel, DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { DocumentCollectionResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
@@ -24,11 +24,11 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 			orderCulture: query.orderCulture ?? 'en-US',
 			orderDirection: query.orderDirection === 'asc' ? DirectionModel.ASCENDING : DirectionModel.DESCENDING,
 			filter: query.filter,
-			skip: query.skip ?? 0,
-			take: query.take ?? 100,
+			skip: query.skip || 0,
+			take: query.take || 100,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, DocumentResource.getCollectionDocumentById(params));
+		const { data, error } = await tryExecuteAndNotify(this.#host, DocumentService.getCollectionDocumentById(params));
 
 		if (data) {
 			const items = data.items.map((item: DocumentCollectionResponseModel) => {
@@ -37,15 +37,18 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 
 				const model: UmbDocumentCollectionItemModel = {
 					unique: item.id,
+					entityType: 'document',
+					contentTypeAlias: item.documentType.alias,
 					createDate: new Date(variant.createDate),
 					creator: item.creator,
 					icon: item.documentType.icon,
 					name: variant.name,
+					sortOrder: item.sortOrder,
 					state: variant.state,
 					updateDate: new Date(variant.updateDate),
 					updater: item.updater,
 					values: item.values.map((item) => {
-						return { alias: item.alias, value: item.value };
+						return { alias: item.alias, value: item.value as string };
 					}),
 				};
 				return model;

@@ -14,12 +14,10 @@ import type { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/b
 /**
  * This Controller manages a single Extension initializing its Element and API.
  * When the extension is permitted to be used, its Element and API will be instantiated and available for the consumer.
- *
  * @example
  * ```ts
  * const controller = new UmbExtensionApiAndElementInitializer(host, extensionRegistry, alias, (permitted, ctrl) => { console.log("Extension is permitted and this is the element: ", ctrl.component) }));
  * ```
- * @export
  * @class UmbExtensionElementAndApiInitializer
  */
 export class UmbExtensionElementAndApiInitializer<
@@ -191,7 +189,7 @@ export class UmbExtensionElementAndApiInitializer<
 		}
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		super.destroy();
 		this.#constructorArguments = undefined;
 		this.#elProps = undefined;

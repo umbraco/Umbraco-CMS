@@ -1,4 +1,3 @@
-import { manifests as tagsUI } from './tags/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as tagsManifests } from './tags/manifests.js';
 
-export const manifests: Array<ManifestTypes> = [...tagsUI];
+export const manifests: Array<UmbExtensionManifest> = [...tagsManifests];

@@ -1,13 +1,13 @@
-export const manifests = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.HealthCheck',
 		name: 'Health Check',
 		elementName: 'umb-dashboard-health-check',
-		js: () => import('./dashboard-health-check.element.js'),
+		element: () => import('./dashboard-health-check.element.js'),
 		weight: 102,
 		meta: {
-			label: 'Health Check',
+			label: '#dashboardTabs_settingsHealthCheck',
 			pathname: 'health-check',
 		},
 		conditions: [

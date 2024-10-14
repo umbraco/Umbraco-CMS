@@ -8,3 +8,5 @@ export class UmbDocumentTypeStructureRepository extends UmbContentTypeStructureR
 		super(host, UmbDocumentTypeStructureServerDataSource);
 	}
 }
+
+export { UmbDocumentTypeStructureRepository as api };

@@ -1,9 +1,9 @@
-import type { UmbTreeItemModelBase } from '../types.js';
+import type { UmbTreeItemModel } from '../types.js';
 import type { UmbPaginationManager } from '../../utils/pagination-manager/pagination.manager.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModelBase> extends UmbApi {
+export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel> extends UmbApi {
 	unique?: string | null;
 	entityType?: string;
 	treeItem: Observable<TreeItemType | undefined>;

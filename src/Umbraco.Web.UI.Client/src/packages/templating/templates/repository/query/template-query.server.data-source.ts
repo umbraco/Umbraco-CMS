@@ -1,12 +1,11 @@
 import type { UmbExecuteTemplateQueryRequestModel } from './types.js';
 import type { TemplateQueryExecuteModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { TemplateResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { TemplateService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Template Query Builder that fetches data from the server
- * @export
  * @class UmbTemplateQueryServerDataSource
  */
 export class UmbTemplateQueryServerDataSource {
@@ -17,7 +16,7 @@ export class UmbTemplateQueryServerDataSource {
 
 	/**
 	 * Creates an instance of UmbTemplateQueryServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbTemplateQueryServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -25,17 +24,16 @@ export class UmbTemplateQueryServerDataSource {
 	}
 	/**
 	 * Fetches the query builder settings from the server
-	 *
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTemplateQueryServerDataSource
 	 */
 	async getTemplateQuerySettings() {
-		return tryExecuteAndNotify(this.#host, TemplateResource.getTemplateQuerySettings());
+		return tryExecuteAndNotify(this.#host, TemplateService.getTemplateQuerySettings());
 	}
 	/**
 	 * Executes a query builder query on the server
 	 * @param {UmbExecuteTemplateQueryRequestModel} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTemplateQueryServerDataSource
 	 */
 	async executeTemplateQuery(args: UmbExecuteTemplateQueryRequestModel) {
@@ -47,6 +45,6 @@ export class UmbTemplateQueryServerDataSource {
 			take: args.take,
 		};
 
-		return tryExecuteAndNotify(this.#host, TemplateResource.postTemplateQueryExecute({ requestBody }));
+		return tryExecuteAndNotify(this.#host, TemplateService.postTemplateQueryExecute({ requestBody }));
 	}
 }

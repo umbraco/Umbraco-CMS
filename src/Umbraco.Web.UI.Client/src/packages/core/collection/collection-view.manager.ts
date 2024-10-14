@@ -1,13 +1,14 @@
+import type { ManifestCollectionView } from './extensions/index.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import type { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 export interface UmbCollectionViewManagerConfig {
 	defaultViewAlias?: string;
+	manifestFilter?: (manifest: ManifestCollectionView) => boolean;
 }
 
 export class UmbCollectionViewManager extends UmbControllerBase {
@@ -20,22 +21,24 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 	#routes = new UmbArrayState<UmbRoute>([], (x) => x.path);
 	public readonly routes = this.#routes.asObservable();
 
-	#rootPathname = new UmbStringState('');
-	public readonly rootPathname = this.#rootPathname.asObservable();
+	#rootPathName = new UmbStringState('');
+	public readonly rootPathName = this.#rootPathName.asObservable();
 
 	#defaultViewAlias?: string;
 
-	constructor(host: UmbControllerHost, config: UmbCollectionViewManagerConfig) {
+	constructor(host: UmbControllerHost) {
 		super(host);
-
-		this.#defaultViewAlias = config.defaultViewAlias;
-		this.#observeViews();
 
 		// TODO: hack - we need to figure out how to get the "parent path" from the router
 		setTimeout(() => {
 			const currentUrl = new URL(window.location.href);
-			this.#rootPathname.setValue(currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/')));
+			this.#rootPathName.setValue(currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/')));
 		}, 100);
+	}
+
+	public setConfig(config: UmbCollectionViewManagerConfig) {
+		this.#defaultViewAlias = config.defaultViewAlias;
+		this.#observeViews(config.manifestFilter);
 	}
 
 	// Views
@@ -50,19 +53,25 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 
 	/**
 	 * Returns the current view.
-	 * @return {ManifestCollectionView}
+	 * @returns {ManifestCollectionView}
 	 * @memberof UmbCollectionContext
 	 */
 	public getCurrentView() {
 		return this.#currentView.getValue();
 	}
 
-	#observeViews() {
-		return new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'collectionView', null, (views) => {
-			const manifests = views.map((view) => view.manifest);
-			this.#views.setValue(manifests);
-			this.#createRoutes(manifests);
-		});
+	#observeViews(filter?: (manifest: ManifestCollectionView) => boolean) {
+		return new UmbExtensionsManifestInitializer(
+			this,
+			umbExtensionsRegistry,
+			'collectionView',
+			filter ?? null,
+			(views) => {
+				const manifests = views.map((view) => view.manifest);
+				this.#views.setValue(manifests);
+				this.#createRoutes(manifests);
+			},
+		);
 	}
 
 	#createRoutes(views: ManifestCollectionView[] | null) {
@@ -88,6 +97,11 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 				redirectTo: fallbackView,
 			});
 		}
+
+		routes.push({
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		});
 
 		this.#routes.setValue(routes);
 	}

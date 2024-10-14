@@ -1,9 +1,8 @@
 import './installer-database.element.js';
 
-import type { Meta, Story } from '@storybook/web-components';
-
 import { installerContextProvider } from '../shared/utils.story-helpers.js';
 import type { UmbInstallerDatabaseElement } from './installer-database.element.js';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
@@ -13,6 +12,6 @@ export default {
 	decorators: [(story) => installerContextProvider(story)],
 } as Meta;
 
-export const Step3Database: Story<UmbInstallerDatabaseElement> = () =>
+export const Step3Database: StoryFn<UmbInstallerDatabaseElement> = () =>
 	html`<umb-installer-database></umb-installer-database>`;
 Step3Database.storyName = 'Step 3: Database';

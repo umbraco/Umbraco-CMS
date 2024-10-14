@@ -1,48 +1,30 @@
-import { UmbScriptDetailRepository } from '../repository/index.js';
 import type { UmbScriptDetailModel } from '../types.js';
 import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
+import { UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS, type UmbScriptDetailRepository } from '../repository/index.js';
 import { UMB_SCRIPT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbScriptWorkspaceEditorElement } from './script-workspace-editor.element.js';
-import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbEntityDetailWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
-	type UmbSaveableWorkspaceContext,
+	type UmbSubmittableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
-	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
-import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
 export class UmbScriptWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<UmbScriptDetailModel>
-	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
+	extends UmbEntityDetailWorkspaceContextBase<UmbScriptDetailModel, UmbScriptDetailRepository>
+	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	public readonly repository = new UmbScriptDetailRepository(this);
-
-	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
-	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
-
-	#data = new UmbObjectState<UmbScriptDetailModel | undefined>(undefined);
-
-	readonly data = this.#data.asObservable();
-	readonly unique = this.#data.asObservablePart((data) => data?.unique);
-	readonly name = this.#data.asObservablePart((data) => data?.name);
-	readonly content = this.#data.asObservablePart((data) => data?.content);
-	readonly path = this.#data.asObservablePart((data) => data?.path);
-
-	#isCodeEditorReady = new UmbBooleanState(false);
-	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
-
-	readonly routes = new UmbWorkspaceRouteManager(this);
+	public readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
+	public readonly content = this._data.createObservablePartOfCurrent((data) => data?.content);
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_SCRIPT_WORKSPACE_ALIAS);
-		this.#loadCodeEditor();
+		super(host, {
+			workspaceAlias: UMB_SCRIPT_WORKSPACE_ALIAS,
+			entityType: UMB_SCRIPT_ENTITY_TYPE,
+			detailRepositoryAlias: UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS,
+		});
 
 		this.routes.setRoutes([
 			{
@@ -51,7 +33,7 @@ export class UmbScriptWorkspaceContext
 				setup: async (component: PageComponent, info: IRoutingInfo) => {
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
-					this.create({ entityType: parentEntityType, unique: parentUnique });
+					this.createScaffold({ parent: { entityType: parentEntityType, unique: parentUnique } });
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
@@ -71,104 +53,42 @@ export class UmbScriptWorkspaceContext
 		]);
 	}
 
-	protected resetState(): void {
-		super.resetState();
-		this.#data.setValue(undefined);
+	/**
+	 * @description Set the name of the script
+	 * @param {string} value
+	 * @memberof UmbScriptWorkspaceContext
+	 */
+	public setName(value: string) {
+		this._data.updateCurrent({ name: value });
 	}
 
-	async #loadCodeEditor() {
-		try {
-			await loadCodeEditor();
-			this.#isCodeEditorReady.setValue(true);
-		} catch (error) {
-			console.error(error);
+	/**
+	 * @description Set the content of the script
+	 * @param {string} value
+	 * @memberof UmbScriptWorkspaceContext
+	 */
+	public setContent(value: string) {
+		this._data.updateCurrent({ content: value });
+	}
+
+	/**
+	 * @description load the script
+	 * @param unique The unique identifier of the script
+	 * @returns {Promise<void>}
+	 * @memberof UmbScriptWorkspaceContext
+	 */
+	public override async load(unique: string) {
+		const response = await super.load(unique);
+		this.observe(response.asObservable?.(), (data) => this.#onDetailStoreChanges(data), 'umbDetailStoreObserver');
+		return response;
+	}
+
+	#onDetailStoreChanges(data: UmbScriptDetailModel | undefined) {
+		// Data is removed from the store
+		// TODO: revisit. We need to handle what should happen when the data is removed from the store
+		if (data === undefined) {
+			this._data.clear();
 		}
-	}
-
-	getEntityType(): string {
-		return UMB_SCRIPT_ENTITY_TYPE;
-	}
-
-	getUnique() {
-		const data = this.getData();
-		if (!data) throw new Error('Data is missing');
-		return data.unique;
-	}
-
-	getData() {
-		return this.#data.getValue();
-	}
-
-	setName(value: string) {
-		this.#data.update({ name: value });
-	}
-
-	setContent(value: string) {
-		this.#data.update({ content: value });
-	}
-
-	async load(unique: string) {
-		this.resetState();
-		const { data } = await this.repository.requestByUnique(unique);
-		if (data) {
-			this.setIsNew(false);
-			this.#data.setValue(data);
-		}
-	}
-
-	async create(parent: { entityType: string; unique: string | null }) {
-		this.resetState();
-		this.#parent.setValue(parent);
-		const { data } = await this.repository.createScaffold();
-
-		if (data) {
-			this.setIsNew(true);
-			this.#data.setValue(data);
-		}
-	}
-
-	async save() {
-		if (!this.#data.value) throw new Error('Data is missing');
-
-		let newData = undefined;
-
-		if (this.getIsNew()) {
-			const parent = this.#parent.getValue();
-			if (!parent) throw new Error('Parent is not set');
-			const { data } = await this.repository.create(this.#data.value, parent.unique);
-			newData = data;
-
-			// TODO: this might not be the right place to alert the tree, but it works for now
-			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
-				entityType: parent.entityType,
-				unique: parent.unique,
-			});
-			eventContext.dispatchEvent(event);
-		} else {
-			const { data } = await this.repository.save(this.#data.value);
-			newData = data;
-
-			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadStructureForEntityEvent({
-				unique: this.getUnique()!,
-				entityType: this.getEntityType(),
-			});
-
-			actionEventContext.dispatchEvent(event);
-		}
-
-		if (newData) {
-			this.#data.setValue(newData);
-
-			this.setIsNew(false);
-			this.workspaceComplete(newData);
-		}
-	}
-
-	destroy(): void {
-		super.destroy();
-		this.#data.destroy();
 	}
 }
 

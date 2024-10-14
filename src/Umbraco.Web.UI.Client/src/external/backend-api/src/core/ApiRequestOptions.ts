@@ -1,17 +1,21 @@
-/* generated using openapi-typescript-codegen -- do no edit */
-/* istanbul ignore file */
-/* tslint:disable */
-/* eslint-disable */
-export type ApiRequestOptions = {
-    readonly method: 'GET' | 'PUT' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD' | 'PATCH';
-    readonly url: string;
-    readonly path?: Record<string, any>;
-    readonly cookies?: Record<string, any>;
-    readonly headers?: Record<string, any>;
-    readonly query?: Record<string, any>;
-    readonly formData?: Record<string, any>;
-    readonly body?: any;
-    readonly mediaType?: string;
-    readonly responseHeader?: string;
-    readonly errors?: Record<number, string>;
+export type ApiRequestOptions<T = unknown> = {
+	readonly body?: any;
+	readonly cookies?: Record<string, unknown>;
+	readonly errors?: Record<number | string, string>;
+	readonly formData?: Record<string, unknown> | any[] | Blob | File;
+	readonly headers?: Record<string, unknown>;
+	readonly mediaType?: string;
+	readonly method:
+		| 'DELETE'
+		| 'GET'
+		| 'HEAD'
+		| 'OPTIONS'
+		| 'PATCH'
+		| 'POST'
+		| 'PUT';
+	readonly path?: Record<string, unknown>;
+	readonly query?: Record<string, unknown>;
+	readonly responseHeader?: string;
+	readonly responseTransformer?: (data: unknown) => Promise<T>;
+	readonly url: string;
 };

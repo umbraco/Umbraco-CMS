@@ -6,4 +6,10 @@ export const extensions = [
 		type: 'bundle',
 		js: () => import('./manifests.js'),
 	},
+	{
+		name: 'Media Management Entry Point',
+		alias: 'Umb.EntryPoint.MediaManagement',
+		type: 'backofficeEntryPoint',
+		js: () => import('./entry-point.js'),
+	},
 ];

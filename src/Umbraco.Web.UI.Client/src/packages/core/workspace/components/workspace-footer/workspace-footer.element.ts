@@ -1,13 +1,21 @@
-import { UMB_SAVEABLE_WORKSPACE_CONTEXT } from '../../contexts/tokens/saveable-workspace.context-token.js';
+import { UMB_SUBMITTABLE_WORKSPACE_CONTEXT } from '../../contexts/tokens/submittable-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { ManifestWorkspaceAction, MetaWorkspaceAction } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbWorkspaceActionArgs } from '@umbraco-cms/backoffice/workspace';
+import type {
+	ManifestWorkspaceAction,
+	MetaWorkspaceAction,
+	UmbWorkspaceActionArgs,
+} from '@umbraco-cms/backoffice/workspace';
 
+/**
+ *
+ * @param manifest
+ * @returns
+ */
 function ExtensionApiArgsMethod(
 	manifest: ManifestWorkspaceAction<MetaWorkspaceAction>,
 ): [UmbWorkspaceActionArgs<MetaWorkspaceAction>] {
@@ -19,9 +27,8 @@ function ExtensionApiArgsMethod(
  * @description Uses the alias to insert extensions that targets this workspace-alias.
  * @slot - Slot for workspace footer items
  * @slot actions - Slot for workspace actions
- * @export
  * @class UmbWorkspaceFooterLayout
- * @extends {UmbLitElement}
+ * @augments {UmbLitElement}
  */
 // TODO: stop naming this something with layout. as its not just an layout. it hooks up with extensions.
 @customElement('umb-workspace-footer')
@@ -37,7 +44,7 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_SAVEABLE_WORKSPACE_CONTEXT, (context) => {
+		this.consumeContext(UMB_SUBMITTABLE_WORKSPACE_CONTEXT, (context) => {
 			this._isNew = context.getIsNew();
 		});
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
@@ -50,7 +57,7 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 	};
 
 	// TODO: Some event/callback from umb-extension-slot that can be utilized to hide the footer, if empty.
-	render() {
+	override render() {
 		return html`
 			<umb-footer-layout>
 				<umb-extension-slot type="workspaceFooterApp"></umb-extension-slot>
@@ -72,12 +79,17 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
 				display: block;
 				width: 100%;
+			}
+
+			/* prevents text in action buttons from wrapping */
+			umb-extension-with-api-slot {
+				text-wrap: nowrap;
 			}
 
 			umb-extension-slot[slot='actions'] {

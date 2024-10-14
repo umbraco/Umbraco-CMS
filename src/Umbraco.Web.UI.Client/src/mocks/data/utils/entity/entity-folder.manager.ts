@@ -2,11 +2,10 @@ import type { UmbEntityMockDbBase } from './entity-base.js';
 import type {
 	CreateFolderRequestModel,
 	FolderResponseModel,
-	FolderTreeItemResponseModel,
 	UpdateFolderResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-export class UmbMockEntityFolderManager<MockItemType extends FolderTreeItemResponseModel> {
+export class UmbMockEntityFolderManager<MockItemType extends { id: string; name: string; isFolder: boolean }> {
 	#db: UmbEntityMockDbBase<MockItemType>;
 	#createMockFolderMapper: (request: CreateFolderRequestModel) => MockItemType;
 

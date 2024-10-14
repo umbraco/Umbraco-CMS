@@ -1,11 +1,10 @@
-import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { PublicAccessRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Document Public Access that fetches data from the server
- * @export
  * @class UmbDocumentPublicAccessServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -14,7 +13,7 @@ export class UmbDocumentPublicAccessServerDataSource {
 
 	/**
 	 * Creates an instance of UmbDocumentPublicAccessServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentPublicAccessServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -31,7 +30,7 @@ export class UmbDocumentPublicAccessServerDataSource {
 		if (!unique) throw new Error('unique is missing');
 		return tryExecuteAndNotify(
 			this.#host,
-			DocumentResource.postDocumentByIdPublicAccess({ id: unique, requestBody: data }),
+			DocumentService.postDocumentByIdPublicAccess({ id: unique, requestBody: data }),
 		);
 	}
 
@@ -42,18 +41,19 @@ export class UmbDocumentPublicAccessServerDataSource {
 	 */
 	async read(unique: string) {
 		if (!unique) throw new Error('unique is missing');
-		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentByIdPublicAccess({ id: unique }));
+		return tryExecuteAndNotify(this.#host, DocumentService.getDocumentByIdPublicAccess({ id: unique }));
 	}
 
 	/**
 	 * Updates Public Access for the given Document unique
 	 * @param {string} unique
 	 * @param {PublicAccessRequestModel} data
+	 * @param requestBody
 	 * @memberof UmbDocumentPublicAccessServerDataSource
 	 */
 	async update(unique: string, requestBody: PublicAccessRequestModel) {
 		if (!unique) throw new Error('unique is missing');
-		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdPublicAccess({ id: unique, requestBody }));
+		return tryExecuteAndNotify(this.#host, DocumentService.putDocumentByIdPublicAccess({ id: unique, requestBody }));
 	}
 
 	/**
@@ -63,6 +63,6 @@ export class UmbDocumentPublicAccessServerDataSource {
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('unique is missing');
-		return tryExecuteAndNotify(this.#host, DocumentResource.deleteDocumentByIdPublicAccess({ id: unique }));
+		return tryExecuteAndNotify(this.#host, DocumentService.deleteDocumentByIdPublicAccess({ id: unique }));
 	}
 }

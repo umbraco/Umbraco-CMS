@@ -1,8 +1,7 @@
 import { UMB_MEDIA_TREE_ALIAS } from '../tree/index.js';
+import { UMB_MEDIA_MENU_ALIAS } from './constants.js';
 
-export const UMB_MEDIA_MENU_ALIAS = 'Umb.Menu.Media';
-
-export const manifests = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menu',
 		alias: UMB_MEDIA_MENU_ALIAS,

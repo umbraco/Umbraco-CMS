@@ -1,6 +1,4 @@
-import type { ManifestSectionView } from '@umbraco-cms/backoffice/extension-registry';
-
-const sectionsViews: Array<ManifestSectionView> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'sectionView',
 		alias: 'Umb.SectionView.Media',
@@ -8,7 +6,7 @@ const sectionsViews: Array<ManifestSectionView> = [
 		element: () => import('./media-section-view.element.js'),
 		weight: 200,
 		meta: {
-			label: 'Media',
+			label: '#general_media',
 			pathname: 'media',
 			icon: 'icon-user',
 		},
@@ -20,5 +18,3 @@ const sectionsViews: Array<ManifestSectionView> = [
 		],
 	},
 ];
-
-export const manifests = [...sectionsViews];

@@ -12,7 +12,7 @@ export class UmbInstallerErrorElement extends UmbLitElement {
 
 	private _installerContext?: UmbInstallerContext;
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 
 		this.consumeContext(UMB_INSTALLER_CONTEXT, (installerContext) => {
@@ -39,7 +39,7 @@ export class UmbInstallerErrorElement extends UmbLitElement {
 	private _renderError(error: ProblemDetails) {
 		return html`
 			<p>Description: ${error.title}</p>
-			${error.errors ? this._renderErrors(error.errors) : nothing}
+			${error.errors ? this._renderErrors(error.errors as any) : nothing}
 			<hr />
 			<h3>Details:</h3>
 			<p id="error-message" data-test="error-message">${error.detail ?? 'Unknown error'}</p>
@@ -55,7 +55,7 @@ export class UmbInstallerErrorElement extends UmbLitElement {
 		`;
 	}
 
-	render() {
+	override render() {
 		return html` <div id="container" class="uui-text" data-test="installer-error">
 			<uui-form>
 				<form id="installer-form" @submit="${this._handleSubmit}">
@@ -74,7 +74,7 @@ export class UmbInstallerErrorElement extends UmbLitElement {
 		</div>`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		css`
 			:host,
 			#container {

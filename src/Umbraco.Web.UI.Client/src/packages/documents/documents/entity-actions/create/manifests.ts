@@ -1,7 +1,8 @@
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_USER_PERMISSION_DOCUMENT_CREATE } from '../../user-permissions/index.js';
+import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
@@ -12,18 +13,23 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
-			label: 'Create...',
+			label: '#actions_create',
+			additionalOptions: true,
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE],
+			},
+			{
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
+			},
+		],
 	},
-];
-
-const modals: Array<ManifestTypes> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.Document.CreateOptions',
 		name: 'Document Create Options Modal',
-		js: () => import('./document-create-options-modal.element.js'),
+		element: () => import('./document-create-options-modal.element.js'),
 	},
 ];
-
-export const manifests = [...entityActions, ...modals];

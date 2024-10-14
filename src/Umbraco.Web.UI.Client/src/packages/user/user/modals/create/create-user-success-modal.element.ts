@@ -1,6 +1,7 @@
 import { UmbUserItemRepository } from '../../repository/item/index.js';
 import { UmbNewUserPasswordRepository } from '../../repository/new-password/index.js';
 import type { UmbUserItemModel } from '../../repository/item/types.js';
+import { UMB_USER_WORKSPACE_PATH } from '../../paths.js';
 import type {
 	UmbCreateUserSuccessModalData,
 	UmbCreateUserSuccessModalValue,
@@ -27,12 +28,12 @@ export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
 	#userNewPasswordRepository = new UmbNewUserPasswordRepository(this);
 	#notificationContext?: UmbNotificationContext;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => (this.#notificationContext = instance));
 	}
 
-	protected async firstUpdated(): Promise<void> {
+	protected override async firstUpdated(): Promise<void> {
 		const unique = this.data?.user.unique;
 		if (!unique) throw new Error('No user unique is provided');
 
@@ -69,13 +70,11 @@ export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
 		this._rejectModal({ type: 'createAnotherUser' });
 	};
 
-	#onGoToProfile = (event: Event) => {
-		event.stopPropagation();
+	#onGoToProfile = () => {
 		this._submitModal();
-		history.pushState(null, '', 'section/user-management/view/users/user/edit/' + this.data?.user.unique); //TODO: URL Should be dynamic
 	};
 
-	render() {
+	override render() {
 		return html`<uui-dialog-layout headline="${this._userItem?.name} has been created">
 			<p>The new user has successfully been created. To log in to Umbraco use the password below</p>
 			<uui-form-layout-item>
@@ -98,11 +97,12 @@ export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
 				slot="actions"
 				label="Go to profile"
 				look="primary"
-				color="positive"></uui-button>
+				color="positive"
+				href=${UMB_USER_WORKSPACE_PATH + '/edit/' + this.data?.user.unique}></uui-button>
 		</uui-dialog-layout>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			p {

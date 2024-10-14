@@ -1,15 +1,14 @@
-import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
 import type { UmbBlockWorkspaceElementManagerNames } from '../../block-workspace.context.js';
+import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
 import type { UmbBlockWorkspaceViewEditTabElement } from './block-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbContentTypeModel, UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { ManifestWorkspaceView, UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspaceView, UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-block-workspace-view-edit')
 export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -35,7 +34,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 	private _routes: UmbRoute[] = [];
 
 	@state()
-	_tabs?: Array<PropertyTypeContainerModelBaseModel>;
+	_tabs?: Array<UmbPropertyTypeContainerModel>;
 
 	@state()
 	private _routerPath?: string;
@@ -52,7 +51,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 			this.#tabsStructureHelper.mergedContainers,
 			(tabs) => {
 				this._tabs = tabs;
-				this._createRoutes();
+				this.#createRoutes();
 			},
 			null,
 		);
@@ -65,25 +64,25 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 		});
 	}
 
-	#setStructureManager() {
+	async #setStructureManager() {
 		if (!this.#blockWorkspace || !this.#managerName) return;
-		const dataManager = this.#blockWorkspace[this.#managerName];
-		this.#tabsStructureHelper.setStructureManager(dataManager.structure);
+		const blockManager = this.#blockWorkspace[this.#managerName];
+		this.#tabsStructureHelper.setStructureManager(blockManager.structure);
 
-		// Create Data Set:
-		dataManager.createPropertyDatasetContext(this);
+		// Create Data Set & setup Validation Context:
+		blockManager.setup(this);
 
 		this.observe(
-			this.#blockWorkspace![this.#managerName!].structure.hasRootContainers('Group'),
+			await this.#blockWorkspace![this.#managerName!].structure.hasRootContainers('Group'),
 			(hasRootGroups) => {
 				this._hasRootGroups = hasRootGroups;
-				this._createRoutes();
+				this.#createRoutes();
 			},
 			'observeGroups',
 		);
 	}
 
-	private _createRoutes() {
+	#createRoutes() {
 		if (!this._tabs || !this.#blockWorkspace) return;
 		const routes: UmbRoute[] = [];
 
@@ -91,7 +90,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 			this._tabs?.forEach((tab) => {
 				const tabName = tab.name ?? '';
 				routes.push({
-					path: `tab/${encodeFolderName(tabName).toString()}`,
+					path: `tab/${encodeFolderName(tabName)}`,
 					component: () => import('./block-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
 						(component as UmbBlockWorkspaceViewEditTabElement).managerName = this.#managerName;
@@ -113,16 +112,22 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 		}
 
 		if (routes.length !== 0) {
+			if (!this._hasRootGroups) {
+				routes.push({
+					path: '',
+					redirectTo: routes[0]?.path,
+				});
+			}
 			routes.push({
-				path: '',
-				redirectTo: routes[0]?.path,
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
 			});
 		}
 
 		this._routes = routes;
 	}
 
-	render() {
+	override render() {
 		if (!this._routes || !this._tabs) return;
 		return html`
 			<umb-body-layout header-fit-height>
@@ -164,7 +169,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

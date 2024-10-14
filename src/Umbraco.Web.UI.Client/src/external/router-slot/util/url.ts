@@ -1,4 +1,4 @@
-import { ISlashOptions, Params, Query } from '../model';
+import type { ISlashOptions, Query } from '../model.js';
 
 const $anchor = document.createElement('a');
 
@@ -70,7 +70,7 @@ export function queryString(): string {
  * @returns Params
  */
 export function query(): Query {
-	return toQuery(queryString().substr(1));
+	return toQuery(queryString().substring(1));
 }
 
 /**

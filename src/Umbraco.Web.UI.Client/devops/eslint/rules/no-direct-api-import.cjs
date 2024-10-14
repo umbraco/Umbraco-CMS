@@ -1,3 +1,4 @@
+/** @type {import('eslint').Rule.RuleModule} */
 module.exports = {
 	meta: {
 		docs: {
@@ -11,12 +12,12 @@ module.exports = {
 	},
 	create: function (context) {
 		return {
-			// If methods called on *Resource classes are not already wrapped with `await tryExecuteAndNotify()`, then we should suggest to wrap them.
+			// If methods called on *Service classes are not already wrapped with `await tryExecuteAndNotify()`, then we should suggest to wrap them.
 			CallExpression: function (node) {
 				if (
 					node.callee.type === 'MemberExpression' &&
 					node.callee.object.type === 'Identifier' &&
-					node.callee.object.name.endsWith('Resource') &&
+					node.callee.object.name.endsWith('Service') &&
 					node.callee.property.type === 'Identifier' &&
 					node.callee.property.name !== 'constructor'
 				) {

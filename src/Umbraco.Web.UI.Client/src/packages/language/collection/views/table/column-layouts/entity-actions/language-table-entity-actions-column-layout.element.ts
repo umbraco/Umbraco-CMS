@@ -14,7 +14,7 @@ export class UmbLanguageTableEntityActionsColumnLayoutElement extends UmbLitElem
 		this._isOpen = false;
 	}
 
-	render() {
+	override render() {
 		// TODO: we need to use conditionals on each action here. But until we have that in place
 		// we'll just remove all actions on the default language.
 		if (this.value.isDefault) return nothing;

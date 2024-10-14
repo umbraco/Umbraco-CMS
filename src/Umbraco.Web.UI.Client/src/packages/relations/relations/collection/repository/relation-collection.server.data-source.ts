@@ -2,13 +2,12 @@ import type { UmbRelationCollectionFilterModel } from '../types.js';
 import type { UmbRelationDetailModel } from '../../types.js';
 import { UMB_RELATION_ENTITY_TYPE } from '../../entity.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
-import { RelationResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { RelationService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source that fetches the relation collection data from the server.
- * @export
  * @class UmbRelationCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */
@@ -17,7 +16,7 @@ export class UmbRelationCollectionServerDataSource implements UmbCollectionDataS
 
 	/**
 	 * Creates an instance of UmbRelationCollectionServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbRelationCollectionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -27,7 +26,7 @@ export class UmbRelationCollectionServerDataSource implements UmbCollectionDataS
 	/**
 	 * Gets the relation collection filtered by the given filter.
 	 * @param {UmbRelationCollectionFilterModel} filter
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbRelationCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbRelationCollectionFilterModel) {
@@ -37,7 +36,10 @@ export class UmbRelationCollectionServerDataSource implements UmbCollectionDataS
 			id: filter.relationType.unique,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, RelationResource.getRelationTypeById(requestBody));
+		const { data, error } = await tryExecuteAndNotify(
+			this.#host,
+			RelationService.getRelationByRelationTypeId(requestBody),
+		);
 
 		if (data) {
 			const items = data.items.map((item) => {

@@ -20,13 +20,13 @@ export class UmbExtensionInitializer extends UmbControllerBase {
 		this.#localPackages = localPackages;
 	}
 
-	hostConnected(): void {
+	override hostConnected(): void {
 		this.#loadLocalPackages();
 		this.#loadServerPackages();
 	}
 
-	hostDisconnected(): void {
-		this.removeControllerByAlias('_observeExtensions');
+	override hostDisconnected(): void {
+		this.removeUmbControllerByAlias('_observeExtensions');
 	}
 
 	async #loadLocalPackages() {

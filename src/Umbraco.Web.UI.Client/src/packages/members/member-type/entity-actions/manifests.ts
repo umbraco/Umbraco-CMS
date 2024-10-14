@@ -2,20 +2,21 @@ import { UMB_MEMBER_TYPE_ENTITY_TYPE, UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE } from '.
 import { UMB_MEMBER_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/detail/index.js';
 import { UMB_MEMBER_TYPE_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UmbCreateMemberTypeEntityAction } from './create.action.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as duplicateManifests } from './duplicate/manifests.js';
 
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.MemberType.Create',
 		name: 'Create Member Type Entity Action',
-		weight: 1000,
+		weight: 1200,
 		api: UmbCreateMemberTypeEntityAction,
 		forEntityTypes: [UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
-			label: 'Create...',
+			label: '#actions_create',
+			additionalOptions: true,
 		},
 	},
 	{
@@ -29,6 +30,5 @@ const entityActions: Array<ManifestTypes> = [
 			itemRepositoryAlias: UMB_MEMBER_TYPE_ITEM_REPOSITORY_ALIAS,
 		},
 	},
+	...duplicateManifests,
 ];
-
-export const manifests = [...entityActions];

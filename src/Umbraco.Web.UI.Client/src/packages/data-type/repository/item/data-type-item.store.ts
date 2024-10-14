@@ -4,16 +4,15 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
- * @export
  * @class UmbDataTypeItemStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Data Store for Data Type items
  */
 
 export class UmbDataTypeItemStore extends UmbItemStoreBase<UmbDataTypeItemModel> {
 	/**
 	 * Creates an instance of UmbDataTypeItemStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDataTypeItemStore
 	 */
 	constructor(host: UmbControllerHost) {
@@ -22,3 +21,5 @@ export class UmbDataTypeItemStore extends UmbItemStoreBase<UmbDataTypeItemModel>
 }
 
 export const UMB_DATA_TYPE_ITEM_STORE_CONTEXT = new UmbContextToken<UmbDataTypeItemStore>('UmbDataTypeItemStore');
+
+export { UmbDataTypeItemStore as api };

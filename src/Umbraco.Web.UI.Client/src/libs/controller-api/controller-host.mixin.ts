@@ -1,6 +1,6 @@
-import type { ClassConstructor } from '../extension-api/types/utils.js';
 import type { UmbControllerHost } from './controller-host.interface.js';
 import type { UmbController } from './controller.interface.js';
+import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 
 interface UmbControllerHostBaseDeclaration extends Omit<UmbControllerHost, 'getHostElement'> {
 	hostConnected(): void;
@@ -11,9 +11,9 @@ interface UmbControllerHostBaseDeclaration extends Omit<UmbControllerHost, 'getH
 /**
  * This mixin enables a class to host controllers.
  * This enables controllers to be added to the life cycle of this element.
- *
- * @param {Object} superClass - superclass to be extended.
+ * @param {object} superClass - superclass to be extended.
  * @mixin
+ * @returns {UmbControllerHost} - A class which extends the given superclass.
  */
 export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T) => {
 	class UmbControllerHostBaseClass extends superClass implements UmbControllerHostBaseDeclaration {
@@ -27,32 +27,34 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 
 		/**
 		 * Tests if a controller is assigned to this element.
-		 * @param {UmbController} ctrl
+		 * @param {UmbController} ctrl - The controller to check for.
+		 * @returns {boolean} - true if the controller is assigned
 		 */
-		hasController(ctrl: UmbController): boolean {
+		hasUmbController(ctrl: UmbController): boolean {
 			return this.#controllers.indexOf(ctrl) !== -1;
 		}
 
 		/**
 		 * Retrieve controllers matching a filter of this element.
-		 * @param {method} filterMethod
+		 * @param {Function} filterMethod - filter method
+		 * @returns {Array<UmbController>} - currently assigned controllers passing the filter method.
 		 */
-		getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[] {
+		getUmbControllers(filterMethod: (ctrl: UmbController) => boolean): Array<UmbController> {
 			return this.#controllers.filter(filterMethod);
 		}
 
 		/**
 		 * Append a controller to this element.
-		 * @param {UmbController} ctrl
+		 * @param {UmbController} ctrl - the controller to append to this host.
 		 */
-		addController(ctrl: UmbController): void {
+		addUmbController(ctrl: UmbController): void {
 			// If this specific class is already added, then skip out.
 			if (this.#controllers.indexOf(ctrl) !== -1) {
 				return;
 			}
 
 			// Check if there is one already with same unique
-			this.removeControllerByAlias(ctrl.controllerAlias);
+			this.removeUmbControllerByAlias(ctrl.controllerAlias);
 
 			this.#controllers.push(ctrl);
 			if (this.#attached) {
@@ -69,9 +71,9 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 		/**
 		 * Remove a controller from this element.
 		 * Notice this will also destroy the controller.
-		 * @param {UmbController} ctrl
+		 * @param {UmbController} ctrl - The controller to remove and destroy from this host.
 		 */
-		removeController(ctrl: UmbController): void {
+		removeUmbController(ctrl: UmbController): void {
 			const index = this.#controllers.indexOf(ctrl);
 			if (index !== -1) {
 				this.#controllers.splice(index, 1);
@@ -87,11 +89,11 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 		 * Notice this will also destroy the controller.
 		 * @param {string | symbol} controllerAlias
 		 */
-		removeControllerByAlias(controllerAlias: UmbController['controllerAlias']): void {
+		removeUmbControllerByAlias(controllerAlias: UmbController['controllerAlias']): void {
 			if (controllerAlias) {
 				this.#controllers.forEach((x) => {
 					if (x.controllerAlias === controllerAlias) {
-						this.removeController(x);
+						this.removeUmbController(x);
 					}
 				});
 			}

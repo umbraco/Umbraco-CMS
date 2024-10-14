@@ -1,7 +1,7 @@
 import type { UmbMockDBBase } from '../mock-db-base.js';
-import type { FileSystemItemResponseModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { FileItemResponseModel } from './types.js';
 
-export class UmbMockFileSystemItemManager<T extends FileSystemItemResponseModelBaseModel> {
+export class UmbMockFileSystemItemManager<T extends { path: string }> {
 	#db: UmbMockDBBase<T>;
 
 	constructor(db: UmbMockDBBase<T>) {
@@ -14,7 +14,7 @@ export class UmbMockFileSystemItemManager<T extends FileSystemItemResponseModelB
 	}
 }
 
-const createFileItemResponseModelBaseModel = (item: any): FileSystemItemResponseModelBaseModel => ({
+const createFileItemResponseModelBaseModel = (item: any): FileItemResponseModel => ({
 	path: item.path,
 	name: item.name,
 	parent: item.parent,

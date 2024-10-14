@@ -1,4 +1,4 @@
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '../../default/collection-default.context.js';
+import { UMB_COLLECTION_CONTEXT } from '../../default/index.js';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, nothing, state } from '@umbraco-cms/backoffice/external/lit';
@@ -17,7 +17,7 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this._collectionContext = instance;
 			this.#observeCurrentPage();
 			this.#observerTotalPages();
@@ -48,7 +48,7 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 		this._collectionContext?.pagination.setCurrentPageNumber(event.target.current);
 	}
 
-	render() {
+	override render() {
 		if (this._totalPages <= 1) {
 			return nothing;
 		}
@@ -59,7 +59,7 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 			@change=${this.#onChange}></uui-pagination>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

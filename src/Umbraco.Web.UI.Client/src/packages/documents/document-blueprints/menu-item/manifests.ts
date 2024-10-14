@@ -1,16 +1,16 @@
-import type { ManifestMenuItem } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_DOCUMENT_BLUEPRINT_TREE_ALIAS } from '../tree/constants.js';
 
-const menuItem: ManifestMenuItem = {
-	type: 'menuItem',
-	alias: 'Umb.MenuItem.DocumentBlueprints',
-	name: 'Document Blueprints Menu Item',
-	weight: 100,
-	meta: {
-		label: 'Document Blueprints',
-		icon: 'icon-blueprint',
-		entityType: 'document-blueprint-root',
-		menus: ['Umb.Menu.StructureSettings'],
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'menuItem',
+		kind: 'tree',
+		alias: 'Umb.MenuItem.DocumentBlueprints',
+		name: 'Document Blueprints Menu Item',
+		weight: 100,
+		meta: {
+			treeAlias: UMB_DOCUMENT_BLUEPRINT_TREE_ALIAS,
+			label: '#treeHeaders_contentBlueprints',
+			menus: ['Umb.Menu.StructureSettings'],
+		},
 	},
-};
-
-export const manifests = [menuItem];
+];

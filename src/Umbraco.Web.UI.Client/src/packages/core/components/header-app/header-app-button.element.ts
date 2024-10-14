@@ -1,13 +1,11 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
-import { css, html, LitElement, customElement, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type {
-	ManifestHeaderAppButtonKind,
-	UmbBackofficeManifestKind,
-} from '@umbraco-cms/backoffice/extension-registry';
+import { css, html, customElement, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import type { ManifestHeaderAppButtonKind, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-const manifest: UmbBackofficeManifestKind = {
+const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.Button',
 	matchKind: 'button',
@@ -21,10 +19,10 @@ const manifest: UmbBackofficeManifestKind = {
 umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-header-app-button')
-export class UmbHeaderAppButtonElement extends LitElement {
+export class UmbHeaderAppButtonElement extends UmbLitElement {
 	public manifest?: ManifestHeaderAppButtonKind;
 
-	render() {
+	override render() {
 		return html`
 			<uui-button
 				look="primary"
@@ -36,12 +34,16 @@ export class UmbHeaderAppButtonElement extends LitElement {
 		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
 			uui-button {
 				font-size: 18px;
-				--uui-button-background-color: transparent;
+				--uui-button-background-color: var(--umb-header-app-button-background-color, transparent);
+				--uui-button-background-color-hover: var(
+					--umb-header-app-button-background-color-hover,
+					var(--uui-color-emphasis)
+				);
 			}
 		`,
 	];

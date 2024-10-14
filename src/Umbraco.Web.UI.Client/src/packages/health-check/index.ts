@@ -1,1 +1,1 @@
-export * from './manifests.js';
+export * from './health-check.extension.js';

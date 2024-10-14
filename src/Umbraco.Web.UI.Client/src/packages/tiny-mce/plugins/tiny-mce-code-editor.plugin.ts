@@ -1,13 +1,16 @@
 import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '../components/input-tiny-mce/tiny-mce-plugin.js';
-import { UMB_CODE_EDITOR_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UMB_CODE_EDITOR_MODAL } from '@umbraco-cms/backoffice/code-editor';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export default class UmbTinyMceCodeEditorPlugin extends UmbTinyMcePluginBase {
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
+		const localize = new UmbLocalizationController(args.host);
 
 		this.editor.ui.registry.addButton('sourcecode', {
 			icon: 'sourcecode',
-			tooltip: 'View Source Code',
+			tooltip: localize.term('general_viewSourceCode'),
 			onAction: () => this.#showCodeEditor(),
 		});
 	}

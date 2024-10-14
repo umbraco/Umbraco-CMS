@@ -9,12 +9,10 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  * This Controller manages a single Extension and its API instance.
  * When the extension is permitted to be used, its API will be instantiated and available for the consumer.
- *
  * @example
  * ```ts
  * const controller = new UmbExtensionApiController(host, extensionRegistry, alias, [], (permitted, ctrl) => { ctrl.api.helloWorld() }));
  * ```
- * @export
  * @class UmbExtensionApiController
  */
 export class UmbExtensionApiInitializer<
@@ -119,7 +117,7 @@ export class UmbExtensionApiInitializer<
 		}
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		super.destroy();
 		this.#constructorArguments = undefined;
 	}

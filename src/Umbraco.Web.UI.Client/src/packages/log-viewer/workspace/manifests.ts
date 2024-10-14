@@ -1,24 +1,16 @@
-import type {
-	ManifestModal,
-	ManifestWorkspace,
-	ManifestWorkspaceActions,
-	ManifestWorkspaceView,
-} from '@umbraco-cms/backoffice/extension-registry';
+const UMB_LOG_VIEWER_WORKSPACE_ALIAS = 'Umb.Workspace.LogViewer';
 
-const workspaceAlias = 'Umb.Workspace.LogViewer';
-
-const workspace: ManifestWorkspace = {
-	type: 'workspace',
-	alias: workspaceAlias,
-	name: 'LogViewer Root Workspace',
-	element: () => import('./logviewer-workspace.element.js'),
-	api: () => import('./logviewer-workspace.context.js'),
-	meta: {
-		entityType: 'logviewer',
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'workspace',
+		alias: UMB_LOG_VIEWER_WORKSPACE_ALIAS,
+		name: 'LogViewer Root Workspace',
+		element: () => import('./logviewer-workspace.element.js'),
+		api: () => import('./logviewer-workspace.context.js'),
+		meta: {
+			entityType: 'logviewer',
+		},
 	},
-};
-
-const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.LogViewer.Overview',
@@ -33,7 +25,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				match: UMB_LOG_VIEWER_WORKSPACE_ALIAS,
 			},
 		],
 	},
@@ -44,22 +36,17 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		element: () => import('./views/search/index.js'),
 		weight: 200,
 		meta: {
-			label: 'Search',
+			label: '#general_search',
 			pathname: 'search',
 			icon: 'icon-search',
 		},
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				match: UMB_LOG_VIEWER_WORKSPACE_ALIAS,
 			},
 		],
 	},
-];
-
-const workspaceActions: Array<ManifestWorkspaceActions> = [];
-
-const modals: Array<ManifestModal> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.LogViewer.SaveSearch',
@@ -67,5 +54,3 @@ const modals: Array<ManifestModal> = [
 		element: () => import('./views/search/components/log-viewer-search-input-modal.element.js'),
 	},
 ];
-
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions, ...modals];

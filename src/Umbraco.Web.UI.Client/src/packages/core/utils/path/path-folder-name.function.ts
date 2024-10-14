@@ -1,3 +1,3 @@
-import { generateAlias } from '../string/generate-umbraco-alias.function.js';
+import { generateAlias } from '../string/index.js';
 
 export const pathFolderName = generateAlias;

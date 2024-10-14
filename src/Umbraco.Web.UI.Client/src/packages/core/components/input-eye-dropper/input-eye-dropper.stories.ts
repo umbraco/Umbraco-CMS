@@ -22,6 +22,13 @@ export const WithOpacity: Story = {
 
 export const WithSwatches: Story = {
 	args: {
+		showPalette: true,
 		swatches: ['#000000', '#ffffff', '#ff0000', '#00ff00', '#0000ff'],
+	},
+};
+
+export const ShowPalette: Story = {
+	args: {
+		showPalette: true,
 	},
 };

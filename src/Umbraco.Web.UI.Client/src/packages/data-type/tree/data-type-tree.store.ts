@@ -1,38 +1,23 @@
-import { UMB_DATA_TYPE_DETAIL_STORE_CONTEXT } from '../repository/index.js';
-import type { UmbDataTypeDetailModel } from '../types.js';
-import type { UmbDataTypeTreeItemModel } from './types.js';
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
-import { UmbStoreConnector } from '@umbraco-cms/backoffice/store';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
- * @export
  * @class UmbDataTypeTreeStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Tree Data Store for Data Types
  */
 export class UmbDataTypeTreeStore extends UmbUniqueTreeStore {
 	/**
 	 * Creates an instance of UmbDataTypeTreeStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDataTypeTreeStore
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DATA_TYPE_TREE_STORE_CONTEXT.toString());
-
-		new UmbStoreConnector<UmbDataTypeTreeItemModel, UmbDataTypeDetailModel>(host, {
-			store: this,
-			connectToStoreAlias: UMB_DATA_TYPE_DETAIL_STORE_CONTEXT,
-			updateStoreItemMapper: (item) => this.#updateTreeItemMapper(item),
-		});
 	}
-
-	#updateTreeItemMapper = (item: UmbDataTypeDetailModel) => {
-		return {
-			name: item.name,
-		};
-	};
 }
 
 export const UMB_DATA_TYPE_TREE_STORE_CONTEXT = new UmbContextToken<UmbDataTypeTreeStore>('UmbDataTypeTreeStore');
+
+export { UmbDataTypeTreeStore as api };

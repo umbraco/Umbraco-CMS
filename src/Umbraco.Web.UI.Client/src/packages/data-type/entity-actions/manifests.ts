@@ -1,12 +1,11 @@
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../entity.js';
 import { UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/detail/index.js';
-import { UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS } from '../repository/item/manifests.js';
+import { UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS } from '../repository/item/index.js';
 import { manifests as createManifests } from './create/manifests.js';
-import { manifests as moveManifests } from './move/manifests.js';
+import { manifests as moveManifests } from './move-to/manifests.js';
 import { manifests as duplicateManifests } from './duplicate/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'delete',
@@ -18,6 +17,7 @@ const entityActions: Array<ManifestTypes> = [
 			itemRepositoryAlias: UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS,
 		},
 	},
+	...createManifests,
+	...moveManifests,
+	...duplicateManifests,
 ];
-
-export const manifests = [...entityActions, ...createManifests, ...moveManifests, ...duplicateManifests];

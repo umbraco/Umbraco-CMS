@@ -1,66 +1,58 @@
-import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
-import type { UmbDataTypeDetailModel } from '../types.js';
+import type { UmbDataTypeDetailModel, UmbDataTypePropertyModel } from '../types.js';
+import { type UmbDataTypeDetailRepository, UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_DATA_TYPE_ENTITY_TYPE } from '../entity.js';
 import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
+import { UMB_DATA_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import type {
 	UmbInvariantDatasetWorkspaceContext,
 	UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbSaveableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
-	UmbWorkspaceRouteManager,
+	UmbEntityDetailWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import {
-	appendToFrozenArray,
-	UmbArrayState,
-	UmbObjectState,
-	UmbStringState,
-} from '@umbraco-cms/backoffice/observable-api';
+import { appendToFrozenArray, UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { combineLatest, map } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
 	PropertyEditorSettingsDefaultData,
 	PropertyEditorSettingsProperty,
-} from '@umbraco-cms/backoffice/extension-registry';
+} from '@umbraco-cms/backoffice/property-editor';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 type EntityType = UmbDataTypeDetailModel;
+
+/**
+ * @class UmbDataTypeWorkspaceContext
+ * @description - Context for handling data type workspace
+ * There is two overall code flows to be aware about:
+ *
+ * propertyEditorUiAlias is observed
+ * loads propertyEditorUi manifest
+ * then the propertyEditorSchemaAlias is set to what the UI is configured for.
+ *
+ * propertyEditorSchemaAlias is observed
+ * loads the propertyEditorSchema manifest
+ * if no UI is defined then the propertyEditorSchema manifest default ui is set for the propertyEditorUiAlias.
+ *
+ * This supports two cases:
+ * - when editing an existing data type that only has a schema alias set, then it gets the UI set.
+ * - a new property editor ui is picked for a data-type, uses the data-type configuration to set the schema, if such is configured for the Property Editor UI. (The user picks the UI via the UI, the schema comes from the UI that the user picked, we store both on the data-type)
+ */
 export class UmbDataTypeWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<EntityType>
+	extends UmbEntityDetailWorkspaceContextBase<EntityType, UmbDataTypeDetailRepository>
 	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	//
-	public readonly repository: UmbDataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
+	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
+	readonly propertyEditorUiAlias = this._data.createObservablePartOfCurrent((data) => data?.editorUiAlias);
+	readonly propertyEditorSchemaAlias = this._data.createObservablePartOfCurrent((data) => data?.editorAlias);
 
-	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
-	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
-
-	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
-	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
-
-	#getDataPromise?: Promise<any>;
-
-	public isLoaded() {
-		return this.#getDataPromise;
-	}
-
-	readonly name = this.#currentData.asObservablePart((data) => data?.name);
-	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
-
-	readonly propertyEditorUiAlias = this.#currentData.asObservablePart((data) => data?.editorUiAlias);
-	readonly propertyEditorSchemaAlias = this.#currentData.asObservablePart((data) => data?.editorAlias);
-
-	#properties = new UmbArrayState<PropertyEditorSettingsProperty>([], (x) => x.alias);
+	#properties = new UmbArrayState<PropertyEditorSettingsProperty>([], (x) => x.alias).sortBy(
+		(a, b) => (a.weight || 0) - (b.weight || 0),
+	);
 	readonly properties = this.#properties.asObservable();
-
-	#defaults = new UmbArrayState<PropertyEditorSettingsDefaultData>([], (entry) => entry.alias);
-	readonly defaults = this.#defaults.asObservable();
 
 	#propertyEditorSchemaSettingsDefaultData: Array<PropertyEditorSettingsDefaultData> = [];
 	#propertyEditorUISettingsDefaultData: Array<PropertyEditorSettingsDefaultData> = [];
@@ -72,18 +64,22 @@ export class UmbDataTypeWorkspaceContext
 
 	#settingsDefaultData?: Array<PropertyEditorSettingsDefaultData>;
 
-	#propertyEditorUISettingsSchemaAlias?: string;
-
 	#propertyEditorUiIcon = new UmbStringState<string | null>(null);
 	readonly propertyEditorUiIcon = this.#propertyEditorUiIcon.asObservable();
 
 	#propertyEditorUiName = new UmbStringState<string | null>(null);
 	readonly propertyEditorUiName = this.#propertyEditorUiName.asObservable();
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
-
 	constructor(host: UmbControllerHost) {
-		super(host, 'Umb.Workspace.DataType');
+		super(host, {
+			workspaceAlias: UMB_DATA_TYPE_WORKSPACE_ALIAS,
+			entityType: UMB_DATA_TYPE_ENTITY_TYPE,
+			detailRepositoryAlias: UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS,
+		});
+
+		this.addValidationContext(new UmbValidationContext(this));
+
+		this.#observePropertyEditorSchemaAlias();
 		this.#observePropertyEditorUIAlias();
 
 		this.routes.setRoutes([
@@ -93,7 +89,7 @@ export class UmbDataTypeWorkspaceContext
 				setup: (_component, info) => {
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
-					this.create({ entityType: parentEntityType, unique: parentUnique });
+					this.createScaffold({ parent: { entityType: parentEntityType, unique: parentUnique } });
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
@@ -113,31 +109,43 @@ export class UmbDataTypeWorkspaceContext
 		]);
 	}
 
-	resetState() {
-		super.resetState();
-		this.#persistedData.setValue(undefined);
-		this.#currentData.setValue(undefined);
+	override async load(unique: string) {
+		const response = await super.load(unique);
+		this.observe(response.asObservable?.(), (entity) => this.#onStoreChange(entity), 'umbDataTypeStoreObserver');
+		return response;
 	}
+
+	#onStoreChange(entity: EntityType | undefined) {
+		if (!entity) {
+			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
+			history.pushState(null, '', 'section/settings/workspace/data-type-root');
+		}
+	}
+
+	override resetState() {
+		super.resetState();
+		this.#propertyEditorSchemaSettingsProperties = [];
+		this.#propertyEditorUISettingsProperties = [];
+		this.#propertyEditorSchemaSettingsDefaultData = [];
+		this.#propertyEditorUISettingsDefaultData = [];
+		this.#settingsDefaultData = undefined;
+		this.#mergeConfigProperties();
+	}
+
+	// Hold the last set property editor ui alias, so we know when it changes, so we can reset values. [NL]
+	#lastPropertyEditorUIAlias?: string | null;
 
 	#observePropertyEditorUIAlias() {
 		this.observe(
 			this.propertyEditorUiAlias,
 			async (propertyEditorUiAlias) => {
+				this.#propertyEditorUISettingsProperties = [];
+				this.#propertyEditorUISettingsDefaultData = [];
+
 				// we only want to react on the change if the alias is set or null. When it is undefined something is still loading
 				if (propertyEditorUiAlias === undefined) return;
 
-				// if the property editor ui alias is not set, we use the default alias from the schema
-				if (propertyEditorUiAlias === null) {
-					await this.#observePropertyEditorSchemaAlias();
-					this.setPropertyEditorUiAlias(this.#propertyEditorSchemaConfigDefaultUIAlias!);
-				} else {
-					await this.#setPropertyEditorUIConfig(propertyEditorUiAlias);
-					this.setPropertyEditorSchemaAlias(this.#propertyEditorUISettingsSchemaAlias!);
-					await this.#observePropertyEditorSchemaAlias();
-				}
-
-				this._mergeConfigProperties();
-				this._mergeConfigDefaultData();
+				this.#observePropertyEditorUIManifest(propertyEditorUiAlias);
 			},
 			'editorUiAlias',
 		);
@@ -146,62 +154,99 @@ export class UmbDataTypeWorkspaceContext
 	#observePropertyEditorSchemaAlias() {
 		return this.observe(
 			this.propertyEditorSchemaAlias,
-			async (propertyEditorSchemaAlias) => {
-				if (!propertyEditorSchemaAlias) {
-					this.setPropertyEditorSchemaAlias(UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT);
-					return;
-				}
-
-				await this.#setPropertyEditorSchemaConfig(propertyEditorSchemaAlias);
+			(propertyEditorSchemaAlias) => {
+				this.#propertyEditorSchemaSettingsProperties = [];
+				this.#propertyEditorSchemaSettingsDefaultData = [];
+				this.#observePropertyEditorSchemaManifest(propertyEditorSchemaAlias);
 			},
 			'schemaAlias',
-		).asPromise();
+		);
 	}
 
-	#setPropertyEditorSchemaConfig(propertyEditorSchemaAlias: string) {
-		return this.observe(
-			umbExtensionsRegistry.byTypeAndAlias('propertyEditorSchema', propertyEditorSchemaAlias),
+	#observePropertyEditorSchemaManifest(propertyEditorSchemaAlias?: string) {
+		if (!propertyEditorSchemaAlias) {
+			this.removeUmbControllerByAlias('schema');
+			return;
+		}
+		this.observe(
+			propertyEditorSchemaAlias
+				? umbExtensionsRegistry.byTypeAndAlias('propertyEditorSchema', propertyEditorSchemaAlias)
+				: undefined,
 			(manifest) => {
-				this.#propertyEditorSchemaSettingsProperties = manifest?.meta.settings?.properties || [];
+				// Maps properties to have a weight, so they can be sorted
+				this.#propertyEditorSchemaSettingsProperties = (manifest?.meta.settings?.properties ?? []).map((x, i) => ({
+					...x,
+					weight: x.weight ?? i,
+				}));
 				this.#propertyEditorSchemaSettingsDefaultData = manifest?.meta.settings?.defaultData || [];
 				this.#propertyEditorSchemaConfigDefaultUIAlias = manifest?.meta.defaultPropertyEditorUiAlias || null;
+				if (this.#propertyEditorSchemaConfigDefaultUIAlias && this.getPropertyEditorUiAlias() === null) {
+					// Fallback to the default property editor ui for this property editor schema.
+					this.setPropertyEditorUiAlias(this.#propertyEditorSchemaConfigDefaultUIAlias);
+				}
+				this.#mergeConfigProperties();
 			},
 			'schema',
-		).asPromise();
+		);
 	}
 
-	#setPropertyEditorUIConfig(propertyEditorUIAlias: string) {
-		return this.observe(
+	#observePropertyEditorUIManifest(propertyEditorUIAlias: string | null) {
+		if (!propertyEditorUIAlias) {
+			this.removeUmbControllerByAlias('editorUi');
+			return;
+		}
+		this.observe(
 			umbExtensionsRegistry.byTypeAndAlias('propertyEditorUi', propertyEditorUIAlias),
 			(manifest) => {
 				this.#propertyEditorUiIcon.setValue(manifest?.meta.icon || null);
 				this.#propertyEditorUiName.setValue(manifest?.name || null);
 
-				this.#propertyEditorUISettingsSchemaAlias = manifest?.meta.propertyEditorSchemaAlias;
-				this.#propertyEditorUISettingsProperties = manifest?.meta.settings?.properties || [];
+				// Maps properties to have a weight, so they can be sorted, notice UI properties have a +1000 weight compared to schema properties.
+				this.#propertyEditorUISettingsProperties = (manifest?.meta.settings?.properties ?? []).map((x, i) => ({
+					...x,
+					weight: x.weight ?? 1000 + i,
+				}));
 				this.#propertyEditorUISettingsDefaultData = manifest?.meta.settings?.defaultData || [];
+				this.setPropertyEditorSchemaAlias(manifest?.meta.propertyEditorSchemaAlias);
+				this.#mergeConfigProperties();
 			},
 			'editorUi',
-		).asPromise();
+		);
 	}
 
-	private _mergeConfigProperties() {
+	#mergeConfigProperties() {
 		if (this.#propertyEditorSchemaSettingsProperties && this.#propertyEditorUISettingsProperties) {
 			// Reset the value to this array, and then afterwards append:
 			this.#properties.setValue(this.#propertyEditorSchemaSettingsProperties);
 			// Append the UI settings properties to the schema properties, so they can override the schema properties:
 			this.#properties.append(this.#propertyEditorUISettingsProperties);
+
+			// If new or if the alias was changed then set default values. This 'complexity' to prevent setting default data when initialized [NL]
+			const previousPropertyEditorUIAlias = this.#lastPropertyEditorUIAlias;
+			this.#lastPropertyEditorUIAlias = this.getPropertyEditorUiAlias();
+			if (
+				this.getIsNew() ||
+				(previousPropertyEditorUIAlias && previousPropertyEditorUIAlias !== this.#lastPropertyEditorUIAlias)
+			) {
+				this.#transferConfigDefaultData();
+			}
 		}
 	}
 
-	private _mergeConfigDefaultData() {
+	#transferConfigDefaultData() {
 		if (!this.#propertyEditorSchemaSettingsDefaultData || !this.#propertyEditorUISettingsDefaultData) return;
+
+		const data = this._data.getCurrent();
+		if (!data) return;
 
 		this.#settingsDefaultData = [
 			...this.#propertyEditorSchemaSettingsDefaultData,
 			...this.#propertyEditorUISettingsDefaultData,
-		];
-		this.#defaults.setValue(this.#settingsDefaultData);
+		] satisfies Array<UmbDataTypePropertyModel>;
+		// We check for satisfied type, because we will be directly transferring them to become value. Future note, if they are not satisfied, we need to transfer alias and value. [NL]
+
+		this._data.updatePersisted({ values: this.#settingsDefaultData });
+		this._data.updateCurrent({ values: this.#settingsDefaultData });
 	}
 
 	public getPropertyDefaultValue(alias: string) {
@@ -212,159 +257,67 @@ export class UmbDataTypeWorkspaceContext
 		return new UmbInvariantWorkspacePropertyDatasetContext(host, this);
 	}
 
-	async load(unique: string) {
-		this.resetState();
-		this.#getDataPromise = this.repository.requestByUnique(unique);
-		type GetDataType = Awaited<ReturnType<UmbDataTypeDetailRepository['requestByUnique']>>;
-		const { data, asObservable } = (await this.#getDataPromise) as GetDataType;
-		if (!data) return undefined;
-
-		if (data) {
-			this.setIsNew(false);
-			this.#persistedData.setValue(data);
-			this.#currentData.setValue(data);
-		}
-
-		if (asObservable) {
-			this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbDataTypeStoreObserver');
-		}
-	}
-
-	#onStoreChange(entity: EntityType | undefined) {
-		if (!entity) {
-			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
-			history.pushState(null, '', 'section/settings/workspace/data-type-root');
-		}
-	}
-
-	async create(parent: { entityType: string; unique: string | null }) {
-		this.resetState();
-		this.#parent.setValue(parent);
-		const request = this.repository.createScaffold();
-		this.#getDataPromise = request;
-		let { data } = await request;
-		if (!data) return undefined;
-		if (this.modalContext) {
-			data = { ...data, ...this.modalContext.data.preset };
-		}
-		this.setIsNew(true);
-		this.#persistedData.setValue(data);
-		this.#currentData.setValue(data);
-		return data;
-	}
-
-	getData() {
-		return this.#currentData.getValue();
-	}
-
-	getUnique() {
-		return this.getData()?.unique || '';
-	}
-
-	getEntityType() {
-		return 'data-type';
-	}
-
 	getName() {
-		return this.#currentData.getValue()?.name;
+		return this._data.getCurrent()?.name;
 	}
+
 	setName(name: string | undefined) {
-		this.#currentData.update({ name });
+		this._data.updateCurrent({ name });
+	}
+
+	getPropertyEditorSchemaAlias() {
+		return this._data.getCurrent()?.editorAlias;
 	}
 
 	setPropertyEditorSchemaAlias(alias?: string) {
-		this.#currentData.update({ editorAlias: alias });
+		this._data.updateCurrent({ editorAlias: alias });
 	}
+
+	getPropertyEditorUiAlias() {
+		return this._data.getCurrent()?.editorUiAlias;
+	}
+
 	setPropertyEditorUiAlias(alias?: string) {
-		this.#currentData.update({ editorUiAlias: alias });
+		this._data.updateCurrent({ editorUiAlias: alias });
 	}
 
+	/**
+	 * @function propertyValueByAlias
+	 * @param {string} propertyAlias
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
+	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
-		await this.#getDataPromise;
-
-		return combineLatest([
-			this.#currentData.asObservablePart(
-				(data) => data?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
-			),
-			this.#defaults.asObservablePart(
-				(defaults) => defaults?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
-			),
-		]).pipe(
-			map(([value, defaultValue]) => {
-				return value ?? defaultValue;
-			}),
+		await this._getDataPromise;
+		return this._data.createObservablePartOfCurrent(
+			(data) => data?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
 		);
 	}
 
 	getPropertyValue<ReturnType = unknown>(propertyAlias: string) {
 		return (
-			(this.#currentData.getValue()?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType) ??
+			(this._data.getCurrent()?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType) ??
 			(this.getPropertyDefaultValue(propertyAlias) as ReturnType)
 		);
 	}
 
 	// TODO: its not called a property in the model, but we do consider this way in our front-end
 	async setPropertyValue(alias: string, value: unknown) {
-		await this.#getDataPromise;
+		await this._getDataPromise;
 		const entry = { alias: alias, value: value };
 
-		const currentData = this.#currentData.value;
+		const currentData = this._data.getCurrent();
 		if (currentData) {
 			// TODO: make a partial update method for array of data, (idea/concept, use if this case is getting common)
 			const newDataSet = appendToFrozenArray(currentData.values || [], entry, (x) => x.alias);
-			this.#currentData.update({ values: newDataSet });
+			this._data.updateCurrent({ values: newDataSet });
 		}
 	}
 
-	async save() {
-		if (!this.#currentData.value) return;
-		if (!this.#currentData.value.unique) return;
-
-		if (this.getIsNew()) {
-			const parent = this.#parent.getValue();
-			if (!parent) throw new Error('Parent is not set');
-			await this.repository.create(this.#currentData.value, parent.unique);
-
-			// TODO: this might not be the right place to alert the tree, but it works for now
-			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
-				entityType: parent.entityType,
-				unique: parent.unique,
-			});
-			eventContext.dispatchEvent(event);
-		} else {
-			await this.repository.save(this.#currentData.value);
-
-			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadStructureForEntityEvent({
-				unique: this.getUnique()!,
-				entityType: this.getEntityType(),
-			});
-
-			actionEventContext.dispatchEvent(event);
-		}
-
-		this.setIsNew(false);
-		this.workspaceComplete(this.#currentData.value);
-	}
-
-	protected workspaceComplete(data: EntityType | undefined) {
-		this.dispatchEvent(new CustomEvent('workspace-complete'));
-		super.workspaceComplete(data);
-	}
-
-	async delete(unique: string) {
-		await this.repository.delete(unique);
-	}
-
-	public destroy(): void {
-		this.#persistedData.destroy();
-		this.#currentData.destroy();
+	public override destroy(): void {
 		this.#properties.destroy();
-		this.#defaults.destroy();
 		this.#propertyEditorUiIcon.destroy();
 		this.#propertyEditorUiName.destroy();
-		this.repository.destroy();
 		super.destroy();
 	}
 }

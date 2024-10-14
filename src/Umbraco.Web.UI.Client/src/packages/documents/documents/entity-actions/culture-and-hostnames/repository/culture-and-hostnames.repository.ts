@@ -3,7 +3,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import type { DomainsPresentationModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UpdateDomainsRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbDocumentCultureAndHostnamesRepository extends UmbControllerBase implements UmbApi {
 	#dataSource = new UmbDocumentCultureAndHostnamesServerDataSource(this);
@@ -28,7 +28,7 @@ export class UmbDocumentCultureAndHostnamesRepository extends UmbControllerBase 
 		return { error };
 	}
 
-	async updateCultureAndHostnames(unique: string, data: DomainsPresentationModelBaseModel) {
+	async updateCultureAndHostnames(unique: string, data: UpdateDomainsRequestModel) {
 		if (!unique) throw new Error('Unique is missing');
 		if (!data) throw new Error('Data is missing');
 
@@ -40,3 +40,5 @@ export class UmbDocumentCultureAndHostnamesRepository extends UmbControllerBase 
 		return { error };
 	}
 }
+
+export { UmbDocumentCultureAndHostnamesRepository as api };

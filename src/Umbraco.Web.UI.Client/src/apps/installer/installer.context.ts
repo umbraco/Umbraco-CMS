@@ -4,14 +4,13 @@ import type {
 	ProblemDetails,
 	InstallRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { InstallResource, TelemetryLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { InstallService, TelemetryLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbObjectState, UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * Context API for the installer
- * @export
  * @class UmbInstallerContext
  */
 export class UmbInstallerContext {
@@ -38,7 +37,7 @@ export class UmbInstallerContext {
 	/**
 	 * Observable method to get the current step in the installation process
 	 * @public
-	 * @return {*}  {Observable<number>}
+	 * @returns {*}  {Observable<number>}
 	 * @memberof UmbInstallerContext
 	 */
 	public currentStepChanges(): Observable<number> {
@@ -48,7 +47,7 @@ export class UmbInstallerContext {
 	/**
 	 * Observable method to get the install status in the installation process
 	 * @public
-	 * @return {*}  {(Observable<ProblemDetails | null>)}
+	 * @returns {*}  {(Observable<ProblemDetails | null>)}
 	 * @memberof UmbInstallerContext
 	 */
 	public installStatusChanges(): Observable<ProblemDetails | null> {
@@ -96,7 +95,7 @@ export class UmbInstallerContext {
 	/**
 	 * Get the data for the installation process
 	 * @public
-	 * @return {*}  {PostInstallRequest}
+	 * @returns {*}  {PostInstallRequest}
 	 * @memberof UmbInstallerContext
 	 */
 	public getData(): InstallRequestModel {
@@ -119,7 +118,8 @@ export class UmbInstallerContext {
 	 * @memberof UmbInstallerContext
 	 */
 	private async _loadInstallerSettings() {
-		const { data, error } = await tryExecute(InstallResource.getInstallSettings());
+		const { data, error: _error } = await tryExecute(InstallService.getInstallSettings());
+		const error: any = _error;
 		if (data) {
 			this._settings.setValue(data);
 		} else if (error) {

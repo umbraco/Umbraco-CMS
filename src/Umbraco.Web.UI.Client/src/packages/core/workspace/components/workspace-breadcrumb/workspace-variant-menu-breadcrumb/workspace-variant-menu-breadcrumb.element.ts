@@ -1,12 +1,12 @@
-import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { css, customElement, html, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbVariantDatasetWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import { UMB_VARIANT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
+import { UMB_VARIANT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
+import type { UmbVariantDatasetWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbVariantStructureItemModel } from '@umbraco-cms/backoffice/menu';
 
 @customElement('umb-workspace-variant-menu-breadcrumb')
@@ -110,13 +110,13 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 			: `${workspaceBasePath}/${structureItem.unique}/${this._workspaceActiveVariantId?.culture}`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-breadcrumbs>
 				${this._structure.map(
 					(structureItem) =>
 						html`<uui-breadcrumb-item href="${ifDefined(this.#getHref(structureItem))}"
-							>${this.#getItemVariantName(structureItem)}</uui-breadcrumb-item
+							>${this.localize.string(this.#getItemVariantName(structureItem))}</uui-breadcrumb-item
 						>`,
 				)}
 				<uui-breadcrumb-item>${this._name}</uui-breadcrumb-item>
@@ -124,7 +124,18 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [
+		UmbTextStyles,
+		css`
+			:host {
+				/* TODO: This is a temp solution to handle an issue where long nested breadcrumbs would hide workspace actions */
+				overflow: hidden;
+				display: flex;
+				flex-direction: row-reverse;
+				margin-left: var(--uui-size-layout-1);
+			}
+		`,
+	];
 }
 
 export default UmbWorkspaceVariantMenuBreadcrumbElement;

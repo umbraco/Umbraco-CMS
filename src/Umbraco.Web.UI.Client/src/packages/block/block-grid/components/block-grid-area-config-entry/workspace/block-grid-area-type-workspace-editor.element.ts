@@ -19,23 +19,26 @@ export class UmbBlockGridAreaTypeWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
+			this.observe(this.#workspaceContext.name, (name) => {
+				this._name = name;
+			});
 			this.#workspaceContext?.createPropertyDatasetContext(this);
 		});
 	}
 
 	// TODO: Localization, make it so that the headline is about area configuration?
-	render() {
+	override render() {
 		return this.workspaceAlias
 			? html`
 					<umb-workspace-editor
 						alias=${this.workspaceAlias}
 						headline=${this.localize.term('blockEditor_blockConfigurationOverlayTitle', [this._name])}>
 					</umb-workspace-editor>
-			  `
+				`
 			: '';
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

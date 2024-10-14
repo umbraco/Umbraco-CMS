@@ -19,14 +19,14 @@ export class UmbMemberGroupPickerModalElement extends UmbModalBaseElement<
 	#collectionRepository = new UmbMemberGroupCollectionRepository(this);
 	#selectionManager = new UmbSelectionManager(this);
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#selectionManager.setSelectable(true);
 		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
 		this.#selectionManager.setSelection(this.value?.selection ?? []);
 	}
 
-	async firstUpdated() {
+	override async firstUpdated() {
 		const { data } = await this.#collectionRepository.requestCollection({});
 		this._memberGroups = data?.items ?? [];
 	}
@@ -48,8 +48,8 @@ export class UmbMemberGroupPickerModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	render() {
-		return html`<umb-body-layout headline="Select members">
+	override render() {
+		return html`<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMemberGroup')}>
 			<uui-box>
 				${repeat(
 					this.#filteredMemberGroups,
@@ -61,7 +61,7 @@ export class UmbMemberGroupPickerModalElement extends UmbModalBaseElement<
 							@selected=${() => this.#selectionManager.select(item.unique)}
 							@deselected=${() => this.#selectionManager.deselect(item.unique)}
 							?selected=${this.#selectionManager.isSelected(item.unique)}>
-							<uui-icon slot="icon" name="icon-globe"></uui-icon>
+							<uui-icon slot="icon" name="icon-users"></uui-icon>
 						</uui-menu-item>
 					`,
 				)}

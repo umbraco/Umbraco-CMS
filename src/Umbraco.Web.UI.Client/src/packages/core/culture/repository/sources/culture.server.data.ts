@@ -1,11 +1,10 @@
 import type { UmbCultureDataSource } from './index.js';
-import { CultureResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { CultureService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Language that fetches data from the server
- * @export
  * @class UmbLanguageServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -14,7 +13,7 @@ export class UmbCultureServerDataSource implements UmbCultureDataSource {
 
 	/**
 	 * Creates an instance of UmbLanguageServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -23,10 +22,13 @@ export class UmbCultureServerDataSource implements UmbCultureDataSource {
 
 	/**
 	 * Get a list of cultures on the server
-	 * @return {*}
+	 * @param root0
+	 * @param root0.skip
+	 * @param root0.take
+	 * @returns {*}
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async getCollection({ skip, take }: { skip: number; take: number }) {
-		return tryExecuteAndNotify(this.#host, CultureResource.getCulture({ skip, take }));
+		return tryExecuteAndNotify(this.#host, CultureService.getCulture({ skip, take }));
 	}
 }

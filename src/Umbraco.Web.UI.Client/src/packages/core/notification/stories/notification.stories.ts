@@ -1,7 +1,7 @@
 import './story-notification-default-example.element.js';
 
-import type { Meta, Story } from '@storybook/web-components';
 import { UmbNotificationContext } from '../notification.context.js';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
@@ -17,7 +17,7 @@ export default {
 	],
 } as Meta;
 
-const Template: Story = () => html`<umb-story-notification-default-example></umb-story-notification-default-example>`;
+const Template: StoryFn = () => html`<umb-story-notification-default-example></umb-story-notification-default-example>`;
 
 export const Default = Template.bind({});
 Default.parameters = {

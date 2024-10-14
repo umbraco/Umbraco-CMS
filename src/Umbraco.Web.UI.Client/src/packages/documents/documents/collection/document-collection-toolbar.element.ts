@@ -1,11 +1,11 @@
-import type { UmbDocumentCollectionContext } from './document-collection.context.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 
 @customElement('umb-document-collection-toolbar')
 export class UmbDocumentCollectionToolbarElement extends UmbLitElement {
-	#collectionContext?: UmbDocumentCollectionContext;
+	#collectionContext?: UmbDefaultCollectionContext;
 
 	#inputTimer?: NodeJS.Timeout;
 	#inputTimerAmount = 500;
@@ -13,8 +13,8 @@ export class UmbDocumentCollectionToolbarElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
-			this.#collectionContext = instance as UmbDocumentCollectionContext;
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
+			this.#collectionContext = instance;
 		});
 	}
 
@@ -25,7 +25,7 @@ export class UmbDocumentCollectionToolbarElement extends UmbLitElement {
 		this.#inputTimer = setTimeout(() => this.#collectionContext?.setFilter({ filter }), this.#inputTimerAmount);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-collection-action-bundle></umb-collection-action-bundle>
 			<uui-input @input=${this.#updateSearch} label="Search" placeholder="Search..." id="input-search"></uui-input>
@@ -33,7 +33,7 @@ export class UmbDocumentCollectionToolbarElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				height: 100%;

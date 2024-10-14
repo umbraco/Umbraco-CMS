@@ -1,9 +1,9 @@
 import './document-save-modal.element.js';
 
-import type { Meta, StoryObj } from '@storybook/web-components';
 import { UmbDocumentVariantState } from '../../types.js';
 import type { UmbDocumentSaveModalData, UmbDocumentSaveModalValue } from './document-save-modal.token.js';
 import type { UmbDocumentSaveModalElement } from './document-save-modal.element.js';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const modalData: UmbDocumentSaveModalData = {

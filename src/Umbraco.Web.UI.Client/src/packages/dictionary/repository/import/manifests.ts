@@ -1,13 +1,10 @@
-import { UmbDictionaryImportRepository } from './dictionary-import.repository.js';
-import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_DICTIONARY_IMPORT_REPOSITORY_ALIAS } from './constants.js';
 
-export const UMB_DICTIONARY_IMPORT_REPOSITORY_ALIAS = 'Umb.Repository.Dictionary.Import';
-
-const repository: ManifestRepository = {
-	type: 'repository',
-	alias: UMB_DICTIONARY_IMPORT_REPOSITORY_ALIAS,
-	name: 'Dictionary Import Repository',
-	api: UmbDictionaryImportRepository,
-};
-
-export const manifests = [repository];
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'repository',
+		alias: UMB_DICTIONARY_IMPORT_REPOSITORY_ALIAS,
+		name: 'Dictionary Import Repository',
+		api: () => import('./dictionary-import.repository.js'),
+	},
+];

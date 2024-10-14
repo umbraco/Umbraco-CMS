@@ -1,6 +1,6 @@
-import { expect } from '@open-wc/testing';
 import { UmbObjectState } from './states/object-state.js';
 import { UmbObserver } from './observer.js';
+import { expect } from '@open-wc/testing';
 
 describe('UmbObserver', () => {
 	type ObjectType = { key: string; another: string };

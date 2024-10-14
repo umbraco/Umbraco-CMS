@@ -4,7 +4,7 @@ import {
 	appendFileExtensionIfNeeded,
 } from '@umbraco-cms/backoffice/server-file-system';
 import type { RenameStylesheetRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { StylesheetResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { StylesheetService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -22,7 +22,7 @@ export class UmbRenameStylesheetServerDataSource {
 	 * Rename Stylesheet
 	 * @param {string} unique
 	 * @param {string} name
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbRenameStylesheetServerDataSource
 	 */
 	async rename(unique: string, name: string) {
@@ -38,7 +38,7 @@ export class UmbRenameStylesheetServerDataSource {
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			StylesheetResource.putStylesheetByPathRename({
+			StylesheetService.putStylesheetByPathRename({
 				path: encodeURIComponent(path),
 				requestBody,
 			}),

@@ -10,7 +10,7 @@ export class UmbDictionaryCollectionDashboardElement extends UmbLitElement {
 		allowSelection: false,
 	};
 
-	render() {
+	override render() {
 		return html` <umb-collection alias=${UMB_DICTIONARY_COLLECTION_ALIAS}></umb-collection>`;
 	}
 }

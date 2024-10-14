@@ -6,7 +6,7 @@ import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
  */
 @customElement('umb-ref-grid-block')
 export class UmbRefGridBlockElement extends UUIRefNodeElement {
-	render() {
+	override render() {
 		return html`
 			${super.render()}
 			<div class="break"></div>
@@ -14,7 +14,7 @@ export class UmbRefGridBlockElement extends UUIRefNodeElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		...UUIRefNodeElement.styles,
 		css`
 			:host {
@@ -33,7 +33,11 @@ export class UmbRefGridBlockElement extends UUIRefNodeElement {
 			#open-part {
 				min-height: var(
 					--uui-size-layout-2
-				); /* We should not do this, but it is a quick fix for now to ensure that the top part of a block gets a minimum height. */
+				); /* TODO: We should not do this, but it is a quick fix for now to ensure that the top part of a block gets a minimum height. */
+			}
+
+			:host([unpublished]) #open-part {
+				opacity: 0.6;
 			}
 		`,
 	];

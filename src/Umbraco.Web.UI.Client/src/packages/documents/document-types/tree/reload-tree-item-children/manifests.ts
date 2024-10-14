@@ -3,9 +3,8 @@ import {
 	UMB_DOCUMENT_TYPE_ENTITY_TYPE,
 	UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
 } from '../../entity.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.DocumentType.Tree.ReloadChildrenOf',

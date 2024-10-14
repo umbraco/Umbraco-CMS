@@ -1,4 +1,4 @@
-import type { ManifestTinyMcePlugin } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTinyMcePlugin } from './tinymce-plugin.extension.js';
 
 export const manifests: Array<ManifestTinyMcePlugin> = [
 	{
@@ -12,26 +12,6 @@ export const manifests: Array<ManifestTinyMcePlugin> = [
 					alias: 'sourcecode',
 					label: 'Source code editor',
 					icon: 'sourcecode',
-				},
-			],
-		},
-	},
-	{
-		type: 'tinyMcePlugin',
-		alias: 'Umb.TinyMcePlugin.LinkPicker',
-		name: 'Link Picker TinyMCE Plugin',
-		js: () => import('./tiny-mce-linkpicker.plugin.js'),
-		meta: {
-			toolbar: [
-				{
-					alias: 'link',
-					label: 'Insert/Edit link',
-					icon: 'link',
-				},
-				{
-					alias: 'unlink',
-					label: 'Remove link',
-					icon: 'unlink',
 				},
 			],
 		},
@@ -62,6 +42,21 @@ export const manifests: Array<ManifestTinyMcePlugin> = [
 					alias: 'umbembeddialog',
 					label: 'Embed',
 					icon: 'embed',
+				},
+			],
+		},
+	},
+	{
+		type: 'tinyMcePlugin',
+		alias: 'Umb.TinyMcePlugin.BlockPicker',
+		name: 'Block Picker TinyMCE Plugin',
+		js: () => import('./tiny-mce-block-picker.plugin.js'),
+		meta: {
+			toolbar: [
+				{
+					alias: 'umbblockpicker',
+					label: '#blockEditor_insertBlock',
+					icon: 'visualblocks',
 				},
 			],
 		},

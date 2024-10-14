@@ -1,15 +1,19 @@
-import type { UmbUserDetailModel } from '../../types.js';
+import type { UmbUserDetailModel, UmbUserStartNodesModel } from '../../types.js';
 import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
+import { UmbUserKind } from '../../utils/index.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import type { CreateUserRequestModel, UpdateUserRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
+import type {
+	CreateUserRequestModel,
+	UpdateUserRequestModel,
+	UserKindModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the User that fetches data from the server
- * @export
  * @class UmbUserServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -18,7 +22,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 
 	/**
 	 * Creates an instance of UmbUserServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbUserServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -28,17 +32,21 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	/**
 	 * Creates a new User scaffold
 	 * @param {(string | null)} parentUnique
-	 * @return { CreateUserRequestModel }
+	 * @returns { CreateUserRequestModel }
 	 * @memberof UmbUserServerDataSource
 	 */
 	async createScaffold() {
 		const data: UmbUserDetailModel = {
 			avatarUrls: [],
-			documentStartNodeUniques: [],
 			createDate: null,
+			documentStartNodeUniques: [],
 			email: '',
 			entityType: UMB_USER_ENTITY_TYPE,
 			failedLoginAttempts: 0,
+			hasDocumentRootAccess: false,
+			hasMediaRootAccess: false,
+			isAdmin: false,
+			kind: UmbUserKind.DEFAULT,
 			languageIsoCode: '',
 			lastLockoutDate: null,
 			lastLoginDate: null,
@@ -58,46 +66,62 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	/**
 	 * Fetches a User with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbUserServerDataSource
 	 */
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, UserResource.getUserById({ id: unique }));
+		const { data, error } = await tryExecuteAndNotify(this.#host, UserService.getUserById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
 		}
 
 		// TODO: make data mapper to prevent errors
-		const dataType: UmbUserDetailModel = {
+		const user: UmbUserDetailModel = {
 			avatarUrls: data.avatarUrls,
-			documentStartNodeUniques: data.documentStartNodeIds,
 			createDate: data.createDate,
+			hasDocumentRootAccess: data.hasDocumentRootAccess,
+			documentStartNodeUniques: data.documentStartNodeIds.map((node) => {
+				return {
+					unique: node.id,
+				};
+			}),
 			email: data.email,
 			entityType: UMB_USER_ENTITY_TYPE,
 			failedLoginAttempts: data.failedLoginAttempts,
+			isAdmin: data.isAdmin,
+			kind: data.kind,
 			languageIsoCode: data.languageIsoCode || null,
 			lastLockoutDate: data.lastLockoutDate || null,
 			lastLoginDate: data.lastLoginDate || null,
 			lastPasswordChangeDate: data.lastPasswordChangeDate || null,
-			mediaStartNodeUniques: data.mediaStartNodeIds,
+			hasMediaRootAccess: data.hasMediaRootAccess,
+			mediaStartNodeUniques: data.mediaStartNodeIds.map((node) => {
+				return {
+					unique: node.id,
+				};
+			}),
 			name: data.name,
 			state: data.state,
 			unique: data.id,
 			updateDate: data.updateDate,
-			userGroupUniques: data.userGroupIds,
+			userGroupUniques: data.userGroupIds.map((reference) => {
+				return {
+					unique: reference.id,
+				};
+			}),
 			userName: data.userName,
 		};
 
-		return { data: dataType };
+		return { data: user };
 	}
 
 	/**
 	 * Inserts a new User on the server
 	 * @param {UmbUserDetailModel} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbUserServerDataSource
 	 */
 	async create(model: UmbUserDetailModel) {
@@ -107,13 +131,18 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 		const requestBody: CreateUserRequestModel = {
 			email: model.email,
 			name: model.name,
-			userGroupIds: model.userGroupUniques,
+			userGroupIds: model.userGroupUniques.map((reference) => {
+				return {
+					id: reference.unique,
+				};
+			}),
 			userName: model.userName,
+			kind: model.kind as UserKindModel,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			UserResource.postUser({
+			UserService.postUser({
 				requestBody,
 			}),
 		);
@@ -128,7 +157,8 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	/**
 	 * Updates a User on the server
 	 * @param {UmbUserDetailModel} User
-	 * @return {*}
+	 * @param model
+	 * @returns {*}
 	 * @memberof UmbUserServerDataSource
 	 */
 	async update(model: UmbUserDetailModel) {
@@ -136,18 +166,32 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: UpdateUserRequestModel = {
-			documentStartNodeIds: model.documentStartNodeUniques,
+			documentStartNodeIds: model.documentStartNodeUniques.map((node) => {
+				return {
+					id: node.unique,
+				};
+			}),
 			email: model.email,
+			hasDocumentRootAccess: model.hasDocumentRootAccess,
+			hasMediaRootAccess: model.hasMediaRootAccess,
 			languageIsoCode: model.languageIsoCode || '',
-			mediaStartNodeIds: model.mediaStartNodeUniques,
+			mediaStartNodeIds: model.mediaStartNodeUniques.map((node) => {
+				return {
+					id: node.unique,
+				};
+			}),
 			name: model.name,
-			userGroupIds: model.userGroupUniques,
+			userGroupIds: model.userGroupUniques.map((reference) => {
+				return {
+					id: reference.unique,
+				};
+			}),
 			userName: model.userName,
 		};
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			UserResource.putUserById({
+			UserService.putUserById({
 				id: model.unique,
 				requestBody,
 			}),
@@ -163,7 +207,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	/**
 	 * Deletes a User on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbUserServerDataSource
 	 */
 	async delete(unique: string) {
@@ -171,9 +215,47 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 
 		return tryExecuteAndNotify(
 			this.#host,
-			UserResource.deleteUserById({
+			UserService.deleteUserById({
 				id: unique,
 			}),
 		);
+	}
+
+	/**
+	 * Calculates the start nodes for the User
+	 * @param {string} unique
+	 * @returns {*}
+	 * @memberof UmbUserServerDataSource
+	 */
+	async calculateStartNodes(unique: string) {
+		if (!unique) throw new Error('Unique is missing');
+
+		const { data, error } = await tryExecuteAndNotify(
+			this.#host,
+			UserService.getUserByIdCalculateStartNodes({
+				id: unique,
+			}),
+		);
+
+		if (data) {
+			const calculatedStartNodes: UmbUserStartNodesModel = {
+				hasDocumentRootAccess: data.hasDocumentRootAccess,
+				documentStartNodeUniques: data.documentStartNodeIds.map((node) => {
+					return {
+						unique: node.id,
+					};
+				}),
+				hasMediaRootAccess: data.hasMediaRootAccess,
+				mediaStartNodeUniques: data.mediaStartNodeIds.map((node) => {
+					return {
+						unique: node.id,
+					};
+				}),
+			};
+
+			return { data: calculatedStartNodes };
+		}
+
+		return { error };
 	}
 }

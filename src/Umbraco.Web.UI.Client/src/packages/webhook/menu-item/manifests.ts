@@ -1,17 +1,14 @@
-import { UMB_WEBHOOK_ENTITY_TYPE } from '../entity.js';
-import type { ManifestMenuItem } from '@umbraco-cms/backoffice/extension-registry';
-
-const menuItem: ManifestMenuItem = {
-	type: 'menuItem',
-	alias: 'Umb.MenuItem.Webhook',
-	name: 'Webhook Menu Item',
-	weight: 100,
-	meta: {
-		label: 'Webhooks',
-		icon: 'icon-webhook',
-		entityType: UMB_WEBHOOK_ENTITY_TYPE,
-		menus: ['Umb.Menu.AdvancedSettings'],
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'menuItem',
+		alias: 'Umb.MenuItem.Webhook',
+		name: 'Webhook Menu Item',
+		weight: 100,
+		meta: {
+			label: '#treeHeaders_webhooks',
+			icon: 'icon-webhook',
+			entityType: 'webhook-root',
+			menus: ['Umb.Menu.AdvancedSettings'],
+		},
 	},
-};
-
-export const manifests = [menuItem];
+];

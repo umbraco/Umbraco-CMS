@@ -1,12 +1,11 @@
 import { UmbUserServerDataSource } from '../../repository/detail/user-detail.server.data-source.js';
 import type { UmbInviteUserDataSource, UmbInviteUserRequestModel, UmbResendUserInviteRequestModel } from './types.js';
-import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A server data source for inviting users
- * @export
  * @class UmbInviteUserServerDataSource
  */
 export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
@@ -15,6 +14,7 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 
 	/**
 	 * Creates an instance of UmbInviteUserServerDataSource.
+	 * @param host
 	 * @memberof UmbInviteUserServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -35,13 +35,15 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 			email: request.email,
 			userName: request.userName,
 			name: request.name,
-			userGroupIds: request.userGroupUniques,
+			userGroupIds: request.userGroupUniques.map((reference) => {
+				return { id: reference.unique };
+			}),
 			message: request.message,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			UserResource.postUserInvite({
+			UserService.postUserInvite({
 				requestBody,
 			}),
 		);
@@ -72,7 +74,7 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 
 		return tryExecuteAndNotify(
 			this.#host,
-			UserResource.postUserInviteResend({
+			UserService.postUserInviteResend({
 				requestBody,
 			}),
 		);

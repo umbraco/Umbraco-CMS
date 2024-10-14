@@ -11,7 +11,7 @@ export class UmbFolderModalElement extends UmbFolderModalElementBase<
 		if (!this.folderRepository) throw new Error('A folder repository is required to load a folder');
 		if (!this.data?.unique) throw new Error('A unique is required to load folder');
 
-		const { data } = await this.folderRepository.request(this.data.unique);
+		const { data } = await this.folderRepository.requestByUnique(this.data.unique);
 
 		if (data) {
 			this.value = { folder: data };
@@ -22,7 +22,7 @@ export class UmbFolderModalElement extends UmbFolderModalElementBase<
 		if (!this.folderRepository) throw new Error('A folder repository is required to update a folder');
 		if (this.value.folder === undefined) throw new Error('The folder was not initialized correctly');
 
-		const { data } = await this.folderRepository.update({
+		const { data } = await this.folderRepository.save({
 			...this.value.folder,
 			name,
 		});

@@ -27,7 +27,7 @@ export interface UmbLocalizationSet extends UmbLocalizationSetBase {
 	[key: UmbLocalizationSetKey]: UmbLocalizationEntry;
 }
 
-export const UMB_DEFAULT_LOCALIZATION_CULTURE = 'en-us';
+export const UMB_DEFAULT_LOCALIZATION_CULTURE = 'en';
 
 export class UmbLocalizationManager {
 	connectedControllers = new Set<UmbLocalizationController<UmbLocalizationSetBase>>();
@@ -60,7 +60,10 @@ export class UmbLocalizationManager {
 		this.connectedControllers.delete(consumer);
 	}
 
-	/** Registers one or more translations */
+	/**
+	 * Registers one or more translations
+	 * @param t
+	 */
 	registerLocalization(t: UmbLocalizationSetBase) {
 		const code = t.$code.toLowerCase();
 

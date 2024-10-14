@@ -14,10 +14,6 @@ export class UmbMockMediaCollectionManager {
 
 	getCollectionMedia({
 		id,
-		dataTypeId,
-		orderBy,
-		orderDirection,
-		filter,
 		skip = 0,
 		take = 100,
 	}: {

@@ -9,7 +9,7 @@ export class UmbCreateMediaTypeEntityAction extends UmbEntityActionBase<never> {
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modalContext = modalManager.open(this, UMB_MEDIA_TYPE_CREATE_OPTIONS_MODAL, {
 			data: {
@@ -23,3 +23,5 @@ export class UmbCreateMediaTypeEntityAction extends UmbEntityActionBase<never> {
 		await modalContext.onSubmit();
 	}
 }
+
+export { UmbCreateMediaTypeEntityAction as api };

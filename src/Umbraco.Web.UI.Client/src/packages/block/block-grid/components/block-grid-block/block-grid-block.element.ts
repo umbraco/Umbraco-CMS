@@ -1,8 +1,11 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
+
+import '@umbraco-cms/backoffice/ufm';
 import '../block-grid-areas-container/index.js';
 import '../ref-grid-block/index.js';
-import type { UmbBlockViewUrlsPropType } from '@umbraco-cms/backoffice/block';
 
 /**
  * @element umb-block-grid-block
@@ -13,22 +16,37 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	@property({ attribute: false })
 	label?: string;
 
-	@property({ attribute: false })
-	urls?: UmbBlockViewUrlsPropType;
+	@property({ type: String, reflect: false })
+	icon?: string;
 
-	render() {
-		return html`<umb-ref-grid-block standalone .name=${this.label ?? ''} href=${this.urls?.editContent ?? ''}>
+	@property({ attribute: false })
+	config?: UmbBlockEditorCustomViewConfiguration;
+
+	@property({ type: Boolean, reflect: true })
+	unpublished?: boolean;
+
+	@property({ attribute: false })
+	content?: UmbBlockDataType;
+
+	override render() {
+		return html`<umb-ref-grid-block standalone href=${this.config?.editContentPath ?? ''}>
+			<umb-icon slot="icon" .name=${this.icon}></umb-icon>
+			<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
 			<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
 		</umb-ref-grid-block>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			umb-block-grid-areas-container {
 				margin-top: calc(var(--uui-size-2) + 1px);
 			}
 			umb-block-grid-areas-container::part(area) {
 				margin: var(--uui-size-2);
+			}
+			:host([unpublished]) umb-icon,
+			:host([unpublished]) umb-ufm-render {
+				opacity: 0.6;
 			}
 		`,
 	];

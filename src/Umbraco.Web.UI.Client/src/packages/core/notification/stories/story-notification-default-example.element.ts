@@ -11,7 +11,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 export class UmbStoryNotificationDefaultExampleElement extends UmbLitElement {
 	private _notificationContext?: UmbNotificationContext;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
@@ -29,7 +29,7 @@ export class UmbStoryNotificationDefaultExampleElement extends UmbLitElement {
 		this._notificationContext?.peek(color, options);
 	};
 
-	render() {
+	override render() {
 		return html`
 			<uui-button @click="${() => this._handleNotification('default')}" label="Default"></uui-button>
 			<uui-button

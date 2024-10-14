@@ -1,16 +1,9 @@
+import type { UmbCropModel, UmbFocalPointModel } from '../../types.js';
+
 export type UmbImageCropperPropertyEditorValue = {
-	crops: Array<{
-		alias: string;
-		coordinates?: {
-			x1: number;
-			x2: number;
-			y1: number;
-			y2: number;
-		};
-		height: number;
-		width: number;
-	}>;
-	focalPoint: { left: number; top: number };
+	temporaryFileId?: string | null;
+	crops: Array<UmbCropModel>;
+	focalPoint: UmbFocalPointModel;
 	src: string;
 };
 

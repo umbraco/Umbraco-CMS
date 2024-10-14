@@ -10,7 +10,7 @@ export class UmbCreateMediaEntityAction extends UmbEntityActionBase<never> {
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		// default to root
 		let mediaItem = null;
 
@@ -33,3 +33,5 @@ export class UmbCreateMediaEntityAction extends UmbEntityActionBase<never> {
 		await modalContext.onSubmit();
 	}
 }
+
+export { UmbCreateMediaEntityAction as api };

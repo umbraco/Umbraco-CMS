@@ -1,47 +1,45 @@
-import { UmbPartialViewDetailRepository } from '../repository/partial-view-detail.repository.js';
 import type { UmbPartialViewDetailModel } from '../types.js';
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
+import type { UmbPartialViewDetailRepository } from '../repository/index.js';
+import { UMB_PARTIAL_VIEW_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UmbPartialViewWorkspaceEditorElement } from './partial-view-workspace-editor.element.js';
-import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_PARTIAL_VIEW_WORKSPACE_ALIAS } from './manifests.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbRoutableWorkspaceContext, UmbSaveableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import {
-	UmbSaveableWorkspaceContextBase,
-	UmbWorkspaceIsNewRedirectController,
-	UmbWorkspaceRouteManager,
+import type {
+	UmbEntityDetailWorkspaceContextCreateArgs,
+	UmbRoutableWorkspaceContext,
+	UmbSubmittableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
-import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
+import {
+	UmbEntityDetailWorkspaceContextBase,
+	UmbWorkspaceIsNewRedirectController,
+} from '@umbraco-cms/backoffice/workspace';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { PartialViewResource } from '@umbraco-cms/backoffice/external/backend-api';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
+export interface UmbPartialViewWorkspaceContextCreateArgs
+	extends UmbEntityDetailWorkspaceContextCreateArgs<UmbPartialViewDetailModel> {
+	snippet: { unique: string } | null;
+}
+
 export class UmbPartialViewWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<UmbPartialViewDetailModel>
-	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
+	extends UmbEntityDetailWorkspaceContextBase<
+		UmbPartialViewDetailModel,
+		UmbPartialViewDetailRepository,
+		UmbPartialViewWorkspaceContextCreateArgs
+	>
+	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	public readonly repository = new UmbPartialViewDetailRepository(this);
-
-	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
-	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
-
-	#data = new UmbObjectState<UmbPartialViewDetailModel | undefined>(undefined);
-	readonly data = this.#data.asObservable();
-	readonly unique = this.#data.asObservablePart((data) => data?.unique);
-	readonly name = this.#data.asObservablePart((data) => data?.name);
-	readonly content = this.#data.asObservablePart((data) => data?.content);
-	readonly path = this.#data.asObservablePart((data) => data?.path);
-
-	#isCodeEditorReady = new UmbBooleanState(false);
-	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
-
-	readonly routes = new UmbWorkspaceRouteManager(this);
+	public readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
+	public readonly content = this._data.createObservablePartOfCurrent((data) => data?.content);
 
 	constructor(host: UmbControllerHost) {
-		super(host, 'Umb.Workspace.PartialView');
-		this.#loadCodeEditor();
+		super(host, {
+			workspaceAlias: UMB_PARTIAL_VIEW_WORKSPACE_ALIAS,
+			entityType: UMB_PARTIAL_VIEW_ENTITY_TYPE,
+			detailRepositoryAlias: UMB_PARTIAL_VIEW_DETAIL_REPOSITORY_ALIAS,
+		});
 
 		this.routes.setRoutes([
 			{
@@ -51,7 +49,10 @@ export class UmbPartialViewWorkspaceContext
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 					const snippetId = info.match.params.snippetId;
-					this.#onCreate({ entityType: parentEntityType, unique: parentUnique }, snippetId);
+					this.#onCreate({
+						parent: { entityType: parentEntityType, unique: parentUnique },
+						snippet: { unique: snippetId },
+					});
 				},
 			},
 			{
@@ -60,7 +61,10 @@ export class UmbPartialViewWorkspaceContext
 				setup: async (component: PageComponent, info: IRoutingInfo) => {
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
-					this.#onCreate({ entityType: parentEntityType, unique: parentUnique });
+					this.#onCreate({
+						parent: { entityType: parentEntityType, unique: parentUnique },
+						snippet: null,
+					});
 				},
 			},
 			{
@@ -74,8 +78,8 @@ export class UmbPartialViewWorkspaceContext
 		]);
 	}
 
-	#onCreate = async (parent: { entityType: string; unique: string | null }, snippetId?: string) => {
-		await this.create(parent, snippetId);
+	#onCreate = async (args: UmbPartialViewWorkspaceContextCreateArgs) => {
+		await this.createScaffold(args);
 
 		new UmbWorkspaceIsNewRedirectController(
 			this,
@@ -84,119 +88,46 @@ export class UmbPartialViewWorkspaceContext
 		);
 	};
 
-	protected resetState(): void {
-		super.resetState();
-		this.#data.setValue(undefined);
-	}
-
-	async #loadCodeEditor() {
-		try {
-			await loadCodeEditor();
-			this.#isCodeEditorReady.setValue(true);
-		} catch (error) {
-			console.error(error);
-		}
-	}
-
-	getUnique() {
-		const data = this.getData();
-		if (!data) throw new Error('Data is missing');
-		return data.unique;
-	}
-
-	getEntityType(): string {
-		return UMB_PARTIAL_VIEW_ENTITY_TYPE;
-	}
-
-	getData() {
-		return this.#data.getValue();
-	}
-
 	setName(value: string) {
-		this.#data.update({ name: value });
+		this._data.updateCurrent({ name: value });
 	}
 
 	setContent(value: string) {
-		this.#data.update({ content: value });
+		this._data.updateCurrent({ content: value });
 	}
 
-	async load(unique: string) {
-		this.resetState();
-		const { data } = await this.repository.requestByUnique(unique);
-		if (data) {
-			this.setIsNew(false);
-			this.#data.setValue(data);
+	override async load(unique: string) {
+		const response = await super.load(unique);
+		this.observe(response.asObservable?.(), (data) => this.#onDetailStoreChanges(data), 'umbDetailStoreObserver');
+		return response;
+	}
+
+	#onDetailStoreChanges(data: UmbPartialViewDetailModel | undefined) {
+		// Data is removed from the store
+		// TODO: revisit. We need to handle what should happen when the data is removed from the store
+		if (data === undefined) {
+			this._data.clear();
 		}
 	}
 
-	async create(parent: { entityType: string; unique: string | null }, snippetId?: string) {
-		this.resetState();
-		this.#parent.setValue(parent);
+	override async createScaffold(args: UmbPartialViewWorkspaceContextCreateArgs) {
 		let snippetContent = '';
 
-		if (snippetId) {
-			const { data: snippet } = await this.#getSnippet(snippetId);
+		if (args.snippet?.unique) {
+			const { data: snippet } = await this.#getSnippet(args.snippet.unique);
 			snippetContent = snippet?.content || '';
 		}
 
-		const { data } = await this.repository.createScaffold({ content: snippetContent });
+		const argsWithPreset = { ...args, preset: { content: snippetContent } };
 
-		if (data) {
-			this.setIsNew(true);
-			this.#data.setValue(data);
-		}
+		return super.createScaffold(argsWithPreset);
 	}
 
-	public async save() {
-		if (!this.#data.value) throw new Error('Data is missing');
-
-		let newData = undefined;
-
-		if (this.getIsNew()) {
-			const parent = this.#parent.getValue();
-			if (!parent) throw new Error('Parent is not set');
-			const { data } = await this.repository.create(this.#data.value, parent.unique);
-
-			// TODO: this might not be the right place to alert the tree, but it works for now
-			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
-				entityType: parent.entityType,
-				unique: parent.unique,
-			});
-
-			eventContext.dispatchEvent(event);
-
-			newData = data;
-		} else {
-			const { data } = await this.repository.save(this.#data.value);
-			newData = data;
-
-			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadStructureForEntityEvent({
-				unique: this.getUnique()!,
-				entityType: this.getEntityType(),
-			});
-
-			actionEventContext.dispatchEvent(event);
-		}
-
-		if (newData) {
-			this.#data.setValue(newData);
-			this.setIsNew(false);
-			this.workspaceComplete(newData);
-		}
-	}
-
-	public destroy(): void {
-		this.#data.destroy();
-		super.destroy();
-	}
-
-	#getSnippet(snippetId: string) {
+	#getSnippet(unique: string) {
 		return tryExecuteAndNotify(
 			this,
-			PartialViewResource.getPartialViewSnippetById({
-				id: snippetId,
+			PartialViewService.getPartialViewSnippetById({
+				id: unique,
 			}),
 		);
 	}

@@ -1,4 +1,4 @@
-import type { UmbControllerHostElement } from '../controller-api/controller-host-element.interface.js';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import type { UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
 

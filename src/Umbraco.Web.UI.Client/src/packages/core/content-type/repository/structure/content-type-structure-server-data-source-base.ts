@@ -1,11 +1,18 @@
 import type { UmbPagedModel } from '../../../repository/types.js';
 import type { UmbContentTypeStructureDataSource } from './content-type-structure-data-source.interface.js';
-import type { AllowedContentTypeModel, ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
+// Temp type
+type AllowedContentTypeModel = {
+	id: string;
+	name: string;
+	description?: string | null;
+	icon?: string | null;
+};
+
 export interface UmbContentTypeStructureServerDataSourceBaseArgs<
-	ServerItemType extends ItemResponseModelBaseModel,
+	ServerItemType extends AllowedContentTypeModel,
 	ClientItemType extends { unique: string },
 > {
 	getAllowedChildrenOf: (unique: string | null) => Promise<UmbPagedModel<ServerItemType>>;
@@ -23,7 +30,8 @@ export abstract class UmbContentTypeStructureServerDataSourceBase<
 
 	/**
 	 * Creates an instance of UmbContentTypeStructureServerDataSourceBase.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
+	 * @param args
 	 * @memberof UmbItemServerDataSourceBase
 	 */
 	constructor(
@@ -38,7 +46,7 @@ export abstract class UmbContentTypeStructureServerDataSourceBase<
 	/**
 	 * Returns a promise with the allowed content types for the given unique
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbContentTypeStructureServerDataSourceBase
 	 */
 	async getAllowedChildrenOf(unique: string | null) {

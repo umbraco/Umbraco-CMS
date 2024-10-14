@@ -9,7 +9,7 @@ export const handlers = [
 	...treeHandlers,
 	...itemHandlers,
 	...folderHandlers,
+	...detailHandlers,
 	...moveHandlers,
 	...copyHandlers,
-	...detailHandlers,
 ];

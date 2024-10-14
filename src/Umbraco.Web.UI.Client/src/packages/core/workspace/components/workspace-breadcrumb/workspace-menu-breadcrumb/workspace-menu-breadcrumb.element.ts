@@ -1,8 +1,8 @@
-import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { css, customElement, html, ifDefined, map, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbMenuStructureWorkspaceContext, UmbStructureItemModel } from '@umbraco-cms/backoffice/menu';
 
 @customElement('umb-workspace-breadcrumb')
@@ -69,13 +69,14 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 		return structureItem.isFolder ? undefined : `${workspaceBasePath}/${structureItem.unique}`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-breadcrumbs>
-				${this._structure?.map(
+				${map(
+					this._structure,
 					(structureItem) =>
-						html`<uui-breadcrumb-item href="${ifDefined(this.#getHref(structureItem))}"
-							>${structureItem.name}</uui-breadcrumb-item
+						html`<uui-breadcrumb-item href=${ifDefined(this.#getHref(structureItem))}
+							>${this.localize.string(structureItem.name)}</uui-breadcrumb-item
 						>`,
 				)}
 				<uui-breadcrumb-item>${this._name}</uui-breadcrumb-item>
@@ -83,7 +84,14 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [
+		UmbTextStyles,
+		css`
+			:host {
+				margin-left: var(--uui-size-layout-1);
+			}
+		`,
+	];
 }
 
 export default UmbWorkspaceBreadcrumbElement;

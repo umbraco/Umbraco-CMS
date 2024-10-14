@@ -8,7 +8,7 @@ import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<UmbMediaTypeCreateOptionsModalData> {
 	#createFolderAction?: UmbCreateFolderEntityAction;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
 
@@ -50,7 +50,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 		}`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Create Media Type">
 				<uui-box>

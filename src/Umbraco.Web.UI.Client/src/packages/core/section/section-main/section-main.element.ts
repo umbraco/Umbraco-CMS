@@ -3,7 +3,7 @@ import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/ex
 
 @customElement('umb-section-main')
 export class UmbSectionMainElement extends LitElement {
-	render() {
+	override render() {
 		return html`
 			<main>
 				<slot></slot>
@@ -11,7 +11,7 @@ export class UmbSectionMainElement extends LitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

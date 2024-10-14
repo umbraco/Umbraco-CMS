@@ -5,7 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
 	ManifestWorkspaceActionMenuItemDefaultKind,
 	MetaWorkspaceActionMenuItemDefaultKind,
-} from '@umbraco-cms/backoffice/extension-registry';
+} from '@umbraco-cms/backoffice/workspace';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-workspace-action-menu-item')
@@ -45,10 +45,12 @@ export class UmbWorkspaceActionMenuItemElement<
 		event.stopPropagation();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-menu-item
-				label=${ifDefined(this.manifest?.meta.label)}
+				label=${ifDefined(
+					this.manifest?.meta.label ? this.localize.string(this.manifest.meta.label) : this.manifest?.name,
+				)}
 				href=${ifDefined(this._href)}
 				@click-label=${this.#onClickLabel}
 				@click=${this.#onClick}>

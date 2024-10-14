@@ -1,13 +1,17 @@
-export interface UmbPickerModalData<TreeItemType> {
+export * from './extensions/index.js';
+
+export interface UmbPickerModalData<ItemType> {
 	multiple?: boolean;
-	hideTreeRoot?: boolean;
-	filter?: (item: TreeItemType) => boolean;
-	pickableFilter?: (item: TreeItemType) => boolean;
-}
-export interface UmbPickerModalValue {
-	selection: Array<string | null>;
+	filter?: (item: ItemType) => boolean;
+	pickableFilter?: (item: ItemType) => boolean;
+	search?: UmbPickerModalSearchConfig;
 }
 
-export interface UmbTreePickerModalData<TreeItemType> extends UmbPickerModalData<TreeItemType> {
-	treeAlias?: string;
+export interface UmbPickerModalSearchConfig {
+	providerAlias: string;
+	queryParams?: object;
+}
+
+export interface UmbPickerModalValue {
+	selection: Array<string | null>;
 }

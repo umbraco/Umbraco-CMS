@@ -1,7 +1,6 @@
 import type { UmbBlockListLayoutModel, UmbBlockListTypeModel } from '../types.js';
-import type { UmbBlockListWorkspaceData } from '../index.js';
-import type { UmbBlockDataType } from '../../block/types.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import type { UmbBlockListWorkspaceOriginData } from '../index.js';
+import type { UmbBlockDataModel } from '../../block/types.js';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 
@@ -10,7 +9,7 @@ import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
  */
 export class UmbBlockListManagerContext<
 	BlockLayoutType extends UmbBlockListLayoutModel = UmbBlockListLayoutModel,
-> extends UmbBlockManagerContext<UmbBlockListTypeModel, BlockLayoutType> {
+> extends UmbBlockManagerContext<UmbBlockListTypeModel, BlockLayoutType, UmbBlockListWorkspaceOriginData> {
 	//
 	#inlineEditingMode = new UmbBooleanState(undefined);
 	readonly inlineEditingMode = this.#inlineEditingMode.asObservable();
@@ -18,31 +17,24 @@ export class UmbBlockListManagerContext<
 	setInlineEditingMode(inlineEditingMode: boolean | undefined) {
 		this.#inlineEditingMode.setValue(inlineEditingMode ?? false);
 	}
+	getInlineEditingMode(): boolean | undefined {
+		return this.#inlineEditingMode.getValue();
+	}
 
-	create(
-		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
-		modalData?: UmbBlockListWorkspaceData,
-	) {
-		return super.createBlockData(contentElementTypeKey, partialLayoutEntry);
+	create(contentElementTypeKey: string, partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>) {
+		return super._createBlockData(contentElementTypeKey, partialLayoutEntry);
 	}
 
 	insert(
 		layoutEntry: BlockLayoutType,
-		content: UmbBlockDataType,
-		settings: UmbBlockDataType | undefined,
-		modalData: UmbBlockListWorkspaceData,
+		content: UmbBlockDataModel,
+		settings: UmbBlockDataModel | undefined,
+		originData: UmbBlockListWorkspaceOriginData,
 	) {
-		this._layouts.appendOneAt(layoutEntry, modalData.originData.index ?? -1);
+		this._layouts.appendOneAt(layoutEntry, originData.index ?? -1);
 
-		this.insertBlockData(layoutEntry, content, settings, modalData);
+		this.insertBlockData(layoutEntry, content, settings);
 
 		return true;
 	}
 }
-
-// TODO: Make discriminator method for this:
-export const UMB_BLOCK_LIST_MANAGER_CONTEXT = new UmbContextToken<
-	UmbBlockListManagerContext,
-	UmbBlockListManagerContext
->('UmbBlockManagerContext');

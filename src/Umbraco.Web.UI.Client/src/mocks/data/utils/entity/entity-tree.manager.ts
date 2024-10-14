@@ -1,9 +1,8 @@
 import { pagedResult } from '../paged-result.js';
 import type { UmbEntityMockDbBase } from './entity-base.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-export class UmbMockEntityTreeManager<T extends EntityTreeItemResponseModel> {
+export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: string } | null; hasChildren: boolean }> {
 	#db: UmbEntityMockDbBase<T>;
 	#treeItemMapper: (item: T) => any;
 
@@ -20,6 +19,18 @@ export class UmbMockEntityTreeManager<T extends EntityTreeItemResponseModel> {
 	getChildrenOf({ parentId, skip = 0, take = 100 }: { parentId: string; skip?: number; take?: number }) {
 		const items = this.#db.getAll().filter((item) => item.parent?.id === parentId);
 		return this.#pagedTreeResult({ items, skip, take });
+	}
+
+	getAncestorsOf({ descendantId }: { descendantId: string }): Array<T> {
+		const items = [];
+		let currentId: string | undefined = descendantId;
+		while (currentId) {
+			const item = this.#db.read(currentId);
+			if (!item) break;
+			items.push(item);
+			currentId = item.parent?.id;
+		}
+		return items.reverse();
 	}
 
 	#pagedTreeResult({ items, skip, take }: { items: Array<T>; skip: number; take: number }) {
@@ -50,7 +61,7 @@ export class UmbMockEntityTreeManager<T extends EntityTreeItemResponseModel> {
 		const movedItems = items.map((item) => {
 			return {
 				...item,
-				parentId: destinationId,
+				parent: destinationId ? { id: destinationId } : null,
 			};
 		});
 
@@ -63,7 +74,7 @@ export class UmbMockEntityTreeManager<T extends EntityTreeItemResponseModel> {
 		const destinationItem = this.#db.read(destinationId);
 		if (!destinationItem) throw new Error(`Destination item with id ${destinationId} not found`);
 
-		// TODO: Notice we don't add numbers to the 'copy' name.
+		// Notice we don't add numbers to the 'copy' name.
 		const items: Array<any> = [];
 
 		ids.forEach((id) => {

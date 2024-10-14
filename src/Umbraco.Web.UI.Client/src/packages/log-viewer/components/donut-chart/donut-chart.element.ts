@@ -28,10 +28,8 @@ interface CircleWithCommands extends Circle {
 //TODO: maybe move to UI Library
 /**
  * This is a donut chart component that can be used to display data in a circular way.
- *
- * @export
  * @class UmbDonutChartElement
- * @extends {LitElement}
+ * @augments {LitElement}
  */
 @customElement('umb-donut-chart')
 export class UmbDonutChartElement extends LitElement {
@@ -41,7 +39,6 @@ export class UmbDonutChartElement extends LitElement {
 
 	/**
 	 * Circle radius in pixels
-	 *
 	 * @memberof UmbDonutChartElement
 	 */
 	@property({ type: Number })
@@ -49,7 +46,6 @@ export class UmbDonutChartElement extends LitElement {
 
 	/**
 	 * The circle thickness in pixels
-	 *
 	 * @memberof UmbDonutChartElement
 	 */
 	@property({ type: Number, attribute: 'border-size' })
@@ -57,7 +53,6 @@ export class UmbDonutChartElement extends LitElement {
 
 	/**
 	 * The size of SVG element in pixels
-	 *
 	 * @memberof UmbDonutChartElement
 	 */
 	@property({ type: Number, attribute: 'svg-size' })
@@ -65,7 +60,6 @@ export class UmbDonutChartElement extends LitElement {
 
 	/**
 	 * Description of the graph, added for accessibility purposes
-	 *
 	 * @memberof UmbDonutChartElement
 	 */
 	@property()
@@ -73,7 +67,6 @@ export class UmbDonutChartElement extends LitElement {
 
 	/**
 	 * Hides the box that appears oh hover with the details of the slice
-	 *
 	 * @memberof UmbDonutChartElement
 	 */
 	@property({ type: Boolean })
@@ -117,11 +110,11 @@ export class UmbDonutChartElement extends LitElement {
 
 	#containerBounds: DOMRect | undefined;
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#containerBounds = this._container.getBoundingClientRect();
 	}
 
-	protected willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
+	protected override willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
 		if (_changedProperties.has('radius') || _changedProperties.has('borderSize') || _changedProperties.has('svgSize')) {
 			if (this.borderSize > this.radius) {
 				throw new Error('Border size cannot be bigger than radius');
@@ -264,7 +257,7 @@ export class UmbDonutChartElement extends LitElement {
         `;
 	}
 
-	render() {
+	override render() {
 		return html` <div id="container" @mousemove=${this.#calculateDetailsBoxPosition}>
 				<svg viewBox="0 0 ${this.viewBox} ${this.viewBox}" role="list">${this.#renderCircles()}</svg>
 				<div
@@ -277,7 +270,7 @@ export class UmbDonutChartElement extends LitElement {
 			<slot @slotchange=${this.#printCircles} @slice-update=${this.#printCircles}></slot>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			path {

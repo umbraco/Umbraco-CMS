@@ -1,6 +1,5 @@
-import { expect, fixture, html } from '@open-wc/testing';
-
 import { UmbUpgraderElement } from './upgrader.element.js';
+import { expect, fixture, html } from '@open-wc/testing';
 
 describe('UmbUpgrader', () => {
 	let element: UmbUpgraderElement;

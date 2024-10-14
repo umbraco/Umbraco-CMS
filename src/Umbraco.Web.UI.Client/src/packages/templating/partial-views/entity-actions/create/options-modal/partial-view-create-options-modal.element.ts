@@ -12,7 +12,7 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 > {
 	#createFolderAction?: UmbCreateFolderEntityAction;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		if (!this.data?.parent) throw new Error('A parent unique is required to create a folder');
 
@@ -63,17 +63,17 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 		}`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Create Partial View">
 				<uui-box>
 					<!-- TODO: construct url -->
 					<uui-menu-item href=${this.#getCreateHref()} label="New empty partial view" @click=${this.#onNavigate}>
-						<uui-icon slot="icon" name="icon-article"></uui-icon>}
+						<uui-icon slot="icon" name="icon-document-html"></uui-icon>}
 					</uui-menu-item>
 
 					<uui-menu-item @click=${this.#onCreateFromSnippetClick} label="New partial view from snippet...">
-						<uui-icon slot="icon" name="icon-article"></uui-icon>}
+						<uui-icon slot="icon" name="icon-document-html"></uui-icon>}
 					</uui-menu-item>
 
 					<uui-menu-item @click=${this.#onCreateFolderClick} label="New Folder...">

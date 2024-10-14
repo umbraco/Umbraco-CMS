@@ -29,7 +29,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 			this.#observeStuff();
 		});
 	}
-	disconnectedCallback(): void {
+	override disconnectedCallback(): void {
 		super.disconnectedCallback();
 		this.removeEventListener('input', this.#setDates);
 	}
@@ -66,7 +66,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 		window.history.pushState({}, '', `${path()}?${qs}`);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<div class="input-container">
 				<uui-label for="start-date">From:</uui-label>
@@ -96,7 +96,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

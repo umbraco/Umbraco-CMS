@@ -1,17 +1,16 @@
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_DOCUMENT_RECYCLE_BIN_TREE_STORE_CONTEXT } from './document-recycle-bin-tree.store.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 
 /**
- * @export
  * @class UmbDocumentRecycleBinTreeStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Tree Data Store for Document Recycle Bin Tree Items
  */
 export class UmbDocumentRecycleBinTreeStore extends UmbUniqueTreeStore {
 	/**
 	 * Creates an instance of UmbDocumentRecycleBinTreeStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentRecycleBinTreeStore
 	 */
 	constructor(host: UmbControllerHost) {
@@ -19,6 +18,4 @@ export class UmbDocumentRecycleBinTreeStore extends UmbUniqueTreeStore {
 	}
 }
 
-export const UMB_DOCUMENT_RECYCLE_BIN_TREE_STORE_CONTEXT = new UmbContextToken<UmbDocumentRecycleBinTreeStore>(
-	'UmbDocumentRecycleBinTreeStore',
-);
+export { UmbDocumentRecycleBinTreeStore as api };

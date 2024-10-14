@@ -1,10 +1,9 @@
-import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A server data source for generating and assigning a new password for a user
- * @export
  * @class UmbNewUserPasswordServerDataSource
  */
 export class UmbNewUserPasswordServerDataSource {
@@ -12,7 +11,7 @@ export class UmbNewUserPasswordServerDataSource {
 
 	/**
 	 * Creates an instance of UmbNewUserPasswordServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbNewUserPasswordServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -22,7 +21,7 @@ export class UmbNewUserPasswordServerDataSource {
 	/**
 	 * Generate a new password for a user
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbNewUserPasswordServerDataSource
 	 */
 	async newPassword(unique: string) {
@@ -30,7 +29,7 @@ export class UmbNewUserPasswordServerDataSource {
 
 		return tryExecuteAndNotify(
 			this.#host,
-			UserResource.postUserByIdResetPassword({
+			UserService.postUserByIdResetPassword({
 				id: unique,
 			}),
 		);

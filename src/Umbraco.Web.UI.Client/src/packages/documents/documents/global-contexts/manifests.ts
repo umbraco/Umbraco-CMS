@@ -5,6 +5,6 @@ export const manifests: Array<ManifestGlobalContext> = [
 		type: 'globalContext',
 		alias: 'Umb.GlobalContext.DocumentConfiguration',
 		name: 'Document Configuration Context',
-		js: () => import('./document-configuration.context.js'),
+		api: () => import('./document-configuration.context.js'),
 	},
 ];

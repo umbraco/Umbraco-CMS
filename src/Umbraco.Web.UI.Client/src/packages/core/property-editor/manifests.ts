@@ -1,4 +1,3 @@
-import { manifests as propertyEditorSchemaManifests } from './schemas/manifests.js';
-import { manifests as propertyEditorUIManifests } from './uis/manifests.js';
+import { manifests as uiPickerModalManifests } from './ui-picker-modal/manifests.js';
 
-export const manifests = [...propertyEditorSchemaManifests, ...propertyEditorUIManifests];
+export const manifests: Array<UmbExtensionManifest> = [...uiPickerModalManifests];

@@ -1,50 +1,41 @@
 import type { UmbTemplateDetailModel } from '../types.js';
-import type { UmbTemplateItemModel } from '../repository/index.js';
-import { UmbTemplateDetailRepository, UmbTemplateItemRepository } from '../repository/index.js';
+import type { UmbTemplateItemModel, UmbTemplateDetailRepository } from '../repository/index.js';
+import { UMB_TEMPLATE_DETAIL_REPOSITORY_ALIAS, UmbTemplateItemRepository } from '../repository/index.js';
+import { UMB_TEMPLATE_ENTITY_TYPE } from '../entity.js';
 import { UMB_TEMPLATE_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbTemplateWorkspaceEditorElement } from './template-workspace-editor.element.js';
-import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import type { UmbRoutableWorkspaceContext, UmbSaveableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbEntityDetailWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
-	UmbWorkspaceRouteManager,
+	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
 export class UmbTemplateWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<UmbTemplateDetailModel>
-	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
+	extends UmbEntityDetailWorkspaceContextBase<UmbTemplateDetailModel, UmbTemplateDetailRepository>
+	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	public readonly detailRepository = new UmbTemplateDetailRepository(this);
 	public readonly itemRepository = new UmbTemplateItemRepository(this);
 
-	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
-	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
-
-	#data = new UmbObjectState<UmbTemplateDetailModel | undefined>(undefined);
-	data = this.#data.asObservable();
 	#masterTemplate = new UmbObjectState<UmbTemplateItemModel | null>(null);
 	masterTemplate = this.#masterTemplate.asObservable();
-	name = this.#data.asObservablePart((data) => data?.name);
-	alias = this.#data.asObservablePart((data) => data?.alias);
-	content = this.#data.asObservablePart((data) => data?.content);
-	readonly unique = this.#data.asObservablePart((data) => data?.unique);
-	masterTemplateUnique = this.#data.asObservablePart((data) => data?.masterTemplate?.unique);
 
-	#isCodeEditorReady = new UmbBooleanState(false);
-	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
-
-	readonly routes = new UmbWorkspaceRouteManager(this);
+	public readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
+	public readonly alias = this._data.createObservablePartOfCurrent((data) => data?.alias);
+	public readonly content = this._data.createObservablePartOfCurrent((data) => data?.content);
+	public readonly masterTemplateUnique = this._data.createObservablePartOfCurrent(
+		(data) => data?.masterTemplate?.unique,
+	);
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_TEMPLATE_WORKSPACE_ALIAS);
-		this.#loadCodeEditor();
+		super(host, {
+			workspaceAlias: UMB_TEMPLATE_WORKSPACE_ALIAS,
+			entityType: UMB_TEMPLATE_ENTITY_TYPE,
+			detailRepositoryAlias: UMB_TEMPLATE_DETAIL_REPOSITORY_ALIAS,
+		});
 
 		this.routes.setRoutes([
 			{
@@ -66,6 +57,7 @@ export class UmbTemplateWorkspaceContext
 				path: 'edit/:unique',
 				component: UmbTemplateWorkspaceEditorElement,
 				setup: (component: PageComponent, info: IRoutingInfo): void => {
+					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
 					this.load(unique);
 				},
@@ -73,42 +65,34 @@ export class UmbTemplateWorkspaceContext
 		]);
 	}
 
-	protected resetState(): void {
-		super.resetState();
-		this.#data.setValue(undefined);
-	}
-
-	async #loadCodeEditor() {
-		try {
-			await loadCodeEditor();
-			this.#isCodeEditorReady.setValue(true);
-		} catch (error) {
-			console.error(error);
+	override async load(unique: string) {
+		const response = await super.load(unique);
+		if (response.data) {
+			this.setMasterTemplate(response.data.masterTemplate?.unique ?? null);
 		}
+		return response;
 	}
 
-	getEntityType(): string {
-		return 'template';
-	}
+	async create(parent: any) {
+		const data = await this.createScaffold({ parent });
 
-	getUnique() {
-		return this.getData()?.unique;
-	}
-
-	getData() {
-		return this.#data.getValue();
+		if (data) {
+			if (!parent) return;
+			await this.setMasterTemplate(parent.unique);
+		}
+		return data;
 	}
 
 	setName(value: string) {
-		this.#data.update({ name: value });
+		this._data.updateCurrent({ name: value });
 	}
 
 	setAlias(value: string) {
-		this.#data.update({ alias: value });
+		this._data.updateCurrent({ alias: value });
 	}
 
 	setContent(value: string) {
-		this.#data.update({ content: value });
+		this._data.updateCurrent({ content: value });
 	}
 
 	getLayoutBlockRegexPattern() {
@@ -117,16 +101,6 @@ export class UmbTemplateWorkspaceContext
 
 	getHasLayoutBlock() {
 		return this.getData()?.content ? this.getLayoutBlockRegexPattern().test(this.getData()?.content as string) : false;
-	}
-
-	async load(unique: string) {
-		this.resetState();
-		const { data } = await this.detailRepository.requestByUnique(unique);
-		if (data) {
-			this.setIsNew(false);
-			this.setMasterTemplate(data.masterTemplate?.unique ?? null);
-			this.#data.setValue(data);
-		}
 	}
 
 	async setMasterTemplate(id: string | null) {
@@ -146,7 +120,7 @@ export class UmbTemplateWorkspaceContext
 	}
 
 	#updateMasterTemplateLayoutBlock = () => {
-		const currentContent = this.#data.getValue()?.content;
+		const currentContent = this._data.getCurrent()?.content;
 		const newMasterTemplateAlias = this.#masterTemplate?.getValue()?.alias;
 		const hasLayoutBlock = this.getHasLayoutBlock();
 
@@ -173,60 +147,6 @@ export class UmbTemplateWorkspaceContext
 ${currentContent}`;
 		this.setContent(string);
 	};
-
-	async create(parent: { entityType: string; unique: string | null }) {
-		this.resetState();
-		this.#parent.setValue(parent);
-		const { data } = await this.detailRepository.createScaffold();
-		if (!data) return;
-		this.setIsNew(true);
-		this.#data.setValue(data);
-
-		if (!parent) return;
-		await this.setMasterTemplate(parent.unique);
-	}
-
-	async save() {
-		if (!this.#data.value) throw new Error('Data is missing');
-
-		let newData = undefined;
-
-		if (this.getIsNew()) {
-			const parent = this.#parent.getValue();
-			if (!parent) throw new Error('Parent is not set');
-			const { data } = await this.detailRepository.create(this.#data.value, parent.unique);
-			newData = data;
-
-			// TODO: this might not be the right place to alert the tree, but it works for now
-			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
-				entityType: parent.entityType,
-				unique: parent.unique,
-			});
-			eventContext.dispatchEvent(event);
-		} else {
-			const { data } = await this.detailRepository.save(this.#data.value);
-			newData = data;
-
-			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadStructureForEntityEvent({
-				unique: this.getUnique()!,
-				entityType: this.getEntityType(),
-			});
-
-			actionEventContext.dispatchEvent(event);
-		}
-
-		if (newData) {
-			this.#data.setValue(newData);
-			this.setIsNew(false);
-			this.workspaceComplete(newData);
-		}
-	}
-
-	public destroy() {
-		this.#data.destroy();
-		super.destroy();
-	}
 }
+
 export { UmbTemplateWorkspaceContext as api };

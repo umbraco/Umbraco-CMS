@@ -1,8 +1,8 @@
 import type { UmbCurrentUserHistoryItem, UmbCurrentUserHistoryStore } from './current-user-history.store.js';
-import { UMB_CURRENT_USER_HISTORY_STORE_CONTEXT } from './current-user-history.store.js';
-import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_CURRENT_USER_HISTORY_STORE_CONTEXT } from './current-user-history.store.token.js';
+import { html, customElement, state, map, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-current-user-history-user-profile-app')
 export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
@@ -25,85 +25,49 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 			this.observe(
 				this.#currentUserHistoryStore.latestHistory,
 				(history) => {
-					this._history = history;
+					this._history = history.reverse();
 				},
 				'umbCurrentUserHistoryObserver',
 			);
 		}
 	}
 
-	render() {
+	#truncate(input: string, length: number, separator = '...'): string {
+		if (input.length <= length) return input;
+
+		const separatorLength = separator.length;
+		const charsToShow = length - separatorLength;
+		const frontChars = Math.ceil(charsToShow / 2);
+		const backChars = Math.floor(charsToShow / 2);
+
+		return input.substring(9, frontChars) + separator + input.substring(input.length - backChars);
+	}
+
+	override render() {
 		return html`
-			<uui-box>
-				<b slot="headline">Recent History</b>
-				<div id="recent-history-items">
-					${this._history.reverse().map((item) => html` ${this.#renderHistoryItem(item)} `)}
-				</div>
+			<uui-box headline=${this.localize.term('user_yourHistory')}>
+				<uui-ref-list>${map(this._history, (item) => html` ${this.#renderItem(item)} `)}</uui-ref-list>
 			</uui-box>
 		`;
 	}
 
-	#renderHistoryItem(item: UmbCurrentUserHistoryItem) {
+	#renderItem(item: UmbCurrentUserHistoryItem) {
+		const label = Array.isArray(item.label) ? item.label[0] : item.label;
+		const detail = Array.isArray(item.label) ? item.label.join(' > ') : this.#truncate(item.path, 50);
+
 		return html`
-			<a href=${item.path} class="history-item">
-				<uui-icon name="icon-link"></uui-icon>
-				<div>
-					<b>${Array.isArray(item.label) ? item.label[0] : item.label}</b>
-					<span>
-						${Array.isArray(item.label)
-							? item.label.map((label, index) => {
-									if (index === 0) return;
-									return html`
-										<span>${label}</span>
-										${index !== item.label.length - 1 ? html`<span>${'>'}</span>` : nothing}
-									`;
-							  })
-							: nothing}
-					</span>
-				</div>
-			</a>
+			<uui-ref-node name=${label} detail=${ifDefined(detail)} href=${item.path}>
+				<uui-icon slot="icon" name="icon-link"></uui-icon>
+			</uui-ref-node>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
-			#recent-history {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-3);
-			}
-			#recent-history-items {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-4);
-			}
-			.history-item {
-				display: grid;
-				grid-template-columns: 32px 1fr;
-				grid-template-rows: 1fr;
-				color: var(--uui-color-interactive);
-				text-decoration: none;
-			}
-			.history-item uui-icon {
-				margin-top: var(--uui-size-space-1);
-			}
-			.history-item:hover {
-				color: var(--uui-color-interactive-emphasis);
-			}
-			.history-item > div {
-				color: inherit;
-				text-decoration: none;
-				display: flex;
-				flex-direction: column;
-				line-height: 1.4em;
-			}
-			.history-item > div > span {
-				font-size: var(--uui-size-4);
-				opacity: 0.5;
-				text-overflow: ellipsis;
-				overflow: hidden;
-				white-space: nowrap;
+			uui-ref-node {
+				padding-left: 0;
+				padding-right: 0;
 			}
 		`,
 	];

@@ -1,9 +1,9 @@
 import './document-publish-modal.element.js';
 
-import type { Meta, StoryObj } from '@storybook/web-components';
 import { UmbDocumentVariantState } from '../../types.js';
 import type { UmbDocumentPublishModalData, UmbDocumentPublishModalValue } from './document-publish-modal.token.js';
 import type { UmbDocumentPublishModalElement } from './document-publish-modal.element.js';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const modalData: UmbDocumentPublishModalData = {

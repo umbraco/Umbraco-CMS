@@ -1,7 +1,7 @@
 import type { UmbUserDetailStore } from './detail/user-detail.store.js';
-import { UMB_USER_DETAIL_STORE_CONTEXT } from './detail/user-detail.store.js';
+import { UMB_USER_DETAIL_STORE_CONTEXT } from './detail/user-detail.store.token.js';
 import type { UmbUserItemStore } from './item/user-item.store.js';
-import { UMB_USER_ITEM_STORE_CONTEXT } from './item/user-item.store.js';
+import { UMB_USER_ITEM_STORE_CONTEXT } from './item/user-item.store.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';

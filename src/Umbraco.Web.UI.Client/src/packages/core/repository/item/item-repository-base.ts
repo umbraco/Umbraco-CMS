@@ -29,15 +29,16 @@ export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 	/**
 	 * Requests the items for the given uniques
 	 * @param {Array<string>} uniques
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbItemRepositoryBase
 	 */
 	async requestItems(uniques: Array<string>) {
 		if (!uniques) throw new Error('Uniques are missing');
 		await this._init;
 
-		const { data, error } = await this.#itemSource.getItems(uniques);
+		const { data, error: _error } = await this.#itemSource.getItems(uniques);
 
+		const error: any = _error;
 		if (data) {
 			this._itemStore!.appendItems(data);
 		}
@@ -48,7 +49,7 @@ export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 	/**
 	 * Returns a promise with an observable of the items for the given uniques
 	 * @param {Array<string>} uniques
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbItemRepositoryBase
 	 */
 	async items(uniques: Array<string>) {

@@ -1,12 +1,3 @@
-import type { ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as debugModalManifests } from './debug-modal/manifests.js';
 
-const modals: Array<ManifestModal> = [
-	{
-		type: 'modal',
-		alias: 'Umb.Modal.ContextDebugger',
-		name: 'Context Debugger Modal',
-		js: () => import('./modals/debug/debug-modal.element.js'),
-	},
-];
-
-export const manifests = [...modals];
+export const manifests: Array<UmbExtensionManifest> = [...debugModalManifests];

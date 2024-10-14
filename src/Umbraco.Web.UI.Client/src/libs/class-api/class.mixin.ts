@@ -28,7 +28,7 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 			super();
 			this._host = host;
 			this._controllerAlias = controllerAlias ?? Symbol(); // This will fallback to a Symbol, ensuring that this class is only appended to the controller host once.
-			this._host.addController(this);
+			this._host.addUmbController(this);
 		}
 
 		getHostElement(): Element {
@@ -68,7 +68,7 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 				) as unknown as SpecificR;
 			} else {
 				callback(undefined as SpecificT);
-				this.removeControllerByAlias(controllerAlias);
+				this.removeUmbControllerByAlias(controllerAlias);
 				return undefined as SpecificR;
 			}
 		}
@@ -102,9 +102,9 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 			return promise;
 		}
 
-		public destroy(): void {
+		public override destroy(): void {
 			if (this._host) {
-				this._host.removeController(this);
+				this._host.removeUmbController(this);
 				this._host = undefined as never;
 			}
 			super.destroy();

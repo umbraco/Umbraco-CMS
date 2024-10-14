@@ -1,16 +1,26 @@
-import type { ManifestUserProfileApp } from '@umbraco-cms/backoffice/extension-registry';
-
-export const userProfileApps: Array<ManifestUserProfileApp> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
-		type: 'userProfileApp',
-		alias: 'Umb.UserProfileApp.CurrentUser.ExternalLoginProviders',
-		name: 'External Login Providers User Profile App',
-		element: () => import('./external-login-providers-user-profile-app.element.js'),
-		weight: 800,
+		type: 'modal',
+		alias: 'Umb.Modal.CurrentUserExternalLogin',
+		name: 'External Login Modal',
+		element: () => import('./modals/external-login-modal.element.js'),
+	},
+	{
+		type: 'currentUserAction',
+		kind: 'default',
+		alias: 'Umb.CurrentUser.App.ExternalLoginProviders',
+		name: 'External Login Providers Current User App',
+		weight: 700,
+		api: () => import('./configure-external-login-providers-action.js'),
 		meta: {
-			label: 'External Login Providers User Profile App',
-			pathname: 'externalLoginProviders',
+			label: '#defaultdialogs_externalLoginProviders',
+			icon: 'icon-lock',
+			look: 'secondary',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.User.AllowExternalLoginAction',
+			},
+		],
 	},
 ];
-export const manifests = [...userProfileApps];

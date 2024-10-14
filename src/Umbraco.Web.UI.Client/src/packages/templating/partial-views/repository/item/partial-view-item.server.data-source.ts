@@ -4,11 +4,10 @@ import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/serve
 import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { PartialViewResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  * A data source for script items that fetches data from the server
- * @export
  * @class UmbPartialViewItemServerDataSource
  * @implements {UmbItemDataSource}
  */
@@ -18,7 +17,7 @@ export class UmbPartialViewItemServerDataSource implements UmbItemDataSource<Umb
 
 	/**
 	 * Creates an instance of UmbPartialViewItemServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbPartialViewItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -28,7 +27,7 @@ export class UmbPartialViewItemServerDataSource implements UmbItemDataSource<Umb
 	/**
 	 * Fetches the items for the given uniques from the server
 	 * @param {Array<string>} uniques
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbPartialViewItemServerDataSource
 	 */
 	async getItems(uniques: Array<string>) {
@@ -37,13 +36,13 @@ export class UmbPartialViewItemServerDataSource implements UmbItemDataSource<Umb
 		const paths = uniques
 			.map((unique) => {
 				const serverPath = this.#serverFilePathUniqueSerializer.toServerPath(unique);
-				return serverPath ? encodeURI(serverPath) : null;
+				return serverPath ? serverPath : null;
 			})
 			.filter((x) => x !== null) as string[];
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			PartialViewResource.getItemPartialView({
+			PartialViewService.getItemPartialView({
 				path: paths,
 			}),
 		);

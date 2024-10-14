@@ -1,15 +1,15 @@
 import type { UmbMemberDetailModel } from '../../types.js';
 import { UMB_MEMBER_ENTITY_TYPE } from '../../entity.js';
+import { UmbMemberKind } from '../../utils/index.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type { CreateMemberRequestModel, UpdateMemberRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { MemberResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { MemberService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Member that fetches data from the server
- * @export
  * @class UmbMemberServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -18,7 +18,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 
 	/**
 	 * Creates an instance of UmbMemberServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMemberServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -28,7 +28,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 	/**
 	 * Creates a new Member scaffold
 	 * @param {Partial<UmbMemberDetailModel>} [preset]
-	 * @return { CreateMemberRequestModel }
+	 * @returns { CreateMemberRequestModel }
 	 * @memberof UmbMemberServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbMemberDetailModel> = {}) {
@@ -43,6 +43,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 			isApproved: false,
 			isLockedOut: false,
 			isTwoFactorEnabled: false,
+			kind: UmbMemberKind.DEFAULT,
 			failedPasswordAttempts: 0,
 			lastLoginDate: null,
 			lastLockoutDate: null,
@@ -67,13 +68,13 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 	/**
 	 * Fetches a Member with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberServerDataSource
 	 */
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, MemberResource.getMemberById({ id: unique }));
+		const { data, error } = await tryExecuteAndNotify(this.#host, MemberService.getMemberById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -91,6 +92,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 			isApproved: data.isApproved,
 			isLockedOut: data.isLockedOut,
 			isTwoFactorEnabled: data.isTwoFactorEnabled,
+			kind: data.kind,
 			failedPasswordAttempts: data.failedPasswordAttempts,
 			lastLoginDate: data.lastLoginDate || null,
 			lastLockoutDate: data.lastLockoutDate || null,
@@ -98,6 +100,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 			groups: data.groups,
 			values: data.values.map((value) => {
 				return {
+					editorAlias: value.editorAlias,
 					culture: value.culture || null,
 					segment: value.segment || null,
 					alias: value.alias,
@@ -121,7 +124,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 	/**
 	 * Inserts a new Member on the server
 	 * @param {UmbMemberDetailModel} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberServerDataSource
 	 */
 	async create(model: UmbMemberDetailModel) {
@@ -142,7 +145,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			MemberResource.postMember({
+			MemberService.postMember({
 				requestBody,
 			}),
 		);
@@ -157,7 +160,8 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 	/**
 	 * Updates a Member on the server
 	 * @param {UmbMemberDetailModel} Member
-	 * @return {*}
+	 * @param model
+	 * @returns {*}
 	 * @memberof UmbMemberServerDataSource
 	 */
 	async update(model: UmbMemberDetailModel) {
@@ -179,7 +183,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			MemberResource.putMemberById({
+			MemberService.putMemberById({
 				id: model.unique,
 				requestBody,
 			}),
@@ -195,7 +199,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 	/**
 	 * Deletes a Member on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberServerDataSource
 	 */
 	async delete(unique: string) {
@@ -203,7 +207,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 
 		return tryExecuteAndNotify(
 			this.#host,
-			MemberResource.deleteMemberById({
+			MemberService.deleteMemberById({
 				id: unique,
 			}),
 		);

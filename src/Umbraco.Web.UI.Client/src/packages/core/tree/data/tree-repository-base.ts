@@ -1,38 +1,53 @@
-import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '../types.js';
+import type { UmbTreeItemModel, UmbTreeRootModel } from '../types.js';
 import type { UmbTreeStore } from './tree-store.interface.js';
 import type { UmbTreeRepository } from './tree-repository.interface.js';
 import type { UmbTreeDataSource, UmbTreeDataSourceConstructor } from './tree-data-source.interface.js';
-import type { UmbTreeAncestorsOfRequestArgs } from './types.js';
+import type {
+	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeRootItemsRequestArgs,
+} from './types.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 /**
  * Base class for a tree repository.
- * @export
  * @abstract
  * @class UmbTreeRepositoryBase
- * @extends {UmbRepositoryBase}
- * @implements {UmbTreeRepository<TreeItemType, TreeRootType>}
+ * @augments {UmbRepositoryBase}
+ * @implements {UmbTreeRepository}
  * @implements {UmbApi}
  * @template TreeItemType
  * @template TreeRootType
  */
 export abstract class UmbTreeRepositoryBase<
-		TreeItemType extends UmbUniqueTreeItemModel,
-		TreeRootType extends UmbUniqueTreeRootModel,
+		TreeItemType extends UmbTreeItemModel,
+		TreeRootType extends UmbTreeRootModel,
+		TreeRootItemsRequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
+		TreeChildrenOfRequestArgsType extends UmbTreeChildrenOfRequestArgs = UmbTreeChildrenOfRequestArgs,
+		TreeAncestorsOfRequestArgsType extends UmbTreeAncestorsOfRequestArgs = UmbTreeAncestorsOfRequestArgs,
 	>
 	extends UmbRepositoryBase
-	implements UmbTreeRepository<TreeItemType, TreeRootType>, UmbApi
+	implements
+		UmbTreeRepository<
+			TreeItemType,
+			TreeRootType,
+			TreeRootItemsRequestArgsType,
+			TreeChildrenOfRequestArgsType,
+			TreeAncestorsOfRequestArgsType
+		>,
+		UmbApi
 {
 	protected _init: Promise<unknown>;
 	protected _treeStore?: UmbTreeStore<TreeItemType>;
-	#treeSource: UmbTreeDataSource<TreeItemType>;
+	protected _treeSource: UmbTreeDataSource<TreeItemType>;
 
 	/**
 	 * Creates an instance of UmbTreeRepositoryBase.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @param {UmbTreeDataSourceConstructor<TreeItemType>} treeSourceConstructor
 	 * @param {(string | UmbContextToken<any, any>)} treeStoreContextAlias
 	 * @memberof UmbTreeRepositoryBase
@@ -43,7 +58,7 @@ export abstract class UmbTreeRepositoryBase<
 		treeStoreContextAlias: string | UmbContextToken<any, any>,
 	) {
 		super(host);
-		this.#treeSource = new treeSourceConstructor(this);
+		this._treeSource = new treeSourceConstructor(this);
 
 		this._init = this.consumeContext(treeStoreContextAlias, (instance) => {
 			this._treeStore = instance;
@@ -52,21 +67,22 @@ export abstract class UmbTreeRepositoryBase<
 
 	/**
 	 * Request the tree root item
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	abstract requestTreeRoot(): Promise<{ data?: TreeRootType; error?: Error }>;
+	abstract requestTreeRoot(): Promise<{ data?: TreeRootType; error?: ProblemDetails }>;
 
 	/**
 	 * Requests root items of a tree
-	 * @return {*}
+	 * @param args
+	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	async requestRootTreeItems(args: any) {
+	async requestTreeRootItems(args: TreeRootItemsRequestArgsType) {
 		await this._init;
 
-		const { data, error } = await this.#treeSource.getRootItems(args);
-
+		const { data, error: _error } = await this._treeSource.getRootItems(args);
+		const error: any = _error;
 		if (data) {
 			this._treeStore!.appendItems(data.items);
 		}
@@ -77,41 +93,44 @@ export abstract class UmbTreeRepositoryBase<
 	/**
 	 * Requests tree items of a given parent
 	 * @param {(string | null)} parentUnique
-	 * @return {*}
+	 * @param args
+	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	async requestTreeItemsOf(args: any) {
-		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
+	async requestTreeItemsOf(args: TreeChildrenOfRequestArgsType) {
+		if (!args.parent) throw new Error('Parent is missing');
+		if (args.parent.unique === undefined) throw new Error('Parent unique is missing');
+		if (args.parent.entityType === null) throw new Error('Parent entity type is missing');
 		await this._init;
 
-		const { data, error } = await this.#treeSource.getChildrenOf(args);
-
+		const { data, error: _error } = await this._treeSource.getChildrenOf(args);
+		const error: any = _error;
 		if (data) {
 			this._treeStore!.appendItems(data.items);
 		}
 
-		return { data, error, asObservable: () => this._treeStore!.childrenOf(args.parentUnique) };
+		return { data, error, asObservable: () => this._treeStore!.childrenOf(args.parent.unique) };
 	}
 
 	/**
 	 * Requests ancestors of a given item
 	 * @param {UmbTreeAncestorsOfRequestArgs} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	async requestTreeItemAncestors(args: UmbTreeAncestorsOfRequestArgs) {
-		if (args.descendantUnique === undefined) throw new Error('Descendant unique is missing');
+	async requestTreeItemAncestors(args: TreeAncestorsOfRequestArgsType) {
+		if (args.treeItem.unique === undefined) throw new Error('Descendant unique is missing');
 		await this._init;
 
-		const { data, error } = await this.#treeSource.getAncestorsOf(args);
-
+		const { data, error: _error } = await this._treeSource.getAncestorsOf(args);
+		const error: any = _error;
 		// TODO: implement observable for ancestor items in the store
 		return { data, error };
 	}
 
 	/**
 	 * Returns a promise with an observable of tree root items
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	async rootTreeItems() {
@@ -122,7 +141,7 @@ export abstract class UmbTreeRepositoryBase<
 	/**
 	 * Returns a promise with an observable of children items of a given parent
 	 * @param {(string | null)} parentUnique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	async treeItemsOf(parentUnique: string | null) {

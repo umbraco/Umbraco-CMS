@@ -1,4 +1,5 @@
 import type { UmbUserDetailModel } from '../../types.js';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbDataSourceResponse, UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbInviteUserDataSource {
@@ -10,7 +11,7 @@ export interface UmbInviteUserRequestModel {
 	email: string;
 	userName: string;
 	name: string;
-	userGroupUniques: Array<string>;
+	userGroupUniques: Array<UmbReferenceByUnique>;
 	message: string | null;
 }
 

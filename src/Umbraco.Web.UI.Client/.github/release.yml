@@ -9,7 +9,7 @@ changelog:
   categories:
     - title: 🙌 Notable Changes
       labels:
-        - notable
+        - category/notable
     - title: 💥 Breaking Changes
       labels:
         - category/breaking

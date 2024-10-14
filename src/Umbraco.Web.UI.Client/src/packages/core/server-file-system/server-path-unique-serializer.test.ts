@@ -1,5 +1,5 @@
-import { expect } from '@open-wc/testing';
 import { UmbServerFilePathUniqueSerializer } from './server-path-unique-serializer.js';
+import { expect } from '@open-wc/testing';
 
 describe('UmbServerFilePathUniqueSerializer', () => {
 	let serializer: UmbServerFilePathUniqueSerializer;

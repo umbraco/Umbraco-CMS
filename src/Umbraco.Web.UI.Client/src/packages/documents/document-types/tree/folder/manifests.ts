@@ -1,17 +1,9 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
-import { UmbDocumentTypeFolderRepository } from './document-type-folder.repository.js';
-import type { ManifestEntityActions, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS } from './repository/constants.js';
+import { manifests as workspaceManifests } from './workspace/manifests.js';
+import { manifests as repositoryManifests } from './repository/manifests.js';
 
-export const UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS = 'Umb.Repository.DocumentType.Folder';
-
-const folderRepository: ManifestRepository = {
-	type: 'repository',
-	alias: UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS,
-	name: 'Document Type Folder Repository',
-	api: UmbDocumentTypeFolderRepository,
-};
-
-const entityActions: Array<ManifestEntityActions> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'folderUpdate',
@@ -32,6 +24,6 @@ const entityActions: Array<ManifestEntityActions> = [
 			folderRepositoryAlias: UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS,
 		},
 	},
+	...repositoryManifests,
+	...workspaceManifests,
 ];
-
-export const manifests = [folderRepository, ...entityActions];

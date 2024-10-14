@@ -5,11 +5,10 @@ import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { MemberGroupResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { MemberGroupResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { MemberGroupService } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  * A data source that fetches the member collection data from the server.
- * @export
  * @class UmbMemberGroupCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */
@@ -18,7 +17,7 @@ export class UmbMemberGroupCollectionServerDataSource implements UmbCollectionDa
 
 	/**
 	 * Creates an instance of UmbMemberGroupCollectionServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMemberGroupCollectionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -28,11 +27,11 @@ export class UmbMemberGroupCollectionServerDataSource implements UmbCollectionDa
 	/**
 	 * Gets the member collection filtered by the given filter.
 	 * @param {UmbMemberGroupCollectionFilterModel} filter
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberGroupCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbMemberGroupCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(this.#host, MemberGroupResource.getMemberGroup(filter));
+		const { data, error } = await tryExecuteAndNotify(this.#host, MemberGroupService.getMemberGroup(filter));
 
 		if (error) {
 			return { error };

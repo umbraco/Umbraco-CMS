@@ -1,49 +1,60 @@
-import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbInputTinyMceElement } from '../../components/input-tiny-mce/input-tiny-mce.element.js';
+import { UmbPropertyEditorUiRteElementBase, UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '@umbraco-cms/backoffice/rte';
+import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 
 import '../../components/input-tiny-mce/input-tiny-mce.element.js';
-
-type RichTextEditorValue = {
-	blocks: object;
-	markup: string;
-};
 
 /**
  * @element umb-property-editor-ui-tiny-mce
  */
 @customElement('umb-property-editor-ui-tiny-mce')
-export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	#configuration?: UmbPropertyEditorConfigCollection;
+export class UmbPropertyEditorUITinyMceElement extends UmbPropertyEditorUiRteElementBase {
+	#onChange(event: CustomEvent & { target: UmbInputTinyMceElement }) {
+		const value = typeof event.target.value === 'string' ? event.target.value : '';
 
-	@property({ type: Object })
-	value?: RichTextEditorValue = {
-		blocks: {},
-		markup: '',
-	};
+		// Clone the DOM, to remove the classes and attributes on the original:
+		const div = document.createElement('div');
+		div.innerHTML = value;
 
-	@property({ attribute: false })
-	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		this.#configuration = config;
-	}
-	public get config() {
-		return this.#configuration;
-	}
+		// Loop through used, to remove the classes on these.
+		const blockEls = div.querySelectorAll(`umb-rte-block, umb-rte-block-inline`);
+		blockEls.forEach((blockEl) => {
+			blockEl.removeAttribute('contenteditable');
+			blockEl.removeAttribute('class');
+		});
 
-	#onChange(event: InputEvent) {
-		this.value = {
-			blocks: {},
-			markup: (event.target as HTMLInputElement).value,
+		const markup = div.innerHTML;
+
+		// Remove unused Blocks of Blocks Layout. Leaving only the Blocks that are present in Markup.
+		//const blockElements = editor.dom.select(`umb-rte-block, umb-rte-block-inline`);
+		const usedContentKeys = Array.from(blockEls).map((blockElement) =>
+			blockElement.getAttribute(UMB_BLOCK_RTE_DATA_CONTENT_KEY),
+		);
+
+		this._filterUnusedBlocks(usedContentKeys);
+
+		// Then get the content of the editor and update the value.
+		// maybe in this way doc.body.innerHTML;
+
+		this._latestMarkup = markup;
+
+		this._value = {
+			...this._value,
+			markup: markup,
 		};
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+
+		this._fireChangeEvent();
 	}
 
-	render() {
-		return html`<umb-input-tiny-mce
-			@change=${this.#onChange}
-			.configuration=${this.#configuration}
-			.value=${this.value?.markup ?? ''}></umb-input-tiny-mce>`;
+	override render() {
+		return html`
+			<umb-input-tiny-mce
+				.configuration=${this._config}
+				.value=${this._markup}
+				@change=${this.#onChange}
+				?readonly=${this.readonly}>
+			</umb-input-tiny-mce>
+		`;
 	}
 }
 

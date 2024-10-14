@@ -1,7 +1,7 @@
 import type { UmbModalContext } from '../context/modal.context.js';
 import { UMB_MODAL_CONTEXT } from '../context/modal.context-token.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestModal } from '@umbraco-cms/backoffice/modal';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
@@ -15,7 +15,7 @@ import {
 	type UUIModalSidebarElement,
 } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
-import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import { createExtensionElement, loadManifestElement } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbContextRequestEvent } from '@umbraco-cms/backoffice/context-api';
 import { UMB_CONTENT_REQUEST_EVENT_TYPE, UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
 
@@ -34,7 +34,6 @@ export class UmbModalElement extends UmbLitElement {
 			return;
 		}
 
-		this.#createModalElement();
 	}
 
 	public element?: UUIModalDialogElement | UUIModalSidebarElement | UUIModalElement;
@@ -49,11 +48,11 @@ export class UmbModalElement extends UmbLitElement {
 		this.#modalContext?.reject({ type: 'close' });
 	};
 
-	#createModalElement() {
+	async createModalElement() {
 		if (!this.#modalContext) return;
 
 		this.#modalContext.addEventListener('umb:destroy', this.#onContextDestroy);
-		this.element = this.#createContainerElement();
+		this.element = await this.#createContainerElement();
 
 		// Makes sure that the modal triggers the reject of the context promise when it is closed by pressing escape.
 		this.element.addEventListener(UUIModalCloseEvent, this.#onClose);
@@ -102,9 +101,13 @@ export class UmbModalElement extends UmbLitElement {
 		provider.hostConnected();
 	}
 
-	#createContainerElement() {
-		if(this.#modalContext!.type == 'custom' && this.#modalContext?.elementFactory)
-			return this.#modalContext.elementFactory();
+	async #createContainerElement() {
+
+		if(this.#modalContext!.type == 'custom' && this.#modalContext?.element)
+		{
+			var customWrapperElementCtor = await loadManifestElement(this.#modalContext.element);
+			return new customWrapperElementCtor!();
+		}
 
 		return this.#modalContext!.type === 'sidebar' ? this.#createSidebarElement() : this.#createDialogElement();
 	}
@@ -167,11 +170,11 @@ export class UmbModalElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`${this.element}`;
 	}
 
-	disconnectedCallback(): void {
+	override disconnectedCallback(): void {
 		super.disconnectedCallback();
 		this.destroy();
 	}
@@ -180,7 +183,7 @@ export class UmbModalElement extends UmbLitElement {
 		this.destroy();
 	};
 
-	destroy() {
+	override destroy() {
 		this.#innerElement.destroy();
 		this.#modalExtensionObserver?.destroy();
 		this.#modalExtensionObserver = undefined;
@@ -192,7 +195,7 @@ export class UmbModalElement extends UmbLitElement {
 		super.destroy();
 	}
 
-	static styles: CSSResultGroup = [UmbTextStyles];
+	static override styles: CSSResultGroup = [UmbTextStyles];
 }
 
 declare global {

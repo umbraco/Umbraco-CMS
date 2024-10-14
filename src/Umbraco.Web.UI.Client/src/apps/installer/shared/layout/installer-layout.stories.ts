@@ -1,5 +1,5 @@
-import type { Meta, Story } from '@storybook/web-components';
 import type { UmbInstallerLayoutElement } from './installer-layout.element.js';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './installer-layout.element.js';
@@ -10,4 +10,4 @@ export default {
 	id: 'umb-installer-layout',
 } as Meta;
 
-export const Layout: Story<UmbInstallerLayoutElement> = () => html`<umb-installer-layout></umb-installer-layout>`;
+export const Layout: StoryFn<UmbInstallerLayoutElement> = () => html`<umb-installer-layout></umb-installer-layout>`;

@@ -84,7 +84,7 @@ const libraries = allowed.map((module) => {
 				preventAssignment: true,
 				values: {
 					'?inline': '',
-				}
+				},
 			}),
 			css({ minify: true }),
 			esbuild({ minify: true, sourceMap: true }),

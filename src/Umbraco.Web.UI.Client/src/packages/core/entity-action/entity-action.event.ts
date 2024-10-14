@@ -1,9 +1,8 @@
 import { UmbControllerEvent } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
-export interface UmbEntityActionEventArgs {
-	unique: string | null;
-	entityType: string;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbEntityActionEventArgs extends UmbEntityModel {}
 
 export class UmbEntityActionEvent extends UmbControllerEvent {
 	#args: UmbEntityActionEventArgs;

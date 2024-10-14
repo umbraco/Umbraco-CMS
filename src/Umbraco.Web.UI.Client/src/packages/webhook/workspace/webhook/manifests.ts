@@ -1,23 +1,22 @@
-import { UMB_WEBHOOK_ENTITY_TYPE, UMB_WEBHOOK_WORKSPACE } from '../../entity.js';
-import type { ManifestWorkspace, ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_WEBHOOK_ENTITY_TYPE, UMB_WEBHOOK_WORKSPACE_ALIAS } from '../../entity.js';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
-const workspace: ManifestWorkspace = {
-	type: 'workspace',
-	alias: UMB_WEBHOOK_WORKSPACE,
-	name: 'Webhook Root Workspace',
-	element: () => import('./webhook-workspace.element.js'),
-	api: () => import('./webhook-workspace.context.js'),
-	meta: {
-		entityType: UMB_WEBHOOK_ENTITY_TYPE,
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'workspace',
+		kind: 'routable',
+		alias: UMB_WEBHOOK_WORKSPACE_ALIAS,
+		name: 'Webhook Root Workspace',
+		api: () => import('./webhook-workspace.context.js'),
+		meta: {
+			entityType: UMB_WEBHOOK_ENTITY_TYPE,
+		},
 	},
-};
-
-const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
-		alias: 'Umb.WorkspaceView.Webhook.Overview',
-		name: 'Webhook Root Workspace Overview View',
-		js: () => import('../views/overview/webhook-overview-view.element.js'),
+		alias: 'Umb.WorkspaceView.Webhook.Details',
+		name: 'Webhook Root Workspace Details View',
+		js: () => import('./views/webhook-details-workspace-view.element.js'),
 		weight: 300,
 		meta: {
 			label: 'Overview',
@@ -27,28 +26,26 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				match: UMB_WEBHOOK_WORKSPACE_ALIAS,
 			},
 		],
 	},
 	{
-		type: 'workspaceView',
-		alias: 'Umb.WorkspaceView.Webhook.Search',
-		name: 'Webhook Root Workspace Logs View',
-		js: () => import('../views/overview/webhook-overview-view.element.js'),
-		weight: 200,
+		type: 'workspaceAction',
+		kind: 'default',
+		alias: 'Umb.WorkspaceAction.Webhook.Save',
+		name: 'Save Webhook Workspace Action',
+		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Logs',
-			pathname: 'logs',
-			icon: 'icon-box-alt',
+			look: 'primary',
+			color: 'positive',
+			label: '#buttons_save',
 		},
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				match: UMB_WEBHOOK_WORKSPACE_ALIAS,
 			},
 		],
 	},
 ];
-
-export const manifests = [workspace, ...workspaceViews];
