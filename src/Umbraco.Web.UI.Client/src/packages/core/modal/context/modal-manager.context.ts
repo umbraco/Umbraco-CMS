@@ -15,7 +15,7 @@ export interface UmbModalConfig {
 	size?: UUIModalSidebarSize;
 
 	/**
-	 * Used to provide a custom modal element
+	 * Used to provide a custom modal element to replace the default uui-modal-dialog or uui-modal-sidebar
 	 */
 	element?: ElementLoaderProperty<UUIModalElement>;
 

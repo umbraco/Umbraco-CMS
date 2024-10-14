@@ -7,7 +7,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { type UmbDeepPartialObject, umbDeepMerge } from '@umbraco-cms/backoffice/utils';
-import { loadManifestElement, type ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
+import { type ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
 
 export interface UmbModalRejectReason {
 	type: string;
@@ -15,7 +15,9 @@ export interface UmbModalRejectReason {
 
 export type UmbModalContextClassArgs<
 	ModalAliasType extends string | UmbModalToken,
-	ModalAliasTypeAsToken extends UmbModalToken = ModalAliasType extends UmbModalToken ? ModalAliasType : UmbModalToken<never, never>,
+	ModalAliasTypeAsToken extends UmbModalToken = ModalAliasType extends UmbModalToken
+		? ModalAliasType
+		: UmbModalToken<never, never>,
 > = {
 	router?: IRouterSlot | null;
 	data?: ModalAliasTypeAsToken['DATA'];
