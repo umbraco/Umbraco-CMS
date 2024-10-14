@@ -2648,6 +2648,7 @@ export default {
 		extGroup_interactive: 'Interactive elements',
 		extGroup_media: 'Embeds and media',
 		extGroup_structure: 'Content structure',
+		extGroup_unknown: 'Uncategorized',
 		toobar_availableItems: 'Available toolbar items',
 		toobar_availableItemsEmpty: 'There are no toolbar extensions to show',
 		toolbar_designer: 'Toolbar designer',
