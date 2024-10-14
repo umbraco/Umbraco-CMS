@@ -15,6 +15,14 @@ export class UmbInputColorElement extends UUIFormControlMixin(UmbLitElement, '')
 		return undefined;
 	}
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@property({ type: Boolean })
 	showLabels = false;
 
@@ -28,7 +36,11 @@ export class UmbInputColorElement extends UUIFormControlMixin(UmbLitElement, '')
 
 	override render() {
 		return html`
-			<uui-color-swatches label="Color picker" value=${this.value ?? ''} @change=${this.#onChange}>
+			<uui-color-swatches
+				?readonly=${this.readonly}
+				label="Color picker"
+				value=${this.value ?? ''}
+				@change=${this.#onChange}>
 				${this.#renderColors()}
 			</uui-color-swatches>
 		`;
@@ -39,7 +51,11 @@ export class UmbInputColorElement extends UUIFormControlMixin(UmbLitElement, '')
 		return map(
 			this.swatches,
 			(swatch) => html`
-				<uui-color-swatch label=${swatch.label} value=${swatch.value} .showLabel=${this.showLabels}></uui-color-swatch>
+				<uui-color-swatch
+					?readonly=${this.readonly}
+					label=${swatch.label}
+					value=${swatch.value}
+					.showLabel=${this.showLabels}></uui-color-swatch>
 			`,
 		);
 	}
