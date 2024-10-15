@@ -1,6 +1,6 @@
 import { UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT } from '../../content/collection/content-collection-workspace.context-token.js';
 import type { WorkspaceHasCollectionConditionConfig } from './types.js';
-import { UMB_WORKSPACE_HAS_COLLECTION_CONDITION } from './const.js';
+import { UMB_WORKSPACE_HAS_COLLECTION_CONDITION_ALIAS } from './const.js';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -29,6 +29,6 @@ export class UmbWorkspaceHasCollectionCondition
 export const manifest: UmbExtensionManifest = {
 	type: 'condition',
 	name: 'Workspace Has Collection Condition',
-	alias: UMB_WORKSPACE_HAS_COLLECTION_CONDITION,
+	alias: UMB_WORKSPACE_HAS_COLLECTION_CONDITION_ALIAS,
 	api: UmbWorkspaceHasCollectionCondition,
 };
