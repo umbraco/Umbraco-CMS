@@ -126,6 +126,17 @@ public static partial class UmbracoBuilderExtensions
     }
 
     /// <summary>
+    /// Adds all available CMS webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>The builder.</returns>
+    public static IUmbracoBuilder AddAllCmsWebhookEvents(this IUmbracoBuilder builder)
+    {
+        builder.WebhookEvents().AddCms();
+        return builder;
+    }
+
+    /// <summary>
     /// Add an IDynamicRootQueryStep to the DynamicRootQueryStepCollectionBuilder.
     /// </summary>
     /// <typeparam name="T"></typeparam>
@@ -134,6 +145,18 @@ public static partial class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddDynamicRootStep<T>(this IUmbracoBuilder builder) where T : IDynamicRootQueryStep
     {
         builder.DynamicRootSteps().Append<T>();
+        return builder;
+    }
+
+    /// <summary>
+    /// Adds CMS webhook events specified in the <paramref name="cmsBuilder" /> action.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <param name="cmsBuilder">The CMS builder.</param>
+    /// <returns>The builder.</returns>
+    public static IUmbracoBuilder ConfigureCmsWebhookEvents(this IUmbracoBuilder builder, Action<WebhookEventCollectionBuilderExtensions.WebhookEventCollectionBuilderCms> cmsBuilder)
+    {
+        builder.WebhookEvents().AddCms(cmsBuilder);
         return builder;
     }
 }
