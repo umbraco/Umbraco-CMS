@@ -20,14 +20,6 @@ public class HybridCacheStartupNotificationHandler : INotificationAsyncHandler<U
         _runtimeState = runtimeState;
     }
 
-    public void Handle(UmbracoApplicationStartingNotification notification)
-    {
-        if (_runtimeState.Level == RuntimeLevel.Run)
-        {
-            _databaseCacheRebuilder.RebuildDatabaseCacheIfSerializerChanged();
-        }
-    }
-
     public Task HandleAsync(UmbracoApplicationStartingNotification notification, CancellationToken cancellationToken)
     {
         if (_runtimeState.Level == RuntimeLevel.Run)
