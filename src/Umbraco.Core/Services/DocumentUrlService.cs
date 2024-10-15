@@ -684,7 +684,7 @@ public class DocumentUrlService : IDocumentUrlService
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static string CreateCacheKey(Guid documentKey, string culture, bool isDraft) => $"{documentKey}|{culture}|{isDraft}";
+    private static string CreateCacheKey(Guid documentKey, string culture, bool isDraft) => $"{documentKey}|{culture}|{isDraft}".ToLowerInvariant();
 
     private Guid? GetStartNodeKey(int? documentStartNodeId)
     {
