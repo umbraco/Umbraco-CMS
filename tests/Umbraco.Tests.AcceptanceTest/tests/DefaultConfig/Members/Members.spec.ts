@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 let memberId = '';
@@ -38,7 +38,7 @@ test('can create a member', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.isSuccessNotificationVisible();
+  await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeTruthy();
 });
 
@@ -55,7 +55,7 @@ test('can edit comments', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.isSuccessNotificationVisible();
+  await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.values[0].value).toBe(comment);
 });
@@ -73,7 +73,7 @@ test('can edit username', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.isSuccessNotificationVisible();
+  await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.username).toBe(updatedUsername);
 });
@@ -91,7 +91,7 @@ test('can edit email', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.isSuccessNotificationVisible();
+  await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.email).toBe(updatedEmail);
 });
@@ -111,7 +111,7 @@ test('can edit password', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.isSuccessNotificationVisible();
+  await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
 });
 
 test('can add member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -129,7 +129,7 @@ test('can add member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.isSuccessNotificationVisible();
+  await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.groups[0]).toBe(memberGroupId);
 
@@ -153,7 +153,7 @@ test('can remove member group', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.isSuccessNotificationVisible();
+  await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.groups.length).toBe(0);
 
@@ -197,7 +197,7 @@ test('can enable approved', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.isSuccessNotificationVisible();
+  await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.isApproved).toBe(true);
 });
@@ -215,7 +215,7 @@ test('can delete member', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.memberGroup.clickConfirmToDeleteButton();
 
   // Assert
-  await umbracoUi.member.isSuccessNotificationVisible();
+  await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeFalsy();
 });
 
@@ -236,7 +236,7 @@ test('cannot create member with invalid email', async ({umbracoApi, umbracoUi}) 
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.isErrorNotificationVisible();
+  await umbracoUi.member.doesErrorNotificationHaveText(NotificationConstantHelper.error.invalidEmail);
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeFalsy();
 });
 
