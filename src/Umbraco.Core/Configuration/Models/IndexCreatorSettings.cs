@@ -17,5 +17,5 @@ public class IndexCreatorSettings
     /// <summary>
     ///     Enable main index recovery when it gets corrupted
     /// </summary>
-    public bool EnableRecovery { get; set; } = true;
+    public bool EnableRecovery { get; set; }
 }
