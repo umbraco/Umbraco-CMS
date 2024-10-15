@@ -536,9 +536,9 @@
                     if (err && err.status === 400 && err.data) {
                         // content was saved but is invalid.
                         eventsService.emit("content.saved", { content: $scope.content, action: args.action, valid: false });
-                        eventsService.emit("form.unlock");
                     }
 
+                    eventsService.emit("form.unlock");
                     return $q.reject(err);
                 });
         }
@@ -759,7 +759,7 @@
                                 //ensure error messages are displayed
                                 formHelper.showNotifications(err.data);
                                 clearNotifications($scope.content);
-                                
+
                               handleHttpException(err);
                               deferred.reject(err);
                             });
