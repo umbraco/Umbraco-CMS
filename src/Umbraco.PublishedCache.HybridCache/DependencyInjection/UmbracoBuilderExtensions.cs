@@ -71,7 +71,7 @@ public static class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<MediaTypeRefreshedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<MediaTypeDeletedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, SeedingNotificationHandler>();
-           builder.AddCacheSeeding();
+        builder.AddCacheSeeding();
         return builder;
     }
 
