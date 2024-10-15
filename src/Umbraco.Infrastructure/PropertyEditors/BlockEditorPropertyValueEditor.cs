@@ -1,8 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -20,6 +22,7 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
 {
     private readonly IJsonSerializer _jsonSerializer;
 
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V16.")]
     protected BlockEditorPropertyValueEditor(
         DataEditorAttribute attribute,
         PropertyEditorCollection propertyEditors,
@@ -29,9 +32,22 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
         ILogger<BlockEditorPropertyValueEditor<TValue, TLayout>> logger,
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
-        IIOHelper ioHelper,
-        BlockEditorVarianceHandler blockEditorVarianceHandler)
-        : base(attribute, propertyEditors, dataTypeConfigurationCache, textService, logger, shortStringHelper, jsonSerializer, ioHelper, dataValueReferenceFactories, blockEditorVarianceHandler) =>
+        IIOHelper ioHelper)
+        : this(propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, shortStringHelper, jsonSerializer,
+            StaticServiceProvider.Instance.GetRequiredService<BlockEditorVarianceHandler>(),
+            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>())
+    {
+    }
+
+    protected BlockEditorPropertyValueEditor(
+        PropertyEditorCollection propertyEditors,
+        DataValueReferenceFactoryCollection dataValueReferenceFactories,
+        IDataTypeConfigurationCache dataTypeConfigurationCache,
+        IShortStringHelper shortStringHelper,
+        IJsonSerializer jsonSerializer,
+        BlockEditorVarianceHandler blockEditorVarianceHandler,
+        ILanguageService languageService)
+        : base(propertyEditors, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, dataValueReferenceFactories, blockEditorVarianceHandler, languageService) =>
         _jsonSerializer = jsonSerializer;
 
     /// <inheritdoc />
