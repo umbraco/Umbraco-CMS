@@ -218,6 +218,9 @@
     <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Restore.cs">
       <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Sort.cs">
+      <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Update.cs">
       <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
     </Compile>

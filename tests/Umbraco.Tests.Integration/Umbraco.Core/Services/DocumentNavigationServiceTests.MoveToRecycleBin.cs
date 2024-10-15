@@ -46,4 +46,74 @@ public partial class DocumentNavigationServiceTests
             Assert.AreEqual(beforeMoveRecycleBinSiblingsCount + 1, afterMoveRecycleBinSiblingsCount);
         });
     }
+
+    // TODO: Add more test cases
+    [Test]
+    public async Task Sort_Order_Of_Siblings_Updates_When_Moving_Content_To_Recycle_Bin_And_Adding_New_One()
+    {
+        // Arrange
+        Guid nodeToMoveToRecycleBin = Child3.Key;
+        Guid node = Child1.Key;
+
+        // Act
+        await ContentEditingService.MoveToRecycleBinAsync(nodeToMoveToRecycleBin, Constants.Security.SuperUserKey);
+
+        // Assert
+        DocumentNavigationQueryService.TryGetSiblingsKeys(node, out IEnumerable<Guid> siblingsKeysAfterDeletion);
+        var siblingsKeysAfterDeletionList = siblingsKeysAfterDeletion.ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, siblingsKeysAfterDeletionList.Count);
+            Assert.AreEqual(Child2.Key, siblingsKeysAfterDeletionList[0]);
+        });
+
+        // Create a new sibling under the same parent
+        var key = Guid.NewGuid();
+        var createModel = CreateContentCreateModel("Child 4", key, Root.Key);
+        await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        DocumentNavigationQueryService.TryGetSiblingsKeys(node, out IEnumerable<Guid> siblingsKeysAfterCreation);
+        var siblingsKeysAfterCreationList = siblingsKeysAfterCreation.ToList();
+
+        // Verify sibling order after creating the new content
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, siblingsKeysAfterCreationList.Count);
+            Assert.AreEqual(Child2.Key, siblingsKeysAfterCreationList[0]);
+            Assert.AreEqual(key, siblingsKeysAfterCreationList[1]);
+        });
+    }
+
+    [Test]
+    public async Task Sort_Order_Of_Chilldren_Is_Maintained_When_Moving_Content_To_Recycle_Bin()
+    {
+        // Arrange
+        Guid nodeToMoveToRecycleBin = Child1.Key;
+
+        // Create a new grandchild under Child1
+        var key = Guid.NewGuid();
+        var createModel = CreateContentCreateModel("Grandchild 3", key, nodeToMoveToRecycleBin);
+        await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        DocumentNavigationQueryService.TryGetChildrenKeys(nodeToMoveToRecycleBin, out IEnumerable<Guid> childrenKeysBeforeDeletion);
+        var childrenKeysBeforeDeletionList = childrenKeysBeforeDeletion.ToList();
+
+        // Act
+        await ContentEditingService.MoveToRecycleBinAsync(nodeToMoveToRecycleBin, Constants.Security.SuperUserKey);
+
+        // Assert
+        DocumentNavigationQueryService.TryGetChildrenKeysInBin(nodeToMoveToRecycleBin, out IEnumerable<Guid> childrenKeysAfterDeletion);
+        var childrenKeysAfterDeletionList = childrenKeysAfterDeletion.ToList();
+
+        // Verify children order in the bin
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, childrenKeysAfterDeletionList.Count);
+            Assert.AreEqual(Grandchild1.Key, childrenKeysAfterDeletionList[0]);
+            Assert.AreEqual(Grandchild2.Key, childrenKeysAfterDeletionList[1]);
+            Assert.AreEqual(key, childrenKeysAfterDeletionList[2]);
+            Assert.IsTrue(childrenKeysBeforeDeletionList.SequenceEqual(childrenKeysAfterDeletionList));
+        });
+    }
 }
