@@ -27,7 +27,7 @@ public class MemberTypeTreeControllerBase : NamedEntityTreeControllerBase<Member
     protected override MemberTypeTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
     {
         var memberTypes = _memberTypeService
-            .GetAll(entities.Select(entity => entity.Id).ToArray())
+            .GetMany(entities.Select(entity => entity.Id).ToArray())
             .ToDictionary(contentType => contentType.Id);
 
         return entities.Select(entity =>
