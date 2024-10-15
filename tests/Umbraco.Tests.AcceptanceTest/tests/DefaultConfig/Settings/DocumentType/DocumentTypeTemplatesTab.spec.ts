@@ -37,8 +37,7 @@ test('can add an allowed template to a document type', {tag: '@smoke'}, async ({
   await umbracoApi.template.ensureNameNotExists(templateName);
 });
 
-// TODO: Need to uodate Act steps
-test.skip('can set an allowed template as default for document type', async ({umbracoApi, umbracoUi}) => {
+test('can set an allowed template as default for document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.template.ensureNameNotExists(templateName);
   const templateId = await umbracoApi.template.createDefaultTemplate(templateName);

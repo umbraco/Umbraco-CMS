@@ -14,11 +14,19 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName); 
 });
 
-// TODO: Skip this test as TinyMCE is replaced by Tiptap. This test should be updated.
-test.skip('can create content with the Rich Text Editor datatype', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can create content with the Rich Text Editor datatype', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeName = 'Richtext editor';
   const contentText = 'This is Rich Text Editor content!';
+  const expectedContentValue = {
+    blocks: {
+      contentData: [],
+      layout: {},
+      propertyEditorAlias: 'Umbraco.TinyMCE',
+      settingsData: [],
+    },
+    markup: '<p>' + contentText + '</p>',
+  };
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   await umbracoUi.goToBackOffice();
@@ -36,7 +44,7 @@ test.skip('can create content with the Rich Text Editor datatype', {tag: '@smoke
   await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.markup).toEqual('<p>' + contentText + '</p>');
+  expect(contentData.values[0].value).toEqual(expectedContentValue);
 });
 
 // TODO: Remove skip when the front-end is ready. Currently it returns error when publishing a content
