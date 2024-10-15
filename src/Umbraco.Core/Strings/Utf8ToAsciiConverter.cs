@@ -3560,29 +3560,55 @@ public static class Utf8ToAsciiConverter
                     output[opos++] = 'a';
                     break;
 
+
                 // BEGIN EXTRA
-                /*
-            case '£':
-                output[opos++] = 'G';
-                output[opos++] = 'B';
-                output[opos++] = 'P';
-                break;
+                //Currencies: https://cloford.com/resources/charcodes/utf-8_currency.htm
+                case '£':
+                    output[opos++] = 'G';
+                    output[opos++] = 'B';
+                    output[opos++] = 'P';
+                    break;
 
-            case '€':
-                output[opos++] = 'E';
-                output[opos++] = 'U';
-                output[opos++] = 'R';
-                break;
+                case '€':
+                    output[opos++] = 'E';
+                    output[opos++] = 'U';
+                    output[opos++] = 'R';
+                    break;
+                case '$':
+                    output[opos++] = 'U';
+                    output[opos++] = 'S';
+                    output[opos++] = 'D';
+                    break;
+                case '¥':
+                    output[opos++] = 'J';
+                    output[opos++] = 'P';
+                    output[opos++] = 'Y';
+                    break;
+                //Rupee
+                case '\u20A8':
+                    output[opos++] = 'R';
+                    output[opos++] = 'S';
+                    break;
+                //indian ruppee
+                case '\u20B9':
+                    output[opos++] = 'I';
+                    output[opos++] = 'N';
+                    output[opos++] = 'R';
+                    break;
 
-            case '©':
-                output[opos++] = '(';
-                output[opos++] = 'C';
-                output[opos++] = ')';
-                break;
-                */
+                //Special symbols
+                case '©':
+                    output[opos++] = '(';
+                    output[opos++] = 'C';
+                    output[opos++] = ')';
+                    break;
+
+                case '™':
+                    output[opos++] = 'T';
+                    output[opos++] = 'M';
+                    break;
+
                 default:
-                    // if (ToMoreAscii(input, ipos, output, ref opos))
-                    //    break;
 
                     // if (!char.IsLetterOrDigit(c)) // that would not catch eg 汉 unfortunately
                     //    output[opos++] = '?';
@@ -3596,35 +3622,4 @@ public static class Utf8ToAsciiConverter
             }
         }
     }
-
-    // private static bool ToMoreAscii(char[] input, int ipos, char[] output, ref int opos)
-    // {
-    //    var c = input[ipos];
-
-    // switch (c)
-    //    {
-    //        case '£':
-    //            output[opos++] = 'G';
-    //            output[opos++] = 'B';
-    //            output[opos++] = 'P';
-    //            break;
-
-    // case '€':
-    //            output[opos++] = 'E';
-    //            output[opos++] = 'U';
-    //            output[opos++] = 'R';
-    //            break;
-
-    // case '©':
-    //            output[opos++] = '(';
-    //            output[opos++] = 'C';
-    //            output[opos++] = ')';
-    //            break;
-
-    // default:
-    //            return false;
-    //    }
-
-    // return true;
-    // }
 }
