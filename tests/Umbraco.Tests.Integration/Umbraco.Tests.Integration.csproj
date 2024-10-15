@@ -188,6 +188,9 @@
     <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Restore.cs">
       <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Sort.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Update.cs">
       <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
     </Compile>
@@ -208,6 +211,9 @@
     </Compile>
     <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Rebuild.cs">
       <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Sort.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Restore.cs">
       <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
