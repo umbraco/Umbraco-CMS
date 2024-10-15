@@ -422,10 +422,10 @@ public class PackagesRepository : ICreatedPackagesRepository
                 }
                 else
                 {
-                    if (processed.ContainsKey(dictionaryItem.ParentId.Value))
+                    if (processed.TryGetValue(dictionaryItem.ParentId.Value, out XElement? processedParent))
                     {
                         // we've processed this parent element already so we can just append this xml child to it
-                        AppendDictionaryElement(processed[dictionaryItem.ParentId.Value], items, processed, key, serializedDictionaryValue);
+                        AppendDictionaryElement(processedParent, items, processed, key, serializedDictionaryValue);
                     }
                     else if (items.ContainsKey(dictionaryItem.ParentId.Value))
                     {

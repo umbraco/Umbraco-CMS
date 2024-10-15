@@ -130,7 +130,7 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
     /// <summary>
     ///     Updates the index ValueSet with a special __Path and __Icon fields.
     /// </summary>
-    private void ApplySpecialIndexValueTransformations(IndexingItemEventArgs e)
+    private static void ApplySpecialIndexValueTransformations(IndexingItemEventArgs e)
     {
         var updatedValues = e.ValueSet.Values.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value);
 

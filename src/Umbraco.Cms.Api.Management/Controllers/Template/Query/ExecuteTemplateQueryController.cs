@@ -98,7 +98,7 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
         if (model.RootDocument?.Id is not null)
         {
             rootContent = _publishedContentQuery.Content(model.RootDocument.Id);
-            queryExpression.Append($"Umbraco.Content(Guid.Parse(\"{model.RootDocument.Id}\"))");
+            queryExpression.Append("Umbraco.Content(Guid.Parse(\"").Append(model.RootDocument.Id).Append("\"))");
         }
         else
         {
@@ -115,7 +115,7 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
 
         if (model.DocumentTypeAlias.IsNullOrWhiteSpace() == false)
         {
-            queryExpression.Append($".ChildrenOfType(\"{model.DocumentTypeAlias}\")");
+            queryExpression.Append(".ChildrenOfType(\"").Append(model.DocumentTypeAlias).Append("\")");
             return rootContent == null
                 ? Enumerable.Empty<IPublishedContent>()
                 : rootContent.ChildrenOfType(_variationContextAccessor, _contentCache, _documentNavigationQueryService, model.DocumentTypeAlias);
@@ -176,7 +176,7 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
             //for review - this uses a tonized query rather then the normal linq query.
             contentQuery = contentQuery.Where(operation.Compile());
             queryExpression.Append(_indent);
-            queryExpression.Append($".Where({operation})");
+            queryExpression.Append(".Where(").Append(operation).Append(')');
         }
 
         return contentQuery;
@@ -220,7 +220,7 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
         return contentQuery;
     }
 
-    private IEnumerable<IPublishedContent> ApplyPaging(int take, IEnumerable<IPublishedContent> contentQuery, StringBuilder queryExpression)
+    private static IEnumerable<IPublishedContent> ApplyPaging(int take, IEnumerable<IPublishedContent> contentQuery, StringBuilder queryExpression)
     {
         if (take <= 0)
         {
@@ -229,7 +229,7 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
 
         contentQuery = contentQuery.Take(take);
         queryExpression.Append(_indent);
-        queryExpression.Append($".Take({take})");
+        queryExpression.Append(".Take(").Append(take).Append(')');
 
         return contentQuery;
     }

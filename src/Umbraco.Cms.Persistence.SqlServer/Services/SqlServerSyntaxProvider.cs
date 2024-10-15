@@ -438,7 +438,7 @@ where tbl.[name]=@0 and col.[name]=@1;",
     private static SqlInspectionUtilities SqlInspector =>
 _sqlInspector ??= new SqlInspectionUtilities();
 
-    private class SqlInspectionUtilities
+    private sealed class SqlInspectionUtilities
     {
         private readonly Func<Sql, Sql> _getSqlRhs;
         private readonly Func<Sql, string> _getSqlText;
@@ -463,7 +463,7 @@ _sqlInspector ??= new SqlInspectionUtilities();
 
     #endregion
 
-    private class SqlPrimaryKey
+    private sealed class SqlPrimaryKey
     {
         public string Name { get; set; } = null!;
     }

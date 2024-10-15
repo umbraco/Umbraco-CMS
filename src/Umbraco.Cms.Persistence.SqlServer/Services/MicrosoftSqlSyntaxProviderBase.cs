@@ -1,4 +1,5 @@
 using System.Data;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -36,7 +37,7 @@ public abstract class MicrosoftSqlSyntaxProviderBase<TSyntax> : SqlSyntaxProvide
 
     public override string GetQuotedTableName(string? tableName)
     {
-        if (tableName?.Contains(".") == false)
+        if (tableName?.Contains('.') == false)
         {
             return $"[{tableName}]";
         }
@@ -207,14 +208,14 @@ public abstract class MicrosoftSqlSyntaxProviderBase<TSyntax> : SqlSyntaxProvide
 
         List<string> indexSql = Format(tableDefinition.Indexes);
         //Loop through index statements and execute sql
-        foreach (var sql in indexSql)
+        foreach (var sql in CollectionsMarshal.AsSpan(indexSql))
         {
             _logger.LogInformation("Create Index:\n {Sql}", sql);
             database.Execute(new Sql(sql));
         }
 
         //Loop through foreignkey statements and execute sql
-        foreach (var sql in foreignSql)
+        foreach (var sql in CollectionsMarshal.AsSpan(foreignSql))
         {
             _logger.LogInformation("Create Foreign Key:\n {Sql}", sql);
             database.Execute(new Sql(sql));

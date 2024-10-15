@@ -13,7 +13,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore.Locking;
 
-internal class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingMechanism
+internal sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingMechanism
     where T : DbContext
 {
     private ConnectionStrings _connectionStrings;
@@ -55,7 +55,7 @@ internal class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingM
         return new SqliteDistributedLock(this, lockId, DistributedLockType.WriteLock, obtainLockTimeout.Value);
     }
 
-    private class SqliteDistributedLock : IDistributedLock
+    private sealed class SqliteDistributedLock : IDistributedLock
     {
         private readonly SqliteEFCoreDistributedLockingMechanism<T> _parent;
         private readonly TimeSpan _timeout;
@@ -164,7 +164,7 @@ internal class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingM
             });
         }
 
-        private bool IsBusyOrLocked(SqliteException ex) =>
+        private static bool IsBusyOrLocked(SqliteException ex) =>
             ex.SqliteErrorCode
                 is raw.SQLITE_BUSY
                 or raw.SQLITE_LOCKED

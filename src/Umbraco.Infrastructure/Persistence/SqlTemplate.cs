@@ -39,7 +39,7 @@ public class SqlTemplate
         // see https://stackoverflow.com/questions/9256594
         // => assume it's an anonymous type object containing named arguments
         // (of course this means we cannot use *real* objects here and need SqlNamed - bah)
-        if (args.Length == 1 && args[0].GetType().Name.Contains("<"))
+        if (args.Length == 1 && args[0].GetType().Name.Contains('<'))
         {
             return SqlNamed(args[0]);
         }
@@ -54,7 +54,7 @@ public class SqlTemplate
             return new Sql<ISqlContext>(_sqlContext, true, _sql);
         }
 
-        var isBuilt = !args.Any(x => x is IEnumerable);
+        var isBuilt = !Array.Exists(args, x => x is IEnumerable);
         return new Sql<ISqlContext>(_sqlContext, isBuilt, _sql, args);
     }
 
@@ -120,7 +120,7 @@ public class SqlTemplate
         new[] { default(T) };
 
     // these are created in PocoToSqlExpressionVisitor
-    internal class TemplateArg
+    internal sealed class TemplateArg
     {
         public TemplateArg(string? name) => Name = name;
 

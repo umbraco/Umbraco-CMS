@@ -37,12 +37,12 @@ public abstract class ContainsFilterBase : IFilterHandler
     {
         GroupCollection groups = QueryParserRegex.Match(filter).Groups;
 
-        if (groups.Count != 3 || groups.ContainsKey("operator") is false || groups.ContainsKey("value") is false)
+        if (groups.Count != 3 || groups.TryGetValue("operator", out Group? operatorGroup) is false || groups.TryGetValue("value", out Group? valueGroup) is false)
         {
             return DefaultFilterOption();
         }
 
-        FilterOperation? filterOperation = ParseFilterOperation(groups["operator"].Value);
+        FilterOperation? filterOperation = ParseFilterOperation(operatorGroup.Value);
         if (filterOperation.HasValue is false)
         {
             return DefaultFilterOption();
@@ -51,7 +51,7 @@ public abstract class ContainsFilterBase : IFilterHandler
         return new FilterOption
         {
             FieldName = FieldName,
-            Values = new[] { groups["value"].Value },
+            Values = [valueGroup.Value],
             Operator = filterOperation.Value
         };
 

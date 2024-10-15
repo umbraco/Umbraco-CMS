@@ -197,8 +197,8 @@ public class LocalizedTextServiceFileSources
         // This needs to be resolved before continuing so that the _twoLetterCultureConverter cache is initialized
         Dictionary<CultureInfo, Lazy<XDocument>> resolved = _xmlSources.Value;
 
-        return _twoLetterCultureConverter.ContainsKey(twoLetterCulture)
-            ? Attempt.Succeed(_twoLetterCultureConverter[twoLetterCulture])
+        return _twoLetterCultureConverter.TryGetValue(twoLetterCulture, out CultureInfo? twoLetterCultureValue)
+            ? Attempt.Succeed(twoLetterCultureValue)
             : Attempt<CultureInfo?>.Fail();
     }
 

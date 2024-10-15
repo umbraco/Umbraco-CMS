@@ -4,7 +4,6 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Templates;
 
 namespace Umbraco.Cms.Infrastructure.DeliveryApi;
 

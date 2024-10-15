@@ -45,7 +45,7 @@ public class SqlitePreferDeferredTransactionsConnection : DbConnection
     protected override DbCommand CreateDbCommand()
         => new CommandWrapper(_inner.CreateCommand());
 
-    private class CommandWrapper : DbCommand
+    private sealed class CommandWrapper : DbCommand
     {
         private readonly DbCommand _inner;
 
