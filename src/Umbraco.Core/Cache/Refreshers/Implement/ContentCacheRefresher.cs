@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -194,7 +192,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         // First creation
         if (ExistsInNavigation(content.Key) is false && ExistsInNavigationBin(content.Key) is false)
         {
-            _documentNavigationManagementService.Add(content.Key, GetParentKey(content));
+            _documentNavigationManagementService.Add(content.Key, GetParentKey(content), content.SortOrder);
             if (content.Trashed)
             {
                 // If created as trashed, move to bin
@@ -210,14 +208,20 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             }
             else
             {
-                // It must have been saved. Check if parent is different
-                if (_documentNavigationQueryService.TryGetParentKey(content.Key, out var oldParentKey))
+                if (_documentNavigationQueryService.TryGetParentKey(content.Key, out Guid? oldParentKey) is false)
                 {
-                    Guid? newParentKey = GetParentKey(content);
-                    if (oldParentKey != newParentKey)
-                    {
-                        _documentNavigationManagementService.Move(content.Key, newParentKey);
-                    }
+                    return;
+                }
+
+                // It must have been saved. Check if parent is different
+                Guid? newParentKey = GetParentKey(content);
+                if (oldParentKey != newParentKey)
+                {
+                    _documentNavigationManagementService.Move(content.Key, newParentKey);
+                }
+                else
+                {
+                    _documentNavigationManagementService.UpdateSortOrder(content.Key, content.SortOrder);
                 }
             }
         }
