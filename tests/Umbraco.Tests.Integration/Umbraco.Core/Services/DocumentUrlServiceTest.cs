@@ -212,10 +212,24 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
         // Publish both the main root and the second root with descendants
         if (loadDraft is false)
         {
+
             ContentService.PublishBranch(Textpage, true, new[] { "*" });
             ContentService.PublishBranch(secondRoot, true, new[] { "*" });
         }
 
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
     }
+
+    //TODO test cases:
+    // - Find the root, when a domain is set
+    // - Find a nested child, when a domain is set
+
+    // - Find the root when no domain is set and hideTopLevelNodeFromPath is true
+    // - Find a nested child of item in the root top when no domain is set and hideTopLevelNodeFromPath is true
+    // - Find a nested child of item in the root bottom when no domain is set and hideTopLevelNodeFromPath is true
+    // - Find the root when no domain is set and hideTopLevelNodeFromPath is false
+    // - Find a nested child of item in the root top when no domain is set and hideTopLevelNodeFromPath is false
+    // - Find a nested child of item in the root bottom when no domain is set and hideTopLevelNodeFromPath is false
+
+    // - All of the above when having Constants.Conventions.Content.UrlName set to a value
 }
