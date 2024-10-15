@@ -43,6 +43,7 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
 
     public void RebuildDatabaseCacheIfSerializerChanged()
     {
+        using var scope = _coreScopeProvider.CreateCoreScope();
         NuCacheSerializerType serializer = _nucacheSettings.Value.NuCacheSerializerType;
         var currentSerializerValue = _keyValueService.GetValue(NuCacheSerializerKey);
 
@@ -60,5 +61,7 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
             Rebuild();
             _keyValueService.SetValue(NuCacheSerializerKey, serializer.ToString());
         }
+
+        scope.Complete();
     }
 }

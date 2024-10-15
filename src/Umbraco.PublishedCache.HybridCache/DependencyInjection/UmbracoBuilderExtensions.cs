@@ -60,6 +60,7 @@ public static class UmbracoBuilderExtensions
                     throw new IndexOutOfRangeException();
             }
         });
+        builder.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, HybridCacheStartupNotificationHandler>(); // Need to happen before notification handlers use the cache. Eg. seeding
         builder.Services.AddSingleton<IPropertyCacheCompressionOptions, NoopPropertyCacheCompressionOptions>();
         builder.AddNotificationAsyncHandler<ContentRefreshNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<ContentDeletedNotification, CacheRefreshingNotificationHandler>();
@@ -70,8 +71,7 @@ public static class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<MediaTypeRefreshedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<MediaTypeDeletedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, SeedingNotificationHandler>();
-        builder.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, HybridCacheStartupNotificationHandler>();
-        builder.AddCacheSeeding();
+           builder.AddCacheSeeding();
         return builder;
     }
 
