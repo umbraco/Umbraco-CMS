@@ -21,6 +21,7 @@ test.afterEach(async ({umbracoApi}) => {
   }
   await umbracoApi.media.ensureNameNotExists(firstMediaFileName);
   await umbracoApi.media.ensureNameNotExists(secondMediaFileName);
+  await umbracoApi.media.emptyRecycleBin();
 });
 
 test('can change the the default sort order for the list in the media section', async ({umbracoApi, umbracoUi}) => {
@@ -115,12 +116,13 @@ test('can allow bulk trash in the media section', async ({umbracoApi, umbracoUi}
   await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
-  await umbracoUi.media.isItemVisibleInRecycleBin(firstMediaFileName);
-  await umbracoUi.media.isItemVisibleInRecycleBin(secondMediaFileName);
+  await umbracoUi.media.reloadMediaTree();
   expect(await umbracoApi.media.doesNameExist(firstMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesNameExist(secondMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(firstMediaFileName)).toBeTruthy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(secondMediaFileName)).toBeTruthy();
+  await umbracoUi.media.isItemVisibleInRecycleBin(firstMediaFileName);
+  await umbracoUi.media.isItemVisibleInRecycleBin(secondMediaFileName, true, false);
 });
 
 test('can allow bulk move in the media section', async ({umbracoApi, umbracoUi}) => {
