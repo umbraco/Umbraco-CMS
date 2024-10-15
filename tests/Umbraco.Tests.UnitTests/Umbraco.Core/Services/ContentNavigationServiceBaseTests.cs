@@ -669,7 +669,7 @@ public class ContentNavigationServiceBaseTests
         var newNodeKey = Guid.NewGuid();
 
         // Act
-        _navigationService.Add(newNodeKey, parentKey: parentKey);
+        _navigationService.Add(newNodeKey, parentKey);
 
         // Assert
         _navigationService.TryGetChildrenKeys(parentKey, out IEnumerable<Guid> childrenKeys);
@@ -853,7 +853,7 @@ public class ContentNavigationServiceBaseTests
         Guid nodeToMove = Grandchild4;
 
         // Act
-        _navigationService.Move(nodeToMove, 4, targetParentKey);
+        _navigationService.Move(nodeToMove, targetParentKey);
 
         // Assert
         _navigationService.TryGetChildrenKeys(targetParentKey, out IEnumerable<Guid> childrenKeys);
@@ -862,10 +862,10 @@ public class ContentNavigationServiceBaseTests
     }
 
     [Test]
-    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", "60E0E5C4-084E-4144-A560-7393BEAD2E96", 0)] // Grandchild 1 to Child 2
-    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", null, 1)] // Child 3 to content root
-    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", "C6173927-0C59-4778-825D-D7B9F45D8DDE", 2)] // Child 2 to Child 1
-    public void Moved_Node_Has_The_Same_Amount_Of_Descendants(Guid nodeToMove, Guid? targetParentKey, int initialDescendantsCount)
+    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", 1, "60E0E5C4-084E-4144-A560-7393BEAD2E96", 0)] // Grandchild 1 to Child 2
+    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", 1, null, 1)] // Child 3 to content root
+    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", 2, "C6173927-0C59-4778-825D-D7B9F45D8DDE", 2)] // Child 2 to Child 1
+    public void Moved_Node_Has_The_Same_Amount_Of_Descendants(Guid nodeToMove, int sortOrder, Guid? targetParentKey, int initialDescendantsCount)
     {
         // Act
         var result = _navigationService.Move(nodeToMove, targetParentKey);
@@ -881,10 +881,10 @@ public class ContentNavigationServiceBaseTests
     }
 
     [Test]
-    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", "A1B1B217-B02F-4307-862C-A5E22DB729EB", 0)] // Child 3 to Grandchild 2
-    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", "B606E3FF-E070-4D46-8CB9-D31352029FDF", 1)] // Child 2 to Child 3
-    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", "60E0E5C4-084E-4144-A560-7393BEAD2E96", 2)] // Grandchild 1 to Child 2
-    public void Number_Of_Target_Parent_Descendants_Updates_When_Moving_Node_With_Descendants(Guid nodeToMove, Guid targetParentKey, int initialDescendantsCountOfTargetParent)
+    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", 0, "A1B1B217-B02F-4307-862C-A5E22DB729EB", 0)] // Child 3 to Grandchild 2
+    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", 1, "B606E3FF-E070-4D46-8CB9-D31352029FDF", 1)] // Child 2 to Child 3
+    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", 1, "60E0E5C4-084E-4144-A560-7393BEAD2E96", 2)] // Grandchild 1 to Child 2
+    public void Number_Of_Target_Parent_Descendants_Updates_When_Moving_Node_With_Descendants(Guid nodeToMove, int sortOrder, Guid targetParentKey, int initialDescendantsCountOfTargetParent)
     {
         // Arrange
         // Get the number of descendants of the node to move
