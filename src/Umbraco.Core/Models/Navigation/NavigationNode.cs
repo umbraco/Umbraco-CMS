@@ -23,7 +23,7 @@ public sealed class NavigationNode
 
     public void UpdateSortOrder(int newSortOrder) => SortOrder = newSortOrder;
 
-    public void AddChild(ConcurrentDictionary<Guid, NavigationNode> navigationStructure, Guid childKey, int? sortOrder = null)
+    public void AddChild(ConcurrentDictionary<Guid, NavigationNode> navigationStructure, Guid childKey)
     {
         if (navigationStructure.TryGetValue(childKey, out NavigationNode? child) is false)
         {
@@ -32,8 +32,8 @@ public sealed class NavigationNode
 
         child.Parent = Key;
 
-        // Add it to the end, if no sortOrder is provided
-        child.SortOrder = sortOrder ?? _children.Count;
+        // Add it as the last item
+        child.SortOrder = _children.Count;
 
         _children.Add(childKey);
 
