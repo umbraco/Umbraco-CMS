@@ -14,8 +14,6 @@ import '../ref-grid-block/index.js';
 @customElement('umb-block-grid-block')
 export class UmbBlockGridBlockElement extends UmbLitElement {
 	//
-	#context?: typeof UMB_BLOCK_GRID_ENTRY_CONTEXT.TYPE;
-
 	@property({ attribute: false })
 	label?: string;
 
@@ -31,35 +29,10 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
 
-	@state()
-	_ownerContentTypeName?: string;
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (context) => {
-			this.#context = context;
-			this.observe(context.contentElementTypeName, (name) => {
-				this._ownerContentTypeName = name;
-			});
-		});
-	}
-
-	#expose = () => {
-		this.#context?.expose();
-	};
-
 	override render() {
 		return html`<umb-ref-grid-block
 			standalone
 			href=${(this.config?.showContentEdit ? this.config?.editContentPath : undefined) ?? ''}>
-			${this.config?.showContentEdit === false && this.unpublished
-				? html`
-						<uui-button slot="action" @click=${this.#expose}
-							><uui-icon name="icon-add"></uui-icon>
-							<umb-localize key="blockEditor_createThisFor" .args=${[this._ownerContentTypeName]}></umb-localize
-						></uui-button>
-					`
-				: nothing}
 			<umb-icon slot="icon" .name=${this.icon}></umb-icon>
 			<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
 			<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>

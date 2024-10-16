@@ -62,6 +62,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	_contentTypeAlias?: string;
 
 	@state()
+	_contentTypeName?: string;
+
+	@state()
 	_columnSpan?: number;
 
 	@state()
@@ -325,6 +328,15 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			},
 			'contentElementTypeAlias',
 		);
+		this.observe(
+			this.#context.contentElementTypeName,
+			(contentElementTypeName) => {
+				if (contentElementTypeName) {
+					this._contentTypeName = contentElementTypeName;
+				}
+			},
+			'contentElementTypeName',
+		);
 
 		this.#callUpdateInlineCreateButtons();
 	}
@@ -335,6 +347,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.#callUpdateInlineCreateButtons();
 		}
 	}
+
+	#expose = () => {
+		this.#context.expose();
+	};
 
 	#callUpdateInlineCreateButtons() {
 		clearTimeout(this.#renderTimeout);
@@ -481,20 +497,25 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderEditAction() {
-		return html`
-			${this._showContentEdit && this._workspaceEditContentPath
+		return this._showContentEdit && this._workspaceEditContentPath
+			? html`<uui-button
+					label="edit"
+					look="secondary"
+					color=${this._contentInvalid ? 'danger' : ''}
+					href=${this._workspaceEditContentPath}>
+					<uui-icon name="icon-edit"></uui-icon>
+					${this._contentInvalid
+						? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+						: nothing}
+				</uui-button>`
+			: this._showContentEdit === false && this._exposed === false
 				? html`<uui-button
-						label="edit"
+						@click=${this.#expose}
+						label=${this.localize.term('blockEditor_createThisFor', this._contentTypeName)}
 						look="secondary"
-						color=${this._contentInvalid ? 'danger' : ''}
-						href=${this._workspaceEditContentPath}>
-						<uui-icon name="icon-edit"></uui-icon>
-						${this._contentInvalid
-							? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
-							: nothing}
-					</uui-button>`
-				: nothing}
-		`;
+						><uui-icon name="icon-add"></uui-icon
+					></uui-button>`
+				: nothing;
 	}
 
 	#renderEditSettingsAction() {
