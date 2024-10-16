@@ -61,7 +61,7 @@ angular.module("umbraco.directives")
            * @private
            */
           function _filesQueued(files, event) {
-            //Push into the queue
+            // Push into the queue
             Utilities.forEach(files, file => {
               if (_filterFile(file) === true) {
                 file.messages = [];
@@ -82,7 +82,6 @@ angular.module("umbraco.directives")
 
             // If we have Accepted Media Types, we will ask to choose Media Type
             if (scope.acceptedMediatypes) {
-
               // If the media type dialog returns a positive answer, it is safe to assume that the
               // contentTypeAlias has been chosen and we can return early because the dialog will start processing
               // the queue automatically
@@ -102,11 +101,6 @@ angular.module("umbraco.directives")
            * @private
            */
           function _processQueueItems() {
-
-            if (scope.processingCount === scope.batchSize) {
-              return;
-            }
-
             // if we have processed all files, either by successful
             // upload, or attending to all messages, we deem the
             // action complete, else continue processing files
@@ -115,29 +109,24 @@ angular.module("umbraco.directives")
             if (scope.totalQueued === scope.processed.length) {
               if (scope.totalMessages === 0) {
                 if (scope.filesUploaded) {
-                  //queue is empty, trigger the done action
+                  // queue is empty, trigger the done action
                   scope.filesUploaded(scope.done);
                 }
 
-                //auto-clear the done queue after 3 secs
+                // auto-clear the done queue after 3 secs
                 var currentLength = scope.processed.length;
                 $timeout(function () {
                   scope.processed.splice(0, currentLength);
                 }, 3000);
               }
             } else if (scope.queue.length) {
-
+              // Process the next file in the queue
               var file = scope.queue.shift();
               scope.processing.push(file);
               _upload(file);
-
-              // If we still have items to process
-              // do so right away for parallel uploads
-              if (scope.queue.length > 0) {
-                _processQueueItems();
-              }
             }
           }
+
 
           /**
            * Upload a specific file and use the scope.contentTypeAlias for the type or fall back to letting
@@ -153,10 +142,10 @@ angular.module("umbraco.directives")
             }
 
             if (file.$error) {
-                file.done = true;
-                scope.processed.push(file);
-                file.messages.push({type: "Error", header: "Error"});
-                return;
+              file.done = true;
+              scope.processed.push(file);
+              file.messages.push({ type: "Error", header: "Error" });
+              return;
             }
 
             scope.propertyAlias = scope.propertyAlias ? scope.propertyAlias : "umbracoFile";
