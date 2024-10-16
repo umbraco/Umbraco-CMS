@@ -1,6 +1,6 @@
 import { UmbBlockListEntryContext } from '../../context/block-list-entry.context.js';
 import { UMB_BLOCK_LIST, type UmbBlockListLayoutModel } from '../../types.js';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import '../ref-list-block/index.js';
@@ -283,7 +283,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}></umb-ref-list-block>`;
+			.settings=${this._blockViewProps.settings}
+			${umbDestroyOnDisconnect()}></umb-ref-list-block>`;
 	}
 
 	#renderInlineBlock() {
@@ -293,7 +294,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}></umb-inline-list-block>`;
+			.settings=${this._blockViewProps.settings}
+			${umbDestroyOnDisconnect()}></umb-inline-list-block>`;
 	}
 
 	#renderBlock() {
