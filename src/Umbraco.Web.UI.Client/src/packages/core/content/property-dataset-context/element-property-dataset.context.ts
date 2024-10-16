@@ -82,7 +82,6 @@ export abstract class UmbElementPropertyDatasetContext<
 		this.observe(
 			this._dataOwner.structure.contentTypeProperties,
 			(props: UmbPropertyTypeModel[]) => {
-				console.log('props', props);
 				const map = props.map((prop) => ({ alias: prop.alias, variantId: this.#createPropertyVariantId(prop) }));
 				this.#propertyVariantIdMap.setValue(map);
 				// Resolve promise, to let the once waiting on this know.

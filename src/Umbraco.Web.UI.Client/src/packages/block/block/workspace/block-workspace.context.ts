@@ -45,6 +45,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	#entityType: string;
 
+	#liveEditingModePromise?: Promise<boolean>;
 	#liveEditingMode?: boolean;
 
 	#initialLayout?: LayoutDataType;
@@ -87,13 +88,13 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.#retrieveBlockManager = this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (manager) => {
 			this.#blockManager = manager;
 
-			this.observe(
+			this.#liveEditingModePromise = this.observe(
 				manager.liveEditingMode,
 				(liveEditingMode) => {
 					this.#liveEditingMode = liveEditingMode;
 				},
 				'observeLiveEditingMode',
-			);
+			).asPromise();
 
 			this.observe(
 				observeMultiple([
@@ -212,6 +213,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	async load(unique: string) {
 		await this.#retrieveBlockManager;
 		await this.#retrieveBlockEntries;
+		await this.#liveEditingModePromise;
 		if (!this.#blockManager || !this.#blockEntries) {
 			throw new Error('Block manager not found');
 		}
@@ -235,6 +237,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	async create(contentElementTypeId: string) {
 		await this.#retrieveBlockEntries;
 		await this.#retrieveModalContext;
+		await this.#liveEditingModePromise;
 		if (!this.#blockEntries) {
 			throw new Error('Block Entries not found');
 		}
@@ -257,13 +260,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		// TODO: We should investigate if it makes sense to gather
 
-		if (!this.#liveEditingMode) {
-			this.#layout.setValue(blockCreated.layout as LayoutDataType);
-			this.content.setData(blockCreated.content);
-			if (blockCreated.settings) {
-				this.settings.setData(blockCreated.settings);
-			}
-		} else {
+		if (this.#liveEditingMode) {
 			// Insert already, cause we are in live editing mode:
 			const blockInserted = await this.#blockEntries.insert(
 				blockCreated.layout,
@@ -279,6 +276,12 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 			this.#observeBlockData(unique);
 			this.establishLiveSync();
+		} else {
+			this.#layout.setValue(blockCreated.layout as LayoutDataType);
+			this.content.setData(blockCreated.content);
+			if (blockCreated.settings) {
+				this.settings.setData(blockCreated.settings);
+			}
 		}
 	}
 
