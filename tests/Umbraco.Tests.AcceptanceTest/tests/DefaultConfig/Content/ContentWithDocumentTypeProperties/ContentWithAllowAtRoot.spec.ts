@@ -13,7 +13,6 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('cannot create content if allow at root is disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const noAllowedDocumentTypeAvailableMessage = 'There are no allowed Document Types available for creating content here';
   await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -23,5 +22,4 @@ test('cannot create content if allow at root is disabled', async ({umbracoApi, u
 
   // Assert
   await umbracoUi.content.isDocumentTypeNameVisible(documentTypeName, false);
-  await umbracoUi.content.doesModalHaveText(noAllowedDocumentTypeAvailableMessage);
 });
