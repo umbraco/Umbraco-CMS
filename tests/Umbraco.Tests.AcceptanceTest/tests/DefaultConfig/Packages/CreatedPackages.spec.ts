@@ -22,7 +22,7 @@ test('can create a empty package', {tag: '@smoke'}, async ({umbracoUi}) => {
   await umbracoUi.package.clickCreateButton();
 
   // Assert
-  await umbracoUi.package.isSuccessNotificationVisible()
+  await umbracoUi.package.isSuccessNotificationVisible();
   await umbracoUi.package.clickCreatedTab();
   await umbracoUi.package.isPackageNameVisible(packageName);
 });
@@ -42,7 +42,7 @@ test('can update package name', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.package.clickUpdateButton();
 
   // Assert
-  await umbracoUi.package.isSuccessNotificationVisible()
+  await umbracoUi.package.isSuccessNotificationVisible();
   await umbracoUi.package.clickCreatedTab();
   await umbracoUi.package.isPackageNameVisible(packageName);
   expect(umbracoApi.package.doesNameExist(packageName)).toBeTruthy();
@@ -149,11 +149,11 @@ test('can create a package with media types', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.package.enterPackageName(packageName);
   await umbracoUi.package.clickAddMediaTypeToPackageButton();
   await umbracoUi.package.clickButtonWithName(mediaTypeName, true);
-  await umbracoUi.package.clickChooseContainerButton()
+  await umbracoUi.package.clickChooseContainerButton();
   await umbracoUi.package.clickCreateButton();
 
   // Assert
-  await umbracoUi.package.isSuccessNotificationVisible()
+  await umbracoUi.package.isSuccessNotificationVisible();
   expect(umbracoUi.package.isButtonWithNameVisible(mediaTypeName)).toBeTruthy();
   const packageData = await umbracoApi.package.getByName(packageName);
   expect(packageData.mediaTypes[0] == mediaTypeId).toBeTruthy();
@@ -174,7 +174,7 @@ test('can create a package with languages', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.package.enterPackageName(packageName);
   await umbracoUi.package.clickAddLanguageToPackageButton();
   await umbracoUi.package.clickButtonWithName(languageName);
-  await umbracoUi.package.clickSubmitButton()
+  await umbracoUi.package.clickSubmitButton();
   await umbracoUi.package.clickCreateButton();
 
   // Assert
