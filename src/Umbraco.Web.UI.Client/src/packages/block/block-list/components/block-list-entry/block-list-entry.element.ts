@@ -253,9 +253,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.contentElementTypeName,
 			(contentElementTypeName) => {
-				if (contentElementTypeName) {
-					this._contentTypeName = contentElementTypeName;
-				}
+				this._contentTypeName = contentElementTypeName;
 			},
 			'contentElementTypeName',
 		);
