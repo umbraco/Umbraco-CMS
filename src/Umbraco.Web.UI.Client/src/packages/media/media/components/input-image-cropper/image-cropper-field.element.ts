@@ -7,6 +7,8 @@ import type {
 	UmbImageCropperCrops,
 	UmbImageCropperFocalPoint,
 	UmbImageCropperPropertyEditorValue,
+	UmbFocalPointChangeEvent,
+	UmbImageCropChangeEvent,
 } from './index.js';
 import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -87,7 +89,7 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 		this.currentCrop = { ...this.crops[index] };
 	}
 
-	#onCropChange = (event: CustomEvent) => {
+	#onCropChange = (event: UmbImageCropChangeEvent) => {
 		const target = event.target as UmbImageCropperElement;
 		const value = target.value;
 
@@ -102,8 +104,8 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 		this.#updateValue();
 	};
 
-	#onFocalPointChange = (event: CustomEvent) => {
-		this.focalPoint = event.detail;
+	#onFocalPointChange = (event: UmbFocalPointChangeEvent) => {
+		this.focalPoint = { top: event.focalPoint.top, left: event.focalPoint.left };
 		this.#updateValue();
 	};
 
@@ -137,7 +139,7 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 					.src=${this.source}
 					.value=${this.currentCrop}
 					?hideFocalPoint=${this.hideFocalPoint}
-					@change=${this.#onCropChange}>
+					@imagecrop-change=${this.#onCropChange}>
 				</umb-image-cropper>
 			`;
 		}
@@ -147,7 +149,7 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 				.focalPoint=${this.focalPoint}
 				.src=${this.source}
 				?hideFocalPoint=${this.hideFocalPoint}
-				@change=${this.#onFocalPointChange}>
+				@focalpoint-change=${this.#onFocalPointChange}>
 			</umb-image-cropper-focus-setter>
 			<div id="actions">${this.renderActions()}</div>
 		`;
@@ -200,6 +202,7 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 		#actions {
 			display: flex;
 			justify-content: space-between;
+			margin-top: 0.5rem;
 		}
 
 		umb-image-cropper-focus-setter {
