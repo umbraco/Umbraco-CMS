@@ -140,6 +140,11 @@ public class HtmlLocalLinkParserTests
         "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}?v=1\" title=\"world\">world</a>",
         "<a href=\"/my-test-url?v=1\" title=\"world\">world</a>")]
 
+    // custom type ignored
+    [TestCase(
+        "<a type=\"custom\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
+        "<a type=\"custom\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>")]
+
     // legacy
     [TestCase(
         "hello href=\"{localLink:1234}\" world ",

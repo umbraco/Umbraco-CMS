@@ -18,7 +18,7 @@ public sealed class HtmlLocalLinkParser
         RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
     internal static readonly Regex TypePattern = new(
-        """type=['"](?<type>[a-zA-Z]+)['"]""",
+        """type=['"](?<type>(?:media|document))['"]""",
         RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
     internal static readonly Regex LocalLinkPattern = new(
