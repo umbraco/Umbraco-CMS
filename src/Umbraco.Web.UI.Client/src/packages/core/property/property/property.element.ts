@@ -182,9 +182,6 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#propertyContext.alias,
 			(alias) => {
 				this._alias = alias;
-				if (this._element) {
-					this._element.alias = alias;
-				}
 			},
 			null,
 		);
@@ -193,6 +190,9 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#propertyContext.label,
 			(label) => {
 				this._label = label;
+				if (this._element) {
+					this._element.name = label;
+				}
 			},
 			null,
 		);
@@ -297,9 +297,9 @@ export class UmbPropertyElement extends UmbLitElement {
 			if (this._element) {
 				this._element.addEventListener('change', this._onPropertyEditorChange as any as EventListener);
 				this._element.addEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
-				// No need to observe mandatory or alias, as we already do so and set it on the _element if present: [NL]
+				// No need to observe mandatory or label, as we already do so and set it on the _element if present: [NL]
 				this._element.mandatory = this._mandatory;
-				this._element.alias = this._alias;
+				this._element.name = this._label;
 
 				// No need for a controller alias, as the clean is handled via the observer prop:
 				this.#valueObserver = this.observe(
