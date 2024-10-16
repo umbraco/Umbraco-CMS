@@ -45,7 +45,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	#entityType: string;
 
-	#liveEditingModePromise?: Promise<boolean>;
+	#liveEditingModePromiseResolve?: (value: unknown) => void;
+	#liveEditingModePromise = new Promise((resolve) => {
+		this.#liveEditingModePromiseResolve = resolve;
+	});
 	#liveEditingMode?: boolean;
 
 	#initialLayout?: LayoutDataType;
@@ -88,13 +91,14 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.#retrieveBlockManager = this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (manager) => {
 			this.#blockManager = manager;
 
-			this.#liveEditingModePromise = this.observe(
+			this.observe(
 				manager.liveEditingMode,
 				(liveEditingMode) => {
-					this.#liveEditingMode = liveEditingMode;
+					this.#liveEditingMode = liveEditingMode ?? false;
+					this.#liveEditingModePromiseResolve?.();
 				},
 				'observeLiveEditingMode',
-			).asPromise();
+			);
 
 			this.observe(
 				observeMultiple([
