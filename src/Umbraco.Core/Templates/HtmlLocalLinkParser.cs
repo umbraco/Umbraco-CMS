@@ -14,12 +14,16 @@ public sealed class HtmlLocalLinkParser
     // <a type="media" href="/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}" title="media">media</a>
     // <a type="document" href="/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" title="other page">other page</a>
     internal static readonly Regex LocalLinkTagPattern = new(
-        @"<a(?:.+?type=['""](?<type>(?:document|media))['""].*?href=['""](?<locallink>\/?{localLink:(?<guid>[a-fA-F0-9-]+)}).*?['""]|.*?href=['""](?<locallink>\/?{localLink:(?<guid>[a-fA-F0-9-]+)}).*?['""].*?type=['""](?<type>(?:document|media))['""])[^>]*?>",
-        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline);
+        @"<a.+?href=['""](?<locallink>\/?{localLink:(?<guid>[a-fA-F0-9-]+)})[^>]*?>",
+        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+
+    internal static readonly Regex TypePattern = new(
+        """type=['"](?<type>[a-zA-Z]+)['"]""",
+        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
     internal static readonly Regex LocalLinkPattern = new(
         @"href=['""](?<locallink>\/?(?:\{|\%7B)localLink:(?<guid>[a-zA-Z0-9-://]+)(?:\}|\%7D))",
-        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline);
+        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
     private readonly IPublishedUrlProvider _publishedUrlProvider;
 
@@ -89,19 +93,21 @@ public sealed class HtmlLocalLinkParser
         MatchCollection localLinkTagMatches = LocalLinkTagPattern.Matches(text);
         foreach (Match linkTag in localLinkTagMatches)
         {
-            if (linkTag.Groups.Count < 1)
+            if (Guid.TryParse(linkTag.Groups["guid"].Value, out Guid guid) is false)
             {
                 continue;
             }
 
-            if (Guid.TryParse(linkTag.Groups["guid"].Value, out Guid guid) is false)
+            // Find the type attribute
+            Match typeMatch = TypePattern.Match(linkTag.Value);
+            if (typeMatch.Success is false)
             {
                 continue;
             }
 
             yield return new LocalLinkTag(
                 null,
-                new GuidUdi(linkTag.Groups["type"].Value, guid),
+                new GuidUdi(typeMatch.Groups["type"].Value, guid),
                 linkTag.Groups["locallink"].Value);
         }
 
