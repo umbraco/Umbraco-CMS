@@ -61,8 +61,9 @@ export class UmbTemporaryFileManager<
 		for (const item of queue) {
 			if (!item.temporaryUnique) throw new Error(`Unique is missing for item ${item}`);
 
-			const { error } = await this.#temporaryFileRepository.upload(item.temporaryUnique, item.file);
-			//await new Promise((resolve) => setTimeout(resolve, (Math.random() + 0.5) * 1000)); // simulate small delay so that the upload badge is properly shown
+			const { error } = await this.#temporaryFileRepository
+				.upload(item.temporaryUnique, item.file)
+				.catch(() => ({ error: true }));
 
 			let status: TemporaryFileStatus;
 			if (error) {
