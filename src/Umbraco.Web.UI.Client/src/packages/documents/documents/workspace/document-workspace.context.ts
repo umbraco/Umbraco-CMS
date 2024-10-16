@@ -120,6 +120,10 @@ export class UmbDocumentWorkspaceContext
 	readonly unique = this.#data.createObservablePartOfCurrent((data) => data?.unique);
 	readonly entityType = this.#data.createObservablePartOfCurrent((data) => data?.entityType);
 	readonly isTrashed = this.#data.createObservablePartOfCurrent((data) => data?.isTrashed);
+	readonly values = this.#data.createObservablePartOfCurrent((data) => data?.values);
+	getValues() {
+		return this.#data.getCurrent()?.values;
+	}
 
 	readonly contentTypeUnique = this.#data.createObservablePartOfCurrent((data) => data?.documentType.unique);
 	readonly contentTypeHasCollection = this.#data.createObservablePartOfCurrent(
@@ -287,6 +291,7 @@ export class UmbDocumentWorkspaceContext
 	override resetState() {
 		super.resetState();
 		this.#data.clear();
+		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 	}
 
 	async loadLanguages() {
@@ -298,6 +303,7 @@ export class UmbDocumentWorkspaceContext
 	async load(unique: string) {
 		this.resetState();
 		this.#getDataPromise = this.repository.requestByUnique(unique);
+
 		type GetDataType = Awaited<ReturnType<UmbDocumentDetailRepository['requestByUnique']>>;
 		const { data, asObservable } = (await this.#getDataPromise) as GetDataType;
 
@@ -870,7 +876,6 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	public override destroy(): void {
-		this.#data.destroy();
 		this.structure.destroy();
 		this.#languageRepository.destroy();
 		super.destroy();

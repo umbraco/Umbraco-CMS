@@ -1,5 +1,5 @@
 import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context.js';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
@@ -60,6 +60,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	_contentTypeAlias?: string;
+
+	@state()
+	_contentTypeName?: string;
 
 	@state()
 	_columnSpan?: number;
@@ -325,6 +328,13 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			},
 			'contentElementTypeAlias',
 		);
+		this.observe(
+			this.#context.contentElementTypeName,
+			(contentElementTypeName) => {
+				this._contentTypeName = contentElementTypeName;
+			},
+			'contentElementTypeName',
+		);
 
 		this.#callUpdateInlineCreateButtons();
 	}
@@ -335,6 +345,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.#callUpdateInlineCreateButtons();
 		}
 	}
+
+	#expose = () => {
+		this.#context.expose();
+	};
 
 	#callUpdateInlineCreateButtons() {
 		clearTimeout(this.#renderTimeout);
@@ -400,7 +414,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}></umb-block-grid-block-inline>`;
+			.settings=${this._blockViewProps.settings}
+			${umbDestroyOnDisconnect()}></umb-block-grid-block-inline>`;
 	}
 
 	#renderRefBlock() {
@@ -411,7 +426,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}></umb-block-grid-block>`;
+			.settings=${this._blockViewProps.settings}
+			${umbDestroyOnDisconnect()}></umb-block-grid-block>`;
 	}
 
 	#renderBlock() {
@@ -479,20 +495,25 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderEditAction() {
-		return html`
-			${this._showContentEdit && this._workspaceEditContentPath
+		return this._showContentEdit && this._workspaceEditContentPath
+			? html`<uui-button
+					label="edit"
+					look="secondary"
+					color=${this._contentInvalid ? 'danger' : ''}
+					href=${this._workspaceEditContentPath}>
+					<uui-icon name="icon-edit"></uui-icon>
+					${this._contentInvalid
+						? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+						: nothing}
+				</uui-button>`
+			: this._showContentEdit === false && this._exposed === false
 				? html`<uui-button
-						label="edit"
+						@click=${this.#expose}
+						label=${this.localize.term('blockEditor_createThisFor', this._contentTypeName)}
 						look="secondary"
-						color=${this._contentInvalid ? 'danger' : ''}
-						href=${this._workspaceEditContentPath}>
-						<uui-icon name="icon-edit"></uui-icon>
-						${this._contentInvalid
-							? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
-							: nothing}
-					</uui-button>`
-				: nothing}
-		`;
+						><uui-icon name="icon-add"></uui-icon
+					></uui-button>`
+				: nothing;
 	}
 
 	#renderEditSettingsAction() {

@@ -244,9 +244,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	public override destroy(): void {
-		this._data.destroy();
-		this._detailRepository?.destroy();
 		window.removeEventListener('willchangestate', this.#onWillNavigate);
+		this._detailRepository?.destroy();
 		super.destroy();
 	}
 }

@@ -1,6 +1,6 @@
 import { UmbBlockListEntryContext } from '../../context/block-list-entry.context.js';
 import { UMB_BLOCK_LIST, type UmbBlockListLayoutModel } from '../../types.js';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import '../ref-list-block/index.js';
@@ -52,6 +52,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	_contentTypeAlias?: string;
+
+	@state()
+	_contentTypeName?: string;
 
 	@state()
 	_showContentEdit = false;
@@ -247,7 +250,18 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			},
 			'contentElementTypeAlias',
 		);
+		this.observe(
+			this.#context.contentElementTypeName,
+			(contentElementTypeName) => {
+				this._contentTypeName = contentElementTypeName;
+			},
+			'contentElementTypeName',
+		);
 	}
+
+	#expose = () => {
+		this.#context.expose();
+	};
 
 	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
 		if (
@@ -267,8 +281,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			.label=${this._label}
 			.icon=${this._icon}
 			.unpublished=${!this._exposed}
+			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}></umb-ref-list-block>`;
+			.settings=${this._blockViewProps.settings}
+			${umbDestroyOnDisconnect()}></umb-ref-list-block>`;
 	}
 
 	#renderInlineBlock() {
@@ -276,8 +292,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			.label=${this._label}
 			.icon=${this._icon}
 			.unpublished=${!this._exposed}
+			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}></umb-inline-list-block>`;
+			.settings=${this._blockViewProps.settings}
+			${umbDestroyOnDisconnect()}></umb-inline-list-block>`;
 	}
 
 	#renderBlock() {
@@ -300,7 +318,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderEditContentAction() {
-		return html` ${this._showContentEdit && this._workspaceEditContentPath
+		return this._showContentEdit && this._workspaceEditContentPath
 			? html`<uui-button
 					label="edit"
 					look="secondary"
@@ -311,7 +329,14 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 						? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
 						: nothing}
 				</uui-button>`
-			: nothing}`;
+			: this._showContentEdit === false && this._exposed === false
+				? html`<uui-button
+						@click=${this.#expose}
+						label=${this.localize.term('blockEditor_createThisFor', this._contentTypeName)}
+						look="secondary"
+						><uui-icon name="icon-add"></uui-icon
+					></uui-button>`
+				: nothing;
 	}
 
 	#renderEditSettingsAction() {

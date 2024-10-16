@@ -1,16 +1,16 @@
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '../../contexts/index.js';
-import type { UmbWorkspaceUniqueType } from '../../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, nothing, query } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 @customElement('umb-workspace-entity-action-menu')
 export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 	private _workspaceContext?: typeof UMB_ENTITY_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	private _unique?: UmbWorkspaceUniqueType;
+	private _unique?: UmbEntityUnique;
 
 	@state()
 	private _entityType?: string;
@@ -39,14 +39,14 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 	#onActionExecuted(event: UmbActionExecutedEvent) {
 		event.stopPropagation();
 
-		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		this._popover?.hidePopover();
 	}
 
 	#onPopoverToggle(event: ToggleEvent) {
-		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		this._popoverOpen = event.newState === 'open';

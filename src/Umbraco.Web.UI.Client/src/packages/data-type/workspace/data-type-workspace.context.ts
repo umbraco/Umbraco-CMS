@@ -49,6 +49,11 @@ export class UmbDataTypeWorkspaceContext
 	readonly propertyEditorUiAlias = this._data.createObservablePartOfCurrent((data) => data?.editorUiAlias);
 	readonly propertyEditorSchemaAlias = this._data.createObservablePartOfCurrent((data) => data?.editorAlias);
 
+	readonly values = this._data.createObservablePartOfCurrent((data) => data?.values);
+	async getValues() {
+		return this._data.getCurrent()?.values;
+	}
+
 	#properties = new UmbArrayState<PropertyEditorSettingsProperty>([], (x) => x.alias).sortBy(
 		(a, b) => (a.weight || 0) - (b.weight || 0),
 	);

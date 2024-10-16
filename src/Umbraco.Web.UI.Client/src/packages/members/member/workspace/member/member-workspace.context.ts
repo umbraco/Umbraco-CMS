@@ -77,6 +77,11 @@ export class UmbMemberWorkspaceContext
 
 	readonly variants = this.#data.createObservablePartOfCurrent((data) => data?.variants ?? []);
 
+	readonly values = this.#data.createObservablePartOfCurrent((data) => data?.values);
+	getValues() {
+		return this.#data.getCurrent()?.values;
+	}
+
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbMemberTypeDetailRepository(this));
 	readonly variesByCulture = this.structure.ownerContentTypeObservablePart((x) => x?.variesByCulture);
 	readonly variesBySegment = this.structure.ownerContentTypeObservablePart((x) => x?.variesBySegment);
@@ -449,7 +454,6 @@ export class UmbMemberWorkspaceContext
 	}
 
 	public override destroy(): void {
-		this.#data.destroy();
 		super.destroy();
 	}
 

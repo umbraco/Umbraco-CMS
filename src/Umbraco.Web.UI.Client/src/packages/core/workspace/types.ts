@@ -1,2 +1,7 @@
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+
 export type * from './extensions/types.js';
-export type UmbWorkspaceUniqueType = string | null;
+/**
+ * @deprecated Use `UmbEntityUnique`instead.
+ */
+export type UmbWorkspaceUniqueType = UmbEntityUnique;

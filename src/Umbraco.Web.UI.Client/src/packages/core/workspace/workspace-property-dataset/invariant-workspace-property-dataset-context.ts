@@ -1,10 +1,14 @@
-import type { UmbPropertyDatasetContext, UmbNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import type {
+	UmbPropertyDatasetContext,
+	UmbNameablePropertyDatasetContext,
+	UmbPropertyValueData,
+} from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbInvariantDatasetWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, type Observable } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * A property dataset context that hooks directly into the workspace context.
@@ -47,6 +51,13 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 		this.name = this.#workspace.name;
 	}
 
+	get properties(): Observable<Array<UmbPropertyValueData> | undefined> {
+		return this.#workspace.values;
+	}
+	getProperties(): Promise<Array<UmbPropertyValueData> | undefined> {
+		return this.#workspace.getValues();
+	}
+
 	/**
 	 * @function propertyValueByAlias
 	 * @param {string} propertyAlias
@@ -58,9 +69,9 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 	}
 
 	/**
-	 * TODO: Write proper JSDocs here.
-	 * @param propertyAlias
-	 * @param value
+	 * @param {string} propertyAlias - The alias of the property
+	 * @param {unknown} value - The value to be set for this property
+	 * @returns {Promise<void>} - an promise which resolves once the value has been set.
 	 */
 	async setPropertyValue(propertyAlias: string, value: unknown) {
 		return this.#workspace.setPropertyValue(propertyAlias, value);

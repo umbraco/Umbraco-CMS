@@ -96,7 +96,7 @@ export class UmbPropertyDatasetElement extends UmbLitElement {
 		this.observe(this.context.name, this.#observerCallback);
 		// prevent the first change event from firing:
 		this.#allowChangeEvent = false;
-		this.observe(this.context.values, this.#observerCallback);
+		this.observe(this.context.properties, this.#observerCallback);
 	}
 
 	#observerCallback = () => {
