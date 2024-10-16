@@ -67,8 +67,7 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
         Assert.IsTrue(contentTypeAttempt.Success);
 
         var contentTypeResult = contentTypeAttempt.Result;
-        ContentTypeUpdateHelper contentTypeUpdateHelper = new ContentTypeUpdateHelper();
-        ContentTypeUpdateModel = contentTypeUpdateHelper.CreateContentTypeUpdateModel(contentTypeResult); ContentTypeUpdateModel.AllowedContentTypes = new[]
+        ContentTypeUpdateModel = ContentTypeUpdateHelper.CreateContentTypeUpdateModel(contentTypeResult); ContentTypeUpdateModel.AllowedContentTypes = new[]
         {
             new ContentTypeSort(contentTypeResult.Key, 0, ContentTypeCreateModel.Alias),
         };

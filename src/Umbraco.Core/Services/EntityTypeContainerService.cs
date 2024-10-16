@@ -50,6 +50,22 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
         return await Task.FromResult(_entityContainerRepository.Get(id));
     }
 
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<EntityContainer>> GetAsync(string name, int level)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        ReadLock(scope);
+        return await Task.FromResult(_entityContainerRepository.Get(name, level));
+    }
+    /// <inheritdoc />
+    public async Task<IEnumerable<EntityContainer>> GetAllAsync()
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        ReadLock(scope);
+        return await Task.FromResult(_entityContainerRepository.GetMany());
+    }
+
     /// <inheritdoc />
     public async Task<EntityContainer?> GetParentAsync(EntityContainer container)
         => await Task.FromResult(GetParent(container));
