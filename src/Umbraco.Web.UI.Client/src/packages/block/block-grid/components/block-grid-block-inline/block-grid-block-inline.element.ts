@@ -49,9 +49,6 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	content?: UmbBlockDataType;
 
 	@state()
-	private _exposed?: boolean;
-
-	@state()
 	_inlineProperty?: UmbPropertyTypeModel;
 
 	@state()
@@ -93,14 +90,6 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 							this._inlineProperty = contentTypeProperties[0];
 						},
 						'observeProperties',
-					);
-
-					this.observe(
-						this.#workspaceContext.exposed,
-						(exposed) => {
-							this._exposed = exposed;
-						},
-						'observeExposed',
 					);
 
 					this.observe(
@@ -174,7 +163,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	}
 
 	#renderInside() {
-		if (this._exposed === false) {
+		if (this.unpublished === true) {
 			return html`<uui-button id="exposeButton" @click=${this.#expose}
 				><uui-icon name="icon-add"></uui-icon>
 				<umb-localize

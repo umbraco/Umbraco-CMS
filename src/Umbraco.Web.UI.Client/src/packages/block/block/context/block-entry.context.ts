@@ -46,10 +46,10 @@ export abstract class UmbBlockEntryContext<
 
 	#contentKey?: string;
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
-	protected _variantId = this.#variantId.asObservable();
+	protected readonly _variantId = this.#variantId.asObservable();
 
 	#hasExpose = new UmbBooleanState(undefined);
-	hasExpose = this.#hasExpose.asObservable();
+	readonly hasExpose = this.#hasExpose.asObservable();
 
 	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
 
