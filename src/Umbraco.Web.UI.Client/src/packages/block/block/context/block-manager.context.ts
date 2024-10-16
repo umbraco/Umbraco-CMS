@@ -206,7 +206,9 @@ export abstract class UmbBlockManagerContext<
 	getContentOf(contentKey: string) {
 		return this.#contents.value.find((x) => x.key === contentKey);
 	}
-	setOneLayout(layoutData: BlockLayoutType) {
+	// originData param is used by some implementations. [NL] should be here, do not remove it.
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	setOneLayout(layoutData: BlockLayoutType, _originData?: BlockOriginDataType) {
 		this._layouts.appendOne(layoutData);
 	}
 	setOneContent(contentData: UmbBlockDataModel) {
@@ -319,7 +321,13 @@ export abstract class UmbBlockManagerContext<
 		originData: BlockOriginDataType,
 	): boolean;
 
-	protected insertBlockData(layoutEntry: BlockLayoutType, content: UmbBlockDataModel, settings?: UmbBlockDataModel) {
+	protected insertBlockData(
+		layoutEntry: BlockLayoutType,
+		content: UmbBlockDataModel,
+		settings: UmbBlockDataModel | undefined,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		_originData: BlockOriginDataType,
+	) {
 		// Create content entry:
 		if (layoutEntry.contentKey) {
 			this.#contents.appendOne(content);

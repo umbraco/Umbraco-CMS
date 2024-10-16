@@ -74,7 +74,9 @@ export class UmbTemporaryFileManager<
 	async #handleUpload(item: UploadableItem) {
 		if (!item.temporaryUnique) throw new Error(`Unique is missing for item ${item}`);
 
-		const { error } = await this.#temporaryFileRepository.upload(item.temporaryUnique, item.file);
+		const { error } = await this.#temporaryFileRepository
+			.upload(item.temporaryUnique, item.file)
+			.catch(() => ({ error: true }));
 
 		let status: TemporaryFileStatus;
 		if (error) {
