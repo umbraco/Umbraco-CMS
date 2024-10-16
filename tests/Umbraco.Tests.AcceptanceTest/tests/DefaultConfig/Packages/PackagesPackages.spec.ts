@@ -9,5 +9,6 @@ test('can see the marketplace', async ({umbracoUi}) => {
   await umbracoUi.package.clickPackagesTab();
 
   // Assert
+  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.package.isMarketPlaceIFrameVisible();
 });

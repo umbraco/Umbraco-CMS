@@ -1,4 +1,4 @@
-﻿import {test} from '@umbraco/playwright-testhelpers';
+﻿import {NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'TestDataType';
@@ -24,7 +24,7 @@ test('can create a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) 
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
 });
 
@@ -41,6 +41,7 @@ test('can rename a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) 
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
   expect(await umbracoApi.dataType.doesNameExist(wrongDataTypeName)).toBeFalsy();
 });
@@ -55,7 +56,7 @@ test('can delete a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) 
   await umbracoUi.dataType.deleteDataType(dataTypeName);
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeFalsy();
 });
 
@@ -75,6 +76,7 @@ test('can change property editor in a data type', {tag: '@smoke'}, async ({umbra
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeData.editorAlias).toBe(updatedEditorAlias);
@@ -110,7 +112,7 @@ test('can change settings', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
