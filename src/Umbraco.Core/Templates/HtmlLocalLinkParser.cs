@@ -18,7 +18,7 @@ public sealed class HtmlLocalLinkParser
         RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
     internal static readonly Regex LocalLinkPattern = new(
-        @"href=""[/]?(?:\{|\%7B)localLink:([a-zA-Z0-9-://]+)(?:\}|\%7D)",
+        @"href=['""](?<locallink>\/?(?:\{|\%7B)localLink:(?<guid>[a-zA-Z0-9-://]+)(?:\}|\%7D))",
         RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
     private readonly IPublishedUrlProvider _publishedUrlProvider;
@@ -79,7 +79,7 @@ public sealed class HtmlLocalLinkParser
     }
 
     // under normal circumstances, the type attribute is preceded by a space
-    // to cover the rare occasion where it isn't, we first replace with a a space and then without.
+    // to cover the rare occasion where it isn't, we first replace with a space and then without.
     private string StripTypeAttributeFromTag(string tag, string type) =>
         tag.Replace($" type=\"{type}\"", string.Empty)
             .Replace($"type=\"{type}\"", string.Empty);
@@ -102,8 +102,7 @@ public sealed class HtmlLocalLinkParser
             yield return new LocalLinkTag(
                 null,
                 new GuidUdi(linkTag.Groups["type"].Value, guid),
-                linkTag.Groups["locallink"].Value,
-                linkTag.Value);
+                linkTag.Groups["locallink"].Value);
         }
 
         // also return legacy results for values that have not been migrated
@@ -120,24 +119,25 @@ public sealed class HtmlLocalLinkParser
         MatchCollection tags = LocalLinkPattern.Matches(text);
         foreach (Match tag in tags)
         {
-            if (tag.Groups.Count > 0)
+            if (tag.Groups.Count <= 0)
             {
-                var id = tag.Groups[1].Value; // .Remove(tag.Groups[1].Value.Length - 1, 1);
+                continue;
+            }
 
-                // The id could be an int or a UDI
-                if (UdiParser.TryParse(id, out Udi? udi))
-                {
-                    var guidUdi = udi as GuidUdi;
-                    if (guidUdi is not null)
-                    {
-                        yield return new LocalLinkTag(null, guidUdi, tag.Value, null);
-                    }
-                }
+            var id = tag.Groups["guid"].Value;
 
-                if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
+            // The id could be an int or a UDI
+            if (UdiParser.TryParse(id, out Udi? udi))
+            {
+                if (udi is GuidUdi guidUdi)
                 {
-                    yield return new LocalLinkTag (intId, null, tag.Value, null);
+                    yield return new LocalLinkTag(null, guidUdi, tag.Groups["locallink"].Value);
                 }
+            }
+
+            if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
+            {
+                yield return new LocalLinkTag (intId, null, tag.Groups["locallink"].Value);
             }
         }
     }
@@ -151,20 +151,10 @@ public sealed class HtmlLocalLinkParser
             TagHref = tagHref;
         }
 
-        public LocalLinkTag(int? intId, GuidUdi? udi, string tagHref, string? fullTag)
-        {
-            IntId = intId;
-            Udi = udi;
-            TagHref = tagHref;
-            FullTag = fullTag;
-        }
-
         public int? IntId { get; }
 
         public GuidUdi? Udi { get; }
 
         public string TagHref { get; }
-
-        public string? FullTag { get; }
     }
 }

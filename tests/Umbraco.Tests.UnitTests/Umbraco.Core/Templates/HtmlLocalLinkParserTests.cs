@@ -148,8 +148,14 @@ public class HtmlLocalLinkParserTests
         "hello href=\"{localLink:umb://document/9931BDE0AAC34BABB838909A7B47570E}\" world ",
         "hello href=\"/my-test-url\" world ")]
     [TestCase(
+        "hello href=\"{localLink:umb://document/9931BDE0AAC34BABB838909A7B47570E}#anchor\" world ",
+        "hello href=\"/my-test-url#anchor\" world ")]
+    [TestCase(
         "hello href=\"{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}\" world ",
         "hello href=\"/media/1001/my-image.jpg\" world ")]
+    [TestCase(
+        "hello href='{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}' world ",
+        "hello href='/media/1001/my-image.jpg' world ")]
 
     // This one has an invalid char so won't match.
     [TestCase(
@@ -157,7 +163,7 @@ public class HtmlLocalLinkParserTests
         "hello href=\"{localLink:umb^://document/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ")]
     [TestCase(
         "hello href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ",
-        "hello href=\"#\" world ")]
+        "hello href=\"\" world ")]
     public void ParseLocalLinks(string input, string result)
     {
         // setup a mock URL provider which we'll use for testing
