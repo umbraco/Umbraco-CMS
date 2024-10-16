@@ -45,10 +45,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	#entityType: string;
 
-	#liveEditingModePromiseResolve?: (value: unknown) => void;
-	#liveEditingModePromise = new Promise((resolve) => {
-		this.#liveEditingModePromiseResolve = resolve;
-	});
 	#liveEditingMode?: boolean;
 
 	#initialLayout?: LayoutDataType;
@@ -95,7 +91,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				manager.liveEditingMode,
 				(liveEditingMode) => {
 					this.#liveEditingMode = liveEditingMode ?? false;
-					this.#liveEditingModePromiseResolve?.();
 				},
 				'observeLiveEditingMode',
 			);
@@ -217,7 +212,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	async load(unique: string) {
 		await this.#retrieveBlockManager;
 		await this.#retrieveBlockEntries;
-		await this.#liveEditingModePromise;
 		if (!this.#blockManager || !this.#blockEntries) {
 			throw new Error('Block manager not found');
 		}
@@ -241,7 +235,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	async create(contentElementTypeId: string) {
 		await this.#retrieveBlockEntries;
 		await this.#retrieveModalContext;
-		await this.#liveEditingModePromise;
 		if (!this.#blockEntries) {
 			throw new Error('Block Entries not found');
 		}
