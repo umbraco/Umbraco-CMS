@@ -117,6 +117,26 @@ public class HtmlLocalLinkParserTests
     [TestCase(
         "<a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\"type=\"media\">world</a>",
         "<a href=\"/media/1001/my-image.jpg\" title=\"world\">world</a>")]
+
+    // attributes order should not matter
+    [TestCase(
+        "<a rel=\"noopener\" title=\"world\" type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\">world</a>",
+        "<a rel=\"noopener\" title=\"world\" href=\"/my-test-url\">world</a>")]
+    [TestCase(
+        "<a rel=\"noopener\" title=\"world\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" type=\"document\">world</a>",
+        "<a rel=\"noopener\" title=\"world\" href=\"/my-test-url\">world</a>")]
+    [TestCase(
+        "<a rel=\"noopener\" title=\"world\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}#anchor\" type=\"document\">world</a>",
+        "<a rel=\"noopener\" title=\"world\" href=\"/my-test-url#anchor\">world</a>")]
+
+    // anchors and query strings
+    [TestCase(
+        "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}#anchor\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url#anchor\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}?v=1\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url?v=1\" title=\"world\">world</a>")]
+
     // legacy
     [TestCase(
         "hello href=\"{localLink:1234}\" world ",

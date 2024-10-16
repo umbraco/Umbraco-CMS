@@ -14,7 +14,7 @@ public sealed class HtmlLocalLinkParser
     // <a type="media" href="/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}" title="media">media</a>
     // <a type="document" href="/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" title="other page">other page</a>
     internal static readonly Regex LocalLinkTagPattern = new(
-        @"<a\s+(?:(?:(?:type=['""](?<type>document|media)['""].*?(?<locallink>href=[""']/{localLink:(?<guid>[a-fA-F0-9-]+)})[""'])|((?<locallink>href=[""']/{localLink:(?<guid>[a-fA-F0-9-]+)})[""'].*?type=(['""])(?<type>document|media)(?:['""])))|(?:(?:type=['""](?<type>document|media)['""])|(?:(?<locallink>href=[""']/{localLink:[a-fA-F0-9-]+})[""'])))[^>]*>",
+        @"<a(?:.+?type=['""](?<type>(?:document|media))['""].*?href=['""](?<locallink>\/?{localLink:(?<guid>[a-fA-F0-9-]+)}).*?['""]|.*?href=['""](?<locallink>\/?{localLink:(?<guid>[a-fA-F0-9-]+)}).*?['""].*?type=['""](?<type>(?:document|media))['""])[^>]*?>",
         RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
     internal static readonly Regex LocalLinkPattern = new(
@@ -58,24 +58,20 @@ public sealed class HtmlLocalLinkParser
         {
             if (tagData.Udi is not null)
             {
-                var newLink = "#";
-                if (tagData.Udi?.EntityType == Constants.UdiEntityType.Document)
+                var newLink = tagData.Udi?.EntityType switch
                 {
-                    newLink = _publishedUrlProvider.GetUrl(tagData.Udi.Guid);
-                }
-                else if (tagData.Udi?.EntityType == Constants.UdiEntityType.Media)
-                {
-                    newLink = _publishedUrlProvider.GetMediaUrl(tagData.Udi.Guid);
-                }
-
+                    Constants.UdiEntityType.Document => _publishedUrlProvider.GetUrl(tagData.Udi.Guid),
+                    Constants.UdiEntityType.Media => _publishedUrlProvider.GetMediaUrl(tagData.Udi.Guid),
+                    _ => ""
+                };
 
                 text = StripTypeAttributeFromTag(text, tagData.Udi!.EntityType);
-                text = text.Replace(tagData.TagHref, "href=\"" + newLink);
+                text = text.Replace(tagData.TagHref, newLink);
             }
             else if (tagData.IntId.HasValue)
             {
                 var newLink = _publishedUrlProvider.GetUrl(tagData.IntId.Value);
-                text = text.Replace(tagData.TagHref, "href=\"" + newLink);
+                text = text.Replace(tagData.TagHref, newLink);
             }
         }
 
