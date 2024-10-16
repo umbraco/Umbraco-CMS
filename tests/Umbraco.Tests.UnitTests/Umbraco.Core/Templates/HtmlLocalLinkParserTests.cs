@@ -117,6 +117,9 @@ public class HtmlLocalLinkParserTests
     [TestCase(
         "<a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\"type=\"media\">world</a>",
         "<a href=\"/media/1001/my-image.jpg\" title=\"world\">world</a>")]
+    [TestCase(
+        "<p><a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a></p><p><a href=\"/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}\" title=\"world\" type=\"media\">world</a></p>",
+        "<p><a href=\"/my-test-url\" title=\"world\">world</a></p><p><a href=\"/media/1001/my-image.jpg\" title=\"world\">world</a></p>")]
 
     // attributes order should not matter
     [TestCase(
