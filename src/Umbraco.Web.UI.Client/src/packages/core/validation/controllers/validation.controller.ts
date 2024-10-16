@@ -225,8 +225,8 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		this.#validationMode = true;
 
 		const resultsStatus = await Promise.all(this.#validators.map((v) => v.validate())).then(
-			() => Promise.resolve(true),
-			() => Promise.resolve(false),
+			() => true,
+			() => false,
 		);
 
 		if (!this.messages) {
