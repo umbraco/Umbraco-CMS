@@ -67,6 +67,13 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 
 						self.#uploadTemporaryFile(files, this.editor);
 					});
+
+					host.addEventListener('paste', (event) => {
+						const files = event.clipboardData?.files;
+						if (!files) return;
+
+						self.#uploadTemporaryFile(files, this.editor);
+					});
 				},
 			}),
 		];
