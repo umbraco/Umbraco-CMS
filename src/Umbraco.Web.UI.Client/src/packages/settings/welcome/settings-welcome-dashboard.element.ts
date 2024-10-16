@@ -29,18 +29,21 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 							Ask a question in the community forum or our Discord community
 						</umb-localize>
 					</p>
-					<uui-button
-						look="primary"
-						href="https://our.umbraco.com/forum"
-						label=${this.localize.term('settingsDashboard_goForum')}
-						target="_blank"
-						rel="noopener"></uui-button>
-					<uui-button
-						look="primary"
-						href="https://discord.umbraco.com"
-						label=${this.localize.term('settingsDashboard_chatWithCommunity')}
-						target="_blank"
-						rel="noopener"></uui-button>
+
+					<div class="button-group">
+						<uui-button
+							look="primary"
+							href="https://our.umbraco.com/forum"
+							label=${this.localize.term('settingsDashboard_goForum')}
+							target="_blank"
+							rel="noopener"></uui-button>
+						<uui-button
+							look="primary"
+							href="https://discord.umbraco.com"
+							label=${this.localize.term('settingsDashboard_chatWithCommunity')}
+							target="_blank"
+							rel="noopener"></uui-button>
+					</div>
 				</uui-box>
 
 				<uui-box class="training">
@@ -114,6 +117,12 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 				#settings-dashboard {
 					grid-template-columns: repeat(1, 1fr);
 				}
+			}
+
+			.button-group {
+				display: flex;
+				flex-wrap: wrap;
+				gap: var(--uui-size-space-2);
 			}
 		`,
 	];

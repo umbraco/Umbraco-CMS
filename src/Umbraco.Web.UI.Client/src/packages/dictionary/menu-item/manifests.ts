@@ -1,3 +1,4 @@
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
 import { UMB_DICTIONARY_TREE_ALIAS } from '../tree/index.js';
 import { UMB_TRANSLATION_MENU_ALIAS } from '@umbraco-cms/backoffice/translation';
@@ -25,7 +26,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		api: () => import('./dictionary-menu-structure.context.js'),
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: 'Umb.Workspace.Dictionary',
 			},
 		],
@@ -37,7 +38,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Data Type Breadcrumb Workspace Footer App',
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: 'Umb.Workspace.Dictionary',
 			},
 		],

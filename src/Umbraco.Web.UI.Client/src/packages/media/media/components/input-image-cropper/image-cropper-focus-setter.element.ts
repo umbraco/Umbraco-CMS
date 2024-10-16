@@ -17,7 +17,6 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 	@property({ attribute: false })
 	focalPoint: UmbImageCropperFocalPoint = { left: 0.5, top: 0.5 };
 
-	// TODO: [LK] Temporary fix; to be reviewed.
 	@property({ type: Boolean })
 	hideFocalPoint = false;
 

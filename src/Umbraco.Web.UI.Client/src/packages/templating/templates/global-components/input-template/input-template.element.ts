@@ -173,16 +173,16 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 			${this._pickedTemplates.map(
 				(template) => html`
 					<umb-template-card
-						.name=${template.name}
 						.id=${template.unique}
-						@open=${() => window.history.pushState({}, '', this.#templatePath + 'edit/' + template.unique)}
+						.name=${template.name}
 						@change=${this.#onCardChange}
-						?default="${template.unique === this.defaultUnique}">
+						@open=${() => window.history.pushState({}, '', this.#templatePath + 'edit/' + template.unique)}
+						?default=${template.unique === this.defaultUnique}>
 						<uui-button
 							slot="actions"
-							label="${this.localize.term('general_remove') + ' ' + template.name}"
-							@click="${() => this.#removeTemplate(template.unique ?? '')}"
-							compact>
+							compact
+							label=${this.localize.term('general_remove') + ' ' + template.name}
+							@click=${() => this.#removeTemplate(template.unique ?? '')}>
 							<uui-icon name="icon-trash"></uui-icon>
 						</uui-button>
 					</umb-template-card>
@@ -191,8 +191,8 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 			<uui-button
 				id="btn-add"
 				look="placeholder"
-				label="${this.localize.term('general_add')}"
-				@click="${this.#openPicker}"></uui-button>
+				label=${this.localize.term('general_choose')}
+				@click=${this.#openPicker}></uui-button>
 		`;
 	}
 
