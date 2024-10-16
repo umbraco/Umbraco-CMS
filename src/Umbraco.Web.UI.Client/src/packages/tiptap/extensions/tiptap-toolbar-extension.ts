@@ -6,6 +6,7 @@ export interface ManifestTiptapToolbarExtension<
 	MetaType extends MetaTiptapToolbarExtension = MetaTiptapToolbarExtension,
 > extends ManifestElementAndApi<UmbControllerHostElement, UmbTiptapToolbarElementApi> {
 	type: 'tiptapToolbarExtension';
+	forExtensions?: Array<string>;
 	meta: MetaType;
 }
 
