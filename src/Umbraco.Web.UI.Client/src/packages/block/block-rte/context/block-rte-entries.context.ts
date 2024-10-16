@@ -53,7 +53,12 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 						{} as any,
 					);
 					if (created) {
-						this.insert(created.layout, created.content, created.settings);
+						this.insert(
+							created.layout,
+							created.content,
+							created.settings,
+							data.originData as UmbBlockRteWorkspaceOriginData,
+						);
 					} else {
 						throw new Error('Failed to create block');
 					}
@@ -122,9 +127,13 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 		this._manager?.setLayouts(layouts);
 	}
 
-	async create(contentElementTypeKey: string, partialLayoutEntry?: Omit<UmbBlockRteLayoutModel, 'contentKey'>) {
+	async create(
+		contentElementTypeKey: string,
+		partialLayoutEntry?: Omit<UmbBlockRteLayoutModel, 'contentKey'>,
+		originData?: UmbBlockRteWorkspaceOriginData,
+	) {
 		await this._retrieveManager;
-		return this._manager?.create(contentElementTypeKey, partialLayoutEntry);
+		return this._manager?.create(contentElementTypeKey, partialLayoutEntry, originData);
 	}
 
 	// insert Block?
@@ -133,9 +142,10 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 		layoutEntry: UmbBlockRteLayoutModel,
 		content: UmbBlockDataModel,
 		settings: UmbBlockDataModel | undefined,
+		originData: UmbBlockRteWorkspaceOriginData,
 	) {
 		await this._retrieveManager;
-		return this._manager?.insert(layoutEntry, content, settings) ?? false;
+		return this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
 	}
 
 	// create Block?
