@@ -25,13 +25,15 @@ export default class UmbTinyMceCodeEditorPlugin extends UmbTinyMcePluginBase {
 			},
 		});
 
-		if (!modal) return;
+		const value = await modal.onSubmit().catch(() => undefined);
+		if (!value) {
+			return;
+		}
 
-		const { content } = await modal.onSubmit();
-		if (!content) {
+		if (!value.content) {
 			this.editor.resetContent();
 		} else {
-			this.editor.setContent(content.toString());
+			this.editor.setContent(value.content.toString());
 		}
 
 		this.editor.dispatch('Change');

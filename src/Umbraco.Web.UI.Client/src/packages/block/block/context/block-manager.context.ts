@@ -78,7 +78,7 @@ export abstract class UmbBlockManagerContext<
 	setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
 		this._editorConfiguration.setValue(configs);
 		if (this._liveEditingMode.getValue() === undefined) {
-			this._liveEditingMode.setValue(configs.getValueByAlias<boolean>('liveEditingMode'));
+			this._liveEditingMode.setValue(configs.getValueByAlias<boolean>('useLiveEditing'));
 		}
 	}
 	getEditorConfiguration(): UmbPropertyEditorConfigCollection | undefined {
