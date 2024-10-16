@@ -54,6 +54,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	_contentTypeAlias?: string;
 
 	@state()
+	_contentTypeName?: string;
+
+	@state()
 	_showContentEdit = false;
 	@state()
 	_hasSettings = false;
@@ -247,7 +250,20 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			},
 			'contentElementTypeAlias',
 		);
+		this.observe(
+			this.#context.contentElementTypeName,
+			(contentElementTypeName) => {
+				if (contentElementTypeName) {
+					this._contentTypeName = contentElementTypeName;
+				}
+			},
+			'contentElementTypeName',
+		);
 	}
+
+	#expose = () => {
+		this.#context.expose();
+	};
 
 	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
 		if (
@@ -302,7 +318,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderEditContentAction() {
-		return html` ${this._showContentEdit && this._workspaceEditContentPath
+		return this._showContentEdit && this._workspaceEditContentPath
 			? html`<uui-button
 					label="edit"
 					look="secondary"
@@ -313,7 +329,14 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 						? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
 						: nothing}
 				</uui-button>`
-			: nothing}`;
+			: this._showContentEdit === false && this._exposed === false
+				? html`<uui-button
+						@click=${this.#expose}
+						label=${this.localize.term('blockEditor_createThisFor', this._contentTypeName)}
+						look="secondary"
+						><uui-icon name="icon-add"></uui-icon
+					></uui-button>`
+				: nothing;
 	}
 
 	#renderEditSettingsAction() {
