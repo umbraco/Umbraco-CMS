@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from '@playwright/test';
 
 const testUser = {
@@ -13,7 +13,6 @@ const rootDocumentTypeName = 'RootDocumentType';
 const childDocumentTypeOneName = 'ChildDocumentTypeOne';
 const childDocumentTypeTwoName = 'ChildDocumentTypeTwo';
 let childDocumentTypeOneId = null;
-let childDocumentTypeTwoId = null;
 let rootDocumentTypeId = null;
 
 let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
@@ -32,14 +31,12 @@ test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeTwoName);
   await umbracoApi.user.ensureNameNotExists(testUser.name);
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
-
   childDocumentTypeOneId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeOneName);
-  childDocumentTypeTwoId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeTwoName);
+  const childDocumentTypeTwoId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeTwoName);
   rootDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedTwoChildNodes(rootDocumentTypeName, childDocumentTypeOneId, childDocumentTypeTwoId);
   rootDocumentId = await umbracoApi.document.createDefaultDocument(rootDocumentName, rootDocumentTypeId);
   childDocumentOneId = await umbracoApi.document.createDefaultDocumentWithParent(childDocumentOneName, childDocumentTypeOneId, rootDocumentId);
   await umbracoApi.document.createDefaultDocumentWithParent(childDocumentTwoName, childDocumentTypeTwoId, rootDocumentId);
-
   userGroupId = await umbracoApi.userGroup.createSimpleUserGroupWithContentSection(userGroupName);
 });
 

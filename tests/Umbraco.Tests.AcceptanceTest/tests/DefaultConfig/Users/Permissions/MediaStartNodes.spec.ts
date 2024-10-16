@@ -23,18 +23,15 @@ test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(rootFolderName);
   await umbracoApi.media.ensureNameNotExists(childFolderOneName);
   await umbracoApi.media.ensureNameNotExists(childFolderTwoName);
-
   rootFolderId = await umbracoApi.media.createDefaultMediaFolder(rootFolderName);
   childFolderOneId = await umbracoApi.media.createDefaultMediaFolderAndParentId(childFolderOneName, rootFolderId);
   await umbracoApi.media.createDefaultMediaFolderAndParentId(childFolderTwoName, rootFolderId);
-
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMediaSection(userGroupName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
   // Ensure we are logged in to admin
   await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
-
   await umbracoApi.user.ensureNameNotExists(testUser.name);
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
   await umbracoApi.media.ensureNameNotExists(rootFolderName);
