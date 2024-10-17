@@ -59,6 +59,14 @@ export class UmbUfmRenderElement extends UmbLitElement {
 			pre {
 				overflow: auto;
 			}
+
+			:host > :first-child {
+				margin-block-start: 0;
+			}
+
+			:host > :last-child {
+				margin-block-end: 0;
+			}
 		`,
 	];
 }
