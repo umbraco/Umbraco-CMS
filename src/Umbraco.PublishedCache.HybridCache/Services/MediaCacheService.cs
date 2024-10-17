@@ -24,6 +24,7 @@ internal class MediaCacheService : IMediaCacheService
     private readonly IEnumerable<IMediaSeedKeyProvider> _seedKeyProviders;
     private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly CacheSettings _cacheSettings;
+    private readonly CacheEntrySettings _cacheEntrySettings;
 
     private HashSet<Guid>? _seedKeys;
     private HashSet<Guid> SeedKeys
@@ -55,7 +56,8 @@ internal class MediaCacheService : IMediaCacheService
         ICacheNodeFactory cacheNodeFactory,
         IEnumerable<IMediaSeedKeyProvider> seedKeyProviders,
         IPublishedModelFactory publishedModelFactory,
-        IOptions<CacheSettings> cacheSettings)
+        IOptions<CacheSettings> cacheSettings,
+        IOptionsMonitor<CacheEntrySettings> cacheEntrySettings)
     {
         _databaseCacheRepository = databaseCacheRepository;
         _idKeyMap = idKeyMap;
@@ -66,6 +68,7 @@ internal class MediaCacheService : IMediaCacheService
         _seedKeyProviders = seedKeyProviders;
         _publishedModelFactory = publishedModelFactory;
         _cacheSettings = cacheSettings.Value;
+        _cacheEntrySettings = cacheEntrySettings.Get(Constants.Configuration.NamedOptions.CacheEntry.Media);
     }
 
     public async Task<IPublishedContent?> GetByKeyAsync(Guid key)
@@ -268,8 +271,8 @@ internal class MediaCacheService : IMediaCacheService
 
     private HybridCacheEntryOptions GetSeedEntryOptions() => new()
     {
-        Expiration = _cacheSettings.SeedCacheDuration,
-        LocalCacheExpiration = _cacheSettings.SeedCacheDuration,
+        Expiration = _cacheEntrySettings.SeedCacheDuration,
+        LocalCacheExpiration = _cacheEntrySettings.SeedCacheDuration,
     };
 
     private string GetCacheKey(Guid key, bool preview) => preview ? $"{key}+draft" : $"{key}";
