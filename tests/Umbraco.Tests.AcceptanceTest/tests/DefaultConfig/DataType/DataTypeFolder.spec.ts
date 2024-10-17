@@ -55,7 +55,7 @@ test('can delete a data type folder', {tag: '@smoke'}, async ({umbracoApi, umbra
   await umbracoUi.dataType.deleteDataTypeFolder(dataTypeFolderName);
 
   // Assert
-  expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeFalsy();
+  expect(await umbracoApi.dataType.doesFolderExist(dataTypeFolderName)).toBeFalsy();
 });
 
 test('can create a data type in a folder', async ({umbracoApi, umbracoUi}) => {

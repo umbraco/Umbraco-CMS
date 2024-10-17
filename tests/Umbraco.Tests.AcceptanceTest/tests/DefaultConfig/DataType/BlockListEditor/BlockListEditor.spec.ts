@@ -62,7 +62,7 @@ test('can delete a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbr
   // Act
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.clickActionsMenuForDataType(blockListEditorName);
-  await umbracoUi.dataType.clickDeleteExactButton();
+  await umbracoUi.dataType.clickDeleteButton();
   await umbracoUi.dataType.clickConfirmToDeleteButton();
 
   // Assert

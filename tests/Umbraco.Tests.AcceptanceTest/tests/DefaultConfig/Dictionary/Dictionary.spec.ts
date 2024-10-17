@@ -59,7 +59,7 @@ test('can create a dictionary item in a dictionary', {tag: '@smoke'}, async ({um
 
   // Act
   await umbracoUi.dictionary.clickActionsMenuForDictionary(parentDictionaryName);
-  await umbracoUi.dictionary.clickCreateDictionaryItemButton();
+  await umbracoUi.dictionary.clickCreateButton();
   await umbracoUi.dictionary.enterDictionaryName(dictionaryName);
   await umbracoUi.dictionary.clickSaveButton();
 
