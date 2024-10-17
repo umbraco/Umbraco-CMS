@@ -20,6 +20,10 @@ internal class NavigationDto : INavigationModel
     public int ParentId { get; set; }
 
     /// <inheritdoc/>
+    [Column(NodeDto.SortOrderColumnName)]
+    public int SortOrder { get; set; }
+
+    /// <inheritdoc/>
     [Column(NodeDto.TrashedColumnName)]
     public bool Trashed { get; set; }
 }
