@@ -99,7 +99,7 @@
           "condition": "(!IncludeExample)",
           "exclude": [
             "**/*.cs",
-            "[Cc]lient/src/openapi-ts.config.ts",
+            "[Cc]lient/openapi-ts.config.ts",
             "[Cc]lient/src/api/**",
             "[Cc]lient/src/dashboards/**"
           ]
