@@ -130,7 +130,6 @@ internal class MediaCacheService : IMediaCacheService
         // We have nodes seperate in the cache, cause 99% of the time, you are only using one
         // and thus we won't get too much data when retrieving from the cache.
         var cacheNode = _cacheNodeFactory.ToContentCacheNode(media);
-        await _hybridCache.SetAsync(GetCacheKey(media.Key, false), cacheNode);
         await _databaseCacheRepository.RefreshMediaAsync(cacheNode);
         scope.Complete();
     }
