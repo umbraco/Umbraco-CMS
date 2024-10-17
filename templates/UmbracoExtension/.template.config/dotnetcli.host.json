@@ -17,6 +17,10 @@
     "SupportPagesAndViews": {
       "longName": "support-pages-and-views",
       "shortName": "s"
+    },
+    "IncludeExample": {
+      "longName": "include-example",
+      "shortName": "ex"
     }
   }
 }

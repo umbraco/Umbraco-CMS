@@ -64,6 +64,13 @@
       "valueSource": "name",
       "replaces": "PROJECT_NAME_KEBABCASE_FOR_NPM",
       "valueTransform": "kebabCase"
+    },
+    "IncludeExample": {
+      "displayName": "Include Example Code",
+      "description": "Wheter to include an example dashboard and other code to get started with.",
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false"
     }
   },
   "primaryOutputs": [

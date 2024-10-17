@@ -15,6 +15,13 @@
       "id": "SupportPagesAndViews",
       "isVisible": true,
       "persistenceScope": "templateGroup"
+    },
+    {
+      "id": "IncludeExample",
+      "isVisible": true,
+      "description": {
+        "text": "Wheter to include an example dashboard and other code to get started with."
+      }
     }
   ]
 }
