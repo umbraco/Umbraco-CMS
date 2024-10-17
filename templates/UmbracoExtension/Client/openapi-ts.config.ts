@@ -8,5 +8,3 @@ export default defineConfig({
         asClass: true,
     }
 });
-
-// NOTE: INCLUDE ONLY IF YOU USE EXAMPLES

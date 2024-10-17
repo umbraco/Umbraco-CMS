@@ -4,25 +4,27 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    //#if IncludeExample
+    "watch": "tsc && vite build --watch",
+    "build": "tsc && vite build",
+    "generate-api": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 openapi-ts"
+    //#else
     "watch": "tsc && vite build --watch",
     "build": "tsc && vite build"
+    //#endif
   },
   "devDependencies": {
+     //#if IncludeExample
+    "@hey-api/client-fetch": "^0.4.2",
+    "@hey-api/openapi-ts": "^0.53.11",
+    "cross-env": "^7.0.3",
     "@umbraco-cms/backoffice": "^UMBRACO_VERSION_FROM_TEMPLATE",
-    "typescript": "^5.5.3",
-    "vite": "^5.4.8"
+    "typescript": "^5.6.3",
+    "vite": "^5.4.9"
+     //#else
+     "@umbraco-cms/backoffice": "^UMBRACO_VERSION_FROM_TEMPLATE",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.9"
+     //#endif
   }
 }
-
-
-// When toggle enabled
-// scripts (new generate-api)
-// "generate-api": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 openapi-ts"
-
-// Add following devDependencies
-//"@hey-api/client-fetch": "^0.4.0",
-//"@hey-api/openapi-ts": "^0.53.9",
-//"cross-env": "^7.0.3",
-
-
-// 
