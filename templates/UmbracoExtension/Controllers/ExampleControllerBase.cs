@@ -4,7 +4,7 @@ using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Routing;
 
-namespace Umbraco.Templates.UmbracoExtension.Controllers
+namespace UmbracoExtension.Controllers
 {
     [ApiController]
     [BackOfficeRoute("example/api/v{version:apiVersion}")]

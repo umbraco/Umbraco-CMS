@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Api.Management.OpenApi;
 
-namespace Umbraco.Templates.UmbracoExtension.Composers
+namespace UmbracoExtension.Composers
 {
     public class ApiComposer : IComposer
     {

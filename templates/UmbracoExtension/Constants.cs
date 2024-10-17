@@ -1,4 +1,4 @@
-namespace Umbraco.Templates.UmbracoExtension
+namespace UmbracoExtension
 {
     public class Constants
     {
