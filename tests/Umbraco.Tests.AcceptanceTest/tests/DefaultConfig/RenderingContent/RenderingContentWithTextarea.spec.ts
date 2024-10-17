@@ -1,9 +1,10 @@
-﻿import {test} from '@umbraco/playwright-testhelpers';
+﻿import {AliasHelper, test} from '@umbraco/playwright-testhelpers';
 
 const contentName = 'Test Rendering Content';
 const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Textarea';
 const templateName = 'TestTemplateForContent';
+const propertyName = 'Test Textarea';
 let dataTypeData;
 
 test.beforeEach(async ({umbracoApi}) => {
@@ -29,7 +30,8 @@ for (const textarea of textareas) {
   test(`can render content with ${textarea.type}`, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const textareaValue = textarea.value;
-    await umbracoApi.document.createPublishedDocumentWithValue(contentName, textareaValue, dataTypeData.id, documentTypeName, templateName);
+    const templateId = await umbracoApi.template.createTemplateWithDisplayingStringValue(templateName, AliasHelper.toAlias(propertyName));
+    await umbracoApi.document.createPublishedDocumentWithValue(contentName, textareaValue, dataTypeData.id, templateId, propertyName, documentTypeName);
     const contentData = await umbracoApi.document.getByName(contentName);
     const contentURL = contentData.urls[0].url;
 
