@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
@@ -15,6 +16,9 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
     private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
     private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
+    private readonly IDocumentCacheService _documentCacheService;
+    private readonly IPublishedContentTypeCache _publishedContentTypeCache;
+    private readonly IMediaCacheService _mediaCacheService;
     private readonly IIdKeyMap _idKeyMap;
 
     public ContentTypeCacheRefresher(
@@ -25,13 +29,19 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         IEventAggregator eventAggregator,
         ICacheRefresherNotificationFactory factory,
         IPublishedModelFactory publishedModelFactory,
-        IPublishedContentTypeFactory publishedContentTypeFactory)
+        IPublishedContentTypeFactory publishedContentTypeFactory,
+        IDocumentCacheService documentCacheService,
+        IPublishedContentTypeCache publishedContentTypeCache,
+        IMediaCacheService mediaCacheService)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
         _contentTypeCommonRepository = contentTypeCommonRepository;
         _publishedModelFactory = publishedModelFactory;
         _publishedContentTypeFactory = publishedContentTypeFactory;
+        _documentCacheService = documentCacheService;
+        _publishedContentTypeCache = publishedContentTypeCache;
+        _mediaCacheService = mediaCacheService;
     }
 
     #region Json
@@ -114,10 +124,16 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
             MemberCacheRefresher.RefreshMemberTypes(AppCaches);
         }
 
-        // TODO: We need to clear the HybridCache of any content using the ContentType, but NOT the database cache here, and this should be done within the "WithSafeLiveFactoryReset" to ensure that the factory is locked in the meantime.
-        _publishedModelFactory.WithSafeLiveFactoryReset(() => { });
-
+        _publishedContentTypeCache.ClearContentTypes(payloads.Select(x => x.Id));
         _publishedContentTypeFactory.NotifyDataTypeChanges();
+        _publishedModelFactory.WithSafeLiveFactoryReset(() =>
+        {
+            IEnumerable<int> documentTypeIds = payloads.Where(x => x.ItemType == nameof(IContentType)).Select(x => x.Id);
+            IEnumerable<int> mediaTypeIds = payloads.Where(x => x.ItemType == nameof(IMediaType)).Select(x => x.Id);
+
+            _documentCacheService.RebuildMemoryCacheByContentTypeAsync(documentTypeIds);
+            _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds);
+        });
 
         // now we can trigger the event
         base.Refresh(payloads);
