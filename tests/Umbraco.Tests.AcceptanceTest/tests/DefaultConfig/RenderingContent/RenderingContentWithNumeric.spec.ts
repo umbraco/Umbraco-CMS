@@ -1,9 +1,10 @@
-﻿import {test} from '@umbraco/playwright-testhelpers';
+﻿import {AliasHelper, test} from '@umbraco/playwright-testhelpers';
 
 const contentName = 'Test Rendering Content';
 const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Numeric';
 const templateName = 'TestTemplateForContent';
+const propertyName = 'Test Numeric';
 let dataTypeData;
 
 test.beforeEach(async ({umbracoApi}) => {
@@ -25,7 +26,8 @@ for (const numeric of numerics) {
   test(`can render content with ${numeric.type}`, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const numericValue = numeric.value;
-    await umbracoApi.document.createPublishedDocumentWithValue(contentName, numericValue, dataTypeData.id, documentTypeName, templateName);
+    const templateId = await umbracoApi.template.createTemplateWithDisplayingStringValue(templateName, AliasHelper.toAlias(propertyName));
+    await umbracoApi.document.createPublishedDocumentWithValue(contentName, numericValue, dataTypeData.id, templateId, propertyName, documentTypeName);
     const contentData = await umbracoApi.document.getByName(contentName);
     const contentURL = contentData.urls[0].url;
 
