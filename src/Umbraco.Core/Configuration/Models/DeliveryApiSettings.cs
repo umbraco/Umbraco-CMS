@@ -39,8 +39,10 @@ public class DeliveryApiSettings
     ///     Gets or sets the aliases of the content types that may never be exposed through the Delivery API. Content of these
     ///     types will never be returned from any Delivery API endpoint, nor added to the query index.
     /// </summary>
-    /// <value>The content type aliases that are not to be exposed.</value>
-    public string[] DisallowedContentTypeAliases { get; set; } = Array.Empty<string>();
+    /// <value>
+    /// The content type aliases that are not to be exposed.
+    /// </value>
+    public ISet<string> DisallowedContentTypeAliases { get; set; } = new HashSet<string>();
 
     /// <summary>
     ///     Gets or sets a value indicating whether the Delivery API should output rich text values as JSON instead of HTML.
@@ -139,15 +141,21 @@ public class DeliveryApiSettings
         /// <summary>
         ///     Gets or sets the URLs allowed to use as redirect targets after a successful login (session authorization).
         /// </summary>
-        /// <value>The URLs allowed as redirect targets.</value>
-        public Uri[] LoginRedirectUrls { get; set; } = Array.Empty<Uri>();
+        /// <value>
+        /// The URLs allowed as redirect targets.
+        /// </value>
+        public ISet<Uri> LoginRedirectUrls { get; set; } = new HashSet<Uri>();
 
         /// <summary>
         ///     Gets or sets the URLs allowed to use as redirect targets after a successful logout (session termination).
         /// </summary>
-        /// <value>The URLs allowed as redirect targets.</value>
-        /// <remarks>These are only required if logout is to be used.</remarks>
-        public Uri[] LogoutRedirectUrls { get; set; } = Array.Empty<Uri>();
+        /// <value>
+        /// The URLs allowed as redirect targets.
+        /// </value>
+        /// <remarks>
+        /// These are only required if logout is to be used.
+        /// </remarks>
+        public ISet<Uri> LogoutRedirectUrls { get; set; } = new HashSet<Uri>();
     }
 
     /// <summary>
