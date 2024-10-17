@@ -75,6 +75,7 @@ import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import type { UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 
 type EntityModel = UmbDocumentDetailModel;
 type EntityTypeModel = UmbDocumentTypeDetailModel;
@@ -600,7 +601,9 @@ export class UmbDocumentWorkspaceContext
 		// Tell the server that we're entering preview mode.
 		await new UmbDocumentPreviewRepository(this).enter();
 
-		const previewUrl = new URL('preview', window.location.origin);
+		const appContext = await this.getContext(UMB_APP_CONTEXT);
+
+		const previewUrl = new URL(appContext.getBackofficePath() + '/preview', appContext.getServerUrl());
 		previewUrl.searchParams.set('id', unique);
 
 		if (culture && culture !== UMB_INVARIANT_CULTURE) {
