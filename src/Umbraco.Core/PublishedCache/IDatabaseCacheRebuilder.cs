@@ -3,4 +3,6 @@
 public interface IDatabaseCacheRebuilder
 {
     void Rebuild();
+
+    void RebuildDatabaseCacheIfSerializerChanged();
 }
