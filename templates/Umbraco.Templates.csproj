@@ -17,6 +17,7 @@
       <PackagePath>UmbracoProject</PackagePath>
     </Content>
     <Content Include="UmbracoProject\**" Exclude="bin;obj" />
+    <Content Include="UmbracoExtension\**" Exclude="bin;obj" />
     <Content Include="UmbracoDockerCompose\**" Exclude="bin;obj" />
     <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blocklist\**">
       <Link>UmbracoProject\Views\Partials\blocklist\%(RecursiveDir)%(Filename)%(Extension)</Link>
@@ -30,9 +31,6 @@
       <Link>UmbracoProject\Views\_ViewImports.cshtml</Link>
       <PackagePath>UmbracoProject\Views</PackagePath>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="UmbracoExtension\**" Exclude="bin;obj" />
   </ItemGroup>
   <!-- Update template.json files with the default UmbracoVersion value set to the current build version -->
   <ItemGroup>
