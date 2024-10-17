@@ -5,6 +5,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 
 const elementName = 'umb-user-group-collection-header';
+
+/** @deprecated This component is no longer used in core; to be removed in Umbraco 17. */
 @customElement(elementName)
 export class UmbUserGroupCollectionHeaderElement extends UmbLitElement {
 	#collectionContext: UmbUserGroupCollectionContext | undefined;
