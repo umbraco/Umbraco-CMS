@@ -91,5 +91,20 @@
       "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
       "continueOnError": true
     }
+  ],
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(!IncludeExample)",
+          "exclude": [
+            "**/*.cs",
+            "[Cc]lient/src/openapi-ts.config.ts",
+            "[Cc]lient/src/api/**",
+            "[Cc]lient/src/dashboards/**"
+          ]
+        }
+      ]
+    }
   ]
 }
