@@ -45,8 +45,7 @@ public class PublishStatusServiceTest : UmbracoIntegrationTestWithContent
         var sut = new PublishStatusService(
             GetRequiredService<ILogger<PublishStatusService>>(),
             GetRequiredService<IPublishStatusRepository>(),
-            GetRequiredService<ICoreScopeProvider>()
-            );
+            GetRequiredService<ICoreScopeProvider>());
 
         Assert.Multiple(() =>
         {
@@ -99,8 +98,7 @@ public class PublishStatusServiceTest : UmbracoIntegrationTestWithContent
         var sut = new PublishStatusService(
             GetRequiredService<ILogger<PublishStatusService>>(),
             GetRequiredService<IPublishStatusRepository>(),
-            GetRequiredService<ICoreScopeProvider>()
-        );
+            GetRequiredService<ICoreScopeProvider>());
 
         Assert.IsFalse(sut.IsDocumentPublished(Textpage.Key, DefaultCulture));
 
@@ -120,8 +118,7 @@ public class PublishStatusServiceTest : UmbracoIntegrationTestWithContent
         var sut = new PublishStatusService(
             GetRequiredService<ILogger<PublishStatusService>>(),
             GetRequiredService<IPublishStatusRepository>(),
-            GetRequiredService<ICoreScopeProvider>()
-        );
+            GetRequiredService<ICoreScopeProvider>());
 
         Assert.IsFalse(sut.IsDocumentPublished(Textpage.Key, DefaultCulture));
 
