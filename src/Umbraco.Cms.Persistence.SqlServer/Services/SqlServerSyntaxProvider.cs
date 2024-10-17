@@ -329,7 +329,7 @@ where tbl.[name]=@0 and col.[name]=@1;",
             : index.Name;
 
         var columns = index.Columns.Any()
-            ? string.Join(",", index.Columns.Select(x => GetQuotedColumnName(x.Name)))
+            ? string.Join(",", index.Columns.Select(x => GetQuotedColumnName(x.Name)  + (x.Direction == Direction.Descending ? " DESC" : " ASC")))
             : GetQuotedColumnName(index.ColumnName);
 
         var includeColumns = index.IncludeColumns?.Any() ?? false
