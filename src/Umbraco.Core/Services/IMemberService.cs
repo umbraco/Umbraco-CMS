@@ -211,6 +211,16 @@ public interface IMemberService : IMembershipMemberService
     IMember? GetById(int id);
 
     /// <summary>
+    ///     Get an list of <see cref="IMember"/> for all members with the specified email.
+    /// </summary>
+    //// <param name="email">Email to use for retrieval</param>
+    /// <returns>
+    ///     <see cref="IEnumerable{IMember}" />
+    /// </returns>
+    IEnumerable<IMember> GetMembersByEmail(string email)
+        => throw new NotImplementedException();
+
+    /// <summary>
     ///     Gets all Members for the specified MemberType alias
     /// </summary>
     /// <param name="memberTypeAlias">Alias of the MemberType</param>
