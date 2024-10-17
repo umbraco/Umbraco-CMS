@@ -36,7 +36,8 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper,
         DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection)
-        : this(propertyEditors,
+        : this(
+            propertyEditors,
             dataTypeConfigurationCache,
             shortStringHelper,
             jsonSerializer,
