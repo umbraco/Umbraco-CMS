@@ -1,8 +1,9 @@
-import { LitElement, css, html, customElement, property } from "@umbraco-cms/backoffice/external/lit";
+import { LitElement, css, html, customElement, state } from "@umbraco-cms/backoffice/external/lit";
 import { UmbElementMixin } from "@umbraco-cms/backoffice/element-api";
 import { ExamplesService, UserModel } from "../api";
 import { UUIButtonElement } from "@umbraco-cms/backoffice/external/uui";
 import { UMB_NOTIFICATION_CONTEXT, UmbNotificationContext } from "@umbraco-cms/backoffice/notification";
+import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserContext, UmbCurrentUserModel } from "@umbraco-cms/backoffice/current-user";
 
 @customElement('my-awesome-dashboard')
 export class MyAwesomeDashboardElement extends UmbElementMixin(LitElement) {
@@ -13,11 +14,21 @@ export class MyAwesomeDashboardElement extends UmbElementMixin(LitElement) {
     this.consumeContext(UMB_NOTIFICATION_CONTEXT, (notificationContext) => {
       this.#notificationContext = notificationContext;
     });
+
+    this.consumeContext(UMB_CURRENT_USER_CONTEXT, (currentUserContext) => {
+
+      // When we have the current user context
+      // We can observe proeprties from it, such as the current user or perhaps just individual properties
+      // When the currentUser object changes we will get notified and can reset the @state properrty
+      this.observe(currentUserContext.currentUser, (currentUser) => {
+        this._contextCurrentUser = currentUser;
+      });
+    });
   }
 
   #notificationContext: UmbNotificationContext | undefined = undefined;
 
-  #whoAmI = async (ev: Event) => {
+  #onClickWhoAmI = async (ev: Event) => {
     const buttonElement = ev.target as UUIButtonElement;
     buttonElement.state = "waiting";
 
@@ -30,21 +41,21 @@ export class MyAwesomeDashboardElement extends UmbElementMixin(LitElement) {
     }
 
     if (data !== undefined) {
-      this.userData = data;
+      this._serverUserData = data;
       buttonElement.state = "success";
     }
 
     if (this.#notificationContext) {
       this.#notificationContext.peek("warning", {
         data: {
-          headline: `You are ${this.userData?.name}`,
-          message: `Your email is ${this.userData?.email}`,
+          headline: `You are ${this._serverUserData?.name}`,
+          message: `Your email is ${this._serverUserData?.email}`,
         }
       })
     }
   }
 
-  #whatsTheTimeMrWolf = async (ev: Event) => {
+  #onClickWhatsTheTimeMrWolf = async (ev: Event) => {
     const buttonElement = ev.target as UUIButtonElement;
     buttonElement.state = "waiting";
 
@@ -58,12 +69,12 @@ export class MyAwesomeDashboardElement extends UmbElementMixin(LitElement) {
     }
 
     if (data !== undefined) {
-      this.timeFromMrWolf = new Date(data);
+      this._timeFromMrWolf = new Date(data);
       buttonElement.state = "success";
     }
   }
 
-  #whatsMyName = async (ev: Event) => {
+  #onClickWhatsMyName = async (ev: Event) => {
     const buttonElement = ev.target as UUIButtonElement;
     buttonElement.state = "waiting";
 
@@ -75,46 +86,51 @@ export class MyAwesomeDashboardElement extends UmbElementMixin(LitElement) {
       return;
     }
 
-    this.yourName = data;
+    this._yourName = data;
     buttonElement.state = "success";
   }
 
-  @property()
-  yourName: string | undefined = "Dunno";
+  @state()
+  private _yourName: string | undefined = "Dunno";
 
-  @property({ attribute: false })
-  timeFromMrWolf: Date | undefined;
+  @state()
+  private _timeFromMrWolf: Date | undefined;
 
-  @property({ type: Object })
-  userData: UserModel | undefined = undefined;
+  @state()
+  private _serverUserData: UserModel | undefined = undefined;
+
+  @state()
+  private _contextCurrentUser: UmbCurrentUserModel | undefined = undefined;
 
   render() {
     return html`
-        <uui-box headline="Who am I ?">
-            <h2>${this.userData?.email ? this.userData.email : 'Dunno'}</h2>
+        <uui-box headline="Who am I? [Server]">
+            <h2>${this._serverUserData?.email ? this._serverUserData.email : 'Dunno'}</h2>
             <ul>
-                ${this.userData?.allowedSections.map(section => html`<li>${section}</li>`)}
+                ${this._serverUserData?.groups.map(group => html`<li>${group.name}</li>`)}
             </ul>
-            <uui-button color="positive" look="primary" @click="${this.#whoAmI}">
-                <uui-icon name="icon-user"></uui-icon>
+            <uui-button color="default" look="primary" @click="${this.#onClickWhoAmI}">
                 Who am I?
             </uui-button>
         </uui-box>
 
         <uui-box headline="Whats the time?">
-            <h2><uui-icon name="icon-alarm-clock"></uui-icon> ${this.timeFromMrWolf ? this.timeFromMrWolf.toLocaleString() : 'Dunno'}</h2>
-            <uui-button color="positive" look="primary" @click="${this.#whatsTheTimeMrWolf}">
-                <uui-icon name="icon-time"></uui-icon>
+            <h2><uui-icon name="icon-alarm-clock"></uui-icon> ${this._timeFromMrWolf ? this._timeFromMrWolf.toLocaleString() : 'Dunno'}</h2>
+            <uui-button color="default" look="primary" @click="${this.#onClickWhatsTheTimeMrWolf}">
                 Whats the time Mr Wolf?
             </uui-button>
         </uui-box>
 
         <uui-box headline="What's my name again?">
-            <h2><uui-icon name="icon-user"></uui-icon> ${this.yourName}</h2>
-            <uui-button color="positive" look="primary" @click="${this.#whatsMyName}">
-                <uui-icon name="icon-help-alt"></uui-icon>
+            <h2><uui-icon name="icon-user"></uui-icon> ${this._yourName}</h2>
+            <uui-button color="default" look="primary" @click="${this.#onClickWhatsMyName}">
                 Whats my name again?
             </uui-button>
+        </uui-box>
+
+        <uui-box headline="Who am I? [Context]" class="wide">
+          <h2>${this._contextCurrentUser?.email}</h2>
+          <umb-code-block language="json" copy>${JSON.stringify(this._contextCurrentUser, null, 2)}</umb-code-block>
         </uui-box>
     `;
   }
@@ -134,6 +150,10 @@ export class MyAwesomeDashboardElement extends UmbElementMixin(LitElement) {
 
             h2 {
                 margin-top:0;
+            }
+
+            .wide {
+                grid-column: span 3;
             }
     `];
 }
