@@ -67,7 +67,7 @@
     },
     "IncludeExample": {
       "displayName": "Include Example Code",
-      "description": "Wheter to include an example dashboard and other code to get started with.",
+      "description": "Whether to include an example dashboard and other code to get started with.",
       "type": "parameter",
       "datatype": "bool",
       "defaultValue": "false"
