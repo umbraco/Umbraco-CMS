@@ -66,7 +66,7 @@ public sealed class HtmlLocalLinkParser
                 {
                     Constants.UdiEntityType.Document => _publishedUrlProvider.GetUrl(tagData.Udi.Guid),
                     Constants.UdiEntityType.Media => _publishedUrlProvider.GetMediaUrl(tagData.Udi.Guid),
-                    _ => ""
+                    _ => string.Empty,
                 };
 
                 text = StripTypeAttributeFromTag(text, tagData.Udi!.EntityType);
