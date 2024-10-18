@@ -30,7 +30,7 @@
                 vm.elementTypes = elementTypes;
 
                 vm.contentPreview = vm.getElementTypeByKey(vm.block.contentElementTypeKey);
-                vm.settingsPreview = vm.getElementTypeByKey(vm.block.settingsElementTypeKey);
+                vm.settingsPreview = vm.getElementTypeByKey(vm.block.settingsElementTypeKey) || { icon: "icon-science", name: "(Unavailable ElementType)" };
             });
         }
 
@@ -123,7 +123,7 @@
         vm.requestRemoveSettingsForBlock = function(block) {
             localizationService.localizeMany(["general_remove", "defaultdialogs_confirmremoveusageof"]).then(function (data) {
 
-                var settingsElementType = vm.getElementTypeByKey(block.settingsElementTypeKey);
+                const settingsElementType = vm.getElementTypeByKey(block.settingsElementTypeKey);
 
                 overlayService.confirmRemove({
                     title: data[0],
