@@ -18,8 +18,8 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 const tags = [
-  {type: 'an empty tags', value: []},
-  {type: 'a non-empty tags', value: ['test tag']},
+  {type: 'an empty tag', value: []},
+  {type: 'a non-empty tag', value: ['test tag']},
   {type: 'multiple tags', value: ['test tag 1', 'test tag 2']},
 ];
 

@@ -20,10 +20,10 @@ test.afterEach(async ({umbracoApi}) => {
 const textareas = [
   {type: 'an empty textarea', value: ''},
   {type: 'a non-empty textarea', value: 'Welcome to Umbraco site'},
-  {type: 'a textarea contains special characters', value: '@#^&*()_+[]{};:"<>,./?'},
-  {type: 'a textarea contains multiple lines', value: 'First line\n Second line\n Third line'},
-  {type: 'a textarea contains an SQL injection', value: "' OR '1'='1'; --"},
-  {type: 'a textarea contains a cross-site scripting', value: "<script>alert('XSS')</script>"}
+  {type: 'a textarea that contains special characters', value: '@#^&*()_+[]{};:"<>,./?'},
+  {type: 'a textarea that contains multiple lines', value: 'First line\n Second line\n Third line'},
+  {type: 'a textarea that contains an SQL injection', value: "' OR '1'='1'; --"},
+  {type: 'a textarea that contains cross-site scripting', value: "<script>alert('XSS')</script>"}
 ];
 
 for (const textarea of textareas) {
