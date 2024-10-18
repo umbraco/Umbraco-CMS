@@ -2,9 +2,9 @@
 
 const contentName = 'Test Rendering Content';
 const documentTypeName = 'TestDocumentTypeForContent';
-const dataTypeName = 'Textstring';
+const dataTypeName = 'True/false';
 const templateName = 'TestTemplateForContent';
-const propertyName = 'Test Textstring';
+const propertyName = 'Test TrueFalse';
 let dataTypeData = null;
 
 test.beforeEach(async ({umbracoApi}) => {
@@ -17,21 +17,16 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.template.ensureNameNotExists(templateName);
 });
 
-const textstrings = [
-  {type: 'an empty textstring', value: ''},
-  {type: 'a non-empty textstring', value: 'Welcome to Umbraco site'},
-  {type: 'a textstring contains special characters', value: '@#^&*()_+[]{};:"<>,./?'},
-  {type: 'a numeric textstring', value: '0123456789'},
-  {type: 'a textstring contains an SQL injection', value: "' OR '1'='1'; --"},
-  {type: 'a textstring contains a cross-site scripting', value: "<script>alert('XSS')</script>"}
+const trueFalseValues  = [
+  {type: 'true value ', value: true, expectedValue: 'True'},
+  {type: 'false value', value: false, expectedValue: 'False'},
 ];
 
-for (const textstring of textstrings) {
-  test(`can render content with ${textstring.type}`, async ({umbracoApi, umbracoUi}) => {
+for (const trueFalse of trueFalseValues) {
+  test(`can render content with ${trueFalse.type}`, async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const textstringValue = textstring.value;
     const templateId = await umbracoApi.template.createTemplateWithDisplayingStringValue(templateName, AliasHelper.toAlias(propertyName));
-    await umbracoApi.document.createPublishedDocumentWithValue(contentName, textstringValue, dataTypeData.id, templateId, propertyName, documentTypeName);
+    await umbracoApi.document.createPublishedDocumentWithValue(contentName, trueFalse.value, dataTypeData.id, templateId, propertyName, documentTypeName);
     const contentData = await umbracoApi.document.getByName(contentName);
     const contentURL = contentData.urls[0].url;
 
@@ -39,6 +34,6 @@ for (const textstring of textstrings) {
     await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
     // Assert
-    await umbracoUi.contentRender.doesContentRenderValueHaveText(textstringValue);
+    await umbracoUi.contentRender.doesContentRenderValueHaveText(trueFalse.expectedValue);
   });
 }
