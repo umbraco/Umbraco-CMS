@@ -1,0 +1,14 @@
+{
+  "id": "UmbracoExtension",
+  "name": "UmbracoExtension",
+  "version": "0.0.0",
+  "allowPackageTelemetry": true,
+  "extensions": [
+    {
+      "name": "UmbracoExtension Bundle",
+      "alias": "PROJECT_NAME_KEBABCASE_FOR_NPM.bundle",
+      "type": "bundle",
+      "js": "/App_Plugins/UmbracoExtension/PROJECT_NAME_KEBABCASE_FOR_NPM.js"
+    }
+  ]
+}

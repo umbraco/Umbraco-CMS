@@ -5,20 +5,21 @@
     "Web",
     "CMS",
     "Umbraco",
-    "Package",
-    "Plugin"
+    "Extension",
+    "Plugin",
+    "Razor Class Library"
   ],
-  "name": "Umbraco Package",
-  "description": "An empty Umbraco package/plugin project ready to get started.",
-  "groupIdentity": "Umbraco.Templates.UmbracoPackage",
-  "identity": "Umbraco.Templates.UmbracoPackage.CSharp",
-  "shortName": "umbracopackage",
+  "name": "Umbraco Extension",
+  "description": "An empty Umbraco extension (Razor Class Library).",
+  "groupIdentity": "Umbraco.Templates.UmbracoExtension",
+  "identity": "Umbraco.Templates.UmbracoExtension",
+  "shortName": "umbraco-extension",
   "tags": {
     "language": "C#",
     "type": "project"
   },
-  "sourceName": "UmbracoPackage",
-  "defaultName": "UmbracoPackage1",
+  "sourceName": "UmbracoExtension",
+  "defaultName": "UmbracoExtension1",
   "preferNameDirectory": true,
   "symbols": {
     "Framework": {
@@ -38,7 +39,7 @@
     },
     "UmbracoVersion": {
       "displayName": "Umbraco version",
-      "description": "The version of Umbraco.Cms to add as PackageReference.",
+      "description": "The version of Umbraco.Cms to add as PackageReference. By default it installs the latest non pre-release version",
       "type": "parameter",
       "datatype": "string",
       "defaultValue": "*",
@@ -51,44 +52,30 @@
       "datatype": "bool",
       "defaultValue": "false"
     },
-    "Namespace": {
+    "SupportPagesAndViews": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false",
+      "displayName": "Support pages and views",
+      "description": "Whether to support adding traditional Razor pages and Views to this library."
+    },
+    "kebabCasedName": {
       "type": "derived",
       "valueSource": "name",
-      "valueTransform": "safe_namespace",
-      "fileRename": "UmbracoPackage",
-      "replaces": "UmbracoPackage"
+      "replaces": "PROJECT_NAME_KEBABCASE_FOR_NPM",
+      "valueTransform": "kebabCase"
     },
-    "MsBuildName": {
-      "type": "generated",
-      "generator": "regex",
-      "dataType": "string",
-      "parameters": {
-        "source": "name",
-        "steps": [
-          {
-            "regex": "\\s",
-            "replacement": ""
-          },
-          {
-            "regex": "\\.",
-            "replacement": ""
-          },
-          {
-            "regex": "-",
-            "replacement": ""
-          },
-          {
-            "regex": "^[^a-zA-Z_]+",
-            "replacement": ""
-          }
-        ]
-      },
-      "replaces": "UmbracoPackageMsBuild"
+    "IncludeExample": {
+      "displayName": "Include Example Code",
+      "description": "Whether to include an example dashboard and other code to get started with.",
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false"
     }
   },
   "primaryOutputs": [
     {
-      "path": "UmbracoPackage.csproj"
+      "path": "UmbracoExtension.csproj"
     }
   ],
   "postActions": [
@@ -103,6 +90,21 @@
       ],
       "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
       "continueOnError": true
+    }
+  ],
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(!IncludeExample)",
+          "exclude": [
+            "**/*.cs",
+            "[Cc]lient/openapi-ts.config.ts",
+            "[Cc]lient/src/api/**",
+            "[Cc]lient/src/dashboards/**"
+          ]
+        }
+      ]
     }
   ]
 }

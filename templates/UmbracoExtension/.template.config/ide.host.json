@@ -3,8 +3,8 @@
   "order": 0,
   "icon": "../../icon.png",
   "description": {
-    "id": "UmbracoPackageRcl",
-    "text": "Umbraco Package RCL - An empty Umbraco package/plugin (Razor Class Library)."
+    "id": "umbraco-extension",
+    "text": "Umbraco Extension - An empty Umbraco extension/plugin (Razor Class Library)."
   },
   "symbolInfo": [
     {
@@ -15,6 +15,13 @@
       "id": "SupportPagesAndViews",
       "isVisible": true,
       "persistenceScope": "templateGroup"
+    },
+    {
+      "id": "IncludeExample",
+      "isVisible": true,
+      "description": {
+        "text": "Whether to include an example dashboard and other code to get started with."
+      }
     }
   ]
 }
