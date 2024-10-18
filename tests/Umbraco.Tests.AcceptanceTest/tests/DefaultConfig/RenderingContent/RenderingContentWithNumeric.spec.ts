@@ -5,7 +5,7 @@ const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Numeric';
 const templateName = 'TestTemplateForContent';
 const propertyName = 'Test Numeric';
-let dataTypeData;
+let dataTypeData = null;
 
 test.beforeEach(async ({umbracoApi}) => {
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName); 
@@ -18,7 +18,7 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 const numerics = [
-  {type: 'an positive integer', value: '1234567890'},
+  {type: 'a positive integer', value: '1234567890'},
   {type: 'a negative integer', value: '-1234567890'},
 ];
 

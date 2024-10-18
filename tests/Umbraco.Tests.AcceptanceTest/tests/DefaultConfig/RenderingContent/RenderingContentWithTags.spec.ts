@@ -5,7 +5,7 @@ const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Tags';
 const templateName = 'TestTemplateForContent';
 const propertyName = 'Test Tags';
-let dataTypeData;
+let dataTypeData = null;
 
 test.beforeEach(async ({umbracoApi}) => {
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName); 

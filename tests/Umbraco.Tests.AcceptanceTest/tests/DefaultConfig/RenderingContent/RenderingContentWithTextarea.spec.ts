@@ -5,7 +5,7 @@ const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Textarea';
 const templateName = 'TestTemplateForContent';
 const propertyName = 'Test Textarea';
-let dataTypeData;
+let dataTypeData = null;
 
 test.beforeEach(async ({umbracoApi}) => {
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName); 
