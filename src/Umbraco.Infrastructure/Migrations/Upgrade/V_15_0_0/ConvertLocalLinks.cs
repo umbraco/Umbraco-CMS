@@ -23,6 +23,7 @@ public class ConvertLocalLinks : MigrationBase
     private readonly IDataTypeService _dataTypeService;
     private readonly ILanguageService _languageService;
     private readonly IJsonSerializer _jsonSerializer;
+    private readonly IIdKeyMap _idKeyMap;
 
     private string[] propertyEditorAliasses =
     [
@@ -40,7 +41,8 @@ public class ConvertLocalLinks : MigrationBase
         ILogger<ConvertLocalLinks> logger,
         IDataTypeService dataTypeService,
         ILanguageService languageService,
-        IJsonSerializer jsonSerializer)
+        IJsonSerializer jsonSerializer,
+        IIdKeyMap idKeyMap)
         : base(context)
     {
         _umbracoContextFactory = umbracoContextFactory;
@@ -50,6 +52,7 @@ public class ConvertLocalLinks : MigrationBase
         _dataTypeService = dataTypeService;
         _languageService = languageService;
         _jsonSerializer = jsonSerializer;
+        _idKeyMap = idKeyMap;
     }
 
     protected override void Migrate()
@@ -100,11 +103,6 @@ public class ConvertLocalLinks : MigrationBase
                                            ?? throw new InvalidOperationException(
                                                "The data type value editor could not be fetched.");
 
-            // Sql<ISqlContext> sql = Sql()
-            //     .Select<PropertyDataDto>()
-            //     .From<PropertyDataDto>()
-            //     .Where<PropertyDataDto>(dto => dto.PropertyTypeId == propertyType.Id);
-
             Sql<ISqlContext> sql = Sql($"""
                                         select pd.* from umbracoPropertyData pd
                                         left join umbracoContentVersion cv on pd.versionId = cv.id
@@ -128,7 +126,6 @@ public class ConvertLocalLinks : MigrationBase
             }
         }
 
-        // todo try and error
         return true;
     }
 
@@ -254,15 +251,45 @@ public class ConvertLocalLinks : MigrationBase
                 newTagHref = $" type=\"{tag.Udi.EntityType}\" "
                              + tag.TagHref.Replace(tag.Udi.ToString(), tag.Udi.Guid.ToString());
             }
+            else if (tag.IntId is not null)
+            {
+                // try to get the key and type from the int, else do nothing
+                (Guid Key, string EntityType)? conversionResult = CreateIntBasedTag(tag.IntId.Value);
+                if (conversionResult is null)
+                {
+                    continue;
+                }
+
+                newTagHref = $" type=\"{conversionResult.Value.EntityType}\" "
+                             + tag.TagHref.Replace(tag.IntId.Value.ToString(), conversionResult.Value.Key.ToString());
+            }
             else
             {
-                //todo use the int to get the guid and figure out the type
-                newTagHref = tag.TagHref;
+                // tag does not contain enough information to convert
+                continue;
             }
 
             input = input.Replace(tag.TagHref, newTagHref);
         }
 
         return input;
+    }
+
+    private (Guid Key, string EntityType)? CreateIntBasedTag(int id)
+    {
+        // very old data, best effort replacement
+        Attempt<Guid> documentAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
+        if (documentAttempt.Success)
+        {
+            return (Key: documentAttempt.Result, EntityType: UmbracoObjectTypes.Document.ToString());
+        }
+
+        Attempt<Guid> mediaAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Media);
+        if (mediaAttempt.Success)
+        {
+            return (Key: mediaAttempt.Result, EntityType: UmbracoObjectTypes.Media.ToString());
+        }
+
+        return null;
     }
 }

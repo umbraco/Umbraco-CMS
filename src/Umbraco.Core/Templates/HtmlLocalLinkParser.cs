@@ -117,7 +117,7 @@ public sealed class HtmlLocalLinkParser
         }
     }
 
-    // todo remove at some point?
+    [Obsolete("This is a temporary method to support legacy formats until we are sure all data has been migration. Scheduled for removal in v17")]
     public IEnumerable<LocalLinkTag> FindLegacyLocalLinkIds(string text)
     {
         // Parse internal links
@@ -146,6 +146,7 @@ public sealed class HtmlLocalLinkParser
         }
     }
 
+    [Obsolete("This is a temporary method to support legacy formats until we are sure all data has been migration. Scheduled for removal in v17")]
     public class LocalLinkTag
     {
         public LocalLinkTag(int? intId, GuidUdi? udi, string tagHref)
