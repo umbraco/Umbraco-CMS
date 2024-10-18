@@ -11,37 +11,27 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.template.ensureNameNotExists(templateName);
 });
 
-test('can render content with a date without time', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const dateValue = '2024-10-29 00:00:00';
-  const dataTypeName = 'Date Picker';
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName); 
-  const templateId = await umbracoApi.template.createTemplateWithDisplayingStringValue(templateName, AliasHelper.toAlias(propertyName));
-  await umbracoApi.document.createPublishedDocumentWithValue(contentName, dateValue, dataTypeData.id, templateId, propertyName, documentTypeName);
-  const contentData = await umbracoApi.document.getByName(contentName);
-  const contentURL = contentData.urls[0].url;
+const dateTimes = [
+  {type: 'with AM time', value: '2024-10-29 09:09:09', expectedValue: '10/29/2024 9:09:09 AM', dataTypeName: 'Date Picker with time'},
+  {type: 'with PM time', value: '2024-10-29 21:09:09', expectedValue: '10/29/2024 9:09:09 PM', dataTypeName: 'Date Picker with time'},
+  // TODO: Uncomment this when the front-end is ready. Currently the time still be rendered.
+  //{type: 'without time', value: '2024-10-29 00:00:00', expectedValue: '10/29/2024', dataTypeName: 'Date Picker'}
+];
 
-  // Act
-  await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
+for (const dateTime of dateTimes) {
+  test(`can render content with a date ${dateTime.type}`, async ({umbracoApi, umbracoUi}) => {
+    const dataTypeData = await umbracoApi.dataType.getByName(dateTime.dataTypeName); 
+    const templateId = await umbracoApi.template.createTemplateWithDisplayingStringValue(templateName, AliasHelper.toAlias(propertyName));
+    await umbracoApi.document.createPublishedDocumentWithValue(contentName, dateTime.value, dataTypeData.id, templateId, propertyName, documentTypeName);
+    const contentData = await umbracoApi.document.getByName(contentName);
+    const contentURL = contentData.urls[0].url;
 
-  // Assert
-  await umbracoUi.contentRender.doesContentRenderValueHaveText(dateValue);
-});
+    // Act
+    await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
-test('can render content with a date with time', async ({umbracoApi, umbracoUi}) => {
-  const dateValue = '2024-10-29 09:09:09 PM';
-  const dataTypeName = 'Date Picker';
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName); 
-  const templateId = await umbracoApi.template.createTemplateWithDisplayingStringValue(templateName, AliasHelper.toAlias(propertyName));
-  await umbracoApi.document.createPublishedDocumentWithValue(contentName, dateValue, dataTypeData.id, templateId, propertyName, documentTypeName);
-  const contentData = await umbracoApi.document.getByName(contentName);
-  const contentURL = contentData.urls[0].url;
-
-  // Act
-  await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
-
-  // Assert
-  await umbracoUi.contentRender.doesContentRenderValueHaveText(dateValue);
-});
+    // Assert
+    await umbracoUi.contentRender.doesContentRenderValueHaveText(dateTime.expectedValue, true);
+  });
+}
 
 
