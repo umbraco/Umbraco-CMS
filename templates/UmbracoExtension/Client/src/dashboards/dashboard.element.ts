@@ -3,7 +3,7 @@ import { UmbElementMixin } from "@umbraco-cms/backoffice/element-api";
 import { ExamplesService, UserModel } from "../api";
 import { UUIButtonElement } from "@umbraco-cms/backoffice/external/uui";
 import { UMB_NOTIFICATION_CONTEXT, UmbNotificationContext } from "@umbraco-cms/backoffice/notification";
-import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserContext, UmbCurrentUserModel } from "@umbraco-cms/backoffice/current-user";
+import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserModel } from "@umbraco-cms/backoffice/current-user";
 
 @customElement('my-awesome-dashboard')
 export class MyAwesomeDashboardElement extends UmbElementMixin(LitElement) {
