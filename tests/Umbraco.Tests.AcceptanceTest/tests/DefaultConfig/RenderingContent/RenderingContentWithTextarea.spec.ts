@@ -42,4 +42,3 @@ for (const textarea of textareas) {
     await umbracoUi.contentRender.doesContentRenderValueHaveText(textareaValue);
   });
 }
-

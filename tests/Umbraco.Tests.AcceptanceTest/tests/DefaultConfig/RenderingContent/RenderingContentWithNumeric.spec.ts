@@ -38,4 +38,3 @@ for (const numeric of numerics) {
     await umbracoUi.contentRender.doesContentRenderValueHaveText(numericValue);
   });
 }
-

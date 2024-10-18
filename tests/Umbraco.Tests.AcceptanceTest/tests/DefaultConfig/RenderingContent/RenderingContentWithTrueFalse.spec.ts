@@ -37,4 +37,3 @@ for (const trueFalse of trueFalseValues) {
     await umbracoUi.contentRender.doesContentRenderValueHaveText(trueFalse.expectedValue);
   });
 }
-

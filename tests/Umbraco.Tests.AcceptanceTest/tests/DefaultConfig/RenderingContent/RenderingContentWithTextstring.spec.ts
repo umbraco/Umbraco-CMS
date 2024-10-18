@@ -42,4 +42,3 @@ for (const textstring of textstrings) {
     await umbracoUi.contentRender.doesContentRenderValueHaveText(textstringValue);
   });
 }
-

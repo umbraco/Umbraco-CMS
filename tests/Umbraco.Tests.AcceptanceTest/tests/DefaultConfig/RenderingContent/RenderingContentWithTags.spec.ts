@@ -41,4 +41,3 @@ for (const tag of tags) {
     }); 
   });
 }
-
