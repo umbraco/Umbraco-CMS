@@ -48,11 +48,14 @@ public static class UmbracoBuilderAuthExtensions
                         Paths.MemberApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
                         Paths.BackOfficeApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash));
 
+
                 // Enable authorization code flow with PKCE
                 options
-                    .AllowAuthorizationCodeFlow()
-                    .RequireProofKeyForCodeExchange()
-                    .AllowRefreshTokenFlow();
+                    .AllowAuthorizationCodeFlow();
+                if (builder.Config.GetValue<bool>("Umbraco:CMS:Global:UseHttps")) // only use PEKCE if HTTPS is enabled because it does not work with HTTP anyway.
+                { options.RequireProofKeyForCodeExchange(); }
+                options.AllowRefreshTokenFlow();
+
 
                 // Enable the client credentials flow.
                 options.AllowClientCredentialsFlow();
