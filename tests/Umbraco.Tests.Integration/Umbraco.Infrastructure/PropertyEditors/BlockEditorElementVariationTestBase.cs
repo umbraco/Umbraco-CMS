@@ -36,6 +36,8 @@ public abstract class BlockEditorElementVariationTestBase : UmbracoIntegrationTe
 
     protected PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
 
+    protected IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
+
     private IUmbracoContextAccessor UmbracoContextAccessor => GetRequiredService<IUmbracoContextAccessor>();
 
     private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
