@@ -158,6 +158,9 @@
     <Compile Update="Umbraco.Core\Services\MediaTypeEditingServiceTests.GetFolderMediaTypes.cs">
       <DependentUpon>MediaTypeEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\PropertyEditors\BlockListElementLevelVariationTests.Indexing.cs">
+      <DependentUpon>BlockListElementLevelVariationTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Infrastructure\PropertyEditors\BlockListElementLevelVariationTests.Parsing.cs">
       <DependentUpon>BlockListElementLevelVariationTests.cs</DependentUpon>
     </Compile>
@@ -188,6 +191,9 @@
     <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Restore.cs">
       <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Sort.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Update.cs">
       <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
     </Compile>
@@ -209,7 +215,13 @@
     <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Rebuild.cs">
       <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Sort.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Restore.cs">
+      <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Sort.cs">
       <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Update.cs">
