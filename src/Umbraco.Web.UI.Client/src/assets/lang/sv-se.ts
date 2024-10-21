@@ -376,6 +376,8 @@ export default {
 		linklocaltip: 'När du använder lokala länkar, lägg till "#" framför länken',
 		linknewwindow: 'Öppna i nytt fönster?',
 		macroDoesNotHaveProperties: 'Detta makro innehåller inga egenskaper som du kan redigera',
+		selectMember: 'Välj medlem',
+		selectMembers: 'Välj medlemmar',
 		paste: 'Klistra in',
 		permissionsEdit: 'Redigera rättigheter för',
 		recycleBinDeleting: 'Allt som ligger i papperskorgen tas nu bort. Stäng inte detta fönster förrän detta är klart',

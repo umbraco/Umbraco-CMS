@@ -117,7 +117,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 				<uui-button
 					color="positive"
 					look="primary"
-					label=${this.localize.term('general_submit')}
+					label=${this.localize.term('general_choose')}
 					@click=${() => this.modalContext?.submit()}></uui-button>
 			</div>
 		`;
