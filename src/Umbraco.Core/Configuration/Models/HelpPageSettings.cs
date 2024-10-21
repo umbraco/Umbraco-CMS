@@ -6,5 +6,5 @@ public class HelpPageSettings
     /// <summary>
     ///     Gets or sets the allowed addresses to retrieve data for the content dashboard.
     /// </summary>
-    public string[]? HelpPageUrlAllowList { get; set; }
+    public ISet<string> HelpPageUrlAllowList { get; set; } = new HashSet<string>();
 }

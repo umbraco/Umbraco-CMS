@@ -30,6 +30,5 @@ public class ContentDashboardSettings
     /// <summary>
     ///     Gets the allowed addresses to retrieve data for the content dashboard.
     /// </summary>
-    /// <value>The URLs.</value>
-    public string[]? ContentDashboardUrlAllowlist { get; set; }
+    public ISet<string> ContentDashboardUrlAllowlist { get; set; } = new HashSet<string>();
 }
