@@ -165,7 +165,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 	#renderReadOnlyTag(culture?: string) {
 		if (!culture) return nothing;
-		return html`<uui-tag slot="badge" look="secondary">Read-only</uui-tag>`;
+		return html`<uui-tag slot="badge" look="secondary">${this.localize.term('general_readOnly')}</uui-tag>`;
 	}
 
 	static override styles = [

@@ -936,6 +936,7 @@ export default {
 		skipToMenu: 'Skip to menu',
 		skipToContent: 'Skip to content',
 		restore: 'Restore',
+		readOnly: 'Read-only',
 		newVersionAvailable: 'New version available',
 	},
 	colors: {

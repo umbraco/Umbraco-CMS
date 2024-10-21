@@ -307,7 +307,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 
 	#renderReadOnlyTag(culture?: string | null) {
 		if (!culture) return nothing;
-		return this.#isReadOnly(culture) ? html`<uui-tag look="secondary">Read-only</uui-tag>` : nothing;
+		return this.#isReadOnly(culture)
+			? html`<uui-tag look="secondary">${this.localize.term('general_readOnly')}</uui-tag>`
+			: nothing;
 	}
 
 	#renderSplitViewButton(variant: UmbDocumentVariantOptionModel) {
