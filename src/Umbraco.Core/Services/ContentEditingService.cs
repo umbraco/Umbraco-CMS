@@ -14,6 +14,7 @@ namespace Umbraco.Cms.Core.Services;
 internal sealed class ContentEditingService
     : ContentEditingServiceWithSortingBase<IContent, IContentType, IContentService, IContentTypeService>, IContentEditingService
 {
+    private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly ITemplateService _templateService;
     private readonly ILogger<ContentEditingService> _logger;
     private readonly IUserService _userService;
@@ -67,6 +68,7 @@ internal sealed class ContentEditingService
         ILanguageService languageService)
         : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, contentValidationService, treeEntitySortingService)
     {
+        _propertyEditorCollection = propertyEditorCollection;
         _templateService = templateService;
         _logger = logger;
         _userService = userService;
@@ -161,21 +163,31 @@ internal sealed class ContentEditingService
                 continue;
             }
 
-
             // else override the updates values with the original values.
             foreach (IProperty property in contentWithPotentialUnallowedChanges.Properties)
             {
-                if (property.PropertyType.VariesByCulture() is false)
+                // if the property varies by culture, simply overwrite the edited property value with the current property value
+                if (property.PropertyType.VariesByCulture())
                 {
+                    var currentValue = existingContent?.Properties.First(x => x.Alias == property.Alias).GetValue(culture, null, false);
+                    property.SetValue(currentValue, culture, null);
                     continue;
                 }
 
-                var value = existingContent?.Properties.First(x=>x.Alias == property.Alias).GetValue(culture, null, false);
-                property.SetValue(value, culture, null);
+                // if the property does not vary by culture and the data editor supports variance within invariant property values,
+                // we need perform a merge between the edited property value and the current property value
+                if (_propertyEditorCollection.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor)
+                   && dataEditor.CanMergePartialPropertyValues(property.PropertyType))
+                {
+                    var currentValue = existingContent?.Properties.First(x => x.Alias == property.Alias).GetValue(null, null, false);
+                    var editedValue = contentWithPotentialUnallowedChanges.Properties.First(x => x.Alias == property.Alias).GetValue(null, null, false);
+                    var mergedValue = dataEditor.MergePartialPropertyValueForCulture(currentValue, editedValue, culture);
+                    property.SetValue(mergedValue, null, null);
+                }
             }
         }
 
-       return contentWithPotentialUnallowedChanges;
+        return contentWithPotentialUnallowedChanges;
     }
 
     public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ContentUpdateModel updateModel, Guid userKey)
