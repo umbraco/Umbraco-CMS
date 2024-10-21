@@ -93,7 +93,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 		const dimensions = this.configuration?.getValueByAlias<{ width?: number; height?: number }>('dimensions');
 		if (dimensions?.width) this.setAttribute('style', `max-width: ${dimensions.width}px;`);
-		if (dimensions?.height) element.setAttribute('style', `max-height: ${dimensions.height}px;`);
+		if (dimensions?.height) element.setAttribute('style', `height: ${dimensions.height}px;`);
 
 		this._toolbar = this.configuration?.getValueByAlias<UmbTiptapToolbarValue>('toolbar') ?? [[[]]];
 
@@ -173,6 +173,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			}
 
 			#editor {
+				/* Required as overflow is set to auto, so that the scrollbars don't appear. */
+				display: flex;
 				overflow: auto;
 				border-radius: var(--uui-border-radius);
 				border: 1px solid var(--uui-color-border);
@@ -183,8 +185,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				box-sizing: border-box;
 				height: 100%;
 				width: 100%;
-				min-height: 400px;
-				display: grid; /* Don't ask me why this is needed, but it is. */
+
 				pre {
 					background-color: var(--uui-color-surface-alt);
 					padding: var(--uui-size-space-2) var(--uui-size-space-4);
