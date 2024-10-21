@@ -2,8 +2,18 @@ import { UmbLanguageCollectionRepository } from '../collection/index.js';
 import type { UmbLanguageDetailModel } from '../types.js';
 import { type UmbAppLanguageContext, UMB_APP_LANGUAGE_CONTEXT } from '../global-contexts/index.js';
 import type { UUIMenuItemEvent, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, state, repeat, ifDefined, query } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	customElement,
+	state,
+	repeat,
+	ifDefined,
+	query,
+	nothing,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
 @customElement('umb-app-language-select')
 export class UmbAppLanguageSelectElement extends UmbLitElement {
@@ -23,12 +33,41 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	#appLanguageContext?: UmbAppLanguageContext;
 	#languagesObserver?: any;
 
+	#currentUserAllowedLanguages?: Array<string>;
+	#currentUserHasAccessToAllLanguages?: boolean;
+
+	@state()
+	_disallowedLanguages: Array<UmbLanguageDetailModel> = [];
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
 			this.#appLanguageContext = instance;
 			this.#observeAppLanguage();
+		});
+
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
+			this.observe(context.languages, (languages) => {
+				this.#currentUserAllowedLanguages = languages;
+				this.#checkForLanguageAccess();
+			});
+
+			this.observe(context.hasAccessToAllLanguages, (hasAccessToAllLanguages) => {
+				this.#currentUserHasAccessToAllLanguages = hasAccessToAllLanguages;
+				this.#checkForLanguageAccess();
+			});
+		});
+	}
+
+	#checkForLanguageAccess() {
+		// find all disallowed languages
+		this._disallowedLanguages = this._languages?.filter((language) => {
+			if (this.#currentUserHasAccessToAllLanguages) {
+				return false;
+			}
+
+			return !this.#currentUserAllowedLanguages?.includes(language.unique);
 		});
 	}
 
@@ -46,6 +85,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		// TODO: listen to changes
 		if (data) {
 			this._languages = data.items;
+			this.#checkForLanguageAccess();
 		}
 	}
 
@@ -98,11 +138,23 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 							label=${ifDefined(language.name)}
 							@click-label=${this.#onLabelClick}
 							data-unique=${ifDefined(language.unique)}
-							?active=${language.unique === this._appLanguage?.unique}></uui-menu-item>
+							?active=${language.unique === this._appLanguage?.unique}>
+							${this.#renderReadOnlyTag(language.unique)}
+						</uui-menu-item>
 					`,
 				)}
 			</umb-popover-layout>
 		</uui-popover-container>`;
+	}
+
+	#isReadOnly(culture: string | null) {
+		if (!culture) return false;
+		return this._disallowedLanguages.find((language) => language.unique === culture) ? true : false;
+	}
+
+	#renderReadOnlyTag(culture?: string | null) {
+		if (!culture) return nothing;
+		return this.#isReadOnly(culture) ? html`<uui-tag slot="badge" look="secondary">Read-only</uui-tag>` : nothing;
 	}
 
 	static override styles = [
