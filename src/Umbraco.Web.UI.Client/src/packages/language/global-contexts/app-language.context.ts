@@ -112,6 +112,10 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 		const unique = this.#readOnlyStateIdentifier + appLanguage.unique;
 		this.appLanguageReadOnlyState.removeState(unique);
 
+		if (this.#currentUserHasAccessToAllLanguages) {
+			return;
+		}
+
 		const isReadOnly = !this.#currentUserAllowedLanguages.includes(appLanguage.unique);
 
 		if (isReadOnly) {
