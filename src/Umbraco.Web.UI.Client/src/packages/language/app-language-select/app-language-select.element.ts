@@ -27,6 +27,9 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	private _appLanguage?: UmbLanguageDetailModel;
 
 	@state()
+	private _appLanguageIsReadOnly = false;
+
+	@state()
 	private _isOpen = false;
 
 	#collectionRepository = new UmbLanguageCollectionRepository(this);
@@ -77,6 +80,10 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		this.observe(this.#appLanguageContext.appLanguage, (language) => {
 			this._appLanguage = language;
 		});
+
+		this.observe(this.#appLanguageContext.appLanguageReadOnlyState.isReadOnly, (isReadOnly) => {
+			this._appLanguageIsReadOnly = isReadOnly;
+		});
 	}
 
 	async #observeLanguages() {
@@ -123,7 +130,11 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 	#renderTrigger() {
 		return html`<button id="toggle" popovertarget="dropdown-popover">
-			${this._appLanguage?.name} <uui-symbol-expand .open=${this._isOpen}></uui-symbol-expand>
+			<span
+				>${this._appLanguage?.name}
+				${this._appLanguageIsReadOnly ? this.#renderReadOnlyTag(this._appLanguage?.unique) : nothing}</span
+			>
+			<uui-symbol-expand .open=${this._isOpen}></uui-symbol-expand>
 		</button>`;
 	}
 
@@ -139,7 +150,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 							@click-label=${this.#onLabelClick}
 							data-unique=${ifDefined(language.unique)}
 							?active=${language.unique === this._appLanguage?.unique}>
-							${this.#renderReadOnlyTag(language.unique)}
+							${this.#isLanguageReadOnly(language.unique) ? this.#renderReadOnlyTag(language.unique) : nothing}
 						</uui-menu-item>
 					`,
 				)}
@@ -147,14 +158,14 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		</uui-popover-container>`;
 	}
 
-	#isReadOnly(culture: string | null) {
+	#isLanguageReadOnly(culture?: string) {
 		if (!culture) return false;
 		return this._disallowedLanguages.find((language) => language.unique === culture) ? true : false;
 	}
 
-	#renderReadOnlyTag(culture?: string | null) {
+	#renderReadOnlyTag(culture?: string) {
 		if (!culture) return nothing;
-		return this.#isReadOnly(culture) ? html`<uui-tag slot="badge" look="secondary">Read-only</uui-tag>` : nothing;
+		return html`<uui-tag slot="badge" look="secondary">Read-only</uui-tag>`;
 	}
 
 	static override styles = [
