@@ -49,6 +49,7 @@ test('can add a domain', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickCultureAndHostnamesButton();
+  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.content.clickAddNewDomainButton();
   await umbracoUi.content.enterDomain(domainName);
   await umbracoUi.content.selectDomainLanguageOption(languageName);

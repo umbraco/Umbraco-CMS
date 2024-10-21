@@ -62,8 +62,7 @@ test('can delete a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.clickActionsMenuForDataType(blockGridEditorName);
-  await umbracoUi.dataType.clickDeleteExactButton();
-  await umbracoUi.dataType.clickConfirmToDeleteButton();
+  await umbracoUi.dataType.clickDeleteAndConfirmButton();
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
