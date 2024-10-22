@@ -11,6 +11,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UMB_SECTION_PATH_PATTERN } from '@umbraco-cms/backoffice/section';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { ensurePathEndsWithSlash } from '@umbraco-cms/backoffice/utils';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext> {
 	#currentUser = new UmbObjectState<UmbCurrentUserModel | undefined>(undefined);
@@ -83,71 +84,139 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 		return currentUser?.isAdmin ?? false;
 	}
 
-	getAllowedSection() {
+	/**
+	 * Get the allowed sections for the current user
+	 * @returns {Array<string> | undefined} The allowed sections for the current user
+	 */
+	getAllowedSection(): Array<string> | undefined {
 		return this.#currentUser.getValue()?.allowedSections;
 	}
 
-	getAvatarUrls() {
+	/**
+	 * Get the avatar urls for the current user
+	 * @returns {Array<string> | undefined} The avatar urls for the current user
+	 */
+	getAvatarUrls(): Array<string> | undefined {
 		return this.#currentUser.getValue()?.avatarUrls;
 	}
 
-	getDocumentStartNodeUniques() {
+	/**
+	 * Get the document start node uniques for the current user
+	 * @returns {Array<UmbReferenceByUnique> | undefined} The document start node uniques for the current user
+	 */
+	getDocumentStartNodeUniques(): Array<UmbReferenceByUnique> | undefined {
 		return this.#currentUser.getValue()?.documentStartNodeUniques;
 	}
 
-	getEmail() {
+	/**
+	 * Get the email for the current user
+	 * @returns {string | undefined} The email for the current user
+	 */
+	getEmail(): string | undefined {
 		return this.#currentUser.getValue()?.email;
 	}
 
-	getFallbackPermissions() {
+	/**
+	 * Get the fallback permissions for the current user
+	 * @returns {Array<string> | undefined} The fallback permissions for the current user
+	 */
+	getFallbackPermissions(): Array<string> | undefined {
 		return this.#currentUser.getValue()?.fallbackPermissions;
 	}
 
-	getHasAccessToAllLanguages() {
+	/**
+	 * Get if the current user has access to all languages
+	 * @returns {boolean | undefined} True if the current user has access to all languages, otherwise false
+	 */
+	getHasAccessToAllLanguages(): boolean | undefined {
 		return this.#currentUser.getValue()?.hasAccessToAllLanguages;
 	}
 
-	getHasAccessToSensitiveData() {
+	/**
+	 * Get if the current user has access to sensitive data
+	 * @returns {boolean | undefined} True if the current user has access to sensitive data, otherwise false
+	 */
+	getHasAccessToSensitiveData(): boolean | undefined {
 		return this.#currentUser.getValue()?.hasAccessToSensitiveData;
 	}
 
-	getHasDocumentRootAccess() {
+	/**
+	 * Get if the current user has document root access
+	 * @returns {boolean | undefined} True if the current user has document root access, otherwise false
+	 */
+	getHasDocumentRootAccess(): boolean | undefined {
 		return this.#currentUser.getValue()?.hasDocumentRootAccess;
 	}
 
-	getHasMediaRootAccess() {
+	/**
+	 * Get if the current user has media root access
+	 * @returns {boolean | undefined} True if the current user has media root access, otherwise false
+	 */
+	getHasMediaRootAccess(): boolean | undefined {
 		return this.#currentUser.getValue()?.hasMediaRootAccess;
 	}
 
-	getIsAdmin() {
+	/**
+	 * Get if the current user is an admin
+	 * @returns {boolean | undefined} True if the current user is an admin, otherwise false
+	 */
+	getIsAdmin(): boolean | undefined {
 		return this.#currentUser.getValue()?.isAdmin;
 	}
 
-	getLanguageIsoCode() {
+	/**
+	 * Get the language iso code for the current user
+	 * @returns {string | undefined} The language iso code for the current user
+	 */
+	getLanguageIsoCode(): string | undefined {
 		return this.#currentUser.getValue()?.languageIsoCode;
 	}
 
-	getLanguages() {
+	/**
+	 * Get the languages for the current user
+	 * @returns {Array<string> | undefined} The languages for the current user
+	 */
+	getLanguages(): Array<string> | undefined {
 		return this.#currentUser.getValue()?.languages;
 	}
 
-	getMediaStartNodeUniques() {
+	/**
+	 * Get the media start node uniques for the current user
+	 * @returns {Array<UmbReferenceByUnique> | undefined} The media start node uniques for the current user
+	 */
+	getMediaStartNodeUniques(): Array<UmbReferenceByUnique> | undefined {
 		return this.#currentUser.getValue()?.mediaStartNodeUniques;
 	}
 
-	getName() {
+	/**
+	 * Get the name for the current user
+	 * @returns {string | undefined} The name for the current user
+	 */
+	getName(): string | undefined {
 		return this.#currentUser.getValue()?.name;
 	}
 
+	/**
+	 * Get the permissions for the current user
+	 * @returns {Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel> | undefined} The permissions for the current user
+	 */
 	getPermissions() {
 		return this.#currentUser.getValue()?.permissions;
 	}
 
-	getUnique() {
+	/**
+	 * Get the unique for the current user
+	 * @returns {string | undefined} The unique for the current user
+	 */
+	getUnique(): string | undefined {
 		return this.#currentUser.getValue()?.unique;
 	}
 
-	getUserName() {
+	/**
+	 * Get the user name for the current user
+	 * @returns {string | undefined} The user name for the current user
+	 */
+	getUserName(): string | undefined {
 		return this.#currentUser.getValue()?.userName;
 	}
 
