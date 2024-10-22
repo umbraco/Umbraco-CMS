@@ -38,6 +38,3 @@ for (const checkbox of checkboxList) {
     }); 
   });
 }
-
-
-

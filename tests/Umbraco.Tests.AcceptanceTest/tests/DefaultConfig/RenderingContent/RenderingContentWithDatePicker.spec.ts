@@ -33,5 +33,3 @@ for (const dateTime of dateTimes) {
     await umbracoUi.contentRender.doesContentRenderValueContainText(dateTime.expectedValue, true);
   });
 }
-
-
