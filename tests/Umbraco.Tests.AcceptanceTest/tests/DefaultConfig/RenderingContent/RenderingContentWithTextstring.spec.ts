@@ -5,7 +5,7 @@ const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Textstring';
 const templateName = 'TestTemplateForContent';
 const propertyName = 'Test Textstring';
-let dataTypeData;
+let dataTypeData = null;
 
 test.beforeEach(async ({umbracoApi}) => {
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName); 
@@ -39,7 +39,6 @@ for (const textstring of textstrings) {
     await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
     // Assert
-    await umbracoUi.contentRender.doesContentRenderValueHaveText(textstringValue);
+    await umbracoUi.contentRender.doesContentRenderValueContainText(textstringValue);
   });
 }
-

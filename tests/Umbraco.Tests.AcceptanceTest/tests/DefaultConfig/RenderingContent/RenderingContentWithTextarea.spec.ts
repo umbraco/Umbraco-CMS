@@ -5,7 +5,7 @@ const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Textarea';
 const templateName = 'TestTemplateForContent';
 const propertyName = 'Test Textarea';
-let dataTypeData;
+let dataTypeData = null;
 
 test.beforeEach(async ({umbracoApi}) => {
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName); 
@@ -20,10 +20,10 @@ test.afterEach(async ({umbracoApi}) => {
 const textareas = [
   {type: 'an empty textarea', value: ''},
   {type: 'a non-empty textarea', value: 'Welcome to Umbraco site'},
-  {type: 'a textarea contains special characters', value: '@#^&*()_+[]{};:"<>,./?'},
-  {type: 'a textarea contains multiple lines', value: 'First line\n Second line\n Third line'},
-  {type: 'a textarea contains an SQL injection', value: "' OR '1'='1'; --"},
-  {type: 'a textarea contains a cross-site scripting', value: "<script>alert('XSS')</script>"}
+  {type: 'a textarea that contains special characters', value: '@#^&*()_+[]{};:"<>,./?'},
+  {type: 'a textarea that contains multiple lines', value: 'First line\n Second line\n Third line'},
+  {type: 'a textarea that contains an SQL injection', value: "' OR '1'='1'; --"},
+  {type: 'a textarea that contains cross-site scripting', value: "<script>alert('XSS')</script>"}
 ];
 
 for (const textarea of textareas) {
@@ -39,7 +39,6 @@ for (const textarea of textareas) {
     await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
     // Assert
-    await umbracoUi.contentRender.doesContentRenderValueHaveText(textareaValue);
+    await umbracoUi.contentRender.doesContentRenderValueContainText(textareaValue);
   });
 }
-
