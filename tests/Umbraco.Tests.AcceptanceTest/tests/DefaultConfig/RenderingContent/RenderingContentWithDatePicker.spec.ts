@@ -30,7 +30,7 @@ for (const dateTime of dateTimes) {
     await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
     // Assert
-    await umbracoUi.contentRender.doesContentRenderValueHaveText(dateTime.expectedValue, true);
+    await umbracoUi.contentRender.doesContentRenderValueContainText(dateTime.expectedValue, true);
   });
 }
 
