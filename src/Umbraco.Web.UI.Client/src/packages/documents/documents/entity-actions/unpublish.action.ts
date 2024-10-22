@@ -11,6 +11,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
 export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never> {
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
@@ -28,8 +29,16 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 
 		if (!documentData) throw new Error('The document was not found');
 
-		const context = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
-		const appCulture = context.getAppCulture();
+		const appLanguageContext = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
+		const appCulture = appLanguageContext.getAppCulture();
+
+		const currentUserContext = await this.getContext(UMB_CURRENT_USER_CONTEXT);
+		const currentUserAllowedLanguages = currentUserContext.getLanguages();
+		const currentUserHasAccessToAllLanguages = currentUserContext.getHasAccessToAllLanguages();
+
+		if (currentUserAllowedLanguages === undefined) throw new Error('The current user languages are missing');
+		if (currentUserHasAccessToAllLanguages === undefined)
+			throw new Error('The current user access to all languages is missing');
 
 		const options: Array<UmbDocumentVariantOptionModel> = documentData.variants.map<UmbDocumentVariantOptionModel>(
 			(variant) => ({
@@ -65,6 +74,11 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 				data: {
 					documentUnique: this.args.unique,
 					options,
+					pickableFilter: (option) => {
+						if (!option.culture) return false;
+						if (currentUserHasAccessToAllLanguages) return true;
+						return currentUserAllowedLanguages.includes(option.culture);
+					},
 				},
 				value: { selection },
 			})
@@ -89,4 +103,5 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 		}
 	}
 }
+
 export default UmbUnpublishDocumentEntityAction;
