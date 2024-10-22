@@ -152,6 +152,7 @@ internal sealed class ContentEditingService
                 {
                     var currentValue = existingContent?.Properties.First(x => x.Alias == property.Alias).GetValue(null, null, false);
 
+                    // If we are not allowed to edit invariant properties, overwrite the edited property value with the current property value.
                     if(_contentSettings.AllowEditInvariantFromNonDefault is false)
                     {
                         property.SetValue(currentValue, null, null);
