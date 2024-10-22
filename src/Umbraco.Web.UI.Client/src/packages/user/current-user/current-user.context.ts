@@ -83,6 +83,74 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 		return currentUser?.isAdmin ?? false;
 	}
 
+	getAllowedSection() {
+		return this.#currentUser.getValue()?.allowedSections;
+	}
+
+	getAvatarUrls() {
+		return this.#currentUser.getValue()?.avatarUrls;
+	}
+
+	getDocumentStartNodeUniques() {
+		return this.#currentUser.getValue()?.documentStartNodeUniques;
+	}
+
+	getEmail() {
+		return this.#currentUser.getValue()?.email;
+	}
+
+	getFallbackPermissions() {
+		return this.#currentUser.getValue()?.fallbackPermissions;
+	}
+
+	getHasAccessToAllLanguages() {
+		return this.#currentUser.getValue()?.hasAccessToAllLanguages;
+	}
+
+	getHasAccessToSensitiveData() {
+		return this.#currentUser.getValue()?.hasAccessToSensitiveData;
+	}
+
+	getHasDocumentRootAccess() {
+		return this.#currentUser.getValue()?.hasDocumentRootAccess;
+	}
+
+	getHasMediaRootAccess() {
+		return this.#currentUser.getValue()?.hasMediaRootAccess;
+	}
+
+	getIsAdmin() {
+		return this.#currentUser.getValue()?.isAdmin;
+	}
+
+	getLanguageIsoCode() {
+		return this.#currentUser.getValue()?.languageIsoCode;
+	}
+
+	getLanguages() {
+		return this.#currentUser.getValue()?.languages;
+	}
+
+	getMediaStartNodeUniques() {
+		return this.#currentUser.getValue()?.mediaStartNodeUniques;
+	}
+
+	getName() {
+		return this.#currentUser.getValue()?.name;
+	}
+
+	getPermissions() {
+		return this.#currentUser.getValue()?.permissions;
+	}
+
+	getUnique() {
+		return this.#currentUser.getValue()?.unique;
+	}
+
+	getUserName() {
+		return this.#currentUser.getValue()?.userName;
+	}
+
 	#observeIsAuthorized() {
 		if (!this.#authContext) return;
 		this.observe(this.#authContext.isAuthorized, (isAuthorized) => {
