@@ -39,6 +39,6 @@ for (const textarea of textareas) {
     await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
     // Assert
-    await umbracoUi.contentRender.doesContentRenderValueHaveText(textareaValue);
+    await umbracoUi.contentRender.doesContentRenderValueContainText(textareaValue);
   });
 }

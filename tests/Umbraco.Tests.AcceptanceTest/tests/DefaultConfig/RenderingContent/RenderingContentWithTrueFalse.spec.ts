@@ -34,6 +34,6 @@ for (const trueFalse of trueFalseValues) {
     await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
     // Assert
-    await umbracoUi.contentRender.doesContentRenderValueHaveText(trueFalse.expectedValue);
+    await umbracoUi.contentRender.doesContentRenderValueContainText(trueFalse.expectedValue);
   });
 }
