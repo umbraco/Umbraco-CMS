@@ -12,6 +12,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
 public partial class BlockListElementLevelVariationTests
 {
+
     [TestCase(true)]
     [TestCase(false)]
     public async Task Can_Handle_Limited_User_Access_To_Languages_With_AllowEditInvariantFromNonDefault(bool updateWithLimitedUserAccess)
