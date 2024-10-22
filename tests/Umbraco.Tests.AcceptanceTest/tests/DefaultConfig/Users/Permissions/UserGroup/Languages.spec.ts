@@ -1,5 +1,4 @@
 import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
-import {expect} from '@playwright/test';
 
 const testUser = {
   name: 'Test User',
@@ -20,14 +19,7 @@ const englishDocumentName = 'EnglishDocument';
 const danishDocumentName = 'DanishDocument';
 const vietnameseDocumentName = 'VietnameseDocument';
 
-
-
 let documentTypeId = null;
-let documentId = null;
-
-let englishLanguageId = null;
-let danishLanguageId = null;
-let vietnameseLanguageId = null;
 
 const englishIsoCode = 'en-US';
 const danishIsoCode = 'da';
@@ -60,25 +52,21 @@ let userGroupId = null;
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.user.ensureNameNotExists(testUser.name);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-
   await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode)
   await umbracoApi.language.ensureIsoCodeNotExists(vietnameseIsoCode)
-
-  danishLanguageId = await umbracoApi.language.createDanishLanguage();
-  vietnameseLanguageId = await umbracoApi.language.createVietnameseLanguage();
-
+  await umbracoApi.language.createDanishLanguage();
+  await umbracoApi.language.createVietnameseLanguage();
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
   dataTypeId = dataType.id;
-
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId, 'TestGroup', true);
-  documentId = await umbracoApi.document.createDocumentWithMultipleVariants(documentName, documentTypeId, AliasHelper.toAlias(dataTypeName), cultureVariants);
+  await umbracoApi.document.createDocumentWithMultipleVariants(documentName, documentTypeId, AliasHelper.toAlias(dataTypeName), cultureVariants);
 });
 
 test.afterEach(async ({umbracoApi}) => {
   // Ensure we are logged in to admin
   await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
-  await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode)
+  await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode);
   await umbracoApi.language.ensureIsoCodeNotExists(vietnameseIsoCode)
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
@@ -87,8 +75,7 @@ test('can rename content with language set in userGroup', async ({umbracoApi, um
   // Arrange
   const updatedContentName = 'UpdatedContentName';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithLanguageAndContentSection(userGroupName, englishIsoCode);
-  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [], false, [] ,false, englishIsoCode);
-  await umbracoUi.waitForTimeout(500);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [], false, [], false, englishIsoCode);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
@@ -102,15 +89,13 @@ test('can rename content with language set in userGroup', async ({umbracoApi, um
 
   // Assert
   await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isContentVisible(updatedContentName);
+  await umbracoUi.content.isContentInTreeVisible(updatedContentName);
 });
 
-test('can not rename content with language not set in userGroup', async ({page, umbracoApi, umbracoUi}) => {
+test('can not rename content with language not set in userGroup', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const updatedContentName = 'UpdatedContentName';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithLanguageAndContentSection(userGroupName, englishIsoCode);
-  await umbracoUi.waitForTimeout(500);
-  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [], false, [] ,false, englishIsoCode);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [], false, [], false, englishIsoCode);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
@@ -129,7 +114,6 @@ test('can update content property with language set in userGroup', async ({umbra
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithLanguageAndContentSection(userGroupName, englishIsoCode);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  await umbracoUi.waitForTimeout(500);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
@@ -142,11 +126,10 @@ test('can update content property with language set in userGroup', async ({umbra
   await umbracoUi.content.isDocumentPropertyEditable(dataTypeName, true);
 });
 
-test('can not update content property with language not set in userGroup', async ({page, umbracoApi, umbracoUi}) => {
+test('can not update content property with language not set in userGroup', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithLanguageAndContentSection(userGroupName, englishIsoCode);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  await umbracoUi.waitForTimeout(500);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
@@ -159,5 +142,3 @@ test('can not update content property with language not set in userGroup', async
   // Assert
   await umbracoUi.content.isDocumentPropertyEditable(dataTypeName, false);
 });
-
-

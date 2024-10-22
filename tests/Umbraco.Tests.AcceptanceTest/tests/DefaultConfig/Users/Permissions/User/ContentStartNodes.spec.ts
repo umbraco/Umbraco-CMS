@@ -1,6 +1,6 @@
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
-import {expect} from '@playwright/test';
 
+let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 const testUser = {
   name: 'Test User',
   email: 'verySecureEmail@123.test',
@@ -8,22 +8,18 @@ const testUser = {
 };
 
 const userGroupName = 'TestUserGroup';
+let userGroupId = null;
 
 const rootDocumentTypeName = 'RootDocumentType';
 const childDocumentTypeOneName = 'ChildDocumentTypeOne';
 const childDocumentTypeTwoName = 'ChildDocumentTypeTwo';
 let childDocumentTypeOneId = null;
 let rootDocumentTypeId = null;
-
-let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
-
-let rootDocumentId = null;
-let childDocumentOneId = null;
 const rootDocumentName = 'RootDocument';
 const childDocumentOneName = 'ChildDocumentOne';
 const childDocumentTwoName = 'ChildDocumentTwo';
-
-let userGroupId = null;
+let rootDocumentId = null;
+let childDocumentOneId = null;
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(rootDocumentTypeName);
@@ -59,10 +55,10 @@ test('can see root start node and children', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.user.goToSection(ConstantHelper.sections.content, false);
 
   // Assert
-  await umbracoUi.content.isContentVisible(rootDocumentName);
+  await umbracoUi.content.isContentInTreeVisible(rootDocumentName);
   await umbracoUi.content.clickCaretButtonForContentName(rootDocumentName);
-  await umbracoUi.content.isChildContentVisible(rootDocumentName, childDocumentOneName);
-  await umbracoUi.content.isChildContentVisible(rootDocumentName, childDocumentTwoName);
+  await umbracoUi.content.isChildContentInTreeVisible(rootDocumentName, childDocumentOneName);
+  await umbracoUi.content.isChildContentInTreeVisible(rootDocumentName, childDocumentTwoName);
 });
 
 test('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
@@ -75,12 +71,12 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
   await umbracoUi.user.goToSection(ConstantHelper.sections.content, false);
 
   // Assert
-  await umbracoUi.content.isContentVisible(rootDocumentName);
+  await umbracoUi.content.isContentInTreeVisible(rootDocumentName);
   await umbracoUi.content.goToContentWithName(rootDocumentName);
   await umbracoUi.content.isTextWithMessageVisible('The authenticated user do not have access to this resource');
   await umbracoUi.content.clickCaretButtonForContentName(rootDocumentName);
-  await umbracoUi.content.isChildContentVisible(rootDocumentName, childDocumentOneName);
-  await umbracoUi.content.isChildContentVisible(rootDocumentName, childDocumentTwoName, false);
+  await umbracoUi.content.isChildContentInTreeVisible(rootDocumentName, childDocumentOneName);
+  await umbracoUi.content.isChildContentInTreeVisible(rootDocumentName, childDocumentTwoName, false);
 });
 
 test('can not see any content when no start nodes specified', async ({umbracoApi, umbracoUi}) => {
@@ -93,5 +89,7 @@ test('can not see any content when no start nodes specified', async ({umbracoApi
   await umbracoUi.user.goToSection(ConstantHelper.sections.content, false);
 
   // Assert
-  await umbracoUi.content.isContentVisible(rootDocumentName, false);
+  await umbracoUi.content.isContentInTreeVisible(rootDocumentName, false);
+  await umbracoUi.content.isContentInTreeVisible(childDocumentOneName, false);
+  await umbracoUi.content.isContentInTreeVisible(childDocumentTwoName, false);
 });
