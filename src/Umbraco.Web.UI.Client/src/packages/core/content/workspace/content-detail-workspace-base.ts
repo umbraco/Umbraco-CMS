@@ -11,12 +11,7 @@ import {
 	type UmbEntityDetailWorkspaceContextCreateArgs,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbContentTypeStructureManager, type UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
-import {
-	UMB_INVARIANT_CULTURE,
-	UmbVariantId,
-	type UmbEntityVariantModel,
-	type UmbEntityVariantOptionModel,
-} from '@umbraco-cms/backoffice/variant';
+import { UMB_INVARIANT_CULTURE, UmbVariantId, type UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import { appendToFrozenArray, mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -44,7 +39,7 @@ export interface UmbContentDetailWorkspaceContextArgs<DetailModelType> extends U
 }
 
 export abstract class UmbContentDetailWorkspaceBase<
-		DetailModelType extends UmbContentDetailModel,
+		DetailModelType extends UmbContentDetailModel<VariantModelType>,
 		DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
 		ContentTypeDetailModel extends UmbContentTypeModel = UmbContentTypeModel,
 		VariantModelType extends UmbEntityVariantModel = UmbEntityVariantModel,
@@ -119,7 +114,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 							unique: language.unique, // This must be a variantId string!
 							culture: language.unique,
 							segment: null,
-						} as UmbEntityVariantOptionModel;
+						} as unknown as VariantModelType;
 					});
 				} else if (varies === false) {
 					return [
@@ -129,10 +124,10 @@ export abstract class UmbContentDetailWorkspaceBase<
 							culture: null,
 							segment: null,
 							unique: UMB_INVARIANT_CULTURE, // This must be a variantId string!
-						} as UmbEntityVariantOptionModel,
+						} as unknown as VariantModelType,
 					];
 				}
-				return [] as Array<UmbEntityVariantOptionModel>;
+				return [] as Array<VariantModelType>;
 			},
 		);
 
