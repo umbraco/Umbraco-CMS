@@ -1,34 +1,27 @@
 import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
-const testUser = {
-  name: 'Test User',
-  email: 'verySecureEmail@123.test',
-  password: 'verySecurePassword123',
-};
+const testUser = ConstantHelper.testUserCredentials;
+let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 
 const userGroupName = 'TestUserGroup';
-
-let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
+let userGroupId = null;
 
 const documentTypeName = 'TestDocumentType';
 const documentName = 'TestDocument';
-const dataTypeName = 'Textstring';
-let dataTypeId = null;
-
 const englishDocumentName = 'EnglishDocument';
 const danishDocumentName = 'DanishDocument';
 const vietnameseDocumentName = 'VietnameseDocument';
-
 let documentTypeId = null;
+
+const dataTypeName = 'Textstring';
+let dataTypeId = null;
 
 const englishIsoCode = 'en-US';
 const danishIsoCode = 'da';
 const vietnameseIsoCode = 'vi';
-
 const englishLanguageName = 'English (United States)';
 const danishLanguageName = 'Danish';
 const vietnameseLanguageName = 'Vietnamese';
-
 const cultureVariants = [
   {
     isoCode: englishIsoCode,
@@ -46,8 +39,6 @@ const cultureVariants = [
     value: 'VietnameseValue',
   }
 ];
-
-let userGroupId = null;
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.user.ensureNameNotExists(testUser.name);

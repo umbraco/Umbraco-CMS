@@ -1,15 +1,10 @@
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
-const testUser = {
-  name: 'Test User',
-  email: 'verySecureEmail@123.test',
-  password: 'verySecurePassword123',
-};
+const testUser = ConstantHelper.testUserCredentials;
+let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 
 const userGroupName = 'TestUserGroup';
 let userGroupId = null;
-
-let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 
 let rootFolderId = null;
 let childFolderOneId = null;

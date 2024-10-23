@@ -1,11 +1,7 @@
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
+const testUser = ConstantHelper.testUserCredentials;
 let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
-const testUser = {
-  name: 'Test User',
-  email: 'verySecureEmail@123.test',
-  password: 'verySecurePassword123',
-};
 
 const userGroupName = 'TestUserGroup';
 let userGroupId = null;
