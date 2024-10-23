@@ -2,7 +2,7 @@ import { UmbSubmittableWorkspaceContextBase } from '../submittable/index.js';
 import { UmbEntityWorkspaceDataManager } from '../entity/entity-workspace-data-manager.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbEntityModel, UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import { UmbEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { UMB_DISCARD_CHANGES_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import {
@@ -50,6 +50,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	protected _detailRepository?: DetailRepositoryType;
 
+	#entityContext = new UmbEntityContext(this);
 	#entityType: string;
 
 	#parent = new UmbObjectState<{ entityType: string; unique: UmbEntityUnique } | undefined>(undefined);
@@ -107,9 +108,11 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		const data = response.data;
 
 		if (data) {
-			this.setIsNew(false);
+			this.#entityContext.setEntityType(this.#entityType);
+			this.#entityContext.setUnique(unique);
 			this._data.setPersisted(data);
 			this._data.setCurrent(data);
+			this.setIsNew(false);
 		}
 
 		return response;
@@ -128,12 +131,16 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		let { data } = await request;
 		if (!data) return undefined;
 
+		this.#entityContext.setEntityType(this.#entityType);
+		this.#entityContext.setUnique(data.unique);
+
 		if (this.modalContext) {
 			data = { ...data, ...this.modalContext.data.preset };
 		}
 		this.setIsNew(true);
 		this._data.setPersisted(data);
 		this._data.setCurrent(data);
+
 		return data;
 	}
 
@@ -263,6 +270,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	public override destroy(): void {
 		window.removeEventListener('willchangestate', this.#onWillNavigate);
 		this._detailRepository?.destroy();
+		this.#entityContext.destroy();
 		super.destroy();
 	}
 }
