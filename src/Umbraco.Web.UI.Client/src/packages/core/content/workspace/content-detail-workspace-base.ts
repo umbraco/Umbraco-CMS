@@ -40,24 +40,32 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 
-export interface UmbContentDetailWorkspaceContextArgs<DetailModelType, VariantOptionModelType>
-	extends UmbEntityDetailWorkspaceContextArgs {
-	contentTypeDetailRepository: UmbDetailRepositoryConstructor<DetailModelType>;
-	contentVariantScaffold: UmbEntityVariantModel;
-	saveModalToken: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
+export interface UmbContentDetailWorkspaceContextArgs<
+	DetailModelType extends UmbContentDetailModel<VariantModelType>,
+	ContentTypeDetailModelType extends UmbContentTypeModel = UmbContentTypeModel,
+	VariantModelType extends UmbEntityVariantModel = DetailModelType extends { variants: UmbEntityVariantModel[] }
+		? DetailModelType['variants'][0]
+		: never,
+	VariantOptionModelType extends UmbEntityVariantOptionModel = UmbEntityVariantOptionModel<VariantModelType>,
+> extends UmbEntityDetailWorkspaceContextArgs {
+	contentTypeDetailRepository: UmbDetailRepositoryConstructor<ContentTypeDetailModelType>;
+	contentVariantScaffold: VariantModelType;
+	saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
 }
 
 export abstract class UmbContentDetailWorkspaceBase<
 		DetailModelType extends UmbContentDetailModel<VariantModelType>,
 		DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
-		ContentTypeDetailModel extends UmbContentTypeModel = UmbContentTypeModel,
-		VariantModelType extends UmbEntityVariantModel = UmbEntityVariantModel,
+		ContentTypeDetailModelType extends UmbContentTypeModel = UmbContentTypeModel,
+		VariantModelType extends UmbEntityVariantModel = DetailModelType extends { variants: UmbEntityVariantModel[] }
+			? DetailModelType['variants'][0]
+			: never,
 		VariantOptionModelType extends UmbEntityVariantOptionModel = UmbEntityVariantOptionModel<VariantModelType>,
 		CreateArgsType extends
 			UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> = UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
 	>
 	extends UmbEntityDetailWorkspaceContextBase<DetailModelType, DetailRepositoryType, CreateArgsType>
-	implements UmbContentWorkspaceContext<DetailModelType, ContentTypeDetailModel, VariantModelType>
+	implements UmbContentWorkspaceContext<DetailModelType, ContentTypeDetailModelType, VariantModelType>
 {
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 
@@ -97,19 +105,27 @@ export abstract class UmbContentDetailWorkspaceBase<
 
 	public readonly variantOptions: Observable<Array<VariantOptionModelType>>;
 
-	#saveModalToken: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
+	#saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
 
 	constructor(
 		host: UmbControllerHost,
-		args: UmbContentDetailWorkspaceContextArgs<DetailModelType, VariantOptionModelType>,
+		args: UmbContentDetailWorkspaceContextArgs<
+			DetailModelType,
+			ContentTypeDetailModelType,
+			VariantModelType,
+			VariantOptionModelType
+		>,
 	) {
 		super(host, args);
 
-		this._data = new UmbContentWorkspaceDataManager<DetailModelType>(this, args.contentVariantScaffold);
+		this._data = new UmbContentWorkspaceDataManager<DetailModelType, VariantModelType>(
+			this,
+			args.contentVariantScaffold,
+		);
 		this.#saveModalToken = args.saveModalToken;
 
 		const contentTypeDetailRepository = new args.contentTypeDetailRepository(this);
-		this.structure = new UmbContentTypeStructureManager<ContentTypeDetailModel>(this, contentTypeDetailRepository);
+		this.structure = new UmbContentTypeStructureManager<ContentTypeDetailModelType>(this, contentTypeDetailRepository);
 		this.variesByCulture = this.structure.ownerContentTypeObservablePart((x) => x?.variesByCulture);
 		this.variesBySegment = this.structure.ownerContentTypeObservablePart((x) => x?.variesBySegment);
 		this.varies = this.structure.ownerContentTypeObservablePart((x) =>
@@ -400,7 +416,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 		} else if (options.length === 1) {
 			// If only one option we will skip ahead and save the content with the only variant available:
 			variantIds.push(UmbVariantId.Create(options[0]));
-		} else {
+		} else if (this.#saveModalToken) {
 			// If there are multiple variants, we will open the modal to let the user pick which variants to save.
 			const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 			const result = await modalManagerContext
@@ -417,6 +433,8 @@ export abstract class UmbContentDetailWorkspaceBase<
 			if (!result?.selection.length) return;
 
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
+		} else {
+			throw new Error('No variant picker modal token is set. There are multiple variants to save. Cannot proceed.');
 		}
 
 		const saveData = await this._data.constructData(variantIds);
