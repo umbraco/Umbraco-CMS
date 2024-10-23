@@ -1,15 +1,15 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Blocks;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Templates;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0.LocalLinks;
 
-public class LocalLinkRteProcessor : LocalLinkProcessor
+public class LocalLinkRteProcessor
 {
-    public LocalLinkRteProcessor(HtmlLocalLinkParser localLinkParser, IIdKeyMap idKeyMap)
-        : base(localLinkParser, idKeyMap)
+    private readonly LocalLinkProcessor _localLinkProcessor;
+
+    public LocalLinkRteProcessor(LocalLinkProcessor localLinkProcessor)
     {
+        _localLinkProcessor = localLinkProcessor;
     }
 
     public bool ProcessRichText(object? value)
@@ -21,7 +21,7 @@ public class LocalLinkRteProcessor : LocalLinkProcessor
 
         bool hasChanged = false;
 
-        var newMarkup = ProcessStringValue(richTextValue.Markup);
+        var newMarkup = _localLinkProcessor.ProcessStringValue(richTextValue.Markup);
         if (newMarkup.Equals(richTextValue.Markup) == false)
         {
             hasChanged = true;
@@ -37,7 +37,7 @@ public class LocalLinkRteProcessor : LocalLinkProcessor
         {
             foreach (BlockPropertyValue blockPropertyValue in blockItemData.Values)
             {
-                if (ProcessToEditorValue(blockPropertyValue.Value))
+                if (_localLinkProcessor.ProcessToEditorValue(blockPropertyValue.Value))
                 {
                     hasChanged = true;
                 }

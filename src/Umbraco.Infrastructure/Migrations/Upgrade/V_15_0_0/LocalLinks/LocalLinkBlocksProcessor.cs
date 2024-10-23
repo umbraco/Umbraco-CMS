@@ -1,14 +1,14 @@
 using Umbraco.Cms.Core.Models.Blocks;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Templates;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0.LocalLinks;
 
-public class LocalLinkBlocksProcessor : LocalLinkProcessor
+public class LocalLinkBlocksProcessor
 {
-    public LocalLinkBlocksProcessor(HtmlLocalLinkParser localLinkParser, IIdKeyMap idKeyMap)
-        : base(localLinkParser, idKeyMap)
+    private readonly LocalLinkProcessor _localLinkProcessor;
+
+    public LocalLinkBlocksProcessor(LocalLinkProcessor localLinkProcessor)
     {
+        _localLinkProcessor = localLinkProcessor;
     }
 
     public bool ProcessBlocks(object? value)
@@ -24,7 +24,7 @@ public class LocalLinkBlocksProcessor : LocalLinkProcessor
         {
             foreach (BlockPropertyValue blockPropertyValue in blockItemData.Values)
             {
-                if (ProcessToEditorValue(blockPropertyValue.Value))
+                if (_localLinkProcessor.ProcessToEditorValue(blockPropertyValue.Value))
                 {
                     hasChanged = true;
                 }

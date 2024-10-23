@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -9,19 +10,16 @@ public class LocalLinkProcessor
 {
     private readonly HtmlLocalLinkParser _localLinkParser;
     private readonly IIdKeyMap _idKeyMap;
-    private List<ProcessorInformation> _processors = new ();
+    private List<ProcessorInformation> _processors;
 
     public LocalLinkProcessor(
         HtmlLocalLinkParser localLinkParser,
-        IIdKeyMap idKeyMap)
+        IIdKeyMap idKeyMap,
+        IOptions<ConvertLocalLinkOptions> options)
     {
         _localLinkParser = localLinkParser;
         _idKeyMap = idKeyMap;
-    }
-
-    public void Initialize(List<ProcessorInformation> processors)
-    {
-        _processors = processors;
+        _processors = options.Value.Processors;
     }
 
     public IEnumerable<string> GetSupportedPropertyEditorAliases() =>
@@ -34,7 +32,7 @@ public class LocalLinkProcessor
         return processor is not null && processor.Process.Invoke(editorValue);
     }
 
-    protected string ProcessStringValue(string input)
+    public string ProcessStringValue(string input)
     {
         // find all legacy tags
         IEnumerable<HtmlLocalLinkParser.LocalLinkTag> tags = _localLinkParser.FindLegacyLocalLinkIds(input);
