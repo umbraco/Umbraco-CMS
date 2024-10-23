@@ -40,7 +40,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @protected
 	 * @memberof UmbEntityWorkspaceContextBase
 	 */
-	protected readonly _data = new UmbEntityWorkspaceDataManager<DetailModelType>(this);
+	protected _data = new UmbEntityWorkspaceDataManager<DetailModelType>(this);
 
 	public readonly data = this._data.current;
 	public readonly entityType = this._data.createObservablePartOfCurrent((data) => data?.entityType);

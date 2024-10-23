@@ -16,7 +16,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbMediaTypeDetailModel } from '@umbraco-cms/backoffice/media-type';
 import {
 	UmbContentDetailWorkspaceBase,
-	UmbContentWorkspaceDataManager,
 	type UmbContentCollectionWorkspaceContext,
 	type UmbContentWorkspaceContext,
 } from '@umbraco-cms/backoffice/content';
@@ -31,12 +30,10 @@ export class UmbMediaWorkspaceContext
 		UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbMediaVariantModel>,
 		UmbContentCollectionWorkspaceContext<ContentTypeModel>
 {
-	readonly #data = new UmbContentWorkspaceDataManager<ContentModel>(this, UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD);
+	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.mediaType.unique);
+	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent((data) => !!data?.mediaType.collection);
 
-	readonly contentTypeUnique = this.#data.createObservablePartOfCurrent((data) => data?.mediaType.unique);
-	readonly contentTypeHasCollection = this.#data.createObservablePartOfCurrent((data) => !!data?.mediaType.collection);
-
-	readonly urls = this.#data.createObservablePartOfCurrent((data) => data?.urls || []);
+	readonly urls = this._data.createObservablePartOfCurrent((data) => data?.urls || []);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 
@@ -46,6 +43,7 @@ export class UmbMediaWorkspaceContext
 			workspaceAlias: UMB_MEDIA_WORKSPACE_ALIAS,
 			detailRepositoryAlias: UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbMediaTypeDetailRepository,
+			contentVariantScaffold: UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD,
 		});
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);

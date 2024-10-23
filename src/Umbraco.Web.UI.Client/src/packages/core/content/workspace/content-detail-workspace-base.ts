@@ -1,9 +1,9 @@
-import type { UmbContentDetailModel } from '../types.js';
+import type { UmbContentDetailModel, UmbElementValueModel } from '../types.js';
 import { UmbContentWorkspaceDataManager } from '../manager/index.js';
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbDetailRepository, UmbDetailRepositoryConstructor } from '@umbraco-cms/backoffice/repository';
 import {
 	UmbEntityDetailWorkspaceContextBase,
 	UmbWorkspaceSplitViewManager,
@@ -11,7 +11,12 @@ import {
 	type UmbEntityDetailWorkspaceContextCreateArgs,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbContentTypeStructureManager, type UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
-import { UMB_INVARIANT_CULTURE, UmbVariantId, type UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
+import {
+	UMB_INVARIANT_CULTURE,
+	UmbVariantId,
+	type UmbEntityVariantModel,
+	type UmbEntityVariantOptionModel,
+} from '@umbraco-cms/backoffice/variant';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import { appendToFrozenArray, mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -33,8 +38,9 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 
-export interface UmbContentDetailWorkspaceContextArgs extends UmbEntityDetailWorkspaceContextArgs {
-	contentTypeDetailRepository: UmbDetailRepository;
+export interface UmbContentDetailWorkspaceContextArgs<DetailModelType> extends UmbEntityDetailWorkspaceContextArgs {
+	contentTypeDetailRepository: UmbDetailRepositoryConstructor<DetailModelType>;
+	contentVariantScaffold: UmbEntityVariantModel;
 }
 
 export abstract class UmbContentDetailWorkspaceBase<
@@ -50,25 +56,18 @@ export abstract class UmbContentDetailWorkspaceBase<
 {
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 
-	protected override readonly _data = new UmbContentWorkspaceDataManager<DetailModelType>(
-		this,
-		UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
-	);
-
 	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
 
 	/* Content Data */
+	protected override _data: UmbContentWorkspaceDataManager<DetailModelType>;
 	public readonly values = this._data.createObservablePartOfCurrent((data) => data?.values);
 	public readonly variants = this._data.createObservablePartOfCurrent((data) => data?.variants ?? []);
 
 	/* Content Type (Structure) Data */
-	public readonly structure: UmbContentTypeStructureManager;
-
-	public readonly variesByCulture = this.structure.ownerContentTypeObservablePart((x) => x?.variesByCulture);
-	public readonly variesBySegment = this.structure.ownerContentTypeObservablePart((x) => x?.variesBySegment);
-	public readonly varies = this.structure.ownerContentTypeObservablePart((x) =>
-		x ? x.variesByCulture || x.variesBySegment : undefined,
-	);
+	public readonly structure;
+	public readonly variesByCulture;
+	public readonly variesBySegment;
+	public readonly varies;
 
 	/* Data Type */
 	readonly #dataTypeItemManager = new UmbDataTypeItemRepositoryManager(this);
@@ -91,42 +90,51 @@ export abstract class UmbContentDetailWorkspaceBase<
 	 */
 	public readonly languages = this.#languages.asObservable();
 
-	readonly variantOptions = mergeObservables(
-		[this.varies, this.variants, this.languages],
-		([varies, variants, languages]) => {
-			// TODO: When including segments, when be aware about the case of segment varying when not culture varying. [NL]
-			if (varies === true) {
-				return languages.map((language) => {
-					return {
-						variant: variants.find((x) => x.culture === language.unique),
-						language,
-						// TODO: When including segments, this object should be updated to include a object for the segment. [NL]
-						// TODO: When including segments, the unique should be updated to include the segment as well. [NL]
-						unique: language.unique, // This must be a variantId string!
-						culture: language.unique,
-						segment: null,
-					} as UmbDocumentVariantOptionModel;
-				});
-			} else if (varies === false) {
-				return [
-					{
-						variant: variants.find((x) => x.culture === null),
-						language: languages.find((x) => x.isDefault),
-						culture: null,
-						segment: null,
-						unique: UMB_INVARIANT_CULTURE, // This must be a variantId string!
-					} as UmbDocumentVariantOptionModel,
-				];
-			}
-			return [] as Array<UmbDocumentVariantOptionModel>;
-		},
-	).pipe(map((results) => results.sort(sortVariants)));
+	readonly variantOptions;
 
-	constructor(host: UmbControllerHost, args: UmbContentDetailWorkspaceContextArgs) {
+	constructor(host: UmbControllerHost, args: UmbContentDetailWorkspaceContextArgs<DetailModelType>) {
 		super(host, args);
+
+		this._data = new UmbContentWorkspaceDataManager<DetailModelType>(this, args.contentVariantScaffold);
 
 		const contentTypeDetailRepository = new args.contentTypeDetailRepository(this);
 		this.structure = new UmbContentTypeStructureManager(this, contentTypeDetailRepository);
+		this.variesByCulture = this.structure.ownerContentTypeObservablePart((x) => x?.variesByCulture);
+		this.variesBySegment = this.structure.ownerContentTypeObservablePart((x) => x?.variesBySegment);
+		this.varies = this.structure.ownerContentTypeObservablePart((x) =>
+			x ? x.variesByCulture || x.variesBySegment : undefined,
+		);
+
+		this.variantOptions = mergeObservables(
+			[this.varies, this.variants, this.languages],
+			([varies, variants, languages]) => {
+				// TODO: When including segments, when be aware about the case of segment varying when not culture varying. [NL]
+				if (varies === true) {
+					return languages.map((language) => {
+						return {
+							variant: variants.find((x) => x.culture === language.unique),
+							language,
+							// TODO: When including segments, this object should be updated to include a object for the segment. [NL]
+							// TODO: When including segments, the unique should be updated to include the segment as well. [NL]
+							unique: language.unique, // This must be a variantId string!
+							culture: language.unique,
+							segment: null,
+						} as UmbEntityVariantOptionModel;
+					});
+				} else if (varies === false) {
+					return [
+						{
+							variant: variants.find((x) => x.culture === null),
+							language: languages.find((x) => x.isDefault),
+							culture: null,
+							segment: null,
+							unique: UMB_INVARIANT_CULTURE, // This must be a variantId string!
+						} as UmbEntityVariantOptionModel,
+					];
+				}
+				return [] as Array<UmbEntityVariantOptionModel>;
+			},
+		);
 
 		this.addValidationContext(new UmbValidationContext(this));
 		new UmbVariantValuesValidationPathTranslator(this);
@@ -286,7 +294,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 			throw new Error(`Editor Alias of "${property.dataType.unique}" not found.`);
 		}
 
-		const entry = { ...variantId.toObject(), alias, editorAlias, value } as UmbDocumentValueModel<ValueType>;
+		const entry = { ...variantId.toObject(), alias, editorAlias, value } as UmbElementValueModel;
 
 		const currentData = this.getData();
 		if (currentData) {

@@ -1,6 +1,7 @@
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
 import { UmbDocumentPropertyDatasetContext } from '../property-dataset-context/document-property-dataset-context.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
+import type { UmbDocumentDetailRepository } from '../repository/index.js';
 import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import type { UmbDocumentVariantPublishModel, UmbDocumentDetailModel, UmbDocumentVariantModel } from '../types.js';
 import {
@@ -18,7 +19,7 @@ import {
 } from '../paths.js';
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../collection/index.js';
-import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
+import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
@@ -46,7 +47,12 @@ type EntityModel = UmbDocumentDetailModel;
 type EntityTypeModel = UmbDocumentTypeDetailModel;
 
 export class UmbDocumentWorkspaceContext
-	extends UmbContentDetailWorkspaceBase<EntityModel>
+	extends UmbContentDetailWorkspaceBase<
+		EntityModel,
+		UmbDocumentDetailRepository,
+		EntityTypeModel,
+		UmbDocumentVariantModel
+	>
 	implements
 		UmbContentWorkspaceContext<EntityModel, EntityTypeModel, UmbDocumentVariantModel>,
 		UmbPublishableWorkspaceContext,
@@ -73,6 +79,7 @@ export class UmbDocumentWorkspaceContext
 			workspaceAlias: UMB_DOCUMENT_WORKSPACE_ALIAS,
 			detailRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbDocumentTypeDetailRepository,
+			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
 		});
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
@@ -140,7 +147,6 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {
-		this.resetState();
 		this.#parent.setValue(parent);
 
 		if (blueprintUnique) {

@@ -13,6 +13,7 @@ export interface UmbPropertyTypeContainerModel {
 
 export interface UmbContentTypeModel {
 	unique: string;
+	entityType: string;
 	name: string;
 	alias: string;
 	description: string;
