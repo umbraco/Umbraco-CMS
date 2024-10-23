@@ -102,7 +102,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
     {
         var success = true;
 
-        foreach (IPropertyType propertyType in propertyTypes)
+        // TODO BMB: clean up (remove .Where(...))
+        foreach (IPropertyType propertyType in propertyTypes.Where(pt => pt.Id == 279))
         {
             try
             {
@@ -137,13 +138,20 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                 var progress = 0;
 
                 ExecutionContext.SuppressFlow();
-                Parallel.ForEach(updateBatch, new ParallelOptions()
+                Parallel.ForEach(updateBatch, new ParallelOptions { MaxDegreeOfParallelism = 1 }, HandleUpdate);
+                ExecutionContext.RestoreFlow();
+
+                // TODO BMB: clean up
+                // foreach (UpdateBatch<PropertyDataDto> update in updateBatch)
+                // {
+                //     HandleUpdate(update);
+                // }
+
+                void HandleUpdate(UpdateBatch<PropertyDataDto> update)
                 {
-                    MaxDegreeOfParallelism = 1
-                } , update =>
-                {
-                    using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-                    scope.Complete();
+                    // TODO BMB: clean up
+                    // using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+                    // scope.Complete();
                     using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
                     progress++;
@@ -242,8 +250,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                     stringValue = UpdateDatabaseValue(stringValue);
 
                     propertyDataDto.TextValue = stringValue;
-                });
-                ExecutionContext.RestoreFlow();
+                }
 
                 updateBatch.RemoveAll(updatesToSkip.Contains);
 
@@ -282,6 +289,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
             }
         }
 
+        // TODO BMB: clean up (added so the migration will be re-runnable)
+        throw new NotImplementedException("TODO: REMOVE THIS");
         return success;
     }
 

@@ -72,15 +72,24 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
     public async Task<IPublishedContent?> GetByKeyAsync(Guid key, bool? preview = null)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        // TODO BMB: clean up
+
+        // using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         bool calculatedPreview = preview ?? GetPreview();
 
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
             GetCacheKey(key, calculatedPreview), // Unique key to the cache entry
-            async cancel => await _databaseCacheRepository.GetContentSourceAsync(key, calculatedPreview));
+            async cancel =>
+            {
+                // TODO BMB: clean up inner scope if applicable
+                using ICoreScope factoryScope = _scopeProvider.CreateCoreScope();
+                ContentCacheNode? result = await _databaseCacheRepository.GetContentSourceAsync(key, calculatedPreview).ConfigureAwait(false);
+                factoryScope.Complete();
+                return result;
+            });
 
-        scope.Complete();
+        // scope.Complete();
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, calculatedPreview).CreateModel(_publishedModelFactory);
     }
 
