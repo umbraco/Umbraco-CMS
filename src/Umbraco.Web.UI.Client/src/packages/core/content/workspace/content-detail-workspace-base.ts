@@ -93,7 +93,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 		this._data = new UmbContentWorkspaceDataManager<DetailModelType>(this, args.contentVariantScaffold);
 
 		const contentTypeDetailRepository = new args.contentTypeDetailRepository(this);
-		this.structure = new UmbContentTypeStructureManager(this, contentTypeDetailRepository);
+		this.structure = new UmbContentTypeStructureManager<ContentTypeDetailModel>(this, contentTypeDetailRepository);
 		this.variesByCulture = this.structure.ownerContentTypeObservablePart((x) => x?.variesByCulture);
 		this.variesBySegment = this.structure.ownerContentTypeObservablePart((x) => x?.variesBySegment);
 		this.varies = this.structure.ownerContentTypeObservablePart((x) =>
