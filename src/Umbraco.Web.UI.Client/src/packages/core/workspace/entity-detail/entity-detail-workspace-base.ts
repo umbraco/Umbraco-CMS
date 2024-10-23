@@ -86,6 +86,18 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return this._data.getCurrent()?.unique;
 	}
 
+	getParent() {
+		return this.#parent.getValue();
+	}
+
+	getParentUnique() {
+		return this.#parent.getValue()?.unique;
+	}
+
+	getParentEntityType() {
+		return this.#parent.getValue()?.entityType;
+	}
+
 	async load(unique: string) {
 		await this.#init;
 		this.resetState();
