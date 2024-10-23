@@ -21,6 +21,8 @@ export class UmbMemberWorkspaceContext
 {
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.memberType.unique);
 	readonly kind = this._data.createObservablePartOfCurrent((data) => data?.kind);
+	readonly createDate = this._data.createObservablePartOfCurrent((data) => data?.variants[0].createDate);
+	readonly updateDate = this._data.createObservablePartOfCurrent((data) => data?.variants[0].updateDate);
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
