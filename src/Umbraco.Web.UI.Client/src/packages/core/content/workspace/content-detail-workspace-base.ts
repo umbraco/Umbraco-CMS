@@ -132,8 +132,6 @@ export abstract class UmbContentDetailWorkspaceBase<
 		new UmbVariantValuesValidationPathTranslator(this);
 		new UmbVariantsValidationPathTranslator(this);
 
-		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
-
 		this.observe(
 			this.varies,
 			(varies) => {
@@ -368,6 +366,11 @@ export abstract class UmbContentDetailWorkspaceBase<
 	}
 
 	async #handleSubmit() {
+		const data = this.getData();
+		if (!data) {
+			throw new Error('Data is missing');
+		}
+
 		const { options, selected } = await this._determineVariantOptions();
 
 		let variantIds: Array<UmbVariantId> = [];
