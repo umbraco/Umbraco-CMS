@@ -147,36 +147,29 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {
-		this.#parent.setValue(parent);
-
 		if (blueprintUnique) {
 			const blueprintRepository = new UmbDocumentBlueprintDetailRepository(this);
 			const { data } = await blueprintRepository.requestByUnique(blueprintUnique);
 
-			this.#getDataPromise = this.repository.createScaffold({
-				documentType: data?.documentType,
-				values: data?.values,
-				variants: data?.variants as Array<UmbDocumentVariantModel>,
-			});
-		} else {
-			this.#getDataPromise = this.repository.createScaffold({
-				documentType: {
-					unique: documentTypeUnique,
-					collection: null,
+			return this.createScaffold({
+				parent,
+				preset: {
+					documentType: data?.documentType,
+					values: data?.values,
+					variants: data?.variants as Array<UmbDocumentVariantModel>,
 				},
 			});
 		}
 
-		const { data } = await this.#getDataPromise;
-		if (!data) return undefined;
-
-		this.#entityContext.setEntityType(UMB_DOCUMENT_ENTITY_TYPE);
-		this.#entityContext.setUnique(data.unique);
-		this.#isTrashedContext.setIsTrashed(data.isTrashed);
-		this.setIsNew(true);
-		this.#data.setPersisted(undefined);
-		this.#data.setCurrent(data);
-		return data;
+		return this.createScaffold({
+			parent,
+			preset: {
+				documentType: {
+					unique: documentTypeUnique,
+					collection: null,
+				},
+			},
+		});
 	}
 
 	getCollectionAlias() {
