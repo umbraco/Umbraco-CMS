@@ -1,6 +1,7 @@
 import { UmbMediaTypeDetailRepository } from '../../media-types/repository/detail/media-type-detail.repository.js';
 import { UmbMediaPropertyDatasetContext } from '../property-dataset-context/media-property-dataset-context.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
+import type { UmbMediaDetailRepository } from '../repository/index.js';
 import { UMB_MEDIA_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import type { UmbMediaDetailModel, UmbMediaVariantModel } from '../types.js';
 import { UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN, UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../paths.js';
@@ -25,7 +26,7 @@ type ContentModel = UmbMediaDetailModel;
 type ContentTypeModel = UmbMediaTypeDetailModel;
 
 export class UmbMediaWorkspaceContext
-	extends UmbContentDetailWorkspaceBase<ContentModel>
+	extends UmbContentDetailWorkspaceBase<ContentModel, UmbMediaDetailRepository, ContentTypeModel, UmbMediaVariantModel>
 	implements
 		UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbMediaVariantModel>,
 		UmbContentCollectionWorkspaceContext<ContentTypeModel>
