@@ -137,7 +137,10 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                 var progress = 0;
 
                 ExecutionContext.SuppressFlow();
-                Parallel.ForEach(updateBatch,  update =>
+                Parallel.ForEach(updateBatch, new ParallelOptions()
+                {
+                    MaxDegreeOfParallelism = 1
+                } , update =>
                 {
                     using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
                     scope.Complete();
