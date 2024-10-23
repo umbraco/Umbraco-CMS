@@ -128,6 +128,8 @@ internal sealed class ContentEditingService
 
         var allowedCultures = (await _languageService.GetIsoCodesByIdsAsync(allowedLanguageIds)).ToHashSet();
 
+        ILanguage? defaultLanguage = await _languageService.GetDefaultLanguageAsync();
+
         foreach (var culture in contentWithPotentialUnallowedChanges.EditedCultures ?? contentWithPotentialUnallowedChanges.PublishedCultures)
         {
             if (allowedCultures.Contains(culture))
@@ -148,21 +150,26 @@ internal sealed class ContentEditingService
 
                 // if the property does not vary by culture and the data editor supports variance within invariant property values,
                 // we need perform a merge between the edited property value and the current property value
-                if (_propertyEditorCollection.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor))
+                if (_propertyEditorCollection.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor) && dataEditor.CanMergePartialPropertyValues(property.PropertyType))
                 {
                     var currentValue = existingContent?.Properties.First(x => x.Alias == property.Alias).GetValue(null, null, false);
+                    var editedValue = contentWithPotentialUnallowedChanges.Properties.First(x => x.Alias == property.Alias).GetValue(null, null, false);
+                    var mergedValue = dataEditor.MergePartialPropertyValueForCulture(currentValue, editedValue, culture);
 
                     // If we are not allowed to edit invariant properties, overwrite the edited property value with the current property value.
-                    if(_contentSettings.AllowEditInvariantFromNonDefault is false)
+                    if (_contentSettings.AllowEditInvariantFromNonDefault is false && culture == defaultLanguage?.IsoCode)
                     {
-                        property.SetValue(currentValue, null, null);
+                        mergedValue = dataEditor.MergePartialPropertyValueForCulture(currentValue, editedValue, null);
                     }
-                    else if(dataEditor.CanMergePartialPropertyValues(property.PropertyType))
-                    {
-                        var editedValue = contentWithPotentialUnallowedChanges.Properties.First(x => x.Alias == property.Alias).GetValue(null, null, false);
-                        var mergedValue = dataEditor.MergePartialPropertyValueForCulture(currentValue, editedValue, culture);
-                        property.SetValue(mergedValue, null, null);
-                    }
+
+                    property.SetValue(mergedValue, null, null);
+                }
+
+                // If property does not support merging, we still need to overwrite if we are not allowed to edit invariant properties.
+                else if (_contentSettings.AllowEditInvariantFromNonDefault is false && culture == defaultLanguage?.IsoCode)
+                {
+                    var currentValue = existingContent?.Properties.First(x => x.Alias == property.Alias).GetValue(null, null, false);
+                    property.SetValue(currentValue, null, null);
                 }
             }
         }
