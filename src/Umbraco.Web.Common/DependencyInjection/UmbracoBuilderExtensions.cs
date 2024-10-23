@@ -195,6 +195,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddHostedService<RecurringBackgroundJobHostedServiceRunner>();
         builder.Services.AddHostedService<QueuedHostedService>();
         builder.Services.AddHostedService<NavigationInitializationHostedService>();
+        builder.Services.AddHostedService<PublishStatusInitializationHostedService>();
 
         return builder;
     }

@@ -171,7 +171,7 @@ public class ContentNavigationServiceBaseTests
     [TestCase("D63C1621-C74A-4106-8587-817DEE5FB732", new[] { "56E29EA9-E224-4210-A59F-7C2C5C0C5CC7" })] // Grandchild 3
     [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", new string[0])] // Great-grandchild 1
     [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", new[] { "F381906C-223C-4466-80F7-B63B4EE073F8" })] // Child 3
-    public void Can_Get_Children_From_Existing_Content_Key_In_Correct_Order(Guid parentKey, string[] children)
+    public void Can_Get_Children_From_Existing_Content_Key_In_Their_Order_Of_Creation(Guid parentKey, string[] children)
     {
         // Arrange
         Guid[] expectedChildren = Array.ConvertAll(children, Guid.Parse);
@@ -235,7 +235,7 @@ public class ContentNavigationServiceBaseTests
     [TestCase("D63C1621-C74A-4106-8587-817DEE5FB732", new[] { "56E29EA9-E224-4210-A59F-7C2C5C0C5CC7" })] // Grandchild 3
     [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", new string[0])] // Great-grandchild 1
     [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", new[] { "F381906C-223C-4466-80F7-B63B4EE073F8" })] // Child 3
-    public void Can_Get_Descendants_From_Existing_Content_Key_In_Correct_Order(Guid parentKey, string[] descendants)
+    public void Can_Get_Descendants_From_Existing_Content_Key_In_Their_Order_Of_Creation(Guid parentKey, string[] descendants)
     {
         // Arrange
         Guid[] expectedDescendants = Array.ConvertAll(descendants, Guid.Parse);
@@ -296,7 +296,7 @@ public class ContentNavigationServiceBaseTests
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", new[] { "E48DD82A-7059-418E-9B82-CDD5205796CF" })] // Child 1
     [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", new[] { "C6173927-0C59-4778-825D-D7B9F45D8DDE", "E48DD82A-7059-418E-9B82-CDD5205796CF" })] // Grandchild 1
     [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", new[] { "D63C1621-C74A-4106-8587-817DEE5FB732", "60E0E5C4-084E-4144-A560-7393BEAD2E96", "E48DD82A-7059-418E-9B82-CDD5205796CF" })] // Great-grandchild 1
-    public void Can_Get_Ancestors_From_Existing_Content_Key_In_Correct_Order(Guid childKey, string[] ancestors)
+    public void Can_Get_Ancestors_From_Existing_Content_Key_In_Correct_Order_Of_Creation(Guid childKey, string[] ancestors)
     {
         // Arrange
         Guid[] expectedAncestors = Array.ConvertAll(ancestors, Guid.Parse);
@@ -395,7 +395,7 @@ public class ContentNavigationServiceBaseTests
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", new string[0])] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", new[] { "60E0E5C4-084E-4144-A560-7393BEAD2E96", "B606E3FF-E070-4D46-8CB9-D31352029FDF" })] // Child 1 - Child 2, Child 3
     [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", new[] { "A1B1B217-B02F-4307-862C-A5E22DB729EB" })] // Grandchild 1 - Grandchild 2
-    public void Can_Get_Siblings_Of_Existing_Content_Key_In_Correct_Order(Guid childKey, string[] siblings)
+    public void Can_Get_Siblings_Of_Existing_Content_Key_In_Their_Order_Of_Creation(Guid childKey, string[] siblings)
     {
         // Arrange
         Guid[] expectedSiblings = Array.ConvertAll(siblings, Guid.Parse);
@@ -508,6 +508,30 @@ public class ContentNavigationServiceBaseTests
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
+    [TestCase("A1B1B217-B02F-4307-862C-A5E22DB729EB")] // Grandchild 2
+    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96")] // Child 2
+    [TestCase("D63C1621-C74A-4106-8587-817DEE5FB732")] // Grandchild 3
+    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7")] // Great-grandchild 1
+    public void Moving_Node_To_Bin_Adds_It_To_Recycle_Bin_Root_As_The_Last_Item(Guid keyOfNodeToRemove)
+    {
+        // Arrange
+        Guid nodeInRecycleBin1 = Grandchild1;
+        Guid nodeInRecycleBin2 = Child3;
+        _navigationService.MoveToBin(nodeInRecycleBin1);
+        _navigationService.MoveToBin(nodeInRecycleBin2);
+
+        // Act
+        _navigationService.MoveToBin(keyOfNodeToRemove);
+
+        // Assert
+        _navigationService.TryGetSiblingsKeysInBin(nodeInRecycleBin1, out IEnumerable<Guid> siblingsInBin);
+
+        Assert.AreEqual(siblingsInBin.Last(), keyOfNodeToRemove);
+    }
+
+    [Test]
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
+    [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
     [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF")] // Child 3
     [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7")] // Great-grandchild 1
     public void Moving_Node_To_Bin_Adds_Its_Descendants_To_Recycle_Bin_As_Well(Guid keyOfNodeToRemove)
@@ -605,6 +629,30 @@ public class ContentNavigationServiceBaseTests
             Assert.AreEqual(currentChildrenCount + 1, newChildrenList.Count);
             Assert.IsTrue(newChildrenList.Any(childKey => childKey == newNodeKey));
         });
+    }
+
+    [Test]
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
+    [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
+    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573")] // Grandchild 1
+    [TestCase("A1B1B217-B02F-4307-862C-A5E22DB729EB")] // Grandchild 2
+    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96")] // Child 2
+    [TestCase("D63C1621-C74A-4106-8587-817DEE5FB732")] // Grandchild 3
+    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7")] // Great-grandchild 1
+    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF")] // Child 3
+    [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8")] // Grandchild 4
+    public void Adding_Node_To_Parent_Adds_It_As_The_Last_Child(Guid parentKey)
+    {
+        // Arrange
+        var newNodeKey = Guid.NewGuid();
+
+        // Act
+        _navigationService.Add(newNodeKey, parentKey);
+
+        // Assert
+        _navigationService.TryGetChildrenKeys(parentKey, out IEnumerable<Guid> childrenKeys);
+
+        Assert.AreEqual(newNodeKey, childrenKeys.Last());
     }
 
     [Test]
@@ -770,10 +818,32 @@ public class ContentNavigationServiceBaseTests
     }
 
     [Test]
-    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", "60E0E5C4-084E-4144-A560-7393BEAD2E96", 0)] // Grandchild 1 to Child 2
-    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", null, 1)] // Child 3 to content root
-    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", "C6173927-0C59-4778-825D-D7B9F45D8DDE", 2)] // Child 2 to Child 1
-    public void Moved_Node_Has_The_Same_Amount_Of_Descendants(Guid nodeToMove, Guid? targetParentKey, int initialDescendantsCount)
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
+    [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
+    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573")] // Grandchild 1
+    [TestCase("A1B1B217-B02F-4307-862C-A5E22DB729EB")] // Grandchild 2
+    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96")] // Child 2
+    [TestCase("D63C1621-C74A-4106-8587-817DEE5FB732")] // Grandchild 3
+    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7")] // Great-grandchild 1
+    public void Moving_Node_To_Parent_Adds_It_As_The_Last_Child(Guid targetParentKey)
+    {
+        // Arrange
+        Guid nodeToMove = Grandchild4;
+
+        // Act
+        _navigationService.Move(nodeToMove, targetParentKey);
+
+        // Assert
+        _navigationService.TryGetChildrenKeys(targetParentKey, out IEnumerable<Guid> childrenKeys);
+
+        Assert.AreEqual(nodeToMove, childrenKeys.Last());
+    }
+
+    [Test]
+    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", 1, "60E0E5C4-084E-4144-A560-7393BEAD2E96", 0)] // Grandchild 1 to Child 2
+    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", 1, null, 1)] // Child 3 to content root
+    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", 2, "C6173927-0C59-4778-825D-D7B9F45D8DDE", 2)] // Child 2 to Child 1
+    public void Moved_Node_Has_The_Same_Amount_Of_Descendants(Guid nodeToMove, int sortOrder, Guid? targetParentKey, int initialDescendantsCount)
     {
         // Act
         var result = _navigationService.Move(nodeToMove, targetParentKey);
@@ -789,10 +859,10 @@ public class ContentNavigationServiceBaseTests
     }
 
     [Test]
-    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", "A1B1B217-B02F-4307-862C-A5E22DB729EB", 0)] // Child 3 to Grandchild 2
-    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", "B606E3FF-E070-4D46-8CB9-D31352029FDF", 1)] // Child 2 to Child 3
-    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", "60E0E5C4-084E-4144-A560-7393BEAD2E96", 2)] // Grandchild 1 to Child 2
-    public void Number_Of_Target_Parent_Descendants_Updates_When_Moving_Node_With_Descendants(Guid nodeToMove, Guid targetParentKey, int initialDescendantsCountOfTargetParent)
+    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", 0, "A1B1B217-B02F-4307-862C-A5E22DB729EB", 0)] // Child 3 to Grandchild 2
+    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", 1, "B606E3FF-E070-4D46-8CB9-D31352029FDF", 1)] // Child 2 to Child 3
+    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", 1, "60E0E5C4-084E-4144-A560-7393BEAD2E96", 2)] // Grandchild 1 to Child 2
+    public void Number_Of_Target_Parent_Descendants_Updates_When_Moving_Node_With_Descendants(Guid nodeToMove, int sortOrder, Guid targetParentKey, int initialDescendantsCountOfTargetParent)
     {
         // Arrange
         // Get the number of descendants of the node to move

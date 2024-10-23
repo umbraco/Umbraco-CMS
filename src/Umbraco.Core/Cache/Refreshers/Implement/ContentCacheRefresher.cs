@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -22,6 +20,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private readonly IDocumentNavigationManagementService _documentNavigationManagementService;
     private readonly IContentService _contentService;
+    private readonly IPublishStatusManagementService _publishStatusManagementService;
     private readonly IIdKeyMap _idKeyMap;
 
     public ContentCacheRefresher(
@@ -35,7 +34,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         IDomainCacheService domainCacheService,
         IDocumentNavigationQueryService documentNavigationQueryService,
         IDocumentNavigationManagementService documentNavigationManagementService,
-        IContentService contentService)
+        IContentService contentService,
+        IPublishStatusManagementService publishStatusManagementService)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
@@ -45,6 +45,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         _documentNavigationQueryService = documentNavigationQueryService;
         _documentNavigationManagementService = documentNavigationManagementService;
         _contentService = contentService;
+        _publishStatusManagementService = publishStatusManagementService;
     }
 
     #region Indirect
@@ -109,6 +110,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             HandleRouting(payload);
 
             HandleNavigation(payload);
+            HandlePublishedAsync(payload, CancellationToken.None).GetAwaiter().GetResult();
             _idKeyMap.ClearCache(payload.Id);
             if (payload.Key.HasValue)
             {
@@ -143,6 +145,13 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     private void HandleNavigation(JsonPayload payload)
     {
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
+        {
+            _documentNavigationManagementService.RebuildAsync();
+            _documentNavigationManagementService.RebuildBinAsync();
+        }
+
         if (payload.Key is null)
         {
             return;
@@ -154,15 +163,9 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             _documentNavigationManagementService.RemoveFromBin(payload.Key.Value);
         }
 
-        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
-        {
-            _documentNavigationManagementService.RebuildAsync();
-            _documentNavigationManagementService.RebuildBinAsync();
-        }
-
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
         {
-            IContent? content = _contentService.GetById(payload.Id);
+            IContent? content = _contentService.GetById(payload.Key.Value);
 
             if (content is null)
             {
@@ -174,7 +177,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
         {
-            IContent? content = _contentService.GetById(payload.Id);
+            IContent? content = _contentService.GetById(payload.Key.Value);
 
             if (content is null)
             {
@@ -194,7 +197,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         // First creation
         if (ExistsInNavigation(content.Key) is false && ExistsInNavigationBin(content.Key) is false)
         {
-            _documentNavigationManagementService.Add(content.Key, GetParentKey(content));
+            _documentNavigationManagementService.Add(content.Key, GetParentKey(content), content.SortOrder);
             if (content.Trashed)
             {
                 // If created as trashed, move to bin
@@ -210,14 +213,20 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             }
             else
             {
-                // It must have been saved. Check if parent is different
-                if (_documentNavigationQueryService.TryGetParentKey(content.Key, out var oldParentKey))
+                if (_documentNavigationQueryService.TryGetParentKey(content.Key, out Guid? oldParentKey) is false)
                 {
-                    Guid? newParentKey = GetParentKey(content);
-                    if (oldParentKey != newParentKey)
-                    {
-                        _documentNavigationManagementService.Move(content.Key, newParentKey);
-                    }
+                    return;
+                }
+
+                // It must have been saved. Check if parent is different
+                Guid? newParentKey = GetParentKey(content);
+                if (oldParentKey != newParentKey)
+                {
+                    _documentNavigationManagementService.Move(content.Key, newParentKey);
+                }
+                else
+                {
+                    _documentNavigationManagementService.UpdateSortOrder(content.Key, content.SortOrder);
                 }
             }
         }
@@ -237,6 +246,32 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     private bool ExistsInNavigationBin(Guid contentKey) => _documentNavigationQueryService.TryGetParentKeyInBin(contentKey, out _);
 
+    private async Task HandlePublishedAsync(JsonPayload payload, CancellationToken cancellationToken)
+    {
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
+        {
+            await _publishStatusManagementService.InitializeAsync(cancellationToken);
+        }
+
+        if (payload.Key.HasValue is false)
+        {
+            return;
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+        {
+            await _publishStatusManagementService.RemoveAsync(payload.Key.Value, cancellationToken);
+        }
+        else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
+        {
+            await _publishStatusManagementService.AddOrUpdateStatusAsync(payload.Key.Value, cancellationToken);
+        }
+        else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
+        {
+            await _publishStatusManagementService.AddOrUpdateStatusWithDescendantsAsync(payload.Key.Value, cancellationToken);
+        }
+    }
     private void HandleRouting(JsonPayload payload)
     {
         if(payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
