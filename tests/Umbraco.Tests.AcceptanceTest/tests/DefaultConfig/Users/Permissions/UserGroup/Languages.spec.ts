@@ -43,8 +43,8 @@ const cultureVariants = [
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.user.ensureNameNotExists(testUser.name);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode)
-  await umbracoApi.language.ensureIsoCodeNotExists(vietnameseIsoCode)
+  await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode);
+  await umbracoApi.language.ensureIsoCodeNotExists(vietnameseIsoCode);
   await umbracoApi.language.createDanishLanguage();
   await umbracoApi.language.createVietnameseLanguage();
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
@@ -58,7 +58,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
   await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode);
-  await umbracoApi.language.ensureIsoCodeNotExists(vietnameseIsoCode)
+  await umbracoApi.language.ensureIsoCodeNotExists(vietnameseIsoCode);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
