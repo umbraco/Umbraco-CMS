@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -23,7 +22,6 @@ public class ConvertLocalLinks : MigrationBase
     private readonly ILanguageService _languageService;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly LocalLinkProcessor _convertLocalLinkProcessor;
-    private readonly IOptions<ConvertLocalLinkOptions> _options;
 
     public ConvertLocalLinks(
         IMigrationContext context,
@@ -33,8 +31,7 @@ public class ConvertLocalLinks : MigrationBase
         IDataTypeService dataTypeService,
         ILanguageService languageService,
         IJsonSerializer jsonSerializer,
-        LocalLinkProcessor convertLocalLinkProcessor,
-        IOptions<ConvertLocalLinkOptions> options)
+        LocalLinkProcessor convertLocalLinkProcessor)
         : base(context)
     {
         _umbracoContextFactory = umbracoContextFactory;
@@ -44,12 +41,10 @@ public class ConvertLocalLinks : MigrationBase
         _languageService = languageService;
         _jsonSerializer = jsonSerializer;
         _convertLocalLinkProcessor = convertLocalLinkProcessor;
-        _options = options;
     }
 
     protected override void Migrate()
     {
-        _convertLocalLinkProcessor.Initialize(_options.Value.Processors);
         IEnumerable<string> propertyEditorAliases = _convertLocalLinkProcessor.GetSupportedPropertyEditorAliases();
 
         using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();

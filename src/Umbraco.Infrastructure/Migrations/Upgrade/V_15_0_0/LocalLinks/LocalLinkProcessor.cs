@@ -10,24 +10,24 @@ public class LocalLinkProcessor
 {
     private readonly HtmlLocalLinkParser _localLinkParser;
     private readonly IIdKeyMap _idKeyMap;
-    private List<ProcessorInformation> _processors;
+    private readonly Lazy<IOptions<ConvertLocalLinkOptions>> _lazyOptions;
 
     public LocalLinkProcessor(
         HtmlLocalLinkParser localLinkParser,
         IIdKeyMap idKeyMap,
-        IOptions<ConvertLocalLinkOptions> options)
+        Lazy<IOptions<ConvertLocalLinkOptions>> lazyOptions)
     {
         _localLinkParser = localLinkParser;
         _idKeyMap = idKeyMap;
-        _processors = options.Value.Processors;
+        _lazyOptions = lazyOptions;
     }
 
     public IEnumerable<string> GetSupportedPropertyEditorAliases() =>
-        _processors.SelectMany(p => p.PropertyEditorAliases);
+        _lazyOptions.Value.Value.Processors.SelectMany(p => p.PropertyEditorAliases);
 
     public bool ProcessToEditorValue(object? editorValue)
     {
-        ProcessorInformation? processor = _processors.FirstOrDefault(p => p.PropertyEditorValueType == editorValue?.GetType());
+        ProcessorInformation? processor = _lazyOptions.Value.Value.Processors.FirstOrDefault(p => p.PropertyEditorValueType == editorValue?.GetType());
 
         return processor is not null && processor.Process.Invoke(editorValue);
     }
@@ -35,7 +35,7 @@ public class LocalLinkProcessor
     public string ProcessStringValue(string input)
     {
         // find all legacy tags
-        IEnumerable<HtmlLocalLinkParser.LocalLinkTag> tags = _localLinkParser.FindLegacyLocalLinkIds(input);
+        var tags = _localLinkParser.FindLegacyLocalLinkIds(input).ToList();
 
         foreach (HtmlLocalLinkParser.LocalLinkTag tag in tags)
         {

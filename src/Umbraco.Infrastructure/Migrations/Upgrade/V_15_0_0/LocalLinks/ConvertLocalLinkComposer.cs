@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Extensions;
@@ -17,8 +18,8 @@ public class ConvertLocalLinkProcessorComposer : IComposer
         builder.Services.AddUnique<LocalLinkProcessor>(provider =>
             new LocalLinkProcessor(
                 provider.GetRequiredService<HtmlLocalLinkParser>(),
-                provider.GetRequiredService<IdKeyMap>(),
-                provider.GetRequiredService<IOptions<ConvertLocalLinkOptions>>()));
+                provider.GetRequiredService<IIdKeyMap>(),
+                provider.GetRequiredService<Lazy<IOptions<ConvertLocalLinkOptions>>>()));
         builder.Services.AddUnique<LocalLinkBlocksProcessor>(provider => new LocalLinkBlocksProcessor(provider.GetRequiredService<LocalLinkProcessor>()));
         builder.Services.AddUnique<LocalLinkRteProcessor>(provider => new LocalLinkRteProcessor(provider.GetRequiredService<LocalLinkProcessor>()));
         builder.Services.ConfigureOptions<ConfigureConvertLocalLinkOptions>();
@@ -47,8 +48,13 @@ public class ConfigureConvertLocalLinkOptions : IConfigureOptions<ConvertLocalLi
             _linkLinkRteProcessor.ProcessRichText));
 
         options.Processors.Add(new ProcessorInformation(
-            typeof(RichTextEditorValue),
-            [Constants.PropertyEditors.Aliases.BlockList, Constants.PropertyEditors.Aliases.BlockGrid],
+            typeof(BlockListValue),
+            [Constants.PropertyEditors.Aliases.BlockList],
+            _localLinkBlocksProcessor.ProcessBlocks));
+
+        options.Processors.Add(new ProcessorInformation(
+            typeof(BlockGridValue),
+            [Constants.PropertyEditors.Aliases.BlockGrid],
             _localLinkBlocksProcessor.ProcessBlocks));
     }
 }
