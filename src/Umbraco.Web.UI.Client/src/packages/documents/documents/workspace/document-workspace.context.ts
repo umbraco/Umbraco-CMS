@@ -7,6 +7,7 @@ import type { UmbDocumentVariantPublishModel, UmbDocumentDetailModel, UmbDocumen
 import {
 	UMB_DOCUMENT_PUBLISH_MODAL,
 	UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL,
+	UMB_DOCUMENT_SAVE_MODAL,
 	UMB_DOCUMENT_SCHEDULE_MODAL,
 } from '../modals/index.js';
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
@@ -80,6 +81,7 @@ export class UmbDocumentWorkspaceContext
 			detailRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbDocumentTypeDetailRepository,
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
+			saveModalToken: UMB_DOCUMENT_SAVE_MODAL,
 		});
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
