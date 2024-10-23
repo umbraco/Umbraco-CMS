@@ -1,5 +1,6 @@
 import type { UmbContentDetailModel } from '../types.js';
 import { UmbContentWorkspaceDataManager } from '../manager/index.js';
+import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
@@ -18,10 +19,19 @@ import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@u
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import {
+	UMB_VALIDATION_CONTEXT,
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+	UmbDataPathVariantQuery,
 	UmbValidationContext,
 	UmbVariantsValidationPathTranslator,
 	UmbVariantValuesValidationPathTranslator,
 } from '@umbraco-cms/backoffice/validation';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import {
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
 
 export interface UmbContentDetailWorkspaceContextArgs extends UmbEntityDetailWorkspaceContextArgs {
 	contentTypeDetailRepository: UmbDetailRepository;
@@ -320,6 +330,149 @@ export abstract class UmbContentDetailWorkspaceBase<
 			options,
 			selected,
 		};
+	}
+
+	protected _readOnlyLanguageVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
+		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
+		return readOnlyCultures.includes(option.culture) === false;
+	};
+
+	/* validation */
+	protected async _runMandatoryValidationForSaveData(saveData: DetailModelType) {
+		// Check that the data is valid before we save it.
+		// Check variants have a name:
+		const variantsWithoutAName = saveData.variants.filter((x) => !x.name);
+		if (variantsWithoutAName.length > 0) {
+			const validationContext = await this.getContext(UMB_VALIDATION_CONTEXT);
+			variantsWithoutAName.forEach((variant) => {
+				validationContext.messages.addMessage(
+					'client',
+					`$.variants[${UmbDataPathVariantQuery(variant)}].name`,
+					UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+				);
+			});
+			throw new Error('All variants must have a name');
+		}
+	}
+
+	public override requestSubmit() {
+		return this.#handleSubmit();
+	}
+
+	public override submit() {
+		return this.#handleSubmit();
+	}
+
+	public override invalidSubmit() {
+		return this.#handleSubmit();
+	}
+
+	async #handleSubmit() {
+		const { options, selected } = await this._determineVariantOptions();
+
+		let variantIds: Array<UmbVariantId> = [];
+
+		// If there is only one variant, we don't need to open the modal.
+		if (options.length === 0) {
+			throw new Error('No variants are available');
+		} else if (options.length === 1) {
+			// If only one option we will skip ahead and save the document with the only variant available:
+			variantIds.push(UmbVariantId.Create(options[0]));
+		} else {
+			// If there are multiple variants, we will open the modal to let the user pick which variants to save.
+			const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+			const result = await modalManagerContext
+				.open(this, UMB_DOCUMENT_SAVE_MODAL, {
+					data: {
+						options,
+						pickableFilter: this._readOnlyLanguageVariantsFilter,
+					},
+					value: { selection: selected },
+				})
+				.onSubmit()
+				.catch(() => undefined);
+
+			if (!result?.selection.length) return;
+
+			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
+		}
+
+		const saveData = await this._data.constructData(variantIds);
+		await this._runMandatoryValidationForSaveData(saveData);
+		await this._performCreateOrUpdate(variantIds, saveData);
+	}
+
+	protected async _performCreateOrUpdate(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
+		if (this.getIsNew()) {
+			await this.#create(variantIds, saveData);
+		} else {
+			await this.#update(variantIds, saveData);
+		}
+	}
+
+	async #create(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
+		if (!this._detailRepository) throw new Error('Detail repository is not set');
+
+		const parent = this.getParent();
+		if (!parent) throw new Error('Parent is not set');
+
+		const { data, error } = await this._detailRepository.create(saveData, parent.unique);
+		if (!data || error) {
+			throw new Error('Error creating document');
+		}
+
+		this.setIsNew(false);
+		this._data.setPersisted(data);
+		// TODO: Only update the variants that was chosen to be saved:
+		const currentData = this._data.getCurrent();
+
+		const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
+
+		const newCurrentData = await new UmbMergeContentVariantDataController(this).process(
+			currentData,
+			data,
+			variantIds,
+			variantIdsIncludingInvariant,
+		);
+		this._data.setCurrent(newCurrentData);
+
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		const event = new UmbRequestReloadChildrenOfEntityEvent({
+			entityType: parent.entityType,
+			unique: parent.unique,
+		});
+		eventContext.dispatchEvent(event);
+	}
+
+	async #update(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
+		if (!this._detailRepository) throw new Error('Detail repository is not set');
+
+		const { data, error } = await this._detailRepository.save(saveData);
+		if (!data || error) {
+			throw new Error('Error saving document');
+		}
+
+		this._data.setPersisted(data);
+		// TODO: Only update the variants that was chosen to be saved:
+		const currentData = this._data.getCurrent();
+
+		const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
+
+		const newCurrentData = await new UmbMergeContentVariantDataController(this).process(
+			currentData,
+			data,
+			variantIds,
+			variantIdsIncludingInvariant,
+		);
+		this._data.setCurrent(newCurrentData);
+
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		const event = new UmbRequestReloadStructureForEntityEvent({
+			entityType: this.getEntityType(),
+			unique: this.getUnique()!,
+		});
+
+		eventContext.dispatchEvent(event);
 	}
 
 	public override destroy(): void {

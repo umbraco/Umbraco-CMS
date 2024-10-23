@@ -1,19 +1,12 @@
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
 import { UmbDocumentPropertyDatasetContext } from '../property-dataset-context/document-property-dataset-context.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
-import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UmbDocumentDetailRepository } from '../repository/index.js';
-import type {
-	UmbDocumentVariantPublishModel,
-	UmbDocumentDetailModel,
-	UmbDocumentValueModel,
-	UmbDocumentVariantModel,
-	UmbDocumentVariantOptionModel,
-} from '../types.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import type { UmbDocumentVariantPublishModel, UmbDocumentDetailModel, UmbDocumentVariantModel } from '../types.js';
 import {
 	UMB_DOCUMENT_PUBLISH_MODAL,
 	UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL,
 	UMB_DOCUMENT_SCHEDULE_MODAL,
-	UMB_DOCUMENT_SAVE_MODAL,
 } from '../modals/index.js';
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
@@ -23,59 +16,30 @@ import {
 	UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 } from '../paths.js';
-import { UMB_DOCUMENTS_SECTION_PATH } from '../../section/paths.js';
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
-import { sortVariants } from '../utils.js';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../collection/index.js';
-import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
-import { UmbEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
 	type UmbPublishableWorkspaceContext,
-	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
-	UmbWorkspaceSplitViewManager,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
-import {
-	appendToFrozenArray,
-	mergeObservables,
-	UmbArrayState,
-	UmbObjectState,
-} from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
-import { type Observable, firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import {
-	UmbRequestReloadChildrenOfEntityEvent,
-	UmbRequestReloadStructureForEntityEvent,
-} from '@umbraco-cms/backoffice/entity-action';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_VALIDATION_CONTEXT,
-	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
-	UmbDataPathVariantQuery,
-	UmbServerModelValidatorContext,
-	UmbValidationContext,
-	UmbVariantValuesValidationPathTranslator,
-	UmbVariantsValidationPathTranslator,
-} from '@umbraco-cms/backoffice/validation';
+import { UmbServerModelValidatorContext } from '@umbraco-cms/backoffice/validation';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import {
 	UmbContentDetailWorkspaceBase,
-	UmbContentWorkspaceDataManager,
-	UmbMergeContentVariantDataController,
 	type UmbContentCollectionWorkspaceContext,
 	type UmbContentWorkspaceContext,
 } from '@umbraco-cms/backoffice/content';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
-import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
-import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
-import type { UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 
 type EntityModel = UmbDocumentDetailModel;
@@ -216,76 +180,8 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	setTemplate(templateUnique: string) {
-		this.#data.updateCurrent({ template: { unique: templateUnique } });
+		this._data.updateCurrent({ template: { unique: templateUnique } });
 	}
-
-	async #performSaveOrCreate(variantIds: Array<UmbVariantId>, saveData: UmbDocumentDetailModel): Promise<void> {
-		if (this.getIsNew()) {
-			// Create:
-			const parent = this.#parent.getValue();
-			if (!parent) throw new Error('Parent is not set');
-
-			const { data, error } = await this.repository.create(saveData, parent.unique);
-			if (!data || error) {
-				throw new Error('Error creating document');
-			}
-
-			this.setIsNew(false);
-			this.#data.setPersisted(data);
-			// TODO: Only update the variants that was chosen to be saved:
-			const currentData = this.#data.getCurrent();
-
-			const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
-
-			const newCurrentData = await new UmbMergeContentVariantDataController(this).process(
-				currentData,
-				data,
-				variantIds,
-				variantIdsIncludingInvariant,
-			);
-			this.#data.setCurrent(newCurrentData);
-
-			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadChildrenOfEntityEvent({
-				entityType: parent.entityType,
-				unique: parent.unique,
-			});
-			eventContext.dispatchEvent(event);
-		} else {
-			// Save:
-			const { data, error } = await this.repository.save(saveData);
-			if (!data || error) {
-				throw new Error('Error saving document');
-			}
-
-			this.#data.setPersisted(data);
-			// TODO: Only update the variants that was chosen to be saved:
-			const currentData = this.#data.getCurrent();
-
-			const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
-
-			const newCurrentData = await new UmbMergeContentVariantDataController(this).process(
-				currentData,
-				data,
-				variantIds,
-				variantIdsIncludingInvariant,
-			);
-			this.#data.setCurrent(newCurrentData);
-
-			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadStructureForEntityEvent({
-				entityType: this.getEntityType(),
-				unique: this.getUnique()!,
-			});
-
-			eventContext.dispatchEvent(event);
-		}
-	}
-
-	#readOnlyLanguageVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
-		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
-		return readOnlyCultures.includes(option.culture) === false;
-	};
 
 	async #handleSaveAndPreview() {
 		const unique = this.getUnique();
@@ -294,13 +190,13 @@ export class UmbDocumentWorkspaceContext
 		let culture = UMB_INVARIANT_CULTURE;
 
 		// Save document (the active variant) before previewing.
-		const { selected } = await this.#determineVariantOptions();
+		const { selected } = await this._determineVariantOptions();
 		if (selected.length > 0) {
 			culture = selected[0];
 			const variantIds = [UmbVariantId.FromString(culture)];
-			const saveData = await this.#data.constructData(variantIds);
-			await this.#runMandatoryValidationForSaveData(saveData);
-			await this.#performSaveOrCreate(variantIds, saveData);
+			const saveData = await this._data.constructData(variantIds);
+			await this._runMandatoryValidationForSaveData(saveData);
+			await this._performCreateOrUpdate(variantIds, saveData);
 		}
 
 		// Tell the server that we're entering preview mode.
@@ -325,7 +221,7 @@ export class UmbDocumentWorkspaceContext
 
 		let variantIds: Array<UmbVariantId> = [];
 
-		const { options, selected } = await this.#determineVariantOptions();
+		const { options, selected } = await this._determineVariantOptions();
 
 		// If there is only one variant, we don't need to open the modal.
 		if (options.length === 0) {
@@ -340,7 +236,7 @@ export class UmbDocumentWorkspaceContext
 				.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
 					data: {
 						options,
-						pickableFilter: this.#readOnlyLanguageVariantsFilter,
+						pickableFilter: this._readOnlyLanguageVariantsFilter,
 					},
 					value: { selection: selected },
 				})
@@ -352,15 +248,15 @@ export class UmbDocumentWorkspaceContext
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		}
 
-		const saveData = await this.#data.constructData(variantIds);
-		await this.#runMandatoryValidationForSaveData(saveData);
+		const saveData = await this._data.constructData(variantIds);
+		await this._runMandatoryValidationForSaveData(saveData);
 
 		// Create the validation repository if it does not exist. (we first create this here when we need it) [NL]
 		this.#validationRepository ??= new UmbDocumentValidationRepository(this);
 
 		// We ask the server first to get a concatenated set of validation messages. So we see both front-end and back-end validation messages [NL]
 		if (this.getIsNew()) {
-			const parent = this.#parent.getValue();
+			const parent = this.getParent();
 			if (!parent) throw new Error('Parent is not set');
 			this.#serverValidation.askServerForValidation(
 				saveData,
@@ -380,7 +276,7 @@ export class UmbDocumentWorkspaceContext
 			},
 			async () => {
 				// If data of the selection is not valid Then just save:
-				await this.#performSaveOrCreate(variantIds, saveData);
+				await this._performCreateOrUpdate(variantIds, saveData);
 				// Notifying that the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
 				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 				// TODO: Get rid of the save notification.
@@ -394,28 +290,11 @@ export class UmbDocumentWorkspaceContext
 		);
 	}
 
-	async #runMandatoryValidationForSaveData(saveData: UmbDocumentDetailModel) {
-		// Check that the data is valid before we save it.
-		// Check variants have a name:
-		const variantsWithoutAName = saveData.variants.filter((x) => !x.name);
-		if (variantsWithoutAName.length > 0) {
-			const validationContext = await this.getContext(UMB_VALIDATION_CONTEXT);
-			variantsWithoutAName.forEach((variant) => {
-				validationContext.messages.addMessage(
-					'client',
-					`$.variants[${UmbDataPathVariantQuery(variant)}].name`,
-					UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
-				);
-			});
-			throw new Error('All variants must have a name');
-		}
-	}
-
 	async #performSaveAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbDocumentDetailModel): Promise<void> {
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 
-		await this.#performSaveOrCreate(variantIds, saveData);
+		await this._performCreateOrUpdate(variantIds, saveData);
 
 		await this.publishingRepository.publish(
 			unique,
@@ -429,53 +308,6 @@ export class UmbDocumentWorkspaceContext
 		});
 
 		eventContext.dispatchEvent(event);
-	}
-
-	async #handleSave() {
-		const { options, selected } = await this.#determineVariantOptions();
-
-		let variantIds: Array<UmbVariantId> = [];
-
-		// If there is only one variant, we don't need to open the modal.
-		if (options.length === 0) {
-			throw new Error('No variants are available');
-		} else if (options.length === 1) {
-			// If only one option we will skip ahead and save the document with the only variant available:
-			variantIds.push(UmbVariantId.Create(options[0]));
-		} else {
-			// If there are multiple variants, we will open the modal to let the user pick which variants to save.
-			const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-			const result = await modalManagerContext
-				.open(this, UMB_DOCUMENT_SAVE_MODAL, {
-					data: {
-						options,
-						pickableFilter: this.#readOnlyLanguageVariantsFilter,
-					},
-					value: { selection: selected },
-				})
-				.onSubmit()
-				.catch(() => undefined);
-
-			if (!result?.selection.length) return;
-
-			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
-		}
-
-		const saveData = await this.#data.constructData(variantIds);
-		await this.#runMandatoryValidationForSaveData(saveData);
-		return await this.#performSaveOrCreate(variantIds, saveData);
-	}
-
-	public override requestSubmit() {
-		return this.#handleSave();
-	}
-
-	public submit() {
-		return this.#handleSave();
-	}
-
-	public override invalidSubmit() {
-		return this.#handleSave();
 	}
 
 	public async publish() {
@@ -498,7 +330,7 @@ export class UmbDocumentWorkspaceContext
 			.open(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
 				data: {
 					options,
-					pickableFilter: this.#readOnlyLanguageVariantsFilter,
+					pickableFilter: this._readOnlyLanguageVariantsFilter,
 				},
 				value: { selection: selected.map((unique) => ({ unique, schedule: {} })) },
 			})
@@ -541,7 +373,7 @@ export class UmbDocumentWorkspaceContext
 			.open(this, UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL, {
 				data: {
 					options,
-					pickableFilter: this.#readOnlyLanguageVariantsFilter,
+					pickableFilter: this._readOnlyLanguageVariantsFilter,
 				},
 				value: { selection: selected },
 			})
