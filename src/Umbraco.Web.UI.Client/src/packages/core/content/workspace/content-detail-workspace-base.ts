@@ -1,6 +1,7 @@
 import type { UmbContentDetailModel, UmbElementValueModel } from '../types.js';
 import { UmbContentWorkspaceDataManager } from '../manager/index.js';
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
+import type { UmbContentVariantPickerData, UmbContentVariantPickerValue } from '../variant-picker/index.js';
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailRepository, UmbDetailRepositoryConstructor } from '@umbraco-cms/backoffice/repository';
@@ -31,17 +32,19 @@ import {
 	UmbVariantsValidationPathTranslator,
 	UmbVariantValuesValidationPathTranslator,
 } from '@umbraco-cms/backoffice/validation';
+import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import type { UmbDocumentVariantOptionModel } from '@umbraco-cms/backoffice/document';
 
-export interface UmbContentDetailWorkspaceContextArgs<DetailModelType> extends UmbEntityDetailWorkspaceContextArgs {
+export interface UmbContentDetailWorkspaceContextArgs<DetailModelType, VariantOptionModelType>
+	extends UmbEntityDetailWorkspaceContextArgs {
 	contentTypeDetailRepository: UmbDetailRepositoryConstructor<DetailModelType>;
 	contentVariantScaffold: UmbEntityVariantModel;
+	saveModalToken: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
 }
 
 export abstract class UmbContentDetailWorkspaceBase<
@@ -94,10 +97,16 @@ export abstract class UmbContentDetailWorkspaceBase<
 
 	public readonly variantOptions: Observable<Array<VariantOptionModelType>>;
 
-	constructor(host: UmbControllerHost, args: UmbContentDetailWorkspaceContextArgs<DetailModelType>) {
+	#saveModalToken: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
+
+	constructor(
+		host: UmbControllerHost,
+		args: UmbContentDetailWorkspaceContextArgs<DetailModelType, VariantOptionModelType>,
+	) {
 		super(host, args);
 
 		this._data = new UmbContentWorkspaceDataManager<DetailModelType>(this, args.contentVariantScaffold);
+		this.#saveModalToken = args.saveModalToken;
 
 		const contentTypeDetailRepository = new args.contentTypeDetailRepository(this);
 		this.structure = new UmbContentTypeStructureManager<ContentTypeDetailModel>(this, contentTypeDetailRepository);
@@ -340,7 +349,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 		};
 	}
 
-	protected _readOnlyLanguageVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
+	protected _readOnlyLanguageVariantsFilter = (option: VariantOptionModelType) => {
 		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
 		return readOnlyCultures.includes(option.culture) === false;
 	};
@@ -389,13 +398,13 @@ export abstract class UmbContentDetailWorkspaceBase<
 		if (options.length === 0) {
 			throw new Error('No variants are available');
 		} else if (options.length === 1) {
-			// If only one option we will skip ahead and save the document with the only variant available:
+			// If only one option we will skip ahead and save the content with the only variant available:
 			variantIds.push(UmbVariantId.Create(options[0]));
 		} else {
 			// If there are multiple variants, we will open the modal to let the user pick which variants to save.
 			const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 			const result = await modalManagerContext
-				.open(this, UMB_DOCUMENT_SAVE_MODAL, {
+				.open(this, this.#saveModalToken, {
 					data: {
 						options,
 						pickableFilter: this._readOnlyLanguageVariantsFilter,
@@ -431,7 +440,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 
 		const { data, error } = await this._detailRepository.create(saveData, parent.unique);
 		if (!data || error) {
-			throw new Error('Error creating document');
+			throw new Error('Error creating content');
 		}
 
 		this.setIsNew(false);
@@ -462,7 +471,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 
 		const { data, error } = await this._detailRepository.save(saveData);
 		if (!data || error) {
-			throw new Error('Error saving document');
+			throw new Error('Error saving content');
 		}
 
 		this._data.setPersisted(data);
