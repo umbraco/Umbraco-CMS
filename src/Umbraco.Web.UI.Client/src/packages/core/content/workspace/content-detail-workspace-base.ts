@@ -22,7 +22,7 @@ import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-t
 import { appendToFrozenArray, mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	UMB_VALIDATION_CONTEXT,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
