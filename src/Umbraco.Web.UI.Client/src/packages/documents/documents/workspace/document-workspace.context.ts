@@ -43,18 +43,18 @@ import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/documen
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 
-type EntityModel = UmbDocumentDetailModel;
-type EntityTypeModel = UmbDocumentTypeDetailModel;
+type ContentModel = UmbDocumentDetailModel;
+type ContentTypeModel = UmbDocumentTypeDetailModel;
 
 export class UmbDocumentWorkspaceContext
 	extends UmbContentDetailWorkspaceBase<
-		EntityModel,
+		ContentModel,
 		UmbDocumentDetailRepository,
-		EntityTypeModel,
+		ContentTypeModel,
 		UmbDocumentVariantModel
 	>
 	implements
-		UmbContentWorkspaceContext<EntityModel, EntityTypeModel, UmbDocumentVariantModel>,
+		UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbDocumentVariantModel>,
 		UmbPublishableWorkspaceContext,
 		UmbContentCollectionWorkspaceContext<UmbDocumentTypeDetailModel>
 {
