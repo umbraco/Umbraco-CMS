@@ -437,7 +437,7 @@ export default {
 			'Bir dil için kültürü değiştirmek pahalı bir işlem olabilir ve içerik önbelleğinin ve dizinlerin yeniden oluşturulmasına neden olabilir',
 		lastEdited: 'Son Düzenleme',
 		link: 'Bağlantı',
-		linkinternal: 'Dahili bağlantı:',
+		linkinternal: 'Dahili bağlantı',
 		linklocaltip: 'Yerel bağlantıları kullanırken, bağlantının önüne "#" ekleyin',
 		linknewwindow: 'Yeni pencerede açılsın mı?',
 		macroDoesNotHaveProperties: 'Bu makro düzenleyebileceğiniz herhangi bir özellik içermiyor',

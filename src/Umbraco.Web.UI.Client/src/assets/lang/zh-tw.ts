@@ -232,7 +232,7 @@ export default {
 		inserttable: '插入表格',
 		lastEdited: '最近編輯',
 		link: '連結',
-		linkinternal: '內部連結：',
+		linkinternal: '內部連結',
 		linklocaltip: '本地連結請用“#”號開頭',
 		linknewwindow: '在新視窗中打開？',
 		macroDoesNotHaveProperties: '本巨集沒有包含您可以編輯的屬性',

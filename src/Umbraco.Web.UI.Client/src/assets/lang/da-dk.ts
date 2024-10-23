@@ -499,7 +499,7 @@ export default {
 			'Ændring af kulturen for et sprog kan forsage en krævende opration og vil\n      resultere i indholds cache og indeksering vil blive genlavet\n    ',
 		lastEdited: 'Sidst redigeret',
 		link: 'Link',
-		linkinternal: 'Internt link:',
+		linkinternal: 'Internt link',
 		linklocaltip: 'Ved lokalt link, indsæt da en "#" foran linket',
 		linknewwindow: 'Åben i nyt vindue?',
 		macroDoesNotHaveProperties: 'Denne makro har ingen egenskaber du kan redigere',

@@ -372,7 +372,7 @@ export default {
 		inserttable: 'Infoga tabell',
 		lastEdited: 'Senast redigerad',
 		link: 'Länk',
-		linkinternal: 'Intern länk:',
+		linkinternal: 'Intern länk',
 		linklocaltip: 'När du använder lokala länkar, lägg till "#" framför länken',
 		linknewwindow: 'Öppna i nytt fönster?',
 		macroDoesNotHaveProperties: 'Detta makro innehåller inga egenskaper som du kan redigera',

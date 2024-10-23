@@ -482,7 +482,7 @@ export default {
 			'Promjena kulture jezika može biti skupa operacija i rezultirat će\n       u kešu sadržaja i indeksima koji se rekonstruišu\n    ',
 		lastEdited: 'Posljednji put uređeno',
 		link: 'Link',
-		linkinternal: 'Interni link:',
+		linkinternal: 'Interni link',
 		linklocaltip: 'Kada koristite lokalne veze, umetnite "#" ispred linka',
 		linknewwindow: 'Otvori u novom prozoru?',
 		macroDoesNotHaveProperties: 'Ovaj makro ne sadrži svojstva koja možete uređivati',
