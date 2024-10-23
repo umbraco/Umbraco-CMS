@@ -75,6 +75,8 @@ export class UmbDocumentWorkspaceContext
 			contentTypeDetailRepository: UmbDocumentTypeDetailRepository,
 		});
 
+		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
+
 		this.routes.setRoutes([
 			{
 				path: UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN.toString(),
