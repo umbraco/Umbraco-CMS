@@ -3,7 +3,7 @@
 * @name umbraco.services.mediaHelper
 * @description A helper object used for dealing with media items
 **/
-function mediaHelper(umbRequestHelper, $http, $log) {
+function mediaHelper(umbRequestHelper, $http, $log, $location) {
 
     //container of fileresolvers
     var _mediaFileResolvers = {};
@@ -449,7 +449,29 @@ function mediaHelper(umbRequestHelper, $http, $log) {
                             cropY2: options.crop ? options.crop.y2 : null
                         })),
                 "Failed to retrieve processed image URL for image: " + imagePath);
-        }
+      },
+
+      /**
+        * @ngdoc function
+        * @name umbraco.services.mediaHelper#openSVG
+        * @methodOf umbraco.services.mediaHelper
+        * @function
+        *
+        * @description
+        * Opens an SVG file in a new window as an image file, to prevent any potential XSS exploits.
+        *
+        * @param {string} imagePath File path, ex /media/1234/my-image.svg
+        */
+      openSVG: function (imagePath) {
+        var popup = window.open('', '_blank');
+        var html = '<!DOCTYPE html><body style="background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(135deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(135deg, transparent 75%, #ccc 75%); background-size:30px 30px; background-position:0 0, 15px 0, 15px -15px, 0px 15px;">'
+          + '<img src="' + imagePath + '"/>'
+          + '<script>history.pushState(null, null,"' + $location.$$absUrl + '");</script></body>';
+
+        popup.document.open();
+        popup.document.write(html);
+        popup.document.close();
+      }
 
     };
 } angular.module('umbraco.services').factory('mediaHelper', mediaHelper);
