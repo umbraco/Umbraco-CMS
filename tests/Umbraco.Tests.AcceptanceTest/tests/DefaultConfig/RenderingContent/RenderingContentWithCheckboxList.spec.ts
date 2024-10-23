@@ -34,7 +34,7 @@ for (const checkbox of checkboxList) {
 
     // Assert
     checkboxValue.forEach(async value => {
-      await umbracoUi.contentRender.doesContentRenderValueHaveText(value);
+      await umbracoUi.contentRender.doesContentRenderValueContainText(value);
     }); 
   });
 }
