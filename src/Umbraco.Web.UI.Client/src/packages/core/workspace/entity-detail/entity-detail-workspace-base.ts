@@ -13,11 +13,16 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 
-export interface UmbEntityWorkspaceContextArgs {
+export interface UmbEntityDetailWorkspaceContextArgs {
 	entityType: string;
 	workspaceAlias: string;
 	detailRepositoryAlias: string;
 }
+
+/**
+ * @deprecated Use UmbEntityDetailWorkspaceContextArgs instead
+ */
+export type UmbEntityWorkspaceContextArgs = UmbEntityDetailWorkspaceContextArgs;
 
 export interface UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> {
 	parent: UmbEntityModel;
