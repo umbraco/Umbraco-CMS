@@ -11,7 +11,12 @@ import {
 	type UmbEntityDetailWorkspaceContextCreateArgs,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbContentTypeStructureManager, type UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
-import { UMB_INVARIANT_CULTURE, UmbVariantId, type UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
+import {
+	UMB_INVARIANT_CULTURE,
+	UmbVariantId,
+	type UmbEntityVariantModel,
+	type UmbEntityVariantOptionModel,
+} from '@umbraco-cms/backoffice/variant';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import { appendToFrozenArray, mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -32,6 +37,7 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbDocumentVariantOptionModel } from '@umbraco-cms/backoffice/document';
 
 export interface UmbContentDetailWorkspaceContextArgs<DetailModelType> extends UmbEntityDetailWorkspaceContextArgs {
 	contentTypeDetailRepository: UmbDetailRepositoryConstructor<DetailModelType>;
@@ -43,6 +49,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 		DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
 		ContentTypeDetailModel extends UmbContentTypeModel = UmbContentTypeModel,
 		VariantModelType extends UmbEntityVariantModel = UmbEntityVariantModel,
+		VariantOptionModelType extends UmbEntityVariantOptionModel = UmbEntityVariantOptionModel<VariantModelType>,
 		CreateArgsType extends
 			UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> = UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
 	>
@@ -85,7 +92,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 	 */
 	public readonly languages = this.#languages.asObservable();
 
-	readonly variantOptions;
+	public readonly variantOptions: Observable<Array<VariantOptionModelType>>;
 
 	constructor(host: UmbControllerHost, args: UmbContentDetailWorkspaceContextArgs<DetailModelType>) {
 		super(host, args);
@@ -114,7 +121,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 							unique: language.unique, // This must be a variantId string!
 							culture: language.unique,
 							segment: null,
-						} as unknown as VariantModelType;
+						} as VariantOptionModelType;
 					});
 				} else if (varies === false) {
 					return [
@@ -124,10 +131,10 @@ export abstract class UmbContentDetailWorkspaceBase<
 							culture: null,
 							segment: null,
 							unique: UMB_INVARIANT_CULTURE, // This must be a variantId string!
-						} as unknown as VariantModelType,
+						} as VariantOptionModelType,
 					];
 				}
-				return [] as Array<VariantModelType>;
+				return [] as Array<VariantOptionModelType>;
 			},
 		);
 
