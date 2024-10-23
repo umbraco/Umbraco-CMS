@@ -5,6 +5,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -23,6 +24,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IUmbracoContextFactory _umbracoContextFactory;
     private readonly ILanguageService _languageService;
+    private readonly ICoreScopeProvider _coreScopeProvider;
 
     protected abstract IEnumerable<string> PropertyEditorAliases { get; }
 
@@ -44,7 +46,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
         IDataTypeService dataTypeService,
         IJsonSerializer jsonSerializer,
         IUmbracoContextFactory umbracoContextFactory,
-        ILanguageService languageService)
+        ILanguageService languageService,
+        ICoreScopeProvider coreScopeProvider)
         : base(context)
     {
         _logger = logger;
@@ -53,6 +56,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
         _jsonSerializer = jsonSerializer;
         _umbracoContextFactory = umbracoContextFactory;
         _languageService = languageService;
+        _coreScopeProvider = coreScopeProvider;
     }
 
     protected override void Migrate()
@@ -133,8 +137,10 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                 var progress = 0;
 
                 ExecutionContext.SuppressFlow();
-                Parallel.ForEach(updateBatch, update =>
+                Parallel.ForEach(updateBatch,  update =>
                 {
+                    using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+                    scope.Complete();
                     using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
                     progress++;

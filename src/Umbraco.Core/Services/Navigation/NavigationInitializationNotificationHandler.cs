@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Hosting;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Core.Services.Navigation;
 
@@ -6,13 +8,13 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 ///     Responsible for seeding the in-memory navigation structures at application's startup
 ///     by rebuild the navigation structures.
 /// </summary>
-public sealed class NavigationInitializationHostedService : IHostedLifecycleService
+public sealed class NavigationInitializationNotificationHandler : INotificationAsyncHandler<PostRuntimePremigrationsUpgradeNotification>
 {
     private readonly IRuntimeState _runtimeState;
     private readonly IDocumentNavigationManagementService _documentNavigationManagementService;
     private readonly IMediaNavigationManagementService _mediaNavigationManagementService;
 
-    public NavigationInitializationHostedService(
+    public NavigationInitializationNotificationHandler(
         IRuntimeState runtimeState,
         IDocumentNavigationManagementService documentNavigationManagementService,
         IMediaNavigationManagementService mediaNavigationManagementService)
@@ -22,7 +24,7 @@ public sealed class NavigationInitializationHostedService : IHostedLifecycleServ
         _mediaNavigationManagementService = mediaNavigationManagementService;
     }
 
-    public async Task StartingAsync(CancellationToken cancellationToken)
+    public async Task HandleAsync(PostRuntimePremigrationsUpgradeNotification notification, CancellationToken cancellationToken)
     {
         if(_runtimeState.Level < RuntimeLevel.Upgrade)
         {
@@ -34,14 +36,4 @@ public sealed class NavigationInitializationHostedService : IHostedLifecycleServ
         await _mediaNavigationManagementService.RebuildAsync();
         await _mediaNavigationManagementService.RebuildBinAsync();
     }
-
-    public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-    public Task StartedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-    public Task StoppingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-    public Task StoppedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

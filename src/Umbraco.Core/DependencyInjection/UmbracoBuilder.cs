@@ -416,7 +416,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Routing
             Services.AddUnique<IDocumentUrlService, DocumentUrlService>();
-            Services.AddHostedService<DocumentUrlServiceInitializer>();
+            Services.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, DocumentUrlServiceInitializerNotificationHandler>();
+
         }
     }
 }

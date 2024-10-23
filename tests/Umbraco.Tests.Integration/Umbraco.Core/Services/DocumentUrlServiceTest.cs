@@ -1,23 +1,13 @@
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Infrastructure.DependencyInjection;
-using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
-using Umbraco.Cms.Infrastructure.HostedServices;
-using Umbraco.Cms.Infrastructure.Search;
-using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
-using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
@@ -33,12 +23,15 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
         builder.Services.AddUnique<IServerMessenger, ScopedRepositoryTests.LocalServerMessenger>();
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
 
-        builder.Services.AddHostedService<DocumentUrlServiceInitializer>();
-
+        builder.Services.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, DocumentUrlServiceInitializerNotificationHandler>();
     }
 
 
-
+    public override void Setup()
+    {
+        DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
+        base.Setup();
+    }
     //
     // [Test]
     // [LongRunning]
