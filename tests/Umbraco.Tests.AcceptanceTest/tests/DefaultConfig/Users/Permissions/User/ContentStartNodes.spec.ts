@@ -85,7 +85,5 @@ test('can not see any content when no start nodes specified', async ({umbracoApi
   await umbracoUi.user.goToSection(ConstantHelper.sections.content, false);
 
   // Assert
-  await umbracoUi.content.isContentInTreeVisible(rootDocumentName, false);
-  await umbracoUi.content.isContentInTreeVisible(childDocumentOneName, false);
-  await umbracoUi.content.isContentInTreeVisible(childDocumentTwoName, false);
+  await umbracoUi.content.isDocumentTreeEmpty();
 });
