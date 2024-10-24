@@ -11,7 +11,11 @@ import {
 	type UmbEntityDetailWorkspaceContextArgs,
 	type UmbEntityDetailWorkspaceContextCreateArgs,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbContentTypeStructureManager, type UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
+import {
+	UmbContentTypeStructureManager,
+	type UmbContentTypeModel,
+	type UmbPropertyTypeModel,
+} from '@umbraco-cms/backoffice/content-type';
 import {
 	UMB_INVARIANT_CULTURE,
 	UmbVariantId,
@@ -72,7 +76,9 @@ export abstract class UmbContentDetailWorkspaceBase<
 	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
 
 	/* Content Data */
-	protected override _data: UmbContentWorkspaceDataManager<DetailModelType>;
+	protected override readonly _data = new UmbContentWorkspaceDataManager<DetailModelType, VariantModelType>(this);
+	public override readonly entityType = this._data.createObservablePartOfCurrent((data) => data?.entityType);
+	public override readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
 	public readonly values = this._data.createObservablePartOfCurrent((data) => data?.values);
 	public readonly variants = this._data.createObservablePartOfCurrent((data) => data?.variants ?? []);
 
@@ -103,7 +109,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 	 */
 	public readonly languages = this.#languages.asObservable();
 
-	public readonly variantOptions: Observable<Array<VariantOptionModelType>>;
+	public readonly variantOptions;
 
 	#saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
 
@@ -118,10 +124,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 	) {
 		super(host, args);
 
-		this._data = new UmbContentWorkspaceDataManager<DetailModelType, VariantModelType>(
-			this,
-			args.contentVariantScaffold,
-		);
+		this._data.setVariantScaffold(args.contentVariantScaffold);
 		this.#saveModalToken = args.saveModalToken;
 
 		const contentTypeDetailRepository = new args.contentTypeDetailRepository(this);
