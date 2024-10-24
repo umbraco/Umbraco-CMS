@@ -1,4 +1,4 @@
-import { UMB_MEMBER_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
+import { UMB_MEMBER_DETAIL_REPOSITORY_ALIAS, UmbMemberDetailRepository } from '../../repository/index.js';
 import type { UmbMemberDetailModel, UmbMemberVariantModel } from '../../types.js';
 import { UmbMemberPropertyDatasetContext } from '../../property-dataset-context/member-property-dataset-context.js';
 import { UMB_MEMBER_ENTITY_TYPE, UMB_MEMBER_ROOT_ENTITY_TYPE } from '../../entity.js';
@@ -14,10 +14,17 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentDetailWorkspaceBase, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 
-type EntityModel = UmbMemberDetailModel;
+type ContentModel = UmbMemberDetailModel;
+type ContentTypeModel = UmbMemberTypeDetailModel;
+
 export class UmbMemberWorkspaceContext
-	extends UmbContentDetailWorkspaceBase<EntityModel>
-	implements UmbContentWorkspaceContext<EntityModel, UmbMemberTypeDetailModel, UmbMemberVariantModel>
+	extends UmbContentDetailWorkspaceBase<
+		ContentModel,
+		UmbMemberDetailRepository,
+		ContentTypeModel,
+		UmbMemberVariantModel
+	>
+	implements UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbMemberVariantModel>
 {
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.memberType.unique);
 	readonly kind = this._data.createObservablePartOfCurrent((data) => data?.kind);
@@ -97,7 +104,7 @@ export class UmbMemberWorkspaceContext
 	}
 
 	// Only for CRUD demonstration purposes
-	updateData(data: Partial<EntityModel>) {
+	updateData(data: Partial<ContentModel>) {
 		const currentData = this._data.getCurrent();
 		if (!currentData) throw new Error('No data to update');
 		this._data.setCurrent({ ...currentData, ...data });
