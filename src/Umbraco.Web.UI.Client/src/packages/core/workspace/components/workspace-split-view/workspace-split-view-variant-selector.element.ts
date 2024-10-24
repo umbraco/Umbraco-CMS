@@ -236,7 +236,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 									compact
 									slot="append"
 									popovertarget="variant-selector-popover"
-									title=${ifDefined(this._activeVariant?.language.name)}>
+									title=${ifDefined(this._activeVariant?.language.name)}
+									label="Select a variant">
 									${this._activeVariant?.language.name} ${this.#renderReadOnlyTag(this._activeVariant?.culture)}
 									<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
 								</uui-button>
