@@ -14,8 +14,17 @@ export class UmbContentWorkspaceDataManager<
 	//#repository;
 	#variantScaffold?: ModelVariantType;
 
-	constructor(host: UmbControllerHost, variantScaffold: ModelVariantType) {
+	constructor(host: UmbControllerHost, variantScaffold?: ModelVariantType) {
 		super(host);
+		this.#variantScaffold = variantScaffold;
+	}
+
+	/**
+	 * Sets the variant scaffold data
+	 * @param {ModelVariantType} variantScaffold The variant scaffold data
+	 * @memberof UmbContentWorkspaceDataManager
+	 */
+	setVariantScaffold(variantScaffold: ModelVariantType) {
 		this.#variantScaffold = variantScaffold;
 	}
 
