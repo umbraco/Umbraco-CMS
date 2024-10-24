@@ -228,7 +228,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
     }
 
     public IMember? GetByUsername(string? username) =>
-        _memberByUsernameCachePolicy.Get(username, PerformGetByUsername, PerformGetAllByUsername);
+        _memberByUsernameCachePolicy.Get("uRepo_userNameKey+" + username, PerformGetByUsername, PerformGetAllByUsername);
 
     public int[] GetMemberIds(string[] usernames)
     {
