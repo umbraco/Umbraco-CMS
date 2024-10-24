@@ -11,7 +11,7 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbDetailRepository, UmbRepositoryResponseWithAsObservable } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbEntityDetailWorkspaceContextArgs {
 	entityType: string;
@@ -120,7 +120,12 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return this.#parent.getValue()?.entityType;
 	}
 
-	async load(unique: string) {
+	/**
+	 * Load the workspace data
+	 * @param {string} unique The unique identifier of the entity to load.
+	 * @returns { Promise<UmbRepositoryResponseWithAsObservable<DetailModelType>> } The data of the entity.
+	 */
+	async load(unique: string): Promise<UmbRepositoryResponseWithAsObservable<DetailModelType>> {
 		await this.#init;
 		this.resetState();
 		this._getDataPromise = this._detailRepository!.requestByUnique(unique);
