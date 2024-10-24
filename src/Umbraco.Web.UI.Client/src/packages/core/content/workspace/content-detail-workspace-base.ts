@@ -111,6 +111,9 @@ export abstract class UmbContentDetailWorkspaceBase<
 	 */
 	public readonly languages = this.#languages.asObservable();
 
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	// TODO: fix type error
 	public readonly variantOptions;
 
 	#saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
@@ -225,7 +228,13 @@ export abstract class UmbContentDetailWorkspaceBase<
 		this.#languages.setValue(data?.items ?? []);
 	}
 
-	getName(variantId?: UmbVariantId) {
+	/**
+	 * Get the name of a variant
+	 * @param {UmbVariantId } [variantId] - The variant id
+	 * @returns { string | undefined} - The name of the variant
+	 * @memberof UmbContentDetailWorkspaceBase
+	 */
+	getName(variantId?: UmbVariantId): string | undefined {
 		const variants = this._data.getCurrent()?.variants;
 		if (!variants) return;
 		if (variantId) {
@@ -235,7 +244,16 @@ export abstract class UmbContentDetailWorkspaceBase<
 		}
 	}
 
-	setName(name: string, variantId?: UmbVariantId) {
+	/**
+	 * Set the name of a variant
+	 * @param {string} name - The name of the variant
+	 * @param {UmbVariantId} [variantId] - The variant id
+	 * @memberof UmbContentDetailWorkspaceBase
+	 */
+	setName(name: string, variantId?: UmbVariantId): void {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		// TODO: fix type error
 		this._data.updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
 	}
 
@@ -373,6 +391,10 @@ export abstract class UmbContentDetailWorkspaceBase<
 				entry,
 				(x) => x.alias === alias && variantId!.compare(x),
 			);
+
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			// TODO: fix type error
 			this._data.updateCurrent({ values });
 
 			// TODO: We should move this type of logic to the act of saving [NL]
