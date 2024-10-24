@@ -178,7 +178,22 @@ export class UmbDocumentWorkspaceContext
 		return UMB_DOCUMENT_COLLECTION_ALIAS;
 	}
 
-	getContentTypeId() {
+	/**
+	 * Gets the unique identifier of the content type.
+	 * @deprecated Use `getContentTypeUnique` instead.
+	 * @returns { string | undefined} The unique identifier of the content type.
+	 * @memberof UmbDocumentWorkspaceContext
+	 */
+	getContentTypeId(): string | undefined {
+		return this.getContentTypeUnique();
+	}
+
+	/**
+	 * Gets the unique identifier of the content type.
+	 * @returns { string | undefined} The unique identifier of the content type.
+	 * @memberof UmbDocumentWorkspaceContext
+	 */
+	getContentTypeUnique(): string | undefined {
 		return this.getData()?.documentType.unique;
 	}
 

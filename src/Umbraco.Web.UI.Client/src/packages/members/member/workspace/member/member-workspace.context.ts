@@ -1,4 +1,5 @@
-import { UMB_MEMBER_DETAIL_REPOSITORY_ALIAS, UmbMemberDetailRepository } from '../../repository/index.js';
+import type { UmbMemberDetailRepository } from '../../repository/index.js';
+import { UMB_MEMBER_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import type { UmbMemberDetailModel, UmbMemberVariantModel } from '../../types.js';
 import { UmbMemberPropertyDatasetContext } from '../../property-dataset-context/member-property-dataset-context.js';
 import { UMB_MEMBER_ENTITY_TYPE, UMB_MEMBER_ROOT_ENTITY_TYPE } from '../../entity.js';
@@ -85,7 +86,22 @@ export class UmbMemberWorkspaceContext
 		});
 	}
 
-	getContentTypeId() {
+	/**
+	 * Gets the unique identifier of the content type.
+	 * @deprecated Use `getContentTypeUnique` instead.
+	 * @returns { string | undefined} The unique identifier of the content type.
+	 * @memberof UmbMemberWorkspaceContext
+	 */
+	getContentTypeId(): string | undefined {
+		return this.getContentTypeUnique();
+	}
+
+	/**
+	 * Gets the unique identifier of the content type.
+	 * @returns { string | undefined} The unique identifier of the content type.
+	 * @memberof UmbMemberWorkspaceContext
+	 */
+	getContentTypeUnique(): string | undefined {
 		return this.getData()?.memberType.unique;
 	}
 

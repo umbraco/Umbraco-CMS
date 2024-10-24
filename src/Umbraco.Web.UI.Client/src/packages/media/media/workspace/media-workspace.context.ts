@@ -106,7 +106,22 @@ export class UmbMediaWorkspaceContext
 		return UMB_MEDIA_COLLECTION_ALIAS;
 	}
 
-	public getContentTypeId() {
+	/**
+	 * Gets the unique identifier of the content type.
+	 * @deprecated Use `getContentTypeUnique` instead.
+	 * @returns { string | undefined} The unique identifier of the content type.
+	 * @memberof UmbMediaWorkspaceContext
+	 */
+	getContentTypeId(): string | undefined {
+		return this.getContentTypeUnique();
+	}
+
+	/**
+	 * Gets the unique identifier of the content type.
+	 * @returns { string | undefined} The unique identifier of the content type.
+	 * @memberof UmbMediaWorkspaceContext
+	 */
+	getContentTypeUnique(): string | undefined {
 		return this.getData()?.mediaType.unique;
 	}
 

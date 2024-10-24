@@ -88,6 +88,8 @@ export abstract class UmbContentDetailWorkspaceBase<
 	public readonly variesBySegment;
 	public readonly varies;
 
+	abstract readonly contentTypeUnique: Observable<string | undefined>;
+
 	/* Data Type */
 	readonly #dataTypeItemManager = new UmbDataTypeItemRepositoryManager(this);
 	#dataTypeSchemaAliasMap = new Map<string, string>();
@@ -555,6 +557,8 @@ export abstract class UmbContentDetailWorkspaceBase<
 
 		eventContext.dispatchEvent(event);
 	}
+
+	abstract getContentTypeUnique(): string | undefined;
 
 	public override destroy(): void {
 		this.structure.destroy();
