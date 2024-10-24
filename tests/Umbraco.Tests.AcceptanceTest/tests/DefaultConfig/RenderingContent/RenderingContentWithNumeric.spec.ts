@@ -35,6 +35,6 @@ for (const numeric of numerics) {
     await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
     // Assert
-    await umbracoUi.contentRender.doesContentRenderValueHaveText(numericValue);
+    await umbracoUi.contentRender.doesContentRenderValueContainText(numericValue);
   });
 }

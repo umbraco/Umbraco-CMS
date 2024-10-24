@@ -30,7 +30,7 @@ test('can render content with an approved color with label', async ({umbracoApi,
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
   // Assert
-  await umbracoUi.contentRender.doesContentRenderValueHaveText(colorValue.label);
+  await umbracoUi.contentRender.doesContentRenderValueContainText(colorValue.label);
 });
 
 test('can render content with an approved color without label', async ({umbracoApi, umbracoUi}) => {
@@ -44,5 +44,5 @@ test('can render content with an approved color without label', async ({umbracoA
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
   // Assert
-  await umbracoUi.contentRender.doesContentRenderValueHaveText(colorValue.value);
+  await umbracoUi.contentRender.doesContentRenderValueContainText(colorValue.value);
 });

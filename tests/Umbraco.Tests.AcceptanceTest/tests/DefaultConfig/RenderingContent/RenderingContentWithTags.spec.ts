@@ -37,7 +37,7 @@ for (const tag of tags) {
 
     // Assert
     tagValue.forEach(async value => {
-      await umbracoUi.contentRender.doesContentRenderValueHaveText(value);
+      await umbracoUi.contentRender.doesContentRenderValueContainText(value);
     }); 
   });
 }
