@@ -224,9 +224,12 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	async #create(currentData: DetailModelType) {
+		if (!this._detailRepository) throw new Error('Detail repository is not set');
+
 		const parent = this.#parent.getValue();
 		if (!parent) throw new Error('Parent is not set');
-		const { error, data } = await this._detailRepository!.create(currentData, parent.unique);
+
+		const { error, data } = await this._detailRepository.create(currentData, parent.unique);
 		if (error || !data) {
 			throw error?.message ?? 'Repository did not return data after create.';
 		}
