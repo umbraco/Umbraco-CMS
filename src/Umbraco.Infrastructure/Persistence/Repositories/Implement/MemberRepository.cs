@@ -310,8 +310,6 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             return SqlSyntax.GetFieldName<MemberDto>(x => x.LastPasswordChangeDate);
         }
 
-        Constants.
-
         return base.ApplySystemOrdering(ref sql, ordering);
     }
 
