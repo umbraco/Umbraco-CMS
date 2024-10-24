@@ -4,4 +4,4 @@ export { UmbDocumentPublishingRepository, UMB_DOCUMENT_PUBLISHING_REPOSITORY_ALI
 export { UmbDocumentUrlRepository, UMB_DOCUMENT_URL_REPOSITORY_ALIAS } from './url/index.js';
 export { UmbDocumentPreviewRepository } from './preview/index.js';
 
-export type { UmbDocumentItemModel } from './item/types.js';
+export type * from './types.js';
