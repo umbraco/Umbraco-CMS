@@ -43,6 +43,7 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbContentPropertyDatasetContext } from '../property-dataset-context/index.js';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -595,6 +596,11 @@ export abstract class UmbContentDetailWorkspaceBase<
 	}
 
 	abstract getContentTypeUnique(): string | undefined;
+
+	abstract createPropertyDatasetContext(
+		host: UmbControllerHost,
+		variantId: UmbVariantId,
+	): UmbContentPropertyDatasetContext<DetailModelType, ContentTypeDetailModelType, VariantModelType>;
 
 	public override destroy(): void {
 		this.structure.destroy();
