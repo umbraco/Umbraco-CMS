@@ -2,6 +2,7 @@ using Umbraco.Cms.Core.Models.Blocks;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0.LocalLinks;
 
+[Obsolete("Will be removed in V18")]
 public class LocalLinkBlocksProcessor
 {
     private readonly LocalLinkProcessor _localLinkProcessor;
