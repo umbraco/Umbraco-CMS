@@ -81,6 +81,11 @@ export class UmbMediaWorkspaceContext
 		]);
 	}
 
+	public override resetState() {
+		super.resetState();
+		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
+	}
+
 	public override async load(unique: string) {
 		const response = await super.load(unique);
 
@@ -123,11 +128,6 @@ export class UmbMediaWorkspaceContext
 	 */
 	getContentTypeUnique(): string | undefined {
 		return this.getData()?.mediaType.unique;
-	}
-
-	public override resetState() {
-		super.resetState();
-		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 	}
 
 	public createPropertyDatasetContext(
