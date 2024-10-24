@@ -245,33 +245,71 @@ export abstract class UmbContentDetailWorkspaceBase<
 
 	/* Variants */
 
-	getVariesByCulture() {
+	/**
+	 * Get whether the content varies by culture
+	 * @returns { boolean | undefined } - If the content varies by culture
+	 * @memberof UmbContentDetailWorkspaceBase
+	 */
+	getVariesByCulture(): boolean | undefined {
 		return this.#variesByCulture;
 	}
 
-	getVariesBySegment() {
+	/**
+	 * Get whether the content varies by segment
+	 * @returns {boolean | undefined} - If the content varies by segment
+	 * @memberof UmbContentDetailWorkspaceBase
+	 */
+	getVariesBySegment(): boolean | undefined {
 		return this.#variesBySegment;
 	}
 
-	getVaries() {
+	/**
+	 * Get whether the content varies
+	 * @returns { boolean | undefined } - If the content varies
+	 * @memberof UmbContentDetailWorkspaceBase
+	 */
+	getVaries(): boolean | undefined {
 		return this.#varies;
 	}
 
-	variantById(variantId: UmbVariantId) {
+	/**
+	 * Get the variant by the given variantId
+	 * @param {UmbVariantId} variantId - The variant id
+	 * @returns { Observable<VariantModelType | undefined> } - The variant or undefined if not found
+	 * @memberof UmbContentDetailWorkspaceBase
+	 */
+	variantById(variantId: UmbVariantId): Observable<VariantModelType | undefined> {
 		return this._data.createObservablePartOfCurrent((data) => data?.variants?.find((x) => variantId.compare(x)));
 	}
 
-	getVariant(variantId: UmbVariantId) {
+	/**
+	 * Get the variant by the given variantId
+	 * @param {UmbVariantId} variantId - The variant id
+	 * @returns { VariantModelType | undefined } - The variant or undefined if not found
+	 * @memberof UmbContentDetailWorkspaceBase
+	 */
+	getVariant(variantId: UmbVariantId): VariantModelType | undefined {
 		return this._data.getCurrent()?.variants?.find((x) => variantId.compare(x));
 	}
 
-	async propertyStructureById(propertyId: string) {
+	/**
+	 * Observe the property type
+	 * @param {string} propertyId - The id of the property
+	 * @returns {Promise<Observable<UmbPropertyTypeModel | undefined>>} - An observable for the property type
+	 * @memberof UmbContentDetailWorkspaceBase
+	 */
+	async propertyStructureById(propertyId: string): Promise<Observable<UmbPropertyTypeModel | undefined>> {
 		return this.structure.propertyStructureById(propertyId);
 	}
 
 	/* Values */
 
-	getValues() {
+	/**
+	 * Get the values of the content
+	 * @returns {Array<UmbElementValueModel> | undefined} - The values of the content
+	 * @memberof UmbContentDetailWorkspaceBase
+	 */
+	getValues(): Array<UmbElementValueModel> | undefined {
 		return this._data.getCurrent()?.values;
 	}
 
