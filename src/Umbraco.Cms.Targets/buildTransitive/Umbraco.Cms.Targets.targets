@@ -32,7 +32,7 @@
   <!-- Include App_Plugins content in output/publish directories -->
   <Target Name="IncludeAppPluginsContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems">
     <ItemGroup>
-      <_AppPluginsFiles Include="App_Plugins\**" />
+      <_AppPluginsFiles Include="App_Plugins\**" Exclude="App_Plugins\**\node_modules\**" />
       <ContentWithTargetPath Include="@(_AppPluginsFiles)" Exclude="@(ContentWithTargetPath)" TargetPath="%(Identity)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
   </Target>
