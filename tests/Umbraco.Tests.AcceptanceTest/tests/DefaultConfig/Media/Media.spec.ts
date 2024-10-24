@@ -110,7 +110,7 @@ test('can create a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickSaveButton();
 
   // Assert
-  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.folderCreated);
+  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   await umbracoUi.media.isTreeItemVisible(folderName);
   expect(await umbracoApi.media.doesNameExist(folderName)).toBeTruthy();
 
@@ -152,7 +152,7 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickSaveButton();
 
   // Assert
-  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.folderCreated);
+  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   await umbracoUi.media.isTreeItemVisible(parentFolderName);
   await umbracoUi.media.clickMediaCaretButtonForName(parentFolderName);
   await umbracoUi.media.isTreeItemVisible(folderName);
