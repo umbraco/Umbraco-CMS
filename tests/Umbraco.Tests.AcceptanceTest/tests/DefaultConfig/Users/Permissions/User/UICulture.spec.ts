@@ -1,14 +1,9 @@
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
-const testUser = {
-  name: 'Test User',
-  email: 'verySecureEmail@123.test',
-  password: 'verySecurePassword123',
-};
+const testUser = ConstantHelper.testUserCredentials;
+let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 
 const userGroupName = 'TestUserGroup';
-
-let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 let userGroupId = null;
 
 test.beforeEach(async ({umbracoApi}) => {
