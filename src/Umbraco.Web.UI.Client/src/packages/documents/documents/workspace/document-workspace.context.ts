@@ -197,6 +197,11 @@ export class UmbDocumentWorkspaceContext
 		return this.getData()?.documentType.unique;
 	}
 
+	/**
+	 * Set the template
+	 * @param {string} templateUnique The unique identifier of the template.
+	 * @memberof UmbDocumentWorkspaceContext
+	 */
 	setTemplate(templateUnique: string) {
 		this._data.updateCurrent({ template: { unique: templateUnique } });
 	}
