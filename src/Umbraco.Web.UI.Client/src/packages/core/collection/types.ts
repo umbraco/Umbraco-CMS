@@ -48,4 +48,4 @@ export interface UmbCollectionContext {
 	totalItems: Observable<number>;
 }
 
-export * from './extensions/index.js';
+export type * from './extensions/index.js';
