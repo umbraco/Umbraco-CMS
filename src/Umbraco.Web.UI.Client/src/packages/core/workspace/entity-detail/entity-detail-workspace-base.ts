@@ -220,6 +220,12 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	#onWillNavigate = async (e: CustomEvent) => {
 		const newUrl = e.detail.url;
 
+		/* TODO: temp removal of discard changes in workspace modals.
+		 The modal closes before the discard changes dialog is resolved.*/
+		if (newUrl.includes('/modal/umb-modal-workspace/')) {
+			return true;
+		}
+
 		if (this._checkWillNavigateAway(newUrl) && this._data.getHasUnpersistedChanges()) {
 			e.preventDefault();
 			const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
