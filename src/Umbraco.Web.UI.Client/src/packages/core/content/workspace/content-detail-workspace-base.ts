@@ -222,7 +222,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 		this.loadLanguages();
 	}
 
-	async loadLanguages() {
+	public async loadLanguages() {
 		// TODO: If we don't end up having a Global Context for languages, then we should at least change this into using a asObservable which should be returned from the repository. [Nl]
 		const { data } = await this.#languageRepository.requestCollection({});
 		this.#languages.setValue(data?.items ?? []);
@@ -234,7 +234,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 	 * @returns { string | undefined} - The name of the variant
 	 * @memberof UmbContentDetailWorkspaceBase
 	 */
-	getName(variantId?: UmbVariantId): string | undefined {
+	public getName(variantId?: UmbVariantId): string | undefined {
 		const variants = this._data.getCurrent()?.variants;
 		if (!variants) return;
 		if (variantId) {
@@ -250,7 +250,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 	 * @param {UmbVariantId} [variantId] - The variant id
 	 * @memberof UmbContentDetailWorkspaceBase
 	 */
-	setName(name: string, variantId?: UmbVariantId): void {
+	public setName(name: string, variantId?: UmbVariantId): void {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		// TODO: fix type error
@@ -263,7 +263,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 	 * @returns {Observable<string>} - The name of the variant
 	 * @memberof UmbContentDetailWorkspaceBase
 	 */
-	name(variantId?: UmbVariantId): Observable<string> {
+	public name(variantId?: UmbVariantId): Observable<string> {
 		return this._data.createObservablePartOfCurrent(
 			(data) => data?.variants?.find((x) => variantId?.compare(x))?.name ?? '',
 		);
@@ -276,7 +276,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 	 * @returns { boolean | undefined } - If the content varies by culture
 	 * @memberof UmbContentDetailWorkspaceBase
 	 */
-	getVariesByCulture(): boolean | undefined {
+	public getVariesByCulture(): boolean | undefined {
 		return this.#variesByCulture;
 	}
 
@@ -285,7 +285,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 	 * @returns {boolean | undefined} - If the content varies by segment
 	 * @memberof UmbContentDetailWorkspaceBase
 	 */
-	getVariesBySegment(): boolean | undefined {
+	public getVariesBySegment(): boolean | undefined {
 		return this.#variesBySegment;
 	}
 
@@ -294,7 +294,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 	 * @returns { boolean | undefined } - If the content varies
 	 * @memberof UmbContentDetailWorkspaceBase
 	 */
-	getVaries(): boolean | undefined {
+	public getVaries(): boolean | undefined {
 		return this.#varies;
 	}
 
@@ -304,7 +304,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 	 * @returns { Observable<VariantModelType | undefined> } - The variant or undefined if not found
 	 * @memberof UmbContentDetailWorkspaceBase
 	 */
-	variantById(variantId: UmbVariantId): Observable<VariantModelType | undefined> {
+	public variantById(variantId: UmbVariantId): Observable<VariantModelType | undefined> {
 		return this._data.createObservablePartOfCurrent((data) => data?.variants?.find((x) => variantId.compare(x)));
 	}
 
@@ -314,7 +314,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 	 * @returns { VariantModelType | undefined } - The variant or undefined if not found
 	 * @memberof UmbContentDetailWorkspaceBase
 	 */
-	getVariant(variantId: UmbVariantId): VariantModelType | undefined {
+	public getVariant(variantId: UmbVariantId): VariantModelType | undefined {
 		return this._data.getCurrent()?.variants?.find((x) => variantId.compare(x));
 	}
 
@@ -324,7 +324,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 	 * @returns {Promise<Observable<UmbPropertyTypeModel | undefined>>} - An observable for the property type
 	 * @memberof UmbContentDetailWorkspaceBase
 	 */
-	async propertyStructureById(propertyId: string): Promise<Observable<UmbPropertyTypeModel | undefined>> {
+	public async propertyStructureById(propertyId: string): Promise<Observable<UmbPropertyTypeModel | undefined>> {
 		return this.structure.propertyStructureById(propertyId);
 	}
 
@@ -335,7 +335,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 	 * @returns {Array<UmbElementValueModel> | undefined} - The values of the content
 	 * @memberof UmbContentDetailWorkspaceBase
 	 */
-	getValues(): Array<UmbElementValueModel> | undefined {
+	public getValues(): Array<UmbElementValueModel> | undefined {
 		return this._data.getCurrent()?.values;
 	}
 
@@ -346,7 +346,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>} - An observable for the value of the property
 	 * @description Get an Observable for the value of this property.
 	 */
-	async propertyValueByAlias<PropertyValueType = unknown>(
+	public async propertyValueByAlias<PropertyValueType = unknown>(
 		propertyAlias: string,
 		variantId?: UmbVariantId,
 	): Promise<Observable<PropertyValueType | undefined> | undefined> {
@@ -363,7 +363,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 	 * @param {UmbVariantId | undefined} variantId - The variant id of the property
 	 * @returns {ReturnType | undefined} The value or undefined if not set or found.
 	 */
-	getPropertyValue<ReturnType = unknown>(alias: string, variantId?: UmbVariantId) {
+	public getPropertyValue<ReturnType = unknown>(alias: string, variantId?: UmbVariantId) {
 		const currentData = this._data.getCurrent();
 		if (currentData) {
 			const newDataSet = currentData.values?.find(
@@ -382,7 +382,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 	 * @param {UmbVariantId} [variantId] - The variant id of the property
 	 * @memberof UmbContentDetailWorkspaceBase
 	 */
-	async setPropertyValue<ValueType = unknown>(alias: string, value: ValueType, variantId?: UmbVariantId) {
+	public async setPropertyValue<ValueType = unknown>(alias: string, value: ValueType, variantId?: UmbVariantId) {
 		this.initiatePropertyValueChange();
 		variantId ??= UmbVariantId.CreateInvariant();
 		const property = await this.structure.getPropertyStructureByAlias(alias);
@@ -417,11 +417,11 @@ export abstract class UmbContentDetailWorkspaceBase<
 		this.finishPropertyValueChange();
 	}
 
-	initiatePropertyValueChange() {
+	public initiatePropertyValueChange() {
 		this._data.initiatePropertyValueChange();
 	}
 
-	finishPropertyValueChange = () => {
+	public finishPropertyValueChange = () => {
 		this._data.finishPropertyValueChange();
 	};
 
