@@ -1,5 +1,5 @@
-import type { CollectionAliasConditionConfig } from '../../collection/collection-alias.manifest.js';
-import type { CollectionBulkActionPermissionConditionConfig } from '../../collection/collection-bulk-action-permission.manifest.js';
+import type { CollectionAliasConditionConfig } from '../../collection/conditions/collection-alias.types.js';
+import type { CollectionBulkActionPermissionConditionConfig } from '../../collection/conditions/collection-bulk-action-permission.manifest.js';
 import type { SwitchConditionConfig } from './switch.condition.js';
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
 
