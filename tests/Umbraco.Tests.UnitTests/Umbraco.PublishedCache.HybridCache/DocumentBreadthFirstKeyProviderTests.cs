@@ -10,7 +10,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.HybridCache;
 [TestFixture]
 public class DocumentBreadthFirstKeyProviderTests
 {
-
     [Test]
     public void ZeroSeedCountReturnsZeroKeys()
     {
@@ -21,7 +20,6 @@ public class DocumentBreadthFirstKeyProviderTests
         IEnumerable<Guid> rootChildren = new List<Guid> { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
         navigationQueryService.Setup(x => x.TryGetRootKeys(out rootKeyList)).Returns(true);
         navigationQueryService.Setup(x => x.TryGetChildrenKeys(It.IsAny<Guid>(), out rootChildren)).Returns(true);
-
 
         var cacheSettings = new CacheSettings { DocumentBreadthFirstSeedCount = 0 };
         var sut = new DocumentBreadthFirstKeyProvider(navigationQueryService.Object, Options.Create(cacheSettings));
