@@ -541,8 +541,8 @@ export abstract class UmbContentDetailWorkspaceBase<
 			throw new Error('Error creating content');
 		}
 
-		this.setIsNew(false);
 		this._data.setPersisted(data);
+
 		// TODO: Only update the variants that was chosen to be saved:
 		const currentData = this._data.getCurrent();
 
@@ -554,6 +554,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 			variantIds,
 			variantIdsIncludingInvariant,
 		);
+
 		this._data.setCurrent(newCurrentData);
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
@@ -562,6 +563,7 @@ export abstract class UmbContentDetailWorkspaceBase<
 			unique: parent.unique,
 		});
 		eventContext.dispatchEvent(event);
+		this.setIsNew(false);
 	}
 
 	async #update(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
