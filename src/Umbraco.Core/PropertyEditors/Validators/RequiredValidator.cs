@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -20,7 +21,7 @@ public class RequiredValidator : IValueRequiredValidator, IValueValidator
     }
 
     /// <inheritdoc cref="IValueValidator.Validate" />
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration) =>
+    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext) =>
         ValidateRequired(value, valueType);
 
     /// <inheritdoc cref="IValueRequiredValidator.ValidateRequired" />

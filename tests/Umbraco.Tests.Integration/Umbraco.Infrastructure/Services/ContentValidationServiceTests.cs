@@ -102,6 +102,10 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
                                                         { "alias": "text", "value": "Valid nested setting text)" }
                                                     ]
                                                   }
+                                                ],
+                                                "expose": [
+                                                    { "contentKey": "f36cebfa-d03b-4451-9e60-4bf32c5b1e2f", "culture": null, "segment": null },
+                                                    { "contentKey": "b8173e4a-0618-475c-8277-c3c6af68bee6", "culture": null, "segment": null }
                                                 ]
                                               }
                                           }
@@ -130,6 +134,10 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
                                             { "alias": "text", "value": "Invalid root setting text (ref #3)" }
                                         ]
                                       }
+                                  ],
+                                  "expose": [
+                                      { "contentKey": "9addc377-c02c-4db0-88c2-73b933704f7b", "culture": null, "segment": null },
+                                      { "contentKey": "3af93b5b-5e40-4c64-b142-2564309fc4c7", "culture": null, "segment": null }
                                   ]
                                 }
                                 """

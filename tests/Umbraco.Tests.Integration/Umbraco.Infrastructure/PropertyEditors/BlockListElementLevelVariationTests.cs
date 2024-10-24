@@ -146,6 +146,63 @@ public partial class BlockListElementLevelVariationTests : BlockEditorElementVar
         return GetPublishedContent(content.Key);
     }
 
+    private IContentType CreateElementTypeWithValidation()
+    {
+        var elementType = CreateElementType(ContentVariation.Culture);
+        foreach (var propertyType in elementType.PropertyTypes)
+        {
+            propertyType.Mandatory = true;
+            propertyType.ValidationRegExp = "^Valid.*$";
+        }
+
+        ContentTypeService.Save(elementType);
+        return elementType;
+    }
+
+    private async Task<(IContentType RootElementType, IContentType NestedElementType)> CreateElementTypeWithValidationAndNestedBlocksAsync()
+    {
+        var nestedElementType = CreateElementTypeWithValidation();
+        var nestedBlockListDataType = await CreateBlockListDataType(nestedElementType);
+
+        var rootElementType = new ContentTypeBuilder()
+            .WithAlias("myRootElementType")
+            .WithName("My Root Element Type")
+            .WithIsElement(true)
+            .WithContentVariation(ContentVariation.Culture)
+            .AddPropertyType()
+            .WithAlias("invariantText")
+            .WithName("Invariant text")
+            .WithMandatory(true)
+            .WithValidationRegExp("^Valid.*$")
+            .WithDataTypeId(Constants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+            .WithValueStorageType(ValueStorageType.Nvarchar)
+            .WithVariations(ContentVariation.Nothing)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("variantText")
+            .WithName("Variant text")
+            .WithMandatory(true)
+            .WithValidationRegExp("^Valid.*$")
+            .WithDataTypeId(Constants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+            .WithValueStorageType(ValueStorageType.Nvarchar)
+            .WithVariations(ContentVariation.Culture)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("nestedBlocks")
+            .WithName("Nested blocks")
+            .WithDataTypeId(nestedBlockListDataType.Id)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.BlockList)
+            .WithValueStorageType(ValueStorageType.Ntext)
+            .WithVariations(ContentVariation.Nothing)
+            .Done()
+            .Build();
+        ContentTypeService.Save(rootElementType);
+
+        return (rootElementType, nestedElementType);
+    }
+
     private class BlockProperty
     {
         public BlockProperty(IList<BlockPropertyValue> blockContentValues, IList<BlockPropertyValue> blockSettingsValues, string? culture, string? segment)

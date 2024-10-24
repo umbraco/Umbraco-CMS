@@ -77,17 +77,13 @@ internal sealed class ContentPublishingService : IContentPublishingService
         }
 
         ContentValidationResult validationResult = await ValidateCurrentContentAsync(content, cultures);
-
-        var errors = validationResult.ValidationErrors.Where(err =>
-            cultures.Contains(err.Culture ?? "*", StringComparer.InvariantCultureIgnoreCase));
-        if (errors.Any())
+        if (validationResult.ValidationErrors.Any())
         {
             scope.Complete();
             return Attempt.FailWithStatus(ContentPublishingOperationStatus.ContentInvalid, new ContentPublishingResult
             {
                 Content = content,
-                InvalidPropertyAliases = errors.Select(property => property.Alias).ToArray()
-                                         ?? Enumerable.Empty<string>()
+                InvalidPropertyAliases = validationResult.ValidationErrors.Select(property => property.Alias).ToArray()
             });
         }
 
@@ -131,11 +127,12 @@ internal sealed class ContentPublishingService : IContentPublishingService
         var model = new ContentUpdateModel()
         {
             InvariantName = content.Name,
-            InvariantProperties = cultures.Contains("*") ? content.Properties.Where(x=>x.PropertyType.VariesByCulture() is false).Select(x=> new PropertyValueModel()
+            // NOTE KJA: this needs redoing; we need to make an informed decision whether to include invariant properties, depending on if editing invariant properties is allowed on all variants, or if the default language is included in cultures
+            InvariantProperties = content.Properties.Where(x => x.PropertyType.VariesByCulture() is false).Select(x => new PropertyValueModel()
             {
                 Alias = x.Alias,
                 Value = x.GetValue()
-            }) : Array.Empty<PropertyValueModel>(),
+            }),
             Variants = cultures.Select(culture => new VariantModel()
             {
                 Name = content.GetPublishName(culture) ?? string.Empty,
@@ -149,7 +146,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             })
         };
         IContentType? contentType = _contentTypeService.Get(content.ContentType.Key)!;
-        ContentValidationResult validationResult = await _contentValidationService.ValidatePropertiesAsync(model, contentType);
+        ContentValidationResult validationResult = await _contentValidationService.ValidatePropertiesAsync(model, contentType, cultures);
         return validationResult;
     }
 

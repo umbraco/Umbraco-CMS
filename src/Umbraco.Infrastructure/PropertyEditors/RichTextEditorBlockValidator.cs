@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 
@@ -25,7 +26,7 @@ internal class RichTextEditorBlockValidator: BlockEditorValidatorBase<RichTextBl
         _logger = logger;
     }
 
-    protected override IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object? value)
+    protected override IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object? value, PropertyValidationContext validationContext)
     {
         RichTextPropertyEditorHelper.TryParseRichTextEditorValue(value, _jsonSerializer, _logger, out RichTextEditorValue? richTextEditorValue);
         if (richTextEditorValue?.Blocks is null)
@@ -35,7 +36,7 @@ internal class RichTextEditorBlockValidator: BlockEditorValidatorBase<RichTextBl
 
         BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? blockEditorData = _blockEditorValues.ConvertAndClean(richTextEditorValue.Blocks);
         return blockEditorData is not null
-            ? GetBlockEditorDataValidation(blockEditorData)
+            ? GetBlockEditorDataValidation(blockEditorData, validationContext)
             : Array.Empty<ElementTypeValidationModel>();
     }
 }
