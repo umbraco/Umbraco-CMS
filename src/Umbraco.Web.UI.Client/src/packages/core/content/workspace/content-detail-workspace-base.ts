@@ -257,7 +257,13 @@ export abstract class UmbContentDetailWorkspaceBase<
 		this._data.updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
 	}
 
-	name(variantId?: UmbVariantId) {
+	/**
+	 * Get an observable for the name of a variant
+	 * @param {UmbVariantId} [variantId] - The variant id
+	 * @returns {Observable<string>} - The name of the variant
+	 * @memberof UmbContentDetailWorkspaceBase
+	 */
+	name(variantId?: UmbVariantId): Observable<string> {
 		return this._data.createObservablePartOfCurrent(
 			(data) => data?.variants?.find((x) => variantId?.compare(x))?.name ?? '',
 		);
@@ -368,6 +374,14 @@ export abstract class UmbContentDetailWorkspaceBase<
 		return undefined;
 	}
 
+	/**
+	 * Set the value of the property with the given alias and variantId.
+	 * @template ValueType
+	 * @param {string} alias - The alias of the property
+	 * @param {ValueType} value - The value to set
+	 * @param {UmbVariantId} [variantId] - The variant id of the property
+	 * @memberof UmbContentDetailWorkspaceBase
+	 */
 	async setPropertyValue<ValueType = unknown>(alias: string, value: ValueType, variantId?: UmbVariantId) {
 		this.initiatePropertyValueChange();
 		variantId ??= UmbVariantId.CreateInvariant();
