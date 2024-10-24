@@ -77,11 +77,6 @@ export class UmbDocumentBlueprintWorkspaceContext
 		]);
 	}
 
-	override resetState() {
-		super.resetState();
-		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
-	}
-
 	async create(parent: UmbEntityModel, documentTypeUnique: string) {
 		return this.createScaffold({
 			parent,

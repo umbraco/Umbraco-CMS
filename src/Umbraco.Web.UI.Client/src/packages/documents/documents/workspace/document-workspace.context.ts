@@ -133,11 +133,6 @@ export class UmbDocumentWorkspaceContext
 		]);
 	}
 
-	override resetState() {
-		super.resetState();
-		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
-	}
-
 	override async load(unique: string) {
 		const response = await super.load(unique);
 

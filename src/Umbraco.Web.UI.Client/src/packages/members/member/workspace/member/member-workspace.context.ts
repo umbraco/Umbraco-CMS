@@ -70,11 +70,6 @@ export class UmbMemberWorkspaceContext
 		]);
 	}
 
-	override resetState() {
-		super.resetState();
-		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
-	}
-
 	async create(memberTypeUnique: string) {
 		return this.createScaffold({
 			parent: { entityType: UMB_MEMBER_ROOT_ENTITY_TYPE, unique: null },
