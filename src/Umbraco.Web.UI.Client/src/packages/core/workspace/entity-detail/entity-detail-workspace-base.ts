@@ -75,23 +75,44 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.#observeRepository(args.detailRepositoryAlias);
 	}
 
-	getEntityType() {
+	/**
+	 * Get the entity type
+	 * @returns { string } The entity type
+	 */
+	getEntityType(): string {
 		return this.#entityType;
 	}
 
-	getData() {
+	/**
+	 * Get the current data
+	 * @returns { DetailModelType | undefined } The entity context
+	 */
+	getData(): DetailModelType | undefined {
 		return this._data.getCurrent();
 	}
 
-	getUnique() {
+	/**
+	 * Get the unique
+	 * @returns { string | undefined } The unique identifier
+	 *
+	 */
+	getUnique(): UmbEntityUnique | undefined {
 		return this._data.getCurrent()?.unique;
 	}
 
-	getParent() {
+	/**
+	 * Get the parent
+	 * @returns { UmbEntityModel | undefined } The parent entity
+	 */
+	getParent(): UmbEntityModel | undefined {
 		return this.#parent.getValue();
 	}
 
-	getParentUnique() {
+	/**
+	 * Get the parent unique
+	 * @returns { string | undefined } The parent unique identifier
+	 */
+	getParentUnique(): UmbEntityUnique | undefined {
 		return this.#parent.getValue()?.unique;
 	}
 
@@ -118,10 +139,24 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return response;
 	}
 
-	public isLoaded() {
+	/**
+	 * Method to check if the workspace data is loaded.
+	 * @returns { Promise<any> | undefined } true if the workspace data is loaded.
+	 * @memberof UmbEntityWorkspaceContextBase
+	 */
+	public isLoaded(): Promise<any> | undefined {
 		return this._getDataPromise;
 	}
 
+	/**
+	 * Create a data scaffold
+	 * @param {CreateArgsType} args The arguments to create the scaffold.
+	 * @param {UmbEntityModel} args.parent The parent entity.
+	 * @param {UmbEntityUnique} args.parent.unique The unique identifier of the parent entity.
+	 * @param {string} args.parent.entityType The entity type of the parent entity.
+	 * @param {Partial<DetailModelType>} args.preset The preset data.
+	 * @returns { Promise<any> | undefined } The data of the scaffold.
+	 */
 	async createScaffold(args: CreateArgsType) {
 		await this.#init;
 		this.resetState();
@@ -163,19 +198,23 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		}
 	}
 
+	/**
+	 * Deletes the entity.
+	 * @param unique The unique identifier of the entity to delete.
+	 */
 	async delete(unique: string) {
 		await this.#init;
 		await this._detailRepository!.delete(unique);
 	}
 
 	/**
-	 * @description method to check if the workspace is about to navigate away.
+	 * Check if the workspace is about to navigate away.
 	 * @protected
-	 * @param {string} newUrl
-	 * @returns {*}
+	 * @param {string} newUrl The new url that the workspace is navigating to.
+	 * @returns { boolean} true if the workspace is navigating away.
 	 * @memberof UmbEntityWorkspaceContextBase
 	 */
-	protected _checkWillNavigateAway(newUrl: string) {
+	protected _checkWillNavigateAway(newUrl: string): boolean {
 		return !newUrl.includes(this.routes.getActiveLocalPath());
 	}
 
