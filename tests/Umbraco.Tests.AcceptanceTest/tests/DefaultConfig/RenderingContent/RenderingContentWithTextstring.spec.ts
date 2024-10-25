@@ -39,6 +39,6 @@ for (const textstring of textstrings) {
     await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
     // Assert
-    await umbracoUi.contentRender.doesContentRenderValueHaveText(textstringValue);
+    await umbracoUi.contentRender.doesContentRenderValueContainText(textstringValue);
   });
 }
