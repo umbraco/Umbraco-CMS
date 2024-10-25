@@ -19,6 +19,7 @@ export type CollectionAliasConditionConfig = UmbConditionConfigBase<typeof UMB_C
 
 declare global {
 	interface UmbExtensionConditionConfigMap {
+		CollectionBulkActionPermissionConditionConfig: CollectionBulkActionPermissionConditionConfig;
 		CollectionAliasConditionConfig: CollectionAliasConditionConfig;
 	}
 }
