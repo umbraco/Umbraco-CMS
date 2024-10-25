@@ -68,6 +68,7 @@ public static class PublishedContentExtensions
     ///     The specific culture to get the URL segment for. If null is used the current culture is used
     ///     (Default is null).
     /// </param>
+    [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in V16.")]
     public static string? UrlSegment(this IPublishedContent content, IVariationContextAccessor? variationContextAccessor, string? culture = null)
     {
         if (content == null)
@@ -89,10 +90,8 @@ public static class PublishedContentExtensions
             culture = variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
         }
 
-        // get
-        return culture != string.Empty && content.Cultures.TryGetValue(culture, out PublishedCultureInfo? infos)
-            ? infos.UrlSegment
-            : null;
+        IDocumentUrlService documentUrlService = StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>();
+        return documentUrlService.GetUrlSegment(content.Key, culture, content.IsDraft());
     }
 
     #endregion

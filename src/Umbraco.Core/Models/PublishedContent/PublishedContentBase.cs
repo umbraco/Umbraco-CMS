@@ -31,6 +31,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public virtual string Name => this.Name(_variationContextAccessor);
 
         /// <inheritdoc />
+        [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in V16.")]
         public virtual string? UrlSegment => this.UrlSegment(_variationContextAccessor);
 
         /// <inheritdoc />
@@ -75,7 +76,6 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
         public abstract IPublishedContent? Parent { get; }
 
-        // FIXME
         /// <inheritdoc />
         [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
         public virtual IEnumerable<IPublishedContent> Children => GetChildren();
