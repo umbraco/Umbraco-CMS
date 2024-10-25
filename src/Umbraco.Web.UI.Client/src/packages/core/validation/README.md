@@ -15,7 +15,7 @@ A Validation message consist of a type, path and body. This typically looks like
 ```
 {
 	type: "client",
-	path: "$.values[?(@.alias = 'my-property-alias')].value",
+	path: "$.values[?(@.alias == 'my-property-alias')].value",
 	message: "Must contain at least 3 words"
 }
 ```
@@ -61,7 +61,7 @@ Data:
 
 JsonPath:
 ```
-"$.values.[?(@.alias = 'my-alias')].value"
+"$.values.[?(@.alias == 'my-alias')].value"
 ```
 
 Paths are based on JSONPath, using JSON Path Queries when looking up data of an Array. Using Queries enables Paths to not point to specific index, but what makes a entry unique.
@@ -107,7 +107,7 @@ Such conversation could be from this path:
 
 To this path:
 ```
-"$.values.[?(@.alias = 'my-alias')].value"
+"$.values.[?(@.alias == 'my-alias')].value"
 ```
 
 Once this path is converted to use Json Path Queries, the Data can be changed. The concerned entry might get another index. Without that affecting the accuracy of the path.
@@ -135,7 +135,7 @@ The Data Path is a JSON Path defining where the data of this input is located in
 	this.#validationMessageBinder = new UmbBindServerValidationToFormControl(
 		this,
 		this.querySelector('#myInput"),
-		"$.values.[?(@.alias = 'my-input-alias')].value",
+		"$.values.[?(@.alias == 'my-input-alias')].value",
 	);
 ```
 

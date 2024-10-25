@@ -100,10 +100,10 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 * @example
 	 * ```ts
 	 * const validationContext = new UmbValidationContext(this);
-	 * validationContext.setDataPath("$.values[?(@.alias='my-property')].value");
+	 * validationContext.setDataPath("$.values[?(@.alias == 'my-property')].value");
 	 * ```
 	 *
-	 * A message with the path: '$.values[?(@.alias='my-property')].value.innerProperty', will for above example become '$.innerProperty' for the local Validation Context.
+	 * A message with the path: '$.values[?(@.alias == 'my-property')].value.innerProperty', will for above example become '$.innerProperty' for the local Validation Context.
 	 */
 	setDataPath(dataPath: string): void {
 		if (this.#baseDataPath) {
