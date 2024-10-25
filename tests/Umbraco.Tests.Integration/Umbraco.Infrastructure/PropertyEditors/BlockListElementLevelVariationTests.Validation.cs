@@ -331,9 +331,9 @@ public partial class BlockListElementLevelVariationTests
         {
             Assert.AreEqual(3, errors.Length);
             Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias = 'invariantText' && @.culture = null && @.segment = null)].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias = 'variantText' && @.culture = 'da-DK' && @.segment = null)].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[?(@.alias = 'variantText' && @.culture = 'en-US' && @.segment = null)].value"));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[?(@.alias == 'variantText' && @.culture == 'en-US' && @.segment == null)].value"));
         });
     }
 
@@ -453,13 +453,13 @@ public partial class BlockListElementLevelVariationTests
             Assert.AreEqual(6, errors.Length);
             Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null));
 
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[?(@.alias = 'invariantText' && @.culture = null && @.segment = null)].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[?(@.alias = 'variantText' && @.culture = 'da-DK' && @.segment = null)].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias = 'variantText' && @.culture = 'da-DK' && @.segment = null)].value"));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
 
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[?(@.alias = 'invariantText' && @.culture = null && @.segment = null)].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[?(@.alias = 'variantText' && @.culture = 'da-DK' && @.segment = null)].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[?(@.alias = 'invariantText' && @.culture = null && @.segment = null)].value"));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
         });
     }
 
