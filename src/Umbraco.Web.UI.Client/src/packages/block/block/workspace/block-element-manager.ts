@@ -41,11 +41,6 @@ export class UmbBlockElementManager extends UmbControllerBase {
 	constructor(host: UmbControllerHost, dataPathPropertyName: string) {
 		super(host);
 
-		console.log('dataPathPropertyName', dataPathPropertyName);
-		if (dataPathPropertyName === 'contentData') {
-			this.validation.messages.debug(dataPathPropertyName);
-		}
-
 		this.observe(this.contentTypeId, (id) => this.structure.loadType(id));
 		this.observe(this.unique, (key) => {
 			if (key) {
