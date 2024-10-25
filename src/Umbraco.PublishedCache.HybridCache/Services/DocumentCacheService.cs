@@ -78,8 +78,10 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             GetCacheKey(key, calculatedPreview), // Unique key to the cache entry
             async cancel =>
             {
-                ContentCacheNode? result = await _databaseCacheRepository.GetContentSourceAsync(key, calculatedPreview).ConfigureAwait(false);
-                return result;
+                using ICoreScope scope = _scopeProvider.CreateCoreScope();
+                ContentCacheNode? contentCacheNode = await _databaseCacheRepository.GetContentSourceAsync(key, calculatedPreview);
+                scope.Complete();
+                return contentCacheNode;
             });
 
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, calculatedPreview).CreateModel(_publishedModelFactory);

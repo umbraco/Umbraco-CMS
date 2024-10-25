@@ -147,9 +147,10 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                 Parallel.ForEachAsync(updateBatch, async (update, token) =>
                 {
                     //Foreach here, but we need to suppress the flow before each task, not all of them
+                    Task task;
                     using (ExecutionContext.SuppressFlow())
                     {
-                        await Task.Run(() =>
+                        task = Task.Run(() =>
                         {
                              using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
                     scope.Complete();
@@ -257,6 +258,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                     propertyDataDto.TextValue = stringValue;
                         }, token);
                     }
+
+                    await task;
                 }).GetAwaiter().GetResult();
 
                 updateBatch.RemoveAll(updatesToSkip.Contains);
