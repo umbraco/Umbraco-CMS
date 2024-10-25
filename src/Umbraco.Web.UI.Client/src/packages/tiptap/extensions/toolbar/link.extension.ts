@@ -1,4 +1,4 @@
-import { UmbTiptapToolbarElementApiBase } from '../types.js';
+import { UmbTiptapToolbarElementApiBase } from '../base.js';
 import { UmbLink } from '@umbraco-cms/backoffice/external/tiptap';
 import { UMB_LINK_PICKER_MODAL } from '@umbraco-cms/backoffice/multi-url-picker';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';

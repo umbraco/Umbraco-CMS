@@ -1,4 +1,4 @@
-import { UmbTiptapToolbarElementApiBase } from '../types.js';
+import { UmbTiptapToolbarElementApiBase } from '../base.js';
 import { getGuidFromUdi, getProcessedImageUrl, imageSize } from '@umbraco-cms/backoffice/utils';
 import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
