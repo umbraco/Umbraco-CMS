@@ -102,12 +102,17 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
     {
         var success = true;
 
-        // TODO BMB: clean up (remove .Where(...))
-        foreach (IPropertyType propertyType in propertyTypes.Where(pt => pt.Id == 279))
+        var propertyTypeCount = propertyTypes.Length;
+        for (var propertyTypeIndex = 0; propertyTypeIndex < propertyTypeCount; propertyTypeIndex++)
         {
+            IPropertyType propertyType = propertyTypes[propertyTypeIndex];
             try
             {
-                _logger.LogInformation("- starting property type: {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias})...", propertyType.Name, propertyType.Id, propertyType.Alias);
+                _logger.LogInformation(
+                    "- starting property type {propertyTypeIndex}/{propertyTypeCount} : {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias})...",
+                    propertyTypeIndex+1,
+                    propertyTypeCount,
+                    propertyType.Name, propertyType.Id, propertyType.Alias);
                 IDataType dataType = _dataTypeService.GetAsync(propertyType.DataTypeKey).GetAwaiter().GetResult()
                                      ?? throw new InvalidOperationException("The data type could not be fetched.");
 
@@ -118,7 +123,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                 }
 
                 IDataValueEditor valueEditor = dataType.Editor?.GetValueEditor()
-                                               ?? throw new InvalidOperationException("The data type value editor could not be fetched.");
+                                               ?? throw new InvalidOperationException(
+                                                   "The data type value editor could not be fetched.");
 
                 Sql<ISqlContext> sql = Sql()
                     .Select<PropertyDataDto>()
@@ -137,27 +143,19 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
 
                 var progress = 0;
 
-                ExecutionContext.SuppressFlow();
-                Parallel.ForEach(updateBatch, new ParallelOptions { MaxDegreeOfParallelism = 1 }, HandleUpdate);
-                ExecutionContext.RestoreFlow();
 
-                // TODO BMB: clean up
-                // foreach (UpdateBatch<PropertyDataDto> update in updateBatch)
-                // {
-                //     HandleUpdate(update);
-                // }
-
-                void HandleUpdate(UpdateBatch<PropertyDataDto> update)
+                foreach (var update in updateBatch)
                 {
-                    // TODO BMB: clean up
-                    // using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-                    // scope.Complete();
-                    using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
+                    using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+                    scope.Complete();
+                    using UmbracoContextReference umbracoContextReference =
+                        _umbracoContextFactory.EnsureUmbracoContext();
 
                     progress++;
                     if (progress % 100 == 0)
                     {
-                        _logger.LogInformation("  - finíshed {progress} of {total} properties", progress, updateBatch.Count);
+                        _logger.LogInformation("  - finíshed {progress} of {total} properties", progress,
+                            updateBatch.Count);
                     }
 
                     PropertyDataDto propertyDataDto = update.Poco;
@@ -165,7 +163,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                     // NOTE: some old property data DTOs can have variance defined, even if the property type no longer varies
                     var culture = propertyType.VariesByCulture()
                                   && propertyDataDto.LanguageId.HasValue
-                                  && languagesById.TryGetValue(propertyDataDto.LanguageId.Value, out ILanguage? language)
+                                  && languagesById.TryGetValue(propertyDataDto.LanguageId.Value,
+                                      out ILanguage? language)
                         ? language.IsoCode
                         : null;
 
@@ -181,7 +180,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                             propertyType.Name,
                             propertyType.Id,
                             propertyType.Alias);
-                        return;
+                        continue;
                     }
 
                     var segment = propertyType.VariesBySegment() ? propertyDataDto.Segment : null;
@@ -198,12 +197,12 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                                 propertyType.Id,
                                 propertyType.Alias);
                             updatesToSkip.Add(update);
-                            return;
+                            continue;
 
                         case string str when str.IsNullOrWhiteSpace():
                             // indicates either an empty block editor or corrupt block editor data - we can't do anything about either here
                             updatesToSkip.Add(update);
-                            return;
+                            continue;
 
                         default:
                             switch (DetermineEditorValueHandling(toEditorValue))
@@ -211,7 +210,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                                 case EditorValueHandling.IgnoreConversion:
                                     // nothing to convert, continue
                                     updatesToSkip.Add(update);
-                                    return;
+                                    continue;
                                 case EditorValueHandling.ProceedConversion:
                                     // continue the conversion
                                     break;
@@ -224,10 +223,11 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                                         propertyType.Id,
                                         propertyType.Alias);
                                     updatesToSkip.Add(update);
-                                    return;
+                                    continue;
                                 default:
                                     throw new ArgumentOutOfRangeException();
                             }
+
                             break;
                     }
 
@@ -244,7 +244,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                             propertyType.Id,
                             propertyType.Alias);
                         updatesToSkip.Add(update);
-                        return;
+                        continue;
                     }
 
                     stringValue = UpdateDatabaseValue(stringValue);
@@ -264,7 +264,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                 var result = Database.UpdateBatch(updateBatch, new BatchOptions { BatchSize = 100 });
                 if (result != updateBatch.Count)
                 {
-                    throw new InvalidOperationException($"The database batch update was supposed to update {updateBatch.Count} property DTO entries, but it updated {result} entries.");
+                    throw new InvalidOperationException(
+                        $"The database batch update was supposed to update {updateBatch.Count} property DTO entries, but it updated {result} entries.");
                 }
 
                 _logger.LogDebug(
@@ -289,8 +290,6 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
             }
         }
 
-        // TODO BMB: clean up (added so the migration will be re-runnable)
-        throw new NotImplementedException("TODO: REMOVE THIS");
         return success;
     }
 

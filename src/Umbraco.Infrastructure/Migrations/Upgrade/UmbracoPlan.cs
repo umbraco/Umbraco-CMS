@@ -66,7 +66,7 @@ public class UmbracoPlan : MigrationPlan
         To<V_13_5_0.ChangeRedirectUrlToNvarcharMax>("{CC47C751-A81B-489A-A2BC-0240245DB687}");
 
         // To 14.0.0
-        To<V_14_0_0.AddPropertyEditorUiAliasColumn>("{419827A0-4FCE-464B-A8F3-247C6092AF55}");
+        To<NoopMigration>("{419827A0-4FCE-464B-A8F3-247C6092AF55}");
         To<NoopMigration>("{69E12556-D9B3-493A-8E8A-65EC89FB658D}");
         To<NoopMigration>("{F2B16CD4-F181-4BEE-81C9-11CF384E6025}");
         To<NoopMigration>("{A8E01644-9F2E-4988-8341-587EF5B7EA69}");

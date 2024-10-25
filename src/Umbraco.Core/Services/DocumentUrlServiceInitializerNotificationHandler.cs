@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Core.Services;
 
-public class DocumentUrlServiceInitializerNotificationHandler : INotificationAsyncHandler<UmbracoApplicationStartedNotification>
+public class DocumentUrlServiceInitializerNotificationHandler : INotificationAsyncHandler<UmbracoApplicationStartingNotification>
 {
     private readonly IDocumentUrlService _documentUrlService;
     private readonly IRuntimeState _runtimeState;
@@ -14,7 +14,7 @@ public class DocumentUrlServiceInitializerNotificationHandler : INotificationAsy
         _runtimeState = runtimeState;
     }
 
-    public async Task HandleAsync(UmbracoApplicationStartedNotification notification, CancellationToken cancellationToken)
+    public async Task HandleAsync(UmbracoApplicationStartingNotification notification, CancellationToken cancellationToken)
     {
         if (_runtimeState.Level == RuntimeLevel.Upgrade)
         {

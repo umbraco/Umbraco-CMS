@@ -23,7 +23,7 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
         builder.Services.AddUnique<IServerMessenger, ScopedRepositoryTests.LocalServerMessenger>();
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
 
-        builder.Services.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, DocumentUrlServiceInitializerNotificationHandler>();
+        builder.Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlServiceInitializerNotificationHandler>();
     }
 
 
