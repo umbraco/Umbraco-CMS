@@ -5,8 +5,8 @@ import type { UmbVariantPropertyValueModel } from '@umbraco-cms/backoffice/varia
  * Validation Data Path Query generator for Property Value.
  * write a JSON-Path filter similar to `?(@.alias = 'myAlias' && @.culture == 'en-us' && @.segment == 'mySegment')`
  * where culture and segment are optional
- * @param value
- * @returns
+ * @param {UmbVariantPropertyValueModel} value - the object holding value and alias.
+ * @returns {string} - a JSON-path query
  */
 export function UmbDataPathPropertyValueQuery(
 	value: UmbPartialSome<Omit<UmbVariantPropertyValueModel, 'value'>, 'culture' | 'segment'>,

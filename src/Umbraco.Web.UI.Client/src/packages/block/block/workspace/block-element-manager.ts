@@ -1,4 +1,5 @@
 import type { UmbBlockDataModel, UmbBlockDataValueModel } from '../types.js';
+import { UmbBlockElementValuesDataValidationPathTranslator } from '../validation/block-element-values-validation-path-translator.controller.js';
 import { UmbBlockElementPropertyDatasetContext } from './block-element-property-dataset.context.js';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
@@ -39,6 +40,11 @@ export class UmbBlockElementManager extends UmbControllerBase {
 
 	constructor(host: UmbControllerHost, dataPathPropertyName: string) {
 		super(host);
+
+		console.log('dataPathPropertyName', dataPathPropertyName);
+		if (dataPathPropertyName === 'contentData') {
+			this.validation.messages.debug(dataPathPropertyName);
+		}
 
 		this.observe(this.contentTypeId, (id) => this.structure.loadType(id));
 		this.observe(this.unique, (key) => {
@@ -198,6 +204,9 @@ export class UmbBlockElementManager extends UmbControllerBase {
 
 		// Provide Validation Context for this view:
 		this.validation.provideAt(host);
+
+		// TODO: Implement ctrl alias.
+		new UmbBlockElementValuesDataValidationPathTranslator(host);
 	}
 
 	public override destroy(): void {
