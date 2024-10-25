@@ -5,6 +5,9 @@ import type { Editor, Extension, Mark, Node } from '@umbraco-cms/backoffice/exte
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
+export type * from './tiptap-extension.js';
+export type * from './tiptap-toolbar-extension.js';
+
 export interface UmbTiptapExtensionApi extends UmbApi {
 	/**
 	 * The manifest for the extension.
