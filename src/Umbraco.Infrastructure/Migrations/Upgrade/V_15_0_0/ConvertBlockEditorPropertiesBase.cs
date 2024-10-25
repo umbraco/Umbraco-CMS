@@ -75,6 +75,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
             .GroupBy(pt => pt.PropertyEditorAlias)
             .ToDictionary(group => group.Key, group => group.ToArray());
 
+
         foreach (var propertyEditorAlias in PropertyEditorAliases)
         {
             if (allPropertyTypesByEditor.TryGetValue(propertyEditorAlias, out IPropertyType[]? propertyTypes) is false)
@@ -143,10 +144,14 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
 
                 var progress = 0;
 
-
-                foreach (var update in updateBatch)
+                Parallel.ForEachAsync(updateBatch, async (update, token) =>
                 {
-                    using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+                    //Foreach here, but we need to suppress the flow before each task, not all of them
+                    using (ExecutionContext.SuppressFlow())
+                    {
+                        await Task.Run(() =>
+                        {
+                             using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
                     scope.Complete();
                     using UmbracoContextReference umbracoContextReference =
                         _umbracoContextFactory.EnsureUmbracoContext();
@@ -180,7 +185,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                             propertyType.Name,
                             propertyType.Id,
                             propertyType.Alias);
-                        continue;
+                        return;
                     }
 
                     var segment = propertyType.VariesBySegment() ? propertyDataDto.Segment : null;
@@ -197,12 +202,12 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                                 propertyType.Id,
                                 propertyType.Alias);
                             updatesToSkip.Add(update);
-                            continue;
+                            return;
 
                         case string str when str.IsNullOrWhiteSpace():
                             // indicates either an empty block editor or corrupt block editor data - we can't do anything about either here
                             updatesToSkip.Add(update);
-                            continue;
+                            return;
 
                         default:
                             switch (DetermineEditorValueHandling(toEditorValue))
@@ -210,7 +215,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                                 case EditorValueHandling.IgnoreConversion:
                                     // nothing to convert, continue
                                     updatesToSkip.Add(update);
-                                    continue;
+                                    return;
                                 case EditorValueHandling.ProceedConversion:
                                     // continue the conversion
                                     break;
@@ -223,7 +228,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                                         propertyType.Id,
                                         propertyType.Alias);
                                     updatesToSkip.Add(update);
-                                    continue;
+                                    return;
                                 default:
                                     throw new ArgumentOutOfRangeException();
                             }
@@ -244,13 +249,15 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                             propertyType.Id,
                             propertyType.Alias);
                         updatesToSkip.Add(update);
-                        continue;
+                        return;
                     }
 
                     stringValue = UpdateDatabaseValue(stringValue);
 
                     propertyDataDto.TextValue = stringValue;
-                }
+                        }, token);
+                    }
+                }).GetAwaiter().GetResult();
 
                 updateBatch.RemoveAll(updatesToSkip.Contains);
 
