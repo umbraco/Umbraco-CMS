@@ -1,4 +1,4 @@
-import type { UmbDataTypeDetailModel, UmbDataTypePropertyModel } from '../../types.js';
+import type { UmbDataTypeDetailModel, UmbDataTypePropertyValueModel } from '../../types.js';
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
@@ -70,7 +70,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 			name: data.name,
 			editorAlias: data.editorAlias,
 			editorUiAlias: data.editorUiAlias || null,
-			values: data.values as Array<UmbDataTypePropertyModel>,
+			values: data.values as Array<UmbDataTypePropertyValueModel>,
 		};
 
 		return { data: dataType };

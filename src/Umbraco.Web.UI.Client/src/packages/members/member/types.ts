@@ -3,6 +3,7 @@ import type { UmbMemberKindType } from './utils/index.js';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbContentDetailModel, UmbContentValueModel } from '@umbraco-cms/backoffice/content';
 
+export type * from './collection/types.js';
 export interface UmbMemberDetailModel extends UmbContentDetailModel {
 	email: string;
 	entityType: UmbMemberEntityType;
