@@ -1,4 +1,5 @@
 import type { UmbBlockDataModel, UmbBlockDataValueModel, UmbBlockLayoutBaseModel } from '../types.js';
+import { UmbBlockElementValuesDataValidationPathTranslator } from '../validation/block-element-values-validation-path-translator.controller.js';
 import { UmbBlockElementPropertyDatasetContext } from './block-element-property-dataset.context.js';
 import type { UmbBlockWorkspaceContext } from './block-workspace.context.js';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
@@ -226,6 +227,9 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 
 		// Provide Validation Context for this view:
 		this.validation.provideAt(host);
+
+		// TODO: Implement ctrl alias.
+		new UmbBlockElementValuesDataValidationPathTranslator(host);
 	}
 
 	public override destroy(): void {
