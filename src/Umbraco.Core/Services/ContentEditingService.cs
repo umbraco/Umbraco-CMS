@@ -159,7 +159,7 @@ internal sealed class ContentEditingService
                     // If we are not allowed to edit invariant properties, overwrite the edited property value with the current property value.
                     if (_contentSettings.AllowEditInvariantFromNonDefault is false && culture == defaultLanguage?.IsoCode)
                     {
-                        mergedValue = dataEditor.MergePartialPropertyValueForCulture(currentValue, editedValue, null);
+                        mergedValue = dataEditor.MergePartialPropertyValueForCulture(currentValue, mergedValue, null);
                     }
 
                     property.SetValue(mergedValue, null, null);
