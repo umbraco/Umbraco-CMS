@@ -901,6 +901,7 @@ export default {
 		avatar: 'Avatar til',
 		header: 'Overskrift',
 		systemField: 'system felt',
+		readOnly: 'Skrivebeskyttet',
 		restore: 'Genskab',
 		generic: 'Generic',
 		media: 'Media',

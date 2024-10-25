@@ -47,6 +47,7 @@ export default {
 		notify: 'Notifications',
 		protect: 'Public Access',
 		publish: 'Publish',
+		readOnly: 'Read-only',
 		refreshNode: 'Reload',
 		remove: 'Remove',
 		rename: 'Rename',
