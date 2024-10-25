@@ -1,3 +1,5 @@
+export type * from './conditions/types.js';
+
 export interface UmbRecycleBinRestoreRequestArgs {
 	unique: string;
 	destination: {
