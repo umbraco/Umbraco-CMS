@@ -16,7 +16,7 @@ test.afterEach(async ({umbracoApi}) => {
 const dropdownValues = [
   {type: 'an empty list of dropdown', value: [], isMultiple: false},
   {type: 'a single dropdown', value: ['Test checkbox'], isMultiple: false},
-  {type: 'a multiple dropdown', value: ['Test option 1', 'Test option 2'], isMultiple: true},
+  {type: 'a multiple dropdown', value: ['Test option 1', 'Test option 2'], isMultiple: true}
 ];
 
 for (const dropdown of dropdownValues) {

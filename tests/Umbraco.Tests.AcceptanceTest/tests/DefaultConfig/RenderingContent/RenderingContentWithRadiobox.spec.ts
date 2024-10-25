@@ -15,7 +15,7 @@ test.afterEach(async ({umbracoApi}) => {
 
 const radioboxValues = [
   {type: 'an empty radiobox', value: ''},
-  {type: 'a radiobox value', value: 'Test radiobox option'},
+  {type: 'a radiobox value', value: 'Test radiobox option'}
 ];
 
 for (const radiobox of radioboxValues) {
