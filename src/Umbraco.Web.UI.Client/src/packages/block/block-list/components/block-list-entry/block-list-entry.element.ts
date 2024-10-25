@@ -1,5 +1,6 @@
 import { UmbBlockListEntryContext } from '../../context/block-list-entry.context.js';
-import { UMB_BLOCK_LIST, type UmbBlockListLayoutModel } from '../../types.js';
+import type { UmbBlockListLayoutModel } from '../../types.js';
+import { UMB_BLOCK_LIST } from '../../constants.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
