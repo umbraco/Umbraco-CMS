@@ -38,6 +38,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 			mediaType: {
 				unique: '',
 				collection: null,
+				icon: null,
 			},
 			isTrashed: false,
 			values: [],
@@ -90,6 +91,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 			mediaType: {
 				unique: data.mediaType.id,
 				collection: data.mediaType.collection ? { unique: data.mediaType.collection.id } : null,
+				icon: data.mediaType.icon,
 			},
 			isTrashed: data.isTrashed,
 		};

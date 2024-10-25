@@ -442,7 +442,7 @@ export default {
 			"Modifier la culture d'une langue peut être une opération lourde qui aura pour conséquence la réinitialisation de la cache de contenu et des index",
 		lastEdited: 'Dernière modification',
 		link: 'Lien',
-		linkinternal: 'Lien interne :',
+		linkinternal: 'Lien interne',
 		linklocaltip: 'Si vous utilisez des ancres, insérez # au début du lien',
 		linknewwindow: 'Ouvrir dans une nouvelle fenêtre?',
 		macroDoesNotHaveProperties: 'Cette macro ne contient aucune propriété éditable',

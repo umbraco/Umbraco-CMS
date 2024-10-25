@@ -178,7 +178,7 @@ export default {
 		inserttable: 'הוסף טבלה',
 		lastEdited: 'נערך לאחרונה',
 		link: 'קישור',
-		linkinternal: 'קישור פנימי:',
+		linkinternal: 'קישור פנימי',
 		linklocaltip: 'בעת שימוש בקישוריים פנימיים, הוסף "#" בתחילת הקישור',
 		linknewwindow: 'לפתוח בחלון חדש?',
 		macroDoesNotHaveProperties: 'המאקרו לא מכיל מאפיינים שניתן לערוך',

@@ -359,7 +359,7 @@ export default {
 		inserttable: 'Вставить таблицу',
 		lastEdited: 'Последняя правка',
 		link: 'Ссылка',
-		linkinternal: 'Внутренняя ссылка:',
+		linkinternal: 'Внутренняя ссылка',
 		linklocaltip: 'Для того чтобы определить локальную ссылку, используйте "#" первым символом',
 		linknewwindow: 'Открыть в новом окне?',
 		macroDoesNotHaveProperties: 'Этот макрос не имеет редактируемых свойств',

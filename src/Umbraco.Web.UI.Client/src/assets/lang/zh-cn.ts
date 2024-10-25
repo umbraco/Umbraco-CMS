@@ -233,7 +233,7 @@ export default {
 		inserttable: '插入表格',
 		lastEdited: '最近编辑',
 		link: '链接',
-		linkinternal: '内部链接：',
+		linkinternal: '内部链接',
 		linklocaltip: '本地链接请用“#”号开头',
 		linknewwindow: '在新窗口中打开？',
 		macroDoesNotHaveProperties: '该宏没有可编辑的属性',

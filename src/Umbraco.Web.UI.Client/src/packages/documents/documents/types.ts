@@ -13,6 +13,7 @@ export interface UmbDocumentDetailModel extends UmbContentDetailModel {
 	documentType: {
 		unique: string;
 		collection: UmbReferenceByUnique | null;
+		icon?: string | null;
 	};
 	entityType: UmbDocumentEntityType;
 	isTrashed: boolean;
