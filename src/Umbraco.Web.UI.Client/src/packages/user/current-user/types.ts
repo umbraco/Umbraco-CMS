@@ -8,6 +8,8 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
+export type * from './conditions/types.js';
+
 export interface UmbCurrentUserModel {
 	allowedSections: Array<string>;
 	avatarUrls: Array<string>;
