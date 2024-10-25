@@ -31,14 +31,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 
                 if (_stack.Value?.TryPop(out IScope? ambientScope) ?? false)
                 {
-                    if(ambientScope is Scope scope)
-                    {
-                        if (scope.ParentScope?.InstanceId != AmbientScope?.InstanceId)
-                        {
-                            throw new InvalidOperationException("Wrong scope poped!");
-                        }
-                    }
-
                     return ambientScope;
                 }
 
