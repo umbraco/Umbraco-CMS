@@ -414,7 +414,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				position: sticky;
 				top: var(--uui-size-space-4);
 				height: min-content;
-				z-index: 2;
 			}
 
 			#editor {
