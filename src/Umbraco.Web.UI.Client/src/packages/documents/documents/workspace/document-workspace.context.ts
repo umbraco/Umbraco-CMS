@@ -36,7 +36,7 @@ import { UmbServerModelValidatorContext } from '@umbraco-cms/backoffice/validati
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import {
-	UmbContentDetailWorkspaceBase,
+	UmbContentDetailWorkspaceContextBase,
 	type UmbContentCollectionWorkspaceContext,
 	type UmbContentWorkspaceContext,
 } from '@umbraco-cms/backoffice/content';
@@ -48,7 +48,7 @@ type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
 
 export class UmbDocumentWorkspaceContext
-	extends UmbContentDetailWorkspaceBase<
+	extends UmbContentDetailWorkspaceContextBase<
 		ContentModel,
 		UmbDocumentDetailRepository,
 		ContentTypeModel,

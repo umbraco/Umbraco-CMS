@@ -15,7 +15,7 @@ import {
 } from '@umbraco-cms/backoffice/document-type';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContentDetailWorkspaceBase, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
+import { UmbContentDetailWorkspaceContextBase, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import {
 	UMB_DOCUMENT_COLLECTION_ALIAS,
 	UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
@@ -27,7 +27,7 @@ type ContentModel = UmbDocumentBlueprintDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
 
 export class UmbDocumentBlueprintWorkspaceContext
-	extends UmbContentDetailWorkspaceBase<
+	extends UmbContentDetailWorkspaceContextBase<
 		ContentModel,
 		UmbDocumentBlueprintDetailRepository,
 		ContentTypeModel,

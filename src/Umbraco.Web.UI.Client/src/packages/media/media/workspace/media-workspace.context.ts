@@ -16,7 +16,7 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbMediaTypeDetailModel } from '@umbraco-cms/backoffice/media-type';
 import {
-	UmbContentDetailWorkspaceBase,
+	UmbContentDetailWorkspaceContextBase,
 	type UmbContentCollectionWorkspaceContext,
 	type UmbContentWorkspaceContext,
 } from '@umbraco-cms/backoffice/content';
@@ -26,7 +26,12 @@ type ContentModel = UmbMediaDetailModel;
 type ContentTypeModel = UmbMediaTypeDetailModel;
 
 export class UmbMediaWorkspaceContext
-	extends UmbContentDetailWorkspaceBase<ContentModel, UmbMediaDetailRepository, ContentTypeModel, UmbMediaVariantModel>
+	extends UmbContentDetailWorkspaceContextBase<
+		ContentModel,
+		UmbMediaDetailRepository,
+		ContentTypeModel,
+		UmbMediaVariantModel
+	>
 	implements
 		UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbMediaVariantModel>,
 		UmbContentCollectionWorkspaceContext<ContentTypeModel>

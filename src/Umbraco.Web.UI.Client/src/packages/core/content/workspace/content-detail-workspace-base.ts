@@ -58,7 +58,7 @@ export interface UmbContentDetailWorkspaceContextArgs<
 	saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
 }
 
-export abstract class UmbContentDetailWorkspaceBase<
+export abstract class UmbContentDetailWorkspaceContextBase<
 		DetailModelType extends UmbContentDetailModel<VariantModelType>,
 		DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
 		ContentTypeDetailModelType extends UmbContentTypeModel = UmbContentTypeModel,

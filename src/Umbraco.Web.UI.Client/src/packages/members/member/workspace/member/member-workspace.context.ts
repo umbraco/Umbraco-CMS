@@ -13,13 +13,13 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbContentDetailWorkspaceBase, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
+import { UmbContentDetailWorkspaceContextBase, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 
 type ContentModel = UmbMemberDetailModel;
 type ContentTypeModel = UmbMemberTypeDetailModel;
 
 export class UmbMemberWorkspaceContext
-	extends UmbContentDetailWorkspaceBase<
+	extends UmbContentDetailWorkspaceContextBase<
 		ContentModel,
 		UmbMemberDetailRepository,
 		ContentTypeModel,
