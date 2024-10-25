@@ -52,9 +52,9 @@ public class ContentStore
     // SnapDictionary has unit tests to ensure it all works correctly
     // For locking information, see SnapDictionary
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
-    private readonly object _rlocko = new();
     private readonly IVariationContextAccessor _variationContextAccessor;
-    private readonly object _wlocko = new();
+    private readonly object _rlocko = new();
+    private readonly SemaphoreSlim _writeLock = new(1);
     private Task? _collectTask;
     private GenObj? _genObj;
     private long _liveGen;
@@ -319,7 +319,7 @@ public class ContentStore
 
     private void EnsureLocked()
     {
-        if (!Monitor.IsEntered(_wlocko))
+        if (_writeLock.CurrentCount != 0)
         {
             throw new InvalidOperationException("Write lock must be acquried.");
         }
@@ -327,14 +327,16 @@ public class ContentStore
 
     private void Lock(WriteLockInfo lockInfo, bool forceGen = false)
     {
-        if (Monitor.IsEntered(_wlocko))
+        if (_writeLock.CurrentCount == 0)
         {
             throw new InvalidOperationException("Recursive locks not allowed");
         }
 
-        Monitor.TryEnter(_wlocko, _monitorTimeout, ref lockInfo.Taken);
-
-        if (Monitor.IsEntered(_wlocko) is false)
+        if (_writeLock.Wait(_monitorTimeout))
+        {
+            lockInfo.Taken = true;
+        }
+        else
         {
             throw new TimeoutException("Could not enter monitor before timeout in content store");
         }
@@ -344,6 +346,7 @@ public class ContentStore
             // see SnapDictionary
             try
             {
+                // Run all code in finally to ensure ThreadAbortException does not interrupt execution
             }
             finally
             {
@@ -374,6 +377,7 @@ public class ContentStore
                     // see SnapDictionary
                     try
                     {
+                        // Run all code in finally to ensure ThreadAbortException does not interrupt execution
                     }
                     finally
                     {
@@ -409,7 +413,7 @@ public class ContentStore
         {
             if (lockInfo.Taken)
             {
-                Monitor.Exit(_wlocko);
+                _writeLock.Release();
             }
         }
     }
@@ -1810,7 +1814,7 @@ public class ContentStore
             // else we need to try to create a new gen ref
             // whether we are wlocked or not, noone can rlock while we do,
             // so _liveGen and _nextGen are safe
-            if (Monitor.IsEntered(_wlocko))
+            if (_writeLock.CurrentCount == 0)
             {
                 // write-locked, cannot use latest gen (at least 1) so use previous
                 var snapGen = _nextGen ? _liveGen - 1 : _liveGen;
@@ -1822,8 +1826,7 @@ public class ContentStore
                 }
                 else if (_genObj.Gen != snapGen)
                 {
-                    throw new PanicException(
-                        $"The generation {_genObj.Gen} does not equal the snapshot generation {snapGen}");
+                    throw new PanicException($"The generation {_genObj.Gen} does not equal the snapshot generation {snapGen}");
                 }
             }
             else
