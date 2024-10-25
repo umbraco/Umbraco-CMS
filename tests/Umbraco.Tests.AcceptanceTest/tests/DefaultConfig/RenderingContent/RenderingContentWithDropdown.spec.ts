@@ -42,6 +42,3 @@ for (const dropdown of dropdownValues) {
     }); 
   });
 }
-
-
-

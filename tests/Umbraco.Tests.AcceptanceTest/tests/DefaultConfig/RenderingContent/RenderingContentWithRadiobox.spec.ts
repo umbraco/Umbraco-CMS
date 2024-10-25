@@ -34,6 +34,3 @@ for (const radiobox of radioboxValues) {
     await umbracoUi.contentRender.doesContentRenderValueContainText(radiobox.value);
   });
 }
-
-
-
