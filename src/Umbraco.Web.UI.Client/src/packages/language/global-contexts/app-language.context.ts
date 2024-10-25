@@ -31,6 +31,7 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 	#currentUserHasAccessToAllLanguages = false;
 
 	#readOnlyStateIdentifier = 'UMB_LANGUAGE_PERMISSION_';
+	#localStorageKey = 'umb:appLanguage';
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_APP_LANGUAGE_CONTEXT);
@@ -61,17 +62,24 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 	}
 
 	setLanguage(unique: string) {
-		const appLanguage = this.#appLanguage.getValue();
-
 		// clear the previous read-only state
+		const appLanguage = this.#appLanguage.getValue();
 		if (appLanguage?.unique) {
 			this.appLanguageReadOnlyState.removeState(this.#readOnlyStateIdentifier + appLanguage.unique);
 		}
 
+		// find the language
+		const language = this.#findLanguage(unique);
+
+		if (!language) {
+			throw new Error(`Language with unique ${unique} not found`);
+		}
+
 		// set the new language
-		const languages = this.#languages.getValue();
-		const language = languages.find((x) => x.unique === unique);
 		this.#appLanguage.update(language);
+
+		// store the new language in local storage
+		localStorage.setItem(this.#localStorageKey, language?.unique);
 
 		// set the new read-only state
 		this.#setIsReadOnly();
@@ -92,13 +100,27 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 	}
 
 	#initAppLanguage() {
+		// get the selected language from local storage
+		const uniqueFromLocalStorage = localStorage.getItem(this.#localStorageKey);
+
+		if (uniqueFromLocalStorage) {
+			const language = this.#findLanguage(uniqueFromLocalStorage);
+			if (language) {
+				this.setLanguage(language.unique);
+				return;
+			}
+		}
+
 		const defaultLanguage = this.#languages.getValue().find((x) => x.isDefault);
 		// TODO: do we always have a default language?
 		// do we always get the default language on the first request, or could it be on page 2?
 		// in that case do we then need an endpoint to get the default language?
 		if (!defaultLanguage?.unique) return;
 		this.setLanguage(defaultLanguage.unique);
-		this.#setIsReadOnly();
+	}
+
+	#findLanguage(unique: string) {
+		return this.#languages.getValue().find((x) => x.unique === unique);
 	}
 
 	#setIsReadOnly() {
