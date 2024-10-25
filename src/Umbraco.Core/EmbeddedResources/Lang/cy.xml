@@ -438,20 +438,12 @@
     <key alias="noSniffCheckHeaderNotFound"><![CDATA[Nid yw'r peniad neu meta-tag <strong>X-Content-Type-Options</strong> sy'n cael ei ddefnyddio i amddiffyn yn erbyn gwendidau sniffio MIME wedi'i ganfod.]]></key>
     <key alias="hSTSCheckHeaderFound"><![CDATA[Mae'r peniad <strong>Strict-Transport-Security</strong>, hefyd wedi'i adnabod fel HSTS-header, wedi'i ganfod.]]></key>
     <key alias="hSTSCheckHeaderNotFound"><![CDATA[Nid yw'r peniad <strong>Strict-Transport-Security</strong> wedi'i ganfod.]]></key>
-    <key alias="hSTSCheckHeaderFoundOnLocalhost">
-      <![CDATA[Darganfuwyd y pennyn <strong>Strict-Transport-Security</strong>, a elwir hefyd yn HSTS-header. <strong>Ni ddylai'r pennyn hwn fod yn bresennol ar localhost.</strong>]]>
-    </key>
-    <key alias="hSTSCheckHeaderNotFoundOnLocalhost">
-      <![CDATA[Ni ddaethpwyd o hyd i'r pennyn <strong>Strict-Transport-Security</strong>. Ni ddylai'r pennyn hwn fod yn bresennol ar localhost.]]>
-    </key>
+    <key alias="hSTSCheckHeaderFoundOnLocalhost"><![CDATA[Darganfuwyd y pennyn <strong>Strict-Transport-Security</strong>, a elwir hefyd yn HSTS-header. <strong>Ni ddylai'r pennyn hwn fod yn bresennol ar localhost.</strong>]]></key>
+    <key alias="hSTSCheckHeaderNotFoundOnLocalhost"><![CDATA[Ni ddaethpwyd o hyd i'r pennyn <strong>Strict-Transport-Security</strong>. Ni ddylai'r pennyn hwn fod yn bresennol ar localhost.]]></key>
     <key alias="xssProtectionCheckHeaderFound"><![CDATA[Mae'r peniad <strong>X-XSS-Protection</strong> wedi'i ganfod.]]></key>
     <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[Nid yw'r peniad <strong>X-XSS-Protection</strong> wedi'i ganfod.]]></key>
-    <key alias="contentSecurityPolicyCheckHeaderFound">
-      <![CDATA[Mae'r peniad <strong>Content-Security-Policy (CSP)</strong> wedi'i ganfod.]]>
-    </key>
-    <key alias="contentSecurityPolicyCheckHeaderNotFound">
-      <![CDATA[Nid yw'r peniad <strong>Content-Security-Policy (CSP)</strong>, a ddefnyddir i atal ymosodiadau sgriptio traws-safle (XSS) a gwendidau pigiad cod eraill, wedi'i ganfod.]]>
-    </key>
+    <key alias="contentSecurityPolicyCheckHeaderFound"><![CDATA[Mae'r peniad <strong>Content-Security-Policy (CSP)</strong> wedi'i ganfod.]]></key>
+    <key alias="contentSecurityPolicyCheckHeaderNotFound"><![CDATA[Nid yw'r peniad <strong>Content-Security-Policy (CSP)</strong>, a ddefnyddir i atal ymosodiadau sgriptio traws-safle (XSS) a gwendidau pigiad cod eraill, wedi'i ganfod.]]></key>
     <key alias="excessiveHeadersFound"><![CDATA[Mae'r peniadau canlynol sy'n datgelu gwynodaeth am dechnoleg eich gwefan wedi'u canfod: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">Dim peniadau sy'n datgelu gwynodaeth am dechnoleg eich gwefan wedi'u canfod.</key>
     <key alias="smtpMailSettingsConnectionSuccess">Gosodiadau SMTP wedi ffurfweddu'n gywir ac mae'r gwasanaeth yn gweithio fel y disgwylir.</key>
@@ -461,9 +453,7 @@
     <key alias="scheduledHealthCheckEmailSubject">Statws Iechyd Umbraco: %0%</key>
     <key alias="httpsCheckConfigurationRectifyNotPossible">Mae gosodiad ap 'Umbraco:CMS:Global:UseHttps' wedi'i osod i 'false' yn eich ffeil appSettings.json. Unwaith y byddwch yn cyrchu'r wefan hon gan ddefnyddio'r cynllun HTTPS, dylid gosod hwnnw i 'true'.</key>
     <key alias="httpsCheckConfigurationCheckResult">Mae'r gosodiad ap 'Umbraco:CMS:Global:UseHttps' wedi'i osod i '%0%' yn eich ffeil appSettings.json, mae eich cwcis %1% wedi'u marcio'n ddiogel.</key>
-    <key alias="umbracoApplicationUrlCheckResultTrue">
-      Mae gosodiad yr ap 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' wedi'i osod i <strong>%0%</strong>.
-    </key>
+    <key alias="umbracoApplicationUrlCheckResultTrue">Mae gosodiad yr ap 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' wedi'i osod i <strong>%0%</strong>.</key>
     <key alias="umbracoApplicationUrlCheckResultFalse">Nid yw gosodiad ap 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' wedi'i osod.</key>
     <key alias="smtpMailSettingsNotFound">Nid oedd modd dod o hyd i'r ffurfweddiad 'Umbraco:CMS:Global:Smtp'.</key>
     <key alias="smtpMailSettingsHostNotConfigured">Nid oedd modd dod o hyd i'r ffurfweddiad 'Umbraco:CMS:Global:Smtp:Host'.</key>
@@ -489,7 +479,8 @@
         <li>Nifer o: Nodau gwraidd, Nodau Cynnwys, Macros, Cyfryngau, Mathau o Ddogfen, Templedi, Ieithoedd, Parthau, Grŵp Defnyddwyr, Defnyddwyr, Aelodau, a Golygyddion Eiddo a ddefnyddir.</li>
         <li>Gwybodaeth system: Webserver, gweinydd OS, fframwaith gweinydd, iaith gweinyddwr OS, a darparwr cronfa ddata.</li>
         <li>Gosodiadau cyfluniad: Modd Modelsbuilder, os oes llwybr Umbraco arferol yn bodoli, amgylchedd ASP, ac os ydych chi yn y modd dadfygio.</li>
-      </ul><em>
+      </ul>
+      <em>
         Efallai y byddwn yn newid yr hyn a anfonwn ar y lefel Fanwl yn y dyfodol. Os felly, fe'i rhestrir uchod.
         <br />Drwy ddewis "Manwl" rydych yn cytuno i wybodaeth ddienw yn awr ac yn y dyfodol gael ei chasglu.
       </em>
