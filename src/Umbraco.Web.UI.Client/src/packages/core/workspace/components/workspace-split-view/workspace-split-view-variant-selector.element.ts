@@ -66,6 +66,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	@state()
 	private _readOnlyCultures: string[] = [];
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	protected _variantSorter = (a: VariantOptionModelType, b: VariantOptionModelType) => {
+		return 0;
+	};
+
 	constructor() {
 		super();
 
@@ -92,7 +97,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		this.observe(
 			workspaceContext.variantOptions,
 			(variantOptions) => {
-				this._variantOptions = variantOptions as Array<VariantOptionModelType>;
+				this._variantOptions = (variantOptions as Array<VariantOptionModelType>).sort(this._variantSorter);
 				this.#setReadOnlyCultures();
 			},
 			'_observeVariantOptions',

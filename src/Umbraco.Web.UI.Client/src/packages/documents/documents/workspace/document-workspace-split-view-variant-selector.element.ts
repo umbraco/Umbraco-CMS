@@ -1,4 +1,5 @@
 import type { UmbDocumentVariantOptionModel } from '../types.js';
+import { sortVariants } from '../utils.js';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -7,6 +8,8 @@ import { UmbWorkspaceSplitViewVariantSelectorElement } from '@umbraco-cms/backof
 const elementName = 'umb-document-workspace-split-view-variant-selector';
 @customElement(elementName)
 export class UmbDocumentWorkspaceSplitViewVariantSelectorElement extends UmbWorkspaceSplitViewVariantSelectorElement<UmbDocumentVariantOptionModel> {
+	protected override _variantSorter = sortVariants;
+
 	#publishStateLocalizationMap = {
 		[DocumentVariantStateModel.DRAFT]: 'content_unpublished',
 		[DocumentVariantStateModel.PUBLISHED]: 'content_published',
