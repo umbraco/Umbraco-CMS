@@ -434,6 +434,47 @@ public class ContentNavigationServiceBaseTests
     }
 
     [Test]
+    public void Cannot_Get_Level_From_Non_Existing_Content_Key()
+    {
+        // Arrange
+        var nonExistingKey = Guid.NewGuid();
+
+        // Act
+        var result = _navigationService.TryGetLevel(nonExistingKey, out var level);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result);
+            Assert.IsNull(level);
+        });
+    }
+
+    [Test]
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", 1)] // Root
+    [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", 2)] // Child 1
+    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", 3)] // Grandchild 1
+    [TestCase("A1B1B217-B02F-4307-862C-A5E22DB729EB", 3)] // Grandchild 2
+    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", 2)] // Child 2
+    [TestCase("D63C1621-C74A-4106-8587-817DEE5FB732", 3)] // Grandchild 3
+    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", 4)] // Great-grandchild 1
+    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", 2)] // Child 3
+    [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8", 3)] // Grandchild 4
+    public void Can_Get_Level_From_Existing_Content_Key(Guid key, int expectedLevel)
+    {
+        // Act
+        var result = _navigationService.TryGetLevel(key, out var level);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            Assert.IsNotNull(level);
+            Assert.AreEqual(expectedLevel, level);
+        });
+    }
+
+    [Test]
     public void Cannot_Move_Node_To_Bin_When_Non_Existing_Content_Key()
     {
         // Arrange
