@@ -71,7 +71,7 @@ stages:
       - job: A
         displayName: Build Umbraco CMS
         pool:
-          vmImage: 'windows-latest'
+          vmImage: 'ubuntu-latest'
         steps:
           - checkout: self
             submodules: true
