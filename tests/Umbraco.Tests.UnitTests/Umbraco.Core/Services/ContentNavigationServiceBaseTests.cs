@@ -374,7 +374,7 @@ public class ContentNavigationServiceBaseTests
     public void Can_Get_Siblings_Of_Existing_Content_Key_At_Content_Root()
     {
         // Arrange
-        Guid anotherRoot = new Guid("716380B9-DAA9-4930-A461-95EF39EBAB41");
+        Guid anotherRoot = Guid.NewGuid();
         _navigationService.Add(anotherRoot);
 
         // Act
