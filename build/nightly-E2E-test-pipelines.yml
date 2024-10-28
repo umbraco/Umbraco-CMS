@@ -207,9 +207,9 @@ stages:
 
           # Test
           - ${{ if eq(parameters.runSmokeTests, true) }}:
-              pwsh: npm run smokeTest --ignore-certificate-errors
+              pwsh: npm run smokeTestSqlite --ignore-certificate-errors
             ${{ else }}:
-              pwsh: npm run test --ignore-certificate-errors
+              pwsh: npm run testSqlite --ignore-certificate-errors
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest

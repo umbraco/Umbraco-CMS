@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Hosting;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Core.Services.Navigation;
 
@@ -6,12 +8,12 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 ///     Responsible for seeding the in-memory publish status cache at application's startup
 ///     by loading all data from the database.
 /// </summary>
-public sealed class PublishStatusInitializationHostedService : IHostedLifecycleService
+public sealed class PublishStatusInitializationNotificationHandler : INotificationAsyncHandler<PostRuntimePremigrationsUpgradeNotification>
 {
     private readonly IRuntimeState _runtimeState;
     private readonly IPublishStatusManagementService _publishStatusManagementService;
 
-    public PublishStatusInitializationHostedService(
+    public PublishStatusInitializationNotificationHandler(
         IRuntimeState runtimeState,
         IPublishStatusManagementService publishStatusManagementService
         )
@@ -20,7 +22,7 @@ public sealed class PublishStatusInitializationHostedService : IHostedLifecycleS
         _publishStatusManagementService = publishStatusManagementService;
     }
 
-    public async Task StartingAsync(CancellationToken cancellationToken)
+    public async Task HandleAsync(PostRuntimePremigrationsUpgradeNotification notification, CancellationToken cancellationToken)
     {
         if(_runtimeState.Level < RuntimeLevel.Upgrade)
         {
@@ -29,14 +31,4 @@ public sealed class PublishStatusInitializationHostedService : IHostedLifecycleS
 
         await _publishStatusManagementService.InitializeAsync(cancellationToken);
     }
-
-    public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-    public Task StartedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-    public Task StoppingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-    public Task StoppedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

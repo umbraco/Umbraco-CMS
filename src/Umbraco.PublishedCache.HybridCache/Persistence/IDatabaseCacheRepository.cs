@@ -67,4 +67,6 @@ internal interface IDatabaseCacheRepository
     ///     Rebuilds the caches for content, media and/or members based on the content type ids specified
     /// </summary>
     bool VerifyMediaDbCache();
+
+    Task<IEnumerable<Guid>> GetContentKeysAsync(Guid nodeObjectType);
 }
