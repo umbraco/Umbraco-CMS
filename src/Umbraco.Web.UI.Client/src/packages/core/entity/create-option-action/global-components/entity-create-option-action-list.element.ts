@@ -51,6 +51,7 @@ export class UmbEntityCreateOptionActionListElement extends UmbLitElement {
 	>;
 
 	#entityContext = new UmbEntityContext(this);
+	#extensionType = 'entityCreateOptionAction';
 
 	#generateApiArgs() {
 		if (!this._props.entityType || this._props.unique === undefined) return;
@@ -69,7 +70,7 @@ export class UmbEntityCreateOptionActionListElement extends UmbLitElement {
 		return this._filter
 			? html`
 					<umb-extension-with-api-slot
-						type="entityAction"
+						type=${this.#extensionType}
 						.filter=${this._filter}
 						.elementProps=${this._props}
 						.apiArgs=${this._apiArgs}
