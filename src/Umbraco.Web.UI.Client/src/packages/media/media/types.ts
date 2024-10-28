@@ -7,6 +7,7 @@ export interface UmbMediaDetailModel extends UmbContentDetailModel {
 	mediaType: {
 		unique: string;
 		collection: UmbReferenceByUnique | null;
+		icon?: string | null;
 	};
 	entityType: UmbMediaEntityType;
 	isTrashed: boolean;

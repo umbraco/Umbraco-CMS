@@ -1,16 +1,17 @@
+import { UMB_DOCUMENT_PROPERTY_DATASET_CONTEXT } from '../../../property-dataset-context/index.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
+import type { UmbDocumentVariantModel } from '../../../types.js';
 import { TimeOptions } from './utils.js';
-import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UMB_TEMPLATE_PICKER_MODAL, UmbTemplateItemRepository } from '@umbraco-cms/backoffice/template';
 import type { DocumentUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
-import type { UmbDocumentVariantModel } from '@umbraco-cms/backoffice/document';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 // import of local components
@@ -27,9 +28,6 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 	@state()
 	private _urls?: Array<DocumentUrlInfoModel>;
-
-	@state()
-	private _createDate?: string;
 
 	/**Document Type */
 	@state()
@@ -52,7 +50,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	private _templateName?: string;
 
 	@state()
-	private _variants: UmbDocumentVariantModel[] = [];
+	private _variant?: UmbDocumentVariantModel;
 
 	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 
@@ -77,6 +75,13 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			this.#workspaceContext = context;
 			this._documentTypeUnique = this.#workspaceContext.getContentTypeId()!;
 			this.#observeContent();
+		});
+
+		this.consumeContext(UMB_DOCUMENT_PROPERTY_DATASET_CONTEXT, (context) => {
+			this.observe(context.currentVariant, (value) => {
+				// TODO: get the correct type automatically
+				this._variant = value as UmbDocumentVariantModel;
+			});
 		});
 	}
 
@@ -121,44 +126,10 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			},
 			'_templateUnique',
 		);
-
-		this.observe(
-			this.#workspaceContext.variants,
-			(variants) => {
-				this._variants = variants;
-				this.#observeVariants();
-			},
-			'_variants',
-		);
 	}
 
-	#observeVariants() {
-		// Find the oldest variant
-		const oldestVariant =
-			this._variants.length > 0
-				? this._variants
-						.filter((v) => !!v.createDate)
-						.reduce((prev, current) => (prev.createDate! < current.createDate! ? prev : current))
-				: null;
-
-		this._createDate = oldestVariant?.createDate ?? new Date().toISOString();
-	}
-
-	#renderVariantStates() {
-		return repeat(
-			this._variants,
-			(variant) => `${variant.culture}_${variant.segment}`,
-			(variant) => html`
-				<div class="variant-state">
-					<span>${variant.culture ?? this._invariantCulture}</span>
-					${this.#renderStateTag(variant)}
-				</div>
-			`,
-		);
-	}
-
-	#renderStateTag(variant: UmbDocumentVariantModel) {
-		switch (variant.state) {
+	#renderStateTag() {
+		switch (this._variant?.state) {
 			case DocumentVariantStateModel.DRAFT:
 				return html`
 					<uui-tag look="secondary" label=${this.localize.term('content_unpublished')}>
@@ -174,13 +145,13 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			case DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES:
 				return html`
 					<uui-tag color="positive" look="primary" label=${this.localize.term('content_publishedPendingChanges')}>
-						${this.localize.term('content_published')}
+						${this.localize.term('content_publishedPendingChanges')}
 					</uui-tag>
 				`;
 			default:
 				return html`
-					<uui-tag look="primary" label=${this.localize.term('content_published')}>
-						${this.localize.term('content_published')}
+					<uui-tag look="primary" label=${this.localize.term('content_notCreated')}>
+						${this.localize.term('content_notCreated')}
 					</uui-tag>
 				`;
 		}
@@ -240,14 +211,10 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		return html`
 			<div class="general-item">
 				<strong><umb-localize key="content_publishStatus">Publication Status</umb-localize></strong>
-				<umb-stack look="compact">${this.#renderVariantStates()}</umb-stack>
+				<span>${this.#renderStateTag()}</span>
 			</div>
-			<div class="general-item">
-				<strong><umb-localize key="content_createDate">Created</umb-localize></strong>
-				<span>
-					<umb-localize-date .date=${this._createDate} .options=${TimeOptions}></umb-localize-date>
-				</span>
-			</div>
+			${this.#renderCreateDate()}
+
 			<div class="general-item">
 				<strong><umb-localize key="content_documentType">Document Type</umb-localize></strong>
 				<uui-ref-node-document-type
@@ -283,6 +250,19 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			<div class="general-item">
 				<strong><umb-localize key="template_id">Id</umb-localize></strong>
 				<span>${this._documentUnique}</span>
+			</div>
+		`;
+	}
+
+	#renderCreateDate() {
+		if (!this._variant?.createDate) return nothing;
+
+		return html`
+			<div class="general-item">
+				<strong><umb-localize key="content_createDate">Created</umb-localize></strong>
+				<span>
+					<umb-localize-date .date=${this._variant.createDate} .options=${TimeOptions}></umb-localize-date>
+				</span>
 			</div>
 		`;
 	}

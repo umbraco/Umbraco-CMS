@@ -42,6 +42,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			documentType: {
 				unique: '',
 				collection: null,
+				icon: null,
 			},
 			isTrashed: false,
 			values: [],
@@ -120,6 +121,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			documentType: {
 				unique: data.documentType.id,
 				collection: data.documentType.collection ? { unique: data.documentType.collection.id } : null,
+				icon: data.documentType.icon,
 			},
 			isTrashed: data.isTrashed,
 		};

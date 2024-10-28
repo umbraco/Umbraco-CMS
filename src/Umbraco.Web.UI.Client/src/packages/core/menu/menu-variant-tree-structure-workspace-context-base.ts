@@ -45,7 +45,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		let structureItems: Array<UmbVariantStructureItemModel> = [];
 
 		const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
-		if (!unique) throw new Error('Unique is not available');
+		if (unique === undefined) throw new Error('Unique is not available');
 
 		const entityType = (await this.observe(entityTypeObservable, () => {})?.asPromise()) as string;
 		if (!entityType) throw new Error('Entity type is not available');

@@ -108,7 +108,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	}
 
 	@property({ type: Array })
-	allowedContentTypeIds?: string[] | undefined;
+	allowedContentTypeIds?: Array<string> | undefined;
 
 	@property({ type: Boolean })
 	showOpenButton?: boolean;

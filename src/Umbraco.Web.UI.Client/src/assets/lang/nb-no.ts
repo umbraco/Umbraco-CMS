@@ -222,7 +222,7 @@ export default {
 		inserttable: 'Sett inn tabell',
 		lastEdited: 'Sist redigert',
 		link: 'Lenke',
-		linkinternal: 'Intern link:',
+		linkinternal: 'Intern link',
 		linklocaltip: 'Ved lokal link, sett inn "#" foran link',
 		linknewwindow: 'Åpne i nytt vindu?',
 		macroDoesNotHaveProperties: 'Denne makroen har ingen egenskaper du kan endre',

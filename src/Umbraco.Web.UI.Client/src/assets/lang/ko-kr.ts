@@ -178,7 +178,7 @@ export default {
 		inserttable: '테이블 삽입',
 		lastEdited: '마지막 수정',
 		link: '링크',
-		linkinternal: '내부링크:',
+		linkinternal: '내부링크',
 		linklocaltip: '내부링크를 사용하실 때 링크앞에 "#"를 넣어주세요',
 		linknewwindow: '새 창으로 여시겠습니까?',
 		macroDoesNotHaveProperties: '이 매크로에는 편집할 수 있는 항목이 포함되어 있지 않습니다.',

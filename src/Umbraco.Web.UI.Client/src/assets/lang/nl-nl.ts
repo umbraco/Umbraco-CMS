@@ -452,7 +452,7 @@ export default {
 			'De cultuur veranderen voor een taal kan een langdurige operatie zijn en zal ertoe\n      leiden dat de inhoudscache en indexen opnieuw worden opgebouwd\n    ',
 		lastEdited: 'Laatst aangepast op',
 		link: 'Link',
-		linkinternal: 'Interne link:',
+		linkinternal: 'Interne link',
 		linklocaltip: 'Plaats een hekje (“#”) voor voor interne links.',
 		linknewwindow: 'In nieuw venster openen?',
 		macroDoesNotHaveProperties: 'Deze macro heeft geen eigenschappen die u kunt bewerken',
