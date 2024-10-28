@@ -2,32 +2,28 @@
 
 const contentName = 'Test Rendering Content';
 const documentTypeName = 'TestDocumentTypeForContent';
-const dataTypeName = 'Numeric';
+const customDataTypeName = 'Custom Radiobox';
 const templateName = 'TestTemplateForContent';
-const propertyName = 'Test Numeric';
-let dataTypeData = null;
-
-test.beforeEach(async ({umbracoApi}) => {
-  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName); 
-});
+const propertyName = 'Test Radiobox';
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName); 
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.template.ensureNameNotExists(templateName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-const numerics = [
-  {type: 'a positive integer', value: '1234567890'},
-  {type: 'a negative integer', value: '-1234567890'},
+const radioboxValues = [
+  {type: 'an empty radiobox', value: ''},
+  {type: 'a radiobox value', value: 'Test radiobox option'}
 ];
 
-for (const numeric of numerics) {
-  test(`can render content with ${numeric.type}`, async ({umbracoApi, umbracoUi}) => {
+for (const radiobox of radioboxValues) {
+  test(`can render content with ${radiobox.type}`, async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const numericValue = numeric.value;
+    const dataTypeId = await umbracoApi.dataType.createRadioboxDataType(customDataTypeName, [radiobox.value]);
     const templateId = await umbracoApi.template.createTemplateWithDisplayingStringValue(templateName, AliasHelper.toAlias(propertyName));
-    await umbracoApi.document.createPublishedDocumentWithValue(contentName, numericValue, dataTypeData.id, templateId, propertyName, documentTypeName);
+    await umbracoApi.document.createPublishedDocumentWithValue(contentName, radiobox.value, dataTypeId, templateId, propertyName, documentTypeName);
     const contentData = await umbracoApi.document.getByName(contentName);
     const contentURL = contentData.urls[0].url;
 
@@ -35,6 +31,6 @@ for (const numeric of numerics) {
     await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
     // Assert
-    await umbracoUi.contentRender.doesContentRenderValueContainText(numericValue);
+    await umbracoUi.contentRender.doesContentRenderValueContainText(radiobox.value);
   });
 }
