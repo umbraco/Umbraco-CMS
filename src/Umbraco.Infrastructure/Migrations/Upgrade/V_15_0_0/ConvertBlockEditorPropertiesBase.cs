@@ -84,16 +84,19 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                 continue;
             }
 
-            _logger.LogInformation("Migration starting for all properties of type: {propertyEditorAlias}",
+            _logger.LogInformation(
+                "Migration starting for all properties of type: {propertyEditorAlias}",
                 propertyEditorAlias);
             if (Handle(propertyTypes, languagesById))
             {
-                _logger.LogInformation("Migration succeeded for all properties of type: {propertyEditorAlias}",
+                _logger.LogInformation(
+                    "Migration succeeded for all properties of type: {propertyEditorAlias}",
                     propertyEditorAlias);
             }
             else
             {
-                _logger.LogError("Migration failed for one or more properties of type: {propertyEditorAlias}",
+                _logger.LogError(
+                    "Migration failed for one or more properties of type: {propertyEditorAlias}",
                     propertyEditorAlias);
             }
         }
@@ -154,7 +157,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                     Task task;
                     using (ExecutionContext.SuppressFlow())
                     {
-                        task = Task.Run(() =>
+                        task = Task.Run(
+                            () =>
                         {
                             using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
                             scope.Complete();
@@ -173,7 +177,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                             // NOTE: some old property data DTOs can have variance defined, even if the property type no longer varies
                             var culture = propertyType.VariesByCulture()
                                           && propertyDataDto.LanguageId.HasValue
-                                          && languagesById.TryGetValue(propertyDataDto.LanguageId.Value,
+                                          && languagesById.TryGetValue(
+                                              propertyDataDto.LanguageId.Value,
                                               out ILanguage? language)
                                 ? language.IsoCode
                                 : null;

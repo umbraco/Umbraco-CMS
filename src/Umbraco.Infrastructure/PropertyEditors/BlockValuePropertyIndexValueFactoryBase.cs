@@ -136,9 +136,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
             indexData.Add(
                 ToRawData(
                     blockItemData.ContentTypeKey,
-                    blockItemData.Values.Where(value => value.Culture is null || exposedCultures.Contains(value.Culture))
-                )
-            );
+                    blockItemData.Values.Where(value => value.Culture is null || exposedCultures.Contains(value.Culture))));
         }
 
         return indexData;
