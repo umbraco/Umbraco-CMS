@@ -33,9 +33,7 @@ internal class SeedingNotificationHandler : INotificationAsyncHandler<UmbracoApp
             return;
         }
 
-        await Task.WhenAll(
-            _documentCacheService.SeedAsync(cancellationToken),
-            _mediaCacheService.SeedAsync(cancellationToken)
-        );
+        await _documentCacheService.SeedAsync(cancellationToken);
+        await _mediaCacheService.SeedAsync(cancellationToken);
     }
 }

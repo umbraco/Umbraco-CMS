@@ -72,16 +72,19 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
     public async Task<IPublishedContent?> GetByKeyAsync(Guid key, bool? preview = null)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
-
         bool calculatedPreview = preview ?? GetPreview();
 
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
             GetCacheKey(key, calculatedPreview), // Unique key to the cache entry
-            async cancel => await _databaseCacheRepository.GetContentSourceAsync(key, calculatedPreview),
+            async cancel =>
+            {
+                using ICoreScope scope = _scopeProvider.CreateCoreScope();
+                ContentCacheNode? contentCacheNode = await _databaseCacheRepository.GetContentSourceAsync(key, calculatedPreview);
+                scope.Complete();
+                return contentCacheNode;
+            },
             GetEntryOptions(key));
 
-        scope.Complete();
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, calculatedPreview).CreateModel(_publishedModelFactory);
     }
 
@@ -101,12 +104,16 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         bool calculatedPreview = preview ?? GetPreview();
         Guid key = keyAttempt.Result;
 
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
-            GetCacheKey(key, calculatedPreview), // Unique key to the cache entry
-            async cancel => await _databaseCacheRepository.GetContentSourceAsync(id, calculatedPreview),
-            GetEntryOptions(key));
-        scope.Complete();
+            GetCacheKey(keyAttempt.Result, calculatedPreview), // Unique key to the cache entry
+        async cancel =>
+        {
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
+            ContentCacheNode? contentCacheNode = await _databaseCacheRepository.GetContentSourceAsync(id, calculatedPreview);
+            scope.Complete();
+            return contentCacheNode;
+        }, GetEntryOptions(key));
+
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, calculatedPreview).CreateModel(_publishedModelFactory);;
     }
 
@@ -174,8 +181,6 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
     public async Task SeedAsync(CancellationToken cancellationToken)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
-
         foreach (Guid key in SeedKeys)
         {
             if(cancellationToken.IsCancellationRequested)
@@ -185,32 +190,33 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
             var cacheKey = GetCacheKey(key, false);
 
-            // We'll use GetOrCreateAsync because it may be in the second level cache, in which case we don't have to re-seed.
-            ContentCacheNode? cachedValue = await _hybridCache.GetOrCreateAsync<ContentCacheNode?>(
-                cacheKey,
-                async cancel =>
-                {
-                    ContentCacheNode? cacheNode = await _databaseCacheRepository.GetContentSourceAsync(key, false);
-
-                    // We don't want to seed drafts
-                    if (cacheNode is null || cacheNode.IsDraft)
+                // We'll use GetOrCreateAsync because it may be in the second level cache, in which case we don't have to re-seed.
+                ContentCacheNode? cachedValue = await _hybridCache.GetOrCreateAsync<ContentCacheNode?>(
+                    cacheKey,
+                    async cancel =>
                     {
-                        return null;
-                    }
+                        using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
-                    return cacheNode;
-                },
+                        ContentCacheNode? cacheNode = await _databaseCacheRepository.GetContentSourceAsync(key, false);
+
+                        scope.Complete();
+                        // We don't want to seed drafts
+                        if (cacheNode is null || cacheNode.IsDraft)
+                        {
+                            return null;
+                        }
+
+                        return cacheNode;
+                    },
                 GetSeedEntryOptions(),
                 cancellationToken: cancellationToken);
 
-            // If the value is null, it's likely because
-            if (cachedValue is null)
+                // If the value is null, it's likely because
+                if (cachedValue is null)
             {
                 await _hybridCache.RemoveAsync(cacheKey);
             }
         }
-
-        scope.Complete();
     }
 
     private HybridCacheEntryOptions GetSeedEntryOptions() => new()
@@ -296,6 +302,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         IEnumerable<ContentCacheNode> contentByContentTypeKey = _databaseCacheRepository.GetContentByContentTypeKey(contentTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.DocumentType).Result), ContentCacheDataSerializerEntityType.Document);
+        scope.Complete();
 
         foreach (ContentCacheNode content in contentByContentTypeKey)
         {
@@ -306,6 +313,6 @@ internal sealed class DocumentCacheService : IDocumentCacheService
                 _hybridCache.RemoveAsync(GetCacheKey(content.Key, false)).GetAwaiter().GetResult();
             }
         }
-        scope.Complete();
+
     }
 }
