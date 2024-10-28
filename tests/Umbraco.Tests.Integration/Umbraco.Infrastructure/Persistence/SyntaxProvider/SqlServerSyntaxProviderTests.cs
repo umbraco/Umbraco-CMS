@@ -68,12 +68,8 @@ public class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
         }
 
         Assert.AreEqual(
-            @$"DELETE FROM {t("cmsContentNu")} WHERE {c("nodeId")} IN (SELECT {c("nodeId")} FROM (SELECT DISTINCT cmsContentNu.nodeId
-FROM {t("cmsContentNu")}
-INNER JOIN {t("umbracoNode")}
-ON {t("cmsContentNu")}.{c("nodeId")} = {t("umbracoNode")}.{c("id")}
-WHERE (({t("umbracoNode")}.{c("nodeObjectType")} = @0))) x)".Replace(Environment.NewLine, " ").Replace("\n", " ")
-                .Replace("\r", " "),
+            @$"DELETE FROM {t("cmsContentNu")} WHERE {c("nodeId")} IN (SELECT {c("nodeId")} FROM (SELECT DISTINCT cmsContentNu.nodeId FROM {t("cmsContentNu")} INNER JOIN {t("umbracoNode")} ON {t("cmsContentNu")}.{c("nodeId")} = {t("umbracoNode")}.{c("id")} WHERE (({t("umbracoNode")}.{c("nodeObjectType")} = @0))) x)".Replace(Environment.NewLine, " ")
+                .Replace("\n", " ").Replace("\r", " "),
             sqlOutput.SQL.Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\r", " "));
 
         Assert.AreEqual(1, sqlOutput.Arguments.Length);

@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using Umbraco.Cms.Core.Factories;
+using System.Diagnostics.CodeAnalysis;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Navigation;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -65,12 +65,12 @@ internal abstract class ContentNavigationServiceBase
     public bool TryGetSiblingsKeysInBin(Guid key, out IEnumerable<Guid> siblingsKeys)
         => TryGetSiblingsKeysFromStructure(_recycleBinNavigationStructure, key, out siblingsKeys);
 
-    public bool TryGetLevel(Guid contentKey, out int level)
+    public bool TryGetLevel(Guid contentKey, [NotNullWhen(true)] out int? level)
     {
         level = 1;
-        Guid? parentKey;
-        if (TryGetParentKey(contentKey, out parentKey) is false)
+        if (TryGetParentKey(contentKey, out Guid? parentKey) is false)
         {
+            level = null;
             return false;
         }
 
@@ -78,6 +78,7 @@ internal abstract class ContentNavigationServiceBase
         {
             if (TryGetParentKey(parentKey.Value, out parentKey) is false)
             {
+                level = null;
                 return false;
             }
 
@@ -97,11 +98,13 @@ internal abstract class ContentNavigationServiceBase
         // Recursively remove all descendants and add them to recycle bin
         AddDescendantsToRecycleBinRecursively(nodeToRemove);
 
+        // Reset the SortOrder based on its new position in the bin
+        nodeToRemove.UpdateSortOrder(_recycleBinNavigationStructure.Count);
         return _recycleBinNavigationStructure.TryAdd(nodeToRemove.Key, nodeToRemove) &&
                _navigationStructure.TryRemove(key, out _);
     }
 
-    public bool Add(Guid key, Guid? parentKey = null)
+    public bool Add(Guid key, Guid? parentKey = null, int? sortOrder = null)
     {
         NavigationNode? parentNode = null;
         if (parentKey.HasValue)
@@ -116,13 +119,14 @@ internal abstract class ContentNavigationServiceBase
             _roots.Add(key);
         }
 
-        var newNode = new NavigationNode(key);
+        // Note: sortOrder can't be automatically determined for items at root level, so it needs to be passed in
+        var newNode = new NavigationNode(key, sortOrder ?? 0);
         if (_navigationStructure.TryAdd(key, newNode) is false)
         {
             return false; // Node with this key already exists
         }
 
-        parentNode?.AddChild(newNode);
+        parentNode?.AddChild(_navigationStructure, key);
 
         return true;
     }
@@ -155,13 +159,25 @@ internal abstract class ContentNavigationServiceBase
         }
 
         // Remove the node from its current parent's children list
-        if (nodeToMove.Parent is not null && _navigationStructure.TryGetValue(nodeToMove.Parent.Key, out var currentParentNode))
+        if (nodeToMove.Parent is not null && _navigationStructure.TryGetValue(nodeToMove.Parent.Value, out NavigationNode? currentParentNode))
         {
-            currentParentNode.RemoveChild(nodeToMove);
+            currentParentNode.RemoveChild(_navigationStructure, key);
         }
 
         // Set the new parent for the node (if parent node is null - the node is moved to root)
-        targetParentNode?.AddChild(nodeToMove);
+        targetParentNode?.AddChild(_navigationStructure, key);
+
+        return true;
+    }
+
+    public bool UpdateSortOrder(Guid key, int newSortOrder)
+    {
+        if (_navigationStructure.TryGetValue(key, out NavigationNode? node) is false)
+        {
+            return false; // Node doesn't exist
+        }
+
+        node.UpdateSortOrder(newSortOrder);
 
         return true;
     }
@@ -195,8 +211,7 @@ internal abstract class ContentNavigationServiceBase
         }
 
         // Set the new parent for the node (if parent node is null - the node is moved to root)
-        targetParentNode?.AddChild(nodeToRestore);
-
+        targetParentNode?.AddChild(_recycleBinNavigationStructure, key);
 
         // Restore the node and its descendants from the recycle bin to the main structure
         RestoreNodeAndDescendantsRecursively(nodeToRestore);
@@ -240,7 +255,7 @@ internal abstract class ContentNavigationServiceBase
     {
         if (structure.TryGetValue(childKey, out NavigationNode? childNode))
         {
-            parentKey = childNode.Parent?.Key;
+            parentKey = childNode.Parent;
             return true;
         }
 
@@ -252,7 +267,10 @@ internal abstract class ContentNavigationServiceBase
     private bool TryGetRootKeysFromStructure(IList<Guid> input, out IEnumerable<Guid> rootKeys)
     {
         // TODO can we make this more efficient?
-        rootKeys = input.ToArray();
+        // Sort by SortOrder
+        rootKeys = input
+            .OrderBy(key => _navigationStructure[key].SortOrder)
+            .ToList();
 
         return true;
     }
@@ -266,7 +284,9 @@ internal abstract class ContentNavigationServiceBase
             return false;
         }
 
-        childrenKeys = parentNode.Children.Select(child => child.Key);
+        // Keep children keys ordered based on their SortOrder
+        childrenKeys = GetOrderedChildren(parentNode, structure).ToList();
+
         return true;
     }
 
@@ -281,7 +301,7 @@ internal abstract class ContentNavigationServiceBase
             return false;
         }
 
-        GetDescendantsRecursively(parentNode, descendants);
+        GetDescendantsRecursively(structure, parentNode, descendants);
 
         descendantsKeys = descendants;
         return true;
@@ -291,17 +311,16 @@ internal abstract class ContentNavigationServiceBase
     {
         var ancestors = new List<Guid>();
 
-        if (structure.TryGetValue(childKey, out NavigationNode? childNode) is false)
+        if (structure.TryGetValue(childKey, out NavigationNode? node) is false)
         {
             // Child doesn't exist
             ancestorsKeys = [];
             return false;
         }
 
-        while (childNode?.Parent is not null)
+        while (node.Parent is not null && structure.TryGetValue(node.Parent.Value, out node))
         {
-            ancestors.Add(childNode.Parent.Key);
-            childNode = childNode.Parent;
+            ancestors.Add(node.Key);
         }
 
         ancestorsKeys = ancestors;
@@ -322,12 +341,13 @@ internal abstract class ContentNavigationServiceBase
             // To find siblings of a node at root level, we need to iterate over all items and add those with null Parent
             siblingsKeys = structure
                 .Where(kv => kv.Value.Parent is null && kv.Key != key)
+                .OrderBy(kv => kv.Value.SortOrder)
                 .Select(kv => kv.Key)
                 .ToList();
             return true;
         }
 
-        if (TryGetChildrenKeys(node.Parent.Key, out IEnumerable<Guid> childrenKeys) is false)
+        if (TryGetChildrenKeys(node.Parent.Value, out IEnumerable<Guid> childrenKeys) is false)
         {
             return false; // Couldn't retrieve children keys
         }
@@ -337,12 +357,18 @@ internal abstract class ContentNavigationServiceBase
         return true;
     }
 
-    private void GetDescendantsRecursively(NavigationNode node, List<Guid> descendants)
+    private void GetDescendantsRecursively(ConcurrentDictionary<Guid, NavigationNode> structure, NavigationNode node, List<Guid> descendants)
     {
-        foreach (NavigationNode child in node.Children)
+        var childrenKeys = GetOrderedChildren(node, structure).ToList();
+        foreach (Guid childKey in childrenKeys)
         {
-            descendants.Add(child.Key);
-            GetDescendantsRecursively(child, descendants);
+            descendants.Add(childKey);
+
+            // Retrieve the child node and its descendants
+            if (structure.TryGetValue(childKey, out NavigationNode? childNode))
+            {
+                GetDescendantsRecursively(structure, childNode, descendants);
+            }
         }
     }
 
@@ -354,9 +380,9 @@ internal abstract class ContentNavigationServiceBase
         }
 
         // Remove the node from its parent's children list
-        if (nodeToRemove.Parent is not null && structure.TryGetValue(nodeToRemove.Parent.Key, out NavigationNode? parentNode))
+        if (nodeToRemove.Parent is not null && structure.TryGetValue(nodeToRemove.Parent.Value, out NavigationNode? parentNode))
         {
-            parentNode.RemoveChild(nodeToRemove);
+            parentNode.RemoveChild(structure, key);
         }
 
         return true;
@@ -366,25 +392,39 @@ internal abstract class ContentNavigationServiceBase
     {
         _recycleBinRoots.Add(node.Key);
         _roots.Remove(node.Key);
+        var childrenKeys = GetOrderedChildren(node, _navigationStructure).ToList();
 
-        foreach (NavigationNode child in node.Children)
+        foreach (Guid childKey in childrenKeys)
         {
-            AddDescendantsToRecycleBinRecursively(child);
+            if (_navigationStructure.TryGetValue(childKey, out NavigationNode? childNode) is false)
+            {
+                continue;
+            }
+
+            // Reset the SortOrder based on its new position in the bin
+            childNode.UpdateSortOrder(_recycleBinNavigationStructure.Count);
+            AddDescendantsToRecycleBinRecursively(childNode);
 
             // Only remove the child from the main structure if it was successfully added to the recycle bin
-            if (_recycleBinNavigationStructure.TryAdd(child.Key, child))
+            if (_recycleBinNavigationStructure.TryAdd(childKey, childNode))
             {
-                _navigationStructure.TryRemove(child.Key, out _);
+                _navigationStructure.TryRemove(childKey, out _);
             }
         }
     }
 
     private void RemoveDescendantsRecursively(NavigationNode node)
     {
-        foreach (NavigationNode child in node.Children)
+        var childrenKeys = GetOrderedChildren(node, _recycleBinNavigationStructure).ToList();
+        foreach (Guid childKey in childrenKeys)
         {
-            RemoveDescendantsRecursively(child);
-            _recycleBinNavigationStructure.TryRemove(child.Key, out _);
+            if (_recycleBinNavigationStructure.TryGetValue(childKey, out NavigationNode? childNode) is false)
+            {
+                continue;
+            }
+
+            RemoveDescendantsRecursively(childNode);
+            _recycleBinNavigationStructure.TryRemove(childKey, out _);
         }
     }
 
@@ -394,28 +434,41 @@ internal abstract class ContentNavigationServiceBase
         {
             _roots.Add(node.Key);
         }
-        _recycleBinRoots.Remove(node.Key);
 
-        foreach (NavigationNode child in node.Children)
+        _recycleBinRoots.Remove(node.Key);
+        var childrenKeys = GetOrderedChildren(node, _recycleBinNavigationStructure).ToList();
+
+        foreach (Guid childKey in childrenKeys)
         {
-            RestoreNodeAndDescendantsRecursively(child);
+            if (_recycleBinNavigationStructure.TryGetValue(childKey, out NavigationNode? childNode) is false)
+            {
+                continue;
+            }
+
+            RestoreNodeAndDescendantsRecursively(childNode);
 
             // Only remove the child from the recycle bin structure if it was successfully added to the main one
-            if (_navigationStructure.TryAdd(child.Key, child))
+            if (_navigationStructure.TryAdd(childKey, childNode))
             {
-                _recycleBinNavigationStructure.TryRemove(child.Key, out _);
+                _recycleBinNavigationStructure.TryRemove(childKey, out _);
             }
         }
     }
 
+    private IEnumerable<Guid> GetOrderedChildren(NavigationNode node, ConcurrentDictionary<Guid, NavigationNode> structure)
+        => node.Children
+            .Where(structure.ContainsKey)
+            .OrderBy(childKey => structure[childKey].SortOrder)
+            .ToList();
+
     private static void BuildNavigationDictionary(ConcurrentDictionary<Guid, NavigationNode> nodesStructure, IList<Guid> roots, IEnumerable<INavigationModel> entities)
     {
         var entityList = entities.ToList();
-        IDictionary<int, Guid> idToKeyMap = entityList.ToDictionary(x => x.Id, x => x.Key);
+        var idToKeyMap = entityList.ToDictionary(x => x.Id, x => x.Key);
 
         foreach (INavigationModel entity in entityList)
         {
-            var node = new NavigationNode(entity.Key);
+            var node = new NavigationNode(entity.Key, entity.SortOrder);
             nodesStructure[entity.Key] = node;
 
             // We don't set the parent for items under root, it will stay null
@@ -433,7 +486,7 @@ internal abstract class ContentNavigationServiceBase
             // If the parent node exists in the nodesStructure, add the node to the parent's children (parent is set as well)
             if (nodesStructure.TryGetValue(parentKey, out NavigationNode? parentNode))
             {
-                parentNode.AddChild(node);
+                parentNode.AddChild(nodesStructure, entity.Key);
             }
         }
     }
