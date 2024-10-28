@@ -1,8 +1,8 @@
-import type { UmbEntityCreateOptionActionArgs } from './types.js';
+import type { UmbEntityCreateOptionActionArgs } from '../types.js';
 import type {
 	ManifestEntityCreateOptionAction,
 	MetaEntityCreateOptionAction,
-} from './entity-create-option-action.extension.js';
+} from '../entity-create-option-action.extension.js';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
