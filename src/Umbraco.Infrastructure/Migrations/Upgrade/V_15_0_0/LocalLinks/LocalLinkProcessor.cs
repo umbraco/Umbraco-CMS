@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -11,26 +10,27 @@ public class LocalLinkProcessor
 {
     private readonly HtmlLocalLinkParser _localLinkParser;
     private readonly IIdKeyMap _idKeyMap;
-    private readonly Lazy<IOptions<ConvertLocalLinkOptions>> _lazyOptions;
+    private readonly IEnumerable<ITypedLocalLinkProcessor> _localLinkProcessors;
 
     public LocalLinkProcessor(
         HtmlLocalLinkParser localLinkParser,
         IIdKeyMap idKeyMap,
-        Lazy<IOptions<ConvertLocalLinkOptions>> lazyOptions)
+        IEnumerable<ITypedLocalLinkProcessor> localLinkProcessors)
     {
         _localLinkParser = localLinkParser;
         _idKeyMap = idKeyMap;
-        _lazyOptions = lazyOptions;
+        _localLinkProcessors = localLinkProcessors;
     }
 
     public IEnumerable<string> GetSupportedPropertyEditorAliases() =>
-        _lazyOptions.Value.Value.Processors.SelectMany(p => p.PropertyEditorAliases);
+        _localLinkProcessors.SelectMany(p => p.PropertyEditorAliases);
 
     public bool ProcessToEditorValue(object? editorValue)
     {
-        ProcessorInformation? processor = _lazyOptions.Value.Value.Processors.FirstOrDefault(p => p.PropertyEditorValueType == editorValue?.GetType());
+        ITypedLocalLinkProcessor? processor =
+            _localLinkProcessors.FirstOrDefault(p => p.PropertyEditorValueType == editorValue?.GetType());
 
-        return processor is not null && processor.Process.Invoke(editorValue);
+        return processor is not null && processor.Process.Invoke(editorValue, ProcessToEditorValue, ProcessStringValue);
     }
 
     public string ProcessStringValue(string input)

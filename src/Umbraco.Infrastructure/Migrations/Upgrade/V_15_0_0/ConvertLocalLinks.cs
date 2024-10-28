@@ -21,7 +21,7 @@ public class ConvertLocalLinks : MigrationBase
     private readonly IDataTypeService _dataTypeService;
     private readonly ILanguageService _languageService;
     private readonly IJsonSerializer _jsonSerializer;
-    private readonly LocalLinkProcessor _convertLocalLinkProcessor;
+    private readonly LocalLinkProcessor _localLinkProcessor;
 
     public ConvertLocalLinks(
         IMigrationContext context,
@@ -31,7 +31,7 @@ public class ConvertLocalLinks : MigrationBase
         IDataTypeService dataTypeService,
         ILanguageService languageService,
         IJsonSerializer jsonSerializer,
-        LocalLinkProcessor convertLocalLinkProcessor)
+        LocalLinkProcessor localLinkProcessor)
         : base(context)
     {
         _umbracoContextFactory = umbracoContextFactory;
@@ -40,12 +40,12 @@ public class ConvertLocalLinks : MigrationBase
         _dataTypeService = dataTypeService;
         _languageService = languageService;
         _jsonSerializer = jsonSerializer;
-        _convertLocalLinkProcessor = convertLocalLinkProcessor;
+        _localLinkProcessor = localLinkProcessor;
     }
 
     protected override void Migrate()
     {
-        IEnumerable<string> propertyEditorAliases = _convertLocalLinkProcessor.GetSupportedPropertyEditorAliases();
+        IEnumerable<string> propertyEditorAliases = _localLinkProcessor.GetSupportedPropertyEditorAliases();
 
         using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
         var languagesById = _languageService.GetAllAsync().GetAwaiter().GetResult()
@@ -148,7 +148,8 @@ public class ConvertLocalLinks : MigrationBase
         var property = new Property(propertyType);
         property.SetValue(propertyDataDto.Value, culture, segment);
         var toEditorValue = valueEditor.ToEditor(property, culture, segment);
-        _convertLocalLinkProcessor.ProcessToEditorValue(toEditorValue);
+
+        _localLinkProcessor.ProcessToEditorValue(toEditorValue);
 
         var editorValue = _jsonSerializer.Serialize(toEditorValue);
         var dbValue = valueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
