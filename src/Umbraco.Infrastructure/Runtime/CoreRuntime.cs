@@ -199,6 +199,10 @@ public class CoreRuntime : IRuntime
                 break;
         }
 
+        //
+        var postRuntimePremigrationsUpgradeNotification = new PostRuntimePremigrationsUpgradeNotification();
+        await _eventAggregator.PublishAsync(postRuntimePremigrationsUpgradeNotification, cancellationToken);
+
         // If level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
         var unattendedUpgradeNotification = new RuntimeUnattendedUpgradeNotification();
         await _eventAggregator.PublishAsync(unattendedUpgradeNotification, cancellationToken);
