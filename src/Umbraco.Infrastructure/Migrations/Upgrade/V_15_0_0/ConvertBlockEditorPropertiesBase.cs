@@ -5,6 +5,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -23,6 +24,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IUmbracoContextFactory _umbracoContextFactory;
     private readonly ILanguageService _languageService;
+    private readonly ICoreScopeProvider _coreScopeProvider;
 
     protected abstract IEnumerable<string> PropertyEditorAliases { get; }
 
@@ -44,7 +46,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
         IDataTypeService dataTypeService,
         IJsonSerializer jsonSerializer,
         IUmbracoContextFactory umbracoContextFactory,
-        ILanguageService languageService)
+        ILanguageService languageService,
+        ICoreScopeProvider coreScopeProvider)
         : base(context)
     {
         _logger = logger;
@@ -53,6 +56,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
         _jsonSerializer = jsonSerializer;
         _umbracoContextFactory = umbracoContextFactory;
         _languageService = languageService;
+        _coreScopeProvider = coreScopeProvider;
     }
 
     protected override void Migrate()
@@ -70,6 +74,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
             .SelectMany(ct => ct.PropertyTypes)
             .GroupBy(pt => pt.PropertyEditorAlias)
             .ToDictionary(group => group.Key, group => group.ToArray());
+
 
         foreach (var propertyEditorAlias in PropertyEditorAliases)
         {
@@ -98,11 +103,17 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
     {
         var success = true;
 
-        foreach (IPropertyType propertyType in propertyTypes)
+        var propertyTypeCount = propertyTypes.Length;
+        for (var propertyTypeIndex = 0; propertyTypeIndex < propertyTypeCount; propertyTypeIndex++)
         {
+            IPropertyType propertyType = propertyTypes[propertyTypeIndex];
             try
             {
-                _logger.LogInformation("- starting property type: {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias})...", propertyType.Name, propertyType.Id, propertyType.Alias);
+                _logger.LogInformation(
+                    "- starting property type {propertyTypeIndex}/{propertyTypeCount} : {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias})...",
+                    propertyTypeIndex+1,
+                    propertyTypeCount,
+                    propertyType.Name, propertyType.Id, propertyType.Alias);
                 IDataType dataType = _dataTypeService.GetAsync(propertyType.DataTypeKey).GetAwaiter().GetResult()
                                      ?? throw new InvalidOperationException("The data type could not be fetched.");
 
@@ -113,7 +124,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                 }
 
                 IDataValueEditor valueEditor = dataType.Editor?.GetValueEditor()
-                                               ?? throw new InvalidOperationException("The data type value editor could not be fetched.");
+                                               ?? throw new InvalidOperationException(
+                                                   "The data type value editor could not be fetched.");
 
                 Sql<ISqlContext> sql = Sql()
                     .Select<PropertyDataDto>()
@@ -132,15 +144,24 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
 
                 var progress = 0;
 
-                ExecutionContext.SuppressFlow();
-                Parallel.ForEach(updateBatch, update =>
+                Parallel.ForEachAsync(updateBatch, async (update, token) =>
                 {
-                    using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
+                    //Foreach here, but we need to suppress the flow before each task, but not the actuall await of the task
+                    Task task;
+                    using (ExecutionContext.SuppressFlow())
+                    {
+                        task = Task.Run(() =>
+                        {
+                             using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+                    scope.Complete();
+                    using UmbracoContextReference umbracoContextReference =
+                        _umbracoContextFactory.EnsureUmbracoContext();
 
                     progress++;
                     if (progress % 100 == 0)
                     {
-                        _logger.LogInformation("  - finíshed {progress} of {total} properties", progress, updateBatch.Count);
+                        _logger.LogInformation("  - finíshed {progress} of {total} properties", progress,
+                            updateBatch.Count);
                     }
 
                     PropertyDataDto propertyDataDto = update.Poco;
@@ -148,7 +169,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                     // NOTE: some old property data DTOs can have variance defined, even if the property type no longer varies
                     var culture = propertyType.VariesByCulture()
                                   && propertyDataDto.LanguageId.HasValue
-                                  && languagesById.TryGetValue(propertyDataDto.LanguageId.Value, out ILanguage? language)
+                                  && languagesById.TryGetValue(propertyDataDto.LanguageId.Value,
+                                      out ILanguage? language)
                         ? language.IsoCode
                         : null;
 
@@ -211,6 +233,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                                 default:
                                     throw new ArgumentOutOfRangeException();
                             }
+
                             break;
                     }
 
@@ -233,8 +256,11 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                     stringValue = UpdateDatabaseValue(stringValue);
 
                     propertyDataDto.TextValue = stringValue;
-                });
-                ExecutionContext.RestoreFlow();
+                        }, token);
+                    }
+
+                    await task;
+                }).GetAwaiter().GetResult();
 
                 updateBatch.RemoveAll(updatesToSkip.Contains);
 
@@ -248,7 +274,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                 var result = Database.UpdateBatch(updateBatch, new BatchOptions { BatchSize = 100 });
                 if (result != updateBatch.Count)
                 {
-                    throw new InvalidOperationException($"The database batch update was supposed to update {updateBatch.Count} property DTO entries, but it updated {result} entries.");
+                    throw new InvalidOperationException(
+                        $"The database batch update was supposed to update {updateBatch.Count} property DTO entries, but it updated {result} entries.");
                 }
 
                 _logger.LogDebug(

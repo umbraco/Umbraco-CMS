@@ -440,7 +440,7 @@ public class DocumentUrlService : IDocumentUrlService
             return "#";
         }
 
-        var cultureOrDefault = culture ?? _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+        var cultureOrDefault = string.IsNullOrWhiteSpace(culture) is false ? culture : _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
 
         Guid[] ancestorsOrSelfKeysArray = ancestorsOrSelfKeys as Guid[] ?? ancestorsOrSelfKeys.ToArray();
         IDictionary<Guid, IDomain?> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToDictionary(x => x, ancestorKey =>
