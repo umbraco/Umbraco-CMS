@@ -173,6 +173,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
     /// Gets a resume as string of all the content in this nested type.
     /// </summary>
     /// <param name="indexedContent">All the indexed content for this property.</param>
+    /// <param name="culture">The culture to get the resume for.</param>
     /// <returns>the string with all relevant content from </returns>
     private static string GetResumeFromAllContent(List<IndexValue> indexedContent, string? culture)
     {
