@@ -161,6 +161,16 @@ AND cmsContentNu.nodeId IS NULL
         return count == 0;
     }
 
+    public async Task<IEnumerable<Guid>> GetContentKeysAsync(Guid nodeObjectType)
+    {
+        Sql<ISqlContext> sql = Sql()
+            .Select<NodeDto>(x => x.UniqueId)
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.NodeObjectType == nodeObjectType);
+
+        return await Database.FetchAsync<Guid>(sql);
+    }
+
     // assumes member tree lock
     public bool VerifyMemberDbCache()
     {
@@ -235,8 +245,13 @@ AND cmsContentNu.nodeId IS NULL
             return [];
         }
 
-        Sql<ISqlContext>? sql = SqlContentSourcesSelect()
-            .InnerJoin<NodeDto>("n")
+        Sql<ISqlContext> sql = objectType == Constants.ObjectTypes.Document
+            ? SqlContentSourcesSelect()
+            : objectType == Constants.ObjectTypes.Media
+                ? SqlMediaSourcesSelect()
+                : throw new ArgumentOutOfRangeException(nameof(objectType), objectType, null);
+
+            sql.InnerJoin<NodeDto>("n")
             .On<NodeDto, ContentDto>((n, c) => n.NodeId == c.ContentTypeId, "n", "umbracoContent")
             .Append(SqlObjectTypeNotTrashed(SqlContext, objectType))
             .WhereIn<NodeDto>(x => x.UniqueId, keys,"n")
@@ -251,7 +266,6 @@ AND cmsContentNu.nodeId IS NULL
         {
             ContentCacheDataSerializerEntityType.Document => Constants.ObjectTypes.Document,
             ContentCacheDataSerializerEntityType.Media => Constants.ObjectTypes.Media,
-            ContentCacheDataSerializerEntityType.Member => Constants.ObjectTypes.Member,
             _ => throw new ArgumentOutOfRangeException(nameof(entityType), entityType, null),
         };
 
@@ -262,7 +276,15 @@ AND cmsContentNu.nodeId IS NULL
 
         foreach (ContentSourceDto row in dtos)
         {
-            yield return CreateContentNodeKit(row, serializer, row.Published is false);
+            if (entityType == ContentCacheDataSerializerEntityType.Document)
+            {
+                yield return CreateContentNodeKit(row, serializer, row.Published is false);
+            }
+            else
+            {
+                yield return CreateMediaNodeKit(row, serializer);
+            }
+
         }
     }
 
