@@ -38,6 +38,10 @@ public class TemplateControllerBase : ManagementApiControllerBase
                 .WithTitle("Master template not found")
                 .WithDetail("The master template referenced in the template was not found.")
                 .Build()),
+            TemplateOperationStatus.IsReferencedMasterTemplate => BadRequest(problemDetailsBuilder
+                .WithTitle("Template is master template.")
+                .WithDetail("This template is referenced as a master template, and thus cannot be deleted.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown template operation status.")
                 .Build()),

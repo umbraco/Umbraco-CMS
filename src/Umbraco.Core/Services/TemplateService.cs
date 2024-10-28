@@ -404,6 +404,12 @@ public class TemplateService : RepositoryService, ITemplateService
                 return Attempt.FailWithStatus<ITemplate?, TemplateOperationStatus>(TemplateOperationStatus.TemplateNotFound, null);
             }
 
+            if (template.IsMasterTemplate)
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus<ITemplate?, TemplateOperationStatus>(TemplateOperationStatus.IsReferencedMasterTemplate, null);
+            }
+
             EventMessages eventMessages = EventMessagesFactory.Get();
             var deletingNotification = new TemplateDeletingNotification(template, eventMessages);
             if (scope.Notifications.PublishCancelable(deletingNotification))
