@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Navigation;
@@ -44,5 +45,5 @@ public interface INavigationQueryService
 
     bool TryGetSiblingsKeys(Guid key, out IEnumerable<Guid> siblingsKeys);
 
-    bool TryGetLevel(Guid contentKey, out int level);
+    bool TryGetLevel(Guid contentKey, [NotNullWhen(true)] out int? level);
 }
