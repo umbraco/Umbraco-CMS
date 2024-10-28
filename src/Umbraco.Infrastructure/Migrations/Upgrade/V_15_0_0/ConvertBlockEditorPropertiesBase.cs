@@ -146,7 +146,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
 
                 Parallel.ForEachAsync(updateBatch, async (update, token) =>
                 {
-                    //Foreach here, but we need to suppress the flow before each task, not all of them
+                    //Foreach here, but we need to suppress the flow before each task, but not the actuall await of the task
                     Task task;
                     using (ExecutionContext.SuppressFlow())
                     {
