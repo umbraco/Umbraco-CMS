@@ -228,7 +228,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 				opacity: 0.5;
 			}
 
-			:host([drag-placeholder]) > * {
+			:host([drag-placeholder]) > uui-box > * {
 				visibility: hidden;
 			}
 
