@@ -6,4 +6,5 @@ export {
 } from './constants.js';
 export { UMB_DICTIONARY_TREE_STORE_CONTEXT } from './dictionary-tree.store.js';
 export { type UmbDictionaryTreeStore } from './dictionary-tree.store.js';
-export * from './types.js';
+
+export type * from './types.js';

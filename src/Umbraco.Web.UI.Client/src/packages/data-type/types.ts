@@ -6,10 +6,10 @@ export interface UmbDataTypeDetailModel {
 	name: string;
 	editorAlias: string | undefined;
 	editorUiAlias: string | null;
-	values: Array<UmbDataTypePropertyModel>;
+	values: Array<UmbDataTypePropertyValueModel>;
 }
 
-export interface UmbDataTypePropertyModel {
+export interface UmbDataTypePropertyValueModel<ValueType = unknown> {
 	alias: string;
-	value: any;
+	value: ValueType;
 }
