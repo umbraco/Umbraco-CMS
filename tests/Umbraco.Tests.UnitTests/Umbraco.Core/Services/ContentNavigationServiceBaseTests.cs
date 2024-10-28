@@ -124,6 +124,59 @@ public class ContentNavigationServiceBaseTests
     }
 
     [Test]
+    public void Cannot_Get_Root_Items_When_Empty_Tree()
+    {
+        // Arrange
+        var emptyNavigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>());
+
+        // Act
+        emptyNavigationService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
+        List<Guid> rootsList = rootKeys.ToList();
+
+        // Assert
+        Assert.IsEmpty(rootsList);
+    }
+
+    [Test]
+    public void Can_Get_Single_Root_Item()
+    {
+        // Act
+        var result = _navigationService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
+        List<Guid> rootsList = rootKeys.ToList();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            Assert.IsNotEmpty(rootsList);
+            Assert.AreEqual(1, rootsList.Count);
+            Assert.IsTrue(rootsList.Contains(Root));
+        });
+    }
+
+    [Test]
+    public void Can_Get_Root_Item_In_Correct_Order()
+    {
+        // Arrange
+        Guid anotherRoot = Guid.NewGuid();
+        _navigationService.Add(anotherRoot);
+
+        // Act
+        var result = _navigationService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
+        List<Guid> rootsList = rootKeys.ToList();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            Assert.AreEqual(2, rootsList.Count);
+            CollectionAssert.AreEqual(new[] { Root, anotherRoot }, rootsList); // Root and Another root in order
+        });
+    }
+
+    [Test]
     public void Cannot_Get_Children_From_Non_Existing_Content_Key()
     {
         // Arrange
@@ -374,7 +427,7 @@ public class ContentNavigationServiceBaseTests
     public void Can_Get_Siblings_Of_Existing_Content_Key_At_Content_Root()
     {
         // Arrange
-        Guid anotherRoot = new Guid("716380B9-DAA9-4930-A461-95EF39EBAB41");
+        Guid anotherRoot = Guid.NewGuid();
         _navigationService.Add(anotherRoot);
 
         // Act
