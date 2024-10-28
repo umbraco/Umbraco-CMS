@@ -74,7 +74,6 @@ test.beforeEach(async ({umbracoApi}) => {
   rootDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndDataType(rootDocumentTypeName, childDocumentTypeId, dataTypeName, dataTypeId);
   rootDocumentId = await umbracoApi.document.createDocumentWithTextContent(rootDocumentName, rootDocumentTypeId, documentText, dataTypeName);
   await umbracoApi.document.createDefaultDocumentWithParent(childDocumentOneName, childDocumentTypeId, rootDocumentId);
-  await umbracoApi.document.createDefaultDocumentWithParent(childDocumentTwoName, childDocumentTypeId, rootDocumentId);
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -467,8 +466,9 @@ test('can not move document with move to permission disabled', async ({page, umb
 
 
 // DOES NOT WORK YET, CANT GET IT TO SELECT THE DRAG AND DROP LOCOATORS
-test('can sort children with sort children permission enabled', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can sort children with sort children permission enabled', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
+  await umbracoApi.document.createDefaultDocumentWithParent(childDocumentTwoName, childDocumentTypeId, rootDocumentId);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSortChildrenPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
@@ -482,7 +482,6 @@ test('can sort children with sort children permission enabled', async ({page, um
   const childDocumentOneLocator = page.locator('uui-ref-node').filter({hasText: childDocumentOneName});
   const childDocumentTwoLocator = page.locator('uui-ref-node').filter({hasText: childDocumentTwoName});
 
-  await page.pause();
   await page.locator('uui-ref-node').filter({hasText: childDocumentOneName}).click();
   await childDocumentOneLocator.dragTo(childDocumentTwoLocator);
   await childDocumentOneLocator.hover()
@@ -499,6 +498,7 @@ test('can sort children with sort children permission enabled', async ({page, um
 
 test('can not sort children with sort children permission disabled', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
+  await umbracoApi.document.createDefaultDocumentWithParent(childDocumentTwoName, childDocumentTypeId, rootDocumentId);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSortChildrenPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
@@ -521,12 +521,90 @@ test('can set culture and hostnames with culture and hostnames permission enable
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
-  await page.pause();
   await umbracoUi.content.clickCultureAndHostnamesButton();
+  await umbracoUi.content.clickAddNewDomainButton();
+  await umbracoUi.content.enterDomain('/en');
+  await umbracoUi.content.clickSaveModalButton();
+
 
   // Assert
-  // await umbracoUi.content.doesCultureAndHostnamesDialogExist();
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.culturesAndHostnamesSaved);
 });
 
-// Notifications,, Set permissions, Move to, Sort children, Culture and Hostnames, Public Access, Rollback
+test('can not set culture and hostnames with culture and hostnames permission disabled', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithCultureAndHostnamesPermission(userGroupName, false);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
+
+  // Assert
+  await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
+});
+
+test('can set public access with public access permission enabled', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithPublicAccessPermission(userGroupName);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
+
+  // Act
+  await page.pause()
+  await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
+  // await umbracoUi.content.clickPublicAccessButton();
+  await umbracoUi.content.clickSaveModalButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+});
+
+test('can not set public access with public access permission disabled', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithPublicAccessPermission(userGroupName, false);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
+
+  // Assert
+  await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
+});
+
+test('can rollback document with rollback permission enabled', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithRollbackPermission(userGroupName);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.restored);
+});
+
+test('can not rollback document with rollback permission disabled', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithRollbackPermission(userGroupName, false);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
+
+  // Assert
+  await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
+});
+
+// Notifications,, Set permissions, Sort children, Public Access, Rollback
 
