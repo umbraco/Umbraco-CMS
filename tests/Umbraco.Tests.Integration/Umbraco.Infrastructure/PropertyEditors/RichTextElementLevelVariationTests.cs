@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Microsoft.Extensions.Logging;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -482,7 +483,9 @@ public class RichTextElementLevelVariationTests : BlockEditorElementVariationTes
             Assert.AreEqual(1, indexValue.Values.Count());
             var indexedValue = indexValue.Values.First() as string;
             Assert.IsNotNull(indexedValue);
+            GetRequiredService<ILogger<RichTextElementLevelVariationTests>>().LogInformation("==> Indexed value = \"{indexedValue}\"", indexedValue);
             var values = indexedValue.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
+            GetRequiredService<ILogger<RichTextElementLevelVariationTests>>().LogInformation("===>> Indexed values parsed = \"{values}\"", string.Join("###", values));
             Assert.AreEqual(expectedIndexedValues.Length, values.Length);
             Assert.IsTrue(values.ContainsAll(expectedIndexedValues));
         }
@@ -562,7 +565,9 @@ public class RichTextElementLevelVariationTests : BlockEditorElementVariationTes
             Assert.AreEqual(1, indexValue.Values.Count());
             var indexedValue = indexValue.Values.First() as string;
             Assert.IsNotNull(indexedValue);
+            GetRequiredService<ILogger<RichTextElementLevelVariationTests>>().LogInformation("==> Indexed value = \"{indexedValue}\"", indexedValue);
             var values = indexedValue.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
+            GetRequiredService<ILogger<RichTextElementLevelVariationTests>>().LogInformation("===>> Indexed values parsed = \"{values}\"", string.Join("###", values));
             Assert.AreEqual(expectedIndexedValues.Length, values.Length);
             Assert.IsTrue(values.ContainsAll(expectedIndexedValues));
         }
@@ -624,7 +629,9 @@ public class RichTextElementLevelVariationTests : BlockEditorElementVariationTes
             Assert.AreEqual(1, indexValue.Values.Count());
             var indexedValue = indexValue.Values.First() as string;
             Assert.IsNotNull(indexedValue);
+            GetRequiredService<ILogger<RichTextElementLevelVariationTests>>().LogInformation("==> Indexed value = \"{indexedValue}\"", indexedValue);
             var values = indexedValue.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
+            GetRequiredService<ILogger<RichTextElementLevelVariationTests>>().LogInformation("===>> Indexed values parsed = \"{values}\"", string.Join("###", values));
             Assert.AreEqual(expectedIndexedValues.Length, values.Length);
             Assert.IsTrue(values.ContainsAll(expectedIndexedValues));
         }
