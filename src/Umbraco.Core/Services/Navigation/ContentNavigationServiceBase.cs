@@ -47,6 +47,18 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     public bool TryGetChildrenKeys(Guid parentKey, out IEnumerable<Guid> childrenKeys)
         => TryGetChildrenKeysFromStructure(_navigationStructure, parentKey, out childrenKeys);
 
+    public bool TryGetChildrenKeysOfType(Guid parentKey, string contentTypeAlias, out IEnumerable<Guid> childrenKeys)
+    {
+        if (TryGetContentTypeKey(contentTypeAlias, out Guid? contentTypeKey))
+        {
+            return TryGetChildrenKeysFromStructure(_navigationStructure, parentKey, out childrenKeys, contentTypeKey);
+        }
+
+        // Content type alias doesn't exist
+        childrenKeys = [];
+        return false;
+    }
+
     public bool TryGetDescendantsKeys(Guid parentKey, out IEnumerable<Guid> descendantsKeys)
         => TryGetDescendantsKeysFromStructure(_navigationStructure, parentKey, out descendantsKeys);
 
@@ -281,7 +293,11 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return true;
     }
 
-    private bool TryGetChildrenKeysFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid parentKey, out IEnumerable<Guid> childrenKeys)
+    private bool TryGetChildrenKeysFromStructure(
+        ConcurrentDictionary<Guid, NavigationNode> structure,
+        Guid parentKey,
+        out IEnumerable<Guid> childrenKeys,
+        Guid? contentTypeKey = null)
     {
         if (structure.TryGetValue(parentKey, out NavigationNode? parentNode) is false)
         {
@@ -291,7 +307,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         }
 
         // Keep children keys ordered based on their SortOrder
-        childrenKeys = GetOrderedChildren(parentNode, structure).ToList();
+        childrenKeys = GetOrderedChildren(parentNode, structure, contentTypeKey).ToList();
 
         return true;
     }
@@ -461,9 +477,19 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         }
     }
 
-    private IEnumerable<Guid> GetOrderedChildren(NavigationNode node, ConcurrentDictionary<Guid, NavigationNode> structure)
-        => node.Children
-            .Where(structure.ContainsKey)
+    private IEnumerable<Guid> GetOrderedChildren(NavigationNode node, ConcurrentDictionary<Guid, NavigationNode> structure, Guid? contentTypeKey = null)
+    {
+        IEnumerable<Guid> children = node
+            .Children
+            .Where(structure.ContainsKey);
+
+        // Apply contentTypeKey filter
+        if (contentTypeKey.HasValue)
+        {
+            children = children.Where(childKey => structure[childKey].ContentTypeKey == contentTypeKey.Value);
+        }
+
+        return children
             .OrderBy(childKey => structure[childKey].SortOrder)
             .ToList();
     }

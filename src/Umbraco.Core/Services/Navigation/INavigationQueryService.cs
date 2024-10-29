@@ -15,6 +15,8 @@ public interface INavigationQueryService
 
     bool TryGetChildrenKeys(Guid parentKey, out IEnumerable<Guid> childrenKeys);
 
+    bool TryGetChildrenKeysOfType(Guid parentKey, string contentTypeAlias, out IEnumerable<Guid> childrenKeys);
+
     bool TryGetDescendantsKeys(Guid parentKey, out IEnumerable<Guid> descendantsKeys);
 
     bool TryGetDescendantsKeysOrSelfKeys(Guid childKey, out IEnumerable<Guid> descendantsOrSelfKeys)
