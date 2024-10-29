@@ -1,7 +1,9 @@
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
@@ -10,6 +12,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 public class ContentNavigationServiceBaseTests
 {
     private TestContentNavigationService _navigationService;
+
+    private Guid ContentType { get; set; }
 
     private Guid Root { get; set; }
 
@@ -34,34 +38,19 @@ public class ContentNavigationServiceBaseTests
     {
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>());
+            Mock.Of<INavigationRepository>(),
+            Mock.Of<IContentTypeService>());
 
-        Root = new Guid("E48DD82A-7059-418E-9B82-CDD5205796CF");
-        _navigationService.Add(Root);
-
-        Child1 = new Guid("C6173927-0C59-4778-825D-D7B9F45D8DDE");
-        _navigationService.Add(Child1, Root);
-
-        Grandchild1 = new Guid("E856AC03-C23E-4F63-9AA9-681B42A58573");
-        _navigationService.Add(Grandchild1, Child1);
-
-        Grandchild2 = new Guid("A1B1B217-B02F-4307-862C-A5E22DB729EB");
-        _navigationService.Add(Grandchild2, Child1);
-
-        Child2 = new Guid("60E0E5C4-084E-4144-A560-7393BEAD2E96");
-        _navigationService.Add(Child2, Root);
-
-        Grandchild3 = new Guid("D63C1621-C74A-4106-8587-817DEE5FB732");
-        _navigationService.Add(Grandchild3, Child2);
-
-        GreatGrandchild1 = new Guid("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7");
-        _navigationService.Add(GreatGrandchild1, Grandchild3);
-
-        Child3 = new Guid("B606E3FF-E070-4D46-8CB9-D31352029FDF");
-        _navigationService.Add(Child3, Root);
-
-        Grandchild4 = new Guid("F381906C-223C-4466-80F7-B63B4EE073F8");
-        _navigationService.Add(Grandchild4, Child3);
+        // Root - E48DD82A-7059-418E-9B82-CDD5205796CF
+        //    - Child 1 - C6173927-0C59-4778-825D-D7B9F45D8DDE
+        //      - Grandchild 1 - E856AC03-C23E-4F63-9AA9-681B42A58573
+        //      - Grandchild 2 - A1B1B217-B02F-4307-862C-A5E22DB729EB
+        //    - Child 2 - 60E0E5C4-084E-4144-A560-7393BEAD2E96
+        //      - Grandchild 3 - D63C1621-C74A-4106-8587-817DEE5FB732
+        //        - Great-grandchild 1 - 56E29EA9-E224-4210-A59F-7C2C5C0C5CC7
+        //    - Child 3 - B606E3FF-E070-4D46-8CB9-D31352029FDF
+        //      - Grandchild 4 - F381906C-223C-4466-80F7-B63B4EE073F8
+        CreateTestData();
     }
 
     [Test]
@@ -1133,6 +1122,38 @@ public class ContentNavigationServiceBaseTests
         var descendantsCountAfterRestore = restoredDescendantsKeys.Count();
 
         Assert.AreEqual(initialDescendantsCount, descendantsCountAfterRestore);
+    }
+
+    private void CreateTestData()
+    {
+        ContentType = new Guid("217C492D-0067-478C-BEA8-D0CE2DECBEB9");
+
+        Root = new Guid("E48DD82A-7059-418E-9B82-CDD5205796CF");
+        _navigationService.Add(Root, ContentType);
+
+        Child1 = new Guid("C6173927-0C59-4778-825D-D7B9F45D8DDE");
+        _navigationService.Add(Child1, ContentType, Root);
+
+        Grandchild1 = new Guid("E856AC03-C23E-4F63-9AA9-681B42A58573");
+        _navigationService.Add(Grandchild1, ContentType, Child1);
+
+        Grandchild2 = new Guid("A1B1B217-B02F-4307-862C-A5E22DB729EB");
+        _navigationService.Add(Grandchild2, ContentType, Child1);
+
+        Child2 = new Guid("60E0E5C4-084E-4144-A560-7393BEAD2E96");
+        _navigationService.Add(Child2, ContentType, Root);
+
+        Grandchild3 = new Guid("D63C1621-C74A-4106-8587-817DEE5FB732");
+        _navigationService.Add(Grandchild3, ContentType, Child2);
+
+        GreatGrandchild1 = new Guid("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7");
+        _navigationService.Add(GreatGrandchild1, ContentType, Grandchild3);
+
+        Child3 = new Guid("B606E3FF-E070-4D46-8CB9-D31352029FDF");
+        _navigationService.Add(Child3, ContentType, Root);
+
+        Grandchild4 = new Guid("F381906C-223C-4466-80F7-B63B4EE073F8");
+        _navigationService.Add(Grandchild4, ContentType, Child3);
     }
 }
 
