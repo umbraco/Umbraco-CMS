@@ -1,6 +1,5 @@
-﻿using StackExchange.Profiling.Internal;
-using Umbraco.Cms.Core.Media.EmbedProviders;
-using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -10,11 +9,13 @@ internal class CacheNodeFactory : ICacheNodeFactory
 {
     private readonly IShortStringHelper _shortStringHelper;
     private readonly UrlSegmentProviderCollection _urlSegmentProviders;
+    private readonly IDocumentUrlService _documentUrlService;
 
-    public CacheNodeFactory(IShortStringHelper shortStringHelper, UrlSegmentProviderCollection urlSegmentProviders)
+    public CacheNodeFactory(IShortStringHelper shortStringHelper, UrlSegmentProviderCollection urlSegmentProviders, IDocumentUrlService documentUrlService)
     {
         _shortStringHelper = shortStringHelper;
         _urlSegmentProviders = urlSegmentProviders;
+        _documentUrlService = documentUrlService;
     }
 
     public ContentCacheNode ToContentCacheNode(IContent content, bool preview)
@@ -126,6 +127,7 @@ internal class CacheNodeFactory : ICacheNodeFactory
         }
 
         var cultureData = new Dictionary<string, CultureVariation>();
+        string? urlSegment = null;
 
         // sanitize - names should be ok but ... never knows
         if (content.ContentType.VariesByCulture())
@@ -153,10 +155,14 @@ internal class CacheNodeFactory : ICacheNodeFactory
                 }
             }
         }
+        else
+        {
+            urlSegment = content.GetUrlSegment(_shortStringHelper, _urlSegmentProviders);
+        }
 
         return new ContentData(
             content.Name,
-            null,
+            urlSegment,
             content.VersionId,
             content.UpdateDate,
             content.CreatorId,

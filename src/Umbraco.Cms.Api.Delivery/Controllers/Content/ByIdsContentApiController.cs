@@ -45,7 +45,7 @@ public class ByIdsContentApiController : ContentApiItemControllerBase
 
     private async Task<IActionResult> HandleRequest(HashSet<Guid> ids)
     {
-        IPublishedContent[] contentItems = ApiPublishedContentCache.GetByIds(ids).ToArray();
+        IPublishedContent[] contentItems = (await ApiPublishedContentCache.GetByIdsAsync(ids).ConfigureAwait(false)).ToArray();
 
         IActionResult? deniedAccessResult = await HandleMemberAccessAsync(contentItems, _requestMemberAccessService);
         if (deniedAccessResult is not null)

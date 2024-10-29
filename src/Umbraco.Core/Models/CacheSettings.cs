@@ -7,7 +7,6 @@ namespace Umbraco.Cms.Core.Models;
 public class CacheSettings
 {
     internal const int StaticDocumentBreadthFirstSeedCount = 100;
-
     internal const int StaticMediaBreadthFirstSeedCount = 100;
     internal const string StaticSeedCacheDuration = "365.00:00:00";
 
@@ -20,10 +19,10 @@ public class CacheSettings
     [DefaultValue(StaticDocumentBreadthFirstSeedCount)]
     public int DocumentBreadthFirstSeedCount { get; set; } = StaticDocumentBreadthFirstSeedCount;
 
-
     [DefaultValue(StaticMediaBreadthFirstSeedCount)]
     public int MediaBreadthFirstSeedCount { get; set; } = StaticDocumentBreadthFirstSeedCount;
 
+    [Obsolete("Use Cache:Entry:Document:SeedCacheDuration instead")]
     [DefaultValue(StaticSeedCacheDuration)]
     public TimeSpan SeedCacheDuration { get; set; } = TimeSpan.Parse(StaticSeedCacheDuration);
 }
