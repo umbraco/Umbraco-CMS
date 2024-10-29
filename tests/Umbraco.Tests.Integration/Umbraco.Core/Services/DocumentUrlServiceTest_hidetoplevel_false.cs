@@ -29,8 +29,14 @@ public class DocumentUrlServiceTest_HideTopLevel_False : UmbracoIntegrationTestW
         builder.Services.AddUnique<IServerMessenger, ScopedRepositoryTests.LocalServerMessenger>();
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
 
-        builder.Services.AddHostedService<DocumentUrlServiceInitializer>();
     }
+
+    public override void Setup()
+    {
+        DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
+        base.Setup();
+    }
+
     [Test]
     [TestCase("/textpage/", "en-US", true, ExpectedResult = TextpageKey)]
     [TestCase("/textpage/text-page-1", "en-US", true, ExpectedResult = SubPageKey)]

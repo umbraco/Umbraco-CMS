@@ -104,6 +104,10 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.Configure<InstallDefaultDataSettings>(
             Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes,
             builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes}"));
+        builder.Services.Configure<CacheEntrySettings>(Constants.Configuration.NamedOptions.CacheEntry.Media,
+            builder.Config.GetSection($"{Constants.Configuration.ConfigCacheEntry}:{Constants.Configuration.NamedOptions.CacheEntry.Media}"));
+        builder.Services.Configure<CacheEntrySettings>(Constants.Configuration.NamedOptions.CacheEntry.Document,
+            builder.Config.GetSection($"{Constants.Configuration.ConfigCacheEntry}:{Constants.Configuration.NamedOptions.CacheEntry.Document}"));
 
         // TODO: Remove this in V12
         // This is to make the move of the AllowEditInvariantFromNonDefault setting from SecuritySettings to ContentSettings backwards compatible

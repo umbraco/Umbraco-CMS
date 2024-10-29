@@ -11,7 +11,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 namespace Umbraco.Cms.Infrastructure.Install;
 
 /// <summary>
-///     Handles <see cref="RuntimeUnattendedUpgradeNotification" /> to execute the unattended Umbraco upgrader
+///     Handles <see cref="RuntimePremigrationsUpgradeNotification" /> to execute the unattended Umbraco upgrader
 ///     or the unattended Package migrations runner.
 /// </summary>
 public class PremigrationUpgrader : INotificationAsyncHandler<RuntimePremigrationsUpgradeNotification>
