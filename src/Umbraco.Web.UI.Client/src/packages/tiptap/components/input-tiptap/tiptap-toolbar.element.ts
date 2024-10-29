@@ -93,11 +93,16 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			border: 1px solid var(--uui-color-border);
 			border-bottom-left-radius: 0;
 			border-bottom-right-radius: 0;
-			background-color: var(--uui-color-surface);
+			box-shadow:
+				0 2px 2px -2px rgba(34, 47, 62, 0.1),
+				0 8px 8px -4px rgba(34, 47, 62, 0.07);
+
+			background-color: var(--uui-color-surface-alt);
 			color: var(--color-text);
 			display: grid;
 			grid-template-columns: repeat(auto-fill, 10px);
 			grid-auto-flow: row;
+
 			position: sticky;
 			top: -25px;
 			left: 0px;
