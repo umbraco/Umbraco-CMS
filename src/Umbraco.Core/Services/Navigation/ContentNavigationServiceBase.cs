@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Navigation;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -64,12 +65,12 @@ internal abstract class ContentNavigationServiceBase
     public bool TryGetSiblingsKeysInBin(Guid key, out IEnumerable<Guid> siblingsKeys)
         => TryGetSiblingsKeysFromStructure(_recycleBinNavigationStructure, key, out siblingsKeys);
 
-    public bool TryGetLevel(Guid contentKey, out int level)
+    public bool TryGetLevel(Guid contentKey, [NotNullWhen(true)] out int? level)
     {
         level = 1;
-        Guid? parentKey;
-        if (TryGetParentKey(contentKey, out parentKey) is false)
+        if (TryGetParentKey(contentKey, out Guid? parentKey) is false)
         {
+            level = null;
             return false;
         }
 
@@ -77,6 +78,7 @@ internal abstract class ContentNavigationServiceBase
         {
             if (TryGetParentKey(parentKey.Value, out parentKey) is false)
             {
+                level = null;
                 return false;
             }
 
