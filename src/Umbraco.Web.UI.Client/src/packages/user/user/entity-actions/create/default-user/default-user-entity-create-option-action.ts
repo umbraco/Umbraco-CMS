@@ -2,8 +2,10 @@ import { UMB_CREATE_USER_MODAL } from '../../../modals/create/create-user-modal.
 import type { UmbUserKindType } from '../../../utils/index.js';
 import { UmbUserKind } from '../../../utils/index.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbEntityCreateOptionActionBase } from '@umbraco-cms/backoffice/entity';
-import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import {
+	UmbEntityCreateOptionActionBase,
+	UmbRequestReloadChildrenOfEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbDefaultUserEntityCreateOptionAction extends UmbEntityCreateOptionActionBase<never> {
@@ -19,7 +21,7 @@ export class UmbDefaultUserEntityCreateOptionAction extends UmbEntityCreateOptio
 			},
 		});
 
-		modalContext
+		await modalContext
 			?.onSubmit()
 			.then(() => {
 				this.#requestReloadChildrenOfEntity();
