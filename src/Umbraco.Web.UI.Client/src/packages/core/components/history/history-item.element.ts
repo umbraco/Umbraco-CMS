@@ -63,6 +63,7 @@ export class UmbHistoryItemElement extends UmbLitElement {
 			.user-info div {
 				display: flex;
 				flex-direction: column;
+				min-width: var(--uui-size-60);
 			}
 
 			.detail {
