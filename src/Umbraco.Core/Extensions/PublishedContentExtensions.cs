@@ -90,8 +90,10 @@ public static class PublishedContentExtensions
             culture = variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
         }
 
-        IDocumentUrlService documentUrlService = StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>();
-        return documentUrlService.GetUrlSegment(content.Key, culture, content.IsDraft());
+        // get
+        return culture != string.Empty && content.Cultures.TryGetValue(culture, out PublishedCultureInfo? infos)
+            ? infos.UrlSegment
+            : null;
     }
 
     #endregion
