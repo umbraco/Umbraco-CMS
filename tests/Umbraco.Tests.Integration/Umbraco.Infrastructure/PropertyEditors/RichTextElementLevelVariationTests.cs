@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -483,9 +482,7 @@ public class RichTextElementLevelVariationTests : BlockEditorElementVariationTes
             Assert.AreEqual(1, indexValue.Values.Count());
             var indexedValue = indexValue.Values.First() as string;
             Assert.IsNotNull(indexedValue);
-            Console.WriteLine($"==> Indexed value = \"{indexedValue}\"");
-            var values = indexedValue.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
-            Console.WriteLine($"===>> Indexed values parsed = \"{string.Join("###", values)}\"");
+            var values = indexedValue.Split(Environment.NewLine).Select(s => s.Trim()).Where(s => s.IsNullOrWhiteSpace() is false).ToArray();
             Assert.AreEqual(expectedIndexedValues.Length, values.Length);
             Assert.IsTrue(values.ContainsAll(expectedIndexedValues));
         }
@@ -565,9 +562,7 @@ public class RichTextElementLevelVariationTests : BlockEditorElementVariationTes
             Assert.AreEqual(1, indexValue.Values.Count());
             var indexedValue = indexValue.Values.First() as string;
             Assert.IsNotNull(indexedValue);
-            Console.WriteLine($"==> Indexed value = \"{indexedValue}\"");
-            var values = indexedValue.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
-            Console.WriteLine($"===>> Indexed values parsed = \"{string.Join("###", values)}\"");
+            var values = indexedValue.Split(Environment.NewLine).Select(s => s.Trim()).Where(s => s.IsNullOrWhiteSpace() is false).ToArray();
             Assert.AreEqual(expectedIndexedValues.Length, values.Length);
             Assert.IsTrue(values.ContainsAll(expectedIndexedValues));
         }
@@ -629,9 +624,7 @@ public class RichTextElementLevelVariationTests : BlockEditorElementVariationTes
             Assert.AreEqual(1, indexValue.Values.Count());
             var indexedValue = indexValue.Values.First() as string;
             Assert.IsNotNull(indexedValue);
-            Console.WriteLine($"==> Indexed value = \"{indexedValue}\"");
-            var values = indexedValue.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
-            Console.WriteLine($"===>> Indexed values parsed = \"{string.Join("###", values)}\"");
+            var values = indexedValue.Split(Environment.NewLine).Select(s => s.Trim()).Where(s => s.IsNullOrWhiteSpace() is false).ToArray();
             Assert.AreEqual(expectedIndexedValues.Length, values.Length);
             Assert.IsTrue(values.ContainsAll(expectedIndexedValues));
         }
