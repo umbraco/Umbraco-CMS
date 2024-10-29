@@ -79,7 +79,7 @@ internal abstract class ContentValidationServiceBase<TContentType>
                         .Variants
                         .FirstOrDefault(variant => string.Equals(variant.Culture, culture, StringComparison.InvariantCultureIgnoreCase) && string.Equals(segment, variant.Segment, StringComparison.InvariantCultureIgnoreCase))?
                         .Properties
-                        .FirstOrDefault(pv => pv.Alias == propertyType.Alias);
+                        .FirstOrDefault(propertyValue => propertyValue.Alias == propertyType.Alias);
                     validationErrors.AddRange(ValidateProperty(propertyType, propertyValueModel, validationContext));
                 }
             }
