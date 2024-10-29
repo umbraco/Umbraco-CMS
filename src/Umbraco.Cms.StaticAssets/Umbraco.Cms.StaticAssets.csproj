@@ -4,10 +4,11 @@
     <Description>Contains the static assets needed to run Umbraco CMS.</Description>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
+    <CompressionEnabled>false</CompressionEnabled> <!-- Disable compression. E.g. for umbraco backoffice files. These files should be precompressed by node and not let dotnet handle it -->
   </PropertyGroup>
 
   <PropertyGroup>
-    <!--  TODO: [NU5123] Rename files so path is shorter -->
+    <!--  TODO: [NU5123] Rename files so path is shorter and remove this override -->
     <WarningsNotAsErrors>NU5123</WarningsNotAsErrors>
   </PropertyGroup>
 

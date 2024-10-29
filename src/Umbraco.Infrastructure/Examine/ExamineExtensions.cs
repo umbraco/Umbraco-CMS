@@ -51,8 +51,7 @@ public static class ExamineExtensions
     }
 
     /// <summary>
-    ///     Creates an <see cref="IEnumerable{PublishedSearchResult}" /> containing all content, media or members from the
-    ///     <paramref name="snapshot" />.
+    ///     Creates an <see cref="IEnumerable{PublishedSearchResult}" /> containing all content, media or members from the snapshot.
     /// </summary>
     /// <param name="results">The search results.</param>
     /// <param name="cacheManager">The caches.</param>

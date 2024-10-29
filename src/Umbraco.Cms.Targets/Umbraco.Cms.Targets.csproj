@@ -6,8 +6,8 @@
     <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup>
   <PropertyGroup>
-    <!--  TODO: [IDE0270] Simplify null checks, [CS0108] resolve hiding inherited members, [CS1998] remove async or make method synchronous,
-          and remove this override -->
+    <!--  TODO: [IDE0270] Simplify null checks, [CS0108] resolve hiding inherited members, [CS1998] remove
+          async or make method synchronous, and remove these overrides -->
     <WarningsNotAsErrors>IDE0270,CS0108,CS1998</WarningsNotAsErrors>
   </PropertyGroup>
   <ItemGroup>

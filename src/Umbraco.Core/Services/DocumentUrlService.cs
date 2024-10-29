@@ -258,8 +258,7 @@ public class DocumentUrlService : IDocumentUrlService
                 document.GetUrlSegment(_shortStringHelper, _urlSegmentProviderCollection, culture);
             if (publishedUrlSegment.IsNullOrWhiteSpace())
             {
-                _logger.LogWarning("No published url segment found for document {DocumentKey} in culture {Culture}",
-                    document.Key, culture ?? "{null}");
+                _logger.LogWarning("No published url segment found for document {DocumentKey} in culture {Culture}", document.Key, culture ?? "{null}");
             }
             else
             {
@@ -434,8 +433,7 @@ public class DocumentUrlService : IDocumentUrlService
             return "#";
         }
 
-        if (_documentNavigationQueryService.TryGetAncestorsOrSelfKeys(docuemntKey,
-                out IEnumerable<Guid> ancestorsOrSelfKeys) is false)
+        if (_documentNavigationQueryService.TryGetAncestorsOrSelfKeys(docuemntKey, out IEnumerable<Guid> ancestorsOrSelfKeys) is false)
         {
             return "#";
         }

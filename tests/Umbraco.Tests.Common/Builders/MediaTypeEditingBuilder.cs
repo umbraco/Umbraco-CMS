@@ -41,8 +41,7 @@ public class MediaTypeEditingBuilder : ContentTypeEditingBaseBuilder<MediaTypeEd
             .Build();
     }
 
-    public static MediaTypeCreateModel CreateBasicFolderMediaType(string alias = "basicFolder",
-        string name = "BasicFolder")
+    public static MediaTypeCreateModel CreateBasicFolderMediaType(string alias = "basicFolder", string name = "BasicFolder")
     {
         var builder = new MediaTypeEditingBuilder();
         return (MediaTypeCreateModel)builder

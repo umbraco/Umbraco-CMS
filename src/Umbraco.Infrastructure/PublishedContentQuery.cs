@@ -336,8 +336,10 @@ public class PublishedContentQuery : IPublishedContentQuery
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IEnumerable<PublishedSearchResult> _wrapped;
 
-        public CultureContextualSearchResults(IEnumerable<PublishedSearchResult> wrapped,
-            IVariationContextAccessor variationContextAccessor, string culture)
+        public CultureContextualSearchResults(
+            IEnumerable<PublishedSearchResult> wrapped,
+            IVariationContextAccessor variationContextAccessor,
+            string culture)
         {
             _wrapped = wrapped;
             _variationContextAccessor = variationContextAccessor;
