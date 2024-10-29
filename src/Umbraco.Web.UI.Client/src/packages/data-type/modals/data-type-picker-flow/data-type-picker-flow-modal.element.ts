@@ -448,6 +448,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 				grid-template-rows: 40px 1fr;
 				height: 100%;
 				width: 100%;
+				word-break: break-word;
 			}
 
 			#item-grid .item .icon {
