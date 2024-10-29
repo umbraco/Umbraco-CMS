@@ -196,6 +196,18 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 	{
 		type: 'tiptapToolbarExtension',
 		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.ClearFormatting',
+		name: 'Clear Formatting Tiptap Extension',
+		api: () => import('./toolbar/clear-formatting.extension.js'),
+		meta: {
+			alias: 'clear-formatting',
+			icon: 'icon-clear-formatting',
+			label: 'Clear Formatting',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.TextAlignLeft',
 		name: 'Text Align Left Tiptap Extension',
 		api: () => import('./toolbar/text-align-left.extension.js'),
