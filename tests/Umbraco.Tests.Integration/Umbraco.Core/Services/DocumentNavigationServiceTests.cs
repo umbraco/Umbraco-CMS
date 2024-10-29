@@ -25,7 +25,6 @@ public partial class DocumentNavigationServiceTests : DocumentNavigationServiceT
         ContentType = ContentTypeBuilder.CreateSimpleContentType("page", "Page");
         ContentType.Key = new Guid("DD72B8A6-2CE3-47F0-887E-B695A1A5D086");
         ContentType.AllowedAsRoot = true;
-        ContentType.AllowedTemplates = null;
         ContentType.AllowedContentTypes = new[] { new ContentTypeSort(ContentType.Key, 0, ContentType.Alias) };
         await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
 

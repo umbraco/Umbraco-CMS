@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
