@@ -1,8 +1,9 @@
+import type { UmbEntityCreateOptionAction } from './entity-create-option-action.interface.js';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestEntityCreateOptionAction<
 	MetaType extends MetaEntityCreateOptionAction = MetaEntityCreateOptionAction,
-> extends ManifestElementAndApi,
+> extends ManifestElementAndApi<any, UmbEntityCreateOptionAction<unknown>>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'entityCreateOptionAction';
 	forEntityTypes: Array<string>;
