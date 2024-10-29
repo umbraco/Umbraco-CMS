@@ -12,7 +12,9 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 	@state()
 	private _multipleOptions = false;
 
-	#apiControllers: Array<any> = [];
+	@state()
+	private _apiControllers: Array<any> = [];
+
 	#createLabel = this.localize.term('general_create');
 
 	#onPopoverToggle(event: PointerEvent) {
@@ -37,7 +39,7 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 			[],
 			undefined,
 			(controllers) => {
-				this.#apiControllers = controllers;
+				this._apiControllers = controllers;
 				this._multipleOptions = controllers.length > 1;
 			},
 		);
@@ -52,7 +54,7 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 			label=${this.#createLabel}
 			color="default"
 			look="outline"
-			@click=${(event: Event) => this.#onClick(event, this.#apiControllers[0])}></uui-button>`;
+			@click=${(event: Event) => this.#onClick(event, this._apiControllers[0])}></uui-button>`;
 	}
 
 	#renderMultiOptionAction() {
@@ -77,7 +79,7 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 				@toggle=${this.#onPopoverToggle}>
 				<umb-popover-layout>
 					<uui-scroll-container>
-						${this.#apiControllers.map((controller) => this.#renderMenuItem(controller))}
+						${this._apiControllers.map((controller) => this.#renderMenuItem(controller))}
 					</uui-scroll-container>
 				</umb-popover-layout>
 			</uui-popover-container>
