@@ -55,7 +55,7 @@ internal abstract class ContentValidationServiceBase<TContentType>
                 Culture = null, Segment = null, CulturesBeingValidated = cultures, SegmentsBeingValidated = segments
             };
 
-            PropertyValueModel? propertyValueModel = contentEditingModelBase.InvariantProperties.FirstOrDefault(pv => pv.Alias == propertyType.Alias);
+            PropertyValueModel? propertyValueModel = contentEditingModelBase.InvariantProperties.FirstOrDefault(propertyValue => propertyValue.Alias == propertyType.Alias);
             validationErrors.AddRange(ValidateProperty(propertyType, propertyValueModel, validationContext));
         }
 
