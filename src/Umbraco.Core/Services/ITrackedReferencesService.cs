@@ -98,5 +98,9 @@ public interface ITrackedReferencesService
     Task<PagedModel<RelationItemModel>> GetPagedItemsWithRelationsAsync(ISet<Guid> keys, long skip, long take,
         bool filterMustBeIsDependency);
 
-    Task<PagedModel<Guid>> GetPagedKeysWithDependentReferencesAsync(ISet<Guid> keys, Guid nodeObjectTypeId, long skip, long take);
+    Task<PagedModel<Guid>> GetPagedKeysWithDependentReferencesAsync(ISet<Guid> keys, Guid nodeObjectTypeId, long skip, long take)
+    {
+        PagedModel<RelationItemModel> pagedItems = GetPagedItemsWithRelationsAsync(keys, skip, take, true).GetAwaiter().GetResult();
+        return Task.FromResult(new PagedModel<Guid>(pagedItems.Total, pagedItems.Items.Select(i => i.NodeKey)));
+    }
 }

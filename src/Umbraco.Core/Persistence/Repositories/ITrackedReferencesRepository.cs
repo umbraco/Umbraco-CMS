@@ -136,5 +136,9 @@ public interface ITrackedReferencesRepository
         ISet<Guid> keys,
         Guid nodeObjectTypeId,
         long skip,
-        long take);
+        long take)
+    {
+        IEnumerable<RelationItemModel> pagedItems = GetPagedItemsWithRelations(keys, skip, take, true, out var total);
+        return Task.FromResult(new PagedModel<Guid>(total, pagedItems.Select(i => i.NodeKey)));
+    }
 }
