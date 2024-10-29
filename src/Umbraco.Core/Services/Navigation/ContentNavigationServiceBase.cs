@@ -11,15 +11,19 @@ internal abstract class ContentNavigationServiceBase
 {
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly INavigationRepository _navigationRepository;
+    private readonly TContentTypeService _typeService;
+    private Lazy<Dictionary<string, Guid>> _contentTypeAliasToKeyMap;
     private ConcurrentDictionary<Guid, NavigationNode> _navigationStructure = new();
     private ConcurrentDictionary<Guid, NavigationNode> _recycleBinNavigationStructure = new();
     private IList<Guid> _roots = new List<Guid>();
     private IList<Guid> _recycleBinRoots = new List<Guid>();
 
-    protected ContentNavigationServiceBase(ICoreScopeProvider coreScopeProvider, INavigationRepository navigationRepository)
+    protected ContentNavigationServiceBase(ICoreScopeProvider coreScopeProvider, INavigationRepository navigationRepository, TContentTypeService typeService)
     {
         _coreScopeProvider = coreScopeProvider;
         _navigationRepository = navigationRepository;
+        _typeService = typeService;
+        _contentTypeAliasToKeyMap = new Lazy<Dictionary<string, Guid>>(LoadContentTypes);
     }
 
     /// <summary>
@@ -460,6 +464,30 @@ internal abstract class ContentNavigationServiceBase
             .Where(structure.ContainsKey)
             .OrderBy(childKey => structure[childKey].SortOrder)
             .ToList();
+    }
+
+    private bool TryGetContentTypeKey(string contentTypeAlias, out Guid? contentTypeKey)
+    {
+        Dictionary<string, Guid> aliasToKeyMap = _contentTypeAliasToKeyMap.Value;
+
+        if (aliasToKeyMap.TryGetValue(contentTypeAlias, out Guid key))
+        {
+            contentTypeKey = key;
+            return true;
+        }
+
+        TContentType? contentType = _typeService.Get(contentTypeAlias);
+        if (contentType is null)
+        {
+            // Content type alias doesn't exist
+            contentTypeKey = null;
+            return false;
+        }
+
+        aliasToKeyMap.TryAdd(contentTypeAlias, contentType.Key);
+        contentTypeKey = contentType.Key;
+        return true;
+    }
 
     private static void BuildNavigationDictionary(ConcurrentDictionary<Guid, NavigationNode> nodesStructure, IList<Guid> roots, IEnumerable<INavigationModel> entities)
     {
@@ -490,4 +518,7 @@ internal abstract class ContentNavigationServiceBase
             }
         }
     }
+
+    private Dictionary<string, Guid> LoadContentTypes()
+        => _typeService.GetAll().ToDictionary(ct => ct.Alias, ct => ct.Key);
 }
