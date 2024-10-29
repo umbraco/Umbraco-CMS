@@ -23,7 +23,7 @@ export class UmbCreateEntityAction extends UmbEntityActionBase<MetaEntityActionC
 			async (actionOptions) => {
 				this.#hasSingleOption = actionOptions.length === 1;
 				this.#singleActionOptionManifest = this.#hasSingleOption
-					? (actionOptions[0].manifest as ManifestEntityCreateOptionAction)
+					? (actionOptions[0].manifest as unknown as ManifestEntityCreateOptionAction)
 					: undefined;
 			},
 			'umbEntityActionsObserver',
