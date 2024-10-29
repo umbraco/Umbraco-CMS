@@ -32,16 +32,6 @@ public class ContentNavigationServiceBaseTests
     [SetUp]
     public void Setup()
     {
-        // Root
-        //    - Child 1
-        //      - Grandchild 1
-        //      - Grandchild 2
-        //    - Child 2
-        //      - Grandchild 3
-        //        - Great-grandchild 1
-        //    - Child 3
-        //      - Grandchild 4
-
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
             Mock.Of<INavigationRepository>());
@@ -129,7 +119,8 @@ public class ContentNavigationServiceBaseTests
         // Arrange
         var emptyNavigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>());
+            Mock.Of<INavigationRepository>(),
+            Mock.Of<IContentTypeService>());
 
         // Act
         emptyNavigationService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
@@ -1145,10 +1136,13 @@ public class ContentNavigationServiceBaseTests
     }
 }
 
-internal class TestContentNavigationService : ContentNavigationServiceBase
+internal class TestContentNavigationService : ContentNavigationServiceBase<IContentType, IContentTypeService>
 {
-    public TestContentNavigationService(ICoreScopeProvider coreScopeProvider, INavigationRepository navigationRepository)
-        : base(coreScopeProvider, navigationRepository)
+    public TestContentNavigationService(
+        ICoreScopeProvider coreScopeProvider,
+        INavigationRepository navigationRepository,
+        IContentTypeService contentTypeService)
+        : base(coreScopeProvider, navigationRepository, contentTypeService)
     {
     }
 

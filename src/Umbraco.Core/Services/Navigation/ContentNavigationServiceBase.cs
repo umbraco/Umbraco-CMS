@@ -7,7 +7,9 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services.Navigation;
 
-internal abstract class ContentNavigationServiceBase
+internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeService>
+    where TContentType : class, IContentTypeComposition
+    where TContentTypeService : IContentTypeBaseService<TContentType>
 {
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly INavigationRepository _navigationRepository;
