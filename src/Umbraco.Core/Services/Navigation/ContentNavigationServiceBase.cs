@@ -104,7 +104,7 @@ internal abstract class ContentNavigationServiceBase
                _navigationStructure.TryRemove(key, out _);
     }
 
-    public bool Add(Guid key, Guid? parentKey = null, int? sortOrder = null)
+    public bool Add(Guid key, Guid contentTypeKey, Guid? parentKey = null, int? sortOrder = null)
     {
         NavigationNode? parentNode = null;
         if (parentKey.HasValue)
@@ -120,7 +120,7 @@ internal abstract class ContentNavigationServiceBase
         }
 
         // Note: sortOrder can't be automatically determined for items at root level, so it needs to be passed in
-        var newNode = new NavigationNode(key, sortOrder ?? 0);
+        var newNode = new NavigationNode(key, contentTypeKey, sortOrder ?? 0);
         if (_navigationStructure.TryAdd(key, newNode) is false)
         {
             return false; // Node with this key already exists
@@ -468,7 +468,7 @@ internal abstract class ContentNavigationServiceBase
 
         foreach (INavigationModel entity in entityList)
         {
-            var node = new NavigationNode(entity.Key, entity.SortOrder);
+            var node = new NavigationNode(entity.Key, entity.ContentTypeKey, entity.SortOrder);
             nodesStructure[entity.Key] = node;
 
             // We don't set the parent for items under root, it will stay null

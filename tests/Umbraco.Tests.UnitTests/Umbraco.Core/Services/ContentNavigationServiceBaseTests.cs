@@ -161,7 +161,7 @@ public class ContentNavigationServiceBaseTests
     {
         // Arrange
         Guid anotherRoot = Guid.NewGuid();
-        _navigationService.Add(anotherRoot);
+        _navigationService.Add(anotherRoot, ContentType);
 
         // Act
         var result = _navigationService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
@@ -428,7 +428,7 @@ public class ContentNavigationServiceBaseTests
     {
         // Arrange
         Guid anotherRoot = Guid.NewGuid();
-        _navigationService.Add(anotherRoot);
+        _navigationService.Add(anotherRoot, ContentType);
 
         // Act
         _navigationService.TryGetSiblingsKeys(anotherRoot, out IEnumerable<Guid> siblingsKeys);
@@ -683,7 +683,7 @@ public class ContentNavigationServiceBaseTests
         var nonExistentParentKey = Guid.NewGuid();
 
         // Act
-        var result = _navigationService.Add(newNodeKey, nonExistentParentKey);
+        var result = _navigationService.Add(newNodeKey, ContentType, nonExistentParentKey);
 
         // Assert
         Assert.IsFalse(result);
@@ -693,7 +693,7 @@ public class ContentNavigationServiceBaseTests
     public void Cannot_Add_When_Node_With_The_Same_Key_Already_Exists()
     {
         // Act
-        var result = _navigationService.Add(Child1);
+        var result = _navigationService.Add(Child1, ContentType);
 
         // Assert
         Assert.IsFalse(result);
@@ -706,7 +706,7 @@ public class ContentNavigationServiceBaseTests
         var newNodeKey = Guid.NewGuid();
 
         // Act
-        var result = _navigationService.Add(newNodeKey); // parentKey is null
+        var result = _navigationService.Add(newNodeKey, ContentType); // parentKey is null
 
         // Assert
         Assert.IsTrue(result);
@@ -732,7 +732,7 @@ public class ContentNavigationServiceBaseTests
         var currentChildrenCount = currentChildrenKeys.Count();
 
         // Act
-        var result = _navigationService.Add(newNodeKey, parentKey);
+        var result = _navigationService.Add(newNodeKey, ContentType, parentKey);
 
         // Assert
         Assert.IsTrue(result);
@@ -763,7 +763,7 @@ public class ContentNavigationServiceBaseTests
         var newNodeKey = Guid.NewGuid();
 
         // Act
-        _navigationService.Add(newNodeKey, parentKey);
+        _navigationService.Add(newNodeKey, ContentType, parentKey);
 
         // Assert
         _navigationService.TryGetChildrenKeys(parentKey, out IEnumerable<Guid> childrenKeys);
