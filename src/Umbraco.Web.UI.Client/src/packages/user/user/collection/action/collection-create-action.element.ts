@@ -87,13 +87,12 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 	}
 
 	#renderMenuItem(controller: any) {
-		const label = controller.manifest.meta.label
-			? this.localize.string(controller.manifest.meta.label)
-			: controller.manifest.meta.name;
+		const manifest = controller.manifest;
+		const label = manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.meta.name;
 
 		return html`
 			<uui-menu-item label=${label} @click=${(event: Event) => this.#onClick(event, controller)}>
-				<umb-icon slot="icon" name="icon-user"></umb-icon>
+				<umb-icon slot="icon" .name=${manifest.meta.icon}></umb-icon>
 			</uui-menu-item>
 		`;
 	}
