@@ -54,13 +54,13 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
         }
 
         Guid[] exposedContentKeys = blockEditorData.BlockValue.Expose
-            .Where(e => culture is null || e.Culture == culture)
-            .Select(e => e.ContentKey)
+            .Where(expose => culture is null || expose.Culture == culture)
+            .Select(expose => expose.ContentKey)
             .Distinct()
             .ToArray();
         Guid[] exposedSettingsKeys = blockEditorData.Layout
-            .Where(l => l.SettingsKey.HasValue && exposedContentKeys.Contains(l.ContentKey))
-            .Select(l => l.SettingsKey!.Value)
+            .Where(layout => layout.SettingsKey.HasValue && exposedContentKeys.Contains(layout.ContentKey))
+            .Select(layout => layout.SettingsKey!.Value)
             .ToArray();
 
         var itemDataGroups = new[]
