@@ -14,30 +14,30 @@ namespace Umbraco.Cms.Infrastructure.Routing
 {
     internal class RedirectTracker : IRedirectTracker
     {
-        private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly ILocalizationService _localizationService;
         private readonly IRedirectUrlService _redirectUrlService;
         private readonly IPublishedContentCache _contentCache;
         private readonly IDocumentNavigationQueryService _navigationQueryService;
         private readonly ILogger<RedirectTracker> _logger;
+        private readonly IDocumentUrlService _documentUrlService;
 
         public RedirectTracker(
-            IUmbracoContextFactory umbracoContextFactory,
             IVariationContextAccessor variationContextAccessor,
             ILocalizationService localizationService,
             IRedirectUrlService redirectUrlService,
             IPublishedContentCache contentCache,
             IDocumentNavigationQueryService navigationQueryService,
-            ILogger<RedirectTracker> logger)
+            ILogger<RedirectTracker> logger,
+            IDocumentUrlService documentUrlService)
         {
-            _umbracoContextFactory = umbracoContextFactory;
             _variationContextAccessor = variationContextAccessor;
             _localizationService = localizationService;
             _redirectUrlService = redirectUrlService;
             _contentCache = contentCache;
             _navigationQueryService = navigationQueryService;
             _logger = logger;
+            _documentUrlService = documentUrlService;
         }
 
         /// <inheritdoc/>
@@ -98,19 +98,11 @@ namespace Umbraco.Cms.Infrastructure.Routing
                 return;
             }
 
-            using UmbracoContextReference reference = _umbracoContextFactory.EnsureUmbracoContext();
-            IPublishedContentCache? contentCache = reference.UmbracoContext.Content;
-            if (contentCache == null)
-            {
-                _logger.LogWarning("Could not track redirects because there is no published content cache available on the current published snapshot.");
-                return;
-            }
-
             foreach (((int contentId, string culture), (Guid contentKey, string oldRoute)) in oldRoutes)
             {
                 try
                 {
-                    var newRoute = contentCache.GetRouteById(contentId, culture);
+                    var newRoute = _documentUrlService.GetLegacyRouteFormat(contentKey, culture, false);
                     if (!IsValidRoute(newRoute) || oldRoute == newRoute)
                     {
                         continue;
