@@ -3,9 +3,9 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-const elementName = 'umb-create-user-collection-action-button';
+const elementName = 'umb-collection-create-action-button';
 @customElement(elementName)
-export class UmbCollectionActionButtonElement extends UmbLitElement {
+export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 	@state()
 	private _popoverOpen = false;
 
@@ -97,10 +97,10 @@ export class UmbCollectionActionButtonElement extends UmbLitElement {
 	}
 }
 
-export { UmbCollectionActionButtonElement as element };
+export { UmbCollectionCreateActionButtonElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbCollectionActionButtonElement;
+		[elementName]: UmbCollectionCreateActionButtonElement;
 	}
 }
