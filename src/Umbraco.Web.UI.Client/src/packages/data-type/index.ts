@@ -9,4 +9,4 @@ export * from './paths.js';
 
 export { UmbMoveDataTypeRepository, UMB_MOVE_DATA_TYPE_REPOSITORY_ALIAS } from './entity-actions/move-to/index.js';
 
-export type { UmbDataTypeDetailModel } from './types.js';
+export type * from './types.js';

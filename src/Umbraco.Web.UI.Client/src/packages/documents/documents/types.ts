@@ -9,6 +9,13 @@ import { DocumentVariantStateModel as UmbDocumentVariantState } from '@umbraco-c
 import type { UmbContentDetailModel, UmbContentValueModel } from '@umbraco-cms/backoffice/content';
 export { UmbDocumentVariantState };
 
+export type * from './audit-log/types.js';
+export type * from './collection/types.js';
+export type * from './modals/types.js';
+export type * from './repository/types.js';
+export type * from './tree/types.js';
+export type * from './user-permissions/types.js';
+
 export interface UmbDocumentDetailModel extends UmbContentDetailModel {
 	documentType: {
 		unique: string;
