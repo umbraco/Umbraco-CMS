@@ -367,6 +367,10 @@
 			"file": "circuit-board.svg"
 		},
 		{
+			"name": "icon-clear-formatting",
+			"file": "remove-formatting.svg"
+		},
+		{
 			"name": "icon-client",
 			"file": "user.svg",
 			"legacy": true

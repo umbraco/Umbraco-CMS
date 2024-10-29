@@ -478,7 +478,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		const ownedTab = this.#tabsStructureHelper.isOwnerChildContainer(tab.id!) ?? false;
 
 		return html`<uui-tab
-			label=${tab.name && tab.name !== '' ? tab.name : 'unnamed'}
+			label=${tab.name && tab.name !== '' ? tab.name : 'Unnamed'}
 			.active=${tabActive}
 			href=${path}
 			data-umb-tab-id=${ifDefined(tab.id)}
@@ -489,10 +489,12 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 	renderTabInner(tab: UmbPropertyTypeContainerModel, tabActive: boolean, ownedTab: boolean) {
 		// TODO: Localize this:
+		const hasTabName = tab.name && tab.name !== '';
+		const tabName = hasTabName ? tab.name : 'Unnamed';
 		if (this._sortModeActive) {
 			return html`<div class="tab">
 				${ownedTab
-					? html`<uui-icon name="icon-navigation" class="drag-${tab.id}"> </uui-icon>${tab.name!}
+					? html`<uui-icon name="icon-navigation" class="drag-${tab.id}"> </uui-icon>${tabName}
 							<uui-input
 								label="sort order"
 								type="number"
@@ -512,6 +514,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					label=${tab.name!}
 					value="${tab.name!}"
 					auto-width
+					minlength="1"
 					@change=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
 					@input=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
 					@blur=${(e: FocusEvent) => this.#tabNameBlur(e, tab)}>
@@ -521,7 +524,11 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		}
 
 		if (ownedTab) {
-			return html`<div class="not-active">${tab.name!} ${this.renderDeleteFor(tab)}</div>`;
+			return html`<div class="not-active">
+				<span class=${hasTabName ? '' : 'invaild'}>${hasTabName ? tab.name : 'Unnamed'}</span> ${this.renderDeleteFor(
+					tab,
+				)}
+			</div>`;
 		} else {
 			return html`<div class="not-active"><uui-icon name="icon-merge"></uui-icon>${tab.name!}</div>`;
 		}
@@ -630,6 +637,10 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				gap: var(--uui-size-space-3);
 			}
 
+			.invaild {
+				color: var(--uui-color-danger, #d42054);
+			}
+
 			.trash {
 				opacity: 1;
 				transition: opacity 100ms;
@@ -640,7 +651,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				transition: opacity 100ms;
 			}
 
-			uui-input:not(:focus, :hover) {
+			uui-input:not(:focus, :hover, :invalid) {
 				border: 1px solid transparent;
 			}
 
