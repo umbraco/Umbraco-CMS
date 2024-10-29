@@ -309,8 +309,7 @@ test.skip('can set permissions with set permissions permission enabled', async (
 
 test('can unpublish document with unpublish permission enabled', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
-  const publishData = {"publishSchedules": [{"culture": null}]};
-  await umbracoApi.document.publish(rootDocumentId, publishData);
+  await umbracoApi.document.publish(rootDocumentId);
   expect(await umbracoApi.document.isDocumentPublished(rootDocumentId)).toBeTruthy();
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUnpublishPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -330,8 +329,7 @@ test('can unpublish document with unpublish permission enabled', async ({page, u
 
 test('can not unpublish document with unpublish permission disabled', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
-  const publishData = {"publishSchedules": [{"culture": null}]};
-  await umbracoApi.document.publish(rootDocumentId, publishData);
+  await umbracoApi.document.publish(rootDocumentId);
   expect(await umbracoApi.document.isDocumentPublished(rootDocumentId)).toBeTruthy();
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUnpublishPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -548,15 +546,19 @@ test('can not set culture and hostnames with culture and hostnames permission di
 test('can set public access with public access permission enabled', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPublicAccessPermission(userGroupName);
+  const testMemberGroup = 'TestMemberGroup';
+  await umbracoApi.memberGroup.ensureNameNotExists(testMemberGroup);
+  await umbracoApi.memberGroup.create(testMemberGroup)
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
   // Act
-  await page.pause()
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
-  // await umbracoUi.content.clickPublicAccessButton();
+  await umbracoUi.content.clickPublicAccessButton();
+  await page.pause()
+  await umbracoUi.content.addGroupBasedPublicAccess(testMemberGroup, rootDocumentName);
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
@@ -580,16 +582,28 @@ test('can not set public access with public access permission disabled', async (
 test('can rollback document with rollback permission enabled', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithRollbackPermission(userGroupName);
+  await umbracoApi.document.publish(rootDocumentId);
+  const updatedTextStringText = 'This is an updated textString text';
+  const content = await umbracoApi.document.get(rootDocumentId);
+  content.values[0].value = updatedTextStringText;
+  await umbracoApi.document.update(rootDocumentId, content);
+  await umbracoApi.document.publish(rootDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
   // Act
-  await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
+  await umbracoUi.content.goToContentWithName(rootDocumentName);
+  await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, updatedTextStringText);
+  await umbracoUi.content.clickInfoTab();
+  await umbracoUi.content.clickRollbackButton();
+  await umbracoUi.content.clickRollBackItem();
+  await umbracoUi.content.clickRollbackContainerButton();
+
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.restored);
+  await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, documentText);
 });
 
 test('can not rollback document with rollback permission disabled', async ({page, umbracoApi, umbracoUi}) => {

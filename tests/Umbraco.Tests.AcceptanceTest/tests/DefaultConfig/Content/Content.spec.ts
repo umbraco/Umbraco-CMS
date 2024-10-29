@@ -147,8 +147,7 @@ test('can unpublish content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
-  const publishData = {"publishSchedules":[{"culture":null}]};
-  await umbracoApi.document.publish(contentId, publishData);
+  await umbracoApi.document.publish(contentId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
