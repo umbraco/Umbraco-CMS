@@ -37,6 +37,8 @@ public class ExamineExternalIndexTests : ExamineBaseTest
         var httpContext = new DefaultHttpContext();
         httpContext.RequestServices = Services;
         Mock.Get(TestHelper.GetHttpContextAccessor()).Setup(x => x.HttpContext).Returns(httpContext);
+
+        DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
     }
 
     [TearDown]
@@ -52,6 +54,7 @@ public class ExamineExternalIndexTests : ExamineBaseTest
     private IExamineExternalIndexSearcherTest ExamineExternalIndexSearcher =>
         GetRequiredService<IExamineExternalIndexSearcherTest>();
 
+    private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     private ContentService ContentService => (ContentService)GetRequiredService<IContentService>();

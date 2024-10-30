@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Navigation;
@@ -18,7 +19,7 @@ public interface INavigationQueryService
 
     bool TryGetDescendantsKeysOrSelfKeys(Guid childKey, out IEnumerable<Guid> descendantsOrSelfKeys)
     {
-        if(TryGetDescendantsKeys(childKey, out var descendantsKeys))
+        if (TryGetDescendantsKeys(childKey, out IEnumerable<Guid>? descendantsKeys))
         {
             descendantsOrSelfKeys = childKey.Yield().Concat(descendantsKeys);
             return true;
@@ -28,14 +29,13 @@ public interface INavigationQueryService
         return false;
     }
 
-
     bool TryGetAncestorsKeys(Guid childKey, out IEnumerable<Guid> ancestorsKeys);
 
     bool TryGetAncestorsOrSelfKeys(Guid childKey, out IEnumerable<Guid> ancestorsOrSelfKeys)
     {
-        if(TryGetAncestorsKeys(childKey, out var ancestorsKeys))
+        if (TryGetAncestorsKeys(childKey, out IEnumerable<Guid>? ancestorsKeys))
         {
-            ancestorsOrSelfKeys =  childKey.Yield().Concat(ancestorsKeys);
+            ancestorsOrSelfKeys = childKey.Yield().Concat(ancestorsKeys);
             return true;
         }
 
@@ -45,5 +45,5 @@ public interface INavigationQueryService
 
     bool TryGetSiblingsKeys(Guid key, out IEnumerable<Guid> siblingsKeys);
 
-    bool TryGetLevel(Guid contentKey, out int level);
+    bool TryGetLevel(Guid contentKey, [NotNullWhen(true)] out int? level);
 }

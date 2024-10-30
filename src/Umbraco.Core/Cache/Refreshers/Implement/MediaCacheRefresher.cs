@@ -2,7 +2,6 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
@@ -169,7 +168,7 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
         // First creation
         if (ExistsInNavigation(media.Key) is false && ExistsInNavigationBin(media.Key) is false)
         {
-            _mediaNavigationManagementService.Add(media.Key, GetParentKey(media));
+            _mediaNavigationManagementService.Add(media.Key, GetParentKey(media), media.SortOrder);
             if (media.Trashed)
             {
                 // If created as trashed, move to bin
@@ -185,14 +184,20 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
             }
             else
             {
-                // It must have been saved. Check if parent is different
-                if (_mediaNavigationQueryService.TryGetParentKey(media.Key, out var oldParentKey))
+                if (_mediaNavigationQueryService.TryGetParentKey(media.Key, out var oldParentKey) is false)
                 {
-                    Guid? newParentKey = GetParentKey(media);
-                    if (oldParentKey != newParentKey)
-                    {
-                        _mediaNavigationManagementService.Move(media.Key, newParentKey);
-                    }
+                    return;
+                }
+
+                // It must have been saved. Check if parent is different
+                Guid? newParentKey = GetParentKey(media);
+                if (oldParentKey != newParentKey)
+                {
+                    _mediaNavigationManagementService.Move(media.Key, newParentKey);
+                }
+                else
+                {
+                    _mediaNavigationManagementService.UpdateSortOrder(media.Key, media.SortOrder);
                 }
             }
         }

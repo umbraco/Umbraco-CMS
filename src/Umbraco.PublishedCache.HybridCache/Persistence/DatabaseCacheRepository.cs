@@ -886,7 +886,7 @@ WHERE cmsContentNu.nodeId IN (
             dto.VersionId,
             dto.PubVersionDate,
             dto.CreatorId,
-            dto.EditTemplateId == 0 ? null : dto.EditTemplateId,
+            dto.PubTemplateId == 0 ? null : dto.PubTemplateId,
             true,
             deserializedContent?.PropertyData,
             deserializedContent?.CultureData);
