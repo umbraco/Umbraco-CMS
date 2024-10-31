@@ -59,6 +59,14 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 		await controller.api.execute();
 	}
 
+	#getTarget(href?: string) {
+		if (href && href.startsWith('http')) {
+			return '_blank';
+		}
+
+		return '_self';
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('user_createUser')}">
@@ -87,12 +95,15 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 		const href = this._hrefList[index];
 
 		return html`
-			<umb-ref-item
+			<uui-ref-node
 				name=${label}
 				detail=${ifDefined(manifest.meta.description)}
 				icon=${manifest.meta.icon}
 				@click=${(event: Event) => this.#onClick(event, controller)}
-				href=${ifDefined(href)}></umb-ref-item>
+				href=${ifDefined(href)}
+				target=${this.#getTarget(href)}
+				?selectable=${!href}
+				?readonly=${!href}></uui-ref-node>
 		`;
 	}
 }
