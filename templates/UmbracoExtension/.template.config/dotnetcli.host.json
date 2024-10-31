@@ -21,6 +21,10 @@
     "IncludeExample": {
       "longName": "include-example",
       "shortName": "ex"
+    },
+    "SiteDomain": {
+      "longName": "site-domain",
+      "shortName": "d"
     }
   }
 }

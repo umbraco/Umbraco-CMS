@@ -22,6 +22,14 @@
       "description": {
         "text": "Whether to include an example dashboard and other code to get started with."
       }
+    },
+    {
+      "id": "SiteDomain",
+      "isVisible": true,
+      "defaultValue": "https://localhost:5000",
+      "description": {
+        "text": "If using the --include-example then you can supply the domain prefix such as 'https://localhost:5000' to communicate with the Umbraco website for generating the TypeScript OpenAPI client"
+      }
     }
   ]
 }
