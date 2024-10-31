@@ -20,7 +20,11 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 	@state()
 	private _apiControllers: Array<UmbExtensionApiInitializer<ManifestType>> = [];
 
-	#hrefMap = new Map<string, string>();
+	@state()
+	_hrefMap = new Map<string, string>();
+
+	@state()
+	_hrefList: Array<any> = [];
 
 	constructor() {
 		super();
@@ -31,19 +35,11 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 			'entityCreateOptionAction',
 			[],
 			undefined,
-			(controllers) => {
+			async (controllers) => {
 				this._apiControllers = controllers as unknown as Array<UmbExtensionApiInitializer<ManifestType>>;
 
-				this._apiControllers.forEach((controller) => {
-					controller.api?.getHref().then((href) => {
-						const alias = controller.manifest?.alias;
-						if (!alias) throw new Error('No alias found');
-						// only apply to map if href is defined
-						if (href) {
-							this.#hrefMap.set(alias, href);
-						}
-					});
-				});
+				const hrefPromises = this._apiControllers.map((controller) => controller.api?.getHref());
+				this._hrefList = await Promise.all(hrefPromises);
 			},
 		);
 	}
@@ -51,10 +47,15 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 	async #onClick(event: Event, controller: UmbExtensionApiInitializer<ManifestType>) {
 		event.stopPropagation();
 
-		if (!controller.api) throw new Error('No api found');
+		if (!controller.manifest) throw new Error('No manifest found');
+		const href = this._hrefMap.get(controller.manifest?.alias);
 
-		const href = this.#hrefMap.get(controller.manifest?.alias);
+		// skip if href is defined
+		if (href) {
+			return;
+		}
 
+		if (!controller.api) throw new Error('No API found');
 		await controller.api.execute();
 	}
 
@@ -66,7 +67,7 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 						${repeat(
 							this._apiControllers,
 							(controller) => controller.manifest?.alias,
-							(controller) => this.#renderRefItem(controller),
+							(controller, index) => this.#renderRefItem(controller, index),
 						)}
 					</uui-ref-list>
 				</uui-box>
@@ -78,12 +79,12 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 		`;
 	}
 
-	#renderRefItem(controller: UmbExtensionApiInitializer<ManifestType>) {
+	#renderRefItem(controller: UmbExtensionApiInitializer<ManifestType>, index: number) {
 		const manifest = controller.manifest;
 		if (!manifest) throw new Error('No manifest found');
 
 		const label = manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name;
-		const href = this.#hrefMap.get(manifest.alias);
+		const href = this._hrefList[index];
 
 		return html`
 			<umb-ref-item
@@ -91,7 +92,7 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 				detail=${ifDefined(manifest.meta.description)}
 				icon=${manifest.meta.icon}
 				@click=${(event: Event) => this.#onClick(event, controller)}
-				.href=${href}></umb-ref-item>
+				href=${ifDefined(href)}></umb-ref-item>
 		`;
 	}
 }
