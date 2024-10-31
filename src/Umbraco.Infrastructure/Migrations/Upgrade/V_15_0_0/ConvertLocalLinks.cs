@@ -22,6 +22,7 @@ public class ConvertLocalLinks : MigrationBase
     private readonly ILanguageService _languageService;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly LocalLinkProcessor _localLinkProcessor;
+    private readonly IMediaTypeService _mediaTypeService;
 
     public ConvertLocalLinks(
         IMigrationContext context,
@@ -31,7 +32,8 @@ public class ConvertLocalLinks : MigrationBase
         IDataTypeService dataTypeService,
         ILanguageService languageService,
         IJsonSerializer jsonSerializer,
-        LocalLinkProcessor localLinkProcessor)
+        LocalLinkProcessor localLinkProcessor,
+        IMediaTypeService mediaTypeService)
         : base(context)
     {
         _umbracoContextFactory = umbracoContextFactory;
@@ -41,6 +43,7 @@ public class ConvertLocalLinks : MigrationBase
         _languageService = languageService;
         _jsonSerializer = jsonSerializer;
         _localLinkProcessor = localLinkProcessor;
+        _mediaTypeService = mediaTypeService;
     }
 
     protected override void Migrate()
@@ -50,12 +53,21 @@ public class ConvertLocalLinks : MigrationBase
         using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
         var languagesById = _languageService.GetAllAsync().GetAwaiter().GetResult()
             .ToDictionary(language => language.Id);
-        IContentType[] allContentTypes = _contentTypeService.GetAll().ToArray();
-        var relevantPropertyEditors = allContentTypes
-            .SelectMany(ct => ct.PropertyTypes)
+
+        IEnumerable<IContentType> allContentTypes = _contentTypeService.GetAll();
+        IEnumerable<IPropertyType> contentPropertyTypes = allContentTypes
+            .SelectMany(ct => ct.PropertyTypes);
+
+        IMediaType[] allMediaTypes = _mediaTypeService.GetAll().ToArray();
+        IEnumerable<IPropertyType> mediaPropertyTypes = allMediaTypes
+            .SelectMany(ct => ct.PropertyTypes);
+
+        var relevantPropertyEditors =
+            contentPropertyTypes.Concat(mediaPropertyTypes).DistinctBy(pt => pt.Id)
             .Where(pt => propertyEditorAliases.Contains(pt.PropertyEditorAlias))
             .GroupBy(pt => pt.PropertyEditorAlias)
             .ToDictionary(group => group.Key, group => group.ToArray());
+
 
         foreach (var propertyEditorAlias in propertyEditorAliases)
         {
@@ -93,13 +105,19 @@ public class ConvertLocalLinks : MigrationBase
                                            ?? throw new InvalidOperationException(
                                                "The data type value editor could not be fetched.");
 
-            Sql<ISqlContext> sql = Sql($"""
-                                        select pd.* from umbracoPropertyData pd
-                                        left join umbracoContentVersion cv on pd.versionId = cv.id
-                                        left join umbracoDocumentVersion dv on dv.id = cv.id
-                                        where (cv.current = 1 or dv.published = 1)
-                                        and pd.PropertyTypeId = {propertyType.Id}
-                                        """);
+            Sql<ISqlContext> sql = Sql()
+                .Select<PropertyDataDto>()
+                .From<PropertyDataDto>()
+                .InnerJoin<ContentVersionDto>()
+                .On<PropertyDataDto, ContentVersionDto>((propertyData, contentVersion) =>
+                    propertyData.VersionId == contentVersion.Id)
+                .LeftJoin<DocumentVersionDto>()
+                .On<ContentVersionDto, DocumentVersionDto>((contentVersion, documentVersion) =>
+                    contentVersion.Id == documentVersion.Id)
+                .Where<PropertyDataDto, ContentVersionDto, DocumentVersionDto>(
+                    (propertyData, contentVersion, documentVersion) =>
+                        (contentVersion.Current == true || documentVersion.Published == true)
+                        && propertyData.PropertyTypeId == propertyType.Id);
 
             List<PropertyDataDto> propertyDataDtos = Database.Fetch<PropertyDataDto>(sql);
             if (propertyDataDtos.Any() is false)
