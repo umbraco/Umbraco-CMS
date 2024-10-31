@@ -3,7 +3,6 @@ import { UMB_USER_ROOT_ENTITY_TYPE } from '../../../entity.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityCreateOptionAction',
-		kind: 'default',
 		alias: 'Umb.EntityCreateOptionAction.User.Api',
 		name: 'Api User Entity Create Option Action',
 		weight: 1100,
