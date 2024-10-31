@@ -1,14 +1,12 @@
 import { UMB_CREATE_USER_MODAL } from '../../../modals/create/create-user-modal.token.js';
 import type { UmbUserKindType } from '../../../utils/index.js';
 import { UmbUserKind } from '../../../utils/index.js';
+import { UmbEntityCreateOptionActionBase } from '@umbraco-cms/backoffice/entity-create-option-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import {
-	UmbEntityCreateOptionActionBase,
-	UmbRequestReloadChildrenOfEntityEvent,
-} from '@umbraco-cms/backoffice/entity-action';
+import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
-export class UmbDefaultUserEntityCreateOptionAction extends UmbEntityCreateOptionActionBase<never> {
+export class UmbDefaultUserEntityCreateOptionAction extends UmbEntityCreateOptionActionBase {
 	override async execute() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const kind: UmbUserKindType = UmbUserKind.DEFAULT;
