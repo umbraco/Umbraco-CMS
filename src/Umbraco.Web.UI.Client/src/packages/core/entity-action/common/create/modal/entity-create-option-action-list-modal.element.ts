@@ -6,7 +6,15 @@ import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/e
 import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { html, customElement, state, repeat, ifDefined, property } from '@umbraco-cms/backoffice/external/lit';
+import {
+	html,
+	customElement,
+	state,
+	repeat,
+	ifDefined,
+	property,
+	type PropertyValues,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 type ManifestType = ManifestEntityCreateOptionAction;
@@ -26,25 +34,27 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 	@state()
 	_hrefList: Array<any> = [];
 
-	@property({ attribute: false })
-	public override set data(value: UmbEntityCreateOptionActionListModalData | undefined) {
-		super.data = value;
+	protected override updated(_changedProperties: PropertyValues): void {
+		super.updated(_changedProperties);
 
-		if (value) {
+		if (_changedProperties.has('data')) {
 			this.#initApi();
 		}
 	}
 
 	#initApi() {
-		if (this._data?.entityType === undefined) throw new Error('No entityType found');
-		if (this._data?.unique === undefined) throw new Error('No unique found');
+		const data = this.data;
+		if (!data) throw new Error('No data found');
+
+		if (data.entityType === undefined) throw new Error('No entityType found');
+		if (data.unique === undefined) throw new Error('No unique found');
 
 		new UmbExtensionsApiInitializer(
 			this,
 			umbExtensionsRegistry,
 			'entityCreateOptionAction',
 			(manifest: ManifestType) => {
-				return [{ entityType: this._data!.entityType, unique: this._data!.unique, meta: manifest.meta }];
+				return [{ entityType: data.entityType, unique: data.unique, meta: manifest.meta }];
 			},
 			undefined,
 			async (controllers) => {
@@ -109,12 +119,13 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 			<uui-ref-node
 				name=${label}
 				detail=${ifDefined(manifest.meta.description)}
-				icon=${manifest.meta.icon}
 				@click=${(event: Event) => this.#onClick(event, controller)}
 				href=${ifDefined(href)}
 				target=${this.#getTarget(href)}
 				?selectable=${!href}
-				?readonly=${!href}></uui-ref-node>
+				?readonly=${!href}>
+				<uui-icon slot="icon" name=${manifest.meta.icon}></uui-icon>
+			</uui-ref-node>
 		`;
 	}
 }
