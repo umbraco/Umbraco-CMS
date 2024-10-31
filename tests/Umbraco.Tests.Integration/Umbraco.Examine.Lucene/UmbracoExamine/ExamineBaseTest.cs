@@ -44,9 +44,8 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
         builder
             .AddNotificationHandler<ContentTreeChangeNotification,
                 ContentTreeChangeDistributedCacheNotificationHandler>();
-        builder.Services.AddHostedService<DocumentUrlServiceInitializer>();
-
     }
+
     /// <summary>
     ///     Used to create and manage a testable index
     /// </summary>
