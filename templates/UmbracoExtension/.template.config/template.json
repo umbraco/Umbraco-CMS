@@ -10,7 +10,7 @@
     "Razor Class Library"
   ],
   "name": "Umbraco Extension",
-  "description": "An empty Umbraco extension (Razor Class Library).",
+  "description": "A Razor Class Library project for building Umbraco extensions.",
   "groupIdentity": "Umbraco.Templates.UmbracoExtension",
   "identity": "Umbraco.Templates.UmbracoExtension",
   "shortName": "umbraco-extension",
