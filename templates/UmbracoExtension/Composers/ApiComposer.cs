@@ -36,11 +36,11 @@ namespace UmbracoExtension.Composers
 
                 // Enable Umbraco authentication for the "Example" Swagger document
                 // PR: https://github.com/umbraco/Umbraco-CMS/pull/15699
-                opt.OperationFilter<ExampleApiOperationSecurityFilter>();
+                opt.OperationFilter<UmbracoExtensionOperationSecurityFilter>();
             });
         }
 
-        public class ExampleApiOperationSecurityFilter : BackOfficeSecurityRequirementsOperationFilterBase
+        public class UmbracoExtensionOperationSecurityFilter : BackOfficeSecurityRequirementsOperationFilterBase
         {
             protected override string ApiName => Constants.ApiName;
         }

@@ -1,25 +1,28 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+#if (IncludeExample)
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
+#endif
 
 namespace UmbracoExtension.Controllers
 {
     [ApiVersion("1.0")]
-    [ApiExplorerSettings(GroupName = "Examples")]
-    public class ExampleApiController : ExampleControllerBase
+    public class UmbracoExtensionApiController : UmbracoExtensionControllerBase
     {
+#if (IncludeExample)
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-        public ExampleApiController(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        public UmbracoExtensionApiController(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         }
-
+#endif
         [HttpGet("Ping")]
         [ProducesResponseType<string>(StatusCodes.Status200OK)]
         public string Ping() => "Pong";
+#if (IncludeExample)
 
         [HttpGet("WhatsTheTimeMrWolf")]
         [ProducesResponseType(typeof(DateTime), 200)]
@@ -39,5 +42,6 @@ namespace UmbracoExtension.Controllers
         [HttpGet("WhoAmI")]
         [ProducesResponseType<IUser>(StatusCodes.Status200OK)]
         public IUser? WhoAmI() => _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+#endif
     }
 }

@@ -2,6 +2,6 @@ namespace UmbracoExtension
 {
     public class Constants
     {
-        public const string ApiName = "example";
+        public const string ApiName = "UmbracoExtension";
     }
 }
