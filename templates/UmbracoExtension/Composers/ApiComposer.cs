@@ -29,7 +29,7 @@ namespace UmbracoExtension.Composers
                     Contact = new OpenApiContact
                     {
                         Name = "Some Developer",
-                        Email = "you@comapny.com",
+                        Email = "you@company.com",
                         Url = new Uri("https://company.com")
                     }
                 });
