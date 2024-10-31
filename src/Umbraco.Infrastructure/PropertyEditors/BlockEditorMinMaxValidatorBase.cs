@@ -3,6 +3,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -19,7 +20,7 @@ internal abstract class BlockEditorMinMaxValidatorBase<TValue, TLayout> : IValue
 
     protected ILocalizedTextService TextService { get; }
 
-    public abstract IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration);
+    public abstract IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext);
 
     protected IEnumerable<ValidationResult> ValidateNumberOfBlocks(BlockEditorData<TValue, TLayout>? blockEditorData, int? min, int? max)
     {
