@@ -6,7 +6,7 @@ import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/e
 import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, repeat, ifDefined, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 type ManifestType = ManifestEntityCreateOptionAction;
@@ -26,18 +26,29 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 	@state()
 	_hrefList: Array<any> = [];
 
-	constructor() {
-		super();
+	@property({ attribute: false })
+	public override set data(value: UmbEntityCreateOptionActionListModalData | undefined) {
+		super.data = value;
+
+		if (value) {
+			this.#initApi();
+		}
+	}
+
+	#initApi() {
+		if (this._data?.entityType === undefined) throw new Error('No entityType found');
+		if (this._data?.unique === undefined) throw new Error('No unique found');
 
 		new UmbExtensionsApiInitializer(
 			this,
 			umbExtensionsRegistry,
 			'entityCreateOptionAction',
-			[],
+			(manifest: ManifestType) => {
+				return [{ entityType: this._data!.entityType, unique: this._data!.unique, meta: manifest.meta }];
+			},
 			undefined,
 			async (controllers) => {
 				this._apiControllers = controllers as unknown as Array<UmbExtensionApiInitializer<ManifestType>>;
-
 				const hrefPromises = this._apiControllers.map((controller) => controller.api?.getHref());
 				this._hrefList = await Promise.all(hrefPromises);
 			},
