@@ -1,6 +1,6 @@
 import { LitElement, css, html, customElement, state } from "@umbraco-cms/backoffice/external/lit";
 import { UmbElementMixin } from "@umbraco-cms/backoffice/element-api";
-import { ExamplesService, UserModel } from "../api";
+import { UmbracoExtensionService, UserModel } from "../api";
 import { UUIButtonElement } from "@umbraco-cms/backoffice/external/uui";
 import { UMB_NOTIFICATION_CONTEXT, UmbNotificationContext } from "@umbraco-cms/backoffice/notification";
 import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserModel } from "@umbraco-cms/backoffice/current-user";
@@ -32,7 +32,7 @@ export class MyAwesomeDashboardElement extends UmbElementMixin(LitElement) {
     const buttonElement = ev.target as UUIButtonElement;
     buttonElement.state = "waiting";
 
-    const { data, error } = await ExamplesService.getUmbracoExampleApiV1WhoAmI();
+    const { data, error } = await UmbracoExtensionService.whoAmI();
 
     if (error) {
       buttonElement.state = "failed";
@@ -60,7 +60,7 @@ export class MyAwesomeDashboardElement extends UmbElementMixin(LitElement) {
     buttonElement.state = "waiting";
 
     // Getting a string - should I expect a datetime?!
-    const { data, error } = await ExamplesService.getUmbracoExampleApiV1WhatsTheTimeMrWolf();
+    const { data, error } = await UmbracoExtensionService.whatsTheTimeMrWolf();
 
     if (error) {
       buttonElement.state = "failed";
@@ -78,7 +78,7 @@ export class MyAwesomeDashboardElement extends UmbElementMixin(LitElement) {
     const buttonElement = ev.target as UUIButtonElement;
     buttonElement.state = "waiting";
 
-    const { data, error } = await ExamplesService.getUmbracoExampleApiV1WhatsMyName();
+    const { data, error } = await UmbracoExtensionService.whatsMyName();
 
     if (error) {
       buttonElement.state = "failed";

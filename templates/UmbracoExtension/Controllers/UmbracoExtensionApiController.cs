@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Security;
 namespace UmbracoExtension.Controllers
 {
     [ApiVersion("1.0")]
+    [ApiExplorerSettings(GroupName = "UmbracoExtension")]
     public class UmbracoExtensionApiController : UmbracoExtensionControllerBase
     {
 #if (IncludeExample)
