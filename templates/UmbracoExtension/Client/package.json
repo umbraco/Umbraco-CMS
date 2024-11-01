@@ -6,13 +6,15 @@
   "scripts": {
     "watch": "tsc && vite build --watch",
     "build": "tsc && vite build",
-    "generate-api": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 openapi-ts"
+    "generate-client": "node scripts/generate-openapi.js https://localhost:44331/umbraco/swagger/example/swagger.json"
   },
   "devDependencies": {
     "@hey-api/client-fetch": "^0.4.2",
     "@hey-api/openapi-ts": "^0.53.11",
-    "cross-env": "^7.0.3",
     "@umbraco-cms/backoffice": "^UMBRACO_VERSION_FROM_TEMPLATE",
+    "chalk": "^5.3.0",
+    "cross-env": "^7.0.3",
+    "node-fetch": "^3.3.2",
     "typescript": "^5.6.3",
     "vite": "^5.4.9"
   }
