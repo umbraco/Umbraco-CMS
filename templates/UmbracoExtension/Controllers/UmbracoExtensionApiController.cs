@@ -6,16 +6,16 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 #endif
 
-namespace UmbracoExtension.Controllers
+namespace PROJECT_SAFENAME.Controllers
 {
     [ApiVersion("1.0")]
-    [ApiExplorerSettings(GroupName = "UmbracoExtension")]
-    public class UmbracoExtensionApiController : UmbracoExtensionControllerBase
+    [ApiExplorerSettings(GroupName = "PROJECT_SAFENAME")]
+    public class PROJECT_SAFENAMEApiController : PROJECT_SAFENAMEControllerBase
     {
 #if (IncludeExample)
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-        public UmbracoExtensionApiController(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        public PROJECT_SAFENAMEApiController(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         }

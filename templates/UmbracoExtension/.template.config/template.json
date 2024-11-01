@@ -19,7 +19,7 @@
     "type": "project"
   },
   "sourceName": "UmbracoExtension",
-  "defaultName": "UmbracoExtension1",
+  "defaultName": "UmbracoExtension",
   "preferNameDirectory": true,
   "symbols": {
     "Framework": {
@@ -65,6 +65,24 @@
       "replaces": "PROJECT_NAME_KEBABCASE_FOR_NPM",
       "valueTransform": "kebabCase"
     },
+    "titleCasedName": {
+      "type": "derived",
+      "valueSource": "name",
+      "replaces": "PROJECT_NAME_TITLEDCASE",
+      "valueTransform": "titleCase"
+    },
+    "safeNamespace": {
+      "type": "derived",
+      "valueSource": "name",
+      "replaces": "PROJECT_SAFENAMESPACE",
+      "valueTransform": "safe_namespace"
+    },
+    "safeName": {
+      "type": "derived",
+      "valueSource": "safeNamespace",
+      "replaces": "PROJECT_SAFENAME",
+      "valueTransform": "final_cleaned_version"
+    },
     "IncludeExample": {
       "displayName": "Include Example Code",
       "description": "Whether to include an example dashboard and other code to get started with.",
@@ -79,6 +97,13 @@
       "datatype": "string",
       "defaultValue": "https://localhost:5000",
       "replaces": "https://localhost:44339"
+    }
+  },
+  "forms": {
+    "final_cleaned_version": {
+      "identifier": "replace",
+      "pattern": "[\\._]", // regex to find . or _ in the name
+      "replacement": "" // replace it with empty string
     }
   },
   "primaryOutputs": [

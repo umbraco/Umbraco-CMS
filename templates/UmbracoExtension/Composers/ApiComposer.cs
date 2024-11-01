@@ -4,13 +4,21 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Api.Management.OpenApi;
+using Umbraco.Cms.Api.Common.OpenApi;
+using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.Extensions.Options;
 
-namespace UmbracoExtension.Composers
+namespace PROJECT_SAFENAME.Composers
 {
     public class ApiComposer : IComposer
     {
         public void Compose(IUmbracoBuilder builder)
         {
+
+            builder.Services.AddSingleton<IOperationIdHandler, CustomOperationHandler>();
+
             builder.Services.Configure<SwaggerGenOptions>(opt =>
             {
                 // Related documentation:
@@ -36,13 +44,30 @@ namespace UmbracoExtension.Composers
 
                 // Enable Umbraco authentication for the "Example" Swagger document
                 // PR: https://github.com/umbraco/Umbraco-CMS/pull/15699
-                opt.OperationFilter<UmbracoExtensionOperationSecurityFilter>();
+                opt.OperationFilter<PROJECT_SAFENAMEOperationSecurityFilter>();
             });
         }
 
-        public class UmbracoExtensionOperationSecurityFilter : BackOfficeSecurityRequirementsOperationFilterBase
+        public class PROJECT_SAFENAMEOperationSecurityFilter : BackOfficeSecurityRequirementsOperationFilterBase
         {
             protected override string ApiName => Constants.ApiName;
+        }
+
+        // This is used to generate nice operation IDs in our swagger json file
+        // So that the gnerated TypeScript client has nice method names and not too verbose
+        // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/umbraco-schema-and-operation-ids#operation-ids
+        public class CustomOperationHandler : OperationIdHandler
+        {
+            public CustomOperationHandler(IOptions<ApiVersioningOptions> apiVersioningOptions) : base(apiVersioningOptions)
+            {
+            }
+
+            protected override bool CanHandle(ApiDescription apiDescription, ControllerActionDescriptor controllerActionDescriptor)
+            {
+                return controllerActionDescriptor.ControllerTypeInfo.Namespace?.StartsWith("PROJECT_SAFENAME.Controllers", comparisonType: StringComparison.InvariantCultureIgnoreCase) is true;
+            }
+
+            public override string Handle(ApiDescription apiDescription) => $"{apiDescription.ActionDescriptor.RouteValues["action"]}";
         }
     }
 }
