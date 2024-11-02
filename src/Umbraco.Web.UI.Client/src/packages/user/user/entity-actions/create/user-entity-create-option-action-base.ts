@@ -1,5 +1,5 @@
-import { UMB_CREATE_USER_MODAL } from '../../modals/create/create-user-modal.token.js';
 import type { UmbUserKindType } from '../../utils/index.js';
+import { UMB_CREATE_USER_MODAL } from './modal/create-user-modal.token.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
