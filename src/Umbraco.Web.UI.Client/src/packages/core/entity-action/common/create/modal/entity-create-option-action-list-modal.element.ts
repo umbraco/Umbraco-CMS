@@ -12,7 +12,6 @@ import {
 	state,
 	repeat,
 	ifDefined,
-	property,
 	type PropertyValues,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -27,9 +26,6 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 > {
 	@state()
 	private _apiControllers: Array<UmbExtensionApiInitializer<ManifestType>> = [];
-
-	@state()
-	_hrefMap = new Map<string, string>();
 
 	@state()
 	_hrefList: Array<any> = [];
@@ -65,11 +61,8 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 		);
 	}
 
-	async #onClick(event: Event, controller: UmbExtensionApiInitializer<ManifestType>) {
+	async #onClick(event: Event, controller: UmbExtensionApiInitializer<ManifestType>, href?: string) {
 		event.stopPropagation();
-
-		if (!controller.manifest) throw new Error('No manifest found');
-		const href = this._hrefMap.get(controller.manifest?.alias);
 
 		// skip if href is defined
 		if (href) {
@@ -119,7 +112,7 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 			<uui-ref-node
 				name=${label}
 				detail=${ifDefined(manifest.meta.description)}
-				@click=${(event: Event) => this.#onClick(event, controller)}
+				@click=${(event: Event) => this.#onClick(event, controller, href)}
 				href=${ifDefined(href)}
 				target=${this.#getTarget(href)}
 				?selectable=${!href}
