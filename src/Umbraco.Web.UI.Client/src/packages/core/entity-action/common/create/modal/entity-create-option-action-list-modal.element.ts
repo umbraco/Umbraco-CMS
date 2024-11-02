@@ -28,7 +28,7 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 	private _apiControllers: Array<UmbExtensionApiInitializer<ManifestType>> = [];
 
 	@state()
-	_hrefList: Array<any> = [];
+	_hrefList: Array<string | undefined> = [];
 
 	protected override updated(_changedProperties: PropertyValues): void {
 		super.updated(_changedProperties);
@@ -52,7 +52,7 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 			(manifest: ManifestType) => {
 				return [{ entityType: data.entityType, unique: data.unique, meta: manifest.meta }];
 			},
-			undefined,
+			(manifest: ManifestType) => manifest.forEntityTypes.includes(data.entityType),
 			async (controllers) => {
 				this._apiControllers = controllers as unknown as Array<UmbExtensionApiInitializer<ManifestType>>;
 				const hrefPromises = this._apiControllers.map((controller) => controller.api?.getHref());
