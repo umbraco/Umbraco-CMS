@@ -42,7 +42,7 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 		const data = this.data;
 		if (!data) throw new Error('No data found');
 
-		if (data.entityType === undefined) throw new Error('No entityType found');
+		if (!data.entityType) throw new Error('No entityType found');
 		if (data.unique === undefined) throw new Error('No unique found');
 
 		new UmbExtensionsApiInitializer(
