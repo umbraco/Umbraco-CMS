@@ -85,13 +85,15 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 		return html`
 			<umb-body-layout headline="${this.localize.term('user_createUser')}">
 				<uui-box>
-					<uui-ref-list>
-						${repeat(
-							this._apiControllers,
-							(controller) => controller.manifest?.alias,
-							(controller, index) => this.#renderRefItem(controller, index),
-						)}
-					</uui-ref-list>
+					${this._apiControllers.length === 0
+						? html`<div>No create options available.</div>`
+						: html`<uui-ref-list>
+								${repeat(
+									this._apiControllers,
+									(controller) => controller.manifest?.alias,
+									(controller, index) => this.#renderRefItem(controller, index),
+								)}
+							</uui-ref-list>`}
 				</uui-box>
 				<uui-button
 					slot="actions"
