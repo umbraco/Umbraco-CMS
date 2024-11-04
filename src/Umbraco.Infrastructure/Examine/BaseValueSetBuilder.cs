@@ -30,18 +30,19 @@ public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
             return;
         }
 
-        IEnumerable<KeyValuePair<string, IEnumerable<object?>>> indexVals =
+        IEnumerable<IndexValue> indexVals =
             editor.PropertyIndexValueFactory.GetIndexValues(property, culture, segment, PublishedValuesOnly, availableCultures, contentTypeDictionary);
-        foreach (KeyValuePair<string, IEnumerable<object?>> keyVal in indexVals)
+        foreach (IndexValue indexValue in indexVals)
         {
-            if (keyVal.Key.IsNullOrWhiteSpace())
+            if (indexValue.FieldName.IsNullOrWhiteSpace())
             {
                 continue;
             }
 
-            var cultureSuffix = culture == null ? string.Empty : "_" + culture;
+            var indexValueCulture = indexValue.Culture ?? culture;
+            var cultureSuffix = indexValueCulture == null ? string.Empty : "_" + indexValueCulture.ToLowerInvariant();
 
-            foreach (var val in keyVal.Value)
+            foreach (var val in indexValue.Values)
             {
                 switch (val)
                 {
@@ -55,28 +56,28 @@ public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
                             continue;
                         }
 
-                        var key = $"{keyVal.Key}{cultureSuffix}";
+                        var key = $"{indexValue.FieldName}{cultureSuffix}";
                         if (values?.TryGetValue(key, out IEnumerable<object?>? v) ?? false)
                         {
                             values[key] = new List<object?>(v) { val }.ToArray();
                         }
                         else
                         {
-                            values?.Add($"{keyVal.Key}{cultureSuffix}", val.Yield());
+                            values?.Add($"{indexValue.FieldName}{cultureSuffix}", val.Yield());
                         }
                     }
 
                         break;
                     default:
                         {
-                        var key = $"{keyVal.Key}{cultureSuffix}";
+                        var key = $"{indexValue.FieldName}{cultureSuffix}";
                         if (values?.TryGetValue(key, out IEnumerable<object?>? v) ?? false)
                         {
                             values[key] = new List<object?>(v) { val }.ToArray();
                         }
                         else
                         {
-                            values?.Add($"{keyVal.Key}{cultureSuffix}", val.Yield());
+                            values?.Add($"{indexValue.FieldName}{cultureSuffix}", val.Yield());
                         }
                     }
 
