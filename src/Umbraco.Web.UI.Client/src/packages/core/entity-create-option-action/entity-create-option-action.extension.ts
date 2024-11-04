@@ -1,11 +1,12 @@
 import type { UmbEntityCreateOptionAction } from './entity-create-option-action.interface.js';
+import type { UMB_EXTENSION_TYPE_ENTITY_CREATE_OPTION_ACTION } from './constants.js';
 import type { ManifestApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestEntityCreateOptionAction<
 	MetaType extends MetaEntityCreateOptionAction = MetaEntityCreateOptionAction,
 > extends ManifestApi<UmbEntityCreateOptionAction<MetaType>>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
-	type: 'entityCreateOptionAction';
+	type: typeof UMB_EXTENSION_TYPE_ENTITY_CREATE_OPTION_ACTION;
 	forEntityTypes: Array<string>;
 	meta: MetaType;
 }
