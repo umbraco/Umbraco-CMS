@@ -95,5 +95,7 @@
     <PackageVersion Include="System.Text.Encodings.Web" Version="9.0.0-rc.2.24473.5" />
     <!-- NPoco.SqlServer bring in vulnerable version of Microsoft.Data.SqlClient  -->
     <PackageVersion Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+    <!-- Examine.Lucene bring in a vulnerable version of Lucene.Net.Replicator -->
+    <PackageVersion Include="Lucene.Net.Replicator" Version="4.8.0-beta00017" />
   </ItemGroup>
 </Project>
