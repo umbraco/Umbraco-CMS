@@ -100,7 +100,7 @@ public interface IPublishedContent : IPublishedElement
     ///     Gets the parent of the content item.
     /// </summary>
     /// <remarks>The parent of root content is <c>null</c>.</remarks>
-    [Obsolete("Please use IDocumentNavigationQueryService.TryGetParentKey() instead. Scheduled for removal in V16.")]
+    [Obsolete("Please use the IPublishedContent.Parent<>() extension method in the Umbraco.Extensions namespace instead. Scheduled for removal in V16.")]
     IPublishedContent? Parent { get; }
 
     /// <summary>
@@ -142,6 +142,6 @@ public interface IPublishedContent : IPublishedElement
     /// <summary>
     ///     Gets the children of the content item that are available for the current culture.
     /// </summary>
-    [Obsolete("Please use IDocumentNavigationQueryService.TryGetChildrenKeys() instead. Scheduled for removal in V16.")]
+    [Obsolete("Please use the IPublishedContent.Children() extension method in the Umbraco.Extensions namespace instead. Scheduled for removal in V16.")]
     IEnumerable<IPublishedContent> Children { get; }
 }
