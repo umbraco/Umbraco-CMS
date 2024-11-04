@@ -10,7 +10,6 @@ export interface ManifestEntityCreateOptionAction<
 	meta: MetaType;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MetaEntityCreateOptionAction {
 	/**
 	 * An icon to represent the action to be performed
