@@ -1187,6 +1187,11 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, new PasswordChangedModel());
         }
 
+        if (user.Kind != UserKind.Default)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.InvalidUserType, new PasswordChangedModel());
+        }
+
         IUser? performingUser = await userStore.GetAsync(performingUserKey);
         if (performingUser is null)
         {
@@ -2474,6 +2479,51 @@ internal class UserService : RepositoryService, IUserService
             GetPermissionsForPath(groups.Select(x => x.ToReadOnlyGroup()).ToArray(), nodeIds, true).ToArray();
 
         return CalculatePermissionsForPathForUser(groupPermissions, nodeIds);
+    }
+
+    public async Task<UserClientCredentialsOperationStatus> AddClientIdAsync(Guid userKey, string clientId)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        IEnumerable<string> currentClientIds = _userRepository.GetAllClientIds();
+        if (currentClientIds.InvariantContains(clientId))
+        {
+            return UserClientCredentialsOperationStatus.DuplicateClientId;
+        }
+
+        IUser? user = await GetAsync(userKey);
+        if (user is null || user.Kind != UserKind.Api)
+        {
+            return UserClientCredentialsOperationStatus.InvalidUser;
+        }
+
+        _userRepository.AddClientId(user.Id, clientId);
+
+        return UserClientCredentialsOperationStatus.Success;
+    }
+
+    public async Task<bool> RemoveClientIdAsync(Guid userKey, string clientId)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        var userId = await _userIdKeyResolver.GetAsync(userKey);
+        return _userRepository.RemoveClientId(userId, clientId);
+    }
+
+    public Task<IUser?> FindByClientIdAsync(string clientId)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        IUser? user = _userRepository.GetByClientId(clientId);
+        return Task.FromResult(user?.Kind == UserKind.Api ? user : null);
+    }
+
+    public async Task<IEnumerable<string>> GetClientIdsAsync(Guid userKey)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        var userId = await _userIdKeyResolver.GetAsync(userKey);
+        return _userRepository.GetClientIds(userId);
     }
 
     /// <summary>

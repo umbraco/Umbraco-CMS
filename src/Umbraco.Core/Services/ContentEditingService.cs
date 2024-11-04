@@ -1,9 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -12,7 +16,11 @@ internal sealed class ContentEditingService
 {
     private readonly ITemplateService _templateService;
     private readonly ILogger<ContentEditingService> _logger;
+    private readonly IUserService _userService;
+    private readonly ILocalizationService _localizationService;
+    private readonly ILanguageService _languageService;
 
+    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 16.")]
     public ContentEditingService(
         IContentService contentService,
         IContentTypeService contentTypeService,
@@ -24,10 +32,46 @@ internal sealed class ContentEditingService
         IUserIdKeyResolver userIdKeyResolver,
         ITreeEntitySortingService treeEntitySortingService,
         IContentValidationService contentValidationService)
+        : this(
+            contentService,
+            contentTypeService,
+            propertyEditorCollection,
+            dataTypeService,
+            templateService,
+            logger,
+            scopeProvider,
+            userIdKeyResolver,
+            treeEntitySortingService,
+            contentValidationService,
+            StaticServiceProvider.Instance.GetRequiredService<IUserService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>()
+            )
+    {
+
+    }
+
+    public ContentEditingService(
+        IContentService contentService,
+        IContentTypeService contentTypeService,
+        PropertyEditorCollection propertyEditorCollection,
+        IDataTypeService dataTypeService,
+        ITemplateService templateService,
+        ILogger<ContentEditingService> logger,
+        ICoreScopeProvider scopeProvider,
+        IUserIdKeyResolver userIdKeyResolver,
+        ITreeEntitySortingService treeEntitySortingService,
+        IContentValidationService contentValidationService,
+        IUserService userService,
+        ILocalizationService localizationService,
+        ILanguageService languageService)
         : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, contentValidationService, treeEntitySortingService)
     {
         _templateService = templateService;
         _logger = logger;
+        _userService = userService;
+        _localizationService = localizationService;
+        _languageService = languageService;
     }
 
     public async Task<IContent?> GetAsync(Guid key)
@@ -36,6 +80,7 @@ internal sealed class ContentEditingService
         return await Task.FromResult(content);
     }
 
+    [Obsolete("Please use the validate update method that is not obsoleted. Will be removed in V16.")]
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ContentUpdateModel updateModel)
     {
         IContent? content = ContentService.GetById(key);
@@ -44,8 +89,16 @@ internal sealed class ContentEditingService
             : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
     }
 
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ValidateContentUpdateModel updateModel)
+    {
+        IContent? content = ContentService.GetById(key);
+        return content is not null
+            ? await ValidateCulturesAndPropertiesAsync(updateModel, content.ContentType.Key, updateModel.Cultures)
+            : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
+    }
+
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ContentCreateModel createModel)
-        => await ValidateCulturesAndPropertiesAsync(createModel, createModel.ContentTypeKey);
+        => await ValidateCulturesAndPropertiesAsync(createModel, createModel.ContentTypeKey, createModel.Variants.Select(variant => variant.Culture));
 
     public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey)
     {
@@ -65,7 +118,7 @@ internal sealed class ContentEditingService
         ContentEditingOperationStatus validationStatus = result.Status;
         ContentValidationResult validationResult = result.Result.ValidationResult;
 
-        IContent content = result.Result.Content!;
+        IContent content = await EnsureOnlyAllowedFieldsAreUpdated(result.Result.Content!, userKey);
         ContentEditingOperationStatus updateTemplateStatus = await UpdateTemplateAsync(content, createModel.TemplateKey);
         if (updateTemplateStatus != ContentEditingOperationStatus.Success)
         {
@@ -76,6 +129,53 @@ internal sealed class ContentEditingService
         return saveStatus == ContentEditingOperationStatus.Success
             ? Attempt.SucceedWithStatus(validationStatus, new ContentCreateResult { Content = content, ValidationResult = validationResult })
             : Attempt.FailWithStatus(saveStatus, new ContentCreateResult { Content = content });
+    }
+
+    /// <summary>
+    /// A temporary method that ensures the data is sent in is overridden by the original data, in cases where the user do not have permissions to change the data.
+    /// </summary>
+    private async Task<IContent> EnsureOnlyAllowedFieldsAreUpdated(IContent contentWithPotentialUnallowedChanges, Guid userKey)
+    {
+        if (contentWithPotentialUnallowedChanges.ContentType.VariesByCulture() is false)
+        {
+            return contentWithPotentialUnallowedChanges;
+        }
+
+        IContent? existingContent = await GetAsync(contentWithPotentialUnallowedChanges.Key);
+
+        IUser? user = await _userService.GetAsync(userKey);
+
+        if (user is null)
+        {
+            return contentWithPotentialUnallowedChanges;
+        }
+
+        var allowedLanguageIds = user.CalculateAllowedLanguageIds(_localizationService)!;
+
+        var allowedCultures = (await _languageService.GetIsoCodesByIdsAsync(allowedLanguageIds)).ToHashSet();
+
+        foreach (var culture in contentWithPotentialUnallowedChanges.EditedCultures ?? contentWithPotentialUnallowedChanges.PublishedCultures)
+        {
+            if (allowedCultures.Contains(culture))
+            {
+                continue;
+            }
+
+
+            // else override the updates values with the original values.
+            foreach (IProperty property in contentWithPotentialUnallowedChanges.Properties)
+            {
+                if (property.PropertyType.VariesByCulture() is false)
+                {
+                    continue;
+                }
+
+                var value = existingContent?.Properties.First(x=>x.Alias == property.Alias).GetValue(culture, null, false);
+                property.SetValue(value, culture, null);
+            }
+        }
+
+       return contentWithPotentialUnallowedChanges;
     }
 
     public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ContentUpdateModel updateModel, Guid userKey)
@@ -101,6 +201,8 @@ internal sealed class ContentEditingService
         // we'll return the actual property validation status if the entire operation succeeds.
         ContentEditingOperationStatus validationStatus = result.Status;
         ContentValidationResult validationResult = result.Result.ValidationResult;
+
+        content = await EnsureOnlyAllowedFieldsAreUpdated(content, userKey);
 
         ContentEditingOperationStatus updateTemplateStatus = await UpdateTemplateAsync(content, updateModel.TemplateKey);
         if (updateTemplateStatus != ContentEditingOperationStatus.Success)
@@ -137,10 +239,11 @@ internal sealed class ContentEditingService
 
     private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCulturesAndPropertiesAsync(
         ContentEditingModelBase contentEditingModelBase,
-        Guid contentTypeKey)
+        Guid contentTypeKey,
+        IEnumerable<string?>? culturesToValidate = null)
         => await ValidateCulturesAsync(contentEditingModelBase) is false
             ? Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentValidationResult())
-            : await ValidatePropertiesAsync(contentEditingModelBase, contentTypeKey);
+            : await ValidatePropertiesAsync(contentEditingModelBase, contentTypeKey, culturesToValidate);
 
     private async Task<ContentEditingOperationStatus> UpdateTemplateAsync(IContent content, Guid? templateKey)
     {

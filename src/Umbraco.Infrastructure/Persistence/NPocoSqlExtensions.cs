@@ -25,7 +25,7 @@ namespace Umbraco.Extensions
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> Where<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, bool>> predicate, string? alias = null)
         {
-            var (s, a) = sql.SqlContext.VisitDto(predicate, alias);
+            (string s, object[] a) = sql.SqlContext.VisitDto(predicate, alias);
             return sql.Where(s, a);
         }
 
@@ -41,7 +41,7 @@ namespace Umbraco.Extensions
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> Where<TDto1, TDto2>(this Sql<ISqlContext> sql, Expression<Func<TDto1, TDto2, bool>> predicate, string? alias1 = null, string? alias2 = null)
         {
-            var (s, a) = sql.SqlContext.VisitDto(predicate, alias1, alias2);
+            (string s, object[] a) = sql.SqlContext.VisitDto(predicate, alias1, alias2);
             return sql.Where(s, a);
         }
 
@@ -56,6 +56,22 @@ namespace Umbraco.Extensions
         public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, IEnumerable? values)
         {
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(field);
+            sql.Where(fieldName + " IN (@values)", new { values });
+            return sql;
+        }
+
+        /// <summary>
+        /// Appends a WHERE IN clause to the Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Dto.</typeparam>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="field">An expression specifying the field.</param>
+        /// <param name="values">The values.</param>
+        /// <param name="alias"></param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, IEnumerable? values, string alias)
+        {
+            var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(field, alias);
             sql.Where(fieldName + " IN (@values)", new { values });
             return sql;
         }
@@ -169,7 +185,7 @@ namespace Umbraco.Extensions
         private static Sql<ISqlContext> WhereIn<T>(this Sql<ISqlContext> sql, Expression<Func<T, object?>> fieldSelector, Sql? valuesSql, bool not, string? tableAlias)
         {
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector, tableAlias);
-            sql.Where(fieldName + (not ? " NOT" : "") +" IN (" + valuesSql?.SQL + ")", valuesSql?.Arguments);
+            sql.Where(fieldName + (not ? " NOT" : string.Empty) + " IN (" + valuesSql?.SQL + ")", valuesSql?.Arguments);
             return sql;
         }
 
@@ -193,7 +209,7 @@ namespace Umbraco.Extensions
 
                 var temp = new Sql<ISqlContext>(sql.SqlContext);
                 temp = predicates[i](temp);
-                wsql.Append(temp.SQL.TrimStart("WHERE "), temp.Arguments);
+                wsql.Append(temp.SQL.TrimStartExact("WHERE "), temp.Arguments);
             }
             wsql.Append(")");
 
@@ -225,7 +241,7 @@ namespace Umbraco.Extensions
         public static Sql<ISqlContext> WhereNull<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, string? tableAlias = null, bool not = false)
         {
             var column = sql.GetColumns(columnExpressions: new[] { field }, tableAlias: tableAlias, withAlias: false).First();
-            return sql.Where("(" + column + " IS " + (not ? "NOT " : "") + "NULL)");
+            return sql.Where("(" + column + " IS " + (not ? "NOT " : string.Empty) + "NULL)");
         }
 
         #endregion
@@ -546,8 +562,10 @@ namespace Umbraco.Extensions
         /// <param name="leftField">An expression specifying the left field.</param>
         /// <param name="rightField">An expression specifying the right field.</param>
         /// <returns>The Sql statement.</returns>
-        public static Sql<ISqlContext> On<TLeft, TRight>(this Sql<ISqlContext>.SqlJoinClause<ISqlContext> sqlJoin,
-            Expression<Func<TLeft, object?>> leftField, Expression<Func<TRight, object?>> rightField)
+        public static Sql<ISqlContext> On<TLeft, TRight>(
+            this Sql<ISqlContext>.SqlJoinClause<ISqlContext> sqlJoin,
+            Expression<Func<TLeft, object?>> leftField,
+            Expression<Func<TRight, object?>> rightField)
         {
             // TODO: ugly - should define on SqlContext!
 
@@ -582,7 +600,7 @@ namespace Umbraco.Extensions
         {
             var sql = new Sql<ISqlContext>(sqlJoin.SqlContext);
             sql = on(sql);
-            var text = sql.SQL.Trim().TrimStart("WHERE").Trim();
+            var text = sql.SQL.Trim().TrimStartExact("WHERE").Trim();
             return sqlJoin.On(text, sql.Arguments);
         }
 
@@ -1181,13 +1199,13 @@ namespace Umbraco.Extensions
                 switch (setExpression.Item2)
                 {
                     case null:
-                        sql.Append((first ? "" : ",") + " " + setExpression.Item1 + "=NULL");
+                        sql.Append((first ? string.Empty : ",") + " " + setExpression.Item1 + "=NULL");
                         break;
                     case string s when s == string.Empty:
-                        sql.Append((first ? "" : ",") + " " + setExpression.Item1 + "=''");
+                        sql.Append((first ? string.Empty : ",") + " " + setExpression.Item1 + "=''");
                         break;
                     default:
-                        sql.Append((first ? "" : ",") + " " + setExpression.Item1 + "=@0", setExpression.Item2);
+                        sql.Append((first ? string.Empty : ",") + " " + setExpression.Item1 + "=@0", setExpression.Item2);
                         break;
                 }
 
@@ -1205,7 +1223,6 @@ namespace Umbraco.Extensions
         public class SqlUpd<TDto>
         {
             private readonly ISqlContext _sqlContext;
-            private readonly List<Tuple<string, object?>> _setExpressions = new List<Tuple<string, object?>>();
 
             public SqlUpd(ISqlContext sqlContext)
             {
@@ -1215,11 +1232,11 @@ namespace Umbraco.Extensions
             public SqlUpd<TDto> Set(Expression<Func<TDto, object?>> fieldSelector, object? value)
             {
                 var fieldName = _sqlContext.SqlSyntax.GetFieldNameForUpdate(fieldSelector);
-                _setExpressions.Add(new Tuple<string, object?>(fieldName, value));
+                SetExpressions.Add(new Tuple<string, object?>(fieldName, value));
                 return this;
             }
 
-            public List<Tuple<string, object?>> SetExpressions => _setExpressions;
+            public List<Tuple<string, object?>> SetExpressions { get; } = [];
         }
 
         #endregion
@@ -1280,11 +1297,7 @@ namespace Umbraco.Extensions
                     var fieldName = field?.GetColumnName();
                     if (alias != null && fieldName is not null)
                     {
-                        if (aliases == null)
-                        {
-                            aliases = new Dictionary<string, string>();
-                        }
-
+                        aliases ??= new Dictionary<string, string>();
                         aliases[fieldName] = alias;
                     }
                     return fieldName;

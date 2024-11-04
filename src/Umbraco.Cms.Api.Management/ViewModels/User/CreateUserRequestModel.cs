@@ -1,6 +1,8 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.User;
+﻿using Umbraco.Cms.Core.Models.Membership;
 
-public class CreateUserRequestModel : UserPresentationBase
+namespace Umbraco.Cms.Api.Management.ViewModels.User;
+
+public class CreateUserRequestModel : CreateUserRequestModelBase
 {
-    public Guid? Id { get; set; }
+    public UserKind Kind { get; set; }
 }

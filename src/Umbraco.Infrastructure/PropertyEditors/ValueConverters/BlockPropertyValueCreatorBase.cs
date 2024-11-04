@@ -15,6 +15,9 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
     where TBlockConfiguration : IBlockConfiguration
     where TBlockValue : BlockValue<TBlockLayoutItem>, new()
 {
+    private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
+
     /// <summary>
     /// Creates a specific data converter for the block property implementation.
     /// </summary>
@@ -57,11 +60,17 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
     /// <returns></returns>
     protected delegate TBlockItemModel? EnrichBlockItemModelFromConfiguration(TBlockItemModel item, TBlockLayoutItem layoutItem, TBlockConfiguration configuration, CreateBlockItemModelFromLayout blockItemModelCreator);
 
-    protected BlockPropertyValueCreatorBase(BlockEditorConverter blockEditorConverter) => BlockEditorConverter = blockEditorConverter;
+    protected BlockPropertyValueCreatorBase(BlockEditorConverter blockEditorConverter, IVariationContextAccessor variationContextAccessor, BlockEditorVarianceHandler blockEditorVarianceHandler)
+    {
+        BlockEditorConverter = blockEditorConverter;
+        _variationContextAccessor = variationContextAccessor;
+        _blockEditorVarianceHandler = blockEditorVarianceHandler;
+    }
 
     protected BlockEditorConverter BlockEditorConverter { get; }
 
     protected TBlockModel CreateBlockModel(
+        IPublishedElement owner,
         PropertyCacheLevel referenceCacheLevel,
         string intermediateBlockModelValue,
         bool preview,
@@ -78,10 +87,11 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
 
         BlockEditorDataConverter<TBlockValue, TBlockLayoutItem> blockEditorDataConverter = CreateBlockEditorDataConverter();
         BlockEditorData<TBlockValue, TBlockLayoutItem> converted = blockEditorDataConverter.Deserialize(intermediateBlockModelValue);
-        return CreateBlockModel(referenceCacheLevel, converted, preview, blockConfigurations, createEmptyModel, createModelFromItems, enrichBlockItem);
+        return CreateBlockModel(owner, referenceCacheLevel, converted, preview, blockConfigurations, createEmptyModel, createModelFromItems, enrichBlockItem);
     }
 
     protected TBlockModel CreateBlockModel(
+        IPublishedElement owner,
         PropertyCacheLevel referenceCacheLevel,
         TBlockValue blockValue,
         bool preview,
@@ -92,10 +102,11 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
     {
         BlockEditorDataConverter<TBlockValue, TBlockLayoutItem> blockEditorDataConverter = CreateBlockEditorDataConverter();
         BlockEditorData<TBlockValue, TBlockLayoutItem> converted = blockEditorDataConverter.Convert(blockValue);
-        return CreateBlockModel(referenceCacheLevel, converted, preview, blockConfigurations, createEmptyModel, createModelFromItems, enrichBlockItem);
+        return CreateBlockModel(owner, referenceCacheLevel, converted, preview, blockConfigurations, createEmptyModel, createModelFromItems, enrichBlockItem);
     }
 
     private TBlockModel CreateBlockModel(
+        IPublishedElement owner,
         PropertyCacheLevel referenceCacheLevel,
         BlockEditorData<TBlockValue, TBlockLayoutItem> converted,
         bool preview,
@@ -115,6 +126,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
         }
 
         var blockConfigMap = blockConfigurations.ToDictionary(bc => bc.ContentElementTypeKey);
+        VariationContext variationContext = _variationContextAccessor.VariationContext ?? new VariationContext();
 
         // Convert the content data
         var contentPublishedElements = new Dictionary<Guid, IPublishedElement>();
@@ -125,8 +137,24 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
                 continue;
             }
 
-            IPublishedElement? element = BlockEditorConverter.ConvertToElement(data, referenceCacheLevel, preview);
+            IPublishedElement? element = BlockEditorConverter.ConvertToElement(owner, data, referenceCacheLevel, preview);
             if (element == null)
+            {
+                continue;
+            }
+
+            // if case changes have been made to the content or element type variation since the content was published,
+            // we need to align those changes for the exposed blocks.
+            IEnumerable<BlockItemVariation> expose = _blockEditorVarianceHandler.AlignedExposeVarianceAsync(converted.BlockValue, owner, element).GetAwaiter().GetResult();
+            var expectedBlockVariationCulture = owner.ContentType.VariesByCulture() && element.ContentType.VariesByCulture()
+                ? variationContext.Culture.NullOrWhiteSpaceAsNull()
+                : null;
+            var expectedBlockVariationSegment = owner.ContentType.VariesBySegment() && element.ContentType.VariesBySegment()
+                ? variationContext.Segment.NullOrWhiteSpaceAsNull()
+                : null;
+            if (expose.Any(v =>
+                    v.ContentKey == element.Key && v.Culture == expectedBlockVariationCulture &&
+                    v.Segment == expectedBlockVariationSegment) is false)
             {
                 continue;
             }
@@ -151,7 +179,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
                 continue;
             }
 
-            IPublishedElement? element = BlockEditorConverter.ConvertToElement(data, referenceCacheLevel, preview);
+            IPublishedElement? element = BlockEditorConverter.ConvertToElement(owner, data, referenceCacheLevel, preview);
             if (element is null)
             {
                 continue;
@@ -165,9 +193,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
         TBlockItemModel? CreateBlockItem(TBlockLayoutItem layoutItem)
         {
             // Get the content reference
-            var contentGuidUdi = (GuidUdi?)layoutItem.ContentUdi;
-            if (contentGuidUdi is null ||
-                !contentPublishedElements.TryGetValue(contentGuidUdi.Guid, out IPublishedElement? contentData))
+            if (!contentPublishedElements.TryGetValue(layoutItem.ContentKey, out IPublishedElement? contentData))
             {
                 return null;
             }
@@ -181,10 +207,9 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
 
             // Get the setting reference
             IPublishedElement? settingsData = null;
-            var settingGuidUdi = (GuidUdi?)layoutItem.SettingsUdi;
-            if (settingGuidUdi is not null)
+            if (layoutItem.SettingsKey.HasValue)
             {
-                settingsPublishedElements.TryGetValue(settingGuidUdi.Guid, out settingsData);
+                settingsPublishedElements.TryGetValue(layoutItem.SettingsKey.Value, out settingsData);
             }
 
             // This can happen if they have a settings type, save content, remove the settings type, and display the front-end page before saving the content again
@@ -196,7 +221,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
             }
 
             // Create instance (use content/settings type from configuration)
-            var blockItem = blockItemActivator.CreateInstance(blockConfig.ContentElementTypeKey, blockConfig.SettingsElementTypeKey, contentGuidUdi, contentData, settingGuidUdi, settingsData);
+            var blockItem = blockItemActivator.CreateInstance(blockConfig.ContentElementTypeKey, blockConfig.SettingsElementTypeKey, layoutItem.ContentKey, contentData, layoutItem.SettingsKey, settingsData);
             if (blockItem == null)
             {
                 return null;
@@ -230,20 +255,20 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
             _constructorCache = constructorCache;
         }
 
-        public T CreateInstance(Guid contentTypeKey, Guid? settingsTypeKey, Udi contentUdi, IPublishedElement contentData, Udi? settingsUdi, IPublishedElement? settingsData)
+        public T CreateInstance(Guid contentTypeKey, Guid? settingsTypeKey, Guid contentKey, IPublishedElement contentData, Guid? settingsKey, IPublishedElement? settingsData)
         {
             if (!_constructorCache.TryGetValue(
                 (contentTypeKey, settingsTypeKey),
-                out Func<Udi, IPublishedElement, Udi?, IPublishedElement?, T>? constructor))
+                out Func<Guid, IPublishedElement, Guid?, IPublishedElement?, T>? constructor))
             {
                 constructor = EmitConstructor(contentTypeKey, settingsTypeKey);
                 _constructorCache.SetValue((contentTypeKey, settingsTypeKey), constructor);
             }
 
-            return constructor(contentUdi, contentData, settingsUdi, settingsData);
+            return constructor(contentKey, contentData, settingsKey, settingsData);
         }
 
-        private Func<Udi, IPublishedElement, Udi?, IPublishedElement?, T> EmitConstructor(
+        private Func<Guid, IPublishedElement, Guid?, IPublishedElement?, T> EmitConstructor(
             Guid contentTypeKey, Guid? settingsTypeKey)
         {
             Type contentType = _blockConverter.GetModelType(contentTypeKey);
@@ -253,7 +278,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
             Type type = GenericItemType.MakeGenericType(contentType, settingsType);
 
             ConstructorInfo? constructor =
-                type.GetConstructor(new[] { typeof(Udi), contentType, typeof(Udi), settingsType });
+                type.GetConstructor(new[] { typeof(Guid), contentType, typeof(Guid?), settingsType });
             if (constructor == null)
             {
                 throw new InvalidOperationException($"Could not find the required public constructor on {type}.");
@@ -261,7 +286,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
 
             // We use unsafe here, because we know the constructor parameter count and types match
             return ReflectionUtilities
-                .EmitConstructorUnsafe<Func<Udi, IPublishedElement, Udi?, IPublishedElement?, T>>(
+                .EmitConstructorUnsafe<Func<Guid, IPublishedElement, Guid?, IPublishedElement?, T>>(
                     constructor);
         }
     }

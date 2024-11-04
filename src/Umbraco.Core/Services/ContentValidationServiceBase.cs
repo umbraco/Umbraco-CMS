@@ -23,7 +23,8 @@ internal abstract class ContentValidationServiceBase<TContentType>
 
     protected async Task<ContentValidationResult> HandlePropertiesValidationAsync(
         ContentEditingModelBase contentEditingModelBase,
-        TContentType contentType)
+        TContentType contentType,
+        IEnumerable<string?>? culturesToValidate = null)
     {
         var validationErrors = new List<PropertyValidationError>();
 
@@ -43,7 +44,7 @@ internal abstract class ContentValidationServiceBase<TContentType>
             return new ContentValidationResult { ValidationErrors = validationErrors };
         }
 
-        var cultures = await GetCultureCodes();
+        var cultures = culturesToValidate?.ToArray() ?? await GetCultureCodes();
         // we don't have any managed segments, so we have to make do with the ones passed in the model
         var segments = contentEditingModelBase.Variants.DistinctBy(variant => variant.Segment).Select(variant => variant.Segment).ToArray();
 

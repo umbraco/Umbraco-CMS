@@ -88,7 +88,7 @@ public class StringExtensionsTests
     [TestCase("Hello this is my string string", "Hello this is my string string", "")]
     public void TrimEnd(string input, string forTrimming, string shouldBe)
     {
-        var trimmed = input.TrimEnd(forTrimming);
+        var trimmed = input.TrimEndExact(forTrimming);
         Assert.AreEqual(shouldBe, trimmed);
     }
 
@@ -98,7 +98,7 @@ public class StringExtensionsTests
     [TestCase("Hello this is my string", "Hello this is my string", "")]
     public void TrimStart(string input, string forTrimming, string shouldBe)
     {
-        var trimmed = input.TrimStart(forTrimming);
+        var trimmed = input.TrimStartExact(forTrimming);
         Assert.AreEqual(shouldBe, trimmed);
     }
 
@@ -360,7 +360,7 @@ public class StringExtensionsTests
         TryIsFullPath(@"\dir", false); // An "absolute", but not "full" path
 
         // Invalid on both Windows and Linux
-        TryIsFullPath("", false, false);
+        TryIsFullPath(string.Empty, false, false);
         TryIsFullPath("   ", false, false); // technically, a valid filename on Linux
     }
 

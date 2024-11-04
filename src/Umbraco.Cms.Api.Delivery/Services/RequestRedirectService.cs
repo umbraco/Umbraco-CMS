@@ -21,7 +21,7 @@ internal sealed class RequestRedirectService : RoutingServiceBase, IRequestRedir
     private readonly GlobalSettings _globalSettings;
 
     public RequestRedirectService(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IDomainCache domainCache,
         IHttpContextAccessor httpContextAccessor,
         IRequestStartItemProviderAccessor requestStartItemProviderAccessor,
         IRequestCultureService requestCultureService,
@@ -29,7 +29,7 @@ internal sealed class RequestRedirectService : RoutingServiceBase, IRequestRedir
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentRouteBuilder apiContentRouteBuilder,
         IOptions<GlobalSettings> globalSettings)
-        : base(publishedSnapshotAccessor, httpContextAccessor, requestStartItemProviderAccessor)
+        : base(domainCache, httpContextAccessor, requestStartItemProviderAccessor)
     {
         _requestCultureService = requestCultureService;
         _redirectUrlService = redirectUrlService;
@@ -66,7 +66,7 @@ internal sealed class RequestRedirectService : RoutingServiceBase, IRequestRedir
         }
 
         // important: redirect URLs are always tracked without trailing slashes
-        IRedirectUrl? redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(requestedPath.TrimEnd("/"), culture);
+        IRedirectUrl? redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(requestedPath.TrimEndExact("/"), culture);
         IPublishedContent? content = redirectUrl != null
             ? _apiPublishedContentCache.GetById(redirectUrl.ContentKey)
             : null;

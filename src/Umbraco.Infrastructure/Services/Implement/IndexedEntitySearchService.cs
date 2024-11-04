@@ -20,6 +20,15 @@ internal sealed class IndexedEntitySearchService : IIndexedEntitySearchService
     }
 
     public PagedModel<IEntitySlim> Search(UmbracoObjectTypes objectType, string query, int skip = 0, int take = 100, bool ignoreUserStartNodes = false)
+        => Search(objectType, query, null, skip, take, ignoreUserStartNodes);
+
+    public PagedModel<IEntitySlim> Search(
+        UmbracoObjectTypes objectType,
+        string query,
+        Guid? parentId,
+        int skip = 0,
+        int take = 100,
+        bool ignoreUserStartNodes = false)
     {
         UmbracoEntityTypes entityType = objectType switch
         {
@@ -37,7 +46,8 @@ internal sealed class IndexedEntitySearchService : IIndexedEntitySearchService
             pageSize,
             pageNumber,
             out var totalFound,
-            ignoreUserStartNodes: ignoreUserStartNodes);
+            ignoreUserStartNodes: ignoreUserStartNodes,
+            searchFrom: parentId?.ToString());
 
         Guid[] keys = searchResults.Select(
                 result =>

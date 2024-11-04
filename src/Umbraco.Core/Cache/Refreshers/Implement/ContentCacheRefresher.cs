@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
@@ -14,22 +15,37 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     ContentCacheRefresher.JsonPayload>
 {
     private readonly IDomainService _domainService;
+    private readonly IDomainCacheService _domainCacheService;
+    private readonly IDocumentUrlService _documentUrlService;
+    private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
+    private readonly IDocumentNavigationManagementService _documentNavigationManagementService;
+    private readonly IContentService _contentService;
+    private readonly IPublishStatusManagementService _publishStatusManagementService;
     private readonly IIdKeyMap _idKeyMap;
-    private readonly IPublishedSnapshotService _publishedSnapshotService;
 
     public ContentCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
-        IPublishedSnapshotService publishedSnapshotService,
         IIdKeyMap idKeyMap,
         IDomainService domainService,
         IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory)
+        ICacheRefresherNotificationFactory factory,
+        IDocumentUrlService documentUrlService,
+        IDomainCacheService domainCacheService,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IDocumentNavigationManagementService documentNavigationManagementService,
+        IContentService contentService,
+        IPublishStatusManagementService publishStatusManagementService)
         : base(appCaches, serializer, eventAggregator, factory)
     {
-        _publishedSnapshotService = publishedSnapshotService;
         _idKeyMap = idKeyMap;
         _domainService = domainService;
+        _domainCacheService = domainCacheService;
+        _documentUrlService = documentUrlService;
+        _documentNavigationQueryService = documentNavigationQueryService;
+        _documentNavigationManagementService = documentNavigationManagementService;
+        _contentService = contentService;
+        _publishStatusManagementService = publishStatusManagementService;
     }
 
     #region Indirect
@@ -75,7 +91,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             // By GUID Key
             isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent, Guid?>(payload.Key));
 
-            _idKeyMap.ClearCache(payload.Id);
+
 
             // remove those that are in the branch
             if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
@@ -89,6 +105,18 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             {
                 idsRemoved.Add(payload.Id);
             }
+
+
+            HandleRouting(payload);
+
+            HandleNavigation(payload);
+            HandlePublishedAsync(payload, CancellationToken.None).GetAwaiter().GetResult();
+            _idKeyMap.ClearCache(payload.Id);
+            if (payload.Key.HasValue)
+            {
+                _idKeyMap.ClearCache(payload.Key.Value);
+            }
+
         }
 
         if (idsRemoved.Count > 0)
@@ -107,26 +135,177 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 // content and when the PublishedCachesService is notified of changes it does not see
                 // the new content...
                 // notify
-                _publishedSnapshotService.Notify(assignedDomains
+                _domainCacheService.Refresh(assignedDomains
                     .Select(x => new DomainCacheRefresher.JsonPayload(x.Id, DomainChangeTypes.Remove)).ToArray());
             }
         }
 
-        // note: must do what's above FIRST else the repositories still have the old cached
-        // content and when the PublishedCachesService is notified of changes it does not see
-        // the new content...
+        base.Refresh(payloads);
+    }
 
-        // TODO: what about this?
-        // should rename it, and then, this is only for Deploy, and then, ???
-        // if (Suspendable.PageCacheRefresher.CanUpdateDocumentCache)
-        //   ...
-        if (payloads.Any(x => x.Blueprint is false))
+    private void HandleNavigation(JsonPayload payload)
+    {
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
         {
-            // Only notify if the payload contains actual (non-blueprint) contents
-            NotifyPublishedSnapshotService(_publishedSnapshotService, AppCaches, payloads);
+            _documentNavigationManagementService.RebuildAsync();
+            _documentNavigationManagementService.RebuildBinAsync();
         }
 
-        base.Refresh(payloads);
+        if (payload.Key is null)
+        {
+            return;
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+        {
+            _documentNavigationManagementService.MoveToBin(payload.Key.Value);
+            _documentNavigationManagementService.RemoveFromBin(payload.Key.Value);
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
+        {
+            IContent? content = _contentService.GetById(payload.Key.Value);
+
+            if (content is null)
+            {
+                return;
+            }
+
+            HandleNavigationForSingleContent(content);
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
+        {
+            IContent? content = _contentService.GetById(payload.Key.Value);
+
+            if (content is null)
+            {
+                return;
+            }
+
+            IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(content.Id, 0, int.MaxValue, out _);
+            foreach (IContent descendant in content.Yield().Concat(descendants))
+            {
+                HandleNavigationForSingleContent(descendant);
+            }
+        }
+    }
+
+    private void HandleNavigationForSingleContent(IContent content)
+    {
+        // First creation
+        if (ExistsInNavigation(content.Key) is false && ExistsInNavigationBin(content.Key) is false)
+        {
+            _documentNavigationManagementService.Add(content.Key, GetParentKey(content), content.SortOrder);
+            if (content.Trashed)
+            {
+                // If created as trashed, move to bin
+                _documentNavigationManagementService.MoveToBin(content.Key);
+            }
+        }
+        else if (ExistsInNavigation(content.Key) && ExistsInNavigationBin(content.Key) is false)
+        {
+            if (content.Trashed)
+            {
+                // It must have been trashed
+                _documentNavigationManagementService.MoveToBin(content.Key);
+            }
+            else
+            {
+                if (_documentNavigationQueryService.TryGetParentKey(content.Key, out Guid? oldParentKey) is false)
+                {
+                    return;
+                }
+
+                // It must have been saved. Check if parent is different
+                Guid? newParentKey = GetParentKey(content);
+                if (oldParentKey != newParentKey)
+                {
+                    _documentNavigationManagementService.Move(content.Key, newParentKey);
+                }
+                else
+                {
+                    _documentNavigationManagementService.UpdateSortOrder(content.Key, content.SortOrder);
+                }
+            }
+        }
+        else if (ExistsInNavigation(content.Key) is false && ExistsInNavigationBin(content.Key))
+        {
+            if (content.Trashed is false)
+            {
+                // It must have been restored
+                _documentNavigationManagementService.RestoreFromBin(content.Key, GetParentKey(content));
+            }
+        }
+    }
+
+    private Guid? GetParentKey(IContent content) => (content.ParentId == -1) ? null : _idKeyMap.GetKeyForId(content.ParentId, UmbracoObjectTypes.Document).Result;
+
+    private bool ExistsInNavigation(Guid contentKey) => _documentNavigationQueryService.TryGetParentKey(contentKey, out _);
+
+    private bool ExistsInNavigationBin(Guid contentKey) => _documentNavigationQueryService.TryGetParentKeyInBin(contentKey, out _);
+
+    private async Task HandlePublishedAsync(JsonPayload payload, CancellationToken cancellationToken)
+    {
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
+        {
+            await _publishStatusManagementService.InitializeAsync(cancellationToken);
+        }
+
+        if (payload.Key.HasValue is false)
+        {
+            return;
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+        {
+            await _publishStatusManagementService.RemoveAsync(payload.Key.Value, cancellationToken);
+        }
+        else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
+        {
+            await _publishStatusManagementService.AddOrUpdateStatusAsync(payload.Key.Value, cancellationToken);
+        }
+        else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
+        {
+            await _publishStatusManagementService.AddOrUpdateStatusWithDescendantsAsync(payload.Key.Value, cancellationToken);
+        }
+    }
+    private void HandleRouting(JsonPayload payload)
+    {
+        if(payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+        {
+            var key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
+
+            //Note the we need to clear the navigation service as the last thing
+            if (_documentNavigationQueryService.TryGetDescendantsKeysOrSelfKeys(key, out var descendantsOrSelfKeys))
+            {
+                _documentUrlService.DeleteUrlsFromCacheAsync(descendantsOrSelfKeys).GetAwaiter().GetResult();
+            }
+            else if(_documentNavigationQueryService.TryGetDescendantsKeysOrSelfKeysInBin(key, out var descendantsOrSelfKeysInBin))
+            {
+                _documentUrlService.DeleteUrlsFromCacheAsync(descendantsOrSelfKeysInBin).GetAwaiter().GetResult();
+            }
+
+        }
+        if(payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
+        {
+            _documentUrlService.RebuildAllUrlsAsync().GetAwaiter().GetResult(); //TODO make async
+        }
+
+        if(payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
+        {
+            var key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
+            _documentUrlService.CreateOrUpdateUrlSegmentsAsync(key).GetAwaiter().GetResult();
+        }
+
+        if(payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
+        {
+            var key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
+            _documentUrlService.CreateOrUpdateUrlSegmentsWithDescendantsAsync(key).GetAwaiter().GetResult();
+        }
+
     }
 
     // these events should never trigger
@@ -142,24 +321,6 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     #endregion
 
     #region Json
-
-    /// <summary>
-    ///     Refreshes the publish snapshot service and if there are published changes ensures that partial view caches are
-    ///     refreshed too
-    /// </summary>
-    /// <param name="service"></param>
-    /// <param name="appCaches"></param>
-    /// <param name="payloads"></param>
-    internal static void NotifyPublishedSnapshotService(IPublishedSnapshotService service, AppCaches appCaches, JsonPayload[] payloads)
-    {
-        service.Notify(payloads, out _, out var publishedChanged);
-
-        if (payloads.Any(x => x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll)) || publishedChanged)
-        {
-            // when a public version changes
-            appCaches.ClearPartialViewCache();
-        }
-    }
 
     // TODO (V14): Change into a record
     public class JsonPayload

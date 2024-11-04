@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class NoopPropertyIndexValueFactory : IPropertyIndexValueFactory
 {
     /// <inheritdoc />
-    public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published,
+    public IEnumerable<IndexValue> GetIndexValues(IProperty property, string? culture, string? segment, bool published,
         IEnumerable<string> availableCultures, IDictionary<Guid, IContentType> contentTypeDictionary)
-    => Array.Empty<KeyValuePair<string, IEnumerable<object?>>>();
+        => [];
 }

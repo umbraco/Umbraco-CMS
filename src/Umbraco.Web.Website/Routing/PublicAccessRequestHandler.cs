@@ -171,7 +171,7 @@ public class PublicAccessRequestHandler : IPublicAccessRequestHandler
         if (pageId != publishedRequest?.PublishedContent?.Id)
         {
             IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            IPublishedContent? publishedContent = umbracoContext.PublishedSnapshot.Content?.GetById(pageId);
+            IPublishedContent? publishedContent = umbracoContext.Content?.GetById(pageId);
             if (publishedContent is null || publishedRequest is null)
             {
                 throw new InvalidOperationException("No content found by id " + pageId);

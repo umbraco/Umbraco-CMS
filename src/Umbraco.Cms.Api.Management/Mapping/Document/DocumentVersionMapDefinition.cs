@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Document;
 
-public class DocumentVersionMapDefinition : ContentMapDefinition<IContent, DocumentValueModel, DocumentVariantResponseModel>, IMapDefinition
+public class DocumentVersionMapDefinition : ContentMapDefinition<IContent, DocumentValueResponseModel, DocumentVariantResponseModel>, IMapDefinition
 {
     public DocumentVersionMapDefinition(PropertyEditorCollection propertyEditorCollection)
         : base(propertyEditorCollection)

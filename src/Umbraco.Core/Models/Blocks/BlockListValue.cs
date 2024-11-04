@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Umbraco.Cms.Core.Models.Blocks;
 
 /// <summary>
@@ -19,5 +21,6 @@ public class BlockListValue : BlockValue<BlockListLayoutItem>
         => Layout[PropertyEditorAlias] = layouts;
 
     /// <inheritdoc />
+    [JsonIgnore]
     public override string PropertyEditorAlias => Constants.PropertyEditors.Aliases.BlockList;
 }

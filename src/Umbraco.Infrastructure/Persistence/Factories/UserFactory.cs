@@ -47,6 +47,7 @@ internal static class UserFactory
             user.Avatar = dto.Avatar;
             user.EmailConfirmedDate = dto.EmailConfirmedDate;
             user.InvitedDate = dto.InvitedDate;
+            user.Kind = (UserKind)dto.Kind;
 
             // reset dirty initial properties (U4-1946)
             user.ResetDirtyProperties(false);
@@ -82,6 +83,7 @@ internal static class UserFactory
             Avatar = entity.Avatar,
             EmailConfirmedDate = entity.EmailConfirmedDate,
             InvitedDate = entity.InvitedDate,
+            Kind = (short)entity.Kind
         };
 
         if (entity.StartContentIds is not null)

@@ -79,6 +79,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         switch (indexTypes)
         {
             case IndexTypes.UniqueNonClustered:
+            case IndexTypes.UniqueClustered:
                 return "UNIQUE";
             default:
                 return string.Empty;

@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -35,11 +36,11 @@ public class DataValueEditorReuseTests
         _propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>));
         _dataValueReferenceFactories = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>);
 
+        var blockVarianceHandler = new BlockEditorVarianceHandler(Mock.Of<ILanguageService>());
         _dataValueEditorFactoryMock
             .Setup(m =>
-                m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>(), It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()))
+                m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()))
             .Returns(() => new BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor(
-                new DataEditorAttribute("a"),
                 new BlockListEditorDataConverter(Mock.Of<IJsonSerializer>()),
                 _propertyEditorCollection,
                 _dataValueReferenceFactories,
@@ -49,8 +50,9 @@ public class DataValueEditorReuseTests
                 Mock.Of<ILogger<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>>(),
                 Mock.Of<IShortStringHelper>(),
                 Mock.Of<IJsonSerializer>(),
-                Mock.Of<IIOHelper>(),
-                Mock.Of<IPropertyValidationService>()));
+                Mock.Of<IPropertyValidationService>(),
+                blockVarianceHandler,
+                Mock.Of<ILanguageService>()));
     }
 
     [Test]
@@ -96,7 +98,6 @@ public class DataValueEditorReuseTests
     {
         var blockListPropertyEditor = new BlockListPropertyEditor(
             _dataValueEditorFactoryMock.Object,
-            _propertyEditorCollection,
             Mock.Of<IIOHelper>(),
             Mock.Of<IBlockValuePropertyIndexValueFactory>(),
             Mock.Of<IJsonSerializer>());
@@ -108,7 +109,7 @@ public class DataValueEditorReuseTests
         Assert.NotNull(dataValueEditor2);
         Assert.AreNotSame(dataValueEditor1, dataValueEditor2);
         _dataValueEditorFactoryMock.Verify(
-            m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>(), It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()),
+            m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()),
             Times.Exactly(2));
     }
 
@@ -117,7 +118,6 @@ public class DataValueEditorReuseTests
     {
         var blockListPropertyEditor = new BlockListPropertyEditor(
             _dataValueEditorFactoryMock.Object,
-            _propertyEditorCollection,
             Mock.Of<IIOHelper>(),
             Mock.Of<IBlockValuePropertyIndexValueFactory>(),
             Mock.Of<IJsonSerializer>());
@@ -131,7 +131,7 @@ public class DataValueEditorReuseTests
         Assert.AreEqual("config", ((DataValueEditor)dataValueEditor2).ConfigurationObject);
         Assert.AreNotSame(dataValueEditor1, dataValueEditor2);
         _dataValueEditorFactoryMock.Verify(
-            m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>(), It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()),
+            m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()),
             Times.Exactly(2));
     }
 }

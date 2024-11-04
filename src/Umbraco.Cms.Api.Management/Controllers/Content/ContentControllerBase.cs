@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -9,6 +11,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Content;
 
 public abstract class ContentControllerBase : ManagementApiControllerBase
 {
+
     protected IActionResult ContentEditingOperationStatusResult(ContentEditingOperationStatus status)
         => OperationStatusResult(status, problemDetailsBuilder => status switch
         {
@@ -96,7 +99,8 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
         }
 
         var errors = new SortedDictionary<string, string[]>();
-        var missingPropertyAliases = new List<string>();
+
+        var missingPropertyModels = new List<PropertyValidationResponseModel>();
         foreach (PropertyValidationError validationError in validationResult.ValidationErrors)
         {
             TValueModel? requestValue = requestModel.Values.FirstOrDefault(value =>
@@ -105,7 +109,7 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                 && value.Segment == validationError.Segment);
             if (requestValue is null)
             {
-                missingPropertyAliases.Add(validationError.Alias);
+                missingPropertyModels.Add(MapMissingProperty(validationError));
                 continue;
             }
 
@@ -119,7 +123,16 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Validation failed")
                 .WithDetail("One or more properties did not pass validation")
                 .WithRequestModelErrors(errors)
-                .WithExtension("missingProperties", missingPropertyAliases.ToArray())
+                .WithExtension("missingValues", missingPropertyModels.ToArray())
                 .Build()));
     }
+
+    private PropertyValidationResponseModel MapMissingProperty(PropertyValidationError source) =>
+        new()
+        {
+            Alias = source.Alias,
+            Segment = source.Segment,
+            Culture = source.Culture,
+            Messages = source.ErrorMessages,
+        };
 }

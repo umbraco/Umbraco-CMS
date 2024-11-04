@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.PublishedCache;
 ///     Represents a content type cache.
 /// </summary>
 /// <remarks>This cache is not snapshotted, so it refreshes any time things change.</remarks>
-public class PublishedContentTypeCache : IDisposable
+public class PublishedContentTypeCache : IPublishedContentTypeCache
 {
     private readonly IContentTypeService? _contentTypeService;
     private readonly Dictionary<Guid, int> _keyToIdMap = new();
@@ -23,11 +23,13 @@ public class PublishedContentTypeCache : IDisposable
     // NOTE: These are not concurrent dictionaries because all access is done within a lock
     private readonly Dictionary<string, IPublishedContentType> _typesByAlias = new();
     private readonly Dictionary<int, IPublishedContentType> _typesById = new();
-    private bool _disposedValue;
 
     // default ctor
-    public PublishedContentTypeCache(IContentTypeService? contentTypeService, IMediaTypeService? mediaTypeService,
-        IMemberTypeService? memberTypeService, IPublishedContentTypeFactory publishedContentTypeFactory,
+    public PublishedContentTypeCache(
+        IContentTypeService? contentTypeService,
+        IMediaTypeService? mediaTypeService,
+        IMemberTypeService? memberTypeService,
+        IPublishedContentTypeFactory publishedContentTypeFactory,
         ILogger<PublishedContentTypeCache> logger)
     {
         _contentTypeService = contentTypeService;
@@ -47,13 +49,6 @@ public class PublishedContentTypeCache : IDisposable
         _logger = logger;
         _publishedContentTypeFactory = publishedContentTypeFactory;
     }
-
-    public void Dispose() =>
-
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(true);
-
-    // note: cache clearing is performed by XmlStore
 
     /// <summary>
     ///     Clears all cached content types.
@@ -175,7 +170,10 @@ public class PublishedContentTypeCache : IDisposable
 
             if (_keyToIdMap.TryGetValue(key, out var id))
             {
-                return Get(itemType, id);
+                if (_typesById.TryGetValue(id, out IPublishedContentType? foundType))
+                {
+                    return foundType;
+                }
             }
 
             IPublishedContentType type = CreatePublishedContentType(itemType, key);
@@ -289,19 +287,6 @@ public class PublishedContentTypeCache : IDisposable
         }
     }
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {
-                _lock.Dispose();
-            }
-
-            _disposedValue = true;
-        }
-    }
-
     private static string GetAliasKey(PublishedItemType itemType, string alias)
     {
         string k;
@@ -317,6 +302,9 @@ public class PublishedContentTypeCache : IDisposable
             case PublishedItemType.Member:
                 k = "m";
                 break;
+            case PublishedItemType.Element:
+                k = "e";
+                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(itemType));
         }
@@ -329,6 +317,7 @@ public class PublishedContentTypeCache : IDisposable
         IContentTypeComposition? contentType = itemType switch
         {
             PublishedItemType.Content => _contentTypeService?.Get(key),
+            PublishedItemType.Element => _contentTypeService?.Get(key),
             PublishedItemType.Media => _mediaTypeService?.Get(key),
             PublishedItemType.Member => _memberTypeService?.Get(key),
             _ => throw new ArgumentOutOfRangeException(nameof(itemType)),

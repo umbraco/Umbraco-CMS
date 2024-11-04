@@ -17,8 +17,9 @@ public static class ContentBaseExtensions
     /// <param name="shortStringHelper"></param>
     /// <param name="urlSegmentProviders"></param>
     /// <param name="culture">The culture.</param>
+    /// <param name="published">Whether to get the published or draft.</param>
     /// <returns>The URL segment.</returns>
-    public static string? GetUrlSegment(this IContentBase content, IShortStringHelper shortStringHelper, IEnumerable<IUrlSegmentProvider> urlSegmentProviders, string? culture = null)
+    public static string? GetUrlSegment(this IContentBase content, IShortStringHelper shortStringHelper, IEnumerable<IUrlSegmentProvider> urlSegmentProviders, string? culture = null, bool published = true)
     {
         if (content == null)
         {
@@ -30,7 +31,7 @@ public static class ContentBaseExtensions
             throw new ArgumentNullException(nameof(urlSegmentProviders));
         }
 
-        var url = urlSegmentProviders.Select(p => p.GetUrlSegment(content, culture)).FirstOrDefault(u => u != null);
+        var url = urlSegmentProviders.Select(p => p.GetUrlSegment(content, published, culture)).FirstOrDefault(u => u != null);
         if (url == null)
         {
             if (_defaultUrlSegmentProvider == null)
