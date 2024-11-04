@@ -130,7 +130,6 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * DataPath, declare the path to the value of the data that this property represents.
 	 * @public
 	 * @type {string}
-	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'data-path' })
