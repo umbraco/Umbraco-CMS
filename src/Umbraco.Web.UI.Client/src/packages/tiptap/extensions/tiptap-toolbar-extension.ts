@@ -25,6 +25,6 @@ export interface ManifestTiptapToolbarExtensionButtonKind<
 
 declare global {
 	interface UmbExtensionManifestMap {
-		tiptapToolbarExtension: ManifestTiptapToolbarExtension | ManifestTiptapToolbarExtensionButtonKind;
+		umbTiptapToolbarExtension: ManifestTiptapToolbarExtension | ManifestTiptapToolbarExtensionButtonKind;
 	}
 }
