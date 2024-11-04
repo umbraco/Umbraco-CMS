@@ -6,14 +6,14 @@ import { html, customElement, property, state, ifDefined } from '@umbraco-cms/ba
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import { removeLastSlashFromPath, transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
+import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import { UUICardEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-block-type-card')
 export class UmbBlockTypeCardElement extends UmbLitElement {
 	//
 	#init: Promise<void>;
-	#appUrl: string = '';
+	#serverUrl: string = '';
 
 	#itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
 		this,
@@ -29,7 +29,8 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 		value = transformServerPathToClientPath(value);
 		if (value) {
 			this.#init.then(() => {
-				this._iconFile = removeLastSlashFromPath(this.#appUrl) + value;
+				const url = new URL(value, this.#serverUrl);
+				this._iconFile = url.href;
 			});
 		} else {
 			this._iconFile = undefined;
@@ -77,7 +78,7 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 		super();
 
 		this.#init = this.getContext(UMB_APP_CONTEXT).then((appContext) => {
-			this.#appUrl = appContext.getServerUrl() + appContext.getBackofficePath();
+			this.#serverUrl = appContext.getServerUrl();
 		});
 
 		this.observe(this.#itemManager.items, (items) => {
