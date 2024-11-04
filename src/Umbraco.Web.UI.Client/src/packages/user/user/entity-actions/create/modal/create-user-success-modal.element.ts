@@ -1,7 +1,7 @@
-import { UmbUserItemRepository } from '../../repository/item/index.js';
-import { UmbNewUserPasswordRepository } from '../../repository/new-password/index.js';
-import type { UmbUserItemModel } from '../../repository/item/types.js';
-import { UMB_USER_WORKSPACE_PATH } from '../../paths.js';
+import { UmbUserItemRepository } from '../../../repository/item/index.js';
+import { UmbNewUserPasswordRepository } from '../../../repository/new-password/index.js';
+import type { UmbUserItemModel } from '../../../repository/item/index.js';
+import { UMB_USER_WORKSPACE_PATH } from '../../../paths.js';
 import type {
 	UmbCreateUserSuccessModalData,
 	UmbCreateUserSuccessModalValue,
