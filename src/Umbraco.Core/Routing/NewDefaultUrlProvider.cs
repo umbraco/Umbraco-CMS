@@ -177,7 +177,7 @@ public class NewDefaultUrlProvider : IUrlProvider
         UrlMode mode,
         string? culture)
     {
-        if (string.IsNullOrWhiteSpace(route))
+        if (string.IsNullOrWhiteSpace(route) || route.Equals("#"))
         {
             if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
             {

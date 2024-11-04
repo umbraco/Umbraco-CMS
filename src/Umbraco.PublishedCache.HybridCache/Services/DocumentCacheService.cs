@@ -270,11 +270,17 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
         await _databaseCacheRepository.RefreshContentAsync(draftCacheNode, content.PublishedState);
 
-        if (content.PublishedState == PublishedState.Publishing)
+        if (content.PublishedState == PublishedState.Publishing || content.PublishedState == PublishedState.Unpublishing)
         {
             var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
 
             await _databaseCacheRepository.RefreshContentAsync(publishedCacheNode, content.PublishedState);
+
+            if (content.PublishedState == PublishedState.Unpublishing)
+            {
+                await _hybridCache.RemoveAsync(GetCacheKey(publishedCacheNode.Key, false));
+            }
+
         }
 
         scope.Complete();
