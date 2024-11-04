@@ -84,6 +84,19 @@ public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     }
 
     [Test]
+    public async Task Cannot_get_unpublished_content()
+    {
+        // Arrange
+        var unpublishAttempt = await ContentPublishingService.UnpublishAsync(PublishedTextPage.Key.Value, null, Constants.Security.SuperUserKey);
+
+        //Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, false);
+
+        // Assert
+        Assert.IsNull(textPage);
+    }
+
+    [Test]
     public async Task Can_Get_Draft_Of_Published_Content_By_Key()
     {
         // Act

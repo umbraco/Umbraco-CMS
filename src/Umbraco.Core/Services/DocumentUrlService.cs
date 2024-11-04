@@ -426,17 +426,22 @@ public class DocumentUrlService : IDocumentUrlService
 
     private bool IsContentPublished(Guid contentKey, string culture) => _publishStatusQueryService.IsDocumentPublished(contentKey, culture);
 
-    public string GetLegacyRouteFormat(Guid docuemntKey, string? culture, bool isDraft)
+    public string GetLegacyRouteFormat(Guid documentKey, string? culture, bool isDraft)
     {
-        Attempt<int> documentIdAttempt = _idKeyMap.GetIdForKey(docuemntKey, UmbracoObjectTypes.Document);
+        Attempt<int> documentIdAttempt = _idKeyMap.GetIdForKey(documentKey, UmbracoObjectTypes.Document);
 
         if(documentIdAttempt.Success is false)
         {
             return "#";
         }
 
-        if (_documentNavigationQueryService.TryGetAncestorsOrSelfKeys(docuemntKey,
+        if (_documentNavigationQueryService.TryGetAncestorsOrSelfKeys(documentKey,
                 out IEnumerable<Guid> ancestorsOrSelfKeys) is false)
+        {
+            return "#";
+        }
+
+        if(isDraft is false && culture != null && _publishStatusQueryService.IsDocumentPublished(documentKey, culture) is false)
         {
             return "#";
         }
