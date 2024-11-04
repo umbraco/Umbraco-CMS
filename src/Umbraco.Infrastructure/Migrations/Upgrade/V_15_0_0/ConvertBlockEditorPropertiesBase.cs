@@ -144,24 +144,14 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
 
                 var progress = 0;
 
-                Parallel.ForEachAsync(updateBatch, async (update, token) =>
+                void HandleUpdateBatch(UpdateBatch<PropertyDataDto> update)
                 {
-                    //Foreach here, but we need to suppress the flow before each task, but not the actuall await of the task
-                    Task task;
-                    using (ExecutionContext.SuppressFlow())
-                    {
-                        task = Task.Run(() =>
-                        {
-                             using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-                    scope.Complete();
-                    using UmbracoContextReference umbracoContextReference =
-                        _umbracoContextFactory.EnsureUmbracoContext();
+                    using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
                     progress++;
                     if (progress % 100 == 0)
                     {
-                        _logger.LogInformation("  - finíshed {progress} of {total} properties", progress,
-                            updateBatch.Count);
+                        _logger.LogInformation("  - finíshed {progress} of {total} properties", progress, updateBatch.Count);
                     }
 
                     PropertyDataDto propertyDataDto = update.Poco;
@@ -169,8 +159,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                     // NOTE: some old property data DTOs can have variance defined, even if the property type no longer varies
                     var culture = propertyType.VariesByCulture()
                                   && propertyDataDto.LanguageId.HasValue
-                                  && languagesById.TryGetValue(propertyDataDto.LanguageId.Value,
-                                      out ILanguage? language)
+                                  && languagesById.TryGetValue(propertyDataDto.LanguageId.Value, out ILanguage? language)
                         ? language.IsoCode
                         : null;
 
@@ -256,11 +245,37 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                     stringValue = UpdateDatabaseValue(stringValue);
 
                     propertyDataDto.TextValue = stringValue;
-                        }, token);
-                    }
+                }
 
-                    await task;
-                }).GetAwaiter().GetResult();
+                if (DatabaseType == DatabaseType.SQLite)
+                {
+                    // SQLite locks up if we run the migration in parallel, so... let's not.
+                    foreach (UpdateBatch<PropertyDataDto> update in updateBatch)
+                    {
+                        HandleUpdateBatch(update);
+                    }
+                }
+                else
+                {
+                    Parallel.ForEachAsync(updateBatch, async (update, token) =>
+                    {
+                        //Foreach here, but we need to suppress the flow before each task, but not the actuall await of the task
+                        Task task;
+                        using (ExecutionContext.SuppressFlow())
+                        {
+                            task = Task.Run(
+                                () =>
+                                {
+                                    using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+                                    scope.Complete();
+                                    HandleUpdateBatch(update);
+                                },
+                                token);
+                        }
+
+                        await task;
+                    }).GetAwaiter().GetResult();
+                }
 
                 updateBatch.RemoveAll(updatesToSkip.Contains);
 
