@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.Validators;
@@ -8,7 +9,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 /// </summary>
 public class DateTimeValidator : IValueValidator
 {
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
     {
         // don't validate if empty
         if (value == null || value.ToString().IsNullOrWhiteSpace())
