@@ -3,9 +3,9 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
-using Umbraco.Cms.Infrastructure.HybridCache.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
@@ -95,7 +95,7 @@ public sealed class DocumentCache : IPublishedContentCache
     public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
         => _documentCacheService.GetByContentType(contentType);
 
-    [Obsolete("Use IDocumentUrlService.GetDocumentKeyByRoute instead, scheduled for removal in v17")]
+    [Obsolete("Use IPublishedUrlProvider.GetUrl instead, scheduled for removal in v17")]
     public IPublishedContent? GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string? culture = null)
     {
         IDocumentUrlService documentUrlService = StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>();
@@ -103,7 +103,7 @@ public sealed class DocumentCache : IPublishedContentCache
         return key is not null ? GetById(preview, key.Value) : null;
     }
 
-    [Obsolete("Use IDocumentUrlService.GetDocumentKeyByRoute instead, scheduled for removal in v17")]
+    [Obsolete("Use IPublishedUrlProvider.GetUrl instead, scheduled for removal in v17")]
     public IPublishedContent? GetByRoute(string route, bool? hideTopLevelNode = null, string? culture = null)
     {
         IDocumentUrlService documentUrlService = StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>();
@@ -111,14 +111,15 @@ public sealed class DocumentCache : IPublishedContentCache
         return key is not null ? GetById(key.Value) : null;
     }
 
-    [Obsolete("Use IDocumentUrlService.GetDocumentKeyByRoute instead, scheduled for removal in v17")]
+    [Obsolete("Use IPublishedUrlProvider.GetUrl instead, scheduled for removal in v17")]
     public string? GetRouteById(bool preview, int contentId, string? culture = null)
     {
-        IDocumentUrlService documentUrlService = StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>();
+        IPublishedUrlProvider publishedUrlProvider = StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>();
         IPublishedContent? content = GetById(preview, contentId);
-        return content is not null ? documentUrlService.GetLegacyRouteFormat(content.Key, culture, preview) : null;
+
+        return content is not null ? publishedUrlProvider.GetUrl(content, UrlMode.Relative, culture) : null;
     }
 
-    [Obsolete("Use IDocumentUrlService.GetDocumentKeyByRoute instead, scheduled for removal in v17")]
+    [Obsolete("Use IPublishedUrlProvider.GetUrl instead, scheduled for removal in v17")]
     public string? GetRouteById(int contentId, string? culture = null) => GetRouteById(false, contentId, culture);
 }
