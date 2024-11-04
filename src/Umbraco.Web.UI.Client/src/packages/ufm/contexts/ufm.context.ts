@@ -60,7 +60,7 @@ export class UmbUfmContext extends UmbContextBase<UmbUfmContext> {
 							const ctrl = controller as unknown as UmbExtensionApiInitializer<ManifestUfmComponent>;
 							if (!ctrl.manifest || !ctrl.api) return;
 							return {
-								alias: ctrl.manifest.alias,
+								alias: ctrl.manifest.meta.alias || ctrl.manifest.alias,
 								marker: ctrl.manifest.meta.marker,
 								render: ctrl.api.render,
 							};
