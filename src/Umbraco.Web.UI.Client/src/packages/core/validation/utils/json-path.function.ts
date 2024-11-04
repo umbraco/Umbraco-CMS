@@ -1,9 +1,10 @@
 /**
  *
- * @param data
- * @param path
+ * @param {object} data - object to traverse for the value.
+ * @param {string} path - the JSON path to the value that should be found
+ * @returns {unknown} - the found value.
  */
-export function GetValueByJsonPath(data: any, path: string): any {
+export function GetValueByJsonPath(data: unknown, path: string): unknown {
 	// strip $ from the path:
 	const strippedPath = path.startsWith('$.') ? path.slice(2) : path;
 	// get value from the path:
@@ -12,23 +13,9 @@ export function GetValueByJsonPath(data: any, path: string): any {
 
 /**
  *
- * @param path
- */
-export function GetPropertyNameFromPath(path: string): string {
-	// find next '.' or '[' in the path, using regex:
-	const match = path.match(/\.|\[/);
-	// If no match is found, we assume its a single key so lets return the value of the key:
-	if (match === null || match.index === undefined) return path;
-
-	// split the path at the first match:
-	return path.slice(0, match.index);
-}
-
-/**
- *
- * @param data
- * @param path
- * @returns {any}
+ * @param {object} data - object to traverse for the value.
+ * @param {string} path - the JSON path to the value that should be found
+ * @returns {unknown} - the found value.
  */
 function GetNextPropertyValueFromPath(data: any, path: string): any {
 	if (!data) return undefined;
@@ -90,8 +77,8 @@ function GetNextPropertyValueFromPath(data: any, path: string): any {
 }
 
 /**
- * @param filter
- * @returns {Array<(queryFilter: any) => boolean>} - array of methods that returns true if the given items property value matches the value of the query.
+ * @param {string} filter - A JSON Query, limited to filtering features. Do not support other JSON PATH Query features.
+ * @returns {Array<(queryFilter: any) => boolean>} - An array of methods that returns true if the given items property value matches the value of the query.
  */
 function JsFilterFromJsonPathFilter(filter: string): Array<(item: any) => boolean> {
 	// strip ?( and ) from the filter
@@ -101,7 +88,7 @@ function JsFilterFromJsonPathFilter(filter: string): Array<(item: any) => boolea
 	// map each part to a function that returns true if the part is true
 	return parts.map((part) => {
 		// split the part into key and value
-		const [path, equal] = part.split(' = ');
+		const [path, equal] = part.split(' == ');
 		// remove @.
 		const key = path.slice(2);
 		// remove quotes:

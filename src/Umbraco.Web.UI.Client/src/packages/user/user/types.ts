@@ -7,6 +7,8 @@ import {
 	type UserTwoFactorProviderModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
+export type * from './conditions/types.js';
+
 export type UmbUserStateEnum = UserStateModel;
 export const UmbUserStateEnum = UserStateModel;
 

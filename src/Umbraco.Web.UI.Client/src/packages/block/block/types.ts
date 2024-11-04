@@ -1,5 +1,8 @@
 import type { UmbElementValueModel } from '@umbraco-cms/backoffice/content';
 
+export type * from './conditions/types.js';
+export type * from './clipboard/types.js';
+
 export interface UmbBlockLayoutBaseModel {
 	contentKey: string;
 	settingsKey?: string | null;

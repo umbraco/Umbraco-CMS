@@ -6,7 +6,8 @@ export interface UmbUfmComponentApi extends UmbApi {
 }
 
 export interface MetaUfmComponent {
-	marker: string;
+	alias: string;
+	marker?: string;
 }
 
 export interface ManifestUfmComponent extends ManifestApi<UmbUfmComponentApi> {

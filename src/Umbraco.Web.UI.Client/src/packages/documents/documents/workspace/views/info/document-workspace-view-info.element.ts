@@ -159,7 +159,6 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 	#renderGeneralSection() {
 		const editDocumentTypePath = this._routeBuilder?.({ entityType: 'document-type' }) ?? '';
-		const editTemplatePath = this._routeBuilder?.({ entityType: 'template' }) ?? '';
 
 		return html`
 			<div class="general-item">
@@ -177,6 +176,20 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 					<umb-icon slot="icon" name=${ifDefined(this._documentTypeIcon)}></umb-icon>
 				</uui-ref-node-document-type>
 			</div>
+			${this.#renderTemplateInput()}
+			<div class="general-item">
+				<strong><umb-localize key="template_id">Id</umb-localize></strong>
+				<span>${this._documentUnique}</span>
+			</div>
+		`;
+	}
+
+	#renderTemplateInput() {
+		if (this._allowedTemplates?.length === 0) return nothing;
+
+		const editTemplatePath = this._routeBuilder?.({ entityType: 'template' }) ?? '';
+
+		return html`
 			<div class="general-item">
 				<strong><umb-localize key="template_template">Template</umb-localize></strong>
 				${this._templateUnique
@@ -199,10 +212,6 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 								look="placeholder"
 								@click=${this.#openTemplatePicker}></uui-button>
 						`}
-			</div>
-			<div class="general-item">
-				<strong><umb-localize key="template_id">Id</umb-localize></strong>
-				<span>${this._documentUnique}</span>
 			</div>
 		`;
 	}

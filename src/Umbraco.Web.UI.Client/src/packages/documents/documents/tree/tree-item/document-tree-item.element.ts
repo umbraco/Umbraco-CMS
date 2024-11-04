@@ -1,4 +1,5 @@
 import type { UmbDocumentTreeItemModel, UmbDocumentTreeItemVariantModel } from '../types.js';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { css, html, nothing, customElement, state, classMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
@@ -31,7 +32,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 	#observeAppCulture() {
 		this.observe(this.#appLanguageContext!.appLanguageCulture, (value) => {
 			this._currentCulture = value;
-			this._variant = this.#getVariant(value);
+			this._variant = this.#findVariant(value);
 		});
 	}
 
@@ -41,7 +42,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 		});
 	}
 
-	#getVariant(culture: string | undefined) {
+	#findVariant(culture: string | undefined) {
 		return this.item?.variants.find((x) => x.culture === culture);
 	}
 
@@ -56,16 +57,22 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 			return this._item?.variants[0].name;
 		}
 
-		const fallbackName = this.#getVariant(this._defaultCulture)?.name ?? this._item?.variants[0].name ?? 'Unknown';
+		// ensure we always have the correct variant data
+		this._variant = this.#findVariant(this._currentCulture);
+
+		const fallbackName = this.#findVariant(this._defaultCulture)?.name ?? this._item?.variants[0].name ?? 'Unknown';
 		return this._variant?.name ?? `(${fallbackName})`;
 	}
 
 	#isDraft() {
 		if (this.#isInvariant()) {
-			return this._item?.variants[0].state === 'Draft';
+			return this._item?.variants[0].state === DocumentVariantStateModel.DRAFT;
 		}
 
-		return this._variant?.state === 'Draft';
+		// ensure we always have the correct variant data
+		this._variant = this.#findVariant(this._currentCulture);
+
+		return this._variant?.state === DocumentVariantStateModel.DRAFT;
 	}
 
 	override renderIconContainer() {

@@ -176,7 +176,8 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 									.alias=${this.localize.string(documentType.description ?? '')}
 									select-only
 									selectable
-									@selected=${() => this.#onSelectDocumentType(documentType.unique)}>
+									@selected=${() => this.#onSelectDocumentType(documentType.unique)}
+									@open=${() => this.#onSelectDocumentType(documentType.unique)}>
 									<umb-icon slot="icon" name=${documentType.icon || 'icon-circle-dotted'}></umb-icon>
 								</uui-ref-node-document-type>
 							`,

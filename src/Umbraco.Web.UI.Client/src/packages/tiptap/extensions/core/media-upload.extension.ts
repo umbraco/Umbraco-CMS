@@ -1,4 +1,4 @@
-import { UmbTiptapExtensionApiBase } from '../types.js';
+import { UmbTiptapExtensionApiBase } from '../base.js';
 import type { UmbTiptapExtensionArgs } from '../types.js';
 import { imageSize } from '@umbraco-cms/backoffice/utils';
 import { Extension } from '@umbraco-cms/backoffice/external/tiptap';

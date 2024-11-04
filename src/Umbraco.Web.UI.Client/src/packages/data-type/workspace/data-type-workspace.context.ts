@@ -1,4 +1,4 @@
-import type { UmbDataTypeDetailModel, UmbDataTypePropertyModel } from '../types.js';
+import type { UmbDataTypeDetailModel, UmbDataTypePropertyValueModel } from '../types.js';
 import { type UmbDataTypeDetailRepository, UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../entity.js';
 import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
@@ -247,7 +247,7 @@ export class UmbDataTypeWorkspaceContext
 		this.#settingsDefaultData = [
 			...this.#propertyEditorSchemaSettingsDefaultData,
 			...this.#propertyEditorUISettingsDefaultData,
-		] satisfies Array<UmbDataTypePropertyModel>;
+		] satisfies Array<UmbDataTypePropertyValueModel>;
 		// We check for satisfied type, because we will be directly transferring them to become value. Future note, if they are not satisfied, we need to transfer alias and value. [NL]
 
 		this._data.updatePersisted({ values: this.#settingsDefaultData });

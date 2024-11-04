@@ -30,7 +30,10 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import {
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbServerModelValidatorContext } from '@umbraco-cms/backoffice/validation';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
@@ -314,18 +317,20 @@ export class UmbDocumentWorkspaceContext
 
 		await this._performCreateOrUpdate(variantIds, saveData);
 
-		await this.publishingRepository.publish(
+		const { error } = await this.publishingRepository.publish(
 			unique,
 			variantIds.map((variantId) => ({ variantId })),
 		);
 
-		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		const event = new UmbRequestReloadStructureForEntityEvent({
-			unique: this.getUnique()!,
-			entityType: this.getEntityType(),
-		});
+		if (!error) {
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadStructureForEntityEvent({
+				unique: this.getUnique()!,
+				entityType: this.getEntityType(),
+			});
 
-		eventContext.dispatchEvent(event);
+			eventContext.dispatchEvent(event);
+		}
 	}
 
 	public async publish() {
@@ -384,6 +389,12 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	public async publishWithDescendants() {
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is missing');
+
+		const entityType = this.getEntityType();
+		if (!entityType) throw new Error('Entity type is missing');
+
 		const { options, selected } = await this._determineVariantOptions();
 
 		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
@@ -405,15 +416,30 @@ export class UmbDocumentWorkspaceContext
 
 		if (!variantIds.length) return;
 
-		// TODO: Validate content & Save changes for the selected variants — This was how it worked in v.13 [NL]
-
-		const unique = this.getUnique();
-		if (!unique) throw new Error('Unique is missing');
-		await this.publishingRepository.publishWithDescendants(
+		const { error } = await this.publishingRepository.publishWithDescendants(
 			unique,
 			variantIds,
 			result.includeUnpublishedDescendants ?? false,
 		);
+
+		if (!error) {
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+
+			// request reload of this entity
+			const structureEvent = new UmbRequestReloadStructureForEntityEvent({
+				entityType,
+				unique,
+			});
+
+			// request reload of the children
+			const childrenEvent = new UmbRequestReloadChildrenOfEntityEvent({
+				entityType,
+				unique,
+			});
+
+			eventContext.dispatchEvent(structureEvent);
+			eventContext.dispatchEvent(childrenEvent);
+		}
 	}
 
 	public createPropertyDatasetContext(

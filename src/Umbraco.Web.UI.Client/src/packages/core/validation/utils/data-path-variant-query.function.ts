@@ -12,9 +12,9 @@ export function UmbDataPathVariantQuery(
 	value: UmbPartialSome<Pick<UmbVariantPropertyValueModel, 'culture' | 'segment'>, 'segment'>,
 ): string {
 	// write a array of strings for each property, where culture must be present and segment is optional
-	const filters: Array<string> = [`@.culture = ${value.culture ? `'${value.culture}'` : 'null'}`];
+	const filters: Array<string> = [`@.culture == ${value.culture ? `'${value.culture}'` : 'null'}`];
 	if (value.segment !== undefined) {
-		filters.push(`@.segment = ${value.segment ? `'${value.segment}'` : 'null'}`);
+		filters.push(`@.segment == ${value.segment ? `'${value.segment}'` : 'null'}`);
 	}
 	return `?(${filters.join(' && ')})`;
 }
