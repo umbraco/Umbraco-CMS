@@ -67,6 +67,7 @@ internal class UmbracoCmsSchema
 
         public required LegacyPasswordMigrationSettings LegacyPasswordMigration { get; set; }
 
+        [Obsolete("Scheduled for removal in v16, dashboard manipulation is now done trough frontend extensions.")]
         public required ContentDashboardSettings ContentDashboard { get; set; }
 
         public required HelpPageSettings HelpPage { get; set; }

@@ -20,6 +20,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private readonly IDocumentNavigationManagementService _documentNavigationManagementService;
     private readonly IContentService _contentService;
+    private readonly IDocumentCacheService _documentCacheService;
     private readonly IPublishStatusManagementService _publishStatusManagementService;
     private readonly IIdKeyMap _idKeyMap;
 
@@ -35,7 +36,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         IDocumentNavigationQueryService documentNavigationQueryService,
         IDocumentNavigationManagementService documentNavigationManagementService,
         IContentService contentService,
-        IPublishStatusManagementService publishStatusManagementService)
+        IPublishStatusManagementService publishStatusManagementService,
+        IDocumentCacheService documentCacheService)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
@@ -45,6 +47,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         _documentNavigationQueryService = documentNavigationQueryService;
         _documentNavigationManagementService = documentNavigationManagementService;
         _contentService = contentService;
+        _documentCacheService = documentCacheService;
         _publishStatusManagementService = publishStatusManagementService;
     }
 
@@ -107,6 +110,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             }
 
 
+            HandleMemoryCache(payload);
             HandleRouting(payload);
 
             HandleNavigation(payload);
@@ -141,6 +145,45 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         }
 
         base.Refresh(payloads);
+    }
+
+    private void HandleMemoryCache(JsonPayload payload)
+    {
+        Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
+
+        if (payload.Blueprint)
+        {
+            return;
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
+        {
+            _documentCacheService.RefreshMemoryCacheAsync(key).GetAwaiter().GetResult();
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
+        {
+            if (_documentNavigationQueryService.TryGetDescendantsKeys(key, out IEnumerable<Guid> descendantsKeys))
+            {
+                var branchKeys = descendantsKeys.ToList();
+                branchKeys.Add(key);
+
+                foreach (Guid branchKey in branchKeys)
+                {
+                    _documentCacheService.RefreshMemoryCacheAsync(branchKey).GetAwaiter().GetResult();
+                }
+            }
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
+        {
+            _documentCacheService.ClearMemoryCacheAsync(CancellationToken.None).GetAwaiter().GetResult();
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+        {
+            _documentCacheService.RemoveFromMemoryCacheAsync(key).GetAwaiter().GetResult();
+        }
     }
 
     private void HandleNavigation(JsonPayload payload)

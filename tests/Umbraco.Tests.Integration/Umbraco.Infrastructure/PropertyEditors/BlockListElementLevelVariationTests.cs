@@ -16,6 +16,12 @@ public partial class BlockListElementLevelVariationTests : BlockEditorElementVar
     public void OneTimeSetUp()
     {
         TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Publish_Invariant_Properties_Without_Default_Culture_With_AllowEditInvariantFromNonDefault));
+        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Handle_Limited_User_Access_To_Languages_With_AllowEditInvariantFromNonDefault));
+        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Handle_Limited_User_Access_To_Languages_In_Nested_Blocks_Without_Access_With_AllowEditInvariantFromNonDefault));
+        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Handle_Limited_User_Access_To_Languages_With_AllowEditInvariantFromNonDefault) + "(True)");
+        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Handle_Limited_User_Access_To_Languages_With_AllowEditInvariantFromNonDefault) + "(False)");
+        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Handle_Limited_User_Access_To_Languages_In_Nested_Blocks_Without_Access_With_AllowEditInvariantFromNonDefault) + "(True)");
+        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Handle_Limited_User_Access_To_Languages_In_Nested_Blocks_Without_Access_With_AllowEditInvariantFromNonDefault) + "(False)");
     }
 
     private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
@@ -144,6 +150,63 @@ public partial class BlockListElementLevelVariationTests : BlockEditorElementVar
 
         var content = CreateContent(contentType, elementType, blockContentValues, blockSettingsValues, true);
         return GetPublishedContent(content.Key);
+    }
+
+    private IContentType CreateElementTypeWithValidation()
+    {
+        var elementType = CreateElementType(ContentVariation.Culture);
+        foreach (var propertyType in elementType.PropertyTypes)
+        {
+            propertyType.Mandatory = true;
+            propertyType.ValidationRegExp = "^Valid.*$";
+        }
+
+        ContentTypeService.Save(elementType);
+        return elementType;
+    }
+
+    private async Task<(IContentType RootElementType, IContentType NestedElementType)> CreateElementTypeWithValidationAndNestedBlocksAsync()
+    {
+        var nestedElementType = CreateElementTypeWithValidation();
+        var nestedBlockListDataType = await CreateBlockListDataType(nestedElementType);
+
+        var rootElementType = new ContentTypeBuilder()
+            .WithAlias("myRootElementType")
+            .WithName("My Root Element Type")
+            .WithIsElement(true)
+            .WithContentVariation(ContentVariation.Culture)
+            .AddPropertyType()
+            .WithAlias("invariantText")
+            .WithName("Invariant text")
+            .WithMandatory(true)
+            .WithValidationRegExp("^Valid.*$")
+            .WithDataTypeId(Constants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+            .WithValueStorageType(ValueStorageType.Nvarchar)
+            .WithVariations(ContentVariation.Nothing)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("variantText")
+            .WithName("Variant text")
+            .WithMandatory(true)
+            .WithValidationRegExp("^Valid.*$")
+            .WithDataTypeId(Constants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+            .WithValueStorageType(ValueStorageType.Nvarchar)
+            .WithVariations(ContentVariation.Culture)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("nestedBlocks")
+            .WithName("Nested blocks")
+            .WithDataTypeId(nestedBlockListDataType.Id)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.BlockList)
+            .WithValueStorageType(ValueStorageType.Ntext)
+            .WithVariations(ContentVariation.Nothing)
+            .Done()
+            .Build();
+        ContentTypeService.Save(rootElementType);
+
+        return (rootElementType, nestedElementType);
     }
 
     private class BlockProperty
