@@ -348,10 +348,15 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	 * in the backoffice UI.
 	 */
 	establishLiveSync() {
+		let initialLayoutSet = true;
 		this.observe(
 			this.layout,
 			(layoutData) => {
 				if (layoutData) {
+					if (initialLayoutSet) {
+						initialLayoutSet = false;
+						return;
+					}
 					this.#blockManager?.setOneLayout(
 						layoutData,
 						this.#modalContext?.data.originData as UmbBlockWorkspaceOriginData,

@@ -250,6 +250,11 @@ export abstract class UmbBaseExtensionInitializer<
 	}
 
 	#onConditionsChangedCallback = async () => {
+		if (this.#manifest === undefined) {
+			// This is cause by this controller begin destroyed in the mean time. [NL]
+			// When writing this the only plausible case is a call from the conditionController to the onChange callback.
+			return;
+		}
 		// We will collect old value here, but we need to re-collect it after a async method have been called, as it could have changed in the mean time. [NL]
 		let oldValue = this.#isPermitted ?? false;
 
@@ -299,7 +304,7 @@ export abstract class UmbBaseExtensionInitializer<
 	protected abstract _conditionsAreBad(): Promise<void>;
 
 	public equal(otherClass: UmbBaseExtensionInitializer | undefined): boolean {
-		return otherClass?.manifest === this.manifest;
+		return otherClass?.manifest === this.#manifest;
 	}
 
 	/*
