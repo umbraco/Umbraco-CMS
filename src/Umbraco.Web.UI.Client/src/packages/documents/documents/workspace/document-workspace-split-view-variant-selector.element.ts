@@ -2,7 +2,6 @@ import type { UmbDocumentVariantOptionModel } from '../types.js';
 import { sortVariants } from '../utils.js';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbWorkspaceSplitViewVariantSelectorElement } from '@umbraco-cms/backoffice/workspace';
 
 const elementName = 'umb-document-workspace-split-view-variant-selector';
@@ -22,8 +21,6 @@ export class UmbDocumentWorkspaceSplitViewVariantSelectorElement extends UmbWork
 			this.#publishStateLocalizationMap[variantOption.variant?.state || DocumentVariantStateModel.NOT_CREATED],
 		)}`;
 	}
-
-	static override styles = [...UmbWorkspaceSplitViewVariantSelectorElement.styles, UmbTextStyles];
 }
 
 declare global {

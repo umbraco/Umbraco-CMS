@@ -33,11 +33,12 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 
 	@state()
 	private _variantSelectorSlotHasContent = false;
-	private _variantSelectorSlotChanged = (e: Event) => {
-		this._variantSelectorSlotHasContent = (e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
-	};
 
 	splitViewContext = new UmbWorkspaceSplitViewContext(this);
+
+	#onVariantSelectorSlotChanged(e: Event) {
+		this._variantSelectorSlotHasContent = (e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
+	}
 
 	override render() {
 		return html`
@@ -46,7 +47,7 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 				back-path=${ifDefined(this.backPath)}
 				.hideNavigation=${!this.displayNavigation}
 				.enforceNoFooter=${true}>
-				<slot id="header" name="variant-selector" slot="header">
+				<slot id="header" name="variant-selector" slot="header" @slotchange=${this.#onVariantSelectorSlotChanged}>
 					${this._variantSelectorSlotHasContent
 						? nothing
 						: html`<umb-workspace-split-view-variant-selector></umb-workspace-split-view-variant-selector>`}
