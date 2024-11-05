@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Filters;
@@ -21,7 +21,8 @@ public abstract class UpgradeControllerBase : ManagementApiControllerBase
             ? Ok()
             : OperationStatusResult(status, problemDetailsBuilder => status switch
             {
-                UpgradeOperationStatus.UpgradeFailed => StatusCode(StatusCodes.Status500InternalServerError,
+                UpgradeOperationStatus.UpgradeFailed => StatusCode(
+                    StatusCodes.Status500InternalServerError,
                     problemDetailsBuilder
                         .WithTitle("Upgrade failed")
                         .WithDetail(result?.ErrorMessage ?? "An unknown error occurred.")

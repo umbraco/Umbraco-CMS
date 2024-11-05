@@ -103,7 +103,7 @@ for (const listViewType of listViewTypes) {
           "isSystem": 1,
         }]
       }];
-  
+
       // Remove all existing values and add a column displayed to remove
       dataTypeData = await umbracoApi.dataType.getByName(listViewType);
       dataTypeData.values = removedDataTypeValues;
@@ -131,7 +131,7 @@ for (const listViewType of listViewTypes) {
         "icon": "icon-thumbnails-small",
         "collectionView": layoutsData,
         "isSystem": true,
-        "name": "Grid", 
+        "name": "Grid",
         "selected": true
       };
 
@@ -160,11 +160,11 @@ for (const listViewType of listViewTypes) {
           "icon": "icon-thumbnails-small",
           "collectionView": layoutsData,
           "isSystem": true,
-          "name": "Grid", 
+          "name": "Grid",
           "selected": true
         }]
       }];
-  
+
       // Remove all existing values and add a layout to remove
       dataTypeData = await umbracoApi.dataType.getByName(listViewType);
       dataTypeData.values = removedDataTypeValues;
@@ -200,14 +200,14 @@ for (const listViewType of listViewTypes) {
 
     test('can update bulk action permission', async ({umbracoApi, umbracoUi}) => {
       // Arrange
-      const bulkActionPermissionValue = 'Allow bulk delete';
+      const bulkActionPermissionValue = 'Allow bulk trash';
       const expectedDataTypeValues = {
         "alias": "bulkActionPermissions",
         "value": {
-          "allowBulkCopy": false, 
-          "allowBulkDelete": true, 
-          "allowBulkMove": false, 
-          "allowBulkPublish": false, 
+          "allowBulkCopy": false,
+          "allowBulkDelete": true,
+          "allowBulkMove": false,
+          "allowBulkPublish": false,
           "allowBulkUnpublish": false
         }
       };

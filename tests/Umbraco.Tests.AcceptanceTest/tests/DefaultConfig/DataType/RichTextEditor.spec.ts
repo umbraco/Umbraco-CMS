@@ -5,6 +5,8 @@ const dataTypeName = 'Richtext editor';
 let dataTypeDefaultData = null;
 let dataTypeData = null;
 
+// Create tests for TinyMCE and TipTap
+
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();
   await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
@@ -13,8 +15,8 @@ test.beforeEach(async ({umbracoUi, umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   if (dataTypeDefaultData !== null) {
-    await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);   
-  }   
+    await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);
+  }
 });
 
 test('can enable ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
@@ -74,7 +76,7 @@ test.skip('can add stylesheet', async ({umbracoApi, umbracoUi}) => {
   };
 
   await umbracoUi.dataType.goToDataType(dataTypeName);
-  
+
   // Act
   await umbracoUi.dataType.addStylesheet(stylesheetName);
   await umbracoUi.dataType.clickSaveButton();
@@ -145,7 +147,8 @@ test('can select overlay size', async ({umbracoApi, umbracoUi}) => {
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
 
-test('can enable hide label', async ({umbracoApi, umbracoUi}) => {
+// No hide label for TipTap
+test.skip('can enable hide label', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedDataTypeValues = {
     "alias": "hideLabel",
@@ -185,7 +188,8 @@ test('can add image upload folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);
 });
 
-test('can enable inline editing mode', async ({umbracoApi, umbracoUi}) => {
+// There is no inline editing mode for TipTap
+test.skip('can enable inline editing mode', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mode = 'Inline';
   const expectedDataTypeValues = {

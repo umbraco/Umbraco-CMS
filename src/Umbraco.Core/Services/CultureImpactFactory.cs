@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -135,7 +135,10 @@ public class CultureImpactFactory : ICultureImpactFactory
             if (isDefault)
             {
                 if (throwOnFail)
+                {
                     throw new InvalidOperationException("The 'all' culture can not be the default culture.");
+                }
+
                 return false;
             }
 

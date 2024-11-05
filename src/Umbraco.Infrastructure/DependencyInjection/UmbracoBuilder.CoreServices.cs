@@ -26,6 +26,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
@@ -145,10 +146,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IMigrationPlanExecutor, MigrationPlanExecutor>();
         builder.Services.AddSingleton<IMigrationBuilder>(factory => new MigrationBuilder(factory));
 
-        builder.Services.AddSingleton<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
-
-        // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
-        builder.Services.AddSingleton<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
+        builder.Services.AddSingleton<ICacheRebuilder, CacheRebuilder>();
 
         builder.Services.AddSingleton<IVariationContextAccessor, HybridVariationContextAccessor>();
         builder.Services.AddSingleton<IBackOfficeVariationContextAccessor, HttpContextBackOfficeVariationContextAccessor>();
@@ -161,6 +159,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<BlockListPropertyValueConstructorCache>();
         builder.Services.AddSingleton<BlockGridPropertyValueConstructorCache>();
         builder.Services.AddSingleton<RichTextBlockPropertyValueConstructorCache>();
+        builder.Services.AddSingleton<BlockEditorVarianceHandler>();
 
         // both SimpleTinyMceValueConverter (in Core) and RteBlockRenderingValueConverter (in Infrastructure) will be
         // discovered when CoreBootManager configures the converters. We will remove the basic one defined
@@ -194,10 +193,11 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddScoped<IPublishedContentQuery>(factory =>
         {
             IUmbracoContextAccessor umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
-            IUmbracoContext umbracoContext = umbCtx.GetRequiredUmbracoContext();
             return new PublishedContentQuery(
-                umbracoContext.PublishedSnapshot,
-                factory.GetRequiredService<IVariationContextAccessor>(), factory.GetRequiredService<IExamineManager>());
+                factory.GetRequiredService<IVariationContextAccessor>(),
+                factory.GetRequiredService<IExamineManager>(),
+                factory.GetRequiredService<IPublishedContentCache>(),
+                factory.GetRequiredService<IPublishedMediaCache>());
         });
 
         // register accessors for cultures
@@ -236,6 +236,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddTransient<IMemberEditingService, MemberEditingService>();
 
         builder.Services.AddSingleton<IBlockEditorElementTypeCache, BlockEditorElementTypeCache>();
+
+        builder.Services.AddSingleton<IRichTextRequiredValidator, RichTextRequiredValidator>();
 
         return builder;
     }

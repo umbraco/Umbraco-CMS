@@ -8,8 +8,9 @@
     <IsPackable>false</IsPackable>
     <BaseEnablePackageValidation>$(EnablePackageValidation)</BaseEnablePackageValidation>
     <EnablePackageValidation>false</EnablePackageValidation>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
-  
+
   <PropertyGroup>
     <!-- TODO: Update test projects to use nullable reference types and remove this to enable nullable warnings as errors (the solution default) -->
     <Nullable>annotations</Nullable>

@@ -4,6 +4,12 @@
     <Description>Contains the static assets needed to run Umbraco CMS.</Description>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
+    <CompressionEnabled>false</CompressionEnabled> <!-- Disable compression. E.g. for umbraco backoffice files. These files should be precompressed by node and not let dotnet handle it -->
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!--  TODO: [NU5123] Rename files so path is shorter and remove this override -->
+    <WarningsNotAsErrors>NU5123</WarningsNotAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,9 +41,14 @@
     <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm run build:for:cms" />
   </Target>
 
-  <Target Name="BuildLogin" DependsOnTargets="BuildBellissima">
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Login\" Command="npm ci --no-fund --no-audit --prefer-offline" />
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Login\" Command="npm run build" />
+  <Target Name="BuildBelle">
+    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm ci --no-fund --no-audit --prefer-offline" Timeout="600000" />
+    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm run build:skip-tests" Timeout="600000" />
+  </Target>
+
+  <Target Name="BuildLogin">
+    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Login\" Command="npm ci --no-fund --no-audit --prefer-offline" Timeout="600000" />
+    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Login\" Command="npm run build" Timeout="600000" />
   </Target>
 
   <Target Name="CleanStaticAssetsPreconditions" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">

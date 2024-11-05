@@ -80,7 +80,9 @@ public class ComponentTests
             Options.Create(new ContentSettings()));
         var eventAggregator = Mock.Of<IEventAggregator>();
         var scopeProvider = new ScopeProvider(
-            new AmbientScopeStack(), new AmbientScopeContextStack(),Mock.Of<IDistributedLockingMechanismFactory>(),
+            new AmbientScopeStack(),
+            new AmbientScopeContextStack(),
+            Mock.Of<IDistributedLockingMechanismFactory>(),
             f,
             fs,
             new TestOptionsMonitor<CoreDebugSettings>(coreDebug),
@@ -113,7 +115,7 @@ public class ComponentTests
         Mock.Of<IProfiler>());
 
     [Test]
-    public void Boot1A()
+    public async Task Boot1A()
     {
         var register = MockRegister();
         var composition = new UmbracoBuilder(register, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
@@ -157,7 +159,7 @@ public class ComponentTests
                 {
                     return Mock.Of<ILogger<ComponentCollection>>();
                 }
-                
+
                 if (type == typeof(ILogger<ComponentCollection>))
                 {
                     return Mock.Of<ILogger<ComponentCollection>>();
@@ -176,9 +178,9 @@ public class ComponentTests
         var components = builder.CreateCollection(factory);
 
         Assert.IsEmpty(components);
-        components.Initialize();
+        await components.InitializeAsync(false, default);
         Assert.IsEmpty(Initialized);
-        components.Terminate();
+        await components.TerminateAsync(false, default);
         Assert.IsEmpty(Terminated);
     }
 
@@ -277,7 +279,7 @@ public class ComponentTests
     }
 
     [Test]
-    public void Initialize()
+    public async Task Initialize()
     {
         Composed.Clear();
         Initialized.Clear();
@@ -324,7 +326,7 @@ public class ComponentTests
                 {
                     return Mock.Of<ILogger<ComponentCollection>>();
                 }
-                
+
                 if (type == typeof(IServiceProviderIsService))
                 {
                     return Mock.Of<IServiceProviderIsService>();
@@ -347,11 +349,11 @@ public class ComponentTests
         var components = builder.CreateCollection(factory);
 
         Assert.IsEmpty(Initialized);
-        components.Initialize();
+        await components.InitializeAsync(false, default);
         AssertTypeArray(TypeArray<Component5, Component5a>(), Initialized);
 
         Assert.IsEmpty(Terminated);
-        components.Terminate();
+        await components.TerminateAsync(false, default);
         AssertTypeArray(TypeArray<Component5a, Component5>(), Terminated);
     }
 

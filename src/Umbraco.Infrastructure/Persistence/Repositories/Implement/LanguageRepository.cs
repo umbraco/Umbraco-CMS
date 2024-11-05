@@ -256,6 +256,7 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
             "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE tagId IN (SELECT id FROM " +
             Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id)",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentUrl + " WHERE languageId = @id",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.Language + " WHERE id = @id",
         };
         return list;

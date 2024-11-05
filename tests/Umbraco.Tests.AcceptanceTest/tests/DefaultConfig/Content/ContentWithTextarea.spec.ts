@@ -14,7 +14,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 

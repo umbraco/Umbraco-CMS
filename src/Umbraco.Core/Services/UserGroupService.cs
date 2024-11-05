@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -422,13 +422,10 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return Attempt.Fail(resolveAttempt.Status);
         }
 
-        ResolvedUserToUserGroupManipulationModel? resolvedModel = resolveAttempt.Result;
+        ResolvedUserToUserGroupManipulationModel? resolvedModel = resolveAttempt.Result ??
 
-        // This should never happen, but we need to check it to avoid null reference exceptions
-        if (resolvedModel is null)
-        {
+            // This should never happen, but we need to check it to avoid null reference exceptions
             throw new InvalidOperationException("The resolved model should not be null.");
-        }
 
         IReadOnlyUserGroup readOnlyGroup = resolvedModel.UserGroup.ToReadOnlyGroup();
 
@@ -455,13 +452,10 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return Attempt.Fail(resolveAttempt.Status);
         }
 
-        ResolvedUserToUserGroupManipulationModel? resolvedModel = resolveAttempt.Result;
+        ResolvedUserToUserGroupManipulationModel? resolvedModel = resolveAttempt.Result
 
         // This should never happen, but we need to check it to avoid null reference exceptions
-        if (resolvedModel is null)
-        {
-            throw new InvalidOperationException("The resolved model should not be null.");
-        }
+            ?? throw new InvalidOperationException("The resolved model should not be null.");
 
         foreach (IUser user in resolvedModel.Users)
         {
@@ -642,7 +636,8 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     /// <remarks>
     /// This is to ensure that the user can access the group they themselves created at a later point and modify it.
     /// </remarks>
-    private IEnumerable<Guid> EnsureNonAdminUserIsInSavedUserGroup(IUser performingUser,
+    private IEnumerable<Guid> EnsureNonAdminUserIsInSavedUserGroup(
+        IUser performingUser,
         IEnumerable<Guid> groupMembersUserKeys)
     {
         var userKeys = groupMembersUserKeys.ToList();

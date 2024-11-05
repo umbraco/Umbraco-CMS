@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentEditing.Validation;
+using Umbraco.Cms.Core.PropertyEditors.Validation;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
@@ -9,6 +12,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Content;
 
 public abstract class ContentControllerBase : ManagementApiControllerBase
 {
+
     protected IActionResult ContentEditingOperationStatusResult(ContentEditingOperationStatus status)
         => OperationStatusResult(status, problemDetailsBuilder => status switch
         {
@@ -96,7 +100,8 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
         }
 
         var errors = new SortedDictionary<string, string[]>();
-        var missingPropertyAliases = new List<string>();
+
+        var validationErrorExpressionRoot = $"$.{nameof(ContentModelBase<TValueModel, TVariantModel>.Values).ToFirstLowerInvariant()}";
         foreach (PropertyValidationError validationError in validationResult.ValidationErrors)
         {
             TValueModel? requestValue = requestModel.Values.FirstOrDefault(value =>
@@ -105,13 +110,16 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                 && value.Segment == validationError.Segment);
             if (requestValue is null)
             {
-                missingPropertyAliases.Add(validationError.Alias);
+                errors.Add(
+                    $"{validationErrorExpressionRoot}[{JsonPathExpression.MissingPropertyValue(validationError.Alias, validationError.Culture, validationError.Segment)}].{nameof(ValueModelBase.Value)}",
+                    validationError.ErrorMessages);
                 continue;
             }
 
             var index = requestModel.Values.IndexOf(requestValue);
-            var key = $"$.{nameof(ContentModelBase<TValueModel, TVariantModel>.Values).ToFirstLowerInvariant()}[{index}].{nameof(ValueModelBase.Value).ToFirstLowerInvariant()}{validationError.JsonPath}";
-            errors.Add(key, validationError.ErrorMessages);
+            errors.Add(
+                $"$.{nameof(ContentModelBase<TValueModel, TVariantModel>.Values).ToFirstLowerInvariant()}[{index}].{nameof(ValueModelBase.Value).ToFirstLowerInvariant()}{validationError.JsonPath}",
+                validationError.ErrorMessages);
         }
 
         return OperationStatusResult(status, problemDetailsBuilder
@@ -119,7 +127,6 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Validation failed")
                 .WithDetail("One or more properties did not pass validation")
                 .WithRequestModelErrors(errors)
-                .WithExtension("missingProperties", missingPropertyAliases.ToArray())
                 .Build()));
     }
 }

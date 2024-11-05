@@ -35,7 +35,7 @@ public static class ModelsBuilderConfigExtensions
 
         if (config.StartsWith("~/"))
         {
-            var dir = Path.Combine(root, config.TrimStart("~/"));
+            var dir = Path.Combine(root, config.TrimStartExact("~/"));
 
             // sanitize - GetFullPath will take care of any relative
             // segments in path, eg '../../foo.tmp' - it may throw a SecurityException

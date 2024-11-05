@@ -65,6 +65,8 @@ public static partial class Constants
         public const string ConfigDataTypes = ConfigPrefix + "DataTypes";
         public const string ConfigPackageManifests = ConfigPrefix + "PackageManifests";
         public const string ConfigWebhook = ConfigPrefix + "Webhook";
+        public const string ConfigCache = ConfigPrefix + "Cache";
+        public const string ConfigCacheEntry = ConfigCache + ":Entry";
 
         public static class NamedOptions
         {
@@ -77,6 +79,13 @@ public static partial class Constants
                 public const string MediaTypes = "MediaTypes";
 
                 public const string MemberTypes = "MemberTypes";
+            }
+
+            public static class CacheEntry
+            {
+                public const string Document = "Document";
+
+                public const string Media = "Media";
             }
         }
     }

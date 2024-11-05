@@ -11,7 +11,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Document;
 
-public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValueModel, DocumentVariantResponseModel>, IMapDefinition
+public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValueResponseModel, DocumentVariantResponseModel>, IMapDefinition
 {
     private readonly CommonMapper _commonMapper;
 
