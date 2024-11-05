@@ -5,13 +5,13 @@ import { defaultMemoization, simpleHashCode } from '@umbraco-cms/backoffice/obse
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+const observeSymbol = Symbol();
+
 /**
  * Binds server validation to a form control.
  * This controller will add a custom error to the form control if the validation context has any messages for the specified data path.
  */
 export class UmbBindServerValidationToFormControl extends UmbControllerBase {
-
-	#observeSymbol = Symbol();
 
 	#context?: typeof UMB_VALIDATION_CONTEXT.TYPE;
 
@@ -57,7 +57,7 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 						this.#demolish();
 					}
 				},
-				this.#observeSymbol,
+				observeSymbol,
 			);
 		});
 	}
