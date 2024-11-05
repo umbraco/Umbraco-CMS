@@ -414,8 +414,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			${umbDestroyOnDisconnect()}></umb-block-grid-block-inline>`;
+			.settings=${this._blockViewProps.settings}></umb-block-grid-block-inline>`;
+		//TODO: investigate if we should have ${umbDestroyOnDisconnect()} here. Note how it works for drag n' drop in grid between areas and areas-root
 	}
 
 	#renderRefBlock() {
@@ -426,8 +426,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			${umbDestroyOnDisconnect()}></umb-block-grid-block>`;
+			.settings=${this._blockViewProps.settings}></umb-block-grid-block>`;
+		//TODO: investigate if we should have ${umbDestroyOnDisconnect()} here. Note how it works for drag n' drop in grid between areas and areas-root
 	}
 
 	#renderBlock() {
