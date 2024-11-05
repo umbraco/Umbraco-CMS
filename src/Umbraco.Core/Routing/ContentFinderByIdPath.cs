@@ -53,7 +53,7 @@ public class ContentFinderByIdPath : ContentFinderByIdentifierPathBase, IContent
             return Task.FromResult(false);
         }
 
-        if (umbracoContext.InPreviewMode == false && (_webRoutingSettings.DisableFindContentByIdPath || _webRoutingSettings.DisableFindContentByIdentifierPath))
+        if (umbracoContext.InPreviewMode == false && _webRoutingSettings.DisableFindContentByIdentifierPath)
         {
             return Task.FromResult(false);
         }
