@@ -37,6 +37,6 @@ public static class UserGroupExtensions
 
     private static bool IsSystemUserGroup(this Guid? groupKey) =>
         groupKey == Constants.Security.AdminGroupKey
-        || groupKey == Constants.Security.AdminGroupKey
-        || groupKey == Constants.Security.AdminGroupKey;
+        || groupKey == Constants.Security.SensitiveDataGroupKey
+        || groupKey == Constants.Security.TranslatorGroupKey;
 }

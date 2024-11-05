@@ -90,21 +90,36 @@ public class UserGroupServiceTests
         });
     }
 
-    [TestCase(false,UserGroupOperationStatus.Success)]
-    [TestCase(true,UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
-    public async Task Can_Not_Update_SystemGroup_Alias(bool isSystemGroup, UserGroupOperationStatus status)
+    // Obsoletion will be resolved when they are converted to internal consts.
+    [TestCase(null, UserGroupOperationStatus.Success)]
+    [TestCase(Constants.Security.AdminGroupAlias, UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
+    [TestCase(Constants.Security.SensitiveDataGroupAlias, UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
+    [TestCase(Constants.Security.TranslatorGroupAlias, UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
+    public async Task Can_Not_Update_SystemGroup_Alias(string? systemGroupAlias, UserGroupOperationStatus status)
     {
+        // prep
+        var userGroupAlias = systemGroupAlias ?? "someNonSystemAlias";
+        Guid userGroupKey = Guid.NewGuid();
+        switch (userGroupAlias)
+        {
+            case Constants.Security.AdminGroupAlias : userGroupKey = Constants.Security.AdminGroupKey;
+                break;
+            case Constants.Security.SensitiveDataGroupAlias : userGroupKey = Constants.Security.SensitiveDataGroupKey;
+                break;
+            case Constants.Security.TranslatorGroupAlias : userGroupKey = Constants.Security.TranslatorGroupKey;
+                break;
+        }
+
         // Arrange
         var actingUserKey = Guid.NewGuid();
         var mockUser = SetupUserWithGroupAccess(actingUserKey, [Constants.Security.AdminGroupAlias]);
         var userService = SetupUserServiceWithGetUserByKey(actingUserKey, mockUser);
         var userGroupRepository = new Mock<IUserGroupRepository>();
-        var userGroupKey = Guid.NewGuid();
         var persistedUserGroup =
             new UserGroup(
                 Mock.Of<IShortStringHelper>(),
                 0,
-                isSystemGroup ? Constants.Security.AdminGroupAlias : "someNonSystemAlias",
+                userGroupAlias,
                 "Administrators",
                 null)
             {
