@@ -72,6 +72,10 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		if (this.#instance === instance) {
 			return true;
 		}
+
+		if (instance === undefined) {
+			throw new Error('Not allowed to set context api instance to undefined.');
+		}
 		if (this.#discriminator) {
 			// Notice if discriminator returns false, we do not want to setInstance.
 			if (this.#discriminator(instance)) {
