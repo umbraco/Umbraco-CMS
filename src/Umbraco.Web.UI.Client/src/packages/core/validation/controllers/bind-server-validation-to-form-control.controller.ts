@@ -1,11 +1,10 @@
 import type { UmbValidationMessage } from '../context/validation-messages.manager.js';
 import { UMB_VALIDATION_CONTEXT } from '../context/validation.context-token.js';
 import type { UmbFormControlMixinInterface } from '../mixins/form-control.mixin.js';
-import { defaultMemoization } from '@umbraco-cms/backoffice/observable-api';
+import { defaultMemoization, simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-const ctrlSymbol = Symbol();
 const observeSymbol = Symbol();
 
 /**
@@ -13,6 +12,7 @@ const observeSymbol = Symbol();
  * This controller will add a custom error to the form control if the validation context has any messages for the specified data path.
  */
 export class UmbBindServerValidationToFormControl extends UmbControllerBase {
+
 	#context?: typeof UMB_VALIDATION_CONTEXT.TYPE;
 
 	#control: UmbFormControlMixinInterface<unknown>;
@@ -41,7 +41,7 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 	}
 
 	constructor(host: UmbControllerHost, formControl: UmbFormControlMixinInterface<unknown>, dataPath: string) {
-		super(host, ctrlSymbol);
+		super(host,'umbFormControlValidation_'+simpleHashCode(dataPath));
 		this.#control = formControl;
 		this.consumeContext(UMB_VALIDATION_CONTEXT, (context) => {
 			this.#context = context;
