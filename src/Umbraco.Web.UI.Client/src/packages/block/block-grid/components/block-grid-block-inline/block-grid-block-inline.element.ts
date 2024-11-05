@@ -294,6 +294,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 			#inside {
 				position: relative;
 				display: block;
+				padding: calc(var(--uui-size-layout-1));
 			}
 		`,
 	];

@@ -598,15 +598,15 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				inset: 0;
 				border: 1px solid transparent;
 				border-radius: var(--uui-border-radius);
-				box-shadow:
-					0 0 0 1px rgba(255, 255, 255, 0.7),
-					inset 0 0 0 1px rgba(255, 255, 255, 0.7);
 
 				transition: border-color 240ms ease-in;
 			}
 			:host(:hover):not(:drop)::after {
 				display: block;
 				border-color: var(--uui-color-interactive-emphasis);
+				box-shadow:
+					0 0 0 1px rgba(255, 255, 255, 0.7),
+					inset 0 0 0 1px rgba(255, 255, 255, 0.7);
 			}
 
 			:host([drag-placeholder])::after {
