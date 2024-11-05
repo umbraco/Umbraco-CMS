@@ -13,6 +13,8 @@ import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 class UmbTestExtensionController extends UmbBaseExtensionInitializer {
+	testInsidesIsDestroyed?: boolean;
+
 	constructor(
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>,
@@ -28,7 +30,8 @@ class UmbTestExtensionController extends UmbBaseExtensionInitializer {
 	}
 
 	protected async _conditionsAreBad() {
-		// Destroy the element/class.
+		// Destroy the element/class. (or in the case of this test, then we just set a flag) [NL]
+		this.testInsidesIsDestroyed = true;
 	}
 }
 
@@ -111,7 +114,7 @@ describe('UmbBaseExtensionsController', () => {
 		it('exposes both manifests', (done) => {
 			let count = 0;
 
-			const extensionController = new UmbTestExtensionsController(
+			const extensionsInitController = new UmbTestExtensionsController(
 				hostElement,
 				testExtensionRegistry,
 				'extension-type',
@@ -120,7 +123,7 @@ describe('UmbBaseExtensionsController', () => {
 					count++;
 					if (count === 1) {
 						expect(permitted.length).to.eq(2);
-						extensionController.destroy();
+						extensionsInitController.destroy();
 					} else if (count === 2) {
 						done();
 					}
@@ -138,7 +141,7 @@ describe('UmbBaseExtensionsController', () => {
 			testExtensionRegistry.register(manifestExtra);
 
 			let count = 0;
-			const extensionController = new UmbTestExtensionsController(
+			const extensionsInitController = new UmbTestExtensionsController(
 				hostElement,
 				testExtensionRegistry,
 				['extension-type', 'extension-type-extra'],
@@ -151,9 +154,9 @@ describe('UmbBaseExtensionsController', () => {
 						expect(permitted[1].alias).to.eq('Umb.Test.Extension.B');
 						expect(permitted[2].alias).to.eq('Umb.Test.Extension.Extra');
 
-						extensionController.destroy();
+						extensionsInitController.destroy();
 					} else if (count === 2) {
-						// Cause we destroyed there will be a last call to reset permitted controllers:
+						// Cause we destroyed there will be a last call to reset permitted controllers: [NL]
 						expect(permitted.length).to.eq(0);
 						done();
 					}
@@ -189,7 +192,7 @@ describe('UmbBaseExtensionsController', () => {
 
 		it('exposes just one manifests', (done) => {
 			let count = 0;
-			const extensionController = new UmbTestExtensionsController(
+			const extensionsInitController = new UmbTestExtensionsController(
 				hostElement,
 				testExtensionRegistry,
 				'extension-type',
@@ -197,17 +200,17 @@ describe('UmbBaseExtensionsController', () => {
 				(permitted) => {
 					count++;
 					if (count === 1) {
-						// Still just equal one, as the second one overwrites the first one.
+						// Still just equal one, as the second one overwrites the first one. [NL]
 						expect(permitted.length).to.eq(1);
 						expect(permitted[0].alias).to.eq('Umb.Test.Extension.B');
 
-						// lets remove the overwriting extension to see the original coming back.
+						// lets remove the overwriting extension to see the original coming back. [NL]
 						testExtensionRegistry.unregister('Umb.Test.Extension.B');
 					} else if (count === 2) {
 						expect(permitted.length).to.eq(1);
 						expect(permitted[0].alias).to.eq('Umb.Test.Extension.A');
 						done();
-						extensionController.destroy();
+						extensionsInitController.destroy();
 					}
 				},
 			);
@@ -255,7 +258,8 @@ describe('UmbBaseExtensionsController', () => {
 
 		it('exposes only the overwriting manifest', (done) => {
 			let count = 0;
-			const extensionController = new UmbTestExtensionsController(
+			let lastPermitted: PermittedControllerType<UmbTestExtensionController>[] = [];
+			const extensionsInitController = new UmbTestExtensionsController(
 				hostElement,
 				testExtensionRegistry,
 				'extension-type',
@@ -263,24 +267,30 @@ describe('UmbBaseExtensionsController', () => {
 				(permitted) => {
 					count++;
 					if (count === 1) {
-						// Still just equal one, as the second one overwrites the first one.
+						// Still just equal one, as the second one overwrites the first one. [NL]
 						expect(permitted.length).to.eq(1);
 						expect(permitted[0].alias).to.eq('Umb.Test.Extension.B');
 
-						// lets remove the overwriting extension to see the original coming back.
+						// lets remove the overwriting extension to see the original coming back. [NL]
 						testExtensionRegistry.unregister('Umb.Test.Extension.B');
 					} else if (count === 2) {
 						expect(permitted.length).to.eq(1);
 						expect(permitted[0].alias).to.eq('Umb.Test.Extension.A');
-						extensionController.destroy();
+						// CHecks that the controller that got overwritten is destroyed. [NL]
+						expect(lastPermitted[0].testInsidesIsDestroyed).to.be.true;
+						// Then continue the test and destroy the initializer. [NL]
+						extensionsInitController.destroy();
+						// And then checks that the controller is destroyed. [NL]
+						expect(permitted[0].testInsidesIsDestroyed).to.be.true;
 					} else if (count === 3) {
-						// Expect that destroy will only result in one last callback with no permitted controllers.
+						// Expect that destroy will only result in one last callback with no permitted controllers. [NL]
 						expect(permitted.length).to.eq(0);
-						Promise.resolve().then(() => done()); // This wrap is to enable the test to detect if more callbacks are fired.
+						Promise.resolve().then(() => done()); // This wrap is to enable the test to detect if more callbacks are fired. [NL]
 					} else if (count === 4) {
-						// This should not happen, we do only want one last callback when destroyed.
+						// This should not happen, we do only want one last callback when destroyed. [NL]
 						expect(false).to.eq(true);
 					}
+					lastPermitted = permitted;
 				},
 			);
 		});
@@ -308,7 +318,7 @@ describe('UmbBaseExtensionsController', () => {
 				],
 			};
 
-			// Register opposite order, to ensure B is there when A comes around. A fix to be able to test this. Cause a late registration of B would not cause a change that is test able.
+			// Register opposite order, to ensure B is there when A comes around. A fix to be able to test this. Cause a late registration of B would not cause a change that is test able.  [NL]
 			testExtensionRegistry.register(manifestB);
 			testExtensionRegistry.register(manifestA);
 			testExtensionRegistry.register({
@@ -329,7 +339,7 @@ describe('UmbBaseExtensionsController', () => {
 
 		it('exposes only the original manifest', (done) => {
 			let count = 0;
-			const extensionController = new UmbTestExtensionsController(
+			const extensionsInitController = new UmbTestExtensionsController(
 				hostElement,
 				testExtensionRegistry,
 				'extension-type',
@@ -338,11 +348,11 @@ describe('UmbBaseExtensionsController', () => {
 					count++;
 
 					if (count === 1) {
-						// First callback gives just one. We need to make a feature to gather changes to only reply after a computation cycle if we like to avoid this.
+						// First callback gives just one. We need to make a feature to gather changes to only reply after a computation cycle if we like to avoid this. [NL]
 						expect(permitted.length).to.eq(1);
 						expect(permitted[0].alias).to.eq('Umb.Test.Extension.A');
 						done();
-						extensionController.destroy();
+						extensionsInitController.destroy();
 					}
 				},
 			);
