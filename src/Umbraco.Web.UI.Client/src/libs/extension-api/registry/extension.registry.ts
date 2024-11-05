@@ -100,6 +100,7 @@ const sortExtensions = (a: ManifestBase, b: ManifestBase): number => (b.weight |
 
 export class UmbExtensionRegistry<
 	IncomingManifestTypes extends ManifestBase,
+	IncomingConditionConfigTypes extends UmbConditionConfigBase = UmbConditionConfigBase,
 	ManifestTypes extends ManifestBase = IncomingManifestTypes | ManifestBase,
 > {
 	readonly MANIFEST_TYPES: ManifestTypes = undefined as never;
@@ -490,7 +491,7 @@ export class UmbExtensionRegistry<
 	 * @param {string} alias - The alias of the extension to append the condition to.
 	 * @param  {UmbConditionConfigBase} newCondition - The condition to append to the extension.
 	 */
-	appendCondition(alias: string, newCondition: UmbConditionConfigBase) {
+	appendCondition(alias: string, newCondition: IncomingConditionConfigTypes) {
 		this.appendConditions(alias, [newCondition]);
 	}
 
@@ -499,7 +500,7 @@ export class UmbExtensionRegistry<
 	 * @param {string} alias  - The alias of the extension to append the condition to
 	 * @param {Array<UmbConditionConfigBase>} newConditions  - An array of conditions to be appended to an extension manifest.
 	 */
-	appendConditions(alias: string, newConditions: Array<UmbConditionConfigBase>) {
+	appendConditions(alias: string, newConditions: Array<IncomingConditionConfigTypes>) {
 		const existingConditionsToBeAdded = this.#additionalConditions.get(alias);
 		this.#additionalConditions.set(
 			alias,
