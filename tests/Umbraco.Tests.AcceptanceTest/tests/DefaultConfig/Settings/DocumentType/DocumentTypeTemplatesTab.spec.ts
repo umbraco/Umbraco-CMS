@@ -23,9 +23,9 @@ test('can add an allowed template to a document type', {tag: '@smoke'}, async ({
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickDocumentTypeTemplatesTab();
-  await umbracoUi.documentType.clickAddButton();
-  await umbracoUi.documentType.clickLabelWithName(templateName);
   await umbracoUi.documentType.clickChooseButton();
+  await umbracoUi.documentType.clickLabelWithName(templateName);
+  await umbracoUi.documentType.clickChooseModalButton();
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
@@ -69,7 +69,7 @@ test.skip('can remove an allowed template from a document type', async ({umbraco
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickDocumentTypeTemplatesTab();
-  await umbracoUi.documentType.clickRemoveWithName(templateName, true);
+  await umbracoUi.documentType.clickRemoveWithName(templateName);
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert

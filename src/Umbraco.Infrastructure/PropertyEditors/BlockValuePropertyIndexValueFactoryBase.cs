@@ -136,9 +136,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
             indexData.Add(
                 ToRawData(
                     blockItemData.ContentTypeKey,
-                    blockItemData.Values.Where(value => value.Culture is null || exposedCultures.Contains(value.Culture))
-                )
-            );
+                    blockItemData.Values.Where(value => value.Culture is null || exposedCultures.Contains(value.Culture))));
         }
 
         return indexData;
@@ -173,6 +171,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
     /// Gets a resume as string of all the content in this nested type.
     /// </summary>
     /// <param name="indexedContent">All the indexed content for this property.</param>
+    /// <param name="culture">The culture to get the resume for.</param>
     /// <returns>the string with all relevant content from </returns>
     private static string GetResumeFromAllContent(List<IndexValue> indexedContent, string? culture)
     {

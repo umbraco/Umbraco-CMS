@@ -1002,10 +1002,12 @@ public static class PublishedContentExtensions
     /// </summary>
     /// <param name="parentNodes"></param>
     /// <param name="variationContextAccessor">Variation context accessor.</param>
+    /// <param name="navigationQueryService"></param>
     /// <param name="culture">
     ///     The specific culture to filter for. If null is used the current culture is used. (Default is
     ///     null)
     /// </param>
+    /// <param name="publishedCache"></param>
     /// <returns></returns>
     /// <remarks>
     ///     This can be useful in order to return all nodes in an entire site by a type when combined with TypedContentAtRoot
@@ -1360,6 +1362,7 @@ public static class PublishedContentExtensions
     ///     Gets the children of the content, of any of the specified types.
     /// </summary>
     /// <param name="content">The content.</param>
+    /// <param name="publishedCache"></param>
     /// <param name="navigationQueryService"></param>
     /// <param name="variationContextAccessor">The accessor for the VariationContext</param>
     /// <param name="culture">
@@ -1367,7 +1370,6 @@ public static class PublishedContentExtensions
     ///     null)
     /// </param>
     /// <param name="contentTypeAlias">The content type alias.</param>
-    /// <param name="publishedContentCache"></param>
     /// <returns>The children of the content, of any of the specified types.</returns>
     public static IEnumerable<IPublishedContent> ChildrenOfType(
         this IPublishedContent content,
@@ -1385,10 +1387,12 @@ public static class PublishedContentExtensions
     /// <typeparam name="T">The content type.</typeparam>
     /// <param name="content">The content.</param>
     /// <param name="variationContextAccessor">The accessor for the VariationContext</param>
+    /// <param name="navigationQueryService"></param>
     /// <param name="culture">
     ///     The specific culture to filter for. If null is used the current culture is used. (Default is
     ///     null)
     /// </param>
+    /// <param name="publishedCache"></param>
     /// <returns>The children of content, of the given content type.</returns>
     /// <remarks>
     ///     <para>Children are sorted by their sortOrder.</para>
@@ -1491,12 +1495,13 @@ public static class PublishedContentExtensions
     ///     Gets the siblings of the content, of a given content type.
     /// </summary>
     /// <param name="content">The content.</param>
-    /// <param name="publishedSnapshot">Published snapshot instance</param>
     /// <param name="variationContextAccessor">Variation context accessor.</param>
     /// <param name="culture">
     ///     The specific culture to filter for. If null is used the current culture is used. (Default is
     ///     null)
     /// </param>
+    /// <param name="publishedCache"></param>
+    /// <param name="navigationQueryService"></param>
     /// <param name="contentTypeAlias">The content type alias.</param>
     /// <returns>The siblings of the content, of the given content type.</returns>
     /// <remarks>
@@ -1517,8 +1522,9 @@ public static class PublishedContentExtensions
     /// </summary>
     /// <typeparam name="T">The content type.</typeparam>
     /// <param name="content">The content.</param>
-    /// <param name="publishedSnapshot">Published snapshot instance</param>
     /// <param name="variationContextAccessor">Variation context accessor.</param>
+    /// <param name="publishedCache"></param>
+    /// <param name="navigationQueryService"></param>
     /// <param name="culture">
     ///     The specific culture to filter for. If null is used the current culture is used. (Default is
     ///     null)
@@ -1580,13 +1586,14 @@ public static class PublishedContentExtensions
     ///     Gets the siblings of the content including the node itself to indicate the position, of a given content type.
     /// </summary>
     /// <param name="content">The content.</param>
-    /// <param name="publishedSnapshot">Published snapshot instance</param>
     /// <param name="variationContextAccessor">Variation context accessor.</param>
     /// <param name="culture">
     ///     The specific culture to filter for. If null is used the current culture is used. (Default is
     ///     null)
     /// </param>
+    /// <param name="navigationQueryService"></param>
     /// <param name="contentTypeAlias">The content type alias.</param>
+    /// <param name="publishedCache"></param>
     /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
     public static IEnumerable<IPublishedContent> SiblingsAndSelfOfType(
         this IPublishedContent content,
@@ -1596,7 +1603,6 @@ public static class PublishedContentExtensions
         string contentTypeAlias,
         string? culture = null)
     {
-
         var parentSuccess = navigationQueryService.TryGetParentKey(content.Key, out Guid? parentKey);
 
         IPublishedContent? parent = parentKey is null ? null : publishedCache.GetById(parentKey.Value);
@@ -1623,12 +1629,13 @@ public static class PublishedContentExtensions
     /// </summary>
     /// <typeparam name="T">The content type.</typeparam>
     /// <param name="content">The content.</param>
-    /// <param name="publishedSnapshot">Published snapshot instance</param>
     /// <param name="variationContextAccessor">Variation context accessor.</param>
+    /// <param name="navigationQueryService"></param>
     /// <param name="culture">
     ///     The specific culture to filter for. If null is used the current culture is used. (Default is
     ///     null)
     /// </param>
+    /// <param name="publishedCache"></param>
     /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
     public static IEnumerable<T> SiblingsAndSelf<T>(
         this IPublishedContent content,
@@ -1731,6 +1738,7 @@ public static class PublishedContentExtensions
     /// </summary>
     /// <param name="content">The content.</param>
     /// <param name="variationContextAccessor">Variation context accessor.</param>
+    /// <param name="navigationQueryService"></param>
     /// <param name="contentTypeService">The content type service.</param>
     /// <param name="mediaTypeService">The media type service.</param>
     /// <param name="memberTypeService">The member type service.</param>
@@ -1740,6 +1748,7 @@ public static class PublishedContentExtensions
     ///     The specific culture to filter for. If null is used the current culture is used. (Default is
     ///     null)
     /// </param>
+    /// <param name="publishedCache"></param>
     /// <returns>The children of the content.</returns>
     public static DataTable ChildrenAsTable(
         this IPublishedContent content,
@@ -1759,6 +1768,7 @@ public static class PublishedContentExtensions
     /// </summary>
     /// <param name="content">The content.</param>
     /// <param name="variationContextAccessor">Variation context accessor.</param>
+    /// <param name="navigationQueryService"></param>
     /// <param name="contentTypeService">The content type service.</param>
     /// <param name="mediaTypeService">The media type service.</param>
     /// <param name="memberTypeService">The member type service.</param>
@@ -1768,6 +1778,7 @@ public static class PublishedContentExtensions
     ///     The specific culture to filter for. If null is used the current culture is used. (Default is
     ///     null)
     /// </param>
+    /// <param name="publishedCache"></param>
     /// <returns>The children of the content.</returns>
     private static DataTable GenerateDataTable(
         IPublishedContent content,

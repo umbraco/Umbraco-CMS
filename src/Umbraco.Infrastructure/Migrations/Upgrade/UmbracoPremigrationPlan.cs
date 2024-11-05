@@ -20,7 +20,7 @@ public class UmbracoPremigrationPlan : MigrationPlan
     /// <remarks>
     /// This is set to the final migration state of 13.0, making that the lowest supported version to upgrade from.
     /// </remarks>
-    public override string InitialState => "";
+    public override string InitialState => string.Empty;
 
     /// <summary>
     /// Defines the plan.

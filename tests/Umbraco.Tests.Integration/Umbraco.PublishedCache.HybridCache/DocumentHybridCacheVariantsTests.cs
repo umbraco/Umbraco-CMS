@@ -91,7 +91,7 @@ public class DocumentHybridCacheVariantsTests : UmbracoIntegrationTest
 
         // Assert
         using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
-        Assert.AreEqual(updatedInvariantTitle, textPage.Value(_invariantTitleAlias, "", ""));
+        Assert.AreEqual(updatedInvariantTitle, textPage.Value(_invariantTitleAlias, string.Empty, string.Empty));
         Assert.AreEqual(updatedVariantTitle, textPage.Value(_variantTitleAlias, _englishIsoCode));
         Assert.AreEqual(updatedVariantTitle, textPage.Value(_variantTitleAlias, _danishIsoCode));
     }
@@ -131,7 +131,7 @@ public class DocumentHybridCacheVariantsTests : UmbracoIntegrationTest
 
         // Assert
         using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
-        Assert.AreEqual(updatedInvariantTitle, textPage.Value(_invariantTitleAlias, "", ""));
+        Assert.AreEqual(updatedInvariantTitle, textPage.Value(_invariantTitleAlias, string.Empty, string.Empty));
         Assert.AreEqual(updatedVariantTitle, textPage.Value(_variantTitleAlias, _englishIsoCode));
         Assert.AreEqual(_variantTitleName, textPage.Value(_variantTitleAlias, _danishIsoCode));
     }

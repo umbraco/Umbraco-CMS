@@ -122,7 +122,7 @@ public class PublishStatusRepository: IPublishStatusRepository
         public Guid Key { get; set; }
 
         [Column(LanguageDto.IsoCodeColumnName)]
-        public string IsoCode { get; set; } = "";
+        public string IsoCode { get; set; } = string.Empty;
 
         [Column(ContentTypeDto.VariationsColumnName)]
         public byte ContentTypeVariation  { get; set; }

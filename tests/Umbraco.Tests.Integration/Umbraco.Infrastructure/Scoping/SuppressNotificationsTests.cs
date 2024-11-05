@@ -34,7 +34,7 @@ public class SuppressNotificationsTests : UmbracoIntegrationTest
     public void GivenScope_WhenNotificationsSuppressed_ThenNotificationsDoNotExecute()
     {
         using var scope = ScopeProvider.CreateScope(autoComplete: true);
-        using var _ = scope.Notifications.Suppress();
+        using var suppressed = scope.Notifications.Suppress();
 
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         ContentTypeService.Save(contentType);
@@ -47,7 +47,7 @@ public class SuppressNotificationsTests : UmbracoIntegrationTest
     {
         using (var parentScope = ScopeProvider.CreateScope(autoComplete: true))
         {
-            using var _ = parentScope.Notifications.Suppress();
+            using var suppressed = parentScope.Notifications.Suppress();
 
             using (var childScope = ScopeProvider.CreateScope(autoComplete: true))
             {
