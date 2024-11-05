@@ -415,7 +415,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			// TODO: fix type error
 			this._data.updateCurrent({ values });
 
-			// TODO: We should move this type of logic to the act of saving [NL]
+			// TODO: Ideally we should move this type of logic to the act of saving [NL]
 			this._data.ensureVariantData(variantId);
 		}
 		this.finishPropertyValueChange();
