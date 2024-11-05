@@ -355,6 +355,10 @@ name: "icon-circuits",
 
 path: () => import("./icons/icon-circuits.js"),
 },{
+name: "icon-clear-formatting",
+
+path: () => import("./icons/icon-clear-formatting.js"),
+},{
 name: "icon-client",
 legacy: true,
 path: () => import("./icons/icon-client.js"),

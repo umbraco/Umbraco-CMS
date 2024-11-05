@@ -1,4 +1,4 @@
-import { UmbTiptapToolbarElementApiBase } from '../types.js';
+import { UmbTiptapToolbarElementApiBase } from '../base.js';
 import { UMB_CODE_EDITOR_MODAL } from '@umbraco-cms/backoffice/code-editor';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';

@@ -1,3 +1,4 @@
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_BLOCK_GRID_TYPE_WORKSPACE_ALIAS } from '../index.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -14,7 +15,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_BLOCK_GRID_TYPE_WORKSPACE_ALIAS,
 			},
 		],
@@ -32,7 +33,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_BLOCK_GRID_TYPE_WORKSPACE_ALIAS,
 			},
 		],
@@ -50,7 +51,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_BLOCK_GRID_TYPE_WORKSPACE_ALIAS,
 			},
 		],

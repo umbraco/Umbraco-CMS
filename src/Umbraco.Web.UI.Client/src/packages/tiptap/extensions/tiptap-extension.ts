@@ -15,6 +15,6 @@ export interface MetaTiptapExtension {
 
 declare global {
 	interface UmbExtensionManifestMap {
-		tiptapExtension: ManifestTiptapExtension;
+		umbTiptapExtension: ManifestTiptapExtension;
 	}
 }

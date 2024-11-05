@@ -1,4 +1,4 @@
-import { UmbTiptapToolbarElementApiBase } from '../types.js';
+import { UmbTiptapToolbarElementApiBase } from '../base.js';
 import { umbEmbeddedMedia } from '@umbraco-cms/backoffice/external/tiptap';
 import { UMB_EMBEDDED_MEDIA_MODAL } from '@umbraco-cms/backoffice/embedded-media';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';

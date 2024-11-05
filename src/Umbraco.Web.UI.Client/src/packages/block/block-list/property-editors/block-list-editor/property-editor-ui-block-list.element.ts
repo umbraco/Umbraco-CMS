@@ -117,7 +117,6 @@ export class UmbPropertyEditorUIBlockListElement
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 * @type {boolean}
-	 * @attr
 	 * @default
 	 */
 	@property({ type: Boolean, reflect: true })
@@ -154,8 +153,6 @@ export class UmbPropertyEditorUIBlockListElement
 
 	constructor() {
 		super();
-
-		//this.#validationContext.messages.debug('block list');
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(

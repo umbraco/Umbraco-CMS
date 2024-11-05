@@ -201,6 +201,7 @@ export abstract class UmbBaseExtensionsInitializer<
 		if (!this.#extensionRegistry) return;
 
 		const oldPermittedExtsLength = this.#exposedPermittedExts?.length ?? 0;
+		this._extensions.forEach((extension) => extension.destroy());
 		(this._extensions as unknown) = undefined;
 		(this.#permittedExts as unknown) = undefined;
 		this.#exposedPermittedExts = undefined;

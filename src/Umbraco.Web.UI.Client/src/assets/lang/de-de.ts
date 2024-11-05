@@ -503,7 +503,7 @@ export default {
 			'\n      Die Kultur-Variante einer Sprache zu ändern ist möglicherweise eine aufwendige Operation und führt zum Erneuern von Inhalts-Zwischenspeicher und Such-Index.\n    ',
 		lastEdited: 'Zuletzt bearbeitet',
 		link: 'Verknüpfung',
-		linkinternal: 'Anker:',
+		linkinternal: 'Internen Link',
 		linklocaltip: 'Wenn lokale Links verwendet werden, füge ein "#" vor den Link ein',
 		linknewwindow: 'In einem neuen Fenster öffnen?',
 		macroDoesNotHaveProperties: 'Dieses Makro enthält keine einstellbaren Eigenschaften.',

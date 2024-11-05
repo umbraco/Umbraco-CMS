@@ -1,3 +1,4 @@
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WEBHOOK_COLLECTION_ALIAS } from '../../collection/manifests.js';
 import { UMB_WEBHOOK_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_WEBHOOK_ROOT_WORKSPACE_ALIAS } from './constants.js';
@@ -26,7 +27,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_WEBHOOK_ROOT_WORKSPACE_ALIAS,
 			},
 		],

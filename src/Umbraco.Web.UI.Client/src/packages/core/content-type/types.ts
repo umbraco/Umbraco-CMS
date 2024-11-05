@@ -1,6 +1,8 @@
 import type { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
+export type * from './composition/types.js';
+
 export type UmbPropertyContainerTypes = 'Group' | 'Tab';
 
 export interface UmbPropertyTypeContainerModel {

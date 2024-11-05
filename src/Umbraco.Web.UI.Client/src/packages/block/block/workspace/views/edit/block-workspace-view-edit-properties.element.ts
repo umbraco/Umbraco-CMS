@@ -5,6 +5,8 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-block-workspace-view-edit-properties')
 export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
@@ -38,12 +40,22 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	@state()
 	private _ownerEntityType?: string;
 
+	#variantId?: UmbVariantId;
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#blockWorkspace = workspaceContext;
 			this._ownerEntityType = this.#blockWorkspace.getEntityType();
+			this.observe(
+				workspaceContext.variantId,
+				(variantId) => {
+					this.#variantId = variantId;
+					this.#generatePropertyDataPath();
+				},
+				'observeVariantId',
+			);
 			this.#setStructureManager();
 		});
 	}
@@ -61,9 +73,23 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 		);
 	}
 
+	/*
 	#generatePropertyDataPath() {
 		if (!this._propertyStructure) return;
 		this._dataPaths = this._propertyStructure.map((property) => `$.${property.alias}`);
+	}
+		*/
+
+	#generatePropertyDataPath() {
+		if (!this.#variantId || !this._propertyStructure) return;
+		this._dataPaths = this._propertyStructure.map(
+			(property) =>
+				`$.values[${UmbDataPathPropertyValueQuery({
+					alias: property.alias,
+					culture: property.variesByCulture ? this.#variantId!.culture : null,
+					segment: property.variesBySegment ? this.#variantId!.segment : null,
+				})}].value`,
+		);
 	}
 
 	override render() {

@@ -2,17 +2,15 @@ import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js'
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../workspace/media-workspace.context-token.js';
 import { UmbFileDropzoneItemStatus, type UmbUploadableItem } from '../dropzone/types.js';
 import type { UmbDropzoneElement } from '../dropzone/dropzone.element.js';
-import type { UmbMediaCollectionContext } from './media-collection.context.js';
 import { UMB_MEDIA_COLLECTION_CONTEXT } from './media-collection.context-token.js';
 import { customElement, html, query, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
-import './media-collection-toolbar.element.js';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 @customElement('umb-media-collection')
 export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
-	#mediaCollection?: UmbMediaCollectionContext;
+	#collectionContext?: typeof UMB_MEDIA_COLLECTION_CONTEXT.TYPE;
 
 	@state()
 	private _progress = -1;
@@ -25,9 +23,11 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (instance) => {
-			this.#mediaCollection = instance;
+
+		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (context) => {
+			this.#collectionContext = context;
 		});
+
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (instance) => {
 			this.observe(instance.unique, (unique) => {
 				this._unique = unique ?? null;
@@ -42,7 +42,7 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 				progressItems.forEach((item) => {
 					if (item.status === UmbFileDropzoneItemStatus.COMPLETE && !item.folder?.name) {
 						// We do not update folders as it may have children still being uploaded.
-						this.#mediaCollection?.updatePlaceholderStatus(item.unique, UmbFileDropzoneItemStatus.COMPLETE);
+						this.#collectionContext?.updatePlaceholderStatus(item.unique, UmbFileDropzoneItemStatus.COMPLETE);
 					}
 				});
 			},
@@ -57,13 +57,13 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 			.filter((p) => p.parentUnique === this._unique)
 			.map((p) => ({ unique: p.unique, status: p.status, name: p.temporaryFile?.file.name ?? p.folder?.name }));
 
-		this.#mediaCollection?.setPlaceholders(placeholders);
+		this.#collectionContext?.setPlaceholders(placeholders);
 		this.#observeProgressItems();
 	}
 
 	async #onComplete() {
 		this._progress = -1;
-		this.#mediaCollection?.requestCollection();
+		this.#collectionContext?.requestCollection();
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 		const event = new UmbRequestReloadChildrenOfEntityEvent({
@@ -82,7 +82,9 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 
 	protected override renderToolbar() {
 		return html`
-			<umb-media-collection-toolbar slot="header"></umb-media-collection-toolbar>
+			<umb-collection-toolbar slot="header">
+				<umb-collection-filter-field></umb-collection-filter-field>
+			</umb-collection-toolbar>
 			${when(this._progress >= 0, () => html`<uui-loader-bar progress=${this._progress}></uui-loader-bar>`)}
 			<umb-dropzone
 				id="dropzone"
@@ -95,7 +97,10 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 	}
 }
 
+/** @deprecated Should be exported as `element` only; to be removed in Umbraco 17. */
 export default UmbMediaCollectionElement;
+
+export { UmbMediaCollectionElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

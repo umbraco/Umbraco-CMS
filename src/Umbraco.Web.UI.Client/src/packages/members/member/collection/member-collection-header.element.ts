@@ -1,21 +1,18 @@
 import { UmbMemberTypeTreeRepository } from '../../member-type/tree/member-type-tree.repository.js';
 import type { UmbMemberTypeItemModel } from '../../member-type/repository/item/types.js';
-import type { UmbMemberCollectionContext } from './member-collection.context.js';
 import { UMB_MEMBER_COLLECTION_CONTEXT } from './member-collection.context-token.js';
 import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-member-collection-header')
 export class UmbMemberCollectionHeaderElement extends UmbLitElement {
-	@state()
-	private _contentTypes: Array<UmbMemberTypeItemModel> = [];
+	#collectionContext?: typeof UMB_MEMBER_COLLECTION_CONTEXT.TYPE;
 
-	#inputTimer?: NodeJS.Timeout;
-	#inputTimerAmount = 300;
-
-	#collectionContext?: UmbMemberCollectionContext;
 	// TODO: Should we make a collection repository for member types?
 	#contentTypeRepository = new UmbMemberTypeTreeRepository(this);
+
+	@state()
+	private _contentTypes: Array<UmbMemberTypeItemModel> = [];
 
 	@state()
 	private _selectedContentTypeUnique?: string;
@@ -45,18 +42,10 @@ export class UmbMemberCollectionHeaderElement extends UmbLitElement {
 
 	get #getContentTypeFilterLabel() {
 		if (!this._selectedContentTypeUnique) return this.localize.term('general_all') + ' Member types';
-
 		return (
 			this._contentTypes.find((type) => type.unique === this._selectedContentTypeUnique)?.name ||
 			this.localize.term('general_all')
 		);
-	}
-
-	#onSearch(event: InputEvent) {
-		const target = event.target as HTMLInputElement;
-		const filter = target.value || '';
-		clearTimeout(this.#inputTimer);
-		this.#inputTimer = setTimeout(() => this.#collectionContext?.setFilter({ filter }), this.#inputTimerAmount);
 	}
 
 	#onContentTypeFilterChange(contentTypeUnique: string) {
@@ -65,13 +54,11 @@ export class UmbMemberCollectionHeaderElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<umb-collection-action-bundle></umb-collection-action-bundle>
-			<uui-input
-				@input=${this.#onSearch}
-				label=${this.localize.term('general_search')}
-				placeholder=${this.localize.term('general_search')}
-				id="input-search"></uui-input>
-			${this.#renderContentTypeFilter()} `;
+		return html`
+			<umb-collection-action-bundle></umb-collection-action-bundle>
+			<umb-collection-filter-field></umb-collection-filter-field>
+			${this.#renderContentTypeFilter()}
+		`;
 	}
 
 	#renderContentTypeFilter() {
@@ -117,7 +104,7 @@ export class UmbMemberCollectionHeaderElement extends UmbLitElement {
 				--uui-button-content-align: left;
 			}
 
-			uui-input {
+			umb-collection-filter-field {
 				width: 100%;
 			}
 		`,

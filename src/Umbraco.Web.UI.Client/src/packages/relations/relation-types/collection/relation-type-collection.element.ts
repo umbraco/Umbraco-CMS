@@ -1,8 +1,7 @@
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
 
-const elementName = 'umb-relation-type-collection';
-@customElement(elementName)
+@customElement('umb-relation-type-collection')
 export class UmbRelationTypeCollectionElement extends UmbCollectionDefaultElement {
 	// NOTE: Returns empty toolbar, so to remove the header padding.
 	protected override renderToolbar() {
@@ -10,10 +9,13 @@ export class UmbRelationTypeCollectionElement extends UmbCollectionDefaultElemen
 	}
 }
 
+/** @deprecated Should be exported as `element` only; to be removed in Umbraco 17. */
 export default UmbRelationTypeCollectionElement;
+
+export { UmbRelationTypeCollectionElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbRelationTypeCollectionElement;
+		'umb-relation-type-collection': UmbRelationTypeCollectionElement;
 	}
 }

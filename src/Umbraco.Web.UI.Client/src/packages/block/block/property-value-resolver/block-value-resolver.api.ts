@@ -1,14 +1,14 @@
 import type { UmbBlockDataValueModel, UmbBlockExposeModel, UmbBlockValueDataPropertiesBaseType } from '../types.js';
-import type { UmbContentValueModel } from '@umbraco-cms/backoffice/content';
+import type { UmbElementValueModel } from '@umbraco-cms/backoffice/content';
 import type { UmbPropertyValueResolver } from '@umbraco-cms/backoffice/property';
 
 export abstract class UmbBlockValueResolver<ValueType>
-	implements UmbPropertyValueResolver<UmbContentValueModel<ValueType>, UmbBlockDataValueModel, UmbBlockExposeModel>
+	implements UmbPropertyValueResolver<UmbElementValueModel<ValueType>, UmbBlockDataValueModel, UmbBlockExposeModel>
 {
 	abstract processValues(
-		property: UmbContentValueModel<ValueType>,
+		property: UmbElementValueModel<ValueType>,
 		valuesCallback: (values: Array<UmbBlockDataValueModel>) => Promise<Array<UmbBlockDataValueModel> | undefined>,
-	): Promise<UmbContentValueModel<ValueType>>;
+	): Promise<UmbElementValueModel<ValueType>>;
 
 	protected async _processValueBlockData<ValueType extends UmbBlockValueDataPropertiesBaseType>(
 		value: ValueType,
@@ -30,9 +30,9 @@ export abstract class UmbBlockValueResolver<ValueType>
 	}
 
 	abstract processVariants(
-		property: UmbContentValueModel<ValueType>,
+		property: UmbElementValueModel<ValueType>,
 		variantsCallback: (values: Array<UmbBlockExposeModel>) => Promise<Array<UmbBlockExposeModel> | undefined>,
-	): Promise<UmbContentValueModel<ValueType>>;
+	): Promise<UmbElementValueModel<ValueType>>;
 
 	protected async _processVariantBlockData<ValueType extends UmbBlockValueDataPropertiesBaseType>(
 		value: ValueType,

@@ -48,7 +48,11 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 			})
 			.onSubmit(async (value, data) => {
 				if (value?.create && data) {
-					const created = await this.create(value.create.contentElementTypeKey, {});
+					const created = await this.create(
+						value.create.contentElementTypeKey,
+						{},
+						data.originData as UmbBlockListWorkspaceOriginData,
+					);
 					if (created) {
 						this.insert(
 							created.layout,
@@ -127,9 +131,13 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 		this._manager?.setLayouts(layouts);
 	}
 
-	async create(contentElementTypeKey: string, partialLayoutEntry?: Omit<UmbBlockListLayoutModel, 'contentKey'>) {
+	async create(
+		contentElementTypeKey: string,
+		partialLayoutEntry?: Omit<UmbBlockListLayoutModel, 'contentKey'>,
+		originData?: UmbBlockListWorkspaceOriginData,
+	) {
 		await this._retrieveManager;
-		return this._manager?.create(contentElementTypeKey, partialLayoutEntry);
+		return this._manager?.create(contentElementTypeKey, partialLayoutEntry, originData);
 	}
 
 	// insert Block?

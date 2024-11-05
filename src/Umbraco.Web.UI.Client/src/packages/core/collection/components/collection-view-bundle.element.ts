@@ -1,8 +1,7 @@
-import type { UmbDefaultCollectionContext } from '../default/index.js';
 import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
-import type { UmbCollectionLayoutConfiguration } from '../types.js';
 import type { ManifestCollectionView } from '../extensions/index.js';
-import { css, html, customElement, state, nothing, repeat, query } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbCollectionLayoutConfiguration } from '../types.js';
+import { css, customElement, html, nothing, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -30,7 +29,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 	@state()
 	private _entityUnique?: string;
 
-	#collectionContext?: UmbDefaultCollectionContext<any, any>;
+	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
 
 	constructor() {
 		super();

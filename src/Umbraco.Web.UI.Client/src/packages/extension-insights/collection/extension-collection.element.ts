@@ -1,17 +1,14 @@
-import type { UmbExtensionCollectionFilterModel } from './types.js';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { html, customElement, css } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbExtensionCollectionFilterModel, UmbExtensionDetailModel } from './types.js';
+import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_COLLECTION_CONTEXT, UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-extension-collection')
 export class UmbExtensionCollectionElement extends UmbCollectionDefaultElement {
-	#collectionContext?: UmbDefaultCollectionContext<any, UmbExtensionCollectionFilterModel>;
-
-	#inputTimer?: NodeJS.Timeout;
-	#inputTimerAmount = 500;
+	#collectionContext?: UmbDefaultCollectionContext<UmbExtensionDetailModel, UmbExtensionCollectionFilterModel>;
 
 	#options: Array<Option> = [];
 
@@ -34,40 +31,35 @@ export class UmbExtensionCollectionElement extends UmbCollectionDefaultElement {
 		this.#collectionContext?.setFilter({ type: extensionType });
 	}
 
-	#onSearch(event: InputEvent) {
-		const target = event.target as HTMLInputElement;
-		const filter = target.value || '';
-		clearTimeout(this.#inputTimer);
-		this.#inputTimer = setTimeout(() => this.#collectionContext?.setFilter({ filter }), this.#inputTimerAmount);
-	}
-
 	protected override renderToolbar() {
 		return html`
-			<div id="toolbar" slot="header">
-				<uui-input @input=${this.#onSearch} label="Search" placeholder="Search..." id="input-search"></uui-input>
-				<uui-select
-					label="Select type..."
-					placeholder="Select type..."
-					.options=${this.#options}
-					@change=${this.#onChange}></uui-select>
-			</div>
+			<umb-collection-toolbar slot="header">
+				<div id="toolbar">
+					<umb-collection-filter-field></umb-collection-filter-field>
+					<uui-select
+						label="Select type..."
+						placeholder="Select type..."
+						.options=${this.#options}
+						@change=${this.#onChange}></uui-select>
+				</div>
+			</umb-collection-toolbar>
 		`;
 	}
 
 	static override styles = [
 		css`
 			#toolbar {
+				flex: 1;
 				display: flex;
 				gap: var(--uui-size-space-5);
 				justify-content: space-between;
 				align-items: center;
-				padding-left: var(--uui-size-space-4);
-				padding-right: var(--uui-size-space-6);
+			}
+
+			umb-collection-filter-field {
 				width: 100%;
 			}
-			uui-input {
-				width: 100%;
-			}
+
 			uui-select {
 				width: 100%;
 			}
@@ -75,7 +67,10 @@ export class UmbExtensionCollectionElement extends UmbCollectionDefaultElement {
 	];
 }
 
+/** @deprecated Should be exported as `element` only; to be removed in Umbraco 17. */
 export default UmbExtensionCollectionElement;
+
+export { UmbExtensionCollectionElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

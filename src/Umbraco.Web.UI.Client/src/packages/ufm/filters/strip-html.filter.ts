@@ -1,4 +1,4 @@
-import { UmbUfmFilterBase } from '../types.js';
+import { UmbUfmFilterBase } from './base.filter.js';
 
 class UmbUfmStripHtmlFilterApi extends UmbUfmFilterBase {
 	filter(value: string | { markup: string } | undefined | null) {

@@ -46,10 +46,10 @@ export abstract class UmbBlockEntryContext<
 
 	#contentKey?: string;
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
-	protected _variantId = this.#variantId.asObservable();
+	protected readonly _variantId = this.#variantId.asObservable();
 
 	#hasExpose = new UmbBooleanState(undefined);
-	hasExpose = this.#hasExpose.asObservable();
+	readonly hasExpose = this.#hasExpose.asObservable();
 
 	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
 
@@ -376,10 +376,10 @@ export abstract class UmbBlockEntryContext<
 
 	/**
 	 * Get the current value of this Blocks label.
-	 * @function getLabel
+	 * @function getName
 	 * @returns {string} - the value of the label.
 	 */
-	getLabel() {
+	getName() {
 		return this.#labelRender.toString();
 	}
 
@@ -638,7 +638,7 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	async requestDelete() {
-		const blockName = this.getLabel();
+		const blockName = this.getName();
 		// TODO: Localizations missing [NL]
 		await umbConfirmModal(this, {
 			headline: `Delete ${blockName}`,

@@ -1,5 +1,6 @@
 import { UMB_TEMPLATE_DETAIL_REPOSITORY_ALIAS, UMB_TEMPLATE_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_TEMPLATE_ENTITY_TYPE, UMB_TEMPLATE_ROOT_ENTITY_TYPE } from '../entity.js';
+import { UMB_TEMPLATE_ALLOW_DELETE_ACTION_CONDITION_ALIAS } from '../conditions/allow-delete/constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -26,5 +27,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			detailRepositoryAlias: UMB_TEMPLATE_DETAIL_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_TEMPLATE_ITEM_REPOSITORY_ALIAS,
 		},
+		conditions: [{ alias: UMB_TEMPLATE_ALLOW_DELETE_ACTION_CONDITION_ALIAS }],
 	},
 ];

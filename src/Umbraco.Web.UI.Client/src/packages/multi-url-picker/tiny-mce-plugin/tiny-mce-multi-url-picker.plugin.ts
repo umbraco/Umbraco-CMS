@@ -1,17 +1,19 @@
-import type { UmbLinkPickerModalValue } from '../link-picker-modal/link-picker-modal.token.js';
 import { UMB_LINK_PICKER_MODAL } from '../link-picker-modal/link-picker-modal.token.js';
-import type { UmbLinkPickerLink } from '../link-picker-modal/types.js';
-import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/tiny-mce';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbLinkPickerLink, UmbLinkPickerLinkType } from '../link-picker-modal/types.js';
+import type { UmbLinkPickerModalValue } from '../link-picker-modal/link-picker-modal.token.js';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/tiny-mce';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { TinyMcePluginArguments } from '@umbraco-cms/backoffice/tiny-mce';
 
 type AnchorElementAttributes = {
-	href?: string | null;
-	title?: string | null;
-	target?: string | null;
 	'data-anchor'?: string | null;
-	rel?: string | null;
+	href?: string | null;
+	target?: string | null;
 	text?: string;
+	title?: string | null;
+	type?: UmbLinkPickerLinkType;
+	rel?: string | null;
 };
 
 export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase {
@@ -21,16 +23,8 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
+
 		const localize = new UmbLocalizationController(args.host);
-
-		// const editorEventSetupCallback = (buttonApi: { setEnabled: (state: boolean) => void }) => {
-		// 	const editorEventCallback = (eventApi: { element: Element}) => {
-		// 		buttonApi.setEnabled(eventApi.element.nodeName.toLowerCase() === 'a' && eventApi.element.hasAttribute('href'));
-		// 	};
-
-		// 	editor.on('NodeChange', editorEventCallback);
-		// 	return () => editor.off('NodeChange', editorEventCallback);
-		// };
 
 		this.editor.ui.registry.addToggleButton('link', {
 			icon: 'link',
@@ -57,38 +51,26 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 		const selectedElm = this.editor.selection.getNode();
 		this.#anchorElement = this.editor.dom.getParent(selectedElm, 'a[href]') as HTMLAnchorElement;
 
-		const data: AnchorElementAttributes = {
-			text: this.#anchorElement
-				? this.#anchorElement.innerText || (this.#anchorElement.textContent ?? '')
-				: this.editor.selection.getContent({ format: 'text' }),
-			href: this.#anchorElement?.getAttribute('href') ?? '',
-			target: this.#anchorElement?.target ?? '',
-			rel: this.#anchorElement?.rel ?? '',
-		};
-
-		if (selectedElm.nodeName === 'IMG') {
-			data.text = ' ';
-		}
-
 		if (!this.#anchorElement) {
-			this.#openLinkPicker({ name: this.editor.selection.getContent() });
+			this.#openLinkPicker({ name: this.editor.selection.getContent({ format: 'text' }) });
 			return;
 		}
 
-		//if we already have a link selected, we want to pass that data over to the dialog
+		let url = this.#anchorElement.getAttribute('href') ?? this.#anchorElement.href ?? '';
+
+		const queryString = this.#anchorElement.getAttribute('data-anchor') ?? '';
+		if (queryString && url.endsWith(queryString)) {
+			url = url.substring(0, url.indexOf(queryString));
+		}
+
 		const currentTarget: UmbLinkPickerLink = {
 			name: this.#anchorElement.title || this.#anchorElement.textContent,
 			target: this.#anchorElement.target,
-			queryString: `${this.#anchorElement.search}${this.#anchorElement.hash}`,
+			queryString: queryString,
+			type: (this.#anchorElement.type as UmbLinkPickerLinkType) ?? 'external',
+			unique: url.includes('localLink:') ? url.substring(url.indexOf(':') + 1, url.indexOf('}')) : null,
+			url: url,
 		};
-
-		if (this.#anchorElement.href.includes('localLink:')) {
-			const href = this.#anchorElement.getAttribute('href')!;
-			currentTarget.unique = href.substring(href.indexOf(':') + 1, href.indexOf('}'));
-		} else if (this.#anchorElement.host.length) {
-			currentTarget.url = this.#anchorElement.protocol ? this.#anchorElement.protocol + '//' : undefined;
-			currentTarget.url += this.#anchorElement.host + this.#anchorElement.pathname;
-		}
 
 		this.#openLinkPicker(currentTarget);
 	}
@@ -112,35 +94,32 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 
 		// TODO: This is a workaround for the issue where the link picker modal is returning a frozen object, and we need to extract the link into smaller parts to avoid the frozen object issue.
 		this.#linkPickerData = { link: { ...linkPickerData.link } };
+
 		this.#updateLink();
 	}
 
-	//Create a json obj used to create the attributes for the tag
-	// TODO => where has rel gone?
 	#createElemAttributes() {
-		// Attribute 'name' because of linkPickerData. It should be 'title' .
-		const { name, ...linkPickerData } = this.#linkPickerData!.link;
-		const a: AnchorElementAttributes = Object.assign({}, linkPickerData);
+		const link = this.#linkPickerData!.link;
 
-		// always need to map back to href for tinymce to render correctly
-		// do this first as checking querystring below may modify the href property
-		if (this.#linkPickerData?.link.url) {
-			a.href = this.#linkPickerData.link.url;
+		const anchor: AnchorElementAttributes = {
+			href: link.url ?? '',
+			title: link.name ?? link.url ?? '',
+			target: link.target,
+			type: link.type ?? 'external',
+			rel: link.target === '_blank' ? 'noopener' : null,
+		};
+
+		if (link.queryString) {
+			anchor['data-anchor'] = link.queryString;
+
+			if (link.queryString.startsWith('?')) {
+				anchor.href += !anchor.href ? '/' + link.queryString : link.queryString;
+			} else if (link.queryString.startsWith('#')) {
+				anchor.href += link.queryString;
+			}
 		}
 
-		if (this.#linkPickerData?.link.name) {
-			a.title = name;
-		}
-
-		if (
-			this.#linkPickerData?.link.queryString?.startsWith('#') ||
-			this.#linkPickerData?.link.queryString?.startsWith('?')
-		) {
-			a['data-anchor'] = this.#linkPickerData?.link.queryString;
-			a.href += this.#linkPickerData?.link.queryString;
-		}
-
-		return a;
+		return anchor;
 	}
 
 	#insertLink() {

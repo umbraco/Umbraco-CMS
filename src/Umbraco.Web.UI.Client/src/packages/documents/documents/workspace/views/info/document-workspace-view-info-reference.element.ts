@@ -1,21 +1,18 @@
 import { UmbDocumentReferenceRepository } from '../../../reference/index.js';
-import { css, html, customElement, state, nothing, repeat, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { isDefaultReference, isDocumentReference, isMediaReference } from '@umbraco-cms/backoffice/relations';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import {
-	isDefaultReference,
-	isDocumentReference,
-	isMediaReference,
-	type UmbReferenceModel,
-} from '@umbraco-cms/backoffice/relations';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import type { UmbReferenceModel } from '@umbraco-cms/backoffice/relations';
+import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-document-workspace-view-info-reference')
 export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement {
 	#itemsPerPage = 10;
-	#referenceRepository;
+
+	#referenceRepository = new UmbDocumentReferenceRepository(this);
 
 	@property()
 	documentUnique = '';
@@ -34,7 +31,6 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 
 	constructor() {
 		super();
-		this.#referenceRepository = new UmbDocumentReferenceRepository(this);
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('document')
@@ -113,63 +109,65 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 	}
 
 	override render() {
-		if (this._items && this._items.length > 0) {
-			return html` <uui-box
-					headline=${this.localize.term('references_labelUsedByItems')}
-					style="--uui-box-default-padding:0">
-					<uui-table>
-						<uui-table-head>
-							<uui-table-head-cell></uui-table-head-cell>
-							<uui-table-head-cell><umb-localize key="general_name">Name</umb-localize></uui-table-head-cell>
-							<uui-table-head-cell><umb-localize key="general_status">Status</umb-localize></uui-table-head-cell>
-							<uui-table-head-cell><umb-localize key="general_typeName">Type Name</umb-localize></uui-table-head-cell>
-							<uui-table-head-cell><umb-localize key="general_type">Type</umb-localize></uui-table-head-cell>
-						</uui-table-head>
-
-						${repeat(
-							this._items,
-							(item) => item.id,
-							(item) =>
-								html`<uui-table-row>
-									<uui-table-cell style="text-align:center;">
-										<umb-icon name=${this.#getIcon(item)}></umb-icon>
-									</uui-table-cell>
-									<uui-table-cell class="link-cell">
-										${isDocumentReference(item)
-											? html` <uui-button
-													label="${this.localize.term('general_edit')} ${item.name}"
-													href=${`${this._editDocumentPath}edit/${item.id}`}>
-													${item.name}
-												</uui-button>`
-											: item.name}
-									</uui-table-cell>
-									<uui-table-cell>
-										${this.#getPublishedStatus(item)
-											? this.localize.term('content_published')
-											: this.localize.term('content_unpublished')}
-									</uui-table-cell>
-									<uui-table-cell>${this.#getContentTypeName(item)}</uui-table-cell>
-									<uui-table-cell>${this.#getContentType(item)}</uui-table-cell>
-								</uui-table-row>`,
-						)}
-					</uui-table>
-				</uui-box>
-				${this.#renderReferencePagination()}`;
-		} else {
-			return nothing;
-		}
+		if (!this._items?.length) return nothing;
+		return html`
+			<uui-box headline=${this.localize.term('references_labelUsedByItems')} style="--uui-box-default-padding:0">
+				<uui-table>
+					<uui-table-head>
+						<uui-table-head-cell></uui-table-head-cell>
+						<uui-table-head-cell><umb-localize key="general_name">Name</umb-localize></uui-table-head-cell>
+						<uui-table-head-cell><umb-localize key="general_status">Status</umb-localize></uui-table-head-cell>
+						<uui-table-head-cell><umb-localize key="general_typeName">Type Name</umb-localize></uui-table-head-cell>
+						<uui-table-head-cell><umb-localize key="general_type">Type</umb-localize></uui-table-head-cell>
+					</uui-table-head>
+					${repeat(
+						this._items,
+						(item) => item.id,
+						(item) => html`
+							<uui-table-row>
+								<uui-table-cell style="text-align:center;">
+									<umb-icon name=${this.#getIcon(item)}></umb-icon>
+								</uui-table-cell>
+								<uui-table-cell class="link-cell">
+									${when(
+										isDocumentReference(item),
+										() => html`
+											<uui-button
+												label="${this.localize.term('general_edit')} ${item.name}"
+												href="${this._editDocumentPath}edit/${item.id}">
+												${item.name}
+											</uui-button>
+										`,
+										() => item.name,
+									)}
+								</uui-table-cell>
+								<uui-table-cell>
+									${this.#getPublishedStatus(item)
+										? this.localize.term('content_published')
+										: this.localize.term('content_unpublished')}
+								</uui-table-cell>
+								<uui-table-cell>${this.#getContentTypeName(item)}</uui-table-cell>
+								<uui-table-cell>${this.#getContentType(item)}</uui-table-cell>
+							</uui-table-row>
+						`,
+					)}
+				</uui-table>
+			</uui-box>
+			${this.#renderReferencePagination()}
+		`;
 	}
 
 	#renderReferencePagination() {
 		if (!this._total) return nothing;
 
 		const totalPages = Math.ceil(this._total / this.#itemsPerPage);
-
 		if (totalPages <= 1) return nothing;
 
-		return html`<div class="pagination">
-			<uui-pagination .total=${totalPages} @change="${this.#onPageChange}"></uui-pagination>
-		</div>`;
+		return html`
+			<div class="pagination">
+				<uui-pagination .total=${totalPages} @change="${this.#onPageChange}"></uui-pagination>
+			</div>
+		`;
 	}
 
 	static override styles = [
