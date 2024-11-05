@@ -108,11 +108,7 @@ public class ComponentTests
 
     private static TypeLoader MockTypeLoader() => new(
         Mock.Of<ITypeFinder>(),
-        new VaryingRuntimeHash(),
-        Mock.Of<IAppPolicyCache>(),
-        new DirectoryInfo(TestHelper.GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)),
-        Mock.Of<ILogger<TypeLoader>>(),
-        Mock.Of<IProfiler>());
+        Mock.Of<ILogger<TypeLoader>>());
 
     [Test]
     public async Task Boot1A()
@@ -452,11 +448,7 @@ public class ComponentTests
         var typeFinder = TestHelper.GetTypeFinder();
         var typeLoader = new TypeLoader(
             typeFinder,
-            new VaryingRuntimeHash(),
-            AppCaches.Disabled.RuntimeCache,
-            new DirectoryInfo(TestHelper.GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)),
-            Mock.Of<ILogger<TypeLoader>>(),
-            Mock.Of<IProfiler>());
+            Mock.Of<ILogger<TypeLoader>>());
 
         var register = MockRegister();
         var builder = new UmbracoBuilder(register, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
