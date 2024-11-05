@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -30,8 +31,8 @@ public class DocumentUrlService : IDocumentUrlService
     private readonly IKeyValueService _keyValueService;
     private readonly IIdKeyMap _idKeyMap;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
-    private readonly IDomainService _domainService;
     private readonly IPublishStatusQueryService _publishStatusQueryService;
+    private readonly IDomainCacheService _domainCacheService;
 
     private readonly ConcurrentDictionary<string, PublishedDocumentUrlSegment> _cache = new();
     private bool _isInitialized;
@@ -49,8 +50,8 @@ public class DocumentUrlService : IDocumentUrlService
         IKeyValueService keyValueService,
         IIdKeyMap idKeyMap,
         IDocumentNavigationQueryService documentNavigationQueryService,
-        IDomainService domainService,
-        IPublishStatusQueryService publishStatusQueryService)
+        IPublishStatusQueryService publishStatusQueryService,
+        IDomainCacheService domainCacheService)
     {
         _logger = logger;
         _documentUrlRepository = documentUrlRepository;
@@ -64,8 +65,8 @@ public class DocumentUrlService : IDocumentUrlService
         _keyValueService = keyValueService;
         _idKeyMap = idKeyMap;
         _documentNavigationQueryService = documentNavigationQueryService;
-        _domainService = domainService;
         _publishStatusQueryService = publishStatusQueryService;
+        _domainCacheService = domainCacheService;
     }
 
     public async Task InitAsync(bool forceEmpty, CancellationToken cancellationToken)
@@ -425,17 +426,22 @@ public class DocumentUrlService : IDocumentUrlService
 
     private bool IsContentPublished(Guid contentKey, string culture) => _publishStatusQueryService.IsDocumentPublished(contentKey, culture);
 
-    public string GetLegacyRouteFormat(Guid docuemntKey, string? culture, bool isDraft)
+    public string GetLegacyRouteFormat(Guid documentKey, string? culture, bool isDraft)
     {
-        Attempt<int> documentIdAttempt = _idKeyMap.GetIdForKey(docuemntKey, UmbracoObjectTypes.Document);
+        Attempt<int> documentIdAttempt = _idKeyMap.GetIdForKey(documentKey, UmbracoObjectTypes.Document);
 
         if(documentIdAttempt.Success is false)
         {
             return "#";
         }
 
-        if (_documentNavigationQueryService.TryGetAncestorsOrSelfKeys(docuemntKey,
+        if (_documentNavigationQueryService.TryGetAncestorsOrSelfKeys(documentKey,
                 out IEnumerable<Guid> ancestorsOrSelfKeys) is false)
+        {
+            return "#";
+        }
+
+        if(isDraft is false && culture != null && _publishStatusQueryService.IsDocumentPublished(documentKey, culture) is false)
         {
             return "#";
         }
@@ -443,19 +449,26 @@ public class DocumentUrlService : IDocumentUrlService
         var cultureOrDefault = string.IsNullOrWhiteSpace(culture) is false ? culture : _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
 
         Guid[] ancestorsOrSelfKeysArray = ancestorsOrSelfKeys as Guid[] ?? ancestorsOrSelfKeys.ToArray();
-        IDictionary<Guid, IDomain?> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToDictionary(x => x, ancestorKey =>
+        IDictionary<Guid, Domain?> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToDictionary(x => x, ancestorKey =>
         {
-            IEnumerable<IDomain> domains = _domainService.GetAssignedDomainsAsync(ancestorKey, false).GetAwaiter().GetResult();
-            return domains.FirstOrDefault(x=>x.LanguageIsoCode == cultureOrDefault);
+            Attempt<int> idAttempt = _idKeyMap.GetIdForKey(ancestorKey, UmbracoObjectTypes.Document);
+
+            if(idAttempt.Success is false)
+            {
+                return null;
+            }
+
+            IEnumerable<Domain> domains = _domainCacheService.GetAssigned(idAttempt.Result, false);
+            return domains.FirstOrDefault(x=>x.Culture == cultureOrDefault);
         });
 
         var urlSegments = new List<string>();
 
-        IDomain? foundDomain = null;
+        Domain? foundDomain = null;
 
         foreach (Guid ancestorOrSelfKey in ancestorsOrSelfKeysArray)
         {
-            if (ancestorOrSelfKeyToDomains.TryGetValue(ancestorOrSelfKey, out IDomain? domain))
+            if (ancestorOrSelfKeyToDomains.TryGetValue(ancestorOrSelfKey, out Domain? domain))
             {
                 if (domain is not null)
                 {
@@ -478,7 +491,7 @@ public class DocumentUrlService : IDocumentUrlService
         if (foundDomain is not null)
         {
             //we found a domain, and not to construct the route in the funny legacy way
-            return foundDomain.RootContentId + "/" + string.Join("/", urlSegments);
+            return foundDomain.ContentId + "/" + string.Join("/", urlSegments);
         }
 
         var isRootFirstItem = GetTopMostRootKey(isDraft, cultureOrDefault) == ancestorsOrSelfKeysArray.Last();
@@ -510,24 +523,30 @@ public class DocumentUrlService : IDocumentUrlService
         var cultures = languages.ToDictionary(x=>x.IsoCode);
 
         Guid[] ancestorsOrSelfKeysArray = ancestorsOrSelfKeys as Guid[] ?? ancestorsOrSelfKeys.ToArray();
-        Dictionary<Guid, Task<Dictionary<string, IDomain>>> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToDictionary(x => x, async ancestorKey =>
+        Dictionary<Guid, Task<Dictionary<string, Domain>>> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToDictionary(x => x, async ancestorKey =>
         {
-            IEnumerable<IDomain> domains = await _domainService.GetAssignedDomainsAsync(ancestorKey, false);
-            return domains.ToDictionary(x => x.LanguageIsoCode!);
-        });
+            Attempt<int> idAttempt = _idKeyMap.GetIdForKey(ancestorKey, UmbracoObjectTypes.Document);
+
+            if(idAttempt.Success is false)
+            {
+                return null;
+            }
+            IEnumerable<Domain> domains = _domainCacheService.GetAssigned(idAttempt.Result, false);
+            return domains.ToDictionary(x => x.Culture!);
+        })!;
 
         foreach ((string culture, ILanguage language) in cultures)
         {
            var urlSegments = new List<string>();
-           IDomain? foundDomain = null;
+           Domain? foundDomain = null;
 
            var hasUrlInCulture = true;
            foreach (Guid ancestorOrSelfKey in ancestorsOrSelfKeysArray)
            {
-                if (ancestorOrSelfKeyToDomains.TryGetValue(ancestorOrSelfKey, out Task<Dictionary<string, IDomain>>? domainDictionaryTask))
+                if (ancestorOrSelfKeyToDomains.TryGetValue(ancestorOrSelfKey, out Task<Dictionary<string, Domain>>? domainDictionaryTask))
                 {
-                    Dictionary<string, IDomain> domainDictionary = await domainDictionaryTask;
-                    if (domainDictionary.TryGetValue(culture, out IDomain? domain))
+                    Dictionary<string, Domain> domainDictionary = await domainDictionaryTask;
+                    if (domainDictionary.TryGetValue(culture, out Domain? domain))
                     {
                         foundDomain = domain;
                         break;
@@ -562,14 +581,14 @@ public class DocumentUrlService : IDocumentUrlService
         return result;
     }
 
-    private string GetFullUrl(bool isRootFirstItem, List<string> reversedUrlSegments, IDomain? foundDomain)
+    private string GetFullUrl(bool isRootFirstItem, List<string> reversedUrlSegments, Domain? foundDomain)
     {
         var urlSegments = new List<string>(reversedUrlSegments);
         urlSegments.Reverse();
 
         if (foundDomain is not null)
         {
-            return foundDomain.DomainName.EnsureEndsWith("/") + string.Join('/', urlSegments);
+            return foundDomain.Name.EnsureEndsWith("/") + string.Join('/', urlSegments);
         }
 
         return '/' + string.Join('/', urlSegments.Skip(_globalSettings.HideTopLevelNodeFromPath && isRootFirstItem ? 1 : 0));

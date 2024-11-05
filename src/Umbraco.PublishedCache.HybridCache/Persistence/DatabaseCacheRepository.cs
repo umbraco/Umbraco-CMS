@@ -596,8 +596,7 @@ WHERE cmsContentNu.nodeId IN (
                     cultureData[cultureInfo.Culture] = new CultureVariation
                     {
                         Name = cultureInfo.Name,
-                        UrlSegment =
-                            content.GetUrlSegment(_shortStringHelper, _urlSegmentProviders, cultureInfo.Culture),
+                        UrlSegment = content.GetUrlSegment(_shortStringHelper, _urlSegmentProviders, cultureInfo.Culture),
                         Date = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue,
                         IsDraft = cultureIsDraft,
                     };
@@ -865,7 +864,7 @@ WHERE cmsContentNu.nodeId IN (
                     serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw, published);
                 var draftContentData = new ContentData(
                     dto.EditName,
-                    null,
+                    deserializedDraftContent?.UrlSegment,
                     dto.VersionId,
                     dto.EditVersionDate,
                     dto.CreatorId,
@@ -904,7 +903,7 @@ WHERE cmsContentNu.nodeId IN (
         ContentCacheDataModel? deserializedContent = serializer.Deserialize(dto, dto.PubData, dto.PubDataRaw, true);
         var publishedContentData = new ContentData(
             dto.PubName,
-            null,
+            deserializedContent?.UrlSegment,
             dto.VersionId,
             dto.PubVersionDate,
             dto.CreatorId,

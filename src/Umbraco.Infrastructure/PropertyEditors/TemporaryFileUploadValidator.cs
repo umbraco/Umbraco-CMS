@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.TemporaryFile;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -32,7 +33,7 @@ internal class TemporaryFileUploadValidator : IValueValidator
         _validateFileType = validateFileType;
     }
 
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
     {
         Guid? temporaryFileKey = _parseTemporaryFileKey(value);
         if (temporaryFileKey.HasValue == false)
