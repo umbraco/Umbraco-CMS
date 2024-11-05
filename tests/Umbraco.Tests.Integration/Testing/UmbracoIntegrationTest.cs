@@ -172,7 +172,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
                 .AddCoreMappingProfiles();
         }
 
-        services.RemoveAll(x=>x.ImplementationType == typeof(DocumentUrlServiceInitializer));
+        services.RemoveAll(x=>x.ImplementationType == typeof(DocumentUrlServiceInitializerNotificationHandler));
         services.AddSignalR();
         services.AddMvc();
 

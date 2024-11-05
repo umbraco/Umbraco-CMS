@@ -482,7 +482,7 @@ public class RichTextElementLevelVariationTests : BlockEditorElementVariationTes
             Assert.AreEqual(1, indexValue.Values.Count());
             var indexedValue = indexValue.Values.First() as string;
             Assert.IsNotNull(indexedValue);
-            var values = indexedValue.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
+            var values = indexedValue.Split(Environment.NewLine).Select(s => s.Trim()).Where(s => s.IsNullOrWhiteSpace() is false).ToArray();
             Assert.AreEqual(expectedIndexedValues.Length, values.Length);
             Assert.IsTrue(values.ContainsAll(expectedIndexedValues));
         }
@@ -562,7 +562,7 @@ public class RichTextElementLevelVariationTests : BlockEditorElementVariationTes
             Assert.AreEqual(1, indexValue.Values.Count());
             var indexedValue = indexValue.Values.First() as string;
             Assert.IsNotNull(indexedValue);
-            var values = indexedValue.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
+            var values = indexedValue.Split(Environment.NewLine).Select(s => s.Trim()).Where(s => s.IsNullOrWhiteSpace() is false).ToArray();
             Assert.AreEqual(expectedIndexedValues.Length, values.Length);
             Assert.IsTrue(values.ContainsAll(expectedIndexedValues));
         }
@@ -624,7 +624,7 @@ public class RichTextElementLevelVariationTests : BlockEditorElementVariationTes
             Assert.AreEqual(1, indexValue.Values.Count());
             var indexedValue = indexValue.Values.First() as string;
             Assert.IsNotNull(indexedValue);
-            var values = indexedValue.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
+            var values = indexedValue.Split(Environment.NewLine).Select(s => s.Trim()).Where(s => s.IsNullOrWhiteSpace() is false).ToArray();
             Assert.AreEqual(expectedIndexedValues.Length, values.Length);
             Assert.IsTrue(values.ContainsAll(expectedIndexedValues));
         }

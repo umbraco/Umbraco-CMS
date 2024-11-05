@@ -71,7 +71,7 @@ stages:
       - job: A
         displayName: Build Umbraco CMS
         pool:
-          vmImage: 'ubuntu-latest'
+          vmImage: 'windows-latest'
         steps:
           - checkout: self
             submodules: true
@@ -514,7 +514,7 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
-          - pwsh: npm run smokeTest --ignore-certificate-errors
+          - pwsh: npm run smokeTestSqlite --ignore-certificate-errors
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
