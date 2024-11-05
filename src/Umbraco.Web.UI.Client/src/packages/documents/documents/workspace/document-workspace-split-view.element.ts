@@ -17,7 +17,7 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		// TODO: Refactor: use a split view workspace context token:
+		// TODO: Refactor: use a split view workspace context token: [NL]
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
 			this._workspaceContext = context;
 			this._observeActiveVariantInfo();
