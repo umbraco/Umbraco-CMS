@@ -93,6 +93,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/* Data Type */
 	readonly #dataTypeItemManager = new UmbDataTypeItemRepositoryManager(this);
+	/**
+	 * Data Type Schema Map is used for lookup, this should make coder simpler and give better performance. [NL]
+	 */
 	#dataTypeSchemaAliasMap = new Map<string, string>();
 
 	#varies?: boolean;
@@ -210,7 +213,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.observe(
 			this.#dataTypeItemManager.items,
 			(dataTypes) => {
-				// Make a map of the data type unique and editorAlias:
+				// Make a map of the data type unique and editorAlias
 				this.#dataTypeSchemaAliasMap = new Map(
 					dataTypes.map((dataType) => {
 						return [dataType.unique, dataType.propertyEditorSchemaAlias];
@@ -233,7 +236,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * Get the name of a variant
 	 * @param {UmbVariantId } [variantId] - The variant id
 	 * @returns { string | undefined} - The name of the variant
-	 * @memberof UmbContentDetailWorkspaceBase
+	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public getName(variantId?: UmbVariantId): string | undefined {
 		const variants = this._data.getCurrent()?.variants;
@@ -249,7 +252,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * Set the name of a variant
 	 * @param {string} name - The name of the variant
 	 * @param {UmbVariantId} [variantId] - The variant id
-	 * @memberof UmbContentDetailWorkspaceBase
+	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public setName(name: string, variantId?: UmbVariantId): void {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -262,7 +265,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * Get an observable for the name of a variant
 	 * @param {UmbVariantId} [variantId] - The variant id
 	 * @returns {Observable<string>} - The name of the variant
-	 * @memberof UmbContentDetailWorkspaceBase
+	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public name(variantId?: UmbVariantId): Observable<string> {
 		return this._data.createObservablePartOfCurrent(
@@ -275,7 +278,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	/**
 	 * Get whether the content varies by culture
 	 * @returns { boolean | undefined } - If the content varies by culture
-	 * @memberof UmbContentDetailWorkspaceBase
+	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public getVariesByCulture(): boolean | undefined {
 		return this.#variesByCulture;
@@ -284,7 +287,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	/**
 	 * Get whether the content varies by segment
 	 * @returns {boolean | undefined} - If the content varies by segment
-	 * @memberof UmbContentDetailWorkspaceBase
+	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public getVariesBySegment(): boolean | undefined {
 		return this.#variesBySegment;
@@ -293,7 +296,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	/**
 	 * Get whether the content varies
 	 * @returns { boolean | undefined } - If the content varies
-	 * @memberof UmbContentDetailWorkspaceBase
+	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public getVaries(): boolean | undefined {
 		return this.#varies;
@@ -303,7 +306,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * Get the variant by the given variantId
 	 * @param {UmbVariantId} variantId - The variant id
 	 * @returns { Observable<VariantModelType | undefined> } - The variant or undefined if not found
-	 * @memberof UmbContentDetailWorkspaceBase
+	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public variantById(variantId: UmbVariantId): Observable<VariantModelType | undefined> {
 		return this._data.createObservablePartOfCurrent((data) => data?.variants?.find((x) => variantId.compare(x)));
@@ -313,7 +316,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * Get the variant by the given variantId
 	 * @param {UmbVariantId} variantId - The variant id
 	 * @returns { VariantModelType | undefined } - The variant or undefined if not found
-	 * @memberof UmbContentDetailWorkspaceBase
+	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public getVariant(variantId: UmbVariantId): VariantModelType | undefined {
 		return this._data.getCurrent()?.variants?.find((x) => variantId.compare(x));
@@ -323,7 +326,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * Observe the property type
 	 * @param {string} propertyId - The id of the property
 	 * @returns {Promise<Observable<UmbPropertyTypeModel | undefined>>} - An observable for the property type
-	 * @memberof UmbContentDetailWorkspaceBase
+	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public async propertyStructureById(propertyId: string): Promise<Observable<UmbPropertyTypeModel | undefined>> {
 		return this.structure.propertyStructureById(propertyId);
@@ -334,7 +337,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	/**
 	 * Get the values of the content
 	 * @returns {Array<UmbElementValueModel> | undefined} - The values of the content
-	 * @memberof UmbContentDetailWorkspaceBase
+	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public getValues(): Array<UmbElementValueModel> | undefined {
 		return this._data.getCurrent()?.values;
@@ -381,7 +384,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * @param {string} alias - The alias of the property
 	 * @param {ValueType} value - The value to set
 	 * @param {UmbVariantId} [variantId] - The variant id of the property
-	 * @memberof UmbContentDetailWorkspaceBase
+	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public async setPropertyValue<ValueType = unknown>(alias: string, value: ValueType, variantId?: UmbVariantId) {
 		this.initiatePropertyValueChange();
