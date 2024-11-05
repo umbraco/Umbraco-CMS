@@ -313,24 +313,22 @@ public class UdiTests
     [UdiDefinition("foo", UdiType.GuidUdi)]
     public class FooConnector : IServiceConnector
     {
-        public IArtifact GetArtifact(Udi udi, IContextCache contextCache) => throw new NotImplementedException();
+        public Task<IArtifact?> GetArtifactAsync(Udi udi, IContextCache contextCache, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
-        public IArtifact GetArtifact(object entity, IContextCache contextCache) => throw new NotImplementedException();
+        public Task<IArtifact> GetArtifactAsync(object entity, IContextCache contextCache, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
-        public ArtifactDeployState ProcessInit(IArtifact art, IDeployContext context) =>
+        public Task<ArtifactDeployState> ProcessInitAsync(IArtifact artifact, IDeployContext context, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+        public Task ProcessAsync(ArtifactDeployState state, IDeployContext context, int pass,
+            CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
-        public void Process(ArtifactDeployState dart, IDeployContext context, int pass) =>
-            throw new NotImplementedException();
+        public IAsyncEnumerable<Udi> ExpandRangeAsync(UdiRange range, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
-        public void Explode(UdiRange range, List<Udi> udis) => throw new NotImplementedException();
+        public Task<NamedUdiRange> GetRangeAsync(Udi udi, string selector, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
-        public NamedUdiRange GetRange(Udi udi, string selector) => throw new NotImplementedException();
+        public Task<NamedUdiRange> GetRangeAsync(string entityType, string sid, string selector, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
-        public NamedUdiRange GetRange(string entityType, string sid, string selector) =>
-            throw new NotImplementedException();
-
-        public bool Compare(IArtifact art1, IArtifact art2, ICollection<Difference> differences = null) =>
-            throw new NotImplementedException();
+        public bool Compare(IArtifact? art1, IArtifact? art2, ICollection<Difference>? differences = null) => throw new NotImplementedException();
     }
 }
