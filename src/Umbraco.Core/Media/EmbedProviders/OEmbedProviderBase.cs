@@ -21,9 +21,14 @@ public abstract class OEmbedProviderBase : IEmbedProvider
     [Obsolete("Use GetMarkupAsync instead. This will be removed in Umbraco 15.")]
     public abstract string? GetMarkup(string url, int maxWidth = 0, int maxHeight = 0);
 
-    public virtual Task<string?> GeOEmbedDataAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken) => Task.FromResult(GetMarkup(url, maxWidth ?? 0, maxHeight ?? 0));
+    public abstract Task<string?> GetMarkupAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken);
+
+    [Obsolete("Cleanup, only proxied to by GetMarkupAsync implementations. Planned for removal in v16")]
+    public virtual Task<string?> GeOEmbedDataAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken)
+        => Task.FromResult(GetMarkup(url, maxWidth ?? 0, maxHeight ?? 0));
 
     public virtual string GetEmbedProviderUrl(string url, int? maxWidth, int? maxHeight) => GetEmbedProviderUrl(url, maxWidth ?? 0, maxHeight ?? 0);
+
     public virtual string GetEmbedProviderUrl(string url, int maxWidth, int maxHeight)
     {
         if (Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute) == false)
@@ -123,5 +128,26 @@ public abstract class OEmbedProviderBase : IEmbedProvider
     {
         XmlNode? selectSingleNode = doc.SelectSingleNode(property);
         return selectSingleNode != null ? selectSingleNode.InnerText : string.Empty;
+    }
+
+    public virtual async Task<string?> GetJsonBasedMarkupAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken)
+    {
+        var requestUrl = GetEmbedProviderUrl(url, maxWidth, maxHeight);
+        OEmbedResponse? oembed = await GetJsonResponseAsync<OEmbedResponse>(requestUrl, cancellationToken);
+
+        return oembed?.GetHtml();
+    }
+
+    public virtual async Task<string?> GetXmlBasedMarkupAsync(
+        string url,
+        int? maxWidth,
+        int? maxHeight,
+        CancellationToken cancellationToken,
+        string property = "/oembed/html")
+    {
+        var requestUrl = GetEmbedProviderUrl(url, maxWidth, maxHeight);
+        XmlDocument xmlDocument = await GetXmlResponseAsync(requestUrl, cancellationToken);
+
+        return GetXmlProperty(xmlDocument, property);
     }
 }
