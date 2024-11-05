@@ -290,9 +290,10 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 						: ''} ${this.#isReadOnly(variantOption.culture) ? 'readonly-mode' : ''}"
 					@click=${() => this.#switchVariant(variantOption)}>
 					${this.#isCreateMode(variantOption) ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
-					<div>
+					<div class="variant-info">
 						<div class="variant-name">
-							${variantOption.language.name} ${this.#renderReadOnlyTag(variantOption.culture)}
+							${variantOption.variant?.name ?? variantOption.language.name}
+							${this.#renderReadOnlyTag(variantOption.culture)}
 						</div>
 						<div class="variant-details">
 							<span>${this._renderVariantDetails(variantOption)}</span>
@@ -303,6 +304,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 							>
 						</div>
 					</div>
+					<div class="specs-info">${variantOption.language.name}</div>
 				</button>
 				${this.#renderSplitViewButton(variantOption)}
 			</li>
@@ -332,10 +334,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				? nothing
 				: html`
 						<uui-button
+							style="background-color: var(--uui-color-surface)"
 							label="Open Split view for ${variant.language.name}"
 							class="variant-selector-split-view"
 							@click=${() => this.#openSplitView(variant)}>
-							Split view
+							Open in Split view
 						</uui-button>
 					`}
 		`;
@@ -423,6 +426,32 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				background: var(--uui-palette-sand);
 				color: var(--uui-palette-space-cadet-light);
 			}
+			.variant-selector-switch-button .variant-info {
+				flex-grow: 1;
+			}
+
+			.variant-selector-switch-button .variant-details {
+				color: var(--uui-color-text-alt);
+				font-size: 12px;
+				font-weight: normal;
+			}
+			.variant-selector-switch-button .variant-details {
+				color: var(--uui-color-text-alt);
+				font-size: 12px;
+				font-weight: normal;
+			}
+			.variant-selector-switch-button.add-mode .variant-details {
+				color: var(--uui-palette-dusty-grey-dark);
+			}
+
+			.variant-selector-switch-button .specs-info {
+				color: var(--uui-color-text-alt);
+				font-size: 12px;
+				font-weight: normal;
+			}
+			.variant-selector-switch-button.add-mode .specs-info {
+				color: var(--uui-palette-dusty-grey-dark);
+			}
 
 			.variant-selector-switch-button i {
 				font-weight: normal;
@@ -465,12 +494,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				right: 0;
 				bottom: 1px;
 				display: none;
-			}
-
-			.variant-details {
-				color: var(--uui-palette-malibu-dimmed);
-				font-size: 12px;
-				font-weight: normal;
 			}
 		`,
 	];
