@@ -1,15 +1,15 @@
+import { css, customElement, html, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, css, html, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import {
-	UmbPropertyValueChangeEvent,
-	type UmbPropertyEditorConfigCollection,
+import type {
+	UmbPropertyEditorUiElement,
+	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 
 const tinyIconSet = tinymce.IconManager.get('default');
 
@@ -59,7 +59,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 	config?: UmbPropertyEditorConfigCollection;
 
 	@state()
-	private _toolbarConfig: ToolbarConfig[] = [];
+	private readonly _toolbarConfig: ToolbarConfig[] = [];
 
 	#selectedValues: string[] = [];
 
@@ -128,13 +128,19 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 		</ul>`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			ul {
 				list-style: none;
 				padding: 0;
 				margin: 0;
+
+				uui-icon {
+					width: 1.5em;
+					height: 1.5em;
+					margin-right: 5px;
+				}
 			}
 		`,
 	];

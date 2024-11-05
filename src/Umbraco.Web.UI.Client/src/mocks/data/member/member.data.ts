@@ -1,4 +1,8 @@
-import type { MemberResponseModel, MemberItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import {
+	type MemberResponseModel,
+	type MemberItemResponseModel,
+	MemberKindModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 export type UmbMockMemberModel = MemberResponseModel & MemberItemResponseModel;
 
@@ -26,6 +30,7 @@ export const data: Array<UmbMockMemberModel> = [
 				updateDate: '2023-02-06T15:32:24.957009',
 			},
 		],
+		kind: MemberKindModel.DEFAULT,
 	},
 	{
 		email: 'member2@member.com',
@@ -50,6 +55,7 @@ export const data: Array<UmbMockMemberModel> = [
 				updateDate: '2023-02-06T15:32:24.957009',
 			},
 		],
+		kind: MemberKindModel.DEFAULT,
 	},
 	{
 		email: 'member3@member.com',
@@ -74,5 +80,6 @@ export const data: Array<UmbMockMemberModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
+		kind: MemberKindModel.DEFAULT,
 	},
 ];

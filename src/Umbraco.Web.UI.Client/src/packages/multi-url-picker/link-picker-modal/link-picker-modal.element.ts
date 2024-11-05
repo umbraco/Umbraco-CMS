@@ -1,145 +1,154 @@
-import type { UmbLinkPickerLink, UmbLinkPickerLinkType } from './types.js';
+import type { UmbLinkPickerLink } from './types.js';
 import type {
 	UmbLinkPickerConfig,
 	UmbLinkPickerModalData,
 	UmbLinkPickerModalValue,
 } from './link-picker-modal.token.js';
-import type { UmbTreeElement, UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
-import { css, html, nothing, customElement, query, state, styleMap } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { css, customElement, html, nothing, query, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbDocumentDetailRepository } from '@umbraco-cms/backoffice/document';
+import { UmbMediaDetailRepository } from '@umbraco-cms/backoffice/media';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UMB_DOCUMENT_TREE_ALIAS } from '@umbraco-cms/backoffice/document';
+import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
+import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
+import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { isUmbracoFolder, UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
+
+type UmbInputPickerEvent = CustomEvent & { target: { value?: string } };
 
 @customElement('umb-link-picker-modal')
 export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalValue> {
 	@state()
-	private _selectionConfiguration: UmbTreeSelectionConfiguration = {
-		multiple: false,
-		selectable: true,
-		selection: [],
-	};
-
-	@state()
-	_selectedKey?: string;
-
-	/**
-	 * The link object, notice this is frozen, as it comes directly from the State. So it cannot be manipulated.
-	 */
-	@state()
-	readonly _link: UmbLinkPickerLink = {};
-
-	@state()
-	_layout: UmbLinkPickerConfig = {
+	private _config: UmbLinkPickerConfig = {
 		hideAnchor: false,
+		hideTarget: false,
 	};
 
 	@state()
-	documentExpand = false;
+	private _allowedMediaTypeIds?: Array<string>;
 
-	@state()
-	mediaExpanded = false;
+	@query('umb-input-document')
+	private _documentPickerElement?: UmbInputDocumentElement;
 
-	@query('#link-input')
-	private _linkInput!: UUIInputElement;
+	@query('umb-input-media')
+	private _mediaPickerElement?: UmbInputMediaElement;
 
-	@query('#anchor-input')
-	private _linkQueryInput?: UUIInputElement;
-
-	@query('#link-title-input')
-	private _linkTitleInput!: UUIInputElement;
-
-	override connectedCallback() {
-		super.connectedCallback();
-		if (!this.data) return;
-
-		if (this.modalContext) {
-			this.observe(this.modalContext.value, (value) => {
-				(this._link as any) = value.link;
-				this._selectedKey = this._link?.unique ?? undefined;
-				this._selectionConfiguration.selection = this._selectedKey ? [this._selectedKey] : [];
-			});
+	override async firstUpdated() {
+		if (this.data?.config) {
+			this._config = this.data.config;
 		}
-		this._layout = this.data?.config;
+
+		// Get all the media types, excluding the folders, so that files are selectable media items.
+		const mediaTypeStructureRepository = new UmbMediaTypeStructureRepository(this);
+		const { data: mediaTypes } = await mediaTypeStructureRepository.requestAllowedChildrenOf(null);
+		this._allowedMediaTypeIds = mediaTypes?.items.map((x) => x.unique).filter((x) => !isUmbracoFolder(x)) ?? [];
 	}
 
-	#handleQueryString() {
-		if (!this._linkQueryInput) return;
-		const query = this._linkQueryInput.value as string;
+	#partialUpdateLink(linkObject: Partial<UmbLinkPickerLink>) {
+		this.modalContext?.updateValue({ link: { ...this.value.link, ...linkObject } });
+	}
 
+	#onLinkAnchorInput(event: UUIInputEvent) {
+		const query = (event.target.value as string) ?? '';
 		if (query.startsWith('#') || query.startsWith('?')) {
 			this.#partialUpdateLink({ queryString: query });
 			return;
 		}
 
 		if (query.includes('=')) {
-			this.#partialUpdateLink({ queryString: `#${query}` });
+			this.#partialUpdateLink({ queryString: `?${query}` });
 		} else {
 			this.#partialUpdateLink({ queryString: `#${query}` });
 		}
 	}
 
-	#handleSelectionChange(e: CustomEvent, entityType: string) {
-		//TODO: Update icon, published, trashed
-		e.stopPropagation();
-		const element = e.target as UmbTreeElement;
-		const selection = element.getSelection();
-		const selectedKey = selection[selection.length - 1];
-
-		if (!selectedKey) {
-			this.#partialUpdateLink({ type: undefined, unique: '', url: undefined });
-			this._selectedKey = undefined;
-			this._selectionConfiguration.selection = [];
-			this.requestUpdate();
-			return;
-		}
-
-		const linkType = (entityType as UmbLinkPickerLinkType) ?? 'external';
-
-		this._selectedKey = selectedKey;
-		if (this._selectedKey === undefined) return;
-		this._selectionConfiguration.selection = [this._selectedKey];
-		this.#partialUpdateLink({ type: linkType, unique: selectedKey, url: selectedKey });
-		this.requestUpdate();
+	#onLinkTitleInput(event: UUIInputEvent) {
+		this.#partialUpdateLink({ name: event.target.value as string });
 	}
 
-	#partialUpdateLink(linkObject: Partial<UmbLinkPickerLink>) {
-		this.modalContext?.updateValue({ link: { ...this._link, ...linkObject } });
+	#onLinkTargetInput(event: UUIBooleanInputEvent) {
+		this.#partialUpdateLink({ target: event.target.checked ? '_blank' : undefined });
+	}
+
+	#onLinkUrlInput(event: UUIInputEvent) {
+		const url = event.target.value as string;
+
+		let name;
+		if (url && !this.value.link.name) {
+			if (URL.canParse(url)) {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
+				const parts = URL.parse(url);
+				name = parts?.hostname ?? url;
+			} else {
+				name = url;
+			}
+		}
+
+		this.#partialUpdateLink({
+			name: this.value.link.name || name,
+			type: 'external',
+			url,
+		});
+	}
+
+	async #onPickerSelection(event: UmbInputPickerEvent, type: 'document' | 'media') {
+		let icon, name, url;
+		const unique = event.target.value;
+
+		if (unique) {
+			if (type === 'document') {
+				const documentRepository = new UmbDocumentDetailRepository(this);
+				const { data: documentData } = await documentRepository.requestByUnique(unique);
+				if (documentData) {
+					icon = documentData.documentType.icon;
+					name = documentData.variants[0].name;
+					url = documentData.urls[0].url;
+				}
+			}
+
+			if (type === 'media') {
+				const mediaRepository = new UmbMediaDetailRepository(this);
+				const { data: mediaData } = await mediaRepository.requestByUnique(unique);
+				if (mediaData) {
+					icon = mediaData.mediaType.icon;
+					name = mediaData.variants[0].name;
+					url = mediaData.urls[0].url;
+				}
+			}
+		}
+
+		const link = {
+			icon,
+			name: this.value.link.name || name,
+			type: unique ? type : undefined,
+			unique,
+			url,
+		};
+
+		this.#partialUpdateLink(link);
+	}
+
+	#triggerDocumentPicker() {
+		this._documentPickerElement?.shadowRoot?.querySelector('#btn-add')?.dispatchEvent(new Event('click'));
+	}
+
+	#triggerMediaPicker() {
+		this._mediaPickerElement?.shadowRoot?.querySelector('#btn-add')?.dispatchEvent(new Event('click'));
 	}
 
 	override render() {
 		return html`
-			<umb-body-layout headline="Select Link">
+			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectLink')}>
 				<uui-box>
-					<div class="url-link">${this.#renderLinkUrlInput()} ${this.#renderAnchorInput()}</div>
-
-					<uui-label for="link-title-input">${this.localize.term('defaultdialogs_nodeNameLinkPicker')}</uui-label>
-					<uui-input
-						id="link-title-input"
-						placeholder=${this.localize.term('defaultdialogs_nodeNameLinkPicker')}
-						label=${this.localize.term('defaultdialogs_nodeNameLinkPicker')}
-						@input=${() => this.#partialUpdateLink({ name: this._linkTitleInput.value as string })}
-						.value="${this._link.name ?? ''}"></uui-input>
-
-					<uui-label>${this.localize.term('content_target')}</uui-label>
-					<uui-toggle
-						id="#target-toggle"
-						label=${this.localize.term('defaultdialogs_openInNewWindow')}
-						.checked="${this._link.target === '_blank' ? true : false}"
-						@change="${(e: UUIBooleanInputEvent) =>
-							this.#partialUpdateLink({ target: e.target.checked ? '_blank' : '' })}">
-						${this.localize.term('defaultdialogs_openInNewWindow')}
-					</uui-toggle>
-
-					<hr />
-
-					${this.#renderTrees()}
+					${this.#renderLinkUrlInput()} ${this.#renderLinkTitleInput()} ${this.#renderLinkTargetInput()}
+					${this.#renderInternals()}
 				</uui-box>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					<uui-button
-						label=${this.localize.term('general_submit')}
-						look="primary"
 						color="positive"
+						look="primary"
+						label=${this.localize.term('general_submit')}
 						@click=${this._submitModal}></uui-button>
 				</div>
 			</umb-body-layout>
@@ -147,108 +156,139 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	}
 
 	#renderLinkUrlInput() {
-		return html`<span>
-			<uui-label for="link-input">${this.localize.term('defaultdialogs_link')}</uui-label>
-			<uui-input
-				id="link-input"
-				placeholder=${this.localize.term('general_url')}
-				label=${this.localize.term('general_url')}
-				.value="${this._link.unique ?? this._link.url ?? ''}"
-				@input=${() => this.#partialUpdateLink({ type: 'external', url: this._linkInput.value as string })}
-				?disabled="${this._link.unique ? true : false}"></uui-input>
-		</span>`;
-	}
-
-	#renderAnchorInput() {
-		if (this._layout.hideAnchor) return nothing;
-		return html`<span>
-			<uui-label for="anchor-input">${this.localize.term('defaultdialogs_anchorLinkPicker')}</uui-label>
-			<uui-input
-				id="anchor-input"
-				placeholder=${this.localize.term('placeholders_anchor')}
-				label=${this.localize.term('placeholders_anchor')}
-				@input=${this.#handleQueryString}
-				.value="${this._link.queryString ?? ''}"></uui-input>
-		</span>`;
-	}
-
-	#renderTrees() {
-		//TODO: Make search work (temporarily disabled)
 		return html`
-			<uui-symbol-expand
-				id="document-expand"
-				@click=${() => (this.documentExpand = !this.documentExpand)}
-				.open=${!this.documentExpand}></uui-symbol-expand>
-			<uui-label for="document-expand">${this.localize.term('defaultdialogs_linkToPage')}</uui-label>
-			<div style="${styleMap({ display: !this.documentExpand ? 'block' : 'none' })}">
+			<umb-property-layout orientation="vertical">
+				<div class="side-by-side" slot="editor">
+					<umb-property-layout
+						orientation="vertical"
+						label=${this.localize.term('defaultdialogs_link')}
+						style="padding:0;">
+						<uui-input
+							slot="editor"
+							placeholder=${this.localize.term('general_url')}
+							label=${this.localize.term('general_url')}
+							.value=${this.value.link.url ?? ''}
+							?disabled=${this.value.link.unique ? true : false}
+							@change=${this.#onLinkUrlInput}>
+						</uui-input>
+					</umb-property-layout>
+					${when(
+						!this._config.hideAnchor,
+						() => html`
+							<umb-property-layout
+								orientation="vertical"
+								label=${this.localize.term('defaultdialogs_anchorLinkPicker')}
+								style="padding:0;">
+								<uui-input
+									slot="editor"
+									placeholder=${this.localize.term('placeholders_anchor')}
+									label=${this.localize.term('placeholders_anchor')}
+									@change=${this.#onLinkAnchorInput}
+									.value=${this.value.link.queryString ?? ''}></uui-input>
+							</umb-property-layout>
+						`,
+					)}
+				</div>
+			</umb-property-layout>
+		`;
+	}
+
+	#renderLinkTitleInput() {
+		return html`
+			<umb-property-layout orientation="vertical" label=${this.localize.term('defaultdialogs_nodeNameLinkPicker')}>
 				<uui-input
-					disabled
-					id="search-input"
-					placeholder=${this.localize.term('placeholders_search')}
-					label=${this.localize.term('placeholders_search')}></uui-input>
-				<umb-tree
-					alias=${UMB_DOCUMENT_TREE_ALIAS}
-					.props=${{
-						hideTreeItemActions: true,
-						hideTreeRoot: true,
-						selectionConfiguration: this._selectionConfiguration,
-					}}
-					@selection-change=${(event: CustomEvent) => this.#handleSelectionChange(event, 'document')}></umb-tree>
-			</div>
-			<hr />
-			<uui-symbol-expand
-				id="media-expand"
-				@click=${() => (this.mediaExpanded = !this.mediaExpanded)}
-				.open=${!this.mediaExpanded}></uui-symbol-expand>
-			<uui-label for="media-expand">${this.localize.term('defaultdialogs_linkToMedia')}</uui-label>
-			<div style="${styleMap({ display: !this.mediaExpanded ? 'block' : 'none' })}">
-				<umb-tree
-					alias="Umb.Tree.Media"
-					.props=${{
-						hideTreeItemActions: true,
-						hideTreeRoot: true,
-						selectionConfiguration: this._selectionConfiguration,
-					}}
-					@selection-change=${(event: CustomEvent) => this.#handleSelectionChange(event, 'media')}></umb-tree>
-			</div>
+					slot="editor"
+					label=${this.localize.term('defaultdialogs_nodeNameLinkPicker')}
+					placeholder=${this.localize.term('defaultdialogs_nodeNameLinkPicker')}
+					.value=${this.value.link.name ?? ''}
+					@change=${this.#onLinkTitleInput}>
+				</uui-input>
+			</umb-property-layout>
+		`;
+	}
+
+	#renderLinkTargetInput() {
+		if (this._config.hideTarget) return nothing;
+		return html`
+			<umb-property-layout orientation="vertical" label=${this.localize.term('content_target')}>
+				<uui-toggle
+					slot="editor"
+					label=${this.localize.term('defaultdialogs_openInNewWindow')}
+					.checked=${this.value.link.target === '_blank' ? true : false}
+					@change=${this.#onLinkTargetInput}>
+					${this.localize.term('defaultdialogs_openInNewWindow')}
+				</uui-toggle>
+			</umb-property-layout>
+		`;
+	}
+
+	#renderInternals() {
+		return html`
+			<umb-property-layout orientation="vertical" label=${this.localize.term('defaultdialogs_linkinternal')}>
+				<div slot="editor">
+					${when(
+						!this.value.link.unique,
+						() => html`
+							<uui-button-group>
+								<uui-button
+									look="placeholder"
+									label=${this.localize.term('defaultdialogs_linkToPage')}
+									@click=${this.#triggerDocumentPicker}></uui-button>
+								<uui-button
+									look="placeholder"
+									label=${this.localize.term('defaultdialogs_linkToMedia')}
+									@click=${this.#triggerMediaPicker}></uui-button>
+							</uui-button-group>
+						`,
+					)}
+					<umb-input-document
+						?hidden=${!this.value.link.unique || this.value.link.type !== 'document'}
+						.max=${1}
+						.showOpenButton=${true}
+						.value=${this.value.link.unique && this.value.link.type === 'document' ? this.value.link.unique : ''}
+						@change=${(e: UmbInputPickerEvent) => this.#onPickerSelection(e, 'document')}>
+					</umb-input-document>
+					<umb-input-media
+						?hidden=${!this.value.link.unique || this.value.link.type !== 'media'}
+						.allowedContentTypeIds=${this._allowedMediaTypeIds}
+						.max=${1}
+						.value=${this.value.link.unique && this.value.link.type === 'media' ? this.value.link.unique : ''}
+						@change=${(e: UmbInputPickerEvent) => this.#onPickerSelection(e, 'media')}></umb-input-media>
+				</div>
+			</umb-property-layout>
 		`;
 	}
 
 	static override styles = [
 		css`
-			hr {
-				border: none;
-				border-bottom: 1px solid var(--uui-color-divider);
-				margin-bottom: var(--uui-size-space-3);
+			uui-box {
+				--uui-box-default-padding: 0 var(--uui-size-space-5);
 			}
 
-			uui-input,
-			uui-toggle,
-			uui-label {
+			uui-button-group {
 				width: 100%;
 			}
 
-			uui-input:not(#search-input),
-			uui-label {
-				margin-bottom: var(--uui-size-space-6);
+			uui-input {
+				width: 100%;
 			}
 
-			.url-link {
+			.side-by-side {
 				display: flex;
-				gap: var(--uui-size-space-6);
-			}
-			.url-link span {
-				flex: 1 1 0px;
-			}
+				flex-wrap: wrap;
+				gap: var(--uui-size-space-5);
 
-			#select-media {
-				display: block;
+				umb-property-layout {
+					flex: 1 1 0px;
+				}
 			}
 		`,
 	];
 }
 
 export default UmbLinkPickerModalElement;
+
+export { UmbLinkPickerModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

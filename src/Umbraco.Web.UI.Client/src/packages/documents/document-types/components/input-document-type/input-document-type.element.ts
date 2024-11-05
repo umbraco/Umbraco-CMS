@@ -1,7 +1,8 @@
 import type { UmbDocumentTypeItemModel } from '../../repository/index.js';
 import { UMB_DOCUMENT_TYPE_WORKSPACE_MODAL } from '../../workspace/document-type-workspace.modal-token.js';
 import type { UmbDocumentTypeTreeItemModel } from '../../tree/types.js';
-import { UmbDocumentTypePickerContext } from './input-document-type.context.js';
+import { UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN } from '../../paths.js';
+import { UmbDocumentTypePickerInputContext } from './input-document-type.context.js';
 import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -34,7 +35,6 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	/**
 	 * Limits to only select Element Types
 	 * @type {boolean}
-	 * @attr
 	 * @default false
 	 */
 	@property({ attribute: false })
@@ -43,7 +43,6 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	/**
 	 * Limits to only select Document Types
 	 * @type {boolean}
-	 * @attr
 	 * @default false
 	 */
 	@property({ attribute: false })
@@ -52,8 +51,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
-	 * @attr
-	 * @default 0
+	 * @default
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
@@ -66,7 +64,6 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	/**
 	 * Min validation message.
 	 * @type {boolean}
-	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
@@ -75,8 +72,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	/**
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
-	 * @attr
-	 * @default Infinity
+	 * @default
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
@@ -89,7 +85,6 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	/**
 	 * Max validation message.
 	 * @type {boolean}
-	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
@@ -117,7 +112,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	@state()
 	private _editPath = '';
 
-	#pickerContext = new UmbDocumentTypePickerContext(this);
+	#pickerContext = new UmbDocumentTypePickerInputContext(this);
 
 	constructor() {
 		super();
@@ -202,12 +197,11 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 
 	#renderItem(item: UmbDocumentTypeItemModel) {
 		if (!item.unique) return;
-		const href = `${this._editPath}edit/${item.unique}`;
+		const href = this._editPath + UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique });
 		return html`
-			<uui-ref-node-document-type name=${this.localize.string(item.name)} id=${item.unique}>
+			<uui-ref-node-document-type name=${this.localize.string(item.name)} href=${href}>
 				${this.#renderIcon(item)}
 				<uui-action-bar slot="actions">
-					<uui-button href=${href} label=${this.localize.term('general_open')}></uui-button>
 					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node-document-type>

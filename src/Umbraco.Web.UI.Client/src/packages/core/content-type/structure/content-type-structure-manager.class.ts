@@ -20,6 +20,9 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 type UmbPropertyTypeId = UmbPropertyTypeModel['id'];
 
+const UmbFilterDuplicateStrings = (value: string, index: number, array: Array<string>) =>
+	array.indexOf(value) === index;
+
 /**
  * Manages a structure of a Content Type and its properties and containers.
  * This loads and merges the structures of the Content Type and its inherited and composed Content Types.
@@ -42,15 +45,36 @@ export class UmbContentTypeStructureManager<
 	readonly ownerContentType = this.#contentTypes.asObservablePart((x) =>
 		x.find((y) => y.unique === this.#ownerContentTypeUnique),
 	);
-	readonly ownerContentTypeCompositions = this.#contentTypes.asObservablePart(
-		(x) => x.find((y) => y.unique === this.#ownerContentTypeUnique)?.compositions,
-	);
+	readonly ownerContentTypeAlias = createObservablePart(this.ownerContentType, (x) => x?.alias);
+	readonly ownerContentTypeName = createObservablePart(this.ownerContentType, (x) => x?.name);
+	readonly ownerContentTypeCompositions = createObservablePart(this.ownerContentType, (x) => x?.compositions);
 
-	readonly #contentTypeContainers = this.#contentTypes.asObservablePart(() => {
-		return this.#contentTypes.getValue().flatMap((x) => x.containers ?? []);
+	readonly #contentTypeContainers = this.#contentTypes.asObservablePart((contentTypes) => {
+		// Notice this may need to use getValue to avoid resetting it self. [NL]
+		return contentTypes.flatMap((x) => x.containers ?? []);
 	});
+	readonly contentTypeProperties = this.#contentTypes.asObservablePart((contentTypes) => {
+		// Notice this may need to use getValue to avoid resetting it self. [NL]
+		return contentTypes.flatMap((x) => x.properties ?? []);
+	});
+	readonly contentTypeDataTypeUniques = this.#contentTypes.asObservablePart((contentTypes) => {
+		// Notice this may need to use getValue to avoid resetting it self. [NL]
+		return contentTypes
+			.flatMap((x) => x.properties?.map((p) => p.dataType.unique) ?? [])
+			.filter(UmbFilterDuplicateStrings);
+	});
+	readonly contentTypeHasProperties = this.#contentTypes.asObservablePart((contentTypes) => {
+		// Notice this may need to use getValue to avoid resetting it self. [NL]
+		return contentTypes.some((x) => x.properties.length > 0);
+	});
+	readonly contentTypePropertyAliases = createObservablePart(this.contentTypeProperties, (properties) =>
+		properties.map((x) => x.alias),
+	);
 	readonly contentTypeUniques = this.#contentTypes.asObservablePart((x) => x.map((y) => y.unique));
 	readonly contentTypeAliases = this.#contentTypes.asObservablePart((x) => x.map((y) => y.alias));
+
+	readonly variesByCulture = createObservablePart(this.ownerContentType, (x) => x?.variesByCulture);
+	readonly variesBySegment = createObservablePart(this.ownerContentType, (x) => x?.variesBySegment);
 
 	#containers: UmbArrayState<UmbPropertyTypeContainerModel> = new UmbArrayState<UmbPropertyTypeContainerModel>(
 		[],
@@ -67,7 +91,7 @@ export class UmbContentTypeStructureManager<
 		// Observe owner content type compositions, as we only allow one level of compositions at this moment. [NL]
 		// But, we could support more, we would just need to flatMap all compositions and make sure the entries are unique and then base the observation on that. [NL]
 		this.observe(this.ownerContentTypeCompositions, (ownerContentTypeCompositions) => {
-			this._loadContentTypeCompositions(ownerContentTypeCompositions);
+			this.#loadContentTypeCompositions(ownerContentTypeCompositions);
 		});
 		this.observe(this.#contentTypeContainers, (contentTypeContainers) => {
 			this.#containers.setValue(contentTypeContainers);
@@ -77,13 +101,17 @@ export class UmbContentTypeStructureManager<
 	/**
 	 * loadType will load the ContentType and all inherited and composed ContentTypes.
 	 * This will give us all the structure for properties and containers.
+	 * @param {string} unique - The unique of the ContentType to load.
+	 * @returns {Promise} - Promise resolved
 	 */
 	public async loadType(unique?: string) {
+		//if (!unique) return;
+		//if (this.#ownerContentTypeUnique === unique) return;
 		this._reset();
 
 		this.#ownerContentTypeUnique = unique;
 
-		const promise = this._loadType(unique);
+		const promise = this.#loadType(unique);
 		this.#init = promise;
 		await this.#init;
 		return promise;
@@ -104,24 +132,27 @@ export class UmbContentTypeStructureManager<
 
 	/**
 	 * Save the owner content type. Notice this is for a Content Type that is already stored on the server.
-	 * @returns boolean
+	 * @returns {Promise} - A promise that will be resolved when the content type is saved.
 	 */
 	public async save() {
 		const contentType = this.getOwnerContentType();
 		if (!contentType || !contentType.unique) throw new Error('Could not find the Content Type to save');
 
 		const { error, data } = await this.#repository.save(contentType);
-		if (error || !data) return { error, data };
+		if (error || !data) {
+			throw error?.message ?? 'Repository did not return data after save.';
+		}
 
 		// Update state with latest version:
 		this.#contentTypes.updateOne(contentType.unique, data);
 
-		return { error, data };
+		return data;
 	}
 
 	/**
 	 * Create the owner content type. Notice this is for a Content Type that is NOT already stored on the server.
-	 * @returns boolean
+	 * @param {string | null} parentUnique - The unique of the parent content type
+	 * @returns {Promise} - a promise that is resolved when the content type has been created.
 	 */
 	public async create(parentUnique: string | null) {
 		const contentType = this.getOwnerContentType();
@@ -136,10 +167,10 @@ export class UmbContentTypeStructureManager<
 		this.#contentTypes.updateOne(contentType.unique, data);
 
 		// Start observe the new content type in the store, as we did not do that when it was a scaffold/local-version.
-		this._observeContentType(data);
+		this.#observeContentType(data);
 	}
 
-	private async _loadContentTypeCompositions(ownerContentTypeCompositions: T['compositions'] | undefined) {
+	async #loadContentTypeCompositions(ownerContentTypeCompositions: T['compositions'] | undefined) {
 		if (!ownerContentTypeCompositions) {
 			// Owner content type was undefined, so we can not load compositions. But at this point we neither offload existing compositions, this is most likely not a case that needs to be handled.
 			return;
@@ -157,28 +188,28 @@ export class UmbContentTypeStructureManager<
 			}
 		});
 		ownerContentTypeCompositions.forEach((composition) => {
-			this._ensureType(composition.contentType.unique);
+			this.#ensureType(composition.contentType.unique);
 		});
 	}
 
-	private async _ensureType(unique?: string) {
+	async #ensureType(unique?: string) {
 		if (!unique) return;
 		if (this.#contentTypes.getValue().find((x) => x.unique === unique)) return;
-		await this._loadType(unique);
+		await this.#loadType(unique);
 	}
 
-	private async _loadType(unique?: string) {
+	async #loadType(unique?: string) {
 		if (!unique) return {};
 
 		// Lets initiate the content type:
 		const { data, asObservable } = await this.#repository.requestByUnique(unique);
 		if (!data) return {};
 
-		await this._observeContentType(data);
+		await this.#observeContentType(data);
 		return { data, asObservable };
 	}
 
-	private async _observeContentType(data: T) {
+	async #observeContentType(data: T) {
 		if (!data.unique) return;
 
 		// Notice we do not store the content type in the store here, cause it will happen shortly after when the observations gets its first initial callback. [NL]
@@ -203,7 +234,7 @@ export class UmbContentTypeStructureManager<
 
 	/** Public methods for consuming structure: */
 
-	ownerContentTypePart<R>(mappingFunction: MappingFunction<T | undefined, R>) {
+	ownerContentTypeObservablePart<R>(mappingFunction: MappingFunction<T | undefined, R>) {
 		return createObservablePart(this.ownerContentType, mappingFunction);
 	}
 
@@ -213,6 +244,14 @@ export class UmbContentTypeStructureManager<
 
 	getOwnerContentTypeUnique() {
 		return this.#ownerContentTypeUnique;
+	}
+
+	/**
+	 * Figure out if any of the Content Types has a Property.
+	 * @returns {boolean} - true if any of the Content Type in this composition has a Property.
+	 */
+	getHasProperties() {
+		return this.#contentTypes.getValue().some((y) => y.properties.length > 0);
 	}
 
 	updateOwnerContentType(entry: Partial<T>) {
@@ -233,9 +272,9 @@ export class UmbContentTypeStructureManager<
 
 	/**
 	 * Ensure a container exists for a specific Content Type. Otherwise clone it.
-	 * @param containerId - The container to ensure exists on the given ContentType.
-	 * @param contentTypeUnique - The content type to ensure the container for.
-	 * @returns Promise<UmbPropertyTypeContainerModel | undefined>
+	 * @param {string} containerId - The container to ensure exists on the given ContentType.
+	 * @param {string} contentTypeUnique - The content type to ensure the container for.
+	 * @returns {Promise<UmbPropertyTypeContainerModel | undefined>} - The container found or created for the owner ContentType.
 	 */
 	async ensureContainerOf(
 		containerId: string,
@@ -256,9 +295,9 @@ export class UmbContentTypeStructureManager<
 
 	/**
 	 * Clone a container to a specific Content Type.
-	 * @param containerId - The container to clone, assuming it does not already exist on the given Content Type.
-	 * @param toContentTypeUnique - The content type to clone to.
-	 * @returns Promise<UmbPropertyTypeContainerModel | undefined>
+	 * @param {string} containerId - The container to clone, assuming it does not already exist on the given Content Type.
+	 * @param {string} toContentTypeUnique - The content type to clone to.
+	 * @returns {Promise<UmbPropertyTypeContainerModel | undefined>} - The container cloned or found for the owner ContentType.
 	 */
 	async cloneContainerTo(
 		containerId: string,
@@ -574,13 +613,6 @@ export class UmbContentTypeStructureManager<
 		return undefined;
 	}
 
-	ownerContentTypeObservablePart<PartResult>(mappingFunction: MappingFunction<T, PartResult>) {
-		return this.#contentTypes.asObservablePart((docTypes) => {
-			const docType = docTypes.find((x) => x.unique === this.#ownerContentTypeUnique);
-			return docType ? mappingFunction(docType) : undefined;
-		});
-	}
-
 	hasPropertyStructuresOf(containerId: string | null) {
 		return this.#contentTypes.asObservablePart((docTypes) => {
 			return (
@@ -619,7 +651,7 @@ export class UmbContentTypeStructureManager<
 		return this.#containers.getValue().filter((x) => x.parent === null && x.type === containerType);
 	}
 
-	hasRootContainers(containerType: UmbPropertyContainerTypes) {
+	async hasRootContainers(containerType: UmbPropertyContainerTypes) {
 		return this.#containers.asObservablePart((data) => {
 			return data.filter((x) => x.parent === null && x.type === containerType).length > 0;
 		});
@@ -628,7 +660,7 @@ export class UmbContentTypeStructureManager<
 	ownerContainersOf(containerType: UmbPropertyContainerTypes, parentId: string | null) {
 		return this.ownerContentTypeObservablePart(
 			(x) =>
-				x.containers?.filter(
+				x?.containers?.filter(
 					(x) => (parentId ? x.parent?.id === parentId : x.parent === null) && x.type === containerType,
 				) ?? [],
 		);
@@ -694,6 +726,7 @@ export class UmbContentTypeStructureManager<
 	}
 
 	private _reset() {
+		this.#contentTypes.setValue([]);
 		this.#contentTypeObservers.forEach((observer) => observer.destroy());
 		this.#contentTypeObservers = [];
 		this.#contentTypes.setValue([]);

@@ -300,6 +300,7 @@ export default {
 		createEmpty: 'Create new',
 		createFromClipboard: 'Paste from clipboard',
 		nodeIsInTrash: 'This item is in the Recycle Bin',
+		saveModalTitle: 'Uložit',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Vytvořit novou šablonu obsahu z <em>%0%</em>',
@@ -428,7 +429,7 @@ export default {
 			'Změna kultury jazyka může být náročná operace a bude mít za následek opětovné sestavení mezipaměti obsahu a indexů',
 		lastEdited: 'Naposledy editováno',
 		link: 'Odkaz',
-		linkinternal: 'Místní odkaz:',
+		linkinternal: 'Místní odkaz',
 		linklocaltip: 'Při používání místních odkazů vložte znak "#" před odkaz',
 		linknewwindow: 'Otevřít v novém okně?',
 		macroDoesNotHaveProperties: 'Toto makro nemá žádné vlastnosti, které by bylo možno editovat',
@@ -498,9 +499,9 @@ export default {
 	},
 	dictionaryItem: {
 		description:
-			"\n      Editujte různé jazykové verze pro položku slovníku '<em>%0%</em>' níže.<br/>Můžete přidat další jazyky v nabídce 'jazyky' nalevo.",
+			"Editujte různé jazykové verze pro položku slovníku '%0%' níže.<br/>Můžete přidat další jazyky v nabídce 'jazyky' nalevo.",
 		displayName: 'Název jazyka',
-		changeKeyError: "\n      Klíč '%0%' již existuje.\n   ",
+		changeKeyError: "Klíč '%0%' již existuje.",
 		overviewTitle: 'Přehled slovníku',
 	},
 	examineManagement: {
@@ -931,14 +932,7 @@ export default {
 	},
 	notifications: {
 		editNotifications: 'Upravte vaše oznámení pro %0%',
-		notificationsSavedFor: 'Nastavení oznámení bylo uloženo pro',
-		mailBody:
-			"\n      Dobrý den, %0%\n\n      Toto je automatická zpráva informující Vás, že úloha '%1%'\n      byla provedena na stránce '%2%'\n      uživatelem '%3%'\n\n      Přejděte na http://%4%/#/content/content/edit/%5% pro editování.\n\n      Mějte hezký den!\n\n      Zdraví Umbraco robot\n    ",
-		mailBodyVariantSummary: 'Následující jazyky byly změněny %0%',
-		mailBodyHtml:
-			'<p>Ahoj %0%</p>\n\n          <p>Toto je automatická zpráva informující Vás, že úloha <strong>\'%1%\'</strong>\n          byla provedena na stránce <a href="http://%4%/#/content/content/edit/%5%"><strong>\'%2%\'</strong></a>\n          uživatelem <strong>\'%3%\'</strong>\n      </p>\n          <div style="margin: 8px 0; padding: 8px; display: block;">\n                <br />\n                <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDITOVAT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;\n                <br />\n          </div>\n          <p>\n              <h3>Shrnutí změn:</h3>\n              <table style="width: 100%;">\n                           %6%\n                </table>\n             </p>\n\n          <div style="margin: 8px 0; padding: 8px; display: block;">\n                <br />\n                <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDITOVAT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;\n                <br />\n          </div>\n\n          <p>Mějte hezký den!<br /><br />\n              Zdraví Umbraco robot\n          </p>',
-		mailBodyVariantHtmlSummary: '<p>Byly změněny následující jazyky:</p>\n        %0%\n    ',
-		mailSubject: '[%0%] Upozornění o %1% na %2%',
+		notificationsSavedFor: 'Nastavení oznámení bylo uloženo pro %0%',
 		notifications: 'Upozornění',
 	},
 	packager: {

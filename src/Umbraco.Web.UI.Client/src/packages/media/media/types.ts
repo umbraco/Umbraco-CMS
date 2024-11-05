@@ -1,18 +1,20 @@
 import type { UmbMediaEntityType } from './entity.js';
-import type { UmbVariantModel, UmbVariantOptionModel } from '@umbraco-cms/backoffice/variant';
+import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import type { UmbContentDetailModel, UmbElementValueModel } from '@umbraco-cms/backoffice/content';
 
-export interface UmbMediaDetailModel {
+export interface UmbMediaDetailModel extends UmbContentDetailModel {
 	mediaType: {
 		unique: string;
 		collection: UmbReferenceByUnique | null;
+		icon?: string | null;
 	};
 	entityType: UmbMediaEntityType;
 	isTrashed: boolean;
 	unique: string;
 	urls: Array<UmbMediaUrlInfoModel>;
 	values: Array<UmbMediaValueModel>;
-	variants: Array<UmbVariantModel>;
+	variants: Array<UmbEntityVariantModel>;
 }
 
 export interface UmbMediaUrlInfoModel {
@@ -20,15 +22,13 @@ export interface UmbMediaUrlInfoModel {
 	url: string;
 }
 
-export interface UmbMediaVariantModel extends UmbVariantModel {}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbMediaVariantModel extends UmbEntityVariantModel {}
 
-export interface UmbMediaValueModel<ValueType = unknown> {
-	culture: string | null;
-	segment: string | null;
-	alias: string;
-	value: ValueType;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbMediaValueModel<ValueType = unknown> extends UmbElementValueModel<ValueType> {}
 
-export interface UmbMediaVariantOptionModel extends UmbVariantOptionModel<UmbVariantModel> {}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbMediaVariantOptionModel extends UmbEntityVariantOptionModel<UmbEntityVariantModel> {}
 
 export type * from './property-editors/types.js';

@@ -1,6 +1,10 @@
 import { UMB_BLOCK_WORKSPACE_MODAL } from '../../workspace/index.js';
 import type { UmbBlockTypeGroup, UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block-type';
-import type { UmbBlockCatalogueModalData, UmbBlockCatalogueModalValue } from '@umbraco-cms/backoffice/block';
+import {
+	UMB_BLOCK_MANAGER_CONTEXT,
+	type UmbBlockCatalogueModalData,
+	type UmbBlockCatalogueModalValue,
+} from '@umbraco-cms/backoffice/block';
 import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_MODAL_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -14,8 +18,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	UmbBlockCatalogueModalData,
 	UmbBlockCatalogueModalValue
 > {
-	//
-	private _search = '';
+	#search = '';
 
 	private _groupedBlocks: Array<{ name?: string; blocks: Array<UmbBlockTypeWithGroupKey> }> = [];
 
@@ -28,24 +31,33 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	@state()
 	private _filtered: Array<{ name?: string; blocks: Array<UmbBlockTypeWithGroupKey> }> = [];
 
+	@state()
+	_manager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_MODAL_CONTEXT, (modalContext) => {
-			new UmbModalRouteRegistrationController(this, UMB_BLOCK_WORKSPACE_MODAL)
-				//.addAdditionalPath('block') // No need for additional path specification in this context as this is for sure the only workspace we want to open here.
-				.onSetup(() => {
-					return {
-						data: { preset: {}, originData: (modalContext.data as UmbBlockCatalogueModalData).blockOriginData },
-					};
-				})
-				.onSubmit(() => {
-					// When workspace is submitted, we want to close this modal.
-					this.modalContext?.submit();
-				})
-				.observeRouteBuilder((routeBuilder) => {
-					this._workspacePath = routeBuilder({});
-				});
+			if (modalContext.data.createBlockInWorkspace) {
+				new UmbModalRouteRegistrationController(this, UMB_BLOCK_WORKSPACE_MODAL)
+					//.addAdditionalPath('block') // No need for additional path specification in this context as this is for sure the only workspace we want to open here.
+					.onSetup(() => {
+						return {
+							data: { preset: {}, originData: (modalContext.data as UmbBlockCatalogueModalData).originData },
+						};
+					})
+					.onSubmit(() => {
+						// When workspace is submitted, we want to close this modal.
+						this.modalContext?.submit();
+					})
+					.observeRouteBuilder((routeBuilder) => {
+						this._workspacePath = routeBuilder({});
+					});
+			}
+		});
+
+		this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (manager) => {
+			this._manager = manager;
 		});
 	}
 
@@ -69,10 +81,10 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	}
 
 	#updateFiltered() {
-		if (this._search.length === 0) {
+		if (this.#search.length === 0) {
 			this._filtered = this._groupedBlocks;
 		} else {
-			const search = this._search.toLowerCase();
+			const search = this.#search.toLowerCase();
 			this._filtered = this._groupedBlocks.map((group) => {
 				return { ...group, blocks: group.blocks.filter((block) => block.label?.toLocaleLowerCase().includes(search)) };
 			});
@@ -80,14 +92,23 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	}
 
 	#onSearch(e: UUIInputEvent) {
-		this._search = e.target.value as string;
+		this.#search = e.target.value as string;
 		this.#updateFiltered();
+	}
+
+	#chooseBlock(contentElementTypeKey: string) {
+		this.value = {
+			create: {
+				contentElementTypeKey,
+			},
+		};
+		this.modalContext?.submit();
 	}
 
 	override render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('blockEditor_addBlock')}">
-				${this.#renderViews()} ${this._openClipboard ? this.#renderClipboard() : this.#renderCreateEmpty()}
+				${this.#renderViews()}${this.#renderMain()}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					<uui-button
@@ -98,6 +119,10 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 				</div>
 			</umb-body-layout>
 		`;
+	}
+
+	#renderMain() {
+		return this._manager ? (this._openClipboard ? this.#renderClipboard() : this.#renderCreateEmpty()) : nothing;
 	}
 
 	#renderClipboard() {
@@ -128,7 +153,10 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 									.iconColor=${block.iconColor}
 									.backgroundColor=${block.backgroundColor}
 									.contentElementTypeKey=${block.contentElementTypeKey}
-									.href="${this._workspacePath}create/${block.contentElementTypeKey}">
+									@open=${() => this.#chooseBlock(block.contentElementTypeKey)}
+									.href=${this._workspacePath && this._manager!.getContentTypeHasProperties(block.contentElementTypeKey)
+										? `${this._workspacePath}create/${block.contentElementTypeKey}`
+										: undefined}>
 								</umb-block-type-card>
 							`,
 						)}

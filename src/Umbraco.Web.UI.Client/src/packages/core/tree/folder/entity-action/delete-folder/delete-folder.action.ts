@@ -1,16 +1,16 @@
-import type { UmbFolderRepository } from '../../folder-repository.interface.js';
+import type { MetaEntityActionFolderKind, UmbFolderModel } from '../../types.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import type { MetaEntityActionFolderKind } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 
 export class UmbDeleteFolderEntityAction extends UmbEntityActionBase<MetaEntityActionFolderKind> {
 	// TODO: make base type for item and detail models
-	#folderRepository?: UmbFolderRepository;
+	#folderRepository?: UmbDetailRepository<UmbFolderModel>;
 	#init: Promise<unknown>;
 
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<MetaEntityActionFolderKind>) {
@@ -25,7 +25,7 @@ export class UmbDeleteFolderEntityAction extends UmbEntityActionBase<MetaEntityA
 				this.args.meta.folderRepositoryAlias,
 				[this._host],
 				(permitted, ctrl) => {
-					this.#folderRepository = permitted ? (ctrl.api as UmbFolderRepository) : undefined;
+					this.#folderRepository = permitted ? (ctrl.api as UmbDetailRepository<UmbFolderModel>) : undefined;
 				},
 			).asPromise(),
 		]);
@@ -35,7 +35,7 @@ export class UmbDeleteFolderEntityAction extends UmbEntityActionBase<MetaEntityA
 		if (!this.args.unique) throw new Error('Unique is not available');
 		await this.#init;
 
-		const { data: folder } = await this.#folderRepository!.request(this.args.unique);
+		const { data: folder } = await this.#folderRepository!.requestByUnique(this.args.unique);
 
 		if (folder) {
 			// TODO: maybe we can show something about how many items are part of the folder?

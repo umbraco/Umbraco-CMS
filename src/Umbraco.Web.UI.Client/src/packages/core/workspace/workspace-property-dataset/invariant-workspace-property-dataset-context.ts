@@ -1,9 +1,14 @@
-import type { UmbPropertyDatasetContext, UmbNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import type {
+	UmbPropertyDatasetContext,
+	UmbNameablePropertyDatasetContext,
+	UmbPropertyValueData,
+} from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbInvariantDatasetWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbBooleanState, type Observable } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * A property dataset context that hooks directly into the workspace context.
@@ -14,6 +19,9 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 	extends UmbContextBase<UmbPropertyDatasetContext>
 	implements UmbPropertyDatasetContext, UmbNameablePropertyDatasetContext
 {
+	#readOnly = new UmbBooleanState(false);
+	public readOnly = this.#readOnly.asObservable();
+
 	#workspace: WorkspaceType;
 
 	name;
@@ -43,17 +51,33 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 		this.name = this.#workspace.name;
 	}
 
+	get properties(): Observable<Array<UmbPropertyValueData> | undefined> {
+		return this.#workspace.values;
+	}
+	getProperties(): Promise<Array<UmbPropertyValueData> | undefined> {
+		return this.#workspace.getValues();
+	}
+
 	/**
-	 * TODO: Write proper JSDocs here.
+	 * @function propertyValueByAlias
+	 * @param {string} propertyAlias
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		return await this.#workspace.propertyValueByAlias<ReturnType>(propertyAlias);
 	}
 
 	/**
-	 * TODO: Write proper JSDocs here.
+	 * @param {string} propertyAlias - The alias of the property
+	 * @param {unknown} value - The value to be set for this property
+	 * @returns {Promise<void>} - an promise which resolves once the value has been set.
 	 */
 	async setPropertyValue(propertyAlias: string, value: unknown) {
 		return this.#workspace.setPropertyValue(propertyAlias, value);
+	}
+
+	getReadOnly() {
+		return this.#readOnly.getValue();
 	}
 }

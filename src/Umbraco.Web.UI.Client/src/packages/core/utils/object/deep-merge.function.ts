@@ -4,6 +4,8 @@ import type { UmbDeepPartialObject } from '../type/deep-partial-object.type.js';
  * Deep merge two objects.
  * @param target
  * @param ...sources
+ * @param source
+ * @param fallback
  */
 export function umbDeepMerge<
 	T extends { [key: string]: any },

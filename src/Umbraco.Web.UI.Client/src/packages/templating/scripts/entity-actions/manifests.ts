@@ -3,11 +3,12 @@ import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
 import { UMB_SCRIPT_ITEM_REPOSITORY_ALIAS } from '../repository/item/index.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as renameManifests } from './rename/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DELETE_SCRIPT_ENTITY_ACTION_ALIAS = 'Umb.EntityAction.Script.Delete';
 
-const scriptViewActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
+	...createManifests,
+	...renameManifests,
 	{
 		type: 'entityAction',
 		kind: 'delete',
@@ -20,5 +21,3 @@ const scriptViewActions: Array<ManifestTypes> = [
 		},
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...scriptViewActions, ...createManifests, ...renameManifests];

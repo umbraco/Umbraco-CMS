@@ -1,5 +1,5 @@
-import type { UmbIconPickerModalElement } from '../../core/modal/common/icon-picker/icon-picker-modal.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { UmbIconPickerModalElement } from '@umbraco-cms/backoffice/icon';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-icon-picker.element.js';
@@ -10,7 +10,7 @@ export default {
 	id: 'umb-property-editor-ui-icon-picker',
 } as Meta;
 
-export const AAAOverview: Story<UmbIconPickerModalElement> = () =>
+export const AAAOverview: StoryFn<UmbIconPickerModalElement> = () =>
 	html`<umb-icon-picker-modal></umb-icon-picker-modal>`;
 AAAOverview.storyName = 'Overview';
 AAAOverview.decorators = [

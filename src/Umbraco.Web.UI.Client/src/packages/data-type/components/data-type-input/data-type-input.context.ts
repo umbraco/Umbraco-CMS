@@ -6,7 +6,7 @@ import type { UmbDataTypeTreeItemModel } from '../../tree/types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 
-export class UmbDataTypePickerContext extends UmbPickerInputContext<
+export class UmbDataTypePickerInputContext extends UmbPickerInputContext<
 	UmbDataTypeItemModel,
 	UmbDataTypeTreeItemModel,
 	UmbDataTypePickerModalData,
@@ -16,3 +16,6 @@ export class UmbDataTypePickerContext extends UmbPickerInputContext<
 		super(host, UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS, UMB_DATA_TYPE_PICKER_MODAL);
 	}
 }
+
+/** @deprecated Use `UmbDataTypePickerInputContext` instead. This method will be removed in Umbraco 15. */
+export { UmbDataTypePickerInputContext as UmbDataTypePickerContext };

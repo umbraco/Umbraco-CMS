@@ -8,6 +8,7 @@ import type {
 } from '../types.js';
 import type { UmbCollectionFilterModel } from '../collection-filter-model.interface.js';
 import type { UmbCollectionRepository } from '../repository/collection-repository.interface.js';
+import type { ManifestCollection } from '../extensions/index.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -15,7 +16,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
-import type { ManifestCollection, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -36,20 +37,21 @@ export class UmbDefaultCollectionContext<
 	implements UmbCollectionContext, UmbApi
 {
 	#config?: UmbCollectionConfiguration = { pageSize: 50 };
-	#manifest?: ManifestCollection;
-	#repository?: UmbCollectionRepository;
+	protected _manifest?: ManifestCollection;
+	protected _repository?: UmbCollectionRepository;
 
-	#loading = new UmbObjectState<boolean>(false);
-	public readonly loading = this.#loading.asObservable();
+	// TODO: replace with a state manager
+	protected _loading = new UmbObjectState<boolean>(false);
+	public readonly loading = this._loading.asObservable();
 
-	#items = new UmbArrayState<CollectionItemType>([], (x) => x.unique);
-	public readonly items = this.#items.asObservable();
+	protected _items = new UmbArrayState<CollectionItemType>([], (x) => x.unique);
+	public readonly items = this._items.asObservable();
 
-	#totalItems = new UmbNumberState(0);
-	public readonly totalItems = this.#totalItems.asObservable();
+	protected _totalItems = new UmbNumberState(0);
+	public readonly totalItems = this._totalItems.asObservable();
 
-	#filter = new UmbObjectState<FilterModelType | object>({});
-	public readonly filter = this.#filter.asObservable();
+	protected _filter = new UmbObjectState<FilterModelType | object>({});
+	public readonly filter = this._filter.asObservable();
 
 	#userDefinedProperties = new UmbArrayState<UmbCollectionColumnConfiguration>([], (x) => x.alias);
 	public readonly userDefinedProperties = this.#userDefinedProperties.asObservable();
@@ -67,8 +69,12 @@ export class UmbDefaultCollectionContext<
 	#initResolver?: () => void;
 	#initialized = false;
 
-	#init = new Promise<void>((resolve) => {
-		this.#initialized ? resolve() : (this.#initResolver = resolve);
+	protected _init = new Promise<void>((resolve) => {
+		if (this.#initialized) {
+			resolve();
+		} else {
+			this.#initResolver = resolve;
+		}
 	});
 
 	#actionEventContext: UmbActionEventContext | undefined;
@@ -109,9 +115,9 @@ export class UmbDefaultCollectionContext<
 		});
 	}
 
-	#configured = false;
+	protected _configured = false;
 
-	#configure() {
+	protected _configure() {
 		if (!this.#config) return;
 
 		this.selection.setMultiple(true);
@@ -120,9 +126,9 @@ export class UmbDefaultCollectionContext<
 			this.pagination.setPageSize(this.#config.pageSize);
 		}
 
-		const filterValue = this.#filter.getValue() as FilterModelType;
+		const filterValue = this._filter.getValue() as FilterModelType;
 
-		this.#filter.setValue({
+		this._filter.setValue({
 			...this.#defaultFilter,
 			...this.#config,
 			...filterValue,
@@ -142,11 +148,11 @@ export class UmbDefaultCollectionContext<
 
 		this.view.setConfig(viewManagerConfig);
 
-		this.#configured = true;
+		this._configured = true;
 	}
 
 	#checkIfInitialized() {
-		if (this.#repository) {
+		if (this._repository) {
 			this.#initialized = true;
 			this.#initResolver?.();
 		}
@@ -161,7 +167,7 @@ export class UmbDefaultCollectionContext<
 			repositoryAlias,
 			[this._host],
 			(permitted, ctrl) => {
-				this.#repository = permitted ? ctrl.api : undefined;
+				this._repository = permitted ? ctrl.api : undefined;
 				this.#checkIfInitialized();
 			},
 		);
@@ -187,38 +193,38 @@ export class UmbDefaultCollectionContext<
 	}
 
 	public set manifest(manifest: ManifestCollection | undefined) {
-		if (this.#manifest === manifest) return;
-		this.#manifest = manifest;
-		this.#observeRepository(this.#manifest?.meta.repositoryAlias);
+		if (this._manifest === manifest) return;
+		this._manifest = manifest;
+		this.#observeRepository(this._manifest?.meta.repositoryAlias);
 	}
 	public get manifest() {
-		return this.#manifest;
+		return this._manifest;
 	}
 
 	/**
 	 * Requests the collection from the repository.
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbCollectionContext
 	 */
 	public async requestCollection() {
-		await this.#init;
+		await this._init;
 
-		if (!this.#configured) this.#configure();
+		if (!this._configured) this._configure();
 
-		if (!this.#repository) throw new Error(`Missing repository for ${this.#manifest}`);
+		if (!this._repository) throw new Error(`Missing repository for ${this._manifest}`);
 
-		this.#loading.setValue(true);
+		this._loading.setValue(true);
 
-		const filter = this.#filter.getValue();
-		const { data } = await this.#repository.requestCollection(filter);
+		const filter = this._filter.getValue();
+		const { data } = await this._repository.requestCollection(filter);
 
 		if (data) {
-			this.#items.setValue(data.items);
-			this.#totalItems.setValue(data.total);
+			this._items.setValue(data.items);
+			this._totalItems.setValue(data.total);
 			this.pagination.setTotalItems(data.total);
 		}
 
-		this.#loading.setValue(false);
+		this._loading.setValue(false);
 	}
 
 	/**
@@ -227,7 +233,7 @@ export class UmbDefaultCollectionContext<
 	 * @memberof UmbCollectionContext
 	 */
 	public setFilter(filter: Partial<FilterModelType>) {
-		this.#filter.setValue({ ...this.#filter.getValue(), ...filter });
+		this._filter.setValue({ ...this._filter.getValue(), ...filter });
 		this.requestCollection();
 	}
 
@@ -252,7 +258,7 @@ export class UmbDefaultCollectionContext<
 	}
 
 	#onReloadStructureRequest = (event: UmbRequestReloadStructureForEntityEvent) => {
-		const items = this.#items.getValue();
+		const items = this._items.getValue();
 		const hasItem = items.some((item) => item.unique === event.getUnique());
 		if (hasItem) {
 			this.requestCollection();
@@ -291,20 +297,20 @@ export class UmbDefaultCollectionContext<
 	 * @deprecated Use set the `.manifest` property instead.
 	 */
 	public setManifest(manifest: ManifestCollection | undefined) {
-		if (this.#manifest === manifest) return;
-		this.#manifest = manifest;
+		if (this._manifest === manifest) return;
+		this._manifest = manifest;
 
-		if (!this.#manifest) return;
-		this.#observeRepository(this.#manifest.meta.repositoryAlias);
+		if (!this._manifest) return;
+		this.#observeRepository(this._manifest.meta.repositoryAlias);
 	}
 
 	/**
 	 * Returns the manifest for the collection.
-	 * @return {ManifestCollection}
+	 * @returns {ManifestCollection}
 	 * @memberof UmbCollectionContext
 	 * @deprecated Use get the `.manifest` property instead.
 	 */
 	public getManifest() {
-		return this.#manifest;
+		return this._manifest;
 	}
 }

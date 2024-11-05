@@ -5,9 +5,9 @@ import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.
 import { html, customElement, property, state, map } from '@umbraco-cms/backoffice/external/lit';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 
 @customElement('umb-create-media-collection-action')
@@ -93,7 +93,7 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 			UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({
 				parentEntityType: this._mediaUnique ? UMB_MEDIA_ENTITY_TYPE : UMB_MEDIA_ROOT_ENTITY_TYPE,
 				parentUnique: this._mediaUnique ?? 'null',
-				documentTypeUnique: item.unique,
+				mediaTypeUnique: item.unique,
 			})
 		);
 	}

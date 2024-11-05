@@ -1,4 +1,4 @@
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 
 export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
@@ -9,5 +9,6 @@ export const manifest: ManifestPropertyEditorUi = {
 		label: 'Media Entity Picker',
 		icon: 'icon-picture',
 		group: 'pickers',
+		supportsReadOnly: true,
 	},
 };

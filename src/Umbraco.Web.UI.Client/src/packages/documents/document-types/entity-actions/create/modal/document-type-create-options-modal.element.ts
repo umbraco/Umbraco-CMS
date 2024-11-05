@@ -32,7 +32,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 			preset: 'template',
 			label: this.localize.term('create_documentTypeWithTemplate'),
 			description: this.localize.term('create_documentTypeWithTemplateDescription'),
-			icon: 'icon-notepad',
+			icon: 'icon-document-html',
 		},
 		{
 			preset: 'element',
@@ -73,7 +73,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 					await this.#createFolderAction?.execute();
 					this._submitModal();
 					return;
-				} catch (error) {
+				} catch {
 					//console.error(error);
 				}
 

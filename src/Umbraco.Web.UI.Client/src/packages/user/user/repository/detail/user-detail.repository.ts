@@ -13,7 +13,7 @@ export class UmbUserDetailRepository extends UmbDetailRepositoryBase<UmbUserDeta
 	/**
 	 * Creates a new User detail
 	 * @param {UmbUserDetailModel} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbUserDetailRepository
 	 */
 	override async create(model: UmbUserDetailModel) {
@@ -22,7 +22,8 @@ export class UmbUserDetailRepository extends UmbDetailRepositoryBase<UmbUserDeta
 
 	/**
 	 * Requests the detail for the given unique
-	 * @return {*}
+	 * @param unique
+	 * @returns {*}
 	 * @memberof UmbUserDetailRepository
 	 */
 	requestCalculateStartNodes(unique: string) {

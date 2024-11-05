@@ -1,13 +1,13 @@
 import { UmbDefaultCollectionContext } from './collection-default.context.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
-const manifest: UmbBackofficeManifestKind = {
+const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.Collection.Default',
 	matchKind: 'default',
@@ -26,14 +26,22 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	@state()
 	private _routes: Array<UmbRoute> = [];
 
+	@state()
+	private _hasItems = false;
+
+	@state()
+	private _isDoneLoading = false;
+
 	#collectionContext?: UmbDefaultCollectionContext<any, any>;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, async (context) => {
 			this.#collectionContext = context;
-			this.#collectionContext?.requestCollection();
 			this.#observeCollectionRoutes();
+			this.#observeTotalItems();
+			await this.#collectionContext?.requestCollection();
+			this._isDoneLoading = true;
 		});
 	}
 
@@ -49,12 +57,23 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		);
 	}
 
+	#observeTotalItems() {
+		if (!this.#collectionContext) return;
+
+		this.observe(
+			this.#collectionContext.totalItems,
+			(totalItems) => {
+				this._hasItems = totalItems > 0;
+			},
+			'umbCollectionTotalItemsObserver',
+		);
+	}
+
 	override render() {
 		return html`
-			<umb-body-layout header-transparent>
-				${this.renderToolbar()}
-				<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>
-				${this.renderPagination()} ${this.renderSelectionActions()}
+			<umb-body-layout header-transparent class=${this._hasItems ? 'has-items' : ''}>
+				<umb-router-slot id="router" .routes=${this._routes}></umb-router-slot>
+				${this.renderToolbar()} ${this._hasItems ? this.#renderContent() : this.#renderEmptyState()}
 			</umb-body-layout>
 		`;
 	}
@@ -71,6 +90,17 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		return html`<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>`;
 	}
 
+	#renderContent() {
+		return html` ${this.renderPagination()} ${this.renderSelectionActions()} `;
+	}
+
+	#renderEmptyState() {
+		if (!this._isDoneLoading) return nothing;
+		return html` <div id="empty-state" class="uui-text">
+			<h4><umb-localize key="collection_noItemsTitle"></umb-localize></h4>
+		</div>`;
+	}
+
 	static override styles = [
 		UmbTextStyles,
 		css`
@@ -81,6 +111,21 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 				gap: var(--uui-size-space-5);
 				height: 100%;
 			}
+
+			#router {
+				display: none;
+			}
+
+			.has-items #router {
+				display: block;
+			}
+
+			#empty-state {
+				height: 80%;
+				align-content: center;
+				text-align: center;
+			}
+
 			router-slot {
 				width: 100%;
 				height: 100%;

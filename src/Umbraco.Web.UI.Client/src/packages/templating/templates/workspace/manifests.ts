@@ -1,27 +1,19 @@
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import type {
-	ManifestWorkspaces,
-	ManifestWorkspaceActions,
-	ManifestWorkspaceView,
-	ManifestTypes,
-} from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_TEMPLATE_WORKSPACE_ALIAS = 'Umb.Workspace.Template';
 
-const workspace: ManifestWorkspaces = {
-	type: 'workspace',
-	kind: 'routable',
-	alias: 'Umb.Workspace.Template',
-	name: 'Template Workspace',
-	api: () => import('./template-workspace.context.js'),
-	meta: {
-		entityType: 'template',
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'workspace',
+		kind: 'routable',
+		alias: 'Umb.Workspace.Template',
+		name: 'Template Workspace',
+		api: () => import('./template-workspace.context.js'),
+		meta: {
+			entityType: 'template',
+		},
 	},
-};
-
-const workspaceViews: Array<ManifestWorkspaceView> = [];
-
-const workspaceActions: Array<ManifestWorkspaceActions> = [
 	{
 		type: 'workspaceAction',
 		kind: 'default',
@@ -36,11 +28,9 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_TEMPLATE_WORKSPACE_ALIAS,
 			},
 		],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions];

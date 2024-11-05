@@ -47,6 +47,7 @@ export default {
 		notify: 'Notifications',
 		protect: 'Public Access',
 		publish: 'Publish',
+		readOnly: 'Read-only',
 		refreshNode: 'Reload',
 		remove: 'Remove',
 		rename: 'Rename',
@@ -341,6 +342,7 @@ export default {
 		variantScheduleNotAllowed: 'Schedule is not allowed',
 		variantUnpublishNotAllowed: 'Unpublish is not allowed',
 		selectAllVariants: 'Select all variants',
+		saveModalTitle: 'Save',
 	},
 	blueprints: {
 		createBlueprintFrom: "Create a new Document Blueprint from '%0%'",
@@ -370,13 +372,16 @@ export default {
 		uploadNotAllowed: 'Upload is not allowed in this location.',
 	},
 	member: {
-		createNewMember: 'Create a new member',
-		allMembers: 'All Members',
-		memberGroupNoProperties: 'Member groups have no additional properties for editing.',
 		'2fa': 'Two-Factor Authentication',
+		allMembers: 'All Members',
+		createNewMember: 'Create a new member',
 		duplicateMemberLogin: 'A member with this login already exists',
+		kind: 'Kind',
+		memberGroupNoProperties: 'Member groups have no additional properties for editing.',
 		memberHasGroup: "The member is already in group '%0%'",
 		memberHasPassword: 'The member already has a password set',
+		memberKindDefault: 'Member',
+		memberKindApi: 'API Member',
 		memberLockoutNotEnabled: 'Lockout is not enabled for this member',
 		memberNotInGroup: "The member is not in group '%0%'",
 	},
@@ -515,7 +520,7 @@ export default {
 			'Changing the culture for a language may be an expensive operation and will result\n      in the content cache and indexes being rebuilt\n    ',
 		lastEdited: 'Last Edited',
 		link: 'Link',
-		linkinternal: 'Internal link:',
+		linkinternal: 'Internal link',
 		linklocaltip: 'When using local links, insert "#" in front of link',
 		linknewwindow: 'Open in new window?',
 		macroDoesNotHaveProperties: 'This macro does not contain any properties you can edit',
@@ -547,7 +552,7 @@ export default {
 		relateToOriginalLabel: 'Relate to original',
 		includeDescendants: 'Include descendants',
 		theFriendliestCommunity: 'The friendliest community',
-		linkToPage: 'Link to page',
+		linkToPage: 'Link to document',
 		openInNewWindow: 'Opens the linked document in a new window or tab',
 		linkToMedia: 'Link to media',
 		selectContentStartNode: 'Select content start node',
@@ -561,8 +566,8 @@ export default {
 		selectContent: 'Select content',
 		selectContentType: 'Select content type',
 		selectMediaStartNode: 'Select media start node',
-		selectMember: 'Select member',
-		selectMembers: 'Select members',
+		selectMember: 'Choose member',
+		selectMembers: 'Choose members',
 		selectMemberGroup: 'Select member group',
 		selectMemberType: 'Select member type',
 		selectNode: 'Select node',
@@ -606,9 +611,9 @@ export default {
 		createNew: 'Create dictionary item',
 	},
 	dictionaryItem: {
-		description: "\n      Edit the different language versions for the dictionary item '<em>%0%</em>' below\n   ",
+		description: "Edit the different language versions for the dictionary item '%0%' below",
 		displayName: 'Culture Name',
-		changeKeyError: "\n      The key '%0%' already exists.\n   ",
+		changeKeyError: "The key '%0%' already exists.",
 		overviewTitle: 'Dictionary overview',
 	},
 	examineManagement: {
@@ -664,6 +669,8 @@ export default {
 		a11yCreateItem: 'Create item',
 		a11yEdit: 'Edit',
 		a11yName: 'Name',
+		rteParagraph: 'Write something amazing...',
+		rteHeading: "What's the title?",
 	},
 	editcontenttype: {
 		createListView: 'Create custom list view',
@@ -799,6 +806,7 @@ export default {
 		email: 'Email',
 		error: 'Error',
 		field: 'Field',
+		fieldFor: 'Field for %0%',
 		findDocument: 'Find',
 		first: 'First',
 		focalPoint: 'Focal point',
@@ -831,6 +839,7 @@ export default {
 		logout: 'Logout',
 		macro: 'Macro',
 		mandatory: 'Mandatory',
+		manifest: 'Manifest',
 		message: 'Message',
 		move: 'Move',
 		name: 'Name',
@@ -933,6 +942,7 @@ export default {
 		media: 'Media',
 		revert: 'Revert',
 		validate: 'Validate',
+		newVersionAvailable: 'New version available',
 	},
 	colors: {
 		blue: 'Blue',
@@ -946,6 +956,7 @@ export default {
 		addChild: 'Add child',
 		editDataType: 'Edit data type',
 		navigateSections: 'Navigate sections',
+		selectAll: 'Select all',
 		shortcut: 'Shortcuts',
 		showShortcuts: 'show shortcuts',
 		toggleListView: 'Toggle list view',
@@ -1103,8 +1114,8 @@ export default {
 		relateToOriginal: 'Relate copied items to original',
 	},
 	notifications: {
-		editNotifications: 'Select your notification for <strong>%0%</strong>',
-		notificationsSavedFor: 'Notification settings saved for',
+		editNotifications: 'Select your notification for %0%',
+		notificationsSavedFor: 'Notification settings saved for %0%',
 		notifications: 'Notifications',
 	},
 	packager: {
@@ -1325,7 +1336,7 @@ export default {
 		packages: 'Packages',
 		marketplace: 'Marketplace',
 		settings: 'Settings',
-		translation: 'Dictionary',
+		translation: 'Translation',
 		users: 'Users',
 	},
 	help: {
@@ -1666,12 +1677,12 @@ export default {
 		andAllMediaItems: 'and all media items using this type',
 		andAllMembers: 'and all members using this type',
 		memberCanEdit: 'Member can edit',
-		memberCanEditDescription: 'Allow this property value to be edited by the member on their profile page\n    ',
+		memberCanEditDescription: 'Allow this property value to be edited by the member on their profile page',
 		isSensitiveData: 'Is sensitive data',
 		isSensitiveDataDescription:
-			"Hide this property value from content editors that don't have access to view\n      sensitive information\n    ",
+			"Hide this property value from content editors that don't have access to view sensitive information",
 		showOnMemberProfile: 'Show on member profile',
-		showOnMemberProfileDescription: 'Allow this property value to be displayed on the member profile page\n    ',
+		showOnMemberProfileDescription: 'Allow this property value to be displayed on the member profile page',
 		tabHasNoSortOrder: 'tab has no sort order',
 		compositionUsageHeading: 'Where is this composition used?',
 		compositionUsageSpecification:
@@ -1897,6 +1908,14 @@ export default {
 		administrators: 'Administrator',
 		categoryField: 'Category field',
 		createDate: 'User created',
+		createUserHeadline: (kind: string) => {
+			return kind === 'Api' ? 'Create API user' : 'Create user';
+		},
+		createUserDescription: (kind: string) => {
+			const defaultUserText = `Create a user to give them access to Umbraco. When a user is created a password will be generated that you can share with them.`;
+			const apiUserText = `Create an Api User to allow external services to authenticate with the Umbraco Management API.`;
+			return kind === 'Api' ? apiUserText : defaultUserText;
+		},
 		changePassword: 'Change your password',
 		changePhoto: 'Change photo',
 		configureMfa: 'Configure MFA',
@@ -1906,6 +1925,7 @@ export default {
 				? 'The email address is used for notifications, password recovery, and as the username for logging in'
 				: 'The email address is used for notifications and password recovery';
 		},
+		kind: 'Kind',
 		newPassword: 'New password',
 		newPasswordFormatLengthTip: 'Minimum %0% character(s) to go!',
 		newPasswordFormatNonAlphaTip: 'There should be at least %0% special character(s) in there.',
@@ -2039,6 +2059,8 @@ export default {
 		sortCreateDateDescending: 'Newest',
 		sortCreateDateAscending: 'Oldest',
 		sortLastLoginDateDescending: 'Last login',
+		userKindDefault: 'User',
+		userKindApi: 'API User',
 		noUserGroupsAdded: 'No user groups have been added',
 		'2faDisableText':
 			'If you wish to disable this two-factor provider, then you must enter the code shown on your authentication device:',
@@ -2353,6 +2375,7 @@ export default {
 		labelForArrayOfItems: 'Collection of %0%',
 		labelForRemoveAllEntries: 'Remove all items',
 		labelForClearClipboard: 'Clear clipboard',
+		labelForCopyToClipboard: 'Copy to clipboard',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Open Property Actions',
@@ -2471,6 +2494,7 @@ export default {
 		tabClipboard: 'Clipboard',
 		tabBlockSettings: 'Settings',
 		headlineAdvanced: 'Advanced',
+		headlineCustomView: 'Custom View',
 		forceHideContentEditor: 'Hide content editor',
 		forceHideContentEditorHelp: 'Hide the content edit button and the content editor from the Block Editor overlay.',
 		gridInlineEditing: 'Inline editing',
@@ -2551,6 +2575,8 @@ export default {
 		configureArea: 'Configure area',
 		deleteArea: 'Delete area',
 		addColumnSpanOption: 'Add spanning %0% columns option',
+		createThisFor: (name: string, variantName: string) =>
+			variantName ? `Create ${name} for ${variantName}` : `Create ${name}`,
 		insertBlock: 'Insert Block',
 		labelInlineMode: 'Display inline with text',
 	},
@@ -2621,5 +2647,21 @@ export default {
 		minimapConfigDescription: 'Show a minimap in the code editor.',
 		wordWrapConfigLabel: 'Word wrap',
 		wordWrapConfigDescription: 'Enable word wrapping in the code editor.',
+	},
+	tiptap: {
+		extGroup_formatting: 'Text formatting',
+		extGroup_interactive: 'Interactive elements',
+		extGroup_media: 'Embeds and media',
+		extGroup_structure: 'Content structure',
+		extGroup_unknown: 'Uncategorized',
+		toobar_availableItems: 'Available toolbar items',
+		toobar_availableItemsEmpty: 'There are no toolbar extensions to show',
+		toolbar_designer: 'Toolbar designer',
+		toolbar_addRow: 'Add row configuration',
+		toolbar_addGroup: 'Add group',
+		toolbar_addItems: 'Add items',
+		toolbar_removeRow: 'Remove row',
+		toolbar_removeGroup: 'Remove group',
+		toolbar_removeItem: 'Remove item',
 	},
 } as UmbLocalizationDictionary;

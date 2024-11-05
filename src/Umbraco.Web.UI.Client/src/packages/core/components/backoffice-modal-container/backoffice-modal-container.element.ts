@@ -35,8 +35,11 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 		});
 	}
 
-	/** We cannot render the umb-modal element directly in the uui-modal-container because it wont get recognized by UUI.
-	 *  We therefore have a helper class which creates the uui-modal element and returns it. */
+	/**
+	 * We cannot render the umb-modal element directly in the uui-modal-container because it wont get recognized by UUI.
+	 *  We therefore have a helper class which creates the uui-modal element and returns it.
+	 * @param modals
+	 */
 	#createModalElements(modals: Array<UmbModalContext>) {
 		this.removeAttribute('fill-background');
 		const oldValue = this._modals;

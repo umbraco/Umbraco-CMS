@@ -49,6 +49,14 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 		this.dispatchEvent(new UmbInputEvent());
 	}
 
+	#onKeydown(event: KeyboardEvent) {
+		event.stopPropagation();
+		const target = event.currentTarget as UUIInputElement;
+		if (event.key === 'Enter' && target.value) {
+			this.dispatchEvent(new CustomEvent('enter'));
+		}
+	}
+
 	#onChange(event: UUIInputEvent) {
 		event.stopPropagation();
 		const target = event.currentTarget as UUIInputElement;
@@ -79,18 +87,19 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 		return html`
 			${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-navigation" class="handle"></uui-icon>`}
 
-			<uui-form-validation-message id="validation-message" @invalid=${this.#onInvalid} @valid=${this.#onValid}>
+			<umb-form-validation-message id="validation-message" @invalid=${this.#onInvalid} @valid=${this.#onValid}>
 				<uui-input
 					id="input"
 					label="Value"
 					value=${this.value}
+					@keydown=${this.#onKeydown}
 					@input=${this.#onInput}
 					@change=${this.#onChange}
 					?disabled=${this.disabled}
 					?readonly=${this.readonly}
 					required=${this.required}
 					required-message="Value is missing"></uui-input>
-			</uui-form-validation-message>
+			</umb-form-validation-message>
 
 			${when(
 				!this.readonly,

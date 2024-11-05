@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorUISliderElement } from './property-editor-ui-slider.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-slider.element.js';
@@ -10,7 +10,7 @@ export default {
 	id: 'umb-property-editor-ui-slider',
 } as Meta;
 
-export const AAAOverview: Story<UmbPropertyEditorUISliderElement> = () =>
+export const AAAOverview: StoryFn<UmbPropertyEditorUISliderElement> = () =>
 	html`<umb-property-editor-ui-slider
 		.config="${[
 			{ alias: 'maxVal', value: 50 },

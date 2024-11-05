@@ -1,25 +1,18 @@
-import type {
-	ManifestModal,
-	ManifestTypes,
-	ManifestWorkspace,
-	ManifestWorkspaceActions,
-	ManifestWorkspaceView,
-} from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
-const workspaceAlias = 'Umb.Workspace.LogViewer';
+const UMB_LOG_VIEWER_WORKSPACE_ALIAS = 'Umb.Workspace.LogViewer';
 
-const workspace: ManifestWorkspace = {
-	type: 'workspace',
-	alias: workspaceAlias,
-	name: 'LogViewer Root Workspace',
-	element: () => import('./logviewer-workspace.element.js'),
-	api: () => import('./logviewer-workspace.context.js'),
-	meta: {
-		entityType: 'logviewer',
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'workspace',
+		alias: UMB_LOG_VIEWER_WORKSPACE_ALIAS,
+		name: 'LogViewer Root Workspace',
+		element: () => import('./logviewer-workspace.element.js'),
+		api: () => import('./logviewer-workspace.context.js'),
+		meta: {
+			entityType: 'logviewer',
+		},
 	},
-};
-
-const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.LogViewer.Overview',
@@ -33,8 +26,8 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_LOG_VIEWER_WORKSPACE_ALIAS,
 			},
 		],
 	},
@@ -51,16 +44,11 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_LOG_VIEWER_WORKSPACE_ALIAS,
 			},
 		],
 	},
-];
-
-const workspaceActions: Array<ManifestWorkspaceActions> = [];
-
-const modals: Array<ManifestModal> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.LogViewer.SaveSearch',
@@ -68,5 +56,3 @@ const modals: Array<ManifestModal> = [
 		element: () => import('./views/search/components/log-viewer-search-input-modal.element.js'),
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions, ...modals];

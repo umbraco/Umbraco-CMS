@@ -202,6 +202,7 @@ export default {
 		addTextBox: 'Añadir otra caja de texto',
 		removeTextBox: 'Eliminar caja de texto',
 		contentRoot: 'Raíz de contenido',
+		saveModalTitle: 'Guardar',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Crear nueva Plantilla de Contenido desde <em>%0%</em>',
@@ -370,9 +371,9 @@ export default {
 		createNew: 'Crear elemento de diccionario',
 	},
 	dictionaryItem: {
-		description: "Editar las diferentes versiones lingüísticas para la entrada en el diccionario '% 0%' debajo",
-		displayName: 'nombre de la cultura\n',
-		changeKeyError: "\n      La clave '%0%' ya existe.\n   ",
+		description: "Editar las diferentes versiones lingüísticas para la entrada en el diccionario '%0%' debajo",
+		displayName: 'nombre de la cultura',
+		changeKeyError: "La clave '%0%' ya existe.",
 	},
 	placeholders: {
 		username: 'Escribe tu nombre de usuario',
@@ -743,11 +744,7 @@ export default {
 	},
 	notifications: {
 		editNotifications: 'Edita tu notificación para %0%',
-		mailBody:
-			"Hola %0% Esto es un e-mail automático para informarte que la tarea '%1%' ha sido realizada sobre la página '%2%' por el usuario '%3%' Vaya a http://%4%/#/content/content/edit/%5% para editarla. ¡Espero que tenga un buen día! Saludos del robot de Umbraco",
-		mailBodyHtml:
-			'<p>Hola %0%</p> <p>Esto es un e-mail generado automáticamente para informarle que la tarea <strong>\'%1%\'</strong> ha sido realizada sobre la página <a href="http://%4%/#/content/content/edit/%5%"><strong>\'%2%\'</strong></a> por el usuario <strong>\'%3%\'</strong> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <br /> </div> <p> <h3>Resumen de actualización:</h3> <table style="width: 100%;"> %6% </table> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLISH&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;DELETE&nbsp;&nbsp;&nbsp;&nbsp;</a> <br /> </div> <p>¡Espero que tenga un buen día!<br /><br /> Saludos del robot Umbraco. </p>',
-		mailSubject: '[%0%] Notificación acerca de %1% realizado en %2%',
+		notificationsSavedFor: 'Notificaciones guardadas para %0%',
 		notifications: 'Notificaciones',
 	},
 	packager: {

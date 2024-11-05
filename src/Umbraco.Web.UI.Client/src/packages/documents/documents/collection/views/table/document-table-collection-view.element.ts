@@ -4,10 +4,10 @@ import type { UmbDocumentCollectionItemModel } from '../../types.js';
 import type { UmbDocumentCollectionContext } from '../../document-collection.context.js';
 import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../../document-collection.context-token.js';
 import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
-import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import type {
@@ -25,9 +25,6 @@ import './column-layouts/document-table-column-state.element.js';
 
 @customElement('umb-document-table-collection-view')
 export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
-	@state()
-	private _loading = false;
-
 	@state()
 	private _userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
 
@@ -99,8 +96,6 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 
 	#observeCollectionContext() {
 		if (!this.#collectionContext) return;
-
-		this.observe(this.#collectionContext.loading, (loading) => (this._loading = loading), '_observeLoading');
 
 		this.observe(
 			this.#collectionContext.userDefinedProperties,
@@ -196,24 +191,6 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	}
 
 	override render() {
-		return this._tableItems.length === 0 ? this.#renderEmpty() : this.#renderItems();
-	}
-
-	#renderEmpty() {
-		if (this._tableItems.length > 0) return nothing;
-		return html`
-			<div class="container">
-				${when(
-					this._loading,
-					() => html`<uui-loader></uui-loader>`,
-					() => html`<p>${this.localize.term('content_listViewNoItems')}</p>`,
-				)}
-			</div>
-		`;
-	}
-
-	#renderItems() {
-		if (this._tableItems.length === 0) return nothing;
 		return html`
 			<umb-table
 				.config=${this._tableConfig}
@@ -223,7 +200,6 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				@selected=${this.#handleSelect}
 				@deselected=${this.#handleDeselect}
 				@ordered=${this.#handleOrdering}></umb-table>
-			${when(this._loading, () => html`<uui-loader-bar></uui-loader-bar>`)}
 		`;
 	}
 

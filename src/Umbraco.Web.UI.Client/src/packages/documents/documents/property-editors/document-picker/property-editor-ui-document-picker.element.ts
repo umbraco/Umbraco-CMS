@@ -4,8 +4,10 @@ import { html, customElement, property, state } from '@umbraco-cms/backoffice/ex
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/property-editor';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-property-editor-ui-document-picker')
@@ -25,6 +27,15 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 		this._startNodeId = config.getValueByAlias('startNodeId');
 		this._showOpenButton = config.getValueByAlias('showOpenButton') ?? false;
 	}
+
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
 
 	@state()
 	private _min = 0;
@@ -57,7 +68,8 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 				.startNode=${startNode}
 				.value=${this.value}
 				?showOpenButton=${this._showOpenButton}
-				@change=${this.#onChange}>
+				@change=${this.#onChange}
+				?readonly=${this.readonly}>
 			</umb-input-document>
 		`;
 	}

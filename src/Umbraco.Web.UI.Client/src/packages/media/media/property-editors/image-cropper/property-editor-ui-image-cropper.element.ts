@@ -1,12 +1,12 @@
 import type { UmbImageCropperPropertyEditorValue, UmbInputImageCropperElement } from '../../components/index.js';
 import { html, customElement, property, nothing, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import '../../components/input-image-cropper/input-image-cropper.element.js';
 import {
+	type UmbPropertyEditorUiElement,
 	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import '../../components/input-image-cropper/input-image-cropper.element.js';
 
 /**
  * @element umb-property-editor-ui-image-cropper

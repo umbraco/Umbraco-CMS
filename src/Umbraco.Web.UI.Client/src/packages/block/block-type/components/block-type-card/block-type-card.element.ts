@@ -6,21 +6,22 @@ import { html, customElement, property, state, ifDefined } from '@umbraco-cms/ba
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import { removeInitialSlashFromPath, transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
+import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
+import { UUICardEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-block-type-card')
 export class UmbBlockTypeCardElement extends UmbLitElement {
 	//
 	#init: Promise<void>;
-	#appUrl?: string;
+	#serverUrl: string = '';
 
-	#itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
+	readonly #itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
 		this,
 		UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
 		(x) => x.unique,
 	);
 
-	@property({ type: String, attribute: false })
+	@property({ type: String })
 	href?: string;
 
 	@property({ type: String, attribute: false })
@@ -28,7 +29,8 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 		value = transformServerPathToClientPath(value);
 		if (value) {
 			this.#init.then(() => {
-				this._iconFile = this.#appUrl + removeInitialSlashFromPath(value);
+				const url = new URL(value, this.#serverUrl);
+				this._iconFile = url.href;
 			});
 		} else {
 			this._iconFile = undefined;
@@ -50,9 +52,6 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 	// TODO: support custom icon/image file
 
 	@property({ type: String, attribute: false })
-	public get contentElementTypeKey(): string | undefined {
-		return this._elementTypeKey;
-	}
 	public set contentElementTypeKey(value: string | undefined) {
 		this._elementTypeKey = value;
 		if (value) {
@@ -61,10 +60,13 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 			this.#itemManager.setUniques([]);
 		}
 	}
-	private _elementTypeKey?: string | undefined;
+	public get contentElementTypeKey(): string | undefined {
+		return this._elementTypeKey;
+	}
+	private _elementTypeKey?: string;
 
 	@state()
-	_name?: string;
+	_name = '';
 
 	@state()
 	_description?: string;
@@ -76,25 +78,30 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 		super();
 
 		this.#init = this.getContext(UMB_APP_CONTEXT).then((appContext) => {
-			this.#appUrl = appContext.getServerUrl() + appContext.getBackofficePath();
+			this.#serverUrl = appContext.getServerUrl();
 		});
 
 		this.observe(this.#itemManager.items, (items) => {
 			const item = items[0];
 			if (item) {
 				this._fallbackIcon = item.icon;
-				this._name = item.name;
-				this._description = item.description ?? undefined;
+				this._name = item.name ? this.localize.string(item.name) : this.localize.term('general_unknown');
+				this._description = this.localize.string(item.description);
 			}
 		});
 	}
+
+	readonly #onOpen = () => {
+		this.dispatchEvent(new UUICardEvent(UUICardEvent.OPEN));
+	};
 
 	// TODO: Support image files instead of icons.
 	override render() {
 		return html`
 			<uui-card-block-type
 				href=${ifDefined(this.href)}
-				.name=${this._name ?? 'Unknown'}
+				@open=${this.#onOpen}
+				.name=${this._name}
 				.description=${this._description}
 				.background=${this.backgroundColor}>
 				${this._iconFile

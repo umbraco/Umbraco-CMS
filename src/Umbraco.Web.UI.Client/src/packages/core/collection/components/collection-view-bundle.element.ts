@@ -1,12 +1,11 @@
-import type { UmbDefaultCollectionContext } from '../default/index.js';
 import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
+import type { ManifestCollectionView } from '../extensions/index.js';
 import type { UmbCollectionLayoutConfiguration } from '../types.js';
-import { css, html, customElement, state, nothing, repeat, query } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import type { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
 import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 
 interface UmbCollectionViewLayout {
@@ -30,7 +29,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 	@state()
 	private _entityUnique?: string;
 
-	#collectionContext?: UmbDefaultCollectionContext<any, any>;
+	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -159,6 +158,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 			:host {
 				--uui-button-content-align: left;
 				--uui-menu-item-flat-structure: 1;
+				display: contents;
 			}
 
 			.filter-dropdown {

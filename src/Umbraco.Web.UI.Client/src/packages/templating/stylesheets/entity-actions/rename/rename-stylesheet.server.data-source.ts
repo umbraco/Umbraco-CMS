@@ -22,7 +22,7 @@ export class UmbRenameStylesheetServerDataSource {
 	 * Rename Stylesheet
 	 * @param {string} unique
 	 * @param {string} name
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbRenameStylesheetServerDataSource
 	 */
 	async rename(unique: string, name: string) {

@@ -1,12 +1,11 @@
 import { UMB_PROPERTY_TYPE_ENTITY_TYPE, UMB_PROPERTY_TYPE_WORKSPACE_ALIAS } from './constants.js';
-import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_WORKSPACE_CONDITION_ALIAS, UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspace',
 		kind: 'routable',
-		name: 'Block Workspace',
+		name: 'Property Type Workspace',
 		alias: UMB_PROPERTY_TYPE_WORKSPACE_ALIAS,
 		api: () => import('./property-type-workspace.context.js'),
 		meta: {
@@ -16,8 +15,8 @@ export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.PropertyType.Settings',
-		name: 'Block Workspace Content View',
-		js: () => import('./views/settings/property-workspace-view-settings.element.js'),
+		name: 'Property Type Settings Workspace View',
+		element: () => import('./views/settings/property-workspace-view-settings.element.js'),
 		weight: 1000,
 		meta: {
 			label: '#general_content',
@@ -26,7 +25,7 @@ export const manifests: Array<ManifestTypes> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_PROPERTY_TYPE_WORKSPACE_ALIAS,
 			},
 		],
@@ -44,7 +43,7 @@ export const manifests: Array<ManifestTypes> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				oneOf: [UMB_PROPERTY_TYPE_WORKSPACE_ALIAS],
 			},
 		],

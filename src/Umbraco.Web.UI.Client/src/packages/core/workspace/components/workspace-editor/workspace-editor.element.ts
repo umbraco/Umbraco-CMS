@@ -3,7 +3,7 @@ import { createExtensionElement, UmbExtensionsManifestInitializer } from '@umbra
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspaceView } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 
 /**
@@ -15,11 +15,9 @@ import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from 
  * @slot footer - Slot for workspace footer
  * @slot actions - Slot for workspace footer actions
  * @slot - slot for main content
- * @export
  * @class UmbWorkspaceEditor
- * @extends {UmbLitElement}
+ * @augments {UmbLitElement}
  */
-// TODO: This element has a bug in the tabs. After the url changes - for example a new entity/file is chosen in the tree and loaded to the workspace the links in the tabs still point to the previous url and therefore views do not change correctly
 @customElement('umb-workspace-editor')
 export class UmbWorkspaceEditorElement extends UmbLitElement {
 	@property()

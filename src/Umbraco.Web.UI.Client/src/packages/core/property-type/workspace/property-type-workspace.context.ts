@@ -1,21 +1,25 @@
 import { UmbPropertyTypeWorkspaceEditorElement } from './property-type-workspace-editor.element.js';
 import type { UmbPropertyTypeWorkspaceData } from './property-type-workspace.modal-token.js';
-import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import type { UmbPropertyDatasetContext, UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
 import type {
 	UmbInvariantDatasetWorkspaceContext,
 	UmbRoutableWorkspaceContext,
+	ManifestWorkspace,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbSubmittableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceIsNewRedirectControllerAlias,
+	umbObjectToPropertyValueArray,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropertyTypeModel = UmbPropertyTypeModel>
 	extends UmbSubmittableWorkspaceContextBase<PropertyTypeData>
@@ -37,8 +41,18 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly unique = this.#data.asObservablePart((data) => data?.id);
 
+	readonly values = this.#data.asObservablePart((data) => {
+		return umbObjectToPropertyValueArray(data);
+	});
+	async getValues(): Promise<Array<UmbPropertyValueData> | undefined> {
+		return umbObjectToPropertyValueArray(await firstValueFrom(this.data));
+	}
+
 	constructor(host: UmbControllerHost, args: { manifest: ManifestWorkspace }) {
 		super(host, args.manifest.alias);
+
+		this.addValidationContext(new UmbValidationContext(this));
+
 		const manifest = args.manifest;
 		this.#entityType = manifest.meta?.entityType;
 
@@ -83,7 +97,7 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 	protected override resetState() {
 		super.resetState();
 		this.#data.setValue(undefined);
-		this.removeUmbControllerByAlias('isNewRedirectController');
+		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 		this.removeUmbControllerByAlias('observePropertyTypeData');
 	}
 
@@ -168,6 +182,12 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 		this.updateData({ name: name } as any);
 	}
 
+	/**
+	 * @function propertyValueByAlias
+	 * @param {string} propertyAlias
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
+	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		return this.#data.asObservablePart((data) => data?.[propertyAlias as keyof PropertyTypeData] as ReturnType);
 	}
@@ -176,6 +196,14 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 		return this.#data.getValue()?.[propertyAlias as keyof PropertyTypeData] as ReturnType;
 	}
 
+	/**
+	 * @function setPropertyValue
+	 * @param {string} propertyAlias
+	 * @param alias
+	 * @param {PromiseLike<unknown>} value - value can be a promise resolving into the actual value or the raw value it self.
+	 * @returns {Promise<void>}
+	 * @description Set the value of this property.
+	 */
 	async setPropertyValue(alias: string, value: unknown) {
 		const currentData = this.#data.value;
 		if (currentData) {

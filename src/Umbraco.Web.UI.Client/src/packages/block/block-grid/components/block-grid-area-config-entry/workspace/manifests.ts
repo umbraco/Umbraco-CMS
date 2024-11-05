@@ -1,9 +1,9 @@
 import { manifests as workspaceViewManifests } from './views/manifests.js';
 import { UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_ALIAS } from './index.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	...workspaceViewManifests,
 	{
 		type: 'workspace',
@@ -28,7 +28,7 @@ export const manifests: Array<ManifestTypes> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_ALIAS,
 			},
 		],

@@ -1,6 +1,6 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import '../block-grid-block/index.js';
 
 /**

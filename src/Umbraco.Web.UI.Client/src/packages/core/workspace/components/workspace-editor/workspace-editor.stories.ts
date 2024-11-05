@@ -1,7 +1,7 @@
 import './workspace-editor.element.js';
 
 import type { UmbWorkspaceEditorElement } from './workspace-editor.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
@@ -10,7 +10,7 @@ export default {
 	id: 'umb-workspace-editor',
 } as Meta;
 
-export const AAAOverview: Story<UmbWorkspaceEditorElement> = () =>
+export const AAAOverview: StoryFn<UmbWorkspaceEditorElement> = () =>
 	html` <umb-workspace-editor>
 		<div slot="icon"><uui-button color="" look="placeholder">Icon slot</uui-button></div>
 		<div slot="name"><uui-button color="" look="placeholder">Name slot</uui-button></div>

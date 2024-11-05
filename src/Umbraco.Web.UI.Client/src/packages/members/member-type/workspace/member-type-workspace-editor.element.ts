@@ -3,7 +3,8 @@ import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/component
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/icon';
 
 @customElement('umb-member-type-workspace-editor')
 export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
@@ -89,7 +90,7 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 							value=${this._name}
 							alias=${this._alias}
 							?auto-generate-alias=${this._isNew}
-							@change="${this.#onNameAndAliasChange}"
+							@change=${this.#onNameAndAliasChange}
 							${umbFocus()}>
 						</umb-input-with-alias>
 

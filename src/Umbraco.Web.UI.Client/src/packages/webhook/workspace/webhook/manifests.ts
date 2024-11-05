@@ -1,24 +1,18 @@
-import { UMB_WEBHOOK_ENTITY_TYPE, UMB_WEBHOOK_WORKSPACE } from '../../entity.js';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WEBHOOK_ENTITY_TYPE, UMB_WEBHOOK_WORKSPACE_ALIAS } from '../../entity.js';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import type {
-	ManifestTypes,
-	ManifestWorkspace,
-	ManifestWorkspaceActions,
-	ManifestWorkspaceView,
-} from '@umbraco-cms/backoffice/extension-registry';
 
-const workspace: ManifestWorkspace = {
-	type: 'workspace',
-	kind: 'routable',
-	alias: UMB_WEBHOOK_WORKSPACE,
-	name: 'Webhook Root Workspace',
-	api: () => import('./webhook-workspace.context.js'),
-	meta: {
-		entityType: UMB_WEBHOOK_ENTITY_TYPE,
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'workspace',
+		kind: 'routable',
+		alias: UMB_WEBHOOK_WORKSPACE_ALIAS,
+		name: 'Webhook Root Workspace',
+		api: () => import('./webhook-workspace.context.js'),
+		meta: {
+			entityType: UMB_WEBHOOK_ENTITY_TYPE,
+		},
 	},
-};
-
-const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Webhook.Details',
@@ -32,14 +26,11 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_WEBHOOK_WORKSPACE_ALIAS,
 			},
 		],
 	},
-];
-
-const workspaceActions: Array<ManifestWorkspaceActions> = [
 	{
 		type: 'workspaceAction',
 		kind: 'default',
@@ -53,11 +44,9 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_WEBHOOK_WORKSPACE_ALIAS,
 			},
 		],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions];

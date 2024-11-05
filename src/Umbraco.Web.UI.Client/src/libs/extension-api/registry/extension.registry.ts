@@ -1,9 +1,20 @@
-import type { ManifestBase, ManifestKind } from '../types/index.js';
+import type {
+	ManifestBase,
+	ManifestKind,
+	ManifestWithDynamicConditions,
+	UmbConditionConfigBase,
+} from '../types/index.js';
 import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { map, distinctUntilChanged, combineLatest, of, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
 
+/**
+ *
+ * @param previousValue {Array<ManifestBase>} - previous value
+ * @param currentValue {Array<ManifestBase>} - current value
+ * @returns {boolean} - true if value is assumed to be the same as previous value.
+ */
 function extensionArrayMemoization<T extends Pick<ManifestBase, 'alias'>>(
 	previousValue: Array<T>,
 	currentValue: Array<T>,
@@ -19,6 +30,12 @@ function extensionArrayMemoization<T extends Pick<ManifestBase, 'alias'>>(
 	return true;
 }
 
+/**
+ *
+ * @param previousValue {Array<ManifestBase>} - previous value
+ * @param currentValue {Array<ManifestBase>} - current value
+ * @returns {boolean} - true if value is assumed to be the same as previous value.
+ */
 function extensionAndKindMatchArrayMemoization<
 	T extends Pick<ManifestBase, 'alias'> & { __isMatchedWithKind?: boolean },
 >(previousValue: Array<T>, currentValue: Array<T>): boolean {
@@ -45,6 +62,12 @@ function extensionAndKindMatchArrayMemoization<
 	return true;
 }
 
+/**
+ *
+ * @param previousValue {Array<ManifestBase>} - previous value
+ * @param currentValue {Array<ManifestBase>} - current value
+ * @returns {boolean} - true if value is assumed to be the same as previous value.
+ */
 function extensionSingleMemoization<T extends Pick<ManifestBase, 'alias'>>(
 	previousValue: T | undefined,
 	currentValue: T | undefined,
@@ -55,6 +78,12 @@ function extensionSingleMemoization<T extends Pick<ManifestBase, 'alias'>>(
 	return previousValue === currentValue;
 }
 
+/**
+ *
+ * @param previousValue {Array<ManifestBase>} - previous value
+ * @param currentValue {Array<ManifestBase>} - current value
+ * @returns {boolean} - true if value is assumed to be the same as previous value.
+ */
 function extensionAndKindMatchSingleMemoization<
 	T extends Pick<ManifestBase, 'alias'> & { __isMatchedWithKind?: boolean },
 >(previousValue: T | undefined, currentValue: T | undefined): boolean {
@@ -71,6 +100,7 @@ const sortExtensions = (a: ManifestBase, b: ManifestBase): number => (b.weight |
 
 export class UmbExtensionRegistry<
 	IncomingManifestTypes extends ManifestBase,
+	IncomingConditionConfigTypes extends UmbConditionConfigBase = UmbConditionConfigBase,
 	ManifestTypes extends ManifestBase = IncomingManifestTypes | ManifestBase,
 > {
 	readonly MANIFEST_TYPES: ManifestTypes = undefined as never;
@@ -80,7 +110,25 @@ export class UmbExtensionRegistry<
 
 	private _kinds = new UmbBasicState<Array<ManifestKind<ManifestTypes>>>([]);
 	public readonly kinds = this._kinds.asObservable();
+
 	#exclusions: Array<string> = [];
+
+	#additionalConditions: Map<string, Array<UmbConditionConfigBase>> = new Map();
+	#appendAdditionalConditions(manifest: ManifestTypes) {
+		const newConditions = this.#additionalConditions.get(manifest.alias);
+		if (newConditions) {
+			// Append the condition to the extensions conditions array
+			if ((manifest as ManifestWithDynamicConditions).conditions) {
+				for (const condition of newConditions) {
+					(manifest as ManifestWithDynamicConditions).conditions!.push(condition);
+				}
+			} else {
+				(manifest as ManifestWithDynamicConditions).conditions = newConditions;
+			}
+			this.#additionalConditions.delete(manifest.alias);
+		}
+		return manifest;
+	}
 
 	defineKind(kind: ManifestKind<ManifestTypes>): void {
 		const extensionsValues = this._extensions.getValue();
@@ -116,12 +164,25 @@ export class UmbExtensionRegistry<
 	};
 
 	register(manifest: ManifestTypes | ManifestKind<ManifestTypes>): void {
-		const isValid = this.#checkExtension(manifest);
+		const isValid = this.#validateExtension(manifest);
 		if (!isValid) {
 			return;
 		}
 
-		this._extensions.setValue([...this._extensions.getValue(), manifest as ManifestTypes]);
+		if (manifest.type === 'kind') {
+			this.defineKind(manifest as ManifestKind<ManifestTypes>);
+			return;
+		}
+
+		const isApproved = this.#isExtensionApproved(manifest);
+		if (!isApproved) {
+			return;
+		}
+
+		this._extensions.setValue([
+			...this._extensions.getValue(),
+			this.#appendAdditionalConditions(manifest as ManifestTypes),
+		]);
 	}
 
 	getAllExtensions(): Array<ManifestTypes> {
@@ -157,7 +218,7 @@ export class UmbExtensionRegistry<
 		return false;
 	}
 
-	#checkExtension(manifest: ManifestTypes | ManifestKind<ManifestTypes>): boolean {
+	#validateExtension(manifest: ManifestTypes | ManifestKind<ManifestTypes>): boolean {
 		if (!manifest.type) {
 			console.error(`Extension is missing type`, manifest);
 			return false;
@@ -168,11 +229,9 @@ export class UmbExtensionRegistry<
 			return false;
 		}
 
-		if (manifest.type === 'kind') {
-			this.defineKind(manifest as ManifestKind<ManifestTypes>);
-			return false;
-		}
-
+		return true;
+	}
+	#isExtensionApproved(manifest: ManifestTypes | ManifestKind<ManifestTypes>): boolean {
 		if (!this.#acceptExtension(manifest as ManifestTypes)) {
 			return false;
 		}
@@ -356,6 +415,21 @@ export class UmbExtensionRegistry<
 		) as Observable<Array<T>>;
 	}
 
+	// TODO: Write test for this method:
+	getByTypeAndFilter<
+		Key extends string,
+		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>,
+	>(type: Key, filter: (ext: T) => boolean): Array<T> {
+		const exts = this._extensions
+			.getValue()
+			.filter((ext) => ext.type === type && filter(ext as unknown as T)) as unknown as T[];
+		if (exts.length === 0) {
+			return [];
+		}
+		const kinds = this._kinds.getValue();
+		return exts.map((ext) => (ext?.kind ? (this.#mergeExtensionWithKinds([ext, kinds]) ?? ext) : ext));
+	}
+
 	/**
 	 * Get an observable of extensions by types and a given filter method.
 	 * This will return the all extensions that matches the types and which filter method returns true.
@@ -409,5 +483,42 @@ export class UmbExtensionRegistry<
 			map(this.#mergeExtensionsWithKinds),
 			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
 		) as Observable<Array<ExtensionTypes>>;
+	}
+
+	/**
+	 * Append a new condition to an existing extension
+	 * Useful to add a condition for example the Save And Publish workspace action shipped by core.
+	 * @param {string} alias - The alias of the extension to append the condition to.
+	 * @param  {UmbConditionConfigBase} newCondition - The condition to append to the extension.
+	 */
+	appendCondition(alias: string, newCondition: IncomingConditionConfigTypes) {
+		this.appendConditions(alias, [newCondition]);
+	}
+
+	/**
+	 * Appends an array of conditions to an existing extension
+	 * @param {string} alias  - The alias of the extension to append the condition to
+	 * @param {Array<UmbConditionConfigBase>} newConditions  - An array of conditions to be appended to an extension manifest.
+	 */
+	appendConditions(alias: string, newConditions: Array<IncomingConditionConfigTypes>) {
+		const existingConditionsToBeAdded = this.#additionalConditions.get(alias);
+		this.#additionalConditions.set(
+			alias,
+			existingConditionsToBeAdded ? [...existingConditionsToBeAdded, ...newConditions] : newConditions,
+		);
+
+		const allExtensions = this._extensions.getValue();
+		for (const extension of allExtensions) {
+			if (extension.alias === alias) {
+				// Replace the existing extension with the updated one
+				allExtensions[allExtensions.indexOf(extension)] = this.#appendAdditionalConditions(extension as ManifestTypes);
+
+				// Update the main extensions collection/observable
+				this._extensions.setValue(allExtensions);
+
+				//Stop the search:
+				break;
+			}
+		}
 	}
 }

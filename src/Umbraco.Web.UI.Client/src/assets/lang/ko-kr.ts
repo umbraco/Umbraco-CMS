@@ -113,6 +113,7 @@ export default {
 		updateDate: '마지막 수정일',
 		uploadClear: '파일 삭제',
 		urls: '문서에 링크',
+		saveModalTitle: '저장',
 	},
 	create: {
 		chooseNode: '새로운 %0% (을)를 생성할 위치를 지정하십시오',
@@ -177,7 +178,7 @@ export default {
 		inserttable: '테이블 삽입',
 		lastEdited: '마지막 수정',
 		link: '링크',
-		linkinternal: '내부링크:',
+		linkinternal: '내부링크',
 		linklocaltip: '내부링크를 사용하실 때 링크앞에 "#"를 넣어주세요',
 		linknewwindow: '새 창으로 여시겠습니까?',
 		macroDoesNotHaveProperties: '이 매크로에는 편집할 수 있는 항목이 포함되어 있지 않습니다.',
@@ -204,7 +205,7 @@ export default {
 	},
 	dictionaryItem: {
 		description:
-			"\n    '<em>%0%</em>'사전 항목 아래에 다른 언어버전들을 편집하세요<br/>왼쪽 '언어'메뉴를 사용하여 추가 언어들을 설정할 수 있습니다.\n ",
+			"'%0%'사전 항목 아래에 다른 언어버전들을 편집하세요<br/>왼쪽 '언어'메뉴를 사용하여 추가 언어들을 설정할 수 있습니다.",
 		displayName: '국가명',
 	},
 	editdatatype: {
@@ -468,11 +469,7 @@ export default {
 	},
 	notifications: {
 		editNotifications: '%0% 에 대한 알림 편집',
-		mailBody:
-			"\n      안녕하세요 %0%\n\n      사용자 '%3%' 가  작업 '%1%' 를 페이지 '%2%' 에서\n      진행했음을 알리는 자동 발송 메일입니다.\n\n      편집하시려면 http://%4%/#/content/content/edit/%5% 로 이동하세요\n\n      좋은 하루 되세요!\n\n    ",
-		mailBodyHtml:
-			'<p>안녕하세요 %0%</p>\n\n\t  <p>사용자 <strong>\'%3%\'</strong> 가  작업 <strong>\'%1%\'</strong> 를\n       페이지 <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>\'%2%\'</strong></a> 에서\n       진행했음을 알리는 자동 발송 메일입니다.\n  </p>\n\t  <div style="margin: 8px 0; padding: 8px; display: block;">\n\t\t\t<br />\n\t\t\t<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;편집&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;\n\t\t\t<br />\n\t  </div>\n\t  <p>\n\t\t  <h3>업데이트 요약:</h3>\n\t\t  <table style="width: 100%;">\n\t\t\t\t\t   %6%\n\t\t\t</table>\n\t\t </p>\n\n\t  <div style="margin: 8px 0; padding: 8px; display: block;">\n\t\t\t<br />\n\t\t\t<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;편집&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;\n\t\t\t<br />\n\t  </div>\n\n\t  <p>좋은 하루 되세요!<br /><br />\n\t  </p>',
-		mailSubject: '%1%에 대한 [%0]알림이 %2%에 생성되었습니다',
+		notificationsSavedFor: '%0% 에 대한 알림이 저장되었습니다.',
 		notifications: '알림',
 	},
 	packager: {

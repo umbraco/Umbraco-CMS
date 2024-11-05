@@ -1,12 +1,12 @@
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_BLOCK_RTE_TYPE_WORKSPACE_ALIAS } from '../index.js';
-import type { ManifestTypes, ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
 
-export const workspaceViews: Array<ManifestWorkspaceView> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.BlockType.RTE.Settings',
 		name: 'Block List Type Workspace Settings View',
-		js: () => import('./block-rte-type-workspace-view.element.js'),
+		element: () => import('./block-rte-type-workspace-view.element.js'),
 		weight: 1000,
 		meta: {
 			label: '#general_settings',
@@ -15,11 +15,9 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_BLOCK_RTE_TYPE_WORKSPACE_ALIAS,
 			},
 		],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...workspaceViews];

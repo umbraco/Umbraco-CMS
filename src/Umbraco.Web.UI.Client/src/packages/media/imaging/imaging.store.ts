@@ -14,6 +14,7 @@ export class UmbImagingStore extends UmbContextBase<never> implements UmbApi {
 
 	/**
 	 * Gets the data from the store.
+	 * @param unique
 	 */
 	getData(unique: string) {
 		return this.#data.get(unique);
@@ -21,6 +22,8 @@ export class UmbImagingStore extends UmbContextBase<never> implements UmbApi {
 
 	/**
 	 * Gets a specific crop if it exists.
+	 * @param unique
+	 * @param data
 	 */
 	getCrop(unique: string, data?: UmbImagingModel) {
 		return this.#data.get(unique)?.get(this.#generateCropKey(data));
@@ -28,6 +31,9 @@ export class UmbImagingStore extends UmbContextBase<never> implements UmbApi {
 
 	/**
 	 * Adds a new crop to the store.
+	 * @param unique
+	 * @param urlInfo
+	 * @param data
 	 */
 	addCrop(unique: string, urlInfo: string, data?: UmbImagingModel) {
 		if (!this.#data.has(unique)) {
@@ -38,6 +44,7 @@ export class UmbImagingStore extends UmbContextBase<never> implements UmbApi {
 
 	/**
 	 * Generates a unique key for the crop based on the width, height and mode.
+	 * @param data
 	 */
 	#generateCropKey(data?: UmbImagingModel) {
 		return data ? `${data.width}x${data.height};${data.mode}` : 'generic';

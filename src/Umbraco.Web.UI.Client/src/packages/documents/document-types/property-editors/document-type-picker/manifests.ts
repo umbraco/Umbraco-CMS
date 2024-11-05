@@ -1,10 +1,10 @@
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 
 export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.DocumentTypePicker',
 	name: 'Document Type Picker Property Editor UI',
-	js: () => import('./property-editor-ui-document-type-picker.element.js'),
+	element: () => import('./property-editor-ui-document-type-picker.element.js'),
 	meta: {
 		label: 'Document Type Picker',
 		icon: 'icon-document-dashed-line',

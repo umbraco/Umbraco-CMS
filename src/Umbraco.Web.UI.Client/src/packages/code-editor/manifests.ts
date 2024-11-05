@@ -1,4 +1,4 @@
 import { manifest as propertyEditorManifest } from './property-editor/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as codeEditorModalManifests } from './code-editor-modal/manifests.js';
 
-export const manifests: Array<ManifestTypes> = [propertyEditorManifest];
+export const manifests: Array<UmbExtensionManifest> = [propertyEditorManifest, ...codeEditorModalManifests];

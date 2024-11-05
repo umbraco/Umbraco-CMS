@@ -17,7 +17,6 @@ import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 
 /**
  * A data source for the Stylesheet tree that fetches data from the server
- * @export
  * @class UmbStylesheetTreeServerDataSource
  * @implements {UmbTreeServerDataSourceBase}
  */
@@ -27,7 +26,7 @@ export class UmbStylesheetTreeServerDataSource extends UmbTreeServerDataSourceBa
 > {
 	/**
 	 * Creates an instance of UmbStylesheetTreeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbStylesheetTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -82,6 +81,6 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbStylesheetTreeIte
 		name: item.name,
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
-		icon: item.isFolder ? undefined : 'icon-brush-alt',
+		icon: item.isFolder ? undefined : 'icon-palette',
 	};
 };

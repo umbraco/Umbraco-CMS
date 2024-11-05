@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorUILabelElement } from './property-editor-ui-label.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-label.element.js';
@@ -10,6 +10,6 @@ export default {
 	id: 'umb-property-editor-ui-label',
 } as Meta;
 
-export const AAAOverview: Story<UmbPropertyEditorUILabelElement> = () =>
+export const AAAOverview: StoryFn<UmbPropertyEditorUILabelElement> = () =>
 	html`<umb-property-editor-ui-label></umb-property-editor-ui-label>`;
 AAAOverview.storyName = 'Overview';

@@ -24,7 +24,7 @@ const privateManifests: PackageManifestResponse = [
 				type: 'section',
 				alias: 'My.Section.Custom',
 				name: 'Custom Section',
-				js: '/App_Plugins/section.js',
+				element: '/App_Plugins/section.js',
 				elementName: 'my-section-custom',
 				weight: 1,
 				meta: {
@@ -36,7 +36,7 @@ const privateManifests: PackageManifestResponse = [
 				type: 'propertyEditorUi',
 				alias: 'My.PropertyEditorUI.Custom',
 				name: 'My Custom Property Editor UI',
-				js: '/App_Plugins/property-editor.js',
+				element: '/App_Plugins/property-editor.js',
 				elementName: 'my-property-editor-ui-custom',
 				meta: {
 					label: 'My Custom Property',

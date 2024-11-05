@@ -1,37 +1,52 @@
 import type { UmbBlockRteLayoutModel } from '../../types.js';
+import { UMB_BLOCK_RTE } from '../../constants.js';
 import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, css, property, state, customElement } from '@umbraco-cms/backoffice/external/lit';
-import type {
-	UmbBlockEditorCustomViewProperties,
-	UmbPropertyEditorUiElement,
-} from '@umbraco-cms/backoffice/extension-registry';
+import { html, css, property, state, customElement, nothing } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type {
+	ManifestBlockEditorCustomView,
+	UmbBlockEditorCustomViewProperties,
+} from '@umbraco-cms/backoffice/block-custom-view';
+import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 
 import '../ref-rte-block/index.js';
+import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
+import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 
 /**
- * @element umb-rte-block
- * @element umb-rte-block-inline
+ * @class UmbBlockRteEntryElement
  */
 @customElement('umb-rte-block')
 export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
-	@property({ type: String, attribute: 'data-content-udi', reflect: true })
-	public get contentUdi(): string | undefined {
-		return this._contentUdi;
+	@property({ type: String, attribute: 'data-content-key', reflect: true })
+	public get contentKey(): string | undefined {
+		return this._contentKey;
 	}
-	public set contentUdi(value: string | undefined) {
+	public set contentKey(value: string | undefined) {
 		if (!value) return;
-		this._contentUdi = value;
-		this.#context.setContentUdi(value);
+		this._contentKey = value;
+		this.#context.setContentKey(value);
+
+		new UmbObserveValidationStateController(
+			this,
+			`$.contentData[${UmbDataPathBlockElementDataQuery({ key: value })}]`,
+			(hasMessages) => {
+				this._contentInvalid = hasMessages;
+				this._blockViewProps.contentInvalid = hasMessages;
+			},
+			'observeMessagesForContent',
+		);
 	}
-	private _contentUdi?: string | undefined;
+	private _contentKey?: string | undefined;
 
 	#context = new UmbBlockRteEntryContext(this);
 
 	@state()
 	_showContentEdit = false;
+
 	@state()
 	_hasSettings = false;
 
@@ -42,16 +57,33 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	_icon?: string;
 
 	@state()
+	_exposed?: boolean;
+
+	@state()
 	_workspaceEditContentPath?: string;
 
 	@state()
 	_workspaceEditSettingsPath?: string;
 
 	@state()
+	_contentElementTypeAlias?: string;
+
+	@state()
+	_contentTypeName?: string;
+
+	@state()
 	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel> = {
-		contentUdi: undefined!,
+		contentKey: undefined!,
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
+
+	// 'content-invalid' attribute is used for styling purpose.
+	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
+	_contentInvalid?: boolean;
+
+	// 'settings-invalid' attribute is used for styling purpose.
+	@property({ type: Boolean, attribute: 'settings-invalid', reflect: true })
+	_settingsInvalid?: boolean;
 
 	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel>>) {
 		this._blockViewProps = { ...this._blockViewProps, ...incoming };
@@ -64,14 +96,36 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		// We do not have index for RTE Blocks at the moment.
 		this.#context.setIndex(0);
 
-		this.observe(this.#context.showContentEdit, (showContentEdit) => {
-			this._showContentEdit = showContentEdit;
-			this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showContentEdit } });
-		});
-		this.observe(this.#context.settingsElementTypeKey, (key) => {
-			this._hasSettings = !!key;
-			this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showSettingsEdit: !!key } });
-		});
+		this.observe(
+			this.#context.showContentEdit,
+			(showContentEdit) => {
+				this._showContentEdit = showContentEdit;
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showContentEdit } });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.settingsElementTypeKey,
+			(key) => {
+				this._hasSettings = !!key;
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showSettingsEdit: !!key } });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.contentElementTypeAlias,
+			(alias) => {
+				this._contentElementTypeAlias = alias;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.contentElementTypeName,
+			(contentElementTypeName) => {
+				this._contentTypeName = contentElementTypeName;
+			},
+			null,
+		);
 		this.observe(
 			this.#context.blockType,
 			(blockType) => {
@@ -96,6 +150,14 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			},
 			null,
 		);
+		this.observe(
+			this.#context.hasExpose,
+			(exposed) => {
+				this.#updateBlockViewProps({ unpublished: !exposed });
+				this._exposed = exposed;
+			},
+			null,
+		);
 		// Data props:
 		this.observe(
 			this.#context.layout,
@@ -104,25 +166,34 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			},
 			null,
 		);
+
+		this.#observeData();
+
 		this.observe(
-			this.#context.content,
-			(content) => {
-				this.#updateBlockViewProps({ content });
+			this.#context.settingsKey,
+			(settingsKey) => {
+				this.removeUmbControllerByAlias('observeMessagesForSettings');
+				if (settingsKey) {
+					// Observe settings validation state:
+					new UmbObserveValidationStateController(
+						this,
+						`$.settingsData[${UmbDataPathBlockElementDataQuery({ key: settingsKey })}]`,
+						(hasMessages) => {
+							this._settingsInvalid = hasMessages;
+							this._blockViewProps.settingsInvalid = hasMessages;
+						},
+						'observeMessagesForSettings',
+					);
+				}
 			},
 			null,
 		);
-		this.observe(
-			this.#context.settings,
-			(settings) => {
-				this.#updateBlockViewProps({ settings });
-			},
-			null,
-		);
+
 		this.observe(
 			this.#context.workspaceEditContentPath,
 			(path) => {
 				this._workspaceEditContentPath = path;
-				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editContentPath: path } });
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editContentPath: path } });
 			},
 			null,
 		);
@@ -130,7 +201,24 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			this.#context.workspaceEditSettingsPath,
 			(path) => {
 				this._workspaceEditSettingsPath = path;
-				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editSettingsPath: path } });
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editSettingsPath: path } });
+			},
+			null,
+		);
+	}
+
+	async #observeData() {
+		this.observe(
+			await this.#context.contentValues(),
+			(content) => {
+				this.#updateBlockViewProps({ content });
+			},
+			null,
+		);
+		this.observe(
+			await this.#context.settingsValues(),
+			(settings) => {
+				this.#updateBlockViewProps({ settings });
 			},
 			null,
 		);
@@ -141,35 +229,83 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.setAttribute('contenteditable', 'false');
 	}
 
-	#renderRefBlock() {
-		return html`<umb-ref-rte-block .label=${this._label} .icon=${this._icon}></umb-ref-rte-block>`;
-	}
+	readonly #filterBlockCustomViews = (manifest: ManifestBlockEditorCustomView) => {
+		const elementTypeAlias = this._contentElementTypeAlias ?? '';
+		const isForBlockEditor =
+			!manifest.forBlockEditor || stringOrStringArrayContains(manifest.forBlockEditor, UMB_BLOCK_RTE);
+		const isForContentTypeAlias =
+			!manifest.forContentTypeAlias || stringOrStringArrayContains(manifest.forContentTypeAlias, elementTypeAlias);
+		return isForBlockEditor && isForContentTypeAlias;
+	};
+
+	#expose = () => {
+		this.#context.expose();
+	};
 
 	#renderBlock() {
 		return html`
 			<div class="uui-text uui-font">
 				<umb-extension-slot
 					type="blockEditorCustomView"
-					default-element=${'umb-ref-rte-block'}
+					default-element="umb-ref-rte-block"
 					.props=${this._blockViewProps}
-					>${this.#renderRefBlock()}</umb-extension-slot
-				>
-				<uui-action-bar>
-					${this._showContentEdit && this._workspaceEditContentPath
-						? html`<uui-button label="edit" compact href=${this._workspaceEditContentPath}>
-								<uui-icon name="icon-edit"></uui-icon>
-							</uui-button>`
-						: ''}
-					${this._hasSettings && this._workspaceEditSettingsPath
-						? html`<uui-button label="Edit settings" compact href=${this._workspaceEditSettingsPath}>
-								<uui-icon name="icon-settings"></uui-icon>
-							</uui-button>`
-						: ''}
-					<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
-						<uui-icon name="icon-remove"></uui-icon>
-					</uui-button>
-				</uui-action-bar>
+					.filter=${this.#filterBlockCustomViews}
+					single>
+					${this.#renderRefBlock()}
+				</umb-extension-slot>
+				<uui-action-bar> ${this.#renderEditAction()} ${this.#renderEditSettingsAction()} </uui-action-bar>
+				${!this._showContentEdit && this._contentInvalid
+					? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+					: nothing}
 			</div>
+		`;
+	}
+
+	#renderRefBlock() {
+		return html`<umb-ref-rte-block
+			.label=${this._label}
+			.icon=${this._icon}
+			.unpublished=${!this._exposed}
+			.content=${this._blockViewProps.content}
+			.settings=${this._blockViewProps.settings}></umb-ref-rte-block>`;
+	}
+
+	#renderEditAction() {
+		return this._showContentEdit && this._workspaceEditContentPath
+			? html`<uui-button
+					label="edit"
+					look="secondary"
+					color=${this._contentInvalid ? 'danger' : ''}
+					href=${this._workspaceEditContentPath}>
+					<uui-icon name="icon-edit"></uui-icon>
+					${this._contentInvalid
+						? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+						: nothing}
+				</uui-button>`
+			: this._showContentEdit === false && this._exposed === false
+				? html`<uui-button
+						@click=${this.#expose}
+						label=${this.localize.term('blockEditor_createThisFor', this._contentTypeName)}
+						look="secondary"
+						><uui-icon name="icon-add"></uui-icon
+					></uui-button>`
+				: nothing;
+	}
+
+	#renderEditSettingsAction() {
+		return html`
+			${this._hasSettings && this._workspaceEditSettingsPath
+				? html`<uui-button
+						label="Edit settings"
+						look="secondary"
+						color=${this._settingsInvalid ? 'danger' : ''}
+						href=${this._workspaceEditSettingsPath}>
+						<uui-icon name="icon-settings"></uui-icon>
+						${this._settingsInvalid
+							? html`<uui-badge attention color="danger" label="Invalid settings">!</uui-badge>`
+							: nothing}
+					</uui-button>`
+				: nothing}
 		`;
 	}
 
@@ -177,7 +313,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		return this.#renderBlock();
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			:host {
@@ -185,6 +321,13 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				display: block;
 				user-select: none;
 				user-drag: auto;
+				white-space: nowrap;
+			}
+			:host(.ProseMirror-selectednode) {
+				umb-ref-rte-block {
+					cursor: not-allowed;
+					outline: 3px solid var(--uui-color-focus);
+				}
 			}
 			uui-action-bar {
 				position: absolute;

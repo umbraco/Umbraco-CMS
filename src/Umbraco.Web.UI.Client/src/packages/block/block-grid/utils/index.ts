@@ -1,3 +1,9 @@
+/**
+ *
+ * @param target
+ * @param map
+ * @param max
+ */
 export function closestColumnSpanOption(target: number, map: Array<number>, max: number) {
 	if (map.length > 0) {
 		const result = map.reduce((a, b) => {

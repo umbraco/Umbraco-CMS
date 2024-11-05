@@ -1,7 +1,7 @@
 import { UMB_SORT_CHILDREN_OF_MODAL } from './modal/index.js';
+import type { MetaEntityActionSortChildrenOfKind } from './types.js';
 import { UmbEntityActionBase, UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { MetaEntityActionSortChildrenOfKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 export class UmbSortChildrenOfEntityAction extends UmbEntityActionBase<MetaEntityActionSortChildrenOfKind> {

@@ -1,10 +1,10 @@
 import { UMB_USER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import type { UmbUserGroupItemModel } from '../../repository/index.js';
-import { UmbUserGroupPickerContext } from './user-group-input.context.js';
+import { UmbUserGroupPickerInputContext } from './user-group-input.context.js';
 import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
@@ -14,7 +14,7 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default 0
+	 * @default
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
@@ -37,7 +37,7 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default Infinity
+	 * @default
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
@@ -75,7 +75,7 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 	@state()
 	private _items?: Array<UmbUserGroupItemModel>;
 
-	#pickerContext = new UmbUserGroupPickerContext(this);
+	#pickerContext = new UmbUserGroupPickerInputContext(this);
 
 	@state()
 	private _editUserGroupPath = '';

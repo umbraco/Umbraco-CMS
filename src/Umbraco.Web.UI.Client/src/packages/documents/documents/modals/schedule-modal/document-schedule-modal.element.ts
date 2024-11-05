@@ -6,6 +6,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';
+import type { UUIBooleanInputElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-document-schedule-modal')
 export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
@@ -20,6 +21,9 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	@state()
 	_selection: UmbDocumentScheduleModalValue['selection'] = [];
 
+	@state()
+	_isAllSelected?: boolean;
+
 	constructor() {
 		super();
 		this.observe(
@@ -28,6 +32,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				this._selection = selection.map((unique) => {
 					return { unique, schedule: {} };
 				});
+				this._isAllSelected = this.#isAllSelected();
 			},
 			'_selection',
 		);
@@ -41,7 +46,17 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setMultiple(true);
 		this.#selectionManager.setSelectable(true);
 
+		const pickableFilter = this.data?.pickableFilter;
+
+		if (pickableFilter) {
+			this.#selectionManager.setAllowLimitation((unique) => {
+				const option = this.data?.options.find((o) => o.unique === unique);
+				return option ? pickableFilter(option) : true;
+			});
+		}
+
 		// Only display variants that are relevant to pick from, i.e. variants that are draft or published with pending changes:
+		// TODO:[NL] I would say we should change this, the act of scheduling should be equivalent to save & publishing. Resulting in content begin saved as part of carrying out the action. (But this requires a update in the workspace.)
 		this._options =
 			this.data?.options.filter(
 				(option) => option.variant && option.variant.state !== UmbDocumentVariantState.NOT_CREATED,
@@ -66,6 +81,25 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 	#isSelected(unique: string) {
 		return this._selection.some((s) => s.unique === unique);
+	}
+
+	#onSelectAllChange(event: Event) {
+		const allUniques = this._options.map((o) => o.unique);
+		const filter = this.#selectionManager.getAllowLimitation();
+		const allowedUniques = allUniques.filter((unique) => filter(unique));
+
+		if ((event.target as UUIBooleanInputElement).checked) {
+			this.#selectionManager.setSelection(allowedUniques);
+		} else {
+			this.#selectionManager.setSelection([]);
+		}
+	}
+
+	#isAllSelected() {
+		const allUniques = this._options.map((o) => o.unique);
+		const filter = this.#selectionManager.getAllowLimitation();
+		const allowedUniques = allUniques.filter((unique) => filter(unique));
+		return this._selection.length === allowedUniques.length;
 	}
 
 	override render() {
@@ -98,22 +132,36 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	#renderOptions() {
-		return repeat(
-			this._options,
-			(option) => option.unique,
-			(option) => html`
-				<uui-menu-item
-					selectable
-					label=${option.variant?.name ?? option.language.name}
-					@selected=${() => this.#selectionManager.select(option.unique)}
-					@deselected=${() => this.#selectionManager.deselect(option.unique)}
-					?selected=${this.#isSelected(option.unique)}>
-					<uui-icon slot="icon" name="icon-globe"></uui-icon>
-					${UmbDocumentVariantLanguagePickerElement.renderLabel(option)}
-				</uui-menu-item>
-				${when(this.#isSelected(option.unique), () => this.#renderPublishDateInput(option))}
-			`,
-		);
+		return html`
+			<uui-checkbox
+				@change=${this.#onSelectAllChange}
+				label=${this.localize.term('general_selectAll')}
+				.checked=${this._isAllSelected}></uui-checkbox>
+
+			${repeat(
+				this._options,
+				(option) => option.unique,
+				(option) => this.#renderItem(option),
+			)}
+		`;
+	}
+
+	#renderItem(option: UmbDocumentVariantOptionModel) {
+		const pickable = this.data?.pickableFilter ? this.data.pickableFilter(option) : () => true;
+
+		return html`
+			<uui-menu-item
+				?selectable=${pickable}
+				?disabled=${!pickable}
+				label=${option.variant?.name ?? option.language.name}
+				@selected=${() => this.#selectionManager.select(option.unique)}
+				@deselected=${() => this.#selectionManager.deselect(option.unique)}
+				?selected=${this.#isSelected(option.unique)}>
+				<uui-icon slot="icon" name="icon-globe"></uui-icon>
+				${UmbDocumentVariantLanguagePickerElement.renderLabel(option)}
+			</uui-menu-item>
+			${when(this.#isSelected(option.unique), () => this.#renderPublishDateInput(option))}
+		`;
 	}
 
 	#renderPublishDateInput(option: UmbDocumentVariantOptionModel) {
@@ -192,6 +240,14 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 			.publish-date > uui-form-layout-item:first-child {
 				border-right: 1px dashed var(--uui-color-border);
+			}
+
+			uui-checkbox {
+				margin-bottom: var(--uui-size-space-3);
+			}
+
+			uui-menu-item {
+				--uui-menu-item-flat-structure: 1;
 			}
 		`,
 	];

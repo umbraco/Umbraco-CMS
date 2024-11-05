@@ -3,7 +3,7 @@ import type { UmbDataTypeReferenceModel } from '../../../reference/index.js';
 import { css, html, customElement, state, repeat, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
@@ -105,6 +105,9 @@ export class UmbDataTypeWorkspaceViewInfoReferenceElement extends UmbLitElement 
 	static override styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				display: contents;
+			}
 			uui-table-cell {
 				color: var(--uui-color-text-alt);
 			}

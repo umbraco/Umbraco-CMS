@@ -8,7 +8,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for Document Blueprint items that fetches data from the server
- * @export
  * @class UmbDocumentBlueprintItemServerDataSource
  * @implements {DocumentTreeDataSource}
  */
@@ -19,7 +18,7 @@ export class UmbDocumentBlueprintItemServerDataSource extends UmbItemServerDataS
 	#host: UmbControllerHost;
 	/**
 	 * Creates an instance of UmbDocumentBlueprintItemServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentBlueprintItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

@@ -1,7 +1,7 @@
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPackageRepository } from '@umbraco-cms/backoffice/package';
-import type { UmbSectionViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbSectionViewElement } from '@umbraco-cms/backoffice/section';
 
 @customElement('umb-packages-marketplace-section-view')
 export class UmbPackagesMarketplaceSectionViewElement extends UmbLitElement implements UmbSectionViewElement {

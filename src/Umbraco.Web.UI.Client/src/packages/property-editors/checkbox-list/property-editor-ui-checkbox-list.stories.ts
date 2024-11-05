@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorUICheckboxListElement } from './property-editor-ui-checkbox-list.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-checkbox-list.element.js';
@@ -10,6 +10,6 @@ export default {
 	id: 'umb-property-editor-ui-checkbox-list',
 } as Meta;
 
-export const AAAOverview: Story<UmbPropertyEditorUICheckboxListElement> = () =>
+export const AAAOverview: StoryFn<UmbPropertyEditorUICheckboxListElement> = () =>
 	html`<umb-property-editor-ui-checkbox-list></umb-property-editor-ui-checkbox-list>`;
 AAAOverview.storyName = 'Overview';

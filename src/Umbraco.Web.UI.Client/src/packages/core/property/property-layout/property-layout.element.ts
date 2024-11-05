@@ -81,9 +81,9 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 				<slot name="description"></slot>
 			</div>
 			<div id="editorColumn">
-				<uui-form-validation-message>
+				<umb-form-validation-message>
 					<slot name="editor"></slot>
-				</uui-form-validation-message>
+				</umb-form-validation-message>
 			</div>
 		`;
 	}

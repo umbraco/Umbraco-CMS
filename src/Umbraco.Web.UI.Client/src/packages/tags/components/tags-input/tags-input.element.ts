@@ -145,7 +145,11 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		const currentItems = [...this.items];
 		const index = currentItems.findIndex((x) => x === tag);
 		currentItems.splice(index, 1);
-		currentItems.length ? (this.items = [...currentItems]) : (this.items = []);
+		if (currentItems.length) {
+			this.items = currentItems;
+		} else {
+			this.items = [];
+		}
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 
@@ -389,7 +393,6 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 			}
 
 			#matchlist {
-				display: none;
 				display: flex;
 				flex-direction: column;
 				background-color: var(--uui-color-surface);
@@ -399,6 +402,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 				top: var(--uui-size-space-6);
 				border-radius: var(--uui-border-radius);
 				border: 1px solid var(--uui-color-border);
+				z-index: 10;
 			}
 
 			#matchlist label {

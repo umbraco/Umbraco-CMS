@@ -2,10 +2,10 @@ import type { UmbWorkspaceSplitViewManager } from '../../controllers/workspace-s
 import type { UmbPropertyDatasetContext } from '../../../property/property-dataset/property-dataset-context.interface.js';
 import type { UmbSubmittableWorkspaceContext } from './submittable-workspace-context.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbVariantId, UmbVariantModel, UmbVariantOptionModel } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantId, UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export interface UmbVariantDatasetWorkspaceContext<VariantType extends UmbVariantModel = UmbVariantModel>
+export interface UmbVariantDatasetWorkspaceContext<VariantType extends UmbEntityVariantModel = UmbEntityVariantModel>
 	extends UmbSubmittableWorkspaceContext {
 	// Name:
 	getName(variantId?: UmbVariantId): string | undefined;
@@ -14,7 +14,7 @@ export interface UmbVariantDatasetWorkspaceContext<VariantType extends UmbVarian
 
 	// Variant:
 	variants: Observable<Array<VariantType>>;
-	variantOptions: Observable<Array<UmbVariantOptionModel<VariantType>>>;
+	variantOptions: Observable<Array<UmbEntityVariantOptionModel<VariantType>>>;
 	splitView: UmbWorkspaceSplitViewManager;
 	getVariant(variantId: UmbVariantId): VariantType | undefined;
 

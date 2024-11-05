@@ -11,7 +11,7 @@ export const UMB_MEDIA_WORKSPACE_PATH = UMB_WORKSPACE_PATH_PATTERN.generateAbsol
 export const UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN = new UmbPathPattern<{
 	parentEntityType: UmbMediaEntityTypeUnion;
 	parentUnique?: string | null;
-	documentTypeUnique: string;
-}>('create/parent/:parentEntityType/:parentUnique/:documentTypeUnique', UMB_MEDIA_WORKSPACE_PATH);
+	mediaTypeUnique: string;
+}>('create/parent/:parentEntityType/:parentUnique/:mediaTypeUnique', UMB_MEDIA_WORKSPACE_PATH);
 
 export const UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN = new UmbPathPattern<{ unique: string }>('edit/:unique');

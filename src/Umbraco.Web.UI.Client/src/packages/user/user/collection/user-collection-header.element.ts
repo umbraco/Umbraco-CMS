@@ -1,14 +1,13 @@
-import type { UmbUserCollectionContext } from './user-collection.context.js';
-import type { UmbUserOrderByOption } from './types.js';
-import type { UmbUserStateFilterType } from './utils/index.js';
 import { UmbUserStateFilter } from './utils/index.js';
 import { UMB_USER_COLLECTION_CONTEXT } from './user-collection.context-token.js';
-import type { UUIBooleanInputEvent, UUICheckboxElement } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbUserGroupDetailModel } from '@umbraco-cms/backoffice/user-group';
-import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
+import type { UmbUserOrderByOption } from './types.js';
+import type { UmbUserStateFilterType } from './utils/index.js';
+import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
+import type { UmbUserGroupDetailModel } from '@umbraco-cms/backoffice/user-group';
+import type { UUIBooleanInputEvent, UUICheckboxElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-user-collection-header')
 export class UmbUserCollectionHeaderElement extends UmbLitElement {
@@ -30,9 +29,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	@state()
 	_activeOrderByOption?: UmbUserOrderByOption;
 
-	#collectionContext?: UmbUserCollectionContext;
-	#inputTimer?: NodeJS.Timeout;
-	#inputTimerAmount = 500;
+	#collectionContext?: typeof UMB_USER_COLLECTION_CONTEXT.TYPE;
 
 	#userGroupCollectionRepository = new UmbUserGroupCollectionRepository(this);
 
@@ -73,13 +70,6 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		if (data) {
 			this._userGroups = data.items;
 		}
-	}
-
-	private _updateSearch(event: InputEvent) {
-		const target = event.target as HTMLInputElement;
-		const filter = target.value || '';
-		clearTimeout(this.#inputTimer);
-		this.#inputTimer = setTimeout(() => this.#collectionContext?.setFilter({ filter }), this.#inputTimerAmount);
 	}
 
 	#onStateFilterChange(event: UUIBooleanInputEvent) {
@@ -141,24 +131,13 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<umb-collection-action-bundle></umb-collection-action-bundle>
-			${this.#renderSearch()}
-			<div>${this.#renderFilters()} ${this.#renderCollectionViews()}</div>
+			<umb-collection-toolbar slot="header">
+				<div id="toolbar">
+					<umb-collection-filter-field></umb-collection-filter-field>
+					${this.#renderStatusFilter()} ${this.#renderUserGroupFilter()} ${this.#renderOrderBy()}
+				</div>
+			</umb-collection-toolbar>
 		`;
-	}
-
-	#renderSearch() {
-		return html`
-			<uui-input
-				@input=${this._updateSearch}
-				label=${this.localize.term('visuallyHiddenTexts_userSearchLabel')}
-				placeholder=${this.localize.term('visuallyHiddenTexts_userSearchLabel')}
-				id="input-search"></uui-input>
-		`;
-	}
-
-	#renderFilters() {
-		return html` ${this.#renderStatusFilter()} ${this.#renderUserGroupFilter()} ${this.#renderOrderBy()} `;
 	}
 
 	#renderStatusFilter() {
@@ -230,10 +209,6 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		`;
 	}
 
-	#renderCollectionViews() {
-		return html` <umb-collection-view-bundle></umb-collection-view-bundle> `;
-	}
-
 	static override styles = [
 		css`
 			:host {
@@ -246,7 +221,15 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 				align-items: center;
 			}
 
-			#input-search {
+			#toolbar {
+				flex: 1;
+				display: flex;
+				gap: var(--uui-size-space-5);
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			umb-collection-filter-field {
 				width: 100%;
 			}
 

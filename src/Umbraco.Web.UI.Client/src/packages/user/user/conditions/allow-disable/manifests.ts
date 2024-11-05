@@ -1,10 +1,10 @@
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_USER_ALLOW_DISABLE_CONDITION_ALIAS } from './constants.js';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'condition',
 		name: 'User Allow Disable Action Condition',
-		alias: 'Umb.Condition.User.AllowDisableAction',
+		alias: UMB_USER_ALLOW_DISABLE_CONDITION_ALIAS,
 		api: () => import('./user-allow-disable-action.condition.js'),
 	},
 ];

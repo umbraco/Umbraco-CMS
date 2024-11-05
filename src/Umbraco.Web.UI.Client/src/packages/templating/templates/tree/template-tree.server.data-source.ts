@@ -12,7 +12,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A data source for the Template tree that fetches data from the server
- * @export
  * @class UmbTemplateTreeServerDataSource
  * @implements {UmbTreeDataSource}
  */
@@ -22,7 +21,7 @@ export class UmbTemplateTreeServerDataSource extends UmbTreeServerDataSourceBase
 > {
 	/**
 	 * Creates an instance of UmbTemplateTreeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbTemplateTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -72,6 +71,6 @@ const mapper = (item: NamedEntityTreeItemResponseModel): UmbTemplateTreeItemMode
 		entityType: UMB_TEMPLATE_ENTITY_TYPE,
 		hasChildren: item.hasChildren,
 		isFolder: false,
-		icon: 'icon-newspaper',
+		icon: 'icon-document-html',
 	};
 };

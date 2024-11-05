@@ -1,24 +1,19 @@
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import type {
-	ManifestWorkspaces,
-	ManifestWorkspaceActions,
-	ManifestTypes,
-} from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_PARTIAL_VIEW_WORKSPACE_ALIAS = 'Umb.Workspace.PartialView';
 
-const workspace: ManifestWorkspaces = {
-	type: 'workspace',
-	kind: 'routable',
-	alias: UMB_PARTIAL_VIEW_WORKSPACE_ALIAS,
-	name: 'Partial View Workspace',
-	api: () => import('./partial-view-workspace.context.js'),
-	meta: {
-		entityType: 'partial-view',
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'workspace',
+		kind: 'routable',
+		alias: UMB_PARTIAL_VIEW_WORKSPACE_ALIAS,
+		name: 'Partial View Workspace',
+		api: () => import('./partial-view-workspace.context.js'),
+		meta: {
+			entityType: 'partial-view',
+		},
 	},
-};
-
-const workspaceActions: Array<ManifestWorkspaceActions> = [
 	{
 		type: 'workspaceAction',
 		kind: 'default',
@@ -32,11 +27,9 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_PARTIAL_VIEW_WORKSPACE_ALIAS,
 			},
 		],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [workspace, ...workspaceActions];

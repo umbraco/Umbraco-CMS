@@ -1,4 +1,4 @@
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'section',
 		alias: 'MyBundle.Section.Custom',

@@ -12,7 +12,6 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
  * A server data source for Document publishing
- * @export
  * @class UmbDocumentPublishingServerDataSource
  * @implements {DocumentTreeDataSource}
  */
@@ -21,7 +20,7 @@ export class UmbDocumentPublishingServerDataSource {
 
 	/**
 	 * Creates an instance of UmbDocumentPublishingServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -32,7 +31,8 @@ export class UmbDocumentPublishingServerDataSource {
 	 * Publish one or more variants of a Document
 	 * @param {string} unique
 	 * @param {Array<UmbVariantId>} variantIds
-	 * @return {*}
+	 * @param variants
+	 * @returns {*}
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async publish(unique: string, variants: Array<UmbDocumentVariantPublishModel>) {
@@ -59,7 +59,7 @@ export class UmbDocumentPublishingServerDataSource {
 	 * Unpublish one or more variants of a Document
 	 * @param {string} unique
 	 * @param {Array<UmbVariantId>} variantIds
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async unpublish(unique: string, variantIds: Array<UmbVariantId>) {
@@ -87,6 +87,9 @@ export class UmbDocumentPublishingServerDataSource {
 
 	/**
 	 * Publish variants of a document and all its descendants
+	 * @param unique
+	 * @param variantIds
+	 * @param includeUnpublishedDescendants
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async publishWithDescendants(

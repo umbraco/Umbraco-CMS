@@ -1,4 +1,4 @@
-import { UmbDocumentUserPermissionCondition } from '../../user-permissions/condition/document-user-permission.condition.js';
+import { UmbDocumentUserPermissionCondition } from '../../user-permissions/conditions/document-user-permission.condition.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../document-workspace.context-token.js';
 import { UMB_USER_PERMISSION_DOCUMENT_UPDATE } from '../../user-permissions/index.js';
 import { UmbWorkspaceActionBase } from '@umbraco-cms/backoffice/workspace';
@@ -23,7 +23,11 @@ export class UmbDocumentSaveAndPreviewWorkspaceAction extends UmbWorkspaceAction
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE],
 			},
 			onChange: () => {
-				condition.permitted ? this.enable() : this.disable();
+				if (condition.permitted) {
+					this.enable();
+				} else {
+					this.disable();
+				}
 			},
 		});
 	}

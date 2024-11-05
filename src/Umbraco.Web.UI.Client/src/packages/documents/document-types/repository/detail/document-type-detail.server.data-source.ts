@@ -13,7 +13,6 @@ import type { UmbPropertyContainerTypes, UmbPropertyTypeContainerModel } from '@
 
 /**
  * A data source for the Document Type that fetches data from the server
- * @export
  * @class UmbDocumentTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -22,7 +21,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 
 	/**
 	 * Creates an instance of UmbDocumentTypeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -32,7 +31,8 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	/**
 	 * Creates a new Document Type scaffold
 	 * @param {(string | null)} parentUnique
-	 * @return { CreateDocumentTypeRequestModel }
+	 * @param preset
+	 * @returns { CreateDocumentTypeRequestModel }
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbDocumentTypeDetailModel> = {}) {
@@ -68,7 +68,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	/**
 	 * Fetches a Media Type with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async read(unique: string) {
@@ -135,7 +135,8 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	/**
 	 * Inserts a new Media Type on the server
 	 * @param {UmbDocumentTypeDetailModel} model
-	 * @return {*}
+	 * @param parentUnique
+	 * @returns {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async create(model: UmbDocumentTypeDetailModel, parentUnique: string | null = null) {
@@ -205,7 +206,8 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	/**
 	 * Updates a DocumentType on the server
 	 * @param {UmbDocumentTypeDetailModel} DocumentType
-	 * @return {*}
+	 * @param model
+	 * @returns {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async update(model: UmbDocumentTypeDetailModel) {
@@ -281,7 +283,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	/**
 	 * Deletes a Media Type on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async delete(unique: string) {

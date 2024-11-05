@@ -7,7 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 /**
  * @element umb-icon
  * @description A wrapper for the uui-icon component with color alias support
- * @extends {UmbLitElement}
+ * @augments {UmbLitElement}
  */
 @customElement('umb-icon')
 export class UmbIconElement extends UmbLitElement {
@@ -23,7 +23,7 @@ export class UmbIconElement extends UmbLitElement {
 	/**
 	 * Color alias or a color code directly.\
 	 * If a color has been set via the name property, this property will override it.
-	 * */
+	 */
 	@property({ type: String })
 	public set color(value: string) {
 		this.#color = value;

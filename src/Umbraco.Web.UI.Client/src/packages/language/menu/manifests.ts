@@ -1,6 +1,6 @@
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menuItem',
 		alias: 'Umb.MenuItem.Languages',
@@ -20,7 +20,7 @@ export const manifests: Array<ManifestTypes> = [
 		api: () => import('./language-menu-structure.context.js'),
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: 'Umb.Workspace.Language',
 			},
 		],
@@ -32,7 +32,7 @@ export const manifests: Array<ManifestTypes> = [
 		name: 'Language Breadcrumb Workspace Footer App',
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: 'Umb.Workspace.Language',
 			},
 		],

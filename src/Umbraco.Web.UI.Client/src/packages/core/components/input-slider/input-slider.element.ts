@@ -24,6 +24,15 @@ export class UmbInputSliderElement extends UUIFormControlMixin(UmbLitElement, ''
 	@property({ type: Boolean, attribute: 'enable-range' })
 	enableRange = false;
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	protected override getFormElement() {
 		return undefined;
 	}
@@ -45,7 +54,8 @@ export class UmbInputSliderElement extends UUIFormControlMixin(UmbLitElement, ''
 				.max=${this.max}
 				.step=${this.step}
 				.value=${this.valueLow.toString()}
-				@change=${this.#onChange}>
+				@change=${this.#onChange}
+				?readonly=${this.readonly}>
 			</uui-slider>
 		`;
 	}
@@ -57,7 +67,8 @@ export class UmbInputSliderElement extends UUIFormControlMixin(UmbLitElement, ''
 				.max=${this.max}
 				.step=${this.step}
 				.value="${this.valueLow},${this.valueHigh}"
-				@change=${this.#onChange}>
+				@change=${this.#onChange}
+				?readonly=${this.readonly}>
 			</uui-range-slider>
 		`;
 	}

@@ -233,6 +233,7 @@ export default {
 		listViewNoContent: 'Inga undernoder har lagts till',
 		noChanges: 'Inga ändringar har gjorts',
 		notCreated: 'Ej skapad',
+		saveModalTitle: 'Spara',
 	},
 	contentTypeEditor: {
 		yesDelete: 'Ja, ta bort',
@@ -371,10 +372,12 @@ export default {
 		inserttable: 'Infoga tabell',
 		lastEdited: 'Senast redigerad',
 		link: 'Länk',
-		linkinternal: 'Intern länk:',
+		linkinternal: 'Intern länk',
 		linklocaltip: 'När du använder lokala länkar, lägg till "#" framför länken',
 		linknewwindow: 'Öppna i nytt fönster?',
 		macroDoesNotHaveProperties: 'Detta makro innehåller inga egenskaper som du kan redigera',
+		selectMember: 'Välj medlem',
+		selectMembers: 'Välj medlemmar',
 		paste: 'Klistra in',
 		permissionsEdit: 'Redigera rättigheter för',
 		recycleBinDeleting: 'Allt som ligger i papperskorgen tas nu bort. Stäng inte detta fönster förrän detta är klart',
@@ -724,11 +727,7 @@ export default {
 	},
 	notifications: {
 		editNotifications: 'Inställningar för notifieringar gällande %0%',
-		mailBody:
-			"Hej %0% Detta mail skickas till dig automatiskt för att meddela att '%1%' har utförts på sidan '%2%' av användaren '%3%' Gå till http://%4%/actions/editContent.aspx?id=%5% för att redigera.",
-		mailBodyHtml:
-			'<p>Hej %0%</p> <p>Detta mail skickas till dig automatiskt för att meddela att <strong>\'%1%\'</strong> har utförts på sidan <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>\'%2%\'</strong></a> av användaren <strong>\'%3%\'</strong> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <br /> </div> <p> <h3>Sammanfattning av uppdateringen:</h3> <table style="width: 100%;"> %6% </table> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLICERA&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;REDIGERA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;TA BORT&nbsp;&nbsp;&nbsp;&nbsp;</a> <br /> </div>',
-		mailSubject: '[%0%] Meddelande för att informera om att %1% har utförts på %2%',
+		notificationsSavedFor: 'Notifieringar sparade för %0%',
 		notifications: 'Notifieringar',
 	},
 	packager: {

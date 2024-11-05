@@ -8,6 +8,7 @@ export interface UmbDocumentScheduleSelectionModel {
 	schedule?: ScheduleRequestModel | null;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbDocumentScheduleModalData extends UmbDocumentVariantPickerData {}
 
 export interface UmbDocumentScheduleModalValue {

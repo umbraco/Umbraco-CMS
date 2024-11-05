@@ -7,9 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * Popover layout element.
- *
  * @element umb-popover-layout
- *
  */
 @customElement('umb-popover-layout')
 export class UmbPopoverLayoutElement extends UmbLitElement {

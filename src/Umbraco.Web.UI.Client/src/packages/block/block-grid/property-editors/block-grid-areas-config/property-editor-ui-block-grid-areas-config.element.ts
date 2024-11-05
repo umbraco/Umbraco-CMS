@@ -4,9 +4,11 @@ import type { UmbBlockGridTypeAreaType } from '../../index.js';
 import { UmbBlockGridAreaTypeEntriesContext } from './block-grid-area-type-entries.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	UmbPropertyEditorUiElement,
+	UmbPropertyEditorConfigCollection,
+} from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { incrementString } from '@umbraco-cms/backoffice/utils';
 
@@ -127,11 +129,7 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 									.key=${area.key}></umb-block-area-config-entry>`,
 						)}
 					</div>
-					<uui-button
-						id="add-button"
-						look="placeholder"
-						label=${'Add area'}
-						href=${this._workspacePath + 'create'}></uui-button>`
+					<uui-button look="placeholder" label=${'Add area'} href=${this._workspacePath + 'create'}></uui-button>`
 			: '';
 	}
 }

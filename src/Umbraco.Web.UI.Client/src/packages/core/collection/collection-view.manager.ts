@@ -1,8 +1,8 @@
+import type { ManifestCollectionView } from './extensions/index.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import type { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
@@ -53,7 +53,7 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 
 	/**
 	 * Returns the current view.
-	 * @return {ManifestCollectionView}
+	 * @returns {ManifestCollectionView}
 	 * @memberof UmbCollectionContext
 	 */
 	public getCurrentView() {

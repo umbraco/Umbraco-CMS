@@ -1,5 +1,5 @@
 import type { UmbUserItemModel } from '../../repository/index.js';
-import { UmbUserPickerContext } from './user-input.context.js';
+import { UmbUserPickerInputContext } from './user-input.context.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -30,7 +30,7 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default 0
+	 * @default
 	 */
 	@property({ type: Number })
 	public get min(): number {
@@ -53,7 +53,7 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default Infinity
+	 * @default
 	 */
 	@property({ type: Number })
 	public get max(): number {
@@ -92,7 +92,7 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	@state()
 	private _items?: Array<UmbUserItemModel>;
 
-	#pickerContext = new UmbUserPickerContext(this);
+	#pickerContext = new UmbUserPickerInputContext(this);
 
 	constructor() {
 		super();
@@ -157,7 +157,11 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		if (!item.unique) return nothing;
 		return html`
 			<uui-ref-node-user name=${item.name} id=${item.unique}>
-				<uui-avatar slot="icon" name=${item.name}></uui-avatar>
+				<umb-user-avatar
+					slot="icon"
+					.name=${item.name}
+					.kind=${item.kind}
+					.imgUrls=${item.avatarUrls}></umb-user-avatar>
 				<uui-action-bar slot="actions">
 					<uui-button label=${this.localize.term('general_remove')} @click=${() => this.#removeItem(item)}></uui-button>
 				</uui-action-bar>
@@ -171,7 +175,7 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 				width: 100%;
 			}
 
-			uui-avatar {
+			umb-user-avatar {
 				font-size: var(--uui-size-4);
 			}
 		`,

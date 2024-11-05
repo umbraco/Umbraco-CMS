@@ -1,8 +1,8 @@
 import { UMB_TEMPLATE_DETAIL_REPOSITORY_ALIAS, UMB_TEMPLATE_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_TEMPLATE_ENTITY_TYPE, UMB_TEMPLATE_ROOT_ENTITY_TYPE } from '../entity.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_TEMPLATE_ALLOW_DELETE_ACTION_CONDITION_ALIAS } from '../conditions/allow-delete/constants.js';
 
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
@@ -14,6 +14,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-add',
 			label: '#actions_create',
+			additionalOptions: true,
 		},
 	},
 	{
@@ -26,7 +27,6 @@ const entityActions: Array<ManifestTypes> = [
 			detailRepositoryAlias: UMB_TEMPLATE_DETAIL_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_TEMPLATE_ITEM_REPOSITORY_ALIAS,
 		},
+		conditions: [{ alias: UMB_TEMPLATE_ALLOW_DELETE_ACTION_CONDITION_ALIAS }],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...entityActions];

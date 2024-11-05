@@ -1,9 +1,8 @@
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_SCRIPT_TREE_ALIAS } from '../tree/index.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
 export const UMB_SCRIPT_MENU_ITEM_ALIAS = 'Umb.MenuItem.Script';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menuItem',
 		kind: 'tree',
@@ -23,7 +22,7 @@ export const manifests: Array<ManifestTypes> = [
 		api: () => import('./script-menu-structure.context.js'),
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: 'Umb.Workspace.Script',
 			},
 		],
@@ -35,7 +34,7 @@ export const manifests: Array<ManifestTypes> = [
 		name: 'Script Breadcrumb Workspace Footer App',
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: 'Umb.Workspace.Script',
 			},
 		],

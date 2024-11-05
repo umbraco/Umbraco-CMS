@@ -9,12 +9,11 @@ import {
 	UmbArrayState,
 	UmbBooleanState,
 	UmbNumberState,
-	UmbObjectState,
 	appendToFrozenArray,
+	mergeObservables,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockGridTypeModel, UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 
@@ -39,6 +38,10 @@ export class UmbBlockGridEntryContext
 	readonly minMaxRowSpan = this._blockType.asObservablePart((x) =>
 		x ? [x.rowMinSpan ?? 1, x.rowMaxSpan ?? 1] : undefined,
 	);
+	readonly forceHideContentEditorInOverlay = this._blockType.asObservablePart((x) =>
+		x ? (x.forceHideContentEditorInOverlay ?? false) : undefined,
+	);
+
 	public getMinMaxRowSpan(): [number, number] | undefined {
 		const x = this._blockType.getValue();
 		if (!x) return undefined;
@@ -58,10 +61,10 @@ export class UmbBlockGridEntryContext
 	#areaGridColumns = new UmbNumberState(undefined);
 	readonly areaGridColumns = this.#areaGridColumns.asObservable();
 
-	readonly showContentEdit = this._blockType.asObservablePart((x) => !x?.forceHideContentEditorInOverlay);
-
-	#firstPropertyType = new UmbObjectState<UmbPropertyTypeModel | undefined>(undefined);
-	readonly firstPropertyType = this.#firstPropertyType.asObservable();
+	readonly showContentEdit = mergeObservables(
+		[this._contentStructureHasProperties, this.forceHideContentEditorInOverlay],
+		([a, b]) => a === true && b === false,
+	);
 
 	readonly scaleManager = new UmbBlockGridScaleManager(this);
 
@@ -245,9 +248,7 @@ export class UmbBlockGridEntryContext
 		);
 	}
 
-	_gotContentType(contentType: UmbContentTypeModel | undefined) {
-		this.#firstPropertyType.setValue(contentType?.properties[0]);
-	}
+	_gotContentType() {}
 
 	#calcColumnSpan(columnSpan: number, relevantColumnSpanOptions: number[], layoutColumns: number) {
 		if (relevantColumnSpanOptions.length > 0) {

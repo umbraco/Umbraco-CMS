@@ -1,6 +1,7 @@
 import { UMB_CURRENT_USER_CONTEXT } from '../current-user.context.token.js';
+import type { UmbCurrentUserAction, UmbCurrentUserActionArgs } from '../current-user-action.extension.js';
+import { UMB_USER_WORKSPACE_PATH } from '@umbraco-cms/backoffice/user';
 import { UmbActionBase } from '@umbraco-cms/backoffice/action';
-import type { UmbCurrentUserAction, UmbCurrentUserActionArgs } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbEditCurrentUserAction<ArgsMetaType = never>
@@ -29,7 +30,7 @@ export class UmbEditCurrentUserAction<ArgsMetaType = never>
 
 	async getHref() {
 		await this.#init;
-		return `section/user-management/view/users/user/edit/${this.#unique}`;
+		return UMB_USER_WORKSPACE_PATH + '/edit/' + this.#unique;
 	}
 
 	async execute() {

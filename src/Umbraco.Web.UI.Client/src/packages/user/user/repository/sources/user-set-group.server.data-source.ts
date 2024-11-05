@@ -4,7 +4,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for Data Type items that fetches data from the server
- * @export
  * @class UmbUserSetGroupsServerDataSource
  */
 export class UmbUserSetGroupsServerDataSource {
@@ -12,7 +11,7 @@ export class UmbUserSetGroupsServerDataSource {
 
 	/**
 	 * Creates an instance of UmbUserSetGroupsServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbUserSetGroupsServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -22,7 +21,9 @@ export class UmbUserSetGroupsServerDataSource {
 	/**
 	 * Set groups for users
 	 * @param {Array<string>} id
-	 * @return {*}
+	 * @param userIds
+	 * @param userGroupIds
+	 * @returns {*}
 	 * @memberof UmbUserSetGroupsServerDataSource
 	 */
 	async setGroups(userIds: string[], userGroupIds: string[]) {

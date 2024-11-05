@@ -1,5 +1,7 @@
-import { UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS } from '../../../tree/folder/manifests.js';
-import { UmbDocumentBlueprintFolderRepository } from '../../../tree/index.js';
+import {
+	UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS,
+	UmbDocumentBlueprintFolderRepository,
+} from '../../../tree/index.js';
 import type {
 	UmbDocumentBlueprintOptionsCreateModalData,
 	UmbDocumentBlueprintOptionsCreateModalValue,
@@ -20,14 +22,14 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 
 	#createFolderAction?: UmbCreateFolderEntityAction;
 
-	#itemRepository = new UmbDocumentBlueprintFolderRepository(this);
+	#folderRepository = new UmbDocumentBlueprintFolderRepository(this);
 
 	override async connectedCallback(): Promise<void> {
 		super.connectedCallback();
 		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
 
 		if (this.data.parent.unique) {
-			const { data: parent } = await this.#itemRepository.request(this.data.parent.unique.toString());
+			const { data: parent } = await this.#folderRepository.requestByUnique(this.data.parent.unique.toString());
 			this._parentName = parent?.name ?? this.localize.term('general_unknown');
 		} else {
 			this._parentName = this.localize.term('treeHeaders_contentBlueprints');

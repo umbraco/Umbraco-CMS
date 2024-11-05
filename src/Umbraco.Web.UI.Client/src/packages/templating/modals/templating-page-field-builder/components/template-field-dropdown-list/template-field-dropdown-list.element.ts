@@ -16,6 +16,11 @@ import type { UUIComboboxEvent, UUIComboboxElement } from '@umbraco-cms/backoffi
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbMediaTypeDetailRepository, UMB_MEDIA_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/media-type';
 import { UMB_MODAL_MANAGER_CONTEXT, type UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+	UmbFormControlMixin,
+	type UmbFormControlValidatorConfig,
+} from '@umbraco-cms/backoffice/validation';
 
 interface FieldPickerValue {
 	alias: string;
@@ -29,19 +34,44 @@ enum FieldType {
 }
 
 @customElement('umb-template-field-dropdown-list')
-export class UmbTemplateFieldDropdownListElement extends UmbLitElement {
+export class UmbTemplateFieldDropdownListElement extends UmbFormControlMixin<
+	FieldPickerValue | undefined,
+	typeof UmbLitElement,
+	undefined
+>(UmbLitElement) {
+	//
+	#requiredValidation?: UmbFormControlValidatorConfig;
+	@property({ type: Boolean })
+	public get required(): boolean | undefined {
+		return undefined;
+	}
+	public set required(value: boolean | undefined) {
+		if (value === true) {
+			this.#requiredValidation ??= this.addValidator(
+				'valueMissing',
+				() => this.requiredMessage,
+				() => !this._value,
+			);
+		} else if (this.#requiredValidation) {
+			this.removeValidator(this.#requiredValidation);
+		}
+	}
+
+	@property({ type: String })
+	requiredMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
+
 	@property({ type: Boolean, attribute: 'exclude-media-type', reflect: true })
 	public excludeMediaType = false;
 
 	private _value: FieldPickerValue | undefined;
 	@property({ type: Object })
-	public set value(val: FieldPickerValue | undefined) {
+	public override set value(val: FieldPickerValue | undefined) {
 		const oldVal = this._value;
 		this._value = val;
 		this.requestUpdate('value', oldVal);
 		this.dispatchEvent(new UmbChangeEvent());
 	}
-	public get value(): FieldPickerValue | undefined {
+	public override get value(): FieldPickerValue | undefined {
 		return this._value;
 	}
 
@@ -176,8 +206,8 @@ export class UmbTemplateFieldDropdownListElement extends UmbLitElement {
 		if (this._type !== FieldType.SYSTEM && !this._unique) return;
 		return html`
 			<strong>${this.localize.string(this._uniqueName ?? '')}</strong>
-			<uui-combobox id="value" value=${ifDefined(this.value?.alias)}>
-				<uui-combobox-list @change=${this.#onChangeValue}>
+			<uui-combobox id="value" value=${ifDefined(this.value?.alias)} @change=${this.#onChangeValue}>
+				<uui-combobox-list>
 					${repeat(
 						this._customFields,
 						(field) => field.alias,

@@ -1,15 +1,10 @@
-import type { ManifestCurrentUserActionDefaultKind, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
-
-export const modals: Array<ManifestModal> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.CurrentUserExternalLogin',
 		name: 'External Login Modal',
-		js: () => import('./modals/external-login-modal.element.js'),
+		element: () => import('./modals/external-login-modal.element.js'),
 	},
-];
-
-export const userProfileApps: Array<ManifestCurrentUserActionDefaultKind> = [
 	{
 		type: 'currentUserAction',
 		kind: 'default',
@@ -29,4 +24,3 @@ export const userProfileApps: Array<ManifestCurrentUserActionDefaultKind> = [
 		],
 	},
 ];
-export const manifests = [...modals, ...userProfileApps];

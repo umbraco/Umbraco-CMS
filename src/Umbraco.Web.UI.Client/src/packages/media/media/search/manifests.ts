@@ -1,7 +1,6 @@
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		name: 'Media Search Provider',
 		alias: 'Umb.SearchProvider.Media',

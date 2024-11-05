@@ -1,35 +1,40 @@
-import { UMB_ROLLBACK_MODAL } from '../../../modals/rollback/index.js';
 import type { UmbDocumentAuditLogModel } from '../../../audit-log/types.js';
 import { UmbDocumentAuditLogRepository } from '../../../audit-log/index.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
-import { TimeOptions, getDocumentHistoryTagStyleAndText } from './utils.js';
-import { css, html, customElement, state, nothing, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { getDocumentHistoryTagStyleAndText, TimeOptions } from './utils.js';
+import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
-import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import type { ManifestEntityAction } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
+import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-document-workspace-view-info-history')
 export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
-	@state()
-	_currentPageNumber = 1;
+	#allowedActions = new Set(['Umb.EntityAction.Document.Rollback']);
+
+	#auditLogRepository = new UmbDocumentAuditLogRepository(this);
+
+	#pagination = new UmbPaginationManager();
+
+	#userItemRepository = new UmbUserItemRepository(this);
+
+	#userMap = new Map<string, UmbUserItemModel>();
+
+	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	_totalPages = 1;
+	private _currentPageNumber = 1;
 
 	@state()
 	private _items: Array<UmbDocumentAuditLogModel> = [];
 
-	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
-	#auditLogRepository = new UmbDocumentAuditLogRepository(this);
-	#pagination = new UmbPaginationManager();
-	#userItemRepository = new UmbUserItemRepository(this);
-
-	#userMap = new Map<string, UmbUserItemModel>();
+	@state()
+	private _totalPages = 1;
 
 	constructor() {
 		super();
@@ -38,10 +43,21 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 		this.observe(this.#pagination.currentPage, (number) => (this._currentPageNumber = number));
 		this.observe(this.#pagination.totalPages, (number) => (this._totalPages = number));
 
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
+			context.addEventListener(UmbRequestReloadStructureForEntityEvent.TYPE, () => {
+				this.#requestAuditLogs();
+			});
+		});
+
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#requestAuditLogs();
 		});
+	}
+
+	#onPageChange(event: UUIPaginationEvent) {
+		this.#pagination.setCurrentPageNumber(event.target?.current);
+		this.#requestAuditLogs();
 	}
 
 	async #requestAuditLogs() {
@@ -60,21 +76,6 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 			this.#requestAndCacheUserItems();
 		}
 	}
-
-	#onPageChange(event: UUIPaginationEvent) {
-		this.#pagination.setCurrentPageNumber(event.target?.current);
-		this.#requestAuditLogs();
-	}
-
-	#onRollbackModalOpen = async () => {
-		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManagerContext.open(this, UMB_ROLLBACK_MODAL, {});
-
-		await modalContext.onSubmit();
-		// TODO: This notification won't actually show at the moment because we perform a full page reload after rollback. However, when we can do it without a full page reload, this should be used.
-		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-		notificationContext.peek('positive', { data: { message: this.localize.term('rollback_documentRolledBack') } });
-	};
 
 	async #requestAndCacheUserItems() {
 		const allUsers = this._items?.map((item) => item.user.unique).filter(Boolean) as string[];
@@ -96,104 +97,84 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<uui-box>
-			<div id="rollback" slot="header">
-				<h2><umb-localize key="general_history">History</umb-localize></h2>
-				<uui-button
-					label=${this.localize.term('actions_rollback')}
-					look="secondary"
-					slot="actions"
-					@click=${this.#onRollbackModalOpen}>
-					<uui-icon name="icon-undo"></uui-icon> ${this.localize.term('actions_rollback')}
-				</uui-button>
-			</div>
-			${this._items ? this.#renderHistory() : html`<uui-loader-circle></uui-loader-circle> `}
+		return html`
+			<uui-box headline=${this.localize.term('general_history')}>
+				<umb-extension-with-api-slot
+				slot="header-actions"
+				type="entityAction"
+				.filter=${(manifest: ManifestEntityAction) => this.#allowedActions.has(manifest.alias)}></umb-extension-with-api-slot>
+			</uui-button>
+			${when(
+				this._items,
+				() => this.#renderHistory(),
+				() => html`<div id="loader"><uui-loader></uui-loader></div>`,
+			)}
 			${this.#renderPagination()}
-		</uui-box> `;
+		</uui-box>
+		`;
 	}
 
 	#renderHistory() {
-		if (this._items && this._items.length) {
-			return html`
-				<umb-history-list>
-					${repeat(
-						this._items,
-						(item) => item.timestamp,
-						(item) => {
-							const { text, style } = getDocumentHistoryTagStyleAndText(item.logType);
-							const user = this.#userMap.get(item.user.unique);
-							const userName = user?.name ?? 'Unknown';
-							const avatarUrl = user && Array.isArray(user.avatarUrls) ? user.avatarUrls[1] : undefined;
+		if (!this._items?.length) return html`${this.localize.term('content_noItemsToShow')}`;
+		return html`
+			<umb-history-list>
+				${repeat(
+					this._items,
+					(item) => item.timestamp,
+					(item) => {
+						const { text, style } = getDocumentHistoryTagStyleAndText(item.logType);
+						const user = this.#userMap.get(item.user.unique);
 
-							return html`<umb-history-item
-								.name=${userName}
+						return html`
+							<umb-history-item
+								.name=${user?.name ?? 'Unknown'}
 								.detail=${this.localize.date(item.timestamp, TimeOptions)}>
-								<uui-avatar slot="avatar" .name="${userName}" img-src=${ifDefined(avatarUrl)}></uui-avatar>
-
-								<span class="log-type">
+								<umb-user-avatar
+									slot="avatar"
+									.name=${user?.name}
+									.kind=${user?.kind}
+									.imgUrls=${user?.avatarUrls ?? []}>
+								</umb-user-avatar>
+								<div class="log-type">
 									<uui-tag look=${style.look} color=${style.color}>
 										${this.localize.term(text.label, item.parameters)}
 									</uui-tag>
-									${this.localize.term(text.desc, item.parameters)}
-								</span>
-							</umb-history-item>`;
-						},
-					)}
-				</umb-history-list>
-			`;
-		} else {
-			return html`${this.localize.term('content_noItemsToShow')}`;
-		}
+									<span>${this.localize.term(text.desc, item.parameters)}</span>
+								</div>
+							</umb-history-item>
+						`;
+					},
+				)}
+			</umb-history-list>
+		`;
 	}
 
 	#renderPagination() {
+		if (this._totalPages <= 1) return nothing;
 		return html`
-			${this._totalPages > 1
-				? html`
-						<uui-pagination
-							class="pagination"
-							.current=${this._currentPageNumber}
-							.total=${this._totalPages}
-							@change=${this.#onPageChange}></uui-pagination>
-					`
-				: nothing}
+			<uui-pagination
+				.current=${this._currentPageNumber}
+				.total=${this._totalPages}
+				@change=${this.#onPageChange}></uui-pagination>
 		`;
 	}
 
 	static override styles = [
 		UmbTextStyles,
 		css`
-			uui-loader-circle {
-				font-size: 2rem;
-			}
-
-			#rollback {
+			#loader {
 				display: flex;
-				width: 100%;
-				align-items: center;
-				justify-content: space-between;
-			}
-
-			#rollback h2 {
-				font-size: var(--uui-type-h5-size);
-				margin: 0;
-			}
-
-			uui-tag uui-icon {
-				margin-right: var(--uui-size-space-1);
+				justify-content: center;
 			}
 
 			.log-type {
-				flex-grow: 1;
-				gap: var(--uui-size-space-2);
+				display: grid;
+				grid-template-columns: var(--uui-size-40) auto;
+				gap: var(--uui-size-layout-1);
 			}
 
 			uui-pagination {
 				flex: 1;
-				display: inline-block;
-			}
-
-			.pagination {
 				display: flex;
 				justify-content: center;
 				margin-top: var(--uui-size-layout-1);

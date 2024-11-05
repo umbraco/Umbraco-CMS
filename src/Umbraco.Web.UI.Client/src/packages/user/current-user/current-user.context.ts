@@ -3,7 +3,7 @@ import { UmbCurrentUserRepository } from './repository/index.js';
 import { UMB_CURRENT_USER_CONTEXT } from './current-user.context.token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { filter, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
@@ -14,12 +14,24 @@ import { ensurePathEndsWithSlash } from '@umbraco-cms/backoffice/utils';
 
 export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext> {
 	#currentUser = new UmbObjectState<UmbCurrentUserModel | undefined>(undefined);
-	readonly currentUser = this.#currentUser.asObservable();
+	readonly currentUser = this.#currentUser.asObservable().pipe(filter((user) => !!user));
 	readonly allowedSections = this.#currentUser.asObservablePart((user) => user?.allowedSections);
-	readonly unique = this.#currentUser.asObservablePart((user) => user?.unique);
-	readonly languageIsoCode = this.#currentUser.asObservablePart((user) => user?.languageIsoCode);
+	readonly avatarUrls = this.#currentUser.asObservablePart((user) => user?.avatarUrls);
+	readonly documentStartNodeUniques = this.#currentUser.asObservablePart((user) => user?.documentStartNodeUniques);
+	readonly email = this.#currentUser.asObservablePart((user) => user?.email);
+	readonly fallbackPermissions = this.#currentUser.asObservablePart((user) => user?.fallbackPermissions);
+	readonly hasAccessToAllLanguages = this.#currentUser.asObservablePart((user) => user?.hasAccessToAllLanguages);
+	readonly hasAccessToSensitiveData = this.#currentUser.asObservablePart((user) => user?.hasAccessToSensitiveData);
 	readonly hasDocumentRootAccess = this.#currentUser.asObservablePart((user) => user?.hasDocumentRootAccess);
 	readonly hasMediaRootAccess = this.#currentUser.asObservablePart((user) => user?.hasMediaRootAccess);
+	readonly isAdmin = this.#currentUser.asObservablePart((user) => user?.isAdmin);
+	readonly languageIsoCode = this.#currentUser.asObservablePart((user) => user?.languageIsoCode);
+	readonly languages = this.#currentUser.asObservablePart((user) => user?.languages);
+	readonly mediaStartNodeUniques = this.#currentUser.asObservablePart((user) => user?.mediaStartNodeUniques);
+	readonly name = this.#currentUser.asObservablePart((user) => user?.name);
+	readonly permissions = this.#currentUser.asObservablePart((user) => user?.permissions);
+	readonly unique = this.#currentUser.asObservablePart((user) => user?.unique);
+	readonly userName = this.#currentUser.asObservablePart((user) => user?.userName);
 
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#currentUserRepository = new UmbCurrentUserRepository(this);
@@ -54,7 +66,6 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 
 	/**
 	 * Checks if a user is the current user.
-	 *
 	 * @param userUnique The user id to check
 	 * @returns True if the user is the current user, otherwise false
 	 */

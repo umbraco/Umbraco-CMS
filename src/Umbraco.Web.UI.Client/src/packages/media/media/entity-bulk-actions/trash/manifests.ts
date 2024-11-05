@@ -6,10 +6,9 @@ import {
 	UMB_COLLECTION_ALIAS_CONDITION,
 	UMB_COLLECTION_BULK_ACTION_PERMISSION_CONDITION,
 } from '@umbraco-cms/backoffice/collection';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbCollectionBulkActionPermissions } from '@umbraco-cms/backoffice/collection';
 
-const bulkTrashAction: ManifestTypes = {
+const bulkTrashAction: UmbExtensionManifest = {
 	type: 'entityBulkAction',
 	kind: 'trash',
 	alias: 'Umb.EntityBulkAction.Media.Trash',
@@ -31,4 +30,4 @@ const bulkTrashAction: ManifestTypes = {
 	],
 };
 
-export const manifests: Array<ManifestTypes> = [bulkTrashAction, ...repositoryManifests];
+export const manifests: Array<UmbExtensionManifest> = [bulkTrashAction, ...repositoryManifests];

@@ -1,10 +1,13 @@
 import type { UmbUserEntityType } from './entity.js';
+import type { UmbUserKindType } from './utils/index.js';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import {
 	type UserConfigurationResponseModel,
 	UserStateModel,
 	type UserTwoFactorProviderModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
+
+export type * from './conditions/types.js';
 
 export type UmbUserStateEnum = UserStateModel;
 export const UmbUserStateEnum = UserStateModel;
@@ -26,6 +29,7 @@ export interface UmbUserDetailModel extends UmbUserStartNodesModel {
 	updateDate: string | null;
 	userGroupUniques: Array<UmbReferenceByUnique>;
 	userName: string;
+	kind: UmbUserKindType;
 }
 
 export interface UmbUserStartNodesModel {

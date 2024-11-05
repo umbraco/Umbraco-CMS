@@ -12,7 +12,6 @@ import { DictionaryService } from '@umbraco-cms/backoffice/external/backend-api'
 
 /**
  * A data source for the Dictionary tree that fetches data from the server
- * @export
  * @class UmbDictionaryTreeServerDataSource
  * @implements {UmbTreeDataSource}
  */
@@ -22,7 +21,7 @@ export class UmbDictionaryTreeServerDataSource extends UmbTreeServerDataSourceBa
 > {
 	/**
 	 * Creates an instance of UmbDictionaryTreeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDictionaryTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

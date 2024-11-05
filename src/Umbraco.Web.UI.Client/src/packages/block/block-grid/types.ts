@@ -1,9 +1,6 @@
 import type { UmbBlockLayoutBaseModel, UmbBlockValueType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block-type';
 
-export const UMB_BLOCK_GRID_TYPE = 'block-grid-type';
-export const UMB_BLOCK_GRID = 'block-grid';
-
 // Configuration models:
 export interface UmbBlockGridTypeModel extends UmbBlockTypeWithGroupKey {
 	columnSpanOptions: Array<UmbBlockGridTypeColumnSpanOption>;
@@ -29,6 +26,7 @@ export interface UmbBlockGridTypeAreaType {
 	minAllowed?: number;
 	maxAllowed?: number;
 	specifiedAllowance?: Array<UmbBlockGridTypeAreaTypePermission>;
+	createLabel?: string;
 }
 
 export interface UmbBlockGridTypeAreaTypePermission {
@@ -45,6 +43,7 @@ export interface UmbBlockGridTypeGroupType {
 
 // Content models:
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbBlockGridValueModel extends UmbBlockValueType<UmbBlockGridLayoutModel> {}
 
 export interface UmbBlockGridLayoutModel extends UmbBlockLayoutBaseModel {

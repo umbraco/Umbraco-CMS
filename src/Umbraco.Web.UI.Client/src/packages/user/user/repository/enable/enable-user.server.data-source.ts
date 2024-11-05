@@ -5,7 +5,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A server data source for enabling users
- * @export
  * @class UmbEnableUserServerDataSource
  */
 export class UmbEnableUserServerDataSource implements UmbEnableUserDataSource {
@@ -13,7 +12,7 @@ export class UmbEnableUserServerDataSource implements UmbEnableUserDataSource {
 
 	/**
 	 * Creates an instance of UmbEnableUserServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbEnableUserServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

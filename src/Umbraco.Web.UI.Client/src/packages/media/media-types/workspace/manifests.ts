@@ -1,26 +1,20 @@
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_MEDIA_TYPE_COMPOSITION_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_MEDIA_TYPE_WORKSPACE_ALIAS } from './constants.js';
-import type {
-	ManifestWorkspaces,
-	ManifestWorkspaceActions,
-	ManifestWorkspaceViews,
-	ManifestTypes,
-} from '@umbraco-cms/backoffice/extension-registry';
 
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
-const workspace: ManifestWorkspaces = {
-	type: 'workspace',
-	kind: 'routable',
-	alias: UMB_MEDIA_TYPE_WORKSPACE_ALIAS,
-	name: 'Media Type Workspace',
-	api: () => import('./media-type-workspace.context.js'),
-	meta: {
-		entityType: 'media-type',
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'workspace',
+		kind: 'routable',
+		alias: UMB_MEDIA_TYPE_WORKSPACE_ALIAS,
+		name: 'Media Type Workspace',
+		api: () => import('./media-type-workspace.context.js'),
+		meta: {
+			entityType: 'media-type',
+		},
 	},
-};
-
-const workspaceViews: Array<ManifestWorkspaceViews> = [
 	{
 		type: 'workspaceView',
 		kind: 'contentTypeDesignEditor',
@@ -34,8 +28,8 @@ const workspaceViews: Array<ManifestWorkspaceViews> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_MEDIA_TYPE_WORKSPACE_ALIAS,
 			},
 		],
 	},
@@ -52,14 +46,11 @@ const workspaceViews: Array<ManifestWorkspaceViews> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_MEDIA_TYPE_WORKSPACE_ALIAS,
 			},
 		],
 	},
-];
-
-const workspaceActions: Array<ManifestWorkspaceActions> = [
 	{
 		type: 'workspaceAction',
 		kind: 'default',
@@ -73,11 +64,9 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_MEDIA_TYPE_WORKSPACE_ALIAS,
 			},
 		],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions];

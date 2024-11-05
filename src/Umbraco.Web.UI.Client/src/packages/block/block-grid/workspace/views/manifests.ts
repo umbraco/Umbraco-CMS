@@ -1,12 +1,12 @@
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_BLOCK_GRID_TYPE_WORKSPACE_ALIAS } from '../index.js';
-import type { ManifestTypes, ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
 
-export const workspaceViews: Array<ManifestWorkspaceView> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.BlockType.Grid.Settings',
 		name: 'Block Grid Type Workspace Settings View',
-		js: () => import('./block-grid-type-workspace-view-settings.element.js'),
+		element: () => import('./block-grid-type-workspace-view-settings.element.js'),
 		weight: 1000,
 		meta: {
 			label: '#general_settings',
@@ -15,7 +15,7 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_BLOCK_GRID_TYPE_WORKSPACE_ALIAS,
 			},
 		],
@@ -24,7 +24,7 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.BlockType.Grid.Areas',
 		name: 'Block Grid Type Workspace Areas View',
-		js: () => import('./block-grid-type-workspace-view-areas.element.js'),
+		element: () => import('./block-grid-type-workspace-view-areas.element.js'),
 		weight: 1000,
 		meta: {
 			label: '#blockEditor_tabAreas',
@@ -33,7 +33,7 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_BLOCK_GRID_TYPE_WORKSPACE_ALIAS,
 			},
 		],
@@ -42,7 +42,7 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.BlockType.Grid.Advance',
 		name: 'Block Grid Type Workspace Advance View',
-		js: () => import('./block-grid-type-workspace-view-advanced.element.js'),
+		element: () => import('./block-grid-type-workspace-view-advanced.element.js'),
 		weight: 1000,
 		meta: {
 			label: '#blockEditor_tabAdvanced',
@@ -51,11 +51,9 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_BLOCK_GRID_TYPE_WORKSPACE_ALIAS,
 			},
 		],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...workspaceViews];

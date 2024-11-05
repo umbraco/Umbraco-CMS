@@ -2,10 +2,12 @@ import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 import type { UmbMediaCollectionItemModel } from '../../types.js';
 import type { UmbMediaCollectionContext } from '../../media-collection.context.js';
 import { UMB_MEDIA_COLLECTION_CONTEXT } from '../../media-collection.context-token.js';
-import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbFileDropzoneItemStatus } from '../../../dropzone/types.js';
+import { UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE } from '../../../entity.js';
+import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 
 import '@umbraco-cms/backoffice/imaging';
@@ -17,9 +19,6 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 
 	@state()
 	private _items: Array<UmbMediaCollectionItemModel> = [];
-
-	@state()
-	private _loading = false;
 
 	@state()
 	private _selection: Array<string | null> = [];
@@ -51,8 +50,6 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 
 	#observeCollectionContext() {
 		if (!this.#collectionContext) return;
-
-		this.observe(this.#collectionContext.loading, (loading) => (this._loading = loading), '_observeLoading');
 
 		this.observe(this.#collectionContext.items, (items) => (this._items = items), '_observeItems');
 
@@ -88,40 +85,24 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	}
 
 	override render() {
-		return this._items.length === 0 ? this.#renderEmpty() : this.#renderItems();
-	}
-
-	#renderEmpty() {
-		if (this._items.length > 0) return nothing;
-		return html`
-			<div class="container">
-				${when(
-					this._loading,
-					() => html`<uui-loader></uui-loader>`,
-					() => html`<p>${this.localize.term('content_listViewNoItems')}</p>`,
-				)}
-			</div>
-		`;
-	}
-
-	#renderItems() {
-		if (this._items.length === 0) return nothing;
 		return html`
 			<div id="media-grid">
 				${repeat(
 					this._items,
-					(item) => item.unique,
+					(item) => item.unique + item.status,
 					(item) => this.#renderItem(item),
 				)}
 			</div>
-			${when(this._loading, () => html`<uui-loader-bar></uui-loader-bar>`)}
 		`;
 	}
 
 	#renderItem(item: UmbMediaCollectionItemModel) {
+		if (item.entityType === UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE) {
+			return this.#renderPlaceholder(item);
+		}
 		return html`
 			<uui-card-media
-				.name=${item.name}
+				name=${ifDefined(item.name)}
 				selectable
 				?select-only=${this._selection && this._selection.length > 0}
 				?selected=${this.#isSelected(item)}
@@ -129,9 +110,19 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}
 				class="media-item">
-				<umb-imaging-thumbnail unique=${item.unique} alt=${item.name} icon=${item.icon}></umb-imaging-thumbnail>
+				<umb-imaging-thumbnail
+					unique=${item.unique}
+					alt=${ifDefined(item.name)}
+					icon=${ifDefined(item.icon)}></umb-imaging-thumbnail>
 			</uui-card-media>
 		`;
+	}
+
+	#renderPlaceholder(item: UmbMediaCollectionItemModel) {
+		const complete = item.status === UmbFileDropzoneItemStatus.COMPLETE;
+		return html`<uui-card-media disabled class="media-placeholder-item" name=${ifDefined(item.name)}>
+			<umb-temporary-file-badge ?complete=${complete}></umb-temporary-file-badge>
+		</uui-card-media>`;
 	}
 
 	static override styles = [
@@ -146,6 +137,10 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				display: flex;
 				justify-content: center;
 				align-items: center;
+			}
+
+			.media-placeholder-item {
+				font-style: italic;
 			}
 
 			#media-grid {

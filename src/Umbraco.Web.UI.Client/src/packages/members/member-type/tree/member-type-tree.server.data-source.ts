@@ -2,23 +2,22 @@ import { UMB_MEMBER_TYPE_ENTITY_TYPE, UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE } from '.
 import type { UmbMemberTypeTreeItemModel } from './types.js';
 import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
-import type { NamedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { MemberTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MemberTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A data source for the MemberType tree that fetches data from the server
- * @export
  * @class UmbMemberTypeTreeServerDataSource
  * @implements {UmbTreeDataSource}
  */
 export class UmbMemberTypeTreeServerDataSource extends UmbTreeServerDataSourceBase<
-	NamedEntityTreeItemResponseModel,
+	MemberTypeTreeItemResponseModel,
 	UmbMemberTypeTreeItemModel
 > {
 	/**
 	 * Creates an instance of UmbMemberTypeTreeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMemberTypeTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -47,7 +46,7 @@ const getAncestorsOf = () => {
 	throw new Error('Not supported for the member type tree');
 };
 
-const mapper = (item: NamedEntityTreeItemResponseModel): UmbMemberTypeTreeItemModel => {
+const mapper = (item: MemberTypeTreeItemResponseModel): UmbMemberTypeTreeItemModel => {
 	return {
 		unique: item.id,
 		parent: {
@@ -58,6 +57,6 @@ const mapper = (item: NamedEntityTreeItemResponseModel): UmbMemberTypeTreeItemMo
 		entityType: UMB_MEMBER_TYPE_ENTITY_TYPE,
 		hasChildren: item.hasChildren,
 		isFolder: false,
-		icon: 'icon-user',
+		icon: item.icon,
 	};
 };

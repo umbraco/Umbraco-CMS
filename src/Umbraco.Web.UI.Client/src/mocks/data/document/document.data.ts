@@ -39,6 +39,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		values: [
 			{
+				editorAlias: 'Umbraco.TextBox',
 				alias: 'prop1',
 				culture: null,
 				segment: null,
@@ -66,6 +67,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		isTrashed: false,
 		values: [
 			{
+				editorAlias: 'Umbraco.RichText',
 				alias: 'richTextEditor',
 				culture: null,
 				segment: null,
@@ -83,6 +85,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				},
 			},
 			{
+				editorAlias: 'Umbraco.TextArea',
 				alias: 'codeEditor',
 				culture: null,
 				segment: null,
@@ -93,50 +96,55 @@ export const data: Array<UmbMockDocumentModel> = [
 	<li>Aenean massa cum sociis natoque penatibus.</li>
 </ul>
 <p>
-	Lorem ipsum dolor sit amet, consectetuer adipiscing 
+	Lorem ipsum dolor sit amet, consectetuer adipiscing
 	elit. Aenean commodo ligula eget dolor.
 </p>
 <p>
 	<blockquote>
-		Lorem ipsum dolor sit amet, consectetuer 
-		adipiscing elit. Aenean commodo ligula eget dolor. 
-		Aenean massa <strong>strong</strong>. Cum sociis 
-		natoque penatibus et magnis dis parturient montes, 
-		nascetur ridiculus mus. Donec quam felis, ultricies 
-		nec, pellentesque eu, pretium quis, sem. Nulla consequat 
-		massa quis enim. Donec pede justo, fringilla vel, 
-		aliquet nec, vulputate eget, arcu. In <em>em</em> 
-		enim justo, rhoncus ut, imperdiet a, venenatis vitae, 
+		Lorem ipsum dolor sit amet, consectetuer
+		adipiscing elit. Aenean commodo ligula eget dolor.
+		Aenean massa <strong>strong</strong>. Cum sociis
+		natoque penatibus et magnis dis parturient montes,
+		nascetur ridiculus mus. Donec quam felis, ultricies
+		nec, pellentesque eu, pretium quis, sem. Nulla consequat
+		massa quis enim. Donec pede justo, fringilla vel,
+		aliquet nec, vulputate eget, arcu. In <em>em</em>
+		enim justo, rhoncus ut, imperdiet a, venenatis vitae,
 		justo. Nullam <a class="external ext" href="#">link</a>
 		dictum felis eu pede mollis pretium.
 	</blockquote>
 </p>`,
 			},
 			{
+				editorAlias: 'Umbraco.TextBox',
 				alias: 'email',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.ColorPicker',
 				alias: 'colorPicker',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.MultiNodeTreePicker',
 				alias: 'contentPicker',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.ColorPicker.EyeDropper',
 				alias: 'eyeDropper',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.MultiUrlPicker',
 				alias: 'multiUrlPicker',
 				culture: 'en-US',
 				segment: null,
@@ -153,12 +161,14 @@ export const data: Array<UmbMockDocumentModel> = [
 				],
 			},
 			{
+				editorAlias: 'Umbraco.MultiUrlPicker',
 				alias: 'multiUrlPicker',
 				culture: 'da-dk',
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.MultiNodeTreePicker',
 				alias: 'multiNodeTreePicker',
 				culture: null,
 				segment: null,
@@ -166,84 +176,98 @@ export const data: Array<UmbMockDocumentModel> = [
 					'all-property-editors-document-id,c05da24d-7740-447b-9cdc-bd8ce2172e38,fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
 			},
 			{
+				editorAlias: 'Umbraco.DateTime',
 				alias: 'datePicker',
 				culture: null,
 				segment: null,
 				value: '2023-12-24',
 			},
 			{
+				editorAlias: 'Umbraco.DateTime',
 				alias: 'datePickerTime',
 				culture: null,
 				segment: null,
 				value: '2023-12-24 14:52',
 			},
 			{
+				editorAlias: 'Umbraco.DateTime',
 				alias: 'time',
 				culture: null,
 				segment: null,
 				value: '14:52:00',
 			},
 			{
+				editorAlias: 'Umbraco.EmailAddress',
 				alias: 'email',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.TextBox',
 				alias: 'textBox',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.DropDown.Flexible',
 				alias: 'dropdown',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.TextArea',
 				alias: 'textArea',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.Slider',
 				alias: 'slider',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.TrueFalse',
 				alias: 'toggle',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.Tags',
 				alias: 'tags',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.MarkdownEditor',
 				alias: 'markdownEditor',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.RadioButtonList',
 				alias: 'radioButtonList',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.CheckBoxList',
 				alias: 'checkboxList',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.BlockList',
 				alias: 'blockList',
 				culture: null,
 				segment: null,
@@ -251,21 +275,21 @@ export const data: Array<UmbMockDocumentModel> = [
 					layout: {
 						'Umbraco.BlockList': [
 							{
-								contentUdi: '1234',
-								settingsUdi: '5678',
+								contentKey: '1234',
+								settingsKey: '5678',
 							},
 						],
 					},
 					contentData: [
 						{
-							udi: '1234',
+							key: '1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 							elementProperty: 'Hello world',
 						},
 					],
 					settingsData: [
 						{
-							udi: '5678',
+							key: '5678',
 							contentTypeKey: 'all-property-editors-document-type-id',
 							elementProperty: 'Hello world',
 							textBox: 'Hello world 123',
@@ -273,21 +297,21 @@ export const data: Array<UmbMockDocumentModel> = [
 								layout: {
 									'Umbraco.BlockList': [
 										{
-											contentUdi: '1234b',
-											settingsUdi: '5678b',
+											contentKey: '1234b',
+											settingsKey: '5678b',
 										},
 									],
 								},
 								contentData: [
 									{
-										udi: '1234b',
+										key: '1234b',
 										contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 										elementProperty: 'Hello world',
 									},
 								],
 								settingsData: [
 									{
-										udi: '5678b',
+										key: '5678b',
 										contentTypeKey: 'all-property-editors-document-type-id',
 										elementProperty: 'Hello world',
 									},
@@ -298,12 +322,14 @@ export const data: Array<UmbMockDocumentModel> = [
 				},
 			},
 			{
+				editorAlias: 'Umbraco.MediaPicker3',
 				alias: 'mediaPicker',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.ImageCropper',
 				alias: 'imageCropper',
 				culture: null,
 				segment: null,
@@ -384,12 +410,14 @@ export const data: Array<UmbMockDocumentModel> = [
 				},
 			},
 			{
+				editorAlias: 'Umbraco.UploadField',
 				alias: 'uploadField',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.BlockGrid',
 				alias: 'blockGrid',
 				culture: null,
 				segment: null,
@@ -397,21 +425,21 @@ export const data: Array<UmbMockDocumentModel> = [
 					layout: {
 						'Umbraco.BlockGrid': [
 							{
-								contentUdi: '1234',
-								settingsUdi: '5678',
+								contentKey: '1234',
+								settingsKey: '5678',
 								columnSpan: 12,
 								areas: [
 									{
 										key: 'area1_key',
 										items: [
 											{
-												contentUdi: 'a1234',
-												settingsUdi: 'a5678',
+												contentKey: 'a1234',
+												settingsKey: 'a5678',
 												columnSpan: 3,
 												rowSpan: 2,
 											},
 											{
-												contentUdi: 'c1234',
+												contentKey: 'c1234',
 												columnSpan: 3,
 											},
 										],
@@ -420,8 +448,8 @@ export const data: Array<UmbMockDocumentModel> = [
 										key: 'area2_key',
 										items: [
 											{
-												contentUdi: 'b1234',
-												settingsUdi: 'b5678',
+												contentKey: 'b1234',
+												settingsKey: 'b5678',
 												columnSpan: 6,
 												areas: [],
 											},
@@ -433,39 +461,39 @@ export const data: Array<UmbMockDocumentModel> = [
 					},
 					contentData: [
 						{
-							udi: '1234',
+							key: '1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 							elementProperty: 'Hello world',
 						},
 						{
-							udi: 'a1234',
+							key: 'a1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 							elementProperty: 'Hello world from area 1',
 						},
 						{
-							udi: 'b1234',
+							key: 'b1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 							elementProperty: 'Hello world from area 2',
 						},
 						{
-							udi: 'c1234',
+							key: 'c1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 							elementProperty: 'Hello CCC from area 1',
 						},
 					],
 					settingsData: [
 						{
-							udi: '5678',
+							key: '5678',
 							contentTypeKey: 'all-property-editors-document-type-id',
 							elementProperty: 'Hello world',
 						},
 						{
-							udi: 'a5678',
+							key: 'a5678',
 							contentTypeKey: 'all-property-editors-document-type-id',
 							elementProperty: 'Hello world from area 1 settings',
 						},
 						{
-							udi: 'b5678',
+							key: 'b5678',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 							elementProperty: 'Hello world from area 2 settings',
 						},
@@ -473,60 +501,70 @@ export const data: Array<UmbMockDocumentModel> = [
 				},
 			},
 			{
+				editorAlias: 'Umbraco.BlockGrid',
 				alias: 'blockGrid',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: '',
 				alias: 'numberRange',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: '',
 				alias: 'orderDirection',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: '',
 				alias: 'overlaySize',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.Label',
 				alias: 'label',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.Integer',
 				alias: 'integer',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.Decimal',
 				alias: 'decimal',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.MemberPicker',
 				alias: 'memberPicker',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.MemberGroupPicker',
 				alias: 'memberGroupPicker',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.UserPicker',
 				alias: 'userPicker',
 				culture: null,
 				segment: null,
@@ -574,60 +612,70 @@ export const data: Array<UmbMockDocumentModel> = [
 		isTrashed: false,
 		values: [
 			{
+				editorAlias: 'Umbraco.TextBox',
 				culture: null,
 				segment: null,
 				alias: 'masterText',
 				value: 'i have a master text',
 			},
 			{
+				editorAlias: 'Umbraco.TextBox',
 				culture: null,
 				segment: null,
 				alias: 'pageTitle',
 				value: 'with a page title',
 			},
 			{
+				editorAlias: 'Umbraco.TextArea',
 				culture: null,
 				segment: null,
 				alias: 'blogPostText',
 				value: 'My first blog post',
 			},
 			{
+				editorAlias: 'Umbraco.TextBox',
 				culture: 'en-US',
 				segment: null,
 				alias: 'blogTextStringUnderMasterTab',
 				value: 'in the master tab',
 			},
 			{
+				editorAlias: 'Umbraco.TextBox',
 				culture: 'en-US',
 				segment: null,
 				alias: 'blogTextStringUnderGroupUnderMasterTab',
 				value: 'which is under another group in the tab',
 			},
 			{
+				editorAlias: 'Umbraco.TextBox',
 				culture: 'da-dk',
 				segment: null,
 				alias: 'blogTextStringUnderMasterTab',
 				value: 'på master dokument tab B',
 			},
 			{
+				editorAlias: 'Umbraco.TextBox',
 				culture: 'da-dk',
 				segment: null,
 				alias: 'blogTextStringUnderGroupUnderMasterTab',
 				value: 'denne er under en anden gruppe i tab B',
 			},
 			{
+				editorAlias: 'Umbraco.TextBox',
 				culture: 'no-no',
 				segment: null,
 				alias: 'blogTextStringUnderMasterTab',
 				value: 'Norsk på master dokument tab B',
 			},
 			{
+				editorAlias: 'Umbraco.TextBox',
 				culture: 'no-no',
 				segment: null,
 				alias: 'blogTextStringUnderGroupUnderMasterTab',
 				value: 'Norsk denne er under en anden gruppe i tab B',
 			},
 			{
+				editorAlias: 'Umbraco.TextBox',
 				culture: null,
 				segment: null,
 				alias: 'localBlogTabString',
@@ -697,48 +745,56 @@ export const data: Array<UmbMockDocumentModel> = [
 		isTrashed: false,
 		values: [
 			{
+				editorAlias: 'Umbraco.TextBox',
 				culture: null,
 				segment: null,
 				alias: 'masterText',
 				value: 'i have a master text B',
 			},
 			{
+				editorAlias: 'Umbraco.TextBox',
 				culture: null,
 				segment: null,
 				alias: 'pageTitle',
 				value: 'with a page title B',
 			},
 			{
+				editorAlias: 'Umbraco.TextBox',
 				culture: null,
 				segment: null,
 				alias: 'blogPostText',
 				value: 'My first blog post B',
 			},
 			{
+				editorAlias: 'Umbraco.TextBox',
 				culture: 'en-US',
 				segment: null,
 				alias: 'blogTextStringUnderMasterTab',
 				value: 'in the master tab B',
 			},
 			{
+				editorAlias: 'Umbraco.TextBox',
 				culture: 'en-US',
 				segment: null,
 				alias: 'blogTextStringUnderGroupUnderMasterTab',
 				value: 'which is under another group in the tab B',
 			},
 			{
+				editorAlias: 'Umbraco.TextBox',
 				culture: 'da-dk',
 				segment: null,
 				alias: 'blogTextStringUnderMasterTab',
 				value: 'på master dokument tab B',
 			},
 			{
+				editorAlias: 'Umbraco.TextBox',
 				culture: 'da-dk',
 				segment: null,
 				alias: 'blogTextStringUnderGroupUnderMasterTab',
 				value: 'denne er under en anden gruppe i tab B',
 			},
 			{
+				editorAlias: 'Umbraco.TextBox',
 				culture: null,
 				segment: null,
 				alias: 'localBlogTabString',
@@ -789,16 +845,87 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		values: [
 			{
+				editorAlias: 'Umbraco.MultiNodeTreePicker',
 				alias: 'multiNodeTreePicker',
 				culture: null,
 				segment: null,
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.ListView',
 				alias: 'listView',
 				culture: null,
 				segment: null,
 				value: null,
+			},
+		],
+	},
+	{
+		urls: [
+			{
+				culture: 'en-US',
+				url: '/',
+			},
+		],
+		template: null,
+		id: 'all-rtes-id',
+		parent: null,
+		documentType: {
+			id: 'all-rtes-document-type-id',
+			icon: 'icon-document',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: DocumentVariantStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:32:24.957009',
+				culture: null,
+				segment: null,
+				name: 'All RTEs',
+				createDate: '2023-02-06T15:32:05.350038',
+				updateDate: '2023-02-06T15:32:24.957009',
+			},
+		],
+		values: [
+			{
+				alias: 'tiptap',
+				editorAlias: 'Umb.PropertyEditorUi.Tiptap',
+				culture: null,
+				segment: null,
+				value: {
+					blocks: undefined,
+					markup: `
+						<p>
+							Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo
+						</p>
+						<p>
+							<img width="500" height="332" loading="lazy" alt="Jason" src="/umbraco/backoffice/assets/login.jpg" />
+						</p>
+						<p>End of test content</p>
+					`,
+				},
+			},
+			{
+				alias: 'tinymce',
+				editorAlias: 'Umb.PropertyEditorUi.TinyMCE',
+				culture: null,
+				segment: null,
+				value: {
+					blocks: undefined,
+					markup: `
+						<p>
+							Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo
+						</p>
+						<div class="umb-macro-holder TestMacro umb-macro-mce_1 mceNonEditable"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>
+						<p>
+							<img width="500" height="332" loading="lazy" alt="Jason" src="/umbraco/backoffice/assets/login.jpg" />
+						</p>
+						<p>End of test content</p>
+					`,
+				},
 			},
 		],
 	},

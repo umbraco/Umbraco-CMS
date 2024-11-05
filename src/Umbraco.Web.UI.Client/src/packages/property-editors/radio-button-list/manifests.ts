@@ -1,7 +1,6 @@
 import { manifest as radioButtonListSchemaManifest } from './Umbraco.RadioButtonList.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.RadioButtonList',
@@ -12,6 +11,7 @@ export const manifests: Array<ManifestTypes> = [
 			propertyEditorSchemaAlias: 'Umbraco.RadioButtonList',
 			icon: 'icon-target',
 			group: 'lists',
+			supportsReadOnly: true,
 		},
 	},
 	radioButtonListSchemaManifest,

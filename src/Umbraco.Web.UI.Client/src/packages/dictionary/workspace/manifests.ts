@@ -1,24 +1,20 @@
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import type {
-	ManifestWorkspaces,
-	ManifestWorkspaceActions,
-	ManifestWorkspaceView,
-	ManifestTypes,
-} from '@umbraco-cms/backoffice/extension-registry';
 
-const workspace: ManifestWorkspaces = {
-	type: 'workspace',
-	kind: 'routable',
-	alias: 'Umb.Workspace.Dictionary',
-	name: 'Dictionary Workspace',
-	api: () => import('./dictionary-workspace.context.js'),
-	meta: {
-		entityType: UMB_DICTIONARY_ENTITY_TYPE,
+export const UMB_DICTIONARY_WORKSPACE_ALIAS = 'Umb.Workspace.Dictionary';
+
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'workspace',
+		kind: 'routable',
+		alias: UMB_DICTIONARY_WORKSPACE_ALIAS,
+		name: 'Dictionary Workspace',
+		api: () => import('./dictionary-workspace.context.js'),
+		meta: {
+			entityType: UMB_DICTIONARY_ENTITY_TYPE,
+		},
 	},
-};
-
-const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Dictionary.Edit',
@@ -32,14 +28,11 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_DICTIONARY_WORKSPACE_ALIAS,
 			},
 		],
 	},
-];
-
-const workspaceActions: Array<ManifestWorkspaceActions> = [
 	{
 		type: 'workspaceAction',
 		kind: 'default',
@@ -54,11 +47,9 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: 'Umb.Workspace.Dictionary',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_DICTIONARY_WORKSPACE_ALIAS,
 			},
 		],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions];

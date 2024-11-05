@@ -1,14 +1,17 @@
-import type { UmbVariantId } from '../../../variant/variant-id.class.js';
-import type { UmbPropertyDatasetContext } from '../../../property/property-dataset/property-dataset-context.interface.js';
 import type { UmbSubmittableWorkspaceContext } from './submittable-workspace-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbPropertyDatasetContext, UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export interface UmbInvariantDatasetWorkspaceContext extends UmbSubmittableWorkspaceContext {
 	// Name:
 	name: Observable<string | undefined>;
 	getName(): string | undefined;
 	setName(name: string): void;
+
+	readonly values: Observable<Array<UmbPropertyValueData> | undefined>;
+	getValues(): Promise<Array<UmbPropertyValueData> | undefined>;
 
 	// Property:
 	propertyValueByAlias<ReturnType = unknown>(alias: string): Promise<Observable<ReturnType | undefined>>;
@@ -17,9 +20,3 @@ export interface UmbInvariantDatasetWorkspaceContext extends UmbSubmittableWorks
 
 	createPropertyDatasetContext(host: UmbControllerHost, variantId?: UmbVariantId): UmbPropertyDatasetContext;
 }
-
-/**
- * @deprecated Use UmbInvariantWorkspaceContextInterface instead — Will be removed before RC.
- * TODO: Delete before RC.
- */
-export interface UmbInvariantableWorkspaceContextInterface extends UmbInvariantDatasetWorkspaceContext {}

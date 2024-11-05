@@ -1,6 +1,7 @@
+import type { UmbContentDetailModel, UmbElementPropertyDataOwner } from '@umbraco-cms/backoffice/content';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbVariantId, UmbVariantModel } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantId, UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 import type {
 	UmbPropertyStructureWorkspaceContext,
 	UmbRoutableWorkspaceContext,
@@ -8,16 +9,23 @@ import type {
 } from '@umbraco-cms/backoffice/workspace';
 
 export interface UmbContentWorkspaceContext<
+	ContentModel extends UmbContentDetailModel = UmbContentDetailModel,
 	ContentTypeModel extends UmbContentTypeModel = UmbContentTypeModel,
-	VariantModelType extends UmbVariantModel = UmbVariantModel,
-> extends UmbRoutableWorkspaceContext,
+	VariantModelType extends UmbEntityVariantModel = UmbEntityVariantModel,
+> extends UmbElementPropertyDataOwner<ContentModel, ContentTypeModel>,
+		UmbRoutableWorkspaceContext,
 		UmbVariantDatasetWorkspaceContext<VariantModelType>,
 		UmbPropertyStructureWorkspaceContext<ContentTypeModel> {
 	readonly IS_CONTENT_WORKSPACE_CONTEXT: true;
+	//readonly values: Observable<ContentModel['values'] | undefined>;
+	//getValues(): ContentModel['values'] | undefined;
+
+	// Data:
+	getData(): ContentModel | undefined;
 
 	isLoaded(): Promise<unknown> | undefined;
 	variantById(variantId: UmbVariantId): Observable<VariantModelType | undefined>;
 
-	initiatePropertyValueChange(): void;
-	finishPropertyValueChange(): void;
+	//initiatePropertyValueChange(): void;
+	//finishPropertyValueChange(): void;
 }

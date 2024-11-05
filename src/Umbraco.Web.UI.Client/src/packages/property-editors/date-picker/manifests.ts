@@ -1,7 +1,6 @@
 import { manifest as schemaManifest } from './Umbraco.DateTime.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.DatePicker',
@@ -12,6 +11,7 @@ export const manifests: Array<ManifestTypes> = [
 			propertyEditorSchemaAlias: 'Umbraco.DateTime',
 			icon: 'icon-time',
 			group: 'pickers',
+			supportsReadOnly: true,
 			settings: {
 				properties: [
 					{

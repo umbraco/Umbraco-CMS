@@ -1,8 +1,10 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/property-editor';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
 import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
 
@@ -22,6 +24,15 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement impleme
 		return this.#value;
 	}
 	#value?: UmbSwatchDetails | undefined;
+
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
 
 	@state()
 	private _showLabels = this.#defaultShowLabels;
@@ -57,7 +68,8 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement impleme
 			value=${this.value?.value ?? ''}
 			.swatches=${this._swatches}
 			?showLabels=${this._showLabels}
-			@change=${this.#onChange}></umb-input-color>`;
+			@change=${this.#onChange}
+			?readonly=${this.readonly}></umb-input-color>`;
 	}
 }
 

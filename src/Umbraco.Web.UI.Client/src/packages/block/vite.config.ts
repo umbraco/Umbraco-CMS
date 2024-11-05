@@ -12,6 +12,7 @@ export default defineConfig({
 		dist,
 		entry: {
 			'block/index': 'block/index.ts',
+			'block-custom-view/index': 'block-custom-view/index.ts',
 			'block-grid/index': 'block-grid/index.ts',
 			'block-list/index': 'block-list/index.ts',
 			'block-rte/index': 'block-rte/index.ts',

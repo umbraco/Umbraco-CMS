@@ -76,6 +76,10 @@ describe('UmbSelectionManager', () => {
 			it('has a clearSelection method', () => {
 				expect(manager).to.have.property('clearSelection').that.is.a('function');
 			});
+
+			it('has a setAllowLimitation method', () => {
+				expect(manager).to.have.property('setAllowLimitation').that.is.a('function');
+			});
 		});
 	});
 
@@ -150,6 +154,15 @@ describe('UmbSelectionManager', () => {
 			manager.select('3');
 			expect(manager.getSelection()).to.deep.equal([]);
 		});
+
+		it('can not select an item if it does not pass the allow function', () => {
+			manager.setAllowLimitation((item) => item !== '2');
+			expect(() => manager.select('2')).to.throw();
+			expect(manager.getSelection()).to.deep.equal([]);
+
+			manager.select('1');
+			expect(manager.getSelection()).to.deep.equal(['1']);
+		});
 	});
 
 	describe('Deselect', () => {
@@ -223,6 +236,12 @@ describe('UmbSelectionManager', () => {
 			manager.select('1');
 			manager.select('2');
 			expect(manager.getSelection()).to.deep.equal(['1', '2']);
+		});
+
+		it('cant do the selection if the selection contains an item that is not allowed', () => {
+			manager.setAllowLimitation((item) => item !== '2');
+			expect(() => manager.setSelection(['1', '2'])).to.throw();
+			expect(manager.getSelection()).to.deep.equal([]);
 		});
 
 		it('deselects multiple items', () => {

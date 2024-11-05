@@ -1,11 +1,11 @@
 import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
 import './block-workspace-view-edit-tab.element.js';
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 
 /**
  * @element umb-block-workspace-view-edit-content-no-router
@@ -25,11 +25,10 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 	@state()
 	private _activeTabId?: string | null | undefined;
 
-	@state()
-	private _activeTabName?: string | null | undefined;
+	//@state()
+	//private _activeTabName?: string | null | undefined;
 
 	#blockWorkspace?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
-
 	#tabsStructureHelper = new UmbContentTypeContainerStructureHelper(this);
 
 	constructor() {
@@ -39,49 +38,49 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 		this.#tabsStructureHelper.setContainerChildType('Tab');
 		this.observe(this.#tabsStructureHelper.mergedContainers, (tabs) => {
 			this._tabs = tabs;
-			this._checkDefaultTabName();
+			this.#checkDefaultTabName();
 		});
 
 		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
 
-		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#blockWorkspace = workspaceContext;
-			this.#tabsStructureHelper.setStructureManager(workspaceContext.content.structure);
-			workspaceContext.content.createPropertyDatasetContext(this);
-			this._observeRootGroups();
+		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {
+			this.#blockWorkspace = context;
+			this.#tabsStructureHelper.setStructureManager(context.content.structure);
+
+			this.#observeRootGroups();
 		});
 	}
 
-	private _observeRootGroups() {
+	async #observeRootGroups() {
 		if (!this.#blockWorkspace) return;
 
 		this.observe(
-			this.#blockWorkspace.content.structure.hasRootContainers('Group'),
+			await this.#blockWorkspace.content.structure.hasRootContainers('Group'),
 			(hasRootGroups) => {
 				this._hasRootGroups = hasRootGroups;
-				this._checkDefaultTabName();
+				this.#checkDefaultTabName();
 			},
 			'observeGroups',
 		);
 	}
 
-	private _checkDefaultTabName() {
+	#checkDefaultTabName() {
 		if (!this._tabs || !this.#blockWorkspace) return;
 
 		// Find the default tab to grab:
 		if (this._activeTabId === undefined) {
 			if (this._hasRootGroups) {
-				this._activeTabName = null;
+				//this._activeTabName = null;
 				this._activeTabId = null;
 			} else if (this._tabs.length > 0) {
-				this._activeTabName = this._tabs[0].name;
+				//this._activeTabName = this._tabs[0].name;
 				this._activeTabId = this._tabs[0].id;
 			}
 		}
 	}
 
 	#setTabName(tabName: string | undefined | null, tabId: string | null | undefined) {
-		this._activeTabName = tabName;
+		//this._activeTabName = tabName;
 		this._activeTabId = tabId;
 	}
 
@@ -99,7 +98,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 										>Content</uui-tab
 									>
 								`
-							: ''}
+							: nothing}
 						${repeat(
 							this._tabs,
 							(tab) => tab.name,
@@ -113,18 +112,14 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 							},
 						)}
 					</uui-tab-group>`
-				: ''}
+				: nothing}
 			${this._activeTabId !== undefined
 				? html`<umb-block-workspace-view-edit-tab
 						.managerName=${'content'}
 						.hideSingleGroup=${true}
-						.ownerTabId=${this._activeTabId && this.#tabsStructureHelper.isOwnerChildContainer(this._activeTabId)
-							? this._activeTabId
-							: null}
-						.noTabName=${this._hasRootGroups && this._activeTabName === null}
-						.tabName=${this._activeTabName ?? undefined}>
+						.containerId=${this._activeTabId}>
 					</umb-block-workspace-view-edit-tab>`
-				: ''}
+				: nothing}
 		`;
 	}
 
@@ -132,9 +127,12 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 		UmbTextStyles,
 		css`
 			:host {
+				position: relative;
 				display: block;
 				height: 100%;
 				--uui-tab-background: var(--uui-color-surface);
+
+				padding: calc(var(--uui-size-layout-1));
 			}
 		`,
 	];

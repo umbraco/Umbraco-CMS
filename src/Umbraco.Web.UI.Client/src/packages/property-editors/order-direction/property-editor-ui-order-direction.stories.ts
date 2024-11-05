@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorUIOrderDirectionElement } from './property-editor-ui-order-direction.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-order-direction.element.js';
@@ -10,6 +10,6 @@ export default {
 	id: 'umb-property-editor-ui-order-direction',
 } as Meta;
 
-export const AAAOverview: Story<UmbPropertyEditorUIOrderDirectionElement> = () =>
+export const AAAOverview: StoryFn<UmbPropertyEditorUIOrderDirectionElement> = () =>
 	html`<umb-property-editor-ui-order-direction></umb-property-editor-ui-order-direction>`;
 AAAOverview.storyName = 'Overview';

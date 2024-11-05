@@ -4,9 +4,10 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export abstract class UmbRenameServerFileRepositoryBase<
-	DetailModelType extends { unique: string },
+	DetailModelType extends UmbEntityModel,
 > extends UmbRepositoryBase {
 	#renameSource: UmbRenameServerFileDataSource<DetailModelType>;
 	#detailStoreContextAlias: string | UmbContextToken<UmbDetailStore<DetailModelType>>;
@@ -25,7 +26,7 @@ export abstract class UmbRenameServerFileRepositoryBase<
 	 * Rename
 	 * @param {string} unique
 	 * @param {string} name
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbRenameServerFileRepositoryBase
 	 */
 	async rename(unique: string, name: string) {

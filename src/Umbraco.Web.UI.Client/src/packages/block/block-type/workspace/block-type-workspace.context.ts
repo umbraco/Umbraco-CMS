@@ -1,19 +1,22 @@
-import type { UmbBlockTypeWithGroupKey } from '../types.js';
+import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../types.js';
 import { UmbBlockTypeWorkspaceEditorElement } from './block-type-workspace-editor.element.js';
-import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import type { UmbPropertyDatasetContext, UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
 	UmbInvariantDatasetWorkspaceContext,
 	UmbRoutableWorkspaceContext,
+	ManifestWorkspace,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbSubmittableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceIsNewRedirectControllerAlias,
+	umbObjectToPropertyValueArray,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { ManifestWorkspace, UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWithGroupKey = UmbBlockTypeWithGroupKey>
 	extends UmbSubmittableWorkspaceContextBase<BlockTypeData>
@@ -24,11 +27,17 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 
 	#entityType: string;
 	#data = new UmbObjectState<BlockTypeData | undefined>(undefined);
-	//readonly data = this.#data.asObservable();
+	readonly data = this.#data.asObservable();
 
-	// TODO: Get the name of the contentElementType..
-	readonly name = this.#data.asObservablePart(() => 'block');
+	readonly name = this.#data.asObservablePart(() => 'block type');
 	readonly unique = this.#data.asObservablePart((data) => data?.contentElementTypeKey);
+
+	readonly values = this.#data.asObservablePart((data) => {
+		return umbObjectToPropertyValueArray(data);
+	});
+	async getValues(): Promise<Array<UmbPropertyValueData> | undefined> {
+		return umbObjectToPropertyValueArray(await firstValueFrom(this.data));
+	}
 
 	constructor(host: UmbControllerHost, args: { manifest: ManifestWorkspace }) {
 		super(host, args.manifest.alias);
@@ -70,7 +79,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 	protected override resetState() {
 		super.resetState();
 		this.#data.setValue(undefined);
-		this.removeUmbControllerByAlias('isNewRedirectController');
+		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 	}
 
 	createPropertyDatasetContext(host: UmbControllerHost): UmbPropertyDatasetContext {
@@ -136,6 +145,12 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 		console.warn('You cannot set a name of a block type.');
 	}
 
+	/**
+	 * @function propertyValueByAlias
+	 * @param {string} propertyAlias
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
+	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		return this.#data.asObservablePart((data) => data?.[propertyAlias as keyof BlockTypeData] as ReturnType);
 	}
@@ -144,6 +159,13 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 		return this.#data.getValue()?.[propertyAlias as keyof BlockTypeData] as ReturnType;
 	}
 
+	/**
+	 * @function setPropertyValue
+	 * @param {string} alias
+	 * @param {unknown} value - value can be a promise resolving into the actual value or the raw value it self.
+	 * @returns {Promise<void>}
+	 * @description Set the value of this property.
+	 */
 	async setPropertyValue(alias: string, value: unknown) {
 		const currentData = this.#data.value;
 		if (currentData) {

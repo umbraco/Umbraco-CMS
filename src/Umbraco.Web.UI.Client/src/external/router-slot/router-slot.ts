@@ -1,5 +1,5 @@
 import { GLOBAL_ROUTER_EVENTS_TARGET, ROUTER_SLOT_TAG_NAME } from './config.js';
-import {
+import type {
 	Cancel,
 	EventListenerSubscription,
 	GlobalRouterEvent,

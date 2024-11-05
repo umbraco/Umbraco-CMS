@@ -1,18 +1,5 @@
-import type { ManifestUfmComponent } from '@umbraco-cms/backoffice/extension-registry';
+import { manifest as ufmContext } from './contexts/manifest.js';
+import { manifests as ufmComponents } from './components/manifests.js';
+import { manifests as ufmFilters } from './filters/manifests.js';
 
-export const manifests: Array<ManifestUfmComponent> = [
-	{
-		type: 'ufmComponent',
-		alias: 'Umb.Markdown.LabelValue',
-		name: 'Label Value UFM Component',
-		api: () => import('./ufm-components/label-value.component.js'),
-		meta: { marker: '=' },
-	},
-	{
-		type: 'ufmComponent',
-		alias: 'Umb.Markdown.Localize',
-		name: 'Localize UFM Component',
-		api: () => import('./ufm-components/localize.component.js'),
-		meta: { marker: '#' },
-	},
-];
+export const manifests: Array<UmbExtensionManifest> = [ufmContext, ...ufmComponents, ...ufmFilters];

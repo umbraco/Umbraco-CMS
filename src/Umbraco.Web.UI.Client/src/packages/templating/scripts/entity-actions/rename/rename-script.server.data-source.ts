@@ -22,7 +22,7 @@ export class UmbRenameScriptServerDataSource {
 	 * Rename Script
 	 * @param {string} unique
 	 * @param {string} name
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbRenameScriptServerDataSource
 	 */
 	async rename(unique: string, name: string) {

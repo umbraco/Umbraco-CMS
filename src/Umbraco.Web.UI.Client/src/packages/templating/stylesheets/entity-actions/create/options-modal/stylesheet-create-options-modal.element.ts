@@ -54,14 +54,14 @@ export class UmbStylesheetCreateOptionsModalElement extends UmbModalBaseElement<
 				<uui-box>
 					<!-- TODO: construct url -->
 					<uui-menu-item href=${`${this.#getCreateHref()}/view/code`} label="New Stylesheet" @click=${this.#onNavigate}>
-						<uui-icon slot="icon" name="icon-article"></uui-icon>}
+						<uui-icon slot="icon" name="icon-palette"></uui-icon>}
 					</uui-menu-item>
 
 					<uui-menu-item
 						href=${`${this.#getCreateHref()}/view/rich-text-editor`}
 						label="New Rich Text Editor Stylesheet"
 						@click=${this.#onNavigate}>
-						<uui-icon slot="icon" name="icon-article"></uui-icon>}
+						<uui-icon slot="icon" name="icon-palette"></uui-icon>}
 					</uui-menu-item>
 
 					<uui-menu-item @click=${this.#onCreateFolderClick} label="New Folder...">

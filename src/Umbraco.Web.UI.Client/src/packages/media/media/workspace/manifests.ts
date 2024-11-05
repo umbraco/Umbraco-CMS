@@ -1,28 +1,24 @@
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import type {
-	ManifestWorkspaces,
-	ManifestWorkspaceActions,
-	ManifestWorkspaceView,
-	ManifestTypes,
-} from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION } from '@umbraco-cms/backoffice/content';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
-const workspace: ManifestWorkspaces = {
-	type: 'workspace',
-	kind: 'routable',
-	alias: 'Umb.Workspace.Media',
-	name: 'Media Workspace',
-	api: () => import('./media-workspace.context.js'),
-	meta: {
-		entityType: 'media',
+export const UMB_MEDIA_WORKSPACE_ALIAS = 'Umb.Workspace.Media';
+
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'workspace',
+		kind: 'routable',
+		alias: UMB_MEDIA_WORKSPACE_ALIAS,
+		name: 'Media Workspace',
+		api: () => import('./media-workspace.context.js'),
+		meta: {
+			entityType: 'media',
+		},
 	},
-};
-
-const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
-		kind: 'collection',
+		kind: 'contentCollection',
 		alias: 'Umb.WorkspaceView.Media.Collection',
 		name: 'Media Workspace Collection View',
 		meta: {
@@ -32,8 +28,8 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_MEDIA_WORKSPACE_ALIAS,
 			},
 			{
 				alias: 'Umb.Condition.WorkspaceHasCollection',
@@ -53,8 +49,8 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_MEDIA_WORKSPACE_ALIAS,
 			},
 			{
 				alias: UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION,
@@ -74,14 +70,11 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_MEDIA_WORKSPACE_ALIAS,
 			},
 		],
 	},
-];
-
-const workspaceActions: Array<ManifestWorkspaceActions> = [
 	{
 		type: 'workspaceAction',
 		kind: 'default',
@@ -95,8 +88,8 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_MEDIA_WORKSPACE_ALIAS,
 			},
 			{
 				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
@@ -104,5 +97,3 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions];

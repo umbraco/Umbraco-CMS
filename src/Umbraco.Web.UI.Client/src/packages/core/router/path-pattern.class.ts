@@ -17,7 +17,6 @@ export class UmbPathPattern<
 
 	/**
 	 * Get the params type of the path pattern
-	 *
 	 * @public
 	 * @type      {T}
 	 * @memberOf  UmbPathPattern
@@ -27,7 +26,6 @@ export class UmbPathPattern<
 
 	/**
 	 * Get absolute params type of the path pattern
-	 *
 	 * @public
 	 * @type      {T}
 	 * @memberOf  UmbPathPattern

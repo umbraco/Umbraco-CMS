@@ -2,8 +2,10 @@ import type { UmbInputSliderElement } from '@umbraco-cms/backoffice/components';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/property-editor';
 
 export type UmbSliderValue = { from: number; to: number } | undefined;
 
@@ -14,6 +16,15 @@ export type UmbSliderValue = { from: number; to: number } | undefined;
 export class UmbPropertyEditorUISliderElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Object })
 	value: UmbSliderValue | undefined;
+
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
 
 	@state()
 	_enableRange = false;
@@ -82,7 +93,8 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 				.min=${this._min}
 				.max=${this._max}
 				?enable-range=${this._enableRange}
-				@change=${this.#onChange}>
+				@change=${this.#onChange}
+				?readonly=${this.readonly}>
 			</umb-input-slider>
 		`;
 	}

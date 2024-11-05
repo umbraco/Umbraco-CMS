@@ -2,6 +2,7 @@ import type { UmbDocumentVariantPickerData, UmbDocumentVariantPickerValue } from
 import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL_ALIAS } from '../manifests.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbDocumentPublishWithDescendantsModalData extends UmbDocumentVariantPickerData {}
 
 export interface UmbDocumentPublishWithDescendantsModalValue extends UmbDocumentVariantPickerValue {

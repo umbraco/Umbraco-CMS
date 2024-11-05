@@ -1,7 +1,7 @@
 import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '../../../entity-action/default/default.action.kind.js';
-import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifest: UmbBackofficeManifestKind = {
+export const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.EntityAction.RecycleBin.Restore',
 	matchKind: 'restoreFromRecycleBin',
@@ -15,8 +15,9 @@ export const manifest: UmbBackofficeManifestKind = {
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-undo',
-			label: 'Restore...',
+			label: 'Restore',
 			pickerModal: '',
+			additionalOptions: true,
 		},
 	},
 };

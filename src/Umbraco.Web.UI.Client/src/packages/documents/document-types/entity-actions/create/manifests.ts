@@ -1,7 +1,6 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE, UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE } from '../../entity.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
@@ -13,6 +12,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-add',
 			label: '#actions_create',
+			additionalOptions: true,
 		},
 	},
 	{
@@ -22,5 +22,3 @@ const entityActions: Array<ManifestTypes> = [
 		element: () => import('./modal/document-type-create-options-modal.element.js'),
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...entityActions];

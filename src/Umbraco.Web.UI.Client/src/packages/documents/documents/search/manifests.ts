@@ -1,10 +1,10 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS } from './constants.js';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		name: 'Document Search Provider',
-		alias: 'Umb.SearchProvider.Document',
+		alias: UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS,
 		type: 'searchProvider',
 		api: () => import('./document.search-provider.js'),
 		weight: 800,
@@ -16,7 +16,7 @@ export const manifests: Array<ManifestTypes> = [
 		name: 'Document Search Result Item ',
 		alias: 'Umb.SearchResultItem.Document',
 		type: 'searchResultItem',
-		js: () => import('./document-search-result-item.element.js'),
+		element: () => import('./document-search-result-item.element.js'),
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 	},
 ];

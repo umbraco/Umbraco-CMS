@@ -1,14 +1,14 @@
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspaceContext',
 		name: 'Example Counter Workspace Context',
 		alias: 'example.workspaceCounter.counter',
-		js: () => import('./counter-workspace-context.js'),
+		api: () => import('./counter-workspace-context.js'),
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: 'Umb.Workspace.Document',
 			},
 		],
@@ -27,7 +27,7 @@ export const manifests: Array<ManifestTypes> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: 'Umb.Workspace.Document',
 			},
 		],
@@ -45,7 +45,7 @@ export const manifests: Array<ManifestTypes> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: 'Umb.Workspace.Document',
 			},
 		],

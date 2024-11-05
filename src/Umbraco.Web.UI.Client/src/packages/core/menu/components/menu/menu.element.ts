@@ -1,5 +1,6 @@
+import type { ManifestMenu } from '../../menu.extension.js';
+import type { ManifestMenuItem } from '../../menu-item.extension.js';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type { ManifestMenu, ManifestMenuItem } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import '../menu-item/menu-item-default.element.js';

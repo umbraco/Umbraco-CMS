@@ -89,6 +89,7 @@ export class UmbUserMfaModalElement extends UmbLitElement {
 
 	/**
 	 * Render a provider with a toggle to enable/disable it
+	 * @param item
 	 */
 	#renderProvider(item: UmbMfaLoginProviderOption) {
 		return html`
@@ -136,6 +137,7 @@ export class UmbUserMfaModalElement extends UmbLitElement {
 	 * This method is called when the user clicks the disable button on a provider.
 	 * It will show a confirmation dialog and then disable the provider if the user confirms.
 	 * NB! The user must have administrative rights before doing so.
+	 * @param item
 	 */
 	async #onProviderDisable(item: UmbMfaLoginProviderOption) {
 		await umbConfirmModal(this, {

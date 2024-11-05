@@ -1,5 +1,5 @@
 import type { UmbDataTypeItemModel } from '../../repository/item/types.js';
-import { UmbDataTypePickerContext } from './data-type-input.context.js';
+import { UmbDataTypePickerInputContext } from './data-type-input.context.js';
 import { css, html, customElement, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -30,7 +30,7 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default 0
+	 * @default
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
@@ -53,7 +53,7 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default Infinity
+	 * @default
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
@@ -92,7 +92,7 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 	@state()
 	private _items?: Array<UmbDataTypeItemModel>;
 
-	#pickerContext = new UmbDataTypePickerContext(this);
+	#pickerContext = new UmbDataTypePickerInputContext(this);
 
 	constructor() {
 		super();

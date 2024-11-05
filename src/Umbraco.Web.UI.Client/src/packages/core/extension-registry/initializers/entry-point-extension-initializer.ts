@@ -1,4 +1,4 @@
-import type { ManifestEntryPoint } from '../models/entry-point.model.js';
+import type { ManifestEntryPoint } from '../extensions/entry-point.extension.js';
 import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
 import {
 	type UmbEntryPointModule,
@@ -20,6 +20,8 @@ export class UmbEntryPointExtensionInitializer extends UmbExtensionInitializerBa
 	}
 
 	async instantiateExtension(manifest: ManifestEntryPoint) {
+		console.error('The `entryPoint` extension-type is deprecated, please use the `backofficeEntryPoint`.');
+
 		if (manifest.js) {
 			const moduleInstance = await loadManifestPlainJs(manifest.js);
 

@@ -1,7 +1,7 @@
 import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '../../default/default.action.kind.js';
-import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifest: UmbBackofficeManifestKind = {
+export const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.EntityAction.Delete',
 	matchKind: 'delete',
@@ -16,6 +16,7 @@ export const manifest: UmbBackofficeManifestKind = {
 		meta: {
 			icon: 'icon-trash',
 			label: '#actions_delete',
+			additionalOptions: true,
 			itemRepositoryAlias: '',
 			detailRepositoryAlias: '',
 		},

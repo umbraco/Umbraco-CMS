@@ -1,3 +1,4 @@
+import { UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS } from '../search/index.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import {
 	type UmbTreePickerModalValue,
@@ -18,6 +19,9 @@ export const UMB_DOCUMENT_PICKER_MODAL = new UmbModalToken<UmbDocumentPickerModa
 		},
 		data: {
 			treeAlias: 'Umb.Tree.Document',
+			search: {
+				providerAlias: UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS,
+			},
 		},
 	},
 );

@@ -1,7 +1,7 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/data-type';
 

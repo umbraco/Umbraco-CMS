@@ -1,7 +1,6 @@
 import { manifest as schemaManifest } from './Umbraco.ContentPicker.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.DocumentPicker',
@@ -11,7 +10,8 @@ export const manifests: Array<ManifestTypes> = [
 			label: 'Document Picker',
 			propertyEditorSchemaAlias: 'Umbraco.ContentPicker',
 			icon: 'icon-document',
-			group: 'common',
+			group: 'pickers',
+			supportsReadOnly: true,
 			settings: {
 				properties: [
 					{

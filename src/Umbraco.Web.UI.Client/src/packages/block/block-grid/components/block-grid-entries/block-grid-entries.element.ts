@@ -1,3 +1,5 @@
+import { UmbBlockGridEntriesContext } from '../../context/block-grid-entries.context.js';
+import type { UmbBlockGridEntryElement } from '../block-grid-entry/index.js';
 import {
 	getAccumulatedValueOfIndex,
 	getInterpolatedIndexOfPositionInWeightMap,
@@ -14,12 +16,12 @@ import {
 	type UmbFormControlValidatorConfig,
 } from '@umbraco-cms/backoffice/validation';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import { UmbBlockGridEntriesContext } from '../../context/block-grid-entries.context.js';
-import type { UmbBlockGridEntryElement } from '../block-grid-entry/index.js';
 import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 
 /**
  * Notice this utility method is not really shareable with others as it also takes areas into account. [NL]
+ * @param args
+ * @returns { null | true }
  */
 function resolvePlacementAsGrid(args: resolvePlacementArgs<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>) {
 	// If this has areas, we do not want to move, unless we are at the edge
@@ -89,10 +91,10 @@ function resolvePlacementAsGrid(args: resolvePlacementArgs<UmbBlockGridLayoutMod
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryElement> = {
 	getUniqueOfElement: (element) => {
-		return element.contentUdi!;
+		return element.contentKey!;
 	},
 	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.contentUdi;
+		return modelEntry.contentKey;
 	},
 	resolvePlacement: resolvePlacementAsGrid,
 	identifier: 'block-grid-editor',
@@ -121,7 +123,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			this.#context.setLayouts(model);
 		},
 		onRequestMove: ({ item }) => {
-			return this.#context.allowDrop(item.contentUdi);
+			return this.#context.allowDrop(item.contentKey);
 		},
 		onDisallowed: () => {
 			this.setAttribute('disallow-drop', '');
@@ -132,11 +134,23 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	});
 
 	#context = new UmbBlockGridEntriesContext(this);
+	#controlValidator?: UmbFormControlValidator;
+	#typeLimitValidator?: UmbFormControlValidatorConfig;
+	#rangeUnderflowValidator?: UmbFormControlValidatorConfig;
+	#rangeOverflowValidator?: UmbFormControlValidatorConfig;
 
-	@property({ attribute: false })
+	@property({ type: String, attribute: 'area-key', reflect: true })
 	public set areaKey(value: string | null | undefined) {
 		this._areaKey = value;
 		this.#context.setAreaKey(value ?? null);
+		this.#controlValidator?.destroy();
+		if (this.areaKey) {
+			// Only when there is a area key we should create a validator, otherwise it is the root entries element, which is taking part of the Property Editor Form Control. [NL]
+			// Currently there is no server validation for areas. So we can leave out the data path for it for now. [NL]
+			this.#controlValidator = new UmbFormControlValidator(this, this);
+
+			//new UmbBindServerValidationToFormControl(this, this, "$.values.[?(@.alias == 'my-input-alias')].value");
+		}
 	}
 	public get areaKey(): string | null | undefined {
 		return this._areaKey;
@@ -157,7 +171,10 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	private _canCreate?: boolean;
 
 	@state()
-	private _singleBlockTypeName?: string;
+	private _createLabel?: string;
+
+	@state()
+	private _configCreateLabel?: string;
 
 	@state()
 	private _styleElement?: HTMLLinkElement;
@@ -165,8 +182,12 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	@state()
 	private _layoutEntries: Array<UmbBlockGridLayoutModel> = [];
 
+	@state()
+	private _isReadOnly: boolean = false;
+
 	constructor() {
 		super();
+
 		this.observe(
 			this.#context.layoutEntries,
 			(layoutEntries) => {
@@ -186,12 +207,13 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 					this.observe(
 						this.#context.firstAllowedBlockTypeName(),
 						(firstAllowedName) => {
-							this._singleBlockTypeName = firstAllowedName;
+							this._createLabel = this.localize.term('blockEditor_addThis', this.localize.string(firstAllowedName));
 						},
 						'observeSingleBlockTypeName',
 					);
 				} else {
 					this.removeUmbControllerByAlias('observeSingleBlockTypeName');
+					this._createLabel = this.localize.term('blockEditor_addBlock');
 				}
 			},
 			null,
@@ -201,6 +223,14 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			this.#context.rangeLimits,
 			(rangeLimits) => {
 				this.#setupRangeValidation(rangeLimits);
+			},
+			null,
+		);
+
+		this.observe(
+			this.#context.hasTypeLimits,
+			(hasTypeLimits) => {
+				this.#setupBlockTypeLimitValidation(hasTypeLimits);
 			},
 			null,
 		);
@@ -216,13 +246,31 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				},
 				'observeStylesheet',
 			);
+
+			this.observe(
+				manager.readOnlyState.isReadOnly,
+				(isReadOnly) => (this._isReadOnly = isReadOnly),
+				'observeIsReadOnly',
+			);
+
+			if (this.areaKey) {
+				this.observe(
+					this.#context.areaTypeCreateLabel,
+					(label) => (this._configCreateLabel = label),
+					'observeConfigCreateLabel',
+				);
+			} else {
+				this.observe(
+					manager.editorConfigurationPart((x) => x?.find((y) => y.alias === 'createLabel')?.value),
+					(label) => (this._configCreateLabel = label as string | undefined),
+					'observeConfigCreateLabel',
+				);
+			}
 		});
 
 		new UmbFormControlValidator(this, this /*, this.#dataPath*/);
 	}
 
-	#rangeUnderflowValidator?: UmbFormControlValidatorConfig;
-	#rangeOverflowValidator?: UmbFormControlValidatorConfig;
 	async #setupRangeValidation(rangeLimit: UmbNumberRangeValueType | undefined) {
 		if (this.#rangeUnderflowValidator) {
 			this.removeValidator(this.#rangeUnderflowValidator);
@@ -238,9 +286,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 						(rangeLimit!.min ?? 0) - this._layoutEntries.length,
 					);
 				},
-				() => {
-					return this._layoutEntries.length < (rangeLimit?.min ?? 0);
-				},
+				() => this._layoutEntries.length < (rangeLimit?.min ?? 0),
 			);
 		}
 
@@ -258,8 +304,37 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 						this._layoutEntries.length - (rangeLimit!.max ?? this._layoutEntries.length),
 					);
 				},
+				() => this._layoutEntries.length > (rangeLimit?.max ?? Infinity),
+			);
+		}
+	}
+
+	async #setupBlockTypeLimitValidation(hasTypeLimits: boolean | undefined) {
+		if (this.#typeLimitValidator) {
+			this.removeValidator(this.#typeLimitValidator);
+			this.#typeLimitValidator = undefined;
+		}
+		if (hasTypeLimits) {
+			this.#typeLimitValidator = this.addValidator(
+				'customError',
 				() => {
-					return (this._layoutEntries.length ?? 0) > (rangeLimit?.max ?? Infinity);
+					const invalids = this.#context.getInvalidBlockTypeLimits();
+					return invalids
+						.map((invalidRule) =>
+							this.localize.term(
+								invalidRule.amount < invalidRule.minRequirement
+									? 'blockEditor_areaValidationEntriesShort'
+									: 'blockEditor_areaValidationEntriesExceed',
+								invalidRule.name,
+								invalidRule.amount,
+								invalidRule.minRequirement,
+								invalidRule.maxRequirement,
+							),
+						)
+						.join(', ');
+				},
+				() => {
+					return !this.#context.checkBlockTypeLimitsValidity();
 				},
 			);
 		}
@@ -272,47 +347,60 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			<div class="umb-block-grid__layout-container" data-area-length=${this._layoutEntries.length}>
 				${repeat(
 					this._layoutEntries,
-					(x) => x.contentUdi,
+					(x) => x.contentKey,
 					(layoutEntry, index) =>
 						html`<umb-block-grid-entry
 							class="umb-block-grid__layout-item"
 							index=${index}
-							.contentUdi=${layoutEntry.contentUdi}
+							.contentKey=${layoutEntry.contentKey}
 							.layout=${layoutEntry}>
 						</umb-block-grid-entry>`,
 				)}
 			</div>
-			<uui-form-validation-message .for=${this}></uui-form-validation-message>
-			${this._canCreate ? this.#renderCreateButton() : nothing}
+			${this._canCreate ? this.#renderCreateButtonGroup() : nothing}
+			${this._areaKey ? html` <uui-form-validation-message .for=${this}></uui-form-validation-message>` : nothing}
 		`;
 	}
 
-	#renderCreateButton() {
+	#renderCreateButtonGroup() {
 		if (this._areaKey === null || this._layoutEntries.length === 0) {
-			return html`<uui-button-group>
-				<uui-button
-					id="add-button"
-					look="placeholder"
-					label=${this._singleBlockTypeName
-						? this.localize.term('blockEditor_addThis', [this._singleBlockTypeName])
-						: this.localize.term('blockEditor_addBlock')}
-					href=${this.#context.getPathForCreateBlock(-1) ?? ''}></uui-button>
-				${this._areaKey === null
-					? html` <uui-button
-							label=${this.localize.term('content_createFromClipboard')}
-							look="placeholder"
-							href=${this.#context.getPathForClipboard(-1) ?? ''}>
-							<uui-icon name="icon-paste-in"></uui-icon>
-						</uui-button>`
-					: nothing}
+			return html` <uui-button-group id="createButton">
+				${this.#renderCreateButton()} ${this.#renderPasteButton()}
 			</uui-button-group>`;
+		} else if (this._isReadOnly === false) {
+			return html`<uui-button-inline-create
+				href=${this.#context.getPathForCreateBlock(-1) ?? ''}
+				label=${this.localize.term('blockEditor_addBlock')}></uui-button-inline-create> `;
 		} else {
-			return html`
-				<uui-button-inline-create
-					href=${this.#context.getPathForCreateBlock(-1) ?? ''}
-					label=${this.localize.term('blockEditor_addBlock')}></uui-button-inline-create>
-			`;
+			return nothing;
 		}
+	}
+
+	#renderCreateButton() {
+		if (this._isReadOnly && this._layoutEntries.length > 0) return nothing;
+
+		return html`
+			<uui-button
+				look="placeholder"
+				label=${this._configCreateLabel ?? this._createLabel ?? ''}
+				href=${this.#context.getPathForCreateBlock(-1) ?? ''}
+				?disabled=${this._isReadOnly}></uui-button>
+		`;
+	}
+
+	#renderPasteButton() {
+		if (this._areaKey) return nothing;
+		if (this._isReadOnly && this._layoutEntries.length > 0) return nothing;
+
+		return html`
+			<uui-button
+				label=${this.localize.term('content_createFromClipboard')}
+				look="placeholder"
+				href=${this.#context.getPathForClipboard(-1) ?? ''}
+				?disabled=${this._isReadOnly}>
+				<uui-icon name="icon-paste-in"></uui-icon>
+			</uui-button>
+		`;
 	}
 
 	static override styles = [
@@ -342,18 +430,30 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				opacity: 0.2;
 				pointer-events: none;
 			}
+
 			> div {
 				display: flex;
 				flex-direction: column;
 				align-items: stretch;
 			}
 
-			uui-button-group {
+			#createButton {
 				padding-top: 1px;
 				grid-template-columns: 1fr auto;
+				display: grid;
+			}
 
+			// Only when we are n an area, we like to hide the button on drag
+			:host([area-key]) #createButton {
 				--umb-block-grid--is-dragging--variable: var(--umb-block-grid--is-dragging) none;
 				display: var(--umb-block-grid--is-dragging--variable, grid);
+			}
+			:host(:not([pristine]):invalid) #createButton {
+				--uui-button-contrast: var(--uui-color-danger);
+				--uui-button-contrast-hover: var(--uui-color-danger);
+				--uui-color-default-emphasis: var(--uui-color-danger);
+				--uui-button-border-color: var(--uui-color-danger);
+				--uui-button-border-color-hover: var(--uui-color-danger);
 			}
 
 			.umb-block-grid__layout-container[data-area-length='0'] {

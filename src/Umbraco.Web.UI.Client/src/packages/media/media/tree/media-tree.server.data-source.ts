@@ -11,9 +11,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A data source for the Media tree that fetches data from the server
- * @export
  * @class UmbMediaTreeServerDataSource
- * @extends {UmbTreeServerDataSourceBase}
+ * @augments {UmbTreeServerDataSourceBase}
  */
 export class UmbMediaTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	MediaTreeItemResponseModel,
@@ -23,7 +22,7 @@ export class UmbMediaTreeServerDataSource extends UmbTreeServerDataSourceBase<
 > {
 	/**
 	 * Creates an instance of UmbMediaTreeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

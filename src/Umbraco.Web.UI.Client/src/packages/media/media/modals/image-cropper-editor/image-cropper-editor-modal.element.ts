@@ -9,7 +9,8 @@ import type {
 } from './image-cropper-editor-modal.token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UMB_MODAL_MANAGER_CONTEXT, UMB_WORKSPACE_MODAL, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import './components/image-cropper-editor-field.element.js';
 

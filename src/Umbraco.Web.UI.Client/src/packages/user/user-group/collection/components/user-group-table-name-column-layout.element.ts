@@ -1,3 +1,4 @@
+import { UMB_USER_GROUP_WORKSPACE_PATH } from '../../paths.js';
 import { css, html, LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -11,7 +12,7 @@ export class UmbUserGroupTableNameColumnLayoutElement extends LitElement {
 	value!: any;
 
 	override render() {
-		const href = `section/user-management/view/user-groups/user-group/edit/${this.item.id}`;
+		const href = UMB_USER_GROUP_WORKSPACE_PATH + '/edit/' + this.item.id;
 		return html`<a href=${href}>${this.value.name}</a>`;
 	}
 

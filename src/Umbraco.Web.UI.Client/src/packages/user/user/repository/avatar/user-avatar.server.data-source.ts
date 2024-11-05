@@ -15,7 +15,7 @@ export class UmbUserAvatarServerDataSource {
 	 * Creates an avatar for the user with the given id based on a temporary uploaded file
 	 * @param {string} unique
 	 * @param {string} fileUnique
-	 * @return {*}  {Promise<UmbDataSourceErrorResponse>}
+	 * @returns {*}  {Promise<UmbDataSourceErrorResponse>}
 	 * @memberof UmbUserServerDataSource
 	 */
 	createAvatar(unique: string, fileUnique: string): Promise<UmbDataSourceErrorResponse> {
@@ -31,7 +31,7 @@ export class UmbUserAvatarServerDataSource {
 	/**
 	 * Deletes the avatar for the user with the given id
 	 * @param {string} unique
-	 * @return {*}  {Promise<UmbDataSourceErrorResponse>}
+	 * @returns {*}  {Promise<UmbDataSourceErrorResponse>}
 	 * @memberof UmbUserServerDataSource
 	 */
 	deleteAvatar(unique: string): Promise<UmbDataSourceErrorResponse> {

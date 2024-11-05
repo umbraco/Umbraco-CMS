@@ -5,7 +5,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * UmbContentPickerDynamicRootServerDataSource
- * @export
  * @class UmbContentPickerDynamicRootServerDataSource
  */
 export class UmbContentPickerDynamicRootServerDataSource {
@@ -18,7 +17,7 @@ export class UmbContentPickerDynamicRootServerDataSource {
 	/**
 	 * Get dynamic root
 	 * @param {DynamicRootRequestModel} args
-	 * @return {*}  {(Promise<DynamicRootResponseModel | undefined>)}
+	 * @returns {*}  {(Promise<DynamicRootResponseModel | undefined>)}
 	 * @memberof UmbContentPickerDynamicRootServerDataSource
 	 */
 	async getRoot(args: DynamicRootRequestModel): Promise<DynamicRootResponseModel | undefined> {

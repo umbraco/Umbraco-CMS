@@ -2,7 +2,7 @@ import type { UmbSectionItemModel } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
-import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestSection } from '@umbraco-cms/backoffice/section';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 
@@ -14,7 +14,7 @@ export class UmbSectionItemRepository extends UmbRepositoryBase implements UmbIt
 	/**
 	 * Requests the items for the given uniques
 	 * @param {Array<string>} uniques
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbItemRepositoryBase
 	 */
 	async requestItems(uniques: Array<string>) {
@@ -33,7 +33,7 @@ export class UmbSectionItemRepository extends UmbRepositoryBase implements UmbIt
 	/**
 	 * Returns a promise with an observable of the items for the given uniques
 	 * @param {Array<string>} uniques
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbItemRepositoryBase
 	 */
 	async items(uniques: Array<string>) {

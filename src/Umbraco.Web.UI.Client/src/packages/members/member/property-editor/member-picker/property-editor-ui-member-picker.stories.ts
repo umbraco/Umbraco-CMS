@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorUIMemberPickerElement } from './property-editor-ui-member-picker.element.js';
-import type { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-member-picker.element.js';
@@ -10,6 +10,6 @@ export default {
 	id: 'umb-property-editor-ui-member-picker',
 } as Meta;
 
-export const AAAOverview: Story<UmbPropertyEditorUIMemberPickerElement> = () =>
+export const AAAOverview: StoryFn<UmbPropertyEditorUIMemberPickerElement> = () =>
 	html`<umb-property-editor-ui-member-picker></umb-property-editor-ui-member-picker>`;
 AAAOverview.storyName = 'Overview';

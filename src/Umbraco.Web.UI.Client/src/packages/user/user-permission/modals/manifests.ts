@@ -1,10 +1,3 @@
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as settingsManifests } from './settings/manifests.js';
 
-export const manifests: Array<ManifestTypes> = [
-	{
-		type: 'modal',
-		alias: 'Umb.Modal.EntityUserPermissionSettings',
-		name: 'Entity User Permission Settings Modal',
-		js: () => import('./settings/entity-user-permission-settings-modal.element.js'),
-	},
-];
+export const manifests: Array<UmbExtensionManifest> = [...settingsManifests];

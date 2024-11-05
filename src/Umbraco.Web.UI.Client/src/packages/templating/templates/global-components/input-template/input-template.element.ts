@@ -5,7 +5,8 @@ import { UmbTemplateItemRepository } from '../../repository/item/index.js';
 import { UMB_TEMPLATE_PICKER_MODAL } from '../../modals/index.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_MODAL_MANAGER_CONTEXT, UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -172,16 +173,16 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 			${this._pickedTemplates.map(
 				(template) => html`
 					<umb-template-card
-						.name=${template.name}
 						.id=${template.unique}
-						@open=${() => window.history.pushState({}, '', this.#templatePath + 'edit/' + template.unique)}
+						.name=${template.name}
 						@change=${this.#onCardChange}
-						?default="${template.unique === this.defaultUnique}">
+						@open=${() => window.history.pushState({}, '', this.#templatePath + 'edit/' + template.unique)}
+						?default=${template.unique === this.defaultUnique}>
 						<uui-button
 							slot="actions"
-							label="${this.localize.term('general_remove') + ' ' + template.name}"
-							@click="${() => this.#removeTemplate(template.unique ?? '')}"
-							compact>
+							compact
+							label=${this.localize.term('general_remove') + ' ' + template.name}
+							@click=${() => this.#removeTemplate(template.unique ?? '')}>
 							<uui-icon name="icon-trash"></uui-icon>
 						</uui-button>
 					</umb-template-card>
@@ -190,8 +191,8 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 			<uui-button
 				id="btn-add"
 				look="placeholder"
-				label="${this.localize.term('general_add')}"
-				@click="${this.#openPicker}"></uui-button>
+				label=${this.localize.term('general_choose')}
+				@click=${this.#openPicker}></uui-button>
 		`;
 	}
 

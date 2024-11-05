@@ -3,8 +3,10 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-property-editor-ui-media-entity-picker')
 export class UmbPropertyEditorUIMediaEntityPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
@@ -18,6 +20,15 @@ export class UmbPropertyEditorUIMediaEntityPickerElement extends UmbLitElement i
 		this._min = minMax?.min ?? 0;
 		this._max = minMax?.max ?? Infinity;
 	}
+
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
 
 	@state()
 	_min: number = 0;
@@ -36,6 +47,7 @@ export class UmbPropertyEditorUIMediaEntityPickerElement extends UmbLitElement i
 				.min=${this._min}
 				.max=${this._max}
 				.value=${this.value}
+				?readonly=${this.readonly}
 				@change=${this.#onChange}></umb-input-media>
 		`;
 	}

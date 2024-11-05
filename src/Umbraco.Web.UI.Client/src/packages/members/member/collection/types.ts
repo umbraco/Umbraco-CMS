@@ -1,4 +1,4 @@
-import type { UmbMemberEntityType } from '../entity.js';
+import type { UmbMemberDetailModel } from '../types.js';
 
 export interface UmbMemberCollectionFilterModel {
 	skip?: number;
@@ -7,8 +7,5 @@ export interface UmbMemberCollectionFilterModel {
 	filter?: string;
 }
 
-export interface UmbMemberCollectionModel {
-	unique: string;
-	entityType: UmbMemberEntityType;
-	variants: Array<any>;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbMemberCollectionModel extends UmbMemberDetailModel {}

@@ -7,6 +7,7 @@ export interface UmbRenameModalData {
 	unique: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbRenameServerFileModalValue {}
 
 export const UMB_RENAME_SERVER_FILE_MODAL = new UmbModalToken<UmbRenameModalData, UmbRenameServerFileModalValue>(

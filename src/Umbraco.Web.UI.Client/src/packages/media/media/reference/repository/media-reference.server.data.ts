@@ -3,7 +3,6 @@ import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
- * @export
  * @class UmbMediaReferenceServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -12,7 +11,7 @@ export class UmbMediaReferenceServerDataSource {
 
 	/**
 	 * Creates an instance of UmbMediaReferenceServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaReferenceServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -22,7 +21,7 @@ export class UmbMediaReferenceServerDataSource {
 	/**
 	 * Fetches the item for the given id from the server
 	 * @param {Array<string>} ids
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMediaReferenceServerDataSource
 	 */
 	async getReferencedBy(id: string, skip = 0, take = 20) {

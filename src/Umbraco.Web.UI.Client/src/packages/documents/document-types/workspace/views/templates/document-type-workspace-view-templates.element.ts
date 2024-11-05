@@ -4,7 +4,7 @@ import type { UmbInputTemplateElement } from '@umbraco-cms/backoffice/template';
 import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 
 import '@umbraco-cms/backoffice/template'; // TODO: This is needed to register the <umb-input-template> element, but it should be done in a better way without importing the whole module.
 
@@ -91,20 +91,19 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 
 	#renderTemplates() {
 		return html`
-			<uui-box headline="${this.localize.term('treeHeaders_templates')}">
+			<uui-box headline=${this.localize.term('treeHeaders_templates')}>
 				${when(
 					this.#workspaceContext?.createTemplateMode,
 					() => html`<p><em>The default template will be created once this document type has been saved.</em></p>`,
 				)}
-				<umb-property-layout
-					alias="Templates"
-					label="${this.localize.term('contentTypeEditor_allowedTemplatesHeading')}">
+				<umb-property-layout alias="Templates" label=${this.localize.term('contentTypeEditor_allowedTemplatesHeading')}>
 					<div slot="description">${this.localize.term('contentTypeEditor_allowedTemplatesDescription')}</div>
 					<div id="templates" slot="editor">
 						<umb-input-template
 							.defaultUnique=${this._defaultTemplateId ?? ''}
 							.selection=${this._allowedTemplateIds}
-							@change=${this.#templateInputChange}></umb-input-template>
+							@change=${this.#templateInputChange}>
+						</umb-input-template>
 					</div>
 				</umb-property-layout>
 			</uui-box>

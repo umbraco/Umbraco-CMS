@@ -147,6 +147,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 	/**
 	 * Show a peek notification with a message.
 	 * @param message The message to show.
+	 * @param color
 	 */
 	protected peek(message: string, color?: UmbNotificationColor) {
 		this.notificationContext?.peek(color ?? 'positive', {

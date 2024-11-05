@@ -1,12 +1,10 @@
-import { UMB_WORKSPACE_CONTEXT, type UmbWorkspaceContext } from '../contexts/index.js';
+import { UMB_WORKSPACE_CONTEXT } from '../workspace.context-token.js';
+import type { UmbWorkspaceContext } from '../workspace-context.interface.js';
+import type { WorkspaceAliasConditionConfig } from './types.js';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
-import type {
-	ManifestCondition,
-	UmbConditionConfigBase,
-	UmbConditionControllerArguments,
-	UmbExtensionCondition,
-} from '@umbraco-cms/backoffice/extension-api';
+import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from './const.js';
 
 export class UmbWorkspaceAliasCondition
 	extends UmbConditionBase<WorkspaceAliasConditionConfig>
@@ -28,32 +26,15 @@ export class UmbWorkspaceAliasCondition
 			});
 		} else {
 			throw new Error(
-				'Condition `Umb.Condition.WorkspaceAlias` could not be initialized properly. Either "match" or "oneOf" must be defined',
+				`Condition [UMB_WORKSPACE_CONDITION_ALIAS] (${UMB_WORKSPACE_CONDITION_ALIAS}) could not be initialized properly. Either "match" or "oneOf" must be defined.`,
 			);
 		}
 	}
 }
 
-export type WorkspaceAliasConditionConfig = UmbConditionConfigBase<'Umb.Condition.WorkspaceAlias'> & {
-	/**
-	 * Define the workspace that this extension should be available in
-	 *
-	 * @example
-	 * "Umb.Workspace.Document"
-	 */
-	match?: string;
-	/**
-	 * Define one or more workspaces that this extension should be available in
-	 *
-	 * @example
-	 * ["Umb.Workspace.Document", "Umb.Workspace.Media"]
-	 */
-	oneOf?: Array<string>;
-};
-
-export const manifest: ManifestCondition = {
+export const manifest: UmbExtensionManifest = {
 	type: 'condition',
 	name: 'Workspace Alias Condition',
-	alias: 'Umb.Condition.WorkspaceAlias',
+	alias: UMB_WORKSPACE_CONDITION_ALIAS,
 	api: UmbWorkspaceAliasCondition,
 };

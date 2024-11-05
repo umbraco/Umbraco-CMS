@@ -1,12 +1,15 @@
 // TODO => this is NOT a full reimplementation of the existing media helper service, currently
 // contains only functions referenced by the TinyMCE editor
-// TODO: This should not be done in this way, we need to split this into seperate defined helper methods. This is also very specific to TinyMCE, so should be named that way.
+// TODO: This should not be done in this way, we need to split this into separate defined helper methods. This is also very specific to TinyMCE, so should be named that way. [NL]
 
 import { getProcessedImageUrl } from '@umbraco-cms/backoffice/utils';
 import type { Editor } from '@umbraco-cms/backoffice/external/tinymce';
 
 /**
  * Sizes an image in the editor
+ * @param editor
+ * @param imageDomElement
+ * @param imgUrl
  */
 export async function sizeImageInEditor(editor: Editor, imageDomElement: HTMLElement, imgUrl?: string) {
 	const size = editor.dom.getSize(imageDomElement);
@@ -34,6 +37,9 @@ export async function sizeImageInEditor(editor: Editor, imageDomElement: HTMLEle
 
 /**
  * Scales an image to the max size
+ * @param maxSize
+ * @param width
+ * @param height
  */
 export function scaleToMaxSize(maxSize: number, width: number, height: number) {
 	const retval = { width, height };
@@ -67,6 +73,8 @@ export function scaleToMaxSize(maxSize: number, width: number, height: number) {
 
 /**
  * Uploads blob images to the server
+ * @param editor
+ * @param newContent
  */
 export async function uploadBlobImages(editor: Editor, newContent?: string) {
 	const content = newContent ?? editor.getContent();

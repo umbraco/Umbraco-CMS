@@ -1,6 +1,6 @@
-import { GLOBAL_ROUTER_EVENTS_TARGET, HISTORY_PATCH_NATIVE_KEY } from '../config';
-import { GlobalRouterEvent } from '../model';
-import { dispatchGlobalRouterEvent } from './events';
+import { GLOBAL_ROUTER_EVENTS_TARGET, HISTORY_PATCH_NATIVE_KEY } from '../config.js';
+import type { GlobalRouterEvent } from '../model.js';
+import { dispatchGlobalRouterEvent } from './events.js';
 
 // Mapping a history functions to the events they are going to dispatch.
 export const historyPatches: [string, GlobalRouterEvent[]][] = [

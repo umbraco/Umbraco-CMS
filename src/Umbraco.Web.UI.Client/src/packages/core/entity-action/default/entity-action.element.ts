@@ -1,10 +1,11 @@
 import type { UmbEntityAction } from '../entity-action.interface.js';
 import type { UmbEntityActionElement } from '../entity-action-element.interface.js';
+import type { ManifestEntityAction } from '../entity-action.extension.js';
+import type { MetaEntityActionDefaultKind } from './types.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { html, nothing, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { ManifestEntityAction, MetaEntityActionDefaultKind } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-entity-action')
 export class UmbEntityActionDefaultElement<
@@ -60,11 +61,11 @@ export class UmbEntityActionDefaultElement<
 	}
 
 	override render() {
+		const label = this.manifest?.meta.label ? this.localize.string(this.manifest.meta.label) : this.manifest?.name;
+
 		return html`
 			<uui-menu-item
-				label=${ifDefined(
-					this.manifest?.meta.label ? this.localize.string(this.manifest.meta.label) : this.manifest?.name,
-				)}
+				label=${ifDefined(this.manifest?.meta.additionalOptions ? label + '...' : label)}
 				href=${ifDefined(this._href)}
 				@click-label=${this.#onClickLabel}
 				@click=${this.#onClick}>

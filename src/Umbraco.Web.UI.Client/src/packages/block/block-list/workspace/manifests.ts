@@ -1,8 +1,7 @@
 import { manifests as workspaceViewManifests } from './views/manifests.js';
 import { UMB_BLOCK_LIST_TYPE_WORKSPACE_ALIAS } from './index.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	...workspaceViewManifests,
 	{
 		type: 'workspace',

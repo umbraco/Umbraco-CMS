@@ -2,12 +2,12 @@ import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../../document-collection.conte
 import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../../types.js';
 import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 import { getPropertyValueByAlias } from '../index.js';
-import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbDefaultCollectionContext, UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
 
@@ -20,9 +20,6 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 
 	@state()
 	private _items: Array<UmbDocumentCollectionItemModel> = [];
-
-	@state()
-	private _loading = false;
 
 	@state()
 	private _selection: Array<string | null> = [];
@@ -58,8 +55,6 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 
 	#observeCollectionContext() {
 		if (!this.#collectionContext) return;
-
-		this.observe(this.#collectionContext.loading, (loading) => (this._loading = loading), '_observeLoading');
 
 		this.observe(
 			this.#collectionContext.userDefinedProperties,
@@ -99,24 +94,6 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 	}
 
 	override render() {
-		return this._items.length === 0 ? this.#renderEmpty() : this.#renderItems();
-	}
-
-	#renderEmpty() {
-		if (this._items.length > 0) return nothing;
-		return html`
-			<div class="container">
-				${when(
-					this._loading,
-					() => html`<uui-loader></uui-loader>`,
-					() => html`<p>${this.localize.term('content_listViewNoItems')}</p>`,
-				)}
-			</div>
-		`;
-	}
-
-	#renderItems() {
-		if (this._items.length === 0) return nothing;
 		return html`
 			<div id="document-grid">
 				${repeat(
@@ -125,7 +102,6 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 					(item) => this.#renderItem(item),
 				)}
 			</div>
-			${when(this._loading, () => html`<uui-loader-bar></uui-loader-bar>`)}
 		`;
 	}
 

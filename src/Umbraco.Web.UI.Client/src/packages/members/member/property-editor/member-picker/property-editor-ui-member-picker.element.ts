@@ -1,8 +1,10 @@
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/property-editor';
 import type { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
 
 /**
@@ -16,13 +18,27 @@ export class UmbPropertyEditorUIMemberPickerElement extends UmbLitElement implem
 	@property({ attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	#onChange(event: CustomEvent & { target: UmbInputMemberElement }) {
 		this.value = event.target.value;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	override render() {
-		return html`<umb-input-member min="0" max="1" .value=${this.value} @change=${this.#onChange}></umb-input-member>`;
+		return html`<umb-input-member
+			min="0"
+			max="1"
+			.value=${this.value}
+			@change=${this.#onChange}
+			?readonly=${this.readonly}></umb-input-member>`;
 	}
 }
 

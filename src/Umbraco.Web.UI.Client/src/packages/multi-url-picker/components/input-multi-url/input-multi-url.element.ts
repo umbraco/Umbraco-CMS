@@ -1,6 +1,16 @@
 import type { UmbLinkPickerLink } from '../../link-picker-modal/types.js';
 import { UMB_LINK_PICKER_MODAL } from '../../link-picker-modal/link-picker-modal.token.js';
-import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	property,
+	repeat,
+	state,
+	when,
+} from '@umbraco-cms/backoffice/external/lit';
 import { simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -109,7 +119,7 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 
 	/**
 	 * @type {Array<UmbLinkPickerLink>}
-	 * @default []
+	 * @default
 	 */
 	@property({ attribute: false })
 	set urls(data: Array<UmbLinkPickerLink>) {
@@ -123,6 +133,27 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	#urls: Array<UmbLinkPickerLink> = [];
+
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: Boolean, reflect: true })
+	public get readonly() {
+		return this.#readonly;
+	}
+	public set readonly(value) {
+		this.#readonly = value;
+
+		if (this.#readonly) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
+	}
+	#readonly = false;
 
 	@state()
 	private _modalRoute?: UmbModalRouteBuilder;
@@ -174,6 +205,7 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 					},
 					value: {
 						link: {
+							icon: data?.icon,
 							name: data?.name,
 							published: data?.published,
 							queryString: data?.queryString,
@@ -242,14 +274,19 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	#renderAddButton() {
-		if (this.max === 1 && this.urls && this.urls.length >= this.max) return;
-		return html`
-			<uui-button
-				id="btn-add"
-				look="placeholder"
-				label=${this.localize.term('general_add')}
-				.href=${this._modalRoute?.({ index: -1 })}></uui-button>
-		`;
+		if (this.max === 1 && this.urls && this.urls.length >= this.max) return nothing;
+		if (this.readonly && this.urls.length > 0) {
+			return nothing;
+		} else {
+			return html`
+				<uui-button
+					id="btn-add"
+					look="placeholder"
+					label=${this.localize.term('general_add')}
+					.href=${this._modalRoute?.({ index: -1 })}
+					?disabled=${this.readonly}></uui-button>
+			`;
+		}
 	}
 
 	#renderItems() {
@@ -267,20 +304,25 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 
 	#renderItem(link: UmbLinkPickerLink, index: number) {
 		const unique = this.#getUnique(link);
-		const href = this._modalRoute?.({ index }) ?? '#';
+		const href = this.readonly ? undefined : (this._modalRoute?.({ index }) ?? undefined);
 		return html`
 			<uui-ref-node
 				id=${unique}
-				href=${href}
+				href=${ifDefined(href)}
 				name=${link.name || ''}
-				detail=${(link.url || '') + (link.queryString || '')}>
+				detail=${(link.url || '') + (link.queryString || '')}
+				?readonly=${this.readonly}>
 				<umb-icon slot="icon" name=${link.icon || 'icon-link'}></umb-icon>
-				<uui-action-bar slot="actions">
-					<uui-button href=${href} label=${this.localize.term('general_edit')}></uui-button>
-					<uui-button
-						@click=${() => this.#requestRemoveItem(index)}
-						label=${this.localize.term('general_remove')}></uui-button>
-				</uui-action-bar>
+				${when(
+					!this.readonly,
+					() => html`
+						<uui-action-bar slot="actions">
+							<uui-button
+								label=${this.localize.term('general_remove')}
+								@click=${() => this.#requestRemoveItem(index)}></uui-button>
+						</uui-action-bar>
+					`,
+				)}
 			</uui-ref-node>
 		`;
 	}

@@ -1,6 +1,6 @@
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as iconPickerModalManifests } from './icon-picker-modal/manifests.js';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'icons',
 		alias: 'Umb.Icons.Backoffice',
@@ -13,4 +13,5 @@ export const manifests: Array<ManifestTypes> = [
 		name: 'Icons Context',
 		api: () => import('./icon-registry.context.js'),
 	},
+	...iconPickerModalManifests,
 ];

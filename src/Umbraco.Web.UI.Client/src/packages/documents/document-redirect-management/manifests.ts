@@ -1,6 +1,6 @@
-import type { ManifestDashboard, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_CONTENT_SECTION_ALIAS } from '@umbraco-cms/backoffice/content';
 
-const dashboards: Array<ManifestDashboard> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.RedirectManagement',
@@ -14,10 +14,8 @@ const dashboards: Array<ManifestDashboard> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.SectionAlias',
-				match: 'Umb.Section.Content',
+				match: UMB_CONTENT_SECTION_ALIAS,
 			},
 		],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...dashboards];

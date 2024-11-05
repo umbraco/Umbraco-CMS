@@ -1,7 +1,7 @@
 import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '@umbraco-cms/backoffice/entity-action';
-import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifest: UmbBackofficeManifestKind = {
+export const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.EntityAction.MoveTo',
 	matchKind: 'moveTo',
@@ -16,6 +16,7 @@ export const manifest: UmbBackofficeManifestKind = {
 		meta: {
 			icon: 'icon-enter',
 			label: '#actions_move',
+			additionalOptions: true,
 			treeRepositoryAlias: '',
 			moveRepositoryAlias: '',
 			treeAlias: '',

@@ -4,16 +4,15 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
- * @export
  * @class UmbStaticFileItemStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Data Store for Static File items
  */
 
 export class UmbStaticFileItemStore extends UmbItemStoreBase<UmbStaticFileItemModel> {
 	/**
 	 * Creates an instance of UmbStaticFileItemStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbStaticFileItemStore
 	 */
 	constructor(host: UmbControllerHost) {

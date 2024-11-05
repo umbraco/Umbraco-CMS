@@ -5,7 +5,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Document Culture and Hostnames that fetches data from the server
- * @export
  * @class UmbDocumentCultureAndHostnamesServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -14,7 +13,7 @@ export class UmbDocumentCultureAndHostnamesServerDataSource {
 
 	/**
 	 * Creates an instance of UmbDocumentCultureAndHostnamesServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentCultureAndHostnamesServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

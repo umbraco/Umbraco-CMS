@@ -1,17 +1,17 @@
 import type { UmbContentPickerDynamicRootQueryStep } from '../../types.js';
+import type { ManifestDynamicRootQueryStep } from '../dynamic-root.extension.js';
 import type { UmbContentPickerDocumentRootQueryStepModalData } from './index.js';
-import { UmbDocumentTypePickerContext } from '@umbraco-cms/backoffice/document-type';
+import { UmbDocumentTypePickerInputContext } from '@umbraco-cms/backoffice/document-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { html, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
-import type { ManifestDynamicRootQueryStep } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-dynamic-root-query-step-picker-modal')
 export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBaseElement<UmbContentPickerDocumentRootQueryStepModalData> {
 	@state()
 	private _querySteps: Array<ManifestDynamicRootQueryStep> = [];
 
-	#documentTypePickerContext = new UmbDocumentTypePickerContext(this);
+	#documentTypePickerContext = new UmbDocumentTypePickerInputContext(this);
 
 	override connectedCallback() {
 		super.connectedCallback();

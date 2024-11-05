@@ -88,6 +88,12 @@ const documentTreeStoreProvider = (story) => html`
 export const decorators = [documentStoreProvider, documentTreeStoreProvider, dataTypeStoreProvider, storybookProvider];
 
 export const parameters = {
+	docs: {
+		source: {
+			excludeDecorators: true,
+			format: 'html', // see storybook docs for more info on this format https://storybook.js.org/docs/api/doc-blocks/doc-block-source#format
+		},
+	},
 	options: {
 		storySort: {
 			method: 'alphabetical',
@@ -116,7 +122,6 @@ export const parameters = {
 			],
 		},
 	},
-	actions: { argTypesRegex: '^on.*' },
 	controls: {
 		expanded: true,
 		matchers: {
@@ -140,3 +145,4 @@ export const parameters = {
 };
 
 setCustomElements(customElementManifests);
+export const tags = ['autodocs'];

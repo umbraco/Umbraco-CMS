@@ -1,7 +1,6 @@
+import type { UmbBlockRteWorkspaceOriginData } from '../workspace/block-rte-workspace.modal-token.js';
 import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '../types.js';
-import type { UmbBlockRteWorkspaceData } from '../index.js';
-import type { UmbBlockDataType } from '../../block/types.js';
-import type { Editor } from '@umbraco-cms/backoffice/external/tinymce';
+import type { UmbBlockDataModel } from '../../block/types.js';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 
 import '../components/block-rte-entry/index.js';
@@ -12,33 +11,18 @@ import '../components/block-rte-entry/index.js';
 export class UmbBlockRteManagerContext<
 	BlockLayoutType extends UmbBlockRteLayoutModel = UmbBlockRteLayoutModel,
 > extends UmbBlockManagerContext<UmbBlockRteTypeModel, BlockLayoutType> {
-	//
-	#editor?: Editor;
-
-	setTinyMceEditor(editor: Editor) {
-		this.#editor = editor;
-	}
-
-	getTinyMceEditor() {
-		return this.#editor;
-	}
-
-	removeOneLayout(contentUdi: string) {
-		this._layouts.removeOne(contentUdi);
-	}
-
-	getLayouts(): Array<BlockLayoutType> {
-		return this._layouts.getValue();
+	removeOneLayout(contentKey: string) {
+		this._layouts.removeOne(contentKey);
 	}
 
 	create(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
-		// TODO: [v15] ignoring unused modalData parameter to avoid breaking changes
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
+		// This property is used by some implementations, but not used in this, do not remove. [NL]
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		modalData?: UmbBlockRteWorkspaceData,
+		_originData?: UmbBlockRteWorkspaceOriginData,
 	) {
-		const data = super.createBlockData(contentElementTypeKey, partialLayoutEntry);
+		const data = super._createBlockData(contentElementTypeKey, partialLayoutEntry);
 
 		// Find block type.
 		const blockType = this.getBlockTypes().find((x) => x.contentElementTypeKey === contentElementTypeKey);
@@ -55,40 +39,22 @@ export class UmbBlockRteManagerContext<
 
 	insert(
 		layoutEntry: BlockLayoutType,
-		content: UmbBlockDataType,
-		settings: UmbBlockDataType | undefined,
-		modalData: UmbBlockRteWorkspaceData,
+		content: UmbBlockDataModel,
+		settings: UmbBlockDataModel | undefined,
+		originData: UmbBlockRteWorkspaceOriginData,
 	) {
-		if (!this.#editor) return false;
-
 		this._layouts.appendOne(layoutEntry);
 
-		this.insertBlockData(layoutEntry, content, settings, modalData);
-
-		if (layoutEntry.displayInline) {
-			this.#editor.selection.setContent(
-				`<umb-rte-block-inline data-content-udi="${layoutEntry.contentUdi}"><!--Umbraco-Block--></umb-rte-block-inline>`,
-			);
-		} else {
-			this.#editor.selection.setContent(
-				`<umb-rte-block data-content-udi="${layoutEntry.contentUdi}"><!--Umbraco-Block--></umb-rte-block>`,
-			);
-		}
-
-		this.#editor.fire('change');
+		this.insertBlockData(layoutEntry, content, settings, originData);
 
 		return true;
 	}
 
-	/** @internal */
-	public deleteLayoutElement(contentUdi: string) {
-		if (!this.#editor) return;
-
-		const blockElementsOfThisUdi = this.#editor.dom.select(
-			`umb-rte-block[data-content-udi='${contentUdi}'], umb-rte-block-inline[data-content-udi='${contentUdi}']`,
-		);
-		blockElementsOfThisUdi.forEach((blockElement) => {
-			this.#editor?.dom.remove(blockElement);
-		});
+	/**
+	 * @param contentKey
+	 * @internal
+	 */
+	public deleteLayoutElement(contentKey: string) {
+		this.removeBlockKey(contentKey);
 	}
 }

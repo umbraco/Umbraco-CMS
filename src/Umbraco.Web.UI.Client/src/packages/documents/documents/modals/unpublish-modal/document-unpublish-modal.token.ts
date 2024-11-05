@@ -6,6 +6,7 @@ export interface UmbDocumentUnpublishModalData extends UmbDocumentVariantPickerD
 	documentUnique?: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbDocumentUnpublishModalValue extends UmbDocumentVariantPickerValue {}
 
 export const UMB_DOCUMENT_UNPUBLISH_MODAL = new UmbModalToken<

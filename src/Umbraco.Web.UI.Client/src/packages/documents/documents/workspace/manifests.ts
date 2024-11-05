@@ -4,33 +4,25 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
 } from '../user-permissions/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
+import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
-import type {
-	ManifestWorkspaces,
-	ManifestWorkspaceActions,
-	ManifestWorkspaceActionMenuItem,
-	ManifestWorkspaceView,
-	ManifestTypes,
-} from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION } from '@umbraco-cms/backoffice/content';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
-export const UMB_DOCUMENT_WORKSPACE_ALIAS = 'Umb.Workspace.Document';
-
-const workspace: ManifestWorkspaces = {
-	type: 'workspace',
-	kind: 'routable',
-	alias: UMB_DOCUMENT_WORKSPACE_ALIAS,
-	name: 'Document Workspace',
-	api: () => import('./document-workspace.context.js'),
-	meta: {
-		entityType: UMB_DOCUMENT_ENTITY_TYPE,
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'workspace',
+		kind: 'routable',
+		alias: UMB_DOCUMENT_WORKSPACE_ALIAS,
+		name: 'Document Workspace',
+		api: () => import('./document-workspace.context.js'),
+		meta: {
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
+		},
 	},
-};
-
-const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
-		kind: 'collection',
+		kind: 'contentCollection',
 		alias: 'Umb.WorkspaceView.Document.Collection',
 		name: 'Document Workspace Collection View',
 		meta: {
@@ -40,8 +32,8 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_DOCUMENT_WORKSPACE_ALIAS,
 			},
 			{
 				alias: 'Umb.Condition.WorkspaceHasCollection',
@@ -61,8 +53,8 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_DOCUMENT_WORKSPACE_ALIAS,
 			},
 			{
 				alias: UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION,
@@ -82,14 +74,11 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_DOCUMENT_WORKSPACE_ALIAS,
 			},
 		],
 	},
-];
-
-const workspaceActions: Array<ManifestWorkspaceActions> = [
 	{
 		type: 'workspaceAction',
 		kind: 'default',
@@ -104,8 +93,8 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_DOCUMENT_WORKSPACE_ALIAS,
 			},
 			{
 				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
@@ -126,8 +115,8 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_DOCUMENT_WORKSPACE_ALIAS,
 			},
 			{
 				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
@@ -146,17 +135,14 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_DOCUMENT_WORKSPACE_ALIAS,
 			},
 			{
 				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},
-];
-
-const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 	{
 		type: 'workspaceActionMenuItem',
 		kind: 'default',
@@ -223,11 +209,4 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 			},
 		],
 	},
-];
-
-export const manifests: Array<ManifestTypes> = [
-	workspace,
-	...workspaceViews,
-	...workspaceActions,
-	...workspaceActionMenuItems,
 ];

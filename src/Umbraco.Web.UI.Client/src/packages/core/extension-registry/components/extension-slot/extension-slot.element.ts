@@ -11,20 +11,23 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  * @element umb-extension-slot
  * @description A element which renderers the extensions of a given type or types.
  * @slot default - slot for inserting additional things into this slot.
- * @export
  * @class UmbExtensionSlot
- * @extends {UmbLitElement}
+ * @augments {UmbLitElement}
  */
 
+// TODO: Refactor extension-slot and extension-with-api slot.
 // TODO: Fire change event.
 // TODO: Make property that reveals the amount of displayed/permitted extensions.
 @customElement('umb-extension-slot')
 export class UmbExtensionSlotElement extends UmbLitElement {
 	#attached = false;
-	#extensionsController?: UmbExtensionsElementInitializer;
+	#extensionsController?: UmbExtensionsElementInitializer | UmbExtensionElementInitializer;
 
 	@state()
 	private _permitted?: Array<UmbExtensionElementInitializer>;
+
+	@property({ type: Boolean })
+	single?: boolean;
 
 	/**
 	 * The type or types of extensions to render.
@@ -34,7 +37,6 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	 * <umb-extension-slot type="my-extension-type"></umb-extension-slot>
 	 * or multiple:
 	 * <umb-extension-slot .type=${['my-extension-type','another-extension-type']}></umb-extension-slot>
-	 *
 	 */
 	@property({ type: String })
 	public get type(): string | string[] | undefined {
@@ -54,7 +56,6 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	 * @memberof UmbExtensionSlot
 	 * @example
 	 * <umb-extension-slot type="my-extension-type" .filter=${(ext) => ext.meta.anyPropToFilter === 'foo'}></umb-extension-slot>
-	 *
 	 */
 	@property({ type: Object, attribute: false })
 	public get filter(): (manifest: any) => boolean {
@@ -80,7 +81,6 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 		return this.#props;
 	}
 	set props(newVal: Record<string, unknown> | undefined) {
-		// TODO, compare changes since last time. only reset the ones that changed. This might be better done by the controller is self:
 		this.#props = newVal;
 		if (this.#extensionsController) {
 			this.#extensionsController.properties = newVal;
@@ -91,7 +91,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	@property({ type: String, attribute: 'default-element' })
 	public defaultElement?: string;
 
-	@property()
+	@property({ attribute: false })
 	public renderMethod?: (
 		extension: UmbExtensionElementInitializer,
 		index: number,
@@ -131,14 +131,16 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	override render() {
 		return this._permitted
 			? this._permitted.length > 0
-				? repeat(
-						this._permitted,
-						(ext) => ext.alias,
-						(ext, i) => (this.renderMethod ? this.renderMethod(ext, i) : ext.component),
-					)
+				? this.single
+					? this.#renderExtension(this._permitted[0], 0)
+					: repeat(this._permitted, (ext) => ext.alias, this.#renderExtension)
 				: html`<slot></slot>`
 			: '';
 	}
+
+	#renderExtension = (ext: UmbExtensionElementInitializer, i: number) => {
+		return this.renderMethod ? this.renderMethod(ext, i) : ext.component;
+	};
 
 	static override styles = css`
 		:host {

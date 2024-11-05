@@ -1,6 +1,6 @@
 import { packageJsonExports } from './devops/package/meta.js';
 
-const excludePaths = ['./src/external', '.src/apps'];
+const excludePaths = ['./src/external', '.src/apps', './src/packages/extension-types/index.d.ts'];
 const entryPoints = [];
 
 for (const [key, value] of Object.entries(packageJsonExports || {})) {

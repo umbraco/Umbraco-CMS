@@ -1,5 +1,5 @@
-import { CATCH_ALL_WILDCARD, DEFAULT_PATH_MATCH, PARAM_IDENTIFIER, TRAVERSE_FLAG } from '../config';
-import {
+import { CATCH_ALL_WILDCARD, DEFAULT_PATH_MATCH, PARAM_IDENTIFIER, TRAVERSE_FLAG } from '../config.js';
+import type {
 	IComponentRoute,
 	IRedirectRoute,
 	IResolverRoute,
@@ -12,8 +12,8 @@ import {
 	PathFragment,
 	RouterTree,
 	IRoutingInfo,
-} from '../model';
-import { constructPathWithBasePath, path as getPath, queryString, stripSlash } from './url';
+} from '../model.js';
+import { constructPathWithBasePath, path as getPath, queryString, stripSlash } from './url.js';
 
 /**
  * Determines whether the path is active.

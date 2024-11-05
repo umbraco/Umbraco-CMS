@@ -3,8 +3,10 @@ import { html, customElement, property, state } from '@umbraco-cms/backoffice/ex
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-property-editor-ui-document-type-picker')
 export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
@@ -45,7 +47,7 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 				.min=${this.min}
 				.max=${this.max}
 				.value=${this.value}
-				?elementTypesOnly=${this.onlyElementTypes}
+				.elementTypesOnly=${this.onlyElementTypes ?? false}
 				?showOpenButton=${this.showOpenButton}
 				@change=${this.#onChange}>
 			</umb-input-document-type>

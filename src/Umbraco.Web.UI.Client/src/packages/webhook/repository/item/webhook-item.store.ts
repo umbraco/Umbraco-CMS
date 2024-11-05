@@ -4,16 +4,15 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
- * @export
  * @class UmbWebhookItemStore
- * @extends {UmbStoreBase}
+ * @augments {UmbItemStoreBase}
  * @description - Data Store for Webhook items
  */
 
 export class UmbWebhookItemStore extends UmbItemStoreBase<UmbWebhookItemModel> {
 	/**
 	 * Creates an instance of UmbWebhookItemStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host
 	 * @memberof UmbWebhookItemStore
 	 */
 	constructor(host: UmbControllerHost) {

@@ -5,7 +5,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Duplicate Document Server Data Source
- * @export
  * @class UmbDuplicateDocumentServerDataSource
  */
 export class UmbDuplicateDocumentServerDataSource {
@@ -13,7 +12,7 @@ export class UmbDuplicateDocumentServerDataSource {
 
 	/**
 	 * Creates an instance of UmbDuplicateDocumentServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDuplicateDocumentServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -23,7 +22,7 @@ export class UmbDuplicateDocumentServerDataSource {
 	/**
 	 * Duplicate an item for the given id to the destination unique
 	 * @param {UmbDuplicateDocumentRequestArgs} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDuplicateDocumentServerDataSource
 	 */
 	async duplicate(args: UmbDuplicateDocumentRequestArgs) {
