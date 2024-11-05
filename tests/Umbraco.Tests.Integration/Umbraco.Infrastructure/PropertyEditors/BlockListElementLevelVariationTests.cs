@@ -16,6 +16,12 @@ public partial class BlockListElementLevelVariationTests : BlockEditorElementVar
     public void OneTimeSetUp()
     {
         TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Publish_Invariant_Properties_Without_Default_Culture_With_AllowEditInvariantFromNonDefault));
+        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Handle_Limited_User_Access_To_Languages_With_AllowEditInvariantFromNonDefault));
+        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Handle_Limited_User_Access_To_Languages_In_Nested_Blocks_Without_Access_With_AllowEditInvariantFromNonDefault));
+        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Handle_Limited_User_Access_To_Languages_With_AllowEditInvariantFromNonDefault) + "(True)");
+        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Handle_Limited_User_Access_To_Languages_With_AllowEditInvariantFromNonDefault) + "(False)");
+        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Handle_Limited_User_Access_To_Languages_In_Nested_Blocks_Without_Access_With_AllowEditInvariantFromNonDefault) + "(True)");
+        TestsRequiringAllowEditInvariantFromNonDefault.Add(nameof(Can_Handle_Limited_User_Access_To_Languages_In_Nested_Blocks_Without_Access_With_AllowEditInvariantFromNonDefault) + "(False)");
     }
 
     private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
