@@ -1,5 +1,5 @@
 import type { UmbBlockGridTypeAreaType } from '../../../types.js';
-import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import type { UmbPropertyDatasetContext, UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
 	UmbInvariantDatasetWorkspaceContext,
@@ -10,12 +10,14 @@ import type {
 import {
 	UmbSubmittableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
+	umbObjectToPropertyValueArray,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/property-editor';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbBlockGridAreaTypeWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<UmbBlockGridTypeAreaType>
@@ -27,6 +29,13 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 	#entityType: string;
 	#data = new UmbObjectState<UmbBlockGridTypeAreaType | undefined>(undefined);
 	readonly data = this.#data.asObservable();
+
+	readonly values = this.#data.asObservablePart((data) => {
+		return umbObjectToPropertyValueArray(data);
+	});
+	async getValues(): Promise<Array<UmbPropertyValueData> | undefined> {
+		return umbObjectToPropertyValueArray(await firstValueFrom(this.data));
+	}
 
 	// TODO: Get the name of the contentElementType..
 	readonly name = this.#data.asObservablePart((data) => data?.alias);

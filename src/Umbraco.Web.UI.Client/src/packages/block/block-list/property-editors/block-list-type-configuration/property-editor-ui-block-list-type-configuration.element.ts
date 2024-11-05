@@ -1,5 +1,5 @@
 import '../../../block-type/components/input-block-type/index.js';
-import { UMB_BLOCK_LIST_TYPE } from '../../types.js';
+import { UMB_BLOCK_LIST_TYPE } from '../../constants.js';
 import type { UmbBlockTypeBaseModel, UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
 import {
 	type UmbPropertyEditorUiElement,

@@ -1,4 +1,4 @@
-import { UmbUfmFilterBase } from '../types.js';
+import { UmbUfmFilterBase } from './base.filter.js';
 
 class UmbUfmLowercaseFilterApi extends UmbUfmFilterBase {
 	filter(str?: string) {

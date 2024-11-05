@@ -154,6 +154,7 @@ export default {
 		scheduledPublishServerTime: '这将转换到服务器上的以下时间:',
 		scheduledPublishDocumentation:
 			'<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">这是什么意思？</a>',
+		saveModalTitle: '保存',
 	},
 	media: {
 		clickToUpload: '点击上传',
@@ -232,7 +233,7 @@ export default {
 		inserttable: '插入表格',
 		lastEdited: '最近编辑',
 		link: '链接',
-		linkinternal: '内部链接：',
+		linkinternal: '内部链接',
 		linklocaltip: '本地链接请用“#”号开头',
 		linknewwindow: '在新窗口中打开？',
 		macroDoesNotHaveProperties: '该宏没有可编辑的属性',

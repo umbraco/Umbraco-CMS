@@ -149,7 +149,6 @@ export class UmbPreviewContext extends UmbContextBase<UmbPreviewContext> {
 		window.open(url, '_blank');
 	}
 
-	// TODO: [LK] Figure out how to make `iframe.contentDocument` works, as it's not from SameOrigin.
 	reloadIFrame(iframe: HTMLIFrameElement) {
 		const document = iframe.contentDocument;
 		if (!document) return;

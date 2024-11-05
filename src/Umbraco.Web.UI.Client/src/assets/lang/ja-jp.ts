@@ -148,6 +148,7 @@ export default {
 		notmemberof: 'グループのメンバーではありません',
 		childItems: '子コンテンツ',
 		target: 'ターゲット',
+		saveModalTitle: '保存',
 	},
 	media: {
 		clickToUpload: 'クリックしてアップロードする',
@@ -226,7 +227,7 @@ export default {
 		inserttable: '表の挿入',
 		lastEdited: '最近の更新',
 		link: 'リンク',
-		linkinternal: '内部リンク:',
+		linkinternal: '内部リンク',
 		linklocaltip: '内部リンクを使うときは、リンクの前に "#" を挿入してください。',
 		linknewwindow: '新規ウィンドウで開きますか?',
 		macroDoesNotHaveProperties: 'このマクロは編集できるプロパティがありません',

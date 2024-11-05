@@ -4,13 +4,22 @@ import {
 	type UmbBlockDataType,
 	type UMB_BLOCK_WORKSPACE_CONTEXT,
 } from '@umbraco-cms/backoffice/block';
-import { UmbExtensionsApiInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import {
+	UmbExtensionApiInitializer,
+	UmbExtensionsApiInitializer,
+	type UmbApiConstructorArgumentsMethodType,
+} from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
+import { UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
+
+const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
+	return [{ manifest }];
+};
 
 /**
  * @element umb-inline-list-block
@@ -34,7 +43,16 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 	content?: UmbBlockDataType;
 
 	@state()
+	private _exposed?: boolean;
+
+	@state()
 	_isOpen = false;
+
+	@state()
+	private _ownerContentTypeName?: string;
+
+	@state()
+	private _variantName?: string;
 
 	constructor() {
 		super();
@@ -50,28 +68,70 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				'observeContentKey',
 			);
 		});
-		this.observe(umbExtensionsRegistry.byTypeAndAlias('workspace', UMB_BLOCK_WORKSPACE_ALIAS), (manifest) => {
-			if (manifest) {
-				createExtensionApi(this, manifest, [{ manifest: manifest }]).then((context) => {
-					if (context) {
-						this.#workspaceContext = context as typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
-						this.#workspaceContext.establishLiveSync();
-						this.#load();
 
-						new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [
-							this,
-							this.#workspaceContext,
-						]);
-					}
-				});
-			}
-		});
+		new UmbExtensionApiInitializer(
+			this,
+			umbExtensionsRegistry,
+			UMB_BLOCK_WORKSPACE_ALIAS,
+			apiArgsCreator,
+			(permitted, ctrl) => {
+				const context = ctrl.api as typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
+				if (permitted && context) {
+					this.#workspaceContext = context;
+					this.#workspaceContext.establishLiveSync();
+					this.#load();
+
+					this.observe(
+						this.#workspaceContext.exposed,
+						(exposed) => {
+							this._exposed = exposed;
+						},
+						'observeExposed',
+					);
+
+					this.observe(
+						context.content.structure.ownerContentTypeName,
+						(name) => {
+							this._ownerContentTypeName = name;
+						},
+						'observeContentTypeName',
+					);
+
+					this.observe(
+						context.variantId,
+						async (variantId) => {
+							if (variantId) {
+								context.content.setup(this, variantId);
+								// TODO: Support segment name?
+								const culture = variantId.culture;
+								if (culture) {
+									const languageRepository = new UmbLanguageItemRepository(this);
+									const { data } = await languageRepository.requestItems([culture]);
+									const name = data?.[0].name;
+									this._variantName = name ? this.localize.string(name) : undefined;
+								}
+							}
+						},
+						'observeVariant',
+					);
+
+					new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [
+						this,
+						this.#workspaceContext,
+					]);
+				}
+			},
+		);
 	}
 
 	#load() {
 		if (!this.#workspaceContext || !this.#contentKey) return;
 		this.#workspaceContext.load(this.#contentKey);
 	}
+
+	#expose = () => {
+		this.#workspaceContext?.expose();
+	};
 
 	override render() {
 		return html`
@@ -89,18 +149,16 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 						this._isOpen = !this._isOpen;
 					}}>
 					<uui-symbol-expand .open=${this._isOpen}></uui-symbol-expand>
-					${this.#renderContent()}
+					${this.#renderBlockInfo()}
 					<slot></slot>
 					<slot name="tag"></slot>
 				</button>
-				${this._isOpen === true
-					? html`<umb-block-workspace-view-edit-content-no-router></umb-block-workspace-view-edit-content-no-router>`
-					: ''}
+				${this._isOpen === true ? this.#renderInside() : ''}
 			</div>
 		`;
 	}
 
-	#renderContent() {
+	#renderBlockInfo() {
 		return html`
 			<span id="content">
 				<span id="icon">
@@ -111,6 +169,19 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				</div>
 			</span>
 		`;
+	}
+
+	#renderInside() {
+		if (this._exposed === false) {
+			return html`<uui-button style="position:absolute; inset:0;" @click=${this.#expose}
+				><uui-icon name="icon-add"></uui-icon>
+				<umb-localize
+					key="blockEditor_createThisFor"
+					.args=${[this._ownerContentTypeName, this._variantName]}></umb-localize
+			></uui-button>`;
+		} else {
+			return html`<umb-block-workspace-view-edit-content-no-router></umb-block-workspace-view-edit-content-no-router>`;
+		}
 	}
 
 	static override styles = [

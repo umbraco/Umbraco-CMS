@@ -26,7 +26,7 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 				{
 					alias: 'orderBy',
 					label: 'Order By',
-					description: 'The default sort order for the list.',
+					description: 'The default sort order for the Collection.',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Collection.OrderBy',
 				},
 				{
@@ -44,25 +44,25 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 				{
 					alias: 'bulkActionPermissions',
 					label: 'Bulk Action Permissions',
-					description: 'The bulk actions that are allowed from the list view.',
+					description: 'The bulk actions that are allowed on items in the Collection view.',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Collection.BulkActionPermissions',
 				},
 				{
 					alias: 'icon',
-					label: 'Content app icon',
-					description: 'The icon of the listview content app.',
+					label: 'Workspace View icon',
+					description: 'The icon for the Collection\'s Workspace View.',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.IconPicker',
 				},
 				{
 					alias: 'tabName',
-					label: 'Content app name',
-					description: 'The name of the listview content app (default if empty: Child Items).',
+					label: 'Workspace View name',
+					description: 'The name of the Collection\'s Workspace View (default if empty: Child Items).',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 				},
 				{
 					alias: 'showContentFirst',
-					label: 'Show Content App First',
-					description: 'Enable this to show the content app by default instead of the list view app.',
+					label: 'Show Content Workspace View First',
+					description: 'Enable this to show the Content Workspace View by default instead of the Collection\'s.',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],

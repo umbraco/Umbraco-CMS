@@ -1,3 +1,4 @@
+import type { UmbBlockRteWorkspaceOriginData } from '../workspace/block-rte-workspace.modal-token.js';
 import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '../types.js';
 import type { UmbBlockDataModel } from '../../block/types.js';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
@@ -14,7 +15,13 @@ export class UmbBlockRteManagerContext<
 		this._layouts.removeOne(contentKey);
 	}
 
-	create(contentElementTypeKey: string, partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>) {
+	create(
+		contentElementTypeKey: string,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
+		// This property is used by some implementations, but not used in this, do not remove. [NL]
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		_originData?: UmbBlockRteWorkspaceOriginData,
+	) {
 		const data = super._createBlockData(contentElementTypeKey, partialLayoutEntry);
 
 		// Find block type.
@@ -30,10 +37,15 @@ export class UmbBlockRteManagerContext<
 		return data;
 	}
 
-	insert(layoutEntry: BlockLayoutType, content: UmbBlockDataModel, settings: UmbBlockDataModel | undefined) {
+	insert(
+		layoutEntry: BlockLayoutType,
+		content: UmbBlockDataModel,
+		settings: UmbBlockDataModel | undefined,
+		originData: UmbBlockRteWorkspaceOriginData,
+	) {
 		this._layouts.appendOne(layoutEntry);
 
-		this.insertBlockData(layoutEntry, content, settings);
+		this.insertBlockData(layoutEntry, content, settings, originData);
 
 		return true;
 	}

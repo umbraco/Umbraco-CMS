@@ -84,6 +84,11 @@ export class UmbDocumentBlueprintWorkspaceContext
 
 	readonly variants = this.#data.createObservablePartOfCurrent((data) => data?.variants || []);
 
+	readonly values = this.#data.createObservablePartOfCurrent((data) => data?.values);
+	getValues() {
+		return this.#data.getCurrent()?.values;
+	}
+
 	//readonly urls = this.#data.current.asObservablePart((data) => data?.urls || []);
 
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbDocumentTypeDetailRepository(this));
@@ -465,7 +470,6 @@ export class UmbDocumentBlueprintWorkspaceContext
 	}
 
 	public override destroy(): void {
-		this.#data.destroy();
 		this.structure.destroy();
 		this.#languageRepository.destroy();
 		super.destroy();

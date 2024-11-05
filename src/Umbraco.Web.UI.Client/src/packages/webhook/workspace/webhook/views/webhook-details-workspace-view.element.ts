@@ -2,7 +2,7 @@ import { UMB_WEBHOOK_WORKSPACE_CONTEXT } from '../webhook-workspace.context-toke
 import type { UmbInputWebhookHeadersElement } from '../../../components/input-webhook-headers.element.js';
 import type { UmbInputWebhookEventsElement } from '../../../components/input-webhook-events.element.js';
 import { css, customElement, html, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputDocumentTypeElement } from '@umbraco-cms/backoffice/document-type';
@@ -110,9 +110,15 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 		return html`
 			<uui-box>
 				<umb-property-layout
+					mandatory
 					label=${this.localize.term('webhooks_url')}
 					description=${this.localize.term('webhooks_urlDescription')}>
-					<uui-input @input=${this.#onUrlChange} .value=${this._webhook.url} slot="editor"></uui-input>
+					<uui-input
+						@input=${this.#onUrlChange}
+						.value=${this._webhook.url}
+						slot="editor"
+						required="true"
+						${umbFocus()}></uui-input>
 				</umb-property-layout>
 				<umb-property-layout
 					label=${this.localize.term('webhooks_events')}

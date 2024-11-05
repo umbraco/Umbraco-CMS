@@ -23,6 +23,7 @@ export default defineConfig({
 			'debug/index': './debug/index.ts',
 			'entity-action/index': './entity-action/index.ts',
 			'entity-bulk-action/index': './entity-bulk-action/index.ts',
+			'entity-create-option-action/index': './entity-create-option-action/index.ts',
 			'entity/index': './entity/index.ts',
 			'entry-point': 'entry-point.ts',
 			'event/index': './event/index.ts',

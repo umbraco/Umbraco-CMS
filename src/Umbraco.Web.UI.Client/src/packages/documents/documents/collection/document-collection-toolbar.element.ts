@@ -3,6 +3,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 
+/** @deprecated This component is no longer used in core; to be removed in Umbraco 17. */
 @customElement('umb-document-collection-toolbar')
 export class UmbDocumentCollectionToolbarElement extends UmbLitElement {
 	#collectionContext?: UmbDefaultCollectionContext;

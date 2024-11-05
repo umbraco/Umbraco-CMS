@@ -77,15 +77,17 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 
 		if (variantIds.length) {
 			const publishingRepository = new UmbDocumentPublishingRepository(this._host);
-			await publishingRepository.unpublish(this.args.unique, variantIds);
+			const { error } = await publishingRepository.unpublish(this.args.unique, variantIds);
 
-			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadStructureForEntityEvent({
-				unique: this.args.unique,
-				entityType: this.args.entityType,
-			});
+			if (!error) {
+				const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+				const event = new UmbRequestReloadStructureForEntityEvent({
+					unique: this.args.unique,
+					entityType: this.args.entityType,
+				});
 
-			actionEventContext.dispatchEvent(event);
+				actionEventContext.dispatchEvent(event);
+			}
 		}
 	}
 }

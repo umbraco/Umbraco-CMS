@@ -1,4 +1,4 @@
-import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
+import { BehaviorSubject, type Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  * @class UmbBasicState
@@ -20,30 +20,31 @@ export class UmbBasicState<T> {
 	 *
 	 * this.observe(myState, (latestStateValue) => console.log("Value is: ", latestStateValue));
 	 */
-	public asObservable(): ReturnType<BehaviorSubject<T>['asObservable']> {
+	public asObservable(): Observable<T> {
 		return this._subject.asObservable();
 	}
 
 	/**
-	 * @property value
+	 * @property {unknown} value - the value of the State.
 	 * @description - Holds the current data of this state.
+	 * @returns {unknown} Observable that
 	 * @example <caption>Example retrieve the current data of a state</caption>
 	 * const myState = new UmbArrayState('Hello world');
 	 * console.log("Value is: ", myState.value);
 	 */
-	public get value(): BehaviorSubject<T>['value'] {
+	public get value(): T {
 		return this.getValue();
 	}
 
 	/**
 	 * @function getValue
-	 * @returns {T} The current data of this state.
+	 * @returns {unknown} The current data of this state.
 	 * @description - Provides the current data of this state.
 	 * @example <caption>Example retrieve the current data of a state</caption>
 	 * const myState = new UmbArrayState('Hello world');
 	 * console.log("Value is: ", myState.value);
 	 */
-	public getValue(): ReturnType<BehaviorSubject<T>['getValue']> {
+	public getValue(): T {
 		return this._subject.getValue();
 	}
 
@@ -58,7 +59,7 @@ export class UmbBasicState<T> {
 
 	/**
 	 * @function setValue
-	 * @param {T} data - The next data for this state to hold.
+	 * @param {unknown} data - The next data for this state to hold.
 	 * @description - Set the data of this state, if data is different than current this will trigger observations to update.
 	 * @example <caption>Example change the data of a state</caption>
 	 * const myState = new UmbArrayState('Good morning');

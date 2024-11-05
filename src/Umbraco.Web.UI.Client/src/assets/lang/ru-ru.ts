@@ -250,6 +250,7 @@ export default {
 		urls: 'Ссылка на документ',
 		addTextBox: 'Добавить новое поле текста',
 		removeTextBox: 'Удалить это поле текста',
+		saveModalTitle: 'Сохранить',
 	},
 	contentPicker: {
 		pickedTrashedItem: 'Выбран элемент содержимого, который в настоящее время удален или находится в корзине',
@@ -358,7 +359,7 @@ export default {
 		inserttable: 'Вставить таблицу',
 		lastEdited: 'Последняя правка',
 		link: 'Ссылка',
-		linkinternal: 'Внутренняя ссылка:',
+		linkinternal: 'Внутренняя ссылка',
 		linklocaltip: 'Для того чтобы определить локальную ссылку, используйте "#" первым символом',
 		linknewwindow: 'Открыть в новом окне?',
 		macroDoesNotHaveProperties: 'Этот макрос не имеет редактируемых свойств',

@@ -3,6 +3,7 @@ import { UMB_MEDIA_COLLECTION_CONTEXT } from './media-collection.context-token.j
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
+/** @deprecated This component is no longer used in core; to be removed in Umbraco 17. */
 @customElement('umb-media-collection-toolbar')
 export class UmbMediaCollectionToolbarElement extends UmbLitElement {
 	#collectionContext?: UmbMediaCollectionContext;

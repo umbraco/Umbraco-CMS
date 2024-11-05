@@ -199,6 +199,7 @@ export default {
 		addTextBox: 'Dodaj kolejne pole tekstowe',
 		removeTextBox: 'Usuń te pole tekstowe',
 		contentRoot: 'Korzeń zawartości',
+		saveModalTitle: 'Zapisz',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Stwórz nowy Szablon Zawartości z <em>%0%</em>',
@@ -301,7 +302,7 @@ export default {
 		inserttable: 'Wstaw tabelę',
 		lastEdited: 'Ostatnio edytowane',
 		link: 'Link',
-		linkinternal: 'Link wewnętrzny:',
+		linkinternal: 'Link wewnętrzny',
 		linklocaltip: 'Kiedy używasz odnośników lokalnych, wstaw znak "#" na początku linku',
 		linknewwindow: 'Otworzyć w nowym oknie?',
 		macroDoesNotHaveProperties: 'To makro nie posiada żadnych właściwości, które można edytować',

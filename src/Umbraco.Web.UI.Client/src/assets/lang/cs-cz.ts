@@ -300,6 +300,7 @@ export default {
 		createEmpty: 'Create new',
 		createFromClipboard: 'Paste from clipboard',
 		nodeIsInTrash: 'This item is in the Recycle Bin',
+		saveModalTitle: 'Uložit',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Vytvořit novou šablonu obsahu z <em>%0%</em>',
@@ -428,7 +429,7 @@ export default {
 			'Změna kultury jazyka může být náročná operace a bude mít za následek opětovné sestavení mezipaměti obsahu a indexů',
 		lastEdited: 'Naposledy editováno',
 		link: 'Odkaz',
-		linkinternal: 'Místní odkaz:',
+		linkinternal: 'Místní odkaz',
 		linklocaltip: 'Při používání místních odkazů vložte znak "#" před odkaz',
 		linknewwindow: 'Otevřít v novém okně?',
 		macroDoesNotHaveProperties: 'Toto makro nemá žádné vlastnosti, které by bylo možno editovat',

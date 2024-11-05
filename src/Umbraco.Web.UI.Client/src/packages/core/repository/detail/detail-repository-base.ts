@@ -124,7 +124,7 @@ export abstract class UmbDetailRepositoryBase<
 			this.#notificationContext!.peek('positive', notification);
 		}
 
-		return { data: model, error };
+		return { data: updatedData, error };
 	}
 
 	/**

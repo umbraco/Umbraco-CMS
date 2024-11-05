@@ -153,6 +153,7 @@ export default {
 		scheduledPublishServerTime: '預計發表的時間（伺服器端）',
 		scheduledPublishDocumentation:
 			'<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">這是什麼意思？</a>',
+		saveModalTitle: '保存',
 	},
 	media: {
 		clickToUpload: '點選以便上傳',
@@ -231,7 +232,7 @@ export default {
 		inserttable: '插入表格',
 		lastEdited: '最近編輯',
 		link: '連結',
-		linkinternal: '內部連結：',
+		linkinternal: '內部連結',
 		linklocaltip: '本地連結請用“#”號開頭',
 		linknewwindow: '在新視窗中打開？',
 		macroDoesNotHaveProperties: '本巨集沒有包含您可以編輯的屬性',

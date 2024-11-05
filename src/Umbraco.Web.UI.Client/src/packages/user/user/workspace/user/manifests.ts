@@ -1,3 +1,4 @@
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
@@ -26,7 +27,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_USER_WORKSPACE_ALIAS,
 			},
 		],

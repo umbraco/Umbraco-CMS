@@ -331,6 +331,7 @@ export default {
 		createEmpty: 'Crea nuovo/a',
 		createFromClipboard: 'Incolla dagli appunti',
 		nodeIsInTrash: 'Questo articolo è nel cestino',
+		saveModalTitle: 'Salva',
 	},
 	blueprints: {
 		createBlueprintFrom: "Crea un nuovo modello di contenuto da '%0%'",
@@ -494,7 +495,7 @@ export default {
 			"La modifica della cultura di una lingua può essere un'operazione costosa e comporterà la ricostruzione della cache dei contenuti e degli indici",
 		lastEdited: 'Ultima modifica',
 		link: 'Link',
-		linkinternal: 'Link interno:',
+		linkinternal: 'Link interno',
 		linklocaltip: 'Quando usi il link locale, inserisci # prima del link',
 		linknewwindow: 'Apri in nuova finestra?',
 		macroContainerSettings: 'Impostazioni della macro',
