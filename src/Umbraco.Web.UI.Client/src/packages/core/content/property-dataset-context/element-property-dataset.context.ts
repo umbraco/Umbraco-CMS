@@ -215,7 +215,8 @@ export abstract class UmbElementPropertyDatasetContext<
 
 	override destroy() {
 		super.destroy();
-		this.#propertyVariantIdMap.destroy();
+
+		this.#propertyVariantIdMap?.destroy();
 		(this.#propertyVariantIdMap as unknown) = undefined;
 	}
 }
