@@ -2073,7 +2073,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             new List<PublicAccessRule> { new() { RuleType = "test", RuleValue = "test" } }));
         Assert.IsTrue(PublicAccessService.AddRule(content1, "test2", "test2").Success);
 
-        var user = UserService.GetAsync(Constants.Security.SuperUserKey);
+        var user = await UserService.GetAsync(Constants.Security.SuperUserKey);
         var userGroup = UserService.GetUserGroupByAlias(user.Groups.First().Alias);
         Assert.IsNotNull(NotificationService.CreateNotification(user, content1, "X"));
 

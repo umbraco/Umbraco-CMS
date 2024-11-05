@@ -91,24 +91,15 @@ public class UserGroupServiceTests
     }
 
     // Obsoletion will be resolved when they are converted to internal consts.
-    [TestCase(null, UserGroupOperationStatus.Success)]
-    [TestCase(Constants.Security.AdminGroupAlias, UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
-    [TestCase(Constants.Security.SensitiveDataGroupAlias, UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
-    [TestCase(Constants.Security.TranslatorGroupAlias, UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
-    public async Task Can_Not_Update_SystemGroup_Alias(string? systemGroupAlias, UserGroupOperationStatus status)
+    [TestCase(null, null, UserGroupOperationStatus.Success)]
+    [TestCase(Constants.Security.AdminGroupKeyString, Constants.Security.AdminGroupAlias, UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
+    [TestCase(Constants.Security.SensitiveDataGroupKeyString, Constants.Security.SensitiveDataGroupAlias, UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
+    [TestCase(Constants.Security.TranslatorGroupString, Constants.Security.TranslatorGroupAlias, UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
+    public async Task Can_Not_Update_SystemGroup_Alias(string? systemGroupKey, string? systemGroupAlias, UserGroupOperationStatus status)
     {
         // prep
         var userGroupAlias = systemGroupAlias ?? "someNonSystemAlias";
-        Guid userGroupKey = Guid.NewGuid();
-        switch (userGroupAlias)
-        {
-            case Constants.Security.AdminGroupAlias : userGroupKey = Constants.Security.AdminGroupKey;
-                break;
-            case Constants.Security.SensitiveDataGroupAlias : userGroupKey = Constants.Security.SensitiveDataGroupKey;
-                break;
-            case Constants.Security.TranslatorGroupAlias : userGroupKey = Constants.Security.TranslatorGroupKey;
-                break;
-        }
+        Guid userGroupKey = systemGroupKey is not null ? new Guid(systemGroupKey) : Guid.NewGuid();
 
         // Arrange
         var actingUserKey = Guid.NewGuid();
