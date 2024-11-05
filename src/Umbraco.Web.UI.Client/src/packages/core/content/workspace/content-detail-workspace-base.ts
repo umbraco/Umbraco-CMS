@@ -471,6 +471,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 	}
 
+	/**
+	 * Request a submit of the workspace, in the case of Content Workspaces the validation does not need to be valid for this to be submitted.
+	 * @returns {Promise<void>} a promise which resolves once it has been completed.
+	 */
 	public override requestSubmit() {
 		return this.#handleSubmit();
 	}
@@ -479,6 +483,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		return this.#handleSubmit();
 	}
 
+	// Because we do not make validation prevent submission this also submits the workspace. [NL]
 	public override invalidSubmit() {
 		return this.#handleSubmit();
 	}
@@ -546,11 +551,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 		this._data.setPersisted(data);
 
-		// TODO: Only update the variants that was chosen to be saved:
 		const currentData = this._data.getCurrent();
 
 		const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
 
+		// Retrieve a data set which only contains updates from the selected variants + invariant. [NL]
 		const newCurrentData = await new UmbMergeContentVariantDataController(this).process(
 			currentData,
 			data,
