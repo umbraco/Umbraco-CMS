@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
@@ -6,5 +8,6 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class LabelConfiguration : IConfigureValueType
 {
     [ConfigurationField(Constants.PropertyEditors.ConfigurationKeys.DataValueType)]
+    [JsonPropertyName("umbracoDataValueType")]
     public string ValueType { get; set; } = ValueTypes.String;
 }
