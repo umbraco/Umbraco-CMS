@@ -92,6 +92,18 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     public bool TryGetSiblingsKeys(Guid key, out IEnumerable<Guid> siblingsKeys)
         => TryGetSiblingsKeysFromStructure(_navigationStructure, key, out siblingsKeys);
 
+    public bool TryGetSiblingsKeysOfType(Guid key, string contentTypeAlias, out IEnumerable<Guid> siblingsKeys)
+    {
+        if (TryGetContentTypeKey(contentTypeAlias, out Guid? contentTypeKey))
+        {
+            return TryGetSiblingsKeysFromStructure(_navigationStructure, key, out siblingsKeys, contentTypeKey);
+        }
+
+        // Content type alias doesn't exist
+        siblingsKeys = [];
+        return false;
+    }
+
     public bool TryGetParentKeyInBin(Guid childKey, out Guid? parentKey)
         => TryGetParentKeyFromStructure(_recycleBinNavigationStructure, childKey, out parentKey);
 
@@ -385,7 +397,11 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return true;
     }
 
-    private bool TryGetSiblingsKeysFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid key, out IEnumerable<Guid> siblingsKeys)
+    private bool TryGetSiblingsKeysFromStructure(
+        ConcurrentDictionary<Guid, NavigationNode> structure,
+        Guid key,
+        out IEnumerable<Guid> siblingsKeys,
+        Guid? contentTypeKey = null)
     {
         siblingsKeys = [];
 
@@ -397,15 +413,23 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         if (node.Parent is null)
         {
             // To find siblings of a node at root level, we need to iterate over all items and add those with null Parent
-            siblingsKeys = structure
-                .Where(kv => kv.Value.Parent is null && kv.Key != key)
+            IEnumerable<KeyValuePair<Guid, NavigationNode>> filteredSiblings = structure
+                .Where(kv => kv.Value.Parent is null && kv.Key != key);
+
+            // Apply contentTypeKey filter
+            if (contentTypeKey.HasValue)
+            {
+                filteredSiblings = filteredSiblings.Where(kv => kv.Value.ContentTypeKey == contentTypeKey.Value);
+            }
+
+            siblingsKeys = filteredSiblings
                 .OrderBy(kv => kv.Value.SortOrder)
                 .Select(kv => kv.Key)
                 .ToList();
             return true;
         }
 
-        if (TryGetChildrenKeys(node.Parent.Value, out IEnumerable<Guid> childrenKeys) is false)
+        if (TryGetChildrenKeysFromStructure(structure, node.Parent.Value, out IEnumerable<Guid> childrenKeys, contentTypeKey) is false)
         {
             return false; // Couldn't retrieve children keys
         }
