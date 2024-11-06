@@ -1,4 +1,6 @@
 import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../../context/block-grid-entry.context-token.js';
+import type { UmbBlockGridWorkspaceOriginData } from '../../workspace/block-grid-workspace.modal-token.js';
+import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from '../../context/block-grid-entries.context-token.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
@@ -32,6 +34,8 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	#blockContext?: typeof UMB_BLOCK_GRID_ENTRY_CONTEXT.TYPE;
 	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 	#contentKey?: string;
+	#parentUnique?: string | null;
+	#areaKey?: string | null;
 
 	@property({ attribute: false })
 	config?: UmbBlockEditorCustomViewConfiguration;
@@ -71,6 +75,10 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 				'observeContentKey',
 			);
 		});
+		this.consumeContext(UMB_BLOCK_GRID_ENTRIES_CONTEXT, (entriesContext) => {
+			this.#parentUnique = entriesContext.getParentUnique();
+			this.#areaKey = entriesContext.getAreaKey();
+		});
 		new UmbExtensionApiInitializer(
 			this,
 			umbExtensionsRegistry,
@@ -79,7 +87,14 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 			(permitted, ctrl) => {
 				const context = ctrl.api as typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 				if (permitted && context) {
+					if (this.#parentUnique === undefined || this.#areaKey === undefined) {
+						throw new Error('Parent unique and area key must be defined');
+					}
 					this.#workspaceContext = context;
+					context.setOriginData({
+						areaKey: this.#areaKey,
+						parentUnique: this.#parentUnique,
+					} as UmbBlockGridWorkspaceOriginData);
 					this.#workspaceContext.establishLiveSync();
 
 					this.#load();
