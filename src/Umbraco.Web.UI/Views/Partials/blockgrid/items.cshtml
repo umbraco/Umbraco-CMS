@@ -37,9 +37,9 @@
                     catch (InvalidOperationException)
                     {
                         <p>
-                            <strong>Could not render component of type: @(item.Content.ContentType.Alias)</strong>
+                            <strong>Could not render component of type: @componentName</strong>
                             <br />
-                            This likely happened because the partial view <em>@partialViewName</em> could not be found.
+                            This likely happened because the partial view <em>@($"{partialViewName}.cshtml")</em> could not be found.
                         </p>
                     }
                 }
