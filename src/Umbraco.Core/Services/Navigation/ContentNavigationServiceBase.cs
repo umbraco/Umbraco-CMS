@@ -77,6 +77,18 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     public bool TryGetAncestorsKeys(Guid childKey, out IEnumerable<Guid> ancestorsKeys)
         => TryGetAncestorsKeysFromStructure(_navigationStructure, childKey, out ancestorsKeys);
 
+    public bool TryGetAncestorsKeysOfType(Guid parentKey, string contentTypeAlias, out IEnumerable<Guid> ancestorsKeys)
+    {
+        if (TryGetContentTypeKey(contentTypeAlias, out Guid? contentTypeKey))
+        {
+            return TryGetAncestorsKeysFromStructure(_navigationStructure, parentKey, out ancestorsKeys, contentTypeKey);
+        }
+
+        // Content type alias doesn't exist
+        ancestorsKeys = [];
+        return false;
+    }
+
     public bool TryGetSiblingsKeys(Guid key, out IEnumerable<Guid> siblingsKeys)
         => TryGetSiblingsKeysFromStructure(_navigationStructure, key, out siblingsKeys);
 
@@ -345,7 +357,11 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return true;
     }
 
-    private bool TryGetAncestorsKeysFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid childKey, out IEnumerable<Guid> ancestorsKeys)
+    private bool TryGetAncestorsKeysFromStructure(
+        ConcurrentDictionary<Guid, NavigationNode> structure,
+        Guid childKey,
+        out IEnumerable<Guid> ancestorsKeys,
+        Guid? contentTypeKey = null)
     {
         var ancestors = new List<Guid>();
 
@@ -358,7 +374,11 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
 
         while (node.Parent is not null && structure.TryGetValue(node.Parent.Value, out node))
         {
-            ancestors.Add(node.Key);
+            // Apply contentTypeKey filter
+            if (contentTypeKey.HasValue is false || node.ContentTypeKey == contentTypeKey.Value)
+            {
+                ancestors.Add(node.Key);
+            }
         }
 
         ancestorsKeys = ancestors;
