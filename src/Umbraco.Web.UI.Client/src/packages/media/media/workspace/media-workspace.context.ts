@@ -62,7 +62,7 @@ export class UmbMediaWorkspaceContext
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 					const mediaTypeUnique = info.match.params.mediaTypeUnique;
-					this.createScaffold({
+					await this.createScaffold({
 						parent: { entityType: parentEntityType, unique: parentUnique },
 						preset: { mediaType: { unique: mediaTypeUnique, collection: null } },
 					});
