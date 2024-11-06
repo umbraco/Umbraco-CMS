@@ -190,7 +190,7 @@ public class ConvertLocalLinks : MigrationBase
 
             if (updateBatch.Any() is false)
             {
-                _logger.LogInformation("  - no properties to convert, continuing");
+                _logger.LogDebug("  - no properties to convert, continuing");
                 continue;
             }
 
