@@ -87,6 +87,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 			(permitted, ctrl) => {
 				const context = ctrl.api as typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 				if (permitted && context) {
+					// Risky business, cause here we are lucky that it seems to be consumed and set before this is called and there for this is acceptable for now. [NL]
 					if (this.#parentUnique === undefined || this.#areaKey === undefined) {
 						throw new Error('Parent unique and area key must be defined');
 					}
