@@ -424,7 +424,7 @@ test('can disable a user', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.clickConfirmDisableButton();
 
   // Assert
-  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.userDisabled);
   expect(umbracoUi.user.isUserDisabledTextVisible()).toBeTruthy();
   const userData = await umbracoApi.user.getByName(nameOfTheUser);
   expect(userData.state).toBe(disabledStatus);
@@ -444,7 +444,8 @@ test('can enable a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.clickConfirmEnableButton();
 
   // Assert
-  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.userDisabled);
+  // TODO: Unskip when it shows userEnabled/userInactive instead of userDisabled
+  // await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.userEnabled);
   await umbracoUi.user.isUserActiveTextVisible();
   // The state of the user is not enabled. The reason for this is that the user has not logged in, resulting in the state Inactive.
   const userData = await umbracoApi.user.getByName(nameOfTheUser);
@@ -480,7 +481,7 @@ test('can remove an avatar from a user', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.clickRemovePhotoButton();
 
   // Assert
-  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.avatarDeleted);
   const userData = await umbracoApi.user.getByName(nameOfTheUser);
   expect(userData.avatarUrls).toHaveLength(0);
 });
