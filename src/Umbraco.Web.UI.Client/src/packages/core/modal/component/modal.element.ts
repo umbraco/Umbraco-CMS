@@ -13,10 +13,14 @@ import {
 	type UUIModalDialogElement,
 	type UUIModalSidebarElement,
 } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
+import { UMB_ROUTE_CONTEXT, type UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbContextRequestEvent } from '@umbraco-cms/backoffice/context-api';
-import { UMB_CONTENT_REQUEST_EVENT_TYPE, UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
+import {
+	UMB_CONTENT_REQUEST_EVENT_TYPE,
+	UmbContextBoundary,
+	UmbContextProvider,
+} from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-modal')
 export class UmbModalElement extends UmbLitElement {
@@ -41,7 +45,7 @@ export class UmbModalElement extends UmbLitElement {
 	#innerElement = new UmbBasicState<HTMLElement | undefined>(undefined);
 
 	#modalExtensionObserver?: UmbObserverController<ManifestModal | undefined>;
-	#modalRouterElement: UmbRouterSlotElement = document.createElement('umb-router-slot');
+	#modalRouterElement?: HTMLDivElement | UmbRouterSlotElement;
 
 	#onClose = () => {
 		this.element?.removeEventListener(UUIModalCloseEvent, this.#onClose);
@@ -85,6 +89,7 @@ export class UmbModalElement extends UmbLitElement {
 		 *
 		 */
 		if (this.#modalContext.router) {
+			this.#modalRouterElement = document.createElement('umb-router-slot');
 			this.#modalRouterElement.routes = [
 				{
 					path: '',
@@ -92,9 +97,13 @@ export class UmbModalElement extends UmbLitElement {
 				},
 			];
 			this.#modalRouterElement.parent = this.#modalContext.router;
+		} else {
+			this.#modalRouterElement = document.createElement('div');
+			new UmbContextBoundary(this.#modalRouterElement, UMB_ROUTE_CONTEXT).hostConnected();
 		}
 
 		this.element.appendChild(this.#modalRouterElement);
+
 		this.#observeModal(this.#modalContext.alias.toString());
 
 		const provider = new UmbContextProvider(this.element, UMB_MODAL_CONTEXT, this.#modalContext);
@@ -151,14 +160,14 @@ export class UmbModalElement extends UmbLitElement {
 	}
 
 	#appendInnerElement(element: HTMLElement) {
-		this.#modalRouterElement.appendChild(element);
+		this.#modalRouterElement!.appendChild(element);
 		this.#innerElement.setValue(element);
 	}
 
 	#removeInnerElement() {
 		const innerElement = this.#innerElement.getValue();
 		if (innerElement) {
-			this.#modalRouterElement.removeChild(innerElement);
+			this.#modalRouterElement!.removeChild(innerElement);
 			this.#innerElement.setValue(undefined);
 		}
 	}

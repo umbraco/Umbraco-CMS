@@ -46,7 +46,7 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 
 	/**
 	 * @private
-	 * @param {UmbContextRequestEvent} event
+	 * @param {UmbContextRequestEvent} event - the event to handle
 	 * @memberof UmbContextProvider
 	 */
 	#handleContextRequest = ((event: UmbContextRequestEvent): void => {
