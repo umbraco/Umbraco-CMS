@@ -6,20 +6,21 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 #endif
 
-namespace PROJECT_SAFENAME.Controllers
+namespace Umbraco.Extension.Controllers
 {
     [ApiVersion("1.0")]
-    [ApiExplorerSettings(GroupName = "PROJECT_SAFENAME")]
-    public class PROJECT_SAFENAMEApiController : PROJECT_SAFENAMEControllerBase
+    [ApiExplorerSettings(GroupName = "Umbraco.Extension")]
+    public class UmbracoExtensionController : UmbracoExtensionControllerBase
     {
 #if (IncludeExample)
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-        public PROJECT_SAFENAMEApiController(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        public UmbracoExtensionController(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         }
 #endif
+
         [HttpGet("Ping")]
         [ProducesResponseType<string>(StatusCodes.Status200OK)]
         public string Ping() => "Pong";

@@ -5,7 +5,7 @@ export default defineConfig({
     lib: {
       entry: "src/bundle.manifests.ts", // Bundle registers one or more manifests
       formats: ["es"],
-      fileName: "PROJECT_NAME_KEBABCASE_FOR_NPM",
+      fileName: "umbraco-extension",
     },
     outDir: "../wwwroot/App_Plugins/UmbracoExtension", // your web component will be saved in this location
     emptyOutDir: true,

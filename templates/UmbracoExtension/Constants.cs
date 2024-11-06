@@ -1,7 +1,7 @@
-namespace PROJECT_SAFENAME
+namespace Umbraco.Extension
 {
     public class Constants
     {
-        public const string ApiName = "PROJECT_SAFENAME";
+        public const string ApiName = "umbracoextension";
     }
 }

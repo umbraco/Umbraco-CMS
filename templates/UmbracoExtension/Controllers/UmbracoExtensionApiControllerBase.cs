@@ -4,13 +4,13 @@ using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Routing;
 
-namespace PROJECT_SAFENAME.Controllers
+namespace Umbraco.Extension.Controllers
 {
     [ApiController]
-    [BackOfficeRoute("PROJECT_SAFENAME/api/v{version:apiVersion}")]
+    [BackOfficeRoute("umbracoextension/api/v{version:apiVersion}")]
     [Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
     [MapToApi(Constants.ApiName)]
-    public class PROJECT_SAFENAMEControllerBase : ControllerBase
+    public class UmbracoExtensionControllerBase : ControllerBase
     {
     }
 }

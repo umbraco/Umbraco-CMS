@@ -9,32 +9,32 @@ import type { PingError, PingResponse } from './types.gen';
 
 export const client = createClient(createConfig());
 
-export class PROJECT_SAFENAMEService {
+export class UmbracoExtensionService {
     public static ping<ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) {
         return (options?.client ?? client).get<PingResponse, PingError, ThrowOnError>({
             ...options,
-          url: '/umbraco/PROJECT_SAFENAME/api/v1/Ping'
+          url: '/umbraco/umbracoextension/api/v1/Ping'
         });
     }
 //#if(IncludeExample)     
     public static whatsMyName<ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) {
         return (options?.client ?? client).get<WhatsMyNameResponse, WhatsMyNameError, ThrowOnError>({
             ...options,
-            url: '/umbraco/PROJECT_SAFENAME/api/v1/WhatsMyName'
+            url: '/umbraco/umbracoextension/api/v1/WhatsMyName'
         });
     }
     
     public static whatsTheTimeMrWolf<ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) {
         return (options?.client ?? client).get<WhatsTheTimeMrWolfResponse, WhatsTheTimeMrWolfError, ThrowOnError>({
             ...options,
-            url: '/umbraco/PROJECT_SAFENAME/api/v1/WhatsTheTimeMrWolf'
+            url: '/umbraco/umbracoextension/api/v1/WhatsTheTimeMrWolf'
         });
     }
     
     public static whoAmI<ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) {
         return (options?.client ?? client).get<WhoAmIResponse, WhoAmIError, ThrowOnError>({
             ...options,
-            url: '/umbraco/PROJECT_SAFENAME/api/v1/WhoAmI'
+            url: '/umbraco/umbracoextension/api/v1/WhoAmI'
         });
     }
 //#endif    

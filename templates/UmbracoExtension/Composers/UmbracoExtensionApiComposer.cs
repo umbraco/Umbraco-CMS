@@ -1,3 +1,7 @@
+using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -5,14 +9,10 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Api.Common.OpenApi;
-using Asp.Versioning;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.Extensions.Options;
 
-namespace PROJECT_SAFENAME.Composers
+namespace Umbraco.Extension.Composers
 {
-    public class ApiComposer : IComposer
+    public class UmbracoExtensionApiComposer : IComposer
     {
         public void Compose(IUmbracoBuilder builder)
         {
@@ -44,11 +44,11 @@ namespace PROJECT_SAFENAME.Composers
 
                 // Enable Umbraco authentication for the "Example" Swagger document
                 // PR: https://github.com/umbraco/Umbraco-CMS/pull/15699
-                opt.OperationFilter<PROJECT_SAFENAMEOperationSecurityFilter>();
+                opt.OperationFilter<UmbracoExtensionOperationSecurityFilter>();
             });
         }
 
-        public class PROJECT_SAFENAMEOperationSecurityFilter : BackOfficeSecurityRequirementsOperationFilterBase
+        public class UmbracoExtensionOperationSecurityFilter : BackOfficeSecurityRequirementsOperationFilterBase
         {
             protected override string ApiName => Constants.ApiName;
         }
@@ -64,7 +64,7 @@ namespace PROJECT_SAFENAME.Composers
 
             protected override bool CanHandle(ApiDescription apiDescription, ControllerActionDescriptor controllerActionDescriptor)
             {
-                return controllerActionDescriptor.ControllerTypeInfo.Namespace?.StartsWith("PROJECT_SAFENAME.Controllers", comparisonType: StringComparison.InvariantCultureIgnoreCase) is true;
+                return controllerActionDescriptor.ControllerTypeInfo.Namespace?.StartsWith("Umbraco.Extension.Controllers", comparisonType: StringComparison.InvariantCultureIgnoreCase) is true;
             }
 
             public override string Handle(ApiDescription apiDescription) => $"{apiDescription.ActionDescriptor.RouteValues["action"]}";

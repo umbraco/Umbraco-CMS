@@ -18,8 +18,8 @@
     "language": "C#",
     "type": "project"
   },
-  "sourceName": "UmbracoExtension",
-  "defaultName": "UmbracoExtension",
+  "sourceName": "Umbraco.Extension",
+  "defaultName": "Umbraco.Extension",
   "preferNameDirectory": true,
   "symbols": {
     "Framework": {
@@ -59,29 +59,37 @@
       "displayName": "Support pages and views",
       "description": "Whether to support adding traditional Razor pages and Views to this library."
     },
-    "kebabCasedName": {
+    "KebabCasedName": {
       "type": "derived",
       "valueSource": "name",
-      "replaces": "PROJECT_NAME_KEBABCASE_FOR_NPM",
+      "replaces": "umbraco-extension",
+      "fileRename": "umbraco-extension",
       "valueTransform": "kebabCase"
     },
-    "titleCasedName": {
+    "SafeName": {
       "type": "derived",
       "valueSource": "name",
-      "replaces": "PROJECT_NAME_TITLEDCASE",
-      "valueTransform": "titleCase"
-    },
-    "safeNamespace": {
-      "type": "derived",
-      "valueSource": "name",
-      "replaces": "PROJECT_SAFENAMESPACE",
       "valueTransform": "safe_namespace"
     },
-    "safeName": {
+    "SafeCleanName": {
       "type": "derived",
-      "valueSource": "safeNamespace",
-      "replaces": "PROJECT_SAFENAME",
-      "valueTransform": "final_cleaned_version"
+      "valueSource": "SafeName",
+      "replaces": "UmbracoExtension",
+      "fileRename": "UmbracoExtension",
+      "valueTransform": "removePunctuation"
+    },
+    "SafeCleanNameLower": {
+      "type": "derived",
+      "valueSource": "SafeCleanName",
+      "replaces": "umbracoextension",
+      "fileRename": "umbracoextension",
+      "valueTransform": "lowerCase"
+    },
+    "SafeCleanNameFriendly": {
+      "type": "derived",
+      "valueSource": "SafeCleanName",
+      "replaces": "Umbraco Extension",
+      "valueTransform": "pascalCaseToSpaces"
     },
     "IncludeExample": {
       "displayName": "Include Example Code",
@@ -100,15 +108,20 @@
     }
   },
   "forms": {
-    "final_cleaned_version": {
+    "removePunctuation": {
       "identifier": "replace",
-      "pattern": "[\\._]", // regex to find . or _ in the name
-      "replacement": "" // replace it with empty string
+      "pattern": "[\\._]",
+      "replacement": ""
+    },
+    "pascalCaseToSpaces": {
+      "identifier": "replace",
+      "pattern": "([A-Z][a-z]+)",
+      "replacement": "$1 "
     }
   },
   "primaryOutputs": [
     {
-      "path": "UmbracoExtension.csproj"
+      "path": "Umbraco.Extension.csproj"
     }
   ],
   "postActions": [

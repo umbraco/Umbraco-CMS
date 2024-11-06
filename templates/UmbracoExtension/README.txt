@@ -24,7 +24,7 @@
 * Open a terminal inside the `\Client` folder
 * Run `npm install` to install all the dependencies
 * Run `npm run build` to build the project
-* The build output is copied to `wwwroot\App_Plugins\UmbracoExtension\PROJECT_NAME_KEBABCASE_FOR_NPM.js`
+* The build output is copied to `wwwroot\App_Plugins\UmbracoExtension\umbraco-extension.js`
 
 == File Watching ==
 * Add this Razor Class Library Project as a project reference to an Umbraco Website project

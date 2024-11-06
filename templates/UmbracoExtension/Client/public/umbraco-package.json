@@ -1,14 +1,14 @@
 {
-  "id": "UmbracoExtension",
-  "name": "UmbracoExtension",
+  "id": "Umbraco.Extension",
+  "name": "Umbraco.Extension",
   "version": "0.0.0",
   "allowPackageTelemetry": true,
   "extensions": [
     {
-      "name": "UmbracoExtension Bundle",
-      "alias": "PROJECT_NAME_KEBABCASE_FOR_NPM.bundle",
+      "name": "Umbraco ExtensionBundle",
+      "alias": "Umbraco.Extension.Bundle",
       "type": "bundle",
-      "js": "/App_Plugins/UmbracoExtension/PROJECT_NAME_KEBABCASE_FOR_NPM.js"
+      "js": "/App_Plugins/UmbracoExtension/umbraco-extension.js"
     }
   ]
 }

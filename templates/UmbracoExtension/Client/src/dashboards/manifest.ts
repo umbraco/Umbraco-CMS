@@ -1,7 +1,7 @@
 export const manifests: Array<UmbExtensionManifest> = [
   {
-    name: "UmbracoExtension Dashboard",
-    alias: "PROJECT_NAME_KEBABCASE_FOR_NPM.dashboard",
+    name: "Umbraco ExtensionDashboard",
+    alias: "Umbraco.Extension.Dashboard",
     type: 'dashboard',
     js: () => import("./dashboard.element"),
     meta: {

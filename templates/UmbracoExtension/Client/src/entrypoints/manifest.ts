@@ -1,7 +1,7 @@
 export const manifests: Array<UmbExtensionManifest> = [
   {
-    name: "UmbracoExtension Entrypoint",
-    alias: "PROJECT_NAME_KEBABCASE_FOR_NPM.entrypoint",
+    name: "Umbraco ExtensionEntrypoint",
+    alias: "Umbraco.Extension.Entrypoint",
     type: "backofficeEntryPoint",
     js: () => import("./entrypoint"),
   }
