@@ -60,7 +60,7 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
         timer.Stop();
 
         var contentTypeIconsByKey = _contentTypeService
-            .GetAll(results.Select(content => content.ContentType.Key).Distinct())
+            .GetMany(results.Select(content => content.ContentType.Key).Distinct())
             .ToDictionary(contentType => contentType.Key, contentType => contentType.Icon);
 
         return await Task.FromResult(Ok(new TemplateQueryResultResponseModel

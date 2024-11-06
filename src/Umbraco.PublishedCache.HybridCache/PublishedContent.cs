@@ -137,7 +137,7 @@ internal class PublishedContent : PublishedContentBase
     {
         get
         {
-            INavigationQueryService? navigationQueryService = null;
+            INavigationQueryService? navigationQueryService;
             switch (_contentNode.ContentType.ItemType)
             {
                 case PublishedItemType.Content:
@@ -150,8 +150,13 @@ internal class PublishedContent : PublishedContentBase
                     throw new NotImplementedException("Level is not implemented for " + _contentNode.ContentType.ItemType);
             }
 
-            navigationQueryService.TryGetLevel(Key, out int level);
-            return level;
+            // Attempt to retrieve the level, returning 0 if it fails or if level is null.
+            if (navigationQueryService.TryGetLevel(Key, out var level) && level.HasValue)
+            {
+                return level.Value;
+            }
+
+            return 0;
         }
     }
 
