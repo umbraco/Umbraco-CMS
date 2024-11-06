@@ -546,7 +546,10 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         }
     }
 
-    private IEnumerable<Guid> GetOrderedChildren(NavigationNode node, ConcurrentDictionary<Guid, NavigationNode> structure, Guid? contentTypeKey = null)
+    private IEnumerable<Guid> GetOrderedChildren(
+        NavigationNode node,
+        ConcurrentDictionary<Guid, NavigationNode> structure,
+        Guid? contentTypeKey = null)
     {
         IEnumerable<Guid> children = node
             .Children

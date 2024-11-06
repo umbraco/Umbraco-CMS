@@ -91,7 +91,8 @@ public partial class DocumentNavigationServiceTests : DocumentNavigationServiceT
     public async Task Can_Filter_Children_By_Type()
     {
         // Arrange
-        DocumentNavigationQueryService.TryGetChildrenKeysOfType(Root.Key, ContentType.Alias, out IEnumerable<Guid> initialChildrenKeysOfType);
+        Guid parentKey = Root.Key;
+        DocumentNavigationQueryService.TryGetChildrenKeysOfType(parentKey, ContentType.Alias, out IEnumerable<Guid> initialChildrenKeysOfType);
         List<Guid> initialChildrenOfTypeList = initialChildrenKeysOfType.ToList();
 
         // Doc Type
