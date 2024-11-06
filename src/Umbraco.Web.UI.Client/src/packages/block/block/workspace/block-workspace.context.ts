@@ -348,7 +348,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	 */
 	establishLiveSync() {
 		// Syncing Layout data is not a necessity, but it was an idea that someone might wanted to manipulate that from this workspace, but as it is giving trouble in Block Grid with Inline Editing Live Sync, then its taken out for now. [NL]
-		/*let initialLayoutSet = true;
+		let initialLayoutSet = true;
 		this.observe(
 			this.layout,
 			(layoutData) => {
@@ -361,7 +361,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				}
 			},
 			'observeThisLayout',
-		);*/
+		);
 		this.observe(
 			this.content.data,
 			(contentData) => {
@@ -499,9 +499,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	public override destroy(): void {
 		super.destroy();
-		this.#layout.destroy();
-		this.#name.destroy();
+		this.#layout?.destroy();
+		this.#name?.destroy();
 		this.#layout = undefined as any;
+		this.#name = undefined as any;
 		this.#blockManager = undefined;
 		this.#originData = undefined;
 	}
