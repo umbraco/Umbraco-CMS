@@ -5,8 +5,8 @@ import { UUIButtonElement } from "@umbraco-cms/backoffice/external/uui";
 import { UMB_NOTIFICATION_CONTEXT, UmbNotificationContext } from "@umbraco-cms/backoffice/notification";
 import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserModel } from "@umbraco-cms/backoffice/current-user";
 
-@customElement('my-awesome-dashboard')
-export class MyAwesomeDashboardElement extends UmbElementMixin(LitElement) {
+@customElement('example-dashboard')
+export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
 
   constructor() {
     super();
@@ -18,7 +18,7 @@ export class MyAwesomeDashboardElement extends UmbElementMixin(LitElement) {
     this.consumeContext(UMB_CURRENT_USER_CONTEXT, (currentUserContext) => {
 
       // When we have the current user context
-      // We can observe proeprties from it, such as the current user or perhaps just individual properties
+      // We can observe properties from it, such as the current user or perhaps just individual properties
       // When the currentUser object changes we will get notified and can reset the @state properrty
       this.observe(currentUserContext.currentUser, (currentUser) => {
         this._contextCurrentUser = currentUser;
@@ -158,10 +158,10 @@ export class MyAwesomeDashboardElement extends UmbElementMixin(LitElement) {
     `];
 }
 
-export default MyAwesomeDashboardElement;
+export default ExampleDashboardElement;
 
 declare global {
   interface HTMLElementTagNameMap {
-    'my-awesome-dashboard': MyAwesomeDashboardElement;
+    'example-dashboard': ExampleDashboardElement;
   }
 }

@@ -20,6 +20,6 @@ The following custom placeholders have been configured in `template.json`:
 - `UmbracoExtension` will be replaced with the safe namespace but without . or _
 - `umbracoextension` will be replaced with the safe namespace but without . or _ , in lower case
 - `umbraco-extension` will be replaced with the kebab case transform of the provided name
-- `Umbraco Extension` will be replaced with a 'friendly' version of the provided name, e.g. MyProject > My Project
+- `Umbraco Extension` will be replaced with a 'friendly' version of the provided name, e.g. MyProject > My Project. NB it will render a trailing space so you don't need to add one.
 
 The first three custom placeholders have been configured to replace the text in both files and filenames.

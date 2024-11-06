@@ -32,14 +32,14 @@ namespace Umbraco.Extension.Composers
                 // Along with having a generated swagger JSON file that we can use to auto generate a TypeScript client
                 opt.SwaggerDoc(Constants.ApiName, new OpenApiInfo
                 {
-                    Title = "Your Awesome Example Umbraco Backoffice API",
+                    Title = "Umbraco ExtensionBackoffice API",
                     Version = "1.0",
-                    Contact = new OpenApiContact
-                    {
-                        Name = "Some Developer",
-                        Email = "you@company.com",
-                        Url = new Uri("https://company.com")
-                    }
+                    // Contact = new OpenApiContact
+                    // {
+                    //     Name = "Some Developer",
+                    //     Email = "you@company.com",
+                    //     Url = new Uri("https://company.com")
+                    // }
                 });
 
                 // Enable Umbraco authentication for the "Example" Swagger document

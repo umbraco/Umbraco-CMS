@@ -5,8 +5,8 @@ export const manifests: Array<UmbExtensionManifest> = [
     type: 'dashboard',
     js: () => import("./dashboard.element"),
     meta: {
-      label: "Awesome Dashboard",
-      pathname: "my-awesome-dashboard"
+      label: "Example Dashboard",
+      pathname: "example-dashboard"
     },
     conditions: [
       {
