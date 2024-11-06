@@ -1,3 +1,5 @@
+import './global-components/index.js';
+
 export * from './common/index.js';
 export * from './default/index.js';
 export * from './entity-action-base.js';
