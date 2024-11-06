@@ -1,8 +1,10 @@
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -23,6 +25,7 @@ public class ConvertLocalLinks : MigrationBase
     private readonly IJsonSerializer _jsonSerializer;
     private readonly LocalLinkProcessor _localLinkProcessor;
     private readonly IMediaTypeService _mediaTypeService;
+    private readonly ICoreScopeProvider _coreScopeProvider;
 
     public ConvertLocalLinks(
         IMigrationContext context,
@@ -33,7 +36,8 @@ public class ConvertLocalLinks : MigrationBase
         ILanguageService languageService,
         IJsonSerializer jsonSerializer,
         LocalLinkProcessor localLinkProcessor,
-        IMediaTypeService mediaTypeService)
+        IMediaTypeService mediaTypeService,
+        ICoreScopeProvider coreScopeProvider)
         : base(context)
     {
         _umbracoContextFactory = umbracoContextFactory;
@@ -44,6 +48,7 @@ public class ConvertLocalLinks : MigrationBase
         _jsonSerializer = jsonSerializer;
         _localLinkProcessor = localLinkProcessor;
         _mediaTypeService = mediaTypeService;
+        _coreScopeProvider = coreScopeProvider;
     }
 
     protected override void Migrate()
@@ -64,9 +69,9 @@ public class ConvertLocalLinks : MigrationBase
 
         var relevantPropertyEditors =
             contentPropertyTypes.Concat(mediaPropertyTypes).DistinctBy(pt => pt.Id)
-            .Where(pt => propertyEditorAliases.Contains(pt.PropertyEditorAlias))
-            .GroupBy(pt => pt.PropertyEditorAlias)
-            .ToDictionary(group => group.Key, group => group.ToArray());
+                .Where(pt => propertyEditorAliases.Contains(pt.PropertyEditorAlias))
+                .GroupBy(pt => pt.PropertyEditorAlias)
+                .ToDictionary(group => group.Key, group => group.ToArray());
 
 
         foreach (var propertyEditorAlias in propertyEditorAliases)
@@ -120,18 +125,90 @@ public class ConvertLocalLinks : MigrationBase
                         && propertyData.PropertyTypeId == propertyType.Id);
 
             List<PropertyDataDto> propertyDataDtos = Database.Fetch<PropertyDataDto>(sql);
-            if (propertyDataDtos.Any() is false)
+            if (propertyDataDtos.Count < 1)
             {
                 continue;
             }
 
-            foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
+            var updateBatch = propertyDataDtos.Select(propertyDataDto =>
+                UpdateBatch.For(propertyDataDto, Database.StartSnapshot(propertyDataDto))).ToList();
+
+            var updatesToSkip = new ConcurrentBag<UpdateBatch<PropertyDataDto>>();
+
+            var progress = 0;
+
+            void HandleUpdateBatch(UpdateBatch<PropertyDataDto> update)
             {
-                if (ProcessPropertyDataDto(propertyDataDto, propertyType, languagesById, valueEditor))
+                using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
+
+                progress++;
+                if (progress % 100 == 0)
                 {
-                    Database.Update(propertyDataDto);
+                    _logger.LogInformation("  - finíshed {progress} of {total} properties", progress,
+                        updateBatch.Count);
+                }
+
+                PropertyDataDto propertyDataDto = update.Poco;
+
+                if (ProcessPropertyDataDto(propertyDataDto, propertyType, languagesById, valueEditor) == false)
+                {
+                    updatesToSkip.Add(update);
                 }
             }
+
+            if (DatabaseType == DatabaseType.SQLite)
+            {
+                // SQLite locks up if we run the migration in parallel, so... let's not.
+                foreach (UpdateBatch<PropertyDataDto> update in updateBatch)
+                {
+                    HandleUpdateBatch(update);
+                }
+            }
+            else
+            {
+                Parallel.ForEachAsync(updateBatch, async (update, token) =>
+                {
+                    //Foreach here, but we need to suppress the flow before each task, but not the actuall await of the task
+                    Task task;
+                    using (ExecutionContext.SuppressFlow())
+                    {
+                        task = Task.Run(
+                            () =>
+                            {
+                                using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+                                scope.Complete();
+                                HandleUpdateBatch(update);
+                            },
+                            token);
+                    }
+
+                    await task;
+                }).GetAwaiter().GetResult();
+            }
+
+            updateBatch.RemoveAll(updatesToSkip.Contains);
+
+            if (updateBatch.Any() is false)
+            {
+                _logger.LogDebug("  - no properties to convert, continuing");
+                continue;
+            }
+
+            _logger.LogInformation("  - {totalConverted} properties converted, saving...", updateBatch.Count);
+            var result = Database.UpdateBatch(updateBatch, new BatchOptions { BatchSize = 100 });
+            if (result != updateBatch.Count)
+            {
+                throw new InvalidOperationException(
+                    $"The database batch update was supposed to update {updateBatch.Count} property DTO entries, but it updated {result} entries.");
+            }
+
+            _logger.LogDebug(
+                "Migration completed for property type: {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias}, editor alias: {propertyTypeEditorAlias}) - {updateCount} property DTO entries updated.",
+                propertyType.Name,
+                propertyType.Id,
+                propertyType.Alias,
+                propertyType.PropertyEditorAlias,
+                result);
         }
 
         return true;
@@ -167,13 +244,22 @@ public class ConvertLocalLinks : MigrationBase
         property.SetValue(propertyDataDto.Value, culture, segment);
         var toEditorValue = valueEditor.ToEditor(property, culture, segment);
 
-        _localLinkProcessor.ProcessToEditorValue(toEditorValue);
+        if (_localLinkProcessor.ProcessToEditorValue(toEditorValue) == false)
+        {
+            _logger.LogDebug(
+                "    - skipping as no processor modified the data for property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
+                propertyDataDto.Id,
+                propertyType.Name,
+                propertyType.Id,
+                propertyType.Alias);
+            return false;
+        }
 
         var editorValue = _jsonSerializer.Serialize(toEditorValue);
         var dbValue = valueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
         if (dbValue is not string stringValue || stringValue.DetectIsJson() is false)
         {
-            _logger.LogError(
+            _logger.LogWarning(
                 "    - value editor did not yield a valid JSON string as FromEditor value property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
                 propertyDataDto.Id,
                 propertyType.Name,
