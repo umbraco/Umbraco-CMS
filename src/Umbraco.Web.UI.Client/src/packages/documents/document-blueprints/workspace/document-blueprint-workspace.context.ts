@@ -189,7 +189,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 					const parentEntityType = info.match.params.parentEntityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 					const documentTypeUnique = info.match.params.documentTypeUnique;
-					this.create({ entityType: parentEntityType, unique: parentUnique }, documentTypeUnique);
+					await this.create({ entityType: parentEntityType, unique: parentUnique }, documentTypeUnique);
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,

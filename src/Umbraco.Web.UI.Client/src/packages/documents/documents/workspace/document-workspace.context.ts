@@ -249,7 +249,11 @@ export class UmbDocumentWorkspaceContext
 					const documentTypeUnique = info.match.params.documentTypeUnique;
 					const blueprintUnique = info.match.params.blueprintUnique;
 
-					this.create({ entityType: parentEntityType, unique: parentUnique }, documentTypeUnique, blueprintUnique);
+					await this.create(
+						{ entityType: parentEntityType, unique: parentUnique },
+						documentTypeUnique,
+						blueprintUnique,
+					);
 					new UmbWorkspaceIsNewRedirectController(
 						this,
 						this,
@@ -264,7 +268,7 @@ export class UmbDocumentWorkspaceContext
 					const parentEntityType = info.match.params.parentEntityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 					const documentTypeUnique = info.match.params.documentTypeUnique;
-					this.create({ entityType: parentEntityType, unique: parentUnique }, documentTypeUnique);
+					await this.create({ entityType: parentEntityType, unique: parentUnique }, documentTypeUnique);
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,

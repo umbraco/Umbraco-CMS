@@ -63,7 +63,7 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 
 					const containerUnique =
 						info.match.params.containerUnique === 'null' ? null : info.match.params.containerUnique;
-					this.create(containerUnique);
+					await this.create(containerUnique);
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
