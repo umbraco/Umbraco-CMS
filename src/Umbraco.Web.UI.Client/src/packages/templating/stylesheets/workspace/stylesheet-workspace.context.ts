@@ -45,7 +45,7 @@ export class UmbStylesheetWorkspaceContext
 				setup: async (component: PageComponent, info: IRoutingInfo) => {
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
-					this.create({ entityType: parentEntityType, unique: parentUnique });
+					await this.create({ entityType: parentEntityType, unique: parentUnique });
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,

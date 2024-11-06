@@ -28,7 +28,7 @@ export class UmbWebhookWorkspaceContext
 				path: 'create',
 				component: UmbWebhookWorkspaceEditorElement,
 				setup: async () => {
-					this.createScaffold({ parent: { entityType: UMB_WEBHOOK_ROOT_ENTITY_TYPE, unique: null } });
+					await this.createScaffold({ parent: { entityType: UMB_WEBHOOK_ROOT_ENTITY_TYPE, unique: null } });
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
