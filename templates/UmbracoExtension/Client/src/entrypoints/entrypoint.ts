@@ -1,6 +1,8 @@
 import { UmbEntryPointOnInit, UmbEntryPointOnUnload } from '@umbraco-cms/backoffice/extension-api';
+//#if IncludeExample
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { client } from '../api';
+//#endif
 
 // load up the manifests here
 export const onInit: UmbEntryPointOnInit = (_host, _extensionRegistry) => {
