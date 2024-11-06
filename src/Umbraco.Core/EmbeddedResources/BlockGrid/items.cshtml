@@ -19,13 +19,16 @@
             data-row-span="@item.RowSpan"
             style=" --umb-block-grid--item-column-span: @item.ColumnSpan; --umb-block-grid--item-row-span: @item.RowSpan; ">
             @{
-                if (_selector.SelectComponent(item.Content.ContentType.Alias) is not null)
+                string componentName = item.Content.ContentType.Alias;
+                var component = _selector.SelectComponent(componentName.ToFirstUpper()) ?? _selector.SelectComponent(componentName);
+                        
+                if (component is ViewComponentDescriptor viewComponent)
                 {
-                    @await Component.InvokeAsync(item.Content.ContentType.Alias, item)
+                    @await Component.InvokeAsync(viewComponent.ShortName, item)
                 }
                 else
                 {
-                    var partialViewName = "blockgrid/Components/" + item.Content.ContentType.Alias;
+                    var partialViewName = "blockgrid/Components/" + componentName;
 
                     try
                     {
