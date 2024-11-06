@@ -53,6 +53,7 @@ public static class AuthorizationPolicies
     public const string TreeAccessMediaOrMediaTypes = nameof(TreeAccessMediaOrMediaTypes);
     public const string TreeAccessDictionaryOrTemplates = nameof(TreeAccessDictionaryOrTemplates);
     public const string TreeAccessDocumentOrMediaOrContentTypes = nameof(TreeAccessDocumentOrMediaOrContentTypes);
+    public const string TreeAccessMembersOrMemberTypes = nameof(TreeAccessMembersOrMemberTypes);
 
     // other
     public const string DictionaryPermissionByResource = nameof(DictionaryPermissionByResource);
