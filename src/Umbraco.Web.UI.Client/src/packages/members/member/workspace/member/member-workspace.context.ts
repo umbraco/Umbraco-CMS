@@ -188,7 +188,7 @@ export class UmbMemberWorkspaceContext
 				component: () => new UmbMemberWorkspaceEditorElement(),
 				setup: async (_component, info) => {
 					const memberTypeUnique = info.match.params.memberTypeUnique;
-					this.create(memberTypeUnique);
+					await this.create(memberTypeUnique);
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
