@@ -106,14 +106,14 @@ public partial class DocumentNavigationServiceTests : DocumentNavigationServiceT
         await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
 
         // Content
-        var child4Model = CreateContentCreateModel("Child 4", new Guid("11233548-2E87-4D3E-8FC4-4400F9DBEF56"), anotherContentType.Key, Root.Key); // Using new doc type
+        var child4Model = CreateContentCreateModel("Child 4", new Guid("11233548-2E87-4D3E-8FC4-4400F9DBEF56"), anotherContentType.Key, parentKey); // Using new doc type
         await ContentEditingService.CreateAsync(child4Model, Constants.Security.SuperUserKey);
 
         // Act
-        DocumentNavigationQueryService.TryGetChildrenKeysOfType(Root.Key, anotherContentType.Alias, out IEnumerable<Guid> filteredChildrenKeysOfType);
+        DocumentNavigationQueryService.TryGetChildrenKeysOfType(parentKey, anotherContentType.Alias, out IEnumerable<Guid> filteredChildrenKeysOfType);
         List<Guid> filteredChildrenList = filteredChildrenKeysOfType.ToList();
 
-        DocumentNavigationQueryService.TryGetChildrenKeys(Root.Key, out IEnumerable<Guid> allChildrenKeys);
+        DocumentNavigationQueryService.TryGetChildrenKeys(parentKey, out IEnumerable<Guid> allChildrenKeys);
         List<Guid> allChildrenList = allChildrenKeys.ToList();
 
         // Assert
@@ -122,6 +122,123 @@ public partial class DocumentNavigationServiceTests : DocumentNavigationServiceT
             Assert.AreEqual(3, initialChildrenOfTypeList.Count); // Verify that loaded doc types can be used to filter
             Assert.AreEqual(1, filteredChildrenList.Count); // Verify that new doc type can be used to filter
             Assert.AreEqual(4, allChildrenList.Count);
+        });
+    }
+
+    [Test]
+    public async Task Can_Filter_Descendants_By_Type()
+    {
+        // Arrange
+        Guid parentKey = Child2.Key;
+        DocumentNavigationQueryService.TryGetDescendantsKeysOfType(parentKey, ContentType.Alias, out IEnumerable<Guid> initialDescendantsKeysOfType);
+        List<Guid> initialDescendantsOfTypeList = initialDescendantsKeysOfType.ToList();
+
+        // Doc Type
+        var anotherContentType = ContentTypeBuilder.CreateSimpleContentType("anotherPage", "Another page");
+        anotherContentType.Key = new Guid("58A2958E-B34F-4289-A225-E99EEC2456AB");
+        anotherContentType.AllowedContentTypes = new[] { new ContentTypeSort(anotherContentType.Key, 0, anotherContentType.Alias) };
+        await ContentTypeService.CreateAsync(anotherContentType, Constants.Security.SuperUserKey);
+
+        // Update old doc type
+        ContentType.AllowedContentTypes = new[] { new ContentTypeSort(ContentType.Key, 0, ContentType.Alias), new ContentTypeSort(anotherContentType.Key, 1, anotherContentType.Alias) };
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
+
+        // Content
+        var greatGreatGrandchild1Model = CreateContentCreateModel("Great-great-grandchild 1", new Guid("11233548-2E87-4D3E-8FC4-4400F9DBEF56"), anotherContentType.Key, GreatGrandchild1.Key); // Using new doc type
+        await ContentEditingService.CreateAsync(greatGreatGrandchild1Model, Constants.Security.SuperUserKey);
+
+        // Act
+        DocumentNavigationQueryService.TryGetDescendantsKeysOfType(parentKey, anotherContentType.Alias, out IEnumerable<Guid> filteredDescendantsKeysOfType);
+        List<Guid> filteredDescendantsList = filteredDescendantsKeysOfType.ToList();
+
+        DocumentNavigationQueryService.TryGetDescendantsKeys(parentKey, out IEnumerable<Guid> allDescendantsKeys);
+        List<Guid> allDescendantsList = allDescendantsKeys.ToList();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, initialDescendantsOfTypeList.Count); // Verify that loaded doc types can be used to filter
+            Assert.AreEqual(1, filteredDescendantsList.Count); // Verify that new doc type can be used to filter
+            Assert.AreEqual(3, allDescendantsList.Count);
+        });
+    }
+
+    [Test]
+    public async Task Can_Filter_Ancestors_By_Type()
+    {
+        // Arrange
+        Guid childKey = new Guid("1802D6B4-4A3C-4EBA-AFA3-1AF82C2D6483");
+
+        // Doc Type
+        var anotherContentType = ContentTypeBuilder.CreateSimpleContentType("anotherPage", "Another page");
+        anotherContentType.Key = new Guid("58A2958E-B34F-4289-A225-E99EEC2456AB");
+        anotherContentType.AllowedContentTypes = new[] { new ContentTypeSort(anotherContentType.Key, 0, anotherContentType.Alias) };
+        await ContentTypeService.CreateAsync(anotherContentType, Constants.Security.SuperUserKey);
+
+        // Update old doc type
+        ContentType.AllowedContentTypes = new[] { new ContentTypeSort(ContentType.Key, 0, ContentType.Alias), new ContentTypeSort(anotherContentType.Key, 1, anotherContentType.Alias) };
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
+
+        // Content
+        var greatGrandchild2Model = CreateContentCreateModel("Great-grandchild 2", new Guid("11233548-2E87-4D3E-8FC4-4400F9DBEF56"), anotherContentType.Key, Grandchild4.Key); // Using new doc type
+        await ContentEditingService.CreateAsync(greatGrandchild2Model, Constants.Security.SuperUserKey);
+        var greatGreatGrandchild1Model = CreateContentCreateModel("Great-great-grandchild 1", childKey, anotherContentType.Key, greatGrandchild2Model.Key); // Using new doc type
+        await ContentEditingService.CreateAsync(greatGreatGrandchild1Model, Constants.Security.SuperUserKey);
+
+        // Act
+        DocumentNavigationQueryService.TryGetAncestorsKeysOfType(childKey, ContentType.Alias, out IEnumerable<Guid> ancestorsKeysOfOriginalType);
+        List<Guid> ancestorsKeysOfOriginalTypeList = ancestorsKeysOfOriginalType.ToList();
+
+        DocumentNavigationQueryService.TryGetAncestorsKeysOfType(childKey, anotherContentType.Alias, out IEnumerable<Guid> ancestorsKeysOfNewType);
+        List<Guid> ancestorsKeysOfNewTypeList = ancestorsKeysOfNewType.ToList();
+
+        DocumentNavigationQueryService.TryGetAncestorsKeys(childKey, out IEnumerable<Guid> allAncestorsKeys);
+        List<Guid> allAncestorsList = allAncestorsKeys.ToList();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, ancestorsKeysOfOriginalTypeList.Count); // Verify that loaded doc types can be used to filter
+            Assert.AreEqual(1, ancestorsKeysOfNewTypeList.Count); // Verify that new doc type can be used to filter
+            Assert.AreEqual(4, allAncestorsList.Count);
+        });
+    }
+
+    [Test]
+    public async Task Can_Filter_Siblings_By_Type()
+    {
+        // Arrange
+        Guid parentKey = Child3.Key;
+        DocumentNavigationQueryService.TryGetSiblingsKeysOfType(parentKey, ContentType.Alias, out IEnumerable<Guid> initialSiblingsKeysOfType);
+        List<Guid> initialSiblingsOfTypeList = initialSiblingsKeysOfType.ToList();
+
+        // Doc Type
+        var anotherContentType = ContentTypeBuilder.CreateSimpleContentType("anotherPage", "Another page");
+        anotherContentType.Key = new Guid("58A2958E-B34F-4289-A225-E99EEC2456AB");
+        anotherContentType.AllowedContentTypes = new[] { new ContentTypeSort(anotherContentType.Key, 0, anotherContentType.Alias) };
+        await ContentTypeService.CreateAsync(anotherContentType, Constants.Security.SuperUserKey);
+
+        // Update old doc type
+        ContentType.AllowedContentTypes = new[] { new ContentTypeSort(ContentType.Key, 0, ContentType.Alias), new ContentTypeSort(anotherContentType.Key, 1, anotherContentType.Alias) };
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
+
+        // Content
+        var child4Model = CreateContentCreateModel("Child 4", new Guid("11233548-2E87-4D3E-8FC4-4400F9DBEF56"), anotherContentType.Key, Root.Key); // Using new doc type
+        await ContentEditingService.CreateAsync(child4Model, Constants.Security.SuperUserKey);
+
+        // Act
+        DocumentNavigationQueryService.TryGetSiblingsKeysOfType(parentKey, anotherContentType.Alias, out IEnumerable<Guid> filteredSiblingsKeysOfType);
+        List<Guid> filteredSiblingsList = filteredSiblingsKeysOfType.ToList();
+
+        DocumentNavigationQueryService.TryGetSiblingsKeys(parentKey, out IEnumerable<Guid> allSiblingsKeys);
+        List<Guid> allSiblingsList = allSiblingsKeys.ToList();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, initialSiblingsOfTypeList.Count); // Verify that loaded doc types can be used to filter
+            Assert.AreEqual(1, filteredSiblingsList.Count); // Verify that new doc type can be used to filter
+            Assert.AreEqual(3, allSiblingsList.Count);
         });
     }
 }
