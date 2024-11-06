@@ -300,22 +300,24 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderBlock() {
-		return html`
-			<umb-extension-slot
-				type="blockEditorCustomView"
-				default-element=${this._inlineEditingMode ? 'umb-inline-list-block' : 'umb-ref-list-block'}
-				.props=${this._blockViewProps}
-				.filter=${this.#extensionSlotFilterMethod}
-				single
-				>${this._inlineEditingMode ? this.#renderInlineBlock() : this.#renderRefBlock()}</umb-extension-slot
-			>
-			<uui-action-bar>
-				${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderDeleteAction()}
-			</uui-action-bar>
-			${!this._showContentEdit && this._contentInvalid
-				? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
-				: nothing}
-		`;
+		return this.contentKey && this._contentTypeAlias
+			? html`
+					<umb-extension-slot
+						type="blockEditorCustomView"
+						default-element=${this._inlineEditingMode ? 'umb-inline-list-block' : 'umb-ref-list-block'}
+						.props=${this._blockViewProps}
+						.filter=${this.#extensionSlotFilterMethod}
+						single
+						>${this._inlineEditingMode ? this.#renderInlineBlock() : this.#renderRefBlock()}</umb-extension-slot
+					>
+					<uui-action-bar>
+						${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderDeleteAction()}
+					</uui-action-bar>
+					${!this._showContentEdit && this._contentInvalid
+						? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+						: nothing}
+				`
+			: nothing;
 	}
 
 	#renderEditContentAction() {
