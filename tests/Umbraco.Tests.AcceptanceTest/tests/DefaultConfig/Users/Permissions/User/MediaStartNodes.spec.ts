@@ -21,7 +21,7 @@ test.beforeEach(async ({umbracoApi}) => {
   rootFolderId = await umbracoApi.media.createDefaultMediaFolder(rootFolderName);
   childFolderOneId = await umbracoApi.media.createDefaultMediaFolderAndParentId(childFolderOneName, rootFolderId);
   await umbracoApi.media.createDefaultMediaFolderAndParentId(childFolderTwoName, rootFolderId);
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithMediaSection(userGroupName);
+  userGroupId = await umbracoApi.userGroup.createSimpleUserGroupWithMediaSection(userGroupName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
