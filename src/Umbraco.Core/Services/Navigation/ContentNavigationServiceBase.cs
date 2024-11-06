@@ -62,6 +62,18 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     public bool TryGetDescendantsKeys(Guid parentKey, out IEnumerable<Guid> descendantsKeys)
         => TryGetDescendantsKeysFromStructure(_navigationStructure, parentKey, out descendantsKeys);
 
+    public bool TryGetDescendantsKeysOfType(Guid parentKey, string contentTypeAlias, out IEnumerable<Guid> descendantsKeys)
+    {
+        if (TryGetContentTypeKey(contentTypeAlias, out Guid? contentTypeKey))
+        {
+            return TryGetDescendantsKeysFromStructure(_navigationStructure, parentKey, out descendantsKeys, contentTypeKey);
+        }
+
+        // Content type alias doesn't exist
+        descendantsKeys = [];
+        return false;
+    }
+
     public bool TryGetAncestorsKeys(Guid childKey, out IEnumerable<Guid> ancestorsKeys)
         => TryGetAncestorsKeysFromStructure(_navigationStructure, childKey, out ancestorsKeys);
 
@@ -312,7 +324,11 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return true;
     }
 
-    private bool TryGetDescendantsKeysFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid parentKey, out IEnumerable<Guid> descendantsKeys)
+    private bool TryGetDescendantsKeysFromStructure(
+        ConcurrentDictionary<Guid, NavigationNode> structure,
+        Guid parentKey,
+        out IEnumerable<Guid> descendantsKeys,
+        Guid? contentTypeKey = null)
     {
         var descendants = new List<Guid>();
 
@@ -323,7 +339,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
             return false;
         }
 
-        GetDescendantsRecursively(structure, parentNode, descendants);
+        GetDescendantsRecursively(structure, parentNode, descendants, contentTypeKey);
 
         descendantsKeys = descendants;
         return true;
@@ -379,17 +395,26 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return true;
     }
 
-    private void GetDescendantsRecursively(ConcurrentDictionary<Guid, NavigationNode> structure, NavigationNode node, List<Guid> descendants)
+    private void GetDescendantsRecursively(
+        ConcurrentDictionary<Guid, NavigationNode> structure,
+        NavigationNode node,
+        List<Guid> descendants,
+        Guid? contentTypeKey = null)
     {
+        // Get all children regardless of contentType
         var childrenKeys = GetOrderedChildren(node, structure).ToList();
         foreach (Guid childKey in childrenKeys)
         {
-            descendants.Add(childKey);
+            // Apply contentTypeKey filter
+            if (contentTypeKey.HasValue is false || structure[childKey].ContentTypeKey == contentTypeKey.Value)
+            {
+                descendants.Add(childKey);
+            }
 
             // Retrieve the child node and its descendants
             if (structure.TryGetValue(childKey, out NavigationNode? childNode))
             {
-                GetDescendantsRecursively(structure, childNode, descendants);
+                GetDescendantsRecursively(structure, childNode, descendants, contentTypeKey);
             }
         }
     }
