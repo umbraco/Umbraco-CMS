@@ -246,7 +246,7 @@ public class ConvertLocalLinks : MigrationBase
 
         if (_localLinkProcessor.ProcessToEditorValue(toEditorValue) == false)
         {
-            _logger.LogInformation(
+            _logger.LogDebug(
                 "    - skipping as no processor modified the data for property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
                 propertyDataDto.Id,
                 propertyType.Name,
