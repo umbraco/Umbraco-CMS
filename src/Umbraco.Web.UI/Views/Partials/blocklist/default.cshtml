@@ -12,13 +12,16 @@
     {
         if (item?.ContentUdi == null) { continue; }
 
-        if (_selector.SelectComponent(item.Content.ContentType.Alias) is not null)
+        string componentName = item.Content.ContentType.Alias;
+        var component = _selector.SelectComponent(componentName.ToFirstUpper()) ?? _selector.SelectComponent(componentName);
+                
+        if (component is ViewComponentDescriptor viewComponent)
         {
-            @await Component.InvokeAsync(item.Content.ContentType.Alias, item)
+            @await Component.InvokeAsync(viewComponent.ShortName, item)
         }
         else
         {
-            var partialViewName = "blocklist/Components/" + item.Content.ContentType.Alias;
+            var partialViewName = "blocklist/Components/" + componentName;
 
             try
             {
