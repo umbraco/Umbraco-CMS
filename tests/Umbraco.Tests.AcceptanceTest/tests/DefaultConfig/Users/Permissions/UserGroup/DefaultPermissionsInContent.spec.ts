@@ -128,6 +128,20 @@ test('can delete document with delete permission enabled', async ({umbracoApi, u
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
 });
 
+test('can not delete document with delete permission disabled', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteDocumentPermission(userGroupName, false);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
+
+  // Assert
+  await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
+});
+
 test('can empty recycle bin with delete permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.moveToRecycleBin(rootDocumentId);
@@ -144,21 +158,6 @@ test('can empty recycle bin with delete permission enabled', async ({umbracoApi,
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.emptiedRecycleBin);
-});
-
-
-test('can not delete document with delete permission disabled', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteDocumentPermission(userGroupName, false);
-  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
-  await umbracoUi.goToBackOffice();
-
-  // Act
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
-
-  // Assert
-  await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
 test('can not empty recycle bin with delete permission disabled', async ({umbracoApi, umbracoUi}) => {
@@ -344,7 +343,7 @@ test('can update document with update permission enabled', async ({umbracoApi, u
 
   // Act
   await umbracoUi.content.goToContentWithName(rootDocumentName);
-  // await umbracoUi.content.isDocumentReadOnly(false);
+  await umbracoUi.content.isDocumentReadOnly(false);
   await umbracoUi.content.enterContentName(testDocumentName);
   await umbracoUi.content.clickSaveButton();
 
@@ -453,7 +452,6 @@ test('can not move document with move to permission disabled', async ({umbracoAp
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-
 test('can sort children with sort children permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDefaultDocumentWithParent(childDocumentTwoName, childDocumentTypeId, rootDocumentId);
@@ -530,7 +528,7 @@ test('can not set culture and hostnames with culture and hostnames permission di
 });
 
 // TODO: Notification is not correct 'access' should be 'access'
-test.skip('can set public access with public access permission enabled', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can set public access with public access permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPublicAccessPermission(userGroupName);
   const testMemberGroup = 'TestMemberGroup';
@@ -564,7 +562,7 @@ test('can not set public access with public access permission disabled', async (
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-test('can rollback document with rollback permission enabled', async ({page, umbracoApi, umbracoUi}) => {
+test('can rollback document with rollback permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithRollbackPermission(userGroupName);
   await umbracoApi.document.publish(rootDocumentId);
