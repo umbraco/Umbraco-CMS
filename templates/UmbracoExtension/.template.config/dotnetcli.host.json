@@ -24,7 +24,7 @@
     },
     "SiteDomain": {
       "longName": "site-domain",
-      "shortName": "d"
+      "shortName": "sd"
     }
   }
 }

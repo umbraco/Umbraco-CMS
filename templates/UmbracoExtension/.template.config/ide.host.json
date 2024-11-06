@@ -4,7 +4,7 @@
   "icon": "../../icon.png",
   "description": {
     "id": "umbraco-extension",
-    "text": "Umbraco Extension - An empty Umbraco extension/plugin (Razor Class Library)."
+    "text": "Umbraco Extension - A Razor Class Library project for building Umbraco extensions."
   },
   "symbolInfo": [
     {
@@ -20,7 +20,7 @@
       "id": "IncludeExample",
       "isVisible": true,
       "description": {
-        "text": "Whether to include an example dashboard and other code to get started with."
+        "text": "Whether to include an example dashboard and supporting code"
       }
     },
     {
