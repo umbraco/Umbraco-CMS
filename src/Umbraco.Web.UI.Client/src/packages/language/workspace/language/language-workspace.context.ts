@@ -32,7 +32,7 @@ export class UmbLanguageWorkspaceContext
 				path: 'create',
 				component: UmbLanguageWorkspaceEditorElement,
 				setup: async () => {
-					this.createScaffold({ parent: { entityType: UMB_LANGUAGE_ROOT_ENTITY_TYPE, unique: null } });
+					await this.createScaffold({ parent: { entityType: UMB_LANGUAGE_ROOT_ENTITY_TYPE, unique: null } });
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
