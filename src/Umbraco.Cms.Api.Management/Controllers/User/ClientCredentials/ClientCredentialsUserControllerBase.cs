@@ -18,6 +18,10 @@ public abstract class ClientCredentialsUserControllerBase : UserControllerBase
                 .WithTitle("Duplicate client ID")
                 .WithDetail("The specified client ID is already in use. Choose another client ID.")
                 .Build()),
+            BackOfficeUserClientCredentialsOperationStatus.InvalidClientId => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid client ID")
+                .WithDetail("The specified client ID is invalid. Specify a valid client ID.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown client credentials operation status.")
                 .Build()),
