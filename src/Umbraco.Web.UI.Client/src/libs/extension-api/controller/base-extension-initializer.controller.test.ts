@@ -430,7 +430,7 @@ describe('UmbBaseExtensionController', () => {
 				'Umb.Test.Section.1',
 				() => {
 					// This should not be called.
-					expect(true).to.be.false;
+					expect.fail('Callback should not be called when never permitted');
 				},
 			);
 			Promise.resolve().then(() => {
@@ -448,7 +448,7 @@ describe('UmbBaseExtensionController', () => {
 				'Umb.Test.Section.1',
 				() => {
 					// This should not be called.
-					expect(true).to.be.false;
+					expect.fail('Callback should not be called when never permitted');
 				},
 			);
 
@@ -615,7 +615,8 @@ describe('UmbBaseExtensionController', () => {
 						extensionController.destroy(); // End this test.
 						setTimeout(() => done(), 60); // Lets wait another round of the conditions approve/disapprove, just to see if the destroy stopped the conditions. (60ms, as that should be enough to test that another round does not happen.) [NL]
 					} else if (count === 5) {
-						expect(false).to.be.true; // This should not be called.
+						// This should not be called.
+						expect.fail('Callback should not be called when never permitted');
 					}
 				},
 			);

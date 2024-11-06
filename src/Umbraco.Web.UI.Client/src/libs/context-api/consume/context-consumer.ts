@@ -3,11 +3,13 @@ import { isUmbContextProvideEventType, UMB_CONTEXT_PROVIDE_EVENT_TYPE } from '..
 import type { UmbContextCallback } from './context-request.event.js';
 import { UmbContextRequestEventImplementation } from './context-request.event.js';
 
+type HostElementMethod = () => Element | undefined;
+
 /**
  * @class UmbContextConsumer
  */
 export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType = BaseType> {
-	protected _host: Element;
+	protected _retrieveHost: HostElementMethod;
 
 	#skipHost?: boolean;
 	#stopAtContextMatch = true;
@@ -33,11 +35,15 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	 * @memberof UmbContextConsumer
 	 */
 	constructor(
-		host: Element,
+		host: Element | HostElementMethod,
 		contextIdentifier: string | UmbContextToken<BaseType, ResultType>,
 		callback?: UmbContextCallback<ResultType>,
 	) {
-		this._host = host;
+		if (typeof host === 'function') {
+			this._retrieveHost = host;
+		} else {
+			this._retrieveHost = () => host;
+		}
 		const idSplit = contextIdentifier.toString().split('#');
 		this.#contextAlias = idSplit[0];
 		this.#apiAlias = idSplit[1] ?? 'default';
@@ -130,7 +136,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 			this._onResponse,
 			this.#stopAtContextMatch,
 		);
-		(this.#skipHost ? this._host.parentNode : this._host)?.dispatchEvent(event);
+		(this.#skipHost ? this._retrieveHost()?.parentNode : this._retrieveHost())?.dispatchEvent(event);
 	}
 
 	public hostConnected(): void {
@@ -176,7 +182,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 
 	public destroy(): void {
 		this.hostDisconnected();
-		this._host = undefined as any;
+		this._retrieveHost = undefined as any;
 		this.#callback = undefined;
 		this.#promise = undefined;
 		this.#promiseResolver = undefined;
