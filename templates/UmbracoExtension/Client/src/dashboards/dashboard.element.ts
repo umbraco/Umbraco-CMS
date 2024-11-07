@@ -8,6 +8,18 @@ import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserModel } from "@umbraco-cms/back
 @customElement('example-dashboard')
 export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
 
+  @state()
+  private _yourName: string | undefined = "Press the button!";
+
+  @state()
+  private _timeFromMrWolf: Date | undefined;
+
+  @state()
+  private _serverUserData: UserModel | undefined = undefined;
+
+  @state()
+  private _contextCurrentUser: UmbCurrentUserModel | undefined = undefined;
+
   constructor() {
     super();
 
@@ -90,46 +102,42 @@ export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
     buttonElement.state = "success";
   }
 
-  @state()
-  private _yourName: string | undefined = "Dunno";
-
-  @state()
-  private _timeFromMrWolf: Date | undefined;
-
-  @state()
-  private _serverUserData: UserModel | undefined = undefined;
-
-  @state()
-  private _contextCurrentUser: UmbCurrentUserModel | undefined = undefined;
-
   render() {
     return html`
-        <uui-box headline="Who am I? [Server]">
-            <h2>${this._serverUserData?.email ? this._serverUserData.email : 'Dunno'}</h2>
+        <uui-box headline="Who am I?">
+            <div slot="header">[Server]</div>
+            <h2><uui-icon name="icon-user"></uui-icon>${this._serverUserData?.email ? this._serverUserData.email : 'Press the button!'}</h2>
             <ul>
                 ${this._serverUserData?.groups.map(group => html`<li>${group.name}</li>`)}
             </ul>
             <uui-button color="default" look="primary" @click="${this.#onClickWhoAmI}">
                 Who am I?
             </uui-button>
+            <p>This endpoint gets your current user from the server and displays your email and list of user groups.
+            It also displays a Notification with your details.</p>
         </uui-box>
 
-        <uui-box headline="Whats the time?">
-            <h2><uui-icon name="icon-alarm-clock"></uui-icon> ${this._timeFromMrWolf ? this._timeFromMrWolf.toLocaleString() : 'Dunno'}</h2>
+        <uui-box headline="What's my Name?">
+            <div slot="header">[Server]</div>
+            <h2><uui-icon name="icon-user"></uui-icon> ${this._yourName }</h2>
+            <uui-button color="default" look="primary" @click="${this.#onClickWhatsMyName}">
+                Whats my name?
+            </uui-button>
+            <p>This endpoint has a forced delay to show the button 'waiting' state for a few seconds before completing the request.</p>
+        </uui-box>
+
+        <uui-box headline="What's the Time?">
+            <h2><uui-icon name="icon-alarm-clock"></uui-icon> ${this._timeFromMrWolf ? this._timeFromMrWolf.toLocaleString() : 'Press the button!'}</h2>
             <uui-button color="default" look="primary" @click="${this.#onClickWhatsTheTimeMrWolf}">
                 Whats the time Mr Wolf?
             </uui-button>
+            <p>This endpoint gets the current date and time from the server.</p>
         </uui-box>
 
-        <uui-box headline="What's my name again?">
-            <h2><uui-icon name="icon-user"></uui-icon> ${this._yourName}</h2>
-            <uui-button color="default" look="primary" @click="${this.#onClickWhatsMyName}">
-                Whats my name again?
-            </uui-button>
-        </uui-box>
-
-        <uui-box headline="Who am I? [Context]" class="wide">
-          <h2>${this._contextCurrentUser?.email}</h2>
+        <uui-box headline="Who am I?" class="wide">
+          <div slot="header">[Context]</div>
+          <p>Current user email: <b>${this._contextCurrentUser?.email}</b></p>
+          <p>This is the JSON object available by consuming the 'UMB_CURRENT_USER_CONTEXT' context:</p>
           <umb-code-block language="json" copy>${JSON.stringify(this._contextCurrentUser, null, 2)}</umb-code-block>
         </uui-box>
     `;
