@@ -1,7 +1,7 @@
+import { UmbMediaReferenceRepository } from '../../../reference/index.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { isDefaultReference, isDocumentReference, isMediaReference } from '@umbraco-cms/backoffice/relations';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbMediaReferenceRepository } from '@umbraco-cms/backoffice/media';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
