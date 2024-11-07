@@ -162,9 +162,11 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 				this._setParent(null);
 			}
 		}
-		if (this.parent && this.parent.match !== null && this.match === null) {
+		if (this.parent) {
 			requestAnimationFrame(() => {
-				this.render();
+				if (this.parent && this.parent.match !== null && this.match === null) {
+					this.render();
+				}
 			});
 		}
 	}
