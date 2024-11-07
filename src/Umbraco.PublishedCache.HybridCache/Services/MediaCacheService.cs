@@ -84,7 +84,9 @@ internal class MediaCacheService : IMediaCacheService
                 ContentCacheNode? mediaCacheNode = await _databaseCacheRepository.GetMediaSourceAsync(idAttempt.Result);
                 scope.Complete();
                 return mediaCacheNode;
-            }, GetEntryOptions(key));
+            },
+            GetEntryOptions(key),
+            GenerateTags(key));
 
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedMedia(contentCacheNode).CreateModel(_publishedModelFactory);
     }
@@ -106,7 +108,9 @@ internal class MediaCacheService : IMediaCacheService
                 ContentCacheNode? mediaCacheNode = await _databaseCacheRepository.GetMediaSourceAsync(id);
                 scope.Complete();
                 return mediaCacheNode;
-            }, GetEntryOptions(key));
+            },
+            GetEntryOptions(key),
+            GenerateTags(key));
 
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedMedia(contentCacheNode).CreateModel(_publishedModelFactory);
     }
@@ -171,7 +175,8 @@ internal class MediaCacheService : IMediaCacheService
                     scope.Complete();
                     return mediaCacheNode;
                 },
-                GetSeedEntryOptions());
+                GetSeedEntryOptions(),
+                GenerateTags(key));
 
             if (cachedValue is null)
             {
@@ -195,27 +200,10 @@ internal class MediaCacheService : IMediaCacheService
 
     public async Task ClearMemoryCacheAsync(CancellationToken cancellationToken)
     {
-        // TODO: This should be done with tags, however this is not implemented yet, so for now we have to naively get all content keys and clear them all.
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
-
-        // We have to get ALL document keys in order to be able to remove them from the cache,
-        IEnumerable<Guid> documentKeys = await _databaseCacheRepository.GetContentKeysAsync(Constants.ObjectTypes.Media);
-
-        foreach (Guid documentKey in documentKeys)
-        {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return;
-            }
-
-            // We'll remove both the draft and published cache
-            await _hybridCache.RemoveAsync(GetCacheKey(documentKey, false), cancellationToken);
-        }
+        await _hybridCache.RemoveByTagAsync(Constants.Cache.Tags.Media, cancellationToken);
 
         // We have to run seeding again after the cache is cleared
         await SeedAsync(cancellationToken);
-
-        scope.Complete();
     }
 
     public async Task RemoveFromMemoryCacheAsync(Guid key)
@@ -281,4 +269,23 @@ internal class MediaCacheService : IMediaCacheService
     };
 
     private string GetCacheKey(Guid key, bool preview) => preview ? $"{key}+draft" : $"{key}";
+
+    // Generates the cache tags for a given CacheNode
+    // We use the tags to be able to clear all cache entries that are related to a given content item.
+    // Tags for now are content/media, draft/published and all it's ancestors, so we can clear when ChangeType.TreeChange
+    private HashSet<string> GenerateTags(Guid? key)
+    {
+        if(key is null)
+        {
+            return new HashSet<string>();
+        }
+
+        var tags = new HashSet<string>
+        {
+            Constants.Cache.Tags.Media,
+            Constants.Cache.Tags.Published
+        };
+
+        return tags;
+    }
 }

@@ -56,6 +56,4 @@ internal interface IDatabaseCacheRepository
         IReadOnlyCollection<int>? contentTypeIds = null,
         IReadOnlyCollection<int>? mediaTypeIds = null,
         IReadOnlyCollection<int>? memberTypeIds = null);
-
-    Task<IEnumerable<Guid>> GetContentKeysAsync(Guid nodeObjectType);
 }

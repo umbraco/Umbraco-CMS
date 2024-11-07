@@ -123,16 +123,6 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     }
 
-    public async Task<IEnumerable<Guid>> GetContentKeysAsync(Guid nodeObjectType)
-    {
-        Sql<ISqlContext> sql = Sql()
-            .Select<NodeDto>(x => x.UniqueId)
-            .From<NodeDto>()
-            .Where<NodeDto>(x => x.NodeObjectType == nodeObjectType);
-
-        return await Database.FetchAsync<Guid>(sql);
-    }
-
     public async Task<ContentCacheNode?> GetContentSourceAsync(int id, bool preview = false)
     {
         Sql<ISqlContext>? sql = SqlContentSourcesSelect()
