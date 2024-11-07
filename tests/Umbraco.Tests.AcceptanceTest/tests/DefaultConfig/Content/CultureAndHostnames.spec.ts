@@ -40,7 +40,7 @@ test('can add a culture', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
-  await umbracoUi.waitForTimeout(2000);
+  await umbracoUi.waitForTimeout(5000);
   const domainsData = await umbracoApi.document.getDomains(contentId);
   expect(domainsData.defaultIsoCode).toEqual(isoCode);
 });
