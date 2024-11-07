@@ -400,7 +400,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			throw new Error(`Editor Alias of "${property.dataType.unique}" not found.`);
 		}
 
-		const entry = { ...variantId.toObject(), alias, editorAlias, value } as UmbElementValueModel;
+		// Notice the order of the properties is important for our JSON String Compare function. [NL]
+		const entry = { editorAlias, alias, ...variantId.toObject(), value } as UmbElementValueModel;
 
 		const currentData = this.getData();
 		if (currentData) {
