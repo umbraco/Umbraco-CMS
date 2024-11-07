@@ -41,7 +41,7 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 	 * @param modals
 	 */
 	#createModalElements(modals: Array<UmbModalContext>) {
-		this.removeAttribute('fill-background');
+		this.fillBackground = false;
 		const oldValue = this._modals;
 		this._modals = modals;
 
