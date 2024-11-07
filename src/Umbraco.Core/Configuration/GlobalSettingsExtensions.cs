@@ -22,7 +22,7 @@ public static class GlobalSettingsExtensions
             return _backOfficePath;
         }
 
-        _backOfficePath = hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath);
+        _backOfficePath = hostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath);
         return _backOfficePath;
     }
 
@@ -54,9 +54,9 @@ public static class GlobalSettingsExtensions
         this GlobalSettings globalSettings,
         IHostingEnvironment hostingEnvironment)
     {
-        var path = string.IsNullOrEmpty(globalSettings.UmbracoPath)
+        var path = string.IsNullOrEmpty(Constants.System.DefaultUmbracoPath)
             ? string.Empty
-            : hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath);
+            : hostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath);
 
         if (path.IsNullOrWhiteSpace())
         {

@@ -367,16 +367,6 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     // TODO (V14): Change into a record
     public class JsonPayload
     {
-        public JsonPayload()
-        { }
-
-        [Obsolete("Use the default constructor and property initializers.")]
-        public JsonPayload(int id, Guid? key, TreeChangeTypes changeTypes)
-        {
-            Id = id;
-            Key = key;
-            ChangeTypes = changeTypes;
-        }
 
         public int Id { get; init; }
 
