@@ -8,8 +8,7 @@ export const manifests: Array<ManifestUfmComponent> = [
 		api: () => import('./custom-ufm-component.js'),
 		meta: {
 			alias: 'myCustomComponent',
-			marker: '%',
-			alias: 'myCustomComponent',
+			marker: '%'
 		},
 	},
 ];

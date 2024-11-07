@@ -41,10 +41,10 @@ export class UmbTemplateWorkspaceContext
 			{
 				path: 'create/parent/:entityType/:parentUnique',
 				component: UmbTemplateWorkspaceEditorElement,
-				setup: (component: PageComponent, info: IRoutingInfo) => {
+				setup: async (component: PageComponent, info: IRoutingInfo) => {
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
-					this.create({ entityType: parentEntityType, unique: parentUnique });
+					await this.create({ entityType: parentEntityType, unique: parentUnique });
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,

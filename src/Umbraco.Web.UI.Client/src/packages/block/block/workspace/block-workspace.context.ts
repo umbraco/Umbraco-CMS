@@ -179,7 +179,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					(component as UmbBlockWorkspaceEditorElement).workspaceAlias = manifest.alias;
 
 					const elementTypeKey = info.match.params.elementTypeKey;
-					this.create(elementTypeKey);
+					await this.create(elementTypeKey);
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
