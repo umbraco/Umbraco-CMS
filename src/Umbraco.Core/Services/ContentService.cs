@@ -2406,6 +2406,8 @@ public class ContentService : RepositoryService, IContentService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            var parentId = content.ParentId;
+
             scope.WriteLock(Constants.Locks.ContentTree);
 
             var originalPath = content.Path;
@@ -2438,6 +2440,14 @@ public class ContentService : RepositoryService, IContentService
                     movingToRecycleBinNotification));
             Audit(AuditType.Move, userId, content.Id, "Moved to recycle bin");
 
+            // sort the children of the parent after deleting the content
+            IQuery<IContent> childQuery = Query<IContent>().Where(x => x.ParentId == parentId && x.Id != content.Id);
+            IEnumerable<IContent> children = _documentRepository.Get(childQuery);
+            if(children.Any())
+            {
+                Sort(children, userId);
+            }
+
             scope.Complete();
         }
 
@@ -2458,6 +2468,8 @@ public class ContentService : RepositoryService, IContentService
     public OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
+
+        var parentIdBeforeMove = content.ParentId;
 
         if (content.ParentId == parentId)
         {
@@ -2522,6 +2534,14 @@ public class ContentService : RepositoryService, IContentService
                 new ContentMovedNotification(moveInfo, eventMessages).WithStateFrom(movingNotification));
 
             Audit(AuditType.Move, userId, content.Id);
+
+            // sort the children of the old parent after moving the content
+            IQuery<IContent> childQuery = Query<IContent>().Where(x => x.ParentId == parentIdBeforeMove && x.Id != content.Id);
+            IEnumerable<IContent> children = _documentRepository.Get(childQuery);
+            if (children.Any())
+            {
+                Sort(children, userId);
+            }
 
             scope.Complete();
             return OperationResult.Succeed(eventMessages);
