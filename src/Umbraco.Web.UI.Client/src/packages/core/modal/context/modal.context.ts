@@ -2,11 +2,12 @@ import { UmbModalToken } from '../token/modal-token.js';
 import type { UmbModalConfig, UmbModalType } from './modal-manager.context.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
-import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIModalElement, UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { type UmbDeepPartialObject, umbDeepMerge } from '@umbraco-cms/backoffice/utils';
+import { type ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
 
 export interface UmbModalRejectReason {
 	type: string;
@@ -38,6 +39,7 @@ export class UmbModalContext<
 	public readonly data: ModalData;
 	public readonly type: UmbModalType = 'dialog';
 	public readonly size: UUIModalSidebarSize = 'small';
+	public element?: ElementLoaderProperty<UUIModalElement>;
 	public readonly backdropBackground?: string;
 	public readonly router: IRouterSlot | null = null;
 	public readonly alias: string | UmbModalToken<ModalData, ModalValue>;
@@ -58,11 +60,13 @@ export class UmbModalContext<
 		if (this.alias instanceof UmbModalToken) {
 			this.type = this.alias.getDefaultModal()?.type || this.type;
 			this.size = this.alias.getDefaultModal()?.size || this.size;
+			this.element = this.alias.getDefaultModal()?.element || this.element;
 			this.backdropBackground = this.alias.getDefaultModal()?.backdropBackground || this.backdropBackground;
 		}
 
 		this.type = args.modal?.type || this.type;
 		this.size = args.modal?.size || this.size;
+		this.element = args.modal?.element || this.element;
 		this.backdropBackground = args.modal?.backdropBackground || this.backdropBackground;
 
 		const defaultData = this.alias instanceof UmbModalToken ? this.alias.getDefaultData() : undefined;

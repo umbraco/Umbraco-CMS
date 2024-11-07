@@ -9,12 +9,13 @@ import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbBasicState, type UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UUIModalCloseEvent,
+	type UUIModalElement,
 	type UUIDialogElement,
 	type UUIModalDialogElement,
 	type UUIModalSidebarElement,
 } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_ROUTE_CONTEXT, type UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
-import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import { createExtensionElement, loadManifestElement } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbContextRequestEvent } from '@umbraco-cms/backoffice/context-api';
 import {
 	UMB_CONTEXT_REQUEST_EVENT_TYPE,
@@ -25,22 +26,8 @@ import {
 @customElement('umb-modal')
 export class UmbModalElement extends UmbLitElement {
 	#modalContext?: UmbModalContext;
-	public get modalContext(): UmbModalContext | undefined {
-		return this.#modalContext;
-	}
-	public set modalContext(value: UmbModalContext | undefined) {
-		if (this.#modalContext === value) return;
-		this.#modalContext = value;
 
-		if (!value) {
-			this.destroy();
-			return;
-		}
-
-		this.#createModalElement();
-	}
-
-	public element?: UUIModalDialogElement | UUIModalSidebarElement;
+	public element?: UUIModalDialogElement | UUIModalSidebarElement | UUIModalElement;
 
 	#innerElement = new UmbBasicState<HTMLElement | undefined>(undefined);
 
@@ -52,11 +39,17 @@ export class UmbModalElement extends UmbLitElement {
 		this.#modalContext?.reject({ type: 'close' });
 	};
 
-	#createModalElement() {
-		if (!this.#modalContext) return;
+	async init(modalContext: UmbModalContext | undefined) {
+		if (this.#modalContext === modalContext) return;
+		this.#modalContext = modalContext;
+
+		if (!this.#modalContext) {
+			this.destroy();
+			return;
+		}
 
 		this.#modalContext.addEventListener('umb:destroy', this.#onContextDestroy);
-		this.element = this.#createContainerElement();
+		this.element = await this.#createContainerElement();
 
 		// Makes sure that the modal triggers the reject of the context promise when it is closed by pressing escape.
 		this.element.addEventListener(UUIModalCloseEvent, this.#onClose);
@@ -113,7 +106,12 @@ export class UmbModalElement extends UmbLitElement {
 		provider.hostConnected();
 	}
 
-	#createContainerElement() {
+	async #createContainerElement() {
+		if (this.#modalContext!.type == 'custom' && this.#modalContext?.element) {
+			const customWrapperElementCtor = await loadManifestElement(this.#modalContext.element);
+			return new customWrapperElementCtor!();
+		}
+
 		return this.#modalContext!.type === 'sidebar' ? this.#createSidebarElement() : this.#createDialogElement();
 	}
 

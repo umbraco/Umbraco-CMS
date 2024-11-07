@@ -1,14 +1,5 @@
-import type { ManifestDashboard, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
-
-// const section : ManifestSection = {
-// 	type: "section",
-// 	alias: 'demo.section',
-// 	name: "Demo Section",
-// 	meta: {
-// 		label: "Demo",
-// 		pathname: "demo"
-// 	}
-// }
+import type { ManifestDashboard } from '@umbraco-cms/backoffice/dashboard';
+import type { ManifestModal } from '@umbraco-cms/backoffice/modal';
 
 const dashboard: ManifestDashboard = {
 	type: 'dashboard',

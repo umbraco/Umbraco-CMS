@@ -150,6 +150,11 @@ export class UmbRouteContext extends UmbContextBase<UmbRouteContext> {
 
 		modalRegistration._internal_setRouteBuilder(urlBuilder);
 	};
+
+	override hostDisconnected(): void {
+		super.hostDisconnected();
+		this._internal_modalRouterChanged(undefined);
+	}
 }
 
 export const UMB_ROUTE_CONTEXT = new UmbContextToken<UmbRouteContext>('UmbRouterContext');
