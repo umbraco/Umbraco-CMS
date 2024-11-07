@@ -13,28 +13,28 @@ export class UmbracoExtensionService {
     public static ping<ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) {
         return (options?.client ?? client).get<PingResponse, PingError, ThrowOnError>({
             ...options,
-          url: '/umbraco/umbracoextension/api/v1/Ping'
+          url: '/umbraco/umbracoextension/api/v1/ping'
         });
     }
 //#if(IncludeExample)     
     public static whatsMyName<ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) {
         return (options?.client ?? client).get<WhatsMyNameResponse, WhatsMyNameError, ThrowOnError>({
             ...options,
-            url: '/umbraco/umbracoextension/api/v1/WhatsMyName'
+            url: '/umbraco/umbracoextension/api/v1/whatsMyName'
         });
     }
     
     public static whatsTheTimeMrWolf<ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) {
         return (options?.client ?? client).get<WhatsTheTimeMrWolfResponse, WhatsTheTimeMrWolfError, ThrowOnError>({
             ...options,
-            url: '/umbraco/umbracoextension/api/v1/WhatsTheTimeMrWolf'
+            url: '/umbraco/umbracoextension/api/v1/whatsTheTimeMrWolf'
         });
     }
     
     public static whoAmI<ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) {
         return (options?.client ?? client).get<WhoAmIResponse, WhoAmIError, ThrowOnError>({
             ...options,
-            url: '/umbraco/umbracoextension/api/v1/WhoAmI'
+            url: '/umbraco/umbracoextension/api/v1/whoAmI'
         });
     }
 //#endif    

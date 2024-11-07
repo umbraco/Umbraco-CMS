@@ -21,16 +21,16 @@ namespace Umbraco.Extension.Controllers
         }
 #endif
 
-        [HttpGet("Ping")]
+        [HttpGet("ping")]
         [ProducesResponseType<string>(StatusCodes.Status200OK)]
         public string Ping() => "Pong";
 #if IncludeExample
 
-        [HttpGet("WhatsTheTimeMrWolf")]
+        [HttpGet("whatsTheTimeMrWolf")]
         [ProducesResponseType(typeof(DateTime), 200)]
         public DateTime WhatsTheTimeMrWolf() => DateTime.Now;
 
-        [HttpGet("WhatsMyName")]
+        [HttpGet("whatsMyName")]
         [ProducesResponseType<string>(StatusCodes.Status200OK)]
         public string WhatsMyName()
         {
@@ -41,7 +41,7 @@ namespace Umbraco.Extension.Controllers
             return currentUser?.Name ?? "I have no idea who you are";
         }
 
-        [HttpGet("WhoAmI")]
+        [HttpGet("whoAmI")]
         [ProducesResponseType<IUser>(StatusCodes.Status200OK)]
         public IUser? WhoAmI() => _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
 #endif
