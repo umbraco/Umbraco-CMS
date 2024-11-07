@@ -193,8 +193,8 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
         {
 
             int? userIdQueryResult = Database.FirstOrDefault<int?>(
-            " select id from umbracoUser where " + GetBaseWhereClause(),
-            new { id = entity.UserId }) ?? throw new InvalidOperationException("The user id does not exist");
+            "select id from umbracoUser where " + GetBaseWhereClause(),
+            new { id = entity.UserId }) ?? throw new InvalidOperationException("The specified user ID does not exist in the database.");
             _cachedUserIds.Add(userIdQueryResult.Value);
         }
         base.Save(entity);
