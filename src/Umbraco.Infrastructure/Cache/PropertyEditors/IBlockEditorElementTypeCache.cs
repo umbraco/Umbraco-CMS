@@ -4,5 +4,6 @@ namespace Umbraco.Cms.Core.Cache.PropertyEditors;
 
 public interface IBlockEditorElementTypeCache
 {
-    IEnumerable<IContentType> GetAll(IEnumerable<Guid> keys);
+    IEnumerable<IContentType> GetMany(IEnumerable<Guid> keys);
+    IEnumerable<IContentType> GetAll();
 }

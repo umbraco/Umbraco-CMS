@@ -1539,4 +1539,332 @@ public partial class BlockListElementLevelVariationTests
             validateBlocks?.Invoke(value);
         }
     }
+
+    [Test]
+    public async Task Can_Publish_Valid_Properties()
+    {
+        var elementType = CreateElementTypeWithValidation();
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var content = CreateContent(contentType, elementType, [], false);
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            [
+                (
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new BlockProperty(
+                        new List<BlockPropertyValue>
+                        {
+                            new() { Alias = "invariantText", Value = "Valid invariant content value" },
+                            new() { Alias = "variantText", Value = "Valid content value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "Valid content value in Danish", Culture = "da-DK" }
+                        },
+                        new List<BlockPropertyValue>
+                        {
+                            new() { Alias = "invariantText", Value = "Valid invariant settings value" },
+                            new() { Alias = "variantText", Value = "Valid value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "Valid value in Danish", Culture = "da-DK" },
+                        },
+                        null,
+                        null
+                    )
+                )
+            ]
+        );
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+
+        var publishResult = ContentService.Publish(content, ["en-US", "da-DK"]);
+        Assert.IsTrue(publishResult.Success);
+        Assert.IsTrue(publishResult.Content.PublishedCultures.Contains("en-US"));
+        Assert.IsTrue(publishResult.Content.PublishedCultures.Contains("da-DK"));
+    }
+
+    [Test]
+    public async Task Can_Publish_Valid_Properties_Specific_Culture_Only()
+    {
+        var elementType = CreateElementTypeWithValidation();
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var content = CreateContent(contentType, elementType, [], false);
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            [
+                (
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new BlockProperty(
+                        new List<BlockPropertyValue>
+                        {
+                            new() { Alias = "invariantText", Value = "Valid invariant content value" },
+                            new() { Alias = "variantText", Value = "Valid content value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "Valid content value in Danish", Culture = "da-DK" }
+                        },
+                        new List<BlockPropertyValue>
+                        {
+                            new() { Alias = "invariantText", Value = "Valid invariant settings value" },
+                            new() { Alias = "variantText", Value = "Valid value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "Valid value in Danish", Culture = "da-DK" },
+                        },
+                        null,
+                        null
+                    )
+                )
+            ]
+        );
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+
+        var publishResult = ContentService.Publish(content, ["en-US"]);
+        Assert.IsTrue(publishResult.Success);
+        Assert.IsTrue(publishResult.Content.PublishedCultures.Contains("en-US"));
+        Assert.IsFalse(publishResult.Content.PublishedCultures.Contains("da-DK"));
+    }
+
+    [Test]
+    public async Task Can_Publish_Valid_Properties_With_Wildcard_Culture()
+    {
+        var elementType = CreateElementTypeWithValidation();
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var content = CreateContent(contentType, elementType, [], false);
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            [
+                (
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new BlockProperty(
+                        new List<BlockPropertyValue>
+                        {
+                            new() { Alias = "invariantText", Value = "Valid invariant content value" },
+                            new() { Alias = "variantText", Value = "Valid content value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "Valid content value in Danish", Culture = "da-DK" }
+                        },
+                        new List<BlockPropertyValue>
+                        {
+                            new() { Alias = "invariantText", Value = "Valid invariant settings value" },
+                            new() { Alias = "variantText", Value = "Valid value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "Valid value in Danish", Culture = "da-DK" },
+                        },
+                        null,
+                        null
+                    )
+                )
+            ]
+        );
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+
+        var publishResult = ContentService.Publish(content, ["*"]);
+        Assert.IsTrue(publishResult.Success);
+        Assert.IsTrue(publishResult.Content.PublishedCultures.Contains("en-US"));
+        Assert.IsTrue(publishResult.Content.PublishedCultures.Contains("da-DK"));
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Cannot_Publish_Invalid_Invariant_Properties(bool invalidSettingsValue)
+    {
+        var elementType = CreateElementTypeWithValidation();
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var content = CreateContent(contentType, elementType, [], false);
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            [
+                (
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new BlockProperty(
+                        new List<BlockPropertyValue>
+                        {
+                            new() { Alias = "invariantText", Value = $"{(invalidSettingsValue ? "Valid" : "Invalid")} invariant content value" },
+                            new() { Alias = "variantText", Value = "Valid content value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "Valid content value in Danish", Culture = "da-DK" }
+                        },
+                        new List<BlockPropertyValue>
+                        {
+                            new() { Alias = "invariantText", Value = $"{(invalidSettingsValue ? "Invalid" : "Valid")} invariant settings value" },
+                            new() { Alias = "variantText", Value = "Valid value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "Valid value in Danish", Culture = "da-DK" },
+                        },
+                        null,
+                        null
+                    )
+                )
+            ]
+        );
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+
+        var publishResult = ContentService.Publish(content, ["en-US", "da-DK"]);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(publishResult.Success);
+            Assert.IsNotNull(publishResult.InvalidProperties);
+            Assert.AreEqual(1, publishResult.InvalidProperties.Count());
+            Assert.AreEqual("blocks", publishResult.InvalidProperties.First().Alias);
+        });
+    }
+
+    [Test]
+    public async Task Cannot_Publish_Missing_Invariant_Properties()
+    {
+        var elementType = CreateElementTypeWithValidation();
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var content = CreateContent(contentType, elementType, [], false);
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            [
+                (
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new BlockProperty(
+                        new List<BlockPropertyValue>
+                        {
+                            new() { Alias = "variantText", Value = "Valid content value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "Valid content value in Danish", Culture = "da-DK" }
+                        },
+                        new List<BlockPropertyValue>
+                        {
+                            new() { Alias = "variantText", Value = "Valid value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "Valid value in Danish", Culture = "da-DK" },
+                        },
+                        null,
+                        null
+                    )
+                )
+            ]
+        );
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+
+        var publishResult = ContentService.Publish(content, ["en-US", "da-DK"]);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(publishResult.Success);
+            Assert.IsNotNull(publishResult.InvalidProperties);
+            Assert.AreEqual(1, publishResult.InvalidProperties.Count());
+            Assert.AreEqual("blocks", publishResult.InvalidProperties.First().Alias);
+        });
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Cannot_Publish_Invalid_Variant_Properties(bool invalidSettingsValue)
+    {
+        var elementType = CreateElementTypeWithValidation();
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var content = CreateContent(contentType, elementType, [], false);
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            [
+                (
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new BlockProperty(
+                        new List<BlockPropertyValue>
+                        {
+                            new() { Alias = "invariantText", Value = "Valid invariant content value" },
+                            new() { Alias = "variantText", Value = "Valid content value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = $"{(invalidSettingsValue ? "Valid" : "Invalid")} content value in Danish", Culture = "da-DK" }
+                        },
+                        new List<BlockPropertyValue>
+                        {
+                            new() { Alias = "invariantText", Value = "Valid invariant settings value" },
+                            new() { Alias = "variantText", Value = "Valid settings value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = $"{(invalidSettingsValue ? "Invalid" : "Valid")} settings value in Danish", Culture = "da-DK" },
+                        },
+                        null,
+                        null
+                    )
+                )
+            ]
+        );
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+
+        var publishResult = ContentService.Publish(content, ["en-US"]);
+        Assert.IsTrue(publishResult.Success);
+
+        publishResult = ContentService.Publish(content, ["da-DK"]);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(publishResult.Success);
+            Assert.IsNotNull(publishResult.InvalidProperties);
+            Assert.AreEqual(1, publishResult.InvalidProperties.Count());
+            Assert.AreEqual("blocks", publishResult.InvalidProperties.First().Alias);
+        });
+    }
+
+    [Test]
+    public async Task Cannot_Publish_Missing_Variant_Properties()
+    {
+        var elementType = CreateElementTypeWithValidation();
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var content = CreateContent(contentType, elementType, [], false);
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            [
+                (
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new BlockProperty(
+                        new List<BlockPropertyValue>
+                        {
+                            new() { Alias = "invariantText", Value = "Valid invariant content value" },
+                            new() { Alias = "variantText", Value = "Valid content value in English", Culture = "en-US" },
+                        },
+                        new List<BlockPropertyValue>
+                        {
+                            new() { Alias = "invariantText", Value = "Valid invariant settings value" },
+                            new() { Alias = "variantText", Value = "Valid settings value in English", Culture = "en-US" },
+                        },
+                        null,
+                        null
+                    )
+                )
+            ]
+        );
+
+        // make sure all blocks are exposed
+        blockListValue.Expose =
+        [
+            new() { ContentKey = blockListValue.ContentData[0].Key, Culture = "en-US" },
+            new() { ContentKey = blockListValue.ContentData[0].Key, Culture = "da-DK" },
+        ];
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+
+        var publishResult = ContentService.Publish(content, ["en-US"]);
+        Assert.IsTrue(publishResult.Success);
+
+        publishResult = ContentService.Publish(content, ["da-DK"]);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(publishResult.Success);
+            Assert.IsNotNull(publishResult.InvalidProperties);
+            Assert.AreEqual(1, publishResult.InvalidProperties.Count());
+            Assert.AreEqual("blocks", publishResult.InvalidProperties.First().Alias);
+        });
+    }
 }

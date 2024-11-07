@@ -15,7 +15,9 @@ internal sealed class BlockEditorElementTypeCache : IBlockEditorElementTypeCache
         _appCaches = appCaches;
     }
 
-    public IEnumerable<IContentType> GetAll(IEnumerable<Guid> keys)
+    public IEnumerable<IContentType> GetMany(IEnumerable<Guid> keys) => GetAll().Where(elementType => keys.Contains(elementType.Key));
+
+    public IEnumerable<IContentType> GetAll()
     {
         // TODO: make this less dumb; don't fetch all elements, only fetch the items that aren't yet in the cache and amend the cache as more elements are loaded
 
@@ -27,6 +29,6 @@ internal sealed class BlockEditorElementTypeCache : IBlockEditorElementTypeCache
             _appCaches.RequestCache.Set(cacheKey, cachedElements);
         }
 
-        return cachedElements.Where(elementType => keys.Contains(elementType.Key));
+        return cachedElements;
     }
 }

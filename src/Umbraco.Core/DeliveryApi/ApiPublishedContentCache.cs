@@ -32,6 +32,35 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
         deliveryApiSettings.OnChange(settings => _deliveryApiSettings = settings);
     }
 
+    public async Task<IPublishedContent?> GetByRouteAsync(string route)
+    {
+        var isPreviewMode = _requestPreviewService.IsPreview();
+
+        // Handle the nasty logic with domain document ids in front of paths.
+        int? documentStartNodeId = null;
+        if (route.StartsWith("/") is false)
+        {
+            var index = route.IndexOf('/');
+
+            if (index > -1 && int.TryParse(route.Substring(0, index), out var nodeId))
+            {
+                documentStartNodeId = nodeId;
+                route = route.Substring(index);
+            }
+        }
+
+        Guid? documentKey = _documentUrlService.GetDocumentKeyByRoute(
+            route,
+            _requestCultureService.GetRequestedCulture(),
+            documentStartNodeId,
+            _requestPreviewService.IsPreview()
+        );
+        IPublishedContent? content = documentKey.HasValue
+            ? await _publishedContentCache.GetByIdAsync(documentKey.Value, isPreviewMode)
+            : null;
+
+        return ContentOrNullIfDisallowed(content);
+    }
 
     public IPublishedContent? GetByRoute(string route)
     {
@@ -64,16 +93,37 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
         return ContentOrNullIfDisallowed(content);
     }
 
+    public async Task<IPublishedContent?> GetByIdAsync(Guid contentId)
+    {
+        IPublishedContent? content = await _publishedContentCache.GetByIdAsync(contentId, _requestPreviewService.IsPreview()).ConfigureAwait(false);
+        return ContentOrNullIfDisallowed(content);
+    }
+
     public IPublishedContent? GetById(Guid contentId)
     {
         IPublishedContent? content = _publishedContentCache.GetById(_requestPreviewService.IsPreview(), contentId);
         return ContentOrNullIfDisallowed(content);
     }
+    public async Task<IEnumerable<IPublishedContent>> GetByIdsAsync(IEnumerable<Guid> contentIds)
+    {
+        var isPreviewMode = _requestPreviewService.IsPreview();
+
+        IEnumerable<Task<IPublishedContent?>> tasks = contentIds
+            .Select(contentId => _publishedContentCache.GetByIdAsync(contentId, isPreviewMode));
+
+        IPublishedContent?[] allContent = await Task.WhenAll(tasks);
+
+        return allContent
+            .WhereNotNull()
+            .Where(IsAllowedContentType)
+            .ToArray();
+    }
 
     public IEnumerable<IPublishedContent> GetByIds(IEnumerable<Guid> contentIds)
     {
+        var isPreviewMode = _requestPreviewService.IsPreview();
         return contentIds
-            .Select(contentId => _publishedContentCache.GetById(_requestPreviewService.IsPreview(), contentId))
+            .Select(contentId => _publishedContentCache.GetById(isPreviewMode, contentId))
             .WhereNotNull()
             .Where(IsAllowedContentType)
             .ToArray();

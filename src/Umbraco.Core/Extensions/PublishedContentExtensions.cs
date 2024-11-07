@@ -68,6 +68,7 @@ public static class PublishedContentExtensions
     ///     The specific culture to get the URL segment for. If null is used the current culture is used
     ///     (Default is null).
     /// </param>
+    [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in V16.")]
     public static string? UrlSegment(this IPublishedContent content, IVariationContextAccessor? variationContextAccessor, string? culture = null)
     {
         if (content == null)
