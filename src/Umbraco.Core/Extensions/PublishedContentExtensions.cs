@@ -560,8 +560,12 @@ public static class PublishedContentExtensions
         this IPublishedContent content,
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService,
-        string contentTypeAlias) =>
-        content.AncestorsOrSelf(publishedCache, navigationQueryService, false, n => n.ContentType.Alias.InvariantEquals(contentTypeAlias));
+        string contentTypeAlias)
+    {
+        ArgumentNullException.ThrowIfNull(content);
+
+        return content.EnumerateAncestorsOrSelfInternal(publishedCache, navigationQueryService, false, contentTypeAlias);
+    }
 
     /// <summary>
     ///     Gets the ancestors of the content, of a specified content type.
@@ -652,8 +656,12 @@ public static class PublishedContentExtensions
         this IPublishedContent content,
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService,
-        string contentTypeAlias) =>
-        content.AncestorsOrSelf(publishedCache, navigationQueryService, true, n => n.ContentType.Alias.InvariantEquals(contentTypeAlias));
+        string contentTypeAlias)
+    {
+        ArgumentNullException.ThrowIfNull(content);
+
+        return content.EnumerateAncestorsOrSelfInternal(publishedCache, navigationQueryService, true, contentTypeAlias);
+    }
 
     /// <summary>
     ///     Gets the content and its ancestors, of a specified content type.
@@ -736,8 +744,14 @@ public static class PublishedContentExtensions
         this IPublishedContent content,
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService,
-        string contentTypeAlias) =>
-        content.EnumerateAncestors(publishedCache, navigationQueryService, false).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias));
+        string contentTypeAlias)
+    {
+        ArgumentNullException.ThrowIfNull(content);
+
+        return content
+            .EnumerateAncestorsOrSelfInternal(publishedCache, navigationQueryService, false, contentTypeAlias)
+            .FirstOrDefault();
+    }
 
     /// <summary>
     ///     Gets the nearest ancestor of the content, of a specified content type.
@@ -813,8 +827,14 @@ public static class PublishedContentExtensions
         this IPublishedContent content,
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService,
-        string contentTypeAlias) => content
-        .EnumerateAncestors(publishedCache, navigationQueryService, true).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias)) ?? content;
+        string contentTypeAlias)
+    {
+        ArgumentNullException.ThrowIfNull(content);
+
+        return content
+            .EnumerateAncestorsOrSelfInternal(publishedCache, navigationQueryService, true, contentTypeAlias)
+            .FirstOrDefault() ?? content;
+    }
 
     /// <summary>
     ///     Gets the content or its nearest ancestor, of a specified content type.
@@ -875,20 +895,9 @@ public static class PublishedContentExtensions
         INavigationQueryService navigationQueryService,
         bool orSelf)
     {
-        if (content == null)
-        {
-            throw new ArgumentNullException(nameof(content));
-        }
+        ArgumentNullException.ThrowIfNull(content);
 
-        if (orSelf)
-        {
-            yield return content;
-        }
-
-        while ((content = content.GetParent(publishedCache, navigationQueryService)) != null)
-        {
-            yield return content;
-        }
+        return content.EnumerateAncestorsOrSelfInternal(publishedCache, navigationQueryService, orSelf);
     }
 
     #endregion
