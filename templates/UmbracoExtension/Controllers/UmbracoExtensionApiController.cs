@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-#if (IncludeExample)
+#if IncludeExample
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 #endif
@@ -10,9 +10,9 @@ namespace Umbraco.Extension.Controllers
 {
     [ApiVersion("1.0")]
     [ApiExplorerSettings(GroupName = "Umbraco.Extension")]
-    public class UmbracoExtensionController : UmbracoExtensionControllerBase
+    public class UmbracoExtensionApiController : UmbracoExtensionApiControllerBase
     {
-#if (IncludeExample)
+#if IncludeExample
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
         public UmbracoExtensionController(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
@@ -24,7 +24,7 @@ namespace Umbraco.Extension.Controllers
         [HttpGet("Ping")]
         [ProducesResponseType<string>(StatusCodes.Status200OK)]
         public string Ping() => "Pong";
-#if (IncludeExample)
+#if IncludeExample
 
         [HttpGet("WhatsTheTimeMrWolf")]
         [ProducesResponseType(typeof(DateTime), 200)]
