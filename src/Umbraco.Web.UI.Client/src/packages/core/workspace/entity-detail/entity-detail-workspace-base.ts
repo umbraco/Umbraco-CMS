@@ -11,7 +11,7 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbDetailRepository, UmbRepositoryResponseWithAsObservable } from '@umbraco-cms/backoffice/repository';
+import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbEntityDetailWorkspaceContextArgs {
 	entityType: string;
