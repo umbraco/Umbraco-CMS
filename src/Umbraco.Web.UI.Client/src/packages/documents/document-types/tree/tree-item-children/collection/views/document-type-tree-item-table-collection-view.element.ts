@@ -94,15 +94,15 @@ export class UmbDocumentTypeTreeItemTableCollectionViewElement extends UmbLitEle
 					},
 					{
 						columnAlias: 'isElementType',
-						value: html`<umb-boolean-table-column-layout .value=${item.isElement}></umb-boolean-table-column-layout>`,
+						value: html`<umb-boolean-table-column-view .value=${item.isElement}></umb-boolean-table-column-view>`,
 					},
 					{
 						columnAlias: 'entityActions',
-						value: html`<umb-entity-actions-table-column-layout
+						value: html`<umb-entity-actions-table-column-view
 							.value=${{
 								entityType: item.entityType,
 								unique: item.unique,
-							}}></umb-entity-actions-table-column-layout>`,
+							}}></umb-entity-actions-table-column-view>`,
 					},
 				],
 			};

@@ -1,4 +1,3 @@
-import './boolean-table-column-layout/boolean-table-column-layout.element.js';
 import './boolean-table-column-view/boolean-table-column-view.element.js';
 import './collection-action-bundle.element.js';
 import './collection-filter-field.element.js';
