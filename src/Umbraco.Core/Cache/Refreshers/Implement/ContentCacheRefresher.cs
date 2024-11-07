@@ -88,6 +88,15 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         foreach (JsonPayload payload in payloads)
         {
+            if (payload.Id != default)
+            {
+                // By INT Id
+                isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent, int>(payload.Id));
+
+                // By GUID Key
+                isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent, Guid?>(payload.Key));
+            }
+
             // remove those that are in the branch
             if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
             {
@@ -109,12 +118,6 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             HandlePublishedAsync(payload, CancellationToken.None).GetAwaiter().GetResult();
             if (payload.Id != default)
             {
-                // By INT Id
-                isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent, int>(payload.Id));
-
-                // By GUID Key
-                isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent, Guid?>(payload.Key));
-
                 _idKeyMap.ClearCache(payload.Id);
             }
             if (payload.Key.HasValue)
