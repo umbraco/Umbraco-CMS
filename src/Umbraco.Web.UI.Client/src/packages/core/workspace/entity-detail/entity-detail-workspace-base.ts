@@ -94,7 +94,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	/**
 	 * Get the unique
 	 * @returns { string | undefined } The unique identifier
-	 *
 	 */
 	getUnique(): UmbEntityUnique | undefined {
 		return this._data.getCurrent()?.unique;

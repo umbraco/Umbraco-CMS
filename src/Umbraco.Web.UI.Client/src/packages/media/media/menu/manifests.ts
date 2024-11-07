@@ -1,6 +1,6 @@
-import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_MEDIA_TREE_ALIAS } from '../tree/index.js';
 import { UMB_MEDIA_MENU_ALIAS } from './constants.js';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

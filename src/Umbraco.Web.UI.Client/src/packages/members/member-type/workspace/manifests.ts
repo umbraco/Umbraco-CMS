@@ -1,6 +1,5 @@
-import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_MEMBER_TYPE_COMPOSITION_REPOSITORY_ALIAS } from '../repository/index.js';
-import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONDITION_ALIAS, UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_MEMBER_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.MemberType';
 
