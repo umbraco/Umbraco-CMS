@@ -86,16 +86,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         var idsRemoved = new HashSet<int>();
         IAppPolicyCache isolatedCache = AppCaches.IsolatedCaches.GetOrCreate<IContent>();
 
-        foreach (JsonPayload payload in payloads.Where(x => x.Id != default))
+        foreach (JsonPayload payload in payloads)
         {
-            // By INT Id
-            isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent, int>(payload.Id));
-
-            // By GUID Key
-            isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent, Guid?>(payload.Key));
-
-
-
             // remove those that are in the branch
             if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
             {
@@ -115,7 +107,16 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
             HandleNavigation(payload);
             HandlePublishedAsync(payload, CancellationToken.None).GetAwaiter().GetResult();
-            _idKeyMap.ClearCache(payload.Id);
+            if (payload.Id != default)
+            {
+                // By INT Id
+                isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent, int>(payload.Id));
+
+                // By GUID Key
+                isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent, Guid?>(payload.Key));
+
+                _idKeyMap.ClearCache(payload.Id);
+            }
             if (payload.Key.HasValue)
             {
                 _idKeyMap.ClearCache(payload.Key.Value);
