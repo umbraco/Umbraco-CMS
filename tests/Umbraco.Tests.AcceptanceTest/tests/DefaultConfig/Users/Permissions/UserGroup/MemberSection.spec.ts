@@ -32,7 +32,6 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 // TODO: Unskip these tests when the issue is fixed
-
 test.skip('can access members section with section enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMemberSection(userGroupName);
@@ -42,7 +41,6 @@ test.skip('can access members section with section enabled', async ({umbracoApi,
 
   // Act
   await umbracoUi.member.goToSection(ConstantHelper.sections.members, false);
-
 
   // Assert
   await umbracoUi.user.isSectionWithNameVisible(ConstantHelper.sections.content, false);
