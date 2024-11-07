@@ -31,8 +31,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
 });
 
-// TODO: Unskip these tests when the issue is fixed
-test.skip('can access members section with section enabled', async ({umbracoApi, umbracoUi}) => {
+test('can access members section with section enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMemberSection(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [], true, [], false, 'en-us');
@@ -47,7 +46,7 @@ test.skip('can access members section with section enabled', async ({umbracoApi,
   await umbracoUi.member.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource, false);
 });
 
-test.skip('can create member with members section set', async ({umbracoApi, umbracoUi}) => {
+test('can create member with members section set', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMemberSection(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [], true, [], false, 'en-us');
@@ -72,7 +71,7 @@ test.skip('can create member with members section set', async ({umbracoApi, umbr
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeTruthy();
 });
 
-test.skip('can update member with members section set', async ({umbracoApi, umbracoUi}) => {
+test('can update member with members section set', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMemberSection(userGroupName);
   memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
