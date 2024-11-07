@@ -47,7 +47,7 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		kind: 'contentEditor',
 		alias: 'Umb.WorkspaceView.Member.Content',
 		name: 'Member Workspace Content View',
-		weight: 100,
+		weight: 1000,
 		meta: {
 			label: '#general_details',
 			pathname: 'content',
@@ -68,10 +68,10 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		alias: 'Umb.WorkspaceView.Member.Member',
 		name: 'Member Workspace Member View',
 		js: () => import('./views/member/member-workspace-view-member.element.js'),
-		weight: 200,
+		weight: 500,
 		meta: {
-			label: '#treeHeaders_member',
-			pathname: 'member',
+			label: '#apps_umbInfo',
+			pathname: 'info',
 			icon: 'icon-user',
 		},
 		conditions: [
