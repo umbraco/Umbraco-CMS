@@ -15,7 +15,7 @@ namespace Umbraco.Extension.Controllers
 #if IncludeExample
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-        public UmbracoExtensionController(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        public UmbracoExtensionApiController(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         }
