@@ -122,7 +122,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 				this.dispatchEvent(new UmbRouterSlotChangeEvent());
 			}
 		} else if (event.detail.slot === this.#modalRouter) {
-			const newActiveModalLocalPath = this.#modalRouter.match?.fragments.consumed ?? '';
+			const newActiveModalLocalPath = this.#modalRouter.match?.route.path ?? '';
 			this.#routeContext._internal_modalRouterChanged(newActiveModalLocalPath);
 		}
 	};
