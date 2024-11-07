@@ -99,6 +99,9 @@ export class UmbModalElement extends UmbLitElement {
 			this.#modalRouterElement.parent = this.#modalContext.router;
 		} else {
 			this.#modalRouterElement = document.createElement('div');
+			// Notice inline styling here is used cause the element is not appended into this elements shadowDom but outside and there by gets into the element via a slot.
+			this.#modalRouterElement.style.position = 'relative';
+			this.#modalRouterElement.style.height = '100%';
 			new UmbContextBoundary(this.#modalRouterElement, UMB_ROUTE_CONTEXT).hostConnected();
 		}
 
