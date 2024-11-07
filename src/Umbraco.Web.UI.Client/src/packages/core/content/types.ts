@@ -19,10 +19,11 @@ export interface UmbPotentialContentValueModel<ValueType = unknown> extends UmbP
 	segment?: string | null;
 }
 
-export interface UmbContentDetailModel extends UmbElementDetailModel {
+export interface UmbContentDetailModel<VariantModelType extends UmbEntityVariantModel = UmbEntityVariantModel>
+	extends UmbElementDetailModel {
 	unique: string;
 	entityType: string;
-	variants: Array<UmbEntityVariantModel>;
+	variants: Array<VariantModelType>;
 }
 
 export interface UmbContentLikeDetailModel

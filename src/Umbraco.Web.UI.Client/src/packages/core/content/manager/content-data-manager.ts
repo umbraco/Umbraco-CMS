@@ -1,5 +1,5 @@
+import type { UmbContentDetailModel } from '../types.js';
 import { UmbElementWorkspaceDataManager } from './element-data-manager.js';
-import type { UmbContentDetailModel } from '@umbraco-cms/backoffice/content';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { appendToFrozenArray, jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId, type UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
@@ -14,8 +14,17 @@ export class UmbContentWorkspaceDataManager<
 	//#repository;
 	#variantScaffold?: ModelVariantType;
 
-	constructor(host: UmbControllerHost, variantScaffold: ModelVariantType) {
+	constructor(host: UmbControllerHost, variantScaffold?: ModelVariantType) {
 		super(host);
+		this.#variantScaffold = variantScaffold;
+	}
+
+	/**
+	 * Sets the variant scaffold data
+	 * @param {ModelVariantType} variantScaffold The variant scaffold data
+	 * @memberof UmbContentWorkspaceDataManager
+	 */
+	setVariantScaffold(variantScaffold: ModelVariantType) {
 		this.#variantScaffold = variantScaffold;
 	}
 

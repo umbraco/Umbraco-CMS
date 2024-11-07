@@ -1,8 +1,19 @@
-import { type UmbImageCropperFocalPoint, UmbFocalPointChangeEvent } from './index.js';
 import type { UmbFocalPointModel } from '../../types.js';
+import type { UmbImageCropperFocalPoint } from './types.js';
+import { UmbFocalPointChangeEvent } from './focalpoint-change.event.js';
 import { drag } from '@umbraco-cms/backoffice/external/uui';
 import { clamp } from '@umbraco-cms/backoffice/utils';
-import { css, customElement, classMap, ifDefined, html, nothing, state, property, query } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	classMap,
+	ifDefined,
+	html,
+	nothing,
+	state,
+	property,
+	query,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
@@ -38,7 +49,7 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 
 	@property({ type: Boolean })
 	hideFocalPoint = false;
-	
+
 	@property({ type: Boolean, reflect: true })
 	disabled = false;
 
@@ -84,7 +95,7 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 			}
 
 			this.#resetCoords();
-			
+
 			this.imageElement.style.aspectRatio = `${imageAspectRatio}`;
 			this.wrapperElement.style.aspectRatio = `${imageAspectRatio}`;
 		};
@@ -97,22 +108,21 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 	}
 
 	#coordsToFactor(x: number, y: number) {
-		const top = (y / 100) / y * 50;
-		const left = (x / 100) / x * 50;
+		const top = (y / 100 / y) * 50;
+		const left = (x / 100 / x) * 50;
 
-		return { top, left }; 
+		return { top, left };
 	}
 
 	#setFocalPoint(x: number, y: number, width: number, height: number) {
-
-		const left = clamp((x / width), 0, 1);
-		const top = clamp((y / height), 0, 1);
+		const left = clamp(x / width, 0, 1);
+		const top = clamp(y / height, 0, 1);
 
 		this.#coordsToFactor(x, y);
 
 		const focalPoint = { left, top } as UmbFocalPointModel;
 
-		console.log("setFocalPoint", focalPoint)
+		console.log('setFocalPoint', focalPoint);
 
 		this.dispatchEvent(new UmbFocalPointChangeEvent(focalPoint));
 	}
@@ -171,7 +181,7 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 
 	#handleGridKeyDown(event: KeyboardEvent) {
 		if (this.disabled || this.hideFocalPoint) return;
-		
+
 		const increment = event.shiftKey ? 1 : 10;
 
 		const grid = this.wrapperElement;
@@ -207,14 +217,13 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 	override render() {
 		if (!this.src) return nothing;
 		return html`
-			<div id="wrapper"
-				@mousedown=${this.#handleGridDrag}
-        		@touchstart=${this.#handleGridDrag}>
+			<div id="wrapper" @mousedown=${this.#handleGridDrag} @touchstart=${this.#handleGridDrag}>
 				<img id="image" @keydown=${() => nothing} src=${this.src} alt="" />
-				<span id="focal-point"
+				<span
+					id="focal-point"
 					class=${classMap({
 						'focal-point--dragging': this._isDraggingGridHandle,
-						'hidden': this.hideFocalPoint
+						hidden: this.hideFocalPoint,
 					})}
 					tabindex=${ifDefined(this.disabled ? undefined : '0')}
 					aria-label="${this.localize.term('general_focalPoint')}"
@@ -241,7 +250,7 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 			margin: auto;
 			max-width: 100%;
 			max-height: 100%;
-			box-sizing: border-box;	
+			box-sizing: border-box;
 			forced-color-adjust: none;
 		}
 		:host(:not([hidefocalpoint])) #wrapper {

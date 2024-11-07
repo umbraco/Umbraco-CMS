@@ -1,7 +1,6 @@
-import type { UmbPropertyEditorConfig } from '../../../property-editor/index.js';
-import type { UmbPropertyTypeModel } from '../../types.js';
+import { UmbContentPropertyContext } from '../../content-property.context.js';
+import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbContentPropertyContext } from '@umbraco-cms/backoffice/content';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -9,6 +8,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_UNSUPPORTED_EDITOR_SCHEMA_ALIASES } from '@umbraco-cms/backoffice/property';
+import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 
 @customElement('umb-property-type-based-property')
 export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {

@@ -16,13 +16,12 @@ import {
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_MODAL_CONTEXT, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { decodeFilePath, UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import {
 	UMB_BLOCK_ENTRIES_CONTEXT,
 	UMB_BLOCK_MANAGER_CONTEXT,
 	type UmbBlockWorkspaceOriginData,
-	type UmbBlockWorkspaceData,
 	UMB_BLOCK_ENTRY_CONTEXT,
 } from '@umbraco-cms/backoffice/block';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -40,7 +39,11 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#retrieveBlockManager;
 	#blockEntries?: typeof UMB_BLOCK_ENTRIES_CONTEXT.TYPE;
 	#retrieveBlockEntries;
-	#modalContext?: UmbModalContext<UmbBlockWorkspaceData>;
+	#originData?: UmbBlockWorkspaceOriginData;
+	// Set the origin data for this workspace. Example used by inline editing which setups the workspace context it self.
+	setOriginData(data: UmbBlockWorkspaceOriginData) {
+		this.#originData = data;
+	}
 	#retrieveModalContext;
 
 	#entityType: string;
@@ -80,7 +83,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.addValidationContext(this.settings.validation);
 
 		this.#retrieveModalContext = this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
-			this.#modalContext = context as any;
+			this.#originData = context?.data.originData;
 			context.onSubmit().catch(this.#modalRejected);
 		}).asPromise();
 
@@ -238,19 +241,15 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		if (!this.#blockEntries) {
 			throw new Error('Block Entries not found');
 		}
-		if (!this.#modalContext) {
-			throw new Error('Modal Context not found');
+		if (!this.#originData) {
+			throw new Error('Origin data not defined');
 		}
 
 		// TODO: Missing some way to append more layout data... this could be part of modal data, (or context api?)
 
 		this.setIsNew(true);
 
-		const blockCreated = await this.#blockEntries.create(
-			contentElementTypeId,
-			{},
-			this.#modalContext.data.originData as UmbBlockWorkspaceOriginData,
-		);
+		const blockCreated = await this.#blockEntries.create(contentElementTypeId, {}, this.#originData);
 		if (!blockCreated) {
 			throw new Error('Block Entries could not create block');
 		}
@@ -263,7 +262,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				blockCreated.layout,
 				blockCreated.content,
 				blockCreated.settings,
-				this.#modalContext.data.originData as UmbBlockWorkspaceOriginData,
+				this.#originData,
 			);
 			if (!blockInserted) {
 				throw new Error('Block Entries could not insert block');
@@ -348,14 +347,17 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	 * in the backoffice UI.
 	 */
 	establishLiveSync() {
+		// Syncing Layout data is not a necessity, but it was an idea that someone might wanted to manipulate that from this workspace, but as it is giving trouble in Block Grid with Inline Editing Live Sync, then its taken out for now. [NL]
+		let initialLayoutSet = true;
 		this.observe(
 			this.layout,
 			(layoutData) => {
 				if (layoutData) {
-					this.#blockManager?.setOneLayout(
-						layoutData,
-						this.#modalContext?.data.originData as UmbBlockWorkspaceOriginData,
-					);
+					if (initialLayoutSet) {
+						initialLayoutSet = false;
+						return;
+					}
+					this.#blockManager?.setOneLayout(layoutData, this.#originData);
 				}
 			},
 			'observeThisLayout',
@@ -430,7 +432,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	async submit() {
 		const layoutData = this.#layout.value;
 		const contentData = this.content.getData();
-		if (!layoutData || !this.#blockManager || !this.#blockEntries || !contentData || !this.#modalContext) {
+		if (!layoutData || !this.#blockManager || !this.#blockEntries || !contentData || !this.#originData) {
 			throw new Error('Missing data');
 		}
 
@@ -439,19 +441,14 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		if (!this.#liveEditingMode) {
 			if (this.getIsNew() === true) {
 				// Insert (This means the layout entry will be inserted at the desired location):
-				const blockInserted = await this.#blockEntries.insert(
-					layoutData,
-					contentData,
-					settingsData,
-					this.#modalContext.data.originData as UmbBlockWorkspaceOriginData,
-				);
+				const blockInserted = await this.#blockEntries.insert(layoutData, contentData, settingsData, this.#originData);
 				if (!blockInserted) {
 					throw new Error('Block Entries could not insert block');
 				}
 			} else {
 				// Update data:
 
-				this.#blockManager.setOneLayout(layoutData, this.#modalContext.data.originData as UmbBlockWorkspaceOriginData);
+				this.#blockManager.setOneLayout(layoutData, this.#originData);
 				if (contentData) {
 					this.#blockManager.setOneContent(contentData);
 				}
@@ -488,10 +485,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			} else {
 				// Revert the layout, content & settings data to the original state: [NL]
 				if (this.#initialLayout) {
-					this.#blockManager?.setOneLayout(
-						this.#initialLayout,
-						this.#modalContext?.data.originData as UmbBlockWorkspaceOriginData,
-					);
+					this.#blockManager?.setOneLayout(this.#initialLayout, this.#originData);
 				}
 				if (this.#initialContent) {
 					this.#blockManager?.setOneContent(this.#initialContent);
@@ -505,10 +499,12 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	public override destroy(): void {
 		super.destroy();
-		this.#layout.destroy();
-		this.#name.destroy();
+		this.#layout?.destroy();
+		this.#name?.destroy();
+		this.#layout = undefined as any;
+		this.#name = undefined as any;
 		this.#blockManager = undefined;
-		this.#modalContext = undefined;
+		this.#originData = undefined;
 	}
 }
 

@@ -4,9 +4,11 @@ import {
 	UmbDataPathPropertyValueQuery,
 } from '@umbraco-cms/backoffice/validation';
 
+const ctrlAlias = Symbol();
+
 export class UmbBlockElementValuesDataValidationPathTranslator extends UmbAbstractArrayValidationPathTranslator {
 	constructor(host: UmbControllerHost) {
-		super(host, '$.values[', UmbDataPathPropertyValueQuery);
+		super(host, '$.values[', UmbDataPathPropertyValueQuery, ctrlAlias);
 	}
 
 	getDataFromIndex(index: number) {
