@@ -2477,26 +2477,23 @@ public static class PublishedContentExtensions
             yield return content;
         }
 
-        IEnumerable<IPublishedContent> children = contentTypeAlias is not null
-            ? content.ChildrenOfType(variationContextAccessor, publishedCache, navigationQueryService, contentTypeAlias, culture)
-            : content.Children(variationContextAccessor, publishedCache, navigationQueryService, culture);
+        var nodeExists = contentTypeAlias is null
+            ? navigationQueryService.TryGetDescendantsKeys(content.Key, out IEnumerable<Guid> descendantsKeys)
+            : navigationQueryService.TryGetDescendantsKeysOfType(content.Key, contentTypeAlias, out descendantsKeys);
 
-        foreach (IPublishedContent child in children)
+        if (nodeExists is false)
         {
-            yield return child;
+            yield break;
+        }
 
-            // Recursively yield each child's descendants
-            foreach (IPublishedContent descendant in EnumerateDescendantsOrSelfInternal(
-                         child,
-                         variationContextAccessor,
-                         publishedCache,
-                         navigationQueryService,
-                         culture,
-                         orSelf,
-                         contentTypeAlias))
-            {
-                yield return descendant;
-            }
+        IEnumerable<IPublishedContent> descendants = descendantsKeys
+            .Select(publishedCache.GetById)
+            .WhereNotNull()
+            .FilterByCulture(culture, variationContextAccessor);
+
+        foreach (IPublishedContent descendant in descendants)
+        {
+            yield return descendant;
         }
     }
 
