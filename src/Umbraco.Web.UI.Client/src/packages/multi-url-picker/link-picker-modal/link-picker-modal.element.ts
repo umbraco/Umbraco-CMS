@@ -5,13 +5,14 @@ import type {
 	UmbLinkPickerModalValue,
 } from './link-picker-modal.token.js';
 import { css, customElement, html, nothing, query, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { isUmbracoFolder, UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDocumentDetailRepository } from '@umbraco-cms/backoffice/document';
 import { UmbMediaDetailRepository } from '@umbraco-cms/backoffice/media';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { isUmbracoFolder, UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 
 type UmbInputPickerEvent = CustomEvent & { target: { value?: string } };
 
@@ -56,8 +57,10 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 		if (query.includes('=')) {
 			this.#partialUpdateLink({ queryString: `?${query}` });
-		} else {
+		} else if (query) {
 			this.#partialUpdateLink({ queryString: `#${query}` });
+		} else {
+			this.#partialUpdateLink({ queryString: query });
 		}
 	}
 
@@ -149,6 +152,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 						color="positive"
 						look="primary"
 						label=${this.localize.term('general_submit')}
+						?disabled=${!this.value.link.url && !this.value.link.queryString}
 						@click=${this._submitModal}></uui-button>
 				</div>
 			</umb-body-layout>
@@ -169,7 +173,8 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 							label=${this.localize.term('general_url')}
 							.value=${this.value.link.url ?? ''}
 							?disabled=${this.value.link.unique ? true : false}
-							@change=${this.#onLinkUrlInput}>
+							@change=${this.#onLinkUrlInput}
+							${umbFocus()}>
 						</uui-input>
 					</umb-property-layout>
 					${when(
