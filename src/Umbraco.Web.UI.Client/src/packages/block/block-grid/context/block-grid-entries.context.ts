@@ -99,6 +99,10 @@ export class UmbBlockGridEntriesContext
 		this.#catalogueModal.setUniquePathValue('parentUnique', pathFolderName(contentKey ?? 'null'));
 	}
 
+	getParentUnique(): string | null | undefined {
+		return this.#parentUnique;
+	}
+
 	setAreaKey(areaKey: string | null) {
 		this.#areaKey = areaKey;
 		this.#workspaceModal.setUniquePathValue('areaKey', areaKey ?? 'null');
@@ -108,6 +112,10 @@ export class UmbBlockGridEntriesContext
 		// Idea: If we need to parse down a validation data path to target the specific layout object: [NL]
 		// If we have a areaKey, we want to inherit our layoutDataPath from nearest blockGridEntry context.
 		// If not, we want to set the layoutDataPath to a base one.
+	}
+
+	getAreaKey(): string | null | undefined {
+		return this.#areaKey;
 	}
 
 	setLayoutColumns(columns: number | undefined) {
@@ -157,7 +165,11 @@ export class UmbBlockGridEntriesContext
 						blocks: this.#allowedBlockTypes.getValue(),
 						blockGroups: this._manager.getBlockGroups() ?? [],
 						openClipboard: routingInfo.view === 'clipboard',
-						originData: { index: index, areaKey: this.#areaKey, parentUnique: this.#parentUnique },
+						originData: {
+							index: index,
+							areaKey: this.#areaKey,
+							parentUnique: this.#parentUnique,
+						} as UmbBlockGridWorkspaceOriginData,
 						createBlockInWorkspace: this._manager.getInlineEditingMode() === false,
 					},
 				};
@@ -195,7 +207,12 @@ export class UmbBlockGridEntriesContext
 					data: {
 						entityType: 'block',
 						preset: {},
-						originData: { areaKey: this.#areaKey, parentUnique: this.#parentUnique, baseDataPath: this._dataPath },
+						originData: {
+							index: -1,
+							areaKey: this.#areaKey,
+							parentUnique: this.#parentUnique,
+							baseDataPath: this._dataPath,
+						} as UmbBlockGridWorkspaceOriginData,
 					},
 					modal: { size: 'medium' },
 				};

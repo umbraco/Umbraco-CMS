@@ -8,7 +8,10 @@ import type {
 	ManifestWithDynamicConditions,
 	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { jsonStringComparison, type UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+
+const observeConditionsCtrlAlias = Symbol();
+const observeExtensionsCtrlAlias = Symbol();
 
 /**
  * This abstract Controller holds the core to manage a single Extension.
@@ -73,8 +76,6 @@ export abstract class UmbBaseExtensionInitializer<
 		this.#manifestObserver = this.observe(
 			this.#extensionRegistry.byAlias<ManifestType>(this.#alias),
 			(extensionManifest) => {
-				this.#clearPermittedState();
-				this.#manifest = extensionManifest;
 				if (extensionManifest) {
 					if (extensionManifest.overwrites) {
 						if (typeof extensionManifest.overwrites === 'string') {
@@ -83,13 +84,15 @@ export abstract class UmbBaseExtensionInitializer<
 							this.#overwrites = extensionManifest.overwrites;
 						}
 					}
-					this.#gotManifest();
+					this.#gotManifest(extensionManifest);
 				} else {
+					this.#manifest = undefined;
+					this.#clearPermittedState();
 					this.#overwrites = [];
 					this.#cleanConditions();
 				}
 			},
-			'_observeExtensionManifest',
+			observeExtensionsCtrlAlias,
 		);
 	}
 
@@ -107,19 +110,22 @@ export abstract class UmbBaseExtensionInitializer<
 		if (this.#conditionControllers === undefined || this.#conditionControllers.length === 0) return;
 		this.#conditionControllers.forEach((controller) => controller.destroy());
 		this.#conditionControllers = [];
-		this.removeUmbControllerByAlias('_observeConditions');
+		this.removeUmbControllerByAlias(observeConditionsCtrlAlias);
 	}
 
-	#gotManifest() {
-		if (!this.#manifest) return;
-		const conditionConfigs = this.#manifest.conditions ?? [];
+	#gotManifest(manifest: ManifestType) {
+		const conditionConfigs = manifest.conditions ?? [];
+		const oldManifest = this.#manifest;
+		this.#manifest = manifest;
 
-		// As conditionConfigs might have been configured as something else than an array, then we ignorer them.
+		/*
+		// As conditionConfigs might have been configured as something else than an array, then we ignorer them. [NL]
 		if (conditionConfigs.length === 0) {
 			this.#cleanConditions();
 			this.#onConditionsChangedCallback();
 			return;
 		}
+		*/
 
 		const conditionAliases = conditionConfigs
 			.map((condition) => condition.alias)
@@ -130,32 +136,39 @@ export abstract class UmbBaseExtensionInitializer<
 		this.#conditionControllers = this.#conditionControllers.filter((current) => {
 			const continueExistence = conditionConfigs.find((config) => config === current.config);
 			if (!continueExistence) {
-				// Destroy condition that is no longer needed.
+				// Destroy condition that is no longer needed. [NL]
 				current.destroy();
 			}
 			return continueExistence;
 		});
 
-		// Check if there was no change in conditions:
-		// First check if any got removed(old amount equal controllers after clean-up)
-		// && check if any new is about to be added(old equal new amount):
-		const noChangeInConditions =
-			oldAmountOfControllers === this.#conditionControllers.length &&
-			oldAmountOfControllers === conditionConfigs.length;
-
 		if (conditionConfigs.length > 0) {
-			// Observes the conditions and initialize as they come in.
+			// Observes the conditions and initialize as they come in. [NL]
 			this.observe(
 				this.#extensionRegistry.byTypeAndAliases('condition', conditionAliases),
 				this.#gotConditions,
-				'_observeConditions',
+				observeConditionsCtrlAlias,
 			);
 		} else {
-			this.removeUmbControllerByAlias('_observeConditions');
+			this.removeUmbControllerByAlias(observeConditionsCtrlAlias);
 		}
 
-		if (noChangeInConditions) {
-			// There was not change in the amount of conditions, but the manifest was changed, this means this.#isPermitted is set to undefined and this will always fire the callback:
+		// If permitted we want to fire an update because we got a new manifest. [NL]
+		if (this.#isPermitted) {
+			// Check if there was no change in conditions:
+			// First check if any got removed(old amount equal controllers after clean-up)
+			// && check if any new is about to be added(old equal new amount): [NL]
+			// The reason for this is because we will get an update via the code above if there is a change in conditions. But if not we will trigger it here [NL]
+			const noChangeInConditions =
+				oldAmountOfControllers === this.#conditionControllers.length &&
+				oldAmountOfControllers === conditionConfigs.length;
+			if (noChangeInConditions) {
+				if (jsonStringComparison(oldManifest, manifest) === false) {
+					// There was not change in the amount of conditions, but the manifest was changed, this means this.#isPermitted is set to undefined and this will always fire the callback: [NL]
+					this.#onPermissionChanged?.(this.#isPermitted, this as any);
+				}
+			}
+		} else {
 			this.#onConditionsChangedCallback();
 		}
 	}
@@ -189,9 +202,9 @@ export abstract class UmbBaseExtensionInitializer<
 		newConditionControllers
 			.filter((x) => x !== undefined)
 			.forEach((emerging) => {
-				// TODO: All of this could use a refactor at one point, when someone is fresh in their mind.
-				// Niels Notes: Current problem being that we are not aware about what is in the making, so we don't know if we end up creating the same condition multiple times.
-				// Because it took some time to create the conditions, it maybe have already gotten created by another cycle, so lets test again.
+				// TODO: All of this could use a refactor at one point, when someone is fresh in their mind. [NL]
+				// Niels Notes: Current problem being that we are not aware about what is in the making, so we don't know if we end up creating the same condition multiple times. [NL]
+				// Because it took some time to create the conditions, it maybe have already gotten created by another cycle, so lets test again. [NL]
 				const existing = this.#conditionControllers.find((existing) => existing.config === emerging?.config);
 				if (!existing) {
 					this.#conditionControllers.push(emerging!);
@@ -200,7 +213,7 @@ export abstract class UmbBaseExtensionInitializer<
 				}
 			});
 
-		// If a change to amount of condition controllers, this will make sure that when new conditions are added, the callback is fired, so the extensions can be re-evaluated, starting out as bad.
+		// If a change to amount of condition controllers, this will make sure that when new conditions are added, the callback is fired, so the extensions can be re-evaluated, starting out as bad. [NL]
 		if (oldLength !== this.#conditionControllers.length) {
 			this.#onConditionsChangedCallback();
 		}
@@ -230,14 +243,19 @@ export abstract class UmbBaseExtensionInitializer<
 
 	#conditionsAreInitialized() {
 		// Not good if we don't have a manifest.
-		// Only good if conditions of manifest is equal to the amount of condition controllers (one for each condition).
+		// Only good if conditions of manifest is equal to the amount of condition controllers (one for each condition). [NL]
 		return (
 			this.#manifest !== undefined && this.#conditionControllers.length === (this.#manifest.conditions ?? []).length
 		);
 	}
 
 	#onConditionsChangedCallback = async () => {
-		// We will collect old value here, but we need to re-collect it after a async method have been called, as it could have changed in the mean time.
+		if (this.#manifest === undefined) {
+			// This is cause by this controller begin destroyed in the mean time. [NL]
+			// When writing this the only plausible case is a call from the conditionController to the onChange callback.
+			return;
+		}
+		// We will collect old value here, but we need to re-collect it after a async method have been called, as it could have changed in the mean time. [NL]
 		let oldValue = this.#isPermitted ?? false;
 
 		// Find a condition that is not permitted (Notice how no conditions, means that this extension is permitted)
@@ -250,13 +268,13 @@ export abstract class UmbBaseExtensionInitializer<
 		if (isPositive === true) {
 			if (this.#isPermitted !== true) {
 				const newPermission = await this._conditionsAreGood();
-				// Only set new permission if we are still positive, otherwise it means that we have been destroyed in the mean time.
+				// Only set new permission if we are still positive, otherwise it means that we have been destroyed in the mean time. [NL]
 				if (newPermission === false || this._isConditionsPositive === false) {
 					// Then we need to revert the above work:
 					this._conditionsAreBad();
 					return;
 				}
-				// We update the oldValue as this point, cause in this way we are sure its the value at this point, when doing async code someone else might have changed the state in the mean time.
+				// We update the oldValue as this point, cause in this way we are sure its the value at this point, when doing async code someone else might have changed the state in the mean time. [NL]
 				oldValue = this.#isPermitted ?? false;
 				this.#isPermitted = newPermission;
 			}
@@ -264,11 +282,11 @@ export abstract class UmbBaseExtensionInitializer<
 			// Clean up:
 			await this._conditionsAreBad();
 
-			// Only continue if we are still negative, otherwise it means that something changed in the mean time.
+			// Only continue if we are still negative, otherwise it means that something changed in the mean time. [NL]
 			if (this._isConditionsPositive === true) {
 				return;
 			}
-			// We update the oldValue as this point, cause in this way we are sure its the value at this point, when doing async code someone else might have changed the state in the mean time.
+			// We update the oldValue as this point, cause in this way we are sure its the value at this point, when doing async code someone else might have changed the state in the mean time. [NL]
 			oldValue = this.#isPermitted ?? false;
 			this.#isPermitted = false;
 		}
@@ -286,7 +304,7 @@ export abstract class UmbBaseExtensionInitializer<
 	protected abstract _conditionsAreBad(): Promise<void>;
 
 	public equal(otherClass: UmbBaseExtensionInitializer | undefined): boolean {
-		return otherClass?.manifest === this.manifest;
+		return otherClass?.manifest === this.#manifest;
 	}
 
 	/*
@@ -296,6 +314,7 @@ export abstract class UmbBaseExtensionInitializer<
 	}
 	*/
 
+	/*
 	public override hostDisconnected(): void {
 		super.hostDisconnected();
 		this._isConditionsPositive = false;
@@ -305,6 +324,7 @@ export abstract class UmbBaseExtensionInitializer<
 			this.#onPermissionChanged?.(false, this as unknown as SubClassType);
 		}
 	}
+	*/
 
 	#clearPermittedState() {
 		if (this.#isPermitted === true) {
@@ -318,7 +338,7 @@ export abstract class UmbBaseExtensionInitializer<
 		if (!this.#extensionRegistry) return;
 		this.#manifest = undefined;
 		this.#promiseResolvers = [];
-		this.#clearPermittedState(); // This fires the callback as not permitted, if it was permitted before.
+		this.#clearPermittedState(); // This fires the callback as not permitted, if it was permitted before. [NL]
 		this.#isPermitted = undefined;
 		this._isConditionsPositive = false;
 		this.#overwrites = [];

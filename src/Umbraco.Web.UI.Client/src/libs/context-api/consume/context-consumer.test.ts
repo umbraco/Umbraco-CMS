@@ -7,7 +7,7 @@ import { expect, oneEvent } from '@open-wc/testing';
 
 const testContextAlias = 'my-test-context';
 const testContextAliasAndApiAlias = 'my-test-context#testApi';
-const testContextAliasAndNotExstingApiAlias = 'my-test-context#notExistingTestApi';
+const testContextAliasAndNotExistingApiAlias = 'my-test-context#notExistingTestApi';
 
 class UmbTestContextConsumerClass {
 	public prop: string = 'value from provider';
@@ -72,6 +72,47 @@ describe('UmbContextConsumer', () => {
 				},
 			);
 			localConsumer.hostConnected();
+		});
+
+		it('works with host as a method', (done) => {
+			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
+			provider.hostConnected();
+
+			const element = document.createElement('div');
+			document.body.appendChild(element);
+
+			const localConsumer = new UmbContextConsumer(
+				() => element,
+				testContextAlias,
+				(_instance: UmbTestContextConsumerClass | undefined) => {
+					if (_instance) {
+						expect(_instance.prop).to.eq('value from provider');
+						done();
+						localConsumer.hostDisconnected();
+						provider.hostDisconnected();
+					}
+				},
+			);
+			localConsumer.hostConnected();
+		});
+
+		it('works with host method returning undefined', async () => {
+			const element = undefined;
+
+			const localConsumer = new UmbContextConsumer(
+				() => element,
+				testContextAlias,
+				(_instance: UmbTestContextConsumerClass | undefined) => {
+					if (_instance) {
+						expect.fail('Callback should not be called when never permitted');
+					}
+				},
+			);
+			localConsumer.hostConnected();
+
+			await Promise.resolve();
+
+			localConsumer.hostDisconnected();
 		});
 
 		/*
@@ -139,7 +180,7 @@ describe('UmbContextConsumer', () => {
 			const element = document.createElement('div');
 			document.body.appendChild(element);
 
-			const localConsumer = new UmbContextConsumer(element, testContextAliasAndNotExstingApiAlias, () => {
+			const localConsumer = new UmbContextConsumer(element, testContextAliasAndNotExistingApiAlias, () => {
 				expect(false).to.be.true;
 			});
 			localConsumer.hostConnected();
