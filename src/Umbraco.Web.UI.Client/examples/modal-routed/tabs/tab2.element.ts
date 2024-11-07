@@ -39,9 +39,6 @@ export class UmbDashboardTab2Element extends UmbElementMixin(LitElement) {
 				<p>This element hosts the UmbModalRouteRegistrationController</p>
 
 				<a href=${this._editLinkPath ?? ''}>Open modal</a>
-				<hr />
-
-				Path: ${this._editLinkPath}
 			</div>
 		`;
 	}
