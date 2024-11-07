@@ -68,7 +68,7 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 	 * @memberof UmbContextProvider
 	 */
 	public hostConnected(): void {
-		//this.hostElement.addEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
+		//this.hostElement.addEventListener(UMB_CONTEXT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
 		this.#eventTarget.dispatchEvent(new UmbContextProvideEventImplementation(this.#contextAlias));
 
 		// Listen to our debug event 'umb:debug-contexts'
@@ -79,7 +79,7 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 	 * @memberof UmbContextProvider
 	 */
 	public hostDisconnected(): void {
-		//this.hostElement.removeEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
+		//this.hostElement.removeEventListener(UMB_CONTEXT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
 		// Out-commented for now, but kept if we like to reintroduce this:
 		//window.dispatchEvent(new UmbContextUnprovidedEventImplementation(this._contextAlias, this.#instance));
 
@@ -104,7 +104,7 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 	destroy(): void {
 		this.hostDisconnected();
 		// Note we are not removing the event listener in the hostDisconnected, therefor we do it here [NL].
-		this.#eventTarget?.removeEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
+		this.#eventTarget?.removeEventListener(UMB_CONTEXT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
 		// We want to call a destroy method on the instance, if it has one.
 		(this.#instance as any)?.destroy?.();
 		this.#instance = undefined;
