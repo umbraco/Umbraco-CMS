@@ -6,7 +6,10 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 
 @customElement('umb-dashboard-tab2')
 export class UmbDashboardTab2Element extends UmbElementMixin(LitElement) {
-	#workspaceModal?: UmbModalRouteRegistrationController;
+	#workspaceModal?: UmbModalRouteRegistrationController<
+		typeof EXAMPLE_ROUTED_MODAL.DATA,
+		typeof EXAMPLE_ROUTED_MODAL.VALUE
+	>;
 
 	@state()
 	_editLinkPath?: string;

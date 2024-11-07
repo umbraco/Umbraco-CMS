@@ -1,14 +1,14 @@
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-example-modal')
 export class UmbExampleModal extends UmbModalBaseElement {
 	@state()
 	private _routes: UmbRoute[] = [
 		{
-			path: `overview`,
+			path: `modalOverview`,
 			component: () => import('./steps/example-modal-step1.element.js'),
 		},
 		{
@@ -17,7 +17,7 @@ export class UmbExampleModal extends UmbModalBaseElement {
 		},
 		{
 			path: '',
-			redirectTo: 'overview',
+			redirectTo: 'modalOverview',
 		},
 	];
 
