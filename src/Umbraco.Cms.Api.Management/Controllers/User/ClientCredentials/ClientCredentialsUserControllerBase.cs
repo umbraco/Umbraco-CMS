@@ -20,7 +20,7 @@ public abstract class ClientCredentialsUserControllerBase : UserControllerBase
                 .Build()),
             BackOfficeUserClientCredentialsOperationStatus.InvalidClientId => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid client ID")
-                .WithDetail("The specified client ID is invalid. Specify a valid client ID.")
+                .WithDetail("The specified client ID is invalid. A valid client ID can only contain [a-z], [A-Z], [0-9], and [-._~].")
                 .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown client credentials operation status.")
