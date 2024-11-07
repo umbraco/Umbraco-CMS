@@ -1,11 +1,13 @@
 import { css, html, customElement, state, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbInputManifestElement } from '@umbraco-cms/backoffice/components';
+import type { UmbInputManifestElement } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 
+// eslint-disable-next-line local-rules/enforce-umb-prefix-on-element-name
 @customElement('example-manifest-picker-dashboard')
+// eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name, local-rules/umb-class-prefix
 export class ExampleManifestPickerDashboard extends UmbLitElement {
 	#options: Array<Option> = [];
 

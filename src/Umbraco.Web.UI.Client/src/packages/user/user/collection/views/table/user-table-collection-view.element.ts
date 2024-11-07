@@ -146,11 +146,11 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'entityActions',
-						value: html`<umb-entity-actions-table-column-layout
+						value: html`<umb-entity-actions-table-column-view
 							.value=${{
 								entityType: user.entityType,
 								unique: user.unique,
-							}}></umb-entity-actions-table-column-layout>`,
+							}}></umb-entity-actions-table-column-view>`,
 					},
 				],
 			};

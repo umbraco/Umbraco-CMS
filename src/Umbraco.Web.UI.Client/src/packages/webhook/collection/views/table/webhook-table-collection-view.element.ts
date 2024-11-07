@@ -81,7 +81,7 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'enabled',
-						value: html`<umb-boolean-table-column-layout .value=${webhook.enabled}></umb-boolean-table-column-layout>`,
+						value: html`<umb-boolean-table-column-view .value=${webhook.enabled}></umb-boolean-table-column-view>`,
 					},
 					{
 						columnAlias: 'events',
@@ -93,11 +93,11 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'entityActions',
-						value: html`<umb-entity-actions-table-column-layout
+						value: html`<umb-entity-actions-table-column-view
 							.value=${{
 								entityType: webhook.entityType,
 								unique: webhook.unique,
-							}}></umb-entity-actions-table-column-layout>`,
+							}}></umb-entity-actions-table-column-view>`,
 					},
 				],
 			};

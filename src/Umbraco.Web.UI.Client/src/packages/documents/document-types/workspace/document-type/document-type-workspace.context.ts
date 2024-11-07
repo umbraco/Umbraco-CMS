@@ -110,7 +110,7 @@ export class UmbDocumentTypeWorkspaceContext
 			{
 				path: UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.toString(),
 				component: UmbDocumentTypeWorkspaceEditorElement,
-				setup: (_component, info) => {
+				setup: async (_component, info) => {
 					const params = info.match.params as unknown as UmbPathPatternTypeAsEncodedParamsType<
 						typeof UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.PARAMS
 					>;
@@ -120,7 +120,7 @@ export class UmbDocumentTypeWorkspaceContext
 					if (parentUnique === undefined) {
 						throw new Error('ParentUnique url parameter is required to create a document type');
 					}
-					this.create({ entityType: parentEntityType, unique: parentUnique }, presetAlias);
+					await this.create({ entityType: parentEntityType, unique: parentUnique }, presetAlias);
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,

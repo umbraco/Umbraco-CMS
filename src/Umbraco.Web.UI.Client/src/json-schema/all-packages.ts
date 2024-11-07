@@ -33,6 +33,7 @@ import '@umbraco-cms/backoffice/document-type';
 import '@umbraco-cms/backoffice/document';
 import '@umbraco-cms/backoffice/entity-action';
 import '@umbraco-cms/backoffice/entity-bulk-action';
+import '@umbraco-cms/backoffice/entity-create-option-action';
 import '@umbraco-cms/backoffice/entity';
 import '@umbraco-cms/backoffice/event';
 import '@umbraco-cms/backoffice/extension-registry';

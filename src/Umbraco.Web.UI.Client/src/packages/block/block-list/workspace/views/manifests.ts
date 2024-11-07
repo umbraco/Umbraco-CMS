@@ -1,4 +1,5 @@
 import { UMB_BLOCK_LIST_TYPE_WORKSPACE_ALIAS } from '../index.js';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -14,7 +15,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_BLOCK_LIST_TYPE_WORKSPACE_ALIAS,
 			},
 		],

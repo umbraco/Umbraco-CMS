@@ -358,7 +358,7 @@ export default {
 		inserttable: 'Вставити таблицю',
 		lastEdited: 'Остання зміна',
 		link: 'Посилання',
-		linkinternal: 'Внутрішнє посилання:',
+		linkinternal: 'Внутрішнє посилання',
 		linklocaltip: 'Для визначення локального посилання, використовуйте "#" першим символом',
 		linknewwindow: 'Відкрити у новому вікні?',
 		macroDoesNotHaveProperties: 'Цей макрос не має властивостей, що редагуються.',

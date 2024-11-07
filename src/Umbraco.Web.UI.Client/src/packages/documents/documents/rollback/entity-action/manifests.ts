@@ -1,6 +1,7 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_USER_PERMISSION_DOCUMENT_ROLLBACK } from '../../user-permissions/index.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from '../../workspace/index.js';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -27,7 +28,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			/* Currently the rollback is tightly coupled to the workspace contexts so we only allow it to show up
 			 In the document workspace. */
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_DOCUMENT_WORKSPACE_ALIAS,
 			},
 		],

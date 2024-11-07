@@ -19,7 +19,7 @@ export class UmbContextConsumerController<BaseType = unknown, ResultType extends
 		contextAlias: string | UmbContextToken<BaseType, ResultType>,
 		callback?: UmbContextCallback<ResultType>,
 	) {
-		super(host.getHostElement(), contextAlias, callback);
+		super(() => host.getHostElement(), contextAlias, callback);
 		this.#host = host;
 		host.addUmbController(this);
 	}

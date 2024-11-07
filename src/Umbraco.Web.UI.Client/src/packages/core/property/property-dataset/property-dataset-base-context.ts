@@ -19,8 +19,13 @@ export class UmbPropertyDatasetContextBase
 	#name = new UmbStringState(undefined);
 	name = this.#name.asObservable();
 
-	#values = new UmbArrayState<UmbPropertyValueData>([], (x) => x.alias);
-	public readonly values = this.#values.asObservable();
+	#properties = new UmbArrayState<UmbPropertyValueData>([], (x) => x.alias);
+	public readonly properties = this.#properties.asObservable();
+	/**
+	 * @deprecated - use `properties` instead.
+	 */
+	readonly values = this.properties;
+
 	private _entityType!: string;
 	private _unique!: string;
 
@@ -51,12 +56,11 @@ export class UmbPropertyDatasetContextBase
 
 	/**
 	 * @function propertyValueByAlias
-	 * @param {string} propertyAlias
-	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
-	 * @description Get an Observable for the value of this property.
+	 * @param {string} propertyAlias - the alias to observe
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>} - an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
-		return this.#values.asObservablePart((values) => {
+		return this.#properties.asObservablePart((values) => {
 			const valueObj = values.find((x) => x.alias === propertyAlias);
 			return valueObj ? (valueObj.value as ReturnType) : undefined;
 		});
@@ -64,26 +68,45 @@ export class UmbPropertyDatasetContextBase
 
 	/**
 	 * @function setPropertyValue
-	 * @param {string} alias
+	 * @param {string} alias - The alias to set this value for
 	 * @param {PromiseLike<unknown>} value - value can be a promise resolving into the actual value or the raw value it self.
-	 * @returns {Promise<void>}
 	 * @description Set the value of this property.
 	 */
 	setPropertyValue(alias: string, value: unknown) {
-		this.#values.appendOne({ alias, value });
+		this.#properties.appendOne({ alias, value });
 	}
 
+	/**
+	 * @deprecated Use `getProperties`
+	 * @returns {Array<UmbPropertyValueData>} - Array of properties as objects with alias and value properties.
+	 */
 	getValues() {
-		return this.#values.getValue();
+		return this.#properties.getValue();
 	}
-	setValues(map: Array<UmbPropertyValueData>) {
-		this.#values.setValue(map);
+	/**
+	 * @param {Array<UmbPropertyValueData>} properties - Properties array with alias and value properties.
+	 * @deprecated Use `setProperties`
+	 */
+	setValues(properties: Array<UmbPropertyValueData>) {
+		this.#properties.setValue(properties);
+	}
+
+	/**
+	 * @returns {Array<UmbPropertyValueData>} - Array of properties as objects with alias and value properties.
+	 */
+	async getProperties() {
+		return this.#properties.getValue();
+	}
+	/**
+	 * @param {Array<UmbPropertyValueData>} properties - Properties array with alias and value properties.
+	 */
+	setProperties(properties: Array<UmbPropertyValueData>) {
+		this.#properties.setValue(properties);
 	}
 
 	/**
 	 * Gets the read-only state of the current variant culture.
 	 * @returns {*}  {boolean}
-	 * @memberof UmbBlockGridInlinePropertyDatasetContext
 	 */
 	getReadOnly(): boolean {
 		return this.#readOnly.getValue();

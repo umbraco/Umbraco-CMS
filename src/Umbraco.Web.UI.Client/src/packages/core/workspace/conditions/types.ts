@@ -1,7 +1,11 @@
-import type { UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION, UMB_WORKSPACE_HAS_COLLECTION_CONDITION } from './const.js';
+import type {
+	UMB_WORKSPACE_CONDITION_ALIAS,
+	UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS,
+	UMB_WORKSPACE_HAS_COLLECTION_CONDITION_ALIAS,
+} from './const.js';
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
 
-export type WorkspaceAliasConditionConfig = UmbConditionConfigBase<'Umb.Condition.WorkspaceAlias'> & {
+export interface WorkspaceAliasConditionConfig extends UmbConditionConfigBase<typeof UMB_WORKSPACE_CONDITION_ALIAS> {
 	/**
 	 * Define the workspace that this extension should be available in
 	 * @example
@@ -14,7 +18,7 @@ export type WorkspaceAliasConditionConfig = UmbConditionConfigBase<'Umb.Conditio
 	 * ["Umb.Workspace.Document", "Umb.Workspace.Media"]
 	 */
 	oneOf?: Array<string>;
-};
+}
 
 export type WorkspaceContentTypeAliasConditionConfig =
 	UmbConditionConfigBase<'Umb.Condition.WorkspaceContentTypeAlias'> & {
@@ -42,11 +46,11 @@ export type WorkspaceEntityTypeConditionConfig = UmbConditionConfigBase<'Umb.Con
 };
 
 export type WorkspaceHasCollectionConditionConfig = UmbConditionConfigBase<
-	typeof UMB_WORKSPACE_HAS_COLLECTION_CONDITION
+	typeof UMB_WORKSPACE_HAS_COLLECTION_CONDITION_ALIAS
 >;
 
 export interface WorkspaceEntityIsNewConditionConfig
-	extends UmbConditionConfigBase<typeof UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION> {
+	extends UmbConditionConfigBase<typeof UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS> {
 	match: boolean;
 }
 

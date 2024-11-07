@@ -1,4 +1,5 @@
 import { UMB_TEMPLATE_TREE_ALIAS } from '../tree/index.js';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -21,7 +22,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		api: () => import('./template-menu-structure.context.js'),
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: 'Umb.Workspace.Template',
 			},
 		],
@@ -33,7 +34,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Template Breadcrumb Workspace Footer App',
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: 'Umb.Workspace.Template',
 			},
 		],

@@ -1,4 +1,4 @@
-import { UmbTiptapExtensionApiBase } from '../types.js';
+import { UmbTiptapExtensionApiBase } from '../base.js';
 import type { UmbTiptapExtensionArgs } from '../types.js';
 import { imageSize } from '@umbraco-cms/backoffice/utils';
 import { Extension } from '@umbraco-cms/backoffice/external/tiptap';
@@ -63,6 +63,13 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 						event.preventDefault();
 
 						const files = event.dataTransfer?.files;
+						if (!files) return;
+
+						self.#uploadTemporaryFile(files, this.editor);
+					});
+
+					host.addEventListener('paste', (event) => {
+						const files = event.clipboardData?.files;
 						if (!files) return;
 
 						self.#uploadTemporaryFile(files, this.editor);

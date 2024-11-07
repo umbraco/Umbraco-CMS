@@ -1,6 +1,6 @@
 import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../types.js';
 import { UmbBlockTypeWorkspaceEditorElement } from './block-type-workspace-editor.element.js';
-import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import type { UmbPropertyDatasetContext, UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
 	UmbInvariantDatasetWorkspaceContext,
@@ -12,9 +12,11 @@ import {
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
+	umbObjectToPropertyValueArray,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWithGroupKey = UmbBlockTypeWithGroupKey>
 	extends UmbSubmittableWorkspaceContextBase<BlockTypeData>
@@ -25,11 +27,17 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 
 	#entityType: string;
 	#data = new UmbObjectState<BlockTypeData | undefined>(undefined);
-	//readonly data = this.#data.asObservable();
+	readonly data = this.#data.asObservable();
 
-	// TODO: Get the name of the contentElementType..
-	readonly name = this.#data.asObservablePart(() => 'block');
+	readonly name = this.#data.asObservablePart(() => 'block type');
 	readonly unique = this.#data.asObservablePart((data) => data?.contentElementTypeKey);
+
+	readonly values = this.#data.asObservablePart((data) => {
+		return umbObjectToPropertyValueArray(data);
+	});
+	async getValues(): Promise<Array<UmbPropertyValueData> | undefined> {
+		return umbObjectToPropertyValueArray(await firstValueFrom(this.data));
+	}
 
 	constructor(host: UmbControllerHost, args: { manifest: ManifestWorkspace }) {
 		super(host, args.manifest.alias);
@@ -46,7 +54,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 
 					const elementTypeKey = info.match.params.elementTypeKey;
 					const groupKey = info.match.params.groupKey === 'null' ? null : info.match.params.groupKey;
-					this.create(elementTypeKey, groupKey);
+					await this.create(elementTypeKey, groupKey);
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,

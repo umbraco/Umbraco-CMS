@@ -58,11 +58,11 @@ export class UmbMemberGroupTableCollectionViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'entityActions',
-						value: html`<umb-entity-actions-table-column-layout
+						value: html`<umb-entity-actions-table-column-view
 							.value=${{
 								entityType: memberGroup.entityType,
 								unique: memberGroup.unique,
-							}}></umb-entity-actions-table-column-layout>`,
+							}}></umb-entity-actions-table-column-view>`,
 					},
 				],
 			};

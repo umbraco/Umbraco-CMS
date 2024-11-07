@@ -1,5 +1,5 @@
 import { UmbWorkspaceSplitViewContext } from './workspace-split-view.context.js';
-import { css, html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, ifDefined, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -31,7 +31,14 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 		return this.splitViewContext.getSplitViewIndex()!;
 	}
 
+	@state()
+	private _variantSelectorSlotHasContent = false;
+
 	splitViewContext = new UmbWorkspaceSplitViewContext(this);
+
+	#onVariantSelectorSlotChanged(e: Event) {
+		this._variantSelectorSlotHasContent = (e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
+	}
 
 	override render() {
 		return html`
@@ -40,9 +47,12 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 				back-path=${ifDefined(this.backPath)}
 				.hideNavigation=${!this.displayNavigation}
 				.enforceNoFooter=${true}>
-				<div id="header" slot="header">
-					<umb-workspace-split-view-variant-selector></umb-workspace-split-view-variant-selector>
-				</div>
+				<slot id="header" name="variant-selector" slot="header" @slotchange=${this.#onVariantSelectorSlotChanged}>
+					${this._variantSelectorSlotHasContent
+						? nothing
+						: html`<umb-workspace-split-view-variant-selector></umb-workspace-split-view-variant-selector>`}
+				</slot>
+
 				${this.displayNavigation
 					? html`<umb-workspace-entity-action-menu slot="action-menu"></umb-workspace-entity-action-menu>`
 					: ''}
@@ -67,6 +77,7 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 
 			#header {
 				flex: 1 1 auto;
+				display: block;
 			}
 		`,
 	];

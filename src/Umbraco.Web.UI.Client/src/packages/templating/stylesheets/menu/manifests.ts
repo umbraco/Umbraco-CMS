@@ -1,4 +1,5 @@
 import { UMB_STYLESHEET_TREE_ALIAS } from '../tree/index.js';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -20,7 +21,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		api: () => import('./stylesheet-menu-structure.context.js'),
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: 'Umb.Workspace.Stylesheet',
 			},
 		],
@@ -32,7 +33,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Stylesheet Breadcrumb Workspace Footer App',
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: 'Umb.Workspace.Stylesheet',
 			},
 		],

@@ -1,8 +1,7 @@
 import type { UmbController } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { MappingFunction, Observable } from '@umbraco-cms/backoffice/observable-api';
 
-export interface UmbWorkspaceDataManager<ModelType extends UmbEntityModel> extends UmbController {
+export interface UmbWorkspaceDataManager<ModelType> extends UmbController {
 	getPersisted(): ModelType | undefined;
 	getCurrent(): ModelType | undefined;
 

@@ -1,3 +1,5 @@
+import type { UmbContentTypePropertyStructureHelper } from '../../../structure/index.js';
+import type { UmbContentTypeModel, UmbPropertyTypeModel, UmbPropertyTypeScaffoldModel } from '../../../types.js';
 import { UmbPropertyTypeContext } from './content-type-design-editor-property.context.js';
 import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
@@ -6,12 +8,6 @@ import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/property-type';
-import type {
-	UmbContentTypeModel,
-	UmbContentTypePropertyStructureHelper,
-	UmbPropertyTypeModel,
-	UmbPropertyTypeScaffoldModel,
-} from '@umbraco-cms/backoffice/content-type';
 import type { UUIInputElement, UUIInputLockElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
@@ -414,7 +410,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				position: sticky;
 				top: var(--uui-size-space-4);
 				height: min-content;
-				z-index: 2;
 			}
 
 			#editor {

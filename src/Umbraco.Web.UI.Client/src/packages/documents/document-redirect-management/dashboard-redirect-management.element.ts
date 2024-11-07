@@ -212,15 +212,19 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 			return html` <uui-table-row>
 				<uui-table-cell> ${data.culture || '*'} </uui-table-cell>
 				<uui-table-cell>
-					<a href="${data.originalUrl || '#'}" target="_blank"> ${data.originalUrl}</a>
-					<uui-icon name="icon-out"></uui-icon>
+					<a href="${data.originalUrl || '#'}" target="_blank">
+						<span>${data.originalUrl}</span>
+						<uui-icon name="icon-out"></uui-icon>
+					</a>
 				</uui-table-cell>
 				<uui-table-cell>
 					<uui-icon name="icon-arrow-right"></uui-icon>
 				</uui-table-cell>
 				<uui-table-cell>
-					<a href="${data.destinationUrl || '#'}" target="_blank"> ${data.destinationUrl}</a>
-					<uui-icon name="icon-out"></uui-icon>
+					<a href="${data.destinationUrl || '#'}" target="_blank">
+						<span>${data.destinationUrl}</span>
+						<uui-icon name="icon-out"></uui-icon>
+					</a>
 				</uui-table-cell>
 				<uui-table-cell>
 					<uui-action-bar style="justify-self: left;">
@@ -289,6 +293,12 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 				display: flex;
 				justify-content: center;
 				margin-top: var(--uui-size-space-5);
+			}
+
+			uui-table-cell a:has(span, uui-icon) {
+				display: inline-flex;
+				align-items: center;
+				gap: var(--uui-size-2);
 			}
 		`,
 	];

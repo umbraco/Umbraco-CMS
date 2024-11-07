@@ -1,5 +1,6 @@
 import { UmbBlockGridEntriesContext } from '../../context/block-grid-entries.context.js';
 import type { UmbBlockGridEntryElement } from '../block-grid-entry/index.js';
+import type { UmbBlockGridLayoutModel } from '../../types.js';
 import {
 	getAccumulatedValueOfIndex,
 	getInterpolatedIndexOfPositionInWeightMap,
@@ -16,7 +17,6 @@ import {
 	type UmbFormControlValidatorConfig,
 } from '@umbraco-cms/backoffice/validation';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 
 /**
  * Notice this utility method is not really shareable with others as it also takes areas into account. [NL]
@@ -149,7 +149,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			// Currently there is no server validation for areas. So we can leave out the data path for it for now. [NL]
 			this.#controlValidator = new UmbFormControlValidator(this, this);
 
-			//new UmbBindServerValidationToFormControl(this, this, "$.values.[?(@.alias = 'my-input-alias')].value");
+			//new UmbBindServerValidationToFormControl(this, this, "$.values.[?(@.alias == 'my-input-alias')].value");
 		}
 	}
 	public get areaKey(): string | null | undefined {

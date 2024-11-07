@@ -63,6 +63,16 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
+		alias: 'Umb.Localization.De-CH',
+		weight: -100,
+		name: 'Deutsch (Schweiz)',
+		meta: {
+			culture: 'de-ch',
+		},
+		js: () => import('../../../assets/lang/de-ch.js'),
+	},
+	{
+		type: 'localization',
 		alias: 'Umb.Localization.En-GB',
 		weight: -100,
 		name: 'English (UK)',
@@ -103,6 +113,16 @@ export const manifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
+		alias: 'Umb.Localization.Fr-CH',
+		weight: -100,
+		name: 'Français (Suisse)',
+		meta: {
+			culture: 'fr-ch',
+		},
+		js: () => import('../../../assets/lang/fr-ch.js'),
+	},
+	{
+		type: 'localization',
 		alias: 'Umb.Localization.He-IL',
 		weight: -100,
 		name: 'Hebrew',
@@ -130,6 +150,16 @@ export const manifests: Array<ManifestLocalization> = [
 			culture: 'it-it',
 		},
 		js: () => import('../../../assets/lang/it-it.js'),
+	},
+	{
+		type: 'localization',
+		alias: 'Umb.Localization.It-CH',
+		weight: -100,
+		name: 'Italiano (Svizerra)',
+		meta: {
+			culture: 'it-ch',
+		},
+		js: () => import('../../../assets/lang/it-ch.js'),
 	},
 	{
 		type: 'localization',
@@ -260,5 +290,5 @@ export const manifests: Array<ManifestLocalization> = [
 			culture: 'zh-tw',
 		},
 		js: () => import('../../../assets/lang/zh-tw.js'),
-	}
+	},
 ];

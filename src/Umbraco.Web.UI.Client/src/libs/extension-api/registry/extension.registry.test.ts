@@ -8,6 +8,7 @@ import type {
 } from '../types/index.js';
 import { UmbExtensionRegistry } from './extension.registry.js';
 import { expect } from '@open-wc/testing';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 interface TestManifestWithMeta extends ManifestBase {
 	meta: unknown;
@@ -535,7 +536,7 @@ describe('Add Conditions', () => {
 
 		// Add a condition with a specific config to Section2
 		const workspaceCondition: WorkspaceAliasConditionConfig = {
-			alias: 'Umb.Condition.WorkspaceAlias',
+			alias: UMB_WORKSPACE_CONDITION_ALIAS,
 			match: 'Umb.Workspace.Document',
 		};
 
@@ -543,7 +544,7 @@ describe('Add Conditions', () => {
 
 		const updatedWorkspaceExt = extensionRegistry.getByAlias('Umb.Test.Section.2') as ManifestWithDynamicConditions;
 		expect(updatedWorkspaceExt.conditions?.length).to.equal(1);
-		expect(updatedWorkspaceExt.conditions?.[0]?.alias).to.equal('Umb.Condition.WorkspaceAlias');
+		expect(updatedWorkspaceExt.conditions?.[0]?.alias).to.equal(UMB_WORKSPACE_CONDITION_ALIAS);
 	});
 
 	it('allows an extension to update with multiple conditions', async () => {
@@ -555,7 +556,7 @@ describe('Add Conditions', () => {
 				alias: 'Umb.Test.Condition.Valid',
 			},
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: 'Umb.Workspace.Document',
 			} as WorkspaceAliasConditionConfig,
 		];
@@ -566,7 +567,7 @@ describe('Add Conditions', () => {
 		expect(extUpdated.conditions?.length).to.equal(3);
 		expect(extUpdated.conditions?.[0]?.alias).to.equal('Umb.Test.Condition.Invalid');
 		expect(extUpdated.conditions?.[1]?.alias).to.equal('Umb.Test.Condition.Valid');
-		expect(extUpdated.conditions?.[2]?.alias).to.equal('Umb.Condition.WorkspaceAlias');
+		expect(extUpdated.conditions?.[2]?.alias).to.equal(UMB_WORKSPACE_CONDITION_ALIAS);
 	});
 
 	it('allows conditions to be prepended when an extension is loaded later on', async () => {
@@ -575,7 +576,7 @@ describe('Add Conditions', () => {
 				alias: 'Umb.Test.Condition.Invalid',
 			},
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: 'Umb.Workspace.Document',
 			} as WorkspaceAliasConditionConfig,
 		];
@@ -606,7 +607,7 @@ describe('Add Conditions', () => {
 		expect(extUpdated.conditions?.length).to.equal(3);
 		expect(extUpdated.conditions?.[0]?.alias).to.equal('Umb.Test.Condition.Valid');
 		expect(extUpdated.conditions?.[1]?.alias).to.equal('Umb.Test.Condition.Invalid');
-		expect(extUpdated.conditions?.[2]?.alias).to.equal('Umb.Condition.WorkspaceAlias');
+		expect(extUpdated.conditions?.[2]?.alias).to.equal(UMB_WORKSPACE_CONDITION_ALIAS);
 	});
 
 	/**
@@ -622,7 +623,7 @@ describe('Add Conditions', () => {
 				alias: 'Umb.Test.Condition.Invalid',
 			},
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: 'Umb.Workspace.Document',
 			} as WorkspaceAliasConditionConfig,
 		];

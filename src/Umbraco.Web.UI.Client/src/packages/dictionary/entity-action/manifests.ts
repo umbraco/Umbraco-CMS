@@ -8,7 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'default',
 		alias: 'Umb.EntityAction.Dictionary.Create',
 		name: 'Create Dictionary Entity Action',
-		weight: 600,
+		weight: 1200,
 		api: () => import('./create/create.action.js'),
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		meta: {

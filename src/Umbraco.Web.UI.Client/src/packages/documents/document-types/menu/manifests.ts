@@ -1,4 +1,5 @@
 import { UMB_DOCUMENT_TYPE_TREE_ALIAS } from '../tree/index.js';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -20,7 +21,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		api: () => import('./document-type-menu-structure.context.js'),
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: 'Umb.Workspace.DocumentType',
 			},
 		],
@@ -32,7 +33,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Document Type Breadcrumb Workspace Footer App',
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: 'Umb.Workspace.DocumentType',
 			},
 		],

@@ -1,4 +1,4 @@
-import type { UmbDataTypeDetailModel, UmbDataTypePropertyModel } from '../types.js';
+import type { UmbDataTypeDetailModel, UmbDataTypePropertyValueModel } from '../types.js';
 import { type UmbDataTypeDetailRepository, UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../entity.js';
 import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
@@ -49,6 +49,11 @@ export class UmbDataTypeWorkspaceContext
 	readonly propertyEditorUiAlias = this._data.createObservablePartOfCurrent((data) => data?.editorUiAlias);
 	readonly propertyEditorSchemaAlias = this._data.createObservablePartOfCurrent((data) => data?.editorAlias);
 
+	readonly values = this._data.createObservablePartOfCurrent((data) => data?.values);
+	async getValues() {
+		return this._data.getCurrent()?.values;
+	}
+
 	#properties = new UmbArrayState<PropertyEditorSettingsProperty>([], (x) => x.alias).sortBy(
 		(a, b) => (a.weight || 0) - (b.weight || 0),
 	);
@@ -86,10 +91,10 @@ export class UmbDataTypeWorkspaceContext
 			{
 				path: 'create/parent/:entityType/:parentUnique',
 				component: UmbDataTypeWorkspaceEditorElement,
-				setup: (_component, info) => {
+				setup: async (_component, info) => {
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
-					this.createScaffold({ parent: { entityType: parentEntityType, unique: parentUnique } });
+					await this.createScaffold({ parent: { entityType: parentEntityType, unique: parentUnique } });
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
@@ -242,7 +247,7 @@ export class UmbDataTypeWorkspaceContext
 		this.#settingsDefaultData = [
 			...this.#propertyEditorSchemaSettingsDefaultData,
 			...this.#propertyEditorUISettingsDefaultData,
-		] satisfies Array<UmbDataTypePropertyModel>;
+		] satisfies Array<UmbDataTypePropertyValueModel>;
 		// We check for satisfied type, because we will be directly transferring them to become value. Future note, if they are not satisfied, we need to transfer alias and value. [NL]
 
 		this._data.updatePersisted({ values: this.#settingsDefaultData });

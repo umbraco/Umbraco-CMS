@@ -1,6 +1,7 @@
 import { UMB_WORKSPACE_CONTEXT } from '../workspace.context-token.js';
 import type { UmbWorkspaceContext } from '../workspace-context.interface.js';
 import type { WorkspaceAliasConditionConfig } from './types.js';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from './const.js';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -25,7 +26,7 @@ export class UmbWorkspaceAliasCondition
 			});
 		} else {
 			throw new Error(
-				'Condition `Umb.Condition.WorkspaceAlias` could not be initialized properly. Either "match" or "oneOf" must be defined',
+				`Condition [UMB_WORKSPACE_CONDITION_ALIAS] (${UMB_WORKSPACE_CONDITION_ALIAS}) could not be initialized properly. Either "match" or "oneOf" must be defined.`,
 			);
 		}
 	}
@@ -34,6 +35,6 @@ export class UmbWorkspaceAliasCondition
 export const manifest: UmbExtensionManifest = {
 	type: 'condition',
 	name: 'Workspace Alias Condition',
-	alias: 'Umb.Condition.WorkspaceAlias',
+	alias: UMB_WORKSPACE_CONDITION_ALIAS,
 	api: UmbWorkspaceAliasCondition,
 };

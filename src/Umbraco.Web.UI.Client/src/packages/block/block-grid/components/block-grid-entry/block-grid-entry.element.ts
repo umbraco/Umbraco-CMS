@@ -1,10 +1,11 @@
 import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context.js';
+import type { UmbBlockGridLayoutModel } from '../../types.js';
+import { UMB_BLOCK_GRID } from '../../constants.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
-import { UMB_BLOCK_GRID, type UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 
 import '../block-grid-block-inline/index.js';
 import '../block-grid-block/index.js';
@@ -60,6 +61,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	_contentTypeAlias?: string;
+
+	@state()
+	_contentTypeName?: string;
 
 	@state()
 	_columnSpan?: number;
@@ -325,6 +329,13 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			},
 			'contentElementTypeAlias',
 		);
+		this.observe(
+			this.#context.contentElementTypeName,
+			(contentElementTypeName) => {
+				this._contentTypeName = contentElementTypeName;
+			},
+			'contentElementTypeName',
+		);
 
 		this.#callUpdateInlineCreateButtons();
 	}
@@ -335,6 +346,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.#callUpdateInlineCreateButtons();
 		}
 	}
+
+	#expose = () => {
+		this.#context.expose();
+	};
 
 	#callUpdateInlineCreateButtons() {
 		clearTimeout(this.#renderTimeout);
@@ -401,6 +416,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
 			.settings=${this._blockViewProps.settings}></umb-block-grid-block-inline>`;
+		//TODO: investigate if we should have ${umbDestroyOnDisconnect()} here. Note how it works for drag n' drop in grid between areas and areas-root
 	}
 
 	#renderRefBlock() {
@@ -412,6 +428,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
 			.settings=${this._blockViewProps.settings}></umb-block-grid-block>`;
+		//TODO: investigate if we should have ${umbDestroyOnDisconnect()} here. Note how it works for drag n' drop in grid between areas and areas-root
 	}
 
 	#renderBlock() {
@@ -479,20 +496,25 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderEditAction() {
-		return html`
-			${this._showContentEdit && this._workspaceEditContentPath
+		return this._showContentEdit && this._workspaceEditContentPath
+			? html`<uui-button
+					label="edit"
+					look="secondary"
+					color=${this._contentInvalid ? 'danger' : ''}
+					href=${this._workspaceEditContentPath}>
+					<uui-icon name="icon-edit"></uui-icon>
+					${this._contentInvalid
+						? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+						: nothing}
+				</uui-button>`
+			: this._showContentEdit === false && this._exposed === false
 				? html`<uui-button
-						label="edit"
+						@click=${this.#expose}
+						label=${this.localize.term('blockEditor_createThisFor', this._contentTypeName)}
 						look="secondary"
-						color=${this._contentInvalid ? 'danger' : ''}
-						href=${this._workspaceEditContentPath}>
-						<uui-icon name="icon-edit"></uui-icon>
-						${this._contentInvalid
-							? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
-							: nothing}
-					</uui-button>`
-				: nothing}
-		`;
+						><uui-icon name="icon-add"></uui-icon
+					></uui-button>`
+				: nothing;
 	}
 
 	#renderEditSettingsAction() {
@@ -577,15 +599,15 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				inset: 0;
 				border: 1px solid transparent;
 				border-radius: var(--uui-border-radius);
-				box-shadow:
-					0 0 0 1px rgba(255, 255, 255, 0.7),
-					inset 0 0 0 1px rgba(255, 255, 255, 0.7);
 
 				transition: border-color 240ms ease-in;
 			}
 			:host(:hover):not(:drop)::after {
 				display: block;
 				border-color: var(--uui-color-interactive-emphasis);
+				box-shadow:
+					0 0 0 1px rgba(255, 255, 255, 0.7),
+					inset 0 0 0 1px rgba(255, 255, 255, 0.7);
 			}
 
 			:host([drag-placeholder])::after {

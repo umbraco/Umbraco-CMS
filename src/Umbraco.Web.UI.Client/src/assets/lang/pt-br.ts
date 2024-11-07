@@ -178,7 +178,7 @@ export default {
 		inserttable: 'Inserir tabela',
 		lastEdited: 'Última Edição',
 		link: 'Link',
-		linkinternal: 'Link interno:',
+		linkinternal: 'Link interno',
 		linklocaltip: 'Ao usar links locais insira "#" na frente do link',
 		linknewwindow: 'Abrir em nova janela?',
 		macroDoesNotHaveProperties: 'Este macro não contém nenhuma propriedade que possa ser editada',

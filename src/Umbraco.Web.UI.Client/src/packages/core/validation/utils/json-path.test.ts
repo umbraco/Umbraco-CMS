@@ -30,7 +30,7 @@ describe('UmbJsonPathFunctions', () => {
 	});
 
 	it('query of first entry in an array', () => {
-		const result = GetValueByJsonPath({ values: [{ id: '123', value: 'test' }] }, "$.values[?(@.id = '123')].value");
+		const result = GetValueByJsonPath({ values: [{ id: '123', value: 'test' }] }, "$.values[?(@.id == '123')].value");
 
 		expect(result).to.eq('test');
 	});

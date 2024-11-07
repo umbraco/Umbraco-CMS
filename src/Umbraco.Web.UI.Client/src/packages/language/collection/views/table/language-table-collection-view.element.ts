@@ -83,13 +83,11 @@ export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'defaultLanguage',
-						value: html`<umb-boolean-table-column-layout
-							.value=${language.isDefault}></umb-boolean-table-column-layout>`,
+						value: html`<umb-boolean-table-column-view .value=${language.isDefault}></umb-boolean-table-column-view>`,
 					},
 					{
 						columnAlias: 'mandatoryLanguage',
-						value: html`<umb-boolean-table-column-layout
-							.value=${language.isMandatory}></umb-boolean-table-column-layout>`,
+						value: html`<umb-boolean-table-column-view .value=${language.isMandatory}></umb-boolean-table-column-view>`,
 					},
 					{
 						columnAlias: 'fallbackLanguage',
@@ -97,11 +95,11 @@ export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'entityActions',
-						value: html`<umb-entity-actions-table-column-layout
+						value: html`<umb-entity-actions-table-column-view
 							.value=${{
 								entityType: language.entityType,
 								unique: language.unique,
-							}}></umb-entity-actions-table-column-layout>`,
+							}}></umb-entity-actions-table-column-view>`,
 					},
 				],
 			};

@@ -11,13 +11,18 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbDetailRepository, UmbRepositoryResponseWithAsObservable } from '@umbraco-cms/backoffice/repository';
 
-export interface UmbEntityWorkspaceContextArgs {
+export interface UmbEntityDetailWorkspaceContextArgs {
 	entityType: string;
 	workspaceAlias: string;
 	detailRepositoryAlias: string;
 }
+
+/**
+ * @deprecated Use UmbEntityDetailWorkspaceContextArgs instead
+ */
+export type UmbEntityWorkspaceContextArgs = UmbEntityDetailWorkspaceContextArgs;
 
 export interface UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> {
 	parent: UmbEntityModel;
@@ -41,12 +46,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	public readonly entityType = this._data.createObservablePartOfCurrent((data) => data?.entityType);
 	public readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
 
-	#entityContext = new UmbEntityContext(this);
-
 	protected _getDataPromise?: Promise<any>;
-
 	protected _detailRepository?: DetailRepositoryType;
 
+	#entityContext = new UmbEntityContext(this);
 	#entityType: string;
 
 	#parent = new UmbObjectState<{ entityType: string; unique: UmbEntityUnique } | undefined>(undefined);
@@ -72,19 +75,52 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.#observeRepository(args.detailRepositoryAlias);
 	}
 
-	getEntityType() {
+	/**
+	 * Get the entity type
+	 * @returns { string } The entity type
+	 */
+	getEntityType(): string {
 		return this.#entityType;
 	}
 
-	getData() {
+	/**
+	 * Get the current data
+	 * @returns { DetailModelType | undefined } The entity context
+	 */
+	getData(): DetailModelType | undefined {
 		return this._data.getCurrent();
 	}
 
-	getUnique() {
+	/**
+	 * Get the unique
+	 * @returns { string | undefined } The unique identifier
+	 */
+	getUnique(): UmbEntityUnique | undefined {
 		return this._data.getCurrent()?.unique;
 	}
 
+	/**
+	 * Get the parent
+	 * @returns { UmbEntityModel | undefined } The parent entity
+	 */
+	getParent(): UmbEntityModel | undefined {
+		return this.#parent.getValue();
+	}
+
+	/**
+	 * Get the parent unique
+	 * @returns { string | undefined } The parent unique identifier
+	 */
+	getParentUnique(): UmbEntityUnique | undefined {
+		return this.#parent.getValue()?.unique;
+	}
+
+	getParentEntityType() {
+		return this.#parent.getValue()?.entityType;
+	}
+
 	async load(unique: string) {
+		this.#entityContext.setEntityType(this.#entityType);
 		this.#entityContext.setUnique(unique);
 		await this.#init;
 		this.resetState();
@@ -94,18 +130,32 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		const data = response.data;
 
 		if (data) {
-			this.setIsNew(false);
 			this._data.setPersisted(data);
 			this._data.setCurrent(data);
+			this.setIsNew(false);
 		}
 
 		return response;
 	}
 
-	public isLoaded() {
+	/**
+	 * Method to check if the workspace data is loaded.
+	 * @returns { Promise<any> | undefined } true if the workspace data is loaded.
+	 * @memberof UmbEntityWorkspaceContextBase
+	 */
+	public isLoaded(): Promise<any> | undefined {
 		return this._getDataPromise;
 	}
 
+	/**
+	 * Create a data scaffold
+	 * @param {CreateArgsType} args The arguments to create the scaffold.
+	 * @param {UmbEntityModel} args.parent The parent entity.
+	 * @param {UmbEntityUnique} args.parent.unique The unique identifier of the parent entity.
+	 * @param {string} args.parent.entityType The entity type of the parent entity.
+	 * @param {Partial<DetailModelType>} args.preset The preset data.
+	 * @returns { Promise<any> | undefined } The data of the scaffold.
+	 */
 	async createScaffold(args: CreateArgsType) {
 		await this.#init;
 		this.resetState();
@@ -115,12 +165,16 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		let { data } = await request;
 		if (!data) return undefined;
 
+		this.#entityContext.setEntityType(this.#entityType);
+		this.#entityContext.setUnique(data.unique);
+
 		if (this.modalContext) {
 			data = { ...data, ...this.modalContext.data.preset };
 		}
 		this.setIsNew(true);
 		this._data.setPersisted(data);
 		this._data.setCurrent(data);
+
 		return data;
 	}
 
@@ -143,26 +197,33 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		}
 	}
 
+	/**
+	 * Deletes the entity.
+	 * @param unique The unique identifier of the entity to delete.
+	 */
 	async delete(unique: string) {
 		await this.#init;
 		await this._detailRepository!.delete(unique);
 	}
 
 	/**
-	 * @description method to check if the workspace is about to navigate away.
+	 * Check if the workspace is about to navigate away.
 	 * @protected
-	 * @param {string} newUrl
-	 * @returns {*}
+	 * @param {string} newUrl The new url that the workspace is navigating to.
+	 * @returns { boolean} true if the workspace is navigating away.
 	 * @memberof UmbEntityWorkspaceContextBase
 	 */
-	protected _checkWillNavigateAway(newUrl: string) {
+	protected _checkWillNavigateAway(newUrl: string): boolean {
 		return !newUrl.includes(this.routes.getActiveLocalPath());
 	}
 
 	async #create(currentData: DetailModelType) {
+		if (!this._detailRepository) throw new Error('Detail repository is not set');
+
 		const parent = this.#parent.getValue();
 		if (!parent) throw new Error('Parent is not set');
-		const { error, data } = await this._detailRepository!.create(currentData, parent.unique);
+
+		const { error, data } = await this._detailRepository.create(currentData, parent.unique);
 		if (error || !data) {
 			throw error?.message ?? 'Repository did not return data after create.';
 		}
@@ -199,6 +260,12 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	#onWillNavigate = async (e: CustomEvent) => {
 		const newUrl = e.detail.url;
+
+		/* TODO: temp removal of discard changes in workspace modals.
+		 The modal closes before the discard changes dialog is resolved.*/
+		if (newUrl.includes('/modal/umb-modal-workspace/')) {
+			return true;
+		}
 
 		if (this._checkWillNavigateAway(newUrl) && this._data.getHasUnpersistedChanges()) {
 			e.preventDefault();
@@ -248,9 +315,9 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	public override destroy(): void {
-		this._data.destroy();
-		this._detailRepository?.destroy();
 		window.removeEventListener('willchangestate', this.#onWillNavigate);
+		this._detailRepository?.destroy();
+		this.#entityContext.destroy();
 		super.destroy();
 	}
 }

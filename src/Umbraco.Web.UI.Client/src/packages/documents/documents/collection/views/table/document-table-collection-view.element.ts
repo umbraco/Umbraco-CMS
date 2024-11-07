@@ -149,11 +149,11 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 					if (column.alias === 'entityActions') {
 						return {
 							columnAlias: 'entityActions',
-							value: html`<umb-entity-actions-table-column-layout
+							value: html`<umb-entity-actions-table-column-view
 								.value=${{
 									entityType: item.entityType,
 									unique: item.unique,
-								}}></umb-entity-actions-table-column-layout>`,
+								}}></umb-entity-actions-table-column-view>`,
 						};
 					}
 

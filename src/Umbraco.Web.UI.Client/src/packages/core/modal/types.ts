@@ -1,4 +1,4 @@
-export * from './extensions/index.js';
+export type * from './extensions/index.js';
 
 export interface UmbPickerModalData<ItemType> {
 	multiple?: boolean;

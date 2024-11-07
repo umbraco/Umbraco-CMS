@@ -128,11 +128,11 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'entityActions',
-						value: html`<umb-entity-actions-table-column-layout
+						value: html`<umb-entity-actions-table-column-view
 							.value=${{
 								entityType: userGroup.entityType,
 								unique: userGroup.unique,
-							}}></umb-entity-actions-table-column-layout>`,
+							}}></umb-entity-actions-table-column-view>`,
 					},
 				],
 			};

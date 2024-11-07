@@ -12,6 +12,7 @@ import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { UmbAllowedDocumentTypeModel } from '@umbraco-cms/backoffice/document-type';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 @customElement('umb-create-document-collection-action')
 export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
@@ -25,7 +26,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	private _currentView?: string;
 
 	@state()
-	private _documentUnique?: string;
+	private _documentUnique?: UmbEntityUnique;
 
 	@state()
 	private _documentTypeUnique?: string;

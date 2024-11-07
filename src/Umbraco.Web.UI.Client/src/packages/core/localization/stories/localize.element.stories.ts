@@ -9,13 +9,6 @@ const meta: Meta<UmbLocalizeElement> = {
 	args: {
 		key: 'general_areyousure',
 	},
-	argTypes: {
-		args: {
-			control: {
-				type: 'array' as any,
-			},
-		},
-	},
 	decorators: [
 		(story) => {
 			return html`<div style="padding: 1rem; margin: 1rem; border: 1px solid green; max-width:50%;">

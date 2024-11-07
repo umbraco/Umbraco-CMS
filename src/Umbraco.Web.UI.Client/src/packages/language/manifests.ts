@@ -7,6 +7,7 @@ import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as globalContextManifests } from './global-contexts/manifests.js';
 import { manifest as conditionsManifest } from './conditions/multiple-app-languages.condition.js';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	...repositoryManifests,
@@ -25,7 +26,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		api: () => import('./permissions/language-access.workspace-context.js'),
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: 'Umb.Workspace.Document',
 			},
 		],

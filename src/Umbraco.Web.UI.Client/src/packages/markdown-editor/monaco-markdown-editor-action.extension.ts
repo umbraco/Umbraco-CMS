@@ -5,7 +5,10 @@ export interface ManifestMonacoMarkdownEditorAction extends ManifestApi<any> {
 	meta?: MetaMonacoMarkdownEditorAction;
 }
 
-export type MetaMonacoMarkdownEditorAction = object;
+export type MetaMonacoMarkdownEditorAction = {
+	icon?: string | null;
+	label?: string | null;
+};
 
 declare global {
 	interface UmbExtensionManifestMap {
