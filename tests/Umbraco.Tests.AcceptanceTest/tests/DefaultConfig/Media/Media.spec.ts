@@ -74,6 +74,7 @@ for (const mediaFileType of mediaFileTypes) {
 
     // Assert
     await umbracoUi.media.isSuccessNotificationVisible();
+    await umbracoUi.media.reloadMediaTree();
     await umbracoUi.media.isTreeItemVisible(mediaFileType.fileName);
     expect(await umbracoApi.media.doesNameExist(mediaFileType.fileName)).toBeTruthy();
 
@@ -83,15 +84,16 @@ for (const mediaFileType of mediaFileTypes) {
 }
 
 // TODO: Currently there is no delete button for the media, only trash, is this correct?
-test.skip('can delete a media file', async ({umbracoApi, umbracoUi}) => {
+test('can delete a media file', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.media.createDefaultMediaFile(mediaFileName);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
   await umbracoApi.media.doesNameExist(mediaFileName);
 
   // Act
-  await umbracoUi.media.deleteMediaItem(mediaFileName);
-
+  await umbracoUi.media.clickActionsMenuForName(mediaFileName);
+  await umbracoUi.media.clickTrashButton();
+  await umbracoUi.media.clickConfirmTrashButton();
   // Assert
   await umbracoUi.media.isSuccessNotificationVisible();
   await umbracoUi.media.isTreeItemVisible(mediaFileName, false);
@@ -111,6 +113,7 @@ test('can create a folder', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.media.isSuccessNotificationVisible();
+  await umbracoUi.media.reloadMediaTree();
   await umbracoUi.media.isTreeItemVisible(folderName);
   expect(await umbracoApi.media.doesNameExist(folderName)).toBeTruthy();
 
@@ -118,8 +121,7 @@ test('can create a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.media.ensureNameNotExists(folderName);
 });
 
-// TODO: Currently there is no delete button for the media, only trash, is this correct?
-test.skip('can delete a folder', async ({umbracoApi, umbracoUi}) => {
+test('can delete a folder', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.media.ensureNameNotExists(folderName);
   await umbracoApi.media.createDefaultMediaFolder(folderName);
@@ -128,8 +130,8 @@ test.skip('can delete a folder', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.media.clickActionsMenuForName(folderName);
-  await umbracoUi.media.clickDeleteButton();
-  await umbracoUi.media.clickConfirmToDeleteButton();
+  await umbracoUi.media.clickTrashButton();
+  await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
   await umbracoUi.media.isTreeItemVisible(folderName, false);
@@ -152,6 +154,7 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.media.isSuccessNotificationVisible();
+  await umbracoUi.media.reloadMediaTree();
   await umbracoUi.media.isTreeItemVisible(parentFolderName);
   await umbracoUi.media.clickMediaCaretButtonForName(parentFolderName);
   await umbracoUi.media.isTreeItemVisible(folderName);
