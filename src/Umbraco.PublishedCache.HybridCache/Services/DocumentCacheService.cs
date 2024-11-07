@@ -57,8 +57,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         IEnumerable<IDocumentSeedKeyProvider> seedKeyProviders,
         IOptionsMonitor<CacheEntrySettings> cacheEntrySettings,
         IPublishedModelFactory publishedModelFactory,
-        IPreviewService previewService,
-        INavigationQueryService navigationQueryService)
+        IPreviewService previewService)
     {
         _databaseCacheRepository = databaseCacheRepository;
         _idKeyMap = idKeyMap;
