@@ -488,6 +488,12 @@ public class DocumentUrlService : IDocumentUrlService
             }
         }
 
+        if (_globalSettings.ForceCombineUrlPathLeftToRight
+            || CultureInfo.GetCultureInfo(cultureOrDefault).TextInfo.IsRightToLeft is false)
+        {
+            urlSegments.Reverse();
+        }
+
         if (foundDomain is not null)
         {
             //we found a domain, and not to construct the route in the funny legacy way
@@ -548,8 +554,15 @@ public class DocumentUrlService : IDocumentUrlService
                     Dictionary<string, Domain> domainDictionary = await domainDictionaryTask;
                     if (domainDictionary.TryGetValue(culture, out Domain? domain))
                     {
-                        foundDomain = domain;
-                        break;
+                        Attempt<Guid> domainKeyAttempt = _idKeyMap.GetKeyForId(domain.ContentId, UmbracoObjectTypes.Document);
+                        if (domainKeyAttempt.Success)
+                        {
+                            if (_publishStatusQueryService.IsDocumentPublished(domainKeyAttempt.Result, culture))
+                            {
+                                foundDomain = domain;
+                                break;
+                            }
+                        }
                     }
                 }
 
