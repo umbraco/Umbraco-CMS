@@ -10,5 +10,5 @@ public class DocumentVariantResponseModel : VariantResponseModelBase
 
     public DateTimeOffset? ScheduledPublishDate { get; set; }
 
-    public DateTimeOffset? ScheduledUnPublishDate { get; set; }
+    public DateTimeOffset? ScheduledUnpublishDate { get; set; }
 }
