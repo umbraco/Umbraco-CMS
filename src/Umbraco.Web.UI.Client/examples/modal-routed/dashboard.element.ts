@@ -21,31 +21,16 @@ export class UmbDashboardElement extends UmbElementMixin(LitElement) {
 		},
 	];
 
-	/**
-	 *
-	 */
-	constructor() {
-		super();
-		console.log('modal element loaded');
-	}
-
 	override render() {
 		return html`
 			<div>
-				umb-example modal
+				Dashboard 1
 				<ul>
 					<li><a href="section/content/dashboard/example/tab1">Tab 1</a></li>
 					<li><a href="section/content/dashboard/example/tab2">Tab 2 (with modal)</a></li>
 				</ul>
 				<hr />
-				<umb-router-slot
-					.routes=${this._routes}
-					@init=${(event: UmbRouterSlotInitEvent) => {
-						console.log('tab routes init', event);
-					}}
-					@change=${(event: UmbRouterSlotChangeEvent) => {
-						console.log('modal routes change', event);
-					}}></umb-router-slot>
+				<umb-router-slot .routes=${this._routes}></umb-router-slot>
 			</div>
 		`;
 	}

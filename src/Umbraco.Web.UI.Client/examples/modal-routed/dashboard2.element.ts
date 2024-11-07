@@ -17,9 +17,7 @@ export class UmbDashboard2Element extends UmbElementMixin(LitElement) {
 					Clicking this link will not load the slots inside the modal, however, going to the "Modal Dashboard", clicking
 					on tab 2 and opening the modal from there will work.
 				</p>
-				<a href="section/content/dashboard/example/tab2/modal/example-routed-modal/view/abc123/overview"
-					>Open Modal Route</a
-				>
+				<a href="section/content/dashboard/example/tab2/modal/example-routed-modal/view/abc123/">Open Modal Route</a>
 			</div>
 		`;
 	}
