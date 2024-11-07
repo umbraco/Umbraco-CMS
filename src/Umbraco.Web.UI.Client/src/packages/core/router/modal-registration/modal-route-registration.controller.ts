@@ -259,9 +259,9 @@ export class UmbModalRouteRegistrationController<
 	}
 
 	public open(params: { [key: string]: string | number }, prepend?: string) {
-		if (this.active) return;
+		if (this.active || !this.#routeBuilder) return;
 
-		window.history.pushState({}, '', this.#routeBuilder?.(params) + (prepend ? `${prepend}` : ''));
+		window.history.pushState({}, '', this.#routeBuilder(params) + (prepend ? `${prepend}` : ''));
 	}
 
 	/**
@@ -277,6 +277,7 @@ export class UmbModalRouteRegistrationController<
 		return this;
 	}
 	public _internal_setRouteBuilder(urlBuilder: UmbModalRouteBuilder) {
+		if (!this.#routeContext) return;
 		this.#routeBuilder = urlBuilder;
 		this.#urlBuilderCallback?.(urlBuilder);
 	}
