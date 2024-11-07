@@ -271,6 +271,19 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				margin-right: var(--uui-size-1);
 			}
 
+			#info {
+				display: flex;
+				flex-direction: column;
+				align-items: start;
+				justify-content: center;
+				height: 100%;
+				padding-left: var(--uui-size-2, 6px);
+			}
+
+			#name {
+				font-weight: 700;
+			}
+
 			:host(:not([disabled])) #open-part:hover #icon {
 				color: var(--uui-color-interactive-emphasis);
 			}

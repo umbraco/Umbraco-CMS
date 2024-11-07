@@ -1,4 +1,4 @@
-import { UMB_CONTENT_REQUEST_EVENT_TYPE, type UmbContextRequestEvent } from '@umbraco-cms/backoffice/context-api';
+import { UMB_CONTEXT_REQUEST_EVENT_TYPE, type UmbContextRequestEvent } from '@umbraco-cms/backoffice/context-api';
 import type { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
 import { UUIIconRequestEvent } from '@umbraco-cms/backoffice/external/uui';
 
@@ -34,7 +34,7 @@ export const defaultFallbackConfig: RawEditorOptions = {
 	init_instance_callback: function (editor) {
 		// The following code is the context api proxy. [NL]
 		// It re-dispatches the context api request event to the origin target of this modal, in other words the element that initiated the modal. [NL]
-		editor.dom.doc.addEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, ((event: UmbContextRequestEvent) => {
+		editor.dom.doc.addEventListener(UMB_CONTEXT_REQUEST_EVENT_TYPE, ((event: UmbContextRequestEvent) => {
 			if (!editor.iframeElement) return;
 
 			event.stopImmediatePropagation();

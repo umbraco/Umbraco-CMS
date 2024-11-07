@@ -63,6 +63,10 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 		UmbTextStyles,
 		css`
 			:host {
+				display: contents;
+			}
+
+			uui-pagination {
 				display: block;
 				margin-top: var(--uui-size-layout-1);
 			}

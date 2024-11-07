@@ -1,4 +1,6 @@
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace.context-token.js';
+import type { UmbContentTypeModel, UmbPropertyTypeModel } from '../../../types.js';
+import { UmbContentTypePropertyStructureHelper } from '../../../structure/index.js';
 import { UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT } from './content-type-design-editor.context.js';
 import type { UmbContentTypeDesignEditorPropertyElement } from './content-type-design-editor-property.element.js';
 import {
@@ -13,16 +15,14 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
-import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-
-import './content-type-design-editor-property.element.js';
 import {
 	UMB_CREATE_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN,
 	UMB_PROPERTY_TYPE_WORKSPACE_MODAL,
 } from '@umbraco-cms/backoffice/property-type';
+
+import './content-type-design-editor-property.element.js';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbContentTypeDesignEditorPropertyElement> = {
 	getUniqueOfElement: (element) => {
@@ -193,7 +193,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 					}
 					preset.sortOrder = sortOrderInt;
 				}
-				return { data: { contentTypeUnique: this._ownerContentTypeUnique, preset: undefined } };
+				return { data: { contentTypeUnique: this._ownerContentTypeUnique, preset: preset } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._newPropertyPath =

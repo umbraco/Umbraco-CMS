@@ -1,5 +1,5 @@
-import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_DOCUMENT_TREE_ALIAS } from '../tree/index.js';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_CONTENT_MENU_ALIAS = 'Umb.Menu.Content';
 

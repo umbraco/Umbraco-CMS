@@ -1,3 +1,4 @@
+import './boolean-table-column-view/boolean-table-column-view.element.js';
 import './collection-action-bundle.element.js';
 import './collection-filter-field.element.js';
 import './collection-selection-actions.element.js';

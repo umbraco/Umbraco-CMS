@@ -47,6 +47,10 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 			name: this.localize.term('user_mediastartnode'),
 			alias: 'userGroupMediaStartNode',
 		},
+		{
+			name: '',
+			alias: 'entityActions',
+		},
 	];
 
 	@state()
@@ -121,6 +125,14 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 						value: userGroup.mediaStartNode?.unique
 							? this.#mediaStartNodeMap.get(userGroup.mediaStartNode.unique)
 							: this.localize.term('media_mediaRoot'),
+					},
+					{
+						columnAlias: 'entityActions',
+						value: html`<umb-entity-actions-table-column-view
+							.value=${{
+								entityType: userGroup.entityType,
+								unique: userGroup.unique,
+							}}></umb-entity-actions-table-column-view>`,
 					},
 				],
 			};

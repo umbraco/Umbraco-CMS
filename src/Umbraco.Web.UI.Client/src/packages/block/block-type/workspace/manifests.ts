@@ -1,8 +1,7 @@
-import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_BLOCK_GRID_TYPE_WORKSPACE_ALIAS } from '../../block-grid/workspace/index.js';
 import { UMB_BLOCK_LIST_TYPE_WORKSPACE_ALIAS } from '../../block-list/workspace/index.js';
 import { UMB_BLOCK_RTE_TYPE_WORKSPACE_ALIAS } from '../../block-rte/workspace/index.js';
-import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONDITION_ALIAS, UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

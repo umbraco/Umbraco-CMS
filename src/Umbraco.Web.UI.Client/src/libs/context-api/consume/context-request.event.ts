@@ -1,4 +1,9 @@
-export const UMB_CONTENT_REQUEST_EVENT_TYPE = 'umb:context-request';
+export const UMB_CONTEXT_REQUEST_EVENT_TYPE = 'umb:context-request';
+/**
+ * @deprecated use UMB_CONTEXT_REQUEST_EVENT_TYPE
+ * This will be removed in Umbraco 17
+ */
+export const UMB_CONTENT_REQUEST_EVENT_TYPE = UMB_CONTEXT_REQUEST_EVENT_TYPE;
 export const UMB_DEBUG_CONTEXT_EVENT_TYPE = 'umb:debug-contexts';
 
 export type UmbContextCallback<T> = (instance: T) => void;
@@ -29,7 +34,7 @@ export class UmbContextRequestEventImplementation<ResultType = unknown>
 		public readonly callback: (context: ResultType) => boolean,
 		public readonly stopAtContextMatch: boolean = true,
 	) {
-		super(UMB_CONTENT_REQUEST_EVENT_TYPE, { bubbles: true, composed: true, cancelable: true });
+		super(UMB_CONTEXT_REQUEST_EVENT_TYPE, { bubbles: true, composed: true, cancelable: true });
 	}
 
 	clone() {

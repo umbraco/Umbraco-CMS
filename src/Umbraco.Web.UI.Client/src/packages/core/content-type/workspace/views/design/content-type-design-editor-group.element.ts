@@ -1,12 +1,9 @@
+import type { UmbContentTypeModel, UmbPropertyTypeContainerModel } from '../../../types.js';
+import type { UmbContentTypeContainerStructureHelper } from '../../../structure/index.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type {
-	UmbContentTypeContainerStructureHelper,
-	UmbContentTypeModel,
-	UmbPropertyTypeContainerModel,
-} from '@umbraco-cms/backoffice/content-type';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import './content-type-design-editor-properties.element.js';

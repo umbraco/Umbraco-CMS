@@ -1,18 +1,19 @@
-import './image-cropper.element.js';
-import './image-cropper-focus-setter.element.js';
-import './image-cropper-preview.element.js';
 import type { UmbImageCropperElement } from './image-cropper.element.js';
 import type {
 	UmbImageCropperCrop,
 	UmbImageCropperCrops,
 	UmbImageCropperFocalPoint,
 	UmbImageCropperPropertyEditorValue,
-	UmbFocalPointChangeEvent,
-	UmbImageCropChangeEvent,
-} from './index.js';
+} from './types.js';
+import type { UmbImageCropChangeEvent } from './crop-change.event.js';
+import type { UmbFocalPointChangeEvent } from './focalpoint-change.event.js';
 import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+
+import './image-cropper.element.js';
+import './image-cropper-focus-setter.element.js';
+import './image-cropper-preview.element.js';
 
 @customElement('umb-image-cropper-field')
 export class UmbInputImageCropperFieldElement extends UmbLitElement {

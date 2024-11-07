@@ -123,7 +123,7 @@ export class UmbRouteContext extends UmbContextBase<UmbRouteContext> {
 		if (this.#activeModalPath) {
 			// If if there is a modal using the old path.
 			const activeModal = this.#modalRegistrations.find((registration) => {
-				return registration.generateModalPath() === this.#activeModalPath;
+				return '/' + registration.generateModalPath() === this.#activeModalPath;
 			});
 			if (activeModal) {
 				this.#modalContext?.close(activeModal.key);

@@ -1,4 +1,5 @@
-import type { UmbContentDetailModel, UmbElementPropertyDataOwner } from '@umbraco-cms/backoffice/content';
+import type { UmbContentDetailModel } from '../types.js';
+import type { UmbElementPropertyDataOwner } from '../property-dataset-context/index.js';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbVariantId, UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';

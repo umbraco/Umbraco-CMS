@@ -6,9 +6,7 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-import './column-layouts/boolean/language-table-boolean-column-layout.element.js';
 import './column-layouts/name/language-table-name-column-layout.element.js';
-import './column-layouts/entity-actions/language-table-entity-actions-column-layout.element.js';
 
 @customElement('umb-language-table-collection-view')
 export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
@@ -31,12 +29,10 @@ export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 		{
 			name: 'Default',
 			alias: 'defaultLanguage',
-			elementName: 'umb-language-table-boolean-column-layout',
 		},
 		{
 			name: 'Mandatory',
 			alias: 'mandatoryLanguage',
-			elementName: 'umb-language-table-boolean-column-layout',
 		},
 		{
 			name: 'Fallback',
@@ -45,7 +41,6 @@ export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 		{
 			name: '',
 			alias: 'entityActions',
-			elementName: 'umb-language-table-entity-actions-column-layout',
 		},
 	];
 
@@ -88,11 +83,11 @@ export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'defaultLanguage',
-						value: language.isDefault,
+						value: html`<umb-boolean-table-column-view .value=${language.isDefault}></umb-boolean-table-column-view>`,
 					},
 					{
 						columnAlias: 'mandatoryLanguage',
-						value: language.isMandatory,
+						value: html`<umb-boolean-table-column-view .value=${language.isMandatory}></umb-boolean-table-column-view>`,
 					},
 					{
 						columnAlias: 'fallbackLanguage',
@@ -100,7 +95,11 @@ export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'entityActions',
-						value: language,
+						value: html`<umb-entity-actions-table-column-view
+							.value=${{
+								entityType: language.entityType,
+								unique: language.unique,
+							}}></umb-entity-actions-table-column-view>`,
 					},
 				],
 			};

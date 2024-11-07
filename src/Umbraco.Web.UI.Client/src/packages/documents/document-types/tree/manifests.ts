@@ -1,15 +1,14 @@
-import {
-	UMB_DOCUMENT_TYPE_ENTITY_TYPE,
-	UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
-	UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
-} from '../entity.js';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
+import { UMB_DOCUMENT_TYPE_ROOT_WORKSPACE_ALIAS } from '../workspace/document-type-root/index.js';
 import {
 	UMB_DOCUMENT_TYPE_TREE_ALIAS,
 	UMB_DOCUMENT_TYPE_TREE_REPOSITORY_ALIAS,
 	UMB_DOCUMENT_TYPE_TREE_STORE_ALIAS,
 } from './constants.js';
+import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE, UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS } from './folder/index.js';
 import { manifests as folderManifests } from './folder/manifests.js';
-import { manifests as reloadManifests } from './reload-tree-item-children/manifests.js';
+import { manifests as treeItemChildrenManifests } from './tree-item-children/manifests.js';
+import { UMB_DOCUMENT_TYPE_TREE_ITEM_CHILDREN_COLLECTION_ALIAS } from './tree-item-children/collection/index.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -45,15 +44,23 @@ export const manifests: Array<UmbExtensionManifest> = [
 		],
 	},
 	{
-		type: 'workspace',
-		kind: 'default',
-		alias: 'Umb.Workspace.DocumentType.Root',
-		name: 'Document Type Root Workspace',
+		type: 'workspaceView',
+		kind: 'collection',
+		alias: 'Umb.WorkspaceView.DocumentType.TreeItemChildrenCollection',
+		name: 'Document Type Tree Item Children Collection Workspace View',
 		meta: {
-			entityType: UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
-			headline: '#treeHeaders_documentTypes',
+			label: '#general_design',
+			pathname: 'design',
+			icon: 'icon-member-dashed-line',
+			collectionAlias: UMB_DOCUMENT_TYPE_TREE_ITEM_CHILDREN_COLLECTION_ALIAS,
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				oneOf: [UMB_DOCUMENT_TYPE_ROOT_WORKSPACE_ALIAS, UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS],
+			},
+		],
 	},
 	...folderManifests,
-	...reloadManifests,
+	...treeItemChildrenManifests,
 ];
