@@ -10,9 +10,9 @@ public class CollectPublishedCacheController : PublishedCacheControllerBase
 {
     [HttpPost("collect")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status501NotImplemented)]
     public async Task<IActionResult> Collect(CancellationToken cancellationToken)
     {
-        return StatusCode(501);
+        return StatusCode(StatusCodes.Status501NotImplemented);
     }
 }

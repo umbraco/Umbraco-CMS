@@ -10,9 +10,9 @@ public class StatusPublishedCacheController : PublishedCacheControllerBase
 {
     [HttpGet("status")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status501NotImplemented)]
     public async Task<ActionResult<string>> Status(CancellationToken cancellationToken)
     {
-        return StatusCode(501);
+        return StatusCode(StatusCodes.Status501NotImplemented);
     }
 }
