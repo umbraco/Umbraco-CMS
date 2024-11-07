@@ -27,7 +27,7 @@ export class UmbDocumentPublicAccessRepository extends UmbControllerBase impleme
 
 		const { error } = await this.#dataSource.create(unique, data);
 		if (!error) {
-			const notification = { data: { message: `Public acccess setting created` } };
+			const notification = { data: { message: `Public access setting created` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
 		return { error };
@@ -46,7 +46,7 @@ export class UmbDocumentPublicAccessRepository extends UmbControllerBase impleme
 
 		const { error } = await this.#dataSource.update(unique, data);
 		if (!error) {
-			const notification = { data: { message: `Public acccess setting updated` } };
+			const notification = { data: { message: `Public access setting updated` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
 		return { error };
@@ -57,7 +57,7 @@ export class UmbDocumentPublicAccessRepository extends UmbControllerBase impleme
 
 		const { error } = await this.#dataSource.delete(unique);
 		if (!error) {
-			const notification = { data: { message: `Public acccess setting deleted` } };
+			const notification = { data: { message: `Public access setting deleted` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
 		return { error };
