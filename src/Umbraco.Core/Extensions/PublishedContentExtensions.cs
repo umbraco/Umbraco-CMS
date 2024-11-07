@@ -1527,7 +1527,7 @@ public static class PublishedContentExtensions
         string contentTypeAlias,
         string? culture = null) =>
         SiblingsAndSelfOfType(content, variationContextAccessor, publishedCache, navigationQueryService, contentTypeAlias, culture)
-            ?.Where(x => x.Id != content.Id) ?? Enumerable.Empty<IPublishedContent>();
+            .Where(x => x.Id != content.Id);
 
     /// <summary>
     ///     Gets the siblings of the content, of a given content type.
@@ -1613,26 +1613,26 @@ public static class PublishedContentExtensions
         string contentTypeAlias,
         string? culture = null)
     {
+        var parentExists = navigationQueryService.TryGetParentKey(content.Key, out Guid? parentKey);
 
-        var parentSuccess = navigationQueryService.TryGetParentKey(content.Key, out Guid? parentKey);
+        IPublishedContent? parent = parentKey is null
+            ? null
+            : publishedCache.GetById(parentKey.Value);
 
-        IPublishedContent? parent = parentKey is null ? null : publishedCache.GetById(parentKey.Value);
-
-        if (parentSuccess is false || parent is null)
+        if (parentExists && parent is not null)
         {
-            if (navigationQueryService.TryGetRootKeys(out IEnumerable<Guid> childrenKeys) is false)
-            {
-                return Enumerable.Empty<IPublishedContent>();
-            }
-
-            return childrenKeys
-                .Select(publishedCache.GetById)
-                .WhereNotNull()
-                .OfTypes(contentTypeAlias)
-                .WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
+            return parent.ChildrenOfType(variationContextAccessor, publishedCache, navigationQueryService, contentTypeAlias, culture);
         }
 
-        return parent.ChildrenOfType(variationContextAccessor, publishedCache, navigationQueryService, contentTypeAlias, culture);
+        if (navigationQueryService.TryGetRootKeysOfType(contentTypeAlias, out IEnumerable<Guid> rootKeysOfType) is false)
+        {
+            return [];
+        }
+
+        return rootKeysOfType
+            .Select(publishedCache.GetById)
+            .WhereNotNull()
+            .WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
     }
 
     /// <summary>
