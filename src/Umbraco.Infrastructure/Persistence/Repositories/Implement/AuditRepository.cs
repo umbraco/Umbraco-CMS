@@ -1,8 +1,10 @@
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -183,20 +185,27 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
         return sql;
     }
 
+
+
     protected override string GetBaseWhereClause() => "id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses() => throw new NotImplementedException();
 
     public override void Save(IAuditItem entity)
     {
-        if (!_cachedUserIds.Any(x => x == entity.UserId))
-        {
-
-            int? userIdQueryResult = Database.FirstOrDefault<int?>(
-            "select id from umbracoUser where " + GetBaseWhereClause(),
-            new { id = entity.UserId }) ?? throw new InvalidOperationException("The specified user ID does not exist in the database.");
-            _cachedUserIds.Add(userIdQueryResult.Value);
-        }
+        ValidateUser(entity.UserId);
         base.Save(entity);
+    }
+
+    private void ValidateUser(int userId)
+    {
+        if (!_cachedUserIds.Any(x => x == userId))
+        {
+            Sql<ISqlContext> sql = SqlContext.Sql();
+
+            sql = sql.Select<UserDto>().From<UserDto>().Where<UserDto>(x => x.Id == userId);
+            UserDto? sqlResult = Database.FirstOrDefault<UserDto>(sql) ?? throw new InvalidOperationException("The specified user Id does not exist in the database.");
+            _cachedUserIds.Add(sqlResult.Id);
+        }
     }
 }
