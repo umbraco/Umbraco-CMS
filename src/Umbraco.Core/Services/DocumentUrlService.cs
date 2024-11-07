@@ -488,6 +488,12 @@ public class DocumentUrlService : IDocumentUrlService
             }
         }
 
+        if (_globalSettings.ForceCombineUrlPathLeftToRight
+            || CultureInfo.GetCultureInfo(cultureOrDefault).TextInfo.IsRightToLeft is false)
+        {
+            urlSegments.Reverse();
+        }
+
         if (foundDomain is not null)
         {
             //we found a domain, and not to construct the route in the funny legacy way
