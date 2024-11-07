@@ -17,7 +17,7 @@ import { UMB_ROUTE_CONTEXT, type UmbRouterSlotElement } from '@umbraco-cms/backo
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbContextRequestEvent } from '@umbraco-cms/backoffice/context-api';
 import {
-	UMB_CONTENT_REQUEST_EVENT_TYPE,
+	UMB_CONTEXT_REQUEST_EVENT_TYPE,
 	UmbContextBoundary,
 	UmbContextProvider,
 } from '@umbraco-cms/backoffice/context-api';
@@ -63,7 +63,7 @@ export class UmbModalElement extends UmbLitElement {
 
 		// The following code is the context api proxy.
 		// It re-dispatches the context api request event to the origin target of this modal, in other words the element that initiated the modal. [NL]
-		this.element.addEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, ((event: UmbContextRequestEvent) => {
+		this.element.addEventListener(UMB_CONTEXT_REQUEST_EVENT_TYPE, ((event: UmbContextRequestEvent) => {
 			if (!this.#modalContext) return;
 			// Note for this hack (The if-sentence):  [NL]
 			// We do not currently have a good enough control to ensure that the proxy is last, meaning if another context is provided at this element, it might respond after the proxy event has been dispatched.
