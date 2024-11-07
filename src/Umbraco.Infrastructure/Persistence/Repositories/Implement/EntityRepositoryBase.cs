@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -244,5 +245,11 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
         }
 
         entity.DeleteDate = DateTime.Now;
+    }
+    protected virtual void ValidateUser(int userId)
+    {
+        Sql<ISqlContext> sql = SqlContext.Sql();
+        sql = sql.Select<UserDto>().From<UserDto>().Where<UserDto>(x => x.Id == userId);
+        UserDto? sqlResult = Database.FirstOrDefault<UserDto>(sql) ?? throw new InvalidOperationException("The specified user Id does not exist in the database.");
     }
 }
