@@ -1,12 +1,17 @@
 import { UmbValidationPathTranslatorBase } from './validation-path-translator-base.controller.js';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export abstract class UmbAbstractArrayValidationPathTranslator extends UmbValidationPathTranslatorBase {
 	#initialPathToMatch: string;
 	#queryMethod: (data: unknown) => string;
 
-	constructor(host: UmbControllerHost, initialPathToMatch: string, queryMethod: (data: any) => string) {
-		super(host);
+	constructor(
+		host: UmbControllerHost,
+		initialPathToMatch: string,
+		queryMethod: (data: any) => string,
+		ctrlAlias?: UmbControllerAlias,
+	) {
+		super(host, ctrlAlias);
 
 		this.#initialPathToMatch = initialPathToMatch;
 		this.#queryMethod = queryMethod;

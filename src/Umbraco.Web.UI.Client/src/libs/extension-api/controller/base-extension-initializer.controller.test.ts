@@ -59,12 +59,12 @@ class UmbTestConditionAlwaysInvalid extends UmbControllerBase implements UmbExte
 
 describe('UmbBaseExtensionController', () => {
 	describe('Manifest without conditions', () => {
-		//let hostElement: UmbControllerHostElement;
+		let hostElement: UmbControllerHostElement;
 		let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
 		let manifest: ManifestWithDynamicConditions;
 
 		beforeEach(async () => {
-			//hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
 			extensionRegistry = new UmbExtensionRegistry();
 			manifest = {
 				type: 'section',
@@ -74,7 +74,7 @@ describe('UmbBaseExtensionController', () => {
 
 			extensionRegistry.register(manifest);
 		});
-		/*
+
 		it('permits when there is no conditions', (done) => {
 			const extensionController = new UmbTestExtensionController(
 				hostElement,
@@ -92,16 +92,15 @@ describe('UmbBaseExtensionController', () => {
 				},
 			);
 		});
-		*/
 	});
 
 	describe('Manifest with empty conditions', () => {
-		//let hostElement: UmbControllerHostElement;
+		let hostElement: UmbControllerHostElement;
 		let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
 		let manifest: ManifestWithDynamicConditions;
 
 		beforeEach(async () => {
-			//hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
 			extensionRegistry = new UmbExtensionRegistry();
 			manifest = {
 				type: 'section',
@@ -113,7 +112,6 @@ describe('UmbBaseExtensionController', () => {
 			extensionRegistry.register(manifest);
 		});
 
-		/*
 		it('permits when there is empty conditions', (done) => {
 			const extensionController = new UmbTestExtensionController(
 				hostElement,
@@ -124,7 +122,7 @@ describe('UmbBaseExtensionController', () => {
 					if (extensionController.permitted) {
 						expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
 
-						// Also verifying that the promise gets resolved.
+						// Also verifying that the promise gets resolved. [NL]
 						extensionController.asPromise().then(() => {
 							done();
 						});
@@ -132,7 +130,6 @@ describe('UmbBaseExtensionController', () => {
 				},
 			);
 		});
-		*/
 	});
 
 	describe('Manifest with valid conditions', () => {
@@ -225,14 +222,14 @@ describe('UmbBaseExtensionController', () => {
 					if (isPermitted) {
 						count++;
 						if (count === 1) {
-							// First time render, there is no conditions.
+							// First time render, there is no conditions. [NL]
 							expect(extensionController.manifest?.weight).to.be.equal(2);
 							expect(extensionController.manifest?.conditions?.length).to.be.equal(1);
 						} else if (count === 2) {
-							// Second time render, there is conditions and weight is 22.
+							// Second time render, there is conditions and weight is 22. [NL]
 							expect(extensionController.manifest?.weight).to.be.equal(22);
 							expect(extensionController.manifest?.conditions?.length).to.be.equal(1);
-							// Check that the promise has been resolved for the first render to ensure timing is right.
+							// Check that the promise has been resolved for the first render to ensure timing is right. [NL]
 							expect(initialPromiseResolved).to.be.true;
 							done();
 							extensionController.destroy();
@@ -270,14 +267,14 @@ describe('UmbBaseExtensionController', () => {
 					if (isPermitted) {
 						count++;
 						if (count === 1) {
-							// First time render, there is no conditions.
+							// First time render, there is no conditions. [NL]
 							expect(extensionController.manifest?.weight).to.be.equal(3);
 							expect(extensionController.manifest?.conditions?.length).to.be.equal(0);
 						} else if (count === 2) {
-							// Second time render, there is conditions and weight is 33.
+							// Second time render, there is conditions and weight is 33. [NL]
 							expect(extensionController.manifest?.weight).to.be.equal(33);
 							expect(extensionController.manifest?.conditions?.length).to.be.equal(0);
-							// Check that the promise has been resolved for the first render to ensure timing is right.
+							// Check that the promise has been resolved for the first render to ensure timing is right. [NL]
 							expect(initialPromiseResolved).to.be.true;
 							done();
 							extensionController.destroy();
@@ -315,14 +312,14 @@ describe('UmbBaseExtensionController', () => {
 					if (isPermitted) {
 						count++;
 						if (count === 1) {
-							// First time render, there is no conditions.
+							// First time render, there is no conditions. [NL]
 							expect(extensionController.manifest?.weight).to.be.equal(4);
 							expect(extensionController.manifest?.conditions?.length).to.be.equal(0);
 						} else if (count === 2) {
-							// Second time render, there is conditions and weight is 33.
+							// Second time render, there is conditions and weight is updated. [NL]
 							expect(extensionController.manifest?.weight).to.be.equal(44);
 							expect(extensionController.manifest?.conditions?.length).to.be.equal(1);
-							// Check that the promise has been resolved for the first render to ensure timing is right.
+							// Check that the promise has been resolved for the first render to ensure timing is right. [NL]
 							expect(initialPromiseResolved).to.be.true;
 							done();
 							extensionController.destroy();
@@ -370,14 +367,14 @@ describe('UmbBaseExtensionController', () => {
 					if (isPermitted) {
 						count++;
 						if (count === 1) {
-							// First time render, there is no conditions.
+							// First time render, there is no conditions. [NL]
 							expect(extensionController.manifest?.weight).to.be.undefined;
 							expect(extensionController.manifest?.conditions?.length).to.be.equal(0);
 						} else if (count === 2) {
-							// Second time render, there is a matching kind and then weight is 123.
+							// Second time render, there is a matching kind and then weight is 123. [NL]
 							expect(extensionController.manifest?.weight).to.be.equal(123);
 							expect(extensionController.manifest?.conditions?.length).to.be.equal(0);
-							// Check that the promise has been resolved for the first render to ensure timing is right.
+							// Check that the promise has been resolved for the first render to ensure timing is right. [NL]
 							expect(initialPromiseResolved).to.be.true;
 							done();
 							extensionController.destroy();
@@ -433,7 +430,7 @@ describe('UmbBaseExtensionController', () => {
 				'Umb.Test.Section.1',
 				() => {
 					// This should not be called.
-					expect(true).to.be.false;
+					expect.fail('Callback should not be called when never permitted');
 				},
 			);
 			Promise.resolve().then(() => {
@@ -451,7 +448,7 @@ describe('UmbBaseExtensionController', () => {
 				'Umb.Test.Section.1',
 				() => {
 					// This should not be called.
-					expect(true).to.be.false;
+					expect.fail('Callback should not be called when never permitted');
 				},
 			);
 
@@ -531,7 +528,7 @@ describe('UmbBaseExtensionController', () => {
 				'Umb.Test.Section.1',
 				async () => {
 					count++;
-					// We want the controller callback to first fire when conditions are initialized.
+					// We want the controller callback to first fire when conditions are initialized. [NL]
 					expect(extensionController.manifest?.conditions?.length).to.be.equal(1);
 					expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
 					if (count === 1) {
@@ -596,29 +593,30 @@ describe('UmbBaseExtensionController', () => {
 				'Umb.Test.Section.1',
 				async (isPermitted) => {
 					count++;
-					// We want the controller callback to first fire when conditions are initialized.
+					// We want the controller callback to first fire when conditions are initialized. [NL]
 					expect(extensionController.manifest?.conditions?.length).to.be.equal(2);
 					expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
 					if (count === 1) {
 						expect(isPermitted).to.be.true;
 						expect(extensionController?.permitted).to.be.true;
-						// Hack to double check that its two conditions that make up the state:
+						// Hack to double check that its two conditions that make up the state: [NL]
 						expect(
 							extensionController.getUmbControllers((controller) => (controller as any).permitted).length,
 						).to.equal(2);
 					} else if (count === 2) {
 						expect(isPermitted).to.be.false;
 						expect(extensionController?.permitted).to.be.false;
-						// Hack to double check that its two conditions that make up the state, in this case its one, cause we already got the callback when one of the conditions changed. meaning in this split second one is still good:
+						// Hack to double check that its two conditions that make up the state, in this case its one, cause we already got the callback when one of the conditions changed. meaning in this split second one is still good: [NL]
 						expect(
 							extensionController.getUmbControllers((controller) => (controller as any).permitted).length,
 						).to.equal(1);
 
 						// Then we are done:
 						extensionController.destroy(); // End this test.
-						setTimeout(() => done(), 60); // Lets wait another round of the conditions approve/disapprove, just to see if the destroy stopped the conditions. (60ms, as that should be enough to test that another round does not happen.)
+						setTimeout(() => done(), 60); // Lets wait another round of the conditions approve/disapprove, just to see if the destroy stopped the conditions. (60ms, as that should be enough to test that another round does not happen.) [NL]
 					} else if (count === 5) {
-						expect(false).to.be.true; // This should not be called.
+						// This should not be called.
+						expect.fail('Callback should not be called when never permitted');
 					}
 				},
 			);

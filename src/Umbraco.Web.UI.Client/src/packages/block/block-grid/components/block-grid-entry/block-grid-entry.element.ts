@@ -1,7 +1,7 @@
 import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context.js';
 import type { UmbBlockGridLayoutModel } from '../../types.js';
 import { UMB_BLOCK_GRID } from '../../constants.js';
-import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
@@ -415,8 +415,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			${umbDestroyOnDisconnect()}></umb-block-grid-block-inline>`;
+			.settings=${this._blockViewProps.settings}></umb-block-grid-block-inline>`;
+		//TODO: investigate if we should have ${umbDestroyOnDisconnect()} here. Note how it works for drag n' drop in grid between areas and areas-root
 	}
 
 	#renderRefBlock() {
@@ -427,8 +427,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			${umbDestroyOnDisconnect()}></umb-block-grid-block>`;
+			.settings=${this._blockViewProps.settings}></umb-block-grid-block>`;
+		//TODO: investigate if we should have ${umbDestroyOnDisconnect()} here. Note how it works for drag n' drop in grid between areas and areas-root
 	}
 
 	#renderBlock() {
@@ -599,15 +599,15 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				inset: 0;
 				border: 1px solid transparent;
 				border-radius: var(--uui-border-radius);
-				box-shadow:
-					0 0 0 1px rgba(255, 255, 255, 0.7),
-					inset 0 0 0 1px rgba(255, 255, 255, 0.7);
 
 				transition: border-color 240ms ease-in;
 			}
 			:host(:hover):not(:drop)::after {
 				display: block;
 				border-color: var(--uui-color-interactive-emphasis);
+				box-shadow:
+					0 0 0 1px rgba(255, 255, 255, 0.7),
+					inset 0 0 0 1px rgba(255, 255, 255, 0.7);
 			}
 
 			:host([drag-placeholder])::after {

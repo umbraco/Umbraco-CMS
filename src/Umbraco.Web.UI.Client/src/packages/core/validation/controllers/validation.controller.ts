@@ -79,13 +79,16 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		this.messages.removeTranslator(translator);
 	}
 
+	#currentProvideHost?: UmbClassInterface;
 	/**
 	 * Provide this validation context to a specific controller host.
 	 * This can be used to Host a validation context in a Workspace, but provide it on a certain scope, like a specific Workspace View.
 	 * @param controllerHost {UmbClassInterface}
 	 */
 	provideAt(controllerHost: UmbClassInterface): void {
+		if (this.#currentProvideHost === controllerHost) return;
 		this.#providerCtrl?.destroy();
+		this.#currentProvideHost = controllerHost;
 		this.#providerCtrl = controllerHost.provideContext(UMB_VALIDATION_CONTEXT, this);
 	}
 
