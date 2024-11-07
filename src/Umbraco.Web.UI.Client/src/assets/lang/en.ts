@@ -1978,7 +1978,7 @@ export default {
 		passwordCurrent: 'Current password',
 		passwordInvalid: 'Invalid current password',
 		passwordIsDifferent:
-			'There was a difference between the new password and the confirmed password. Please\n      try again!\n    ',
+			'There was a difference between the new password and the confirmed password. Please try again!',
 		passwordMismatch: "The confirmed password doesn't match the new password!",
 		passwordRequiresDigit: "The password must have at least one digit ('0'-'9')",
 		passwordRequiresLower: "The password must have at least one lowercase ('a'-'z')",
