@@ -108,7 +108,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
                     variant.ScheduledPublishDate = new DateTimeOffset(schedule.Date, TimeSpan.Zero);
                     break;
                 case ContentScheduleAction.Expire:
-                    variant.ScheduledUnPublishDate = new DateTimeOffset(schedule.Date, TimeSpan.Zero);
+                    variant.ScheduledUnpublishDate = new DateTimeOffset(schedule.Date, TimeSpan.Zero);
                     break;
             }
         }
