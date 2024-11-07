@@ -3,6 +3,7 @@ import './collection-filter-field.element.js';
 import './collection-selection-actions.element.js';
 import './collection-toolbar.element.js';
 import './collection-view-bundle.element.js';
+import './boolean-table-column-view/boolean-table-column-view.element.js';
 import './pagination/collection-pagination.element.js';
 
 export * from './collection-action-bundle.element.js';

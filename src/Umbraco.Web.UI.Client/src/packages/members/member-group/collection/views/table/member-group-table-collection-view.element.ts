@@ -19,6 +19,10 @@ export class UmbMemberGroupTableCollectionViewElement extends UmbLitElement {
 			name: this.localize.term('general_name'),
 			alias: 'memberGroupName',
 		},
+		{
+			name: '',
+			alias: 'entityActions',
+		},
 	];
 
 	@state()
@@ -51,6 +55,14 @@ export class UmbMemberGroupTableCollectionViewElement extends UmbLitElement {
 						value: html`<a href=${'section/member-management/workspace/member-group/edit/' + memberGroup.unique}
 							>${memberGroup.name}</a
 						>`,
+					},
+					{
+						columnAlias: 'entityActions',
+						value: html`<umb-entity-actions-table-column-view
+							.value=${{
+								entityType: memberGroup.entityType,
+								unique: memberGroup.unique,
+							}}></umb-entity-actions-table-column-view>`,
 					},
 				],
 			};

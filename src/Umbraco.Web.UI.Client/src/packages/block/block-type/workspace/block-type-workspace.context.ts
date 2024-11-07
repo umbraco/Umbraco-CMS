@@ -54,7 +54,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 
 					const elementTypeKey = info.match.params.elementTypeKey;
 					const groupKey = info.match.params.groupKey === 'null' ? null : info.match.params.groupKey;
-					this.create(elementTypeKey, groupKey);
+					await this.create(elementTypeKey, groupKey);
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
