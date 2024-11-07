@@ -42,7 +42,10 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             jsonSerializer,
             dataValueReferenceFactoryCollection,
             StaticServiceProvider.Instance.GetRequiredService<BlockEditorVarianceHandler>(),
-            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>())
+            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
+            ioHelper,
+            attribute
+            )
     {
     }
 
@@ -53,8 +56,10 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         IJsonSerializer jsonSerializer,
         DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection,
         BlockEditorVarianceHandler blockEditorVarianceHandler,
-        ILanguageService languageService)
-        : base(shortStringHelper, jsonSerializer)
+        ILanguageService languageService,
+        IIOHelper ioHelper,
+        DataEditorAttribute attribute)
+        : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _propertyEditors = propertyEditors;
         _dataTypeConfigurationCache = dataTypeConfigurationCache;
