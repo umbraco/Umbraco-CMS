@@ -48,7 +48,14 @@ public static class ObjectExtensions
     {
         if (input is IDisposable disposable)
         {
-            disposable.Dispose();
+            try
+            {
+                disposable.Dispose();
+            }
+            catch (ObjectDisposedException)
+            {
+                // ignore if it is already disposed
+            }
         }
     }
 

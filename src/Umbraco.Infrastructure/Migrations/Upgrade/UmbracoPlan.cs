@@ -66,14 +66,14 @@ public class UmbracoPlan : MigrationPlan
         To<V_13_5_0.ChangeRedirectUrlToNvarcharMax>("{CC47C751-A81B-489A-A2BC-0240245DB687}");
 
         // To 14.0.0
-        To<V_14_0_0.AddPropertyEditorUiAliasColumn>("{419827A0-4FCE-464B-A8F3-247C6092AF55}");
+        To<NoopMigration>("{419827A0-4FCE-464B-A8F3-247C6092AF55}");
         To<NoopMigration>("{69E12556-D9B3-493A-8E8A-65EC89FB658D}");
         To<NoopMigration>("{F2B16CD4-F181-4BEE-81C9-11CF384E6025}");
         To<NoopMigration>("{A8E01644-9F2E-4988-8341-587EF5B7EA69}");
         To<V_14_0_0.UpdateDefaultGuidsOfCreatedPackages>("{E073DBC0-9E8E-4C92-8210-9CB18364F46E}");
         To<V_14_0_0.RenameTechnologyLeakingPropertyEditorAliases>("{80D282A4-5497-47FF-991F-BC0BCE603121}");
         To<V_14_0_0.MigrateSchduledPublishesToUtc>("{96525697-E9DC-4198-B136-25AD033442B8}");
-        To<V_14_0_0.AddListViewKeysToDocumentTypes>("{7FC5AC9B-6F56-415B-913E-4A900629B853}");
+        To<NoopMigration>("{7FC5AC9B-6F56-415B-913E-4A900629B853}");
         To<V_14_0_0.MigrateDataTypeConfigurations>("{1539A010-2EB5-4163-8518-4AE2AA98AFC6}");
         To<NoopMigration>("{C567DE81-DF92-4B99-BEA8-CD34EF99DA5D}");
         To<V_14_0_0.DeleteMacroTables>("{0D82C836-96DD-480D-A924-7964E458BD34}");
@@ -103,5 +103,6 @@ public class UmbracoPlan : MigrationPlan
         To<V_15_0_0.ConvertBlockListEditorProperties>("{6C04B137-0097-4938-8C6A-276DF1A0ECA8}");
         To<V_15_0_0.ConvertBlockGridEditorProperties>("{9D3CE7D4-4884-41D4-98E8-302EB6CB0CF6}");
         To<V_15_0_0.ConvertRichTextEditorProperties>("{37875E80-5CDD-42FF-A21A-7D4E3E23E0ED}");
+        To<V_15_0_0.ConvertLocalLinks>("{42E44F9E-7262-4269-922D-7310CB48E724}");
     }
 }
