@@ -94,9 +94,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 
 	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
-		this._routerPath = this._constructAbsoluteRouterPath();
-		this.#routeContext._internal_routerGotBasePath(this._routerPath);
-		this.dispatchEvent(new UmbRouterSlotInitEvent());
+		this._updateRouterPath();
 	}
 
 	protected _updateRouterPath() {
@@ -124,7 +122,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 				this.dispatchEvent(new UmbRouterSlotChangeEvent());
 			}
 		} else if (event.detail.slot === this.#modalRouter) {
-			const newActiveModalLocalPath = this.#modalRouter.match?.fragments.consumed ?? '';
+			const newActiveModalLocalPath = this.#modalRouter.match?.route.path ?? '';
 			this.#routeContext._internal_modalRouterChanged(newActiveModalLocalPath);
 		}
 	};
