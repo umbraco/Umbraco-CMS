@@ -1,7 +1,6 @@
 import { manifests as workspaceViewManifests } from './views/manifests.js';
 import { UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_ALIAS } from './index.js';
-import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction, UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	...workspaceViewManifests,

@@ -1,5 +1,5 @@
+import type { UmbContentLikeDetailModel, UmbPotentialContentValueModel } from '../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbContentLikeDetailModel, UmbPotentialContentValueModel } from '@umbraco-cms/backoffice/content';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbVariantId, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';

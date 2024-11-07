@@ -9,8 +9,8 @@ export class UmbUfmContentNameComponent extends UmbUfmComponentBase {
 
 		if (token.prefix === '~') {
 			/*
-	    * @deprecated since version 15.0-rc3
-	    */
+			 * @deprecated since version 15.0-rc3
+			 */
 			console.warn(`Please update your UFM syntax from \`${token.raw}\` to \`{umbContentName:${token.text}}\`.`);
 		}
 

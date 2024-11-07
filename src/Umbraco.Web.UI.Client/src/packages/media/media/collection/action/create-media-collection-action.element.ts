@@ -9,6 +9,7 @@ import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 @customElement('umb-create-media-collection-action')
 export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
@@ -22,7 +23,7 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 	private _currentView?: string;
 
 	@state()
-	private _mediaUnique?: string;
+	private _mediaUnique?: UmbEntityUnique;
 
 	@state()
 	private _mediaTypeUnique?: string;
@@ -54,6 +55,7 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 			this.observe(workspaceContext.unique, (unique) => {
 				this._mediaUnique = unique;
 			});
+
 			this.observe(workspaceContext.contentTypeUnique, (mediaTypeUnique) => {
 				this._mediaTypeUnique = mediaTypeUnique;
 			});
