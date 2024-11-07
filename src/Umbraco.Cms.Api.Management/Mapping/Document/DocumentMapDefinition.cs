@@ -24,6 +24,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         mapper.Define<IContent, DocumentResponseModel>((_, _) => new DocumentResponseModel(), Map);
         mapper.Define<IContent, DocumentCollectionResponseModel>((_, _) => new DocumentCollectionResponseModel(), Map);
         mapper.Define<IContent, DocumentBlueprintResponseModel>((_, _) => new DocumentBlueprintResponseModel(), Map);
+        mapper.Define<ContentScheduleCollection, DocumentResponseModel>(Map);
     }
 
     // Umbraco.Code.MapAll -Urls -Template
@@ -89,5 +90,27 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
             {
                 documentVariantViewModel.State = DocumentVariantState.Draft;
             });
+    }
+
+    private void Map(ContentScheduleCollection source, DocumentResponseModel target, MapperContext context)
+    {
+        foreach (ContentSchedule schedule in source.FullSchedule)
+        {
+            DocumentVariantResponseModel? variant = target.Variants.FirstOrDefault(v => v.Culture == schedule.Culture || (v.Culture.IsNullOrWhiteSpace() && schedule.Culture.IsNullOrWhiteSpace()));
+            if (variant is null)
+            {
+                continue;
+            }
+
+            switch (schedule.Action)
+            {
+                case ContentScheduleAction.Release:
+                    variant.ScheduledPublishDate = new DateTimeOffset(schedule.Date, TimeSpan.Zero);
+                    break;
+                case ContentScheduleAction.Expire:
+                    variant.ScheduledUnPublishDate = new DateTimeOffset(schedule.Date, TimeSpan.Zero);
+                    break;
+            }
+        }
     }
 }

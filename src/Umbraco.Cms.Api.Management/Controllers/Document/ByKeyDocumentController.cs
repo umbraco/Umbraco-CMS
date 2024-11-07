@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
@@ -20,7 +22,9 @@ public class ByKeyDocumentController : DocumentControllerBase
     private readonly IAuthorizationService _authorizationService;
     private readonly IContentEditingService _contentEditingService;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
+    private readonly IContentService _contentService;
 
+    [Obsolete("Scheduled for removal in v17")]
     public ByKeyDocumentController(
         IAuthorizationService authorizationService,
         IContentEditingService contentEditingService,
@@ -29,6 +33,20 @@ public class ByKeyDocumentController : DocumentControllerBase
         _authorizationService = authorizationService;
         _contentEditingService = contentEditingService;
         _documentPresentationFactory = documentPresentationFactory;
+        _contentService = StaticServiceProvider.Instance.GetRequiredService<IContentService>();
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public ByKeyDocumentController(
+        IAuthorizationService authorizationService,
+        IContentEditingService contentEditingService,
+        IDocumentPresentationFactory documentPresentationFactory,
+        IContentService contentService)
+    {
+        _authorizationService = authorizationService;
+        _contentEditingService = contentEditingService;
+        _documentPresentationFactory = documentPresentationFactory;
+        _contentService = contentService;
     }
 
     [HttpGet("{id:guid}")]
@@ -53,7 +71,9 @@ public class ByKeyDocumentController : DocumentControllerBase
             return DocumentNotFound();
         }
 
-        DocumentResponseModel model = await _documentPresentationFactory.CreateResponseModelAsync(content);
+        ContentScheduleCollection schedule = _contentService.GetContentScheduleByContentId(content.Id);
+
+        DocumentResponseModel model = await _documentPresentationFactory.CreateResponseModelAsync(content, schedule);
         return Ok(model);
     }
 }
