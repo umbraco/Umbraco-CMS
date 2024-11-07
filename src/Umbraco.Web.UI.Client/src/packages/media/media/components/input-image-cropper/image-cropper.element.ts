@@ -1,4 +1,5 @@
-import { UmbImageCropChangeEvent, type UmbImageCropperCrop, type UmbImageCropperFocalPoint } from './index.js';
+import type { UmbImageCropperCrop, UmbImageCropperFocalPoint } from './types.js';
+import { UmbImageCropChangeEvent } from './crop-change.event.js';
 import { calculateExtrapolatedValue, clamp, inverseLerp, lerp } from '@umbraco-cms/backoffice/utils';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, property, query, state, css, html } from '@umbraco-cms/backoffice/external/lit';
@@ -335,8 +336,15 @@ export class UmbImageCropperElement extends UmbLitElement {
 			</uui-slider>
 			<div id="actions">
 				<uui-button @click=${this.#onReset} label="${this.localize.term('general_reset')}"></uui-button>
-				<uui-button look="secondary" @click=${this.#onCancel} label="${this.localize.term('general_cancel')}"></uui-button>
-				<uui-button look="primary" color="positive" @click=${this.#onSave} label="${this.localize.term('buttons_save')}"></uui-button>
+				<uui-button
+					look="secondary"
+					@click=${this.#onCancel}
+					label="${this.localize.term('general_cancel')}"></uui-button>
+				<uui-button
+					look="primary"
+					color="positive"
+					@click=${this.#onSave}
+					label="${this.localize.term('buttons_save')}"></uui-button>
 			</div>
 		`;
 	}
