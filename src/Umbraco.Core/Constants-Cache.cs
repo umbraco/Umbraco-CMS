@@ -8,10 +8,6 @@ public static partial class Constants
             public const string Content = "cache";
 
             public const string Media = "media";
-
-            public const string Draft = "draft";
-
-            public const string Published = "published";
         }
     }
 }

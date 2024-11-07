@@ -25,7 +25,6 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     private readonly IEnumerable<IDocumentSeedKeyProvider> _seedKeyProviders;
     private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IPreviewService _previewService;
-    private readonly INavigationQueryService _navigationQueryService;
     private readonly CacheEntrySettings _cacheEntrySettings;
     private HashSet<Guid>? _seedKeys;
     private HashSet<Guid> SeedKeys
@@ -70,7 +69,6 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         _seedKeyProviders = seedKeyProviders;
         _publishedModelFactory = publishedModelFactory;
         _previewService = previewService;
-        _navigationQueryService = navigationQueryService;
         _cacheEntrySettings = cacheEntrySettings.Get(Constants.Configuration.NamedOptions.CacheEntry.Document);
     }
 
@@ -88,7 +86,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
                 return contentCacheNode;
             },
             GetEntryOptions(key),
-            GenerateTags(key, calculatedPreview));
+            GenerateTags(key));
 
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, calculatedPreview).CreateModel(_publishedModelFactory);
     }
@@ -119,7 +117,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             return contentCacheNode;
         },
             GetEntryOptions(key),
-            GenerateTags(key, calculatedPreview));
+            GenerateTags(key));
 
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, calculatedPreview).CreateModel(_publishedModelFactory);;
     }
@@ -150,13 +148,13 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         ContentCacheNode? draftNode = await _databaseCacheRepository.GetContentSourceAsync(key, true);
         if (draftNode is not null)
         {
-            await _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key), GenerateTags(key, true));
+            await _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key), GenerateTags(key));
         }
 
         ContentCacheNode? publishedNode = await _databaseCacheRepository.GetContentSourceAsync(key, false);
         if (publishedNode is not null)
         {
-            await _hybridCache.SetAsync(GetCacheKey(publishedNode.Key, false), publishedNode, GetEntryOptions(publishedNode.Key), GenerateTags(key, false));
+            await _hybridCache.SetAsync(GetCacheKey(publishedNode.Key, false), publishedNode, GetEntryOptions(publishedNode.Key), GenerateTags(key));
         }
 
         scope.Complete();
@@ -198,7 +196,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
                         return cacheNode;
                     },
                 GetSeedEntryOptions(),
-                GenerateTags(key, false),
+                GenerateTags(key),
                 cancellationToken: cancellationToken);
 
                 // If the value is null, it's likely because
@@ -281,7 +279,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     // Generates the cache tags for a given CacheNode
     // We use the tags to be able to clear all cache entries that are related to a given content item.
     // Tags for now are content/media, draft/published and all it's ancestors, so we can clear when ChangeType.TreeChange
-    private HashSet<string> GenerateTags(Guid? key, bool preview)
+    private HashSet<string> GenerateTags(Guid? key)
     {
         if(key is null)
         {
@@ -292,14 +290,6 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         {
             Constants.Cache.Tags.Content,
         };
-        tags.Add(preview ? Constants.Cache.Tags.Draft : Constants.Cache.Tags.Published);
-
-        _navigationQueryService.TryGetAncestorsKeys(key.Value, out IEnumerable<Guid> ancestorsKeys);
-        foreach (Guid ancestorKey in ancestorsKeys)
-        {
-            tags.Add(ancestorKey.ToString());
-        }
-
         return tags;
     }
 

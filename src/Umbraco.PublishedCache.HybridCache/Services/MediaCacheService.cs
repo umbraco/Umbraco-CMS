@@ -282,8 +282,7 @@ internal class MediaCacheService : IMediaCacheService
 
         var tags = new HashSet<string>
         {
-            Constants.Cache.Tags.Media,
-            Constants.Cache.Tags.Published
+            Constants.Cache.Tags.Media
         };
 
         return tags;
