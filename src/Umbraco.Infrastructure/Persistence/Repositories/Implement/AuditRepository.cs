@@ -202,7 +202,6 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
         if (!_cachedUserIds.Any(x => x == userId))
         {
             Sql<ISqlContext> sql = SqlContext.Sql();
-
             sql = sql.Select<UserDto>().From<UserDto>().Where<UserDto>(x => x.Id == userId);
             UserDto? sqlResult = Database.FirstOrDefault<UserDto>(sql) ?? throw new InvalidOperationException("The specified user Id does not exist in the database.");
             _cachedUserIds.Add(sqlResult.Id);
