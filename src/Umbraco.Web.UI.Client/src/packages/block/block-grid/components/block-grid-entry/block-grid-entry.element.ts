@@ -1,10 +1,11 @@
 import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context.js';
+import type { UmbBlockGridLayoutModel } from '../../types.js';
+import { UMB_BLOCK_GRID } from '../../constants.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
-import { UMB_BLOCK_GRID, type UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 
 import '../block-grid-block-inline/index.js';
 import '../block-grid-block/index.js';
