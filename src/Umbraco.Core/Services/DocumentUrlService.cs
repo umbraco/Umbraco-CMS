@@ -548,8 +548,15 @@ public class DocumentUrlService : IDocumentUrlService
                     Dictionary<string, Domain> domainDictionary = await domainDictionaryTask;
                     if (domainDictionary.TryGetValue(culture, out Domain? domain))
                     {
-                        foundDomain = domain;
-                        break;
+                        Attempt<Guid> domainKeyAttempt = _idKeyMap.GetKeyForId(domain.ContentId, UmbracoObjectTypes.Document);
+                        if (domainKeyAttempt.Success)
+                        {
+                            if (_publishStatusQueryService.IsDocumentPublished(domainKeyAttempt.Result, culture))
+                            {
+                                foundDomain = domain;
+                                break;
+                            }
+                        }
                     }
                 }
 
