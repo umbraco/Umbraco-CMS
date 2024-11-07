@@ -13,6 +13,6 @@ export class UmbBooleanTableColumnViewElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		['umb-boolean-table-column-view']: UmbBooleanTableColumnViewElement;
+		'umb-boolean-table-column-view': UmbBooleanTableColumnViewElement;
 	}
 }
