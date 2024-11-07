@@ -193,7 +193,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 					}
 					preset.sortOrder = sortOrderInt;
 				}
-				return { data: { contentTypeUnique: this._ownerContentTypeUnique, preset: undefined } };
+				return { data: { contentTypeUnique: this._ownerContentTypeUnique, preset: preset } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._newPropertyPath =
