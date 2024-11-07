@@ -28,11 +28,6 @@ export class UmbDocumentTypeTreeItemChildrenCollectionRepository
 			return this.#treeRepository.requestTreeItemsOf({ parent, skip: filter.skip, take: filter.take });
 		}
 	}
-
-	override destroy(): void {
-		this.#treeRepository.destroy();
-		super.destroy();
-	}
 }
 
 export { UmbDocumentTypeTreeItemChildrenCollectionRepository as api };
