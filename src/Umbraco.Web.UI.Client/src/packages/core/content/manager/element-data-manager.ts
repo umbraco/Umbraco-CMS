@@ -1,5 +1,5 @@
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
-import type { UmbElementDetailModel } from '@umbraco-cms/backoffice/content';
+import type { UmbElementDetailModel } from '../types.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbEntityWorkspaceDataManager, type UmbWorkspaceDataManager } from '@umbraco-cms/backoffice/workspace';
 

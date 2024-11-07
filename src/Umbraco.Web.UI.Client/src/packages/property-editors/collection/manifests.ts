@@ -50,19 +50,19 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 				{
 					alias: 'icon',
 					label: 'Workspace View icon',
-					description: 'The icon for the Collection\'s Workspace View.',
+					description: "The icon for the Collection's Workspace View.",
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.IconPicker',
 				},
 				{
 					alias: 'tabName',
 					label: 'Workspace View name',
-					description: 'The name of the Collection\'s Workspace View (default if empty: Child Items).',
+					description: "The name of the Collection's Workspace View (default if empty: Child Items).",
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 				},
 				{
 					alias: 'showContentFirst',
 					label: 'Show Content Workspace View First',
-					description: 'Enable this to show the Content Workspace View by default instead of the Collection\'s.',
+					description: "Enable this to show the Content Workspace View by default instead of the Collection's.",
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],

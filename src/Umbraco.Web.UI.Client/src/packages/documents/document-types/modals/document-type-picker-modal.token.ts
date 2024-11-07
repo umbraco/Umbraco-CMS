@@ -1,10 +1,7 @@
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN } from '../paths.js';
+import type { UmbDocumentTypeTreeItemModel } from '../tree/index.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_DOCUMENT_TYPE_ENTITY_TYPE,
-	UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
-	type UmbDocumentTypeTreeItemModel,
-} from '@umbraco-cms/backoffice/document-type';
 import {
 	type UmbTreePickerModalValue,
 	type UmbTreePickerModalData,
