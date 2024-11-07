@@ -133,9 +133,9 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		}
 
 		if (this.getIsNew()) {
-			this.#create(currentData);
+			await this.#create(currentData);
 		} else {
-			this.#update(currentData);
+			await this.#update(currentData);
 		}
 	}
 
