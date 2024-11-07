@@ -1,15 +1,14 @@
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace.context-token.js';
+import type { UmbContentTypeModel, UmbPropertyTypeContainerModel } from '../../../types.js';
+import {
+	UmbContentTypeContainerStructureHelper,
+	UmbContentTypeMoveRootGroupsIntoFirstTabHelper,
+} from '../../../structure/index.js';
+import { UMB_COMPOSITION_PICKER_MODAL } from '../../../modals/index.js';
 import type { UmbContentTypeDesignEditorTabElement } from './content-type-design-editor-tab.element.js';
 import { UmbContentTypeDesignEditorContext } from './content-type-design-editor.context.js';
 import { css, html, customElement, state, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement, UUIInputEvent, UUITabElement } from '@umbraco-cms/backoffice/external/uui';
-import {
-	UMB_COMPOSITION_PICKER_MODAL,
-	UmbContentTypeContainerStructureHelper,
-	UmbContentTypeMoveRootGroupsIntoFirstTabHelper,
-	type UmbContentTypeModel,
-	type UmbPropertyTypeContainerModel,
-} from '@umbraco-cms/backoffice/content-type';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';

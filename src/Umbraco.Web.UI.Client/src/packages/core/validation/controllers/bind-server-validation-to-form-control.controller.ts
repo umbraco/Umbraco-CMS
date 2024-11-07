@@ -12,7 +12,6 @@ const observeSymbol = Symbol();
  * This controller will add a custom error to the form control if the validation context has any messages for the specified data path.
  */
 export class UmbBindServerValidationToFormControl extends UmbControllerBase {
-
 	#context?: typeof UMB_VALIDATION_CONTEXT.TYPE;
 
 	#control: UmbFormControlMixinInterface<unknown>;
@@ -41,7 +40,7 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 	}
 
 	constructor(host: UmbControllerHost, formControl: UmbFormControlMixinInterface<unknown>, dataPath: string) {
-		super(host,'umbFormControlValidation_'+simpleHashCode(dataPath));
+		super(host, 'umbFormControlValidation_' + simpleHashCode(dataPath));
 		this.#control = formControl;
 		this.consumeContext(UMB_VALIDATION_CONTEXT, (context) => {
 			this.#context = context;
