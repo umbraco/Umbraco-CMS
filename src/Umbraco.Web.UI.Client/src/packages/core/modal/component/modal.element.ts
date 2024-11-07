@@ -26,18 +26,6 @@ import {
 @customElement('umb-modal')
 export class UmbModalElement extends UmbLitElement {
 	#modalContext?: UmbModalContext;
-	public get modalContext(): UmbModalContext | undefined {
-		return this.#modalContext;
-	}
-	public set modalContext(value: UmbModalContext | undefined) {
-		if (this.#modalContext === value) return;
-		this.#modalContext = value;
-
-		if (!value) {
-			this.destroy();
-			return;
-		}
-	}
 
 	public element?: UUIModalDialogElement | UUIModalSidebarElement | UUIModalElement;
 
@@ -51,8 +39,14 @@ export class UmbModalElement extends UmbLitElement {
 		this.#modalContext?.reject({ type: 'close' });
 	};
 
-	async createModalElement() {
-		if (!this.#modalContext) return;
+	async init(modalContext: UmbModalContext | undefined) {
+		if (this.#modalContext === modalContext) return;
+		this.#modalContext = modalContext;
+
+		if (!this.#modalContext) {
+			this.destroy();
+			return;
+		}
 
 		this.#modalContext.addEventListener('umb:destroy', this.#onContextDestroy);
 		this.element = await this.#createContainerElement();

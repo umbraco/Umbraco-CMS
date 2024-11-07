@@ -13,7 +13,7 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 	@state()
 	_modals: Array<UmbModalContext> = [];
 
-	@property({ reflect: true, attribute: 'fill-background' })
+	@property({ type: Boolean, reflect: true, attribute: 'fill-background' })
 	fillBackground = false;
 
 	private _modalManager?: UmbModalManagerContext;
@@ -58,28 +58,26 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 			return;
 		}
 
-		this._modals.forEach(async (modal) => {
-			if (this._modalElementMap.has(modal.key)) return;
+		this._modals.forEach(async (modalContext) => {
+			if (this._modalElementMap.has(modalContext.key)) return;
 
 			const modalElement = new UmbModalElement();
-			modalElement.modalContext = modal;
+			await modalElement.init(modalContext);
 
-			await modalElement.createModalElement();
+			modalElement.element?.addEventListener('close-end', this.#onCloseEnd.bind(this, modalContext.key));
+			modalContext.addEventListener('umb:destroy', this.#onCloseEnd.bind(this, modalContext.key));
 
-			modalElement.element?.addEventListener('close-end', this.#onCloseEnd.bind(this, modal.key));
-			modal.addEventListener('umb:destroy', this.#onCloseEnd.bind(this, modal.key));
-
-			this._modalElementMap.set(modal.key, modalElement);
+			this._modalElementMap.set(modalContext.key, modalElement);
 
 			// If any of the modals are fillBackground, set the fillBackground property to true
-			if (modal.backdropBackground) {
+			if (modalContext.backdropBackground) {
 				this.fillBackground = true;
 				this.shadowRoot
 					?.getElementById('container')
-					?.style.setProperty('--backdrop-background', modal.backdropBackground);
+					?.style.setProperty('--backdrop-background', modalContext.backdropBackground);
 			}
 
-			this.requestUpdate();
+			this.requestUpdate('_modalElementMap');
 		});
 	}
 
