@@ -127,6 +127,7 @@ export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
         </uui-box>
 
         <uui-box headline="What's the Time?">
+            <div slot="header">[Server]</div>
             <h2><uui-icon name="icon-alarm-clock"></uui-icon> ${this._timeFromMrWolf ? this._timeFromMrWolf.toLocaleString() : 'Press the button!'}</h2>
             <uui-button color="default" look="primary" @click="${this.#onClickWhatsTheTimeMrWolf}">
                 Whats the time Mr Wolf?
