@@ -17,6 +17,7 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
     private readonly IMediaNavigationQueryService _mediaNavigationQueryService;
     private readonly IMediaNavigationManagementService _mediaNavigationManagementService;
     private readonly IMediaService _mediaService;
+    private readonly IMediaCacheService _mediaCacheService;
 
     public MediaCacheRefresher(
         AppCaches appCaches,
@@ -26,13 +27,15 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
         ICacheRefresherNotificationFactory factory,
         IMediaNavigationQueryService mediaNavigationQueryService,
         IMediaNavigationManagementService mediaNavigationManagementService,
-        IMediaService mediaService)
+        IMediaService mediaService,
+        IMediaCacheService mediaCacheService)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
         _mediaNavigationQueryService = mediaNavigationQueryService;
         _mediaNavigationManagementService = mediaNavigationManagementService;
         _mediaService = mediaService;
+        _mediaCacheService = mediaCacheService;
     }
 
     #region Indirect
@@ -107,6 +110,7 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
                 }
             }
 
+            HandleMemoryCache(payload);
             HandleNavigation(payload);
         }
 
@@ -114,6 +118,41 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
 
 
         base.Refresh(payloads);
+    }
+
+    private void HandleMemoryCache(JsonPayload payload)
+    {
+        Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
+
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
+        {
+            _mediaCacheService.RefreshMemoryCacheAsync(key).GetAwaiter().GetResult();
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
+        {
+            if (_mediaNavigationQueryService.TryGetDescendantsKeys(key, out IEnumerable<Guid> descendantsKeys))
+            {
+                var branchKeys = descendantsKeys.ToList();
+                branchKeys.Add(key);
+
+                foreach (Guid branchKey in branchKeys)
+                {
+                    _mediaCacheService.RefreshMemoryCacheAsync(branchKey).GetAwaiter().GetResult();
+                }
+            }
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
+        {
+            _mediaCacheService.ClearMemoryCacheAsync(CancellationToken.None).GetAwaiter().GetResult();
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+        {
+            _mediaCacheService.RemoveFromMemoryCacheAsync(key).GetAwaiter().GetResult();
+        }
     }
 
     private void HandleNavigation(JsonPayload payload)
@@ -169,7 +208,7 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
         // First creation
         if (ExistsInNavigation(media.Key) is false && ExistsInNavigationBin(media.Key) is false)
         {
-            _mediaNavigationManagementService.Add(media.Key, GetParentKey(media));
+            _mediaNavigationManagementService.Add(media.Key, GetParentKey(media), media.SortOrder);
             if (media.Trashed)
             {
                 // If created as trashed, move to bin
@@ -185,14 +224,20 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
             }
             else
             {
-                // It must have been saved. Check if parent is different
-                if (_mediaNavigationQueryService.TryGetParentKey(media.Key, out var oldParentKey))
+                if (_mediaNavigationQueryService.TryGetParentKey(media.Key, out var oldParentKey) is false)
                 {
-                    Guid? newParentKey = GetParentKey(media);
-                    if (oldParentKey != newParentKey)
-                    {
-                        _mediaNavigationManagementService.Move(media.Key, newParentKey);
-                    }
+                    return;
+                }
+
+                // It must have been saved. Check if parent is different
+                Guid? newParentKey = GetParentKey(media);
+                if (oldParentKey != newParentKey)
+                {
+                    _mediaNavigationManagementService.Move(media.Key, newParentKey);
+                }
+                else
+                {
+                    _mediaNavigationManagementService.UpdateSortOrder(media.Key, media.SortOrder);
                 }
             }
         }
