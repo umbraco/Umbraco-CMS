@@ -17,7 +17,7 @@ test.beforeEach(async ({umbracoApi}) => {
   const stylesheetPath = await umbracoApi.stylesheet.createStylesheetWithHeaderContent(stylesheetName);
   const dataTypeId = await umbracoApi.dataType.createRichTextEditorDataTypeWithStylesheet(richTextEditorName, stylesheetPath);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, richTextEditorName, dataTypeId);
-  const userGroup = await umbracoApi.userGroup.getByName('Editors')
+  const userGroup = await umbracoApi.userGroup.getByName('Editors');
   userGroupId = userGroup.id;
 });
 
