@@ -1,8 +1,7 @@
 import { html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-const elementName = 'umb-boolean-table-column-view';
-@customElement(elementName)
+@customElement('umb-boolean-table-column-view')
 export class UmbBooleanTableColumnViewElement extends UmbLitElement {
 	@property({ attribute: false })
 	value = false;
@@ -14,6 +13,6 @@ export class UmbBooleanTableColumnViewElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbBooleanTableColumnViewElement;
+		'umb-boolean-table-column-view': UmbBooleanTableColumnViewElement;
 	}
 }

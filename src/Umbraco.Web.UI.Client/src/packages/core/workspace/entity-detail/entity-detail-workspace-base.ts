@@ -11,7 +11,7 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbDetailRepository, UmbRepositoryResponseWithAsObservable } from '@umbraco-cms/backoffice/repository';
+import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbEntityDetailWorkspaceContextArgs {
 	entityType: string;
@@ -47,7 +47,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	public readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
 
 	protected _getDataPromise?: Promise<any>;
-
 	protected _detailRepository?: DetailRepositoryType;
 
 	#entityContext = new UmbEntityContext(this);
@@ -71,6 +70,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	constructor(host: UmbControllerHost, args: UmbEntityWorkspaceContextArgs) {
 		super(host, args.workspaceAlias);
 		this.#entityType = args.entityType;
+		this.#entityContext.setEntityType(this.#entityType);
 		window.addEventListener('willchangestate', this.#onWillNavigate);
 		this.#observeRepository(args.detailRepositoryAlias);
 	}
@@ -119,12 +119,9 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return this.#parent.getValue()?.entityType;
 	}
 
-	/**
-	 * Load the workspace data
-	 * @param {string} unique The unique identifier of the entity to load.
-	 * @returns { Promise<UmbRepositoryResponseWithAsObservable<DetailModelType>> } The data of the entity.
-	 */
-	async load(unique: string): Promise<UmbRepositoryResponseWithAsObservable<DetailModelType>> {
+	async load(unique: string) {
+		this.#entityContext.setEntityType(this.#entityType);
+		this.#entityContext.setUnique(unique);
 		await this.#init;
 		this.resetState();
 		this._getDataPromise = this._detailRepository!.requestByUnique(unique);
@@ -133,8 +130,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		const data = response.data;
 
 		if (data) {
-			this.#entityContext.setEntityType(this.#entityType);
-			this.#entityContext.setUnique(unique);
 			this._data.setPersisted(data);
 			this._data.setCurrent(data);
 			this.setIsNew(false);

@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../entity.js';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
