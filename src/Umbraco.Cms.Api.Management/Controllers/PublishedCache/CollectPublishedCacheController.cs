@@ -1,7 +1,6 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PublishedCache;
 
@@ -14,6 +13,6 @@ public class CollectPublishedCacheController : PublishedCacheControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Collect(CancellationToken cancellationToken)
     {
-        return Ok();
+        return StatusCode(501);
     }
 }
