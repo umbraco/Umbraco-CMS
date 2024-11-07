@@ -13,6 +13,8 @@ public interface INavigationQueryService
 
     bool TryGetRootKeys(out IEnumerable<Guid> rootKeys);
 
+    bool TryGetRootKeysOfType(string contentTypeAlias, out IEnumerable<Guid> rootKeys);
+
     bool TryGetChildrenKeys(Guid parentKey, out IEnumerable<Guid> childrenKeys);
 
     bool TryGetChildrenKeysOfType(Guid parentKey, string contentTypeAlias, out IEnumerable<Guid> childrenKeys);

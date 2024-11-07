@@ -44,6 +44,18 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     public bool TryGetRootKeys(out IEnumerable<Guid> rootKeys)
         => TryGetRootKeysFromStructure(_roots, out rootKeys);
 
+    public bool TryGetRootKeysOfType(string contentTypeAlias, out IEnumerable<Guid> rootKeys)
+    {
+        if (TryGetContentTypeKey(contentTypeAlias, out Guid? contentTypeKey))
+        {
+            return TryGetRootKeysFromStructure(_roots, out rootKeys, contentTypeKey);
+        }
+
+        // Content type alias doesn't exist
+        rootKeys = [];
+        return false;
+    }
+
     public bool TryGetChildrenKeys(Guid parentKey, out IEnumerable<Guid> childrenKeys)
         => TryGetChildrenKeysFromStructure(_navigationStructure, parentKey, out childrenKeys);
 
@@ -318,11 +330,19 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return false;
     }
 
-    private bool TryGetRootKeysFromStructure(IList<Guid> input, out IEnumerable<Guid> rootKeys)
+    private bool TryGetRootKeysFromStructure(
+        IList<Guid> input,
+        out IEnumerable<Guid> rootKeys,
+        Guid? contentTypeKey = null)
     {
+        // Apply contentTypeKey filter
+        IEnumerable<Guid> filteredKeys = contentTypeKey.HasValue
+            ? input.Where(key => _navigationStructure[key].ContentTypeKey == contentTypeKey.Value)
+            : input;
+
         // TODO can we make this more efficient?
         // Sort by SortOrder
-        rootKeys = input
+        rootKeys = filteredKeys
             .OrderBy(key => _navigationStructure[key].SortOrder)
             .ToList();
 

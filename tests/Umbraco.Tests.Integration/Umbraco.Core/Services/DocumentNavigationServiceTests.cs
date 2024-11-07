@@ -88,6 +88,46 @@ public partial class DocumentNavigationServiceTests : DocumentNavigationServiceT
     }
 
     [Test]
+    public async Task Can_Filter_Root_Items_By_Type()
+    {
+        // Arrange
+        DocumentNavigationQueryService.TryGetRootKeysOfType(ContentType.Alias, out IEnumerable<Guid> initialRootKeysOfType);
+        List<Guid> initialRootOfTypeList = initialRootKeysOfType.ToList();
+
+        // Doc Type
+        var anotherContentType = ContentTypeBuilder.CreateSimpleContentType("anotherPage", "Another page");
+        anotherContentType.Key = new Guid("58A2958E-B34F-4289-A225-E99EEC2456AB");
+        anotherContentType.AllowedContentTypes = new[] { new ContentTypeSort(anotherContentType.Key, 0, anotherContentType.Alias) };
+        anotherContentType.AllowedAsRoot = true;
+        await ContentTypeService.CreateAsync(anotherContentType, Constants.Security.SuperUserKey);
+
+        // Update old doc type
+        ContentType.AllowedContentTypes = new[] { new ContentTypeSort(ContentType.Key, 0, ContentType.Alias), new ContentTypeSort(anotherContentType.Key, 1, anotherContentType.Alias) };
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
+
+        // Content
+        var root2Model = CreateContentCreateModel("Root 2", new Guid("11233548-2E87-4D3E-8FC4-4400F9DBEF56"), anotherContentType.Key); // Using new doc type
+        await ContentEditingService.CreateAsync(root2Model, Constants.Security.SuperUserKey);
+        var root3Model = CreateContentCreateModel("Root 3", new Guid("6E10F212-CE7F-47B5-A796-345861AEE613"), anotherContentType.Key); // Using new doc type
+        await ContentEditingService.CreateAsync(root3Model, Constants.Security.SuperUserKey);
+
+        // Act
+        DocumentNavigationQueryService.TryGetRootKeysOfType(anotherContentType.Alias, out IEnumerable<Guid> filteredRootKeysOfType);
+        List<Guid> filteredRootList = filteredRootKeysOfType.ToList();
+
+        DocumentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> allRootKeys);
+        List<Guid> allRootList = allRootKeys.ToList();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, initialRootOfTypeList.Count); // Verify that loaded doc types can be used to filter
+            Assert.AreEqual(2, filteredRootList.Count); // Verify that new doc type can be used to filter
+            Assert.AreEqual(3, allRootList.Count);
+        });
+    }
+
+    [Test]
     public async Task Can_Filter_Children_By_Type()
     {
         // Arrange
