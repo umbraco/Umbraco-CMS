@@ -75,7 +75,9 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 
 		const anchor = this.#getAnchorFromQueryString(queryString);
 
-		if (anchor) url += anchor;
+		if (anchor) {
+			url = (url ?? '') + anchor;
+		}
 
 		if (!url) return null;
 
