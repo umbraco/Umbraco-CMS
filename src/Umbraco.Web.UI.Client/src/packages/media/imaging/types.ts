@@ -2,8 +2,14 @@ import { ImageCropModeModel as UmbImagingCropMode } from '@umbraco-cms/backoffic
 
 export { UmbImagingCropMode };
 
-export interface UmbImagingModel {
+export interface UmbImagingResizeModel {
 	height?: number;
 	width?: number;
 	mode?: UmbImagingCropMode;
 }
+
+/**
+ * @deprecated use `UmbImagingResizeModel` instead
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbImagingModel extends UmbImagingResizeModel {}

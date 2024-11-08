@@ -1,4 +1,4 @@
-import { UmbImagingCropMode, type UmbImagingModel } from './types.js';
+import { UmbImagingCropMode, type UmbImagingResizeModel } from './types.js';
 import { UmbImagingServerDataSource } from './imaging.server.data.js';
 import { UMB_IMAGING_STORE_CONTEXT } from './imaging.store.token.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
@@ -21,13 +21,14 @@ export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
 
 	/**
 	 * Requests the items for the given uniques
-	 * @param {Array<string>} uniques
-	 * @param imagingModel
+	 * @param {Array<string>} uniques - The uniques
+	 * @param {UmbImagingResizeModel} imagingModel - The imaging model
+	 * @returns {Promise<{ data: UmbMediaUrlModel[] }>}
 	 * @memberof UmbImagingRepository
 	 */
 	async requestResizedItems(
 		uniques: Array<string>,
-		imagingModel?: UmbImagingModel,
+		imagingModel?: UmbImagingResizeModel,
 	): Promise<{ data: UmbMediaUrlModel[] }> {
 		if (!uniques.length) throw new Error('Uniques are missing');
 		if (!this.#dataStore) throw new Error('Data store is missing');
@@ -69,7 +70,7 @@ export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
 	 * @memberof UmbImagingRepository
 	 */
 	async requestThumbnailUrls(uniques: Array<string>, height: number, width: number, mode = UmbImagingCropMode.MIN) {
-		const imagingModel: UmbImagingModel = { height, width, mode };
+		const imagingModel: UmbImagingResizeModel = { height, width, mode };
 		return this.requestResizedItems(uniques, imagingModel);
 	}
 }
