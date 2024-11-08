@@ -6,7 +6,6 @@ import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice
 
 import '../block-grid-entries/index.js';
 /**
- * @element umb-block-grid-areas-container
  * @description
  * This element is used to render the block grid areas.
  */

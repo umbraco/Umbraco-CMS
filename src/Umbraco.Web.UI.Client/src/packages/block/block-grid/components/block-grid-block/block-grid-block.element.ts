@@ -7,9 +7,6 @@ import '@umbraco-cms/backoffice/ufm';
 import '../block-grid-areas-container/index.js';
 import '../ref-grid-block/index.js';
 
-/**
- * @element umb-block-grid-block
- */
 @customElement('umb-block-grid-block')
 export class UmbBlockGridBlockElement extends UmbLitElement {
 	//

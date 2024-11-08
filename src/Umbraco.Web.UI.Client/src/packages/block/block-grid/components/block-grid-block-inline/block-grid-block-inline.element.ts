@@ -25,9 +25,6 @@ const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest:
 	return [{ manifest }];
 };
 
-/**
- * @element umb-block-grid-block-inline
- */
 @customElement('umb-block-grid-block-inline')
 export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	//
