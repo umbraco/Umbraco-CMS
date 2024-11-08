@@ -16,6 +16,11 @@ public sealed class HtmlLocalLinkParser
     internal static readonly Regex LocalLinkTagPattern = new(
         @"<a\s+(?:(?:(?:type=['""](?<type>document|media)['""].*?(?<locallink>href=[""']/{localLink:(?<guid>[a-fA-F0-9-]+)})[""'])|((?<locallink>href=[""']/{localLink:(?<guid>[a-fA-F0-9-]+)})[""'].*?type=(['""])(?<type>document|media)(?:['""])))|(?:(?:type=['""](?<type>document|media)['""])|(?:(?<locallink>href=[""']/{localLink:[a-fA-F0-9-]+})[""'])))[^>]*>",
         RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+    
+    // used same from v15 as the LocalLinkTagPattern is failing on the current version
+    internal static readonly Regex LocalLinkPatternNew = new(
+        @"<a.+?href=['""](?<locallink>\/?{localLink:(?<guid>[a-fA-F0-9-]+)})[^>]*?>",
+        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
     internal static readonly Regex LocalLinkPattern = new(
         @"href=""[/]?(?:\{|\%7B)localLink:([a-zA-Z0-9-://]+)(?:\}|\%7D)",
@@ -116,7 +121,7 @@ public sealed class HtmlLocalLinkParser
 
     private IEnumerable<LocalLinkTag> FindLocalLinkIds(string text)
     {
-        MatchCollection localLinkTagMatches = LocalLinkTagPattern.Matches(text);
+        MatchCollection localLinkTagMatches = LocalLinkPatternNew.Matches(text);
         foreach (Match linkTag in localLinkTagMatches)
         {
             if (linkTag.Groups.Count < 1)
