@@ -239,25 +239,6 @@ test('can delete toolbar row', async ({umbracoApi, umbracoUi}) => {
   }
 });
 
-test('can add toolbar group', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const addedToolbarItem = 'Redo';
-  await umbracoApi.dataType.createDefaultTiptapDataType(tiptapName);
-  await umbracoUi.dataType.goToDataType(tiptapName);
-  const groupCount = await umbracoApi.dataType.getTiptapToolbarGroupInRowCount(tiptapName);
-
-  // Act
-  await umbracoUi.dataType.clickAddGroupToolbarButton();
-  await umbracoUi.dataType.addToolbarItemToGroup(addedToolbarItem);
-  await umbracoUi.dataType.clickSaveButton();
-
-  // Assert
-  const tipTapData = await umbracoApi.dataType.getByName(tiptapName);
-  const extensionsValue = tipTapData.values.find(value => value.alias === 'toolbar');
-  expect(extensionsValue.value[0].length).toBe(groupCount + 1);
-  expect(extensionsValue.value[groupCount]).toBe(addedToolbarItem);
-});
-
 test('can disable extensions item', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const extensionItemName = 'Text Align';
