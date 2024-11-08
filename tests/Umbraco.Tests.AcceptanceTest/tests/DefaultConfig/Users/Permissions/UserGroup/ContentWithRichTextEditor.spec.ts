@@ -25,6 +25,8 @@ test.afterEach(async ({umbracoApi}) => {
   // Ensure we are logged in to admin
   await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
   await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
+  await umbracoApi.dataType.ensureNameNotExists(richTextEditorName);
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
 test('can create content with a rich text editor that has a stylesheet', async ({umbracoApi, umbracoUi}) => {
