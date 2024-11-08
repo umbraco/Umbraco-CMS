@@ -438,15 +438,14 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			}
 
 			#createButton {
-				padding-top: 1px;
 				grid-template-columns: 1fr auto;
 				display: grid;
 			}
 
-			// Only when we are n an area, we like to hide the button on drag
+			/* Only when we are n an area, we like to hide the button on drag */
 			:host([area-key]) #createButton {
-				--umb-block-grid--is-dragging--variable: var(--umb-block-grid--is-dragging) none;
-				display: var(--umb-block-grid--is-dragging--variable, grid);
+				--umb-block-grid--create-button--is-dragging--variable: var(--umb-block-grid--is-dragging) none;
+				display: var(--umb-block-grid--create-button--is-dragging--variable, grid);
 			}
 			:host(:not([pristine]):invalid) #createButton {
 				--uui-button-contrast: var(--uui-color-danger);
@@ -457,9 +456,17 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			}
 
 			.umb-block-grid__layout-container[data-area-length='0'] {
-				--umb-block-grid--is-dragging--variable: var(--umb-block-grid--is-dragging) 1;
-				min-height: calc(var(--umb-block-grid--is-dragging--variable, 0) * var(--uui-size-11));
-				border: calc(var(--umb-block-grid--is-dragging--variable, 0) * 1px) dashed var(--uui-color-border);
+				--umb-block-grid--layout-container--is-dragging--variable: var(--umb-block-grid--is-dragging) 1;
+				min-height: calc(var(--umb-block-grid--layout-container--is-dragging--variable, 0) * var(--uui-size-11));
+			}
+
+			.umb-block-grid__layout-container[data-area-length='0']::after {
+				content: '';
+				position: absolute;
+				inset: 0;
+				top: 1px;
+				border: calc(var(--umb-block-grid--layout-container--is-dragging--variable, 0) * 1px) dashed
+					var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
 			}
 		`,
