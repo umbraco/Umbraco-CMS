@@ -1,4 +1,4 @@
-import type { UmbImagingModel } from './types.js';
+import type { UmbImagingResizeModel } from './types.js';
 import { ImagingService, type MediaUrlInfoResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbMediaUrlModel } from '@umbraco-cms/backoffice/media';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -28,7 +28,7 @@ export class UmbImagingServerDataSource {
 	 * @param imagingModel
 	 * @memberof UmbImagingServerDataSource
 	 */
-	async getItems(uniques: Array<string>, imagingModel?: UmbImagingModel) {
+	async getItems(uniques: Array<string>, imagingModel?: UmbImagingResizeModel) {
 		if (!uniques.length) throw new Error('Uniques are missing');
 
 		const { data, error } = await tryExecuteAndNotify(

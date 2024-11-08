@@ -1,45 +1,22 @@
-import { UmbImagingCropMode } from '../types.js';
-import { UmbImagingRepository } from '../imaging.repository.js';
+import { UmbMediaUrlRepository } from '../../media/repository/index.js';
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-@customElement('umb-imaging-thumbnail')
-export class UmbImagingThumbnailElement extends UmbLitElement {
+@customElement('umb-media-image')
+export class UmbMediaImageElement extends UmbLitElement {
 	/**
 	 * The unique identifier for the media item.
 	 * @description This is also known as the media key and is used to fetch the resource.
 	 */
 	@property()
-	unique = '';
-
-	/**
-	 * The width of the thumbnail in pixels.
-	 * @default 300
-	 */
-	@property({ type: Number })
-	width = 300;
-
-	/**
-	 * The height of the thumbnail in pixels.
-	 * @default 300
-	 */
-	@property({ type: Number })
-	height = 300;
-
-	/**
-	 * The mode of the thumbnail.
-	 * @description The mode determines how the image is cropped.
-	 * @enum {UmbImagingCropMode}
-	 */
-	@property()
-	mode: UmbImagingCropMode = UmbImagingCropMode.MIN;
+	unique?: string;
 
 	/**
 	 * The alt text for the thumbnail.
 	 */
 	@property()
-	alt = '';
+	alt?: string;
 
 	/**
 	 * The fallback icon for the thumbnail.
@@ -59,15 +36,11 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	private _isLoading = true;
 
 	@state()
-	private _thumbnailUrl = '';
+	private _imageUrl = '';
 
-	#imagingRepository = new UmbImagingRepository(this);
+	#mediaRepository = new UmbMediaUrlRepository(this);
 
 	#intersectionObserver?: IntersectionObserver;
-
-	override render() {
-		return html` ${this.#renderThumbnail()} ${when(this._isLoading, () => this.#renderLoading())} `;
-	}
 
 	override connectedCallback() {
 		super.connectedCallback();
@@ -90,6 +63,18 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 		this.#intersectionObserver?.disconnect();
 	}
 
+	async #generateThumbnailUrl() {
+		if (!this.unique) throw new Error('Unique is missing');
+		const { data } = await this.#mediaRepository.requestItems([this.unique]);
+
+		this._imageUrl = data?.[0]?.url ?? '';
+		this._isLoading = false;
+	}
+
+	override render() {
+		return html` ${this.#renderThumbnail()} ${when(this._isLoading, () => this.#renderLoading())} `;
+	}
+
 	#renderLoading() {
 		return html`<div id="loader"><uui-loader></uui-loader></div>`;
 	}
@@ -98,42 +83,23 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 		if (this._isLoading) return nothing;
 
 		return when(
-			this._thumbnailUrl,
+			this._imageUrl,
 			() =>
 				html`<img
-					id="figure"
-					src="${this._thumbnailUrl}"
-					alt="${this.alt}"
+					part="img"
+					src="${this._imageUrl}"
+					alt="${this.alt ?? ''}"
 					loading="${this.loading}"
 					draggable="false" />`,
 			() => html`<umb-icon id="icon" name="${this.icon}"></umb-icon>`,
 		);
 	}
 
-	async #generateThumbnailUrl() {
-		const { data } = await this.#imagingRepository.requestThumbnailUrls(
-			[this.unique],
-			this.height,
-			this.width,
-			this.mode,
-		);
-
-		this._thumbnailUrl = data?.[0]?.url ?? '';
-		this._isLoading = false;
-	}
-
 	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
-				display: block;
-				position: relative;
-				overflow: hidden;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				width: 100%;
-				height: 100%;
+				display: contents;
 			}
 
 			#loader {
@@ -142,17 +108,6 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 				align-items: center;
 				height: 100%;
 				width: 100%;
-			}
-
-			#figure {
-				display: block;
-				width: 100%;
-				height: 100%;
-				object-fit: cover;
-
-				background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill-opacity=".1"><path d="M50 0h50v50H50zM0 50h50v50H0z"/></svg>');
-				background-size: 10px 10px;
-				background-repeat: repeat;
 			}
 
 			#icon {
@@ -166,6 +121,6 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-imaging-thumbnail': UmbImagingThumbnailElement;
+		'umb-media-image': UmbMediaImageElement;
 	}
 }
