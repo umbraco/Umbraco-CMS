@@ -213,9 +213,9 @@ test('can delete toolbar group', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   const tipTapData = await umbracoApi.dataType.getByName(tiptapName);
-  const extensionsValue = tipTapData.values.find(value => value.alias === 'toolbar');
-  expect(extensionsValue.value[rowIndex].length).toBe(groupCount - 1);
-  expect(extensionsValue.value[rowIndex]).not.toContain(groupValue);
+  const toolbarValue = tipTapData.values.find(value => value.alias === 'toolbar');
+  expect(toolbarValue.value[rowIndex].length).toBe(groupCount - 1);
+  expect(toolbarValue.value[rowIndex]).not.toContain(groupValue);
 });
 
 test('can delete toolbar row', async ({umbracoApi, umbracoUi}) => {
@@ -231,11 +231,11 @@ test('can delete toolbar row', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   const tipTapData = await umbracoApi.dataType.getByName(tiptapName);
-  const extensionsValue = tipTapData.values.find(value => value.alias === 'toolbar');
+  const toolbarValue = tipTapData.values.find(value => value.alias === 'toolbar');
   if (rowCount - 1 === 0) {
-    expect(extensionsValue).toBeFalsy();
+    expect(toolbarValue).toBeFalsy();
   } else {
-    expect(extensionsValue.value.length).toBe(rowCount - 1);
+    expect(toolbarValue.value.length).toBe(rowCount - 1);
   }
 });
 
