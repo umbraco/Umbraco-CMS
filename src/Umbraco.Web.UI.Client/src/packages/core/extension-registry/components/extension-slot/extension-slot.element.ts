@@ -103,6 +103,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 		this.#observeExtensions();
 	}
 	override disconnectedCallback(): void {
+		// _permitted is reset as the extensionsController fires a callback on destroy.
 		this.#attached = false;
 		this.#extensionsController?.destroy();
 		this.#extensionsController = undefined;

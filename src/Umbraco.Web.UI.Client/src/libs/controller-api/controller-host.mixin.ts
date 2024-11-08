@@ -129,6 +129,7 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 				prev = ctrl;
 			}
 			this.#controllers.length = 0;
+			this.#attached = false;
 		}
 	}
 

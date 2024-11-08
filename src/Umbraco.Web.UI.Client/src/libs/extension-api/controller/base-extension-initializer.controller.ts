@@ -310,6 +310,7 @@ export abstract class UmbBaseExtensionInitializer<
 	/*
 	public hostConnected(): void {
 		super.hostConnected();
+		// Should not be nesecary as conditions would be reactive to connectedCallback, as they will use consumeContext. [NL]
 		//this.#onConditionsChangedCallback();
 	}
 	*/
