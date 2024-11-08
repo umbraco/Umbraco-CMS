@@ -62,6 +62,7 @@ export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 			? html` ${this._styleElement}
 					<div
 						class="umb-block-grid__area-container"
+						part="area-container"
 						style="--umb-block-grid--area-grid-columns: ${this._areaGridColumns}">
 						${repeat(
 							this._areas,

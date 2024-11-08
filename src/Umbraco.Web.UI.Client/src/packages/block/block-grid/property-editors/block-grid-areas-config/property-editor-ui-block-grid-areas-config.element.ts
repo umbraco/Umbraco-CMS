@@ -117,6 +117,7 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 			? html`${this._styleElement}
 					<div
 						class="umb-block-grid__area-container"
+						part="area-container"
 						style="--umb-block-grid--area-grid-columns: ${this._areaGridColumns}">
 						${repeat(
 							this.value,
