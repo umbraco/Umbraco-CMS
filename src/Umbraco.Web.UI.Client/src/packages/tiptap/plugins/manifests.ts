@@ -1,5 +1,5 @@
-import type { ManifestTiptapExtension } from '../extensions/tiptap-extension.js';
-import type { ManifestTiptapToolbarExtensionButtonKind } from '../extensions/tiptap-toolbar-extension.js';
+import type { ManifestTiptapExtension } from '../extensions/tiptap.extension.js';
+import type { ManifestTiptapToolbarExtensionButtonKind } from '../extensions/tiptap-toolbar.extension.js';
 
 export const manifests: Array<ManifestTiptapExtension | ManifestTiptapToolbarExtensionButtonKind> = [
 	{
