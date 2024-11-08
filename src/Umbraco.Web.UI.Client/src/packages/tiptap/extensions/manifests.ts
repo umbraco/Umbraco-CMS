@@ -1,5 +1,5 @@
-import type { ManifestTiptapExtension } from './tiptap-extension.js';
-import type { ManifestTiptapToolbarExtension } from './tiptap-toolbar-extension.js';
+import type { ManifestTiptapExtension } from './tiptap.extension.js';
+import type { ManifestTiptapToolbarExtension } from './tiptap-toolbar.extension.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 const kinds: Array<UmbExtensionManifestKind> = [
@@ -19,7 +19,7 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.Embed',
 		name: 'Embed Tiptap Extension',
-		api: () => import('./core/embedded-media.extension.js'),
+		api: () => import('./core/embedded-media.tiptap-api.js'),
 		meta: {
 			icon: 'icon-embed',
 			label: '#general_embed',
@@ -30,7 +30,7 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.Link',
 		name: 'Link Tiptap Extension',
-		api: () => import('./core/link.extension.js'),
+		api: () => import('./core/link.tiptap-api.js'),
 		meta: {
 			icon: 'icon-link',
 			label: '#defaultdialogs_urlLinkPicker',
@@ -41,7 +41,7 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.Figure',
 		name: 'Figure Tiptap Extension',
-		api: () => import('./core/figure.extension.js'),
+		api: () => import('./core/figure.tiptap-api.js'),
 		meta: {
 			icon: 'icon-frame',
 			label: 'Figure',
@@ -52,7 +52,7 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.Image',
 		name: 'Image Tiptap Extension',
-		api: () => import('./core/image.extension.js'),
+		api: () => import('./core/image.tiptap-api.js'),
 		meta: {
 			icon: 'icon-picture',
 			label: 'Image',
@@ -64,7 +64,7 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Subscript',
 		name: 'Subscript Tiptap Extension',
-		api: () => import('./core/subscript.extension.js'),
+		api: () => import('./core/subscript.tiptap-api.js'),
 		meta: {
 			icon: 'icon-subscript',
 			label: 'Subscript',
@@ -76,7 +76,7 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Superscript',
 		name: 'Superscript Tiptap Extension',
-		api: () => import('./core/superscript.extension.js'),
+		api: () => import('./core/superscript.tiptap-api.js'),
 		meta: {
 			icon: 'icon-superscript',
 			label: 'Superscript',
@@ -88,7 +88,7 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Table',
 		name: 'Table Tiptap Extension',
-		api: () => import('./core/table.extension.js'),
+		api: () => import('./core/table.tiptap-api.js'),
 		meta: {
 			icon: 'icon-table',
 			label: 'Table',
@@ -100,7 +100,7 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Underline',
 		name: 'Underline Tiptap Extension',
-		api: () => import('./core/underline.extension.js'),
+		api: () => import('./core/underline.tiptap-api.js'),
 		meta: {
 			icon: 'icon-underline',
 			label: 'Underline',
@@ -111,7 +111,7 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.TextAlign',
 		name: 'Text Align Tiptap Extension',
-		api: () => import('./core/text-align.extension.js'),
+		api: () => import('./core/text-align.tiptap-api.js'),
 		meta: {
 			icon: 'icon-text-align-justify',
 			label: 'Text Align',
@@ -122,7 +122,7 @@ const coreExtensions: Array<ManifestTiptapExtension> = [
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.MediaUpload',
 		name: 'Media Upload Tiptap Extension',
-		api: () => import('./core/media-upload.extension.js'),
+		api: () => import('./core/media-upload.tiptap-api.js'),
 		meta: {
 			icon: 'icon-image-up',
 			label: 'Media Upload',
@@ -137,7 +137,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.SourceEditor',
 		name: 'Source Editor Tiptap Extension',
-		api: () => import('./toolbar/source-editor.extension.js'),
+		api: () => import('./toolbar/source-editor.tiptap-toolbar-api.js'),
 		meta: {
 			alias: 'umbSourceEditor',
 			icon: 'icon-code-xml',
@@ -149,7 +149,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Bold',
 		name: 'Bold Tiptap Extension',
-		api: () => import('./toolbar/bold.extension.js'),
+		api: () => import('./toolbar/bold.tiptap-toolbar-api.js'),
 		meta: {
 			alias: 'bold',
 			icon: 'icon-bold',
@@ -161,7 +161,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Italic',
 		name: 'Italic Tiptap Extension',
-		api: () => import('./toolbar/italic.extension.js'),
+		api: () => import('./toolbar/italic.tiptap-toolbar-api.js'),
 		meta: {
 			alias: 'italic',
 			icon: 'icon-italic',
@@ -173,7 +173,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Underline',
 		name: 'Underline Tiptap Extension',
-		api: () => import('./toolbar/underline.extension.js'),
+		api: () => import('./toolbar/underline.tiptap-toolbar-api.js'),
 		forExtensions: ['Umb.Tiptap.Underline'],
 		meta: {
 			alias: 'underline',
@@ -186,7 +186,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Strike',
 		name: 'Strike Tiptap Extension',
-		api: () => import('./toolbar/strike.extension.js'),
+		api: () => import('./toolbar/strike.tiptap-toolbar-api.js'),
 		meta: {
 			alias: 'strike',
 			icon: 'icon-strikethrough',
@@ -198,7 +198,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.ClearFormatting',
 		name: 'Clear Formatting Tiptap Extension',
-		api: () => import('./toolbar/clear-formatting.extension.js'),
+		api: () => import('./toolbar/clear-formatting.tiptap-toolbar-api.js'),
 		meta: {
 			alias: 'clear-formatting',
 			icon: 'icon-clear-formatting',
@@ -210,7 +210,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.TextAlignLeft',
 		name: 'Text Align Left Tiptap Extension',
-		api: () => import('./toolbar/text-align-left.extension.js'),
+		api: () => import('./toolbar/text-align-left.tiptap-toolbar-api.js'),
 		forExtensions: ['Umb.Tiptap.TextAlign'],
 		meta: {
 			alias: 'text-align-left',
@@ -223,7 +223,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.TextAlignCenter',
 		name: 'Text Align Center Tiptap Extension',
-		api: () => import('./toolbar/text-align-center.extension.js'),
+		api: () => import('./toolbar/text-align-center.tiptap-toolbar-api.js'),
 		forExtensions: ['Umb.Tiptap.TextAlign'],
 		meta: {
 			alias: 'text-align-center',
@@ -236,7 +236,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.TextAlignRight',
 		name: 'Text Align Right Tiptap Extension',
-		api: () => import('./toolbar/text-align-right.extension.js'),
+		api: () => import('./toolbar/text-align-right.tiptap-toolbar-api.js'),
 		forExtensions: ['Umb.Tiptap.TextAlign'],
 		meta: {
 			alias: 'text-align-right',
@@ -249,7 +249,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.TextAlignJustify',
 		name: 'Text Align Justify Tiptap Extension',
-		api: () => import('./toolbar/text-align-justify.extension.js'),
+		api: () => import('./toolbar/text-align-justify.tiptap-toolbar-api.js'),
 		forExtensions: ['Umb.Tiptap.TextAlign'],
 		meta: {
 			alias: 'text-align-justify',
@@ -262,7 +262,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Heading1',
 		name: 'Heading 1 Tiptap Extension',
-		api: () => import('./toolbar/heading1.extension.js'),
+		api: () => import('./toolbar/heading1.tiptap-toolbar-api.js'),
 		meta: {
 			alias: 'heading1',
 			icon: 'icon-heading-1',
@@ -274,7 +274,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Heading2',
 		name: 'Heading 2 Tiptap Extension',
-		api: () => import('./toolbar/heading2.extension.js'),
+		api: () => import('./toolbar/heading2.tiptap-toolbar-api.js'),
 		meta: {
 			alias: 'heading2',
 			icon: 'icon-heading-2',
@@ -286,7 +286,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Heading3',
 		name: 'Heading 3 Tiptap Extension',
-		api: () => import('./toolbar/heading3.extension.js'),
+		api: () => import('./toolbar/heading3.tiptap-toolbar-api.js'),
 		meta: {
 			alias: 'heading3',
 			icon: 'icon-heading-3',
@@ -298,7 +298,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.BulletList',
 		name: 'Bullet List Tiptap Extension',
-		api: () => import('./toolbar/bullet-list.extension.js'),
+		api: () => import('./toolbar/bullet-list.tiptap-toolbar-api.js'),
 		meta: {
 			alias: 'bulletList',
 			icon: 'icon-bulleted-list',
@@ -310,7 +310,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.OrderedList',
 		name: 'Ordered List Tiptap Extension',
-		api: () => import('./toolbar/ordered-list.extension.js'),
+		api: () => import('./toolbar/ordered-list.tiptap-toolbar-api.js'),
 		meta: {
 			alias: 'orderedList',
 			icon: 'icon-ordered-list',
@@ -322,7 +322,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Blockquote',
 		name: 'Blockquote Tiptap Extension',
-		api: () => import('./toolbar/blockquote.extension.js'),
+		api: () => import('./toolbar/blockquote.tiptap-toolbar-api.js'),
 		meta: {
 			alias: 'blockquote',
 			icon: 'icon-blockquote',
@@ -334,7 +334,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Link',
 		name: 'Link Tiptap Extension',
-		api: () => import('./toolbar/link.extension.js'),
+		api: () => import('./toolbar/link.tiptap-toolbar-api.js'),
 		forExtensions: ['Umb.Tiptap.Link'],
 		meta: {
 			alias: 'umbLink',
@@ -347,7 +347,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Unlink',
 		name: 'Unlink Tiptap Extension',
-		api: () => import('./toolbar/unlink.extension.js'),
+		api: () => import('./toolbar/unlink.tiptap-toolbar-api.js'),
 		element: () => import('../components/toolbar/tiptap-toolbar-button-disabled.element.js'),
 		forExtensions: ['Umb.Tiptap.Link'],
 		meta: {
@@ -361,7 +361,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.CodeBlock',
 		name: 'Code Block Tiptap Extension',
-		api: () => import('./toolbar/code-block.extension.js'),
+		api: () => import('./toolbar/code-block.tiptap-toolbar-api.js'),
 		meta: {
 			alias: 'codeBlock',
 			icon: 'icon-code',
@@ -373,7 +373,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Subscript',
 		name: 'Subscript Tiptap Extension',
-		api: () => import('./toolbar/subscript.extension.js'),
+		api: () => import('./toolbar/subscript.tiptap-toolbar-api.js'),
 		forExtensions: ['Umb.Tiptap.Subscript'],
 		meta: {
 			alias: 'subscript',
@@ -386,7 +386,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Superscript',
 		name: 'Superscript Tiptap Extension',
-		api: () => import('./toolbar/superscript.extension.js'),
+		api: () => import('./toolbar/superscript.tiptap-toolbar-api.js'),
 		forExtensions: ['Umb.Tiptap.Superscript'],
 		meta: {
 			alias: 'superscript',
@@ -399,7 +399,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.HorizontalRule',
 		name: 'Horizontal Rule Tiptap Extension',
-		api: () => import('./toolbar/horizontal-rule.extension.js'),
+		api: () => import('./toolbar/horizontal-rule.tiptap-toolbar-api.js'),
 		meta: {
 			alias: 'horizontalRule',
 			icon: 'icon-horizontal-rule',
@@ -411,7 +411,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Undo',
 		name: 'Undo Tiptap Extension',
-		api: () => import('./toolbar/undo.extension.js'),
+		api: () => import('./toolbar/undo.tiptap-toolbar-api.js'),
 		element: () => import('../components/toolbar/tiptap-toolbar-button-disabled.element.js'),
 		meta: {
 			alias: 'undo',
@@ -424,7 +424,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Redo',
 		name: 'Redo Tiptap Extension',
-		api: () => import('./toolbar/redo.extension.js'),
+		api: () => import('./toolbar/redo.tiptap-toolbar-api.js'),
 		element: () => import('../components/toolbar/tiptap-toolbar-button-disabled.element.js'),
 		meta: {
 			alias: 'redo',
@@ -437,7 +437,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.MediaPicker',
 		name: 'Media Picker Tiptap Extension',
-		api: () => import('./toolbar/media-picker.extension.js'),
+		api: () => import('./toolbar/media-picker.tiptap-toolbar-api.js'),
 		forExtensions: ['Umb.Tiptap.Figure', 'Umb.Tiptap.Image'],
 		meta: {
 			alias: 'umbMedia',
@@ -450,7 +450,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.EmbeddedMedia',
 		name: 'Embedded Media Tiptap Extension',
-		api: () => import('./toolbar/embedded-media.extension.js'),
+		api: () => import('./toolbar/embedded-media.tiptap-toolbar-api.js'),
 		forExtensions: ['Umb.Tiptap.Embed'],
 		meta: {
 			alias: 'umbEmbeddedMedia',
@@ -463,7 +463,7 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Table',
 		name: 'Table Tiptap Extension',
-		api: () => import('./toolbar/table.extension.js'),
+		api: () => import('./toolbar/table.tiptap-toolbar-api.js'),
 		forExtensions: ['Umb.Tiptap.Table'],
 		meta: {
 			alias: 'table',

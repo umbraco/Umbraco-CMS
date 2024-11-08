@@ -1,11 +1,11 @@
-import type { ManifestTiptapExtension } from './tiptap-extension.js';
-import type { ManifestTiptapToolbarExtension } from './tiptap-toolbar-extension.js';
+import type { ManifestTiptapExtension } from './tiptap.extension.js';
+import type { ManifestTiptapToolbarExtension } from './tiptap-toolbar.extension.js';
 import type { Editor, Extension, Mark, Node } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
-export type * from './tiptap-extension.js';
-export type * from './tiptap-toolbar-extension.js';
+export type * from './tiptap.extension.js';
+export type * from './tiptap-toolbar.extension.js';
 
 export interface UmbTiptapExtensionApi extends UmbApi {
 	/**
