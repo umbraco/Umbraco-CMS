@@ -9,7 +9,7 @@ export class UmbPropertyEditorConfigCollection extends Array<UmbPropertyEditorCo
 	constructor(args: UmbPropertyEditorConfig) {
 		super(...args);
 	}
-	static get [Symbol.species](): ArrayConstructor {
+	static override get [Symbol.species](): ArrayConstructor {
 		return Array;
 	}
 
