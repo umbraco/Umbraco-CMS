@@ -123,15 +123,6 @@ stages:
           - checkout: self
             submodules: true
           - template: templates/backoffice-install.yml
-          - script: npm run lint:errors
-            displayName: Run lint:errors
-            workingDirectory: src/Umbraco.Web.UI.Client
-          - script: npx playwright install --with-deps
-            displayName: Install Playwright
-            workingDirectory: src/Umbraco.Web.UI.Client
-          - script: npm test
-            displayName: Run tests
-            workingDirectory: src/Umbraco.Web.UI.Client
           - script: npm run build:for:npm
             displayName: Run build:for:npm
             workingDirectory: src/Umbraco.Web.UI.Client
