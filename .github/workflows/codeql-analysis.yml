@@ -66,9 +66,6 @@ jobs:
       - if: matrix.build-mode == 'manual'
         name: Use .NET ${{ env.dotnetVersion }}
         uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.dotnetVersion }}
-          dotnet-quality: ${{ env.dotnetIncludePreviewVersions }}
 
       - if: matrix.build-mode == 'manual'
         shell: bash
