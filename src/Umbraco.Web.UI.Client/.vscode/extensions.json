@@ -1,0 +1,14 @@
+{
+	"recommendations": [
+		"gruntfuggly.todo-tree",
+		"formulahendry.auto-rename-tag",
+		"mikestead.dotenv",
+		"dbaeumer.vscode-eslint",
+		"runem.lit-plugin",
+		"esbenp.prettier-vscode",
+		"hbenl.vscode-test-explorer",
+		"vunguyentuan.vscode-css-variables",
+		"unifiedjs.vscode-mdx",
+		"editorconfig.editorconfig"
+	]
+}
