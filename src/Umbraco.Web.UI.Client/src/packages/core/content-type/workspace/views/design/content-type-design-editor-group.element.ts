@@ -172,7 +172,8 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 						?disabled=${!this._hasOwnerContainer}
 						@blur=${this.#blurGroup}
 						@change=${this.#renameGroup}
-						${this._group!.name === '' ? umbFocus() : nothing}></uui-input>
+						${this._group!.name === '' ? umbFocus() : nothing}
+						auto-width></uui-input>
 				</div>
 			</div>
 			<div slot="header-actions">
@@ -208,10 +209,10 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 						<uui-input
 							type="number"
 							label=${this.localize.term('sort_sortOrder')}
-							.value=${this.group!.sortOrder ?? 0}
+							.value=${this.group!.sortOrder.toString()}
 							?disabled=${!this._hasOwnerContainer}
 							@change=${(e: UUIInputEvent) =>
-								this._singleValueUpdate('sortOrder', parseInt(e.target.value as string) || 0)}></uui-input>
+								this._singleValueUpdate('sortOrder', parseInt(e.target.value as string) ?? 0)}></uui-input>
 					`,
 				)}
 			</div>
@@ -245,7 +246,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 
 			#group-name {
 				--uui-input-border-color: transparent;
-				width: 100%;
+				min-width: 200px;
 			}
 
 			uui-input[type='number'] {
