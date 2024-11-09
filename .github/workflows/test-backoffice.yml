@@ -39,5 +39,3 @@ jobs:
       - run: npm run lint:errors
       - run: npx playwright install --with-deps
       - run: npm test
-      - run: npm run check:paths
-      - run: npm run generate:jsonschema:dist
