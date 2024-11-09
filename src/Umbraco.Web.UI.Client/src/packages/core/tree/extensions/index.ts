@@ -1,2 +1,2 @@
-export * from './tree-item.extension.js';
-export * from './tree.extension.js';
+export type * from './tree-item.extension.js';
+export type * from './tree.extension.js';

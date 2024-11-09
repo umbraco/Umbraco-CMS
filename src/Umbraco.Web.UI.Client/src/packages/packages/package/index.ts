@@ -1,2 +1,2 @@
-export * from './extensions/index.js';
+export type * from './extensions/index.js';
 export * from './repository/index.js';

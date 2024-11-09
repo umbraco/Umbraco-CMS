@@ -10,4 +10,4 @@ export type { UmbDetailDataSource, UmbDetailDataSourceConstructor } from './deta
 export { UmbDetailRepositoryBase } from './detail-repository-base.js';
 export type { UmbDetailRepository } from './detail-repository.interface.js';
 
-export * from './detail-repository.interface.js';
+export type * from './detail-repository.interface.js';

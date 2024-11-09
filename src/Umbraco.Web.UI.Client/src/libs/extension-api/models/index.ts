@@ -1,3 +1,3 @@
-export * from './entry-point.interface.js';
-export * from './api.interface.js';
-export * from './extension-api.interface.js';
+export type * from './entry-point.interface.js';
+export type * from './api.interface.js';
+export type * from './extension-api.interface.js';

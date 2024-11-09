@@ -7,7 +7,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { type UmbDeepPartialObject, umbDeepMerge } from '@umbraco-cms/backoffice/utils';
-import { type ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
+import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
 
 export interface UmbModalRejectReason {
 	type: string;

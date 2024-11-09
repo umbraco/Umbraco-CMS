@@ -1,1 +1,1 @@
-export * from './property-action.interface.js';
+export type * from './property-action.interface.js';

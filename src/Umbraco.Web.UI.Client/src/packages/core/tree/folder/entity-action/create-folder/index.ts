@@ -1,2 +1,2 @@
 export * from './create-folder.action.js';
-export * from './types.js';
+export type * from './types.js';

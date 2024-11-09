@@ -1,1 +1,1 @@
-export * from './tinymce-plugin.extension.js';
+export type * from './tinymce-plugin.extension.js';

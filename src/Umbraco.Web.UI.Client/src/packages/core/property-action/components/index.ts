@@ -1,2 +1,2 @@
-export * from './property-action/index.js';
+export type * from './property-action/index.js';
 export * from './property-action-menu/index.js';

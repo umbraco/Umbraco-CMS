@@ -1,1 +1,1 @@
-export * from './health-check.extension.js';
+export type * from './health-check.extension.js';

@@ -6,4 +6,4 @@ export {
 } from './manifests.js';
 export { UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT } from './partial-view-tree.store.context-token.js';
 export { type UmbPartialViewTreeStore } from './partial-view-tree.store.js';
-export * from './types.js';
+export type * from './types.js';

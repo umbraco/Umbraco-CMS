@@ -10,7 +10,7 @@ export * from './collection-item-picker-modal/index.js';
 
 export * from './default/collection-default.context.js';
 export * from './default/collection-default.context-token.js';
-export * from './collection-filter-model.interface.js';
+export type * from './collection-filter-model.interface.js';
 export type * from './types.js';
 
 export { UmbCollectionActionElement, UmbCollectionActionBase } from './action/index.js';

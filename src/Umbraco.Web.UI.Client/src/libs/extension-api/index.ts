@@ -1,4 +1,4 @@
-export * from './condition/index.js';
+export type * from './condition/index.js';
 export * from './controller/index.js';
 export * from './functions/index.js';
 export * from './initializers/index.js';

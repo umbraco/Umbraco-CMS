@@ -1,4 +1,4 @@
-export * from './composition/index.js';
+export type * from './composition/index.js';
 export * from './modals/index.js';
 export * from './repository/index.js';
 export * from './structure/index.js';

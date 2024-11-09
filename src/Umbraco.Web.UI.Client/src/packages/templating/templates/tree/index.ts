@@ -6,4 +6,4 @@ export {
 } from './manifests.js';
 export { UMB_TEMPLATE_TREE_STORE_CONTEXT } from './template-tree.store.context-token.js';
 export { type UmbTemplateTreeStore } from './template-tree.store.js';
-export * from './types.js';
+export type * from './types.js';

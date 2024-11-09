@@ -1,3 +1,3 @@
-export * from './duplicate-to/index.js';
-export * from './move-to/index.js';
-export * from './trash/index.js';
+export type * from './duplicate-to/index.js';
+export type * from './move-to/index.js';
+export type * from './trash/index.js';
