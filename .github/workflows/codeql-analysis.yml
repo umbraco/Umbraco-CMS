@@ -31,11 +31,21 @@ env:
 
 jobs:
   CodeQL-Build:
+    name: Analyze (${{ matrix.language }})
     permissions:
       actions: read # for github/codeql-action/init to get workflow details
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/analyze to upload SARIF results
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: csharp
+            build-mode: manual
+          - language: javascript-typescript
+            build-mode: none
 
     steps:
       - name: Checkout
@@ -45,19 +55,24 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
           config-file: ./.github/config/codeql-config.yml
 
-      - name: Use .NET ${{ env.dotnetVersion }}
+      - if: matrix.build-mode == 'manual'
+        name: Use .NET ${{ env.dotnetVersion }}
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.dotnetVersion }}
           dotnet-quality: ${{ env.dotnetIncludePreviewVersions }}
 
-      - name: Run dotnet restore
-        run: dotnet restore ${{ env.solution }}
-
-      - name: Run dotnet build
-        run: dotnet build ${{ env.solution }} --configuration ${{ env.buildConfiguration }} --no-restore -p:ContinuousIntegrationBuild=true
+      - if: matrix.build-mode == 'manual'
+        shell: bash
+        run: |
+          dotnet restore ${{ env.solution }}
+          dotnet build ${{ env.solution }} --configuration ${{ env.buildConfiguration }} --no-restore -p:ContinuousIntegrationBuild=true
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"
