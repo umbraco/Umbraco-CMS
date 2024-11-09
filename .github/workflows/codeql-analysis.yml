@@ -45,15 +45,17 @@ jobs:
       matrix:
         include:
           - language: csharp
-            build-mode: manual
+            build-mode: none
           - language: javascript-typescript
             build-mode: none
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+
+      # We use the setup-dotnet action to set up .NET Core, otherwise the CodeQL CLI will not work with preview versions.
+      - name: Setup .NET from global.json
+        uses: actions/setup-dotnet@v4
 
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
@@ -62,16 +64,6 @@ jobs:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
           config-file: ./.github/config/codeql-config.yml
-
-      - if: matrix.build-mode == 'manual'
-        name: Use .NET ${{ env.dotnetVersion }}
-        uses: actions/setup-dotnet@v4
-
-      - if: matrix.build-mode == 'manual'
-        shell: bash
-        run: |
-          dotnet restore ${{ env.solution }}
-          dotnet build ${{ env.solution }} --configuration ${{ env.buildConfiguration }} --no-restore -p:ContinuousIntegrationBuild=true
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
