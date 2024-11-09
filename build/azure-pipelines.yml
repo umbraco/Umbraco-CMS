@@ -75,7 +75,7 @@ stages:
       - job: A
         displayName: Build Umbraco CMS
         pool:
-          vmImage: 'ubuntu-latest'
+          vmImage: 'windows-latest'
         steps:
           - checkout: self
             submodules: true
@@ -506,6 +506,10 @@ stages:
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
             workingDirectory: $(Agent.BuildDirectory)/app
 
+          # Ensures we have the package wait-on installed
+          - pwsh: npm install wait-on
+            displayName: Install wait-on package
+
           # Wait for application to start responding to requests
           - pwsh: npx wait-on -v --interval 1000 --timeout 120000 $(ASPNETCORE_URLS)
             displayName: Wait for application
@@ -517,7 +521,7 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
-          - pwsh: npm run smokeTest --ignore-certificate-errors
+          - pwsh: npm run smokeTestSqlite --ignore-certificate-errors
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
@@ -553,7 +557,6 @@ stages:
 
       - job:
         displayName: E2E Tests (SQL Server)
-        # condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerAcceptanceTests}}) # Outcommented due to timeouts
         condition: eq(${{parameters.sqlServerAcceptanceTests}}, True)
         variables:
           # Connection string
@@ -590,7 +593,8 @@ stages:
           - pwsh: |
               "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
               UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-              URL=$(ASPNETCORE_URLS)" | Out-File .env
+              URL=$(ASPNETCORE_URLS)
+              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json" | Out-File .env
             displayName: Generate .env
             workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
 
@@ -708,7 +712,7 @@ stages:
     dependsOn:
       - Unit
       - Integration
-#      - E2E
+    #      - E2E
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.myGetDeploy}}))
     jobs:
       - job:

@@ -26,7 +26,8 @@ namespace Umbraco.Cms.Infrastructure.Install
         private readonly IFireAndForgetRunner _fireAndForgetRunner;
         private readonly IEnumerable<IDatabaseProviderMetadata> _databaseProviderMetadata;
 
-        public InstallHelper(DatabaseBuilder databaseBuilder,
+        public InstallHelper(
+            DatabaseBuilder databaseBuilder,
             ILogger<InstallHelper> logger,
             IUmbracoVersion umbracoVersion,
             IOptionsMonitor<ConnectionStrings> connectionStrings,

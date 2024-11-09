@@ -58,13 +58,16 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
 
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessContent, Constants.Applications.Content);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessContentOrMedia, Constants.Applications.Content, Constants.Applications.Media);
-        AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessForContentTree,
+        AddAllowedApplicationsPolicy(
+            AuthorizationPolicies.SectionAccessForContentTree,
             Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Users,
             Constants.Applications.Settings, Constants.Applications.Packages, Constants.Applications.Members);
-        AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessForMediaTree,
+        AddAllowedApplicationsPolicy(
+            AuthorizationPolicies.SectionAccessForMediaTree,
             Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Users,
             Constants.Applications.Settings, Constants.Applications.Packages, Constants.Applications.Members);
-        AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessForMemberTree,
+        AddAllowedApplicationsPolicy(
+            AuthorizationPolicies.SectionAccessForMemberTree,
             Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessMedia, Constants.Applications.Media);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessMembers, Constants.Applications.Members);
@@ -88,6 +91,7 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessRelationTypes, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessScripts, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessStylesheets, Constants.Applications.Settings);
+        AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessStylesheetsOrDocumentOrMediaOrMember, Constants.Applications.Settings, Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessTemplates, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessWebhooks, Constants.Applications.Settings);
 

@@ -32,7 +32,9 @@ public class FilePermissionHelper : IFilePermissionHelper
     /// <summary>
     ///     Initializes a new instance of the <see cref="FilePermissionHelper" /> class.
     /// </summary>
-    public FilePermissionHelper(IOptions<GlobalSettings> globalSettings, IIOHelper ioHelper,
+    public FilePermissionHelper(
+        IOptions<GlobalSettings> globalSettings,
+        IIOHelper ioHelper,
         IHostingEnvironment hostingEnvironment)
     {
         _globalSettings = globalSettings.Value;
