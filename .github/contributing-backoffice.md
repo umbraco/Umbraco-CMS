@@ -6,19 +6,14 @@ In the high probability that you are porting something from angular JS then here
 
 Here is the LIT documentation and playground: [https://lit.dev](https://lit.dev)
 
-### How best to find what needs converting from the old backoffice?
-
-1. Navigate to [https://github.com/umbraco/Umbraco-CMS](https://github.com/umbraco/Umbraco-CMS)
-2. Make sure you are on the `v14/dev` branch
-
 ### What is the process of contribution?
 
-- Read the [README](README.md) to learn how to get the project up and running
-- Find an issue marked as [community/up-for-grabs](https://github.com/umbraco/Umbraco.CMS.Backoffice/issues?q=is%3Aissue+is%3Aopen+label%3Acommunity%2Fup-for-grabs) - note that some are also marked [good first issue](https://github.com/umbraco/Umbraco.CMS.Backoffice/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) which indicates they are simple to get started on
-- Umbraco HQ owns the Management API on the backend, so features can be worked on in the frontend only when there is an API, or otherwise if no API is required
-- A contribution should be made in a fork of the repository
-- Once a contribution is ready, a pull request should be made to this repository and HQ will assign a reviewer
-- A pull request should always indicate what part of a feature it tries to solve, i.e. does it close the targeted issue (if any) or does the developer expect Umbraco HQ to take over
+-   Read the [README](README.md) to learn how to get the project up and running
+-   Find an issue marked as [community/up-for-grabs](https://github.com/umbraco/Umbraco.CMS.Backoffice/issues?q=is%3Aissue+is%3Aopen+label%3Acommunity%2Fup-for-grabs) - note that some are also marked [good first issue](https://github.com/umbraco/Umbraco.CMS.Backoffice/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) which indicates they are simple to get started on
+-   Umbraco HQ owns the Management API on the backend, so features can be worked on in the frontend only when there is an API, or otherwise if no API is required
+-   A contribution should be made in a fork of the repository
+-   Once a contribution is ready, a pull request should be made to this repository and HQ will assign a reviewer
+-   A pull request should always indicate what part of a feature it tries to solve, i.e. does it close the targeted issue (if any) or does the developer expect Umbraco HQ to take over
 
 ## Contributing in general terms
 
@@ -32,31 +27,27 @@ The management API is the colloquial term used to describe the new backoffice AP
 
 The frontend has an API formatter that takes the OpenAPI schema file and converts it into a set of TypeScript classes and interfaces.
 
-### Caveats
-
-1. The backoffice can be run and tested against a real Umbraco instance by cloning down the `v14/dev` branch, but there are no guarantees about how well it works yet.
-
 **Current schema for API:**
 
-[https://raw.githubusercontent.com/umbraco/Umbraco-CMS/v13/dev/src/Umbraco.Cms.Api.Management/OpenApi.json](https://raw.githubusercontent.com/umbraco/Umbraco-CMS/v14/dev/src/Umbraco.Cms.Api.Management/OpenApi.json)
+[https://raw.githubusercontent.com/umbraco/Umbraco-CMS/v13/dev/src/Umbraco.Cms.Api.Management/OpenApi.json](https://raw.githubusercontent.com/umbraco/Umbraco-CMS/v15/dev/src/Umbraco.Cms.Api.Management/OpenApi.json)
 
 **How to convert it:**
 
-- Run `npm run generate:api`
+-   Run `npm run generate:server-api`
 
 ## A contribution example
 
 ### Example: Published Cache Status Dashboard
 
-![Published Status Dashboard](/.github/images/contributing/published-cache-status-dashboard.png)
+![Published Status Dashboard](/.github/img/contributing/published-cache-status-dashboard.png)
 
 ### Boilerplate (example using Lit)
 
 Links for Lit examples and documentation:
 
-- [https://lit.dev](https://lit.dev)
-- [https://lit.dev/docs/](https://lit.dev/docs/)
-- [https://lit.dev/playground/](https://lit.dev/playground/)
+-   [https://lit.dev](https://lit.dev)
+-   [https://lit.dev/docs/](https://lit.dev/docs/)
+-   [https://lit.dev/playground/](https://lit.dev/playground/)
 
 ### Functionality
 
@@ -132,39 +123,39 @@ To declare the Published Cache Status Dashboard as a new manifest, we need to ad
 
 Let’s go through each of these properties…
 
-- Type: can be one of the following:
+-   Type: can be one of the following:
 
-  - section - examples include: `Content`, `Media`
-  - dashboard - a view within a section. Examples include: the welcome dashboard
-  - propertyEditorUi
-  - editorView
-  - propertyAction
-  - tree
-  - editor
-  - treeItemAction
+    -   section - examples include: `Content`, `Media`
+    -   dashboard - a view within a section. Examples include: the welcome dashboard
+    -   propertyEditorUi
+    -   editorView
+    -   propertyAction
+    -   tree
+    -   editor
+    -   treeItemAction
 
-- Alias: is the unique key used to identify this item.
-- Name: is the human-readable name for this item.
+-   Alias: is the unique key used to identify this item.
+-   Name: is the human-readable name for this item.
 
-- ElementName: this is the customElementName declared on the element at the top of the file i.e
+-   ElementName: this is the customElementName declared on the element at the top of the file i.e
 
 ```typescript
 @customElement('umb-dashboard-published-status')
 ```
 
-- Js: references a function call to import the file that the element is declared within
+-   Js: references a function call to import the file that the element is declared within
 
-- Weight: allows us to specify the order in which the dashboard will be displayed within the tabs bar
+-   Weight: allows us to specify the order in which the dashboard will be displayed within the tabs bar
 
-- Meta: allows us to reference additional data - in our case, we can specify the label that is shown in the tabs bar and the pathname that will be displayed in the URL
+-   Meta: allows us to reference additional data - in our case, we can specify the label that is shown in the tabs bar and the pathname that will be displayed in the URL
 
-- Conditions: allows us to specify the conditions that must be met for the dashboard to be displayed. In our case, we are specifying that the dashboard will only be displayed within the Settings section
+-   Conditions: allows us to specify the conditions that must be met for the dashboard to be displayed. In our case, we are specifying that the dashboard will only be displayed within the Settings section
 
 ## API mock handlers
 
 Running the app with `npm run dev`, you will quickly notice the API requests turn into 404 errors. To hit the API, we need to add a mock handler to define the endpoints that our dashboard will call. In the case of the Published Cache Status section, we have several calls to work through. Let’s start by looking at the call to retrieve the current status of the cache:
 
-![Published Status Dashboard](/.github/images/contributing/status-of-cache.png)
+![Published Status Dashboard](/.github/img/contributing/status-of-cache.png)
 
 From the existing functionality, we can see that this is a string message that is received as part of a `GET` request from the server.
 
@@ -172,18 +163,18 @@ So to define this, we must first add a handler for the Published Status called `
 
 ```typescript
 const { rest } = window.MockServiceWorker;
-import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import { umbracoPath } from "@umbraco-cms/backoffice/utils";
 
 export const handlers = [
-	rest.get(umbracoPath('/published-cache/status'), (_req, res, ctx) => {
-		return res(
-			// Respond with a 200 status code
-			ctx.status(200),
-			ctx.json<string>(
-				'Database cache is ok. ContentStore contains 1 item and has 1 generation and 0 snapshot. MediaStore contains 5 items and has 1 generation and 0 snapshot.',
-			),
-		);
-	}),
+    rest.get(umbracoPath("/published-cache/status"), (_req, res, ctx) => {
+        return res(
+            // Respond with a 200 status code
+            ctx.status(200),
+            ctx.json<string>(
+                "Database cache is ok. ContentStore contains 1 item and has 1 generation and 0 snapshot. MediaStore contains 5 items and has 1 generation and 0 snapshot."
+            )
+        );
+    }),
 ];
 ```
 
@@ -193,7 +184,7 @@ It returns a `200 OK` response and a string value with the current “status” 
 
 An example `POST` is similar. Let’s take the “Refresh status” button as an example:
 
-![Published Status Dashboard](/.github/images/contributing/refresh-status.png)
+![Published Status Dashboard](/.github/img/contributing/refresh-status.png)
 
 From our existing functionality, we can see that this makes a `POST` call to the server to prompt a reload of the published cache. So we would add a new endpoint to the mock handler that would look like:
 
@@ -220,7 +211,7 @@ In-depth: [https://storybook.js.org/docs/web-components/get-started/introduction
 
 Reference: [https://ambitious-stone-0033b3603.1.azurestaticapps.net/](https://ambitious-stone-0033b3603.1.azurestaticapps.net/)
 
-- Locally: `npm run storybook`
+-   Locally: `npm run storybook`
 
 For Umbraco UI stories, please navigate to [https://uui.umbraco.com/](https://uui.umbraco.com/)
 
