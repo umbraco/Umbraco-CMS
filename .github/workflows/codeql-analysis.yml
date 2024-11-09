@@ -53,9 +53,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Use .NET ${{ env.dotnetVersion }}
-        uses: actions/setup-dotnet@v4
-
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
