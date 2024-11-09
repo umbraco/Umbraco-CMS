@@ -24,6 +24,9 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/Umbraco.Web.UI.Client
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js
@@ -33,14 +36,8 @@ jobs:
           cache: npm
           cache-dependency-path: ./src/Umbraco.Web.UI.Client/package-lock.json
       - run: npm ci --no-audit --no-fund --prefer-offline
-        working-directory: src/Umbraco.Web.UI.Client
       - run: npm run lint:errors
-        working-directory: src/Umbraco.Web.UI.Client
       - run: npx playwright install --with-deps
-        working-directory: src/Umbraco.Web.UI.Client
       - run: npm test
-        working-directory: src/Umbraco.Web.UI.Client
       - run: npm run check:paths
-        working-directory: src/Umbraco.Web.UI.Client
       - run: npm run generate:jsonschema:dist
-        working-directory: src/Umbraco.Web.UI.Client
