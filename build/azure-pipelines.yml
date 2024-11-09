@@ -32,21 +32,21 @@ parameters:
   - name: integrationNonReleaseTestFilter
     displayName: TestFilter used for non-release type builds
     type: string
-    default: '--filter TestCategory!=LongRunning&TestCategory!=NonCritical'
+    default: "--filter TestCategory!=LongRunning&TestCategory!=NonCritical"
   - name: integrationReleaseTestFilter
     displayName: TestFilter used for release type builds
     type: string
-    default: ' '
+    default: " "
   - name: nonWindowsIntegrationNonReleaseTestFilter
     displayName: TestFilter used for non-release type builds on non Windows agents
     type: string
-    default: '--filter TestCategory!=LongRunning&TestCategory!=NonCritical'
+    default: "--filter TestCategory!=LongRunning&TestCategory!=NonCritical"
   - name: nonWindowsIntegrationReleaseTestFilter
     displayName: TestFilter used for release type builds on non Windows agents
     type: string
-    default: ' '
+    default: " "
   - name: isNightly
-    displayName: 'Is nightly build (used for MyGet feed)'
+    displayName: "Is nightly build (used for MyGet feed)"
     type: boolean
     default: false
 
@@ -71,7 +71,7 @@ stages:
       - job: A
         displayName: Build Umbraco CMS
         pool:
-          vmImage: 'windows-latest'
+          vmImage: "windows-latest"
         steps:
           - checkout: self
             submodules: true
@@ -82,6 +82,9 @@ stages:
           - template: templates/backoffice-install.yml
           - script: npm run build:for:cms
             displayName: Run build (Bellissima)
+            workingDirectory: src/Umbraco.Web.UI.Client
+          - script: npm run check:paths
+            displayName: Run check:paths
             workingDirectory: src/Umbraco.Web.UI.Client
           - script: npm ci --no-fund --no-audit --prefer-offline
             displayName: Run npm ci (Login)
@@ -100,7 +103,7 @@ stages:
             inputs:
               command: build
               projects: $(solution)
-              arguments: '--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg'
+              arguments: "--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg"
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
             inputs:
@@ -115,11 +118,20 @@ stages:
       - job: B
         displayName: Build Bellissima Package
         pool:
-          vmImage: 'ubuntu-latest'
+          vmImage: "ubuntu-latest"
         steps:
           - checkout: self
             submodules: true
           - template: templates/backoffice-install.yml
+          - script: npm run lint:errors
+            displayName: Run lint:errors
+            workingDirectory: src/Umbraco.Web.UI.Client
+          - script: npx playwright install --with-deps
+            displayName: Install Playwright
+            workingDirectory: src/Umbraco.Web.UI.Client
+          - script: npm test
+            displayName: Run tests
+            workingDirectory: src/Umbraco.Web.UI.Client
           - script: npm run build:for:npm
             displayName: Run build:for:npm
             workingDirectory: src/Umbraco.Web.UI.Client
@@ -148,7 +160,7 @@ stages:
       - job:
         displayName: Build C# API Reference
         pool:
-          vmImage: 'windows-latest'
+          vmImage: "windows-latest"
         steps:
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
@@ -197,7 +209,7 @@ stages:
       - job:
         displayName: Build js API Reference
         pool:
-          vmImage: 'ubuntu-latest'
+          vmImage: "ubuntu-latest"
         variables:
           BASE_PATH: /v$(umbracoMajorVersion)/ui
         steps:
@@ -251,11 +263,11 @@ stages:
         strategy:
           matrix:
             Windows:
-              vmImage: 'windows-latest'
+              vmImage: "windows-latest"
             Linux:
-              vmImage: 'ubuntu-latest'
+              vmImage: "ubuntu-latest"
             macOS:
-              vmImage: 'macOS-latest'
+              vmImage: "macOS-latest"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -272,8 +284,8 @@ stages:
             displayName: Run dotnet test
             inputs:
               command: test
-              projects: 'tests/Umbraco.Tests.UnitTests/Umbraco.Tests.UnitTests.csproj'
-              arguments: '--configuration $(buildConfiguration) --no-build'
+              projects: "tests/Umbraco.Tests.UnitTests/Umbraco.Tests.UnitTests.csproj"
+              arguments: "--configuration $(buildConfiguration) --no-build"
               testRunTitle: Unit Tests - $(Agent.OS)
 
   - stage: Integration
@@ -288,16 +300,16 @@ stages:
         displayName: Integration Tests (SQLite)
         strategy:
           matrix:
-#            Windows:
-#              vmImage: 'windows-latest'
+            #            Windows:
+            #              vmImage: 'windows-latest'
             Linux:
-              vmImage: 'ubuntu-latest'
+              vmImage: "ubuntu-latest"
             macOS:
-              vmImage: 'macOS-latest'
+              vmImage: "macOS-latest"
         pool:
           vmImage: $(vmImage)
         variables:
-          Tests__Database__DatabaseType: 'Sqlite'
+          Tests__Database__DatabaseType: "Sqlite"
         steps:
           # Setup test environment
           - task: DownloadPipelineArtifact@2
@@ -316,16 +328,16 @@ stages:
             displayName: Run dotnet test
             inputs:
               command: test
-              projects: 'tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj'
+              projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
               ${{ if and(eq(variables['Agent.OS'],'Windows_NT'), or(variables.releaseTestFilter, parameters.forceReleaseTestFilter)) }}:
-                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
+                arguments: "--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}"
               ${{ elseif eq(variables['Agent.OS'],'Windows_NT') }}:
-                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}'
+                arguments: "--configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}"
               ${{ elseif or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
-                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
+                arguments: "--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}"
               ${{ else }}:
-                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
+                arguments: "--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}"
 
       # Integration Tests (SQL Server)
       - job:
@@ -336,14 +348,14 @@ stages:
         strategy:
           matrix:
             Windows:
-              vmImage: 'windows-latest'
+              vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
             Linux:
-              vmImage: 'ubuntu-latest'
+              vmImage: "ubuntu-latest"
               SA_PASSWORD: UmbracoIntegration123!
               Tests__Database__DatabaseType: SqlServer
-              Tests__Database__SQLServerMasterConnectionString: 'Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True'
+              Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -373,16 +385,16 @@ stages:
             displayName: Run dotnet test
             inputs:
               command: test
-              projects: 'tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj'
+              projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
               ${{ if and(eq(variables['Agent.OS'],'Windows_NT'), or(variables.releaseTestFilter, parameters.forceReleaseTestFilter)) }}:
-                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
+                arguments: "--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}"
               ${{ elseif eq(variables['Agent.OS'],'Windows_NT') }}:
-                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}'
+                arguments: "--configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}"
               ${{ elseif or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
-                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
+                arguments: "--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}"
               ${{ else }}:
-                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
+                arguments: "--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}"
 
           # Stop SQL Server
           - pwsh: docker stop mssql
@@ -428,9 +440,9 @@ stages:
         strategy:
           matrix:
             Linux:
-              vmImage: 'ubuntu-latest'
+              vmImage: "ubuntu-latest"
             Windows:
-              vmImage: 'windows-latest'
+              vmImage: "windows-latest"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -546,7 +558,7 @@ stages:
             condition: succeededOrFailed()
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
-              artifact: 'Acceptance Tests - $(Agent.JobName) - Attempt #$(System.JobAttempt)'
+              artifact: "Acceptance Tests - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
 
       - job:
         displayName: E2E Tests (SQL Server)
@@ -557,11 +569,11 @@ stages:
         strategy:
           matrix:
             Linux:
-              vmImage: 'ubuntu-latest'
+              vmImage: "ubuntu-latest"
               SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-              CONNECTIONSTRINGS__UMBRACODBDSN: 'Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True'
+              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
             Windows:
-              vmImage: 'windows-latest'
+              vmImage: "windows-latest"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -694,7 +706,7 @@ stages:
             condition: succeededOrFailed()
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
-              artifact: 'Acceptance Tests - $(Agent.JobName) - Attempt #$(System.JobAttempt)'
+              artifact: "Acceptance Tests - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
 
   ###############################################
   ## Release
@@ -719,13 +731,13 @@ stages:
           - task: NuGetCommand@2
             displayName: NuGet push
             inputs:
-              command: 'push'
+              command: "push"
               packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
-              nuGetFeedType: 'external'
+              nuGetFeedType: "external"
               ${{ if eq(parameters.isNightly, true) }}:
-                publishFeedCredentials: 'MyGet - Umbraco Nightly'
+                publishFeedCredentials: "MyGet - Umbraco Nightly"
               ${{ else }}:
-                publishFeedCredentials: 'MyGet - Pre-releases'
+                publishFeedCredentials: "MyGet - Pre-releases"
       - job:
         displayName: Push to pre-release feed (npm)
         steps:
@@ -749,8 +761,8 @@ stages:
           - task: npmAuthenticate@0
             displayName: Authenticate with npm (MyGet)
             inputs:
-              workingFile: '$(Pipeline.Workspace)/npm/.npmrc'
-              customEndpoint: 'MyGet (npm) - Umbracoprereleases, MyGet (npm) - Umbraconightly'
+              workingFile: "$(Pipeline.Workspace)/npm/.npmrc"
+              customEndpoint: "MyGet (npm) - Umbracoprereleases, MyGet (npm) - Umbraconightly"
           - bash: |
               # Setup temp npm project to load in defaults from the local .npmrc
               npm init -y
@@ -780,10 +792,10 @@ stages:
           - task: NuGetCommand@2
             displayName: NuGet push
             inputs:
-              command: 'push'
+              command: "push"
               packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
-              nuGetFeedType: 'external'
-              publishFeedCredentials: 'NuGet - Umbraco.*'
+              nuGetFeedType: "external"
+              publishFeedCredentials: "NuGet - Umbraco.*"
 
   - stage: Deploy_Npm
     displayName: Npm release
@@ -804,7 +816,7 @@ stages:
             displayName: Authenticate with npm
             inputs:
               workingFile: $(Pipeline.Workspace)/npm/.npmrc
-              customEndpoint: 'NPM - Umbraco Backoffice'
+              customEndpoint: "NPM - Umbraco Backoffice"
           - script: |
               # Setup temp npm project to load in defaults from the local .npmrc
               npm init -y
@@ -817,7 +829,7 @@ stages:
 
   - stage: Upload_API_Docs
     pool:
-      vmImage: 'windows-latest' # Apparently AzureFileCopy is windows only :(
+      vmImage: "windows-latest" # Apparently AzureFileCopy is windows only :(
     variables:
       umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
     displayName: Upload API Documentation
@@ -840,13 +852,13 @@ stages:
               archiveFilePatterns: $(Build.SourcesDirectory)/csharp-docs.zip
               destinationFolder: $(Build.ArtifactStagingDirectory)/csharp-docs
           - task: AzureFileCopy@4
-            displayName: 'Copy C# Docs to blob storage'
+            displayName: "Copy C# Docs to blob storage"
             inputs:
-              SourcePath: '$(Build.ArtifactStagingDirectory)/csharp-docs/*'
+              SourcePath: "$(Build.ArtifactStagingDirectory)/csharp-docs/*"
               azureSubscription: umbraco-storage
               Destination: AzureBlob
               storage: umbracoapidocs
-              ContainerName: '$web'
+              ContainerName: "$web"
               BlobPrefix: v$(umbracoMajorVersion)/csharp
               CleanTargetBeforeCopy: true
       - job:
@@ -863,13 +875,13 @@ stages:
               archiveFilePatterns: $(Build.SourcesDirectory)/ui-docs.zip
               destinationFolder: $(Build.ArtifactStagingDirectory)/ui-docs
           - task: AzureFileCopy@4
-            displayName: 'Copy Storybook to blob storage'
+            displayName: "Copy Storybook to blob storage"
             inputs:
-              SourcePath: '$(Build.ArtifactStagingDirectory)/ui-docs/*'
+              SourcePath: "$(Build.ArtifactStagingDirectory)/ui-docs/*"
               azureSubscription: umbraco-storage
               Destination: AzureBlob
               storage: umbracoapidocs
-              ContainerName: '$web'
+              ContainerName: "$web"
               BlobPrefix: v$(umbracoMajorVersion)/ui
               CleanTargetBeforeCopy: true
       - job:
@@ -886,12 +898,12 @@ stages:
               archiveFilePatterns: $(Build.SourcesDirectory)/ui-api-docs.zip
               destinationFolder: $(Build.ArtifactStagingDirectory)/ui-api-docs
           - task: AzureFileCopy@4
-            displayName: 'Copy UI API Docs to blob storage'
+            displayName: "Copy UI API Docs to blob storage"
             inputs:
-              SourcePath: '$(Build.ArtifactStagingDirectory)/ui-api-docs/*'
+              SourcePath: "$(Build.ArtifactStagingDirectory)/ui-api-docs/*"
               azureSubscription: umbraco-storage
               Destination: AzureBlob
               storage: umbracoapidocs
-              ContainerName: '$web'
+              ContainerName: "$web"
               BlobPrefix: v$(umbracoMajorVersion)/ui-api
               CleanTargetBeforeCopy: true
