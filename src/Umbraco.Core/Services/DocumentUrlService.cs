@@ -597,7 +597,6 @@ public class DocumentUrlService : IDocumentUrlService
     private string GetFullUrl(bool isRootFirstItem, List<string> reversedUrlSegments, Domain? foundDomain)
     {
         var urlSegments = new List<string>(reversedUrlSegments);
-        urlSegments.Reverse();
 
         if (foundDomain is not null)
         {
