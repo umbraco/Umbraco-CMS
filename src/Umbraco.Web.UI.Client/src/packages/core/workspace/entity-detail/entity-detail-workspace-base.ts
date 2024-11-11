@@ -12,6 +12,7 @@ import {
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbStateManager } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbEntityDetailWorkspaceContextArgs {
 	entityType: string;
@@ -46,6 +47,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	public readonly entityType = this._data.createObservablePartOfCurrent((data) => data?.entityType);
 	public readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
 
+	public readonly loading = new UmbStateManager(this);
+
 	protected _getDataPromise?: Promise<any>;
 	protected _detailRepository?: DetailRepositoryType;
 
@@ -55,6 +58,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	#parent = new UmbObjectState<{ entityType: string; unique: UmbEntityUnique } | undefined>(undefined);
 	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
 	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
+
+	#loadingStateUnique = 'umbLoadingEntityDetail';
 
 	#initResolver?: () => void;
 	#initialized = false;
@@ -120,6 +125,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	async load(unique: string) {
+		this.loading.addState({ unique: this.#loadingStateUnique, message: 'Loading Entity Details' });
 		this.#entityContext.setEntityType(this.#entityType);
 		this.#entityContext.setUnique(unique);
 		await this.#init;
@@ -141,6 +147,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			);
 		}
 
+		this.loading.removeState(this.#loadingStateUnique);
 		return response;
 	}
 
@@ -163,6 +170,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @returns { Promise<any> | undefined } The data of the scaffold.
 	 */
 	async createScaffold(args: CreateArgsType) {
+		this.loading.addState({ unique: this.#loadingStateUnique, message: 'Creating entity scaffold' });
 		await this.#init;
 		this.resetState();
 		this.#parent.setValue(args.parent);
@@ -180,6 +188,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.setIsNew(true);
 		this._data.setPersisted(data);
 		this._data.setCurrent(data);
+
+		this.loading.removeState(this.#loadingStateUnique);
 
 		return data;
 	}
