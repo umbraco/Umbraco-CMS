@@ -13,7 +13,6 @@
 		"./embedded-media": "./dist-cms/packages/embedded-media/index.js",
 		"./extension-api": "./dist-cms/libs/extension-api/index.js",
 		"./extension-types": "./dist-cms/packages/extension-types/index.d.ts",
-		"./formatting-api": "./dist-cms/libs/formatting-api/index.js",
 		"./localization-api": "./dist-cms/libs/localization-api/index.js",
 		"./observable-api": "./dist-cms/libs/observable-api/index.js",
 		"./action": "./dist-cms/packages/core/action/index.js",

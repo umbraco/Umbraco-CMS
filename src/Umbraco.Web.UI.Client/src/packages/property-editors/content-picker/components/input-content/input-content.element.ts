@@ -60,16 +60,6 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 		return this.#selection.map((id) => ({ type: this.#entityTypeLookup[this.#type], unique: id }));
 	}
 
-	/** @deprecated Please use `selection` instead. This property will be removed in Umbraco 15. */
-	@property({ type: Array })
-	public set items(items: Array<UmbReferenceByUniqueAndType>) {
-		this.selection = items;
-	}
-	/** @deprecated Please use `selection` instead. This property will be removed in Umbraco 15. */
-	public get items(): Array<UmbReferenceByUniqueAndType> {
-		return this.selection;
-	}
-
 	@property({ type: String })
 	public override set value(selectionString: string | undefined) {
 		this.#selection = splitStringToArray(selectionString);
