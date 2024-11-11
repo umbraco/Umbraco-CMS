@@ -577,7 +577,7 @@ export abstract class UmbBlockEntryContext<
 		if (!variantId || !this.#contentKey) return;
 		// TODO: Handle variantId changes
 		this.observe(
-			this._manager?.hasExposeOf(this.#contentKey),
+			this._manager?.hasExposeOf(this.#contentKey, variantId),
 			(hasExpose) => {
 				this.#hasExpose.setValue(hasExpose);
 			},
