@@ -64,7 +64,7 @@ test('can create an empty user group', async ({umbracoApi, umbracoUi}) => {
   // Checks if the user group was created in the UI as well
   await umbracoUi.userGroup.clickUserGroupsTabButton();
   await umbracoUi.userGroup.isUserGroupWithNameVisible(userGroupName);
-})
+});
 
 test('can rename a user group', async ({umbracoApi, umbracoUi}) => {
   // Arrange

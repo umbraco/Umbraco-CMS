@@ -21,7 +21,6 @@ test.beforeEach(async ({umbracoApi}) => {
   rootFolderId = await umbracoApi.media.createDefaultMediaFolder(rootFolderName);
   childFolderOneId = await umbracoApi.media.createDefaultMediaFolderAndParentId(childFolderOneName, rootFolderId);
   await umbracoApi.media.createDefaultMediaFolderAndParentId(childFolderTwoName, rootFolderId);
-  userGroupId = await umbracoApi.userGroup.createSimpleUserGroupWithMediaSection(userGroupName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -36,7 +35,8 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can see root media start node and children', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [], false, [rootFolderId]);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithMediaStartNode(userGroupName, rootFolderId);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
@@ -52,7 +52,8 @@ test('can see root media start node and children', async ({umbracoApi, umbracoUi
 
 test('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [], false, [childFolderOneId]);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithMediaStartNode(userGroupName, childFolderOneId);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
@@ -71,6 +72,7 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
 
 test('can not see any media when no media start nodes specified', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  userGroupId = await umbracoApi.userGroup.createSimpleUserGroupWithMediaSection(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
