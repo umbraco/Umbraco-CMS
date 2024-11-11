@@ -244,7 +244,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         // First creation
         if (ExistsInNavigation(content.Key) is false && ExistsInNavigationBin(content.Key) is false)
         {
-            _documentNavigationManagementService.Add(content.Key, GetParentKey(content), content.SortOrder);
+            _documentNavigationManagementService.Add(content.Key, content.ContentType.Key, GetParentKey(content), content.SortOrder);
             if (content.Trashed)
             {
                 // If created as trashed, move to bin

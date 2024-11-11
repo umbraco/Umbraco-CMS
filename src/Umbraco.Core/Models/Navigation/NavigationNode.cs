@@ -8,15 +8,18 @@ public sealed class NavigationNode
 
     public Guid Key { get; private set; }
 
+    public Guid ContentTypeKey { get; private set; }
+
     public int SortOrder { get; private set; }
 
     public Guid? Parent { get; private set; }
 
     public ISet<Guid> Children => _children;
 
-    public NavigationNode(Guid key, int sortOrder = 0)
+    public NavigationNode(Guid key, Guid contentTypeKey, int sortOrder = 0)
     {
         Key = key;
+        ContentTypeKey = contentTypeKey;
         SortOrder = sortOrder;
         _children = new HashSet<Guid>();
     }

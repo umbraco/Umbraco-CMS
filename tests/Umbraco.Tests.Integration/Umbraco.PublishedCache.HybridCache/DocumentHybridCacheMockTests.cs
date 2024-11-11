@@ -94,8 +94,6 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
             });
 
         _mockedNucacheRepository.Setup(r => r.DeleteContentItemAsync(It.IsAny<int>()));
-        var optionsMonitorMock = new Mock<IOptionsMonitor<CacheEntrySettings>>();
-        optionsMonitorMock.Setup(x => x.Get(It.IsAny<string>())).Returns(new CacheEntrySettings());
 
         _mockDocumentCacheService = new DocumentCacheService(
             _mockedNucacheRepository.Object,
@@ -105,7 +103,7 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
             GetRequiredService<IPublishedContentFactory>(),
             GetRequiredService<ICacheNodeFactory>(),
             GetSeedProviders(),
-            optionsMonitorMock.Object,
+            new OptionsWrapper<CacheSettings>(new CacheSettings()),
             GetRequiredService<IPublishedModelFactory>(),
             GetRequiredService<IPreviewService>());
 
