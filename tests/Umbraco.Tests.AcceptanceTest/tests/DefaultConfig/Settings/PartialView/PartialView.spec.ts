@@ -89,8 +89,7 @@ test('can rename a partial view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   await umbracoUi.partialView.isPartialViewRootTreeItemVisible(partialViewFileName, true, false);
 });
 
-// TODO: unskip when fixed
-test.skip('can update a partial view content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can update a partial view content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedPartialViewContent = defaultPartialViewContent +
     '@{\r\n' +
@@ -112,8 +111,7 @@ test.skip('can update a partial view content', {tag: '@smoke'}, async ({umbracoA
   expect(updatedPartialView.content).toBe(updatedPartialViewContent);
 });
 
-// Remove skip when the front-end is ready. Currently this function is not stable, sometimes the shown code is not updated after choosing Order By
-test.skip('can use query builder with Order By statement for a partial view', async ({umbracoApi, umbracoUi}) => {
+test('can use query builder with Order By statement for a partial view', async ({umbracoApi, umbracoUi}) => {
   //Arrange
   const propertyAliasValue = 'UpdateDate';
   const isAscending = true;
@@ -192,8 +190,7 @@ test('can use query builder with Where statement for a partial view', async ({um
   expect(updatedPartialView.content).toBe(expectedTemplateContent);
 });
 
-// TODO: Remove skip when the front-end is ready. Currently the returned items count is not updated after choosing the root content.
-test.skip('can insert dictionary item into a partial view', async ({umbracoApi, umbracoUi}) => {
+test('can insert dictionary item into a partial view', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.partialView.create(partialViewFileName, defaultPartialViewContent, '/');
   expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
@@ -201,7 +198,7 @@ test.skip('can insert dictionary item into a partial view', async ({umbracoApi, 
   await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
   await umbracoApi.dictionary.create(dictionaryName);
 
-  const partialViewContent = '@Umbraco.GetDictionaryValue("' + dictionaryName + '")' + defaultPartialViewContent;
+  const partialViewContent = '@Umbraco.GetDictionaryValue("' + dictionaryName + '")\n' + defaultPartialViewContent;
 
   // Act
   await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
@@ -214,8 +211,7 @@ test.skip('can insert dictionary item into a partial view', async ({umbracoApi, 
   expect(partialViewData.content).toBe(partialViewContent);
 });
 
-// TODO: Update the value of the System Field in the testHelpers. There has been changes to the SystemField Name.
-test.skip('can insert value into a partial view', async ({umbracoApi, umbracoUi}) => {
+test('can insert value into a partial view', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.partialView.create(partialViewFileName, defaultPartialViewContent, '/');
   expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
@@ -271,7 +267,7 @@ test.skip('can show returned items in query builder ', async ({umbracoApi, umbra
   //Act
   await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
   await umbracoUi.partialView.clickQueryBuilderButton();
-  await umbracoUi.partialView.chooseRootContentInQueryBuilder('(' + contentName + ')');
+  await umbracoUi.partialView.chooseRootContentInQueryBuilder(contentName);
 
   // Assert
   await umbracoUi.partialView.doesReturnedItemsHaveCount(1);
@@ -290,6 +286,6 @@ test('cannot create a partial view with an empty name', async ({umbracoApi, umbr
 
   // Assert
   // TODO: Uncomment this when the front-end is ready. Currently there is no error displays.
-  //await umbracoUi.partialView.isErrorNotificationVisible();
+  // await umbracoUi.partialView.isErrorNotificationVisible();
   expect(await umbracoApi.partialView.doesNameExist(partialViewFileName)).toBeFalsy();
 });
