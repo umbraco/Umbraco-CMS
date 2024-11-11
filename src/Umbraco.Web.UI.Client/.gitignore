@@ -18,7 +18,6 @@ dist-ssr
 
 ## testing
 coverage/
-mockServiceWorker.js
 
 # Editor directories and files
 .vscode/*
