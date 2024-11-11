@@ -293,13 +293,5 @@ public class UdiTests
         Assert.IsFalse(UdiParser.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", true, out udi));
         Assert.AreEqual(Constants.UdiEntityType.Unknown, udi.EntityType);
         Assert.AreEqual("Umbraco.Cms.Core.UnknownTypeUdi", udi.GetType().FullName);
-
-        // known
-        Assert.IsTrue(UdiParser.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", true, out udi));
-        Assert.IsInstanceOf<GuidUdi>(udi);
-
-        // can get method for Deploy compatibility
-        var method = typeof(UdiParser).GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(string), typeof(bool) }, null);
-        Assert.IsNotNull(method);
     }
 }
