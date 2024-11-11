@@ -1,4 +1,3 @@
-import { UMB_PARTIAL_VIEW_FOLDER_WORKSPACE_ALIAS } from './constants.js';
 import { UMB_PARTIAL_VIEW_FOLDER_WORKSPACE_CONTEXT } from './partial-view-folder-workspace.context-token.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

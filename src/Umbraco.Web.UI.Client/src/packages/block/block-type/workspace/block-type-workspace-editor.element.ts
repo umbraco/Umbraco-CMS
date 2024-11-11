@@ -1,6 +1,6 @@
 import { UMB_BLOCK_TYPE_WORKSPACE_CONTEXT } from './block-type-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { customElement, css, html, state, property } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, css, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import type { UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';

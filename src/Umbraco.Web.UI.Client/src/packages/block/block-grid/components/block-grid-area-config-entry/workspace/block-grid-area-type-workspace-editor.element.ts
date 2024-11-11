@@ -1,6 +1,6 @@
 import { UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_CONTEXT } from './block-grid-area-type-workspace.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { customElement, css, html, state, property } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, css, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-block-grid-area-type-workspace-editor')

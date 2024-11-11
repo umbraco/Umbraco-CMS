@@ -62,7 +62,7 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 			{
 				path: 'create',
 				component: () => import('./block-grid-area-type-workspace-editor.element.js'),
-				setup: (component) => {
+				setup: () => {
 					this.create();
 				},
 			},
