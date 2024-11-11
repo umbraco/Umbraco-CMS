@@ -38,7 +38,7 @@ export class UmbWorkspacePackageElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<umb-workspace-editor alias="Umb.Workspace.Package"> ${this._renderHeader()} </umb-workspace-editor> `;
+		return html`<umb-workspace-editor> ${this._renderHeader()} </umb-workspace-editor> `;
 	}
 
 	static override styles = [

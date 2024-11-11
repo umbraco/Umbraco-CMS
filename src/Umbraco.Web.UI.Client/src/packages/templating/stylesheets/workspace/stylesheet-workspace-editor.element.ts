@@ -37,7 +37,7 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 	override render() {
 		return this._isNew !== undefined
 			? html`
-					<umb-workspace-editor alias="Umb.Workspace.StyleSheet">
+					<umb-workspace-editor>
 						<div id="header" slot="header">
 							<uui-input
 								placeholder="Enter stylesheet name..."

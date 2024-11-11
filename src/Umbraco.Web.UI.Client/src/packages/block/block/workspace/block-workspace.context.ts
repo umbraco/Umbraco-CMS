@@ -176,8 +176,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				path: 'create/:elementTypeKey',
 				component: UmbBlockWorkspaceEditorElement,
 				setup: async (component, info) => {
-					(component as UmbBlockWorkspaceEditorElement).workspaceAlias = manifest.alias;
-
 					const elementTypeKey = info.match.params.elementTypeKey;
 					await this.create(elementTypeKey);
 
@@ -192,7 +190,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				path: 'edit/:key',
 				component: UmbBlockWorkspaceEditorElement,
 				setup: (component, info) => {
-					(component as UmbBlockWorkspaceEditorElement).workspaceAlias = manifest.alias;
 					const key = decodeFilePath(info.match.params.key);
 					this.load(key);
 				},
