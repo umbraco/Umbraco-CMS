@@ -44,6 +44,9 @@ public static partial class Constants
 
         public const string RelationType = "relation-type";
 
+        public const string User = "user";
+        public const string UserGroup = "user-group";
+
         public const string Webhook = "webhook";
 
         // forms

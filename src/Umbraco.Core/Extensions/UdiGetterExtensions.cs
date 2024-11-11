@@ -4,6 +4,7 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Extensions;
 
@@ -39,6 +40,8 @@ public static class UdiGetterExtensions
             IPartialView partialView => partialView.GetUdi(),
             IRelationType relationType => relationType.GetUdi(),
             ITemplate template => template.GetUdi(),
+            IUser user => user.GetUdi(),
+            IUserGroup userGroup => userGroup.GetUdi(),
             IWebhook webhook => webhook.GetUdi(),
             _ => throw new NotSupportedException($"Entity type {entity.GetType().FullName} is not supported."),
         };
@@ -330,6 +333,34 @@ public static class UdiGetterExtensions
         ArgumentNullException.ThrowIfNull(entity);
 
         return new GuidUdi(Constants.UdiEntityType.Template, entity.Key).EnsureClosed();
+    }
+
+    /// <summary>
+    /// Gets the entity identifier of the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>
+    /// The entity identifier of the entity.
+    /// </returns>
+    public static GuidUdi GetUdi(this IUser entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        return new GuidUdi(Constants.UdiEntityType.User, entity.Key).EnsureClosed();
+    }
+
+    /// <summary>
+    /// Gets the entity identifier of the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>
+    /// The entity identifier of the entity.
+    /// </returns>
+    public static GuidUdi GetUdi(this IUserGroup entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        return new GuidUdi(Constants.UdiEntityType.UserGroup, entity.Key).EnsureClosed();
     }
 
     /// <summary>

@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Extensions;
@@ -259,6 +260,34 @@ public class UdiGetterExtensionsTests
     public void GetUdiForTemplate(Guid key, string expected)
     {
         ITemplate entity = new TemplateBuilder()
+            .WithKey(key)
+            .Build();
+
+        Udi udi = entity.GetUdi();
+        Assert.AreEqual(expected, udi.ToString());
+
+        udi = ((IEntity)entity).GetUdi();
+        Assert.AreEqual(expected, udi.ToString());
+    }
+
+    [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://user/6ad82c70685c4e049b36d81bd779d16f")]
+    public void GetUdiForUser(Guid key, string expected)
+    {
+        IUser entity = new UserBuilder()
+            .WithKey(key)
+            .Build();
+
+        Udi udi = entity.GetUdi();
+        Assert.AreEqual(expected, udi.ToString());
+
+        udi = ((IEntity)entity).GetUdi();
+        Assert.AreEqual(expected, udi.ToString());
+    }
+
+    [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://user-group/6ad82c70685c4e049b36d81bd779d16f")]
+    public void GetUdiForUserGroup(Guid key, string expected)
+    {
+        IUserGroup entity = new UserGroupBuilder()
             .WithKey(key)
             .Build();
 
