@@ -116,7 +116,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 					this.#variantId.setValue(variantId);
 				},
-				'observeBlockType',
+				'observeVariantIds',
 			);
 
 			this.removeUmbControllerByAlias('observeHasExpose');
