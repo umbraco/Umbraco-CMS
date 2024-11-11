@@ -46,6 +46,9 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var childKey = Guid.NewGuid();
         var child = SetupInvariantPublishedContent("The Child", childKey, navigationQueryServiceMock, root);
 
+        IEnumerable<Guid> ancestorsKeys = [rootKey];
+        navigationQueryServiceMock.Setup(x=>x.TryGetAncestorsKeys(childKey, out ancestorsKeys)).Returns(true);
+
         var contentCache = CreatePublishedContentCache("#");
         Mock.Get(contentCache).Setup(x => x.GetById(root.Key)).Returns(root);
         Mock.Get(contentCache).Setup(x => x.GetById(child.Key)).Returns(child);
@@ -78,6 +81,9 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Mock.Get(contentCache).Setup(x => x.GetById(child.Key)).Returns(child);
         Mock.Get(contentCache).Setup(x => x.GetById(grandchild.Key)).Returns(grandchild);
 
+        IEnumerable<Guid> ancestorsKeys = [childKey, rootKey];
+        navigationQueryServiceMock.Setup(x=>x.TryGetAncestorsKeys(grandchildKey, out ancestorsKeys)).Returns(true);
+
         var builder = CreateApiContentRouteBuilder(hideTopLevelNodeFromPath, contentCache: contentCache, navigationQueryService: navigationQueryServiceMock.Object);
         var result = builder.Build(grandchild);
         Assert.IsNotNull(result);
@@ -100,6 +106,9 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var contentCache = CreatePublishedContentCache("#");
         Mock.Get(contentCache).Setup(x => x.GetById(root.Key)).Returns(root);
         Mock.Get(contentCache).Setup(x => x.GetById(child.Key)).Returns(child);
+
+        IEnumerable<Guid> ancestorsKeys = [rootKey];
+        navigationQueryServiceMock.Setup(x=>x.TryGetAncestorsKeys(childKey, out ancestorsKeys)).Returns(true);
 
         var builder = CreateApiContentRouteBuilder(false, contentCache: contentCache, navigationQueryService: navigationQueryServiceMock.Object);
         var result = builder.Build(child, "en-us");
@@ -130,6 +139,9 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Mock.Get(contentCache).Setup(x => x.GetById(root.Key)).Returns(root);
         Mock.Get(contentCache).Setup(x => x.GetById(child.Key)).Returns(child);
 
+        IEnumerable<Guid> ancestorsKeys = [rootKey];
+        navigationQueryServiceMock.Setup(x=>x.TryGetAncestorsKeys(childKey, out ancestorsKeys)).Returns(true);
+
         var builder = CreateApiContentRouteBuilder(false, contentCache: contentCache, navigationQueryService: navigationQueryServiceMock.Object);
         var result = builder.Build(child, "en-us");
         Assert.IsNotNull(result);
@@ -158,6 +170,9 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var contentCache = CreatePublishedContentCache("#");
         Mock.Get(contentCache).Setup(x => x.GetById(root.Key)).Returns(root);
         Mock.Get(contentCache).Setup(x => x.GetById(child.Key)).Returns(child);
+
+        IEnumerable<Guid> ancestorsKeys = [rootKey];
+        navigationQueryServiceMock.Setup(x=>x.TryGetAncestorsKeys(childKey, out ancestorsKeys)).Returns(true);
 
         var builder = CreateApiContentRouteBuilder(false, contentCache: contentCache, navigationQueryService: navigationQueryServiceMock.Object);
         var result = builder.Build(child, "en-us");
@@ -224,6 +239,12 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Mock.Get(contentCache).Setup(x => x.GetById(root.Key)).Returns(root);
         Mock.Get(contentCache).Setup(x => x.GetById(child.Key)).Returns(child);
         Mock.Get(contentCache).Setup(x => x.GetById(grandchild.Key)).Returns(grandchild);
+
+        IEnumerable<Guid> grandchildAncestorsKeys = [childKey, rootKey];
+        navigationQueryServiceMock.Setup(x=>x.TryGetAncestorsKeys(grandchildKey, out grandchildAncestorsKeys)).Returns(true);
+
+        IEnumerable<Guid> ancestorsKeys = [rootKey];
+        navigationQueryServiceMock.Setup(x=>x.TryGetAncestorsKeys(childKey, out ancestorsKeys)).Returns(true);
 
         // yes... actually testing the mock setup here. but it's important for the rest of the tests that this behave correct, so we better test it.
         var publishedUrlProvider = SetupPublishedUrlProvider(hideTopLevelNodeFromPath, contentCache, navigationQueryServiceMock.Object);
@@ -306,6 +327,9 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Mock.Get(contentCache).Setup(x => x.GetById(root.Key)).Returns(root);
         Mock.Get(contentCache).Setup(x => x.GetById(child.Key)).Returns(child);
 
+        IEnumerable<Guid> ancestorsKeys = [rootKey];
+        navigationQueryServiceMock.Setup(x=>x.TryGetAncestorsKeys(childKey, out ancestorsKeys)).Returns(true);
+
         var builder = CreateApiContentRouteBuilder(true, contentCache: contentCache, isPreview: isPreview, navigationQueryService: navigationQueryServiceMock.Object);
         var result = builder.Build(child);
 
@@ -341,6 +365,9 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         apiContentPathProvider
             .Setup(p => p.GetContentPath(It.IsAny<IPublishedContent>(), It.IsAny<string?>()))
             .Returns((IPublishedContent content, string? culture) => $"my-custom-path-for-{content.UrlSegment}");
+
+        IEnumerable<Guid> ancestorsKeys = [rootKey];
+        navigationQueryServiceMock.Setup(x=>x.TryGetAncestorsKeys(childKey, out ancestorsKeys)).Returns(true);
 
         var builder = CreateApiContentRouteBuilder(true, contentCache: contentCache, apiContentPathProvider: apiContentPathProvider.Object, navigationQueryService: navigationQueryServiceMock.Object);
         var result = builder.Build(root);
