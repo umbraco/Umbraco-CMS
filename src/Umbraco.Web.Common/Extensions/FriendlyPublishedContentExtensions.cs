@@ -272,6 +272,14 @@ public static class FriendlyPublishedContentExtensions
         => content.Parent<T>(GetPublishedCache(content), GetNavigationQueryService(content));
 
     /// <summary>
+    ///     Gets the parent of the content item.
+    /// </summary>
+    /// <param name="content">The content.</param>
+    /// <returns>The parent of content or <c>null</c>.</returns>
+    public static IPublishedContent? Parent(this IPublishedContent content)
+        => content.Parent<IPublishedContent>(GetPublishedCache(content), GetNavigationQueryService(content));
+
+    /// <summary>
     ///     Gets the ancestors of the content.
     /// </summary>
     /// <param name="content">The content.</param>
