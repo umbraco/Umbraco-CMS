@@ -242,6 +242,21 @@ public class UdiGetterExtensionsTests
         Assert.AreEqual(expected, udi.ToString());
     }
 
+    [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://relation/6ad82c70685c4e049b36d81bd779d16f")]
+    public void GetUdiForRelation(Guid key, string expected)
+    {
+        IRelation entity = new RelationBuilder()
+            .WithKey(key)
+            .AddRelationType().Done()
+            .Build();
+
+        Udi udi = entity.GetUdi();
+        Assert.AreEqual(expected, udi.ToString());
+
+        udi = ((IEntity)entity).GetUdi();
+        Assert.AreEqual(expected, udi.ToString());
+    }
+
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://relation-type/6ad82c70685c4e049b36d81bd779d16f")]
     public void GetUdiForRelationType(Guid key, string expected)
     {

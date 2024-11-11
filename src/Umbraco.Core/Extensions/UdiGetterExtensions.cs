@@ -38,6 +38,7 @@ public static class UdiGetterExtensions
             ILanguage language => language.GetUdi(),
             IMemberGroup memberGroup => memberGroup.GetUdi(),
             IPartialView partialView => partialView.GetUdi(),
+            IRelation relation => relation.GetUdi(),
             IRelationType relationType => relationType.GetUdi(),
             ITemplate template => template.GetUdi(),
             IUser user => user.GetUdi(),
@@ -305,6 +306,20 @@ public static class UdiGetterExtensions
         ArgumentNullException.ThrowIfNull(entity);
 
         return GetUdiFromPath(Constants.UdiEntityType.PartialView, entity.Path);
+    }
+
+    /// <summary>
+    /// Gets the entity identifier of the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>
+    /// The entity identifier of the entity.
+    /// </returns>
+    public static GuidUdi GetUdi(this IRelation entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        return new GuidUdi(Constants.UdiEntityType.Relation, entity.Key).EnsureClosed();
     }
 
     /// <summary>

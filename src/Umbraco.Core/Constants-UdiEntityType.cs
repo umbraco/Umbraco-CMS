@@ -42,6 +42,7 @@ public static partial class Constants
         public const string MemberType = "member-type";
         public const string MemberGroup = "member-group";
 
+        public const string Relation = "relation";
         public const string RelationType = "relation-type";
 
         public const string User = "user";
