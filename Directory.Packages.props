@@ -17,7 +17,7 @@
     <PackageVersion Include="Microsoft.Data.Sqlite" Version="9.0.0-rc.2.24474.1" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0-rc.2.24474.1" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0-rc.2.24474.1" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.0-rc.2.24473.5" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.0-rc.2.24473.5" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0-rc.2.24473.5" />
@@ -90,7 +90,7 @@
     <!-- Both Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc bring in a vulnerable version of System.Text.RegularExpressions -->
     <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
     <!-- Both OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer bring in a vulnerable version of Microsoft.IdentityModel.JsonWebTokens -->
-    <PackageVersion Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.1.2" />
+    <PackageVersion Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.2.0" />
     <!-- Both  Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer, Dazinator.Extensions.FileProviders bring in legacy versions of System.Text.Encodings.Web  -->
     <PackageVersion Include="System.Text.Encodings.Web" Version="9.0.0-rc.2.24473.5" />
     <!-- NPoco.SqlServer bring in vulnerable version of Microsoft.Data.SqlClient  -->
