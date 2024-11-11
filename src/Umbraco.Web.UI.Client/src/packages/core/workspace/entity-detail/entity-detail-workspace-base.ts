@@ -133,9 +133,22 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			this._data.setPersisted(data);
 			this._data.setCurrent(data);
 			this.setIsNew(false);
+
+			this.observe(
+				response.asObservable(),
+				(entity) => this.#onStoreChange(entity),
+				'umbEntityDetailTypeStoreObserver',
+			);
 		}
 
 		return response;
+	}
+
+	#onStoreChange(entity: DetailModelType | undefined) {
+		if (!entity) {
+			this._data.setPersisted(undefined);
+			this._data.setCurrent(undefined);
+		}
 	}
 
 	/**
