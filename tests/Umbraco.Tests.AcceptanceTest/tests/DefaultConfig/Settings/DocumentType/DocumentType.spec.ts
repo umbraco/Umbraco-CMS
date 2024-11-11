@@ -1,4 +1,4 @@
-﻿import {AliasHelper, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from '@playwright/test';
 
 const documentTypeName = 'TestDocumentType';
@@ -24,7 +24,7 @@ test('can create a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoU
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   await umbracoUi.documentType.reloadTree('Document Types');
   await umbracoUi.documentType.isDocumentTreeItemVisible(documentTypeName);
@@ -43,7 +43,7 @@ test('can create a document type with a template', {tag: '@smoke'}, async ({umbr
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  // Checks if both the success notification for document Types and teh template are visible
+  // Checks if both the success notification for document Types and the template are visible
   await umbracoUi.documentType.doesSuccessNotificationsHaveCount(2);
   // Checks if the documentType contains the template
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
@@ -67,7 +67,7 @@ test('can create a element type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   // Checks if the isElement is true
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
@@ -87,7 +87,7 @@ test('can rename a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoU
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   await umbracoUi.documentType.isDocumentTreeItemVisible(wrongName, false);
   await umbracoUi.documentType.isDocumentTreeItemVisible(documentTypeName);
@@ -108,7 +108,7 @@ test('can update the alias for a document type', async ({umbracoApi, umbracoUi})
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   await umbracoUi.documentType.isDocumentTreeItemVisible(documentTypeName, true);
   const documentTypeDataNew = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeDataNew.alias).toBe(newAlias);
@@ -126,7 +126,7 @@ test('can add an icon for a document type', {tag: '@smoke'}, async ({umbracoApi,
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.icon).toBe(bugIcon);
   await umbracoUi.documentType.isDocumentTreeItemVisible(documentTypeName, true);
@@ -144,6 +144,6 @@ test('can delete a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoU
   await umbracoUi.documentType.clickDeleteAndConfirmButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeFalsy();
 });
