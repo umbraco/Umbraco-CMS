@@ -6,9 +6,6 @@ import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-block-workspace-editor')
 export class UmbBlockWorkspaceEditorElement extends UmbLitElement {
-	@property({ type: String, attribute: false })
-	workspaceAlias?: string;
-
 	constructor() {
 		super();
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {
@@ -30,9 +27,7 @@ export class UmbBlockWorkspaceEditorElement extends UmbLitElement {
 	_headline: string = '';
 
 	override render() {
-		return this.workspaceAlias
-			? html` <umb-workspace-editor alias=${this.workspaceAlias} headline=${this._headline}> </umb-workspace-editor> `
-			: nothing;
+		return html`<umb-workspace-editor headline=${this._headline}> </umb-workspace-editor> `;
 	}
 
 	static override readonly styles = [

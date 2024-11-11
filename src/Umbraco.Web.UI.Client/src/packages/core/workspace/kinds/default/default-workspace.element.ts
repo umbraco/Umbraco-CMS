@@ -13,7 +13,6 @@ export class UmbDefaultWorkspaceElement extends UmbLitElement {
 		const headline = this.manifest?.meta.headline;
 
 		return html` <umb-workspace-editor
-			alias=${this.manifest.alias}
 			headline=${ifDefined(headline ? this.localize.string(headline) : undefined)}></umb-workspace-editor>`;
 	}
 

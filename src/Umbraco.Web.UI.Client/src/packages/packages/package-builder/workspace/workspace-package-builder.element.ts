@@ -41,9 +41,6 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	@property()
 	entityUnique?: string;
 
-	@property()
-	workspaceAlias?: string;
-
 	@state()
 	private _package?: UmbCreatedPackageDefinition;
 
@@ -123,9 +120,8 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	}
 
 	override render() {
-		if (!this.workspaceAlias) return nothing;
 		return html`
-			<umb-workspace-editor alias=${this.workspaceAlias} back-path="section/packages/view/created">
+			<umb-workspace-editor back-path="section/packages/view/created">
 				${this.#renderHeader()} ${this.#renderEditors()} ${this.#renderActions()}
 			</umb-workspace-editor>
 		`;

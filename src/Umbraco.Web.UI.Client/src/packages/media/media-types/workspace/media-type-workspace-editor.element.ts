@@ -82,7 +82,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<umb-workspace-editor alias="Umb.Workspace.MediaType">
+			<umb-workspace-editor>
 				<div id="header" slot="header">
 					<uui-button id="icon" compact label="icon" look="outline" @click=${this._handleIconClick}>
 						<umb-icon name=${ifDefined(this._icon)}></umb-icon>

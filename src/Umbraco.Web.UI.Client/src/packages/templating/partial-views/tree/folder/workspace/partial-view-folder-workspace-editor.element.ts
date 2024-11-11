@@ -35,8 +35,7 @@ export class UmbPartialViewFolderWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<umb-workspace-editor headline=${this._name} alias=${UMB_PARTIAL_VIEW_FOLDER_WORKSPACE_ALIAS}>
-		</umb-workspace-editor>`;
+		return html`<umb-workspace-editor headline=${this._name}> </umb-workspace-editor>`;
 	}
 
 	static override styles = [UmbTextStyles, css``];
