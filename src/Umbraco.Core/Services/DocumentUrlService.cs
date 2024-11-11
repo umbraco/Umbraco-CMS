@@ -583,6 +583,13 @@ public class DocumentUrlService : IDocumentUrlService
            }
 
            var isRootFirstItem = GetTopMostRootKey(false, culture) == ancestorsOrSelfKeysArray.Last();
+
+           if (_globalSettings.ForceCombineUrlPathLeftToRight
+               || CultureInfo.GetCultureInfo(culture).TextInfo.IsRightToLeft is false)
+           {
+               urlSegments.Reverse();
+           }
+
            result.Add(new UrlInfo(
                text: GetFullUrl(isRootFirstItem, urlSegments, foundDomain),
                isUrl: hasUrlInCulture,
@@ -594,9 +601,9 @@ public class DocumentUrlService : IDocumentUrlService
         return result;
     }
 
-    private string GetFullUrl(bool isRootFirstItem, List<string> reversedUrlSegments, Domain? foundDomain)
+    private string GetFullUrl(bool isRootFirstItem, List<string> segments, Domain? foundDomain)
     {
-        var urlSegments = new List<string>(reversedUrlSegments);
+        var urlSegments = new List<string>(segments);
 
         if (foundDomain is not null)
         {
