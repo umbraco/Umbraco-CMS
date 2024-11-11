@@ -31,11 +31,10 @@ test('can see correct information when published', async ({umbracoApi, umbracoUi
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesLinkHaveText(notPublishContentLink);
   await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.waitForTimeout(2000);
 
   // Assert
+  await umbracoUi.waitForTimeout(2000);
   const contentData = await umbracoApi.document.getByName(contentName);
-  console.log(contentData);
   await umbracoUi.content.doesIdHaveText(contentData.id);
   const expectedCreatedDate = new Date(contentData.variants[0].createDate).toLocaleString("en-US", {
     year: "numeric",
