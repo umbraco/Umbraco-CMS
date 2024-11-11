@@ -16,4 +16,5 @@ public class CacheEntrySettings
 
     [DefaultValue(StaticSeedCacheDuration)]
     public  TimeSpan SeedCacheDuration { get; set; } = TimeSpan.Parse(StaticSeedCacheDuration);
+
 }

@@ -24,7 +24,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     private readonly IEnumerable<IDocumentSeedKeyProvider> _seedKeyProviders;
     private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IPreviewService _previewService;
-    private readonly CacheEntrySettings _cacheEntrySettings;
+    private readonly CacheSettings _cacheSettings;
     private HashSet<Guid>? _seedKeys;
     private HashSet<Guid> SeedKeys
     {
@@ -54,7 +54,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         IPublishedContentFactory publishedContentFactory,
         ICacheNodeFactory cacheNodeFactory,
         IEnumerable<IDocumentSeedKeyProvider> seedKeyProviders,
-        IOptionsMonitor<CacheEntrySettings> cacheEntrySettings,
+        IOptions<CacheSettings> cacheSettings,
         IPublishedModelFactory publishedModelFactory,
         IPreviewService previewService)
     {
@@ -67,7 +67,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         _seedKeyProviders = seedKeyProviders;
         _publishedModelFactory = publishedModelFactory;
         _previewService = previewService;
-        _cacheEntrySettings = cacheEntrySettings.Get(Constants.Configuration.NamedOptions.CacheEntry.Document);
+        _cacheSettings = cacheSettings.Value;
     }
 
     public async Task<IPublishedContent?> GetByKeyAsync(Guid key, bool? preview = null)
@@ -221,8 +221,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
     private HybridCacheEntryOptions GetSeedEntryOptions() => new()
     {
-        Expiration = _cacheEntrySettings.SeedCacheDuration,
-        LocalCacheExpiration = _cacheEntrySettings.SeedCacheDuration
+        Expiration = _cacheSettings.SeedCacheDuration,
+        LocalCacheExpiration = _cacheSettings.SeedCacheDuration
     };
 
     private HybridCacheEntryOptions GetEntryOptions(Guid key)
@@ -234,8 +234,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
         return new HybridCacheEntryOptions
         {
-            Expiration = _cacheEntrySettings.RemoteCacheDuration,
-            LocalCacheExpiration = _cacheEntrySettings.LocalCacheDuration,
+            Expiration = _cacheSettings.Entry.Document.RemoteCacheDuration,
+            LocalCacheExpiration = _cacheSettings.Entry.Document.LocalCacheDuration,
         };
     }
 
