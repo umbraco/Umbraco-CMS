@@ -235,7 +235,8 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 							.value=${this.property.description}
 							@input=${(e: CustomEvent) => {
 								if (e.target) this.#singleValueUpdate('description', (e.target as HTMLInputElement).value);
-							}}></uui-textarea>
+							}}
+							auto-height></uui-textarea>
 					</p>
 				</div>
 				<uui-button
