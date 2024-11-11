@@ -95,8 +95,7 @@ test('can delete a group in a document type', {tag: '@smoke'}, async ({umbracoAp
   expect(documentTypeData.properties.length).toBe(0);
 });
 
-// TODO: Currently I am getting an error If I delete a tab that contains children. The children are not cleaned up when deleting the tab.
-test.skip('can delete a tab in a document type', async ({umbracoApi, umbracoUi}) => {
+test('can delete a tab in a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditorInTab(documentTypeName, dataTypeName, dataTypeData.id, tabName);
@@ -108,7 +107,7 @@ test.skip('can delete a tab in a document type', async ({umbracoApi, umbracoUi})
   await umbracoUi.documentType.clickConfirmToDeleteButton();
   await umbracoUi.documentType.clickSaveButton();
 
-  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
+  await umbracoApi.documentType.getByName(documentTypeName);
   // Assert
   await umbracoUi.documentType.isSuccessNotificationVisible();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
@@ -176,8 +175,7 @@ test('can create a document type with multiple groups', async ({umbracoApi, umbr
   expect(await umbracoApi.documentType.doesGroupContainCorrectPropertyEditor(documentTypeName, secondDataTypeName, secondDataType.id, secondGroupName)).toBeTruthy();
 });
 
-// TODO: unskip, currently flaky
-test.skip('can create a document type with multiple tabs', async ({umbracoApi, umbracoUi}) => {
+test('can create a document type with multiple tabs', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondDataTypeName = 'Image Media Picker';
