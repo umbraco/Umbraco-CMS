@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
-using StackExchange.Profiling.Internal;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
@@ -18,13 +17,8 @@ internal sealed partial class RequestCultureService : RequestHeaderHandler, IReq
     /// <inheritdoc />
     public string? GetRequestedCulture()
     {
-        var acceptLanguage = GetHeaderValue(HeaderNames.AcceptLanguage);
-        if (acceptLanguage.IsNullOrWhiteSpace())
-        {
-            return null;
-        }
-
-        return ValidLanguageHeaderRegex().IsMatch(acceptLanguage!) ? acceptLanguage : null;
+        var acceptLanguage = GetHeaderValue(HeaderNames.AcceptLanguage) ?? string.Empty;
+        return ValidLanguageHeaderRegex().IsMatch(acceptLanguage) ? acceptLanguage : null;
     }
 
     /// <inheritdoc />
