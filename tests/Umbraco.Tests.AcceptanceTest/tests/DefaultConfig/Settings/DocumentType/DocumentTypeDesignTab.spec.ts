@@ -280,7 +280,7 @@ test('can reorder groups in a document type', async ({umbracoApi, umbracoUi}) =>
   expect(await umbracoApi.documentType.doesDocumentTypeGroupNameContainCorrectSortOrder(documentTypeName, firstGroupValue, 1)).toBeTruthy();
 });
 
-// TODO: Unskip when it works. Sometimes the properties are not dragged correctly.
+// Skip this flaky tests as sometimes the properties are not dragged correctly.
 test.skip('can reorder properties in a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -306,7 +306,7 @@ test.skip('can reorder properties in a document type', async ({umbracoApi, umbra
   expect(documentTypeData.properties[1].name).toBe(dataTypeName);
 });
 
-// TODO: Unskip when the frontend does not give the secondTab -1 as the sortOrder
+// TODO: Remove skip when the frontend is ready. Currently it is impossible to reorder tab by drag and drop
 test.skip('can reorder tabs in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
