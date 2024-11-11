@@ -221,8 +221,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
     private HybridCacheEntryOptions GetSeedEntryOptions() => new()
     {
-        Expiration = _cacheSettings.SeedCacheDuration,
-        LocalCacheExpiration = _cacheSettings.SeedCacheDuration
+        Expiration = _cacheSettings.Entry.Document.SeedCacheDuration,
+        LocalCacheExpiration = _cacheSettings.Entry.Document.SeedCacheDuration
     };
 
     private HybridCacheEntryOptions GetEntryOptions(Guid key)
