@@ -53,7 +53,7 @@ test('can disable URL tracker', async ({umbracoApi, umbracoUi}) => {
 });
 
 // TODO: Remove skip when the frond-end is ready. Currently there is no redirect have been made after renaming a published page
-test.skip('can re-enable URL tracker', async ({umbracoApi, umbracoUi}) => {
+test('can re-enable URL tracker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.redirectManagement.setStatus(disableStatus);
 

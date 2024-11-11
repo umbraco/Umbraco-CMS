@@ -110,8 +110,7 @@ test('can open content model in a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.isElementWorkspaceOpenInBlock(elementTypeName);
 });
 
-// TODO: Is this an issue? should you be able to remove the contentModel so you have none?
-// There is currently frontend issues
+// TODO: Skip this test as it is impossible to remove a content model
 test.skip('can remove a content model from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -128,7 +127,6 @@ test.skip('can remove a content model from a block', async ({umbracoApi, umbraco
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
 });
 
 test('can add a settings model to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -303,7 +301,7 @@ test('can delete a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   expect(blockData.values[0].value[0].iconColor).toEqual('');
 });
 
-// TODO: Currently it is not possible to update a stylesheet to a block
+// TODO: Remove skip when the front-end is ready. Currently it is not possible to update a stylesheet to a block
 test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css';
@@ -325,6 +323,7 @@ test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbr
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   // Removes first stylesheet
+  await umbracoUi.dataType.clickRemoveCustomStylesheetWithName(stylesheetName);
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
@@ -338,7 +337,7 @@ test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbr
   await umbracoApi.stylesheet.ensureNameNotExists(secondStylesheetName);
 });
 
-// TODO: Currently it is not possible to delete a stylesheet to a block
+// TODO: Remove skip when the front-end is ready. Currently it is not possible to delete a stylesheet to a block
 test.skip('can delete a custom stylesheet from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css';
