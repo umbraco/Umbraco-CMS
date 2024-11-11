@@ -1,0 +1,48 @@
+import { Meta } from '@storybook/blocks';
+import DebugDialogImage from './umb-debug-dialog.jpg';
+import DebugImage from './umb-debug.jpg';
+
+<Meta title="Guides/Debug" />
+
+# Debugging
+
+## Debugging Contexts
+
+The component `<umb-debug>` allows you to discover the available contexts from the current DOM element, that you are able to consume and use.
+
+For example it will help you as a package developer or implementor to know you are able to consume the `DigalogService` and quickly see what properties and methods are available to use.
+
+This can help with the developer experience to quickly see what is available to use and how to use it.
+
+### Usage
+
+The `<umb-debug>` component can be used in two different ways, either as a button or as a dialog. By default it is rendered as a button and the debug information about available contexts is displayed inline to where the `umb-debug` element is placed.
+
+<img src={DebugImage} width="100%" />
+
+```typescript
+// This will add a Debug button to the UI and once clicked the information about avilable contextes will slide down
+<umb-debug visible></umb-debug>
+```
+
+#### Dialog
+
+This example uses an additional property/attribute `dialog` which adds a smaller badge to the UI as opposed to a button and will open the information in a dialog/modal on the right hand side, this may be more useful to use when space is limited in the UI to add a button and pane of information directly to where the element is placed.
+
+<img src={DebugDialogImage} width="100%" />
+
+```typescript
+// This will open the debug information in a small dialog/modal from the right hand side
+<umb-debug visible dialog></umb-debug>
+```
+
+#### Disable
+
+You may wish to temporarily hide or disable the debug information but return to it later on in the development process.
+
+```typescript
+// To hide or remove the button ensure you remove the `visible` attribute or set it to false
+<umb-debug></umb-debug>
+
+<umb-debug ?visible=${false}></umb-debug>
+```
