@@ -33,38 +33,6 @@ public class UdiGetterExtensionsTests
         Assert.AreEqual(expected, udi.ToString());
     }
 
-    [TestCase("script.js", "umb://script/script.js")]
-    [TestCase("editor\\script.js", "umb://script/editor/script.js")]
-    [TestCase("editor/script.js", "umb://script/editor/script.js")]
-    public void GetUdiForScript(string path, string expected)
-    {
-        Script entity = new ScriptBuilder()
-            .WithPath(path)
-            .Build();
-
-        Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
-
-        udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
-    }
-
-    [TestCase("style.css", "umb://stylesheet/style.css")]
-    [TestCase("editor\\style.css", "umb://stylesheet/editor/style.css")]
-    [TestCase("editor/style.css", "umb://stylesheet/editor/style.css")]
-    public void GetUdiForStylesheet(string path, string expected)
-    {
-        Stylesheet entity = new StylesheetBuilder()
-            .WithPath(path)
-            .Build();
-
-        Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
-
-        udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
-    }
-
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", false, "umb://document/6ad82c70685c4e049b36d81bd779d16f")]
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", true, "umb://document-blueprint/6ad82c70685c4e049b36d81bd779d16f")]
     public void GetUdiForContent(Guid key, bool blueprint, string expected)
@@ -262,6 +230,38 @@ public class UdiGetterExtensionsTests
     {
         IRelationTypeWithIsDependency entity = new RelationTypeBuilder()
             .WithKey(key)
+            .Build();
+
+        Udi udi = entity.GetUdi();
+        Assert.AreEqual(expected, udi.ToString());
+
+        udi = ((IEntity)entity).GetUdi();
+        Assert.AreEqual(expected, udi.ToString());
+    }
+
+    [TestCase("script.js", "umb://script/script.js")]
+    [TestCase("editor\\script.js", "umb://script/editor/script.js")]
+    [TestCase("editor/script.js", "umb://script/editor/script.js")]
+    public void GetUdiForScript(string path, string expected)
+    {
+        IScript entity = new ScriptBuilder()
+            .WithPath(path)
+            .Build();
+
+        Udi udi = entity.GetUdi();
+        Assert.AreEqual(expected, udi.ToString());
+
+        udi = ((IEntity)entity).GetUdi();
+        Assert.AreEqual(expected, udi.ToString());
+    }
+
+    [TestCase("style.css", "umb://stylesheet/style.css")]
+    [TestCase("editor\\style.css", "umb://stylesheet/editor/style.css")]
+    [TestCase("editor/style.css", "umb://stylesheet/editor/style.css")]
+    public void GetUdiForStylesheet(string path, string expected)
+    {
+        IStylesheet entity = new StylesheetBuilder()
+            .WithPath(path)
             .Build();
 
         Udi udi = entity.GetUdi();
