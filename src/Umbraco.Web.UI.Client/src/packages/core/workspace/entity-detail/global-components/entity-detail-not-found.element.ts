@@ -1,14 +1,17 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-entity-detail-not-found')
 export class UmbEntityDetailNotFoundElement extends UmbLitElement {
+	@property({ type: String, attribute: 'entity-type' })
+	entityType = '';
+
 	override render() {
 		return html`
 			<div class="uui-text">
-				<h4><umb-localize key="routing_routeNotFoundTitle"></umb-localize></h4>
-				<umb-localize key="routing_routeNotFoundDescription"></umb-localize>
+				<h4>${this.localize.term('entityDetail_notFoundTitle', this.entityType)}</h4>
+				${this.localize.term('entityDetail_notFoundDescription', this.entityType)}
 			</div>
 		`;
 	}
