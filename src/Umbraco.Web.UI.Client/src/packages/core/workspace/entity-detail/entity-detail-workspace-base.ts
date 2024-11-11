@@ -136,19 +136,12 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 			this.observe(
 				response.asObservable(),
-				(entity) => this.#onStoreChange(entity),
+				(entity) => this.#onDetailStoreChange(entity),
 				'umbEntityDetailTypeStoreObserver',
 			);
 		}
 
 		return response;
-	}
-
-	#onStoreChange(entity: DetailModelType | undefined) {
-		if (!entity) {
-			this._data.setPersisted(undefined);
-			this._data.setCurrent(undefined);
-		}
 	}
 
 	/**
@@ -325,6 +318,12 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 				this.#checkIfInitialized();
 			},
 		);
+	}
+
+	#onDetailStoreChange(entity: DetailModelType | undefined) {
+		if (!entity) {
+			this._data.clear();
+		}
 	}
 
 	public override destroy(): void {
