@@ -51,8 +51,9 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 		}
 	}
 
-	// close the modal when navigating to data type
+	// close the modal when navigating to media
 	#onNavigate(mediaType: UmbAllowedMediaTypeModel) {
+		// TODO: Use a URL builder instead of hardcoding the URL. [NL]
 		const url = `section/media/workspace/media/create/parent/${this.data?.parent.entityType}/${
 			this.data?.parent.unique ?? 'null'
 		}/${mediaType.unique}`;
