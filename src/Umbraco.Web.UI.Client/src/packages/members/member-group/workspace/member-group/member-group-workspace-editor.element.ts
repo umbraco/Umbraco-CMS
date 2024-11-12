@@ -6,35 +6,11 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-member-group-workspace-editor')
 export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
-	@state()
-	private _unique?: string;
-
-	#workspaceContext?: typeof UMB_MEMBER_GROUP_WORKSPACE_CONTEXT.TYPE;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_MEMBER_GROUP_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#workspaceContext = workspaceContext;
-			if (!this.#workspaceContext) return;
-			this.observe(this.#workspaceContext.unique, (unique) => (this._unique = unique ?? undefined));
-		});
-	}
-
-	#renderActions() {
-		// Actions only works if we have a valid unique.
-		if (!this._unique || this.#workspaceContext?.getIsNew()) return nothing;
-
-		return html`<umb-workspace-entity-action-menu slot="action-menu"></umb-workspace-entity-action-menu>`;
-	}
-
 	override render() {
 		return html`
-			<umb-workspace-editor back-path=${UMB_MEMBER_GROUP_ROOT_WORKSPACE_PATH}>
+			<umb-entity-detail-workspace-editor .backPath=${UMB_MEMBER_GROUP_ROOT_WORKSPACE_PATH}>
 				<umb-workspace-header-name-editable slot="header"></umb-workspace-header-name-editable>
-				${this.#renderActions()}
-				<umb-workspace-entity-action-menu slot="action-menu"></umb-workspace-entity-action-menu>
-			</umb-workspace-editor>
+			</umb-entity-detail-workspace-editor>
 		`;
 	}
 
