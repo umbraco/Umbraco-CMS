@@ -3,16 +3,7 @@ import type {
 	UmbMediaCreateOptionsModalData,
 	UmbMediaCreateOptionsModalValue,
 } from './media-create-options-modal.token.js';
-import {
-	html,
-	nothing,
-	customElement,
-	state,
-	ifDefined,
-	repeat,
-	css,
-	when,
-} from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, state, repeat, css, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbMediaTypeStructureRepository, type UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

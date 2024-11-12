@@ -3,7 +3,7 @@ import type {
 	UmbDocumentCreateOptionsModalData,
 	UmbDocumentCreateOptionsModalValue,
 } from './document-create-options-modal.token.js';
-import { html, customElement, state, ifDefined, repeat, css, when } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, repeat, css, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import {
