@@ -1,10 +1,11 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '../entity-detail-workspace.context-token.js';
-import { customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-entity-detail-workspace-editor')
 export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
-	#context?: typeof UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT.TYPE;
+	@property({ attribute: 'back-path' })
+	public backPath?: string;
 
 	@state()
 	private _entityType = '';
@@ -14,6 +15,8 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 
 	@state()
 	private _exists = false;
+
+	#context?: typeof UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -31,7 +34,7 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 			return html`<umb-entity-detail-not-found entity-type=${this._entityType}></umb-entity-detail-not-found>`;
 		}
 
-		return html`<umb-workspace-editor ?loading=${this._isLoading}>
+		return html`<umb-workspace-editor ?loading=${this._isLoading} .backPath=${this.backPath}>
 			<slot name="header" slot="header"></slot>
 		</umb-workspace-editor>`;
 	}
