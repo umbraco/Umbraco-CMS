@@ -1,7 +1,9 @@
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
@@ -10,6 +12,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 public class ContentNavigationServiceBaseTests
 {
     private TestContentNavigationService _navigationService;
+
+    private Guid ContentType { get; set; }
 
     private Guid Root { get; set; }
 
@@ -32,46 +36,21 @@ public class ContentNavigationServiceBaseTests
     [SetUp]
     public void Setup()
     {
-        // Root
-        //    - Child 1
-        //      - Grandchild 1
-        //      - Grandchild 2
-        //    - Child 2
-        //      - Grandchild 3
-        //        - Great-grandchild 1
-        //    - Child 3
-        //      - Grandchild 4
-
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>());
+            Mock.Of<INavigationRepository>(),
+            Mock.Of<IContentTypeService>());
 
-        Root = new Guid("E48DD82A-7059-418E-9B82-CDD5205796CF");
-        _navigationService.Add(Root);
-
-        Child1 = new Guid("C6173927-0C59-4778-825D-D7B9F45D8DDE");
-        _navigationService.Add(Child1, Root);
-
-        Grandchild1 = new Guid("E856AC03-C23E-4F63-9AA9-681B42A58573");
-        _navigationService.Add(Grandchild1, Child1);
-
-        Grandchild2 = new Guid("A1B1B217-B02F-4307-862C-A5E22DB729EB");
-        _navigationService.Add(Grandchild2, Child1);
-
-        Child2 = new Guid("60E0E5C4-084E-4144-A560-7393BEAD2E96");
-        _navigationService.Add(Child2, Root);
-
-        Grandchild3 = new Guid("D63C1621-C74A-4106-8587-817DEE5FB732");
-        _navigationService.Add(Grandchild3, Child2);
-
-        GreatGrandchild1 = new Guid("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7");
-        _navigationService.Add(GreatGrandchild1, Grandchild3);
-
-        Child3 = new Guid("B606E3FF-E070-4D46-8CB9-D31352029FDF");
-        _navigationService.Add(Child3, Root);
-
-        Grandchild4 = new Guid("F381906C-223C-4466-80F7-B63B4EE073F8");
-        _navigationService.Add(Grandchild4, Child3);
+        // Root - E48DD82A-7059-418E-9B82-CDD5205796CF
+        //    - Child 1 - C6173927-0C59-4778-825D-D7B9F45D8DDE
+        //      - Grandchild 1 - E856AC03-C23E-4F63-9AA9-681B42A58573
+        //      - Grandchild 2 - A1B1B217-B02F-4307-862C-A5E22DB729EB
+        //    - Child 2 - 60E0E5C4-084E-4144-A560-7393BEAD2E96
+        //      - Grandchild 3 - D63C1621-C74A-4106-8587-817DEE5FB732
+        //        - Great-grandchild 1 - 56E29EA9-E224-4210-A59F-7C2C5C0C5CC7
+        //    - Child 3 - B606E3FF-E070-4D46-8CB9-D31352029FDF
+        //      - Grandchild 4 - F381906C-223C-4466-80F7-B63B4EE073F8
+        CreateTestData();
     }
 
     [Test]
@@ -129,7 +108,8 @@ public class ContentNavigationServiceBaseTests
         // Arrange
         var emptyNavigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>());
+            Mock.Of<INavigationRepository>(),
+            Mock.Of<IContentTypeService>());
 
         // Act
         emptyNavigationService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
@@ -161,7 +141,7 @@ public class ContentNavigationServiceBaseTests
     {
         // Arrange
         Guid anotherRoot = Guid.NewGuid();
-        _navigationService.Add(anotherRoot);
+        _navigationService.Add(anotherRoot, ContentType);
 
         // Act
         var result = _navigationService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
@@ -174,6 +154,179 @@ public class ContentNavigationServiceBaseTests
             Assert.AreEqual(2, rootsList.Count);
             CollectionAssert.AreEqual(new[] { Root, anotherRoot }, rootsList); // Root and Another root in order
         });
+    }
+
+    [Test]
+    public void Cannot_Get_Root_Items_Of_Type_From_Non_Existing_Content_Type_Alias()
+    {
+        // Arrange
+        var nonExistingContentTypeAlias = string.Empty;
+
+        // Act
+        var result = _navigationService.TryGetRootKeysOfType(nonExistingContentTypeAlias, out IEnumerable<Guid> rootKeys);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result);
+            Assert.IsEmpty(rootKeys);
+        });
+    }
+
+    [Test]
+    public void Can_Get_Root_Items_Of_Type()
+    {
+        // Arrange
+        const string contentTypeAlias = "contentPage";
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object });
+
+        _navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        // We need to re-create the test data since we use new mock
+        CreateTestData();
+
+        Guid anotherRoot = Guid.NewGuid();
+        _navigationService.Add(anotherRoot, ContentType);
+
+        // Act
+        var result = _navigationService.TryGetRootKeysOfType(contentTypeAlias, out IEnumerable<Guid> rootKeys);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            Assert.AreEqual(2, rootKeys.Count());
+        });
+    }
+
+    [Test]
+    public void Can_Get_Root_Items_Of_Type_Filters_Result()
+    {
+        // Arrange
+        const string contentTypeAlias = "contentPage";
+        const string anotherContentTypeAlias = "anotherContentPage";
+        Guid anotherContentTypeKey = Guid.NewGuid();
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var anotherContentTypeMock = new Mock<IContentType>();
+        anotherContentTypeMock.SetupGet(x => x.Alias).Returns(anotherContentTypeAlias);
+        anotherContentTypeMock.SetupGet(x => x.Key).Returns(anotherContentTypeKey);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
+
+        _navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        // We need to re-create the test data since we use new mock
+        CreateTestData();
+
+        // Adding 2 new root items with different content type
+        _navigationService.Add(Guid.NewGuid(), anotherContentTypeKey);
+        _navigationService.Add(Guid.NewGuid(), anotherContentTypeKey);
+
+        // Act
+        _navigationService.TryGetRootKeysOfType(anotherContentTypeAlias, out IEnumerable<Guid> rootKeysOfType);
+        var rootsOfTypeCount = rootKeysOfType.Count();
+
+        // Assert
+        // Retrieve all root items without filtering to compare
+        _navigationService.TryGetRootKeys(out IEnumerable<Guid> allRootKeys);
+        var allRootsCount = allRootKeys.Count();
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(allRootsCount > rootsOfTypeCount);
+            Assert.AreEqual(3, allRootsCount);
+            Assert.AreEqual(2, rootsOfTypeCount);
+        });
+    }
+
+    [Test]
+    public void Can_Get_Root_Items_Of_Type_Filters_Result_And_Maintains_Their_Order_Of_Creation()
+    {
+        // Arrange
+        const string contentTypeAlias = "contentPage";
+        const string anotherContentTypeAlias = "anotherContentPage";
+        Guid anotherContentTypeKey = Guid.NewGuid();
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var anotherContentTypeMock = new Mock<IContentType>();
+        anotherContentTypeMock.SetupGet(x => x.Alias).Returns(anotherContentTypeAlias);
+        anotherContentTypeMock.SetupGet(x => x.Key).Returns(anotherContentTypeKey);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
+
+        _navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        // We need to re-create the test data since we use new mock
+        CreateTestData();
+
+        // Adding 2 new root items with different content type
+        Guid root2 = Guid.NewGuid();
+        Guid root3 = Guid.NewGuid();
+        _navigationService.Add(root2, anotherContentTypeKey);
+        _navigationService.Add(root3, anotherContentTypeKey);
+
+        var expectedRootsOrder = new List<Guid> { root2, root3 };
+
+        // Act
+        _navigationService.TryGetRootKeysOfType(anotherContentTypeAlias, out IEnumerable<Guid> rootKeysOfType);
+
+        // Assert
+        // Check that the order matches what is expected
+        Assert.IsTrue(expectedRootsOrder.SequenceEqual(rootKeysOfType));
+    }
+
+    [Test]
+    public void Can_Get_Root_Items_Of_Type_Even_When_Content_Type_Was_Not_Initially_Loaded()
+    {
+        // Arrange
+        const string contentTypeAlias = "contentPage";
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x
+            .Get(It.Is<string>(alias => alias == contentTypeAlias)))
+            .Returns(contentTypeMock.Object);
+
+        _navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        // We need to re-create the test data since we use new mock
+        CreateTestData();
+
+        // Act
+        _navigationService.TryGetRootKeysOfType(contentTypeAlias, out IEnumerable<Guid> rootKeys);
+
+        // Assert
+        Assert.AreEqual(1, rootKeys.Count());
     }
 
     [Test]
@@ -217,7 +370,7 @@ public class ContentNavigationServiceBaseTests
     }
 
     [Test]
-    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", new[] { "C6173927-0C59-4778-825D-D7B9F45D8DDE", "60E0E5C4-084E-4144-A560-7393BEAD2E96", "B606E3FF-E070-4D46-8CB9-D31352029FDF" })] // Root
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", new[] { "C6173927-0C59-4778-825D-D7B9F45D8DDE", "60E0E5C4-084E-4144-A560-7393BEAD2E96", "B606E3FF-E070-4D46-8CB9-D31352029FDF", })] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", new[] { "E856AC03-C23E-4F63-9AA9-681B42A58573", "A1B1B217-B02F-4307-862C-A5E22DB729EB" })] // Child 1
     [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", new string[0])] // Grandchild 1
     [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", new[] { "D63C1621-C74A-4106-8587-817DEE5FB732" })] // Child 2
@@ -238,6 +391,219 @@ public class ContentNavigationServiceBaseTests
         {
             Assert.AreEqual(expectedChildren[i], childrenList.ElementAt(i));
         }
+    }
+
+    [Test]
+    public void Cannot_Get_Children_Of_Type_From_Non_Existing_Content_Type_Alias()
+    {
+        // Arrange
+        Guid parentKey = Root;
+        var nonExistingContentTypeAlias = string.Empty;
+
+        // Act
+        var result = _navigationService.TryGetChildrenKeysOfType(parentKey, nonExistingContentTypeAlias, out IEnumerable<Guid> childrenKeys);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result);
+            Assert.IsEmpty(childrenKeys);
+        });
+    }
+
+    [Test]
+    public void Cannot_Get_Children_Of_Type_From_Non_Existing_Content_Key()
+    {
+        // Arrange
+        var nonExistingKey = Guid.NewGuid();
+        const string contentTypeAlias = "contentPage";
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object });
+
+        _navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        // Act
+        var result = _navigationService.TryGetChildrenKeysOfType(nonExistingKey, contentTypeAlias, out IEnumerable<Guid> childrenKeys);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result);
+            Assert.IsEmpty(childrenKeys);
+        });
+    }
+
+    [Test]
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", 3)] // Root - Child 1, Child 2, Child 3
+    [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", 2)] // Child 1 - Grandchild 1, Grandchild 2
+    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", 0)] // Grandchild 1
+    [TestCase("A1B1B217-B02F-4307-862C-A5E22DB729EB", 0)] // Grandchild 2
+    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", 1)] // Child 2 - Grandchild 3
+    [TestCase("D63C1621-C74A-4106-8587-817DEE5FB732", 1)] // Grandchild 3 - Great-grandchild 1
+    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", 0)] // Great-grandchild 1
+    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", 1)] // Child 3 - Grandchild 4
+    [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8", 0)] // Grandchild 4
+    public void Can_Get_Children_Of_Type(Guid parentKey, int childrenCount)
+    {
+        // Arrange
+        const string contentTypeAlias = "contentPage";
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object });
+
+        _navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        // We need to re-create the test data since we use new mock
+        CreateTestData();
+
+        // Act
+        var result = _navigationService.TryGetChildrenKeysOfType(parentKey, contentTypeAlias, out IEnumerable<Guid> childrenKeys);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            Assert.AreEqual(childrenCount, childrenKeys.Count());
+        });
+    }
+
+    [Test]
+    public void Can_Get_Children_Of_Type_Filters_Result()
+    {
+        // Arrange
+        Guid parentKey = Root;
+        const string contentTypeAlias = "contentPage";
+        const string anotherContentTypeAlias = "anotherContentPage";
+        Guid anotherContentTypeKey = Guid.NewGuid();
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var anotherContentTypeMock = new Mock<IContentType>();
+        anotherContentTypeMock.SetupGet(x => x.Alias).Returns(anotherContentTypeAlias);
+        anotherContentTypeMock.SetupGet(x => x.Key).Returns(anotherContentTypeKey);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
+
+        _navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        // We need to re-create the test data since we use new mock
+        CreateTestData();
+
+        // Adding 2 new children with different content type under Root
+        _navigationService.Add(Guid.NewGuid(), anotherContentTypeKey, Root);
+        _navigationService.Add(Guid.NewGuid(), anotherContentTypeKey, Root);
+
+        // Act
+        _navigationService.TryGetChildrenKeysOfType(parentKey, anotherContentTypeAlias, out IEnumerable<Guid> childrenKeysOfType);
+        var childrenOfTypeCount = childrenKeysOfType.Count();
+
+        // Assert
+        // Retrieve all children without filtering to compare
+        _navigationService.TryGetChildrenKeys(parentKey, out IEnumerable<Guid> allChildrenKeys);
+        var allChildrenCount = allChildrenKeys.Count();
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(allChildrenCount > childrenOfTypeCount);
+            Assert.AreEqual(5, allChildrenCount);
+            Assert.AreEqual(2, childrenOfTypeCount);
+        });
+    }
+
+    [Test]
+    public void Can_Get_Children_Of_Type_Filters_Result_And_Maintains_Their_Order_Of_Creation()
+    {
+        // Arrange
+        Guid parentKey = Root;
+        const string contentTypeAlias = "contentPage";
+        const string anotherContentTypeAlias = "anotherContentPage";
+        Guid anotherContentTypeKey = Guid.NewGuid();
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var anotherContentTypeMock = new Mock<IContentType>();
+        anotherContentTypeMock.SetupGet(x => x.Alias).Returns(anotherContentTypeAlias);
+        anotherContentTypeMock.SetupGet(x => x.Key).Returns(anotherContentTypeKey);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
+
+        _navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        // We need to re-create the test data since we use new mock
+        CreateTestData();
+
+        // Adding 2 new children with different content type under Root
+        Guid child4 = Guid.NewGuid();
+        Guid child5 = Guid.NewGuid();
+        _navigationService.Add(child4, anotherContentTypeKey, Root);
+        _navigationService.Add(child5, anotherContentTypeKey, Root);
+
+        var expectedChildrenOrder = new List<Guid> { child4, child5 };
+
+        // Act
+        _navigationService.TryGetChildrenKeysOfType(parentKey, anotherContentTypeAlias, out IEnumerable<Guid> childrenKeysOfType);
+
+        // Assert
+        // Check that the order matches what is expected
+        Assert.IsTrue(expectedChildrenOrder.SequenceEqual(childrenKeysOfType));
+    }
+
+    [Test]
+    public void Can_Get_Children_Of_Type_Even_When_Content_Type_Was_Not_Initially_Loaded()
+    {
+        // Arrange
+        Guid parentKey = Child1;
+        const string contentTypeAlias = "contentPage";
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x
+            .Get(It.Is<string>(alias => alias == contentTypeAlias)))
+            .Returns(contentTypeMock.Object);
+
+        _navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        // We need to re-create the test data since we use new mock
+        CreateTestData();
+
+        // Act
+        _navigationService.TryGetChildrenKeysOfType(parentKey, contentTypeAlias, out IEnumerable<Guid> childrenKeys);
+
+        // Assert
+        Assert.AreEqual(2, childrenKeys.Count());
     }
 
     [Test]
@@ -281,7 +647,7 @@ public class ContentNavigationServiceBaseTests
     }
 
     [Test]
-    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", new[] { "C6173927-0C59-4778-825D-D7B9F45D8DDE", "E856AC03-C23E-4F63-9AA9-681B42A58573", "A1B1B217-B02F-4307-862C-A5E22DB729EB", "60E0E5C4-084E-4144-A560-7393BEAD2E96", "D63C1621-C74A-4106-8587-817DEE5FB732", "56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", "B606E3FF-E070-4D46-8CB9-D31352029FDF", "F381906C-223C-4466-80F7-B63B4EE073F8" })] // Root
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", new[] { "C6173927-0C59-4778-825D-D7B9F45D8DDE", "E856AC03-C23E-4F63-9AA9-681B42A58573", "A1B1B217-B02F-4307-862C-A5E22DB729EB", "60E0E5C4-084E-4144-A560-7393BEAD2E96", "D63C1621-C74A-4106-8587-817DEE5FB732", "56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", "B606E3FF-E070-4D46-8CB9-D31352029FDF", "F381906C-223C-4466-80F7-B63B4EE073F8", })] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", new[] { "E856AC03-C23E-4F63-9AA9-681B42A58573", "A1B1B217-B02F-4307-862C-A5E22DB729EB" })] // Child 1
     [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", new string[0])] // Grandchild 1
     [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", new[] { "D63C1621-C74A-4106-8587-817DEE5FB732", "56E29EA9-E224-4210-A59F-7C2C5C0C5CC7" })] // Child 2
@@ -302,6 +668,189 @@ public class ContentNavigationServiceBaseTests
         {
             Assert.AreEqual(expectedDescendants[i], descendantsList.ElementAt(i));
         }
+    }
+
+    [Test]
+    public void Cannot_Get_Descendants_Of_Type_From_Non_Existing_Content_Type_Alias()
+    {
+        // Arrange
+        Guid parentKey = Root;
+        var nonExistingContentTypeAlias = string.Empty;
+
+        // Act
+        var result = _navigationService.TryGetDescendantsKeysOfType(parentKey, nonExistingContentTypeAlias, out IEnumerable<Guid> descendantsKeys);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result);
+            Assert.IsEmpty(descendantsKeys);
+        });
+    }
+
+    [Test]
+    public void Cannot_Get_Descendants_Of_Type_From_Non_Existing_Content_Key()
+    {
+        // Arrange
+        var nonExistingKey = Guid.NewGuid();
+        const string contentTypeAlias = "contentPage";
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object });
+
+        _navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        // Act
+        var result = _navigationService.TryGetDescendantsKeysOfType(nonExistingKey, contentTypeAlias, out IEnumerable<Guid> descendantsKeys);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result);
+            Assert.IsEmpty(descendantsKeys);
+        });
+    }
+
+    [Test]
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF",
+        8)] // Root - Child 1, Grandchild 1, Grandchild 2, Child 2, Grandchild 3, Great-grandchild 1, Child 3, Grandchild 4
+    [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", 2)] // Child 1 - Grandchild 1, Grandchild 2
+    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", 0)] // Grandchild 1
+    [TestCase("A1B1B217-B02F-4307-862C-A5E22DB729EB", 0)] // Grandchild 2
+    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", 2)] // Child 2 - Grandchild 3, Great-grandchild 1
+    [TestCase("D63C1621-C74A-4106-8587-817DEE5FB732", 1)] // Grandchild 3 - Great-grandchild 1
+    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", 0)] // Great-grandchild 1
+    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", 1)] // Child 3 - Grandchild 4
+    [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8", 0)] // Grandchild 4
+    public void Can_Get_Descendants_Of_Type(Guid parentKey, int descendantsCount)
+    {
+        // Arrange
+        const string contentTypeAlias = "contentPage";
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object });
+
+        _navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        // We need to re-create the test data since we use new mock
+        CreateTestData();
+
+        // Act
+        var result = _navigationService.TryGetDescendantsKeysOfType(parentKey, contentTypeAlias, out IEnumerable<Guid> descendantsKeys);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            Assert.AreEqual(descendantsCount, descendantsKeys.Count());
+        });
+    }
+
+    [Test]
+    public void Can_Get_Descendants_Of_Type_Filters_Result()
+    {
+        // Arrange
+        Guid parentKey = Child2;
+        const string contentTypeAlias = "contentPage";
+        const string anotherContentTypeAlias = "anotherContentPage";
+        Guid anotherContentTypeKey = Guid.NewGuid();
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var anotherContentTypeMock = new Mock<IContentType>();
+        anotherContentTypeMock.SetupGet(x => x.Alias).Returns(anotherContentTypeAlias);
+        anotherContentTypeMock.SetupGet(x => x.Key).Returns(anotherContentTypeKey);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
+
+        _navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        // We need to re-create the test data since we use new mock
+        CreateTestData();
+
+        // Adding 2 new descendants with different content type under Child2
+        _navigationService.Add(Guid.NewGuid(), anotherContentTypeKey, Grandchild3);
+        _navigationService.Add(Guid.NewGuid(), anotherContentTypeKey, GreatGrandchild1);
+
+        // Act
+        _navigationService.TryGetDescendantsKeysOfType(parentKey, anotherContentTypeAlias, out IEnumerable<Guid> descendantsKeysOfType);
+        var descendantsOfTypeCount = descendantsKeysOfType.Count();
+
+        // Assert
+        // Retrieve descendants without filtering to compare
+        _navigationService.TryGetDescendantsKeys(parentKey, out IEnumerable<Guid> allDescendantsKeys);
+        var allDescendantsCount = allDescendantsKeys.Count();
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(allDescendantsCount > descendantsOfTypeCount);
+            Assert.AreEqual(4, allDescendantsCount);
+            Assert.AreEqual(2, descendantsOfTypeCount);
+        });
+    }
+
+    [Test]
+    public void Can_Get_Descendants_Of_Type_Filters_Result_And_Maintains_Their_Order_Of_Creation()
+    {
+        // Arrange
+        Guid parentKey = Child2;
+        const string contentTypeAlias = "contentPage";
+        const string anotherContentTypeAlias = "anotherContentPage";
+        Guid anotherContentTypeKey = Guid.NewGuid();
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var anotherContentTypeMock = new Mock<IContentType>();
+        anotherContentTypeMock.SetupGet(x => x.Alias).Returns(anotherContentTypeAlias);
+        anotherContentTypeMock.SetupGet(x => x.Key).Returns(anotherContentTypeKey);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
+
+        _navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        // We need to re-create the test data since we use new mock
+        CreateTestData();
+
+        // Adding 2 new descendants with different content type under Child2
+        Guid greatGreatGrandchild2 = Guid.NewGuid();
+        Guid greatGreatGrandchild3 = Guid.NewGuid();
+        _navigationService.Add(greatGreatGrandchild2, anotherContentTypeKey, Grandchild3);
+        _navigationService.Add(greatGreatGrandchild3, anotherContentTypeKey, Grandchild3);
+
+        var expectedDescendantsOrder = new List<Guid> { greatGreatGrandchild2, greatGreatGrandchild3 };
+
+        // Act
+        _navigationService.TryGetDescendantsKeysOfType(parentKey, anotherContentTypeAlias, out IEnumerable<Guid> descendantsOfType);
+
+        // Assert
+        // Check that the order matches what is expected
+        Assert.IsTrue(expectedDescendantsOrder.SequenceEqual(descendantsOfType));
     }
 
     [Test]
@@ -348,7 +897,8 @@ public class ContentNavigationServiceBaseTests
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", new string[0])] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", new[] { "E48DD82A-7059-418E-9B82-CDD5205796CF" })] // Child 1
     [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", new[] { "C6173927-0C59-4778-825D-D7B9F45D8DDE", "E48DD82A-7059-418E-9B82-CDD5205796CF" })] // Grandchild 1
-    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", new[] { "D63C1621-C74A-4106-8587-817DEE5FB732", "60E0E5C4-084E-4144-A560-7393BEAD2E96", "E48DD82A-7059-418E-9B82-CDD5205796CF" })] // Great-grandchild 1
+    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", new[] { "D63C1621-C74A-4106-8587-817DEE5FB732", "60E0E5C4-084E-4144-A560-7393BEAD2E96", "E48DD82A-7059-418E-9B82-CDD5205796CF",
+        })] // Great-grandchild 1
     public void Can_Get_Ancestors_From_Existing_Content_Key_In_Correct_Order_Of_Creation(Guid childKey, string[] ancestors)
     {
         // Arrange
@@ -363,6 +913,145 @@ public class ContentNavigationServiceBaseTests
         {
             Assert.AreEqual(expectedAncestors[i], ancestorsList.ElementAt(i));
         }
+    }
+
+    [Test]
+    public void Cannot_Get_Ancestors_Of_Type_From_Non_Existing_Content_Type_Alias()
+    {
+        // Arrange
+        Guid childKey = GreatGrandchild1;
+        var nonExistingContentTypeAlias = string.Empty;
+
+        // Act
+        var result = _navigationService.TryGetAncestorsKeysOfType(childKey, nonExistingContentTypeAlias, out IEnumerable<Guid> ancestorsKeys);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result);
+            Assert.IsEmpty(ancestorsKeys);
+        });
+    }
+
+    [Test]
+    public void Cannot_Get_Ancestors_Of_Type_From_Non_Existing_Content_Key()
+    {
+        // Arrange
+        var nonExistingKey = Guid.NewGuid();
+        const string contentTypeAlias = "contentPage";
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object });
+
+        _navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        // Act
+        var result = _navigationService.TryGetAncestorsKeysOfType(nonExistingKey, contentTypeAlias, out IEnumerable<Guid> ancestorsKeys);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result);
+            Assert.IsEmpty(ancestorsKeys);
+        });
+    }
+
+    [Test]
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", 0)] // Root
+    [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", 1)] // Child 1 - Root
+    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", 2)] // Grandchild 1 - Child 1, Root
+    [TestCase("A1B1B217-B02F-4307-862C-A5E22DB729EB", 2)] // Grandchild 2 - Child 1, Root
+    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", 1)] // Child 2 - Root
+    [TestCase("D63C1621-C74A-4106-8587-817DEE5FB732", 2)] // Grandchild 3 - Child 2, Root
+    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", 3)] // Great-grandchild 1 - Grandchild 3, Child 2, Root
+    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", 1)] // Child 3 - Root
+    [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8", 2)] // Grandchild 4 - Child 3, Root
+    public void Can_Get_Ancestors_Of_Type(Guid childKey, int ancestorsCount)
+    {
+        // Arrange
+        const string contentTypeAlias = "contentPage";
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object });
+
+        _navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        // We need to re-create the test data since we use new mock
+        CreateTestData();
+
+        // Act
+        var result = _navigationService.TryGetAncestorsKeysOfType(childKey, contentTypeAlias, out IEnumerable<Guid> ancestorsKeys);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            Assert.AreEqual(ancestorsCount, ancestorsKeys.Count());
+        });
+    }
+
+    [Test]
+    public void Can_Get_Ancestors_Of_Type_Filters_Result()
+    {
+        // Arrange
+        Guid childKey = Guid.NewGuid();
+        const string contentTypeAlias = "contentPage";
+        const string anotherContentTypeAlias = "anotherContentPage";
+        Guid anotherContentTypeKey = Guid.NewGuid();
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var anotherContentTypeMock = new Mock<IContentType>();
+        anotherContentTypeMock.SetupGet(x => x.Alias).Returns(anotherContentTypeAlias);
+        anotherContentTypeMock.SetupGet(x => x.Key).Returns(anotherContentTypeKey);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
+
+        _navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        // We need to re-create the test data since we use new mock
+        CreateTestData();
+
+        // Adding 2 new items with different content type under Grandchild 1
+        var greatGrandchild2 = Guid.NewGuid();
+        _navigationService.Add(greatGrandchild2, anotherContentTypeKey, Grandchild1);
+        _navigationService.Add(childKey, anotherContentTypeKey, greatGrandchild2);
+
+        // Act
+        _navigationService.TryGetAncestorsKeysOfType(childKey, anotherContentTypeAlias, out IEnumerable<Guid> ancestorsKeysOfType);
+        var ancestorsOfTypeCount = ancestorsKeysOfType.Count();
+
+        // Assert
+        // Retrieve all ancestors without filtering to compare
+        _navigationService.TryGetAncestorsKeys(childKey, out IEnumerable<Guid> allAncestorsKeys);
+        var allAncestorsCount = allAncestorsKeys.Count();
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(allAncestorsCount > ancestorsOfTypeCount);
+            Assert.AreEqual(4, allAncestorsCount);
+            Assert.AreEqual(1, ancestorsOfTypeCount);
+        });
     }
 
     [Test]
@@ -406,7 +1095,7 @@ public class ContentNavigationServiceBaseTests
     {
         // Arrange
         Guid anotherRoot = Guid.NewGuid();
-        _navigationService.Add(anotherRoot);
+        _navigationService.Add(anotherRoot, ContentType);
 
         // Act
         _navigationService.TryGetSiblingsKeys(anotherRoot, out IEnumerable<Guid> siblingsKeys);
@@ -462,6 +1151,188 @@ public class ContentNavigationServiceBaseTests
         {
             Assert.AreEqual(expectedSiblings[i], siblingsList.ElementAt(i));
         }
+    }
+
+    [Test]
+    public void Cannot_Get_Siblings_Of_Type_From_Non_Existing_Content_Type_Alias()
+    {
+        // Arrange
+        Guid nodeKey = Child1;
+        var nonExistingContentTypeAlias = string.Empty;
+
+        // Act
+        var result = _navigationService.TryGetSiblingsKeysOfType(nodeKey, nonExistingContentTypeAlias, out IEnumerable<Guid> siblingsKeys);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result);
+            Assert.IsEmpty(siblingsKeys);
+        });
+    }
+
+    [Test]
+    public void Cannot_Get_Siblings_Of_Type_From_Non_Existing_Content_Key()
+    {
+        // Arrange
+        var nonExistingKey = Guid.NewGuid();
+        const string contentTypeAlias = "contentPage";
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object });
+
+        _navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        // Act
+        var result = _navigationService.TryGetSiblingsKeysOfType(nonExistingKey, contentTypeAlias, out IEnumerable<Guid> siblingsKeys);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result);
+            Assert.IsEmpty(siblingsKeys);
+        });
+    }
+
+    [Test]
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", 0)] // Root
+    [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", 2)] // Child 1 - Child 2, Child 3
+    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", 1)] // Grandchild 1 - Grandchild 2
+    [TestCase("A1B1B217-B02F-4307-862C-A5E22DB729EB", 1)] // Grandchild 2 - Grandchild 1
+    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", 2)] // Child 2 - Child 1, Child 3
+    [TestCase("D63C1621-C74A-4106-8587-817DEE5FB732", 0)] // Grandchild 3
+    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", 0)] // Great-grandchild 1
+    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", 2)] // Child 3 - Child 1, Child 2
+    [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8", 0)] // Grandchild 4
+    public void Can_Get_Siblings_Of_Type(Guid key, int siblingsCount)
+    {
+        // Arrange
+        const string contentTypeAlias = "contentPage";
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object });
+
+        _navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        // We need to re-create the test data since we use new mock
+        CreateTestData();
+
+        // Act
+        var result = _navigationService.TryGetSiblingsKeysOfType(key, contentTypeAlias, out IEnumerable<Guid> siblingsKeys);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            Assert.AreEqual(siblingsCount, siblingsKeys.Count());
+        });
+    }
+
+    [Test]
+    public void Can_Get_Siblings_Of_Type_Filters_Result()
+    {
+        // Arrange
+        Guid nodeKey = Child1;
+        const string contentTypeAlias = "contentPage";
+        const string anotherContentTypeAlias = "anotherContentPage";
+        Guid anotherContentTypeKey = Guid.NewGuid();
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var anotherContentTypeMock = new Mock<IContentType>();
+        anotherContentTypeMock.SetupGet(x => x.Alias).Returns(anotherContentTypeAlias);
+        anotherContentTypeMock.SetupGet(x => x.Key).Returns(anotherContentTypeKey);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
+
+        _navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        // We need to re-create the test data since we use new mock
+        CreateTestData();
+
+        // Adding 2 new children with different content type under Root
+        _navigationService.Add(Guid.NewGuid(), anotherContentTypeKey, Root);
+        _navigationService.Add(Guid.NewGuid(), anotherContentTypeKey, Root);
+
+        // Act
+        _navigationService.TryGetSiblingsKeysOfType(nodeKey, anotherContentTypeAlias, out IEnumerable<Guid> siblingsKeysOfType);
+        var siblingsOfTypeCount = siblingsKeysOfType.Count();
+
+        // Assert
+        // Retrieve all siblings without filtering to compare
+        _navigationService.TryGetSiblingsKeys(nodeKey, out IEnumerable<Guid> allSiblingsKeys);
+        var allSiblingsCount = allSiblingsKeys.Count();
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(allSiblingsCount > siblingsOfTypeCount);
+            Assert.AreEqual(4, allSiblingsCount);
+            Assert.AreEqual(2, siblingsOfTypeCount);
+        });
+    }
+
+    [Test]
+    public void Can_Get_Siblings_Of_Type_Filters_Result_And_Maintains_Their_Order_Of_Creation()
+    {
+        // Arrange
+        Guid nodeKey = Child1;
+        const string contentTypeAlias = "contentPage";
+        const string anotherContentTypeAlias = "anotherContentPage";
+        Guid anotherContentTypeKey = Guid.NewGuid();
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var anotherContentTypeMock = new Mock<IContentType>();
+        anotherContentTypeMock.SetupGet(x => x.Alias).Returns(anotherContentTypeAlias);
+        anotherContentTypeMock.SetupGet(x => x.Key).Returns(anotherContentTypeKey);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
+
+        _navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        // We need to re-create the test data since we use new mock
+        CreateTestData();
+
+        // Adding 2 new children with different content type under Root
+        Guid child4 = Guid.NewGuid();
+        Guid child5 = Guid.NewGuid();
+        _navigationService.Add(child4, anotherContentTypeKey, Root);
+        _navigationService.Add(child5, anotherContentTypeKey, Root);
+
+        var expectedSiblingsOrder = new List<Guid> { child4, child5 };
+
+        // Act
+        _navigationService.TryGetSiblingsKeysOfType(nodeKey, anotherContentTypeAlias, out IEnumerable<Guid> siblingsKeysOfType);
+
+        // Assert
+        // Check that the order matches what is expected
+        Assert.IsTrue(expectedSiblingsOrder.SequenceEqual(siblingsKeysOfType));
     }
 
     [Test]
@@ -661,7 +1532,7 @@ public class ContentNavigationServiceBaseTests
         var nonExistentParentKey = Guid.NewGuid();
 
         // Act
-        var result = _navigationService.Add(newNodeKey, nonExistentParentKey);
+        var result = _navigationService.Add(newNodeKey, ContentType, nonExistentParentKey);
 
         // Assert
         Assert.IsFalse(result);
@@ -671,7 +1542,7 @@ public class ContentNavigationServiceBaseTests
     public void Cannot_Add_When_Node_With_The_Same_Key_Already_Exists()
     {
         // Act
-        var result = _navigationService.Add(Child1);
+        var result = _navigationService.Add(Child1, ContentType);
 
         // Assert
         Assert.IsFalse(result);
@@ -684,7 +1555,7 @@ public class ContentNavigationServiceBaseTests
         var newNodeKey = Guid.NewGuid();
 
         // Act
-        var result = _navigationService.Add(newNodeKey); // parentKey is null
+        var result = _navigationService.Add(newNodeKey, ContentType); // parentKey is null
 
         // Assert
         Assert.IsTrue(result);
@@ -710,7 +1581,7 @@ public class ContentNavigationServiceBaseTests
         var currentChildrenCount = currentChildrenKeys.Count();
 
         // Act
-        var result = _navigationService.Add(newNodeKey, parentKey);
+        var result = _navigationService.Add(newNodeKey, ContentType, parentKey);
 
         // Assert
         Assert.IsTrue(result);
@@ -741,7 +1612,7 @@ public class ContentNavigationServiceBaseTests
         var newNodeKey = Guid.NewGuid();
 
         // Act
-        _navigationService.Add(newNodeKey, parentKey);
+        _navigationService.Add(newNodeKey, ContentType, parentKey);
 
         // Assert
         _navigationService.TryGetChildrenKeys(parentKey, out IEnumerable<Guid> childrenKeys);
@@ -1121,12 +1992,47 @@ public class ContentNavigationServiceBaseTests
 
         Assert.AreEqual(initialDescendantsCount, descendantsCountAfterRestore);
     }
+
+    private void CreateTestData()
+    {
+        ContentType = new Guid("217C492D-0067-478C-BEA8-D0CE2DECBEB9");
+
+        Root = new Guid("E48DD82A-7059-418E-9B82-CDD5205796CF");
+        _navigationService.Add(Root, ContentType);
+
+        Child1 = new Guid("C6173927-0C59-4778-825D-D7B9F45D8DDE");
+        _navigationService.Add(Child1, ContentType, Root);
+
+        Grandchild1 = new Guid("E856AC03-C23E-4F63-9AA9-681B42A58573");
+        _navigationService.Add(Grandchild1, ContentType, Child1);
+
+        Grandchild2 = new Guid("A1B1B217-B02F-4307-862C-A5E22DB729EB");
+        _navigationService.Add(Grandchild2, ContentType, Child1);
+
+        Child2 = new Guid("60E0E5C4-084E-4144-A560-7393BEAD2E96");
+        _navigationService.Add(Child2, ContentType, Root);
+
+        Grandchild3 = new Guid("D63C1621-C74A-4106-8587-817DEE5FB732");
+        _navigationService.Add(Grandchild3, ContentType, Child2);
+
+        GreatGrandchild1 = new Guid("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7");
+        _navigationService.Add(GreatGrandchild1, ContentType, Grandchild3);
+
+        Child3 = new Guid("B606E3FF-E070-4D46-8CB9-D31352029FDF");
+        _navigationService.Add(Child3, ContentType, Root);
+
+        Grandchild4 = new Guid("F381906C-223C-4466-80F7-B63B4EE073F8");
+        _navigationService.Add(Grandchild4, ContentType, Child3);
+    }
 }
 
-internal class TestContentNavigationService : ContentNavigationServiceBase
+internal class TestContentNavigationService : ContentNavigationServiceBase<IContentType, IContentTypeService>
 {
-    public TestContentNavigationService(ICoreScopeProvider coreScopeProvider, INavigationRepository navigationRepository)
-        : base(coreScopeProvider, navigationRepository)
+    public TestContentNavigationService(
+        ICoreScopeProvider coreScopeProvider,
+        INavigationRepository navigationRepository,
+        IContentTypeService contentTypeService)
+        : base(coreScopeProvider, navigationRepository, contentTypeService)
     {
     }
 

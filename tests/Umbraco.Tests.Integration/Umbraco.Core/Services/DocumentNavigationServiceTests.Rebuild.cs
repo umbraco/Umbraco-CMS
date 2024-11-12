@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
@@ -22,7 +23,10 @@ public partial class DocumentNavigationServiceTests
         DocumentNavigationQueryService.TryGetSiblingsKeys(nodeKey, out IEnumerable<Guid> originalSiblingsKeys);
 
         // In-memory navigation structure is empty here
-        var newDocumentNavigationService = new DocumentNavigationService(GetRequiredService<ICoreScopeProvider>(), GetRequiredService<INavigationRepository>());
+        var newDocumentNavigationService = new DocumentNavigationService(
+            GetRequiredService<ICoreScopeProvider>(),
+            GetRequiredService<INavigationRepository>(),
+            GetRequiredService<IContentTypeService>());
         var initialNodeExists = newDocumentNavigationService.TryGetParentKey(nodeKey, out _);
 
         // Act
@@ -67,7 +71,10 @@ public partial class DocumentNavigationServiceTests
         DocumentNavigationQueryService.TryGetSiblingsKeysInBin(nodeKey, out IEnumerable<Guid> originalSiblingsKeys);
 
         // In-memory navigation structure is empty here
-        var newDocumentNavigationService = new DocumentNavigationService(GetRequiredService<ICoreScopeProvider>(), GetRequiredService<INavigationRepository>());
+        var newDocumentNavigationService = new DocumentNavigationService(
+            GetRequiredService<ICoreScopeProvider>(),
+            GetRequiredService<INavigationRepository>(),
+            GetRequiredService<IContentTypeService>());
         var initialNodeExists = newDocumentNavigationService.TryGetParentKeyInBin(nodeKey, out _);
 
         // Act

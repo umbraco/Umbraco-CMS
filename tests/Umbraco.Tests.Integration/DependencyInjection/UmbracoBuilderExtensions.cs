@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -129,7 +130,7 @@ public static class UmbracoBuilderExtensions
                     uiProject.Create();
                 }
 
-                var mainLangFolder = new DirectoryInfo(Path.Combine(uiProject.FullName, globalSettings.Value.UmbracoPath.TrimStartExact("~/"), "config", "lang"));
+                var mainLangFolder = new DirectoryInfo(Path.Combine(uiProject.FullName, Constants.System.DefaultUmbracoPath.TrimStartExact("~/"), "config", "lang"));
 
                 return new LocalizedTextServiceFileSources(
                     loggerFactory.CreateLogger<LocalizedTextServiceFileSources>(),

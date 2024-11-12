@@ -192,8 +192,7 @@ export abstract class UmbBlockManagerContext<
 		);
 	}
 
-	hasExposeOf(contentKey: string) {
-		const variantId = this.#variantId.getValue();
+	hasExposeOf(contentKey: string, variantId: UmbVariantId) {
 		if (!variantId) return;
 		return this.#exposes.asObservablePart((source) =>
 			source.some((x) => x.contentKey === contentKey && variantId.compare(x)),
