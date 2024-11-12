@@ -335,7 +335,7 @@ export class UmbDocumentWorkspaceContext
 
 			eventContext.dispatchEvent(event);
 
-			this._finishModal();
+			this._closeModal();
 		}
 	}
 

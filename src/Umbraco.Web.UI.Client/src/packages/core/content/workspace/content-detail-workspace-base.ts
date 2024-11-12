@@ -574,7 +574,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		eventContext.dispatchEvent(event);
 		this.setIsNew(false);
 
-		this._finishModal();
+		this._closeModal();
 	}
 
 	async #update(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
@@ -606,7 +606,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		});
 
 		eventContext.dispatchEvent(event);
-		this._finishModal();
+		this._closeModal();
 	}
 
 	abstract getContentTypeUnique(): string | undefined;
