@@ -2,12 +2,17 @@ import { UMB_LANGUAGE_WORKSPACE_CONTEXT } from './language-workspace.context-tok
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_LANGUAGE_ROOT_WORKSPACE_PATH } from '../language-root/paths.js';
 @customElement('umb-language-workspace-editor')
 export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 	#workspaceContext?: typeof UMB_LANGUAGE_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	_isNew?: boolean;
+
+	#getBackPath() {
+		return UMB_LANGUAGE_ROOT_WORKSPACE_PATH;
+	}
 
 	constructor() {
 		super();
@@ -19,11 +24,11 @@ export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<umb-workspace-editor back-path="section/settings/workspace/language-root">
+		return html`<umb-entity-detail-workspace-editor .backPath=${this.#getBackPath()}>
 			${this._isNew
 				? html`<h3 slot="header">Add language</h3>`
 				: html`<umb-workspace-header-name-editable slot="header"></umb-workspace-header-name-editable>`}
-		</umb-workspace-editor>`;
+		</umb-entity-detail-workspace-editor>`;
 	}
 
 	static override styles = [UmbTextStyles];
