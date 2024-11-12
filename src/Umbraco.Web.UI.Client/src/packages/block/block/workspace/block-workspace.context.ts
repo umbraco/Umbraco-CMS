@@ -25,6 +25,7 @@ import {
 	UMB_BLOCK_ENTRY_CONTEXT,
 } from '@umbraco-cms/backoffice/block';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
@@ -156,6 +157,23 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				},
 				'observeIsReadOnly',
 			);
+
+			this.observe(
+				this.content.contentTypeId,
+				(contentTypeId) => {
+					this.observe(
+						contentTypeId ? manager.blockTypeOf(contentTypeId) : undefined,
+						(blockType) => {
+							console.log('got block type', blockType);
+							if (blockType?.editorSize) {
+								this.setEditorSize(blockType.editorSize);
+							}
+						},
+						'observeBlockType',
+					);
+				},
+				'observeContentTypeId',
+			);
 		});
 
 		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
@@ -198,6 +216,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				},
 			},
 		]);
+	}
+
+	setEditorSize(editorSize: UUIModalSidebarSize) {
+		console.log(this.getHostElement(), editorSize);
 	}
 
 	protected override resetState() {
