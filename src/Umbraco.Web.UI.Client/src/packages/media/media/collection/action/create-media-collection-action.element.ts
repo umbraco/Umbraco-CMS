@@ -35,17 +35,6 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		/*
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath('media')
-			.onSetup(() => {
-				return { data: { entityType: 'media', preset: {} } };
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._createMediaPath = routeBuilder({});
-			});
-			*/
-
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.observe(workspaceContext.unique, (unique) => {
 				this._mediaUnique = unique;
