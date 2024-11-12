@@ -14,7 +14,7 @@ public abstract class TreeEntityBase : EntityBase, ITreeEntity
     private ITreeEntity? _parent;
     private int _parentId;
     private string _path = string.Empty;
-    private int _sortOrder;
+    private int _sortOrder = -1; // means no specific sortOrder
     private bool _trashed;
 
     /// <inheritdoc />
