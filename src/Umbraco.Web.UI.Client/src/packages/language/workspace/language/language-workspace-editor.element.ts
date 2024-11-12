@@ -10,10 +10,6 @@ export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	_isNew?: boolean;
 
-	#getBackPath() {
-		return UMB_LANGUAGE_ROOT_WORKSPACE_PATH;
-	}
-
 	constructor() {
 		super();
 
@@ -24,7 +20,7 @@ export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<umb-entity-detail-workspace-editor .backPath=${this.#getBackPath()}>
+		return html`<umb-entity-detail-workspace-editor .backPath=${UMB_LANGUAGE_ROOT_WORKSPACE_PATH}>
 			${this._isNew
 				? html`<h3 slot="header">Add language</h3>`
 				: html`<umb-workspace-header-name-editable slot="header"></umb-workspace-header-name-editable>`}
