@@ -96,7 +96,7 @@ export class UmbDefaultCollectionContext<
 
 	setupView(viewElement: UmbControllerHost) {
 		new UmbModalRouteRegistrationController(viewElement, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath('entity')
+			.addAdditionalPath('entity/:entityType')
 			.onSetup((params) => {
 				return { data: { entityType: params.entityType, preset: {} } };
 			})
