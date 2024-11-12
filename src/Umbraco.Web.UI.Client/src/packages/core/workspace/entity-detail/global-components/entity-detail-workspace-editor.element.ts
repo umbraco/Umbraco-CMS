@@ -1,6 +1,6 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '../entity-detail-workspace.context-token.js';
-import { customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-entity-detail-workspace-editor')
 export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
@@ -16,6 +16,9 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _exists = false;
 
+	@state()
+	private _isNew? = false;
+
 	#context?: typeof UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
@@ -26,6 +29,7 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 			this.observe(this.#context?.entityType, (entityType) => (this._entityType = entityType));
 			this.observe(this.#context?.loading.isOn, (isLoading) => (this._isLoading = isLoading));
 			this.observe(this.#context?.data, (data) => (this._exists = !!data));
+			this.observe(this.#context?.isNew, (isNew) => (this._isNew = isNew));
 		});
 	}
 
@@ -37,9 +41,14 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 
 		return html`<umb-workspace-editor ?loading=${this._isLoading} .backPath=${this.backPath}>
 			<slot name="header" slot="header"></slot>
-			<slot name="action-menu" slot="action-menu"></slot>
+			${this.#renderEntityActions()}
 			<slot></slot>
 		</umb-workspace-editor>`;
+	}
+
+	#renderEntityActions() {
+		if (this._isNew) return nothing;
+		return html`<umb-workspace-entity-action-menu slot="action-menu"></umb-workspace-entity-action-menu>`;
 	}
 }
 
