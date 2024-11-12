@@ -126,10 +126,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		this.#submitReject = undefined;
 
 		// If we do not want to close a modal when saving something with errors, then move this part down to #completeSubmit method. [NL]
-		if (this.modalContext) {
-			this.modalContext?.setValue(this.getData());
-			this.modalContext?.submit();
-		}
+		this._finishModal();
 	};
 
 	#completeSubmit = () => {
@@ -139,6 +136,14 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		// TODO: Capture the validation messages on open, and then reset to that.
 		//this.validation.reset();
 	};
+
+	protected _finishModal() {
+		// If we do not want to close a modal when saving something with errors, then move this part down to #completeSubmit method. [NL]
+		if (this.modalContext) {
+			this.modalContext?.setValue(this.getData());
+			this.modalContext?.submit();
+		}
+	}
 
 	//abstract getIsDirty(): Promise<boolean>;
 	abstract getUnique(): string | null | undefined;

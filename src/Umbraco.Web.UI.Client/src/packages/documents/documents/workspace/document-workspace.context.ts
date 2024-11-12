@@ -334,6 +334,8 @@ export class UmbDocumentWorkspaceContext
 			});
 
 			eventContext.dispatchEvent(event);
+
+			this._finishModal();
 		}
 	}
 
