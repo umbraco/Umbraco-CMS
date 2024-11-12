@@ -35,16 +35,14 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	override render() {
-		if (!this._user) return html`User not found`;
-
 		return html`
-			<umb-workspace-editor class="uui-text" back-path=${UMB_USER_ROOT_WORKSPACE_PATH}>
+			<umb-entity-detail-workspace-editor class="uui-text" .backPath=${UMB_USER_ROOT_WORKSPACE_PATH}>
 				${this.#renderHeader()}
 				<div id="main">
 					<div id="left-column">${this.#renderLeftColumn()}</div>
 					<div id="right-column">${this.#renderRightColumn()}</div>
 				</div>
-			</umb-workspace-editor>
+			</umb-entity-detail-workspace-editor>
 		`;
 	}
 

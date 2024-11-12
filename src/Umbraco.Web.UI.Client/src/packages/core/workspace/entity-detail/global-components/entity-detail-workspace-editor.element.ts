@@ -36,6 +36,8 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 
 		return html`<umb-workspace-editor ?loading=${this._isLoading} .backPath=${this.backPath}>
 			<slot name="header" slot="header"></slot>
+			<slot name="action-menu" slot="action-menu"></slot>
+			<slot></slot>
 		</umb-workspace-editor>`;
 	}
 }
