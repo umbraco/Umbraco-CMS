@@ -188,7 +188,7 @@ export class UmbMediaWorkspaceContext
 				path: UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN.toString(),
 				component: () => import('./media-workspace-editor.element.js'),
 				setup: async (_component, info) => {
-					const parentEntityType = info.match.params.entityType;
+					const parentEntityType = info.match.params.parentEntityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 					const mediaTypeUnique = info.match.params.mediaTypeUnique;
 					await this.create({ entityType: parentEntityType, unique: parentUnique }, mediaTypeUnique);
