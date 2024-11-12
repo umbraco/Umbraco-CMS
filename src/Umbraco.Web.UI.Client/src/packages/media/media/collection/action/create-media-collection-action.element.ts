@@ -5,11 +5,10 @@ import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.
 import { html, customElement, property, state, map } from '@umbraco-cms/backoffice/external/lit';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-create-media-collection-action')
 export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
@@ -17,10 +16,7 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 	private _allowedMediaTypes: Array<UmbAllowedMediaTypeModel> = [];
 
 	@state()
-	private _createMediaPath = '';
-
-	@state()
-	private _currentView?: string;
+	private _workspacePathBuilder?: UmbModalRouteBuilder;
 
 	@state()
 	private _mediaUnique?: UmbEntityUnique;
@@ -31,9 +27,6 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 	@state()
 	private _popoverOpen = false;
 
-	@state()
-	private _rootPathName?: string;
-
 	@property({ attribute: false })
 	manifest?: ManifestCollectionAction;
 
@@ -42,6 +35,7 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		/*
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('media')
 			.onSetup(() => {
@@ -50,6 +44,7 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 			.observeRouteBuilder((routeBuilder) => {
 				this._createMediaPath = routeBuilder({});
 			});
+			*/
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.observe(workspaceContext.unique, (unique) => {
@@ -62,11 +57,8 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (collectionContext) => {
-			this.observe(collectionContext.view.currentView, (currentView) => {
-				this._currentView = currentView?.meta.pathName;
-			});
-			this.observe(collectionContext.view.rootPathName, (rootPathName) => {
-				this._rootPathName = rootPathName;
+			this.observe(collectionContext.workspacePathBuilder, (builder) => {
+				this._workspacePathBuilder = builder;
 			});
 		});
 	}
@@ -90,14 +82,14 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 	}
 
 	#getCreateUrl(item: UmbAllowedMediaTypeModel) {
-		return (
-			this._createMediaPath.replace(`${this._rootPathName}`, `${this._rootPathName}/${this._currentView}`) +
-			UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({
-				parentEntityType: this._mediaUnique ? UMB_MEDIA_ENTITY_TYPE : UMB_MEDIA_ROOT_ENTITY_TYPE,
-				parentUnique: this._mediaUnique ?? 'null',
-				mediaTypeUnique: item.unique,
-			})
-		);
+		return item.unique && this._workspacePathBuilder
+			? this._workspacePathBuilder({ entityType: item.entityType }) +
+					UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({
+						parentEntityType: this._mediaUnique ? UMB_MEDIA_ENTITY_TYPE : UMB_MEDIA_ROOT_ENTITY_TYPE,
+						parentUnique: this._mediaUnique ?? 'null',
+						mediaTypeUnique: item.unique,
+					})
+			: '';
 	}
 
 	override render() {

@@ -11,7 +11,7 @@ import type { UmbCollectionRepository } from '../repository/collection-repositor
 import type { ManifestCollection } from '../extensions/index.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBasicState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -26,6 +26,8 @@ import {
 import type { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import { UmbModalRouteRegistrationController, type UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 const LOCAL_STORAGE_KEY = 'umb-collection-view';
 
@@ -52,6 +54,9 @@ export class UmbDefaultCollectionContext<
 
 	protected _filter = new UmbObjectState<FilterModelType | object>({});
 	public readonly filter = this._filter.asObservable();
+
+	#workspacePathBuilder = new UmbBasicState<UmbModalRouteBuilder | undefined>(undefined);
+	public readonly workspacePathBuilder = this.#workspacePathBuilder.asObservable();
 
 	#userDefinedProperties = new UmbArrayState<UmbCollectionColumnConfiguration>([], (x) => x.alias);
 	public readonly userDefinedProperties = this.#userDefinedProperties.asObservable();
@@ -87,6 +92,25 @@ export class UmbDefaultCollectionContext<
 
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
 		this.#listenToEntityEvents();
+	}
+
+	setupView(viewElement: UmbControllerHost) {
+		new UmbModalRouteRegistrationController(viewElement, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('item') // Something unique to make this different from other modals.
+			.onSetup((params) => {
+				return { data: { entityType: params.entityType, preset: {} } };
+			})
+			.onReject(() => {
+				// TODO: Maybe this can be removed?
+				this.requestCollection();
+			})
+			.onSubmit(() => {
+				// TODO: Maybe this can be removed?
+				this.requestCollection();
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this.#workspacePathBuilder.setValue(routeBuilder);
+			});
 	}
 
 	async #listenToEntityEvents() {
