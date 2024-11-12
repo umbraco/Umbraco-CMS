@@ -59,21 +59,23 @@ export class UmbModalContext<
 		this.router = args.router ?? null;
 		this.alias = modalAlias;
 
-		let size;
+		let size = 'small';
 
 		if (this.alias instanceof UmbModalToken) {
 			this.type = this.alias.getDefaultModal()?.type || this.type;
-			size = this.alias.getDefaultModal()?.size;
+			size = this.alias.getDefaultModal()?.size ?? size;
 			this.element = this.alias.getDefaultModal()?.element || this.element;
 			this.backdropBackground = this.alias.getDefaultModal()?.backdropBackground || this.backdropBackground;
 		}
 
 		this.type = args.modal?.type || this.type;
-		size = args.modal?.size;
+		size = args.modal?.size ?? size;
 		this.element = args.modal?.element || this.element;
 		this.backdropBackground = args.modal?.backdropBackground || this.backdropBackground;
 
-		this.#size.setValue(size ?? 'small');
+		console.log('size', size);
+
+		this.#size.setValue(size);
 
 		const defaultData = this.alias instanceof UmbModalToken ? this.alias.getDefaultData() : undefined;
 		this.data = Object.freeze(
