@@ -441,7 +441,7 @@ public class DocumentUrlService : IDocumentUrlService
             return "#";
         }
 
-        if(isDraft is false && culture != null && _publishStatusQueryService.IsDocumentPublished(documentKey, culture) is false)
+        if(isDraft is false && string.IsNullOrWhiteSpace(culture) is false && _publishStatusQueryService.IsDocumentPublished(documentKey, culture) is false)
         {
             return "#";
         }
