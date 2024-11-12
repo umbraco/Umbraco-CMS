@@ -40,7 +40,7 @@ test('can create content with the member picker data type', {tag: '@smoke'}, asy
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickChooseMemberPickerButton();
   await umbracoUi.content.selectMemberByName(memberName);
-  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
@@ -94,4 +94,3 @@ test('can remove a member picker in the content', async ({umbracoApi, umbracoUi}
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
 });
-
