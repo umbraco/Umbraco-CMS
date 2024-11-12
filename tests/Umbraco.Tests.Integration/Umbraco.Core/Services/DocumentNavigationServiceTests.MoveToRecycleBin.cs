@@ -70,7 +70,7 @@ public partial class DocumentNavigationServiceTests
 
         // Create a new sibling under the same parent
         var key = Guid.NewGuid();
-        var createModel = CreateContentCreateModel("Child 4", key, Root.Key);
+        var createModel = CreateContentCreateModel("Child 4", key, parentKey: Root.Key);
         await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
         DocumentNavigationQueryService.TryGetSiblingsKeys(node, out IEnumerable<Guid> siblingsKeysAfterCreation);
@@ -93,7 +93,7 @@ public partial class DocumentNavigationServiceTests
 
         // Create a new grandchild under Child1
         var key = Guid.NewGuid();
-        var createModel = CreateContentCreateModel("Grandchild 3", key, nodeToMoveToRecycleBin);
+        var createModel = CreateContentCreateModel("Grandchild 3", key, parentKey: nodeToMoveToRecycleBin);
         await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
         DocumentNavigationQueryService.TryGetChildrenKeys(nodeToMoveToRecycleBin, out IEnumerable<Guid> childrenKeysBeforeDeletion);

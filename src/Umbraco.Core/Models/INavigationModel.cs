@@ -13,6 +13,11 @@ public interface INavigationModel
     Guid Key { get; set; }
 
     /// <summary>
+    ///     Gets or sets the Guid unique identifier of the entity's content type.
+    /// </summary>
+    public Guid ContentTypeKey { get; set; }
+
+    /// <summary>
     ///     Gets or sets the integer identifier of the parent entity.
     /// </summary>
     int ParentId { get; set; }

@@ -16,7 +16,7 @@ public partial class UserServiceCrudTests
     public async Task Cannot_Request_Disabled_If_Hidden(UserState includeState)
     {
         var userService = CreateUserService(new SecuritySettings {HideDisabledUsersInBackOffice = true});
-        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
 
         var createModel = new UserCreateModel
         {
@@ -44,8 +44,8 @@ public partial class UserServiceCrudTests
     public async Task Only_Super_User_Can_Filter_Super_user()
     {
         var userService = CreateUserService();
-        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
-        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
+        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupKey);
 
         var nonSuperCreateModel = new UserCreateModel
         {
@@ -78,7 +78,7 @@ public partial class UserServiceCrudTests
     public async Task Super_User_Can_Filter_Super_User()
     {
         var userService = CreateUserService();
-        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
 
         var nonSuperCreateModel = new UserCreateModel
         {
@@ -107,8 +107,8 @@ public partial class UserServiceCrudTests
     public async Task Non_Admins_Cannot_Filter_Admins()
     {
         var userService = CreateUserService();
-        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
-        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupKey);
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
 
         var editorCreateModel = new UserCreateModel
         {
@@ -146,8 +146,8 @@ public partial class UserServiceCrudTests
     public async Task Admins_Can_Filter_Admins()
     {
         var userService = CreateUserService();
-        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
-        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupKey);
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
 
         var editorCreateModel = new UserCreateModel
         {
@@ -185,10 +185,10 @@ public partial class UserServiceCrudTests
 
     private async Task CreateTestUsers(IUserService userService)
     {
-        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
-        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
-        var writerGroup = await UserGroupService.GetAsync(Constants.Security.WriterGroupAlias);
-        var translatorGroup = await UserGroupService.GetAsync(Constants.Security.TranslatorGroupAlias);
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
+        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupKey);
+        var writerGroup = await UserGroupService.GetAsync(Constants.Security.WriterGroupKey);
+        var translatorGroup = await UserGroupService.GetAsync(Constants.Security.TranslatorGroupKey);
 
         var createModels = new List<UserCreateModel>
         {
@@ -262,7 +262,7 @@ public partial class UserServiceCrudTests
         var userService = CreateUserService();
         await CreateTestUsers(userService);
 
-        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
         var filter = new UserFilter
         {
             ExcludeUserGroups = new HashSet<Guid> { editorGroup!.Key }

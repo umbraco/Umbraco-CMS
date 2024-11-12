@@ -209,7 +209,10 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 				h1,
 				h2,
-				h3 {
+				h3,
+				h4,
+				h5,
+				h6 {
 					margin-top: 0;
 					margin-bottom: 0.5em;
 				}
@@ -230,6 +233,13 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				img {
 					&.ProseMirror-selectednode {
 						outline: 3px solid var(--uui-color-focus);
+					}
+				}
+
+				li {
+					> p {
+						margin: 0;
+						padding: 0;
 					}
 				}
 

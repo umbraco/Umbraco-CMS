@@ -14,6 +14,8 @@ public interface IDocumentPresentationFactory
 {
     Task<DocumentResponseModel> CreateResponseModelAsync(IContent content);
 
+    Task<PublishedDocumentResponseModel> CreatePublishedResponseModelAsync(IContent content);
+
     DocumentItemResponseModel CreateItemResponseModel(IDocumentEntitySlim entity);
 
     DocumentBlueprintItemResponseModel CreateBlueprintItemResponseModel(IDocumentEntitySlim entity);
