@@ -1,6 +1,6 @@
 import { UMB_SETTINGS_SECTION_PATHNAME } from '@umbraco-cms/backoffice/settings';
 import { UMB_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
-import { UMB_LANGUAGE_ROOT_ENTITY_TYPE } from '../../entity';
+import { UMB_LANGUAGE_ROOT_ENTITY_TYPE } from '../../entity.js';
 
 export const UMB_LANGUAGE_ROOT_WORKSPACE_PATH = UMB_WORKSPACE_PATH_PATTERN.generateAbsolute({
 	sectionName: UMB_SETTINGS_SECTION_PATHNAME,
