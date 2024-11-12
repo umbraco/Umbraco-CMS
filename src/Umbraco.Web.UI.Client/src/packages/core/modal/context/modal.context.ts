@@ -1,5 +1,4 @@
 import { UmbModalToken } from '../token/modal-token.js';
-import type { UmbModalConfig, UmbModalType } from './modal-manager.context.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import type { UUIModalElement, UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
@@ -8,6 +7,7 @@ import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { type UmbDeepPartialObject, umbDeepMerge } from '@umbraco-cms/backoffice/utils';
 import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbModalConfig, UmbModalType } from '../types.js';
 
 export interface UmbModalRejectReason {
 	type: string;
@@ -39,7 +39,7 @@ export class UmbModalContext<
 	public readonly data: ModalData;
 	public readonly type: UmbModalType = 'dialog';
 	public readonly size: UUIModalSidebarSize = 'small';
-	public element?: ElementLoaderProperty<UUIModalElement>;
+	public readonly element?: ElementLoaderProperty<UUIModalElement>;
 	public readonly backdropBackground?: string;
 	public readonly router: IRouterSlot | null = null;
 	public readonly alias: string | UmbModalToken<ModalData, ModalValue>;
