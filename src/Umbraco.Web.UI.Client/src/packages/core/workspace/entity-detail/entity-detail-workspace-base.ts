@@ -31,7 +31,7 @@ export interface UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> {
 }
 
 export abstract class UmbEntityDetailWorkspaceContextBase<
-	DetailModelType extends UmbEntityModel,
+	DetailModelType extends UmbEntityModel = UmbEntityModel,
 	DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
 	CreateArgsType extends
 		UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> = UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
