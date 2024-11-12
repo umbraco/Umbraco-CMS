@@ -45,6 +45,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	setOriginData(data: UmbBlockWorkspaceOriginData) {
 		this.#originData = data;
 	}
+	#modalContext?: typeof UMB_MODAL_CONTEXT.TYPE;
 	#retrieveModalContext;
 
 	#entityType: string;
@@ -84,6 +85,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.addValidationContext(this.settings.validation);
 
 		this.#retrieveModalContext = this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
+			this.#modalContext = context;
 			this.#originData = context?.data.originData;
 			context.onSubmit().catch(this.#modalRejected);
 		}).asPromise();
@@ -219,7 +221,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	}
 
 	setEditorSize(editorSize: UUIModalSidebarSize) {
-		console.log(this.getHostElement(), editorSize);
+		this.#modalContext?.setModalSize(editorSize);
 	}
 
 	protected override resetState() {
