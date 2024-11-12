@@ -77,7 +77,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 
 	#getCreateUrl(item: UmbAllowedDocumentTypeModel) {
 		return item.unique && this._workspacePathBuilder
-			? this._workspacePathBuilder({ entityType: item.entityType }) +
+			? this._workspacePathBuilder({ entityType: UMB_DOCUMENT_ENTITY_TYPE }) +
 					UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({
 						parentEntityType: this._documentUnique ? UMB_DOCUMENT_ENTITY_TYPE : UMB_DOCUMENT_ROOT_ENTITY_TYPE,
 						parentUnique: this._documentUnique ?? 'null',

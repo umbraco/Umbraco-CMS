@@ -72,7 +72,7 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 
 	#getCreateUrl(item: UmbAllowedMediaTypeModel) {
 		return item.unique && this._workspacePathBuilder
-			? this._workspacePathBuilder({ entityType: item.entityType }) +
+			? this._workspacePathBuilder({ entityType: UMB_MEDIA_ENTITY_TYPE }) +
 					UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({
 						parentEntityType: this._mediaUnique ? UMB_MEDIA_ENTITY_TYPE : UMB_MEDIA_ROOT_ENTITY_TYPE,
 						parentUnique: this._mediaUnique ?? 'null',
