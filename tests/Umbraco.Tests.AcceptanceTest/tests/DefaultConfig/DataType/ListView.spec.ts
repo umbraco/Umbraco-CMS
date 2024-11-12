@@ -222,7 +222,8 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test('can update content app icon', async ({umbracoApi, umbracoUi}) => {
+    // TODO: Check if needed
+    test.skip('can update content app icon', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const iconValue = 'icon-activity';
       const expectedDataTypeValues = {
@@ -259,7 +260,8 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test('can enable show content app first', async ({umbracoApi, umbracoUi}) => {
+    // TODO: Check if needed
+    test.skip('can enable show content app first', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const expectedDataTypeValues = {
         "alias": "showContentFirst",

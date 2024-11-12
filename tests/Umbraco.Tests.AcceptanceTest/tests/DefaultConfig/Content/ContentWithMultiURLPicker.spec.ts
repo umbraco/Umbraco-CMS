@@ -13,11 +13,11 @@ test.beforeEach(async ({umbracoApi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can create content with the document link', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can create content with the document link', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -27,6 +27,8 @@ test('can create content with the document link', {tag: '@smoke'}, async ({umbra
   const documentTypeForLinkedDocumentId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeForLinkedDocumentName);
   const linkedDocumentName = 'LinkedDocument';
   const linkedDocumentId = await umbracoApi.document.createDefaultDocument(linkedDocumentName, documentTypeForLinkedDocumentId);
+  await umbracoUi.waitForTimeout(2000);
+  await umbracoApi.document.publish(linkedDocumentId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -36,7 +38,9 @@ test('can create content with the document link', {tag: '@smoke'}, async ({umbra
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickLinkToDocumentButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
+  await umbracoUi.content.clickButtonWithName('Choose');
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
 
@@ -70,13 +74,17 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   const documentTypeForLinkedDocumentId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeForLinkedDocumentName);
   const linkedDocumentName = 'ContentToPick';
   const linkedDocumentId = await umbracoApi.document.createDefaultDocument(linkedDocumentName, documentTypeForLinkedDocumentId);
+  await umbracoUi.waitForTimeout(2000);
+  await umbracoApi.document.publish(linkedDocumentId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickLinkToDocumentButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
+  await umbracoUi.content.clickButtonWithName('Choose');
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveAndPublishButton();
 
@@ -127,7 +135,7 @@ test('can create content with the external link', async ({umbracoApi, umbracoUi}
   expect(contentData.values[0].value[0].url).toEqual(link);
 });
 
-test('can create content with the media link', async ({umbracoApi, umbracoUi}) => {
+test('can create content with the media link', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -142,7 +150,10 @@ test('can create content with the media link', async ({umbracoApi, umbracoUi}) =
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
-  await umbracoUi.content.selectLinkByName(mediaFileName);
+  await umbracoUi.content.clickLinkToMediaButton();
+  await umbracoUi.content.selectMediaWithName(mediaFileName);
+  await umbracoUi.content.clickMediaPickerModalSubmitButton();
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
 
@@ -178,7 +189,10 @@ test('can add multiple links in the content', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.content.goToContentWithName(contentName);
   // Add media link
   await umbracoUi.content.clickAddMultiURLPickerButton();
-  await umbracoUi.content.selectLinkByName(mediaFileName);
+  await umbracoUi.content.clickLinkToMediaButton();
+  await umbracoUi.content.selectMediaWithName(mediaFileName);
+  await umbracoUi.content.clickMediaPickerModalSubmitButton();
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.clickSubmitButton();
   // Add external link
   await umbracoUi.content.clickAddMultiURLPickerButton();
@@ -216,7 +230,7 @@ test('can remove the URL picker in the content', async ({umbracoApi, umbracoUi})
   await umbracoApi.document.createDocumentWithExternalLinkURLPicker(contentName, documentTypeId, link, linkTitle);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-  
+
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.removeUrlPickerByName(linkTitle);
@@ -237,10 +251,10 @@ test('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) =
   await umbracoApi.document.createDocumentWithExternalLinkURLPicker(contentName, documentTypeId, link, linkTitle);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-  
+
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickEditUrlPickerButtonByName(linkTitle);
+  await umbracoUi.content.clickLinkWithName(linkTitle);
   await umbracoUi.content.enterLinkTitle(updatedLinkTitle);
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
