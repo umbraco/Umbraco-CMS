@@ -36,6 +36,9 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	CreateArgsType extends
 		UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> = UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
 > extends UmbSubmittableWorkspaceContextBase<DetailModelType> {
+	// Just for context token safety:
+	public readonly IS_ENTITY_DETAIL_WORKSPACE_CONTEXT = true;
+
 	/**
 	 * @description Data manager for the workspace.
 	 * @protected
@@ -48,7 +51,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	public readonly unique = this.#entityContext.unique;
 
 	public readonly data = this._data.current;
-
 	public readonly loading = new UmbStateManager(this);
 
 	protected _getDataPromise?: Promise<any>;
