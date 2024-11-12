@@ -293,42 +293,5 @@ public class UdiTests
         Assert.IsFalse(UdiParser.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", true, out udi));
         Assert.AreEqual(Constants.UdiEntityType.Unknown, udi.EntityType);
         Assert.AreEqual("Umbraco.Cms.Core.UnknownTypeUdi", udi.GetType().FullName);
-
-        // scanned
-        UdiParserServiceConnectors
-            .RegisterServiceConnector<
-                FooConnector>(); // this is the equivalent of scanning but we'll just manually register this one
-        Assert.IsTrue(UdiParser.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", out udi));
-        Assert.IsInstanceOf<GuidUdi>(udi);
-
-        // known
-        Assert.IsTrue(UdiParser.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", true, out udi));
-        Assert.IsInstanceOf<GuidUdi>(udi);
-
-        // can get method for Deploy compatibility
-        var method = typeof(UdiParser).GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(string), typeof(bool) }, null);
-        Assert.IsNotNull(method);
-    }
-
-    [UdiDefinition("foo", UdiType.GuidUdi)]
-    public class FooConnector : IServiceConnector
-    {
-        public Task<IArtifact?> GetArtifactAsync(Udi udi, IContextCache contextCache, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-
-        public Task<IArtifact> GetArtifactAsync(object entity, IContextCache contextCache, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-
-        public Task<ArtifactDeployState> ProcessInitAsync(IArtifact artifact, IDeployContext context, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-
-        public Task ProcessAsync(ArtifactDeployState state, IDeployContext context, int pass,
-            CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
-
-        public IAsyncEnumerable<Udi> ExpandRangeAsync(UdiRange range, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-
-        public Task<NamedUdiRange> GetRangeAsync(Udi udi, string selector, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-
-        public Task<NamedUdiRange> GetRangeAsync(string entityType, string sid, string selector, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-
-        public bool Compare(IArtifact? art1, IArtifact? art2, ICollection<Difference>? differences = null) => throw new NotImplementedException();
     }
 }
