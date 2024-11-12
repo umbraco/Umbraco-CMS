@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Infrastructure.Routing
                 {
                     try
                     {
-                        var route = _publishedUrlProvider.GetUrl(publishedContent.Id, UrlMode.Relative, culture);
+                        var route = _publishedUrlProvider.GetUrl(publishedContent.Id, UrlMode.Relative, culture).TrimEnd(Constants.CharArrays.ForwardSlash);
 
                         if (IsValidRoute(route))
                         {
@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Infrastructure.Routing
                             // Retry using all languages, if this is invariant but has a variant ancestor.
                             foreach (string languageIsoCode in languageIsoCodes.Value)
                             {
-                                route = _publishedUrlProvider.GetUrl(publishedContent.Id, UrlMode.Relative, languageIsoCode);
+                                route = _publishedUrlProvider.GetUrl(publishedContent.Id, UrlMode.Relative, languageIsoCode).TrimEnd(Constants.CharArrays.ForwardSlash);
                                 if (IsValidRoute(route))
                                 {
                                     oldRoutes[(publishedContent.Id, languageIsoCode)] = (publishedContent.Key, route);
@@ -103,7 +103,7 @@ namespace Umbraco.Cms.Infrastructure.Routing
             {
                 try
                 {
-                    var newRoute = _publishedUrlProvider.GetUrl(contentKey, UrlMode.Relative,  culture);
+                    var newRoute = _publishedUrlProvider.GetUrl(contentKey, UrlMode.Relative,  culture).TrimEnd(Constants.CharArrays.ForwardSlash);
                     if (!IsValidRoute(newRoute) || oldRoute == newRoute)
                     {
                         continue;
