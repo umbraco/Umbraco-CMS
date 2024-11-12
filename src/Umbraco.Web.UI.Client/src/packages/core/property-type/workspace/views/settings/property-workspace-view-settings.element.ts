@@ -247,7 +247,8 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 						@input=${this.#onDescriptionChange}
 						label=${this.localize.term('placeholders_enterDescription')}
 						placeholder=${this.localize.term('placeholders_enterDescription')}
-						.value=${this._data?.description}></uui-textarea>
+						.value=${this._data?.description}
+						auto-height></uui-textarea>
 				</div>
 				<umb-form-validation-message>
 					<umb-data-type-flow-input
