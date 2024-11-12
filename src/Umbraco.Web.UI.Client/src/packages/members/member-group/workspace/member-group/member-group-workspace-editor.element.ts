@@ -1,7 +1,6 @@
 import { UMB_MEMBER_GROUP_ROOT_WORKSPACE_PATH } from '../../paths.js';
-import { UMB_MEMBER_GROUP_WORKSPACE_CONTEXT } from './member-group-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-member-group-workspace-editor')
