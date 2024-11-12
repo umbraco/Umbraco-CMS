@@ -51,7 +51,7 @@ public class BackOfficeLoginController : Controller
 
         if (string.IsNullOrEmpty(model.UmbracoUrl))
         {
-            model.UmbracoUrl = _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoPath);
+            model.UmbracoUrl = _hostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath);
         }
 
         if (string.IsNullOrEmpty(model.ReturnUrl))

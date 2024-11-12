@@ -35,6 +35,7 @@ public sealed class BackOfficeUserClientCredentialsManager : ClientCredentialsMa
             {
                 UserClientCredentialsOperationStatus.InvalidUser => Attempt.Fail(BackOfficeUserClientCredentialsOperationStatus.InvalidUser),
                 UserClientCredentialsOperationStatus.DuplicateClientId => Attempt.Fail(BackOfficeUserClientCredentialsOperationStatus.DuplicateClientId),
+                UserClientCredentialsOperationStatus.InvalidClientId => Attempt.Fail(BackOfficeUserClientCredentialsOperationStatus.InvalidClientId),
                 _ => throw new ArgumentOutOfRangeException($"Unsupported client ID operation status: {result}")
             };
         }

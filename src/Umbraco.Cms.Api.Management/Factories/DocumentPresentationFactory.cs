@@ -54,6 +54,23 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         return responseModel;
     }
 
+    public async Task<PublishedDocumentResponseModel> CreatePublishedResponseModelAsync(IContent content)
+    {
+        PublishedDocumentResponseModel responseModel = _umbracoMapper.Map<PublishedDocumentResponseModel>(content)!;
+
+        responseModel.Urls = await _documentUrlFactory.CreateUrlsAsync(content);
+
+        Guid? templateKey = content.PublishTemplateId.HasValue
+            ? _templateService.GetAsync(content.PublishTemplateId.Value).Result?.Key
+            : null;
+
+        responseModel.Template = templateKey.HasValue
+            ? new ReferenceByIdModel { Id = templateKey.Value }
+            : null;
+
+        return responseModel;
+    }
+
     public DocumentItemResponseModel CreateItemResponseModel(IDocumentEntitySlim entity)
     {
         var responseModel = new DocumentItemResponseModel
