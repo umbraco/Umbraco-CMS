@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
@@ -35,7 +36,7 @@ namespace Umbraco.Cms.Core.Services;
 ///     Represents the UserService, which is an easy access to operations involving <see cref="IProfile" />,
 ///     <see cref="IMembershipUser" /> and eventually Backoffice Users.
 /// </summary>
-internal class UserService : RepositoryService, IUserService
+internal partial class UserService : RepositoryService, IUserService
 {
     private readonly GlobalSettings _globalSettings;
     private readonly SecuritySettings _securitySettings;
@@ -477,6 +478,7 @@ internal class UserService : RepositoryService, IUserService
     ///     This is just the default user group that the membership provider will use
     /// </summary>
     /// <returns></returns>
+    [Obsolete("No (backend) code path is using this anymore, so it can not be considered the default. Planned for removal in V16.")]
     public string GetDefaultMemberType() => Constants.Security.WriterGroupAlias;
 
     /// <summary>
@@ -2483,6 +2485,11 @@ internal class UserService : RepositoryService, IUserService
 
     public async Task<UserClientCredentialsOperationStatus> AddClientIdAsync(Guid userKey, string clientId)
     {
+        if (ValidClientId().IsMatch(clientId) is false)
+        {
+            return UserClientCredentialsOperationStatus.InvalidClientId;
+        }
+
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
         IEnumerable<string> currentClientIds = _userRepository.GetAllClientIds();
@@ -2669,6 +2676,9 @@ internal class UserService : RepositoryService, IUserService
             assignedPermissions.Add(additionalPermission);
         }
     }
+
+    [GeneratedRegex(@"^[\w\d\-\._~]*$")]
+    private static partial Regex ValidClientId();
 
     #endregion
 }

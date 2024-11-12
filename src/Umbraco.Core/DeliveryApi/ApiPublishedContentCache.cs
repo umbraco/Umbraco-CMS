@@ -80,9 +80,18 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
             }
         }
 
+        var requestCulture = _requestCultureService.GetRequestedCulture();
+
+        if (requestCulture?.Trim().Length <= 0)
+        {
+            // documentUrlService does not like empty strings
+            // todo: align culture null vs empty string behaviour across the codebase
+            requestCulture = null;
+        }
+
         Guid? documentKey = _documentUrlService.GetDocumentKeyByRoute(
             route,
-            _requestCultureService.GetRequestedCulture(),
+            requestCulture,
             documentStartNodeId,
             _requestPreviewService.IsPreview()
         );
