@@ -38,10 +38,10 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 	private _urls?: Array<MediaUrlInfoModel>;
 
 	@state()
-	private _createDate = 'Unknown';
+	private _createDate?: string | null = null;
 
 	@state()
-	private _updateDate = 'Unknown';
+	private _updateDate?: string | null = null;
 
 	constructor() {
 		super();
@@ -91,8 +91,8 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 
 		/** TODO: Doubt this is the right way to get the create date... */
 		this.observe(this.#workspaceContext.variants, (variants) => {
-			this._createDate = Array.isArray(variants) ? variants[0].createDate || 'Unknown' : 'Unknown';
-			this._updateDate = Array.isArray(variants) ? variants[0].updateDate || 'Unknown' : 'Unknown';
+			this._createDate = variants?.[0]?.createDate;
+			this._updateDate = variants?.[0]?.updateDate;
 		});
 	}
 	#openSvg(imagePath: string) {
@@ -170,18 +170,7 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 
 	#renderGeneralSection() {
 		return html`
-			<div class="general-item">
-				<strong><umb-localize key="content_createDate"></umb-localize></strong>
-				<span>
-					<umb-localize-date .date=${this._createDate} .options=${TimeOptions}></umb-localize-date>
-				</span>
-			</div>
-			<div class="general-item">
-				<strong><umb-localize key="content_updateDate"></umb-localize></strong>
-				<span>
-					<umb-localize-date .date=${this._updateDate} .options=${TimeOptions}></umb-localize-date>
-				</span>
-			</div>
+			${this.#renderCreateDate()} ${this.#renderUpdateDate()}
 			<div class="general-item">
 				<strong><umb-localize key="content_mediaType">Media Type</umb-localize></strong>
 				<uui-ref-node-document-type
@@ -194,6 +183,30 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 			<div class="general-item">
 				<strong><umb-localize key="template_id">Id</umb-localize></strong>
 				<span>${this._mediaUnique}</span>
+			</div>
+		`;
+	}
+
+	#renderCreateDate() {
+		if (!this._createDate) return nothing;
+		return html`
+			<div class="general-item">
+				<strong><umb-localize key="content_createDate"></umb-localize></strong>
+				<span>
+					<umb-localize-date .date=${this._createDate} .options=${TimeOptions}></umb-localize-date>
+				</span>
+			</div>
+		`;
+	}
+
+	#renderUpdateDate() {
+		if (!this._updateDate) return nothing;
+		return html`
+			<div class="general-item">
+				<strong><umb-localize key="content_updateDate"></umb-localize></strong>
+				<span>
+					<umb-localize-date .date=${this._updateDate} .options=${TimeOptions}></umb-localize-date>
+				</span>
 			</div>
 		`;
 	}
