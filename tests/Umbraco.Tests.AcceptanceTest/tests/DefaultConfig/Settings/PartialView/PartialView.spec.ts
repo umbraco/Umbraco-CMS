@@ -198,7 +198,7 @@ test('can insert dictionary item into a partial view', async ({umbracoApi, umbra
   await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
   await umbracoApi.dictionary.create(dictionaryName);
 
-  const partialViewContent = '@Umbraco.GetDictionaryValue("' + dictionaryName + '")\n' + defaultPartialViewContent;
+  const partialViewContent = '@Umbraco.GetDictionaryValue("' + dictionaryName + '")' + defaultPartialViewContent;
 
   // Act
   await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);

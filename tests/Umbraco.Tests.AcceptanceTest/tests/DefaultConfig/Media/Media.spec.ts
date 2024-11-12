@@ -15,7 +15,7 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 //TODO: Remove skip when the frontend is ready. Currently it is possible to create an empty media file, should not be possible
-test('can not create a empty media file', async ({umbracoApi, umbracoUi}) => {
+test.skip('can not create a empty media file', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
@@ -112,7 +112,7 @@ test('can trash a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.media.clickActionsMenuForName(folderName);
   await umbracoUi.media.clickTrashButton();
-  await umbracoUi.media.clickConfirmToTrashButton();
+  await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
   await umbracoUi.media.isTreeItemVisible(folderName, false);

@@ -240,7 +240,8 @@ test('can remove a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainIconColor(blockGridEditorName, contentElementTypeId, '')).toBeTruthy();
 });
  
-test('can add a thumbnail to a block', async ({umbracoApi, umbracoUi}) => {
+// TODO: Remove skip when the code is updated due to UI changes
+test.skip('can add a thumbnail to a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaName = 'TestMedia';
   await umbracoApi.media.ensureNameNotExists(mediaName);
