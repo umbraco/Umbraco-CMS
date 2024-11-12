@@ -109,7 +109,7 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 				label: 'Rich Text Essentials',
 				icon: 'icon-browser-window',
 				group: '#tiptap_extGroup_formatting',
-				description: 'This is a core extension, it must be enabled',
+				description: 'This is a core extension, it is always enabled by default.',
 			});
 
 			if (!this.value) {

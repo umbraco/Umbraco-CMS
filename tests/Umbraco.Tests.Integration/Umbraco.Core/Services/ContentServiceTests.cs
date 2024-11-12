@@ -55,6 +55,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
     private IUserService UserService => GetRequiredService<IUserService>();
 
+    private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
+
     private IRelationService RelationService => GetRequiredService<IRelationService>();
 
     private ILocalizedTextService TextService => GetRequiredService<ILocalizedTextService>();
@@ -2056,11 +2058,11 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         ContentService.Save(content2);
         Assert.IsTrue(ContentService.Publish(content2, content2.AvailableCultures.ToArray(), userId: -1).Success);
 
-        var editorGroup = UserService.GetUserGroupByAlias(Constants.Security.EditorGroupAlias);
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
         editorGroup.StartContentId = content1.Id;
         UserService.Save(editorGroup);
 
-        var admin = UserService.GetUserById(Constants.Security.SuperUserId);
+        var admin = await UserService.GetAsync(Constants.Security.SuperUserKey);
         admin.StartContentIds = new[] { content1.Id };
         UserService.Save(admin);
 
@@ -2072,7 +2074,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             new List<PublicAccessRule> { new() { RuleType = "test", RuleValue = "test" } }));
         Assert.IsTrue(PublicAccessService.AddRule(content1, "test2", "test2").Success);
 
-        var user = UserService.GetUserById(Constants.Security.SuperUserId);
+        var user = await UserService.GetAsync(Constants.Security.SuperUserKey);
         var userGroup = UserService.GetUserGroupByAlias(user.Groups.First().Alias);
         Assert.IsNotNull(NotificationService.CreateNotification(user, content1, "X"));
 

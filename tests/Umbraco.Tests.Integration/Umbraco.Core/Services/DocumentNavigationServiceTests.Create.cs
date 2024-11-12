@@ -11,7 +11,7 @@ public partial class DocumentNavigationServiceTests
         // Arrange
         DocumentNavigationQueryService.TryGetSiblingsKeys(Root.Key, out IEnumerable<Guid> initialSiblingsKeys);
         var initialRootNodeSiblingsCount = initialSiblingsKeys.Count();
-        var createModel = CreateContentCreateModel("Root 2", Guid.NewGuid(), Constants.System.RootKey);
+        var createModel = CreateContentCreateModel("Root 2", Guid.NewGuid(), parentKey: Constants.System.RootKey);
 
         // Act
         var createAttempt = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -36,7 +36,7 @@ public partial class DocumentNavigationServiceTests
         // Arrange
         DocumentNavigationQueryService.TryGetChildrenKeys(Child1.Key, out IEnumerable<Guid> initialChildrenKeys);
         var initialChild1ChildrenCount = initialChildrenKeys.Count();
-        var createModel = CreateContentCreateModel("Grandchild 3", Guid.NewGuid(), Child1.Key);
+        var createModel = CreateContentCreateModel("Grandchild 3", Guid.NewGuid(), parentKey: Child1.Key);
 
         // Act
         var createAttempt = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -70,7 +70,7 @@ public partial class DocumentNavigationServiceTests
     {
         // Arrange
         Guid newNodeKey = Guid.NewGuid();
-        var createModel = CreateContentCreateModel("Child", newNodeKey, parentKey);
+        var createModel = CreateContentCreateModel("Child", newNodeKey, parentKey: parentKey);
 
         // Act
         await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);

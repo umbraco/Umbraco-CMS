@@ -30,11 +30,8 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 			if (!defaultMemoization(this.#value, value)) {
 				this.#value = value;
 				// Only remove server validations from validation context [NL]
-				this.#messages.forEach((message) => {
-					if (message.type === 'server') {
-						this.#context?.messages.removeMessageByKey(message.key);
-					}
-				});
+				const toRemove = this.#messages.filter((x) => x.type === 'server').map((msg) => msg.key);
+				this.#context?.messages.removeMessageByKeys(toRemove);
 			}
 		}
 	}
