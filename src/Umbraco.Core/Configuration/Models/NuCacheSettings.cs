@@ -19,7 +19,7 @@ public class NuCacheSettings
     /// <summary>
     ///     Gets or sets a value defining the BTree block size.
     /// </summary>
-    [Obsolete("This property is no longer used")]
+    [Obsolete("This property is no longer used. Scheduled for removal in v16")]
     public int? BTreeBlockSize { get; set; }
 
     /// <summary>

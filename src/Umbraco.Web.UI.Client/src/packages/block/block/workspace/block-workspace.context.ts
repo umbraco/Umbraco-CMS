@@ -124,19 +124,19 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 			this.removeUmbControllerByAlias('observeHasExpose');
 			this.observe(
-				this.contentKey,
-				(contentKey) => {
-					if (!contentKey) return;
+				observeMultiple([this.contentKey, this.variantId]),
+				([contentKey, variantId]) => {
+					if (!contentKey || !variantId) return;
 
 					this.observe(
-						manager.hasExposeOf(contentKey),
+						manager.hasExposeOf(contentKey, variantId),
 						(exposed) => {
 							this.#exposed.setValue(exposed);
 						},
 						'observeHasExpose',
 					);
 				},
-				'observeContentKey',
+				'observeContentKeyAndVariantId',
 			);
 
 			this.observe(

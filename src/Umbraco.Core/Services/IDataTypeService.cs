@@ -77,16 +77,6 @@ public interface IDataTypeService : IService
     IDataType? GetDataType(int id);
 
     /// <summary>
-    ///     Gets a <see cref="IDataType" /> by its unique guid Id
-    /// </summary>
-    /// <param name="id">Unique guid Id of the DataType</param>
-    /// <returns>
-    ///     <see cref="IDataType" />
-    /// </returns>
-    [Obsolete("Please use GetAsync. Will be removed in V15.")]
-    IDataType? GetDataType(Guid id);
-
-    /// <summary>
     ///     Gets an <see cref="IDataType" /> by its Name
     /// </summary>
     /// <param name="name">Name of the <see cref="IDataType" /></param>

@@ -36,10 +36,10 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	set value(value: UmbTiptapToolbarValue | undefined) {
 		if (!value) value = [[[]]];
 		if (value === this.#value) return;
-		this.#context.setToolbar(value);
+		this.#value = this.#context.migrateTinyMceToolbar(value);
 	}
 	get value(): UmbTiptapToolbarValue | undefined {
-		return this.#value?.map((rows) => rows.map((groups) => [...groups]));
+		return this.#context.cloneToolbarValue(this.#value);
 	}
 	#value?: UmbTiptapToolbarValue;
 
@@ -64,6 +64,10 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				propertyContext.setValue(this.#value);
 			});
 		});
+	}
+
+	protected override firstUpdated() {
+		this.#context.setToolbar(this.value);
 	}
 
 	#onClick(item: UmbTiptapToolbarExtension) {

@@ -321,7 +321,6 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentMovedToRecycleBinNotification, UserNotificationsHandler>()
             .AddNotificationHandler<ContentCopiedNotification, UserNotificationsHandler>()
             .AddNotificationHandler<ContentRolledBackNotification, UserNotificationsHandler>()
-            .AddNotificationHandler<ContentSentToPublishNotification, UserNotificationsHandler>()
             .AddNotificationHandler<ContentUnpublishedNotification, UserNotificationsHandler>()
             .AddNotificationHandler<AssignedUserGroupPermissionsNotification, UserNotificationsHandler>()
             .AddNotificationHandler<PublicAccessEntrySavedNotification, UserNotificationsHandler>();

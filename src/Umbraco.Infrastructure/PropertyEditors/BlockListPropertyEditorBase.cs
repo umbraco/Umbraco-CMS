@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.Validation;
@@ -47,11 +48,12 @@ public abstract class BlockListPropertyEditorBase : DataEditor
     protected virtual BlockEditorDataConverter<BlockListValue, BlockListLayoutItem> CreateBlockEditorDataConverter() => new BlockListEditorDataConverter(_jsonSerializer);
 
     protected override IDataValueEditor CreateValueEditor() =>
-        DataValueEditorFactory.Create<BlockListEditorPropertyValueEditor>(CreateBlockEditorDataConverter());
+        DataValueEditorFactory.Create<BlockListEditorPropertyValueEditor>(Attribute!, CreateBlockEditorDataConverter());
 
     internal class BlockListEditorPropertyValueEditor : BlockEditorPropertyValueEditor<BlockListValue, BlockListLayoutItem>
     {
         public BlockListEditorPropertyValueEditor(
+            DataEditorAttribute attribute,
             BlockEditorDataConverter<BlockListValue, BlockListLayoutItem> blockEditorDataConverter,
             PropertyEditorCollection propertyEditors,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
@@ -63,8 +65,9 @@ public abstract class BlockListPropertyEditorBase : DataEditor
             IJsonSerializer jsonSerializer,
             IPropertyValidationService propertyValidationService,
             BlockEditorVarianceHandler blockEditorVarianceHandler,
-            ILanguageService languageService)
-            : base(propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, blockEditorVarianceHandler, languageService)
+            ILanguageService languageService,
+            IIOHelper ioHelper)
+            : base(propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, blockEditorVarianceHandler, languageService, ioHelper, attribute)
         {
             BlockEditorValues = new BlockEditorValues<BlockListValue, BlockListLayoutItem>(blockEditorDataConverter, elementTypeCache, logger);
             Validators.Add(new BlockEditorValidator<BlockListValue, BlockListLayoutItem>(propertyValidationService, BlockEditorValues, elementTypeCache));

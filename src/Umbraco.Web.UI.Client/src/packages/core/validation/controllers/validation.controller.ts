@@ -138,9 +138,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 					if (this.#parentMessages) {
 						// Remove the local messages that does not exist in the parent anymore:
 						const toRemove = this.#parentMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
-						toRemove.forEach((msg) => {
-							this.messages.removeMessageByKey(msg.key);
-						});
+						this.#parent!.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
 					}
 					this.#parentMessages = msgs;
 					msgs.forEach((msg) => {
@@ -160,9 +158,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 					if (this.#localMessages) {
 						// Remove the parent messages that does not exist locally anymore:
 						const toRemove = this.#localMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
-						toRemove.forEach((msg) => {
-							this.#parent!.messages.removeMessageByKey(msg.key);
-						});
+						this.#parent!.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
 					}
 					this.#localMessages = msgs;
 					msgs.forEach((msg) => {

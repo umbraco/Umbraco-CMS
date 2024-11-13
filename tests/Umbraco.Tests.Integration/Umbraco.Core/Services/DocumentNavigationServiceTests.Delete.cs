@@ -63,7 +63,7 @@ public partial class DocumentNavigationServiceTests
 
         // Create a new sibling under the same parent
         var key = Guid.NewGuid();
-        var createModel = CreateContentCreateModel("Child 4", key, Root.Key);
+        var createModel = CreateContentCreateModel("Child 4", key, parentKey: Root.Key);
         await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
         DocumentNavigationQueryService.TryGetSiblingsKeys(node, out IEnumerable<Guid> siblingsKeysAfterCreation);

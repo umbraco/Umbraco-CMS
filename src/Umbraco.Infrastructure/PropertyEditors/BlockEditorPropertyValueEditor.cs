@@ -35,7 +35,9 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
         IIOHelper ioHelper)
         : this(propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, shortStringHelper, jsonSerializer,
             StaticServiceProvider.Instance.GetRequiredService<BlockEditorVarianceHandler>(),
-            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>())
+            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
+            ioHelper,
+            attribute)
     {
     }
 
@@ -46,8 +48,10 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
         BlockEditorVarianceHandler blockEditorVarianceHandler,
-        ILanguageService languageService)
-        : base(propertyEditors, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, dataValueReferenceFactories, blockEditorVarianceHandler, languageService) =>
+        ILanguageService languageService,
+        IIOHelper ioHelper,
+        DataEditorAttribute attribute)
+        : base(propertyEditors, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, dataValueReferenceFactories, blockEditorVarianceHandler, languageService, ioHelper, attribute) =>
         _jsonSerializer = jsonSerializer;
 
     /// <inheritdoc />
