@@ -98,7 +98,7 @@ export class UmbContentTypeStructureManager<
 	constructor(host: UmbControllerHost, typeRepository: UmbDetailRepository<T> | string) {
 		super(host);
 
-		if (typeRepository instanceof String) {
+		if (typeof typeRepository === 'string') {
 			this.#observeRepository(typeRepository);
 		} else {
 			this.#repository = typeRepository;
