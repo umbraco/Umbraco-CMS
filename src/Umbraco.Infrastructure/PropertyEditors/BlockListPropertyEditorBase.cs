@@ -66,8 +66,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor
             IPropertyValidationService propertyValidationService,
             BlockEditorVarianceHandler blockEditorVarianceHandler,
             ILanguageService languageService,
-            IIOHelper ioHelper
-            )
+            IIOHelper ioHelper)
             : base(propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, blockEditorVarianceHandler, languageService, ioHelper, attribute)
         {
             BlockEditorValues = new BlockEditorValues<BlockListValue, BlockListLayoutItem>(blockEditorDataConverter, elementTypeCache, logger);
