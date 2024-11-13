@@ -10,8 +10,7 @@ using Umbraco.Cms.Infrastructure.HostedServices;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
-[Obsolete("This will be removed in Umbraco 15. Use IIndexRebuilder instead.")] // Main reason for this is to remove it form the service container. Maybe even make this internal
-public class ExamineIndexRebuilder : IIndexRebuilder
+internal sealed class ExamineIndexRebuilder : IIndexRebuilder
 {
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
     private readonly IExamineManager _examineManager;
@@ -50,7 +49,7 @@ public class ExamineIndexRebuilder : IIndexRebuilder
         return _populators.Any(x => x.IsRegistered(index));
     }
 
-    public virtual void RebuildIndex(string indexName, TimeSpan? delay = null, bool useBackgroundThread = true)
+    public void RebuildIndex(string indexName, TimeSpan? delay = null, bool useBackgroundThread = true)
     {
         if (delay == null)
         {
@@ -85,7 +84,7 @@ public class ExamineIndexRebuilder : IIndexRebuilder
         }
     }
 
-    public virtual void RebuildIndexes(bool onlyEmptyIndexes, TimeSpan? delay = null, bool useBackgroundThread = true)
+    public void RebuildIndexes(bool onlyEmptyIndexes, TimeSpan? delay = null, bool useBackgroundThread = true)
     {
         if (delay == null)
         {

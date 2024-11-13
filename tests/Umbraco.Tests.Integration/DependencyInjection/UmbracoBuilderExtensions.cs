@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Examine;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +19,6 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Persistence.EFCore.Locking;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
@@ -145,31 +143,16 @@ public static class UmbracoBuilderExtensions
     }
 
     // replace the default so there is no background index rebuilder
-    private class TestBackgroundIndexRebuilder : ExamineIndexRebuilder
+    private class TestBackgroundIndexRebuilder : IIndexRebuilder
     {
-        public TestBackgroundIndexRebuilder(
-            IMainDom mainDom,
-            IRuntimeState runtimeState,
-            ILogger<ExamineIndexRebuilder> logger,
-            IExamineManager examineManager,
-            IEnumerable<IIndexPopulator> populators,
-            IBackgroundTaskQueue backgroundTaskQueue)
-            : base(
-            mainDom,
-            runtimeState,
-            logger,
-            examineManager,
-            populators,
-            backgroundTaskQueue)
-        {
-        }
+        public bool CanRebuild(string indexName) => false;
 
-        public override void RebuildIndex(string indexName, TimeSpan? delay = null, bool useBackgroundThread = true)
+        public void RebuildIndex(string indexName, TimeSpan? delay = null, bool useBackgroundThread = true)
         {
             // noop
         }
 
-        public override void RebuildIndexes(bool onlyEmptyIndexes, TimeSpan? delay = null, bool useBackgroundThread = true)
+        public void RebuildIndexes(bool onlyEmptyIndexes, TimeSpan? delay = null, bool useBackgroundThread = true)
         {
             // noop
         }
