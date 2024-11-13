@@ -267,7 +267,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			return true;
 		}
 
-		if (this._checkWillNavigateAway(newUrl) && this._data.getHasUnpersistedChanges()) {
+		if (this._checkWillNavigateAway(newUrl) && this._getHasUnpersistedChanges()) {
 			e.preventDefault();
 			const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 			const modal = modalManager.open(this, UMB_DISCARD_CHANGES_MODAL);
@@ -286,6 +286,14 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 		return true;
 	};
+
+	/**
+	 * Check if there are unpersisted changes.
+	 * @returns { boolean } true if there are unpersisted changes.
+	 */
+	protected _getHasUnpersistedChanges(): boolean {
+		return this._data.getHasUnpersistedChanges();
+	}
 
 	override resetState() {
 		super.resetState();
