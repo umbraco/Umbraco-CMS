@@ -133,7 +133,7 @@ test.skip('can delete a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickConfirmToDeleteButton();
 
   // Assert
-  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.folderDeleted);
+  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
   await umbracoUi.media.isMediaTreeItemVisible(folderName, false);
   expect(await umbracoApi.media.doesNameExist(folderName)).toBeFalsy();
 });

@@ -24,7 +24,7 @@ test('can create a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.waitForTimeout(1000);
 
   // Assert
-  await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.folderCreated);
+  await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.script.doesFolderExist(scriptFolderName)).toBeTruthy();
   await umbracoUi.script.isScriptRootTreeItemVisible(scriptFolderName);
 });
@@ -40,7 +40,7 @@ test('can delete a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.script.deleteFolder();
 
   // Assert
-  await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.folderDeleted);
+  await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
   expect(await umbracoApi.script.doesFolderExist(scriptFolderName)).toBeFalsy();
   await umbracoUi.script.isScriptRootTreeItemVisible(scriptFolderName, false, false);
 });
@@ -83,7 +83,7 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.script.createFolder(childFolderName);
 
   // Assert
-  await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.folderCreated);
+  await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.script.doesNameExist(childFolderName)).toBeTruthy();
   const scriptChildren = await umbracoApi.script.getChildren('/' + scriptFolderName);
   expect(scriptChildren[0].path).toBe('/' + scriptFolderName + '/' + childFolderName);
@@ -106,7 +106,7 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   await umbracoUi.script.createFolder(childOfChildFolderName);
 
   // Assert
-  await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.folderCreated);
+  await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.script.doesNameExist(childOfChildFolderName)).toBeTruthy();
   const scriptChildren = await umbracoApi.script.getChildren('/' + scriptFolderName + '/' + childFolderName);
   expect(scriptChildren[0].path).toBe('/' + scriptFolderName + '/' + childFolderName + '/' + childOfChildFolderName);
