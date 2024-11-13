@@ -467,12 +467,14 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	expose() {
 		const contentKey = this.#layout.value?.contentKey;
-		if (!contentKey) throw new Error('Cannot expose block that does not exist.');
+		if (!contentKey) throw new Error('Failed to expose block, missing content key.');
 		this.#expose(contentKey);
 	}
 
 	#expose(unique: string) {
-		this.#blockManager?.setOneExpose(unique);
+		const variantId = this.#variantId.getValue();
+		if (!variantId) throw new Error('Failed to expose block, missing variant id.');
+		this.#blockManager?.setOneExpose(unique, variantId);
 	}
 
 	#modalRejected = () => {
