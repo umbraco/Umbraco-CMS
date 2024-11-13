@@ -75,30 +75,4 @@
 
     <WriteLinesToFile File="$(IntermediateOutputPath)login.complete.txt" Lines="@(_LoginAssetsBuildOutput)" Overwrite="true" />
   </Target>
-
-  <Target Name="CleanStaticAssetsPreconditions" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
-    <Message Text="Skip CleanBackoffice target because '$(BackofficePath)' doesn't exist" Importance="high" Condition="!Exists('$(BackofficePath)')" />
-    <Message Text="Skip CleanBackoffice target because preserve.backoffice marker file exists" Importance="high" Condition="Exists('$(BackofficePath)') and Exists('$(SolutionDir)preserve.backoffice')" />
-    <Message Text="Call CleanBackoffice target because '$(BackofficePath)' exists and preserve.backoffice marker file doesn't exist" Importance="high" Condition="Exists('$(BackofficePath)') and !Exists('$(SolutionDir)preserve.backoffice')" />
-    <CallTarget Targets="CleanBackoffice" Condition="Exists('$(BackofficePath)') and !Exists('$(SolutionDir)preserve.backoffice')" />
-
-    <Message Text="Skip CleanLogin target because '$(LoginPath)' doesn't exist" Importance="high" Condition="!Exists('$(LoginPath)')" />
-    <Message Text="Skip CleanLogin target because preserve.login marker file exists" Importance="high" Condition="Exists('$(LoginPath)') and Exists('$(SolutionDir)preserve.login')" />
-    <Message Text="Call CleanLogin target because '$(LoginPath)' exists and preserve.login marker file doesn't exist" Importance="high" Condition="Exists('$(LoginPath)') and !Exists('$(SolutionDir)preserve.login')" />
-    <CallTarget Targets="CleanLogin" Condition="Exists('$(LoginPath)') and !Exists('$(SolutionDir)preserve.login')" />
-  </Target>
-
-  <Target Name="CleanBackoffice">
-    <ItemGroup>
-      <BackofficeDirectories Include="$(BackofficePath)" />
-    </ItemGroup>
-    <RemoveDir Directories="@(BackofficeDirectories)" />
-  </Target>
-
-  <Target Name="CleanLogin">
-    <ItemGroup>
-      <LoginDirectories Include="$(LoginPath)" />
-    </ItemGroup>
-    <RemoveDir Directories="@(LoginDirectories)" />
-  </Target>
 </Project>
