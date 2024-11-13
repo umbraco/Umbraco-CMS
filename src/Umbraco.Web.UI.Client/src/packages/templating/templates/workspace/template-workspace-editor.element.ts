@@ -160,7 +160,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	override render() {
 		// TODO: add correct UI elements
 		return html`
-			<umb-workspace-editor alias="Umb.Workspace.Template">
+			<umb-workspace-editor>
 				<umb-input-with-alias
 					slot="header"
 					id="name"
