@@ -38,18 +38,6 @@
     <LoginAssetsInputs Include="$(LoginAssetsDirectory)**" Exclude="$(DefaultItemExcludes)" />
   </ItemGroup>
 
-  <Target Name="BuildStaticAssetsPreconditions" BeforeTargets="Build">
-    <Message Text="Skip BuildBackoffice target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
-    <Message Text="Skip BuildBackoffice target because '$(BackofficePath)' already exists" Importance="high" Condition="Exists('$(BackofficePath)')" />
-    <Message Text="Call BuildBackoffice target because UmbracoBuild is empty (this is Visual Studio) and '$(BackofficePath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BackofficePath)')" />
-    <CallTarget Targets="BuildBackoffice" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BackofficePath)')" />
-
-    <Message Text="Skip BuildLogin target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
-    <Message Text="Skip BuildLogin target because '$(LoginPath)' already exists" Importance="high" Condition="Exists('$(LoginPath)')" />
-    <Message Text="Call BuildLogin target because UmbracoBuild is empty (this is Visual Studio) and '$(LoginPath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(LoginPath)')" />
-    <CallTarget Targets="BuildLogin" Condition="'$(UmbracoBuild)' == '' and !Exists('$(LoginPath)')" />
-  </Target>
-
   <Target Name="RestoreBackoffice" Inputs="$(BackofficeAssetsDirectory)package.json;$(BackofficeAssetsDirectory)package-lock.json" Outputs="$(BackofficeAssetsDirectory)node_modules\.package-lock.json">
     <Message Importance="high" Text="Restoring Backoffice NPM packages..." />
     <Exec Command="npm ci --no-fund --no-audit --prefer-offline" WorkingDirectory="$(BackofficeAssetsDirectory)" />
