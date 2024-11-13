@@ -88,7 +88,7 @@ public class StringExtensionsTests
     [TestCase("Hello this is my string string", "Hello this is my string string", "")]
     public void TrimEnd(string input, string forTrimming, string shouldBe)
     {
-        var trimmed = input.TrimEndExact(forTrimming);
+        var trimmed = input.TrimEnd(forTrimming);
         Assert.AreEqual(shouldBe, trimmed);
     }
 
@@ -98,7 +98,7 @@ public class StringExtensionsTests
     [TestCase("Hello this is my string", "Hello this is my string", "")]
     public void TrimStart(string input, string forTrimming, string shouldBe)
     {
-        var trimmed = input.TrimStartExact(forTrimming);
+        var trimmed = input.TrimStart(forTrimming);
         Assert.AreEqual(shouldBe, trimmed);
     }
 

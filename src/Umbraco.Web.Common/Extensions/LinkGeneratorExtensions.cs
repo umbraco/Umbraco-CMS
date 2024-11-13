@@ -40,7 +40,7 @@ public static class LinkGeneratorExtensions
                                              " or the result ");
         }
 
-        return linkGenerator.GetUmbracoApiService<T>(method.Name)?.TrimEndExact(method.Name);
+        return linkGenerator.GetUmbracoApiService<T>(method.Name)?.TrimEnd(method.Name);
     }
 
     /// <summary>
