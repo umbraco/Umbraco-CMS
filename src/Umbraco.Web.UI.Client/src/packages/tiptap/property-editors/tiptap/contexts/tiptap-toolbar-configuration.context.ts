@@ -28,6 +28,49 @@ export class UmbTiptapToolbarConfigurationContext extends UmbContextBase<UmbTipt
 	#toolbar = new UmbArrayState<UmbTiptapToolbarRowViewModel>([], (x) => x.unique);
 	public readonly toolbar = this.#toolbar.asObservable();
 
+	/** @deprecated This will be removed in Umbraco 16. */
+	#tinyMceToolbarMapping: Record<string, string | null> = {
+		undo: 'Umb.Tiptap.Toolbar.Undo',
+		redo: 'Umb.Tiptap.Toolbar.Redo',
+		cut: null,
+		copy: null,
+		paste: null,
+		styles: null,
+		fontname: null,
+		fontsize: null,
+		forecolor: null,
+		backcolor: null,
+		blockquote: 'Umb.Tiptap.Toolbar.Blockquote',
+		formatblock: null,
+		removeformat: 'Umb.Tiptap.Toolbar.ClearFormatting',
+		bold: 'Umb.Tiptap.Toolbar.Bold',
+		italic: 'Umb.Tiptap.Toolbar.Italic',
+		underline: 'Umb.Tiptap.Toolbar.Underline',
+		strikethrough: 'Umb.Tiptap.Toolbar.Strike',
+		alignleft: 'Umb.Tiptap.Toolbar.TextAlignLeft',
+		aligncenter: 'Umb.Tiptap.Toolbar.TextAlignCenter',
+		alignright: 'Umb.Tiptap.Toolbar.TextAlignRight',
+		alignjustify: 'Umb.Tiptap.Toolbar.TextAlignJustify',
+		bullist: 'Umb.Tiptap.Toolbar.BulletList',
+		numlist: 'Umb.Tiptap.Toolbar.OrderedList',
+		outdent: null,
+		indent: null,
+		anchor: null,
+		table: 'Umb.Tiptap.Toolbar.Table',
+		hr: 'Umb.Tiptap.Toolbar.HorizontalRule',
+		subscript: 'Umb.Tiptap.Toolbar.Subscript',
+		superscript: 'Umb.Tiptap.Toolbar.Superscript',
+		charmap: null,
+		rtl: null,
+		ltr: null,
+		link: 'Umb.Tiptap.Toolbar.Link',
+		unlink: 'Umb.Tiptap.Toolbar.Unlink',
+		sourcecode: 'Umb.Tiptap.Toolbar.SourceEditor',
+		umbmediapicker: 'Umb.Tiptap.Toolbar.MediaPicker',
+		umbembeddialog: 'Umb.Tiptap.Toolbar.EmbeddedMedia',
+		umbblockpicker: 'Umb.Tiptap.Toolbar.BlockPicker',
+	};
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TIPTAP_TOOLBAR_CONFIGURATION_CONTEXT);
 
@@ -64,6 +107,11 @@ export class UmbTiptapToolbarConfigurationContext extends UmbContextBase<UmbTipt
 				'_observeExtensions',
 			);
 		});
+	}
+
+	public cloneToolbarValue(value?: UmbTiptapToolbarValue | null): UmbTiptapToolbarValue {
+		if (!this.isValidToolbarValue(value)) return [[[]]];
+		return value.map((row) => row.map((group) => [...group]));
 	}
 
 	public filterExtensions(query: string): Array<UmbTiptapToolbarExtension> {
@@ -130,6 +178,24 @@ export class UmbTiptapToolbarConfigurationContext extends UmbContextBase<UmbTipt
 		const toolbar = [...this.#toolbar.getValue()];
 		toolbar.splice(rowIndex, 0, { unique: UmbId.new(), data: [{ unique: UmbId.new(), data: [] }] });
 		this.#toolbar.setValue(toolbar);
+	}
+
+	/** @deprecated This will be removed in Umbraco 16. */
+	public migrateTinyMceToolbar(value?: UmbTiptapToolbarValue | Array<string> | null): UmbTiptapToolbarValue {
+		if (this.isValidToolbarValue(value)) return value;
+
+		const items: Array<string> = [];
+
+		if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'string') {
+			for (const alias of value) {
+				const mapping = this.#tinyMceToolbarMapping[alias];
+				if (mapping) {
+					items.push(mapping);
+				}
+			}
+		}
+
+		return [[items]];
 	}
 
 	public moveToolbarItem(from: [number, number, number], to: [number, number, number]) {

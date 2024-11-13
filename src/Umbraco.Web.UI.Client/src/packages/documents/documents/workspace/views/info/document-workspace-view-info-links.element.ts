@@ -48,8 +48,7 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 
 	async #requestUrls() {
 		if (this._isNew) return;
-
-		if (!this._unique) throw new Error('Document unique is required');
+		if (!this._unique) return;
 
 		const { data } = await this.#documentUrlRepository.requestItems([this._unique]);
 

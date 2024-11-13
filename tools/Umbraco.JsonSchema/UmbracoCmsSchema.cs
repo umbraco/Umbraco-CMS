@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 
 internal class UmbracoCmsSchema
 {
@@ -79,5 +80,6 @@ internal class UmbracoCmsSchema
         public required MarketplaceSettings Marketplace { get; set; }
 
         public required WebhookSettings Webhook { get; set; }
+        public required CacheSettings Cache { get; set; }
     }
 }
