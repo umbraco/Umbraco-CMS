@@ -70,7 +70,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 					return { id };
 				}) ?? [];
 		this.#workspaceContext?.setAllowedTemplateIds(idsWithoutRoot);
-		this.#workspaceContext?.setDefaultTemplate({ id: input.defaultUnique });
+		this.#workspaceContext?.setDefaultTemplate(input.defaultUnique ? { id: input.defaultUnique } : null);
 	}
 
 	override render() {
