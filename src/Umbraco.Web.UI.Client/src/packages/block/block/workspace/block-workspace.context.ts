@@ -166,7 +166,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					this.observe(
 						contentTypeId ? manager.blockTypeOf(contentTypeId) : undefined,
 						(blockType) => {
-							console.log('got block type', blockType);
 							if (blockType?.editorSize) {
 								this.setEditorSize(blockType.editorSize);
 							}
