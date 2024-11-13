@@ -15,6 +15,8 @@
     <Nullable>enable</Nullable>
     <WarningsAsErrors>nullable</WarningsAsErrors>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!--  TODO: [NU5104] Warning As Error: A stable release of a package should not have a prerelease dependency. Either modify the version spec of dependency -->
+    <WarningsNotAsErrors>NU5104</WarningsNotAsErrors>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
