@@ -31,7 +31,8 @@ public interface IValueConnector
     /// <returns>
     /// A task that represents the asynchronous operation. The task result contains the deploy property value.
     /// </returns>
-    Task<string?> ToArtifactAsync(object? value,
+    Task<string?> ToArtifactAsync(
+        object? value,
         IPropertyType propertyType,
         ICollection<ArtifactDependency> dependencies,
         IContextCache contextCache,
