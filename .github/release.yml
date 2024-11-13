@@ -10,6 +10,11 @@ changelog:
     - title: 🙌 Notable Changes
       labels:
         - category/notable
+    - title: 🐛 Bug Fixes
+      labels:
+        - type/bug
+        - category/bug
+        - type/improvement
     - title: 💥 Breaking Changes
       labels:
         - category/breaking
