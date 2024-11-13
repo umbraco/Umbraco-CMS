@@ -575,7 +575,6 @@ export abstract class UmbBlockEntryContext<
 	#gotVariantId() {
 		const variantId = this.#variantId.getValue();
 		if (!variantId || !this.#contentKey) return;
-		// TODO: Handle variantId changes
 		this.observe(
 			this._manager?.hasExposeOf(this.#contentKey, variantId),
 			(hasExpose) => {
@@ -615,8 +614,9 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	public expose() {
-		if (!this.#contentKey) return;
-		this._manager?.setOneExpose(this.#contentKey);
+		const variantId = this.#variantId.getValue();
+		if (!variantId || !this.#contentKey) return;
+		this._manager?.setOneExpose(this.#contentKey, variantId);
 	}
 
 	//copy
