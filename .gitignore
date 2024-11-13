@@ -48,7 +48,7 @@ QueryResult.htm
 tools/docfx/
 
 # Ignore rule for clearing out Belle (avoid rebuilding all the time)
-preserve.bellissima
+preserve.backoffice
 preserve.login
 
 # csharp-docs

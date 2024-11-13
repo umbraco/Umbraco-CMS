@@ -5,6 +5,7 @@
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
     <CompressionEnabled>false</CompressionEnabled> <!-- Disable compression. E.g. for umbraco backoffice files. These files should be precompressed by node and not let dotnet handle it -->
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -16,19 +17,32 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <ProjectReference Include="..\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj" />
     <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="umbraco\**" />
+    <Content Include="wwwroot\**" />
   </ItemGroup>
 
   <PropertyGroup>
+    <BackofficeAssetsDirectory Condition="'$(BackofficeAssetsDirectory)' == ''">..\Umbraco.Web.UI.Client\</BackofficeAssetsDirectory>
+    <LoginAssetsDirectory Condition="'$(LoginAssetsDirectory)' == ''">..\Umbraco.Web.UI.Login\</LoginAssetsDirectory>
     <BasePath>$(ProjectDir)wwwroot\umbraco</BasePath>
-    <BellissimaPath>$(BasePath)\backoffice</BellissimaPath>
+    <BackofficePath>$(BasePath)\backoffice</BackofficePath>
     <LoginPath>$(BasePath)\login</LoginPath>
   </PropertyGroup>
 
+  <ItemGroup>
+    <BackofficeAssetsInputs Include="$(BackofficeAssetsDirectory)package.json;$(BackofficeAssetsDirectory)package-lock.json;$(BackofficeAssetsDirectory)src\**" Exclude="$(DefaultItemExcludes)" />
+    <LoginAssetsInputs Include="$(LoginAssetsDirectory)**" Exclude="$(DefaultItemExcludes)" />
+  </ItemGroup>
+
   <Target Name="BuildStaticAssetsPreconditions" BeforeTargets="Build">
-    <Message Text="Skip BuildBellissima target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
-    <Message Text="Skip BuildBellissima target because '$(BellissimaPath)' already exists" Importance="high" Condition="Exists('$(BellissimaPath)')" />
-    <Message Text="Call BuildBellissima target because UmbracoBuild is empty (this is Visual Studio) and '$(BellissimaPath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BellissimaPath)')" />
-    <CallTarget Targets="BuildBellissima" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BellissimaPath)')" />
+    <Message Text="Skip BuildBackoffice target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
+    <Message Text="Skip BuildBackoffice target because '$(BackofficePath)' already exists" Importance="high" Condition="Exists('$(BackofficePath)')" />
+    <Message Text="Call BuildBackoffice target because UmbracoBuild is empty (this is Visual Studio) and '$(BackofficePath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BackofficePath)')" />
+    <CallTarget Targets="BuildBackoffice" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BackofficePath)')" />
 
     <Message Text="Skip BuildLogin target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
     <Message Text="Skip BuildLogin target because '$(LoginPath)' already exists" Importance="high" Condition="Exists('$(LoginPath)')" />
@@ -36,27 +50,49 @@
     <CallTarget Targets="BuildLogin" Condition="'$(UmbracoBuild)' == '' and !Exists('$(LoginPath)')" />
   </Target>
 
-  <Target Name="BuildBellissima">
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm ci --no-fund --no-audit --prefer-offline" />
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm run build:for:cms" />
+  <Target Name="RestoreBackoffice" Inputs="$(BackofficeAssetsDirectory)package.json;$(BackofficeAssetsDirectory)package-lock.json" Outputs="$(BackofficeAssetsDirectory)node_modules\.package-lock.json">
+    <Message Importance="high" Text="Restoring Backoffice NPM packages..." />
+    <Exec Command="npm ci --no-fund --no-audit --prefer-offline" WorkingDirectory="$(BackofficeAssetsDirectory)" />
   </Target>
 
-  <Target Name="BuildBelle">
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm ci --no-fund --no-audit --prefer-offline" Timeout="600000" />
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm run build:skip-tests" Timeout="600000" />
+  <Target Name="BuildBackoffice" DependsOnTargets="RestoreBackoffice" BeforeTargets="AssignTargetPaths" Inputs="@(BackofficeAssetsInputs)" Outputs="$(IntermediateOutputPath)backoffice.complete.txt">
+    <Message Importance="high" Text="Executing backoffice NPM build script..." />
+    <Exec Command="npm run build:for:cms" WorkingDirectory="$(BackofficeAssetsDirectory)" />
+
+    <ItemGroup>
+      <_BackofficeAssetsBuildOutput Include="$(BackofficePath)/**" />
+
+      <FileWrites Include="@(_BackofficeAssetsBuildOutput)" />
+      <FileWrites Include="$(IntermediateOutputPath)backoffice.complete.txt" />
+    </ItemGroup>
+
+    <WriteLinesToFile File="$(IntermediateOutputPath)backoffice.complete.txt" Lines="@(_BackofficeAssetsBuildOutput)" Overwrite="true" />
   </Target>
 
-  <Target Name="BuildLogin">
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Login\" Command="npm ci --no-fund --no-audit --prefer-offline" Timeout="600000" />
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Login\" Command="npm run build" Timeout="600000" />
+  <Target Name="RestoreLogin" Inputs="$(LoginAssetsDirectory)package.json;$(LoginAssetsDirectory)package-lock.json" Outputs="$(LoginAssetsDirectory)node_modules/.package-lock.json">
+    <Message Importance="high" Text="Restoring Login NPM packages..." />
+    <Exec Command="npm ci --no-fund --no-audit --prefer-offline" WorkingDirectory="$(LoginAssetsDirectory)" />
+  </Target>
+
+  <Target Name="BuildLogin" DependsOnTargets="RestoreLogin" BeforeTargets="AssignTargetPaths" Inputs="@(LoginAssetsInputs)" Outputs="$(IntermediateOutputPath)login.complete.txt">
+    <Message Importance="high" Text="Executing Login NPM build script..." />
+    <Exec Command="npm run build" WorkingDirectory="$(LoginAssetsDirectory)" />
+
+    <ItemGroup>
+      <_LoginAssetsBuildOutput Include="$(LoginPath)\**" />
+
+      <FileWrites Include="@(_LoginAssetsBuildOutput)" />
+      <FileWrites Include="$(IntermediateOutputPath)login.complete.txt" />
+    </ItemGroup>
+
+    <WriteLinesToFile File="$(IntermediateOutputPath)login.complete.txt" Lines="@(_LoginAssetsBuildOutput)" Overwrite="true" />
   </Target>
 
   <Target Name="CleanStaticAssetsPreconditions" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
-
-    <Message Text="Skip CleanBellissima target because '$(BellissimaPath)' doesn't exist" Importance="high" Condition="!Exists('$(BellissimaPath)')" />
-    <Message Text="Skip CleanBellissima target because preserve.bellissima marker file exists" Importance="high" Condition="Exists('$(BellissimaPath)') and Exists('$(SolutionDir)preserve.bellissima')" />
-    <Message Text="Call CleanBellissima target because '$(BellissimaPath)' exists and preserve.bellissima marker file doesn't exist" Importance="high" Condition="Exists('$(BellissimaPath)') and !Exists('$(SolutionDir)preserve.bellissima')" />
-    <CallTarget Targets="CleanBellissima" Condition="Exists('$(BellissimaPath)') and !Exists('$(SolutionDir)preserve.bellissima')" />
+    <Message Text="Skip CleanBackoffice target because '$(BackofficePath)' doesn't exist" Importance="high" Condition="!Exists('$(BackofficePath)')" />
+    <Message Text="Skip CleanBackoffice target because preserve.backoffice marker file exists" Importance="high" Condition="Exists('$(BackofficePath)') and Exists('$(SolutionDir)preserve.backoffice')" />
+    <Message Text="Call CleanBackoffice target because '$(BackofficePath)' exists and preserve.backoffice marker file doesn't exist" Importance="high" Condition="Exists('$(BackofficePath)') and !Exists('$(SolutionDir)preserve.backoffice')" />
+    <CallTarget Targets="CleanBackoffice" Condition="Exists('$(BackofficePath)') and !Exists('$(SolutionDir)preserve.backoffice')" />
 
     <Message Text="Skip CleanLogin target because '$(LoginPath)' doesn't exist" Importance="high" Condition="!Exists('$(LoginPath)')" />
     <Message Text="Skip CleanLogin target because preserve.login marker file exists" Importance="high" Condition="Exists('$(LoginPath)') and Exists('$(SolutionDir)preserve.login')" />
@@ -64,16 +100,16 @@
     <CallTarget Targets="CleanLogin" Condition="Exists('$(LoginPath)') and !Exists('$(SolutionDir)preserve.login')" />
   </Target>
 
-  <Target Name="CleanBellissima">
+  <Target Name="CleanBackoffice">
     <ItemGroup>
-      <BellissimaDirectories Include="$(BellissimaPath);" />
+      <BackofficeDirectories Include="$(BackofficePath)" />
     </ItemGroup>
-    <RemoveDir Directories="@(BellissimaDirectories)" />
+    <RemoveDir Directories="@(BackofficeDirectories)" />
   </Target>
 
   <Target Name="CleanLogin">
     <ItemGroup>
-      <LoginDirectories Include="$(LoginPath);" />
+      <LoginDirectories Include="$(LoginPath)" />
     </ItemGroup>
     <RemoveDir Directories="@(LoginDirectories)" />
   </Target>
