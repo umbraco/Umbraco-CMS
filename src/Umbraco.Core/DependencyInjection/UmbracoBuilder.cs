@@ -63,6 +63,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         public ILoggerFactory BuilderLoggerFactory { get; }
 
         /// <inheritdoc />
+        [Obsolete("Only here to comply with obsolete implementation. Scheduled for removal in v16")]
         public IHostingEnvironment? BuilderHostingEnvironment { get; }
 
         public IProfiler Profiler { get; }
@@ -79,6 +80,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoBuilder"/> class.
         /// </summary>
+        [Obsolete("Use a non obsolete constructor instead. Scheduled for removal in v16")]
         public UmbracoBuilder(
             IServiceCollection services,
             IConfiguration config,
@@ -92,6 +94,27 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Config = config;
             BuilderLoggerFactory = loggerFactory;
             BuilderHostingEnvironment = hostingEnvironment;
+            Profiler = profiler;
+            AppCaches = appCaches;
+            TypeLoader = typeLoader;
+
+            AddCoreServices();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoBuilder"/> class.
+        /// </summary>
+        public UmbracoBuilder(
+            IServiceCollection services,
+            IConfiguration config,
+            TypeLoader typeLoader,
+            ILoggerFactory loggerFactory,
+            IProfiler profiler,
+            AppCaches appCaches)
+        {
+            Services = services;
+            Config = config;
+            BuilderLoggerFactory = loggerFactory;
             Profiler = profiler;
             AppCaches = appCaches;
             TypeLoader = typeLoader;
