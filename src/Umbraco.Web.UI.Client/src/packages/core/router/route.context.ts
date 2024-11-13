@@ -6,6 +6,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UmbStringState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 
 const EmptyDiv = document.createElement('div');
 
@@ -16,9 +17,16 @@ export class UmbRouteContext extends UmbContextBase<UmbRouteContext> {
 	#modalRegistrations: UmbModalRouteRegistration[] = [];
 	#modalContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 	#modalRoutes: UmbRoutePlusModalKey[] = [];
-	#routerBasePath?: string;
-	#routerActiveLocalPath?: string;
 	#activeModalPath?: string;
+
+	#basePath = new UmbStringState(undefined);
+	public readonly basePath = this.#basePath.asObservable();
+
+	#activeLocalPath = new UmbStringState(undefined);
+	public readonly activeLocalPath = this.#activeLocalPath.asObservable();
+	public readonly activePath = mergeObservables([this.basePath, this.activeLocalPath], ([basePath, localPath]) => {
+		return basePath + '/' + localPath;
+	});
 
 	constructor(host: UmbControllerHost, mainRouter: IRouterSlot, modalRouter: IRouterSlot) {
 		super(host, UMB_ROUTE_CONTEXT);
@@ -72,7 +80,8 @@ export class UmbRouteContext extends UmbContextBase<UmbRouteContext> {
 		// Reset the URL to the routerBasePath + routerActiveLocalPath [NL]
 		const folderToRemove = info.match.fragments.consumed;
 		if (folderToRemove && window.location.href.includes(folderToRemove)) {
-			window.history.pushState({}, '', this.#routerBasePath + '/' + this.#routerActiveLocalPath);
+			const url = this.#basePath.getValue() + '/' + this.#activeLocalPath.getValue();
+			window.history.pushState({}, '', url);
 		}
 	}
 
@@ -106,14 +115,14 @@ export class UmbRouteContext extends UmbContextBase<UmbRouteContext> {
 	}
 
 	public _internal_routerGotBasePath(routerBasePath: string) {
-		if (this.#routerBasePath === routerBasePath) return;
-		this.#routerBasePath = routerBasePath;
+		if (this.#basePath.getValue() === routerBasePath) return;
+		this.#basePath.setValue(routerBasePath);
 		this.#createNewUrlBuilders();
 	}
 
 	public _internal_routerGotActiveLocalPath(routerActiveLocalPath: string | undefined) {
-		if (this.#routerActiveLocalPath === routerActiveLocalPath) return;
-		this.#routerActiveLocalPath = routerActiveLocalPath;
+		if (this.#activeLocalPath.getValue() === routerActiveLocalPath) return;
+		this.#activeLocalPath.setValue(routerActiveLocalPath);
 		this.#createNewUrlBuilders();
 	}
 
@@ -137,13 +146,16 @@ export class UmbRouteContext extends UmbContextBase<UmbRouteContext> {
 	}
 
 	#createNewUrlBuilder = (modalRegistration: UmbModalRouteRegistration) => {
-		if (!this.#routerBasePath) return;
+		const routerBasePath = this.#basePath.getValue();
+		if (!routerBasePath) return;
 
-		const routeBasePath = this.#routerBasePath.endsWith('/') ? this.#routerBasePath : this.#routerBasePath + '/';
-		const routeActiveLocalPath = this.#routerActiveLocalPath
-			? this.#routerActiveLocalPath.endsWith('/')
-				? this.#routerActiveLocalPath
-				: this.#routerActiveLocalPath + '/'
+		const activeLocalPath = this.#activeLocalPath.getValue();
+
+		const routeBasePath = routerBasePath.endsWith('/') ? routerBasePath : routerBasePath + '/';
+		const routeActiveLocalPath = activeLocalPath
+			? activeLocalPath.endsWith('/')
+				? activeLocalPath
+				: activeLocalPath + '/'
 			: '';
 		const localPath = routeBasePath + routeActiveLocalPath + modalRegistration.generateModalPath();
 		const urlBuilder = umbGenerateRoutePathBuilder(localPath);
