@@ -17,6 +17,8 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import { incrementString } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
 type UmbPropertyTypeId = UmbPropertyTypeModel['id'];
 
@@ -35,7 +37,16 @@ export class UmbContentTypeStructureManager<
 > extends UmbControllerBase {
 	#init!: Promise<unknown>;
 
-	#repository: UmbDetailRepository<T>;
+	#repository?: UmbDetailRepository<T>;
+	#initRepositoryResolver?: () => void;
+
+	#initRepository = new Promise<void>((resolve) => {
+		if (this.#repository) {
+			resolve();
+		} else {
+			this.#initRepositoryResolver = resolve;
+		}
+	});
 
 	#ownerContentTypeUnique?: string;
 	#contentTypeObservers = new Array<UmbController>();
@@ -84,9 +95,15 @@ export class UmbContentTypeStructureManager<
 		return this.#containers.asObservablePart((x) => x.find((y) => y.id === id));
 	}
 
-	constructor(host: UmbControllerHost, typeRepository: UmbDetailRepository<T>) {
+	constructor(host: UmbControllerHost, typeRepository: UmbDetailRepository<T> | string) {
 		super(host);
-		this.#repository = typeRepository;
+
+		if (typeRepository instanceof String) {
+			this.#observeRepository(typeRepository);
+		} else {
+			this.#repository = typeRepository;
+			this.#initRepositoryResolver?.();
+		}
 
 		// Observe owner content type compositions, as we only allow one level of compositions at this moment. [NL]
 		// But, we could support more, we would just need to flatMap all compositions and make sure the entries are unique and then base the observation on that. [NL]
@@ -118,9 +135,10 @@ export class UmbContentTypeStructureManager<
 	}
 
 	public async createScaffold() {
+		await this.#initRepository;
 		this._reset();
 
-		const { data } = await this.#repository.createScaffold();
+		const { data } = await this.#repository!.createScaffold();
 		if (!data) return {};
 
 		this.#ownerContentTypeUnique = data.unique;
@@ -135,10 +153,11 @@ export class UmbContentTypeStructureManager<
 	 * @returns {Promise} - A promise that will be resolved when the content type is saved.
 	 */
 	public async save() {
+		await this.#initRepository;
 		const contentType = this.getOwnerContentType();
 		if (!contentType || !contentType.unique) throw new Error('Could not find the Content Type to save');
 
-		const { error, data } = await this.#repository.save(contentType);
+		const { error, data } = await this.#repository!.save(contentType);
 		if (error || !data) {
 			throw error?.message ?? 'Repository did not return data after save.';
 		}
@@ -155,12 +174,13 @@ export class UmbContentTypeStructureManager<
 	 * @returns {Promise} - a promise that is resolved when the content type has been created.
 	 */
 	public async create(parentUnique: string | null) {
+		await this.#initRepository;
 		const contentType = this.getOwnerContentType();
 		if (!contentType || !contentType.unique) {
 			throw new Error('Could not find the Content Type to create');
 		}
 
-		const { data } = await this.#repository.create(contentType, parentUnique);
+		const { data } = await this.#repository!.create(contentType, parentUnique);
 		if (!data) return Promise.reject();
 
 		// Update state with latest version:
@@ -200,9 +220,10 @@ export class UmbContentTypeStructureManager<
 
 	async #loadType(unique?: string) {
 		if (!unique) return {};
+		await this.#initRepository;
 
 		// Lets initiate the content type:
-		const { data, asObservable } = await this.#repository.requestByUnique(unique);
+		const { data, asObservable } = await this.#repository!.requestByUnique(unique);
 		if (!data) return {};
 
 		await this.#observeContentType(data);
@@ -211,12 +232,13 @@ export class UmbContentTypeStructureManager<
 
 	async #observeContentType(data: T) {
 		if (!data.unique) return;
+		await this.#initRepository;
 
 		// Notice we do not store the content type in the store here, cause it will happen shortly after when the observations gets its first initial callback. [NL]
 
 		const ctrl = this.observe(
 			// Then lets start observation of the content type:
-			await this.#repository.byUnique(data.unique),
+			await this.#repository!.byUnique(data.unique),
 			(docType) => {
 				if (docType) {
 					this.#contentTypes.appendOne(docType);
@@ -722,6 +744,21 @@ export class UmbContentTypeStructureManager<
 	contentTypeOfProperty(propertyId: UmbPropertyTypeId) {
 		return this.#contentTypes.asObservablePart((contentTypes) =>
 			contentTypes.find((contentType) => contentType.properties.some((p) => p.id === propertyId)),
+		);
+	}
+
+	#observeRepository(repositoryAlias: string) {
+		if (!repositoryAlias) throw new Error('Content Type structure manager must have a repository alias.');
+
+		new UmbExtensionApiInitializer<ManifestRepository<UmbDetailRepository<T>>>(
+			this,
+			umbExtensionsRegistry,
+			repositoryAlias,
+			[this._host],
+			(permitted, ctrl) => {
+				this.#repository = permitted ? ctrl.api : undefined;
+				this.#initRepositoryResolver?.();
+			},
 		);
 	}
 
