@@ -38,6 +38,7 @@ test('can update content of a template', {tag: '@smoke'}, async ({umbracoApi, um
 
   // Act
   await umbracoUi.template.goToTemplate(templateName);
+  await umbracoUi.template.enterTemplateContent('');
   await umbracoUi.template.enterTemplateContent(updatedTemplateContent);
   await umbracoUi.template.clickSaveButton();
 

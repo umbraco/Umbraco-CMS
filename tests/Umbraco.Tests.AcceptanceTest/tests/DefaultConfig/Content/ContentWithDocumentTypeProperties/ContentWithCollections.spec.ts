@@ -16,13 +16,12 @@ test.beforeEach(async ({umbracoApi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
 test('can create content configured as a collection', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const noItemsToShowMessage = 'There are no items to show in the list.';
   await umbracoApi.documentType.createDocumentTypeWithCollectionId(documentTypeName, dataTypeData.id);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -33,11 +32,11 @@ test('can create content configured as a collection', async ({umbracoApi, umbrac
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButton();
-  
+
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isTabNameVisible('Collection');
-  await umbracoUi.content.doesDocumentWorkspaceHaveText(noItemsToShowMessage);
+  await umbracoUi.content.doesContentListHaveNoItemsInList();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
 });
 

@@ -155,8 +155,9 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   // Assert
   await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   await umbracoUi.media.isMediaTreeItemVisible(parentFolderName);
+  await umbracoUi.media.isMediaTreeItemVisible(folderName, false);
   await umbracoUi.media.clickMediaCaretButtonForName(parentFolderName);
-  await umbracoUi.media.isMediaTreeItemVisible(folderName);
+  await umbracoUi.media.isMediaTreeItemVisible(folderName, true);
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(parentFolderName);

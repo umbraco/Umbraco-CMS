@@ -64,7 +64,7 @@ test('can publish content with the member picker data type', async ({umbracoApi,
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickChooseMemberPickerButton();
   await umbracoUi.content.selectMemberByName(memberName);
-  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickChooseContainerButton();
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert

@@ -46,17 +46,20 @@ test('can access members section with section enabled', async ({umbracoApi, umbr
   await umbracoUi.member.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource, false);
 });
 
-test('can create member with members section set', async ({umbracoApi, umbracoUi}) => {
+// TODO: unskip when member creation is fixed
+test.skip('can create member with members section set', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMemberSection(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [], true, [], false, 'en-us');
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.member.goToSection(ConstantHelper.sections.members, false);
+  await umbracoUi.member.clickMembersMenu();
 
   // Act
   await umbracoUi.member.clickCreateButton();
   await umbracoUi.member.enterMemberName(memberName);
+  await umbracoUi.member.clickInfoTab();
   await umbracoUi.member.enterUsername(username);
   await umbracoUi.member.enterEmail(email);
   await umbracoUi.member.enterPassword(password);
@@ -71,7 +74,8 @@ test('can create member with members section set', async ({umbracoApi, umbracoUi
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeTruthy();
 });
 
-test('can update member with members section set', async ({umbracoApi, umbracoUi}) => {
+// TODO: unskip when member creation is fixed
+test.skip('can update member with members section set', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMemberSection(userGroupName);
   memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);

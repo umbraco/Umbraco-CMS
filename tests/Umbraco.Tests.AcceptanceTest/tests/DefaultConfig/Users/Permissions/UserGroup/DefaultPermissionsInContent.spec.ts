@@ -614,6 +614,6 @@ test('can not see delete button in content for userGroup with delete permission 
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
 
   // Assert
-  await umbracoUi.content.isPermissionInActionsMenuVisible('Delete', false);
-  await umbracoUi.content.isPermissionInActionsMenuVisible('Create', true);
+  await umbracoUi.content.isPermissionInActionsMenuVisible('Delete...', false);
+  await umbracoUi.content.isPermissionInActionsMenuVisible('Create...', true);
 });

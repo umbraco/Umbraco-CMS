@@ -226,6 +226,7 @@ test('cannot create member with invalid email', async ({umbracoApi, umbracoUi}) 
   // Act
   await umbracoUi.member.clickCreateButton();
   await umbracoUi.member.enterMemberName(memberName);
+  await umbracoUi.member.clickInfoTab();
   await umbracoUi.member.enterUsername(username);
   await umbracoUi.member.enterEmail(invalidEmail);
   await umbracoUi.member.enterPassword(password);

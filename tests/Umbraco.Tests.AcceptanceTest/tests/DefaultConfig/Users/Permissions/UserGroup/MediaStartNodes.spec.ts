@@ -1,4 +1,4 @@
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 const testUser = ConstantHelper.testUserCredentials;
 let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
@@ -64,7 +64,7 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
   await umbracoUi.waitForTimeout(500);
   await umbracoUi.media.goToMediaWithName(rootFolderName);
-  await umbracoUi.media.isTextWithMessageVisible('The authenticated user do not have access to this resource');
+  await umbracoUi.media.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource);
   await umbracoUi.media.clickCaretButtonForMediaName(rootFolderName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderOneName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderTwoName, false);
