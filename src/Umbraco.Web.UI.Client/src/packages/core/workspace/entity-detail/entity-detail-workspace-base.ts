@@ -163,7 +163,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @param {Partial<DetailModelType>} args.preset The preset data.
 	 * @returns { Promise<any> | undefined } The data of the scaffold.
 	 */
-	async createScaffold(args: CreateArgsType) {
+	public async createScaffold(args: CreateArgsType) {
 		await this.#init;
 		this.resetState();
 		this.setParent(args.parent);
