@@ -203,7 +203,7 @@ public class NPocoSqlTemplateTests
             .Append("AND whatever=@0", SqlTemplate.Arg("k")));
 
         sql = template.Sql(new { j = new[] { 1, 2, 3 }, k = "oops" });
-        Assert.AreEqual(sqlBase.TrimEndExact("WHERE ") + "AND whatever=@0,@1,@2 AND whatever=@3", sql.SQL.NoCrLf());
+        Assert.AreEqual(sqlBase.TrimEnd("WHERE ") + "AND whatever=@0,@1,@2 AND whatever=@3", sql.SQL.NoCrLf());
         Assert.AreEqual(4, sql.Arguments.Length);
         Assert.AreEqual(1, sql.Arguments[0]);
         Assert.AreEqual(2, sql.Arguments[1]);
