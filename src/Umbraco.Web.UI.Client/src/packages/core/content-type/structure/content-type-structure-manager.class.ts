@@ -134,11 +134,11 @@ export class UmbContentTypeStructureManager<
 		return promise;
 	}
 
-	public async createScaffold() {
+	public async createScaffold(preset?: Partial<T>) {
 		await this.#initRepository;
 		this._reset();
 
-		const { data } = await this.#repository!.createScaffold();
+		const { data } = await this.#repository!.createScaffold(preset);
 		if (!data) return {};
 
 		this.#ownerContentTypeUnique = data.unique;
