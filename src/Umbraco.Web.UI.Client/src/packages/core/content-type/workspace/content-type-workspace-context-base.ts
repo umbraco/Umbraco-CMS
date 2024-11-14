@@ -13,6 +13,12 @@ import type { Observable } from 'rxjs';
 import { UmbContentTypeStructureManager } from '../structure/index.js';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import {
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export interface UmbContentTypeWorkspaceContextArgs extends UmbEntityDetailWorkspaceContextArgs {}
 
@@ -60,6 +66,71 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		this.collection = this.structure.ownerContentTypeObservablePart((data) => data?.collection);
 	}
 
+	override async createScaffold(args: UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>) {
+		this.resetState();
+		this.setParent(args.parent);
+
+		const request = this.structure.createScaffold();
+		this._getDataPromise = request;
+		let { data } = await request;
+		if (!data) return undefined;
+
+		this.setUnique(data.unique);
+
+		if (this.modalContext) {
+			data = { ...data, ...this.modalContext.data.preset };
+		}
+
+		this.setIsNew(true);
+		this._data.setPersisted(data);
+
+		return data;
+	}
+
+	override async load(unique: string) {
+		this.setUnique(unique);
+		this.resetState();
+		this._getDataPromise = this.structure.loadType(unique);
+		const response = await this._getDataPromise;
+		const data = response.data;
+
+		if (data) {
+			this._data.setPersisted(data);
+			this.setIsNew(false);
+		}
+
+		return response;
+	}
+
+	override async _create(currentData: DetailModelType, parent: UmbEntityModel) {
+		try {
+			await this.structure.create(parent?.unique);
+
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadChildrenOfEntityEvent({
+				entityType: parent.entityType,
+				unique: parent.unique,
+			});
+			eventContext.dispatchEvent(event);
+
+			this.setIsNew(false);
+		} catch (error) {}
+	}
+
+	override async _update() {
+		try {
+			await this.structure.save();
+
+			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadStructureForEntityEvent({
+				unique: this.getUnique()!,
+				entityType: this.getEntityType(),
+			});
+
+			actionEventContext.dispatchEvent(event);
+		} catch (error) {}
+	}
+
 	public getName(): string | undefined {
 		return this.structure.getOwnerContentType()?.name;
 	}
@@ -68,12 +139,28 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		this.structure.updateOwnerContentType({ name });
 	}
 
+	public getAlias(): string | undefined {
+		return this.structure.getOwnerContentType()?.alias;
+	}
+
 	public setAlias(alias: string) {
 		this.structure.updateOwnerContentType({ alias });
 	}
 
+	public getDescription(): string | undefined {
+		return this.structure.getOwnerContentType()?.description;
+	}
+
 	public setDescription(description: string) {
 		this.structure.updateOwnerContentType({ description });
+	}
+
+	public getCompositions(): Array<UmbContentTypeCompositionModel> | undefined {
+		return this.structure.getOwnerContentType()?.compositions;
+	}
+
+	public setCompositions(compositions: Array<UmbContentTypeCompositionModel>) {
+		this.structure.updateOwnerContentType({ compositions });
 	}
 
 	// TODO: manage setting icon color alias?
@@ -83,10 +170,6 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 
 	public override getData() {
 		return this.structure.getOwnerContentType();
-	}
-
-	public override getUnique() {
-		return this.getData()?.unique;
 	}
 
 	protected override _getHasUnpersistedChanges(): boolean {
