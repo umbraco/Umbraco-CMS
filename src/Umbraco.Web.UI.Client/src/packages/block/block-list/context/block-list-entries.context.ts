@@ -8,6 +8,7 @@ import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT,
@@ -149,11 +150,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 		originData: UmbBlockListWorkspaceOriginData,
 	) {
 		await this._retrieveManager;
-		const success = this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
-		if (success) {
-			this._manager?.setOneExpose(layoutEntry.contentKey);
-		}
-		return success;
+		return this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
 	}
 
 	// create Block?

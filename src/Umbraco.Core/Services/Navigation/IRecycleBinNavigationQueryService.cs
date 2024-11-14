@@ -16,7 +16,7 @@ public interface IRecycleBinNavigationQueryService
 
     bool TryGetDescendantsKeysOrSelfKeysInBin(Guid childKey, out IEnumerable<Guid> descendantsOrSelfKeys)
     {
-        if(TryGetDescendantsKeysInBin(childKey, out var descendantsKeys))
+        if (TryGetDescendantsKeysInBin(childKey, out IEnumerable<Guid>? descendantsKeys))
         {
             descendantsOrSelfKeys = childKey.Yield().Concat(descendantsKeys);
             return true;

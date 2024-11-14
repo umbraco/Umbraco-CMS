@@ -43,7 +43,6 @@ export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
 								view.index + '_' + (view.culture ?? '') + '_' + (view.segment ?? '') + '_' + this._variants!.length,
 							(view) => html`
 								<umb-workspace-split-view
-									alias="Umb.Workspace.Member"
 									back-path=${UMB_MEMBER_ROOT_WORKSPACE_PATH}
 									.splitViewIndex=${view.index}
 									.displayNavigation=${view.index === this._variants!.length - 1}>

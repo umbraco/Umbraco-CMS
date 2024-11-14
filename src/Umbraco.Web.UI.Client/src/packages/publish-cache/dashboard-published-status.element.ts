@@ -1,59 +1,27 @@
-import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { PublishedCacheService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-dashboard-published-status')
 export class UmbDashboardPublishedStatusElement extends UmbLitElement {
-	@state()
-	private _publishedStatusText = '';
-
-	@state()
-	private _buttonState: UUIButtonState = undefined;
-
 	@state()
 	private _buttonStateReload: UUIButtonState = undefined;
 
 	@state()
 	private _buttonStateRebuild: UUIButtonState = undefined;
 
-	@state()
-	private _buttonStateCollect: UUIButtonState = undefined;
-
-	override connectedCallback() {
-		super.connectedCallback();
-		this._getPublishedStatus();
-	}
-
-	// Refresh
-	private async _getPublishedStatus() {
-		const { data } = await tryExecuteAndNotify(this, PublishedCacheService.getPublishedCacheStatus());
-		if (data) {
-			this._publishedStatusText = data;
-		}
-	}
-
-	private async _onRefreshCacheHandler() {
-		this._buttonState = 'waiting';
-		await this._getPublishedStatus();
-		this._buttonState = 'success';
-	}
-
 	//Reload
 	private async _reloadMemoryCache() {
 		this._buttonStateReload = 'waiting';
-		this._buttonState = 'waiting';
 		const { error } = await tryExecuteAndNotify(this, PublishedCacheService.postPublishedCacheReload());
 		if (error) {
 			this._buttonStateReload = 'failed';
-			this._buttonState = 'failed';
 		} else {
 			this._buttonStateReload = 'success';
-			this._getPublishedStatus();
-			this._buttonState = 'success';
 		}
 	}
 	private async _onReloadCacheHandler() {
@@ -89,42 +57,8 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 		this._rebuildDatabaseCache();
 	}
 
-	//Collect
-	private async _cacheCollect() {
-		this._buttonStateCollect = 'waiting';
-		const { error } = await tryExecuteAndNotify(this, PublishedCacheService.postPublishedCacheCollect());
-		if (error) {
-			this._buttonStateCollect = 'failed';
-		} else {
-			this._buttonStateCollect = 'success';
-		}
-	}
-
-	private async _onSnapshotCacheHandler() {
-		await umbConfirmModal(this, {
-			headline: 'Snapshot',
-			content: html` Trigger a NuCache snapshots collection.`,
-			color: 'danger',
-			confirmLabel: 'Continue',
-		});
-		this._cacheCollect();
-	}
-
 	override render() {
 		return html`
-			<uui-box headline="Published Cache Status">
-				<p>${this._publishedStatusText}</p>
-				<uui-button
-					.state=${this._buttonState}
-					type="button"
-					look="primary"
-					color="danger"
-					label="Refresh Status"
-					@click=${this._onRefreshCacheHandler}>
-					Refresh Status
-				</uui-button>
-			</uui-box>
-
 			<uui-box headline="Memory Cache">
 				<p>
 					This button lets you reload the in-memory cache, by entirely reloading it from the database cache (but it does
@@ -157,22 +91,6 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 					@click=${this._onRebuildCacheHandler}
 					.state=${this._buttonStateRebuild}>
 					Rebuild Database Cache
-				</uui-button>
-			</uui-box>
-
-			<uui-box headline="Internal Cache">
-				<p>
-					This button lets you trigger a NuCache snapshots collection (after running a fullCLR GC). Unless you know what
-					that means, you probably do not need to use it.
-				</p>
-				<uui-button
-					type="button"
-					look="primary"
-					color="danger"
-					label="Snapshot Internal Cache"
-					@click=${this._onSnapshotCacheHandler}
-					.state=${this._buttonStateCollect}>
-					Snapshot Internal Cache
 				</uui-button>
 			</uui-box>
 		`;

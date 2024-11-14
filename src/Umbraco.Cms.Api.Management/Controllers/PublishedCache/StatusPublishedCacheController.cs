@@ -1,7 +1,6 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PublishedCache;
 
@@ -11,7 +10,9 @@ public class StatusPublishedCacheController : PublishedCacheControllerBase
 {
     [HttpGet("status")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status501NotImplemented)]
     public async Task<ActionResult<string>> Status(CancellationToken cancellationToken)
-        => await Task.FromResult(Ok("Obsoleted"));
+    {
+        return StatusCode(StatusCodes.Status501NotImplemented);
+    }
 }

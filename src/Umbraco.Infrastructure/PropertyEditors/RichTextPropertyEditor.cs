@@ -65,7 +65,7 @@ public class RichTextPropertyEditor : DataEditor
     /// </summary>
     /// <returns></returns>
     protected override IDataValueEditor CreateValueEditor() =>
-        DataValueEditorFactory.Create<RichTextPropertyValueEditor>();
+        DataValueEditorFactory.Create<RichTextPropertyValueEditor>(Attribute!);
 
     protected override IConfigurationEditor CreateConfigurationEditor() =>
         new RichTextConfigurationEditor(_ioHelper);
@@ -87,6 +87,7 @@ public class RichTextPropertyEditor : DataEditor
         private readonly ILogger<RichTextPropertyValueEditor> _logger;
 
         public RichTextPropertyValueEditor(
+            DataEditorAttribute attribute,
             PropertyEditorCollection propertyEditors,
             IDataTypeConfigurationCache dataTypeReadCache,
             ILogger<RichTextPropertyValueEditor> logger,
@@ -102,8 +103,9 @@ public class RichTextPropertyEditor : DataEditor
             DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection,
             IRichTextRequiredValidator richTextRequiredValidator,
             BlockEditorVarianceHandler blockEditorVarianceHandler,
-            ILanguageService languageService)
-            : base(propertyEditors, dataTypeReadCache, shortStringHelper, jsonSerializer, dataValueReferenceFactoryCollection, blockEditorVarianceHandler, languageService)
+            ILanguageService languageService,
+            IIOHelper ioHelper)
+            : base(propertyEditors, dataTypeReadCache, shortStringHelper, jsonSerializer, dataValueReferenceFactoryCollection, blockEditorVarianceHandler, languageService, ioHelper, attribute)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _imageSourceParser = imageSourceParser;

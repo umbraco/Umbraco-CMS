@@ -439,7 +439,7 @@ public class DocumentUrlService : IDocumentUrlService
             return "#";
         }
 
-        if(isDraft is false && culture != null && _publishStatusQueryService.IsDocumentPublished(documentKey, culture) is false)
+        if(isDraft is false && string.IsNullOrWhiteSpace(culture) is false && _publishStatusQueryService.IsDocumentPublished(documentKey, culture) is false)
         {
             return "#";
         }
@@ -486,6 +486,13 @@ public class DocumentUrlService : IDocumentUrlService
             }
         }
 
+        var leftToRight = _globalSettings.ForceCombineUrlPathLeftToRight
+                          || CultureInfo.GetCultureInfo(cultureOrDefault).TextInfo.IsRightToLeft is false;
+        if (leftToRight)
+        {
+            urlSegments.Reverse();
+        }
+
         if (foundDomain is not null)
         {
             //we found a domain, and not to construct the route in the funny legacy way
@@ -493,7 +500,7 @@ public class DocumentUrlService : IDocumentUrlService
         }
 
         var isRootFirstItem = GetTopMostRootKey(isDraft, cultureOrDefault) == ancestorsOrSelfKeysArray.Last();
-        return GetFullUrl(isRootFirstItem, urlSegments, null);
+        return GetFullUrl(isRootFirstItem, urlSegments, null, leftToRight);
     }
 
     public bool HasAny()
@@ -546,8 +553,15 @@ public class DocumentUrlService : IDocumentUrlService
                     Dictionary<string, Domain> domainDictionary = await domainDictionaryTask;
                     if (domainDictionary.TryGetValue(culture, out Domain? domain))
                     {
-                        foundDomain = domain;
-                        break;
+                        Attempt<Guid> domainKeyAttempt = _idKeyMap.GetKeyForId(domain.ContentId, UmbracoObjectTypes.Document);
+                        if (domainKeyAttempt.Success)
+                        {
+                            if (_publishStatusQueryService.IsDocumentPublished(domainKeyAttempt.Result, culture))
+                            {
+                                foundDomain = domain;
+                                break;
+                            }
+                        }
                     }
                 }
 
@@ -568,8 +582,16 @@ public class DocumentUrlService : IDocumentUrlService
            }
 
            var isRootFirstItem = GetTopMostRootKey(false, culture) == ancestorsOrSelfKeysArray.Last();
+
+           var leftToRight = _globalSettings.ForceCombineUrlPathLeftToRight
+                             || CultureInfo.GetCultureInfo(culture).TextInfo.IsRightToLeft is false;
+           if (leftToRight)
+           {
+               urlSegments.Reverse();
+           }
+
            result.Add(new UrlInfo(
-               text: GetFullUrl(isRootFirstItem, urlSegments, foundDomain),
+               text: GetFullUrl(isRootFirstItem, urlSegments, foundDomain, leftToRight),
                isUrl: hasUrlInCulture,
                culture: culture
            ));
@@ -579,17 +601,27 @@ public class DocumentUrlService : IDocumentUrlService
         return result;
     }
 
-    private string GetFullUrl(bool isRootFirstItem, List<string> reversedUrlSegments, Domain? foundDomain)
+    private string GetFullUrl(bool isRootFirstItem, List<string> segments, Domain? foundDomain, bool leftToRight)
     {
-        var urlSegments = new List<string>(reversedUrlSegments);
-        urlSegments.Reverse();
+        var urlSegments = new List<string>(segments);
 
         if (foundDomain is not null)
         {
             return foundDomain.Name.EnsureEndsWith("/") + string.Join('/', urlSegments);
         }
 
-        return '/' + string.Join('/', urlSegments.Skip(_globalSettings.HideTopLevelNodeFromPath && isRootFirstItem ? 1 : 0));
+        var hideTopLevel = _globalSettings.HideTopLevelNodeFromPath && isRootFirstItem;
+        if (leftToRight)
+        {
+            return '/' + string.Join('/', urlSegments.Skip(hideTopLevel ? 1 : 0));
+        }
+
+        if (hideTopLevel)
+        {
+            urlSegments.RemoveAt(urlSegments.Count - 1);
+        }
+
+        return '/' + string.Join('/', urlSegments);
     }
 
     public async Task CreateOrUpdateUrlSegmentsWithDescendantsAsync(Guid key)

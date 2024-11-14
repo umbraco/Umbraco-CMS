@@ -30,7 +30,7 @@ export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<umb-workspace-editor alias="Umb.Workspace.MemberGroup" back-path=${UMB_MEMBER_GROUP_ROOT_WORKSPACE_PATH}>
+			<umb-workspace-editor back-path=${UMB_MEMBER_GROUP_ROOT_WORKSPACE_PATH}>
 				<umb-workspace-header-name-editable slot="header"></umb-workspace-header-name-editable>
 				${this.#renderActions()}
 				<umb-workspace-entity-action-menu slot="action-menu"></umb-workspace-entity-action-menu>

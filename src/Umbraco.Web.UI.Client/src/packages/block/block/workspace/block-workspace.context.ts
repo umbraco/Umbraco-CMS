@@ -121,19 +121,19 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 			this.removeUmbControllerByAlias('observeHasExpose');
 			this.observe(
-				this.contentKey,
-				(contentKey) => {
-					if (!contentKey) return;
+				observeMultiple([this.contentKey, this.variantId]),
+				([contentKey, variantId]) => {
+					if (!contentKey || !variantId) return;
 
 					this.observe(
-						manager.hasExposeOf(contentKey),
+						manager.hasExposeOf(contentKey, variantId),
 						(exposed) => {
 							this.#exposed.setValue(exposed);
 						},
 						'observeHasExpose',
 					);
 				},
-				'observeContentKey',
+				'observeContentKeyAndVariantId',
 			);
 
 			this.observe(
@@ -176,8 +176,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				path: 'create/:elementTypeKey',
 				component: UmbBlockWorkspaceEditorElement,
 				setup: async (component, info) => {
-					(component as UmbBlockWorkspaceEditorElement).workspaceAlias = manifest.alias;
-
 					const elementTypeKey = info.match.params.elementTypeKey;
 					await this.create(elementTypeKey);
 
@@ -192,7 +190,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				path: 'edit/:key',
 				component: UmbBlockWorkspaceEditorElement,
 				setup: (component, info) => {
-					(component as UmbBlockWorkspaceEditorElement).workspaceAlias = manifest.alias;
 					const key = decodeFilePath(info.match.params.key);
 					this.load(key);
 				},
@@ -464,12 +461,14 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	expose() {
 		const contentKey = this.#layout.value?.contentKey;
-		if (!contentKey) throw new Error('Cannot expose block that does not exist.');
+		if (!contentKey) throw new Error('Failed to expose block, missing content key.');
 		this.#expose(contentKey);
 	}
 
 	#expose(unique: string) {
-		this.#blockManager?.setOneExpose(unique);
+		const variantId = this.#variantId.getValue();
+		if (!variantId) throw new Error('Failed to expose block, missing variant id.');
+		this.#blockManager?.setOneExpose(unique, variantId);
 	}
 
 	#modalRejected = () => {

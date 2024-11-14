@@ -25,4 +25,13 @@ public class CacheSettings
     [Obsolete("Use Cache:Entry:Document:SeedCacheDuration instead")]
     [DefaultValue(StaticSeedCacheDuration)]
     public TimeSpan SeedCacheDuration { get; set; } = TimeSpan.Parse(StaticSeedCacheDuration);
+
+    public CacheEntry Entry { get; set; } = new CacheEntry();
+
+    public class CacheEntry
+    {
+        public CacheEntrySettings Document { get; set; } = new CacheEntrySettings();
+
+        public CacheEntrySettings Media { get; set; } = new CacheEntrySettings();
+    }
 }
