@@ -124,7 +124,7 @@ export class UmbContentTypeStructureManager<
 	public async loadType(unique?: string) {
 		//if (!unique) return;
 		//if (this.#ownerContentTypeUnique === unique) return;
-		this._reset();
+		this.#clear();
 
 		this.#ownerContentTypeUnique = unique;
 
@@ -136,7 +136,7 @@ export class UmbContentTypeStructureManager<
 
 	public async createScaffold(preset?: Partial<T>) {
 		await this.#initRepository;
-		this._reset();
+		this.#clear();
 
 		const { data } = await this.#repository!.createScaffold(preset);
 		if (!data) return {};
@@ -762,13 +762,14 @@ export class UmbContentTypeStructureManager<
 		);
 	}
 
-	private _reset() {
+	#clear() {
 		this.#contentTypes.setValue([]);
 		this.#contentTypeObservers.forEach((observer) => observer.destroy());
 		this.#contentTypeObservers = [];
 		this.#contentTypes.setValue([]);
 		this.#containers.setValue([]);
 	}
+
 	public override destroy() {
 		this.#contentTypes.destroy();
 		this.#containers.destroy();
