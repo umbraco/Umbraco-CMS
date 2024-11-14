@@ -68,8 +68,6 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 				path: 'create/:containerUnique',
 				component: UmbPropertyTypeWorkspaceEditorElement,
 				setup: async (component, info) => {
-					(component as UmbPropertyTypeWorkspaceEditorElement).workspaceAlias = manifest.alias;
-
 					const containerUnique =
 						info.match.params.containerUnique === 'null' ? null : info.match.params.containerUnique;
 					await this.create(containerUnique);
@@ -85,8 +83,6 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 				path: 'edit/:unique',
 				component: UmbPropertyTypeWorkspaceEditorElement,
 				setup: (component, info) => {
-					(component as UmbPropertyTypeWorkspaceEditorElement).workspaceAlias = manifest.alias;
-
 					const unique = info.match.params.unique;
 					this.load(unique);
 				},

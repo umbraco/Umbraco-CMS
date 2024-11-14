@@ -17,7 +17,7 @@ export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<umb-workspace-editor alias="Umb.Workspace.DataType">
+			<umb-workspace-editor>
 				<umb-workspace-header-name-editable slot="header"></umb-workspace-header-name-editable>
 			</umb-workspace-editor>
 		`;
