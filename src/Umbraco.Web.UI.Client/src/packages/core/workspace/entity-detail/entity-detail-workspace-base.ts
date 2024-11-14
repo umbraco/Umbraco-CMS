@@ -43,18 +43,19 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	protected readonly _data = new UmbEntityWorkspaceDataManager<DetailModelType>(this);
 
 	public readonly data = this._data.current;
-	public readonly entityType = this._data.createObservablePartOfCurrent((data) => data?.entityType);
-	public readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
 
 	protected _getDataPromise?: Promise<any>;
 	protected _detailRepository?: DetailRepositoryType;
 
 	#entityContext = new UmbEntityContext(this);
-	#entityType: string;
+	public readonly entityType = this.#entityContext.entityType;
+	public readonly unique = this.#entityContext.unique;
 
 	#parent = new UmbObjectState<{ entityType: string; unique: UmbEntityUnique } | undefined>(undefined);
-	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
-	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
+	public readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
+	public readonly parentEntityType = this.#parent.asObservablePart((parent) =>
+		parent ? parent.entityType : undefined,
+	);
 
 	#initResolver?: () => void;
 	#initialized = false;
@@ -69,8 +70,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	constructor(host: UmbControllerHost, args: UmbEntityWorkspaceContextArgs) {
 		super(host, args.workspaceAlias);
-		this.#entityType = args.entityType;
-		this.#entityContext.setEntityType(this.#entityType);
+		this.#entityContext.setEntityType(args.entityType);
 		window.addEventListener('willchangestate', this.#onWillNavigate);
 		this.#observeRepository(args.detailRepositoryAlias);
 	}
@@ -80,7 +80,9 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @returns { string } The entity type
 	 */
 	getEntityType(): string {
-		return this.#entityType;
+		const entityType = this.#entityContext.getEntityType();
+		if (!entityType) throw new Error('Entity type is not set');
+		return entityType;
 	}
 
 	/**
@@ -173,7 +175,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		let { data } = await request;
 		if (!data) return undefined;
 
-		this.#entityContext.setEntityType(this.#entityType);
 		this.#entityContext.setUnique(data.unique);
 
 		if (this.modalContext) {
