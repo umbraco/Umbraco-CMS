@@ -70,7 +70,7 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		this.resetState();
 		this.setParent(args.parent);
 
-		const request = this.structure.createScaffold();
+		const request = this.structure.createScaffold(args.preset);
 		this._getDataPromise = request;
 		let { data } = await request;
 		if (!data) return undefined;
