@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -225,6 +226,11 @@ internal sealed class MemberEditingService : IMemberEditingService
             return MemberEditingOperationStatus.InvalidUsername;
         }
 
+        if (IsEmailValid(model.Email) is false)
+        {
+            return MemberEditingOperationStatus.InvalidEmail;
+        }
+
         if (password is not null)
         {
             IdentityResult validatePassword = await _memberManager.ValidatePasswordAsync(password);
@@ -393,4 +399,6 @@ internal sealed class MemberEditingService : IMemberEditingService
 
         return true;
     }
+
+    private static bool IsEmailValid(string email) => new EmailAddressAttribute().IsValid(email);
 }

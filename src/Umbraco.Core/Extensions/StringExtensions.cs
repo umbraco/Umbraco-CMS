@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Security.Cryptography;
@@ -1557,6 +1558,14 @@ public static class StringExtensions
 
         yield return sb.ToString();
     }
+
+    /// <summary>
+    ///     Checks whether a string is a valid email address.
+    /// </summary>
+    /// <param name="email">The string check</param>
+    /// <returns>Returns a bool indicating whether the string is an email address.</returns>
+    public static bool IsEmail(this string email) =>
+        new EmailAddressAttribute().IsValid(email);
 
     // having benchmarked various solutions (incl. for/foreach, split and LINQ based ones),
     // this is by far the fastest way to find string needles in a string haystack

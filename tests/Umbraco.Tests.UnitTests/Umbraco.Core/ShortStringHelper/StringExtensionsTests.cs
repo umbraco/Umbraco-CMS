@@ -364,6 +364,13 @@ public class StringExtensionsTests
         TryIsFullPath("   ", false, false); // technically, a valid filename on Linux
     }
 
+    [TestCase("test@test.com",true)]
+    [TestCase("test@test",  true)]
+    [TestCase("testtest.com",  false)]
+    [TestCase("test@test.dk",  true)]
+    [TestCase("test@test.se",  true)]
+    public void IsEmail(string email, bool isEmail) => Assert.AreEqual(isEmail, email.IsEmail());
+
     private static void TryIsFullPath(string path, bool expectedIsFull, bool expectedIsValid = true)
     {
         Assert.AreEqual(expectedIsFull, path.IsFullPath(), "IsFullPath('" + path + "')");
