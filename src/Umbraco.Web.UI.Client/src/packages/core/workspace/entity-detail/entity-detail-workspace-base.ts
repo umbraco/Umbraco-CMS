@@ -96,7 +96,11 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @returns { string | undefined } The unique identifier
 	 */
 	getUnique(): UmbEntityUnique | undefined {
-		return this._data.getCurrent()?.unique;
+		return this.getData()?.unique;
+	}
+
+	setUnique(unique: string) {
+		this.#entityContext.setUnique(unique);
 	}
 
 	/**
@@ -105,6 +109,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 */
 	getParent(): UmbEntityModel | undefined {
 		return this.#parent.getValue();
+	}
+
+	setParent(parent: UmbEntityModel) {
+		this.#parent.setValue(parent);
 	}
 
 	/**
@@ -120,7 +128,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	async load(unique: string) {
-		this.#entityContext.setEntityType(this.#entityType);
 		this.#entityContext.setUnique(unique);
 		await this.#init;
 		this.resetState();
@@ -159,7 +166,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	async createScaffold(args: CreateArgsType) {
 		await this.#init;
 		this.resetState();
-		this.#parent.setValue(args.parent);
+		this.setParent(args.parent);
+
 		const request = this._detailRepository!.createScaffold(args.preset);
 		this._getDataPromise = request;
 		let { data } = await request;
@@ -171,6 +179,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		if (this.modalContext) {
 			data = { ...data, ...this.modalContext.data.preset };
 		}
+
 		this.setIsNew(true);
 		this._data.setPersisted(data);
 		this._data.setCurrent(data);
@@ -180,7 +189,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	async submit() {
 		await this.#init;
-		const currentData = this._data.getCurrent();
+		const currentData = this.getData();
 
 		if (!currentData) {
 			throw new Error('Data is not set');
@@ -191,9 +200,12 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		}
 
 		if (this.getIsNew()) {
-			await this.#create(currentData);
+			const parent = this.#parent.getValue();
+			if (parent?.unique === undefined) throw new Error('Parent unique is missing');
+			if (!parent.entityType) throw new Error('Parent entity type is missing');
+			await this._create(currentData, parent);
 		} else {
-			await this.#update(currentData);
+			await this._update(currentData);
 		}
 	}
 
@@ -217,11 +229,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return !newUrl.includes(this.routes.getActiveLocalPath());
 	}
 
-	async #create(currentData: DetailModelType) {
+	async _create(currentData: DetailModelType, parent: UmbEntityModel) {
 		if (!this._detailRepository) throw new Error('Detail repository is not set');
-
-		const parent = this.#parent.getValue();
-		if (!parent) throw new Error('Parent is not set');
 
 		const { error, data } = await this._detailRepository.create(currentData, parent.unique);
 		if (error || !data) {
@@ -240,7 +249,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.setIsNew(false);
 	}
 
-	async #update(currentData: DetailModelType) {
+	async _update(currentData: DetailModelType) {
 		const { error, data } = await this._detailRepository!.save(currentData);
 		if (error || !data) {
 			throw error?.message ?? 'Repository did not return data after create.';
