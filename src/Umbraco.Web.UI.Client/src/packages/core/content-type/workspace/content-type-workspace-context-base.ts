@@ -221,7 +221,6 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 	protected override _getHasUnpersistedChanges(): boolean {
 		const currentData = this.structure.getOwnerContentType();
 		const persistedData = this._data.getPersisted();
-		debugger;
 		return jsonStringComparison(persistedData, currentData) === false;
 	}
 
