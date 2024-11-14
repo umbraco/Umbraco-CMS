@@ -66,7 +66,14 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		this.collection = this.structure.ownerContentTypeObservablePart((data) => data?.collection);
 	}
 
-	override async createScaffold(args: UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>) {
+	/**
+	 * Creates a new scaffold
+	 * @param { UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> } args The arguments for creating a new scaffold
+	 * @returns { Promise<DetailModelType | undefined> } The new scaffold
+	 */
+	public override async createScaffold(
+		args: UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
+	): Promise<DetailModelType | undefined> {
 		this.resetState();
 		this.setParent(args.parent);
 
@@ -87,9 +94,14 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		return data;
 	}
 
+	/**
+	 * Loads the data for the workspace
+	 * @param { string } unique The unique identifier of the data to load
+	 * @returns { Promise<DetailModelType> } The loaded data
+	 */
 	override async load(unique: string) {
-		this.setUnique(unique);
 		this.resetState();
+		this.setUnique(unique);
 		this._getDataPromise = this.structure.loadType(unique);
 		const response = await this._getDataPromise;
 		const data = response.data;
@@ -131,34 +143,68 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		} catch (error) {}
 	}
 
+	/**
+	 * Gets the name of the content type
+	 * @returns { string | undefined } The name of the content type
+	 */
 	public getName(): string | undefined {
 		return this.structure.getOwnerContentType()?.name;
 	}
 
+	/**
+	 * Sets the name of the content type
+	 * @param { string } name The name of the content type
+	 */
 	public setName(name: string) {
 		this.structure.updateOwnerContentType({ name });
 	}
 
+	/**
+	 * Gets the alias of the content type
+	 * @returns { string | undefined } The alias of the content type
+	 */
 	public getAlias(): string | undefined {
 		return this.structure.getOwnerContentType()?.alias;
 	}
 
+	/**
+	 * Sets the alias of the content type
+	 * @param { string } alias The alias of the content type
+	 */
 	public setAlias(alias: string) {
 		this.structure.updateOwnerContentType({ alias });
 	}
 
+	/**
+	 * Gets the description of the content type
+	 * @returns { string | undefined } The description of the content type
+	 */
 	public getDescription(): string | undefined {
 		return this.structure.getOwnerContentType()?.description;
 	}
 
+	/**
+	 * Sets the description of the content type
+	 * @param { string } description The description of the content type
+	 */
 	public setDescription(description: string) {
 		this.structure.updateOwnerContentType({ description });
 	}
 
+	/**
+	 * Gets the compositions of the content type
+	 * @returns { string | undefined } The icon of the content type
+	 */
 	public getCompositions(): Array<UmbContentTypeCompositionModel> | undefined {
 		return this.structure.getOwnerContentType()?.compositions;
 	}
 
+	/**
+	 * Sets the compositions of the content type
+	 * @param { string } compositions The compositions of the content type
+	 * @returns { void }
+	 *
+	 */
 	public setCompositions(compositions: Array<UmbContentTypeCompositionModel>) {
 		this.structure.updateOwnerContentType({ compositions });
 	}
