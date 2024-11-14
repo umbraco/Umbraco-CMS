@@ -190,7 +190,7 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
 
         foreach (KeyValuePair<string, object> dataAttribute in dataAttributes)
         {
-            var actualKey = dataAttribute.Key.TrimStartExact("data-");
+            var actualKey = dataAttribute.Key.TrimStart("data-");
             attributes.TryAdd(actualKey, dataAttribute.Value);
 
             attributes.Remove(dataAttribute.Key);
