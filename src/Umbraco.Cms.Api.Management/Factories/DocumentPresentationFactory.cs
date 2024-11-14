@@ -138,7 +138,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         {
             if (cultureAndScheduleRequestModel.Schedule is null || (cultureAndScheduleRequestModel.Schedule.PublishTime is null && cultureAndScheduleRequestModel.Schedule.UnpublishTime is null))
             {
-                culturesToPublishImmediately.Add(cultureAndScheduleRequestModel.Culture ?? "*"); // API have `null` for invariant, but service layer has "*".
+                culturesToPublishImmediately.Add(cultureAndScheduleRequestModel.Culture ?? Constants.System.InvariantCulture); // API have `null` for invariant, but service layer has "*".
                 continue;
             }
 
@@ -154,7 +154,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
                 }
 
                 contentScheduleCollection.Add(new ContentSchedule(
-                    cultureAndScheduleRequestModel.Culture ?? "*",
+                    cultureAndScheduleRequestModel.Culture ?? Constants.System.InvariantCulture,
                     cultureAndScheduleRequestModel.Schedule.PublishTime.Value.UtcDateTime,
                     ContentScheduleAction.Release));
             }
@@ -179,7 +179,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
                 }
 
                 contentScheduleCollection.Add(new ContentSchedule(
-                    cultureAndScheduleRequestModel.Culture ?? "*",
+                    cultureAndScheduleRequestModel.Culture ?? Constants.System.InvariantCulture,
                     cultureAndScheduleRequestModel.Schedule.UnpublishTime.Value.UtcDateTime,
                     ContentScheduleAction.Expire));
             }

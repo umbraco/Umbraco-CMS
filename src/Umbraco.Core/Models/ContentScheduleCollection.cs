@@ -170,6 +170,32 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
         }
     }
 
+    public void RemoveIfExists(string culture, ContentScheduleAction action)
+    {
+        ContentSchedule? changeToRemove = FullSchedule.FirstOrDefault(change =>
+            change.Culture == culture
+            && change.Action == action);
+        if (changeToRemove is not null)
+        {
+            Remove(changeToRemove);
+        }
+    }
+
+    public void AddOrUpdate(string culture, DateTime dateTime, ContentScheduleAction action)
+    {
+        // we need to remove the old one as ContentSchedule.Date is immutable
+        ContentSchedule? changeToRemove = FullSchedule.FirstOrDefault(change =>
+            change.Culture == culture
+            && change.Action == action);
+
+        if (changeToRemove is not null)
+        {
+            Remove(changeToRemove);
+        }
+
+        Add(new ContentSchedule(culture, dateTime, action));
+    }
+
     /// <summary>
     ///     Clear all of the scheduled change type for invariant content
     /// </summary>

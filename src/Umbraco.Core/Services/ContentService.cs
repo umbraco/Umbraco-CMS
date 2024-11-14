@@ -36,10 +36,45 @@ public class ContentService : RepositoryService, IContentService
     private readonly ICultureImpactFactory _cultureImpactFactory;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly PropertyEditorCollection _propertyEditorCollection;
+    private readonly IIdKeyMap _idKeyMap;
     private IQuery<IContent>? _queryNotTrashed;
 
     #region Constructors
 
+    public ContentService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IDocumentRepository documentRepository,
+        IEntityRepository entityRepository,
+        IAuditRepository auditRepository,
+        IContentTypeRepository contentTypeRepository,
+        IDocumentBlueprintRepository documentBlueprintRepository,
+        ILanguageRepository languageRepository,
+        Lazy<IPropertyValidationService> propertyValidationService,
+        IShortStringHelper shortStringHelper,
+        ICultureImpactFactory cultureImpactFactory,
+        IUserIdKeyResolver userIdKeyResolver,
+        PropertyEditorCollection propertyEditorCollection,
+        IIdKeyMap idKeyMap)
+        : base(provider, loggerFactory, eventMessagesFactory)
+    {
+        _documentRepository = documentRepository;
+        _entityRepository = entityRepository;
+        _auditRepository = auditRepository;
+        _contentTypeRepository = contentTypeRepository;
+        _documentBlueprintRepository = documentBlueprintRepository;
+        _languageRepository = languageRepository;
+        _propertyValidationService = propertyValidationService;
+        _shortStringHelper = shortStringHelper;
+        _cultureImpactFactory = cultureImpactFactory;
+        _userIdKeyResolver = userIdKeyResolver;
+        _propertyEditorCollection = propertyEditorCollection;
+        _idKeyMap = idKeyMap;
+        _logger = loggerFactory.CreateLogger<ContentService>();
+    }
+
+    [Obsolete("Use non-obsolete constructor. Scheduled for removal in V17.")]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -68,6 +103,7 @@ public class ContentService : RepositoryService, IContentService
         _cultureImpactFactory = cultureImpactFactory;
         _userIdKeyResolver = userIdKeyResolver;
         _propertyEditorCollection = propertyEditorCollection;
+        _idKeyMap = StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>();
         _logger = loggerFactory.CreateLogger<ContentService>();
     }
 
@@ -100,7 +136,8 @@ public class ContentService : RepositoryService, IContentService
             shortStringHelper,
             cultureImpactFactory,
             userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<PropertyEditorCollection>())
+            StaticServiceProvider.Instance.GetRequiredService<PropertyEditorCollection>()
+            )
     {
     }
 
@@ -548,6 +585,17 @@ public class ContentService : RepositoryService, IContentService
             scope.ReadLock(Constants.Locks.ContentTree);
             return _documentRepository.GetContentSchedule(contentId);
         }
+    }
+
+    public ContentScheduleCollection GetContentScheduleByContentId(Guid contentId)
+    {
+        Attempt<int> idAttempt = _idKeyMap.GetIdForKey(contentId, UmbracoObjectTypes.Document);
+        if (idAttempt.Success is false)
+        {
+            return new ContentScheduleCollection();
+        }
+
+        return GetContentScheduleByContentId(idAttempt.Result);
     }
 
     /// <inheritdoc />

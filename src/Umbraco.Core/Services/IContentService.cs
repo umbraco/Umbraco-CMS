@@ -523,4 +523,5 @@ public interface IContentService : IContentServiceBase<IContent>
     #endregion
 
     Task<OperationResult> EmptyRecycleBinAsync(Guid userId);
+    ContentScheduleCollection GetContentScheduleByContentId(Guid contentId);
 }
