@@ -230,7 +230,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return !newUrl.includes(this.routes.getActiveLocalPath());
 	}
 
-	async _create(currentData: DetailModelType, parent: UmbEntityModel) {
+	protected async _create(currentData: DetailModelType, parent: UmbEntityModel) {
 		if (!this._detailRepository) throw new Error('Detail repository is not set');
 
 		const { error, data } = await this._detailRepository.create(currentData, parent.unique);
@@ -250,7 +250,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.setIsNew(false);
 	}
 
-	async _update(currentData: DetailModelType) {
+	protected async _update(currentData: DetailModelType) {
 		const { error, data } = await this._detailRepository!.save(currentData);
 		if (error || !data) {
 			throw error?.message ?? 'Repository did not return data after create.';
