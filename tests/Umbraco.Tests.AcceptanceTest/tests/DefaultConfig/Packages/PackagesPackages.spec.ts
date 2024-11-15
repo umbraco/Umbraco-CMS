@@ -1,6 +1,7 @@
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
-test('can see the marketplace', async ({umbracoUi}) => {
+// TODO: There is currently an issue with playwright and the Iframe in the marketplace, look into this.
+test.skip('can see the marketplace', async ({umbracoUi}) => {
   // Arrange
   await umbracoUi.goToBackOffice();
   await umbracoUi.package.goToSection(ConstantHelper.sections.packages);
