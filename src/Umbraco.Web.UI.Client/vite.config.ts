@@ -6,10 +6,6 @@ export const plugins: PluginOption[] = [
 	viteStaticCopy({
 		targets: [
 			{
-				src: 'src/shared/icon-registry/icons/*.js',
-				dest: 'icons',
-			},
-			{
 				src: 'public-assets/App_Plugins/*.js',
 				dest: 'App_Plugins',
 			},
