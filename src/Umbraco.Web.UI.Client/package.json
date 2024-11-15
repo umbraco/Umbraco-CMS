@@ -212,7 +212,6 @@
 		"@tiptap/pm": "^2.9.1",
 		"@tiptap/starter-kit": "^2.9.1",
 		"@types/diff": "^6.0.0",
-		"@types/uuid": "^10.0.0",
 		"@umbraco-ui/uui": "^1.11.0",
 		"@umbraco-ui/uui-css": "^1.11.0",
 		"base64-js": "^1.5.1",
@@ -225,7 +224,7 @@
 		"rxjs": "^7.8.1",
 		"tinymce": "^6.8.3",
 		"tinymce-i18n": "^24.7.15",
-		"uuid": "^10.0.0"
+		"uuid": "^11.0.3"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.26.0",
