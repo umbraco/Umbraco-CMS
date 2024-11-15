@@ -118,6 +118,8 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		try {
 			await this.structure.create(parent?.unique);
 
+			this._data.setPersisted(this.structure.getOwnerContentType());
+
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadChildrenOfEntityEvent({
 				entityType: parent.entityType,
@@ -132,6 +134,8 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 	override async _update() {
 		try {
 			await this.structure.save();
+
+			this._data.setPersisted(this.structure.getOwnerContentType());
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
