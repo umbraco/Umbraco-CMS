@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MimeKit;
+using Umbraco.Cms.Core.Models.Email;
 
 namespace Umbraco.Cms.Infrastructure.Mail.Interfaces
 {
@@ -17,6 +12,6 @@ namespace Umbraco.Cms.Infrastructure.Mail.Interfaces
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public Task SendAsync(MimeMessage? message);
+        public Task SendAsync(EmailMessage message);
     }
 }
