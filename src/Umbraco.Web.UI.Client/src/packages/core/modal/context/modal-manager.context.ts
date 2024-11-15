@@ -1,29 +1,9 @@
 import type { UmbModalToken } from '../token/modal-token.js';
 import { UmbModalContext, type UmbModalContextClassArgs } from './modal.context.js';
-import type { UUIModalElement, UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbBasicState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
-
-export type UmbModalType = 'dialog' | 'sidebar' | 'custom';
-
-export interface UmbModalConfig {
-	key?: string;
-	type?: UmbModalType;
-	size?: UUIModalSidebarSize;
-
-	/**
-	 * Used to provide a custom modal element to replace the default uui-modal-dialog or uui-modal-sidebar
-	 */
-	element?: ElementLoaderProperty<UUIModalElement>;
-
-	/**
-	 * Set the background property of the modal backdrop
-	 */
-	backdropBackground?: string;
-}
 
 export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContext> {
 	// TODO: Investigate if we can get rid of HTML elements in our store, so we can use one of our states.
