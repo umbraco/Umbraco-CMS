@@ -25,7 +25,6 @@ const config: StorybookConfig = {
 	},
 	staticDirs: [
 		'../public-assets',
-		'../public',
 		'../src/assets',
 		{
 			from: '../src/packages/core/icon-registry/icons',
