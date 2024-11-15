@@ -33,6 +33,10 @@ export const plugins: PluginOption[] = [
 				src: 'node_modules/msw/lib/iife/**/*',
 				dest: 'umbraco/backoffice/msw',
 			},
+			{
+				src: 'node_modules/monaco-editor/esm/**/*',
+				dest: 'umbraco/backoffice/monaco-editor/esm',
+			},
 		],
 	}),
 	viteTSConfigPaths(),
