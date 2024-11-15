@@ -161,17 +161,7 @@ export class UmbDocumentTypeWorkspaceContext
 		}
 
 		try {
-			await this.structure.create(parent.unique);
-
-			// TODO: this might not be the right place to alert the tree, but it works for now
-			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadChildrenOfEntityEvent({
-				entityType: parent.entityType,
-				unique: parent.unique,
-			});
-			eventContext.dispatchEvent(event);
-
-			this.setIsNew(false);
+			super._create(currentData, parent);
 			this.createTemplateMode = false;
 		} catch (error) {}
 	}
