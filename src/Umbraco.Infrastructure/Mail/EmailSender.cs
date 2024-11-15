@@ -153,9 +153,7 @@ public class EmailSender : IEmailSender
             while (true);
         }
 
-        var mailMessage = message.ToMimeMessage(_globalSettings.Smtp!.From);
-
-        await _emailSenderClient.SendAsync(mailMessage);
+        await _emailSenderClient.SendAsync(message);
     }
 
 }
