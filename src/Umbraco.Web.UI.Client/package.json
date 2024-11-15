@@ -165,7 +165,6 @@
 		"example": "node ./devops/example-runner/index.js",
 		"format:fix": "npm run format -- --write",
 		"format": "prettier 'src/**/*.ts' --check",
-		"generate:server-api-local": "openapi-ts --file devops/openapi-ts/openapi-ts.local.config.js",
 		"generate:server-api-dev": "openapi-ts --file devops/openapi-ts/openapi-ts.dev.config.js",
 		"generate:server-api": "openapi-ts --file devops/openapi-ts/openapi-ts.config.js",
 		"generate:icons": "node ./devops/icons/index.js",
@@ -232,7 +231,7 @@
 	"devDependencies": {
 		"@babel/core": "^7.26.0",
 		"@eslint/js": "^9.9.1",
-		"@hey-api/openapi-ts": "^0.52.11",
+		"@hey-api/openapi-ts": "^0.55.3",
 		"@open-wc/testing": "^4.0.0",
 		"@playwright/test": "^1.48.2",
 		"@rollup/plugin-commonjs": "^28.0.1",
