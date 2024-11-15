@@ -2675,7 +2675,7 @@ internal partial class UserService : RepositoryService, IUserService
         }
     }
 
-    [GeneratedRegex(@"^[\w\d\-\._~]*$")]
+    [GeneratedRegex(@"^[\w\d\-\._~]{1,255}$")]
     private static partial Regex ValidClientId();
 
     #endregion
