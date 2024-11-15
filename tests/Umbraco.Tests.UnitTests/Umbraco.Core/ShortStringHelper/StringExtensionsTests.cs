@@ -369,6 +369,9 @@ public class StringExtensionsTests
     [TestCase("testtest.com",  false)]
     [TestCase("test@test.dk",  true)]
     [TestCase("test@test.se",  true)]
+    [TestCase(null,  false)]
+    [TestCase("",  false)]
+    [TestCase(" ",  false)]
     public void IsEmail(string email, bool isEmail) => Assert.AreEqual(isEmail, email.IsEmail());
 
     private static void TryIsFullPath(string path, bool expectedIsFull, bool expectedIsValid = true)
