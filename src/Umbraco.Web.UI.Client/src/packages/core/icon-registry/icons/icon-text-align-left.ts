@@ -1,4 +1,4 @@
-export default `<!-- @license lucide-static v0.446.0 - ISC -->
+export default `<!-- @license lucide-static v0.459.0 - ISC -->
 <svg
   class="lucide lucide-align-left"
   xmlns="http://www.w3.org/2000/svg"
@@ -9,8 +9,8 @@ export default `<!-- @license lucide-static v0.446.0 - ISC -->
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <line x1="21" x2="3" y1="6" y2="6" />
-  <line x1="15" x2="3" y1="12" y2="12" />
-  <line x1="17" x2="3" y1="18" y2="18" />
+  <path d="M15 12H3" />
+  <path d="M17 18H3" />
+  <path d="M21 6H3" />
 </svg>
 `;

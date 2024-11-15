@@ -1,4 +1,4 @@
-export default `<!-- @license lucide-static v0.446.0 - ISC -->
+export default `<!-- @license lucide-static v0.459.0 - ISC -->
 <svg
   class="lucide lucide-move-vertical"
   xmlns="http://www.w3.org/2000/svg"
@@ -9,8 +9,8 @@ export default `<!-- @license lucide-static v0.446.0 - ISC -->
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <polyline points="8 18 12 22 16 18" />
-  <polyline points="8 6 12 2 16 6" />
-  <line x1="12" x2="12" y1="2" y2="22" />
+  <path d="M12 2v20" />
+  <path d="m8 18 4 4 4-4" />
+  <path d="m8 6 4-4 4 4" />
 </svg>
 `;

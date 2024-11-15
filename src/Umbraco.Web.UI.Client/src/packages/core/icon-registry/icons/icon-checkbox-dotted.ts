@@ -1,6 +1,6 @@
-export default `<!-- @license lucide-static v0.446.0 - ISC -->
+export default `<!-- @license lucide-static v0.459.0 - ISC -->
 <svg
-  class="lucide lucide-box-select"
+  class="lucide lucide-square-dashed"
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 24 24"
   fill="none"
