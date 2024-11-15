@@ -268,8 +268,14 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		actionEventContext.dispatchEvent(event);
 	}
 
+	#allowNavigateAway = false;
+
 	#onWillNavigate = async (e: CustomEvent) => {
 		const newUrl = e.detail.url;
+
+		if (this.#allowNavigateAway) {
+			return true;
+		}
 
 		/* TODO: temp removal of discard changes in workspace modals.
 		 The modal closes before the discard changes dialog is resolved.*/
@@ -285,8 +291,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			try {
 				// navigate to the new url when discarding changes
 				await modal.onSubmit();
-				// Reset the current data so we don't end in a endless loop of asking to discard changes.
-				this._data.resetCurrent();
+				this.#allowNavigateAway = true;
 				history.pushState({}, '', e.detail.url);
 				return true;
 			} catch {
@@ -308,6 +313,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	override resetState() {
 		super.resetState();
 		this._data.clear();
+		this.#allowNavigateAway = false;
 	}
 
 	#checkIfInitialized() {
