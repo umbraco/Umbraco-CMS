@@ -6,13 +6,12 @@ import {
 	type UmbEntityDetailWorkspaceContextCreateArgs,
 	type UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
-import type { UmbContentTypeWorkspaceContext } from './content-type-workspace-context.interface';
-import type { UmbContentTypeCompositionModel, UmbContentTypeDetailModel, UmbContentTypeSortModel } from '../types';
+import type { UmbContentTypeWorkspaceContext } from './content-type-workspace-context.interface.js';
+import type { UmbContentTypeCompositionModel, UmbContentTypeDetailModel, UmbContentTypeSortModel } from '../types.js';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
-import type { Observable } from 'rxjs';
 import { UmbContentTypeStructureManager } from '../structure/index.js';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
+import { jsonStringComparison, type Observable } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
@@ -20,6 +19,7 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbContentTypeWorkspaceContextArgs extends UmbEntityDetailWorkspaceContextArgs {}
 
 export abstract class UmbContentTypeWorkspaceContextBase<
@@ -134,7 +134,9 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 			eventContext.dispatchEvent(event);
 
 			this.setIsNew(false);
-		} catch (error) {}
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	/**
@@ -154,7 +156,9 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 			});
 
 			actionEventContext.dispatchEvent(event);
-		} catch (error) {}
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	/**

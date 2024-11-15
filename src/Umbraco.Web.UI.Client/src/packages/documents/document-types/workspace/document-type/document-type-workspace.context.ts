@@ -22,8 +22,6 @@ import { UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import { UMB_DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbTemplateDetailRepository } from '@umbraco-cms/backoffice/template';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 type DetailModelType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
@@ -163,7 +161,9 @@ export class UmbDocumentTypeWorkspaceContext
 		try {
 			super._create(currentData, parent);
 			this.createTemplateMode = false;
-		} catch (error) {}
+		} catch (error) {
+			console.log(error);
+		}
 	}
 
 	// TODO: move this responsibility to the template package
