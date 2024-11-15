@@ -1139,7 +1139,43 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
 
     #region Combinations
 
+    [Test]
+    public async Task Can_Publish_And_Schedule_Different_Cultures()
+    {
+        var setupInfo = await SetupVariantDoctypeAsync();
+        var setupData = await CreateVariantContentAsync(
+            setupInfo.LangEn,
+            setupInfo.LangDa,
+            setupInfo.LangBe,
+            setupInfo.contentType);
 
+        var scheduleAttempt = await ContentPublishingService.PublishAsync(
+            setupData.Key,
+            new List<CulturePublishScheduleModel>
+            {
+                new()
+                {
+                    Culture = setupInfo.LangEn.IsoCode,
+                },
+                new()
+                {
+                    Culture = setupInfo.LangDa.IsoCode,
+                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate },
+                },
+            },
+            Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(scheduleAttempt.Success);
+
+        var schedules = ContentService.GetContentScheduleByContentId(setupData.Id);
+        var content = ContentService.GetById(setupData.Key);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, content!.PublishedCultures.Count());
+            Assert.AreEqual(1, schedules.FullSchedule.Count);
+        });
+    }
 
     #endregion
 
