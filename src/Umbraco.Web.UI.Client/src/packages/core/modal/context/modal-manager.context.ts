@@ -72,7 +72,7 @@ export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContex
 	public close(key: string) {
 		const modal = this.#modals.getValue().find((modal) => modal.key === key);
 		if (modal) {
-			modal.reject();
+			modal.forceResolve();
 		}
 	}
 

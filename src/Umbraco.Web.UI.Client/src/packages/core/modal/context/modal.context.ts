@@ -1,4 +1,5 @@
 import { UmbModalToken } from '../token/modal-token.js';
+import { UMB_ROUTE_CONTEXT } from '../../router/route.context.js';
 import type { UmbModalConfig, UmbModalType } from './modal-manager.context.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
@@ -31,9 +32,19 @@ export class UmbModalContext<
 	ModalValue = any,
 > extends UmbControllerBase {
 	//
+	// TODO: Come up with a better name:
+	#submitIsGood?: boolean;
+	#submitRejectReason?: UmbModalRejectReason;
+	#submitIsResolved?: boolean;
+
 	#submitPromise: Promise<ModalValue>;
 	#submitResolver?: (value: ModalValue) => void;
 	#submitRejecter?: (reason?: UmbModalRejectReason) => void;
+	#markAsResolved() {
+		this.#submitResolver = undefined;
+		this.#submitRejecter = undefined;
+		this.#submitIsResolved = true;
+	}
 
 	public readonly key: string;
 	public readonly data: ModalData;
@@ -91,6 +102,35 @@ export class UmbModalContext<
 		});
 	}
 
+	#activeModalPath?: string;
+
+	_internal_setCurrentModalPath(path: string) {
+		this.#activeModalPath = path;
+	}
+
+	async _internal_removeCurrentModal() {
+		const routeContext = await this.getContext(UMB_ROUTE_CONTEXT);
+		routeContext._internal_removeModalPath(this.#activeModalPath);
+	}
+
+	forceResolve() {
+		// THIS should close the element no matter what.
+		if (this.#submitIsGood) {
+			const resolver = this.#submitResolver;
+			this.#markAsResolved();
+			resolver?.(this.getValue());
+		} else {
+			// We might store the reason from reject and use it here?, but I'm not sure what the real need is for this reason. [NL]
+			const resolver = this.#submitRejecter;
+			this.#markAsResolved();
+			resolver?.(this.#submitRejectReason ?? { type: 'close' });
+		}
+	}
+
+	isResolved() {
+		return this.#submitIsResolved === true;
+	}
+
 	// note, this methods is private  argument is not defined correctly here, but requires to be fix by appending the OptionalSubmitArgumentIfUndefined type when newing up this class.
 	/**
 	 * Submits this modal, returning with a value to the initiator of the modal.
@@ -98,7 +138,15 @@ export class UmbModalContext<
 	 * @memberof UmbModalContext
 	 */
 	public submit() {
+		if (this.#submitIsResolved) return;
+		if (this.router) {
+			// Do not resolve jet, lets try to change the URL.
+			this.#submitIsGood = true;
+			this._internal_removeCurrentModal();
+			return;
+		}
 		this.#submitResolver?.(this.getValue());
+		this.#markAsResolved();
 		// TODO: Could we clean up this class here? (Example destroy the value state, and other things?)
 	}
 
@@ -109,7 +157,16 @@ export class UmbModalContext<
 	 * @memberof UmbModalContext
 	 */
 	public reject(reason?: UmbModalRejectReason) {
+		if (this.#submitIsResolved) return;
+		if (this.router) {
+			// Do not reject jet, lets try to change the URL.
+			this.#submitIsGood = false;
+			this.#submitRejectReason = reason;
+			this._internal_removeCurrentModal();
+			return;
+		}
 		this.#submitRejecter?.(reason);
+		this.#markAsResolved();
 		// TODO: Could we clean up this class here? (Example destroy the value state, and other things?)
 	}
 

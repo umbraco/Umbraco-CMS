@@ -1,7 +1,7 @@
 import type { UmbRoute } from './route.interface.js';
 import { umbGenerateRoutePathBuilder } from './generate-route-path-builder.function.js';
 import type { UmbModalRouteRegistration } from './modal-registration/modal-route-registration.interface.js';
-import type { IRoutingInfo, IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
+import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -63,22 +63,14 @@ export class UmbRouteContext extends UmbContextBase<UmbRouteContext> {
 					info.match.params,
 				);
 				if (modalContext) {
-					modalContext.onSubmit().then(
-						() => {
-							this.#removeModalPath(info);
-						},
-						() => {
-							this.#removeModalPath(info);
-						},
-					);
+					modalContext._internal_setCurrentModalPath(info.match.fragments.consumed);
 				}
 			},
 		};
 	}
 
-	#removeModalPath(info: IRoutingInfo) {
+	_internal_removeModalPath(folderToRemove?: string) {
 		// Reset the URL to the routerBasePath + routerActiveLocalPath [NL]
-		const folderToRemove = info.match.fragments.consumed;
 		if (folderToRemove && window.location.href.includes(folderToRemove)) {
 			const url = this.#basePath.getValue() + '/' + this.#activeLocalPath.getValue();
 			window.history.pushState({}, '', url);
