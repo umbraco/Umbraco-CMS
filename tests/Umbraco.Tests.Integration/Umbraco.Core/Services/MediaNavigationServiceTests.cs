@@ -21,6 +21,8 @@ public partial class MediaNavigationServiceTests : MediaNavigationServiceTestsBa
         // Media Types
         FolderMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.Folder);
         ImageMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.Image);
+        ImageMediaType.PropertyTypes.First(x => x.Alias == "umbracoFile").Mandatory = false;
+        MediaTypeService.Save(ImageMediaType);
 
         // Media
         var albumModel = CreateMediaCreateModel("Album", new Guid("1CD97C02-8534-4B72-AE9E-AE52EC94CF31"), FolderMediaType.Key);
