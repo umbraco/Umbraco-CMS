@@ -1004,6 +1004,7 @@ public class UserServiceTests : UmbracoIntegrationTest
     [TestCase("@", UserClientCredentialsOperationStatus.InvalidClientId)]
     [TestCase("[", UserClientCredentialsOperationStatus.InvalidClientId)]
     [TestCase("]", UserClientCredentialsOperationStatus.InvalidClientId)]
+    [TestCase("More_Than_255_characters_012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789", UserClientCredentialsOperationStatus.InvalidClientId)]
     public async Task Can_Use_Only_Unreserved_Characters_For_ClientId(string clientId, UserClientCredentialsOperationStatus expectedResult)
     {
         // Arrange

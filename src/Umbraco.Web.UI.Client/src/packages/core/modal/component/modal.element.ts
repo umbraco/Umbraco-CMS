@@ -13,6 +13,7 @@ import {
 	type UUIDialogElement,
 	type UUIModalDialogElement,
 	type UUIModalSidebarElement,
+	type UUIModalSidebarSize,
 } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_ROUTE_CONTEXT, type UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
 import { createExtensionElement, loadManifestElement } from '@umbraco-cms/backoffice/extension-api';
@@ -117,7 +118,13 @@ export class UmbModalElement extends UmbLitElement {
 
 	#createSidebarElement() {
 		const sidebarElement = document.createElement('uui-modal-sidebar');
-		sidebarElement.size = this.#modalContext!.size;
+		this.observe(
+			this.#modalContext!.size,
+			(size) => {
+				sidebarElement.size = size as UUIModalSidebarSize;
+			},
+			'observeSize',
+		);
 		return sidebarElement;
 	}
 
