@@ -19,9 +19,7 @@ export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<umb-workspace-editor
-			alias="Umb.Workspace.Language"
-			back-path="section/settings/workspace/language-root">
+		return html`<umb-workspace-editor back-path="section/settings/workspace/language-root">
 			${this._isNew
 				? html`<h3 slot="header">Add language</h3>`
 				: html`<umb-workspace-header-name-editable slot="header"></umb-workspace-header-name-editable>`}

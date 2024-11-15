@@ -1,18 +1,14 @@
 import { UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_CONTEXT } from './block-grid-area-type-workspace.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { customElement, css, html, state, property } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, css, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-block-grid-area-type-workspace-editor')
 export class UmbBlockGridAreaTypeWorkspaceEditorElement extends UmbLitElement {
-	//
 	#workspaceContext?: typeof UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	_name?: string;
-
-	@property({ type: String, attribute: false })
-	workspaceAlias?: string;
 
 	constructor() {
 		super();
@@ -28,14 +24,10 @@ export class UmbBlockGridAreaTypeWorkspaceEditorElement extends UmbLitElement {
 
 	// TODO: Localization, make it so that the headline is about area configuration?
 	override render() {
-		return this.workspaceAlias
-			? html`
-					<umb-workspace-editor
-						alias=${this.workspaceAlias}
-						headline=${this.localize.term('blockEditor_blockConfigurationOverlayTitle', [this._name])}>
-					</umb-workspace-editor>
-				`
-			: '';
+		return html`
+			<umb-workspace-editor headline=${this.localize.term('blockEditor_blockConfigurationOverlayTitle', [this._name])}>
+			</umb-workspace-editor>
+		`;
 	}
 
 	static override styles = [

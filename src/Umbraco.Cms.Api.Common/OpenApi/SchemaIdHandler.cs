@@ -36,7 +36,7 @@ public class SchemaIdHandler : ISchemaIdHandler
         // first grab the "non-generic" part of any generic type name (i.e. "PagedViewModel`1" becomes "PagedViewModel")
         .Split('`').First()
         // then remove the "ViewModel" postfix from type names
-        .TrimEndExact("ViewModel");
+        .TrimEnd("ViewModel");
 
     private string HandleGenerics(string name, Type type)
     {

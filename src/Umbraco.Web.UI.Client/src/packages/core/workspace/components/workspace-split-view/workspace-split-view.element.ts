@@ -14,9 +14,6 @@ import './workspace-split-view-variant-selector.element.js';
  */
 @customElement('umb-workspace-split-view')
 export class UmbWorkspaceSplitViewElement extends UmbLitElement {
-	@property()
-	alias!: string;
-
 	@property({ type: Boolean })
 	displayNavigation = false;
 
@@ -43,7 +40,6 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 	override render() {
 		return html`
 			<umb-workspace-editor
-				alias=${this.alias}
 				back-path=${ifDefined(this.backPath)}
 				.hideNavigation=${!this.displayNavigation}
 				.enforceNoFooter=${true}>

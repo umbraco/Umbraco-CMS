@@ -69,6 +69,12 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 					});
 
 					host.addEventListener('paste', (event) => {
+						const htmlContent = event.clipboardData?.getData('text/html');
+						if (htmlContent) {
+							// If there is HTML content, exit early to prevent uploading the remote file(s).
+							return;
+						}
+
 						const files = event.clipboardData?.files;
 						if (!files) return;
 
