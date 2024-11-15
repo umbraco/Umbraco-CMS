@@ -68,7 +68,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		}
 	});
 
-	constructor(host: UmbControllerHost, args: UmbEntityWorkspaceContextArgs) {
+	constructor(host: UmbControllerHost, args: UmbEntityDetailWorkspaceContextArgs) {
 		super(host, args.workspaceAlias);
 		this.#entityContext.setEntityType(args.entityType);
 		window.addEventListener('willchangestate', this.#onWillNavigate);
