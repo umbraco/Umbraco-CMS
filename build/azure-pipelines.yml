@@ -563,8 +563,8 @@ stages:
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
         strategy:
           matrix:
+            ${{ if eq(parameters.sqlServerLinuxAcceptanceTests, True) }}:
             Linux:
-              condition: eq(${{parameters.sqlServerLinuxAcceptanceTests}}, True)
               vmImage: 'ubuntu-latest'
               SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               CONNECTIONSTRINGS__UMBRACODBDSN: 'Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True'
