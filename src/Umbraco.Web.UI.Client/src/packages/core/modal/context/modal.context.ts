@@ -1,10 +1,10 @@
 import { UmbModalToken } from '../token/modal-token.js';
-import type { UmbModalConfig, UmbModalType } from './modal-manager.context.js';
+import type { UmbModalConfig, UmbModalType } from '../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import type { UUIModalElement, UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { type UmbDeepPartialObject, umbDeepMerge } from '@umbraco-cms/backoffice/utils';
 import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
@@ -38,14 +38,16 @@ export class UmbModalContext<
 	public readonly key: string;
 	public readonly data: ModalData;
 	public readonly type: UmbModalType = 'dialog';
-	public readonly size: UUIModalSidebarSize = 'small';
-	public element?: ElementLoaderProperty<UUIModalElement>;
+	public readonly element?: ElementLoaderProperty<UUIModalElement>;
 	public readonly backdropBackground?: string;
 	public readonly router: IRouterSlot | null = null;
 	public readonly alias: string | UmbModalToken<ModalData, ModalValue>;
 
 	#value;
 	public readonly value;
+
+	#size = new UmbStringState<UUIModalSidebarSize>('small');
+	public readonly size = this.#size.asObservable();
 
 	constructor(
 		host: UmbControllerHost,
@@ -57,17 +59,23 @@ export class UmbModalContext<
 		this.router = args.router ?? null;
 		this.alias = modalAlias;
 
+		let size = 'small';
+
 		if (this.alias instanceof UmbModalToken) {
 			this.type = this.alias.getDefaultModal()?.type || this.type;
-			this.size = this.alias.getDefaultModal()?.size || this.size;
+			size = this.alias.getDefaultModal()?.size ?? size;
 			this.element = this.alias.getDefaultModal()?.element || this.element;
 			this.backdropBackground = this.alias.getDefaultModal()?.backdropBackground || this.backdropBackground;
 		}
 
 		this.type = args.modal?.type || this.type;
-		this.size = args.modal?.size || this.size;
+		size = args.modal?.size ?? size;
 		this.element = args.modal?.element || this.element;
 		this.backdropBackground = args.modal?.backdropBackground || this.backdropBackground;
+
+		console.log('size', size);
+
+		this.#size.setValue(size);
 
 		const defaultData = this.alias instanceof UmbModalToken ? this.alias.getDefaultData() : undefined;
 		this.data = Object.freeze(
@@ -151,6 +159,16 @@ export class UmbModalContext<
 	 */
 	public updateValue(partialValue: Partial<ModalValue>) {
 		this.#value.update(partialValue);
+	}
+
+	/**
+	 * Updates the size this modal.
+	 * @param size
+	 * @public
+	 * @memberof UmbModalContext
+	 */
+	setModalSize(size: UUIModalSidebarSize) {
+		this.#size.setValue(size);
 	}
 
 	public override destroy(): void {
