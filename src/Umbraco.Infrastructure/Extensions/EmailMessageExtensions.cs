@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Models.Email;
 
 namespace Umbraco.Cms.Infrastructure.Extensions;
 
-public static class EmailMessageExtensions
+internal static class EmailMessageExtensions
 {
     public static MimeMessage ToMimeMessage(this EmailMessage mailMessage, string configuredFromAddress)
     {
