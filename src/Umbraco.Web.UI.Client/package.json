@@ -280,7 +280,7 @@
 		"storybook": "^8.4.4",
 		"tiny-glob": "^0.2.9",
 		"tsc-alias": "^1.8.10",
-		"typedoc": "^0.26.5",
+		"typedoc": "^0.26.11",
 		"typescript": "^5.5.3",
 		"typescript-eslint": "^8.0.1",
 		"typescript-json-schema": "^0.65.1",
