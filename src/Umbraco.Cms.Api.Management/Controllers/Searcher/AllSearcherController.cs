@@ -30,7 +30,7 @@ public class AllSearcherController : SearcherControllerBase
         var searchers = new List<SearcherResponse>(
             _examineManager.RegisteredSearchers.Select(searcher => new SearcherResponse { Name = searcher.Name })
                 .OrderBy(x =>
-                    x.Name.TrimEndExact("Searcher"))); // order by name , but strip the "Searcher" from the end if it exists
+                    x.Name.TrimEnd("Searcher"))); // order by name , but strip the "Searcher" from the end if it exists
         var viewModel = new PagedViewModel<SearcherResponse>
         {
             Items = searchers.Skip(skip).Take(take),

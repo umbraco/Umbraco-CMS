@@ -123,7 +123,7 @@ export class UmbDocumentTypeWorkspaceContext
 		this.structure.updateOwnerContentType({ allowedTemplates });
 	}
 
-	setDefaultTemplate(defaultTemplate: { id: string }) {
+	setDefaultTemplate(defaultTemplate: { id: string } | null) {
 		this.structure.updateOwnerContentType({ defaultTemplate });
 	}
 

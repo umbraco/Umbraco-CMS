@@ -1,4 +1,3 @@
-import { UMB_PARTIAL_VIEW_FOLDER_WORKSPACE_ALIAS } from './constants.js';
 import { UMB_PARTIAL_VIEW_FOLDER_WORKSPACE_CONTEXT } from './partial-view-folder-workspace.context-token.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -35,8 +34,7 @@ export class UmbPartialViewFolderWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<umb-workspace-editor headline=${this._name} alias=${UMB_PARTIAL_VIEW_FOLDER_WORKSPACE_ALIAS}>
-		</umb-workspace-editor>`;
+		return html`<umb-workspace-editor headline=${this._name}> </umb-workspace-editor>`;
 	}
 
 	static override styles = [UmbTextStyles, css``];
