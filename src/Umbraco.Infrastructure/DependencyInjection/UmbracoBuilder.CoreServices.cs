@@ -181,7 +181,6 @@ public static partial class UmbracoBuilderExtensions
                 services.GetRequiredService<ILogger<EmailSender>>(),
                 services.GetRequiredService<IOptionsMonitor<GlobalSettings>>(),
                 services.GetRequiredService<IEventAggregator>(),
-                services.GetRequiredService<IEmailSenderClient>(),
                 services.GetService<INotificationHandler<SendEmailNotification>>(),
                 services.GetService<INotificationAsyncHandler<SendEmailNotification>>()
                 ));
