@@ -119,26 +119,20 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toEqual([]);
     });
 
-    // TODO: Remove skip when the front-end is ready
-    test.skip('can add layouts', async ({umbracoApi, umbracoUi}) => {
+    test('can add layouts', async ({umbracoApi, umbracoUi}) => {
       // Arrange
-      let layoutsData = 'Document Grid Collection View';
-      if (listViewType === 'List View - Media') {
-        layoutsData = 'Media Grid Collection View';
-      }
-
+      const layoutName = 'Extension Table Collection View';
+      const layoutCollectionView = 'Umb.CollectionView.Extension.Table';
       const expectedIncludePropertiesValues = {
-        "icon": "icon-thumbnails-small",
-        "collectionView": layoutsData,
-        "isSystem": true,
-        "name": "Grid",
-        "selected": true
+        "icon": "icon-list",
+        "name": layoutName,
+        "collectionView": layoutCollectionView,
       };
 
       // Act
       await umbracoUi.dataType.goToDataType(listViewType);
       await umbracoUi.waitForTimeout(500);
-      await umbracoUi.dataType.addLayouts(layoutsData);
+      await umbracoUi.dataType.addLayouts(layoutName);
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
@@ -222,7 +216,8 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test('can update content app icon', async ({umbracoApi, umbracoUi}) => {
+    // Skip this test as there is no setting for content app icon
+    test.skip('can update content app icon', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const iconValue = 'icon-activity';
       const expectedDataTypeValues = {
@@ -241,7 +236,8 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test('can update content app name', async ({umbracoApi, umbracoUi}) => {
+    // Skip this test as there is no setting for content app icon
+    test.skip('can update content app name', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const contentAppName = 'Test Content App Name';
       const expectedDataTypeValues = {
@@ -259,7 +255,8 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test('can enable show content app first', async ({umbracoApi, umbracoUi}) => {
+    // Skip this test as there is no setting for content app icon
+    test.skip('can enable show content app first', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const expectedDataTypeValues = {
         "alias": "showContentFirst",
