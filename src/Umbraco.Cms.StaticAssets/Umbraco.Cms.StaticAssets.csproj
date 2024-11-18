@@ -9,17 +9,24 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <!--  TODO: [NU5123] Rename files so path is shorter and remove this override -->
-    <WarningsNotAsErrors>NU5123</WarningsNotAsErrors>
+    <!--
+      TODO: Fix and remove overrides:
+      [NU5123] Rename files so path is shorter
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),NU5123</WarningsNotAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <ProjectReference Include="..\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj" />
-    <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
     <SupportedPlatform Include="browser" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
+  </ItemGroup>
+
+  <!-- Restore and build Umbraco backoffice and login projects -->
   <PropertyGroup>
     <BackofficeAssetsDirectory Condition="'$(BackofficeAssetsDirectory)' == ''">..\Umbraco.Web.UI.Client\</BackofficeAssetsDirectory>
     <LoginAssetsDirectory Condition="'$(LoginAssetsDirectory)' == ''">..\Umbraco.Web.UI.Login\</LoginAssetsDirectory>
@@ -31,6 +38,8 @@
   <ItemGroup>
     <BackofficeAssetsInputs Include="$(BackofficeAssetsDirectory)package.json;$(BackofficeAssetsDirectory)package-lock.json;$(BackofficeAssetsDirectory)src\**" Exclude="$(DefaultItemExcludes)" />
     <LoginAssetsInputs Include="$(LoginAssetsDirectory)**" Exclude="$(DefaultItemExcludes)" />
+    <Content Remove="wwwroot\umbraco\backoffice\**" />
+    <Content Remove="wwwroot\umbraco\login\**" />
   </ItemGroup>
 
   <Target Name="RestoreBackoffice" Inputs="$(BackofficeAssetsDirectory)package-lock.json" Outputs="$(BackofficeAssetsDirectory)node_modules\.package-lock.json">
@@ -43,10 +52,18 @@
     <Exec Command="npm run build:for:cms" WorkingDirectory="$(BackofficeAssetsDirectory)" />
     <ItemGroup>
       <_BackofficeAssetsBuildOutput Include="$(BackofficePath)/**" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(IntermediateOutputPath)backoffice.complete.txt" Lines="@(_BackofficeAssetsBuildOutput)" Overwrite="true" />
+  </Target>
+
+  <Target Name="DefineBackofficeAssets" AfterTargets="BuildBackoffice" DependsOnTargets="ResolveStaticWebAssetsConfiguration">
+    <ItemGroup>
       <FileWrites Include="@(_BackofficeAssetsBuildOutput)" />
       <FileWrites Include="$(IntermediateOutputPath)backoffice.complete.txt" />
     </ItemGroup>
-    <WriteLinesToFile File="$(IntermediateOutputPath)backoffice.complete.txt" Lines="@(_BackofficeAssetsBuildOutput)" Overwrite="true" />
+    <DefineStaticWebAssets CandidateAssets="@(_BackofficeAssetsBuildOutput)" SourceId="$(PackageId)" SourceType="Computed" ContentRoot="$(ProjectDir)wwwroot" BasePath="$(StaticWebAssetBasePath)">
+      <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
+    </DefineStaticWebAssets>
   </Target>
 
   <Target Name="RestoreLogin" Inputs="$(LoginAssetsDirectory)package-lock.json" Outputs="$(LoginAssetsDirectory)node_modules/.package-lock.json">
@@ -59,9 +76,17 @@
     <Exec Command="npm run build" WorkingDirectory="$(LoginAssetsDirectory)" />
     <ItemGroup>
       <_LoginAssetsBuildOutput Include="$(LoginPath)\**" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(IntermediateOutputPath)login.complete.txt" Lines="@(_LoginAssetsBuildOutput)" Overwrite="true" />
+  </Target>
+
+  <Target Name="DefineLoginAssets" AfterTargets="BuildLogin" DependsOnTargets="ResolveStaticWebAssetsConfiguration">
+    <ItemGroup>
       <FileWrites Include="@(_LoginAssetsBuildOutput)" />
       <FileWrites Include="$(IntermediateOutputPath)login.complete.txt" />
     </ItemGroup>
-    <WriteLinesToFile File="$(IntermediateOutputPath)login.complete.txt" Lines="@(_LoginAssetsBuildOutput)" Overwrite="true" />
+    <DefineStaticWebAssets CandidateAssets="@(_LoginAssetsBuildOutput)" SourceId="$(PackageId)" SourceType="Computed" ContentRoot="$(ProjectDir)wwwroot" BasePath="$(StaticWebAssetBasePath)">
+      <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
+    </DefineStaticWebAssets>
   </Target>
 </Project>
