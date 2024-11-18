@@ -8,8 +8,9 @@
     <!--
       TODO: Fix and remove overrides:
       [ASP0019] use IHeaderDictionary.Append or the indexer to append or set headers
+      [CS0618] update obsolete references
     -->
-    <WarningsNotAsErrors>$(WarningsNotAsErrors),ASP0019</WarningsNotAsErrors>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),ASP0019,CS0618</WarningsNotAsErrors>
   </PropertyGroup>
   
   <ItemGroup>
