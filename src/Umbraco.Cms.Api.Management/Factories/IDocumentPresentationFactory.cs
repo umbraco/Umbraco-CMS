@@ -18,7 +18,7 @@ public interface IDocumentPresentationFactory
     Task<DocumentResponseModel> CreateResponseModelAsync(IContent content);
 
     Task<PublishedDocumentResponseModel> CreatePublishedResponseModelAsync(IContent content);
-    
+
     Task<DocumentResponseModel> CreateResponseModelAsync(IContent content, ContentScheduleCollection schedule)
 #pragma warning disable CS0618 // Type or member is obsolete
         // Remove when obsolete CreateResponseModelAsync is removed

@@ -71,7 +71,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
 
         return responseModel;
     }
-    
+
     public async Task<DocumentResponseModel> CreateResponseModelAsync(IContent content, ContentScheduleCollection schedule)
     {
         DocumentResponseModel responseModel = _umbracoMapper.Map<DocumentResponseModel>(content)!;
