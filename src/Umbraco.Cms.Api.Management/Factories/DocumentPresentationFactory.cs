@@ -130,6 +130,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
     public DocumentTypeReferenceResponseModel CreateDocumentTypeReferenceResponseModel(IDocumentEntitySlim entity)
         => _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(entity)!;
 
+    [Obsolete("Use CreateCulturePublishScheduleModels instead. Scheduled for removal in v17")]
     public Attempt<CultureAndScheduleModel, ContentPublishingOperationStatus> CreateCultureAndScheduleModel(PublishDocumentRequestModel requestModel)
     {
         var contentScheduleCollection = new ContentScheduleCollection();
@@ -189,5 +190,54 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
             Schedules = contentScheduleCollection,
             CulturesToPublishImmediately = culturesToPublishImmediately,
         });
+    }
+
+    // NOTE: Keep the default implementation on the interface in line with this one until
+    // the default implementation can be removed
+    public Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> CreateCulturePublishScheduleModels(PublishDocumentRequestModel requestModel)
+    {
+        var model = new List<CulturePublishScheduleModel>();
+
+        foreach (CultureAndScheduleRequestModel cultureAndScheduleRequestModel in requestModel.PublishSchedules)
+        {
+            if (cultureAndScheduleRequestModel.Schedule is null)
+            {
+                model.Add(new CulturePublishScheduleModel
+                {
+                    Culture = cultureAndScheduleRequestModel.Culture
+                              ?? Constants.System.InvariantCulture // API have `null` for invariant, but service layer has "*".
+                });
+                continue;
+            }
+
+            if (cultureAndScheduleRequestModel.Schedule.PublishTime is not null
+                && cultureAndScheduleRequestModel.Schedule.PublishTime <= _timeProvider.GetUtcNow())
+            {
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.PublishTimeNeedsToBeInFuture, model);
+            }
+
+            if (cultureAndScheduleRequestModel.Schedule.UnpublishTime is not null
+                && cultureAndScheduleRequestModel.Schedule.UnpublishTime <= _timeProvider.GetUtcNow())
+            {
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.UpublishTimeNeedsToBeInFuture, model);
+            }
+
+            if (cultureAndScheduleRequestModel.Schedule.UnpublishTime <= cultureAndScheduleRequestModel.Schedule.PublishTime)
+            {
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.UnpublishTimeNeedsToBeAfterPublishTime, model);
+            }
+
+            model.Add(new CulturePublishScheduleModel
+            {
+                Culture = cultureAndScheduleRequestModel.Culture,
+                Schedule = new ContentScheduleModel
+                {
+                    PublishDate = cultureAndScheduleRequestModel.Schedule.PublishTime,
+                    UnpublishDate = cultureAndScheduleRequestModel.Schedule.UnpublishTime,
+                },
+            });
+        }
+
+        return Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, model);
     }
 }
