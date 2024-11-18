@@ -224,7 +224,6 @@ test('can insert sections - render child template into a template', async ({umbr
 
   // Act
   await umbracoUi.template.goToTemplate(templateName);
-  // TODO: refactor later
   await umbracoUi.waitForTimeout(1000);
   await umbracoUi.template.insertSection(sectionType);
   await umbracoUi.template.clickSaveButton();
@@ -245,8 +244,6 @@ test('can insert sections - render a named section into a template', async ({umb
 
   // Act
   await umbracoUi.template.goToTemplate(templateName);
-  // TODO: refactor later
-  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.template.insertSection(sectionType, sectionName);
   await umbracoUi.template.clickSaveButton();
 
@@ -266,8 +263,6 @@ test('can insert sections - define a named section into a template', async ({umb
 
   // Act
   await umbracoUi.template.goToTemplate(templateName);
-  // TODO: refactor later
-  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.template.insertSection(sectionType, sectionName);
   await umbracoUi.template.clickSaveButton();
 
@@ -287,8 +282,6 @@ test('can insert dictionary item into a template', async ({umbracoApi, umbracoUi
 
   // Act
   await umbracoUi.template.goToTemplate(templateName);
-  // TODO: refactor later
-  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.template.insertDictionaryItem(dictionaryName);
   await umbracoUi.template.clickSaveButton();
 
@@ -312,8 +305,6 @@ test('can insert partial view into a template', async ({umbracoApi, umbracoUi}) 
 
   // Act
   await umbracoUi.template.goToTemplate(templateName);
-  // TODO: refactor later
-  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.template.insertPartialView(partialViewFileName);
   await umbracoUi.template.clickSaveButton();
 
@@ -323,8 +314,7 @@ test('can insert partial view into a template', async ({umbracoApi, umbracoUi}) 
   expect(templateData.content).toBe(templateContent);
 });
 
-// TODO: Update the value of the System Field in the testHelpers. There has been changes to the SystemField Name.
-test.skip('can insert value into a template', async ({umbracoApi, umbracoUi}) => {
+test('can insert value into a template', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.template.createDefaultTemplate(templateName);
   const systemFieldValue = 'createDate';
@@ -332,8 +322,6 @@ test.skip('can insert value into a template', async ({umbracoApi, umbracoUi}) =>
 
   // Act
   await umbracoUi.template.goToTemplate(templateName);
-  // TODO: refactor later
-  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.template.insertSystemFieldValue(systemFieldValue);
   await umbracoUi.template.clickSaveButton();
 

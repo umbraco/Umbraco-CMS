@@ -46,9 +46,9 @@ test('can delete a dictionary item', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dictionary.doesNameExist(dictionaryName)).toBeFalsy();
   // Verify the dictionary item does not display in the tree
   await umbracoUi.dictionary.isDictionaryTreeItemVisible(dictionaryName, false);
-  // TODO: Uncomment this when the front-end is ready. Currently the dictionary list is not updated immediately.
   // Verify the dictionary item does not display in the list
-  //expect(await umbracoUi.dictionary.doesDictionaryListHaveText(dictionaryName)).toBeFalsy();
+  await umbracoUi.goBackPage();
+  await umbracoUi.dictionary.doesDictionaryCollectionContainText('No items');
 });
 
 test('can create a dictionary item in a dictionary', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -129,12 +129,12 @@ test('can import a dictionary item', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dictionary.importDictionary(udtFilePath);
 
   // Assert
+  // Verify the imported dictionary item displays in the list
+  await umbracoUi.goBackPage();
+  expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importDictionaryName)).toBeTruthy();
   // Verify the imported dictionary item displays in the tree
   await umbracoUi.dictionary.reloadTree(dictionaryName);
   await umbracoUi.dictionary.isDictionaryTreeItemVisible(importDictionaryName);
-  // TODO: Uncomment this when the front-end is ready. Currently the dictionary list is not updated immediately.
-  // Verify the imported dictionary item displays in the list
-  //expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importDictionaryName)).toBeTruthy();
 });
 
 test('can import a dictionary item with descendants', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -153,15 +153,15 @@ test('can import a dictionary item with descendants', {tag: '@smoke'}, async ({u
   await umbracoUi.dictionary.importDictionary(udtFilePath);
 
   // Assert
+  // Verify the imported dictionary items display in the list
+  await umbracoUi.goBackPage();
+  expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importParentDictionaryName)).toBeTruthy();
+  expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importChildDictionaryName)).toBeTruthy();
   // Verify the imported dictionary items display in the tree
   await umbracoUi.dictionary.reloadTree(dictionaryName);
   await umbracoUi.dictionary.isDictionaryTreeItemVisible(importParentDictionaryName);
   await umbracoUi.dictionary.reloadTree(importParentDictionaryName);
   await umbracoUi.dictionary.isDictionaryTreeItemVisible(importChildDictionaryName);
-  // TODO: Uncomment this when the front-end is ready. Currently the dictionary list is not updated immediately.
-  // Verify the imported dictionary items display in the list
-  //expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importParentDictionaryName)).toBeTruthy();
-  //expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importChildDictionaryName)).toBeTruthy();
 });
 
 // Skip this test as the search function is removed

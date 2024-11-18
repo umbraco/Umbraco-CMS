@@ -135,7 +135,7 @@ test('can create content with the external link', async ({umbracoApi, umbracoUi}
   expect(contentData.values[0].value[0].url).toEqual(link);
 });
 
-test('can create content with the media link', async ({page, umbracoApi, umbracoUi}) => {
+test('can create content with the media link', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
