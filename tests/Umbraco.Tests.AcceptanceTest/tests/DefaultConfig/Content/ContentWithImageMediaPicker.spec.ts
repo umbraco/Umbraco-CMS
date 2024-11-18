@@ -109,7 +109,7 @@ test('can remove an image from the image media picker', async ({umbracoApi, umbr
 });
 
 // TODO: Remove skip when the front-end is ready as there are currently no displayed error notification.
-test.skip('image count can not be less that min amount set in image media picker', async ({umbracoApi, umbracoUi}) => {
+test.skip('image count can not be less than min amount set in image media picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 1);
@@ -130,7 +130,7 @@ test.skip('image count can not be less that min amount set in image media picker
 });
 
 // TODO: Remove skip when the front-end is ready as there are currently no displayed error notification.
-test.skip('image count can not be more that max amount set in image media picker', async ({umbracoApi, umbracoUi}) => {
+test.skip('image count can not be more than max amount set in image media picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 0, 0);
