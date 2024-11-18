@@ -174,7 +174,7 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 	 * @param { string } name The name of the content type
 	 */
 	public setName(name: string) {
-		this.structure.updateOwnerContentType({ name });
+		this.structure.updateOwnerContentType({ name } as Partial<DetailModelType>);
 	}
 
 	/**
@@ -190,7 +190,7 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 	 * @param { string } alias The alias of the content type
 	 */
 	public setAlias(alias: string) {
-		this.structure.updateOwnerContentType({ alias });
+		this.structure.updateOwnerContentType({ alias } as Partial<DetailModelType>);
 	}
 
 	/**
@@ -206,7 +206,7 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 	 * @param { string } description The description of the content type
 	 */
 	public setDescription(description: string) {
-		this.structure.updateOwnerContentType({ description });
+		this.structure.updateOwnerContentType({ description } as Partial<DetailModelType>);
 	}
 
 	/**
@@ -224,12 +224,12 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 	 *
 	 */
 	public setCompositions(compositions: Array<UmbContentTypeCompositionModel>) {
-		this.structure.updateOwnerContentType({ compositions });
+		this.structure.updateOwnerContentType({ compositions } as Partial<DetailModelType>);
 	}
 
 	// TODO: manage setting icon color alias?
 	public setIcon(icon: string) {
-		this.structure.updateOwnerContentType({ icon });
+		this.structure.updateOwnerContentType({ icon } as Partial<DetailModelType>);
 	}
 
 	public override getData() {
