@@ -5,8 +5,8 @@ parameters:
     displayName: Run SQL Server Integration Tests
     type: boolean
     default: false
-  - name: sqlServerAcceptanceTests
-    displayName: Run SQL Server Acceptance Tests
+  - name: sqlServerLinuxAcceptanceTests
+    displayName: Run SQL Server Linux Acceptance Tests
     type: boolean
     default: false
   - name: myGetDeploy
@@ -557,17 +557,17 @@ stages:
 
       - job:
         displayName: E2E Tests (SQL Server)
-        condition: eq(${{parameters.sqlServerAcceptanceTests}}, True)
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
         strategy:
           matrix:
-            Linux:
-              vmImage: 'ubuntu-latest'
-              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-              CONNECTIONSTRINGS__UMBRACODBDSN: 'Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True'
+            ${{ if eq(parameters.sqlServerLinuxAcceptanceTests, True) }} :
+              Linux:
+                vmImage: 'ubuntu-latest'
+                SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
+                CONNECTIONSTRINGS__UMBRACODBDSN: 'Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True'
             Windows:
               vmImage: 'windows-latest'
         pool:
