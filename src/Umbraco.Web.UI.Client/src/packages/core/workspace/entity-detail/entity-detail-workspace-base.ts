@@ -284,6 +284,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		}
 
 		if (this._checkWillNavigateAway(newUrl) && this._getHasUnpersistedChanges()) {
+			/* Since ours modals are async while events are synchronous, we need to prevent the default behavior of the event, even if the modal hasn’t been resolved yet. 
+			Once the modal is resolved (the user accepted to discard the changes and navigate away from the route), we will push a new history state. 
+			This push will make the "willchangestate" event happen again and due to this somewhat "backward" behavior, 
+			we set an "allowNavigateAway"-flag to prevent the "discard-changes" functionality from running in a loop.*/
 			e.preventDefault();
 			const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 			const modal = modalManager.open(this, UMB_DISCARD_CHANGES_MODAL);
