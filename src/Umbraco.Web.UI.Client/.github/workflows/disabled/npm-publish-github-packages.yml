@@ -1,0 +1,82 @@
+# This workflow will publish the @umbraco-cms/backoffice package to npmjs.com
+# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
+# The @umbraco-cms scope is owned by Umbraco HQ
+
+name: Node.js Package
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'devops/publish/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig.json'
+      - 'staticwebapp.config.json'
+      - 'README.md'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch or tag or SHA to publish
+        required: false
+      version:
+        description: 'Version to publish'
+        required: false
+      tag:
+        description: 'Tag to publish'
+        required: false
+        type: choice
+        options:
+          - 'next'
+          - 'latest'
+
+env:
+  NODE_OPTIONS: --max-old-space-size=16384
+
+jobs:
+  build_publish:
+    name: Build and publish
+    runs-on: ubuntu-latest
+    concurrency:
+      group: npm-publish
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          registry-url: https://registry.npmjs.org/
+          scope: '@umbraco-cms'
+      - run: npm ci
+      - run: npm run build
+      - name: Calculate version
+        run: |
+          if [ -z "${{inputs.version}}" ]; then
+            echo "No version input, calculating version from package.json"
+            SHA_SHORT=$(echo $GITHUB_SHA | cut -c1-8)
+            VERSION=$(node -p "require('./package.json').version")-$SHA_SHORT
+            echo "Version: $VERSION"
+            echo "BACKOFFICE_VERSION=$VERSION" >> "$GITHUB_ENV"
+          else
+            echo "Version input found, using ${{inputs.version}}"
+            echo "BACKOFFICE_VERSION=${{inputs.version}}" >> "$GITHUB_ENV"
+          fi
+      - name: Publish
+        run: |
+          npm whoami
+          npm version $BACKOFFICE_VERSION --allow-same-version --no-git-tag-version
+          npm publish --tag $BACKOFFICE_NPM_TAG --access public
+          echo "### Published new version of @umbraco-cms/backoffice to npm! :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Version: $BACKOFFICE_VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "- Tag: $BACKOFFICE_NPM_TAG" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: $GITHUB_SHA" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit message: $GITHUB_SHA_MESSAGE" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit date: $GITHUB_SHA_DATE" >> $GITHUB_STEP_SUMMARY
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          BACKOFFICE_NPM_TAG: ${{ inputs.tag || 'next' }}

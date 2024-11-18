@@ -13,7 +13,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.memberGroup.ensureNameNotExists(memberGroupName);
 });
 
-test('can create a member group', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
+test('can create a member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.memberGroup.clickMemberGroupCreateButton();
   await umbracoUi.memberGroup.enterMemberGroupName(memberGroupName);
@@ -36,14 +36,13 @@ test('cannot create member group with empty name', async ({umbracoApi, umbracoUi
   expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeFalsy();
 });
 
-// TODO: unskip, currently flaky
-test.skip('cannot create member group with duplicate name', async ({umbracoApi, umbracoUi}) => {
+test('cannot create member group with duplicate name', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.memberGroup.create(memberGroupName);
   expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeTruthy();
 
   // Act
-  await umbracoUi.memberGroup.clickCreateButton(true);
+  await umbracoUi.memberGroup.clickMemberGroupCreateButton();
   await umbracoUi.memberGroup.enterMemberGroupName(memberGroupName);
   await umbracoUi.memberGroup.clickSaveButton();
 

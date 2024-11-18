@@ -87,10 +87,12 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessMediaOrMediaTypes, Constants.Applications.Media, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessMemberGroups, Constants.Applications.Members);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessMemberTypes, Constants.Applications.Settings);
+        AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessMembersOrMemberTypes, Constants.Applications.Settings, Constants.Applications.Members);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessPartialViews, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessRelationTypes, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessScripts, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessStylesheets, Constants.Applications.Settings);
+        AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessStylesheetsOrDocumentOrMediaOrMember, Constants.Applications.Settings, Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessTemplates, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessWebhooks, Constants.Applications.Settings);
 

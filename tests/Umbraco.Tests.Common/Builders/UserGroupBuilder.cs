@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using Moq;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Strings;
@@ -22,6 +20,7 @@ public class UserGroupBuilder : UserGroupBuilder<object>
 public class UserGroupBuilder<TParent>
     : ChildBuilderBase<TParent, IUserGroup>,
         IWithIdBuilder,
+        IWithKeyBuilder,
         IWithIconBuilder,
         IWithAliasBuilder,
         IWithNameBuilder
@@ -30,6 +29,7 @@ public class UserGroupBuilder<TParent>
     private IEnumerable<string> _allowedSections = Enumerable.Empty<string>();
     private string _icon;
     private int? _id;
+    private Guid? _key;
     private string _name;
     private ISet<string> _permissions = new HashSet<string>();
     private int? _startContentId;
@@ -58,6 +58,12 @@ public class UserGroupBuilder<TParent>
     {
         get => _id;
         set => _id = value;
+    }
+
+    Guid? IWithKeyBuilder.Key
+    {
+        get => _key;
+        set => _key = value;
     }
 
     string IWithNameBuilder.Name
@@ -117,11 +123,13 @@ public class UserGroupBuilder<TParent>
             x.StartContentId == userGroup.StartContentId &&
             x.StartMediaId == userGroup.StartMediaId &&
             x.AllowedSections == userGroup.AllowedSections &&
-            x.Id == userGroup.Id);
+            x.Id == userGroup.Id &&
+            x.Key == userGroup.Key);
 
     public override IUserGroup Build()
     {
         var id = _id ?? 0;
+        var key = _key ?? Guid.NewGuid();
         var name = _name ?? "TestUserGroup" + _suffix;
         var alias = _alias ?? "testUserGroup" + _suffix;
         var userCount = _userCount ?? 0;
@@ -134,6 +142,7 @@ public class UserGroupBuilder<TParent>
         var userGroup = new UserGroup(shortStringHelper, userCount, alias, name, icon)
         {
             Id = id,
+            Key = key,
             StartContentId = startContentId,
             StartMediaId = startMediaId
         };

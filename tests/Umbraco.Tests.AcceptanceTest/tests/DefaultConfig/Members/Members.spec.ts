@@ -29,12 +29,12 @@ test('can create a member', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   // Act
   await umbracoUi.member.clickCreateButton();
   await umbracoUi.member.enterMemberName(memberName);
+  await umbracoUi.member.enterComments(comment);
+  await umbracoUi.member.clickInfoTab();
   await umbracoUi.member.enterUsername(username);
   await umbracoUi.member.enterEmail(email);
   await umbracoUi.member.enterPassword(password);
   await umbracoUi.member.enterConfirmPassword(password);
-  await umbracoUi.member.clickDetailsTab();
-  await umbracoUi.member.enterComments(comment);
   await umbracoUi.member.clickSaveButton();
 
   // Assert
@@ -50,7 +50,6 @@ test('can edit comments', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.member.clickMemberLinkByName(memberName);
-  await umbracoUi.member.clickDetailsTab();
   await umbracoUi.member.enterComments(comment);
   await umbracoUi.member.clickSaveButton();
 
@@ -227,12 +226,12 @@ test('cannot create member with invalid email', async ({umbracoApi, umbracoUi}) 
   // Act
   await umbracoUi.member.clickCreateButton();
   await umbracoUi.member.enterMemberName(memberName);
+  await umbracoUi.member.enterComments(comment);
+  await umbracoUi.member.clickInfoTab();
   await umbracoUi.member.enterUsername(username);
   await umbracoUi.member.enterEmail(invalidEmail);
   await umbracoUi.member.enterPassword(password);
   await umbracoUi.member.enterConfirmPassword(password);
-  await umbracoUi.member.clickDetailsTab();
-  await umbracoUi.member.enterComments(comment);
   await umbracoUi.member.clickSaveButton();
 
   // Assert

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
@@ -49,7 +50,7 @@ public class RenderNoContentController : Controller
             return Redirect("~/");
         }
 
-        var model = new NoNodesViewModel { UmbracoPath = _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoPath) };
+        var model = new NoNodesViewModel { UmbracoPath = _hostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath) };
 
         return View(_globalSettings.NoNodesViewPath, model);
     }
