@@ -147,6 +147,8 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
         var content = ContentService.GetById(setupData.Key);
         Assert.NotNull(content!.PublishDate);
     }
+    //todo more tests for invariant
+    //todo update schedule date
 
     [Test]
     public async Task Can_NOT_Publish_Unknown_Culture()
@@ -191,7 +193,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangEn.IsoCode,
-                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
                 }
             },
             Constants.Security.SuperUserKey);
@@ -217,6 +219,40 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
     #region Schedule Publish
 
     [Test]
+    public async Task Can_Schedule_Publish_Invariant()
+    {
+        var doctype = await SetupInvariantDoctypeAsync();
+        var setupData = await CreateInvariantContentAsync(doctype);
+
+        var scheduleAttempt = await ContentPublishingService.PublishAsync(
+            setupData.Key,
+            new List<CulturePublishScheduleModel>
+            {
+                new()
+                {
+                    Culture = Constants.System.InvariantCulture,
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
+                },
+            },
+            Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(scheduleAttempt.Success);
+
+        var schedules = ContentService.GetContentScheduleByContentId(setupData.Id);
+        var content = ContentService.GetById(setupData.Key);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(0, content!.PublishedCultures.Count());
+            Assert.IsNull(content!.PublishDate);
+            Assert.AreEqual(
+                _schedulePublishDate,
+                schedules.GetSchedule(Constants.System.InvariantCulture, ContentScheduleAction.Release).Single().Date);
+            Assert.AreEqual(1, schedules.FullSchedule.Count);
+        });
+    }
+
+    [Test]
     public async Task Can_Schedule_Publish_Single_Culture()
     {
         var setupInfo = await SetupVariantDoctypeAsync();
@@ -233,7 +269,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangEn.IsoCode,
-                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
                 },
             },
             Constants.Security.SuperUserKey);
@@ -270,12 +306,12 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangEn.IsoCode,
-                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
                 },
                 new()
                 {
                     Culture = setupInfo.LangDa.IsoCode,
-                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
                 },
             },
             Constants.Security.SuperUserKey);
@@ -315,17 +351,17 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangEn.IsoCode,
-                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
                 },
                 new()
                 {
                     Culture = setupInfo.LangDa.IsoCode,
-                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
                 },
                 new()
                 {
                     Culture = setupInfo.LangBe.IsoCode,
-                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
                 },
             },
             Constants.Security.SuperUserKey);
@@ -368,17 +404,17 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangEn.IsoCode,
-                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
                 },
                 new()
                 {
                     Culture = setupInfo.LangDa.IsoCode,
-                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
                 },
                 new()
                 {
                     Culture = UnknownCulture,
-                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate }
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate }
                 },
             },
             Constants.Security.SuperUserKey);
@@ -400,6 +436,40 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
     #region Schedule Unpublish
 
     [Test]
+    public async Task Can_Schedule_Unpublish_Invariant()
+    {
+        var doctype = await SetupInvariantDoctypeAsync();
+        var setupData = await CreateInvariantContentAsync(doctype);
+
+        var scheduleAttempt = await ContentPublishingService.PublishAsync(
+            setupData.Key,
+            new List<CulturePublishScheduleModel>
+            {
+                new()
+                {
+                    Culture = Constants.System.InvariantCulture,
+                    Schedule = new ContentScheduleModel { UnpublishDate = _scheduleUnPublishDate },
+                },
+            },
+            Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(scheduleAttempt.Success);
+
+        var schedules = ContentService.GetContentScheduleByContentId(setupData.Id);
+        var content = ContentService.GetById(setupData.Key);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(0, content!.PublishedCultures.Count());
+            Assert.IsNull(content!.PublishDate);
+            Assert.AreEqual(
+                _scheduleUnPublishDate,
+                schedules.GetSchedule(Constants.System.InvariantCulture, ContentScheduleAction.Expire).Single().Date);
+            Assert.AreEqual(1, schedules.FullSchedule.Count);
+        });
+    }
+
+    [Test]
     public async Task Can_Schedule_Unpublish_Single_Culture()
     {
         var setupInfo = await SetupVariantDoctypeAsync();
@@ -416,7 +486,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangEn.IsoCode,
-                    Schedule = new ScheduleModel { UnpublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { UnpublishDate = _schedulePublishDate },
                 },
             },
             Constants.Security.SuperUserKey);
@@ -453,12 +523,12 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangEn.IsoCode,
-                    Schedule = new ScheduleModel { UnpublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { UnpublishDate = _schedulePublishDate },
                 },
                 new()
                 {
                     Culture = setupInfo.LangDa.IsoCode,
-                    Schedule = new ScheduleModel { UnpublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { UnpublishDate = _schedulePublishDate },
                 },
             },
             Constants.Security.SuperUserKey);
@@ -498,17 +568,17 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangEn.IsoCode,
-                    Schedule = new ScheduleModel { UnpublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { UnpublishDate = _schedulePublishDate },
                 },
                 new()
                 {
                     Culture = setupInfo.LangDa.IsoCode,
-                    Schedule = new ScheduleModel { UnpublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { UnpublishDate = _schedulePublishDate },
                 },
                 new()
                 {
                     Culture = setupInfo.LangBe.IsoCode,
-                    Schedule = new ScheduleModel { UnpublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { UnpublishDate = _schedulePublishDate },
                 },
             },
             Constants.Security.SuperUserKey);
@@ -551,17 +621,17 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangEn.IsoCode,
-                    Schedule = new ScheduleModel { UnpublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { UnpublishDate = _schedulePublishDate },
                 },
                 new()
                 {
                     Culture = setupInfo.LangDa.IsoCode,
-                    Schedule = new ScheduleModel { UnpublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { UnpublishDate = _schedulePublishDate },
                 },
                 new()
                 {
                     Culture = UnknownCulture,
-                    Schedule = new ScheduleModel { UnpublishDate = _schedulePublishDate }
+                    Schedule = new ContentScheduleModel { UnpublishDate = _schedulePublishDate }
                 },
             },
             Constants.Security.SuperUserKey);
@@ -581,6 +651,47 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
     #endregion
 
     #region Unschedule Publish
+
+    [Test]
+    public async Task Can_UnSchedule_Publish_Invariant()
+    {
+        var doctype = await SetupInvariantDoctypeAsync();
+        var setupData = await CreateInvariantContentAsync(doctype);
+
+        var scheduleSetupAttempt =
+            await SchedulePublishAndUnPublishInvariantAsync(setupData);
+
+        if (scheduleSetupAttempt.Success is false)
+        {
+            throw new Exception("Setup failed");
+        }
+
+        var unscheduleAttempt = await ContentPublishingService.PublishAsync(
+            setupData.Key,
+            new List<CulturePublishScheduleModel>
+            {
+                new()
+                {
+                    Culture = Constants.System.InvariantCulture,
+                    Schedule = new ContentScheduleModel { UnpublishDate = _scheduleUnPublishDate },
+                },
+            },
+            Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(unscheduleAttempt.Success);
+
+        var schedules = ContentService.GetContentScheduleByContentId(setupData.Id);
+        var content = ContentService.GetById(setupData.Key);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(0, content!.PublishedCultures.Count());
+            Assert.IsNull(content!.PublishDate);
+            Assert.IsFalse(schedules.GetSchedule(Constants.System.InvariantCulture, ContentScheduleAction.Release).Any());
+            Assert.IsTrue(schedules.GetSchedule(Constants.System.InvariantCulture, ContentScheduleAction.Expire).Any());
+            Assert.AreEqual(1, schedules.FullSchedule.Count);
+        });
+    }
 
     [Test]
     public async Task Can_Unschedule_Publish_Single_Culture()
@@ -607,7 +718,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangEn.IsoCode,
-                    Schedule = new ScheduleModel { UnpublishDate = _scheduleUnPublishDate },
+                    Schedule = new ContentScheduleModel { UnpublishDate = _scheduleUnPublishDate },
                 },
             },
             Constants.Security.SuperUserKey);
@@ -650,12 +761,12 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangEn.IsoCode,
-                    Schedule = new ScheduleModel { UnpublishDate = _scheduleUnPublishDate }
+                    Schedule = new ContentScheduleModel { UnpublishDate = _scheduleUnPublishDate }
                 },
                 new()
                 {
                     Culture = setupInfo.LangDa.IsoCode,
-                    Schedule = new ScheduleModel { UnpublishDate = _scheduleUnPublishDate }
+                    Schedule = new ContentScheduleModel { UnpublishDate = _scheduleUnPublishDate }
                 },
             },
             Constants.Security.SuperUserKey);
@@ -699,17 +810,17 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangEn.IsoCode,
-                    Schedule = new ScheduleModel { UnpublishDate = _scheduleUnPublishDate },
+                    Schedule = new ContentScheduleModel { UnpublishDate = _scheduleUnPublishDate },
                 },
                 new()
                 {
                     Culture = setupInfo.LangDa.IsoCode,
-                    Schedule = new ScheduleModel { UnpublishDate = _scheduleUnPublishDate },
+                    Schedule = new ContentScheduleModel { UnpublishDate = _scheduleUnPublishDate },
                 },
                 new()
                 {
                     Culture = setupInfo.LangBe.IsoCode,
-                    Schedule = new ScheduleModel { UnpublishDate = _scheduleUnPublishDate },
+                    Schedule = new ContentScheduleModel { UnpublishDate = _scheduleUnPublishDate },
                 },
             },
             Constants.Security.SuperUserKey);
@@ -754,17 +865,17 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangEn.IsoCode,
-                    Schedule = new ScheduleModel { UnpublishDate = _scheduleUnPublishDate },
+                    Schedule = new ContentScheduleModel { UnpublishDate = _scheduleUnPublishDate },
                 },
                 new()
                 {
                     Culture = setupInfo.LangDa.IsoCode,
-                    Schedule = new ScheduleModel { UnpublishDate = _scheduleUnPublishDate },
+                    Schedule = new ContentScheduleModel { UnpublishDate = _scheduleUnPublishDate },
                 },
                 new()
                 {
                     Culture = UnknownCulture,
-                    Schedule = new ScheduleModel { UnpublishDate = _scheduleUnPublishDate },
+                    Schedule = new ContentScheduleModel { UnpublishDate = _scheduleUnPublishDate },
                 },
             },
             Constants.Security.SuperUserKey);
@@ -784,6 +895,47 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
     #endregion
 
     #region Unschedule Unpublish
+
+    [Test]
+    public async Task Can_UnSchedule_Unpublish_Invariant()
+    {
+        var doctype = await SetupInvariantDoctypeAsync();
+        var setupData = await CreateInvariantContentAsync(doctype);
+
+        var scheduleSetupAttempt =
+            await SchedulePublishAndUnPublishInvariantAsync(setupData);
+
+        if (scheduleSetupAttempt.Success is false)
+        {
+            throw new Exception("Setup failed");
+        }
+
+        var unscheduleAttempt = await ContentPublishingService.PublishAsync(
+            setupData.Key,
+            new List<CulturePublishScheduleModel>
+            {
+                new()
+                {
+                    Culture = Constants.System.InvariantCulture,
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
+                },
+            },
+            Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(unscheduleAttempt.Success);
+
+        var schedules = ContentService.GetContentScheduleByContentId(setupData.Id);
+        var content = ContentService.GetById(setupData.Key);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(0, content!.PublishedCultures.Count());
+            Assert.IsNull(content!.PublishDate);
+            Assert.IsFalse(schedules.GetSchedule(Constants.System.InvariantCulture, ContentScheduleAction.Expire).Any());
+            Assert.IsTrue(schedules.GetSchedule(Constants.System.InvariantCulture, ContentScheduleAction.Release).Any());
+            Assert.AreEqual(1, schedules.FullSchedule.Count);
+        });
+    }
 
     [Test]
     public async Task Can_Unschedule_Unpublish_Single_Culture()
@@ -810,7 +962,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangEn.IsoCode,
-                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
                 },
             },
             Constants.Security.SuperUserKey);
@@ -853,12 +1005,12 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangEn.IsoCode,
-                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate }
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate }
                 },
                 new()
                 {
                     Culture = setupInfo.LangDa.IsoCode,
-                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate }
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate }
                 },
             },
             Constants.Security.SuperUserKey);
@@ -902,17 +1054,17 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangEn.IsoCode,
-                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
                 },
                 new()
                 {
                     Culture = setupInfo.LangDa.IsoCode,
-                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
                 },
                 new()
                 {
                     Culture = setupInfo.LangBe.IsoCode,
-                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
                 },
             },
             Constants.Security.SuperUserKey);
@@ -957,17 +1109,17 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangEn.IsoCode,
-                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
                 },
                 new()
                 {
                     Culture = setupInfo.LangDa.IsoCode,
-                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
                 },
                 new()
                 {
                     Culture = UnknownCulture,
-                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
                 },
             },
             Constants.Security.SuperUserKey);
@@ -987,6 +1139,45 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
     #endregion
 
     #region Clean Schedule
+
+    [Test]
+    public async Task Can_Clear_Schedule_Invariant()
+    {
+        var doctype = await SetupInvariantDoctypeAsync();
+        var setupData = await CreateInvariantContentAsync(doctype);
+
+        var scheduleSetupAttempt =
+            await SchedulePublishAndUnPublishInvariantAsync(setupData);
+
+        if (scheduleSetupAttempt.Success is false)
+        {
+            throw new Exception("Setup failed");
+        }
+
+        var clearScheduleAttempt = await ContentPublishingService.PublishAsync(
+            setupData.Key,
+            new List<CulturePublishScheduleModel>
+            {
+                new()
+                {
+                    Culture = Constants.System.InvariantCulture,
+                    Schedule = new ContentScheduleModel(),
+                },
+            },
+            Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(clearScheduleAttempt.Success);
+
+        var schedules = ContentService.GetContentScheduleByContentId(setupData.Id);
+        var content = ContentService.GetById(setupData.Key);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(0, content!.PublishedCultures.Count());
+            Assert.IsNull(content!.PublishDate);
+            Assert.AreEqual(0, schedules.FullSchedule.Count);
+        });
+    }
 
     [Test]
     public async Task Can_Clear_Schedule_Single_Culture()
@@ -1013,7 +1204,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangEn.IsoCode,
-                    Schedule = new ScheduleModel(),
+                    Schedule = new ContentScheduleModel(),
                 },
             },
             Constants.Security.SuperUserKey);
@@ -1057,12 +1248,12 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangEn.IsoCode,
-                    Schedule = new ScheduleModel(),
+                    Schedule = new ContentScheduleModel(),
                 },
                 new()
                 {
                     Culture = setupInfo.LangDa.IsoCode,
-                    Schedule = new ScheduleModel(),
+                    Schedule = new ContentScheduleModel(),
                 },
             },
             Constants.Security.SuperUserKey);
@@ -1108,17 +1299,17 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangEn.IsoCode,
-                    Schedule = new ScheduleModel(),
+                    Schedule = new ContentScheduleModel(),
                 },
                 new()
                 {
                     Culture = setupInfo.LangDa.IsoCode,
-                    Schedule = new ScheduleModel(),
+                    Schedule = new ContentScheduleModel(),
                 },
                 new()
                 {
                     Culture = setupInfo.LangBe.IsoCode,
-                    Schedule = new ScheduleModel(),
+                    Schedule = new ContentScheduleModel(),
                 },
             },
             Constants.Security.SuperUserKey);
@@ -1160,7 +1351,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangDa.IsoCode,
-                    Schedule = new ScheduleModel { PublishDate = _schedulePublishDate },
+                    Schedule = new ContentScheduleModel { PublishDate = _schedulePublishDate },
                 },
             },
             Constants.Security.SuperUserKey);
@@ -1176,7 +1367,6 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
             Assert.AreEqual(1, schedules.FullSchedule.Count);
         });
     }
-
     #endregion
 
     #region Helper methods
@@ -1314,7 +1504,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 {
                     Culture = setupInfo.LangEn.IsoCode,
                     Schedule =
-                        new ScheduleModel
+                        new ContentScheduleModel
                         {
                             PublishDate = _schedulePublishDate, UnpublishDate = _scheduleUnPublishDate,
                         },
@@ -1323,7 +1513,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 {
                     Culture = setupInfo.LangDa.IsoCode,
                     Schedule =
-                        new ScheduleModel
+                        new ContentScheduleModel
                         {
                             PublishDate = _schedulePublishDate, UnpublishDate = _scheduleUnPublishDate,
                         },
@@ -1331,10 +1521,29 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
                 new()
                 {
                     Culture = setupInfo.LangBe.IsoCode,
-                    Schedule = new ScheduleModel
+                    Schedule = new ContentScheduleModel
                     {
                         PublishDate = _schedulePublishDate, UnpublishDate = _scheduleUnPublishDate,
                     },
+                },
+            },
+            Constants.Security.SuperUserKey);
+
+    private async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>>
+        SchedulePublishAndUnPublishInvariantAsync(
+            IContent setupData)
+        => await ContentPublishingService.PublishAsync(
+            setupData.Key,
+            new List<CulturePublishScheduleModel>
+            {
+                new()
+                {
+                    Culture = Constants.System.InvariantCulture,
+                    Schedule =
+                        new ContentScheduleModel
+                        {
+                            PublishDate = _schedulePublishDate, UnpublishDate = _scheduleUnPublishDate,
+                        },
                 },
             },
             Constants.Security.SuperUserKey);

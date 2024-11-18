@@ -10,10 +10,10 @@ public class CulturePublishScheduleModel
     /// <summary>
     /// Gets or sets the schedule of publishing. Null means immediately.
     /// </summary>
-    public ScheduleModel? Schedule { get; set; }
+    public ContentScheduleModel? Schedule { get; set; }
 }
 
-public class ScheduleModel
+public class ContentScheduleModel
 {
     public DateTimeOffset? PublishDate { get; set; }
 

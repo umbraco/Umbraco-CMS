@@ -123,7 +123,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
         }
         else
         {
-            if (cultures.Length != 1 || cultures.Any(x => x != "*"))
+            if (cultures.Length != 1 || cultures.Any(x => x != Constants.System.InvariantCulture))
             {
                 scope.Complete();
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.InvalidCulture, new ContentPublishingResult());
