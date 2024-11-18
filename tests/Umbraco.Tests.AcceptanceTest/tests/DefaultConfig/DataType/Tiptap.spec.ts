@@ -220,8 +220,8 @@ test('can delete toolbar group', async ({umbracoApi, umbracoUi}) => {
 
 test('can delete toolbar row', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const deletedRowIndex = 0;
-  await umbracoApi.dataType.createDefaultTiptapDataType(tiptapName);
+  const deletedRowIndex = 1;
+  await umbracoApi.dataType.createTiptapDataTypeWithTwoToolbarRows(tiptapName);
   await umbracoUi.dataType.goToDataType(tiptapName);
   const rowCount = await umbracoApi.dataType.getTiptapToolbarRowCount(tiptapName);
 
@@ -256,4 +256,3 @@ test('can disable extensions item', async ({umbracoApi, umbracoUi}) => {
   expect(extensionsValue.value.length).toBe(extensionsCount - 1);
   expect(extensionsValue.value).not.toContain(extensionItemName);
 });
-
