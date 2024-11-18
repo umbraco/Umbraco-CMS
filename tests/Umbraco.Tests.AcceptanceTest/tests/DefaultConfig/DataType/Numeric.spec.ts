@@ -18,8 +18,7 @@ test.afterEach(async ({umbracoApi}) => {
   }
 });
 
-// TODO: unskip when fixed, currently flaky
-test.skip('can update minimum value', async ({umbracoApi, umbracoUi}) => {
+test('can update minimum value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minimumValue = -5;
   const expectedDataTypeValues = {
