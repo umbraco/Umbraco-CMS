@@ -57,8 +57,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	protected _detailRepository?: DetailRepositoryType;
 
 	#parent = new UmbObjectState<{ entityType: string; unique: UmbEntityUnique } | undefined>(undefined);
-	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
-	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
+	public readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
+	public readonly parentEntityType = this.#parent.asObservablePart((parent) =>
+		parent ? parent.entityType : undefined,
+	);
 
 	#loadingStateUnique = 'umbLoadingEntityDetail';
 
@@ -73,7 +75,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		}
 	});
 
-	constructor(host: UmbControllerHost, args: UmbEntityWorkspaceContextArgs) {
+	constructor(host: UmbControllerHost, args: UmbEntityDetailWorkspaceContextArgs) {
 		super(host, args.workspaceAlias);
 		this.#entityContext.setEntityType(args.entityType);
 		window.addEventListener('willchangestate', this.#onWillNavigate);
@@ -103,7 +105,11 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @returns { string | undefined } The unique identifier
 	 */
 	getUnique(): UmbEntityUnique | undefined {
-		return this._data.getCurrent()?.unique;
+		return this.getData()?.unique;
+	}
+
+	setUnique(unique: string) {
+		this.#entityContext.setUnique(unique);
 	}
 
 	/**
@@ -112,6 +118,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 */
 	getParent(): UmbEntityModel | undefined {
 		return this.#parent.getValue();
+	}
+
+	setParent(parent: UmbEntityModel) {
+		this.#parent.setValue(parent);
 	}
 
 	/**
@@ -170,11 +180,12 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @param {Partial<DetailModelType>} args.preset The preset data.
 	 * @returns { Promise<any> | undefined } The data of the scaffold.
 	 */
-	async createScaffold(args: CreateArgsType) {
+	public async createScaffold(args: CreateArgsType) {
 		this.loading.addState({ unique: this.#loadingStateUnique, message: `Creating ${this.getEntityType()} scaffold` });
 		await this.#init;
 		this.resetState();
-		this.#parent.setValue(args.parent);
+		this.setParent(args.parent);
+
 		const request = this._detailRepository!.createScaffold(args.preset);
 		this._getDataPromise = request;
 		let { data } = await request;
@@ -198,7 +209,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	async submit() {
 		await this.#init;
-		const currentData = this._data.getCurrent();
+		const currentData = this.getData();
 
 		if (!currentData) {
 			throw new Error('Data is not set');
@@ -209,9 +220,12 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		}
 
 		if (this.getIsNew()) {
-			await this.#create(currentData);
+			const parent = this.#parent.getValue();
+			if (parent?.unique === undefined) throw new Error('Parent unique is missing');
+			if (!parent.entityType) throw new Error('Parent entity type is missing');
+			await this._create(currentData, parent);
 		} else {
-			await this.#update(currentData);
+			await this._update(currentData);
 		}
 	}
 
@@ -235,11 +249,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return !newUrl.includes(this.routes.getActiveLocalPath());
 	}
 
-	async #create(currentData: DetailModelType) {
+	protected async _create(currentData: DetailModelType, parent: UmbEntityModel) {
 		if (!this._detailRepository) throw new Error('Detail repository is not set');
-
-		const parent = this.#parent.getValue();
-		if (!parent) throw new Error('Parent is not set');
 
 		const { error, data } = await this._detailRepository.create(currentData, parent.unique);
 		if (error || !data) {
@@ -258,7 +269,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.setIsNew(false);
 	}
 
-	async #update(currentData: DetailModelType) {
+	protected async _update(currentData: DetailModelType) {
 		const { error, data } = await this._detailRepository!.save(currentData);
 		if (error || !data) {
 			throw error?.message ?? 'Repository did not return data after create.';
@@ -276,8 +287,14 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		actionEventContext.dispatchEvent(event);
 	}
 
+	#allowNavigateAway = false;
+
 	#onWillNavigate = async (e: CustomEvent) => {
 		const newUrl = e.detail.url;
+
+		if (this.#allowNavigateAway) {
+			return true;
+		}
 
 		/* TODO: temp removal of discard changes in workspace modals.
 		 The modal closes before the discard changes dialog is resolved.*/
@@ -285,7 +302,11 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			return true;
 		}
 
-		if (this._checkWillNavigateAway(newUrl) && this._data.getHasUnpersistedChanges()) {
+		if (this._checkWillNavigateAway(newUrl) && this._getHasUnpersistedChanges()) {
+			/* Since ours modals are async while events are synchronous, we need to prevent the default behavior of the event, even if the modal hasn’t been resolved yet. 
+			Once the modal is resolved (the user accepted to discard the changes and navigate away from the route), we will push a new history state. 
+			This push will make the "willchangestate" event happen again and due to this somewhat "backward" behavior, 
+			we set an "allowNavigateAway"-flag to prevent the "discard-changes" functionality from running in a loop.*/
 			e.preventDefault();
 			const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 			const modal = modalManager.open(this, UMB_DISCARD_CHANGES_MODAL);
@@ -293,8 +314,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			try {
 				// navigate to the new url when discarding changes
 				await modal.onSubmit();
-				// Reset the current data so we don't end in a endless loop of asking to discard changes.
-				this._data.resetCurrent();
+				this.#allowNavigateAway = true;
 				history.pushState({}, '', e.detail.url);
 				return true;
 			} catch {
@@ -305,9 +325,18 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return true;
 	};
 
+	/**
+	 * Check if there are unpersisted changes.
+	 * @returns { boolean } true if there are unpersisted changes.
+	 */
+	protected _getHasUnpersistedChanges(): boolean {
+		return this._data.getHasUnpersistedChanges();
+	}
+
 	override resetState() {
 		super.resetState();
 		this._data.clear();
+		this.#allowNavigateAway = false;
 	}
 
 	#checkIfInitialized() {

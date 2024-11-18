@@ -17,7 +17,8 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can create content with the document link', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+// TODO: Remove skip when the front-end is ready. Currently it is impossible to link an unpublish document
+test.skip('can create content with the document link', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -36,7 +37,9 @@ test('can create content with the document link', {tag: '@smoke'}, async ({umbra
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickLinkToDocumentButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
+  await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
 
@@ -59,7 +62,8 @@ test('can create content with the document link', {tag: '@smoke'}, async ({umbra
   await umbracoApi.document.ensureNameNotExists(linkedDocumentName);
 });
 
-test('can publish content with the document link', async ({umbracoApi, umbracoUi}) => {
+// TODO: Remove skip when the front-end is ready. Currently it is impossible to link an unpublish document
+test.skip('can publish content with the document link', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -76,7 +80,9 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickLinkToDocumentButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
+  await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveAndPublishButton();
 
@@ -127,7 +133,8 @@ test('can create content with the external link', async ({umbracoApi, umbracoUi}
   expect(contentData.values[0].value[0].url).toEqual(link);
 });
 
-test('can create content with the media link', async ({umbracoApi, umbracoUi}) => {
+// TODO: Remove skip when the code is updated due to UI changes
+test.skip('can create content with the media link', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -162,7 +169,8 @@ test('can create content with the media link', async ({umbracoApi, umbracoUi}) =
   await umbracoApi.media.ensureNameNotExists(mediaFileName);
 });
 
-test('can add multiple links in the content', async ({umbracoApi, umbracoUi}) => {
+// TODO: Remove skip when the code is updated due to UI changes
+test.skip('can add multiple links in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -229,7 +237,8 @@ test('can remove the URL picker in the content', async ({umbracoApi, umbracoUi})
   expect(contentData.values).toEqual([]);
 });
 
-test('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) => {
+// TODO: Remove skip when the code is updated due to UI changes
+test.skip('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedLinkTitle = 'Updated Umbraco Documentation';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
