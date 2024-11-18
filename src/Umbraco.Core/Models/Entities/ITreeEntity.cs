@@ -32,7 +32,6 @@ public interface ITreeEntity : IEntity
 
     /// <summary>
     ///     Gets or sets the sort order of the entity.
-    ///     The value -1 holds a special meaning as 'unset'. Using this special value implicitly might cause unwanted behaviour
     /// </summary>
     int SortOrder { get; set; }
 

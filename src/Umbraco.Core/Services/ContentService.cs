@@ -2744,7 +2744,7 @@ public class ContentService : RepositoryService, IContentService
                 while (page * pageSize < total)
                 {
                     IEnumerable<IContent> descendants =
-                        GetPagedDescendants(content.Id, page++, pageSize, out total);
+                        GetPagedDescendants(content.Id, page++, pageSize, out total, ordering: Ordering.By("sortOrder"));
                     foreach (IContent descendant in descendants)
                     {
                         // if parent has not been copied, skip, else gets its copy id
