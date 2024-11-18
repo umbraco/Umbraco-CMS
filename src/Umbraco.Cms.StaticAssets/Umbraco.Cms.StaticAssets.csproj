@@ -33,26 +33,23 @@
     <LoginAssetsInputs Include="$(LoginAssetsDirectory)**" Exclude="$(DefaultItemExcludes)" />
   </ItemGroup>
 
-  <Target Name="RestoreBackoffice" Inputs="$(BackofficeAssetsDirectory)package.json;$(BackofficeAssetsDirectory)package-lock.json" Outputs="$(BackofficeAssetsDirectory)node_modules\.package-lock.json">
+  <Target Name="RestoreBackoffice" Inputs="$(BackofficeAssetsDirectory)package-lock.json" Outputs="$(BackofficeAssetsDirectory)node_modules\.package-lock.json">
     <Message Importance="high" Text="Restoring Backoffice NPM packages..." />
     <Exec Command="npm ci --no-fund --no-audit --prefer-offline" WorkingDirectory="$(BackofficeAssetsDirectory)" />
   </Target>
 
   <Target Name="BuildBackoffice" DependsOnTargets="RestoreBackoffice" BeforeTargets="AssignTargetPaths" Inputs="@(BackofficeAssetsInputs)" Outputs="$(IntermediateOutputPath)backoffice.complete.txt">
-    <Message Importance="high" Text="Executing backoffice NPM build script..." />
+    <Message Importance="high" Text="Executing Backoffice NPM build script..." />
     <Exec Command="npm run build:for:cms" WorkingDirectory="$(BackofficeAssetsDirectory)" />
-
     <ItemGroup>
       <_BackofficeAssetsBuildOutput Include="$(BackofficePath)/**" />
-
       <FileWrites Include="@(_BackofficeAssetsBuildOutput)" />
       <FileWrites Include="$(IntermediateOutputPath)backoffice.complete.txt" />
     </ItemGroup>
-
     <WriteLinesToFile File="$(IntermediateOutputPath)backoffice.complete.txt" Lines="@(_BackofficeAssetsBuildOutput)" Overwrite="true" />
   </Target>
 
-  <Target Name="RestoreLogin" Inputs="$(LoginAssetsDirectory)package.json;$(LoginAssetsDirectory)package-lock.json" Outputs="$(LoginAssetsDirectory)node_modules/.package-lock.json">
+  <Target Name="RestoreLogin" Inputs="$(LoginAssetsDirectory)package-lock.json" Outputs="$(LoginAssetsDirectory)node_modules/.package-lock.json">
     <Message Importance="high" Text="Restoring Login NPM packages..." />
     <Exec Command="npm ci --no-fund --no-audit --prefer-offline" WorkingDirectory="$(LoginAssetsDirectory)" />
   </Target>
@@ -60,14 +57,11 @@
   <Target Name="BuildLogin" DependsOnTargets="RestoreLogin" BeforeTargets="AssignTargetPaths" Inputs="@(LoginAssetsInputs)" Outputs="$(IntermediateOutputPath)login.complete.txt">
     <Message Importance="high" Text="Executing Login NPM build script..." />
     <Exec Command="npm run build" WorkingDirectory="$(LoginAssetsDirectory)" />
-
     <ItemGroup>
       <_LoginAssetsBuildOutput Include="$(LoginPath)\**" />
-
       <FileWrites Include="@(_LoginAssetsBuildOutput)" />
       <FileWrites Include="$(IntermediateOutputPath)login.complete.txt" />
     </ItemGroup>
-
     <WriteLinesToFile File="$(IntermediateOutputPath)login.complete.txt" Lines="@(_LoginAssetsBuildOutput)" Overwrite="true" />
   </Target>
 </Project>
