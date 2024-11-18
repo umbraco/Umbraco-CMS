@@ -27,7 +27,7 @@ const textstrings = [
 ];
 
 for (const textstring of textstrings) {
-  test(`can render content with ${textstring.type}`, async ({umbracoApi, umbracoUi}) => {
+  test(`can render content with ${textstring.type}`, {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const textstringValue = textstring.value;
     const templateId = await umbracoApi.template.createTemplateWithDisplayingStringValue(templateName, AliasHelper.toAlias(propertyName));
