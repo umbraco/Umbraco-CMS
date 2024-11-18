@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -523,5 +525,16 @@ public interface IContentService : IContentServiceBase<IContent>
     #endregion
 
     Task<OperationResult> EmptyRecycleBinAsync(Guid userId);
-    ContentScheduleCollection GetContentScheduleByContentId(Guid contentId);
+
+    ContentScheduleCollection GetContentScheduleByContentId(Guid contentId)
+    {
+        // Todo clean up default implementation in v17
+        Attempt<int> idAttempt = StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>()
+            .GetIdForKey(contentId, UmbracoObjectTypes.Document);
+        if (idAttempt.Success is false)
+        {
+            throw new ArgumentException("Invalid contentId");
+        }
+        return GetContentScheduleByContentId(idAttempt.Result);
+    }
 }
