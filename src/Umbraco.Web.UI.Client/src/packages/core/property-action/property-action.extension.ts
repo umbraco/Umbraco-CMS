@@ -1,4 +1,4 @@
-import type { UmbPropertyAction } from '../components/property-action/property-action.interface.js';
+import type { UmbPropertyAction } from './property-action.interface.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 

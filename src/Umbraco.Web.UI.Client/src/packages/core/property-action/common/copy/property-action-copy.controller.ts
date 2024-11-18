@@ -1,4 +1,4 @@
-import { UmbPropertyActionBase } from '../../components/property-action/property-action-base.controller.js';
+import { UmbPropertyActionBase } from '../../property-action-base.js';
 import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationDefaultData } from '@umbraco-cms/backoffice/notification';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 

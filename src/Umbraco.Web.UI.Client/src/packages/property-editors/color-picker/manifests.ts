@@ -1,9 +1,11 @@
+import { UMB_COLOR_PICKER_PROPERTY_EDITOR_UI_ALIAS } from './constants.js';
 import { manifest as schemaManifest } from './Umbraco.ColorPicker.js';
+import { manifests as propertyActionManifests } from './copy-property-action/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
-		alias: 'Umb.PropertyEditorUi.ColorPicker',
+		alias: UMB_COLOR_PICKER_PROPERTY_EDITOR_UI_ALIAS,
 		name: 'Color Picker Property Editor UI',
 		element: () => import('./property-editor-ui-color-picker.element.js'),
 		meta: {
@@ -15,4 +17,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	schemaManifest,
+	...propertyActionManifests,
 ];
