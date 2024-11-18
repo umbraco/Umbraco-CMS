@@ -83,7 +83,7 @@ public class SliderPropertyEditor : DataEditor
 
             public decimal To { get; set; }
 
-            public override string ToString() => From == To ? $"{From}" : $"{From},{To}";
+            public override string ToString() => From == To ? $"{From.ToString(CultureInfo.InvariantCulture)}" : $"{From.ToString(CultureInfo.InvariantCulture)},{To.ToString(CultureInfo.InvariantCulture)}";
         }
     }
 }
