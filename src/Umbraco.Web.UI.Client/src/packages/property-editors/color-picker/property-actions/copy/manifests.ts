@@ -1,5 +1,5 @@
 import { UMB_WRITABLE_PROPERTY_CONDITION_ALIAS } from '@umbraco-cms/backoffice/property';
-import { UMB_COLOR_PICKER_PROPERTY_EDITOR_UI_ALIAS } from '../constants.js';
+import { UMB_COLOR_PICKER_PROPERTY_EDITOR_UI_ALIAS } from '../../constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
