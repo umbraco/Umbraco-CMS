@@ -4,8 +4,8 @@
     <Description>Contains the static assets needed to run Umbraco CMS.</Description>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
-    <CompressionEnabled>false</CompressionEnabled> <!-- Disable compression. E.g. for umbraco backoffice files. These files should be precompressed by node and not let dotnet handle it -->
-    <EnableDefaultContentItems>false</EnableDefaultContentItems>
+    <!-- Disable compression for static files, because MapStaticAssets() is not used anyway (yet) -->
+    <CompressionEnabled>false</CompressionEnabled>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -18,11 +18,6 @@
     <ProjectReference Include="..\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj" />
     <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
     <SupportedPlatform Include="browser" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="umbraco\**" />
-    <Content Include="wwwroot\**" />
   </ItemGroup>
 
   <PropertyGroup>
