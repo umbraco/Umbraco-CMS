@@ -195,7 +195,7 @@ public class TemplateServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Deleting_Master_Template_Also_Deletes_Children()
+    public async Task Master_Template_Cannot_Be_Deleted()
     {
         Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Parent", "parent", "test", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
@@ -207,10 +207,8 @@ public class TemplateServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("parent", child.MasterTemplateAlias);
 
         result = await TemplateService.DeleteAsync(parent.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-
-        child = await TemplateService.GetAsync(child.Key);
-        Assert.Null(child);
+        Assert.IsFalse(result.Success);
+        Assert.That(result.Status, Is.EqualTo(TemplateOperationStatus.MasterTemplateCannotBeDeleted));
     }
 
     [Test]

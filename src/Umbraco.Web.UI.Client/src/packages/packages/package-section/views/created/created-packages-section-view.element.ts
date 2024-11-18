@@ -43,18 +43,12 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implemen
 				setup: (component, info) => {
 					if (component) {
 						(component as any).entityUnique = info.match.params.unique;
-						(component as any).workspaceAlias = workspace.alias;
 					}
 				},
 			});
 			routes.push({
 				path: workspace.meta.entityType,
 				component: () => createExtensionElement(workspace),
-				setup: (component) => {
-					if (component) {
-						(component as any).workspaceAlias = workspace.alias;
-					}
-				},
 			});
 		});
 

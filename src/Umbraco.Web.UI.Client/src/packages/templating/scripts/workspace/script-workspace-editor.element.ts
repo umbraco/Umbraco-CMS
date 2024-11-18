@@ -54,7 +54,7 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 	override render() {
 		if (this._isNew === undefined) return;
 		return html`
-			<umb-workspace-editor alias="Umb.Workspace.Script">
+			<umb-workspace-editor>
 				<div id="workspace-header" slot="header">
 					<uui-input
 						placeholder=${this.localize.term('placeholders_entername')}
