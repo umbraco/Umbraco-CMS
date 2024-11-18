@@ -276,7 +276,7 @@
 
                 // Readonly mode
                 baseLineConfigObj.toolbar = vm.readonly ? false : baseLineConfigObj.toolbar;
-                baseLineConfigObj.readonly = vm.readonly ? 1 : baseLineConfigObj.readonly;
+                baseLineConfigObj.readonly = vm.readonly ? true : baseLineConfigObj.readonly;
 
                 // We need to wait for DOM to have rendered before we can find the element by ID.
                 $timeout(function () {
