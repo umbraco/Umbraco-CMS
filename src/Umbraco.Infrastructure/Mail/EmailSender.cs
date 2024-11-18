@@ -29,14 +29,17 @@ public class EmailSender : IEmailSender
     private readonly bool _notificationHandlerRegistered;
     private GlobalSettings _globalSettings;
     private readonly IEmailSenderClient _emailSenderClient;
+
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
     public EmailSender(
         ILogger<EmailSender> logger,
         IOptionsMonitor<GlobalSettings> globalSettings,
         IEventAggregator eventAggregator)
-        : this(logger, globalSettings, eventAggregator, null, null)
+        : this(logger, globalSettings, eventAggregator,null, null)
     {
     }
 
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
     public EmailSender(
         ILogger<EmailSender> logger,
         IOptionsMonitor<GlobalSettings> globalSettings,
@@ -49,6 +52,23 @@ public class EmailSender : IEmailSender
         _globalSettings = globalSettings.CurrentValue;
         _notificationHandlerRegistered = handler1 is not null || handler2 is not null;
         _emailSenderClient = StaticServiceProvider.Instance.GetRequiredService<IEmailSenderClient>();
+        globalSettings.OnChange(x => _globalSettings = x);
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public EmailSender(
+        ILogger<EmailSender> logger,
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        IEventAggregator eventAggregator,
+        IEmailSenderClient emailSenderClient,
+        INotificationHandler<SendEmailNotification>? handler1,
+        INotificationAsyncHandler<SendEmailNotification>? handler2)
+    {
+        _logger = logger;
+        _eventAggregator = eventAggregator;
+        _globalSettings = globalSettings.CurrentValue;
+        _notificationHandlerRegistered = handler1 is not null || handler2 is not null;
+        _emailSenderClient = emailSenderClient;
         globalSettings.OnChange(x => _globalSettings = x);
     }
 
