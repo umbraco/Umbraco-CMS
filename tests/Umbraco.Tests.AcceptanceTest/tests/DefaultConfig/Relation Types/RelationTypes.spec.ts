@@ -1,6 +1,7 @@
 ﻿import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
+// Skip all tests as this feature is removed
 const relationTypeName = 'Test Relation Type';
 const objectTypeName = 'Document';
 let relationTypeId = '';
