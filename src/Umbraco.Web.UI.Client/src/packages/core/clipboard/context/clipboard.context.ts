@@ -53,7 +53,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	 * @param {UmbClipboardEntry} entry A clipboard entry to insert into the clipboard
 	 * @memberof UmbClipboardContext
 	 */
-	create(entry: UmbClipboardEntry): void {
+	async create(entry: UmbClipboardEntry): Promise<void> {
 		if (!entry) throw new Error('Entry is required');
 		if (!entry.unique) throw new Error('Entry must have a unique property');
 		this.setEntries([...this.#entries.getValue(), entry]);
@@ -64,7 +64,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	 * @param {UmbClipboardEntry} entry A clipboard entry to insert into the clipboard
 	 * @memberof UmbClipboardContext
 	 */
-	read(unique: string): UmbClipboardEntry {
+	async read(unique: string): Promise<UmbClipboardEntry> {
 		const entry = this.#entries.getValue().find((x) => x.unique === unique);
 		if (!entry) throw new Error(`Entry with unique ${unique} not found`);
 		return entry;
@@ -75,7 +75,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	 * @param {UmbClipboardEntry} entry A clipboard entry to update in the clipboard
 	 * @memberof UmbClipboardContext
 	 */
-	update(entry: UmbClipboardEntry): void {
+	async update(entry: UmbClipboardEntry): Promise<void> {
 		if (!entry) throw new Error('Entry is required');
 		if (!entry.unique) throw new Error('Entry must have a unique property');
 		this.#entries.updateOne(entry.unique, entry);
@@ -86,7 +86,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	 * @param {string} unique A unique identifier of the entry to remove from the clipboard
 	 * @memberof UmbClipboardContext
 	 */
-	delete(unique: string): void {
+	async delete(unique: string): Promise<void> {
 		const entry = this.read(unique);
 		if (!entry) return;
 		this.#entries.setValue(this.#entries.getValue().filter((x) => x.unique !== unique));
@@ -96,7 +96,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	 * Remove all entries from the clipboard
 	 * @memberof UmbClipboardContext
 	 */
-	clear() {
+	async clear(): Promise<void> {
 		this.#entries.setValue([]);
 	}
 
