@@ -12,7 +12,12 @@ if (!['dev', 'prod'].includes(mode)) {
 	throw new Error(`MODE must be "dev" or "prod", was "${mode}"`);
 }
 
-const silencedLogs = ['Lit is in dev mode.', 'Multiple versions of Lit loaded.', '-- Extension of alias "', 'Error: Failed to create extension api from alias'];
+const silencedLogs = [
+	'Lit is in dev mode.',
+	'Multiple versions of Lit loaded.',
+	'-- Extension of alias "',
+	'Error: Failed to create extension api from alias',
+];
 
 /** @type {import('@web/dev-server').DevServerConfig} */
 export default {
@@ -62,6 +67,7 @@ export default {
 					window.__UMBRACO_TEST_RUN_A11Y_TEST = ${(!devMode).toString()};
 				</script>
 				<script src="/node_modules/msw/lib/iife/index.js"></script>
+				<script type="module" src="/web-test-runner.index.ts"></script>
 				<link rel="stylesheet" href="node_modules/@umbraco-ui/uui-css/dist/uui-css.css">
 				<link rel="stylesheet" href="src/css/umb-css.css">
 				<script type="module">
