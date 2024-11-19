@@ -593,12 +593,12 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	};
 
 	#handleDragEnd = async (event?: DragEvent) => {
-		// If not good drop, revert model?
-
 		if (!UmbSorterController.activeElement || !UmbSorterController.activeItem) {
 			return;
 		}
 
+		// If browser thinks this was a cancelled move, we should revert the move. (based on dropEffect === 'none') [NL]
+		// But notice, this also count when releasing the mouse outside the sorters element, this i'm not sure if I agree on, would be ideal only to revert if ESC was pressed. [NL]
 		if (UmbSorterController.originalSorter && event?.dataTransfer != null && event.dataTransfer.dropEffect === 'none') {
 			// Revert move, to start position.
 			UmbSorterController.originalSorter.moveItemInModel(
