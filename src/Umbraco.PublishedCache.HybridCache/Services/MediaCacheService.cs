@@ -259,6 +259,17 @@ internal class MediaCacheService : IMediaCacheService
         scope.Complete();
     }
 
+    public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        IEnumerable<ContentCacheNode> nodes = _databaseCacheRepository.GetContentByContentTypeKey([contentType.Key], ContentCacheDataSerializerEntityType.Media);
+        scope.Complete();
+
+        return nodes
+            .Select(x => _publishedContentFactory.ToIPublishedContent(x, x.IsDraft).CreateModel(_publishedModelFactory))
+            .WhereNotNull();
+    }
+
     private HybridCacheEntryOptions GetEntryOptions(Guid key)
     {
         if (SeedKeys.Contains(key))

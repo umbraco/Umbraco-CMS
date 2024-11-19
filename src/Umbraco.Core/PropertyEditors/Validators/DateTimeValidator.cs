@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Globalization;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Extensions;
 
@@ -26,7 +25,7 @@ public class DateTimeValidator : IValueValidator
             yield break;
         }
 
-        if (DateTime.TryParse(value.ToString(), CultureInfo.InvariantCulture, out DateTime dt) == false)
+        if (DateTime.TryParse(value.ToString(), out DateTime dt) == false)
         {
             yield return new ValidationResult(
                 $"The string value {value} cannot be parsed into a DateTime",

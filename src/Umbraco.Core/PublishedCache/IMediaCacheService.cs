@@ -26,4 +26,5 @@ public interface IMediaCacheService
     Task SeedAsync(CancellationToken cancellationToken);
 
     void Rebuild(IReadOnlyCollection<int> contentTypeIds);
+    IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType);
 }

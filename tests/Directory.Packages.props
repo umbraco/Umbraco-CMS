@@ -5,12 +5,12 @@
   <ItemGroup>
     <!-- Microsoft packages -->
     <PackageVersion Include="BenchmarkDotNet" Version="0.14.0" />
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.0-rc.2.24474.3" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0-rc.2.24473.5" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageVersion Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageVersion Include="System.Data.Odbc" Version="9.0.0-rc.2.24473.5" />
-    <PackageVersion Include="System.Data.OleDb" Version="9.0.0-rc.2.24473.5" />
+    <PackageVersion Include="System.Data.Odbc" Version="9.0.0" />
+    <PackageVersion Include="System.Data.OleDb" Version="9.0.0" />
     <PackageVersion Include="System.Reflection.Emit" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup>

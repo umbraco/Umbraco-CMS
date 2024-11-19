@@ -1,7 +1,6 @@
 import type { UmbUserGroupDetailModel } from '../../index.js';
 import { UMB_USER_GROUP_ROOT_WORKSPACE_PATH } from '../../paths.js';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context-token.js';
-import { UMB_USER_GROUP_WORKSPACE_ALIAS } from './constants.js';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
@@ -169,15 +168,10 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	override render() {
-		if (!this._unique) return nothing;
-
 		return html`
-			<umb-workspace-editor
-				alias=${UMB_USER_GROUP_WORKSPACE_ALIAS}
-				class="uui-text"
-				back-path=${UMB_USER_GROUP_ROOT_WORKSPACE_PATH}>
+			<umb-entity-detail-workspace-editor class="uui-text" back-path=${UMB_USER_GROUP_ROOT_WORKSPACE_PATH}>
 				${this.#renderHeader()} ${this.#renderMain()}
-			</umb-workspace-editor>
+			</umb-entity-detail-workspace-editor>
 		`;
 	}
 
@@ -223,8 +217,6 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					${umbFocus()}>
 				</umb-input-with-alias>
 			</div>
-
-			<umb-workspace-entity-action-menu slot="action-menu"></umb-workspace-entity-action-menu>
 		`;
 	}
 

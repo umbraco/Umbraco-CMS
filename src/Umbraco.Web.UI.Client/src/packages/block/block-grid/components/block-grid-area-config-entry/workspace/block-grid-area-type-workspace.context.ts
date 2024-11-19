@@ -56,15 +56,13 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 				component: () => import('./block-grid-area-type-workspace-editor.element.js'),
 				setup: (component, info) => {
 					const id = info.match.params.id;
-					(component as any).workspaceAlias = manifest.alias;
 					this.load(id);
 				},
 			},
 			{
 				path: 'create',
 				component: () => import('./block-grid-area-type-workspace-editor.element.js'),
-				setup: (component) => {
-					(component as any).workspaceAlias = manifest.alias;
+				setup: () => {
 					this.create();
 				},
 			},

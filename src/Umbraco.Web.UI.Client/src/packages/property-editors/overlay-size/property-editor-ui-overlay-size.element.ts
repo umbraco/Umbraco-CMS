@@ -15,9 +15,11 @@ export class UmbPropertyEditorUIOverlaySizeElement extends UmbLitElement impleme
 	@property()
 	value: UUIModalSidebarSize | string = '';
 
+	// TODO: Stop having global type of the UUI-SELECT element. And make it possible to have undefined as an option.
 	@state()
 	private _list: Array<Option> = [
-		{ value: 'small', name: 'Small', selected: true },
+		{ value: undefined as any, name: 'Default', selected: true },
+		{ value: 'small', name: 'Small' },
 		{ value: 'medium', name: 'Medium' },
 		{ value: 'large', name: 'Large' },
 		{ value: 'full', name: 'Full' },
