@@ -50,24 +50,6 @@ export class UmbMemberGroupWorkspaceContext
 		]);
 	}
 
-	override async load(unique: string) {
-		const response = await super.load(unique);
-
-		this.observe(
-			response.asObservable?.(),
-			(memberGroup) => this.#onMemberGroupStoreChange(memberGroup),
-			'umbMemberGroupStoreObserver',
-		);
-
-		return response;
-	}
-
-	#onMemberGroupStoreChange(memberGroup: UmbMemberGroupDetailModel | undefined) {
-		if (!memberGroup) {
-			history.pushState(null, '', 'section/member-management/view/member-groups');
-		}
-	}
-
 	getName() {
 		return this._data.getCurrent()?.name;
 	}

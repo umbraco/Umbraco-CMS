@@ -55,7 +55,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 		if (_changedProperties.has('data')) {
 			if (this.data?.search) {
-				this.#pickerContext.search.updateConfig({ ...this.data?.search });
+				this.#pickerContext.search.updateConfig({ ...this.data?.search, searchFrom: this.data?.startNode });
 			}
 
 			const multiple = this.data?.multiple ?? false;

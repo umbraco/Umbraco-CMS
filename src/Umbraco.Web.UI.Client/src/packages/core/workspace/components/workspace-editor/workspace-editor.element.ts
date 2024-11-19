@@ -32,6 +32,9 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	@property({ attribute: 'back-path' })
 	public backPath?: string;
 
+	@property({ type: Boolean })
+	public loading = false;
+
 	@state()
 	private _workspaceViews: Array<ManifestWorkspaceView> = [];
 
@@ -83,7 +86,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<umb-body-layout main-no-padding .headline=${this.headline}>
+			<umb-body-layout main-no-padding .headline=${this.headline} ?loading=${this.loading}>
 				${this.#renderBackButton()}
 				<slot name="header" slot="header"></slot>
 				${this.#renderViews()}
