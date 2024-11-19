@@ -157,7 +157,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 					<slot></slot>
 					<slot name="tag"></slot>
 				</button>
-				<div id="inside">${this.#renderInside()}</div>
+				${this.#renderInside()}
 			</div>
 		`;
 	}
@@ -184,10 +184,12 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 					.args=${[this._ownerContentTypeName, this._variantName]}></umb-localize
 			></uui-button>`;
 		} else {
-			return html`<umb-property-type-based-property
+			return html`<div id="inside">
+				<umb-property-type-based-property
 					.property=${this._inlineProperty}
 					slot="areas"></umb-property-type-based-property>
-				<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>`;
+				<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
+			</div>`;
 		}
 	}
 
