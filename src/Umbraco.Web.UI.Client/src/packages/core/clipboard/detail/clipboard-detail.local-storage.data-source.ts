@@ -50,7 +50,6 @@ export class UmbClipboardDetailLocalStorageDataSource implements UmbDetailDataSo
 
 		const updatedItems = [...items, model];
 		localStorage.setItem(UMB_CLIPBOARD_LOCALSTORAGE_KEY, JSON.stringify(updatedItems));
-		debugger;
 
 		return { data: model };
 	}
