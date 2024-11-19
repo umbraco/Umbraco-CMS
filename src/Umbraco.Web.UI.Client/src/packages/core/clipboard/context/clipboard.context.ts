@@ -69,6 +69,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		if (!entry) throw new Error('Entry is required');
 		if (!entry.unique) throw new Error('Entry must have a unique property');
 		this.setEntries([...this.#entries.getValue(), entry]);
+		this.#clipboardDetailRepository.create(entry);
 	}
 
 	/**
