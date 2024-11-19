@@ -183,8 +183,8 @@ public static partial class UmbracoBuilderExtensions
                 services.GetRequiredService<IEventAggregator>(),
                 services.GetRequiredService<IEmailSenderClient>(),
                 services.GetService<INotificationHandler<SendEmailNotification>>(),
-                services.GetService<INotificationAsyncHandler<SendEmailNotification>>()
-                ));
+                services.GetService<INotificationAsyncHandler<SendEmailNotification>>()));
+
         builder.Services.AddTransient<IUserInviteSender, EmailUserInviteSender>();
         builder.Services.AddTransient<IUserForgotPasswordSender, EmailUserForgotPasswordSender>();
 
