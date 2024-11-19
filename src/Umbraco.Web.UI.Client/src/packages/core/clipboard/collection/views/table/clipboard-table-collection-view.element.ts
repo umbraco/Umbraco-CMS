@@ -6,7 +6,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbClipboardEntry } from '../../../types.js';
 
-@customElement('umb-clipboard-language-table-collection-view')
+@customElement('umb-clipboard-table-collection-view')
 export class UmbClipboardTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableConfig: UmbTableConfig = {

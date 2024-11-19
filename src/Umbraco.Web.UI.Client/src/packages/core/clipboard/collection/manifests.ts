@@ -8,7 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'collection',
 		kind: 'default',
 		alias: UMB_CLIPBOARD_COLLECTION_ALIAS,
-		name: 'Language Collection',
+		name: 'Clipboard Collection',
 		meta: {
 			repositoryAlias: UMB_CLIPBOARD_COLLECTION_REPOSITORY_ALIAS,
 		},
