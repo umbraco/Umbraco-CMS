@@ -2,7 +2,8 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_CLIPBOARD_CONTEXT } from './clipboard.context-token';
 import type { UmbClipboardEntry } from '../types';
-import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 /**
  * Clipboard context for managing clipboard entries
@@ -12,6 +13,7 @@ import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observab
  */
 export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	#entries = new UmbArrayState<UmbClipboardEntry>([], (x) => x.unique);
+	#init?: Promise<unknown>;
 
 	/**
 	 * Observable that emits all entries in the clipboard
@@ -25,8 +27,16 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	 */
 	public hasEntries = this.#entries.asObservablePart((x) => x.length > 0);
 
+	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_CLIPBOARD_CONTEXT);
+
+		this.#init = Promise.all([
+			this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
+				this.#modalManagerContext = context;
+			}).asPromise(),
+		]);
 	}
 
 	/**
@@ -98,6 +108,15 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	 */
 	async clear(): Promise<void> {
 		this.#entries.setValue([]);
+	}
+
+	/**
+	 * Open the clipboard
+	 * @memberof UmbClipboardContext
+	 */
+	async open() {
+		await this.#init;
+		alert('Open clipboard');
 	}
 
 	observeEntriesOf(types: Array<string>, filter?: (entry: UmbClipboardEntry) => boolean) {
