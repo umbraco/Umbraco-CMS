@@ -80,7 +80,7 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
 
                     // It's entirely possible that there's both a core upgrade and package migrations to run, so try and run package migrations too.
                     // but only if upgrade unattended is enabled.
-                    if (_unattendedSettings.UpgradeUnattended)
+                    if (_unattendedSettings.PackageMigrationsUnattended)
                     {
                         RunPackageMigrations(notification);
                     }
