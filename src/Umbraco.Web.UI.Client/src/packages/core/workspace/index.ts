@@ -1,3 +1,5 @@
+import './entity-detail/global-components/index.js';
+
 export * from './components/index.js';
 export * from './conditions/const.js';
 export * from './contexts/index.js';
@@ -15,3 +17,4 @@ export * from './workspace.context-token.js';
 export * from './workspace.element.js';
 export type * from './conditions/index.js';
 export type * from './types.js';
+export * from './entity-detail/global-components/index.js';

@@ -114,19 +114,6 @@ export class UmbDataTypeWorkspaceContext
 		]);
 	}
 
-	override async load(unique: string) {
-		const response = await super.load(unique);
-		this.observe(response.asObservable?.(), (entity) => this.#onStoreChange(entity), 'umbDataTypeStoreObserver');
-		return response;
-	}
-
-	#onStoreChange(entity: EntityType | undefined) {
-		if (!entity) {
-			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
-			history.pushState(null, '', 'section/settings/workspace/data-type-root');
-		}
-	}
-
 	override resetState() {
 		super.resetState();
 		this.#propertyEditorSchemaSettingsProperties = [];

@@ -47,10 +47,6 @@ NDependOut/
 QueryResult.htm
 tools/docfx/
 
-# Ignore rule for clearing out Belle (avoid rebuilding all the time)
-preserve.bellissima
-preserve.login
-
 # csharp-docs
 /build/csharp-docs/api/
 /build/csharp-docs/_site/
@@ -99,7 +95,6 @@ preserve.login
 /tests/Umbraco.Tests.Integration/[Uu]mbraco/[Ll]ogs/
 /tests/Umbraco.Tests.Integration/Views/
 /tests/Umbraco.Tests.UnitTests/[Uu]mbraco/[Dd]ata/TEMP/
-**/public/mockServiceWorker.js
 
 # Ignore auto-generated schema
 /src/Umbraco.Cms.Targets/tasks/

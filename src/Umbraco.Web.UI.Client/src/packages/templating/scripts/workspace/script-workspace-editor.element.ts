@@ -52,9 +52,8 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	override render() {
-		if (this._isNew === undefined) return;
 		return html`
-			<umb-workspace-editor>
+			<umb-entity-detail-workspace-editor>
 				<div id="workspace-header" slot="header">
 					<uui-input
 						placeholder=${this.localize.term('placeholders_entername')}
@@ -70,7 +69,7 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 					<div slot="header"></div>
 					${this.#renderCodeEditor()}
 				</uui-box>
-			</umb-workspace-editor>
+			</umb-entity-detail-workspace-editor>
 		`;
 	}
 
