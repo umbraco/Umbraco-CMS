@@ -265,6 +265,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	public get identifier() {
 		return this.#config.identifier;
 	}
+	public set identifier(identifier: UniqueType) {
+		this.#config.identifier = identifier;
+	}
 	#isActiveIdentifier() {
 		return UmbSorterController.activeSorter?.identifier === this.identifier;
 	}
