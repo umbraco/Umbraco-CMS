@@ -96,20 +96,6 @@ export class UmbPartialViewWorkspaceContext
 		this._data.updateCurrent({ content: value });
 	}
 
-	override async load(unique: string) {
-		const response = await super.load(unique);
-		this.observe(response.asObservable?.(), (data) => this.#onDetailStoreChanges(data), 'umbDetailStoreObserver');
-		return response;
-	}
-
-	#onDetailStoreChanges(data: UmbPartialViewDetailModel | undefined) {
-		// Data is removed from the store
-		// TODO: revisit. We need to handle what should happen when the data is removed from the store
-		if (data === undefined) {
-			this._data.clear();
-		}
-	}
-
 	override async createScaffold(args: UmbPartialViewWorkspaceContextCreateArgs) {
 		let snippetContent = '';
 

@@ -168,12 +168,10 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	override render() {
-		if (!this._unique) return nothing;
-
 		return html`
-			<umb-workspace-editor class="uui-text" back-path=${UMB_USER_GROUP_ROOT_WORKSPACE_PATH}>
+			<umb-entity-detail-workspace-editor class="uui-text" back-path=${UMB_USER_GROUP_ROOT_WORKSPACE_PATH}>
 				${this.#renderHeader()} ${this.#renderMain()}
-			</umb-workspace-editor>
+			</umb-entity-detail-workspace-editor>
 		`;
 	}
 
@@ -219,8 +217,6 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					${umbFocus()}>
 				</umb-input-with-alias>
 			</div>
-
-			<umb-workspace-entity-action-menu slot="action-menu"></umb-workspace-entity-action-menu>
 		`;
 	}
 

@@ -37,6 +37,9 @@ export class UmbBodyLayoutElement extends LitElement {
 	@property({ type: Boolean, reflect: true, attribute: 'header-transparent' })
 	public headerTransparent = false;
 
+	@property({ type: Boolean })
+	loading = false;
+
 	@state()
 	private _headerSlotHasChildren = false;
 
@@ -116,6 +119,7 @@ export class UmbBodyLayoutElement extends LitElement {
 
 			<!-- This div should be changed for the uui-scroll-container when it gets updated -->
 			<div id="main">
+				${this.loading ? html`<uui-loader-bar></uui-loader-bar>` : nothing}
 				<slot></slot>
 			</div>
 
