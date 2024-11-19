@@ -70,26 +70,6 @@ export class UmbScriptWorkspaceContext
 	public setContent(value: string) {
 		this._data.updateCurrent({ content: value });
 	}
-
-	/**
-	 * @description load the script
-	 * @param unique The unique identifier of the script
-	 * @returns {Promise<void>}
-	 * @memberof UmbScriptWorkspaceContext
-	 */
-	public override async load(unique: string) {
-		const response = await super.load(unique);
-		this.observe(response.asObservable?.(), (data) => this.#onDetailStoreChanges(data), 'umbDetailStoreObserver');
-		return response;
-	}
-
-	#onDetailStoreChanges(data: UmbScriptDetailModel | undefined) {
-		// Data is removed from the store
-		// TODO: revisit. We need to handle what should happen when the data is removed from the store
-		if (data === undefined) {
-			this._data.clear();
-		}
-	}
 }
 
 export { UmbScriptWorkspaceContext as api };
