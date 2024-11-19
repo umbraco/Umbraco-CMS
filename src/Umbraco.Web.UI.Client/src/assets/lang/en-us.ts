@@ -359,6 +359,16 @@ export default {
 		blueprintDescription:
 			'A Document Blueprint is predefined content that an editor can select to use as the\n      basis for creating new content\n    ',
 	},
+	entityDetail: {
+		notFoundTitle: (entityType: string) => {
+			const entityName = entityType ?? 'Item';
+			return `${entityName} not found`;
+		},
+		notFoundDescription: (entityType: string) => {
+			const entityName = entityType ?? 'item';
+			return `The requested ${entityName} could not be found. Please check the URL and try again.`;
+		},
+	},
 	media: {
 		clickToUpload: 'Click to upload',
 		orClickHereToUpload: 'or click here to choose files',

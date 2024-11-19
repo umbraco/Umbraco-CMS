@@ -1,3 +1,4 @@
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbPagedModel, UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 
@@ -12,6 +13,7 @@ export type UmbSearchResultItemModel = {
 
 export type UmbSearchRequestArgs = {
 	query: string;
+	searchFrom?: UmbEntityModel;
 };
 
 export interface UmbSearchProvider<

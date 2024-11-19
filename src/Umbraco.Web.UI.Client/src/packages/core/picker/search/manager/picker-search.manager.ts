@@ -184,7 +184,12 @@ export class UmbPickerSearchManager<
 			return;
 		}
 
-		const { data } = await this.#searchProvider.search(query);
+		const args = {
+			searchFrom: this.#config?.searchFrom,
+			...query,
+		};
+
+		const { data } = await this.#searchProvider.search(args);
 		const items = (data?.items as ResultItemType[]) ?? [];
 		this.#resultItems.setValue(items);
 		this.#resultTotalItems.setValue(data?.total ?? 0);
