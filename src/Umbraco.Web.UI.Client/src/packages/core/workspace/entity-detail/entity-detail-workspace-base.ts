@@ -1,5 +1,6 @@
 import { UmbSubmittableWorkspaceContextBase } from '../submittable/index.js';
 import { UmbEntityWorkspaceDataManager } from '../entity/entity-workspace-data-manager.js';
+import type { UmbEntityDetailWorkspaceContextArgs, UmbEntityDetailWorkspaceContextCreateArgs } from './types.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
@@ -12,29 +13,19 @@ import {
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbStateManager } from '@umbraco-cms/backoffice/utils';
 
-export interface UmbEntityDetailWorkspaceContextArgs {
-	entityType: string;
-	workspaceAlias: string;
-	detailRepositoryAlias: string;
-}
-
-/**
- * @deprecated Use UmbEntityDetailWorkspaceContextArgs instead
- */
-export type UmbEntityWorkspaceContextArgs = UmbEntityDetailWorkspaceContextArgs;
-
-export interface UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> {
-	parent: UmbEntityModel;
-	preset?: Partial<DetailModelType>;
-}
+const LOADING_STATE_UNIQUE = 'umbLoadingEntityDetail';
 
 export abstract class UmbEntityDetailWorkspaceContextBase<
-	DetailModelType extends UmbEntityModel,
+	DetailModelType extends UmbEntityModel = UmbEntityModel,
 	DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
 	CreateArgsType extends
 		UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> = UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
 > extends UmbSubmittableWorkspaceContextBase<DetailModelType> {
+	// Just for context token safety:
+	public readonly IS_ENTITY_DETAIL_WORKSPACE_CONTEXT = true;
+
 	/**
 	 * @description Data manager for the workspace.
 	 * @protected
@@ -42,14 +33,15 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 */
 	protected readonly _data = new UmbEntityWorkspaceDataManager<DetailModelType>(this);
 
-	public readonly data = this._data.current;
-
-	protected _getDataPromise?: Promise<any>;
-	protected _detailRepository?: DetailRepositoryType;
-
 	#entityContext = new UmbEntityContext(this);
 	public readonly entityType = this.#entityContext.entityType;
 	public readonly unique = this.#entityContext.unique;
+
+	public readonly data = this._data.current;
+	public readonly loading = new UmbStateManager(this);
+
+	protected _getDataPromise?: Promise<any>;
+	protected _detailRepository?: DetailRepositoryType;
 
 	#parent = new UmbObjectState<{ entityType: string; unique: UmbEntityUnique } | undefined>(undefined);
 	public readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
@@ -131,6 +123,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	async load(unique: string) {
 		this.#entityContext.setUnique(unique);
+		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Loading ${this.getEntityType()} Details` });
 		await this.#init;
 		this.resetState();
 		this._getDataPromise = this._detailRepository!.requestByUnique(unique);
@@ -142,8 +135,15 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			this._data.setPersisted(data);
 			this._data.setCurrent(data);
 			this.setIsNew(false);
+
+			this.observe(
+				response.asObservable(),
+				(entity) => this.#onDetailStoreChange(entity),
+				'umbEntityDetailTypeStoreObserver',
+			);
 		}
 
+		this.loading.removeState(LOADING_STATE_UNIQUE);
 		return response;
 	}
 
@@ -166,6 +166,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @returns { Promise<any> | undefined } The data of the scaffold.
 	 */
 	public async createScaffold(args: CreateArgsType) {
+		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Creating ${this.getEntityType()} scaffold` });
 		await this.#init;
 		this.resetState();
 		this.setParent(args.parent);
@@ -173,17 +174,20 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		const request = this._detailRepository!.createScaffold(args.preset);
 		this._getDataPromise = request;
 		let { data } = await request;
-		if (!data) return undefined;
 
-		this.#entityContext.setUnique(data.unique);
+		if (data) {
+			this.#entityContext.setUnique(data.unique);
 
-		if (this.modalContext) {
-			data = { ...data, ...this.modalContext.data.preset };
+			if (this.modalContext) {
+				data = { ...data, ...this.modalContext.data.preset };
+			}
+
+			this.setIsNew(true);
+			this._data.setPersisted(data);
+			this._data.setCurrent(data);
 		}
 
-		this.setIsNew(true);
-		this._data.setPersisted(data);
-		this._data.setCurrent(data);
+		this.loading.removeState(LOADING_STATE_UNIQUE);
 
 		return data;
 	}
@@ -284,9 +288,9 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		}
 
 		if (this._checkWillNavigateAway(newUrl) && this._getHasUnpersistedChanges()) {
-			/* Since ours modals are async while events are synchronous, we need to prevent the default behavior of the event, even if the modal hasn’t been resolved yet. 
-			Once the modal is resolved (the user accepted to discard the changes and navigate away from the route), we will push a new history state. 
-			This push will make the "willchangestate" event happen again and due to this somewhat "backward" behavior, 
+			/* Since ours modals are async while events are synchronous, we need to prevent the default behavior of the event, even if the modal hasn’t been resolved yet.
+			Once the modal is resolved (the user accepted to discard the changes and navigate away from the route), we will push a new history state.
+			This push will make the "willchangestate" event happen again and due to this somewhat "backward" behavior,
 			we set an "allowNavigateAway"-flag to prevent the "discard-changes" functionality from running in a loop.*/
 			e.preventDefault();
 			const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
@@ -340,6 +344,12 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 				this.#checkIfInitialized();
 			},
 		);
+	}
+
+	#onDetailStoreChange(entity: DetailModelType | undefined) {
+		if (!entity) {
+			this._data.clear();
+		}
 	}
 
 	public override destroy(): void {
