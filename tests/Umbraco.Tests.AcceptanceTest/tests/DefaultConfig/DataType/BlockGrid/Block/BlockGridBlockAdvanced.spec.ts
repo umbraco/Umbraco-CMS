@@ -16,7 +16,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockGridEditorName);
 });
 
-//TODO: It is not possible to add a view to a block
+// TODO: Remove skip and update test when the front-end is ready. Currently it is not possible to add a custom view to a block
 test.skip('can add a custom view to a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -29,7 +29,7 @@ test.skip('can add a custom view to a block', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.dataType.goToBlockAdvancedTab();
 });
 
-//TODO: It is not possible to add a view to a block
+// TODO: Remove skip and update test when the front-end is ready. Currently it is not possible to add a custom view to a block
 test.skip('can remove a custom view from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -42,7 +42,7 @@ test.skip('can remove a custom view from a block', async ({umbracoApi, umbracoUi
   await umbracoUi.dataType.goToBlockAdvancedTab();
 });
 
-// TODO: Stylesheets are currently saved as arrays
+// TODO: Remove skip and update test when the front-end is ready. Currently stylesheets are saved as arrays
 test.skip('can remove a custom stylesheet from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css'
@@ -239,8 +239,8 @@ test('can remove a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.dataType.isSuccessNotificationVisible();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainIconColor(blockGridEditorName, contentElementTypeId, '')).toBeTruthy();
 });
-
-// TODO: Thumbnails are not showing correctly
+ 
+// TODO: Remove skip when the code is updated due to UI changes
 test.skip('can add a thumbnail to a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaName = 'TestMedia';
@@ -263,7 +263,7 @@ test.skip('can add a thumbnail to a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.isSuccessNotificationVisible();
 });
 
-// TODO: Thumbnails are not showing correctly
+// TODO: Remove skip when the code is updated. Currently it is missing the assertion steps
 test.skip('can remove a thumbnail from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
