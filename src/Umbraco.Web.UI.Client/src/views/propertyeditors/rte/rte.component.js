@@ -349,8 +349,8 @@
           if(modelObject) {
             modelObject.update(vm.model.value.blocks, $scope);
             vm.tinyMceEditor.fire('updateBlocks');
+            onLoaded();
           }
-          onLoaded();
       }
 
       function ensurePropertyValue(newVal) {
