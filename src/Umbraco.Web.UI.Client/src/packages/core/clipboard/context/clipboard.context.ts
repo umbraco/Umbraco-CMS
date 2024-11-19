@@ -4,6 +4,7 @@ import { UMB_CLIPBOARD_CONTEXT } from './clipboard.context-token';
 import type { UmbClipboardEntry } from '../types';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UmbClipboardDetailRepository } from '../detail/index.js';
 
 /**
  * Clipboard context for managing clipboard entries
@@ -28,6 +29,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	public hasEntries = this.#entries.asObservablePart((x) => x.length > 0);
 
 	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
+	#clipboardDetailRepository = new UmbClipboardDetailRepository(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_CLIPBOARD_CONTEXT);
