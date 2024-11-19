@@ -6,7 +6,6 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Serialization;
 
@@ -15,11 +14,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 [TestFixture]
 public class SliderValueEditorTests
 {
-    // annoyingly we can't use decimals etc. in attributes, so we can't turn these into test cases :(
-    private List<object?> _invalidValues = new();
-
-    [SetUp]
-    public void SetUp() => _invalidValues = new List<object?>
+    public static object[] InvalidCaseData = new object[]
     {
         123m,
         123,
@@ -32,14 +27,11 @@ public class SliderValueEditorTests
         new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid())
     };
 
-    [Test]
-    public void Can_Handle_Invalid_Values_From_Editor()
+    [TestCaseSource(nameof(InvalidCaseData))]
+    public void Can_Handle_Invalid_Values_From_Editor(object value)
     {
-        foreach (var value in _invalidValues)
-        {
-            var fromEditor = FromEditor(value);
-            Assert.IsNull(fromEditor, message: $"Failed for: {value}");
-        }
+        var fromEditor = FromEditor(value);
+        Assert.IsNull(fromEditor);
     }
 
     [TestCase("1", 1)]
@@ -86,14 +78,11 @@ public class SliderValueEditorTests
         Assert.AreEqual(expectedResult, fromEditor);
     }
 
-    [Test]
-    public void Can_Handle_Invalid_Values_To_Editor()
+    [TestCaseSource(nameof(InvalidCaseData))]
+    public void Can_Handle_Invalid_Values_To_Editor(object value)
     {
-        foreach (var value in _invalidValues)
-        {
-            var toEditor = ToEditor(value);
-            Assert.IsNull(toEditor, message: $"Failed for: {value}");
-        }
+        var toEditor = ToEditor(value);
+        Assert.IsNull(toEditor, message: $"Failed for: {value}");
     }
 
     [Test]
