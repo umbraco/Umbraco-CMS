@@ -13,6 +13,7 @@ import type {
 	ManifestBlockEditorCustomView,
 	UmbBlockEditorCustomViewProperties,
 } from '@umbraco-cms/backoffice/block-custom-view';
+import { UUIBlinkAnimationValue } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * @element umb-block-list-entry
@@ -302,20 +303,22 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	#renderBlock() {
 		return this.contentKey && this._contentTypeAlias
 			? html`
-					<umb-extension-slot
-						type="blockEditorCustomView"
-						default-element=${this._inlineEditingMode ? 'umb-inline-list-block' : 'umb-ref-list-block'}
-						.props=${this._blockViewProps}
-						.filter=${this.#extensionSlotFilterMethod}
-						single
-						>${this._inlineEditingMode ? this.#renderInlineBlock() : this.#renderRefBlock()}</umb-extension-slot
-					>
-					<uui-action-bar>
-						${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderDeleteAction()}
-					</uui-action-bar>
-					${!this._showContentEdit && this._contentInvalid
-						? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
-						: nothing}
+					<div class="umb-block-list__block">
+						<umb-extension-slot
+							type="blockEditorCustomView"
+							default-element=${this._inlineEditingMode ? 'umb-inline-list-block' : 'umb-ref-list-block'}
+							.props=${this._blockViewProps}
+							.filter=${this.#extensionSlotFilterMethod}
+							single
+							>${this._inlineEditingMode ? this.#renderInlineBlock() : this.#renderRefBlock()}</umb-extension-slot
+						>
+						<uui-action-bar>
+							${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderDeleteAction()}
+						</uui-action-bar>
+						${!this._showContentEdit && this._contentInvalid
+							? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+							: nothing}
+					</div>
 				`
 			: nothing;
 	}
@@ -385,6 +388,23 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				--umb-block-list-entry-actions-opacity: 1;
 			}
 
+			:host::after {
+				content: '';
+				position: absolute;
+				z-index: 1;
+				pointer-events: none;
+				inset: 0;
+				border: 1px solid transparent;
+				border-radius: var(--uui-border-radius);
+
+				transition: border-color 240ms ease-in;
+			}
+
+			:host([settings-invalid])::after,
+			:host([content-invalid])::after {
+				border-color: var(--uui-color-danger);
+			}
+
 			uui-action-bar {
 				position: absolute;
 				top: var(--uui-size-2);
@@ -393,23 +413,47 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				transition: opacity 120ms;
 			}
 
-			:host([drag-placeholder]) {
-				opacity: 0.2;
-				--umb-block-list-entry-actions-opacity: 0;
-			}
-
-			:host([settings-invalid])::after,
-			:host([content-invalid])::after {
-				content: '';
-				position: absolute;
-				inset: 0;
-				pointer-events: none;
-				border: 1px solid var(--uui-color-danger);
-				border-radius: var(--uui-border-radius);
-			}
-
 			uui-badge {
 				z-index: 2;
+			}
+
+			:host::after {
+				content: '';
+				position: absolute;
+				z-index: 1;
+				pointer-events: none;
+				inset: 0;
+				border: 1px solid transparent;
+				border-radius: var(--uui-border-radius);
+
+				transition: border-color 240ms ease-in;
+			}
+			:host(:hover):not(:drop)::after {
+				display: block;
+				border-color: var(--uui-color-interactive-emphasis);
+				box-shadow:
+					0 0 0 1px rgba(255, 255, 255, 0.7),
+					inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+			}
+
+			:host([drag-placeholder])::after {
+				display: block;
+				border-width: 2px;
+				border-color: var(--uui-color-interactive-emphasis);
+				animation: ${UUIBlinkAnimationValue};
+			}
+			:host([drag-placeholder])::before {
+				content: '';
+				position: absolute;
+				pointer-events: none;
+				inset: 0;
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-interactive-emphasis);
+				opacity: 0.12;
+			}
+			:host([drag-placeholder]) .umb-block-list__block {
+				transition: opacity 50ms 16ms;
+				opacity: 0;
 			}
 		`,
 	];
