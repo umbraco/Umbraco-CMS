@@ -3,14 +3,20 @@ import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbClipboardCollectionFilterModel } from '../types.js';
 
-export class UmbClipboardCollectionLocalStorageDataSource implements UmbCollectionDataSource<UmbClipboardEntry> {
-	#host: UmbControllerHost;
+const UMB_CLIPBOARD_LOCALSTORAGE_KEY = 'umb:clipboard';
 
-	constructor(host: UmbControllerHost) {
-		this.#host = host;
+export class UmbClipboardCollectionLocalStorageDataSource implements UmbCollectionDataSource<UmbClipboardEntry> {
+	async getCollection(filter: UmbClipboardCollectionFilterModel) {
+		const items = this.#getEntriesFromLocalStorage();
+		const total = items.length;
+		return { data: { items, total } };
 	}
 
-	async getCollection(filter: UmbClipboardCollectionFilterModel) {
-		debugger;
+	#getEntriesFromLocalStorage(): Array<UmbClipboardEntry> {
+		const entries = localStorage.getItem(UMB_CLIPBOARD_LOCALSTORAGE_KEY);
+		if (entries) {
+			return JSON.parse(entries);
+		}
+		return [];
 	}
 }
