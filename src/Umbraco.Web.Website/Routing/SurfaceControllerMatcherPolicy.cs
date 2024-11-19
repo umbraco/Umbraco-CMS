@@ -25,8 +25,8 @@ internal class SurfaceControllerMatcherPolicy : MatcherPolicy, IEndpointSelector
 
     public Task ApplyAsync(HttpContext httpContext, CandidateSet candidates)
     {
-        ArgumentNullException.ThrowIfNull(nameof(httpContext));
-        ArgumentNullException.ThrowIfNull(nameof(candidates));
+        ArgumentNullException.ThrowIfNull(httpContext);
+        ArgumentNullException.ThrowIfNull(candidates);
 
         if (candidates.Count < 2)
         {
