@@ -3,28 +3,32 @@ import type {
 	UmbDataSourceResponse,
 	UmbDetailDataSource,
 } from '@umbraco-cms/backoffice/repository';
-import type { UmbClipboardEntry } from '../types.js';
+import type { UmbClipboardEntryDetailModel } from '../types.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbClipboardLocalStorageManager } from '../../clipboard-local-storage.manager.js';
+import { UMB_CLIPBOARD_ENTRY_ENTITY_TYPE } from '../entity.js';
 
 /**
  * Manage clipboard entries in local storage
  * @export
  * @class UmbClipboardEntryDetailLocalStorageDataSource
- * @implements {UmbDetailDataSource<UmbClipboardEntry>}
+ * @implements {UmbDetailDataSource<UmbClipboardEntryDetailModel>}
  */
-export class UmbClipboardEntryDetailLocalStorageDataSource implements UmbDetailDataSource<UmbClipboardEntry> {
+export class UmbClipboardEntryDetailLocalStorageDataSource
+	implements UmbDetailDataSource<UmbClipboardEntryDetailModel>
+{
 	#localStorageManager = new UmbClipboardLocalStorageManager();
 
 	/**
 	 * Scaffold a new clipboard entry
-	 * @param {Partial<UmbClipboardEntry>} [preset={}]
+	 * @param {Partial<UmbClipboardEntryDetailModel>} [preset={}]
 	 * @return {*}
 	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
-	async createScaffold(preset: Partial<UmbClipboardEntry> = {}) {
-		const data: UmbClipboardEntry = {
+	async createScaffold(preset: Partial<UmbClipboardEntryDetailModel> = {}) {
+		const data: UmbClipboardEntryDetailModel = {
 			data: [],
+			entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
 			icons: [],
 			meta: {},
 			name: '',
@@ -38,11 +42,11 @@ export class UmbClipboardEntryDetailLocalStorageDataSource implements UmbDetailD
 
 	/**
 	 * Create a new clipboard entry in local storage
-	 * @param {UmbClipboardEntry} model
+	 * @param {UmbClipboardEntryDetailModel} model
 	 * @return {*}  {Promise<UmbDataSourceResponse<UmbClipboardEntry>>}
 	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
-	async create(model: UmbClipboardEntry): Promise<UmbDataSourceResponse<UmbClipboardEntry>> {
+	async create(model: UmbClipboardEntryDetailModel): Promise<UmbDataSourceResponse<UmbClipboardEntryDetailModel>> {
 		if (!model) return { error: new Error('Clipboard entry is missing') };
 
 		// check if entry already exists
@@ -62,7 +66,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource implements UmbDetailD
 	 * @return {*}  {Promise<UmbDataSourceResponse<UmbClipboardEntry>>}
 	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
-	async read(unique: string): Promise<UmbDataSourceResponse<UmbClipboardEntry>> {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbClipboardEntryDetailModel>> {
 		if (!unique) return { error: new Error('Unique is missing') };
 
 		// check if entry exists
@@ -74,11 +78,11 @@ export class UmbClipboardEntryDetailLocalStorageDataSource implements UmbDetailD
 
 	/**
 	 * Update a clipboard entry in local storage
-	 * @param {UmbClipboardEntry} model
+	 * @param {UmbClipboardEntryDetailModel} model
 	 * @return {*}  {Promise<UmbDataSourceResponse<UmbClipboardEntry>>}
 	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
-	async update(model: UmbClipboardEntry): Promise<UmbDataSourceResponse<UmbClipboardEntry>> {
+	async update(model: UmbClipboardEntryDetailModel): Promise<UmbDataSourceResponse<UmbClipboardEntryDetailModel>> {
 		if (!model) return { error: new Error('Clipboard entry is missing') };
 
 		// check if entry exists so it can be updated

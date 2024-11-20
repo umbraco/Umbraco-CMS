@@ -1,8 +1,11 @@
+import type { UmbClipboardEntryEntityType } from './entity';
+
 /**
  * A Clipboard entry is a composed set of data representing one entry in the clipboard.
  * The entry has enough knowledge for the context of the clipboard to filter away unsupported entries.
  */
-export interface UmbClipboardEntry<Type extends string = string, MetaType = object, DataType = unknown> {
+export interface UmbClipboardEntryDetailModel<Type extends string = string, MetaType = object, DataType = unknown> {
+	entityType: UmbClipboardEntryEntityType;
 	/**
 	 * The type of clipboard entry, this determines the data type of the entry. Making the entry as general as possible.
 	 * Example a entry from a Block Editor, gets a generic type called 'block'. Making it able to copy/paste between different Block Editors.
@@ -27,5 +30,18 @@ export interface UmbClipboardEntry<Type extends string = string, MetaType = obje
 	/**
 	 * The data of the copied pieces for this clipboard entry.
 	 */
+	data: Array<DataType>;
+}
+
+/**
+ * @deprecated
+ * @see UmbClipboardEntryDetailModel
+ */
+export interface UmbClipboardEntry<Type extends string = string, MetaType = object, DataType = unknown> {
+	type: Type;
+	unique: string;
+	name: string;
+	icons: Array<string>;
+	meta: MetaType;
 	data: Array<DataType>;
 }

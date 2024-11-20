@@ -1,4 +1,4 @@
-import type { UmbClipboardEntry } from './clipboard-entry/index.js';
+import type { UmbClipboardEntryDetailModel } from './clipboard-entry/index.js';
 
 const UMB_CLIPBOARD_LOCALSTORAGE_KEY = 'umb:clipboard';
 
@@ -6,7 +6,7 @@ const UMB_CLIPBOARD_LOCALSTORAGE_KEY = 'umb:clipboard';
 export class UmbClipboardLocalStorageManager {
 	// Gets all entries from local storage
 	getEntries(): {
-		entries: Array<UmbClipboardEntry>;
+		entries: Array<UmbClipboardEntryDetailModel>;
 		total: number;
 	} {
 		const localStorageItem = localStorage.getItem(UMB_CLIPBOARD_LOCALSTORAGE_KEY);
@@ -17,8 +17,8 @@ export class UmbClipboardLocalStorageManager {
 
 	// Gets a single entry from local storage
 	getEntry(unique: string): {
-		entry: UmbClipboardEntry | undefined;
-		entries: Array<UmbClipboardEntry>;
+		entry: UmbClipboardEntryDetailModel | undefined;
+		entries: Array<UmbClipboardEntryDetailModel>;
 	} {
 		const { entries } = this.getEntries();
 		const entry = entries.find((x) => x.unique === unique);
@@ -26,7 +26,7 @@ export class UmbClipboardLocalStorageManager {
 	}
 
 	// Sets all entries in local storage
-	setEntries(entries: Array<UmbClipboardEntry>) {
+	setEntries(entries: Array<UmbClipboardEntryDetailModel>) {
 		localStorage.setItem(UMB_CLIPBOARD_LOCALSTORAGE_KEY, JSON.stringify(entries));
 	}
 }

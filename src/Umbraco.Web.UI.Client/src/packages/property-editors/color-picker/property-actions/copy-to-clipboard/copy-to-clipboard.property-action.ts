@@ -3,8 +3,9 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbPropertyActionBase, type UmbPropertyActionArgs } from '@umbraco-cms/backoffice/property-action';
 import { UMB_CLIPBOARD_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
-import type { UmbClipboardEntry } from '@umbraco-cms/backoffice/clipboard';
+import type { UmbClipboardEntryDetailModel } from '@umbraco-cms/backoffice/clipboard';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+import { UMB_CLIPBOARD_ENTRY_ENTITY_TYPE } from 'src/packages/core/clipboard/clipboard-entry/entity';
 
 export class UmbColorPickerCopyToClipboardPropertyAction extends UmbPropertyActionBase {
 	#clipboardContext?: typeof UMB_CLIPBOARD_CONTEXT.TYPE;
@@ -41,7 +42,9 @@ export class UmbColorPickerCopyToClipboardPropertyAction extends UmbPropertyActi
 		}
 
 		// TODO: Add correct meta data
-		const clipboardEntry: UmbClipboardEntry = {
+		// TODO use scaffold to create clipboard entry
+		const clipboardEntryDetail: UmbClipboardEntryDetailModel = {
+			entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
 			unique: UmbId.new(),
 			type: 'color',
 			name: propertyLabel,
@@ -50,7 +53,8 @@ export class UmbColorPickerCopyToClipboardPropertyAction extends UmbPropertyActi
 			data: [propertyValue],
 		};
 
-		await this.#clipboardContext!.create(clipboardEntry);
+		await this.#clipboardContext!.create(clipboardEntryDetail);
+
 		// TODO: Add correct message + localization
 		this.#notificationContext?.peek('positive', { data: { message: `${propertyLabel} copied to clipboard` } });
 	}

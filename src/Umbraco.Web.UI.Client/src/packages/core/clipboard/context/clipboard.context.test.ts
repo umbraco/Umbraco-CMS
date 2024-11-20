@@ -3,14 +3,16 @@ import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbClipboardContext } from './clipboard.context.js';
-import type { UmbClipboardEntry } from '../clipboard-entry/index.js';
+import type { UmbClipboardEntryDetailModel } from '../clipboard-entry/index.js';
+import { UMB_CLIPBOARD_ENTRY_ENTITY_TYPE } from '../clipboard-entry/entity.js';
 
 @customElement('test-my-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 describe('UmbSelectionManager', () => {
 	let context: UmbClipboardContext;
-	const clipboardTextEntry: UmbClipboardEntry = {
+	const textClipboardEntry: UmbClipboardEntryDetailModel = {
+		entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
 		unique: '1',
 		type: 'text',
 		name: 'Text',
@@ -19,7 +21,8 @@ describe('UmbSelectionManager', () => {
 		data: [],
 	};
 
-	const clipboardMediaEntry: UmbClipboardEntry = {
+	const mediaClipboardEntry: UmbClipboardEntryDetailModel = {
+		entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
 		unique: '2',
 		type: 'media',
 		name: 'Media',
@@ -81,7 +84,7 @@ describe('UmbSelectionManager', () => {
 		});
 
 		it('returns all entries in the clipboard', () => {
-			context.create(clipboardTextEntry);
+			context.create(textClipboardEntry);
 			expect(context.getEntries()).to.have.lengthOf(1);
 		});
 	});
@@ -93,7 +96,7 @@ describe('UmbSelectionManager', () => {
 		});
 
 		it('sets entries in the clipboard', () => {
-			context.setEntries([clipboardTextEntry]);
+			context.setEntries([textClipboardEntry]);
 			expect(context.getEntries()).to.have.lengthOf(1);
 		});
 	});
@@ -110,10 +113,10 @@ describe('UmbSelectionManager', () => {
 		});
 
 		it('creates an entry in the clipboard', () => {
-			context.create(clipboardTextEntry);
+			context.create(textClipboardEntry);
 			expect(context.getEntries()).to.have.lengthOf(1);
 			const entry = context.read('1');
-			expect(entry).to.deep.equal(clipboardTextEntry);
+			expect(entry).to.deep.equal(textClipboardEntry);
 		});
 	});
 
@@ -123,9 +126,9 @@ describe('UmbSelectionManager', () => {
 		});
 
 		it('reads an entry from the clipboard', () => {
-			context.create(clipboardTextEntry);
+			context.create(textClipboardEntry);
 			const entry = context.read('1');
-			expect(entry).to.deep.equal(clipboardTextEntry);
+			expect(entry).to.deep.equal(textClipboardEntry);
 		});
 	});
 
@@ -141,8 +144,8 @@ describe('UmbSelectionManager', () => {
 		});
 
 		it('updates an entry in the clipboard', () => {
-			context.create(clipboardTextEntry);
-			const updatedEntry = { ...clipboardTextEntry, name: 'Updated Text' };
+			context.create(textClipboardEntry);
+			const updatedEntry = { ...textClipboardEntry, name: 'Updated Text' };
 			context.update(updatedEntry);
 			const entry = context.read('1');
 			expect(entry).to.deep.equal(updatedEntry);
@@ -151,7 +154,7 @@ describe('UmbSelectionManager', () => {
 
 	describe('Delete', () => {
 		it('deletes an entry from the clipboard', () => {
-			context.create(clipboardTextEntry);
+			context.create(textClipboardEntry);
 			context.delete('1');
 			expect(context.getEntries).to.have.lengthOf(0);
 			expect(() => context.read('1')).to.throw('Entry with unique 1 not found');
@@ -160,7 +163,7 @@ describe('UmbSelectionManager', () => {
 
 	describe('Clear', () => {
 		it('clears all entries from the clipboard', () => {
-			context.create(clipboardTextEntry);
+			context.create(textClipboardEntry);
 			context.clear();
 			expect(context.getEntries).to.have.lengthOf(0);
 		});
@@ -175,7 +178,7 @@ describe('UmbSelectionManager', () => {
 		});
 
 		it('emits true when there are entries', (done) => {
-			context.create(clipboardTextEntry);
+			context.create(textClipboardEntry);
 			context.hasEntries.subscribe((hasEntries) => {
 				expect(hasEntries).to.be.true;
 				done();
@@ -185,7 +188,7 @@ describe('UmbSelectionManager', () => {
 
 	describe('observeHasEntriesOf', () => {
 		it('emits true if the clipboard has entries of the specified types', (done) => {
-			context.create(clipboardTextEntry);
+			context.create(textClipboardEntry);
 
 			context.observeHasEntriesOf(['text']).subscribe((hasEntries) => {
 				expect(hasEntries).to.be.true;
@@ -194,7 +197,7 @@ describe('UmbSelectionManager', () => {
 		});
 
 		it('emits false when an entry of a different type is created', (done) => {
-			context.create(clipboardMediaEntry);
+			context.create(mediaClipboardEntry);
 			context.observeHasEntriesOf(['text']).subscribe((hasEntries) => {
 				expect(hasEntries).to.be.false;
 				done();

@@ -1,10 +1,12 @@
 import { expect } from '@open-wc/testing';
 import { UmbClipboardEntryDetailLocalStorageDataSource } from './clipboard-entry-detail.local-storage.data-source.js';
-import type { UmbClipboardEntry } from '../types.js';
+import type { UmbClipboardEntryDetailModel } from '../types.js';
+import { UMB_CLIPBOARD_ENTRY_ENTITY_TYPE } from '../entity.js';
 
 describe('UmbClipboardLocalStorageDataSource', () => {
 	let dataSource: UmbClipboardEntryDetailLocalStorageDataSource;
-	const clipboardEntry: UmbClipboardEntry = {
+	const clipboardEntry: UmbClipboardEntryDetailModel = {
+		entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
 		data: ['test'],
 		icons: ['icon'],
 		meta: {},

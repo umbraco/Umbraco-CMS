@@ -4,7 +4,7 @@ import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbClipboardEntry } from '../../../clipboard-entry/index.js';
+import type { UmbClipboardEntryDetailModel } from '../../../clipboard-entry/index.js';
 
 @customElement('umb-clipboard-table-collection-view')
 export class UmbClipboardTableCollectionViewElement extends UmbLitElement {
@@ -24,7 +24,7 @@ export class UmbClipboardTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableItems: Array<UmbTableItem> = [];
 
-	#collectionContext?: UmbDefaultCollectionContext<UmbClipboardEntry>;
+	#collectionContext?: UmbDefaultCollectionContext<UmbClipboardEntryDetailModel>;
 
 	constructor() {
 		super();
@@ -40,7 +40,7 @@ export class UmbClipboardTableCollectionViewElement extends UmbLitElement {
 		this.observe(this.#collectionContext.items, (items) => this.#createTableItems(items), 'umbCollectionItemsObserver');
 	}
 
-	#createTableItems(items: Array<UmbClipboardEntry>) {
+	#createTableItems(items: Array<UmbClipboardEntryDetailModel>) {
 		this._tableItems = items.map((item) => {
 			return {
 				id: item.unique,
