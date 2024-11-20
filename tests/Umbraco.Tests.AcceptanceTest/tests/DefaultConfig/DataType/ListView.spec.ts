@@ -216,8 +216,7 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    // Skip this test as there is no setting for content app icon
-    test.skip('can update content app icon', async ({umbracoApi, umbracoUi}) => {
+    test('can update workspace view icon', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const iconValue = 'icon-activity';
       const expectedDataTypeValues = {
@@ -227,8 +226,8 @@ for (const listViewType of listViewTypes) {
 
       // Act
       await umbracoUi.dataType.goToDataType(listViewType);
-      await umbracoUi.dataType.clickContentAppIconButton();
-      await umbracoUi.dataType.chooseContentAppIconByValue(iconValue);
+      await umbracoUi.dataType.clickSelectIconButton();
+      await umbracoUi.dataType.chooseWorkspaceViewIconByValue(iconValue);
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
@@ -236,18 +235,17 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    // Skip this test as there is no setting for content app icon
-    test.skip('can update content app name', async ({umbracoApi, umbracoUi}) => {
+    test('can update workspace view name', async ({umbracoApi, umbracoUi}) => {
       // Arrange
-      const contentAppName = 'Test Content App Name';
+      const WorkspaceViewName = 'Test Content Name';
       const expectedDataTypeValues = {
         "alias": "tabName",
-        "value": contentAppName
+        "value": WorkspaceViewName
       };
 
       // Act
       await umbracoUi.dataType.goToDataType(listViewType);
-      await umbracoUi.dataType.enterContentAppName(contentAppName);
+      await umbracoUi.dataType.enterWorkspaceViewName(WorkspaceViewName);
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
@@ -255,8 +253,7 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    // Skip this test as there is no setting for content app icon
-    test.skip('can enable show content app first', async ({umbracoApi, umbracoUi}) => {
+    test('can enable show content workspace view first', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const expectedDataTypeValues = {
         "alias": "showContentFirst",
@@ -265,7 +262,7 @@ for (const listViewType of listViewTypes) {
 
       // Act
       await umbracoUi.dataType.goToDataType(listViewType);
-      await umbracoUi.dataType.clickShowContentAppFirstSlider();
+      await umbracoUi.dataType.clickShowContentWorkspaceViewFirstSlider();
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert

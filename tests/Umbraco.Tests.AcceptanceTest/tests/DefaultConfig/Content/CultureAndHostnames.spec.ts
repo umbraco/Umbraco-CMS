@@ -109,6 +109,7 @@ test('can add culture and hostname for multiple languages', async ({umbracoApi, 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickCultureAndHostnamesButton();
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.clickAddNewDomainButton();
   await umbracoUi.content.enterDomain(domainName, 0);
   await umbracoUi.content.selectDomainLanguageOption(languageName, 0);
