@@ -12,7 +12,13 @@ export interface UmbPropertyTypeContainerModel {
 	type: UmbPropertyContainerTypes;
 	sortOrder: number;
 }
-
+/**
+ *
+ * @deprecated
+ * This model is deprecated and will be removed in version 17. Please use the UmbContentTypeDetailModel instead.
+ * @export
+ * @interface UmbContentTypeModel
+ */
 export interface UmbContentTypeModel {
 	unique: string;
 	name: string;
@@ -28,6 +34,10 @@ export interface UmbContentTypeModel {
 	allowedContentTypes: Array<UmbContentTypeSortModel>;
 	compositions: Array<UmbContentTypeCompositionModel>;
 	collection: UmbReferenceByUnique | null;
+}
+
+export interface UmbContentTypeDetailModel extends UmbContentTypeModel {
+	entityType: string;
 }
 
 export interface UmbPropertyTypeScaffoldModel extends Omit<UmbPropertyTypeModel, 'dataType'> {

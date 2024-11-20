@@ -267,8 +267,7 @@ test('can delete a tab from a media type', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeTruthy();
 });
 
-// TODO: Currently there is no composition button, which makes it impossible to test
-test.skip('can create a media type with a composition', async ({umbracoApi, umbracoUi}) => {
+test('can create a media type with a composition', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const compositionMediaTypeName = 'CompositionMediaType';
   await umbracoApi.mediaType.ensureNameNotExists(compositionMediaTypeName);
@@ -316,8 +315,7 @@ test('can reorder groups in a media type', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.mediaType.doesMediaTypeGroupNameContainCorrectSortOrder(mediaTypeName, firstGroupValue, 1)).toBeTruthy();
 });
 
-// TODO: Unskip when it works. Sometimes the properties are not dragged correctly.
-test.skip('can reorder properties in a media type', async ({umbracoApi, umbracoUi}) => {
+test('can reorder properties in a media type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const dataTypeNameTwo = "Upload Second File";
@@ -329,7 +327,7 @@ test.skip('can reorder properties in a media type', async ({umbracoApi, umbracoU
   // Drag and Drop
   const dragFromLocator = umbracoUi.mediaType.getTextLocatorWithName(dataTypeNameTwo);
   const dragToLocator = umbracoUi.mediaType.getTextLocatorWithName(dataTypeName);
-  await umbracoUi.mediaType.dragAndDrop(dragFromLocator, dragToLocator, -10, 0, 5);
+  await umbracoUi.mediaType.dragAndDrop(dragFromLocator, dragToLocator);
   await umbracoUi.waitForTimeout(200);
   await umbracoUi.mediaType.clickIAmDoneReorderingButton();
   await umbracoUi.mediaType.clickSaveButton();
@@ -340,7 +338,7 @@ test.skip('can reorder properties in a media type', async ({umbracoApi, umbracoU
   expect(mediaTypeData.properties[0].name).toBe(dataTypeNameTwo);
 });
 
-// TODO: Unskip when the frontend does not give the secondTab -1 as the sortOrder
+// TODO: Remove skip when the frontend is ready. Currently it is impossible to reorder tab by drag and drop
 test.skip('can reorder tabs in a media type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);

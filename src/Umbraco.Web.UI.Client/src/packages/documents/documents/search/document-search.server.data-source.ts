@@ -33,6 +33,7 @@ export class UmbDocumentSearchServerDataSource implements UmbSearchDataSource<Um
 			this.#host,
 			DocumentService.getItemDocumentSearch({
 				query: args.query,
+				parentId: args.searchFrom?.unique ?? undefined,
 			}),
 		);
 

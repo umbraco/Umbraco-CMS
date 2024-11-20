@@ -37,6 +37,7 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 			this.observe(
 				observeMultiple([context.isNew, context.unique, context.variantOptions]),
 				([isNew, unique, variantOptions]) => {
+					if (!unique) return;
 					this._isNew = isNew === true;
 					this._unique = unique;
 					this._variantOptions = variantOptions;
