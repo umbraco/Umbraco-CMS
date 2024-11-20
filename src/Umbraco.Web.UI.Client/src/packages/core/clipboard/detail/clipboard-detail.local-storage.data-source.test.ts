@@ -43,6 +43,12 @@ describe('UmbClipboardLocalStorageDataSource', () => {
 			const response = await dataSource.create(clipboardEntry);
 			expect(response.data).to.deep.equal(clipboardEntry);
 		});
+
+		it('returns an error if entry is missing', async () => {
+			// @ts-expect-error - Testing error case
+			const response = await dataSource.create();
+			expect(response.error).to.be.an.instanceOf(Error);
+		});
 	});
 
 	describe('Read', () => {
@@ -50,6 +56,17 @@ describe('UmbClipboardLocalStorageDataSource', () => {
 			await dataSource.create(clipboardEntry);
 			const response = await dataSource.read(clipboardEntry.unique);
 			expect(response.data).to.deep.equal(clipboardEntry);
+		});
+
+		it('returns an error if unique is missing', async () => {
+			// @ts-expect-error - Testing error case
+			const response = await dataSource.read();
+			expect(response.error).to.be.an.instanceOf(Error);
+		});
+
+		it('returns an error if entry is not found', async () => {
+			const response = await dataSource.read('123');
+			expect(response.error).to.be.an.instanceOf(Error);
 		});
 	});
 
@@ -60,6 +77,17 @@ describe('UmbClipboardLocalStorageDataSource', () => {
 			const response = await dataSource.update(updatedEntry);
 			expect(response.data).to.deep.equal(updatedEntry);
 		});
+
+		it('returns an error if entry is missing', async () => {
+			// @ts-expect-error - Testing error case
+			const response = await dataSource.update();
+			expect(response.error).to.be.an.instanceOf(Error);
+		});
+
+		it('returns an error if entry is not found', async () => {
+			const response = await dataSource.update(clipboardEntry);
+			expect(response.error).to.be.an.instanceOf(Error);
+		});
 	});
 
 	describe('Delete', () => {
@@ -68,6 +96,17 @@ describe('UmbClipboardLocalStorageDataSource', () => {
 			await dataSource.delete(clipboardEntry.unique);
 			const response = await dataSource.read(clipboardEntry.unique);
 			expect(response.data).to.be.undefined;
+		});
+
+		it('returns an error if unique is missing', async () => {
+			// @ts-expect-error - Testing error case
+			const response = await dataSource.delete();
+			expect(response.error).to.be.an.instanceOf(Error);
+		});
+
+		it('returns an error if entry is not found', async () => {
+			const response = await dataSource.delete('not-existing');
+			expect(response.error).to.be.an.instanceOf(Error);
 		});
 	});
 });
