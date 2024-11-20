@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -34,17 +35,19 @@ public class AdvancedMigrationTests : UmbracoIntegrationTest
     private ILoggerFactory LoggerFactory => GetRequiredService<ILoggerFactory>();
     private IMigrationBuilder MigrationBuilder => GetRequiredService<IMigrationBuilder>();
     private IUmbracoDatabaseFactory UmbracoDatabaseFactory => GetRequiredService<IUmbracoDatabaseFactory>();
-    private IPublishedSnapshotService PublishedSnapshotService => GetRequiredService<IPublishedSnapshotService>();
+    private IServiceScopeFactory ServiceScopeFactory => GetRequiredService<IServiceScopeFactory>();
     private DistributedCache DistributedCache => GetRequiredService<DistributedCache>();
+    private IDatabaseCacheRebuilder DatabaseCacheRebuilder => GetRequiredService<IDatabaseCacheRebuilder>();
     private IMigrationPlanExecutor MigrationPlanExecutor => new MigrationPlanExecutor(
         CoreScopeProvider,
         ScopeAccessor,
         LoggerFactory,
         MigrationBuilder,
         UmbracoDatabaseFactory,
-        PublishedSnapshotService,
+        DatabaseCacheRebuilder,
         DistributedCache,
-        Mock.Of<IKeyValueService>());
+        Mock.Of<IKeyValueService>(),
+        ServiceScopeFactory);
 
     [Test]
     public void CreateTableOfTDto()

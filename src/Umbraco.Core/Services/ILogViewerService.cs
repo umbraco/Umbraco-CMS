@@ -22,8 +22,8 @@ public interface ILogViewerService : IService
     /// <param name="filterExpression">The query expression to filter on.</param>
     /// <param name="logLevels">The log levels for which to retrieve the log messages.</param>
     Task<Attempt<PagedModel<ILogEntry>?, LogViewerOperationStatus>> GetPagedLogsAsync(
-        DateTime? startDate,
-        DateTime? endDate,
+        DateTimeOffset? startDate,
+        DateTimeOffset? endDate,
         int skip,
         int take,
         Direction orderDirection = Direction.Descending,
@@ -63,7 +63,7 @@ public interface ILogViewerService : IService
     /// <param name="startDate">The start date for the date range.</param>
     /// <param name="endDate">The end date for the date range.</param>
     /// <returns>The value whether or not you are able to view the logs.</returns>
-    Task<Attempt<bool, LogViewerOperationStatus>> CanViewLogsAsync(DateTime? startDate, DateTime? endDate);
+    Task<Attempt<bool, LogViewerOperationStatus>> CanViewLogsAsync(DateTimeOffset? startDate, DateTimeOffset? endDate);
 
     /// <summary>
     ///     Returns a number of the different log level entries.
@@ -72,7 +72,7 @@ public interface ILogViewerService : IService
     /// </summary>
     /// <param name="startDate">The start date for the date range.</param>
     /// <param name="endDate">The end date for the date range.</param>
-    Task<Attempt<LogLevelCounts?, LogViewerOperationStatus>> GetLogLevelCountsAsync(DateTime? startDate, DateTime? endDate);
+    Task<Attempt<LogLevelCounts?, LogViewerOperationStatus>> GetLogLevelCountsAsync(DateTimeOffset? startDate, DateTimeOffset? endDate);
 
     /// <summary>
     ///     Returns a paged model of all unique message templates and their counts.
@@ -83,7 +83,7 @@ public interface ILogViewerService : IService
     /// <param name="endDate">The end date for the date range.</param>
     /// <param name="skip">The amount of items to skip.</param>
     /// <param name="take">The amount of items to take.</param>
-    Task<Attempt<PagedModel<LogTemplate>, LogViewerOperationStatus>> GetMessageTemplatesAsync(DateTime? startDate, DateTime? endDate, int skip, int take);
+    Task<Attempt<PagedModel<LogTemplate>, LogViewerOperationStatus>> GetMessageTemplatesAsync(DateTimeOffset? startDate, DateTimeOffset? endDate, int skip, int take);
 
     /// <summary>
     ///     Get the log level values of the global minimum and the UmbracoFile one from the config file.

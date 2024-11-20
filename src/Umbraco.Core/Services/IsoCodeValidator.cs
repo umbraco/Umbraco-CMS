@@ -6,16 +6,5 @@ namespace Umbraco.Cms.Core.Services;
 public class IsoCodeValidator : IIsoCodeValidator
 {
     /// <inheritdoc />
-    public bool IsValid(string isoCode)
-    {
-        try
-        {
-            var culture = CultureInfo.GetCultureInfo(isoCode);
-            return culture.Name.Equals(isoCode, StringComparison.InvariantCultureIgnoreCase) && culture.CultureTypes.HasFlag(CultureTypes.UserCustomCulture) == false;
-        }
-        catch (CultureNotFoundException)
-        {
-            return false;
-        }
-    }
+    public bool IsValid(CultureInfo culture) => culture.CultureTypes.HasFlag(CultureTypes.UserCustomCulture) is false;
 }

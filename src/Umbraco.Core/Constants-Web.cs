@@ -56,12 +56,14 @@ public static partial class Constants
         ///     The "base" path to the Management API
         /// </summary>
         public const string ManagementApiPath = "/management/api/";
+        public const string BackofficeSignalRHub = "/backofficeHub";
 
         public static class Routing
         {
             public const string ControllerToken = "controller";
             public const string ActionToken = "action";
             public const string AreaToken = "area";
+            public const string DynamicRoutePattern = "/{**umbracoSlug}";
         }
 
         public static class RoutePath

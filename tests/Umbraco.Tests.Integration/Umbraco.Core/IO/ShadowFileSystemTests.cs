@@ -183,7 +183,7 @@ public class ShadowFileSystemTests : UmbracoIntegrationTest
         File.WriteAllText(path + "/ShadowTests/sub/f1.txt", "foo");
         File.WriteAllText(path + "/ShadowTests/sub/f2.txt", "foo");
 
-        var files = fs.GetFiles("");
+        var files = fs.GetFiles(string.Empty);
         Assert.AreEqual(0, files.Count());
 
         files = fs.GetFiles("sub");
@@ -407,7 +407,7 @@ public class ShadowFileSystemTests : UmbracoIntegrationTest
             {
                 IsScoped = () => scopedFileSystems
             };
-        var shadowPath = $"x/{Guid.NewGuid().ToString("N").Substring(0, 6)}";
+        var shadowPath = $"x/{Guid.NewGuid().ToString("N")[..6]}";
         var sw = (ShadowWrapper)fileSystems.CreateShadowWrapper(phy, shadowPath);
 
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
@@ -523,7 +523,7 @@ public class ShadowFileSystemTests : UmbracoIntegrationTest
             {
                 IsScoped = () => scopedFileSystems
             };
-        var shadowPath = $"x/{Guid.NewGuid().ToString("N").Substring(0, 6)}";
+        var shadowPath = $"x/{Guid.NewGuid().ToString("N")[..6]}";
         var sw = fileSystems.CreateShadowWrapper(phy, shadowPath);
 
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
@@ -592,7 +592,7 @@ public class ShadowFileSystemTests : UmbracoIntegrationTest
             {
                 IsScoped = () => scopedFileSystems
             };
-        var shadowPath = $"x/{Guid.NewGuid().ToString("N").Substring(0, 6)}";
+        var shadowPath = $"x/{Guid.NewGuid().ToString("N")[..6]}";
         var sw = fileSystems.CreateShadowWrapper(phy, shadowPath);
 
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))

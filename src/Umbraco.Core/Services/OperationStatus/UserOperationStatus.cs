@@ -34,9 +34,11 @@ public enum UserOperationStatus
     MediaStartNodeNotFound,
     ContentNodeNotFound,
     MediaNodeNotFound,
+    NodeNotFound,
     UnknownFailure,
     CannotPasswordReset,
     NotInInviteState,
     SelfPasswordResetNotAllowed,
     DuplicateId,
+    InvalidUserType,
 }

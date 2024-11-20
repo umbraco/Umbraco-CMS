@@ -16,5 +16,12 @@ public enum ContentTypeOperationStatus
     MissingContainer,
     DuplicateContainer,
     NotFound,
-    NotAllowed
+    NotAllowed,
+    CancelledByNotification,
+    PropertyTypeAliasCannotEqualContentTypeAlias,
+    NameCannotBeEmpty,
+    NameTooLong,
+    InvalidElementFlagDocumentHasContent,
+    InvalidElementFlagElementIsUsedInPropertyEditorConfiguration,
+    InvalidElementFlagComparedToParent,
 }

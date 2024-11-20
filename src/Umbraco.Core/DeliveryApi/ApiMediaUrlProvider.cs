@@ -17,6 +17,6 @@ public sealed class ApiMediaUrlProvider : IApiMediaUrlProvider
             throw new ArgumentException("Media URLs can only be generated from Media items.", nameof(media));
         }
 
-        return _publishedUrlProvider.GetMediaUrl(media, UrlMode.Relative);
+        return _publishedUrlProvider.GetMediaUrl(media);
     }
 }

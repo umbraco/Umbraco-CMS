@@ -107,8 +107,8 @@ public interface IUserGroupService
     /// <param name="userGroupKeys">The user groups the users should be part of.</param>
     /// <param name="userKeys">The user whose groups we want to alter.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
-    Task<UserGroupOperationStatus> UpdateUserGroupsOnUsersAsync(ISet<Guid> userGroupKeys, ISet<Guid> userKeys);
+    Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsersAsync(ISet<Guid> userGroupKeys, ISet<Guid> userKeys);
 
-    Task<UserGroupOperationStatus> AddUsersToUserGroupAsync(UsersToUserGroupManipulationModel addUsersModel, Guid performingUserKey);
-    Task<UserGroupOperationStatus> RemoveUsersFromUserGroupAsync(UsersToUserGroupManipulationModel removeUsersModel, Guid performingUserKey);
+    Task<Attempt<UserGroupOperationStatus>> AddUsersToUserGroupAsync(UsersToUserGroupManipulationModel addUsersModel, Guid performingUserKey);
+    Task<Attempt<UserGroupOperationStatus>> RemoveUsersFromUserGroupAsync(UsersToUserGroupManipulationModel removeUsersModel, Guid performingUserKey);
 }

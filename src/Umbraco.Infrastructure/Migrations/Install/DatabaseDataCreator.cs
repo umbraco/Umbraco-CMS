@@ -195,10 +195,9 @@ internal class DatabaseDataCreator
     {
         var userGroupKeyToPermissions = new Dictionary<Guid, IEnumerable<string>>()
         {
-            [Constants.Security.AdminGroupKey] = new []{ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionAssignDomain.ActionLetter, ActionPublish.ActionLetter, ActionRights.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "7", "T"},
-            [Constants.Security.WriterGroupKey] =  new []{ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionToPublish.ActionLetter, ActionBrowse.ActionLetter, ActionNotify.ActionLetter, ":"},
-            [Constants.Security.EditorGroupKey] = new []{ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionPublish.ActionLetter, ActionUnpublish.ActionLetter,  ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "T"},
-            [Constants.Security.TranslatorGroupKey] =  new []{ActionUpdate.ActionLetter, ActionBrowse.ActionLetter},
+            [Constants.Security.AdminGroupKey] = new[] { ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionAssignDomain.ActionLetter, ActionPublish.ActionLetter, ActionRights.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "7", "T" },
+            [Constants.Security.EditorGroupKey] = new[] { ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionPublish.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "T" },
+            [Constants.Security.TranslatorGroupKey] = new[] { ActionUpdate.ActionLetter, ActionBrowse.ActionLetter },
         };
 
         var i = 1;
@@ -1062,6 +1061,7 @@ internal class DatabaseDataCreator
                     Thumbnail = Constants.Icons.MediaFolder,
                     AllowAtRoot = true,
                     Variations = (byte)ContentVariation.Nothing,
+                    ListView = Constants.DataTypes.Guids.ListViewMediaGuid
                 });
         }
 
@@ -1886,11 +1886,13 @@ internal class DatabaseDataCreator
         }
 
         // layouts for the list view
-        const string cardLayout =
-            "{\"name\": \"Grid\",\"path\": \"views/propertyeditors/listview/layouts/grid/grid.html\", \"icon\": \"icon-thumbnails-small\", \"isSystem\": true, \"selected\": true}";
-        const string listLayout =
-            "{\"name\": \"List\",\"path\": \"views/propertyeditors/listview/layouts/list/list.html\",\"icon\": \"icon-list\", \"isSystem\": true,\"selected\": true}";
-        const string layouts = "[" + cardLayout + "," + listLayout + "]";
+        string TableCollectionView(string collectionViewType) =>
+            $"{{\"name\": \"List\",\"collectionView\": \"Umb.CollectionView.{collectionViewType}.Table\", \"icon\": \"icon-list\", \"isSystem\": true, \"selected\": true}}";
+
+        string GridCollectionView(string collectionViewType) =>
+            $"{{\"name\": \"Grid\",\"collectionView\": \"Umb.CollectionView.{collectionViewType}.Grid\",\"icon\": \"icon-thumbnails-small\", \"isSystem\": true,\"selected\": true}}";
+
+        string Layouts(string collectionViewType) => $"[{GridCollectionView(collectionViewType)},{TableCollectionView(collectionViewType)}]";
 
         // Insert data types only if the corresponding Node record exists (which may or may not have been created depending on configuration
         // of data types to create).
@@ -1918,7 +1920,7 @@ internal class DatabaseDataCreator
                 });
         }
 
-        if (_database.Exists<NodeDto>(-87))
+        if (_database.Exists<NodeDto>(Constants.DataTypes.RichtextEditor))
         {
             _database.Insert(
                 Constants.DatabaseSchema.Tables.DataType,
@@ -1926,12 +1928,11 @@ internal class DatabaseDataCreator
                 false,
                 new DataTypeDto
                 {
-                    NodeId = -87,
+                    NodeId = Constants.DataTypes.RichtextEditor,
                     EditorAlias = Constants.PropertyEditors.Aliases.RichText,
-                    EditorUiAlias = "Umb.PropertyEditorUi.TinyMCE",
+                    EditorUiAlias = "Umb.PropertyEditorUi.Tiptap",
                     DbType = "Ntext",
-                    Configuration =
-                        "{\"toolbar\":[\"ace\",\"styles\",\"bold\",\"italic\",\"alignleft\",\"aligncenter\",\"alignright\",\"bullist\",\"numlist\",\"outdent\",\"indent\",\"link\",\"umbmediapicker\",\"umbembeddialog\"],\"stylesheets\":[],\"maxImageSize\":500,\"mode\":\"classic\"}",
+                    Configuration = "{\"extensions\": [\"Umb.Tiptap.Block\", \"Umb.Tiptap.Blockquote\", \"Umb.Tiptap.Bold\", \"Umb.Tiptap.CodeBlock\", \"Umb.Tiptap.Embed\", \"Umb.Tiptap.Figure\", \"Umb.Tiptap.Heading\", \"Umb.Tiptap.HorizontalRule\", \"Umb.Tiptap.Image\", \"Umb.Tiptap.Italic\", \"Umb.Tiptap.Link\", \"Umb.Tiptap.List\", \"Umb.Tiptap.MediaUpload\", \"Umb.Tiptap.Strike\", \"Umb.Tiptap.Subscript\", \"Umb.Tiptap.Superscript\", \"Umb.Tiptap.Table\", \"Umb.Tiptap.TextAlign\", \"Umb.Tiptap.Underline\"], \"maxImageSize\": 500, \"overlaySize\": \"medium\", \"toolbar\": [[[\"Umb.Tiptap.Toolbar.SourceEditor\"], [\"Umb.Tiptap.Toolbar.Bold\", \"Umb.Tiptap.Toolbar.Italic\", \"Umb.Tiptap.Toolbar.Underline\"], [\"Umb.Tiptap.Toolbar.TextAlignLeft\", \"Umb.Tiptap.Toolbar.TextAlignCenter\", \"Umb.Tiptap.Toolbar.TextAlignRight\"], [\"Umb.Tiptap.Toolbar.BulletList\", \"Umb.Tiptap.Toolbar.OrderedList\"], [\"Umb.Tiptap.Toolbar.Blockquote\", \"Umb.Tiptap.Toolbar.HorizontalRule\"], [\"Umb.Tiptap.Toolbar.Link\", \"Umb.Tiptap.Toolbar.Unlink\"], [\"Umb.Tiptap.Toolbar.MediaPicker\", \"Umb.Tiptap.Toolbar.EmbeddedMedia\"]]]}",
                 });
         }
 
@@ -2094,7 +2095,7 @@ internal class DatabaseDataCreator
                     DbType = "Nvarchar",
                     Configuration =
                         "{\"pageSize\":100, \"orderBy\":\"updateDate\", \"orderDirection\":\"desc\", \"layouts\":" +
-                        layouts +
+                        Layouts("Document") +
                         ", \"includeProperties\":[{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":true},{\"alias\":\"creator\",\"header\":\"Updated by\",\"isSystem\":true}]}",
                 });
         }
@@ -2113,7 +2114,7 @@ internal class DatabaseDataCreator
                     DbType = "Nvarchar",
                     Configuration =
                         "{\"pageSize\":100, \"orderBy\":\"updateDate\", \"orderDirection\":\"desc\", \"layouts\":" +
-                        layouts +
+                        Layouts("Media") +
                         ", \"includeProperties\":[{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":true},{\"alias\":\"creator\",\"header\":\"Updated by\",\"isSystem\":true}]}",
                 });
         }

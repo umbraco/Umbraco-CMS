@@ -13,11 +13,12 @@
 		"npm": ">=10.1"
 	},
 	"dependencies": {
-		"msw": "^2.2.13"
 	},
 	"devDependencies": {
-		"typescript": "^5.3.3",
-		"vite": "^5.2.6",
+    "@umbraco-cms/backoffice": "^14.3.1",
+    "msw": "^2.3.0",
+		"typescript": "^5.4.5",
+		"vite": "^5.4.6",
 		"vite-tsconfig-paths": "^4.3.2"
 	},
 	"msw": {

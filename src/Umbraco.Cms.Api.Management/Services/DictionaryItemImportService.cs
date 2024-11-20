@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Services;
 internal sealed class DictionaryItemImportService : IDictionaryItemImportService
 {
     private readonly IDictionaryItemService _dictionaryItemService;
-    private readonly PackageDataInstallation _packageDataInstallation;
+    private readonly IPackageDataInstallation _packageDataInstallation;
     private readonly ILogger<DictionaryItemImportService> _logger;
     private readonly ITemporaryFileService _temporaryFileService;
     private readonly IUserService _userService;
@@ -25,7 +25,7 @@ internal sealed class DictionaryItemImportService : IDictionaryItemImportService
 
     public DictionaryItemImportService(
         IDictionaryItemService dictionaryItemService,
-        PackageDataInstallation packageDataInstallation,
+        IPackageDataInstallation packageDataInstallation,
         ILogger<DictionaryItemImportService> logger,
         ITemporaryFileService temporaryFileService,
         IUserService userService,

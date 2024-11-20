@@ -139,12 +139,12 @@ public class TemplateService : RepositoryService, ITemplateService
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
-        if (keys.Any() == false)
+        IQuery<ITemplate> query = Query<ITemplate>();
+        if (keys.Any())
         {
-            return Task.FromResult((IEnumerable<ITemplate>)_templateRepository.GetAll().OrderBy(x => x.Name));
+            query = query.Where(x => keys.Contains(x.Key));
         }
 
-        IQuery<ITemplate> query = Query<ITemplate>().Where(x => keys.Contains(x.Key));
         IEnumerable<ITemplate> templates = _templateRepository.Get(query).OrderBy(x => x.Name);
 
         return Task.FromResult(templates);

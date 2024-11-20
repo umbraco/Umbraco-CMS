@@ -27,8 +27,8 @@ public class AspNetCoreCookieManager : ICookieManager
 
     public string? GetCookieValue(string cookieName) => _httpContextAccessor.HttpContext?.Request.Cookies[cookieName];
 
-    public void SetCookieValue(string cookieName, string value) =>
-        _httpContextAccessor.HttpContext?.Response.Cookies.Append(cookieName, value, new CookieOptions());
+    public void SetCookieValue(string cookieName, string value, bool httpOnly) =>
+        _httpContextAccessor.HttpContext?.Response.Cookies.Append(cookieName, value, new CookieOptions { HttpOnly = httpOnly });
 
     public bool HasCookie(string cookieName) => !(GetCookieValue(cookieName) is null);
 }

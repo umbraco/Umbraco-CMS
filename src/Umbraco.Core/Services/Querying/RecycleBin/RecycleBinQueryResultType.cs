@@ -1,7 +1,7 @@
 namespace Umbraco.Cms.Core.Services.Querying.RecycleBin;
 
 /// <summary>
-/// < 10 = Success
+/// &lt;10 = Success.
 /// </summary>
 public enum RecycleBinQueryResultType
 {

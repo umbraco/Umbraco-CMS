@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Web.Common.Security;
 ///     A <see cref="SignInManager{BackOfficeIdentityUser}" /> for the back office with a
 ///     <seealso cref="BackOfficeIdentityUser" />
 /// </summary>
-public interface IBackOfficeSignInManager
+public interface IBackOfficeSignInManager : ICoreBackOfficeSignInManager
 {
     AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string? redirectUrl, string? userId = null);
 

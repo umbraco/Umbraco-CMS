@@ -29,11 +29,15 @@ public class UserGroupControllerBase : ManagementApiControllerBase
                 .WithTitle("Duplicate alias")
                 .WithDetail("A user group already exists with the attempted alias.")
                 .Build()),
+            UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup => BadRequest(problemDetailsBuilder
+                .WithTitle("System user group")
+                .WithDetail("Changing the alias is not allowed on a system user group.")
+                .Build()),
             UserGroupOperationStatus.MissingUser => Unauthorized(problemDetailsBuilder
                 .WithTitle("Missing user")
                 .WithDetail("A performing user was not found when attempting the operation.")
                 .Build()),
-            UserGroupOperationStatus.IsSystemUserGroup => BadRequest(problemDetailsBuilder
+            UserGroupOperationStatus.CanNotDeleteIsSystemUserGroup => BadRequest(problemDetailsBuilder
                 .WithTitle("System user group")
                 .WithDetail("The operation is not allowed on a system user group.")
                 .Build()),

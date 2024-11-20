@@ -75,17 +75,25 @@ public class UdiRange
 
     public static bool operator !=(UdiRange range1, UdiRange range2) => !(range1 == range2);
 
-    public static UdiRange Parse(string s)
+    public static UdiRange Parse(string value)
     {
-        if (Uri.IsWellFormedUriString(s, UriKind.Absolute) == false
-            || Uri.TryCreate(s, UriKind.Absolute, out Uri? uri) == false)
+        if (Uri.TryCreate(value, UriKind.Absolute, out Uri? uri) is false ||
+            uri.IsWellFormedOriginalString() is false)
         {
-            // if (tryParse) return false;
-            throw new FormatException(string.Format("String \"{0}\" is not a valid udi range.", s));
+            throw new FormatException($"String \"{value}\" is not a valid UDI range.");
         }
 
-        Uri udiUri = uri.Query == string.Empty ? uri : new UriBuilder(uri) { Query = string.Empty }.Uri;
-        return new UdiRange(Udi.Create(udiUri), uri.Query.TrimStart(Constants.CharArrays.QuestionMark));
+        // Remove selector from UDI
+        Uri udiUri = string.IsNullOrEmpty(uri.Query)
+            ? uri
+            : new UriBuilder(uri) { Query = string.Empty }.Uri;
+
+        var udi = Udi.Create(udiUri);
+
+        // Only specify selector if query string is not empty
+        return string.IsNullOrEmpty(uri.Query)
+            ? new UdiRange(udi)
+            : new UdiRange(udi, uri.Query.TrimStart(Constants.CharArrays.QuestionMark));
     }
 
     public override string ToString() => _uriValue.ToString();

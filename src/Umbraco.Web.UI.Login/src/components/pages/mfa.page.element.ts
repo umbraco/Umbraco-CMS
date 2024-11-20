@@ -56,6 +56,7 @@ export default class UmbMfaPageElement extends UmbLitElement {
     if (codeInput) {
       codeInput.error = false;
       codeInput.errorMessage = '';
+      codeInput.setCustomValidity('');
     }
 
     if (!form.checkValidity()) return;
@@ -84,44 +85,30 @@ export default class UmbMfaPageElement extends UmbLitElement {
 
     this.buttonState = 'waiting';
 
-    try {
-      const response = await this.#authContext.validateMfaCode(code, provider);
-      if (response.error) {
-        if (codeInput) {
-          codeInput.error = true;
-          codeInput.errorMessage = response.error;
-        } else {
-          this.error = response.error;
-        }
-        this.buttonState = 'failed';
-        return;
-      }
-
-      this.buttonState = 'success';
-
-      const returnPath = this.#authContext.returnPath;
-      if (returnPath) {
-        location.href = returnPath;
-      }
-
-      this.dispatchEvent(
-        new CustomEvent('umb-login-success', {bubbles: true, composed: true})
-      );
-    } catch (e) {
-      if (e instanceof Error) {
-        this.error = e.message ?? 'Unknown error';
+    const response = await this.#authContext.validateMfaCode(code, provider);
+    if (response.error) {
+      if (codeInput) {
+        codeInput.error = true;
+        codeInput.errorMessage = response.error;
       } else {
-        this.error = 'Unknown error';
+        this.error = response.error;
       }
       this.buttonState = 'failed';
-      this.dispatchEvent(new CustomEvent('umb-login-failed', {bubbles: true, composed: true}));
+      return;
+    }
+
+    this.buttonState = 'success';
+
+    const returnPath = this.#authContext.returnPath;
+    if (returnPath) {
+      location.href = returnPath;
     }
   }
 
   protected renderDefaultView() {
     return html`
       <uui-form>
-        <form id="LoginForm" @submit=${this.#handleSubmit}>
+        <form id="LoginForm" @submit=${this.#handleSubmit} novalidate>
           <header id="header">
             <h1>
               <umb-localize key="auth_mfaTitle">One last step</umb-localize>
@@ -141,7 +128,7 @@ export default class UmbMfaPageElement extends UmbLitElement {
                 <uui-label id="providerLabel" for="provider" slot="label" required>
                   <umb-localize key="auth_mfaMultipleText">Please choose a 2-factor provider</umb-localize>
                 </uui-label>
-                <uui-select id="provider" name="provider" .options=${this.providers} aria-required="true" required></uui-select>
+                <uui-select label=${this.localize.term('auth_mfaMultipleText')} id="provider" name="provider" .options=${this.providers} aria-required="true" required></uui-select>
               </uui-form-layout-item>
             `
             : nothing}
@@ -162,6 +149,7 @@ export default class UmbMfaPageElement extends UmbLitElement {
               aria-required="true"
               required
               required-message=${this.localize.term('auth_mfaCodeInputHelp')}
+              label=${this.localize.term('auth_mfaCodeInput')}
               style="width:100%;">
             </uui-input>
           </uui-form-layout-item>

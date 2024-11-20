@@ -242,7 +242,7 @@ public sealed class AuditService : RepositoryService, IAuditService
         int skip,
         int take,
         Direction orderDirection = Direction.Descending,
-        DateTime? sinceDate = null,
+        DateTimeOffset? sinceDate = null,
         AuditType[]? auditTypeFilter = null)
         {
             if (skip < 0)
@@ -264,7 +264,7 @@ public sealed class AuditService : RepositoryService, IAuditService
             using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.Id == keyToIdAttempt.Result);
-                IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
+                IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate.Value.LocalDateTime) : null;
                 PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
                 IEnumerable<IAuditItem> auditItems = _auditRepository.GetPagedResultsByQuery(query, pageNumber, pageSize, out var totalRecords, orderDirection, auditTypeFilter, customFilter);

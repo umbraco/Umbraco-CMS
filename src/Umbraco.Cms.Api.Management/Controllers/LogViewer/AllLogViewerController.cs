@@ -48,8 +48,8 @@ public class AllLogViewerController : LogViewerControllerBase
         Direction orderDirection = Direction.Descending,
         string? filterExpression = null,
         [FromQuery(Name = "logLevel")] LogLevel[]? logLevels = null,
-        DateTime? startDate = null,
-        DateTime? endDate = null)
+        DateTimeOffset? startDate = null,
+        DateTimeOffset? endDate = null)
     {
         var levels = logLevels?.Select(l => l.ToString()).ToArray();
 

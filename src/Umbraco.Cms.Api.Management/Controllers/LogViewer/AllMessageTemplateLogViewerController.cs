@@ -40,8 +40,8 @@ public class AllMessageTemplateLogViewerController : LogViewerControllerBase
         CancellationToken cancellationToken,
         int skip = 0,
         int take = 100,
-        DateTime? startDate = null,
-        DateTime? endDate = null)
+        DateTimeOffset? startDate = null,
+        DateTimeOffset? endDate = null)
     {
         Attempt<PagedModel<LogTemplate>, LogViewerOperationStatus> messageTemplatesAttempt = await _logViewerService.GetMessageTemplatesAsync(startDate, endDate, skip, take);
 

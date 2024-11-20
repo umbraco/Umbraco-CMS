@@ -1,11 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq.Expressions;
+using Microsoft.Extensions.DependencyInjection;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using Microsoft.Extensions.DependencyInjection;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Editors;
@@ -13,6 +15,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.Notifications;
@@ -33,7 +36,7 @@ namespace Umbraco.Cms.Core.Services;
 ///     Represents the UserService, which is an easy access to operations involving <see cref="IProfile" />,
 ///     <see cref="IMembershipUser" /> and eventually Backoffice Users.
 /// </summary>
-internal class UserService : RepositoryService, IUserService
+internal partial class UserService : RepositoryService, IUserService
 {
     private readonly GlobalSettings _globalSettings;
     private readonly SecuritySettings _securitySettings;
@@ -152,7 +155,7 @@ internal class UserService : RepositoryService, IUserService
         if (permissions.Any(x => x.EntityId == nodeId))
         {
             EntityPermission found = permissions.First(x => x.EntityId == nodeId);
-            var assignedPermissionsArray = found.AssignedPermissions;
+            ISet<string> assignedPermissionsArray = found.AssignedPermissions;
 
             // Working with permissions assigned directly to a user AND to their groups, so maybe several per node
             // and we need to get the most permissive set
@@ -475,6 +478,7 @@ internal class UserService : RepositoryService, IUserService
     ///     This is just the default user group that the membership provider will use
     /// </summary>
     /// <returns></returns>
+    [Obsolete("No (backend) code path is using this anymore, so it can not be considered the default. Planned for removal in V16.")]
     public string GetDefaultMemberType() => Constants.Security.WriterGroupAlias;
 
     /// <summary>
@@ -664,7 +668,7 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new UserCreationResult());
         }
 
-        var userGroups = _userGroupRepository.GetMany().Where(x=>model.UserGroupKeys.Contains(x.Key)).ToArray();
+        IUserGroup[] userGroups = _userGroupRepository.GetMany().Where(x=>model.UserGroupKeys.Contains(x.Key)).ToArray();
 
         if (userGroups.Length != model.UserGroupKeys.Count)
         {
@@ -785,7 +789,7 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new UserInvitationResult());
         }
 
-        var userGroups = _userGroupRepository.GetMany().Where(x=>model.UserGroupKeys.Contains(x.Key)).ToArray();
+        IUserGroup[] userGroups = _userGroupRepository.GetMany().Where(x => model.UserGroupKeys.Contains(x.Key)).ToArray();
 
         if (userGroups.Length != model.UserGroupKeys.Count)
         {
@@ -984,20 +988,30 @@ internal class UserService : RepositoryService, IUserService
 
         // We have to resolve the keys to ids to be compatible with the repository, this could be done in the factory,
         // but I'd rather keep the ids out of the service API as much as possible.
-        int[]? startContentIds = GetIdsFromKeys(model.ContentStartNodeKeys, UmbracoObjectTypes.Document);
+        List<int>? startContentIds = GetIdsFromKeys(model.ContentStartNodeKeys, UmbracoObjectTypes.Document);
 
-        if (startContentIds is null || startContentIds.Length != model.ContentStartNodeKeys.Count)
+        if (startContentIds is null || startContentIds.Count != model.ContentStartNodeKeys.Count)
         {
             scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.ContentStartNodeNotFound, existingUser);
         }
 
-        int[]? startMediaIds = GetIdsFromKeys(model.MediaStartNodeKeys, UmbracoObjectTypes.Media);
+        List<int>? startMediaIds = GetIdsFromKeys(model.MediaStartNodeKeys, UmbracoObjectTypes.Media);
 
-        if (startMediaIds is null || startMediaIds.Length != model.MediaStartNodeKeys.Count)
+        if (startMediaIds is null || startMediaIds.Count != model.MediaStartNodeKeys.Count)
         {
             scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MediaStartNodeNotFound, existingUser);
+        }
+
+        if (model.HasContentRootAccess)
+        {
+            startContentIds.Add(Constants.System.Root);
+        }
+
+        if (model.HasMediaRootAccess)
+        {
+            startMediaIds.Add(Constants.System.Root);
         }
 
         Attempt<string?> isAuthorized = _userEditorAuthorizationHelper.IsAuthorized(
@@ -1085,15 +1099,15 @@ internal class UserService : RepositoryService, IUserService
         UserUpdateModel source,
         ISet<IUserGroup> sourceUserGroups,
         IUser target,
-        int[]? startContentIds,
-        int[]? startMediaIds)
+        List<int> startContentIds,
+        List<int> startMediaIds)
     {
         target.Name = source.Name;
         target.Language = source.LanguageIsoCode;
         target.Email = source.Email;
         target.Username = source.UserName;
-        target.StartContentIds = startContentIds;
-        target.StartMediaIds = startMediaIds;
+        target.StartContentIds = startContentIds.ToArray();
+        target.StartMediaIds = startMediaIds.ToArray();
 
         target.ClearGroups();
         foreach (IUserGroup group in sourceUserGroups)
@@ -1152,13 +1166,13 @@ internal class UserService : RepositoryService, IUserService
 
     private static bool IsEmailValid(string email) => new EmailAddressAttribute().IsValid(email);
 
-    private int[]? GetIdsFromKeys(IEnumerable<Guid>? guids, UmbracoObjectTypes type)
+    private List<int>? GetIdsFromKeys(IEnumerable<Guid>? guids, UmbracoObjectTypes type)
     {
-        int[]? keys = guids?
+        var keys = guids?
             .Select(x => _entityService.GetId(x, type))
             .Where(x => x.Success)
             .Select(x => x.Result)
-            .ToArray();
+            .ToList();
 
         return keys;
     }
@@ -1173,6 +1187,11 @@ internal class UserService : RepositoryService, IUserService
         if (user is null)
         {
             return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, new PasswordChangedModel());
+        }
+
+        if (user.Kind != UserKind.Default)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.InvalidUserType, new PasswordChangedModel());
         }
 
         IUser? performingUser = await userStore.GetAsync(performingUserKey);
@@ -2284,7 +2303,7 @@ internal class UserService : RepositoryService, IUserService
         var results = new List<NodePermissions>();
         foreach (KeyValuePair<Guid, int> node in nodes)
         {
-            var permissions = permissionsCollection.GetAllPermissions(node.Value);
+            ISet<string> permissions = permissionsCollection.GetAllPermissions(node.Value);
             results.Add(new NodePermissions { NodeKey = node.Key, Permissions = permissions });
         }
 
@@ -2329,14 +2348,25 @@ internal class UserService : RepositoryService, IUserService
         }
 
         // We don't know what the entity type may be, so we have to get the entire entity :(
-        var idKeyMap = keys.ToDictionary(key => _entityService.Get(key)!.Id);
+        Dictionary<int, Guid> idKeyMap = new();
+        foreach (Guid key in keys)
+        {
+            IEntitySlim? entity = _entityService.Get(key);
+
+            if (entity is null)
+            {
+                return Attempt.FailWithStatus(UserOperationStatus.NodeNotFound, Enumerable.Empty<NodePermissions>());
+            }
+
+            idKeyMap[entity.Id] = key;
+        }
 
         EntityPermissionCollection permissionCollection = _userGroupRepository.GetPermissions(user.Groups.ToArray(), true, idKeyMap.Keys.ToArray());
 
         var results = new List<NodePermissions>();
         foreach (int nodeId in idKeyMap.Keys)
         {
-            var permissions = permissionCollection.GetAllPermissions(nodeId);
+            ISet<string> permissions = permissionCollection.GetAllPermissions(nodeId);
             results.Add(new NodePermissions { NodeKey = idKeyMap[nodeId], Permissions = permissions });
         }
 
@@ -2424,6 +2454,7 @@ internal class UserService : RepositoryService, IUserService
         EntityPermission[] groupPermissions = GetPermissionsForPath(user.Groups.ToArray(), nodeIds, true).ToArray();
 
         return CalculatePermissionsForPathForUser(groupPermissions, nodeIds);
+
     }
 
     /// <summary>
@@ -2450,6 +2481,56 @@ internal class UserService : RepositoryService, IUserService
             GetPermissionsForPath(groups.Select(x => x.ToReadOnlyGroup()).ToArray(), nodeIds, true).ToArray();
 
         return CalculatePermissionsForPathForUser(groupPermissions, nodeIds);
+    }
+
+    public async Task<UserClientCredentialsOperationStatus> AddClientIdAsync(Guid userKey, string clientId)
+    {
+        if (ValidClientId().IsMatch(clientId) is false)
+        {
+            return UserClientCredentialsOperationStatus.InvalidClientId;
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        IEnumerable<string> currentClientIds = _userRepository.GetAllClientIds();
+        if (currentClientIds.InvariantContains(clientId))
+        {
+            return UserClientCredentialsOperationStatus.DuplicateClientId;
+        }
+
+        IUser? user = await GetAsync(userKey);
+        if (user is null || user.Kind != UserKind.Api)
+        {
+            return UserClientCredentialsOperationStatus.InvalidUser;
+        }
+
+        _userRepository.AddClientId(user.Id, clientId);
+
+        return UserClientCredentialsOperationStatus.Success;
+    }
+
+    public async Task<bool> RemoveClientIdAsync(Guid userKey, string clientId)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        var userId = await _userIdKeyResolver.GetAsync(userKey);
+        return _userRepository.RemoveClientId(userId, clientId);
+    }
+
+    public Task<IUser?> FindByClientIdAsync(string clientId)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        IUser? user = _userRepository.GetByClientId(clientId);
+        return Task.FromResult(user?.Kind == UserKind.Api ? user : null);
+    }
+
+    public async Task<IEnumerable<string>> GetClientIdsAsync(Guid userKey)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        var userId = await _userIdKeyResolver.GetAsync(userKey);
+        return _userRepository.GetClientIds(userId);
     }
 
     /// <summary>
@@ -2595,6 +2676,9 @@ internal class UserService : RepositoryService, IUserService
             assignedPermissions.Add(additionalPermission);
         }
     }
+
+    [GeneratedRegex(@"^[\w\d\-\._~]{1,255}$")]
+    private static partial Regex ValidClientId();
 
     #endregion
 }

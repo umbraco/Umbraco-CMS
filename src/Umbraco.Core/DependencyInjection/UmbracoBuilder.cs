@@ -35,8 +35,11 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.DynamicRoot;
+using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services.FileSystem;
+using Umbraco.Cms.Core.Services.ImportExport;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Services.Querying.RecycleBin;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
@@ -60,6 +63,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         public ILoggerFactory BuilderLoggerFactory { get; }
 
         /// <inheritdoc />
+        [Obsolete("Only here to comply with obsolete implementation. Scheduled for removal in v16")]
         public IHostingEnvironment? BuilderHostingEnvironment { get; }
 
         public IProfiler Profiler { get; }
@@ -76,6 +80,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoBuilder"/> class.
         /// </summary>
+        [Obsolete("Use a non obsolete constructor instead. Scheduled for removal in v16")]
         public UmbracoBuilder(
             IServiceCollection services,
             IConfiguration config,
@@ -89,6 +94,27 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Config = config;
             BuilderLoggerFactory = loggerFactory;
             BuilderHostingEnvironment = hostingEnvironment;
+            Profiler = profiler;
+            AppCaches = appCaches;
+            TypeLoader = typeLoader;
+
+            AddCoreServices();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoBuilder"/> class.
+        /// </summary>
+        public UmbracoBuilder(
+            IServiceCollection services,
+            IConfiguration config,
+            TypeLoader typeLoader,
+            ILoggerFactory loggerFactory,
+            IProfiler profiler,
+            AppCaches appCaches)
+        {
+            Services = services;
+            Config = config;
+            BuilderLoggerFactory = loggerFactory;
             Profiler = profiler;
             AppCaches = appCaches;
             TypeLoader = typeLoader;
@@ -261,9 +287,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddSingleton<ISyncBootStateAccessor, NonRuntimeLevelBootStateAccessor>();
 
-            // register a basic/noop published snapshot service to be replaced
-            Services.AddSingleton<IPublishedSnapshotService, InternalPublishedSnapshotService>();
-
             // Register ValueEditorCache used for validation
             Services.AddSingleton<IValueEditorCache, ValueEditorCache>();
 
@@ -286,6 +309,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IMediaTypeContainerService, MediaTypeContainerService>();
             Services.AddUnique<IContentBlueprintContainerService, ContentBlueprintContainerService>();
             Services.AddUnique<IIsoCodeValidator, IsoCodeValidator>();
+            Services.AddUnique<ICultureService, CultureService>();
             Services.AddUnique<ILanguageService, LanguageService>();
             Services.AddUnique<IMemberGroupService, MemberGroupService>();
             Services.AddUnique<IRedirectUrlService, RedirectUrlService>();
@@ -335,8 +359,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 factory.GetRequiredService<ICoreScopeProvider>(),
                 factory.GetRequiredService<ILoggerFactory>(),
                 factory.GetRequiredService<IEventMessagesFactory>(),
-                factory.GetRequiredService<IExternalLoginWithKeyRepository>()
-            ));
+                factory.GetRequiredService<IExternalLoginWithKeyRepository>()));
             Services.AddUnique<ILogViewerService, LogViewerService>();
             Services.AddUnique<IExternalLoginWithKeyService>(factory => factory.GetRequiredService<ExternalLoginService>());
             Services.AddUnique<ILocalizedTextService>(factory => new LocalizedTextService(
@@ -347,7 +370,18 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddSingleton<ConflictingPackageData>();
             Services.AddSingleton<CompiledPackageXmlParser>();
+            Services.AddUnique<IPreviewTokenGenerator, NoopPreviewTokenGenerator>();
             Services.AddUnique<IPreviewService, PreviewService>();
+            Services.AddUnique<DocumentNavigationService, DocumentNavigationService>();
+            Services.AddUnique<IDocumentNavigationQueryService>(x => x.GetRequiredService<DocumentNavigationService>());
+            Services.AddUnique<IDocumentNavigationManagementService>(x => x.GetRequiredService<DocumentNavigationService>());
+            Services.AddUnique<MediaNavigationService, MediaNavigationService>();
+            Services.AddUnique<IMediaNavigationQueryService>(x => x.GetRequiredService<MediaNavigationService>());
+            Services.AddUnique<IMediaNavigationManagementService>(x => x.GetRequiredService<MediaNavigationService>());
+
+            Services.AddUnique<PublishStatusService, PublishStatusService>();
+            Services.AddUnique<IPublishStatusManagementService>(x => x.GetRequiredService<PublishStatusService>());
+            Services.AddUnique<IPublishStatusQueryService>(x => x.GetRequiredService<PublishStatusService>());
 
             // Register a noop IHtmlSanitizer & IMarkdownSanitizer to be replaced
             Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
@@ -394,6 +428,19 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Segments
             Services.AddUnique<ISegmentService, NoopSegmentService>();
+
+            // definition Import/export
+            Services.AddUnique<ITemporaryFileToXmlImportService, TemporaryFileToXmlImportService>();
+            Services.AddUnique<IContentTypeImportService, ContentTypeImportService>();
+            Services.AddUnique<IMediaTypeImportService, MediaTypeImportService>();
+
+            // add validation services
+            Services.AddUnique<IElementSwitchValidator, ElementSwitchValidator>();
+
+            // Routing
+            Services.AddUnique<IDocumentUrlService, DocumentUrlService>();
+            Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlServiceInitializerNotificationHandler>();
+
         }
     }
 }

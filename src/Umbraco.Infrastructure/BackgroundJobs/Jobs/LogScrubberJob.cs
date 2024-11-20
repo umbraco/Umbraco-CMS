@@ -30,7 +30,7 @@ public class LogScrubberJob : IRecurringBackgroundJob
     private readonly IAuditService _auditService;
     private readonly ILogger<LogScrubberJob> _logger;
     private readonly IProfilingLogger _profilingLogger;
-    private readonly ICoreScopeProvider _scopeProvider;    
+    private readonly ICoreScopeProvider _scopeProvider;
     private LoggingSettings _settings;
 
     /// <summary>
@@ -41,14 +41,14 @@ public class LogScrubberJob : IRecurringBackgroundJob
     /// <param name="scopeProvider">Provides scopes for database operations.</param>
     /// <param name="logger">The typed logger.</param>
     /// <param name="profilingLogger">The profiling logger.</param>
-    public LogScrubberJob(   
+    public LogScrubberJob(
         IAuditService auditService,
         IOptionsMonitor<LoggingSettings> settings,
         ICoreScopeProvider scopeProvider,
         ILogger<LogScrubberJob> logger,
         IProfilingLogger profilingLogger)
     {
-       
+
         _auditService = auditService;
         _settings = settings.CurrentValue;
         _scopeProvider = scopeProvider;
@@ -59,7 +59,7 @@ public class LogScrubberJob : IRecurringBackgroundJob
 
     public Task RunJobAsync()
     {
-        
+
         // Ensure we use an explicit scope since we are running on a background thread.
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         using (_profilingLogger.DebugDuration<LogScrubberJob>("Log scrubbing executing", "Log scrubbing complete"))

@@ -23,7 +23,7 @@ public class HealthCheckViewModelsMapDefinition : IMapDefinition
         mapper.Define<IGrouping<string?, Core.HealthChecks.HealthCheck>, HealthCheckGroupResponseModel>((_, _) => new HealthCheckGroupResponseModel { Name = string.Empty }, Map);
     }
 
-    // Umbraco.Code.MapAll -ActionParameters
+    // Umbraco.Code.MapAll
     private static void Map(HealthCheckActionRequestModel source, HealthCheckAction target, MapperContext context)
     {
         target.Alias = source.Alias;
@@ -34,6 +34,7 @@ public class HealthCheckViewModelsMapDefinition : IMapDefinition
         target.ProvidedValueValidation = source.ProvidedValueValidation;
         target.ProvidedValueValidationRegex = source.ProvidedValueValidationRegex;
         target.ProvidedValue = source.ProvidedValue;
+        target.ActionParameters = source.ActionParameters;
     }
 
     // Umbraco.Code.MapAll
@@ -50,6 +51,7 @@ public class HealthCheckViewModelsMapDefinition : IMapDefinition
         target.ProvidedValue = source.ProvidedValue;
         target.ProvidedValueValidation = source.ProvidedValueValidation;
         target.ProvidedValueValidationRegex = source.ProvidedValueValidationRegex;
+        target.ActionParameters = source.ActionParameters;
     }
 
     // Umbraco.Code.MapAll

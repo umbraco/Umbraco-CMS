@@ -100,7 +100,7 @@ a, a:active, a:visited {
 }
 
 section {
-  background-image: url(/umbraco/website/nonodesbg.jpg);
+  background-image: url(/umbraco/website/nonodesbg.webp);
   background-position: 50%;
   background-size: cover;
   display: table;
@@ -149,11 +149,7 @@ section article > div {
 }
 
 section .logo {
-  background-image: url(/umbraco/website/logo.png);
-  background-repeat: no-repeat;
-  height: 91px;
   margin: 0 auto;
-  width: 91px;
 }
 
 section .row {

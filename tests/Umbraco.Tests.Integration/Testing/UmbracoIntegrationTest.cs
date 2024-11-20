@@ -21,7 +21,7 @@ using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
-using Umbraco.Cms.Tests.Integration.TestServerTest;
+
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
@@ -136,6 +136,12 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
 
         services.AddLogger(webHostEnvironment, Configuration);
 
+        // Register a keyed service to verify that all calls to ServiceDescriptor.ImplementationType
+        // are guarded by checking IsKeyedService first.
+        // Failure to check this when accessing a keyed service descriptor's ImplementationType property
+        // throws a InvalidOperationException.
+        services.AddKeyedSingleton<object>("key");
+
         // Add it!
         var hostingEnvironment = TestHelper.GetHostingEnvironment();
         var typeLoader = services.AddTypeLoader(
@@ -156,6 +162,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
             .AddExamine()
             .AddUmbracoSqlServerSupport()
             .AddUmbracoSqliteSupport()
+            .AddUmbracoHybridCache()
             .AddTestServices(TestHelper);
 
         if (TestOptions.Mapper)
@@ -165,6 +172,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
                 .AddCoreMappingProfiles();
         }
 
+        services.RemoveAll(x=>x.ImplementationType == typeof(DocumentUrlServiceInitializerNotificationHandler));
         services.AddSignalR();
         services.AddMvc();
 

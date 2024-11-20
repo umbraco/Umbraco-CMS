@@ -3,20 +3,26 @@ name: "Code scanning - action"
 on:
   push:
     branches:
-    - '*/dev'
-    - '*/contrib'
+      - "*/dev"
+      - "*/contrib"
+      - "contrib"
+      - "release/*"
   pull_request:
     # The branches below must be a subset of the branches above
     branches:
-    - '*/dev'
-    - '*/contrib'
+      - "*/dev"
+      - "*/contrib"
+      - "contrib"
+      - "release/*"
+  schedule:
+    - cron: "33 2 * * 1"
 
 permissions:
   contents: read
 
 env:
-  dotnetVersion: 8.x
-  dotnetIncludePreviewVersions: true
+  dotnetVersion: 9.x
+  dotnetIncludePreviewVersions: "preview"
   solution: umbraco.sln
   buildConfiguration: SkipTests
   DOTNET_NOLOGO: true
@@ -27,36 +33,39 @@ env:
 
 jobs:
   CodeQL-Build:
+    name: Analyze (${{ matrix.language }})
     permissions:
       actions: read # for github/codeql-action/init to get workflow details
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/analyze to upload SARIF results
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: csharp
+            build-mode: none
+          - language: javascript-typescript
+            build-mode: none
+
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-        submodules: true
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    # Initializes the CodeQL tools for scanning.
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
-      with:
-        config-file: ./.github/config/codeql-config.yml
+      # We use the setup-dotnet action to set up .NET Core, otherwise the CodeQL CLI will not work with preview versions.
+      - name: Setup .NET from global.json
+        uses: actions/setup-dotnet@v4
 
-    - name: Use .NET ${{ env.dotnetVersion }}
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: ${{ env.dotnetVersion }}
-        include-prerelease: ${{ env.dotnetIncludePreviewVersions }}
+      # Initializes the CodeQL tools for scanning.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+          config-file: ./.github/config/codeql-config.yml
 
-    - name: Run dotnet restore
-      run: dotnet restore ${{ env.solution }}
-
-    - name: Run dotnet build
-      run: dotnet build ${{ env.solution }} --configuration ${{ env.buildConfiguration }} --no-restore -p:ContinuousIntegrationBuild=true
-
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"

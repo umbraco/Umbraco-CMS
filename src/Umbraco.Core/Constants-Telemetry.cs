@@ -35,5 +35,10 @@ public static partial class Constants
         public static string WebhookTotal = $"{WebhookPrefix}Total";
         public static string WebhookCustomHeaders = $"{WebhookPrefix}CustomHeaders";
         public static string WebhookCustomEvent = $"{WebhookPrefix}CustomEvent";
+        public static string RichTextEditorCount = "RichTextEditorCount";
+        public static string RichTextBlockCount = "RichTextBlockCount";
+        public static string TotalPropertyCount = "TotalPropertyCount";
+        public static string HighestPropertyCount = "HighestPropertyCount";
+        public static string TotalCompositions = "TotalCompositions";
     }
 }

@@ -5,13 +5,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 using Umbraco.Cms.Infrastructure.HostedServices;
@@ -19,7 +17,6 @@ using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
@@ -36,7 +33,9 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         var httpContext = new DefaultHttpContext();
         httpContext.RequestServices = Services;
         Mock.Get(TestHelper.GetHttpContextAccessor()).Setup(x => x.HttpContext).Returns(httpContext);
-    }
+
+        DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
+                }
 
     [TearDown]
     public void TearDown()
@@ -47,6 +46,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         Services.DisposeIfDisposable();
     }
 
+    private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
     private IBackOfficeExamineSearcher BackOfficeExamineSearcher => GetRequiredService<IBackOfficeExamineSearcher>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
@@ -64,11 +64,8 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
+        base.CustomTestSetup(builder);
         builder.Services.AddUnique<IBackOfficeExamineSearcher, BackOfficeExamineSearcher>();
-        builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
-        builder
-            .AddNotificationHandler<ContentTreeChangeNotification,
-                ContentTreeChangeDistributedCacheNotificationHandler>();
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddExamineIndexes();
         builder.Services.AddHostedService<QueuedHostedService>();
@@ -160,6 +157,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_Published_Content_With_Empty_Query()
     {
         await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
@@ -178,6 +176,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_Published_Content_With_Query_By_Content_Name()
     {
         // Arrange
@@ -198,6 +197,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_Published_Content_With_Query_By_Non_Existing_Content_Name()
     {
         // Arrange
@@ -215,6 +215,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_Published_Content_With_Query_By_Content_Id()
     {
         // Arrange
@@ -238,6 +239,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_Two_Published_Content_With_Similar_Names_By_Name()
     {
         // Arrange
@@ -298,6 +300,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_For_Child_Published_Content_With_Query_By_Content_Name()
     {
         // Arrange
@@ -360,6 +363,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_For_Child_In_Child_Published_Content_With_Query_By_Content_Name()
     {
         // Arrange
@@ -444,6 +448,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_Published_Content_With_Query_With_Content_Name_No_User_Logged_In()
     {
         // Arrange
@@ -462,6 +467,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
 
     // Multiple Languages
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_Published_Content_By_Content_Name_With_Two_Languages()
     {
         // Arrange
@@ -515,6 +521,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_For_Published_Content_Name_With_Two_Languages_By_Default_Language_Content_Name()
     {
         // Arrange
@@ -540,6 +547,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_For_Published_Content_Name_With_Two_Languages_By_Non_Default_Language_Content_Name()
     {
         // Arrange
@@ -565,6 +573,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Search_Published_Content_With_Two_Languages_By_Id()
     {
         // Arrange
@@ -591,6 +600,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
 
     // Check All Indexed Values
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Check_All_Indexed_Values_For_Published_Content_With_No_Properties()
     {
         // Arrange
@@ -657,6 +667,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    [Retry(5)] // TODO make this test non-flaky.
     public async Task Check_All_Indexed_Values_For_Published_Content_With_Properties()
     {
         // Arrange

@@ -26,9 +26,9 @@ public class DataTypeReferencePresentationFactory : IDataTypeReferencePresentati
     {
         var getContentTypesByObjectType = new Dictionary<string, Func<IEnumerable<Guid>, IEnumerable<IContentTypeBase>>>
         {
-            { UmbracoObjectTypes.DocumentType.GetUdiType(), keys => _contentTypeService.GetAll(keys) },
-            { UmbracoObjectTypes.MediaType.GetUdiType(), keys => _mediaTypeService.GetAll(keys) },
-            { UmbracoObjectTypes.MemberType.GetUdiType(), keys => _memberTypeService.GetAll(keys) }
+            { UmbracoObjectTypes.DocumentType.GetUdiType(), keys => _contentTypeService.GetMany(keys) },
+            { UmbracoObjectTypes.MediaType.GetUdiType(), keys => _mediaTypeService.GetMany(keys) },
+            { UmbracoObjectTypes.MemberType.GetUdiType(), keys => _memberTypeService.GetMany(keys) }
         };
 
         foreach (IGrouping<string, KeyValuePair<Udi, IEnumerable<string>>> usagesByEntityType in dataTypeUsages.GroupBy(u => u.Key.EntityType))
@@ -47,8 +47,13 @@ public class DataTypeReferencePresentationFactory : IDataTypeReferencePresentati
                 IEnumerable<string> propertyAliases = propertyAliasesByGuid[contentType.Key];
                 yield return new DataTypeReferenceResponseModel
                 {
-                    Id = contentType.Key,
-                    Type = usagesByEntityType.Key,
+                    ContentType = new DataTypeContentTypeReferenceModel
+                    {
+                        Id = contentType.Key,
+                        Name = contentType.Name,
+                        Icon = contentType.Icon,
+                        Type = usagesByEntityType.Key,
+                    },
                     Properties = contentType
                         .PropertyTypes
                         .Where(propertyType => propertyAliases.InvariantContains(propertyType.Alias))

@@ -1,7 +1,6 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Semver;
@@ -139,7 +138,7 @@ public class TelemetryServiceTests
     private IPackagingService CreatePackagingService(IEnumerable<InstalledPackage> installedPackages)
     {
         var packagingServiceMock = new Mock<IPackagingService>();
-        packagingServiceMock.Setup(x => x.GetAllInstalledPackages()).Returns(installedPackages);
+        packagingServiceMock.Setup(x => x.GetAllInstalledPackagesAsync()).ReturnsAsync(installedPackages);
         return packagingServiceMock.Object;
     }
 

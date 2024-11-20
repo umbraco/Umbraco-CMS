@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Webhooks.Events;
 [WebhookEvent("Content Rolled Back", Constants.WebhookEvents.Types.Content)]
 public class ContentRolledBackWebhookEvent : WebhookEventContentBase<ContentRolledBackNotification, IContent>
 {
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IPublishedContentCache _contentCache;
     private readonly IApiContentBuilder _apiContentBuilder;
 
     public ContentRolledBackWebhookEvent(
@@ -21,7 +21,7 @@ public class ContentRolledBackWebhookEvent : WebhookEventContentBase<ContentRoll
         IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IPublishedContentCache contentCache,
         IApiContentBuilder apiContentBuilder)
         : base(
             webhookFiringService,
@@ -29,7 +29,7 @@ public class ContentRolledBackWebhookEvent : WebhookEventContentBase<ContentRoll
             webhookSettings,
             serverRoleAccessor)
     {
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
+        _contentCache = contentCache;
         _apiContentBuilder = apiContentBuilder;
     }
 
@@ -40,13 +40,8 @@ public class ContentRolledBackWebhookEvent : WebhookEventContentBase<ContentRoll
 
     protected override object? ConvertEntityToRequestPayload(IContent entity)
     {
-        if (_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot) is false || publishedSnapshot!.Content is null)
-        {
-            return null;
-        }
-
         // Get preview/saved version of content for a rollback
-        IPublishedContent? publishedContent = publishedSnapshot.Content.GetById(true, entity.Key);
+        IPublishedContent? publishedContent = _contentCache.GetById(true, entity.Key);
         return publishedContent is null ? null : _apiContentBuilder.Build(publishedContent);
     }
 }

@@ -18,6 +18,11 @@ public class UserGroupBase
     public required string Name { get; init; }
 
     /// <summary>
+    /// The alias of the user groups
+    /// </summary>
+    public required string Alias { get; init; }
+
+    /// <summary>
     /// The Icon for the user group
     /// </summary>
     public string? Icon { get; init; }

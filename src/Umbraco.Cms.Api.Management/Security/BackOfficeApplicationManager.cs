@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System.Globalization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
@@ -6,7 +7,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Security;
 
@@ -57,6 +57,8 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         }
         else
         {
+            var developerClientTimeOutValue = new GlobalSettings().TimeOut.ToString("c", CultureInfo.InvariantCulture);
+
             await CreateOrUpdate(
                 new OpenIddictApplicationDescriptor
                 {
@@ -73,6 +75,11 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
                         OpenIddictConstants.Permissions.Endpoints.Token,
                         OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                         OpenIddictConstants.Permissions.ResponseTypes.Code
+                    },
+                    Settings =
+                    {
+                        // use a fixed access token lifetime for tokens issued to the Swagger application.
+                        [OpenIddictConstants.Settings.TokenLifetimes.AccessToken] = developerClientTimeOutValue
                     }
                 },
                 cancellationToken);
@@ -93,6 +100,11 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
                         OpenIddictConstants.Permissions.Endpoints.Token,
                         OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                         OpenIddictConstants.Permissions.ResponseTypes.Code
+                    },
+                    Settings =
+                    {
+                        // use a fixed access token lifetime for tokens issued to the Postman application.
+                        [OpenIddictConstants.Settings.TokenLifetimes.AccessToken] = developerClientTimeOutValue
                     }
                 },
                 cancellationToken);
@@ -120,7 +132,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
             {
                 OpenIddictConstants.Permissions.Endpoints.Authorization,
                 OpenIddictConstants.Permissions.Endpoints.Token,
-                OpenIddictConstants.Permissions.Endpoints.Logout,
+                OpenIddictConstants.Permissions.Endpoints.EndSession,
                 OpenIddictConstants.Permissions.Endpoints.Revocation,
                 OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                 OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
@@ -128,6 +140,28 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
             },
         };
     }
+
+    public async Task EnsureBackOfficeClientCredentialsApplicationAsync(string clientId, string clientSecret, CancellationToken cancellationToken = default)
+    {
+        var applicationDescriptor = new OpenIddictApplicationDescriptor
+        {
+            DisplayName = $"Umbraco client credentials back-office access: {clientId}",
+            ClientId = clientId,
+            ClientSecret = clientSecret,
+            ClientType = OpenIddictConstants.ClientTypes.Confidential,
+            Permissions =
+            {
+                OpenIddictConstants.Permissions.Endpoints.Token,
+                OpenIddictConstants.Permissions.Endpoints.Revocation,
+                OpenIddictConstants.Permissions.GrantTypes.ClientCredentials
+            }
+        };
+
+        await CreateOrUpdate(applicationDescriptor, cancellationToken);
+    }
+
+    public async Task DeleteBackOfficeClientCredentialsApplicationAsync(string clientId, CancellationToken cancellationToken = default)
+        => await Delete(clientId, cancellationToken);
 
     private static Uri CallbackUrlFor(Uri url, string relativePath) => new Uri($"{url.GetLeftPart(UriPartial.Authority)}/{relativePath.TrimStart(Constants.CharArrays.ForwardSlash)}");
 }

@@ -242,4 +242,146 @@ public partial class UserServiceCrudTests
         Assert.IsNotNull(updatedUser);
         Assert.AreEqual(isoCode, updatedUser.Language);
     }
+
+    // todo Ideally we would test content and media separately and together (Introduce Testcases for switching permutations)
+    [Test]
+    public async Task Can_Assign_User_Start_Nodes()
+    {
+        var contentService = GetRequiredService<IContentService>();
+        var mediaService = GetRequiredService<IMediaService>();
+        var contentStartNode = contentService.GetRootContent().First();
+        var mediaStartNode = mediaService.CreateMediaWithIdentity("test", -1, "Image");
+
+        var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
+
+        var (updateModel, createdUser) = await CreateUserForUpdate(userService);
+        updateModel.ContentStartNodeKeys = new HashSet<Guid> { contentStartNode.Key };
+        updateModel.MediaStartNodeKeys = new HashSet<Guid> { mediaStartNode.Key };
+
+        var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
+
+        Assert.IsTrue(result.Success);
+        var updatedUser = await userService.GetAsync(createdUser.Key);
+
+        Assert.IsNotNull(updatedUser);
+        Assert.IsNotNull(updatedUser.StartContentIds);
+        Assert.AreEqual(1, updatedUser.StartContentIds.Length);
+        Assert.AreEqual(contentStartNode.Id, updatedUser.StartContentIds.First());
+        Assert.IsNotNull(updatedUser.StartMediaIds);
+        Assert.AreEqual(1, updatedUser.StartMediaIds.Length);
+        Assert.AreEqual(mediaStartNode.Id, updatedUser.StartMediaIds.First());
+    }
+
+    [TestCase(false, false)]
+    [TestCase(false, true)]
+    [TestCase(true, false)]
+    [TestCase(true, true)]
+    public async Task Can_Assign_Root_As_User_Start_Node(bool contentRootAccess, bool mediaRootAccess)
+    {
+        var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
+
+        var (updateModel, createdUser) = await CreateUserForUpdate(userService);
+        updateModel.HasContentRootAccess = contentRootAccess;
+        updateModel.HasMediaRootAccess = mediaRootAccess;
+
+        var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
+
+        Assert.IsTrue(result.Success);
+        var updatedUser = await userService.GetAsync(createdUser.Key);
+        Assert.IsNotNull(updatedUser);
+
+        Assert.IsNotNull(updatedUser.StartContentIds);
+        if (contentRootAccess)
+        {
+            Assert.AreEqual(1, updatedUser.StartContentIds.Length);
+            Assert.AreEqual(Constants.System.Root, updatedUser.StartContentIds.First());
+        }
+        else
+        {
+            Assert.IsEmpty(updatedUser.StartContentIds);
+        }
+
+        Assert.IsNotNull(updatedUser.StartMediaIds);
+        if (mediaRootAccess)
+        {
+            Assert.AreEqual(1, updatedUser.StartMediaIds.Length);
+            Assert.AreEqual(Constants.System.Root, updatedUser.StartMediaIds.First());
+        }
+        else
+        {
+            Assert.IsEmpty(updatedUser.StartMediaIds);
+        }
+    }
+
+    // todo Ideally we would test content and media separately and together (Introduce Testcases for switching permutations)
+    [Test]
+    public async Task Can_Unassign_User_Start_Nodes()
+    {
+        var contentService = GetRequiredService<IContentService>();
+        var mediaService = GetRequiredService<IMediaService>();
+        var contentStartNode = contentService.GetRootContent().First();
+        var mediaStartNode = mediaService.CreateMediaWithIdentity("test", -1, "Image");
+
+        var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
+
+        var (updateModel, createdUser) = await CreateUserForUpdate(userService);
+        updateModel.ContentStartNodeKeys = new HashSet<Guid> { contentStartNode.Key };
+        updateModel.MediaStartNodeKeys = new HashSet<Guid> { mediaStartNode.Key };
+
+        await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
+
+        var updatedUser = await userService.GetAsync(createdUser.Key);
+        Assert.IsNotNull(updatedUser);
+        Assert.IsNotEmpty(updatedUser.StartContentIds!);
+        Assert.IsNotEmpty(updatedUser.StartMediaIds!);
+
+        updateModel = await MapUserToUpdateModel(updatedUser);
+        updateModel.ContentStartNodeKeys = new HashSet<Guid>();
+        updateModel.MediaStartNodeKeys = new HashSet<Guid>();
+
+        var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
+
+        Assert.IsTrue(result.Success);
+        updatedUser = await userService.GetAsync(createdUser.Key);
+        Assert.IsNotNull(updatedUser);
+
+        Assert.IsNotNull(updatedUser.StartContentIds);
+        Assert.IsEmpty(updatedUser.StartContentIds);
+
+        Assert.IsNotNull(updatedUser.StartMediaIds);
+        Assert.IsEmpty(updatedUser.StartMediaIds);
+    }
+
+    // todo Ideally we would test content and media separately and together (Introduce Testcases for switching permutations)
+    [Test]
+    public async Task Can_Unassign_Root_As_User_Start_Node()
+    {
+        var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
+
+        var (updateModel, createdUser) = await CreateUserForUpdate(userService);
+        updateModel.HasContentRootAccess = true;
+        updateModel.HasMediaRootAccess = true;
+
+        await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
+        var updatedUser = await userService.GetAsync(createdUser.Key);
+        Assert.IsNotNull(updatedUser);
+        Assert.IsNotEmpty(updatedUser.StartContentIds!);
+        Assert.IsNotEmpty(updatedUser.StartMediaIds!);
+
+        updateModel = await MapUserToUpdateModel(updatedUser);
+        updateModel.HasContentRootAccess = false;
+        updateModel.HasMediaRootAccess = false;
+
+        var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
+
+        Assert.IsTrue(result.Success);
+        updatedUser = await userService.GetAsync(createdUser.Key);
+        Assert.IsNotNull(updatedUser);
+
+        Assert.IsNotNull(updatedUser.StartContentIds);
+        Assert.IsEmpty(updatedUser.StartContentIds);
+
+        Assert.IsNotNull(updatedUser.StartMediaIds);
+        Assert.IsEmpty(updatedUser.StartMediaIds);
+    }
 }

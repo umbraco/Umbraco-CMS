@@ -148,6 +148,8 @@
     <!-- Następujące klucze spowodują, że tokeny zostaną przekazane:
 	    0: Lista znalezionych nagłówków, oddzielonych przecinkami
   	-->
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[Nagłówek lub meta-tag <strong>X-Frame-Options</strong> używany do kontrolowania czy strona może być IFRAME'owana przez inną został znaleziony.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Nagłówek lub meta-tag <strong>X-Frame-Options</strong> używany do kontrolowania czy strona może być IFRAME'owana przez inną nie został znaleziony.]]></key>
     <key alias="excessiveHeadersFound"><![CDATA[Znaleziono następujące nagłówki, ujawniające informacje o technologii strony: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">Nie znaleziono żadnych nagłówków, ujawniających informacji o technologii strony.</key>
     <key alias="smtpMailSettingsConnectionSuccess">Ustawienia SMTP są skonfigurowane poprawnie i serwis działa według oczekiwań.</key>

@@ -90,15 +90,16 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
             .Select(p => p.Alias)
             .WhereNotNull();
 
-        // Service layer expects "owner" instead of "creator", so make sure to pass in the correct field
-        if (orderBy.InvariantEquals("creator"))
-        {
-            orderBy = "owner";
-        }
 
         if (listViewPropertyAliases.Contains(orderBy) == false && orderBy.InvariantEquals("name") == false)
         {
             return Attempt.FailWithStatus<Ordering?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.OrderByNotPartOfCollectionConfiguration, null);
+        }
+
+        // Service layer expects "owner" instead of "creator", so make sure to pass in the correct field
+        if (orderBy.InvariantEquals("creator"))
+        {
+            orderBy = "owner";
         }
 
         var orderByCustomField = listViewProperties

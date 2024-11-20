@@ -143,7 +143,7 @@ public class UmbracoRequestPaths
     /// <summary>
     ///     Checks if the current uri is an install request
     /// </summary>
-    public bool IsInstallerRequest(string absPath) => absPath.InvariantStartsWith(_installPath);
+    public bool IsInstallerRequest(string absPath) => absPath.InvariantStartsWith(_managementApiPath);
 
     /// <summary>
     ///     Rudimentary check to see if it's not a server side request

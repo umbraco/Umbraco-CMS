@@ -9,4 +9,6 @@ public class DocumentTypeConfigurationResponseModel
     public required bool DisableTemplates { get; set; }
 
     public required bool UseSegments { get; set; }
+
+    public required ISet<string> ReservedFieldNames { get; set; }
 }

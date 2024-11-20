@@ -338,6 +338,14 @@
     <!-- The following key get these tokens passed in:
         0: Comma delimitted list of headers found
     -->
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[Bylo nalezeno záhlaví nebo metaznačka <strong>X-Frame-Options</strong>, které určuje, zda může být obsah webu zobrazen na jiném webu pomocí IFRAME.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Nebylo nalezeno záhlaví nebo metaznačka <strong>X-Frame-Options</strong>, které určuje, zda může být obsah webu zobrazen na jiném webu pomocí IFRAME.]]></key>
+    <key alias="noSniffCheckHeaderFound"><![CDATA[Bylo nalezeno záhlaví nebo metaznačka <strong>X-Content-Type-Options</strong> použitá k ochraně před zranitelnostmi čichání MIME.]]></key>
+    <key alias="noSniffCheckHeaderNotFound"><![CDATA[Záhlaví nebo metaznačky <strong>X-Content-Type-Options</strong> použité k ochraně před zranitelnostmi čichání MIME nebyly nalezeny.]]></key>
+    <key alias="hSTSCheckHeaderFound"><![CDATA[Záhlaví <strong>Strict-Transport-Security</strong>, také známo jako HSTS-header, bylo nalezeno.]]></key>
+    <key alias="hSTSCheckHeaderNotFound"><![CDATA[záhlaví <strong>Strict-Transport-Security</strong> nebylo nalezeno.]]></key>
+    <key alias="xssProtectionCheckHeaderFound"><![CDATA[Záhlaví <strong>X-XSS-Protection</strong> bylo nalezeno.]]></key>
+    <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[Záhlaví <strong>X-XSS-Protection</strong> bylo nalezeno.]]></key>
     <key alias="excessiveHeadersFound"><![CDATA[Byly nalezeny následující záhlaví odhalující informace o technologii webových stránek: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">Nebyly nalezeny žádné hlavičky odhalující informace o technologii webových stránek.</key>
     <key alias="smtpMailSettingsConnectionSuccess">Nastavení SMTP jsou správně nakonfigurována a služba funguje jak má.</key>

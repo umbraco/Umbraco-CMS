@@ -5,7 +5,16 @@
     <Description>Contains the web assembly needed to run Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Web.Common</RootNamespace>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <!--  TODO: Fix [SA1117] params all on same line, [SA1401] make fields private, [SA1134] own line
+          attributes, [ASP0019] use IHeaderDictionary.Append or the indexer to append or set headers,
+          [CS0618]/[SYSLIB0051] adjust obsolete references, [IDE0040]/[SA1400] access modifiers, [SA1405]
+          Debug assert message text, [CS0419]/[CS1574] cref ambiguities, [SA1649] file name match type,
+          and remove overrides -->
+    <WarningsNotAsErrors>
+      SA1117,SA1401,SA1134,ASP0019,CS0618,IDE0040,SA1400,SA1405,SYSLIB0051,CS0419,CS1574,SA1649
+    </WarningsNotAsErrors>
+  </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
@@ -21,11 +30,16 @@
     <PackageReference Include="System.Net.Http" />
     <!-- Take top-level depedendency on System.Text.RegularExpressions, because both Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc depend on a vulnerable version -->
     <PackageReference Include="System.Text.RegularExpressions" />
+    <!-- Both OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer bring in a vulnerable version of Microsoft.IdentityModel.JsonWebTokens -->
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens"/>
+    <!-- Both  Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer, Dazinator.Extensions.FileProviders bring in legacy versions of System.Text.Encodings.Web  -->
+    <PackageReference Include="System.Text.Encodings.Web"/>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj" />
-    <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
+    <ProjectReference Include="..\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj" />
+<!--    <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />-->
   </ItemGroup>
 
   <ItemGroup>

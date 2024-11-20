@@ -109,7 +109,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
     {
         const int pageSize = 500;
 
-        IEnumerable<IMemberType> memberTypes = _memberTypeService.GetAll(memberTypeIds);
+        IEnumerable<IMemberType> memberTypes = _memberTypeService.GetMany(memberTypeIds);
         foreach (IMemberType memberType in memberTypes)
         {
             var page = 0;

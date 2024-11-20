@@ -58,7 +58,7 @@ test.describe('Stylesheet tests', () => {
     expect(await umbracoApi.stylesheet.doesExist(stylesheetPath)).toBeTruthy();
 
     // Act
-    await umbracoApi.stylesheet.delete(stylesheetPath);
+    await umbracoApi.stylesheet.delete(stylesheetName);
 
     // Assert
     expect(await umbracoApi.stylesheet.doesExist(stylesheetPath)).toBeFalsy();

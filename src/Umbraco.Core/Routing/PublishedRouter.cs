@@ -24,6 +24,7 @@ public class PublishedRouter : IPublishedRouter
     private readonly IContentLastChanceFinder _contentLastChanceFinder;
     private readonly IContentTypeService _contentTypeService;
     private readonly IEventAggregator _eventAggregator;
+    private readonly IDomainCache _domainCache;
     private readonly IFileService _fileService;
     private readonly ILogger<PublishedRouter> _logger;
     private readonly IProfilingLogger _profilingLogger;
@@ -50,7 +51,8 @@ public class PublishedRouter : IPublishedRouter
         IFileService fileService,
         IContentTypeService contentTypeService,
         IUmbracoContextAccessor umbracoContextAccessor,
-        IEventAggregator eventAggregator)
+        IEventAggregator eventAggregator,
+        IDomainCache domainCache)
     {
         _webRoutingSettings = webRoutingSettings.CurrentValue ??
                               throw new ArgumentNullException(nameof(webRoutingSettings));
@@ -68,6 +70,7 @@ public class PublishedRouter : IPublishedRouter
         _contentTypeService = contentTypeService;
         _umbracoContextAccessor = umbracoContextAccessor;
         _eventAggregator = eventAggregator;
+        _domainCache = domainCache;
         webRoutingSettings.OnChange(x => _webRoutingSettings = x);
     }
 
@@ -108,7 +111,7 @@ public class PublishedRouter : IPublishedRouter
         // find domain
         if (builder.Domain == null)
         {
-            FindDomain(builder);
+            FindAndSetDomain(builder);
         }
 
         await RouteRequestInternalAsync(builder);
@@ -185,7 +188,7 @@ public class PublishedRouter : IPublishedRouter
 
     private async Task<IPublishedRequest> TryRouteRequest(IPublishedRequestBuilder request)
     {
-        FindDomain(request);
+        FindAndSetDomain(request);
 
         if (request.IsRedirect())
         {
@@ -270,22 +273,35 @@ public class PublishedRouter : IPublishedRouter
         // to find out the appropriate template
     }
 
-    /// <summary>
-    ///     Finds the site root (if any) matching the http request, and updates the PublishedRequest accordingly.
-    /// </summary>
-    /// <returns>A value indicating whether a domain was found.</returns>
-    internal bool FindDomain(IPublishedRequestBuilder request)
+    /// <inheritdoc />
+    public bool RouteDomain(IPublishedRequestBuilder request)
+    {
+        var found = FindAndSetDomain(request);
+        HandleWildcardDomains(request);
+        SetVariationContext(request.Culture);
+        return found;
+    }
+
+    /// <inheritdoc />
+    public bool UpdateVariationContext(Uri uri)
+    {
+        DomainAndUri? domain = FindDomain(uri, out _);
+        SetVariationContext(domain?.Culture);
+        return domain?.Culture is not null;
+    }
+
+    private DomainAndUri? FindDomain(Uri uri, out string? defaultCulture)
     {
         const string tracePrefix = "FindDomain: ";
 
         // note - we are not handling schemes nor ports here.
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug("{TracePrefix}Uri={RequestUri}", tracePrefix, request.Uri);
+            _logger.LogDebug("{TracePrefix}Uri={RequestUri}", tracePrefix, uri);
         }
 
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-        IDomainCache? domainsCache = umbracoContext.PublishedSnapshot.Domains;
+        IDomainCache? domainsCache = umbracoContext.Domains;
         var domains = domainsCache?.GetAll(false).ToList();
 
         // determines whether a domain corresponds to a published document, since some
@@ -295,7 +311,7 @@ public class PublishedRouter : IPublishedRouter
         bool IsPublishedContentDomain(Domain domain)
         {
             // just get it from content cache - optimize there, not here
-            IPublishedContent? domainDocument = umbracoContext.PublishedSnapshot.Content?.GetById(domain.ContentId);
+            IPublishedContent? domainDocument = umbracoContext.Content?.GetById(domain.ContentId);
 
             // not published - at all
             if (domainDocument == null)
@@ -315,10 +331,20 @@ public class PublishedRouter : IPublishedRouter
 
         domains = domains?.Where(IsPublishedContentDomain).ToList();
 
-        var defaultCulture = domainsCache?.DefaultCulture;
+        defaultCulture = domainsCache?.DefaultCulture;
 
+        return DomainUtilities.SelectDomain(domains, uri, defaultCulture: defaultCulture);
+    }
+
+    /// <summary>
+    ///     Finds the site root (if any) matching the http request, and updates the PublishedRequest accordingly.
+    /// </summary>
+    /// <returns>A value indicating whether a domain was found.</returns>
+    internal bool FindAndSetDomain(IPublishedRequestBuilder request)
+    {
+        const string tracePrefix = "FindDomain: ";
         // try to find a domain matching the current request
-        DomainAndUri? domainAndUri = DomainUtilities.SelectDomain(domains, request.Uri, defaultCulture: defaultCulture);
+        DomainAndUri? domainAndUri = FindDomain(request.Uri, out var defaultCulture);
 
         // handle domain - always has a contentId and a culture
         if (domainAndUri != null)
@@ -381,11 +407,10 @@ public class PublishedRouter : IPublishedRouter
         }
 
         var rootNodeId = request.Domain != null ? request.Domain.ContentId : (int?)null;
-        IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
         Domain? domain =
-            DomainUtilities.FindWildcardDomainInPath(umbracoContext.PublishedSnapshot.Domains?.GetAll(true), nodePath, rootNodeId);
+            DomainUtilities.FindWildcardDomainInPath(_domainCache.GetAll(true), nodePath, rootNodeId);
 
-        // always has a contentId and a culture
+
         if (domain != null)
         {
             request.SetCulture(domain.Culture);

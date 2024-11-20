@@ -99,16 +99,15 @@ public interface IAuditService : IService
         int skip,
         int take,
         Direction orderDirection = Direction.Descending,
-        DateTime? sinceDate = null,
+        DateTimeOffset? sinceDate = null,
         AuditType[]? auditTypeFilter = null) => throw new NotImplementedException();
 
     /// <summary>
     ///     Returns paged items in the audit trail for a given user
     /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="pageIndex"></param>
-    /// <param name="pageSize"></param>
-    /// <param name="totalRecords"></param>
+    /// <param name="userKey"></param>
+    /// <param name="skip"></param>
+    /// <param name="take"></param>
     /// <param name="orderDirection">
     ///     By default this will always be ordered descending (newest first)
     /// </param>
@@ -117,9 +116,7 @@ public interface IAuditService : IService
     ///     or the custom filter
     ///     so we need to do that here
     /// </param>
-    /// <param name="customFilter">
-    ///     Optional filter to be applied
-    /// </param>
+    /// <param name="sinceDate"></param>
     /// <returns></returns>
     Task<PagedModel<IAuditItem>> GetPagedItemsByUserAsync(
         Guid userKey,

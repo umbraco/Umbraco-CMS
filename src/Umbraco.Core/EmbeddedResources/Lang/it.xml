@@ -397,6 +397,43 @@
     <!-- The following key get these tokens passed in:
   0: Comma delimitted list of headers found
 -->
+    <key alias="clickJackingCheckHeaderFound">
+      <![CDATA[L'header o meta-tag <strong>X-Frame-Options</strong> usato per controllare se un sito può essere inserito in un IFRAME da un altro è stato trovato.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound">
+      <![CDATA[L'header o meta-tag <strong>X-Frame-Options</strong> usato per controllare se un sito può essere inserito in un IFRAME da un altro non è stato trovato.]]></key>
+    <key alias="setHeaderInConfig">Imposta l'header nella configurazione</key>
+    <key alias="clickJackingSetHeaderInConfigDescription">Aggiunge un valore alla sezione httpProtocol/customHeaders del
+      file web.config per prevenire che un sito possa essere inserito in un IFRAME da altri siti web.
+    </key>
+    <key alias="clickJackingSetHeaderInConfigSuccess">
+      <![CDATA[L'impostazione per creare un header per prevenire l'inserimento del sito in altri siti tramite IFRAME è stata aggiunta al file web.config.]]></key>
+    <key alias="setHeaderInConfigError">Non posso aggiornare il file web.config. Errore: %0%</key>
+    <key alias="noSniffCheckHeaderFound">
+      <![CDATA[L'header o meta-tag <strong>X-Content-Type-Options</strong> usato per proteggere dalle vulnerabilità per MIME sniffing è stato trovato.]]></key>
+    <key alias="noSniffCheckHeaderNotFound">
+      <![CDATA[L'header o meta-tag <strong>X-Content-Type-Options</strong> usato per proteggere dalle vulnerabilità per MIME sniffing è stato trovato.]]></key>
+    <key alias="noSniffSetHeaderInConfigDescription">
+      <![CDATA[Aggiunge un valore alla sezione httpProtocol/customHeaders del file web.config per proteggere dalle vulnerabilità per MIME sniffing.]]></key>
+    <key alias="noSniffSetHeaderInConfigSuccess">
+      <![CDATA[L'impostazione per creare un header per proteggere dalle vulnerabilità per MIME sniffing è stata aggiunta al file web.config.]]></key>
+    <key alias="hSTSCheckHeaderFound">
+      <![CDATA[L'header <strong>Strict-Transport-Security</strong>, conosciuto anche come l'header HSTS, è stato trovato.]]></key>
+    <key alias="hSTSCheckHeaderNotFound">
+      <![CDATA[L'header <strong>Strict-Transport-Security</strong> non è stato trovato.]]></key>
+    <key alias="hSTSSetHeaderInConfigDescription">Aggiunge l'header 'Strict-Transport-Security' con il valore
+      'max-age=10886400' alla sezione httpProtocol/customHeaders del file web.config. Usa questa correzione solo se
+      avrai i tuoi domini in esecuzione con https per le prossime 18 settimane (minimo).
+    </key>
+    <key alias="hSTSSetHeaderInConfigSuccess"><![CDATA[L'header HSTS è stato aggiunto al file web.config.]]></key>
+    <key alias="xssProtectionCheckHeaderFound">
+      <![CDATA[L'header <strong>X-XSS-Protection</strong> è stato trovato.]]></key>
+    <key alias="xssProtectionCheckHeaderNotFound">
+      <![CDATA[L'header <strong>X-XSS-Protection</strong> non è stato trovato.]]></key>
+    <key alias="xssProtectionSetHeaderInConfigDescription">Aggiunge l'header 'X-XSS-Protection' con il valore '1;
+      mode=block' alla sezione httpProtocol/customHeaders del file web.config.
+    </key>
+    <key alias="xssProtectionSetHeaderInConfigSuccess">
+      <![CDATA[L'header X-XSS-Protection è stato aggiunto al file web.config.]]></key>
     <key alias="excessiveHeadersFound"><![CDATA[Gli header seguenti, contenenti informazioni riguardo la tecnologia utilizzata per il sito sono stati trovati: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">Non sono stati trovati header che rivelano informazioni riguardo alla
       tecnologia utilizzata per il sito.

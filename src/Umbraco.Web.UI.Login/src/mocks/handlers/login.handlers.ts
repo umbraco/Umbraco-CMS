@@ -3,7 +3,7 @@ import { delay, http, type HttpHandler, HttpResponse } from "msw";
 import type { ManifestResponseModel } from "@umbraco-cms/backoffice/external/backend-api";
 
 export const handlers: HttpHandler[] = [
-  http.get<any, Array<ManifestResponseModel>>('umbraco/management/api/v1/package/manifest/public', async () => {
+  http.get<any, Array<ManifestResponseModel>>('umbraco/management/api/v1/manifest/manifest/public', async () => {
     await delay();
     return HttpResponse.json<Array<ManifestResponseModel>>([
       {

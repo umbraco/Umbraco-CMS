@@ -48,6 +48,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Name = source.Name ?? string.Empty;
         target.Id = source.Key;
         target.EditorUiAlias = source.EditorUiAlias;
+        target.EditorAlias = source.EditorAlias;
         target.IsDeletable = source.IsDeletableDataType();
     }
 
@@ -65,6 +66,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Id = source.Key;
         target.Icon = source.Icon;
         target.IsElement = source.IsElement;
+        target.Description = source.Description;
     }
 
     // Umbraco.Code.MapAll
@@ -112,6 +114,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Id = source.Key;
         target.Name = source.Name ?? source.Alias;
         target.Icon = source.Icon;
+        target.Alias = source.Alias;
     }
 
     // Umbraco.Code.MapAll
