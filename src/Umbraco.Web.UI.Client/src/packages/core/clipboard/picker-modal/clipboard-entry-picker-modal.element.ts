@@ -1,17 +1,17 @@
 import { UmbClipboardCollectionRepository } from '../collection/index.js';
 import type {
-	UmbClipboardItemPickerModalValue,
-	UmbClipboardItemPickerModalData,
-} from './clipboard-item-picker-modal.token.js';
+	UmbClipboardEntryPickerModalValue,
+	UmbClipboardEntryPickerModalData,
+} from './clipboard-entry-picker-modal.token.js';
 import { html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbClipboardEntry } from '../types.js';
 
-@customElement('umb-clipboard-item-picker-modal')
-export class UmbClipboardItemPickerModalElement extends UmbModalBaseElement<
-	UmbClipboardItemPickerModalData,
-	UmbClipboardItemPickerModalValue
+@customElement('umb-clipboard-entry-picker-modal')
+export class UmbClipboardEntryPickerModalElement extends UmbModalBaseElement<
+	UmbClipboardEntryPickerModalData,
+	UmbClipboardEntryPickerModalValue
 > {
 	@state()
 	private _items: Array<UmbClipboardEntry> = [];
@@ -79,10 +79,10 @@ export class UmbClipboardItemPickerModalElement extends UmbModalBaseElement<
 	}
 }
 
-export { UmbClipboardItemPickerModalElement as element };
+export { UmbClipboardEntryPickerModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-clipboard-item-picker-modal': UmbClipboardItemPickerModalElement;
+		'umb-clipboard-entry-picker-modal': UmbClipboardEntryPickerModalElement;
 	}
 }
