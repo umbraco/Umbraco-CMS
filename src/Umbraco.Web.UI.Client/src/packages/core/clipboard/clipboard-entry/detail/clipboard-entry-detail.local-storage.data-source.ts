@@ -4,8 +4,8 @@ import type {
 	UmbDetailDataSource,
 } from '@umbraco-cms/backoffice/repository';
 import type { UmbClipboardEntry } from '../types.js';
-import { UmbClipboardLocalStorageManager } from '../clipboard-local-storage.manager.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+import { UmbClipboardLocalStorageManager } from '../../clipboard-local-storage.manager.js';
 
 /**
  * Manage clipboard entries in local storage

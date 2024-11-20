@@ -6,7 +6,7 @@ import type {
 import { html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UmbClipboardEntry } from '../../types.js';
+import type { UmbClipboardEntry } from '../types.js';
 
 @customElement('umb-clipboard-entry-picker-modal')
 export class UmbClipboardEntryPickerModalElement extends UmbModalBaseElement<

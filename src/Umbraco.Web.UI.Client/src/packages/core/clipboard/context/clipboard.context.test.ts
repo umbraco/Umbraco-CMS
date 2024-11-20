@@ -3,7 +3,7 @@ import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbClipboardContext } from './clipboard.context.js';
-import type { UmbClipboardEntry } from '../types.js';
+import type { UmbClipboardEntry } from '../clipboard-entry/index.js';
 
 @customElement('test-my-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}

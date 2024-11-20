@@ -1,5 +1,4 @@
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbClipboardEntry } from './types';
+import type { UmbClipboardEntry } from './clipboard-entry/index.js';
 
 const UMB_CLIPBOARD_LOCALSTORAGE_KEY = 'umb:clipboard';
 

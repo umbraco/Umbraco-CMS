@@ -4,7 +4,7 @@ import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbClipboardEntry } from '../../../types.js';
+import type { UmbClipboardEntry } from '../../../clipboard-entry/index.js';
 
 @customElement('umb-clipboard-table-collection-view')
 export class UmbClipboardTableCollectionViewElement extends UmbLitElement {

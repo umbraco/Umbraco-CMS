@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
-import type { UmbClipboardEntry } from './types.js';
 import { UmbClipboardEntryDetailLocalStorageDataSource } from './clipboard-entry-detail.local-storage.data-source.js';
+import type { UmbClipboardEntry } from '../types.js';
 
 describe('UmbClipboardLocalStorageDataSource', () => {
 	let dataSource: UmbClipboardEntryDetailLocalStorageDataSource;
