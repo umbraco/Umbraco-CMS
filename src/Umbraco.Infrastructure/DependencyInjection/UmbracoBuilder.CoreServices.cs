@@ -46,6 +46,7 @@ using Umbraco.Cms.Infrastructure.HealthChecks;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Mail;
+using Umbraco.Cms.Infrastructure.Mail.Interfaces;
 using Umbraco.Cms.Infrastructure.Manifest;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -172,14 +173,18 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
+        builder.Services.AddTransient<IEmailSenderClient, BasicSmtpEmailSenderClient>();
+
         // replace
         builder.Services.AddSingleton<IEmailSender, EmailSender>(
             services => new EmailSender(
                 services.GetRequiredService<ILogger<EmailSender>>(),
                 services.GetRequiredService<IOptionsMonitor<GlobalSettings>>(),
                 services.GetRequiredService<IEventAggregator>(),
+                services.GetRequiredService<IEmailSenderClient>(),
                 services.GetService<INotificationHandler<SendEmailNotification>>(),
                 services.GetService<INotificationAsyncHandler<SendEmailNotification>>()));
+
         builder.Services.AddTransient<IUserInviteSender, EmailUserInviteSender>();
         builder.Services.AddTransient<IUserForgotPasswordSender, EmailUserForgotPasswordSender>();
 
