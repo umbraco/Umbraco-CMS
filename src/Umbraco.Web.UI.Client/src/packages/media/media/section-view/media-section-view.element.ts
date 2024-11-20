@@ -7,10 +7,7 @@ import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type {
-	UmbCollectionBulkActionPermissions,
-	UmbCollectionConfiguration,
-} from '@umbraco-cms/backoffice/collection';
+import type { UmbCollectionConfiguration } from '@umbraco-cms/backoffice/collection';
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
@@ -74,7 +71,6 @@ export class UmbMediaSectionViewElement extends UmbLitElement {
 		return {
 			unique: '',
 			dataTypeId: '',
-			allowedEntityBulkActions: config?.getValueByAlias<UmbCollectionBulkActionPermissions>('bulkActionPermissions'),
 			layouts: config?.getValueByAlias('layouts'),
 			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
 			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',

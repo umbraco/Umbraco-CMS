@@ -42,12 +42,6 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 					config: [{ alias: 'min', value: 0 }],
 				},
 				{
-					alias: 'bulkActionPermissions',
-					label: 'Bulk Action Permissions',
-					description: 'The bulk actions that are allowed on items in the Collection view.',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Collection.BulkActionPermissions',
-				},
-				{
 					alias: 'icon',
 					label: 'Workspace View icon',
 					description: "The icon for the Collection's Workspace View.",
@@ -85,10 +79,6 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 				{ alias: 'pageSize', value: 10 },
 				{ alias: 'orderBy', value: 'sortOrder' },
 				{ alias: 'orderDirection', value: 'desc' },
-				{
-					alias: 'bulkActionPermissions',
-					value: { allowBulkPublish: true, allowBulkUnpublish: true, allowBulkCopy: true },
-				},
 				{ alias: 'icon', value: 'icon-list' },
 			],
 		},
