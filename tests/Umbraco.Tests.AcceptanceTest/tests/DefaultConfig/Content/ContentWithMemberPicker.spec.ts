@@ -22,7 +22,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.memberType.ensureNameNotExists(memberTypeName);
   await umbracoApi.member.ensureNameNotExists(memberName);
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
@@ -64,7 +64,7 @@ test('can publish content with the member picker data type', async ({umbracoApi,
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickChooseMemberPickerButton();
   await umbracoUi.content.selectMemberByName(memberName);
-  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickChooseContainerButton();
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
