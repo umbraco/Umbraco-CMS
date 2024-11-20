@@ -5,5 +5,5 @@ export interface UmbDataSourceResponse<T = unknown> extends UmbDataSourceErrorRe
 }
 
 export interface UmbDataSourceErrorResponse {
-	error?: ApiError | CancelError;
+	error?: Error | ApiError | CancelError;
 }
