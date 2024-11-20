@@ -669,7 +669,7 @@ public class DocumentUrlService : IDocumentUrlService
             return foundDomain.Name.EnsureEndsWith("/") + string.Join('/', urlSegments);
         }
 
-        var hideTopLevel = _globalSettings.HideTopLevelNodeFromPath && isRootFirstItem;
+        var hideTopLevel = HideTopLevel(_globalSettings.HideTopLevelNodeFromPath, isRootFirstItem, urlSegments);
         if (leftToRight)
         {
             return '/' + string.Join('/', urlSegments.Skip(hideTopLevel ? 1 : 0));
@@ -681,6 +681,21 @@ public class DocumentUrlService : IDocumentUrlService
         }
 
         return '/' + string.Join('/', urlSegments);
+    }
+
+    private bool HideTopLevel(bool hideTopLevelNodeFromPath, bool isRootFirstItem, List<string> urlSegments)
+    {
+        if (hideTopLevelNodeFromPath is false)
+        {
+            return false;
+        }
+
+        if(isRootFirstItem is false && urlSegments.Count == 1)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     public async Task CreateOrUpdateUrlSegmentsWithDescendantsAsync(Guid key)
