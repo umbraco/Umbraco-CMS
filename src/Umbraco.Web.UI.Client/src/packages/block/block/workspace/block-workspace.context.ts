@@ -250,6 +250,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		this.#observeBlockData(unique);
 
+		console.log('live sync', this.#liveEditingMode);
 		if (this.#liveEditingMode) {
 			this.establishLiveSync();
 		}
@@ -386,6 +387,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			this.content.data,
 			(contentData) => {
 				if (contentData) {
+					console.log('sync ', contentData);
 					this.#blockManager?.setOneContent(contentData);
 				}
 			},
