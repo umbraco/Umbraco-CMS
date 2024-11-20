@@ -555,11 +555,29 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				display: block;
 				--umb-block-grid-entry-actions-opacity: 0;
 			}
+
 			:host([settings-invalid]),
 			:host([content-invalid]),
 			:host(:hover),
 			:host(:focus-within) {
 				--umb-block-grid-entry-actions-opacity: 1;
+			}
+
+			:host::after {
+				content: '';
+				position: absolute;
+				z-index: 1;
+				pointer-events: none;
+				inset: 0;
+				border: 1px solid transparent;
+				border-radius: var(--uui-border-radius);
+
+				transition: border-color 240ms ease-in;
+			}
+
+			:host([settings-invalid])::after,
+			:host([content-invalid])::after {
+				border-color: var(--uui-color-danger);
 			}
 
 			uui-action-bar {
@@ -591,17 +609,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				height: 100%;
 			}
 
-			:host::after {
-				content: '';
-				position: absolute;
-				z-index: 1;
-				pointer-events: none;
-				inset: 0;
-				border: 1px solid transparent;
-				border-radius: var(--uui-border-radius);
-
-				transition: border-color 240ms ease-in;
-			}
 			:host(:hover):not(:drop)::after {
 				display: block;
 				border-color: var(--uui-color-interactive-emphasis);
@@ -628,15 +635,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			:host([drag-placeholder]) .umb-block-grid__block {
 				transition: opacity 50ms 16ms;
 				opacity: 0;
-			}
-
-			:host([settings-invalid])::after,
-			:host([content-invalid])::after {
-				border-color: var(--uui-color-danger);
-			}
-			:host([settings-invalid])::before,
-			:host([content-invalid])::before {
-				background-color: var(--uui-color-danger);
 			}
 
 			uui-badge {
