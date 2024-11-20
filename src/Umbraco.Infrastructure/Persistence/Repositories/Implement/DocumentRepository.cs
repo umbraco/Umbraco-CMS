@@ -916,7 +916,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         NodeDto parent = GetParentNodeDto(entity.ParentId);
         var level = parent.Level + 1;
 
-        var calculateSortOrder = (entity is { HasIdentity: false, SortOrder: 0 } && entity.IsPropertyDirty(nameof(entity.SortOrder)) == false) // SortOrder was not updated from it's default value
+        var calculateSortOrder = (entity is { HasIdentity: false, SortOrder: 0 } && entity.IsPropertyDirty(nameof(entity.SortOrder)) is false) // SortOrder was not updated from it's default value
                                  || SortorderExists(entity.ParentId, entity.SortOrder);
         // if the sortorder of the entity already exists get a new one, else use the sortOrder of the entity
         var sortOrder = calculateSortOrder ? GetNewChildSortOrder(entity.ParentId, 0) : entity.SortOrder;
