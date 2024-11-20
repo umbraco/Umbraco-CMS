@@ -118,9 +118,10 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	 * Open the clipboard
 	 * @memberof UmbClipboardContext
 	 */
-	async open() {
+	async pick() {
 		await this.#init;
 		const modalContext = this.#modalManagerContext?.open(this, UMB_CLIPBOARD_ITEM_PICKER_MODAL);
+		return modalContext?.onSubmit();
 	}
 
 	observeEntriesOf(types: Array<string>, filter?: (entry: UmbClipboardEntry) => boolean) {

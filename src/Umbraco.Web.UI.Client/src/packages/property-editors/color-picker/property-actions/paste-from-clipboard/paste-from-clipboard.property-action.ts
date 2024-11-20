@@ -24,9 +24,11 @@ export class UmbColorPickerPasteFromClipboardPropertyAction extends UmbPropertyA
 
 	override async execute() {
 		await this.#init;
-		await this.#clipboardContext?.open();
-		// TODO: get value from clipboard entry
-		// TODO: set value in property context
+
+		try {
+			const value = await this.#clipboardContext?.pick();
+			debugger;
+		} catch (error) {}
 	}
 }
 export { UmbColorPickerPasteFromClipboardPropertyAction as api };
