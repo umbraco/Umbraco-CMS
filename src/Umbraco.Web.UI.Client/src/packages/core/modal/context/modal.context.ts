@@ -73,8 +73,6 @@ export class UmbModalContext<
 		this.element = args.modal?.element || this.element;
 		this.backdropBackground = args.modal?.backdropBackground || this.backdropBackground;
 
-		console.log('size', size);
-
 		this.#size.setValue(size);
 
 		const defaultData = this.alias instanceof UmbModalToken ? this.alias.getDefaultData() : undefined;
