@@ -1,9 +1,9 @@
-import { expect, oneEvent } from '@open-wc/testing';
-import type { UmbClipboardEntry } from '../types.js';
-import { UmbClipboardDetailLocalStorageDataSource } from './clipboard-detail.local-storage.data-source.js';
+import { expect } from '@open-wc/testing';
+import type { UmbClipboardEntry } from './types.js';
+import { UmbClipboardEntryDetailLocalStorageDataSource } from './clipboard-entry-detail.local-storage.data-source.js';
 
 describe('UmbClipboardLocalStorageDataSource', () => {
-	let dataSource: UmbClipboardDetailLocalStorageDataSource;
+	let dataSource: UmbClipboardEntryDetailLocalStorageDataSource;
 	const clipboardEntry: UmbClipboardEntry = {
 		data: ['test'],
 		icons: ['icon'],
@@ -15,7 +15,7 @@ describe('UmbClipboardLocalStorageDataSource', () => {
 
 	beforeEach(() => {
 		localStorage.clear();
-		dataSource = new UmbClipboardDetailLocalStorageDataSource();
+		dataSource = new UmbClipboardEntryDetailLocalStorageDataSource();
 	});
 
 	describe('Public API', () => {

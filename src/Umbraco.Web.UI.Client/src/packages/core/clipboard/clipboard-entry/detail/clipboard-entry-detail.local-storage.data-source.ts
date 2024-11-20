@@ -10,17 +10,17 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 /**
  * Manage clipboard entries in local storage
  * @export
- * @class UmbClipboardDetailLocalStorageDataSource
+ * @class UmbClipboardEntryDetailLocalStorageDataSource
  * @implements {UmbDetailDataSource<UmbClipboardEntry>}
  */
-export class UmbClipboardDetailLocalStorageDataSource implements UmbDetailDataSource<UmbClipboardEntry> {
+export class UmbClipboardEntryDetailLocalStorageDataSource implements UmbDetailDataSource<UmbClipboardEntry> {
 	#localStorageManager = new UmbClipboardLocalStorageManager();
 
 	/**
 	 * Scaffold a new clipboard entry
 	 * @param {Partial<UmbClipboardEntry>} [preset={}]
 	 * @return {*}
-	 * @memberof UmbClipboardDetailLocalStorageDataSource
+	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
 	async createScaffold(preset: Partial<UmbClipboardEntry> = {}) {
 		const data: UmbClipboardEntry = {
@@ -40,7 +40,7 @@ export class UmbClipboardDetailLocalStorageDataSource implements UmbDetailDataSo
 	 * Create a new clipboard entry in local storage
 	 * @param {UmbClipboardEntry} model
 	 * @return {*}  {Promise<UmbDataSourceResponse<UmbClipboardEntry>>}
-	 * @memberof UmbClipboardDetailLocalStorageDataSource
+	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
 	async create(model: UmbClipboardEntry): Promise<UmbDataSourceResponse<UmbClipboardEntry>> {
 		if (!model) return { error: new Error('Clipboard entry is missing') };
@@ -60,7 +60,7 @@ export class UmbClipboardDetailLocalStorageDataSource implements UmbDetailDataSo
 	 * Read a clipboard entry from local storage
 	 * @param {string} unique
 	 * @return {*}  {Promise<UmbDataSourceResponse<UmbClipboardEntry>>}
-	 * @memberof UmbClipboardDetailLocalStorageDataSource
+	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
 	async read(unique: string): Promise<UmbDataSourceResponse<UmbClipboardEntry>> {
 		if (!unique) return { error: new Error('Unique is missing') };
@@ -76,7 +76,7 @@ export class UmbClipboardDetailLocalStorageDataSource implements UmbDetailDataSo
 	 * Update a clipboard entry in local storage
 	 * @param {UmbClipboardEntry} model
 	 * @return {*}  {Promise<UmbDataSourceResponse<UmbClipboardEntry>>}
-	 * @memberof UmbClipboardDetailLocalStorageDataSource
+	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
 	async update(model: UmbClipboardEntry): Promise<UmbDataSourceResponse<UmbClipboardEntry>> {
 		if (!model) return { error: new Error('Clipboard entry is missing') };
@@ -95,7 +95,7 @@ export class UmbClipboardDetailLocalStorageDataSource implements UmbDetailDataSo
 	 * Delete a clipboard entry from local storage
 	 * @param {string} unique
 	 * @return {*}  {Promise<UmbDataSourceErrorResponse>}
-	 * @memberof UmbClipboardDetailLocalStorageDataSource
+	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
 	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) return { error: new Error('Unique is missing') };
