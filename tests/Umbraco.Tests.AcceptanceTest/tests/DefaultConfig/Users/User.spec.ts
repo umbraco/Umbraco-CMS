@@ -63,7 +63,7 @@ test('can delete a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
   await umbracoUi.user.clickActionButton();
-  await umbracoUi.user.clickDeleteButton();
+  await umbracoUi.user.clickDeleteLabelButton();
   await umbracoUi.user.clickConfirmToDeleteButton();
 
   // Assert
