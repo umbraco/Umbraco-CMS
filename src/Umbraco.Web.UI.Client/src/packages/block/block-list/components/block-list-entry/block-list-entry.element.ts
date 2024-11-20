@@ -13,6 +13,7 @@ import type {
 	ManifestBlockEditorCustomView,
 	UmbBlockEditorCustomViewProperties,
 } from '@umbraco-cms/backoffice/block-custom-view';
+import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UUIBlinkAnimationValue } from '@umbraco-cms/backoffice/external/uui';
 
 /**
@@ -278,6 +279,19 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		return true;
 	};
 
+	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
+		if (this._exposed) {
+			return ext.component;
+		} else {
+			return html`<div>
+				${ext.component}
+				<umb-block-overlay-expose-button
+					.contentTypeName=${this._contentTypeName}
+					@click=${this.#expose}></umb-block-overlay-expose-button>
+			</div>`;
+		}
+	};
+
 	#renderRefBlock() {
 		return html`<umb-ref-list-block
 			.label=${this._label}
@@ -307,6 +321,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 						<umb-extension-slot
 							type="blockEditorCustomView"
 							default-element=${this._inlineEditingMode ? 'umb-inline-list-block' : 'umb-ref-list-block'}
+							.renderMethod=${this.#extensionSlotRenderMethod}
 							.props=${this._blockViewProps}
 							.filter=${this.#extensionSlotFilterMethod}
 							single

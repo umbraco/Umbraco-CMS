@@ -404,7 +404,16 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		if (ext.component) {
 			ext.component.classList.add('umb-block-grid__block--view');
 		}
-		return ext.component;
+		if (this._exposed) {
+			return ext.component;
+		} else {
+			return html`<div>
+				${ext.component}
+				<umb-block-overlay-expose-button
+					.contentTypeName=${this._contentTypeName}
+					@click=${this.#expose}></umb-block-overlay-expose-button>
+			</div>`;
+		}
 	};
 
 	#renderInlineEditBlock() {
