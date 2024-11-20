@@ -669,7 +669,8 @@ public class DocumentUrlService : IDocumentUrlService
             return foundDomain.Name.EnsureEndsWith("/") + string.Join('/', urlSegments);
         }
 
-        var hideTopLevel = _globalSettings.HideTopLevelNodeFromPath && isRootFirstItem;
+        // We always hide the top level of the first root item and decesendants
+        var hideTopLevel = _globalSettings.HideTopLevelNodeFromPath || isRootFirstItem;
         if (leftToRight)
         {
             return '/' + string.Join('/', urlSegments.Skip(hideTopLevel ? 1 : 0));
@@ -735,12 +736,33 @@ public class DocumentUrlService : IDocumentUrlService
         }
         else
         {
+            Guid? firstRoot = null;
             foreach (Guid rootKey in rootKeys)
             {
+                if (isDraft is false && IsContentPublished(rootKey, culture) is false)
+                {
+                    continue;
+                }
+
+                if (firstRoot is null)
+                {
+                    firstRoot = rootKey;
+                }
+
                 yield return rootKey;
             }
-        }
 
+            //Always consider the child of first root item as roots
+            if (firstRoot.HasValue)
+            {
+                IEnumerable<Guid> childKeys = GetChildKeys(firstRoot.Value);
+
+                foreach (Guid childKey in childKeys)
+                {
+                    yield return childKey;
+                }
+            }
+        }
     }
 
     private Guid? GetChildWithUrlSegment(IEnumerable<Guid> childKeys, string urlSegment, string culture, bool isDraft)
