@@ -8,6 +8,7 @@ export const manifests: Array<ManifestCondition> = [
 		alias: UMB_COLLECTION_ALIAS_CONDITION,
 		api: () => import('./collection-alias.condition.js'),
 	},
+	/** @deprecated No longer used internally. This class will be removed in Umbraco 17. [LK] */
 	{
 		type: 'condition',
 		name: 'Collection Bulk Action Permission Condition',

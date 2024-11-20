@@ -18,6 +18,7 @@ type BulkActionPermissionType =
 
 /**
  * @element umb-property-editor-ui-collection-permissions
+ * @deprecated No longer used internally. This will be removed in Umbraco 17. [LK]
  */
 @customElement('umb-property-editor-ui-collection-permissions')
 export class UmbPropertyEditorUICollectionPermissionsElement
@@ -100,6 +101,7 @@ export class UmbPropertyEditorUICollectionPermissionsElement
 	];
 }
 
+/** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
 export default UmbPropertyEditorUICollectionPermissionsElement;
 
 declare global {
