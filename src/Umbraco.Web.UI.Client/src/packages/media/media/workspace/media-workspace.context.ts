@@ -6,6 +6,7 @@ import { UMB_MEDIA_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import type { UmbMediaDetailModel, UmbMediaVariantModel } from '../types.js';
 import { UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN, UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import { UMB_MEDIA_COLLECTION_ALIAS } from '../collection/index.js';
+import { UmbMediaValidationRepository } from '../repository/validation/media-validation.repository.js';
 import { UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD } from './constants.js';
 import { UMB_MEDIA_WORKSPACE_ALIAS } from './manifests.js';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -49,6 +50,7 @@ export class UmbMediaWorkspaceContext
 			workspaceAlias: UMB_MEDIA_WORKSPACE_ALIAS,
 			detailRepositoryAlias: UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbMediaTypeDetailRepository,
+			contentValidationRepository: UmbMediaValidationRepository,
 			contentVariantScaffold: UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD,
 		});
 
