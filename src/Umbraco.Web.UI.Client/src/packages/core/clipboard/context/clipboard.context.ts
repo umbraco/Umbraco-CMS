@@ -4,8 +4,8 @@ import { UMB_CLIPBOARD_CONTEXT } from './clipboard.context-token';
 import type { UmbClipboardEntry } from '../types';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UmbClipboardDetailRepository } from '../detail/index.js';
-import { UMB_CLIPBOARD_ITEM_PICKER_MODAL } from '../picker-modal/index.js';
+import { UMB_CLIPBOARD_ITEM_PICKER_MODAL } from '../clipboard-entry/picker-modal/index.js';
+import { UmbClipboardDetailRepository } from '../clipboard-entry/index.js';
 
 /**
  * Clipboard context for managing clipboard entries

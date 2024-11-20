@@ -1,7 +1,7 @@
 import { UMB_CLIPBOARD_ENTRY_ITEM_STORE_CONTEXT } from './clipboard-entry-item.store.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
-import type { UmbClipboardEntry } from '../types.js';
+import type { UmbClipboardEntry } from '../../types.js';
 
 /**
  * @class UmbClipboardEntryItemStore

@@ -1,6 +1,6 @@
 import { type UmbDataSourceResponse, type UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
-import type { UmbClipboardEntry } from '../types.js';
-import { UmbClipboardLocalStorageManager } from '../clipboard-local-storage.manager.js';
+import type { UmbClipboardEntry } from '../../types.js';
+import { UmbClipboardLocalStorageManager } from '../../clipboard-local-storage.manager.js';
 
 /**
  * A local storage data source for Clipboard Entry items

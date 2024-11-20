@@ -1,13 +1,11 @@
-import { manifests as clipboardRootManifests } from './clipboard-root/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as contextManifests } from './context/manifests.js';
-import { manifests as detailManifests } from './detail/manifests.js';
-import { manifests as pickerModalManifests } from './picker-modal/manifests.js';
+import { manifests as entryManifests } from './clipboard-entry/manifests.js';
+import { manifests as rootManifests } from './clipboard-root/manifests.js';
 
-export const manifests = [
-	...clipboardRootManifests,
+export const manifests: Array<UmbExtensionManifest> = [
 	...collectionManifests,
 	...contextManifests,
-	...detailManifests,
-	...pickerModalManifests,
+	...entryManifests,
+	...rootManifests,
 ];
