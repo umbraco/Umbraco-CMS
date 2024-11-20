@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from '@playwright/test';
 
 const stylesheetName = 'TestStyleSheetFile.css';
@@ -23,7 +23,7 @@ test('can create a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.waitForTimeout(1000);
 
   // Assert
-  await umbracoUi.stylesheet.isSuccessNotificationVisible();
+  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.stylesheet.doesFolderExist(stylesheetFolderName)).toBeTruthy();
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetFolderName);
 });
@@ -39,7 +39,7 @@ test('can delete a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.stylesheet.deleteFolder();
 
   // Assert
-  await umbracoUi.stylesheet.isSuccessNotificationVisible();
+  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
   expect(await umbracoApi.stylesheet.doesFolderExist(stylesheetFolderName)).toBeFalsy();
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetFolderName, false, false);
 });
@@ -56,7 +56,7 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.stylesheet.createFolder(childFolderName);
 
   //Assert
-  await umbracoUi.stylesheet.isSuccessNotificationVisible();
+  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.stylesheet.doesNameExist(childFolderName)).toBeTruthy();
   const styleChildren = await umbracoApi.stylesheet.getChildren('/' + stylesheetFolderName);
   expect(styleChildren[0].path).toBe('/' + stylesheetFolderName + '/' + childFolderName);
@@ -79,7 +79,7 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   await umbracoUi.stylesheet.createFolder(childOfChildFolderName);
 
   //Assert
-  await umbracoUi.stylesheet.isSuccessNotificationVisible();
+  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.stylesheet.doesNameExist(childOfChildFolderName)).toBeTruthy();
   const styleChildren = await umbracoApi.stylesheet.getChildren('/' + stylesheetFolderName + '/' + childFolderName);
   expect(styleChildren[0].path).toBe('/' + stylesheetFolderName + '/' + childFolderName + '/' + childOfChildFolderName);
@@ -103,7 +103,7 @@ test('can create a stylesheet in a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.stylesheet.clickSaveButton();
 
   // Assert
-  await umbracoUi.stylesheet.isSuccessNotificationVisible();
+  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeTruthy();
   const stylesheetChildren = await umbracoApi.stylesheet.getChildren('/' + stylesheetFolderName);
   expect(stylesheetChildren[0].path).toBe('/' + stylesheetFolderName + '/' + stylesheetName);
@@ -132,7 +132,7 @@ test('can create a stylesheet in a folder in a folder', async ({umbracoApi, umbr
   await umbracoUi.stylesheet.clickSaveButton();
 
   // Assert
-  await umbracoUi.stylesheet.isSuccessNotificationVisible();
+  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeTruthy();
   const stylesheetChildren = await umbracoApi.stylesheet.getChildren('/' + stylesheetFolderName + '/' + childFolderName);
   expect(stylesheetChildren[0].path).toBe('/' + stylesheetFolderName + '/' + childFolderName + '/' + stylesheetName);
@@ -155,5 +155,5 @@ test('cannot delete non-empty folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.stylesheet.deleteFolder();
 
   //Assert
-  await umbracoUi.stylesheet.isErrorNotificationVisible();
+  await umbracoUi.stylesheet.doesErrorNotificationHaveText(NotificationConstantHelper.error.notEmpty);
 });

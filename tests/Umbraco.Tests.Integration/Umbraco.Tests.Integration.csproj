@@ -6,19 +6,27 @@
     <Description>Contains helper classes for integration tests with Umbraco CMS, including all internal integration tests.</Description>
     <RootNamespace>Umbraco.Cms.Tests.Integration</RootNamespace>
     <IsPackable>true</IsPackable>
-    <EnablePackageValidation>false</EnablePackageValidation>
-    <NoWarn>NU5100</NoWarn>
+    <EnablePackageValidation>$(BaseEnablePackageValidation)</EnablePackageValidation>
+    <NoWarn>$(NoWarn),NU5100</NoWarn>
   </PropertyGroup>
+  
   <PropertyGroup>
-    <!--  TODO: Fix [CS0108] hidden inherited members, fix [SYSLIB0012] and [CS0618] obsolete references,
-          [CS1998] async, [SA1116] and [SA1117] parameter formatting, [CS0162] unreachable code, [CS0169]
-          unused fields, [SA1134] attribute on each line of code, [SA1405] Debug.Assert provide message text,
-          [CS4014]/[CS1998] await call, [CS0649] field not assigned to, [CS0168] unused variable,
-          and remove overrides -->
-    <WarningsNotAsErrors>
-      SYSLIB0012,SA1117,SA1116,CS0162,CS0169,SA1134,SA1405,CS0108,CS0618,CS4014,CS1998,CS0649,CS0168
-    </WarningsNotAsErrors>
+    <!--
+      TODO: Fix and remove overrides:
+      [CS0108] hidden inherited members
+      [SYSLIB0012] and [CS0618] obsolete references
+      [SA1116] and [SA1117] parameter formatting
+      [CS0162] unreachable code
+      [CS0169] unused fields
+      [SA1134] attribute on each line of code
+      [SA1405] Debug.Assert provide message text
+      [CS4014]/[CS1998] await call
+      [CS0649] field not assigned to
+      [CS0168] unused variable
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),CS0108,SYSLIB0012,CS0618,SA1116,SA1117,CS0162,CS0169,SA1134,SA1405,CS4014,CS1998,CS0649,CS0168</WarningsNotAsErrors>
   </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="Bogus" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
@@ -239,9 +247,5 @@
     <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Update.cs">
       <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
     </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
   </ItemGroup>
 </Project>
