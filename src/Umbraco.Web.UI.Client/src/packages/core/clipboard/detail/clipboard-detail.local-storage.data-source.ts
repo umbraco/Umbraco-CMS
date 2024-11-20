@@ -4,8 +4,7 @@ import type {
 	UmbDetailDataSource,
 } from '@umbraco-cms/backoffice/repository';
 import type { UmbClipboardEntry } from '../types.js';
-
-const UMB_CLIPBOARD_LOCALSTORAGE_KEY = 'umb:clipboard';
+import { UmbClipboardLocalStorageManager } from '../clipboard-local-storage.manager.js';
 
 /**
  * Manage clipboard entries in local storage
@@ -14,6 +13,8 @@ const UMB_CLIPBOARD_LOCALSTORAGE_KEY = 'umb:clipboard';
  * @implements {UmbDetailDataSource<UmbClipboardEntry>}
  */
 export class UmbClipboardDetailLocalStorageDataSource implements UmbDetailDataSource<UmbClipboardEntry> {
+	#localStorageManager = new UmbClipboardLocalStorageManager();
+
 	/**
 	 * Scaffold a new clipboard entry
 	 * @param {Partial<UmbClipboardEntry>} [preset={}]
@@ -44,12 +45,12 @@ export class UmbClipboardDetailLocalStorageDataSource implements UmbDetailDataSo
 		if (!model) return { error: new Error('Clipboard entry is missing') };
 
 		// check if entry already exists
-		const { entries, entry } = this.#getEntryFromLocalStorage(model.unique);
+		const { entries, entry } = this.#localStorageManager.getEntry(model.unique);
 		if (entry) return { error: new Error('Clipboard entry already exists') };
 
 		const updatedEntries = [...entries, model];
 
-		this.#setEntriesInLocalStorage(updatedEntries);
+		this.#localStorageManager.setEntries(updatedEntries);
 
 		return { data: model };
 	}
@@ -64,7 +65,7 @@ export class UmbClipboardDetailLocalStorageDataSource implements UmbDetailDataSo
 		if (!unique) return { error: new Error('Unique is missing') };
 
 		// check if entry exists
-		const { entry } = this.#getEntryFromLocalStorage(unique);
+		const { entry } = this.#localStorageManager.getEntry(unique);
 		if (!entry) return { error: new Error('Clipboard entry not found') };
 
 		return { data: entry };
@@ -80,12 +81,12 @@ export class UmbClipboardDetailLocalStorageDataSource implements UmbDetailDataSo
 		if (!model) return { error: new Error('Clipboard entry is missing') };
 
 		// check if entry exists so it can be updated
-		const { entry, entries } = this.#getEntryFromLocalStorage(model.unique);
+		const { entry, entries } = this.#localStorageManager.getEntry(model.unique);
 		if (!entry) return { error: new Error('Clipboard entry not found') };
 
 		const updatedEntries = entries.map((storedEntry) => (storedEntry.unique === model.unique ? model : storedEntry));
 
-		this.#setEntriesInLocalStorage(updatedEntries);
+		this.#localStorageManager.setEntries(updatedEntries);
 		return { data: model };
 	}
 
@@ -99,36 +100,12 @@ export class UmbClipboardDetailLocalStorageDataSource implements UmbDetailDataSo
 		if (!unique) return { error: new Error('Unique is missing') };
 
 		// check if entry exist so it can be deleted
-		const { entry, entries } = this.#getEntryFromLocalStorage(unique);
+		const { entry, entries } = this.#localStorageManager.getEntry(unique);
 		if (!entry) return { error: new Error('Clipboard entry not found') };
 
 		const updatedEntriesArray = entries.filter((x) => x.unique !== unique);
 
-		this.#setEntriesInLocalStorage(updatedEntriesArray);
+		this.#localStorageManager.setEntries(updatedEntriesArray);
 		return {};
-	}
-
-	// Gets all entries from local storage
-	#getEntriesFromLocalStorage(): Array<UmbClipboardEntry> {
-		const entries = localStorage.getItem(UMB_CLIPBOARD_LOCALSTORAGE_KEY);
-		if (entries) {
-			return JSON.parse(entries);
-		}
-		return [];
-	}
-
-	// Gets a single entry from local storage
-	#getEntryFromLocalStorage(unique: string): {
-		entry: UmbClipboardEntry | undefined;
-		entries: Array<UmbClipboardEntry>;
-	} {
-		const entries = this.#getEntriesFromLocalStorage();
-		const entry = entries.find((x) => x.unique === unique);
-		return { entries, entry };
-	}
-
-	// Sets all entries in local storage
-	#setEntriesInLocalStorage(entries: Array<UmbClipboardEntry>) {
-		localStorage.setItem(UMB_CLIPBOARD_LOCALSTORAGE_KEY, JSON.stringify(entries));
 	}
 }
