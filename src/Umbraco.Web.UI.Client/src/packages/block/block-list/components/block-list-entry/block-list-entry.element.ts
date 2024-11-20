@@ -317,7 +317,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	#renderBlock() {
 		return this.contentKey && this._contentTypeAlias
 			? html`
-					<<<<<<< HEAD
 					<umb-extension-slot
 						type="blockEditorCustomView"
 						default-element=${this._inlineEditingMode ? 'umb-inline-list-block' : 'umb-ref-list-block'}
@@ -333,24 +332,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 					${!this._showContentEdit && this._contentInvalid
 						? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
 						: nothing}
-					=======
-					<div class="umb-block-list__block">
-						<umb-extension-slot
-							type="blockEditorCustomView"
-							default-element=${this._inlineEditingMode ? 'umb-inline-list-block' : 'umb-ref-list-block'}
-							.props=${this._blockViewProps}
-							.filter=${this.#extensionSlotFilterMethod}
-							single
-							>${this._inlineEditingMode ? this.#renderInlineBlock() : this.#renderRefBlock()}</umb-extension-slot
-						>
-						<uui-action-bar>
-							${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderDeleteAction()}
-						</uui-action-bar>
-						${!this._showContentEdit && this._contentInvalid
-							? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
-							: nothing}
-					</div>
-					>>>>>>> v15/dev
 				`
 			: nothing;
 	}
