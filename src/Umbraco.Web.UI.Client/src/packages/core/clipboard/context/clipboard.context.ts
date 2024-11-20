@@ -5,6 +5,7 @@ import type { UmbClipboardEntry } from '../types';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbClipboardDetailRepository } from '../detail/index.js';
+import { UMB_CLIPBOARD_ITEM_PICKER_MODAL } from '../picker-modal/index.js';
 
 /**
  * Clipboard context for managing clipboard entries
@@ -119,7 +120,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	 */
 	async open() {
 		await this.#init;
-		alert('Open clipboard');
+		const modalContext = this.#modalManagerContext?.open(this, UMB_CLIPBOARD_ITEM_PICKER_MODAL);
 	}
 
 	observeEntriesOf(types: Array<string>, filter?: (entry: UmbClipboardEntry) => boolean) {
