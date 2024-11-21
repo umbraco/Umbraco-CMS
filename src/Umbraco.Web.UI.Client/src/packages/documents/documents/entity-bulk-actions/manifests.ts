@@ -1,5 +1,9 @@
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../collection/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
+import {
+	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
+	UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
+} from '../user-permissions/constants.js';
 import { manifests as duplicateToManifests } from './duplicate-to/manifests.js';
 import { manifests as moveToManifests } from './move-to/manifests.js';
 import { manifests as trashManifests } from './trash/manifests.js';
@@ -24,6 +28,10 @@ export const entityBulkActions: Array<ManifestEntityBulkAction> = [
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
 				match: UMB_DOCUMENT_COLLECTION_ALIAS,
 			},
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
+			},
 		],
 	},
 	{
@@ -42,6 +50,10 @@ export const entityBulkActions: Array<ManifestEntityBulkAction> = [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
 				match: UMB_DOCUMENT_COLLECTION_ALIAS,
+			},
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH],
 			},
 		],
 	},
