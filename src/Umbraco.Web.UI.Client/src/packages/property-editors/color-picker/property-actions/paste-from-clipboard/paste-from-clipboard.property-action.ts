@@ -10,7 +10,6 @@ import {
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 
 export class UmbColorPickerPasteFromClipboardPropertyAction extends UmbPropertyActionBase {
-	#clipboardContext?: typeof UMB_CLIPBOARD_CONTEXT.TYPE;
 	#propertyContext?: typeof UMB_PROPERTY_CONTEXT.TYPE;
 	#init?: Promise<unknown>;
 
@@ -26,10 +25,6 @@ export class UmbColorPickerPasteFromClipboardPropertyAction extends UmbPropertyA
 		this.#pickerInputContext.max = 1;
 
 		this.#init = Promise.all([
-			this.consumeContext(UMB_CLIPBOARD_CONTEXT, (context) => {
-				this.#clipboardContext = context;
-			}).asPromise(),
-
 			this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 				this.#propertyContext = context;
 			}).asPromise(),
