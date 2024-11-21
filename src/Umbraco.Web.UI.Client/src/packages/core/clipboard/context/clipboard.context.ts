@@ -3,8 +3,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_CLIPBOARD_CONTEXT } from './clipboard.context-token';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_CLIPBOARD_ITEM_PICKER_MODAL } from '../clipboard-entry/picker-modal/index.js';
-import { UmbClipboardDetailRepository, type UmbClipboardEntryDetailModel } from '../clipboard-entry/index.js';
+import { UMB_CLIPBOARD_ENTRY_PICKER_MODAL } from '../clipboard-entry/picker-modal/index.js';
+import { UmbClipboardEntryDetailRepository, type UmbClipboardEntryDetailModel } from '../clipboard-entry/index.js';
 
 /**
  * Clipboard context for managing clipboard entries
@@ -29,7 +29,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	public hasEntries = this.#entries.asObservablePart((x) => x.length > 0);
 
 	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
-	#clipboardDetailRepository = new UmbClipboardDetailRepository(this);
+	#clipboardDetailRepository = new UmbClipboardEntryDetailRepository(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_CLIPBOARD_CONTEXT);
@@ -119,7 +119,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	 */
 	async pick() {
 		await this.#init;
-		const modalContext = this.#modalManagerContext?.open(this, UMB_CLIPBOARD_ITEM_PICKER_MODAL);
+		const modalContext = this.#modalManagerContext?.open(this, UMB_CLIPBOARD_ENTRY_PICKER_MODAL);
 		return modalContext?.onSubmit();
 	}
 
