@@ -1,12 +1,9 @@
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../../collection/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_USER_PERMISSION_DOCUMENT_DELETE } from '../../user-permissions/constants.js';
 import { UMB_BULK_TRASH_DOCUMENT_REPOSITORY_ALIAS } from './repository/constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
-import {
-	UMB_COLLECTION_ALIAS_CONDITION,
-	UMB_COLLECTION_BULK_ACTION_PERMISSION_CONDITION,
-} from '@umbraco-cms/backoffice/collection';
-import type { UmbCollectionBulkActionPermissions } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -25,8 +22,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 				match: UMB_DOCUMENT_COLLECTION_ALIAS,
 			},
 			{
-				alias: UMB_COLLECTION_BULK_ACTION_PERMISSION_CONDITION,
-				match: (permissions: UmbCollectionBulkActionPermissions) => permissions.allowBulkDelete,
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_DELETE],
 			},
 		],
 	},

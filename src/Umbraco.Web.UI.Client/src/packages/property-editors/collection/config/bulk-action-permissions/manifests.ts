@@ -1,5 +1,6 @@
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 
+/** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
 export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.Collection.BulkActionPermissions',
