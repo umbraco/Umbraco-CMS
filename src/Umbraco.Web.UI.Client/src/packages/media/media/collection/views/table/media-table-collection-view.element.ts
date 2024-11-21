@@ -104,7 +104,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 		if (this._userDefinedProperties && this._userDefinedProperties.length > 0) {
 			const userColumns: Array<UmbTableColumn> = this._userDefinedProperties.map((item) => {
 				return {
-					name: item.header,
+					name: this.localize.string(item.header),
 					alias: item.alias,
 					elementName: item.elementName,
 					allowSorting: true,
