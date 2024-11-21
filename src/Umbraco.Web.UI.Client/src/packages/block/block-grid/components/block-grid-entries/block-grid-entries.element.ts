@@ -108,9 +108,6 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryE
 @customElement('umb-block-grid-entries')
 export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElement) {
 	//
-	// TODO: Make sure Sorter callbacks handles columnSpan when retrieving a new entry.
-
-	//
 	#sorter = new UmbSorterController<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>(this, {
 		...SORTER_CONFIG,
 		onStart: () => {
@@ -198,7 +195,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			},
 			null,
 		);
-
 		this.observe(
 			this.#context.amountOfAllowedBlockTypes,
 			(length) => {
@@ -251,6 +247,16 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				manager.readOnlyState.isReadOnly,
 				(isReadOnly) => (this._isReadOnly = isReadOnly),
 				'observeIsReadOnly',
+			);
+
+			this.observe(
+				manager.variantId,
+				(variantId) => {
+					if (variantId) {
+						this.#sorter.identifier = 'umb-block-grid-' + variantId.toString();
+					}
+				},
+				'observeVariantId',
 			);
 
 			if (this.areaKey) {

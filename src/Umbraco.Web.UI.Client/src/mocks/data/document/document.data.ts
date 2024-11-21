@@ -929,4 +929,267 @@ export const data: Array<UmbMockDocumentModel> = [
 			},
 		],
 	},
+	{
+		urls: [
+			{
+				culture: 'en-US',
+				url: '/',
+			},
+		],
+		template: null,
+		id: 'block-editors-document-id',
+		parent: null,
+		documentType: {
+			id: 'block-editors-document-type-id',
+			icon: 'icon-document',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		values: [
+			{
+				editorAlias: 'Umbraco.BlockList',
+				alias: 'blockList',
+				culture: null,
+				segment: null,
+				value: {
+					layout: {
+						'Umbraco.BlockList': [
+							{
+								contentKey: '1234',
+								settingsKey: '5678',
+							},
+							{
+								contentKey: '1234-headline',
+								settingsKey: '1234-headline-settings',
+							},
+						],
+					},
+					contentData: [
+						{
+							key: '1234',
+							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world',
+								},
+							],
+						},
+						{
+							key: '1234-headline',
+							contentTypeKey: 'headline-umbraco-demo-block-id',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'headline',
+									culture: null,
+									segment: null,
+									value: 'Hello world',
+								},
+							],
+						},
+					],
+					settingsData: [
+						{
+							key: '5678',
+							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Im in settings',
+								},
+							],
+						},
+						{
+							key: '1234-headline-settings',
+							contentTypeKey: 'headline-settings-demo-block-id',
+							values: [],
+						},
+					],
+					expose: [
+						{
+							contentKey: '1234',
+							culture: null,
+							segment: null,
+						},
+					],
+				},
+			},
+			{
+				editorAlias: 'Umbraco.BlockGrid',
+				alias: 'blockGrid',
+				culture: null,
+				segment: null,
+				value: {
+					layout: {
+						'Umbraco.BlockGrid': [
+							{
+								contentKey: '1234',
+								settingsKey: '5678',
+								columnSpan: 12,
+								areas: [
+									{
+										key: 'area1_key',
+										items: [
+											{
+												contentKey: 'a1234',
+												settingsKey: 'a5678',
+												columnSpan: 3,
+												rowSpan: 2,
+											},
+											{
+												contentKey: 'c1234',
+												columnSpan: 3,
+											},
+										],
+									},
+									{
+										key: 'area2_key',
+										items: [
+											{
+												contentKey: 'b1234',
+												settingsKey: 'b5678',
+												columnSpan: 6,
+												areas: [],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+					contentData: [
+						{
+							key: '1234',
+							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Im in settings',
+								},
+							],
+						},
+						{
+							key: 'a1234',
+							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world from area 1',
+								},
+							],
+						},
+						{
+							key: 'b1234',
+							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world from area 2',
+								},
+							],
+						},
+						{
+							key: 'c1234',
+							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello CCC from area 1',
+								},
+							],
+						},
+					],
+					settingsData: [
+						{
+							key: '5678',
+							contentTypeKey: 'all-property-editors-document-type-id',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world settings',
+								},
+							],
+						},
+						{
+							key: 'a5678',
+							contentTypeKey: 'all-property-editors-document-type-id',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world from area 1 settings',
+								},
+							],
+						},
+						{
+							key: 'b5678',
+							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world from area 2 settings',
+								},
+							],
+						},
+					],
+					expose: [
+						{
+							contentKey: '1234',
+							culture: null,
+							segment: null,
+						},
+					],
+				},
+			},
+		],
+		variants: [
+			{
+				state: DocumentVariantStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: 'en-US',
+				segment: null,
+				name: 'All Block Editors',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+			{
+				state: DocumentVariantStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: 'da-dk',
+				segment: null,
+				name: 'Alle blok redigeringer',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+		],
+	},
 ];
