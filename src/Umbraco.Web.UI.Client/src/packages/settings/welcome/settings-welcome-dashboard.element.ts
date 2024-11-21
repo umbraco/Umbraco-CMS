@@ -7,9 +7,8 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 	override render() {
 		return html`
 			<section id="settings-dashboard" class="uui-text">
-				<uui-box>
-					<h1 class="uui-h3"><umb-localize key="settingsDashboard_documentationHeader">Documentation</umb-localize></h1>
-					<p>
+				<uui-box headline="${this.localize.term('settingsDashboard_documentationHeader')}">
+					<p style="margin-top: 0;">
 						<umb-localize key="settingsDashboard_documentationDescription">
 							Read more about working with the items in Settings in our Documentation.
 						</umb-localize>
@@ -22,9 +21,8 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 						rel="noopener"></uui-button>
 				</uui-box>
 
-				<uui-box>
-					<h1 class="uui-h3"><umb-localize key="settingsDashboard_communityHeader">Community</umb-localize></h1>
-					<p>
+				<uui-box headline="${this.localize.term('settingsDashboard_communityHeader')}">
+					<p style="margin-top: 0;">
 						<umb-localize key="settingsDashboard_communityDescription">
 							Ask a question in the community forum or our Discord community
 						</umb-localize>
@@ -46,10 +44,8 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 					</div>
 				</uui-box>
 
-				<uui-box class="training">
-					<h1 class="uui-h3"><umb-localize key="settingsDashboard_trainingHeader">Training</umb-localize></h1>
-
-					<p>
+				<uui-box headline="${this.localize.term('settingsDashboard_trainingHeader')}">
+					<p style="margin-top: 0;">
 						<umb-localize key="settingsDashboard_trainingDescription">
 							Find out about real-life training and certification opportunities
 						</umb-localize>
@@ -62,10 +58,8 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 						rel="noopener"></uui-button>
 				</uui-box>
 
-				<uui-box>
-					<h1 class="uui-h3"><umb-localize key="settingsDashboard_supportHeader">Support</umb-localize></h1>
-
-					<p>
+				<uui-box headline="${this.localize.term('settingsDashboard_supportHeader')}">
+					<p style="margin-top: 0;">
 						<umb-localize key="settingsDashboard_supportDescription">
 							Extend your team with a highly skilled and passionate bunch of Umbraco know-it-alls
 						</umb-localize>
@@ -78,14 +72,14 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 						rel="noopener"></uui-button>
 				</uui-box>
 
-				<uui-box>
-					<h1 class="uui-h3"><umb-localize key="settingsDashboard_videosHeader">Videos</umb-localize></h1>
-					<p>
+				<uui-box headline="${this.localize.term('settingsDashboard_videosHeader')}">
+					<p style="margin-top: 0;">
 						<umb-localize key="settingsDashboard_videosDescription">
 							Watch our free tutorial videos on the Umbraco Learning Base YouTube channel, to get upto speed quickly
 							with Umbraco.
 						</umb-localize>
 					</p>
+
 					<uui-button
 						look="primary"
 						href="https://www.youtube.com/c/UmbracoLearningBase"
