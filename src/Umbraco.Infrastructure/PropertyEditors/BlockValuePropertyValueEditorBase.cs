@@ -1,5 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -8,7 +10,6 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -18,12 +19,13 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 {
     private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
     private readonly PropertyEditorCollection _propertyEditors;
-    private readonly ILogger _logger;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactoryCollection;
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
     private BlockEditorValues<TValue, TLayout>? _blockEditorValues;
+    private readonly ILanguageService _languageService;
 
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V16.")]
     protected BlockValuePropertyValueEditorBase(
         DataEditorAttribute attribute,
         PropertyEditorCollection propertyEditors,
@@ -33,16 +35,39 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper,
+        DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection)
+        : this(
+            propertyEditors,
+            dataTypeConfigurationCache,
+            shortStringHelper,
+            jsonSerializer,
+            dataValueReferenceFactoryCollection,
+            StaticServiceProvider.Instance.GetRequiredService<BlockEditorVarianceHandler>(),
+            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
+            ioHelper,
+            attribute
+            )
+    {
+    }
+
+    protected BlockValuePropertyValueEditorBase(
+        PropertyEditorCollection propertyEditors,
+        IDataTypeConfigurationCache dataTypeConfigurationCache,
+        IShortStringHelper shortStringHelper,
+        IJsonSerializer jsonSerializer,
         DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection,
-        BlockEditorVarianceHandler blockEditorVarianceHandler)
-        : base(textService, shortStringHelper, jsonSerializer, ioHelper, attribute)
+        BlockEditorVarianceHandler blockEditorVarianceHandler,
+        ILanguageService languageService,
+        IIOHelper ioHelper,
+        DataEditorAttribute attribute)
+        : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _propertyEditors = propertyEditors;
         _dataTypeConfigurationCache = dataTypeConfigurationCache;
-        _logger = logger;
         _jsonSerializer = jsonSerializer;
         _dataValueReferenceFactoryCollection = dataValueReferenceFactoryCollection;
         _blockEditorVarianceHandler = blockEditorVarianceHandler;
+        _languageService = languageService;
     }
 
     /// <inheritdoc />
@@ -121,7 +146,10 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
                 object? configuration = _dataTypeConfigurationCache.GetConfiguration(blockPropertyValue.PropertyType.DataTypeKey);
 
-                result.AddRange(tagsProvider.GetTags(blockPropertyValue.Value, configuration, languageId));
+                var tagLanguageId = blockPropertyValue.Culture is not null
+                    ? _languageService.GetAsync(blockPropertyValue.Culture).GetAwaiter().GetResult()?.Id
+                    : languageId;
+                result.AddRange(tagsProvider.GetTags(blockPropertyValue.Value, configuration, tagLanguageId));
             }
         }
 

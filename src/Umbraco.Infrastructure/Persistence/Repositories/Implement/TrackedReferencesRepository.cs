@@ -477,10 +477,49 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return _umbracoMapper.MapEnumerable<RelationItemDto, RelationItemModel>(pagedResult);
         }
 
-        public IEnumerable<RelationItemModel> GetPagedDescendantsInReferences(
-            Guid parentKey,
+        public async Task<PagedModel<Guid>> GetPagedNodeKeysWithDependantReferencesAsync(
+            ISet<Guid> keys,
+            Guid nodeObjectTypeId,
             long skip,
-            long take,
+            long take)
+        {
+            if (_scopeAccessor.AmbientScope is null)
+            {
+                throw new InvalidOperationException("Can not execute without a valid AmbientScope");
+            }
+
+            Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
+                .SelectDistinct<NodeDto>(node => node.UniqueId)
+                .From<NodeDto>()
+                .InnerJoin<RelationDto>()
+                .On<NodeDto, RelationDto>((node, relation) =>
+                    node.NodeId == relation.ParentId || node.NodeId == relation.ParentId || node.NodeId == relation.ChildId)
+                .InnerJoin<RelationTypeDto>()
+                .On<RelationDto, RelationTypeDto>((relation, relationType) => relation.RelationType == relationType.Id && relationType.IsDependency)
+                .Where<NodeDto, RelationDto, RelationTypeDto>(
+                    (node, relation, relationType)
+                    => node.NodeObjectType == nodeObjectTypeId
+                       && keys.Contains(node.UniqueId)
+                       && (node.NodeId == relation.ChildId
+                           || (relationType.Dual && relation.ParentId == node.NodeId)));
+
+            var totalRecords = _scopeAccessor.AmbientScope.Database.Count(sql);
+
+            // no need to process further if no records are found
+            if (totalRecords < 1)
+            {
+                return new PagedModel<Guid>(totalRecords, Enumerable.Empty<Guid>());
+            }
+
+            // Ordering is required for paging
+            sql = sql.OrderBy<NodeDto>(node => node.UniqueId);
+
+            IEnumerable<Guid> result = await _scopeAccessor.AmbientScope.Database.SkipTakeAsync<Guid>(skip, take, sql);
+
+            return new PagedModel<Guid>(totalRecords, result);
+        }
+
+        public IEnumerable<RelationItemModel> GetPagedDescendantsInReferences(Guid parentKey, long skip, long take,
             bool filterMustBeIsDependency,
             out long totalRecords)
         {

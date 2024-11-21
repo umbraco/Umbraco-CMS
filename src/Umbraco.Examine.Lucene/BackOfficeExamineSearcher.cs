@@ -246,7 +246,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                         for (var index = 0; index < querywords.Length; index++)
                         {
                             queryWordsReplaced[index] =
-                                querywords[index].Replace("\\-", " ").Replace("_", " ").TrimExact(" ");
+                                querywords[index].Replace("\\-", " ").Replace("_", " ").Trim(" ");
                         }
                     }
                     else

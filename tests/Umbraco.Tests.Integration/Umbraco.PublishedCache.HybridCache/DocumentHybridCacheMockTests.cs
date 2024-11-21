@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -103,11 +104,15 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
             GetRequiredService<IPublishedContentFactory>(),
             GetRequiredService<ICacheNodeFactory>(),
             GetSeedProviders(),
-            Options.Create(new CacheSettings()),
+            new OptionsWrapper<CacheSettings>(new CacheSettings()),
             GetRequiredService<IPublishedModelFactory>(),
             GetRequiredService<IPreviewService>());
 
-        _mockedCache = new DocumentCache(_mockDocumentCacheService, GetRequiredService<IPublishedContentTypeCache>());
+        _mockedCache = new DocumentCache(_mockDocumentCacheService,
+            GetRequiredService<IPublishedContentTypeCache>(),
+            GetRequiredService<IDocumentNavigationQueryService>(),
+            GetRequiredService<IDocumentUrlService>(),
+            new Lazy<IPublishedUrlProvider>(GetRequiredService<IPublishedUrlProvider>));
     }
 
     // We want to be able to alter the settings for the providers AFTER the test has started

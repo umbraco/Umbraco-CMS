@@ -1100,7 +1100,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var dataTypeDefinitionId =
                     new Guid(property.Element("Definition")!.Value); //Unique Id for a DataTypeDefinition
 
-                IDataType? dataTypeDefinition = _dataTypeService.GetDataType(dataTypeDefinitionId);
+                IDataType? dataTypeDefinition = _dataTypeService.GetAsync(dataTypeDefinitionId).GetAwaiter().GetResult();
 
                 //If no DataTypeDefinition with the guid from the xml wasn't found OR the ControlId on the DataTypeDefinition didn't match the DataType Id
                 //We look up a DataTypeDefinition that matches
@@ -1290,7 +1290,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     parentId = importedFolders[dataTypeDefinitionName];
                 }
 
-                IDataType? definition = _dataTypeService.GetDataType(dataTypeDefinitionId);
+                IDataType? definition = _dataTypeService.GetAsync(dataTypeDefinitionId).GetAwaiter().GetResult();
                 //If the datatype definition doesn't already exist we create a new according to the one in the package xml
                 if (definition == null)
                 {

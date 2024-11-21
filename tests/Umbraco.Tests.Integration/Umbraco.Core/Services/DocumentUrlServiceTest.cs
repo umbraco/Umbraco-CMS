@@ -1,23 +1,13 @@
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Infrastructure.DependencyInjection;
-using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
-using Umbraco.Cms.Infrastructure.HostedServices;
-using Umbraco.Cms.Infrastructure.Search;
-using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
-using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
@@ -33,12 +23,15 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
         builder.Services.AddUnique<IServerMessenger, ScopedRepositoryTests.LocalServerMessenger>();
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
 
-        builder.Services.AddHostedService<DocumentUrlServiceInitializer>();
-
+        builder.Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlServiceInitializerNotificationHandler>();
     }
 
 
-
+    public override void Setup()
+    {
+        DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
+        base.Setup();
+    }
     //
     // [Test]
     // [LongRunning]
@@ -63,9 +56,9 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
     {
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
-        var actual = DocumentUrlService.GetUrlSegment(Trashed.Key, isoCode, true);
+        Assert.IsNull(DocumentUrlService.GetUrlSegment(Trashed.Key, isoCode, true));
+        Assert.IsNull(DocumentUrlService.GetUrlSegment(Trashed.Key, isoCode, false));
 
-        Assert.IsNull(actual);
     }
 
     //TODO test with the urlsegment property value!
@@ -120,7 +113,38 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
     [Test]
     public void No_Published_Route_when_not_published()
     {
+        Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, true));
         Assert.IsNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, false));
+    }
+
+    [Test]
+    public void Unpublished_Pages_Are_not_available()
+    {
+        //Arrange
+        ContentService.PublishBranch(Textpage, true, new[] { "*" });
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/", "en-US", null, true));
+            Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/", "en-US", null, false));
+            Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, true));
+            Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, false));
+        });
+
+        //Act
+        ContentService.Unpublish(Textpage );
+
+        Assert.Multiple(() =>
+        {
+            //The unpublished page self
+            Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/", "en-US", null, true));
+            Assert.IsNull(DocumentUrlService.GetDocumentKeyByRoute("/", "en-US", null, false));
+
+            //A descendant of the unpublished page
+            Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, true));
+            Assert.IsNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, false));
+        });
+
     }
 
 
@@ -181,10 +205,24 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
         // Publish both the main root and the second root with descendants
         if (loadDraft is false)
         {
+
             ContentService.PublishBranch(Textpage, true, new[] { "*" });
             ContentService.PublishBranch(secondRoot, true, new[] { "*" });
         }
 
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
     }
+
+    //TODO test cases:
+    // - Find the root, when a domain is set
+    // - Find a nested child, when a domain is set
+
+    // - Find the root when no domain is set and hideTopLevelNodeFromPath is true
+    // - Find a nested child of item in the root top when no domain is set and hideTopLevelNodeFromPath is true
+    // - Find a nested child of item in the root bottom when no domain is set and hideTopLevelNodeFromPath is true
+    // - Find the root when no domain is set and hideTopLevelNodeFromPath is false
+    // - Find a nested child of item in the root top when no domain is set and hideTopLevelNodeFromPath is false
+    // - Find a nested child of item in the root bottom when no domain is set and hideTopLevelNodeFromPath is false
+
+    // - All of the above when having Constants.Conventions.Content.UrlName set to a value
 }

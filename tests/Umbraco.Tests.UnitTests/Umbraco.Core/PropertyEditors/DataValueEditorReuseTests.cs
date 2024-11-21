@@ -51,9 +51,11 @@ public class DataValueEditorReuseTests
                 Mock.Of<ILogger<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>>(),
                 Mock.Of<IShortStringHelper>(),
                 Mock.Of<IJsonSerializer>(),
-                Mock.Of<IIOHelper>(),
                 Mock.Of<IPropertyValidationService>(),
-                blockVarianceHandler));
+                blockVarianceHandler,
+                Mock.Of<ILanguageService>(),
+                Mock.Of<IIOHelper>()
+                ));
     }
 
     [Test]
@@ -99,7 +101,6 @@ public class DataValueEditorReuseTests
     {
         var blockListPropertyEditor = new BlockListPropertyEditor(
             _dataValueEditorFactoryMock.Object,
-            _propertyEditorCollection,
             Mock.Of<IIOHelper>(),
             Mock.Of<IBlockValuePropertyIndexValueFactory>(),
             Mock.Of<IJsonSerializer>());
@@ -120,7 +121,6 @@ public class DataValueEditorReuseTests
     {
         var blockListPropertyEditor = new BlockListPropertyEditor(
             _dataValueEditorFactoryMock.Object,
-            _propertyEditorCollection,
             Mock.Of<IIOHelper>(),
             Mock.Of<IBlockValuePropertyIndexValueFactory>(),
             Mock.Of<IJsonSerializer>());

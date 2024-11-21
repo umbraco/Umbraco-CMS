@@ -2,7 +2,6 @@
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
@@ -78,7 +77,6 @@ public class RichTextPropertyEditor : DataEditor
     internal class RichTextPropertyValueEditor : BlockValuePropertyValueEditorBase<RichTextBlockValue, RichTextBlockLayoutItem>
     {
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-        private readonly ILocalizedTextService _localizedTextService;
         private readonly IHtmlSanitizer _htmlSanitizer;
         private readonly HtmlImageSourceParser _imageSourceParser;
         private readonly HtmlLocalLinkParser _localLinkParser;
@@ -94,23 +92,22 @@ public class RichTextPropertyEditor : DataEditor
             IDataTypeConfigurationCache dataTypeReadCache,
             ILogger<RichTextPropertyValueEditor> logger,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             HtmlImageSourceParser imageSourceParser,
             HtmlLocalLinkParser localLinkParser,
             RichTextEditorPastedImages pastedImages,
             IJsonSerializer jsonSerializer,
-            IIOHelper ioHelper,
             IHtmlSanitizer htmlSanitizer,
             IBlockEditorElementTypeCache elementTypeCache,
             IPropertyValidationService propertyValidationService,
             DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection,
             IRichTextRequiredValidator richTextRequiredValidator,
-            BlockEditorVarianceHandler blockEditorVarianceHandler)
-            : base(attribute, propertyEditors, dataTypeReadCache, localizedTextService, logger, shortStringHelper, jsonSerializer, ioHelper, dataValueReferenceFactoryCollection, blockEditorVarianceHandler)
+            BlockEditorVarianceHandler blockEditorVarianceHandler,
+            ILanguageService languageService,
+            IIOHelper ioHelper)
+            : base(propertyEditors, dataTypeReadCache, shortStringHelper, jsonSerializer, dataValueReferenceFactoryCollection, blockEditorVarianceHandler, languageService, ioHelper, attribute)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-            _localizedTextService = localizedTextService;
             _imageSourceParser = imageSourceParser;
             _localLinkParser = localLinkParser;
             _pastedImages = pastedImages;
