@@ -1,4 +1,4 @@
-import type { UmbClipboardEntryEntityType } from './entity';
+import type { UmbClipboardEntryEntityType } from './entity.js';
 
 /**
  * A Clipboard entry is a composed set of data representing one entry in the clipboard.

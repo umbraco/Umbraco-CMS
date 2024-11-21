@@ -1,4 +1,4 @@
-import { type UmbDataSourceResponse, type UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
+import { type UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
 import { UmbClipboardLocalStorageManager } from '../../clipboard-local-storage.manager.js';
 import type { UmbClipboardEntryItemModel } from './types.js';
 
