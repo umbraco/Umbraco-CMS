@@ -252,7 +252,7 @@ public class ManifestParser : IManifestParser
 
         var files = Directory.GetFiles(_path, "package.manifest", SearchOption.AllDirectories);
 
-        // Ensure a consistent sorting of paths
+        // Ensure a consistent, alphabetical sorting of paths, because this is not guaranteed to be the same between file systems or OSes
         Array.Sort(files);
 
         return files;
