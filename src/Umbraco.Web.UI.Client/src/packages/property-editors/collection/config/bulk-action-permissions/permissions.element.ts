@@ -67,6 +67,12 @@ export class UmbPropertyEditorUICollectionPermissionsElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
+	protected override firstUpdated() {
+		console.warn(
+			'The `umb-property-editor-ui-collection-permissions` component has been deprecated, it will be removed in Umbraco 17.',
+		);
+	}
+
 	override render() {
 		return html`<uui-toggle
 				?checked=${this.value.allowBulkPublish}
