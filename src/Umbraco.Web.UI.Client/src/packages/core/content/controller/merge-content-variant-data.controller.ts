@@ -32,14 +32,12 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 		// Combine data and persisted data depending on the selectedVariants. Always use the invariant values from the data.
 		// loops over each entry in values, determine wether the value should be from the data or the persisted data, depending on wether its a selectedVariant or an invariant value.
 		// loops over each entry in variants, determine wether the variant should be from the data or the persisted data, depending on the selectedVariants.
-		const result = {
-			...currentData,
-			values: await this.#processValues<ModelType['values'][0]>(
-				persistedData?.values,
-				currentData.values,
-				variantsToStore,
-			),
-		};
+		const result = { ...currentData };
+		result.values = await this.#processValues<ModelType['values'][0]>(
+			persistedData?.values,
+			currentData.values,
+			variantsToStore,
+		);
 
 		if (currentData.variants) {
 			// Notice for variants we do not want to include all the variants that we are processing. but just the once selected for the process. (Not include invariant if we are in a variant document) [NL]

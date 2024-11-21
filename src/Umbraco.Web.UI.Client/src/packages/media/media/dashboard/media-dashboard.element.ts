@@ -1,21 +1,18 @@
 import { UmbMediaCollectionRepository } from '../collection/repository/index.js';
 import { UMB_MEDIA_COLLECTION_ALIAS } from '../collection/index.js';
-import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
+import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbCollectionElement } from '@umbraco-cms/backoffice/collection';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type {
-	UmbCollectionBulkActionPermissions,
-	UmbCollectionConfiguration,
-} from '@umbraco-cms/backoffice/collection';
+import { UmbCollectionElement } from '@umbraco-cms/backoffice/collection';
+import type { UmbCollectionConfiguration } from '@umbraco-cms/backoffice/collection';
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
-@customElement('umb-media-section-view')
-export class UmbMediaSectionViewElement extends UmbLitElement {
+@customElement('umb-media-dashboard')
+export class UmbMediaDashboardElement extends UmbLitElement {
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 	#entityContext = new UmbEntityContext(this);
 	#mediaCollectionRepository = new UmbMediaCollectionRepository(this);
@@ -28,7 +25,7 @@ export class UmbMediaSectionViewElement extends UmbLitElement {
 
 		this.#defineRoutes();
 
-		this.#entityContext.setEntityType(UMB_MEDIA_ENTITY_TYPE);
+		this.#entityContext.setEntityType(UMB_MEDIA_ROOT_ENTITY_TYPE);
 		this.#entityContext.setUnique(null);
 	}
 
@@ -74,7 +71,6 @@ export class UmbMediaSectionViewElement extends UmbLitElement {
 		return {
 			unique: '',
 			dataTypeId: '',
-			allowedEntityBulkActions: config?.getValueByAlias<UmbCollectionBulkActionPermissions>('bulkActionPermissions'),
 			layouts: config?.getValueByAlias('layouts'),
 			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
 			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',
@@ -101,10 +97,10 @@ export class UmbMediaSectionViewElement extends UmbLitElement {
 	];
 }
 
-export default UmbMediaSectionViewElement;
+export default UmbMediaDashboardElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-media-section-view': UmbMediaSectionViewElement;
+		'umb-media-dashboard': UmbMediaDashboardElement;
 	}
 }

@@ -14,15 +14,17 @@ import type {
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UmbModalRouteRegistrationController, type UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 import './column-layouts/media-table-column-name.element.js';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-media-table-collection-view')
 export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
+
+	@state()
+	private _workspacePathBuilder?: UmbModalRouteBuilder;
 
 	@state()
 	private _items?: Array<UmbMediaCollectionItemModel>;
@@ -52,36 +54,20 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 
 	#collectionContext?: UmbDefaultCollectionContext<UmbMediaCollectionItemModel, UmbMediaCollectionFilterModel>;
 
-	#routeBuilder?: UmbModalRouteBuilder;
-
 	constructor() {
 		super();
 		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
+			this.#observeCollectionContext();
+			collectionContext.setupView(this);
+			this.observe(
+				collectionContext.workspacePathBuilder,
+				(builder) => {
+					this._workspacePathBuilder = builder;
+				},
+				'observePath',
+			);
 		});
-
-		this.#registerModalRoute();
-	}
-
-	#registerModalRoute() {
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath(':entityType')
-			.onSetup((params) => {
-				return { data: { entityType: params.entityType, preset: {} } };
-			})
-			.onReject(() => {
-				this.#collectionContext?.requestCollection();
-			})
-			.onSubmit(() => {
-				this.#collectionContext?.requestCollection();
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this.#routeBuilder = routeBuilder;
-
-				// NOTE: Configuring the observations AFTER the route builder is ready,
-				// otherwise there is a race condition and `#collectionContext.items` tends to win. [LK]
-				this.#observeCollectionContext();
-			});
 	}
 
 	#observeCollectionContext() {
@@ -118,7 +104,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 		if (this._userDefinedProperties && this._userDefinedProperties.length > 0) {
 			const userColumns: Array<UmbTableColumn> = this._userDefinedProperties.map((item) => {
 				return {
-					name: item.header,
+					name: this.localize.string(item.header),
 					alias: item.alias,
 					elementName: item.elementName,
 					allowSorting: true,
@@ -152,10 +138,13 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 						};
 					}
 
-					const editPath = this.#routeBuilder
-						? this.#routeBuilder({ entityType: item.entityType }) +
-							UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique })
-						: '';
+					const editPath =
+						item.unique && this._workspacePathBuilder
+							? this._workspacePathBuilder({ entityType: item.entityType }) +
+								UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({
+									unique: item.unique,
+								})
+							: '';
 
 					return {
 						columnAlias: column.alias,

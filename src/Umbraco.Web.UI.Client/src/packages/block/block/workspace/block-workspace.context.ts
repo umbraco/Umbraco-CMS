@@ -249,7 +249,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		);
 
 		this.#observeBlockData(unique);
-
 		if (this.#liveEditingMode) {
 			this.establishLiveSync();
 		}

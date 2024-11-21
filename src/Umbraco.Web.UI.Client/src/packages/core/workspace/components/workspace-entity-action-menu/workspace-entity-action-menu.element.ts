@@ -26,14 +26,13 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
 			this._workspaceContext = context;
-			this._observeInfo();
+			this.observe(this._workspaceContext.unique, (unique) => {
+				this._unique = unique;
+				// TODO: the context does not have an observable for the entity type, so we need to use the
+				// getEntityType method until we can add an observable for it.
+				this._entityType = this._workspaceContext?.getEntityType();
+			});
 		});
-	}
-
-	private _observeInfo() {
-		if (!this._workspaceContext) return;
-		this._unique = this._workspaceContext.getUnique();
-		this._entityType = this._workspaceContext.getEntityType();
 	}
 
 	#onActionExecuted(event: UmbActionExecutedEvent) {
