@@ -26,13 +26,13 @@
 
 @* Helper method to traverse through all descendants *@
 @{
-    void Traverse(IPublishedContent? node)
+    void Traverse(IPublishedContent node)
     {
         //Update the level to reflect how deep you want the sitemap to go
         const int maxLevelForSitemap = 4;
 
         @* Select visible children *@
-        var selection = node?
+        var selection = node
             .Children(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService)
             .Where(x => x.IsVisible(PublishedValueFallback) && x.Level <= maxLevelForSitemap)
             .ToArray();

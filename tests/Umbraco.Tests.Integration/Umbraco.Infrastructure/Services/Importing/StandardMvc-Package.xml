@@ -927,7 +927,7 @@
 
     /* This is your basic query to select the nodes you want */
 
-    var nodes = Model.Content.Children.Where(x => x.DocumentTypeAlias == "NewsArticle").OrderBy(x=>x.CreateDate);
+    var nodes = Model.Content.Children().Where(x => x.DocumentTypeAlias == "NewsArticle").OrderBy(x=>x.CreateDate);
 
     int totalNodes = nodes.Count();
     int totalPages = (int)Math.Ceiling((double)totalNodes / (double)pageSize);
@@ -1023,7 +1023,7 @@
         <![CDATA[@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
       Layout = "SW_Master.cshtml";
-      var pages = Model.Content.Children.Where(x => x.IsVisible() && x.TemplateId > 0 && Umbraco.MemberHasAccess(x.Id, x.Path));
+      var pages = Model.Content.Children().Where(x => x.IsVisible() && x.TemplateId > 0 && Umbraco.MemberHasAccess(x.Id, x.Path));
 }
  <div id="mainContent" class="fc">
 
@@ -1347,7 +1347,7 @@
 
 @helper traverse(IPublishedContent node)
 {
- var cc = node.Children.Where(x=>x.IsVisible() && x.TemplateId > 0);
+ var cc = node.Children().Where(x=>x.IsVisible() && x.TemplateId > 0);
  if (cc.Count()>0)
  {
   <ul>
