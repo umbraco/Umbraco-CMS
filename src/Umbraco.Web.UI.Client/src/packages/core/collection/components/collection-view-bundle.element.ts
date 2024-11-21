@@ -1,6 +1,7 @@
 import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
 import type { ManifestCollectionView } from '../extensions/index.js';
 import type { UmbCollectionLayoutConfiguration } from '../types.js';
+import { UMB_ROUTE_CONTEXT } from '../../router/route.context.js';
 import { css, customElement, html, nothing, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -34,6 +35,12 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		this.consumeContext(UMB_ROUTE_CONTEXT, (context) => {
+			this.observe(context.activePath, (activePath) => {
+				this._collectionRootPathName = activePath;
+			});
+		});
+
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
 			this.#collectionContext = context;
 			this.#observeCollection();
@@ -46,14 +53,6 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 
 	#observeCollection() {
 		if (!this.#collectionContext) return;
-
-		this.observe(
-			this.#collectionContext.view.rootPathName,
-			(rootPathName) => {
-				this._collectionRootPathName = rootPathName;
-			},
-			'umbCollectionRootPathNameObserver',
-		);
 
 		this.observe(
 			this.#collectionContext.view.currentView,
