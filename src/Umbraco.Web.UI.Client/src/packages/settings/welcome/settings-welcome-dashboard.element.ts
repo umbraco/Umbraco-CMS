@@ -7,45 +7,41 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 	override render() {
 		return html`
 			<section id="settings-dashboard" class="uui-text">
-				<uui-box headline="${this.localize.term('settingsDashboard_documentationHeader')}">
-					<p style="margin-top: 0;">
+				<uui-box headline=${this.localize.term('settingsDashboard_documentationHeader')}>
+					<p>
 						<umb-localize key="settingsDashboard_documentationDescription">
 							Read more about working with the items in Settings in our Documentation.
 						</umb-localize>
 					</p>
 					<uui-button
 						look="primary"
-						href="https://docs.umbraco.com/umbraco-cms/umbraco-cms"
+						href="https://docs.umbraco.com/umbraco-cms"
 						label=${this.localize.term('settingsDashboard_getHelp')}
-						target="_blank"
-						rel="noopener"></uui-button>
+						target="_blank"></uui-button>
 				</uui-box>
 
-				<uui-box headline="${this.localize.term('settingsDashboard_communityHeader')}">
-					<p style="margin-top: 0;">
+				<uui-box headline=${this.localize.term('settingsDashboard_communityHeader')}>
+					<p>
 						<umb-localize key="settingsDashboard_communityDescription">
 							Ask a question in the community forum or our Discord community
 						</umb-localize>
 					</p>
-
 					<div class="button-group">
 						<uui-button
 							look="primary"
-							href="https://our.umbraco.com/forum"
+							href="https://our.umbraco.com/forum/"
 							label=${this.localize.term('settingsDashboard_goForum')}
-							target="_blank"
-							rel="noopener"></uui-button>
+							target="_blank"></uui-button>
 						<uui-button
 							look="primary"
 							href="https://discord.umbraco.com"
 							label=${this.localize.term('settingsDashboard_chatWithCommunity')}
-							target="_blank"
-							rel="noopener"></uui-button>
+							target="_blank"></uui-button>
 					</div>
 				</uui-box>
 
-				<uui-box headline="${this.localize.term('settingsDashboard_trainingHeader')}">
-					<p style="margin-top: 0;">
+				<uui-box headline=${this.localize.term('settingsDashboard_trainingHeader')}>
+					<p>
 						<umb-localize key="settingsDashboard_trainingDescription">
 							Find out about real-life training and certification opportunities
 						</umb-localize>
@@ -54,12 +50,11 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 						look="primary"
 						href="https://umbraco.com/training/"
 						label=${this.localize.term('settingsDashboard_getCertified')}
-						target="_blank"
-						rel="noopener"></uui-button>
+						target="_blank"></uui-button>
 				</uui-box>
 
-				<uui-box headline="${this.localize.term('settingsDashboard_supportHeader')}">
-					<p style="margin-top: 0;">
+				<uui-box headline=${this.localize.term('settingsDashboard_supportHeader')}>
+					<p>
 						<umb-localize key="settingsDashboard_supportDescription">
 							Extend your team with a highly skilled and passionate bunch of Umbraco know-it-alls
 						</umb-localize>
@@ -68,24 +63,21 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 						look="primary"
 						href="https://umbraco.com/support/"
 						label=${this.localize.term('settingsDashboard_getHelp')}
-						target="_blank"
-						rel="noopener"></uui-button>
+						target="_blank"></uui-button>
 				</uui-box>
 
-				<uui-box headline="${this.localize.term('settingsDashboard_videosHeader')}">
-					<p style="margin-top: 0;">
+				<uui-box headline=${this.localize.term('settingsDashboard_videosHeader')}>
+					<p>
 						<umb-localize key="settingsDashboard_videosDescription">
 							Watch our free tutorial videos on the Umbraco Learning Base YouTube channel, to get upto speed quickly
 							with Umbraco.
 						</umb-localize>
 					</p>
-
 					<uui-button
 						look="primary"
 						href="https://www.youtube.com/c/UmbracoLearningBase"
 						label=${this.localize.term('settingsDashboard_watchVideos')}
-						target="_blank"
-						rel="noopener"></uui-button>
+						target="_blank"></uui-button>
 				</uui-box>
 			</section>
 		`;
@@ -99,6 +91,12 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 				grid-gap: var(--uui-size-7);
 				grid-template-columns: repeat(3, 1fr);
 				padding: var(--uui-size-layout-1);
+			}
+
+			uui-box {
+				p:first-child {
+					margin-top: 0;
+				}
 			}
 
 			@media (max-width: 1200px) {
