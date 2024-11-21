@@ -157,6 +157,10 @@ export class UmbDropzoneManager extends UmbControllerBase {
 
 			const mediaTypeUnique = options[0].unique;
 
+			if (!mediaTypeUnique) {
+				throw new Error('Media type unique is not defined');
+			}
+
 			// Handle files and folders differently: a file is uploaded as temp then created as a media item, and a folder is created as a media item directly
 			if (item.temporaryFile) {
 				await this.#handleFile(item as UmbUploadableFile, mediaTypeUnique);

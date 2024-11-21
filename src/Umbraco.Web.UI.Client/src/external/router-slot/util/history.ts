@@ -30,7 +30,8 @@ export function ensureHistoryEvents() {
 	// want the popstate event to bubble up before the changestate event is dispatched.
 	window.addEventListener('popstate', (e: PopStateEvent) => {
 		// Check if the state should be allowed to change
-		if (shouldCancelChangeState({ eventName: 'popstate' })) {
+		// [NL] I injected the url property here, cause we need that when URL is changed by the browser back/forth button.
+		if (shouldCancelChangeState({ url: window.location.pathname, eventName: 'popstate' })) {
 			e.preventDefault();
 			e.stopPropagation();
 			return;

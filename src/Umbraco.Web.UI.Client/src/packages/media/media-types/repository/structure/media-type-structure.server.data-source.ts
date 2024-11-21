@@ -1,3 +1,4 @@
+import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import type { UmbAllowedMediaTypeModel } from './types.js';
 import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContentTypeStructureServerDataSourceBase } from '@umbraco-cms/backoffice/content-type';
@@ -38,6 +39,7 @@ const getAllowedChildrenOf = (unique: string | null) => {
 const mapper = (item: AllowedMediaTypeModel): UmbAllowedMediaTypeModel => {
 	return {
 		unique: item.id,
+		entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
 		name: item.name,
 		description: item.description || null,
 		icon: item.icon || null,

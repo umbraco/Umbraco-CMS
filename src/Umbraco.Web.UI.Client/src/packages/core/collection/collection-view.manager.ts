@@ -77,7 +77,7 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 	#createRoutes(views: ManifestCollectionView[] | null) {
 		let routes: Array<UmbRoute> = [];
 
-		if (views?.length) {
+		if (views && views.length > 0) {
 			// find the default view from the config. If it doesn't exist, use the first view
 			const defaultView = views.find((view) => view.alias === this.#defaultViewAlias);
 			const fallbackView = defaultView?.meta.pathName || views[0].meta.pathName;
@@ -92,16 +92,18 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 				};
 			});
 
+			if (routes.length > 0) {
+				routes.push({
+					path: '',
+					redirectTo: fallbackView,
+				});
+			}
+
 			routes.push({
-				path: '',
-				redirectTo: fallbackView,
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
 			});
 		}
-
-		routes.push({
-			path: `**`,
-			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-		});
 
 		this.#routes.setValue(routes);
 	}

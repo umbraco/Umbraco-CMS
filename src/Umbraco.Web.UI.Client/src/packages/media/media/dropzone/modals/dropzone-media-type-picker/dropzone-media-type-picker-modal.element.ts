@@ -7,6 +7,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import type { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 @customElement('umb-dropzone-media-type-picker-modal')
 export class UmbDropzoneMediaTypePickerModalElement extends UmbModalBaseElement<
@@ -25,19 +26,22 @@ export class UmbDropzoneMediaTypePickerModalElement extends UmbModalBaseElement<
 		requestAnimationFrame(() => this._buttonAuto.focus());
 	}
 
-	#onMediaTypePick(unique: string | undefined) {
+	#onAutoPick() {
+		this.value = { mediaTypeUnique: undefined };
+		this._submitModal();
+	}
+
+	#onMediaTypePick(unique: UmbEntityUnique) {
+		if (!unique) {
+			throw new Error('Invalid media type unique');
+		}
 		this.value = { mediaTypeUnique: unique };
 		this._submitModal();
 	}
 
 	override render() {
 		return html` <div id="options">
-			<uui-button
-				id="auto"
-				look="secondary"
-				@click=${() => this.#onMediaTypePick(undefined)}
-				label="Automatically"
-				compact>
+			<uui-button id="auto" look="secondary" @click=${() => this.#onAutoPick()} label="Automatically" compact>
 				<umb-icon name="icon-wand"></umb-icon> Auto pick
 			</uui-button>
 			${repeat(
