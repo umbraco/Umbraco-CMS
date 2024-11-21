@@ -1565,7 +1565,7 @@ public static class StringExtensions
     /// <param name="email">The string check</param>
     /// <returns>Returns a bool indicating whether the string is an email address.</returns>
     public static bool IsEmail(this string? email) =>
-        email is not null && new EmailAddressAttribute().IsValid(email);
+        string.IsNullOrWhiteSpace(email) is false && new EmailAddressAttribute().IsValid(email);
 
     // having benchmarked various solutions (incl. for/foreach, split and LINQ based ones),
     // this is by far the fastest way to find string needles in a string haystack
