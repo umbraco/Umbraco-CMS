@@ -5,6 +5,7 @@ import type { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 export type * from './extensions/index.js';
 export type * from './conditions/types.js';
 
+/** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
 export interface UmbCollectionBulkActionPermissions {
 	allowBulkCopy: boolean;
 	allowBulkDelete: boolean;
@@ -16,6 +17,7 @@ export interface UmbCollectionBulkActionPermissions {
 export interface UmbCollectionConfiguration {
 	unique?: string;
 	dataTypeId?: string;
+	/** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
 	allowedEntityBulkActions?: UmbCollectionBulkActionPermissions;
 	layouts?: Array<UmbCollectionLayoutConfiguration>;
 	orderBy?: string;
