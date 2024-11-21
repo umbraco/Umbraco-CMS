@@ -70,12 +70,14 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`
-			<umb-body-layout header-transparent class=${this._hasItems ? 'has-items' : ''}>
-				<umb-router-slot id="router" .routes=${this._routes}></umb-router-slot>
-				${this.renderToolbar()} ${this._hasItems ? this.#renderContent() : this.#renderEmptyState()}
-			</umb-body-layout>
-		`;
+		return this._routes
+			? html`
+					<umb-body-layout header-transparent class=${this._hasItems ? 'has-items' : ''}>
+						<umb-router-slot id="router" .routes=${this._routes}></umb-router-slot>
+						${this.renderToolbar()} ${this._hasItems ? this.#renderContent() : this.#renderEmptyState()}
+					</umb-body-layout>
+				`
+			: nothing;
 	}
 
 	protected renderToolbar() {
