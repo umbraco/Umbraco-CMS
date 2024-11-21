@@ -17,7 +17,7 @@
     - It uses a local method called Traverse() to select and display the markup and links.
 *@
 
-@{ var selection = Model?.Content.Root(); }
+@{ var selection = Model?.Content.Root(PublishedContentCache, DocumentNavigationQueryService); }
 
 <div class="sitemap">
     @* Render the sitemap by passing the root node to the traverse method, below *@
