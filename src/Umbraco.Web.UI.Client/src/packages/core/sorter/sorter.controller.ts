@@ -203,7 +203,7 @@ export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = 
 	Partial<Pick<INTERNAL_UmbSorterConfig<T, ElementType>, 'ignorerSelector' | 'containerSelector' | 'identifier'>>;
 
 /**
- 
+
  * @class UmbSorterController
  * @implements {UmbControllerInterface}
  * @description This controller can make user able to sort items.
@@ -264,6 +264,12 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	public get identifier() {
 		return this.#config.identifier;
+	}
+	public set identifier(identifier: UniqueType) {
+		this.#config.identifier = identifier;
+	}
+	#isActiveIdentifier() {
+		return UmbSorterController.activeSorter?.identifier === this.identifier;
 	}
 
 	constructor(host: UmbControllerHostElement, config: UmbSorterConfig<T, ElementType>) {
@@ -460,7 +466,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 
 		// If we have a currentItem and the element matches, we should set the currentElement to this element.
-		if (UmbSorterController.activeItem) {
+		if (UmbSorterController.activeItem && this.#isActiveIdentifier()) {
 			const elUnique = this.#config.getUniqueOfElement(element);
 			const modelUnique = this.#config.getUniqueOfModel(UmbSorterController.activeItem);
 			if (elUnique === modelUnique && elUnique !== undefined) {
@@ -587,12 +593,12 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	};
 
 	#handleDragEnd = async (event?: DragEvent) => {
-		// If not good drop, revert model?
-
 		if (!UmbSorterController.activeElement || !UmbSorterController.activeItem) {
 			return;
 		}
 
+		// If browser thinks this was a cancelled move, we should revert the move. (based on dropEffect === 'none') [NL]
+		// But notice, this also count when releasing the mouse outside the sorters element, this i'm not sure if I agree on, would be ideal only to revert if ESC was pressed. [NL]
 		if (UmbSorterController.originalSorter && event?.dataTransfer != null && event.dataTransfer.dropEffect === 'none') {
 			// Revert move, to start position.
 			UmbSorterController.originalSorter.moveItemInModel(

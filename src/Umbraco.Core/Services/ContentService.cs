@@ -2772,6 +2772,9 @@ public class ContentService : RepositoryService, IContentService
                         descendantCopy.CreatorId = userId;
                         descendantCopy.WriterId = userId;
 
+                        // since the repository relies on the dirty state to figure out whether it needs to update the sort order, we mark it dirty here
+                        descendantCopy.SortOrder = descendantCopy.SortOrder;
+
                         // save and flush (see above)
                         _documentRepository.Save(descendantCopy);
 

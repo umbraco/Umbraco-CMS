@@ -208,6 +208,19 @@ export class UmbDocumentWorkspaceContext
 		this._data.updateCurrent({ template: { unique: templateUnique } });
 	}
 
+	/**
+	 * Request a submit of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be submitted.
+	 * @returns {Promise<void>} a promise which resolves once it has been completed.
+	 */
+	public override requestSubmit() {
+		return this._handleSubmit();
+	}
+
+	// Because we do not make validation prevent submission this also submits the workspace. [NL]
+	public override invalidSubmit() {
+		return this._handleSubmit();
+	}
+
 	async #handleSaveAndPreview() {
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
