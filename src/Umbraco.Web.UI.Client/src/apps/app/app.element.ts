@@ -20,7 +20,7 @@ import {
 } from '@umbraco-cms/backoffice/extension-registry';
 import { filter, first, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { hasOwnOpener, retrieveStoredPath } from '@umbraco-cms/backoffice/utils';
-import type { UmbAppOauthElement } from "./app-oauth.element.js";
+import type { UmbAppOauthElement } from './app-oauth.element.js';
 
 import './app-oauth.element.js';
 
