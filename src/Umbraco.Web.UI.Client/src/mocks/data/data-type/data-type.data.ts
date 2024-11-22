@@ -855,16 +855,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 			},
 			{ alias: 'orderBy', value: 'updateDate' },
 			{
-				alias: 'bulkActionPermissions',
-				value: {
-					allowBulkPublish: true,
-					allowBulkUnpublish: false,
-					allowBulkCopy: true,
-					allowBulkMove: false,
-					allowBulkDelete: true,
-				},
-			},
-			{
 				alias: 'layouts',
 				value: [
 					{ icon: 'icon-grid', isSystem: true, name: 'Grid', path: '', selected: true },
@@ -898,16 +888,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				],
 			},
 			{ alias: 'orderBy', value: 'updateDate' },
-			{
-				alias: 'bulkActionPermissions',
-				value: {
-					allowBulkPublish: false,
-					allowBulkUnpublish: false,
-					allowBulkCopy: true,
-					allowBulkMove: true,
-					allowBulkDelete: true,
-				},
-			},
 			{
 				alias: 'layouts',
 				value: [

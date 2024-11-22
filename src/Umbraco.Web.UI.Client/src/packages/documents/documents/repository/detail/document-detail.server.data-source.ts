@@ -102,9 +102,9 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			}),
 			variants: data.variants.map((variant) => {
 				return {
-					state: variant.state,
 					culture: variant.culture || null,
 					segment: variant.segment || null,
+					state: variant.state,
 					name: variant.name,
 					publishDate: variant.publishDate || null,
 					createDate: variant.createDate,
