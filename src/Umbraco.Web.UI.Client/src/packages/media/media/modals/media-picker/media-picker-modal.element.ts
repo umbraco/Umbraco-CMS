@@ -26,7 +26,6 @@ import { UmbMediaSearchProvider, type UmbMediaSearchItemModel } from '../../sear
 
 import '@umbraco-cms/backoffice/imaging';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { not } from 'rxjs/internal/util/not';
 
 const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
 
@@ -52,6 +51,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _searchOnlyWithinCurrentItem = false;
+
+	@state()
+	private _searchFrom: UmbEntityModel | undefined;
 
 	@state()
 	private _searchQuery = '';
@@ -122,7 +124,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 		};
 
 		// If the user has navigated into an item, we default to search only within that item.
-		this._searchOnlyWithinCurrentItem = this._currentMediaEntity.unique ? true : false;
+		this._searchFrom = this._currentMediaEntity.unique
+			? { unique: this._currentMediaEntity.unique, entityType: this._currentMediaEntity.entityType }
+			: undefined;
 
 		this.#loadChildrenOfCurrentMediaItem();
 	}
@@ -148,17 +152,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 			return;
 		}
 
-		let searchFrom: UmbEntityModel | undefined = undefined;
-
-		if (this._searchOnlyWithinCurrentItem) {
-			searchFrom = {
-				unique: this._currentMediaEntity.unique,
-				entityType: this._currentMediaEntity.entityType,
-			};
-		}
-
 		const query = this._searchQuery;
-		const { data } = await this.#mediaSearchProvider.search({ query, searchFrom });
+		const { data } = await this.#mediaSearchProvider.search({ query, searchFrom: this._searchFrom });
 
 		if (!data) {
 			// No search results.
@@ -190,6 +185,14 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 
 	#allowNavigateToMedia(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel): boolean {
 		return isUmbracoFolder(item.mediaType.unique) || item.hasChildren;
+	}
+
+	#onSearchFromChange(e: CustomEvent) {
+		const checked = (e.target as HTMLInputElement).checked;
+
+		this._searchFrom = checked
+			? { unique: this._currentMediaEntity.unique, entityType: this._currentMediaEntity.entityType }
+			: undefined;
 	}
 
 	override render() {
@@ -262,8 +265,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 
 					${this._currentMediaEntity.unique
 						? html`<uui-checkbox
-								?checked=${this._searchOnlyWithinCurrentItem}
-								@change=${() => (this._searchOnlyWithinCurrentItem = !this._searchOnlyWithinCurrentItem)}
+								?checked=${this._searchFrom?.unique === this._currentMediaEntity.unique}
+								@change=${this.#onSearchFromChange}
 								label="Search only in ${this._currentMediaEntity.name}"></uui-checkbox>`
 						: nothing}
 				</div>
@@ -297,7 +300,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#renderBreadcrumb() {
-		if (this._searchQuery && this._searchOnlyWithinCurrentItem === false) {
+		// hide the breadcrumb when doing a global search within another item
+		// We do this to avoid confusion that the current search result is within the item shown in the breadcrumb.
+		if (this._searchQuery && this._currentMediaEntity.unique && !this._searchFrom) {
 			return nothing;
 		}
 
