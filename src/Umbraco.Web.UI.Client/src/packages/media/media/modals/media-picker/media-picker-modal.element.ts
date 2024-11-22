@@ -61,6 +61,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	@state()
 	private _currentMediaEntity: UmbMediaPathModel = root;
 
+	@state()
+	private _isSelectionMode = false;
+
 	@query('#dropzone')
 	private _dropzone!: UmbDropzoneElement;
 
@@ -133,11 +136,13 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 
 	#onSelected(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
 		const selection = this.data?.multiple ? [...this.value.selection, item.unique!] : [item.unique!];
+		this._isSelectionMode = selection.length > 0;
 		this.modalContext?.setValue({ selection });
 	}
 
 	#onDeselected(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
 		const selection = this.value.selection.filter((value) => value !== item.unique);
+		this._isSelectionMode = selection.length > 0;
 		this.modalContext?.setValue({ selection });
 	}
 
@@ -290,7 +295,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 				@deselected=${() => this.#onDeselected(item)}
 				?selected=${this.value?.selection?.find((value) => value === item.unique)}
 				?selectable=${!disabled}
-				?select-only=${this.#allowNavigateToMedia(item) === false}>
+				?select-only=${this._isSelectionMode || this.#allowNavigateToMedia(item) === false}>
 				<umb-imaging-thumbnail
 					unique=${item.unique}
 					alt=${item.name}
