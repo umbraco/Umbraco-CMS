@@ -42,7 +42,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	#dataType?: { unique: string };
 
 	@state()
-	private _selectableFilter: (item: UmbMediaTreeItemModel) => boolean = () => true;
+	private _selectableFilter: (item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) => boolean = () => true;
 
 	@state()
 	private _currentChildren: Array<UmbMediaTreeItemModel> = [];
