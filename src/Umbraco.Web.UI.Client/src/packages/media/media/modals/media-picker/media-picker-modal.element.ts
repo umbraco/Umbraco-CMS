@@ -252,7 +252,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 				<uui-button
 					@click=${() => this._dropzone.browse()}
 					label=${this.localize.term('general_upload')}
-					look="primary"></uui-button>
+					look="outline"
+					color="default"></uui-button>
 			</div>
 		`;
 	}
