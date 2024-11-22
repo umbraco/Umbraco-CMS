@@ -50,9 +50,6 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	private _searchResult: Array<UmbMediaSearchItemModel> = [];
 
 	@state()
-	private _searchOnlyWithinCurrentItem = false;
-
-	@state()
 	private _searchFrom: UmbEntityModel | undefined;
 
 	@state()
