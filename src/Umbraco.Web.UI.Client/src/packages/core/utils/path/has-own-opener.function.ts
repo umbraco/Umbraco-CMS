@@ -22,11 +22,11 @@ export function hasOwnOpener(pathname?: string, windowLike: Window = globalThis.
 			return false;
 		}
 
-		if (pathname && openerLocation.pathname !== pathname) {
-			return false;
+		if (pathname && openerLocation.pathname.startsWith(pathname)) {
+			return true;
 		}
 
-		return true;
+		return false;
 	} catch {
 		// If there is a security error, it means that the opener is from a different origin, so we let it fall through
 		return false;
