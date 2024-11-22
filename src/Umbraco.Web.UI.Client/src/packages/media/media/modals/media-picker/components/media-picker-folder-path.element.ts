@@ -2,8 +2,16 @@ import type { UmbMediaPathModel } from '../types.js';
 import type { UmbMediaDetailModel } from '../../../types.js';
 import { UmbMediaDetailRepository } from '../../../repository/index.js';
 import { UmbMediaTreeRepository } from '../../../tree/index.js';
-import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../../entity.js';
-import { css, html, customElement, state, repeat, property } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../../entity.js';
+import {
+	css,
+	html,
+	customElement,
+	state,
+	repeat,
+	property,
+	type PropertyValues,
+} from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { getUmbracoFolderUnique } from '@umbraco-cms/backoffice/media-type';
@@ -16,6 +24,9 @@ const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_M
 export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 	#mediaTreeRepository = new UmbMediaTreeRepository(this); // used to get file structure
 	#mediaDetailRepository = new UmbMediaDetailRepository(this); // used to create folders
+
+	@property({ attribute: false })
+	startNode: UmbMediaPathModel = root;
 
 	@property({ attribute: false })
 	public set currentMedia(value: UmbMediaPathModel) {
@@ -38,30 +49,34 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 	@state()
 	private _typingNewFolder = false;
 
-	override connectedCallback(): void {
-		super.connectedCallback();
+	protected override firstUpdated(_changedProperties: PropertyValues): void {
+		super.firstUpdated(_changedProperties);
 		this.#loadPath();
 	}
 
 	async #loadPath() {
 		const unique = this._currentMedia.unique;
+		const entityType = this._currentMedia.entityType;
 
 		const items = unique
 			? (
 					await this.#mediaTreeRepository.requestTreeItemAncestors({
-						treeItem: { unique, entityType: UMB_MEDIA_ENTITY_TYPE },
+						treeItem: { unique, entityType },
 					})
-				).data
-			: undefined;
+				).data || []
+			: [];
 
-		if (items) {
-			this._paths = [
-				root,
-				...items.map((item) => ({ name: item.name, unique: item.unique, entityType: item.entityType })),
-			];
-			return;
+		let paths: Array<UmbMediaPathModel> = items.map((item) => ({
+			name: item.name,
+			unique: item.unique,
+			entityType: item.entityType,
+		}));
+
+		if (!this.startNode) {
+			paths.unshift(root);
 		}
-		this._paths = [root];
+
+		this._paths = [...paths];
 	}
 
 	#goToFolder(entity: UmbMediaPathModel) {
