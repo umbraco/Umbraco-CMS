@@ -229,7 +229,7 @@ public class RuntimeState : IRuntimeState
                         $"""
                          A connection string is configured but Umbraco could not connect to the database.
                          Possible causes include network errors, a bad connection string or a missing database.
-                         Tip: Use {nameof(GlobalSettings)}:{nameof(GlobalSettings.InstallMissingDatabase)} to instruct Umbraco to create the database automatically.
+                         Tip: Use {Constants.Configuration.ConfigGlobal}:{nameof(GlobalSettings.InstallMissingDatabase)} to instruct Umbraco to create the database automatically.
                          """);
                     throw BootFailedException;
                 }
