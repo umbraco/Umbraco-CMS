@@ -103,7 +103,7 @@ for (const listViewType of listViewTypes) {
           "isSystem": 1,
         }]
       }];
-  
+
       // Remove all existing values and add a column displayed to remove
       dataTypeData = await umbracoApi.dataType.getByName(listViewType);
       dataTypeData.values = removedDataTypeValues;
@@ -131,7 +131,7 @@ for (const listViewType of listViewTypes) {
         "icon": "icon-thumbnails-small",
         "collectionView": layoutsData,
         "isSystem": true,
-        "name": "Grid", 
+        "name": "Grid",
         "selected": true
       };
 
@@ -160,11 +160,11 @@ for (const listViewType of listViewTypes) {
           "icon": "icon-thumbnails-small",
           "collectionView": layoutsData,
           "isSystem": true,
-          "name": "Grid", 
+          "name": "Grid",
           "selected": true
         }]
       }];
-  
+
       // Remove all existing values and add a layout to remove
       dataTypeData = await umbracoApi.dataType.getByName(listViewType);
       dataTypeData.values = removedDataTypeValues;
@@ -200,14 +200,14 @@ for (const listViewType of listViewTypes) {
 
     test('can update bulk action permission', async ({umbracoApi, umbracoUi}) => {
       // Arrange
-      const bulkActionPermissionValue = 'Allow bulk delete';
+      const bulkActionPermissionValue = 'Allow bulk trash';
       const expectedDataTypeValues = {
         "alias": "bulkActionPermissions",
         "value": {
-          "allowBulkCopy": false, 
-          "allowBulkDelete": true, 
-          "allowBulkMove": false, 
-          "allowBulkPublish": false, 
+          "allowBulkCopy": false,
+          "allowBulkDelete": true,
+          "allowBulkMove": false,
+          "allowBulkPublish": false,
           "allowBulkUnpublish": false
         }
       };
@@ -222,7 +222,7 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test('can update content app icon', async ({umbracoApi, umbracoUi}) => {
+    test('can update workspace view icon', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const iconValue = 'icon-activity';
       const expectedDataTypeValues = {
@@ -241,9 +241,9 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test('can update content app name', async ({umbracoApi, umbracoUi}) => {
+    test('can update workspace view name', async ({umbracoApi, umbracoUi}) => {
       // Arrange
-      const contentAppName = 'Test Content App Name';
+      const contentAppName = 'Test Workspace View Name';
       const expectedDataTypeValues = {
         "alias": "tabName",
         "value": contentAppName
@@ -259,7 +259,7 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test('can enable show content app first', async ({umbracoApi, umbracoUi}) => {
+    test('can enable show Content Workspace View first', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const expectedDataTypeValues = {
         "alias": "showContentFirst",

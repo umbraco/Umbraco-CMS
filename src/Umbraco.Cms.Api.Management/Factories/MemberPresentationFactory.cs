@@ -1,7 +1,9 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
+﻿using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -19,19 +21,23 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
     private readonly IMemberTypeService _memberTypeService;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
     private readonly IMemberGroupService _memberGroupService;
+    private readonly DeliveryApiSettings _deliveryApiSettings;
+    private IEnumerable<Guid>? _clientCredentialsMemberKeys;
 
     public MemberPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IMemberService memberService,
         IMemberTypeService memberTypeService,
         ITwoFactorLoginService twoFactorLoginService,
-        IMemberGroupService memberGroupService)
+        IMemberGroupService memberGroupService,
+        IOptions<DeliveryApiSettings> deliveryApiSettings)
     {
         _umbracoMapper = umbracoMapper;
         _memberService = memberService;
         _memberTypeService = memberTypeService;
         _twoFactorLoginService = twoFactorLoginService;
         _memberGroupService = memberGroupService;
+        _deliveryApiSettings = deliveryApiSettings.Value;
     }
 
     public async Task<MemberResponseModel> CreateResponseModelAsync(IMember member, IUser currentUser)
@@ -39,6 +45,7 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         MemberResponseModel responseModel = _umbracoMapper.Map<MemberResponseModel>(member)!;
 
         responseModel.IsTwoFactorEnabled = await _twoFactorLoginService.IsTwoFactorEnabledAsync(member.Key);
+        responseModel.Kind = GetMemberKind(member.Key);
         IEnumerable<string> roles = _memberService.GetAllRoles(member.Username);
 
         // Get the member groups per role, so we can return the group keys
@@ -71,7 +78,8 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         {
             Id = entity.Key,
             MemberType = _umbracoMapper.Map<MemberTypeReferenceResponseModel>(entity)!,
-            Variants = CreateVariantsItemResponseModels(entity)
+            Variants = CreateVariantsItemResponseModels(entity),
+            Kind = GetMemberKind(entity.Key)
         };
 
     private static IEnumerable<VariantItemResponseModel> CreateVariantsItemResponseModels(ITreeEntity entity)
@@ -107,5 +115,25 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
             .ToArray();
 
         return responseModel;
+    }
+
+    private MemberKind GetMemberKind(Guid key)
+    {
+        if (_clientCredentialsMemberKeys is null)
+        {
+            IEnumerable<string> clientCredentialsMemberUserNames = _deliveryApiSettings
+                                                                       .MemberAuthorization?
+                                                                       .ClientCredentialsFlow?
+                                                                       .AssociatedMembers
+                                                                       .Select(m => m.UserName).ToArray()
+                                                                   ?? [];
+
+            _clientCredentialsMemberKeys = clientCredentialsMemberUserNames
+                .Select(_memberService.GetByUsername)
+                .WhereNotNull()
+                .Select(m => m.Key).ToArray();
+        }
+
+        return _clientCredentialsMemberKeys.Contains(key) ? MemberKind.Api : MemberKind.Default;
     }
 }

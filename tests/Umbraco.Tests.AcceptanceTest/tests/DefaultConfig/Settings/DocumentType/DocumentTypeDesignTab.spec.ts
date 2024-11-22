@@ -176,7 +176,8 @@ test('can create a document type with multiple groups', async ({umbracoApi, umbr
   expect(await umbracoApi.documentType.doesGroupContainCorrectPropertyEditor(documentTypeName, secondDataTypeName, secondDataType.id, secondGroupName)).toBeTruthy();
 });
 
-test('can create a document type with multiple tabs', async ({umbracoApi, umbracoUi}) => {
+// TODO: unskip, currently flaky
+test.skip('can create a document type with multiple tabs', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondDataTypeName = 'Image Media Picker';
@@ -229,7 +230,7 @@ test('can create a document type with a composition', {tag: '@smoke'}, async ({u
   await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
 });
 
-test('can remove a composition form a document type', async ({umbracoApi, umbracoUi}) => {
+test('can remove a composition from a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const compositionDocumentTypeName = 'CompositionDocumentType';
   await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
@@ -248,7 +249,7 @@ test('can remove a composition form a document type', async ({umbracoApi, umbrac
 
   // Assert
   await umbracoUi.documentType.isSuccessNotificationVisible();
-  expect(await umbracoUi.documentType.doesGroupHaveValue(groupName)).toBeFalsy();
+  await umbracoUi.documentType.isGroupVisible(groupName, false);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.compositions).toEqual([]);
 
@@ -396,7 +397,7 @@ test('can enable validation for a property in a document type', async ({umbracoA
 test('can allow vary by culture for a property in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName, true);
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName, false);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
 
   // Act

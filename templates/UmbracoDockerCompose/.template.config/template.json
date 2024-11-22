@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json.schemastore.org/template.json",
+  "author": "Umbraco HQ",
+  "classifications": [
+    "Web",
+    "CMS",
+    "Umbraco"
+  ],
+  "name": "Umbraco Docker Compose",
+  "description": "Creates the prerequisites for developing Umbraco in Docker containers",
+  "groupIdentity": "Umbraco.Templates.UmbracoDockerCompose",
+  "identity": "Umbraco.Templates.UmbracoDockerCompose",
+  "shortName": "umbraco-compose",
+  "tags": {
+    "type": "item"
+  },
+  "symbols": {
+    "ProjectName": {
+      "type": "parameter",
+      "description": "The name of the project the Docker Compose file will be created for",
+      "datatype": "string",
+      "replaces": "UmbracoProject",
+      "isRequired": true
+    },
+    "DatabasePassword": {
+      "type": "parameter",
+      "description": "The password to the database, will be stored in .env file",
+      "datatype": "string",
+      "replaces": "Password1234",
+      "defaultValue": "Password1234"
+    },
+    "Port": {
+      "type": "parameter",
+      "description": "The port forward on the docker container, this is the port you use to access the site",
+      "datatype": "string",
+      "replaces": "TEMPLATE_PORT",
+      "defaultValue": "44372"
+    },
+    "ImageName": {
+      "type": "generated",
+      "generator": "casing",
+      "parameters": {
+        "source": "ProjectName",
+        "toLower": true
+      },
+      "replaces": "umbraco_image"
+    }
+  }
+}

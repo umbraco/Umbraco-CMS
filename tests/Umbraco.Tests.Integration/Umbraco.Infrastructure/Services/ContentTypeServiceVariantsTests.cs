@@ -36,7 +36,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
-        builder.AddNuCache();
+        builder.AddUmbracoHybridCache();
         builder.Services.AddUnique<IServerMessenger, ScopedRepositoryTests.LocalServerMessenger>();
         builder.Services.PostConfigure<NuCacheSettings>(options =>
         {
@@ -48,7 +48,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     {
         var json = GetJson(id).Replace('"', '\'');
         var pos = json.IndexOf("'cd':", StringComparison.InvariantCultureIgnoreCase);
-        json = json.Substring(0, pos + "'cd':".Length);
+        json = json[..(pos + "'cd':".Length)];
         Assert.AreEqual(expected, json);
     }
 
@@ -82,8 +82,10 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment, true)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.CultureAndSegment, false)]
     [LongRunning]
-    public void Change_Content_Type_Variation_Clears_Redirects(ContentVariation startingContentTypeVariation,
-        ContentVariation changedContentTypeVariation, bool shouldUrlRedirectsBeCleared)
+    public void Change_Content_Type_Variation_Clears_Redirects(
+        ContentVariation startingContentTypeVariation,
+        ContentVariation changedContentTypeVariation,
+        bool shouldUrlRedirectsBeCleared)
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = startingContentTypeVariation;

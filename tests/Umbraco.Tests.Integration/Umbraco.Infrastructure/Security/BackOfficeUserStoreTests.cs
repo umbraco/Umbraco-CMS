@@ -38,7 +38,7 @@ public class BackOfficeUserStoreTests : UmbracoIntegrationTest
 
     private IEventMessagesFactory EventMessagesFactory => GetRequiredService<IEventMessagesFactory>();
 
-    private ILogger<BackOfficeUserStore> Logger = NullLogger<BackOfficeUserStore>.Instance;
+    private readonly ILogger<BackOfficeUserStore> _logger = NullLogger<BackOfficeUserStore>.Instance;
 
 
     private BackOfficeUserStore GetUserStore()
@@ -55,7 +55,7 @@ public class BackOfficeUserStoreTests : UmbracoIntegrationTest
             UserRepository,
             RuntimeState,
             EventMessagesFactory,
-            Logger
+            _logger
         );
 
     [Test]

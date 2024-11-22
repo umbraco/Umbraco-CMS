@@ -186,9 +186,6 @@ public class MediaPicker3PropertyEditor : DataEditor
 
         private List<MediaWithCropsDto> HandleTemporaryMediaUploads(List<MediaWithCropsDto> mediaWithCropsDtos, MediaPicker3Configuration configuration)
         {
-            Guid userKey = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key
-                         ?? throw new InvalidOperationException("Could not obtain the current backoffice user");
-
             var invalidDtos = new List<MediaWithCropsDto>();
 
             foreach (MediaWithCropsDto mediaWithCropsDto in mediaWithCropsDtos)
@@ -218,7 +215,7 @@ public class MediaPicker3PropertyEditor : DataEditor
                 // there are multiple allowed media types matching the file extension
                 using Stream fileStream = temporaryFile.OpenReadStream();
                 IMedia mediaFile = _mediaImportService
-                    .ImportAsync(temporaryFile.FileName, fileStream, startNodeGuid, mediaWithCropsDto.MediaTypeAlias, userKey)
+                    .ImportAsync(temporaryFile.FileName, fileStream, startNodeGuid, mediaWithCropsDto.MediaTypeAlias, CurrentUserKey())
                     .GetAwaiter()
                     .GetResult();
 
@@ -228,6 +225,9 @@ public class MediaPicker3PropertyEditor : DataEditor
 
             return mediaWithCropsDtos.Except(invalidDtos).ToList();
         }
+
+        private Guid CurrentUserKey() => _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key
+                                         ?? throw new InvalidOperationException("Could not obtain the current backoffice user");
 
         /// <summary>
         ///     Model/DTO that represents the JSON that the MediaPicker3 stores.

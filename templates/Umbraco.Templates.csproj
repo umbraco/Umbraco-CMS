@@ -16,9 +16,9 @@
       <Link>UmbracoProject\Program.cs</Link>
       <PackagePath>UmbracoProject</PackagePath>
     </Content>
-    <Content Include="UmbracoPackage\**" Exclude="bin;obj" />
-    <Content Include="UmbracoPackageRcl\**" Exclude="bin;obj" />
     <Content Include="UmbracoProject\**" Exclude="bin;obj" />
+    <Content Include="UmbracoExtension\**" Exclude="bin;obj" />
+    <Content Include="UmbracoDockerCompose\**" Exclude="bin;obj" />
     <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blocklist\**">
       <Link>UmbracoProject\Views\Partials\blocklist\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <PackagePath>UmbracoProject\Views\Partials\blocklist</PackagePath>
@@ -39,6 +39,13 @@
   <ItemGroup>
     <Content Update="**\.template.config\template.json" Pack="false" />
   </ItemGroup>
+  <!-- Added project references as the sample API in umbraco-extension will fail -->
+  <ItemGroup>
+    <ProjectReference Include="..\src\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj" />
+    <ProjectReference Include="..\src\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj" />
+    <ProjectReference Include="..\src\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
+    <ProjectReference Include="..\src\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
+  </ItemGroup>
   <Target Name="GetUpdatedTemplateJsonPackageFiles" BeforeTargets="GenerateNuspec" AfterTargets="GetUmbracoBuildVersion">
     <ItemGroup>
       <_TemplateJsonFiles Include="**\.template.config\template.json" Exclude="bin\**;obj\**" />
@@ -47,7 +54,7 @@
       </_TemplateJsonFiles>
     </ItemGroup>
     <Copy SourceFiles="@(_TemplateJsonFiles)" DestinationFiles="%(DestinationFile)" />
-    <JsonPathUpdateValue JsonFile="%(_TemplateJsonFiles.DestinationFile)" Path="$.symbols.UmbracoVersion.defaultValue" Value="&quot;$(PackageVersion)&quot;" />
+    <JsonPathUpdateValue JsonFile="%(_TemplateJsonFiles.DestinationFile)" Path="$.symbols.FinalVersion.parameters.cases.[0].value" Value="&quot;$(PackageVersion)&quot;" />
     <ItemGroup>
       <_PackageFiles Include="%(_TemplateJsonFiles.DestinationFile)">
         <PackagePath>%(_TemplateJsonFiles.RelativeDir)</PackagePath>

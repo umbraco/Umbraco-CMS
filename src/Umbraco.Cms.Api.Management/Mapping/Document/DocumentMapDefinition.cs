@@ -11,7 +11,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Document;
 
-public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValueModel, DocumentVariantResponseModel>, IMapDefinition
+public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValueResponseModel, DocumentVariantResponseModel>, IMapDefinition
 {
     private readonly CommonMapper _commonMapper;
 
@@ -22,6 +22,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IContent, DocumentResponseModel>((_, _) => new DocumentResponseModel(), Map);
+        mapper.Define<IContent, PublishedDocumentResponseModel>((_, _) => new PublishedDocumentResponseModel(), Map);
         mapper.Define<IContent, DocumentCollectionResponseModel>((_, _) => new DocumentCollectionResponseModel(), Map);
         mapper.Define<IContent, DocumentBlueprintResponseModel>((_, _) => new DocumentBlueprintResponseModel(), Map);
     }
@@ -37,6 +38,28 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
             (culture, _, documentVariantViewModel) =>
             {
                 documentVariantViewModel.State = DocumentVariantStateHelper.GetState(source, culture);
+                documentVariantViewModel.PublishDate = culture == null
+                    ? source.PublishDate
+                    : source.GetPublishDate(culture);
+            });
+        target.IsTrashed = source.Trashed;
+    }
+
+    // Umbraco.Code.MapAll -Urls -Template
+    private void Map(IContent source, PublishedDocumentResponseModel target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.DocumentType = context.Map<DocumentTypeReferenceResponseModel>(source.ContentType)!;
+        target.Values = MapValueViewModels(source.Properties, published: true);
+        target.Variants = MapVariantViewModels(
+            source,
+            (culture, _, documentVariantViewModel) =>
+            {
+                documentVariantViewModel.Name = source.GetPublishName(culture) ?? documentVariantViewModel.Name;
+                DocumentVariantState variantState = DocumentVariantStateHelper.GetState(source, culture);
+                documentVariantViewModel.State = variantState == DocumentVariantState.PublishedPendingChanges
+                        ? DocumentVariantState.Published
+                        : variantState;
                 documentVariantViewModel.PublishDate = culture == null
                     ? source.PublishDate
                     : source.GetPublishDate(culture);

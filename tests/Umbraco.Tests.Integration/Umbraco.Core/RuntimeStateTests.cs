@@ -88,7 +88,8 @@ public class RuntimeStateTests : UmbracoIntegrationTest
             MediaUrlGeneratorCollection mediaUrlGenerators,
             IShortStringHelper shortStringHelper,
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-            IMigrationContext context, IOptions<PackageMigrationSettings> options)
+            IMigrationContext context,
+            IOptions<PackageMigrationSettings> options)
             : base(packagingService, mediaService, mediaFileManager, mediaUrlGenerators, shortStringHelper, contentTypeBaseServiceProvider, context, options)
         {
         }

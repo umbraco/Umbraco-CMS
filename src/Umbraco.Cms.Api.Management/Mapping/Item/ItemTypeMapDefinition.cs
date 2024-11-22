@@ -48,6 +48,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Name = source.Name ?? string.Empty;
         target.Id = source.Key;
         target.EditorUiAlias = source.EditorUiAlias;
+        target.EditorAlias = source.EditorAlias;
         target.IsDeletable = source.IsDeletableDataType();
     }
 

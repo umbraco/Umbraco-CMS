@@ -34,7 +34,7 @@ public class AspNetCoreBackOfficeInfo : IBackOfficeInfo
 
                 _getAbsoluteUrl = WebPath.Combine(
                     _hostingEnvironment.ApplicationMainUrl.ToString(),
-                    _globalSettings.CurrentValue.UmbracoPath.TrimStart(CharArrays.TildeForwardSlash));
+                    Core.Constants.System.DefaultUmbracoPath.TrimStart(CharArrays.TildeForwardSlash));
             }
 
             return _getAbsoluteUrl;

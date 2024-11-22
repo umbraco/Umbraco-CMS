@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions;
@@ -6,9 +6,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions;
 [TestFixture]
 public class TypeExtensionsTests
 {
-    private string[] PublicObjectMethodNames = { nameof(GetType), nameof(ToString), nameof(Equals), nameof(GetHashCode) };
+    private readonly string[] _publicObjectMethodNames = { nameof(GetType), nameof(ToString), nameof(Equals), nameof(GetHashCode) };
 
-    private string[] NonPublicObjectMethodNames = { nameof(MemberwiseClone), "Finalize" };
+    private readonly string[] _nonPublicObjectMethodNames = { nameof(MemberwiseClone), "Finalize" };
 
     [Test]
     public void Can_Get_Public_Properties_Of_Interface()
@@ -95,20 +95,20 @@ public class TypeExtensionsTests
     public void Can_Get_Public_Methods_Of_Class()
     {
         var methods = typeof(TheBaseThing).GetPublicMethods();
-        Assert.AreEqual(3 + PublicObjectMethodNames.Length, methods.Length);
+        Assert.AreEqual(3 + _publicObjectMethodNames.Length, methods.Length);
 
         var methodNames = methods.Select(p => p.Name).ToArray();
         Assert.Contains( $"get_{nameof(TheBaseThing.TheBaseThingProperty)}", methodNames);
         Assert.Contains( nameof(TheBaseThing.TheBaseThingMethod), methodNames);
         Assert.Contains( nameof(TheBaseThing.TheExtraMethod), methodNames);
-        Assert.IsTrue(methodNames.ContainsAll(PublicObjectMethodNames));
+        Assert.IsTrue(methodNames.ContainsAll(_publicObjectMethodNames));
     }
 
     [Test]
     public void Get_Public_Methods_Of_Class_Contains_Inherited_Methods()
     {
         var methods = typeof(TheThing).GetPublicMethods();
-        Assert.AreEqual(7 + PublicObjectMethodNames.Length, methods.Length);
+        Assert.AreEqual(7 + _publicObjectMethodNames.Length, methods.Length);
 
         var methodNames = methods.Select(p => p.Name).ToArray();
         Assert.Contains( $"get_{nameof(TheBaseThing.TheBaseThingProperty)}", methodNames);
@@ -118,29 +118,29 @@ public class TypeExtensionsTests
         Assert.Contains( $"set_{nameof(TheThing.TheThingProperty)}", methodNames);
         Assert.Contains( $"get_{nameof(TheThing.TheExtraProperty)}", methodNames);
         Assert.Contains( nameof(TheThing.TheThingMethod), methodNames);
-        Assert.IsTrue(methodNames.ContainsAll(PublicObjectMethodNames));
+        Assert.IsTrue(methodNames.ContainsAll(_publicObjectMethodNames));
     }
 
     [Test]
     public void Can_Get_All_Methods_Of_Class()
     {
         var methods = typeof(TheBaseThing).GetAllMethods();
-        Assert.AreEqual(4 + PublicObjectMethodNames.Length + NonPublicObjectMethodNames.Length, methods.Length);
+        Assert.AreEqual(4 + _publicObjectMethodNames.Length + _nonPublicObjectMethodNames.Length, methods.Length);
 
         var methodNames = methods.Select(p => p.Name).ToArray();
         Assert.Contains( $"get_{nameof(TheBaseThing.TheBaseThingProperty)}", methodNames);
         Assert.Contains( nameof(TheBaseThing.TheBaseThingMethod), methodNames);
         Assert.Contains( nameof(TheBaseThing.TheExtraMethod), methodNames);
         Assert.Contains( nameof(TheBaseThing.TheInternalMethod), methodNames);
-        Assert.IsTrue(methodNames.ContainsAll(PublicObjectMethodNames));
-        Assert.IsTrue(methodNames.ContainsAll(NonPublicObjectMethodNames));
+        Assert.IsTrue(methodNames.ContainsAll(_publicObjectMethodNames));
+        Assert.IsTrue(methodNames.ContainsAll(_nonPublicObjectMethodNames));
     }
 
     [Test]
     public void Get_All_Methods_Of_Class_Contains_Inherited_Methods()
     {
         var methods = typeof(TheThing).GetAllMethods();
-        Assert.AreEqual(9 + PublicObjectMethodNames.Length + NonPublicObjectMethodNames.Length, methods.Length);
+        Assert.AreEqual(9 + _publicObjectMethodNames.Length + _nonPublicObjectMethodNames.Length, methods.Length);
 
         var methodNames = methods.Select(p => p.Name).ToArray();
         Assert.Contains( $"get_{nameof(TheBaseThing.TheBaseThingProperty)}", methodNames);
@@ -152,8 +152,8 @@ public class TypeExtensionsTests
         Assert.Contains( $"get_{nameof(TheThing.TheExtraProperty)}", methodNames);
         Assert.Contains( $"get_{nameof(TheThing.TheInternalProperty)}", methodNames);
         Assert.Contains( nameof(TheThing.TheThingMethod), methodNames);
-        Assert.IsTrue(methodNames.ContainsAll(PublicObjectMethodNames));
-        Assert.IsTrue(methodNames.ContainsAll(NonPublicObjectMethodNames));
+        Assert.IsTrue(methodNames.ContainsAll(_publicObjectMethodNames));
+        Assert.IsTrue(methodNames.ContainsAll(_nonPublicObjectMethodNames));
     }
 
     [Test]
