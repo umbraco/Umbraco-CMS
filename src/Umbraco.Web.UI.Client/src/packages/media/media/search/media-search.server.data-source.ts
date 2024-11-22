@@ -33,6 +33,7 @@ export class UmbMediaSearchServerDataSource implements UmbSearchDataSource<UmbMe
 			this.#host,
 			MediaService.getItemMediaSearch({
 				query: args.query,
+				parentId: args.searchFrom?.unique || undefined,
 			}),
 		);
 
