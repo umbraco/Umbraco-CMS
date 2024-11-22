@@ -2,7 +2,7 @@ import { UmbMediaItemRepository } from '../../repository/index.js';
 import { UmbMediaTreeRepository } from '../../tree/media-tree.repository.js';
 import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDropzoneElement } from '../../dropzone/dropzone.element.js';
-import type { UmbMediaCardItemModel, UmbMediaPathModel } from './types.js';
+import type { UmbMediaPathModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
 import { css, html, customElement, state, repeat, ifDefined, query } from '@umbraco-cms/backoffice/external/lit';
@@ -10,6 +10,8 @@ import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_CONTENT_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { isUmbracoFolder } from '@umbraco-cms/backoffice/media-type';
+import type { UmbMediaTreeItemModel } from '../../tree/index.js';
 
 import '@umbraco-cms/backoffice/imaging';
 
@@ -26,12 +28,12 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	#dataType?: { unique: string };
 
 	@state()
-	private _selectableFilter: (item: UmbMediaCardItemModel) => boolean = () => true;
+	private _selectableFilter: (item: UmbMediaTreeItemModel) => boolean = () => true;
 
-	#mediaItemsCurrentFolder: Array<UmbMediaCardItemModel> = [];
+	#mediaItemsCurrentFolder: Array<UmbMediaTreeItemModel> = [];
 
 	@state()
-	private _mediaFilteredList: Array<UmbMediaCardItemModel> = [];
+	private _mediaFilteredList: Array<UmbMediaTreeItemModel> = [];
 
 	@state()
 	private _searchOnlyThisFolder = false;
@@ -86,7 +88,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 		this.#filterMediaItems();
 	}
 
-	#onOpen(item: UmbMediaCardItemModel) {
+	#onOpen(item: UmbMediaTreeItemModel) {
 		this._currentMediaEntity = {
 			name: item.name,
 			unique: item.unique,
@@ -95,12 +97,12 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 		this.#loadMediaFolder();
 	}
 
-	#onSelected(item: UmbMediaCardItemModel) {
+	#onSelected(item: UmbMediaTreeItemModel) {
 		const selection = this.data?.multiple ? [...this.value.selection, item.unique!] : [item.unique!];
 		this.modalContext?.setValue({ selection });
 	}
 
-	#onDeselected(item: UmbMediaCardItemModel) {
+	#onDeselected(item: UmbMediaTreeItemModel) {
 		const selection = this.value.selection.filter((value) => value !== item.unique);
 		this.modalContext?.setValue({ selection });
 	}
@@ -148,6 +150,10 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 			entityType: UMB_MEDIA_ROOT_ENTITY_TYPE,
 		};
 		this.#loadMediaFolder();
+	}
+
+	#allowNavigateToMedia(item: UmbMediaTreeItemModel): boolean {
+		return isUmbracoFolder(item.mediaType.unique) || item.hasChildren;
 	}
 
 	override render() {
@@ -207,7 +213,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	#renderCard(item: UmbMediaCardItemModel) {
+	#renderCard(item: UmbMediaTreeItemModel) {
 		const disabled = !this._selectableFilter(item);
 		return html`
 			<uui-card-media
@@ -217,7 +223,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 				@selected=${() => this.#onSelected(item)}
 				@deselected=${() => this.#onDeselected(item)}
 				?selected=${this.value?.selection?.find((value) => value === item.unique)}
-				?selectable=${!disabled}>
+				?selectable=${!disabled}
+				?select-only=${this.#allowNavigateToMedia(item) === false}>
 				<umb-imaging-thumbnail
 					unique=${item.unique}
 					alt=${item.name}
