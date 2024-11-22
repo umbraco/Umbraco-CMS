@@ -28,6 +28,15 @@ export class UmbMediaItemServerDataSource extends UmbItemServerDataSourceBase<
 		});
 		this.#host = host;
 	}
+
+	/**
+	 * @deprecated - The search method will be removed in v17. Use the
+	 * Use the UmbMediaSearchProvider instead.
+	 * Get it from:
+	 * ```ts
+	 * import { UmbMediaSearchProvider } from '@umbraco-cms/backoffice/media';
+	 * ```
+	 */
 	async search({ query, skip, take }: { query: string; skip: number; take: number }) {
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
