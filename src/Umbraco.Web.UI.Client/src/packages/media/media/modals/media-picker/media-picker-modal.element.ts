@@ -251,7 +251,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 					<uui-input
 						label=${this.localize.term('general_search')}
 						placeholder=${this.localize.term('placeholders_search')}
-						@input=${this.#onSearch}>
+						@input=${this.#onSearch}
+						value=${this._searchQuery}>
 						<uui-icon slot="prepend" name="icon-search"></uui-icon>
 					</uui-input>
 
