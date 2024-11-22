@@ -1,4 +1,4 @@
-import { UmbMediaItemRepository } from '../../repository/index.js';
+import { UmbMediaItemRepository, type UmbMediaItemModel } from '../../repository/index.js';
 import { UmbMediaTreeRepository } from '../../tree/media-tree.repository.js';
 import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDropzoneElement } from '../../dropzone/dropzone.element.js';
@@ -61,6 +61,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	@state()
 	private _isSelectionMode = false;
 
+	@state()
+	private _startNode: UmbMediaItemModel | undefined;
+
 	@query('#dropzone')
 	private _dropzone!: UmbDropzoneElement;
 
@@ -86,13 +89,13 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 
 		if (this.data?.startNode) {
 			const { data } = await this.#mediaItemRepository.requestItems([this.data.startNode]);
-			const startNode = data?.[0];
+			this._startNode = data?.[0];
 
-			if (startNode) {
+			if (this._startNode) {
 				this._currentMediaEntity = {
-					name: startNode.name,
-					unique: startNode.unique,
-					entityType: startNode.entityType,
+					name: this._startNode.name,
+					unique: this._startNode.unique,
+					entityType: this._startNode.entityType,
 				};
 			}
 		}
@@ -192,9 +195,13 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	#onSearchFromChange(e: CustomEvent) {
 		const checked = (e.target as HTMLInputElement).checked;
 
-		this._searchFrom = checked
-			? { unique: this._currentMediaEntity.unique, entityType: this._currentMediaEntity.entityType }
-			: undefined;
+		if (checked) {
+			this._searchFrom = { unique: this._currentMediaEntity.unique, entityType: this._currentMediaEntity.entityType };
+		} else if (checked && this._startNode) {
+			this._searchFrom = { unique: this._startNode.unique, entityType: this._startNode.entityType };
+		} else {
+			this._searchFrom = undefined;
+		}
 	}
 
 	override render() {
@@ -265,7 +272,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 						<uui-icon slot="prepend" name="icon-search"></uui-icon>
 					</uui-input>
 
-					${this._currentMediaEntity.unique
+					${this._currentMediaEntity.unique && this._currentMediaEntity.unique !== this._startNode?.unique
 						? html`<uui-checkbox
 								?checked=${this._searchFrom?.unique === this._currentMediaEntity.unique}
 								@change=${this.#onSearchFromChange}
