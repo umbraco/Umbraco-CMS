@@ -1,3 +1,4 @@
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../../entity.js';
 import type { UmbAllowedDocumentTypeModel } from './types.js';
 import type { AllowedDocumentTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
@@ -32,6 +33,7 @@ const getAllowedChildrenOf = (unique: string | null) => {
 const mapper = (item: AllowedDocumentTypeModel): UmbAllowedDocumentTypeModel => {
 	return {
 		unique: item.id,
+		entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
 		name: item.name,
 		description: item.description || null,
 		icon: item.icon || null,

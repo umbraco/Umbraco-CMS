@@ -4,6 +4,7 @@ import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@um
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+/** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
 export class UmbCollectionBulkActionPermissionCondition
 	extends UmbConditionBase<CollectionBulkActionPermissionConditionConfig>
 	implements UmbExtensionCondition
@@ -21,4 +22,5 @@ export class UmbCollectionBulkActionPermissionCondition
 	}
 }
 
+/** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
 export default UmbCollectionBulkActionPermissionCondition;
