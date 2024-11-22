@@ -121,6 +121,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 			entityType: UMB_MEDIA_ROOT_ENTITY_TYPE,
 		};
 
+		// If the user has navigated into an item, we default to search only within that item.
+		this._searchOnlyWithinCurrentItem = this._currentMediaEntity.unique ? true : false;
+
 		this.#loadChildrenOfCurrentMediaItem();
 	}
 
@@ -181,6 +184,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 			unique: null,
 			entityType: UMB_MEDIA_ROOT_ENTITY_TYPE,
 		};
+
 		this.#loadChildrenOfCurrentMediaItem();
 	}
 
@@ -258,6 +262,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 
 					${this._currentMediaEntity.unique
 						? html`<uui-checkbox
+								?checked=${this._searchOnlyWithinCurrentItem}
 								@change=${() => (this._searchOnlyWithinCurrentItem = !this._searchOnlyWithinCurrentItem)}
 								label="Search only in ${this._currentMediaEntity.name}"></uui-checkbox>`
 						: nothing}
