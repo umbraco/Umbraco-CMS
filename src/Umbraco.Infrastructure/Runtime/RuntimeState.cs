@@ -225,7 +225,12 @@ public class RuntimeState : IRuntimeState
 
                     // else it is bad enough that we want to throw
                     Reason = RuntimeLevelReason.BootFailedCannotConnectToDatabase;
-                    BootFailedException = new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");
+                    BootFailedException = new BootFailedException(
+                        $"""
+                         A connection string is configured but Umbraco could not connect to the database.
+                         Possible causes include network errors, a bad connection string or a missing database.
+                         Tip: Use {nameof(GlobalSettings)}:{nameof(GlobalSettings.InstallMissingDatabase)} to instruct Umbraco to create the database automatically.
+                         """);
                     throw BootFailedException;
                 }
             case UmbracoDatabaseState.NotInstalled:
