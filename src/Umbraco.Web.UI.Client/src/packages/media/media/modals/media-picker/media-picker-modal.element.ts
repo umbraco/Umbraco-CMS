@@ -5,15 +5,26 @@ import type { UmbDropzoneElement } from '../../dropzone/dropzone.element.js';
 import type { UmbMediaPathModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
-import { css, html, customElement, state, repeat, ifDefined, query } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	customElement,
+	state,
+	repeat,
+	ifDefined,
+	query,
+	type PropertyValues,
+} from '@umbraco-cms/backoffice/external/lit';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_CONTENT_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { isUmbracoFolder } from '@umbraco-cms/backoffice/media-type';
 import type { UmbMediaTreeItemModel } from '../../tree/index.js';
+import { UmbMediaSearchProvider, type UmbMediaSearchItemModel } from '../../search/index.js';
 
 import '@umbraco-cms/backoffice/imaging';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
 
@@ -22,18 +33,20 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	UmbMediaPickerModalData<unknown>,
 	UmbMediaPickerModalValue
 > {
-	#mediaTreeRepository = new UmbMediaTreeRepository(this); // used to get file structure
-	#mediaItemRepository = new UmbMediaItemRepository(this); // used to search
+	#mediaTreeRepository = new UmbMediaTreeRepository(this);
+	#mediaItemRepository = new UmbMediaItemRepository(this);
+	#mediaSearchProvider = new UmbMediaSearchProvider(this);
 
 	#dataType?: { unique: string };
 
 	@state()
 	private _selectableFilter: (item: UmbMediaTreeItemModel) => boolean = () => true;
 
-	#mediaItemsCurrentFolder: Array<UmbMediaTreeItemModel> = [];
+	@state()
+	private _currentChildren: Array<UmbMediaTreeItemModel> = [];
 
 	@state()
-	private _mediaFilteredList: Array<UmbMediaTreeItemModel> = [];
+	private _searchResult: Array<UmbMediaSearchItemModel> = [];
 
 	@state()
 	private _searchOnlyThisFolder = false;
@@ -59,21 +72,31 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 
 	override async connectedCallback(): Promise<void> {
 		super.connectedCallback();
+		if (this.data?.pickableFilter) {
+			this._selectableFilter = this.data?.pickableFilter;
+		}
+	}
 
-		if (this.data?.pickableFilter) this._selectableFilter = this.data?.pickableFilter;
+	protected override async firstUpdated(_changedProperties: PropertyValues): Promise<void> {
+		super.firstUpdated(_changedProperties);
 
 		if (this.data?.startNode) {
 			const { data } = await this.#mediaItemRepository.requestItems([this.data.startNode]);
+			const startNode = data?.[0];
 
-			if (data?.length) {
-				this._currentMediaEntity = { name: data[0].name, unique: data[0].unique, entityType: data[0].entityType };
+			if (startNode) {
+				this._currentMediaEntity = {
+					name: startNode.name,
+					unique: startNode.unique,
+					entityType: startNode.entityType,
+				};
 			}
 		}
 
-		this.#loadMediaFolder();
+		this.#loadChildrenOfCurrentMediaItem();
 	}
 
-	async #loadMediaFolder() {
+	async #loadChildrenOfCurrentMediaItem() {
 		const { data } = await this.#mediaTreeRepository.requestTreeItemsOf({
 			parent: {
 				unique: this._currentMediaEntity.unique,
@@ -84,59 +107,59 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 			take: 100,
 		});
 
-		this.#mediaItemsCurrentFolder = data?.items ?? [];
-		this.#filterMediaItems();
+		this._currentChildren = data?.items ?? [];
 	}
 
-	#onOpen(item: UmbMediaTreeItemModel) {
+	#onOpen(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
 		this._currentMediaEntity = {
 			name: item.name,
 			unique: item.unique,
 			entityType: UMB_MEDIA_ROOT_ENTITY_TYPE,
 		};
-		this.#loadMediaFolder();
+
+		this.#loadChildrenOfCurrentMediaItem();
 	}
 
-	#onSelected(item: UmbMediaTreeItemModel) {
+	#onSelected(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
 		const selection = this.data?.multiple ? [...this.value.selection, item.unique!] : [item.unique!];
 		this.modalContext?.setValue({ selection });
 	}
 
-	#onDeselected(item: UmbMediaTreeItemModel) {
+	#onDeselected(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
 		const selection = this.value.selection.filter((value) => value !== item.unique);
 		this.modalContext?.setValue({ selection });
 	}
 
-	async #filterMediaItems() {
+	async #searchMedia() {
 		if (!this._searchQuery) {
-			// No search query, show all media items in current folder.
-			this._mediaFilteredList = this.#mediaItemsCurrentFolder;
+			this._searchResult = [];
 			return;
+		}
+
+		let searchFrom: UmbEntityModel | undefined = undefined;
+
+		if (this._searchOnlyThisFolder) {
+			searchFrom = {
+				unique: this._currentMediaEntity.unique,
+				entityType: this._currentMediaEntity.entityType,
+			};
 		}
 
 		const query = this._searchQuery;
-		const { data } = await this.#mediaItemRepository.search({ query, skip: 0, take: 100 });
+		const { data } = await this.#mediaSearchProvider.search({ query, searchFrom });
 
 		if (!data) {
 			// No search results.
-			this._mediaFilteredList = [];
-			return;
-		}
-
-		if (this._searchOnlyThisFolder) {
-			// Don't have to map urls here, because we already have everything loaded within this folder.
-			this._mediaFilteredList = this.#mediaItemsCurrentFolder.filter((media) =>
-				data.find((item) => item.unique === media.unique),
-			);
+			this._searchResult = [];
 			return;
 		}
 
 		// Map urls for search results as we are going to show for all folders (as long they aren't trashed).
-		this._mediaFilteredList = data.filter((found) => found.isTrashed === false);
+		this._searchResult = data.items;
 	}
 
 	#debouncedSearch = debounce(() => {
-		this.#filterMediaItems();
+		this.#searchMedia();
 	}, 500);
 
 	#onSearch(e: UUIInputEvent) {
@@ -149,10 +172,10 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 			unique: null,
 			entityType: UMB_MEDIA_ROOT_ENTITY_TYPE,
 		};
-		this.#loadMediaFolder();
+		this.#loadChildrenOfCurrentMediaItem();
 	}
 
-	#allowNavigateToMedia(item: UmbMediaTreeItemModel): boolean {
+	#allowNavigateToMedia(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel): boolean {
 		return isUmbracoFolder(item.mediaType.unique) || item.hasChildren;
 	}
 
@@ -174,19 +197,40 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 
 	#renderBody() {
 		return html`${this.#renderToolbar()}
-		<umb-dropzone id="dropzone" multiple @complete=${() => this.#loadMediaFolder()} .parentUnique=${this._currentMediaEntity.unique}></umb-dropzone>
-				${
-					!this._mediaFilteredList.length
-						? html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`
-						: html`<div id="media-grid">
-								${repeat(
-									this._mediaFilteredList,
-									(item) => item.unique,
-									(item) => this.#renderCard(item),
-								)}
-							</div>`
-				}
-			</div>`;
+			<umb-dropzone
+				id="dropzone"
+				multiple
+				@complete=${() => this.#loadChildrenOfCurrentMediaItem()}
+				.parentUnique=${this._currentMediaEntity.unique}></umb-dropzone>
+			${this._searchQuery ? this.#renderSearchResult() : this.#renderCurrentChildren()} `;
+	}
+
+	#renderSearchResult() {
+		return html`
+			${!this._searchResult.length
+				? html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`
+				: html`<div id="media-grid">
+						${repeat(
+							this._searchResult,
+							(item) => item.unique,
+							(item) => this.#renderCard(item),
+						)}
+					</div>`}
+		`;
+	}
+
+	#renderCurrentChildren() {
+		return html`
+			${!this._currentChildren.length
+				? html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`
+				: html`<div id="media-grid">
+						${repeat(
+							this._currentChildren,
+							(item) => item.unique,
+							(item) => this.#renderCard(item),
+						)}
+					</div>`}
+		`;
 	}
 
 	#renderToolbar() {
@@ -213,7 +257,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	#renderCard(item: UmbMediaTreeItemModel) {
+	#renderCard(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
 		const disabled = !this._selectableFilter(item);
 		return html`
 			<uui-card-media
