@@ -14,6 +14,7 @@ import {
 	ifDefined,
 	query,
 	type PropertyValues,
+	nothing,
 } from '@umbraco-cms/backoffice/external/lit';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -25,6 +26,7 @@ import { UmbMediaSearchProvider, type UmbMediaSearchItemModel } from '../../sear
 
 import '@umbraco-cms/backoffice/imaging';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { not } from 'rxjs/internal/util/not';
 
 const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
 
@@ -49,7 +51,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	private _searchResult: Array<UmbMediaSearchItemModel> = [];
 
 	@state()
-	private _searchOnlyThisFolder = false;
+	private _searchOnlyWithinCurrentItem = false;
 
 	@state()
 	private _searchQuery = '';
@@ -138,7 +140,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 
 		let searchFrom: UmbEntityModel | undefined = undefined;
 
-		if (this._searchOnlyThisFolder) {
+		if (this._searchOnlyWithinCurrentItem) {
 			searchFrom = {
 				unique: this._currentMediaEntity.unique,
 				entityType: this._currentMediaEntity.entityType,
@@ -245,9 +247,12 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 						@input=${this.#onSearch}>
 						<uui-icon slot="prepend" name="icon-search"></uui-icon>
 					</uui-input>
-					<uui-checkbox
-						@change=${() => (this._searchOnlyThisFolder = !this._searchOnlyThisFolder)}
-						label=${this.localize.term('general_excludeFromSubFolders')}></uui-checkbox>
+
+					${this._currentMediaEntity.unique
+						? html`<uui-checkbox
+								@change=${() => (this._searchOnlyWithinCurrentItem = !this._searchOnlyWithinCurrentItem)}
+								label="Search only in ${this._currentMediaEntity.name}"></uui-checkbox>`
+						: nothing}
 				</div>
 				<uui-button
 					@click=${() => this._dropzone.browse()}
