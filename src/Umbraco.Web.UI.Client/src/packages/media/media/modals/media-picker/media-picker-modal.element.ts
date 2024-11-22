@@ -144,7 +144,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 
 	async #searchMedia() {
 		if (!this._searchQuery) {
-			this._searchResult = [];
+			this.#clearSearch();
 			return;
 		}
 
