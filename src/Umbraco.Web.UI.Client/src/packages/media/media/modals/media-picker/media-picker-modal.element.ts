@@ -297,6 +297,10 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#renderBreadcrumb() {
+		if (this._searchQuery && this._searchOnlyWithinCurrentItem === false) {
+			return nothing;
+		}
+
 		return html`<umb-media-picker-folder-path
 			slot="footer-info"
 			.currentMedia=${this._currentMediaEntity}
