@@ -113,6 +113,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#onOpen(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
+		this.#clearSearch();
+
 		this._currentMediaEntity = {
 			name: item.name,
 			unique: item.unique,
@@ -130,6 +132,11 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	#onDeselected(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
 		const selection = this.value.selection.filter((value) => value !== item.unique);
 		this.modalContext?.setValue({ selection });
+	}
+
+	#clearSearch() {
+		this._searchQuery = '';
+		this._searchResult = [];
 	}
 
 	async #searchMedia() {
