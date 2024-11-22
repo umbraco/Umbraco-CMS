@@ -195,10 +195,10 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	#onSearchFromChange(e: CustomEvent) {
 		const checked = (e.target as HTMLInputElement).checked;
 
-		if (checked) {
-			this._searchFrom = { unique: this._currentMediaEntity.unique, entityType: this._currentMediaEntity.entityType };
-		} else if (checked && this._startNode) {
+		if (checked && this._startNode) {
 			this._searchFrom = { unique: this._startNode.unique, entityType: this._startNode.entityType };
+		} else if (checked) {
+			this._searchFrom = { unique: this._currentMediaEntity.unique, entityType: this._currentMediaEntity.entityType };
 		} else {
 			this._searchFrom = undefined;
 		}
