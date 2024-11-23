@@ -187,7 +187,7 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
     private BlockGridPropertyValueConverter CreateConverter()
     {
         var publishedModelFactory = new NoopPublishedModelFactory();
-        var blockVarianceHandler = new BlockEditorVarianceHandler(Mock.Of<ILanguageService>());
+        var blockVarianceHandler = new BlockEditorVarianceHandler(Mock.Of<ILanguageService>(), Mock.Of<IContentTypeService>());
         var editor = new BlockGridPropertyValueConverter(
             Mock.Of<IProfilingLogger>(),
             new BlockEditorConverter(GetPublishedContentTypeCache(), Mock.Of<ICacheManager>(), publishedModelFactory, Mock.Of<IVariationContextAccessor>(), blockVarianceHandler),
