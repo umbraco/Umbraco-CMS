@@ -196,17 +196,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 		this.#loadChildrenOfCurrentMediaItem();
 	}
 
-	#isTreeItem(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel): item is UmbMediaTreeItemModel {
-		return 'hasChildren' in item;
-	}
-
-	// TODO: get hasChildren for media search items from the server
 	#allowNavigateToMedia(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel): boolean {
-		if (this.#isTreeItem(item)) {
-			return isUmbracoFolder(item.mediaType.unique) || item.hasChildren;
-		} else {
-			return isUmbracoFolder(item.mediaType.unique);
-		}
+		return isUmbracoFolder(item.mediaType.unique) || item.hasChildren;
 	}
 
 	#onSearchFromChange(e: CustomEvent) {
