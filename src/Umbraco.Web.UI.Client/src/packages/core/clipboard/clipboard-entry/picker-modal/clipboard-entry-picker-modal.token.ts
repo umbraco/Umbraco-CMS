@@ -1,6 +1,6 @@
-import { UmbModalToken, type UmbPickerModalData, type UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
-import { UMB_CLIPBOARD_ENTRY_PICKER_MODAL_ALIAS } from './constants.js';
 import type { UmbClipboardEntryDetailModel } from '../types.js';
+import { UMB_CLIPBOARD_ENTRY_PICKER_MODAL_ALIAS } from './constants.js';
+import { UmbModalToken, type UmbPickerModalData, type UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbClipboardEntryPickerModalData extends UmbPickerModalData<UmbClipboardEntryDetailModel> {}
 

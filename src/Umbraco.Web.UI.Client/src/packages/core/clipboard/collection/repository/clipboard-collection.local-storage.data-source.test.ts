@@ -1,7 +1,7 @@
+import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { UmbClipboardCollectionFilterModel } from '../types.js';
 import { UmbClipboardLocalStorageManager } from '../../clipboard-local-storage.manager.js';
 import type { UmbClipboardEntryDetailModel } from '../../clipboard-entry/index.js';
-import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 
 export class UmbClipboardCollectionLocalStorageDataSource
 	implements UmbCollectionDataSource<UmbClipboardEntryDetailModel>

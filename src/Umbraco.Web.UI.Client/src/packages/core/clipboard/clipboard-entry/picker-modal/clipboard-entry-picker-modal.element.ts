@@ -1,4 +1,5 @@
 import { UmbClipboardCollectionRepository } from '../../collection/index.js';
+import type { UmbClipboardEntryDetailModel } from '../types.js';
 import type {
 	UmbClipboardEntryPickerModalValue,
 	UmbClipboardEntryPickerModalData,
@@ -6,7 +7,6 @@ import type {
 import { html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UmbClipboardEntryDetailModel } from '../types.js';
 
 @customElement('umb-clipboard-entry-picker-modal')
 export class UmbClipboardEntryPickerModalElement extends UmbModalBaseElement<

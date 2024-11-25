@@ -1,8 +1,8 @@
+import { UMB_CLIPBOARD_ENTRY_PICKER_MODAL, UmbClipboardEntryDetailRepository } from '../../clipboard-entry/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbPropertyActionBase, type UmbPropertyActionArgs } from '@umbraco-cms/backoffice/property-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_CLIPBOARD_ENTRY_PICKER_MODAL, UmbClipboardEntryDetailRepository } from '../../clipboard-entry/index.js';
 
 export class UmbColorPickerPasteFromClipboardPropertyAction extends UmbPropertyActionBase {
 	#propertyContext?: typeof UMB_PROPERTY_CONTEXT.TYPE;

@@ -1,16 +1,16 @@
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_CLIPBOARD_CONTEXT } from './clipboard.context-token';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_CLIPBOARD_ENTRY_PICKER_MODAL } from '../clipboard-entry/picker-modal/index.js';
 import { UmbClipboardEntryDetailRepository, type UmbClipboardEntryDetailModel } from '../clipboard-entry/index.js';
+import { UMB_CLIPBOARD_CONTEXT } from './clipboard.context-token.js';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 /**
  * Clipboard context for managing clipboard entries
  * @export
  * @class UmbClipboardContext
- * @extends {UmbContextBase<UmbClipboardContext>}
+ * @augments {UmbContextBase<UmbClipboardContext>}
  */
 export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	#entries = new UmbArrayState<UmbClipboardEntryDetailModel>([], (x) => x.unique);
@@ -54,7 +54,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	 * Set entries in the clipboard
 	 * @param {Array<UmbClipboardEntryDetailModel>} entries An array of entries to set in the clipboard
 	 * @memberof UmbClipboard
-	 **/
+	 */
 	setEntries(entries: UmbClipboardEntryDetailModel[]): void {
 		if (!entries) throw new Error('Entries are required');
 		this.#entries.setValue(entries);
@@ -75,6 +75,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	/**
 	 * Read an entry from the clipboard
 	 * @param {UmbClipboardEntryDetailModel} entry A clipboard entry to insert into the clipboard
+	 * @param unique
 	 * @memberof UmbClipboardContext
 	 */
 	async read(unique: string): Promise<UmbClipboardEntryDetailModel> {

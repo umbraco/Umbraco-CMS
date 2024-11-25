@@ -1,11 +1,11 @@
+import { UMB_CLIPBOARD_CONTEXT } from '../../context/index.js';
+import type { UmbClipboardEntryDetailModel } from '../../clipboard-entry/index.js';
+import { UMB_CLIPBOARD_ENTRY_ENTITY_TYPE } from '../../clipboard-entry/entity.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbPropertyActionBase, type UmbPropertyActionArgs } from '@umbraco-cms/backoffice/property-action';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UMB_CLIPBOARD_CONTEXT } from '../../context/index.js';
-import type { UmbClipboardEntryDetailModel } from '../../clipboard-entry/index.js';
-import { UMB_CLIPBOARD_ENTRY_ENTITY_TYPE } from '../../clipboard-entry/entity.js';
 
 export class UmbColorPickerCopyToClipboardPropertyAction extends UmbPropertyActionBase {
 	#clipboardContext?: typeof UMB_CLIPBOARD_CONTEXT.TYPE;

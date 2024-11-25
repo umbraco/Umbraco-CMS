@@ -1,7 +1,7 @@
-import { UMB_CLIPBOARD_ROOT_WORKSPACE_ALIAS } from './constants.js';
-import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
-import { UMB_CLIPBOARD_ROOT_ENTITY_TYPE } from './entity.js';
 import { UMB_CLIPBOARD_COLLECTION_ALIAS } from '../collection/index.js';
+import { UMB_CLIPBOARD_ROOT_WORKSPACE_ALIAS } from './constants.js';
+import { UMB_CLIPBOARD_ROOT_ENTITY_TYPE } from './entity.js';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
