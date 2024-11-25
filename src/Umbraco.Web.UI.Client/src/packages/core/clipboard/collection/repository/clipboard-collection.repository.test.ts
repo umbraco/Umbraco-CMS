@@ -5,10 +5,10 @@ import {
 	type UmbClipboardEntryDetailModel,
 } from '../../clipboard-entry/index.js';
 import { UMB_CLIPBOARD_ENTRY_ENTITY_TYPE } from '../../clipboard-entry/entity.js';
-import { UmbClipboardCollectionLocalStorageDataSource } from './clipboard-collection.local-storage.data-source.js';
 import { customElement } from 'lit/decorators.js';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UmbClipboardCollectionRepository } from './clipboard-collection.repository.js';
 
 @customElement('test-my-app-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {
@@ -22,7 +22,7 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 describe('UmbClipboardLocalStorageDataSource', () => {
 	let hostElement: UmbTestControllerHostElement;
 	let detailRepository: UmbClipboardEntryDetailRepository;
-	let dataSource: UmbClipboardCollectionLocalStorageDataSource;
+	let collectionRepository: UmbClipboardCollectionRepository;
 	const clipboardEntries: Array<UmbClipboardEntryDetailModel> = [
 		{
 			entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
@@ -57,7 +57,7 @@ describe('UmbClipboardLocalStorageDataSource', () => {
 		localStorage.clear();
 		hostElement = new UmbTestControllerHostElement();
 		detailRepository = new UmbClipboardEntryDetailRepository(hostElement);
-		dataSource = new UmbClipboardCollectionLocalStorageDataSource();
+		collectionRepository = new UmbClipboardCollectionRepository(hostElement);
 		document.body.innerHTML = '';
 		document.body.appendChild(hostElement);
 		const createPromises = Promise.all(
@@ -70,14 +70,14 @@ describe('UmbClipboardLocalStorageDataSource', () => {
 	describe('Public API', () => {
 		describe('methods', () => {
 			it('has a getCollection method', () => {
-				expect(dataSource).to.have.property('getCollection').that.is.a('function');
+				expect(collectionRepository).to.have.property('getCollection').that.is.a('function');
 			});
 		});
 	});
 
 	describe('getCollection', () => {
 		it('should return all clipboard entries', async () => {
-			const result = await dataSource.getCollection({});
+			const result = await collectionRepository.requestCollection({});
 
 			expect(result.data.items).to.have.lengthOf(clipboardEntries.length);
 			expect(result.data.items).to.deep.equal(clipboardEntries);
