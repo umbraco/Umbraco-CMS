@@ -26,7 +26,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 	#mediaDetailRepository = new UmbMediaDetailRepository(this); // used to create folders
 
 	@property({ attribute: false })
-	startNode: UmbMediaPathModel = root;
+	startNode?: UmbMediaPathModel = root;
 
 	@property({ attribute: false })
 	public set currentMedia(value: UmbMediaPathModel) {
