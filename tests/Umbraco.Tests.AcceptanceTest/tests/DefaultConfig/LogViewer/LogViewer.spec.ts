@@ -112,7 +112,7 @@ test('can delete a saved search', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
   await umbracoUi.logViewer.clickSavedSearchesButton();
   await umbracoUi.logViewer.removeSavedSearchByName(searchName + ' ' + search);
-  await umbracoUi.logViewer.clickDeleteLabelButton();
+  await umbracoUi.logViewer.clickDeleteButton();
 
   // Assert
   // Checks if the saved search is visible in the UI

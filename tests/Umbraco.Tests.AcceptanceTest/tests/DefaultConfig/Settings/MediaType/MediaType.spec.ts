@@ -86,7 +86,7 @@ test('can delete a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
   // Act
   await umbracoUi.mediaType.clickRootFolderCaretButton();
   await umbracoUi.mediaType.clickActionsMenuForName(mediaTypeName);
-  await umbracoUi.mediaType.clickDeleteLabelButton();
+  await umbracoUi.mediaType.clickDeleteButton();
   await umbracoUi.mediaType.clickConfirmToDeleteButton();
 
   // Assert
