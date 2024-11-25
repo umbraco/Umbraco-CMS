@@ -170,7 +170,7 @@ export class UmbTableElement extends LitElement {
 		this.dispatchEvent(new UmbTableDeselectedEvent());
 	}
 
-	private #onClickRow(key: string) {
+	#onClickRow(key: string) {
 		if (this._selectionMode) {
 			if (this._isSelected(key)) {
 				this._deselectRow(key);
