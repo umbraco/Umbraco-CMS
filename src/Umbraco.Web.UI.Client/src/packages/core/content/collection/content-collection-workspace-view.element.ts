@@ -1,4 +1,4 @@
-import type { UmbCollectionBulkActionPermissions, UmbCollectionConfiguration } from '../../collection/types.js';
+import type { UmbCollectionConfiguration } from '../../collection/types.js';
 import { UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT } from './content-collection-workspace.context-token.js';
 import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -64,7 +64,6 @@ export class UmbContentCollectionWorkspaceViewElement extends UmbLitElement impl
 		const pageSize = Number(config.getValueByAlias('pageSize'));
 		return {
 			unique: this._documentUnique,
-			allowedEntityBulkActions: config?.getValueByAlias<UmbCollectionBulkActionPermissions>('bulkActionPermissions'),
 			layouts: config?.getValueByAlias('layouts'),
 			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
 			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',

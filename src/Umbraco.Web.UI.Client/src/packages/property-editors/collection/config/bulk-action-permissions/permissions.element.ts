@@ -18,6 +18,7 @@ type BulkActionPermissionType =
 
 /**
  * @element umb-property-editor-ui-collection-permissions
+ * @deprecated No longer used internally. This will be removed in Umbraco 17. [LK]
  */
 @customElement('umb-property-editor-ui-collection-permissions')
 export class UmbPropertyEditorUICollectionPermissionsElement
@@ -66,6 +67,12 @@ export class UmbPropertyEditorUICollectionPermissionsElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
+	protected override firstUpdated() {
+		console.warn(
+			'The `umb-property-editor-ui-collection-permissions` component has been deprecated, it will be removed in Umbraco 17.',
+		);
+	}
+
 	override render() {
 		return html`<uui-toggle
 				?checked=${this.value.allowBulkPublish}
@@ -100,6 +107,7 @@ export class UmbPropertyEditorUICollectionPermissionsElement
 	];
 }
 
+/** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
 export default UmbPropertyEditorUICollectionPermissionsElement;
 
 declare global {
