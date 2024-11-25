@@ -22,19 +22,22 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
     private readonly ITemplateService _templateService;
     private readonly IPublicAccessService _publicAccessService;
     private readonly TimeProvider _timeProvider;
+    private readonly IIdKeyMap _idKeyMap;
 
     public DocumentPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IDocumentUrlFactory documentUrlFactory,
         ITemplateService templateService,
         IPublicAccessService publicAccessService,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IIdKeyMap idKeyMap)
     {
         _umbracoMapper = umbracoMapper;
         _documentUrlFactory = documentUrlFactory;
         _templateService = templateService;
         _publicAccessService = publicAccessService;
         _timeProvider = timeProvider;
+        _idKeyMap = idKeyMap;
     }
 
     [Obsolete("Schedule for removal in v17")]
@@ -92,10 +95,14 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
 
     public DocumentItemResponseModel CreateItemResponseModel(IDocumentEntitySlim entity)
     {
+        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(entity.ParentId, UmbracoObjectTypes.Document);
+
         var responseModel = new DocumentItemResponseModel
         {
             Id = entity.Key,
-            IsTrashed = entity.Trashed
+            IsTrashed = entity.Trashed,
+            Parent = parentKeyAttempt.Success ? new ReferenceByIdModel { Id = parentKeyAttempt.Result } : null,
+            HasChildren = entity.HasChildren,
         };
 
         responseModel.IsProtected = _publicAccessService.IsProtected(entity.Path);
