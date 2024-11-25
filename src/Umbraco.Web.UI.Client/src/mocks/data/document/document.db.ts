@@ -130,6 +130,8 @@ const itemMapper = (model: UmbMockDocumentModel): DocumentItemResponseModel => {
 		isProtected: model.isProtected,
 		isTrashed: model.isTrashed,
 		variants: model.variants,
+		hasChildren: model.hasChildren,
+		parent: model.parent,
 	};
 };
 

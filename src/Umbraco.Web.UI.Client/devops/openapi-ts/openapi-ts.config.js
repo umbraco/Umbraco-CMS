@@ -11,11 +11,11 @@ export default defineConfig({
 	},
 	plugins: [
 		{
-			name: '@hey-api/types',
+			name: '@hey-api/typescript',
 			enums: 'typescript'
 		},
 		{
-			name: '@hey-api/services',
+			name: '@hey-api/sdk',
 			asClass: true
 		}
 	]

@@ -102,6 +102,8 @@ const itemMapper = (model: UmbMockMediaModel): MediaItemResponseModel => {
 		id: model.id,
 		isTrashed: model.isTrashed,
 		variants: model.variants,
+		hasChildren: model.hasChildren,
+		parent: model.parent,
 	};
 };
 
