@@ -246,7 +246,6 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		return html`
 			<uui-card-media
 				name=${ifDefined(item.name === null ? undefined : item.name)}
-				detail=${ifDefined(item.unique)}
 				href="${ifDefined(href)}"
 				?readonly=${this.readonly}>
 				<umb-imaging-thumbnail
