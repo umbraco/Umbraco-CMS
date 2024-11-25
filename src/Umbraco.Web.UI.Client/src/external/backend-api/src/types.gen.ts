@@ -442,15 +442,6 @@ export type CultureReponseModel = {
     englishName: string;
 };
 
-export type CurrenUserConfigurationResponseModel = {
-    keepUserLoggedIn: boolean;
-    /**
-     * @deprecated
-     */
-    usernameIsEmail: boolean;
-    passwordConfiguration: (PasswordConfigurationResponseModel);
-};
-
 export type CurrentUserResponseModel = {
     id: string;
     email: string;
@@ -471,11 +462,52 @@ export type CurrentUserResponseModel = {
     isAdmin: boolean;
 };
 
+export type CurrenUserConfigurationResponseModel = {
+    keepUserLoggedIn: boolean;
+    /**
+     * @deprecated
+     */
+    usernameIsEmail: boolean;
+    passwordConfiguration: (PasswordConfigurationResponseModel);
+};
+
+export type DatabaseInstallRequestModel = {
+    id: string;
+    providerName: string;
+    server?: (string) | null;
+    name?: (string) | null;
+    username?: (string) | null;
+    password?: (string) | null;
+    useIntegratedAuthentication: boolean;
+    connectionString?: (string) | null;
+    trustServerCertificate: boolean;
+};
+
+export type DatabaseSettingsPresentationModel = {
+    id: string;
+    sortOrder: number;
+    displayName: string;
+    defaultDatabaseName: string;
+    providerName: string;
+    isConfigured: boolean;
+    requiresServer: boolean;
+    serverPlaceholder: string;
+    requiresCredentials: boolean;
+    supportsIntegratedAuthentication: boolean;
+    requiresConnectionTest: boolean;
+};
+
 export enum DataTypeChangeModeModel {
     TRUE = 'True',
     FALSE = 'False',
     FALSE_WITH_HELP_TEXT = 'FalseWithHelpText'
 }
+
+export type DatatypeConfigurationResponseModel = {
+    canBeChanged: DataTypeChangeModeModel;
+    documentListViewId: string;
+    mediaListViewId: string;
+};
 
 export type DataTypeContentTypeReferenceModel = {
     id: string;
@@ -525,38 +557,6 @@ export type DataTypeTreeItemResponseModel = {
     isFolder: boolean;
     editorUiAlias?: (string) | null;
     isDeletable: boolean;
-};
-
-export type DatabaseInstallRequestModel = {
-    id: string;
-    providerName: string;
-    server?: (string) | null;
-    name?: (string) | null;
-    username?: (string) | null;
-    password?: (string) | null;
-    useIntegratedAuthentication: boolean;
-    connectionString?: (string) | null;
-    trustServerCertificate: boolean;
-};
-
-export type DatabaseSettingsPresentationModel = {
-    id: string;
-    sortOrder: number;
-    displayName: string;
-    defaultDatabaseName: string;
-    providerName: string;
-    isConfigured: boolean;
-    requiresServer: boolean;
-    serverPlaceholder: string;
-    requiresCredentials: boolean;
-    supportsIntegratedAuthentication: boolean;
-    requiresConnectionTest: boolean;
-};
-
-export type DatatypeConfigurationResponseModel = {
-    canBeChanged: DataTypeChangeModeModel;
-    documentListViewId: string;
-    mediaListViewId: string;
 };
 
 export type DefaultReferenceResponseModel = {
@@ -653,6 +653,8 @@ export type DocumentItemResponseModel = {
     id: string;
     isTrashed: boolean;
     isProtected: boolean;
+    parent?: ((ReferenceByIdModel) | null);
+    hasChildren: boolean;
     documentType: (DocumentTypeReferenceResponseModel);
     variants: Array<(DocumentVariantItemResponseModel)>;
 };
@@ -1116,6 +1118,11 @@ export type LanguageResponseModel = {
     isoCode: string;
 };
 
+export type LoggerResponseModel = {
+    name: string;
+    level: LogLevelModel;
+};
+
 export type LogLevelCountsReponseModel = {
     information: number;
     debug: number;
@@ -1152,11 +1159,6 @@ export type LogTemplateResponseModel = {
     count: number;
 };
 
-export type LoggerResponseModel = {
-    name: string;
-    level: LogLevelModel;
-};
-
 export type ManifestResponseModel = {
     name: string;
     id?: (string) | null;
@@ -1185,6 +1187,8 @@ export type MediaConfigurationResponseModel = {
 export type MediaItemResponseModel = {
     id: string;
     isTrashed: boolean;
+    parent?: ((ReferenceByIdModel) | null);
+    hasChildren: boolean;
     mediaType: (MediaTypeReferenceResponseModel);
     variants: Array<(VariantItemResponseModel)>;
 };
@@ -1580,13 +1584,13 @@ export type NotificationHeaderModel = {
     type: EventMessageTypeModel;
 };
 
-export type OEmbedResponseModel = {
-    markup: string;
-};
-
 export type ObjectTypeResponseModel = {
     name?: (string) | null;
     id: string;
+};
+
+export type OEmbedResponseModel = {
+    markup: string;
 };
 
 export enum OperatorModel {
@@ -1723,19 +1727,24 @@ export type PagedHelpPageResponseModel = {
     items: Array<(HelpPageResponseModel)>;
 };
 
-export type PagedIReferenceResponseModel = {
-    total: number;
-    items: Array<(DefaultReferenceResponseModel | DocumentReferenceResponseModel | MediaReferenceResponseModel)>;
-};
-
 export type PagedIndexResponseModel = {
     total: number;
     items: Array<(IndexResponseModel)>;
 };
 
+export type PagedIReferenceResponseModel = {
+    total: number;
+    items: Array<(DefaultReferenceResponseModel | DocumentReferenceResponseModel | MediaReferenceResponseModel)>;
+};
+
 export type PagedLanguageResponseModel = {
     total: number;
     items: Array<(LanguageResponseModel)>;
+};
+
+export type PagedLoggerResponseModel = {
+    total: number;
+    items: Array<(LoggerResponseModel)>;
 };
 
 export type PagedLogMessageResponseModel = {
@@ -1746,11 +1755,6 @@ export type PagedLogMessageResponseModel = {
 export type PagedLogTemplateResponseModel = {
     total: number;
     items: Array<(LogTemplateResponseModel)>;
-};
-
-export type PagedLoggerResponseModel = {
-    total: number;
-    items: Array<(LoggerResponseModel)>;
 };
 
 export type PagedMediaCollectionResponseModel = {
@@ -1883,14 +1887,14 @@ export type PagedSavedLogSearchResponseModel = {
     items: Array<(SavedLogSearchResponseModel)>;
 };
 
-export type PagedSearchResultResponseModel = {
-    total: number;
-    items: Array<(SearchResultResponseModel)>;
-};
-
 export type PagedSearcherResponseModel = {
     total: number;
     items: Array<(SearcherResponseModel)>;
+};
+
+export type PagedSearchResultResponseModel = {
+    total: number;
+    items: Array<(SearchResultResponseModel)>;
 };
 
 export type PagedSegmentResponseModel = {
@@ -2171,15 +2175,15 @@ export type ScriptResponseModel = {
     content: string;
 };
 
+export type SearcherResponseModel = {
+    name: string;
+};
+
 export type SearchResultResponseModel = {
     id: string;
     score: number;
     readonly fieldCount: number;
     fields: Array<(FieldPresentationModel)>;
-};
-
-export type SearcherResponseModel = {
-    name: string;
 };
 
 export type SecurityConfigurationResponseModel = {
@@ -3087,284 +3091,6 @@ export type GetTreeDictionaryRootData = {
 
 export type GetTreeDictionaryRootResponse = ((PagedNamedEntityTreeItemResponseModel));
 
-export type PostDocumentBlueprintData = {
-    requestBody?: (CreateDocumentBlueprintRequestModel);
-};
-
-export type PostDocumentBlueprintResponse = (string);
-
-export type GetDocumentBlueprintByIdData = {
-    id: string;
-};
-
-export type GetDocumentBlueprintByIdResponse = ((DocumentBlueprintResponseModel));
-
-export type DeleteDocumentBlueprintByIdData = {
-    id: string;
-};
-
-export type DeleteDocumentBlueprintByIdResponse = (string);
-
-export type PutDocumentBlueprintByIdData = {
-    id: string;
-    requestBody?: (UpdateDocumentBlueprintRequestModel);
-};
-
-export type PutDocumentBlueprintByIdResponse = (string);
-
-export type PutDocumentBlueprintByIdMoveData = {
-    id: string;
-    requestBody?: (MoveDocumentBlueprintRequestModel);
-};
-
-export type PutDocumentBlueprintByIdMoveResponse = (string);
-
-export type PostDocumentBlueprintFolderData = {
-    requestBody?: (CreateFolderRequestModel);
-};
-
-export type PostDocumentBlueprintFolderResponse = (string);
-
-export type GetDocumentBlueprintFolderByIdData = {
-    id: string;
-};
-
-export type GetDocumentBlueprintFolderByIdResponse = ((FolderResponseModel));
-
-export type DeleteDocumentBlueprintFolderByIdData = {
-    id: string;
-};
-
-export type DeleteDocumentBlueprintFolderByIdResponse = (string);
-
-export type PutDocumentBlueprintFolderByIdData = {
-    id: string;
-    requestBody?: (UpdateFolderResponseModel);
-};
-
-export type PutDocumentBlueprintFolderByIdResponse = (string);
-
-export type PostDocumentBlueprintFromDocumentData = {
-    requestBody?: (CreateDocumentBlueprintFromDocumentRequestModel);
-};
-
-export type PostDocumentBlueprintFromDocumentResponse = (string);
-
-export type GetItemDocumentBlueprintData = {
-    id?: Array<(string)>;
-};
-
-export type GetItemDocumentBlueprintResponse = (Array<(DocumentBlueprintItemResponseModel)>);
-
-export type GetTreeDocumentBlueprintAncestorsData = {
-    descendantId?: string;
-};
-
-export type GetTreeDocumentBlueprintAncestorsResponse = (Array<(DocumentBlueprintTreeItemResponseModel)>);
-
-export type GetTreeDocumentBlueprintChildrenData = {
-    foldersOnly?: boolean;
-    parentId?: string;
-    skip?: number;
-    take?: number;
-};
-
-export type GetTreeDocumentBlueprintChildrenResponse = ((PagedDocumentBlueprintTreeItemResponseModel));
-
-export type GetTreeDocumentBlueprintRootData = {
-    foldersOnly?: boolean;
-    skip?: number;
-    take?: number;
-};
-
-export type GetTreeDocumentBlueprintRootResponse = ((PagedDocumentBlueprintTreeItemResponseModel));
-
-export type PostDocumentTypeData = {
-    requestBody?: (CreateDocumentTypeRequestModel);
-};
-
-export type PostDocumentTypeResponse = (string);
-
-export type GetDocumentTypeByIdData = {
-    id: string;
-};
-
-export type GetDocumentTypeByIdResponse = ((DocumentTypeResponseModel));
-
-export type DeleteDocumentTypeByIdData = {
-    id: string;
-};
-
-export type DeleteDocumentTypeByIdResponse = (string);
-
-export type PutDocumentTypeByIdData = {
-    id: string;
-    requestBody?: (UpdateDocumentTypeRequestModel);
-};
-
-export type PutDocumentTypeByIdResponse = (string);
-
-export type GetDocumentTypeByIdAllowedChildrenData = {
-    id: string;
-    skip?: number;
-    take?: number;
-};
-
-export type GetDocumentTypeByIdAllowedChildrenResponse = ((PagedAllowedDocumentTypeModel));
-
-export type GetDocumentTypeByIdBlueprintData = {
-    id: string;
-    skip?: number;
-    take?: number;
-};
-
-export type GetDocumentTypeByIdBlueprintResponse = ((PagedDocumentTypeBlueprintItemResponseModel));
-
-export type GetDocumentTypeByIdCompositionReferencesData = {
-    id: string;
-};
-
-export type GetDocumentTypeByIdCompositionReferencesResponse = (Array<(DocumentTypeCompositionResponseModel)>);
-
-export type PostDocumentTypeByIdCopyData = {
-    id: string;
-    requestBody?: (CopyDocumentTypeRequestModel);
-};
-
-export type PostDocumentTypeByIdCopyResponse = (string);
-
-export type GetDocumentTypeByIdExportData = {
-    id: string;
-};
-
-export type GetDocumentTypeByIdExportResponse = (((Blob | File)));
-
-export type PutDocumentTypeByIdImportData = {
-    id: string;
-    requestBody?: (ImportDocumentTypeRequestModel);
-};
-
-export type PutDocumentTypeByIdImportResponse = (string);
-
-export type PutDocumentTypeByIdMoveData = {
-    id: string;
-    requestBody?: (MoveDocumentTypeRequestModel);
-};
-
-export type PutDocumentTypeByIdMoveResponse = (string);
-
-export type GetDocumentTypeAllowedAtRootData = {
-    skip?: number;
-    take?: number;
-};
-
-export type GetDocumentTypeAllowedAtRootResponse = ((PagedAllowedDocumentTypeModel));
-
-export type PostDocumentTypeAvailableCompositionsData = {
-    requestBody?: (DocumentTypeCompositionRequestModel);
-};
-
-export type PostDocumentTypeAvailableCompositionsResponse = (Array<(AvailableDocumentTypeCompositionResponseModel)>);
-
-export type GetDocumentTypeConfigurationResponse = ((DocumentTypeConfigurationResponseModel));
-
-export type PostDocumentTypeFolderData = {
-    requestBody?: (CreateFolderRequestModel);
-};
-
-export type PostDocumentTypeFolderResponse = (string);
-
-export type GetDocumentTypeFolderByIdData = {
-    id: string;
-};
-
-export type GetDocumentTypeFolderByIdResponse = ((FolderResponseModel));
-
-export type DeleteDocumentTypeFolderByIdData = {
-    id: string;
-};
-
-export type DeleteDocumentTypeFolderByIdResponse = (string);
-
-export type PutDocumentTypeFolderByIdData = {
-    id: string;
-    requestBody?: (UpdateFolderResponseModel);
-};
-
-export type PutDocumentTypeFolderByIdResponse = (string);
-
-export type PostDocumentTypeImportData = {
-    requestBody?: (ImportDocumentTypeRequestModel);
-};
-
-export type PostDocumentTypeImportResponse = (string);
-
-export type GetItemDocumentTypeData = {
-    id?: Array<(string)>;
-};
-
-export type GetItemDocumentTypeResponse = (Array<(DocumentTypeItemResponseModel)>);
-
-export type GetItemDocumentTypeSearchData = {
-    query?: string;
-    skip?: number;
-    take?: number;
-};
-
-export type GetItemDocumentTypeSearchResponse = ((PagedModelDocumentTypeItemResponseModel));
-
-export type GetTreeDocumentTypeAncestorsData = {
-    descendantId?: string;
-};
-
-export type GetTreeDocumentTypeAncestorsResponse = (Array<(DocumentTypeTreeItemResponseModel)>);
-
-export type GetTreeDocumentTypeChildrenData = {
-    foldersOnly?: boolean;
-    parentId?: string;
-    skip?: number;
-    take?: number;
-};
-
-export type GetTreeDocumentTypeChildrenResponse = ((PagedDocumentTypeTreeItemResponseModel));
-
-export type GetTreeDocumentTypeRootData = {
-    foldersOnly?: boolean;
-    skip?: number;
-    take?: number;
-};
-
-export type GetTreeDocumentTypeRootResponse = ((PagedDocumentTypeTreeItemResponseModel));
-
-export type GetDocumentVersionData = {
-    culture?: string;
-    documentId: string;
-    skip?: number;
-    take?: number;
-};
-
-export type GetDocumentVersionResponse = ((PagedDocumentVersionItemResponseModel));
-
-export type GetDocumentVersionByIdData = {
-    id: string;
-};
-
-export type GetDocumentVersionByIdResponse = ((DocumentVersionResponseModel));
-
-export type PutDocumentVersionByIdPreventCleanupData = {
-    id: string;
-    preventCleanup?: boolean;
-};
-
-export type PutDocumentVersionByIdPreventCleanupResponse = (string);
-
-export type PostDocumentVersionByIdRollbackData = {
-    culture?: string;
-    id: string;
-};
-
-export type PostDocumentVersionByIdRollbackResponse = (string);
-
 export type GetCollectionDocumentByIdData = {
     dataTypeId?: string;
     filter?: string;
@@ -3644,6 +3370,284 @@ export type GetTreeDocumentRootData = {
 
 export type GetTreeDocumentRootResponse = ((PagedDocumentTreeItemResponseModel));
 
+export type PostDocumentBlueprintData = {
+    requestBody?: (CreateDocumentBlueprintRequestModel);
+};
+
+export type PostDocumentBlueprintResponse = (string);
+
+export type GetDocumentBlueprintByIdData = {
+    id: string;
+};
+
+export type GetDocumentBlueprintByIdResponse = ((DocumentBlueprintResponseModel));
+
+export type DeleteDocumentBlueprintByIdData = {
+    id: string;
+};
+
+export type DeleteDocumentBlueprintByIdResponse = (string);
+
+export type PutDocumentBlueprintByIdData = {
+    id: string;
+    requestBody?: (UpdateDocumentBlueprintRequestModel);
+};
+
+export type PutDocumentBlueprintByIdResponse = (string);
+
+export type PutDocumentBlueprintByIdMoveData = {
+    id: string;
+    requestBody?: (MoveDocumentBlueprintRequestModel);
+};
+
+export type PutDocumentBlueprintByIdMoveResponse = (string);
+
+export type PostDocumentBlueprintFolderData = {
+    requestBody?: (CreateFolderRequestModel);
+};
+
+export type PostDocumentBlueprintFolderResponse = (string);
+
+export type GetDocumentBlueprintFolderByIdData = {
+    id: string;
+};
+
+export type GetDocumentBlueprintFolderByIdResponse = ((FolderResponseModel));
+
+export type DeleteDocumentBlueprintFolderByIdData = {
+    id: string;
+};
+
+export type DeleteDocumentBlueprintFolderByIdResponse = (string);
+
+export type PutDocumentBlueprintFolderByIdData = {
+    id: string;
+    requestBody?: (UpdateFolderResponseModel);
+};
+
+export type PutDocumentBlueprintFolderByIdResponse = (string);
+
+export type PostDocumentBlueprintFromDocumentData = {
+    requestBody?: (CreateDocumentBlueprintFromDocumentRequestModel);
+};
+
+export type PostDocumentBlueprintFromDocumentResponse = (string);
+
+export type GetItemDocumentBlueprintData = {
+    id?: Array<(string)>;
+};
+
+export type GetItemDocumentBlueprintResponse = (Array<(DocumentBlueprintItemResponseModel)>);
+
+export type GetTreeDocumentBlueprintAncestorsData = {
+    descendantId?: string;
+};
+
+export type GetTreeDocumentBlueprintAncestorsResponse = (Array<(DocumentBlueprintTreeItemResponseModel)>);
+
+export type GetTreeDocumentBlueprintChildrenData = {
+    foldersOnly?: boolean;
+    parentId?: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetTreeDocumentBlueprintChildrenResponse = ((PagedDocumentBlueprintTreeItemResponseModel));
+
+export type GetTreeDocumentBlueprintRootData = {
+    foldersOnly?: boolean;
+    skip?: number;
+    take?: number;
+};
+
+export type GetTreeDocumentBlueprintRootResponse = ((PagedDocumentBlueprintTreeItemResponseModel));
+
+export type PostDocumentTypeData = {
+    requestBody?: (CreateDocumentTypeRequestModel);
+};
+
+export type PostDocumentTypeResponse = (string);
+
+export type GetDocumentTypeByIdData = {
+    id: string;
+};
+
+export type GetDocumentTypeByIdResponse = ((DocumentTypeResponseModel));
+
+export type DeleteDocumentTypeByIdData = {
+    id: string;
+};
+
+export type DeleteDocumentTypeByIdResponse = (string);
+
+export type PutDocumentTypeByIdData = {
+    id: string;
+    requestBody?: (UpdateDocumentTypeRequestModel);
+};
+
+export type PutDocumentTypeByIdResponse = (string);
+
+export type GetDocumentTypeByIdAllowedChildrenData = {
+    id: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetDocumentTypeByIdAllowedChildrenResponse = ((PagedAllowedDocumentTypeModel));
+
+export type GetDocumentTypeByIdBlueprintData = {
+    id: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetDocumentTypeByIdBlueprintResponse = ((PagedDocumentTypeBlueprintItemResponseModel));
+
+export type GetDocumentTypeByIdCompositionReferencesData = {
+    id: string;
+};
+
+export type GetDocumentTypeByIdCompositionReferencesResponse = (Array<(DocumentTypeCompositionResponseModel)>);
+
+export type PostDocumentTypeByIdCopyData = {
+    id: string;
+    requestBody?: (CopyDocumentTypeRequestModel);
+};
+
+export type PostDocumentTypeByIdCopyResponse = (string);
+
+export type GetDocumentTypeByIdExportData = {
+    id: string;
+};
+
+export type GetDocumentTypeByIdExportResponse = (((Blob | File)));
+
+export type PutDocumentTypeByIdImportData = {
+    id: string;
+    requestBody?: (ImportDocumentTypeRequestModel);
+};
+
+export type PutDocumentTypeByIdImportResponse = (string);
+
+export type PutDocumentTypeByIdMoveData = {
+    id: string;
+    requestBody?: (MoveDocumentTypeRequestModel);
+};
+
+export type PutDocumentTypeByIdMoveResponse = (string);
+
+export type GetDocumentTypeAllowedAtRootData = {
+    skip?: number;
+    take?: number;
+};
+
+export type GetDocumentTypeAllowedAtRootResponse = ((PagedAllowedDocumentTypeModel));
+
+export type PostDocumentTypeAvailableCompositionsData = {
+    requestBody?: (DocumentTypeCompositionRequestModel);
+};
+
+export type PostDocumentTypeAvailableCompositionsResponse = (Array<(AvailableDocumentTypeCompositionResponseModel)>);
+
+export type GetDocumentTypeConfigurationResponse = ((DocumentTypeConfigurationResponseModel));
+
+export type PostDocumentTypeFolderData = {
+    requestBody?: (CreateFolderRequestModel);
+};
+
+export type PostDocumentTypeFolderResponse = (string);
+
+export type GetDocumentTypeFolderByIdData = {
+    id: string;
+};
+
+export type GetDocumentTypeFolderByIdResponse = ((FolderResponseModel));
+
+export type DeleteDocumentTypeFolderByIdData = {
+    id: string;
+};
+
+export type DeleteDocumentTypeFolderByIdResponse = (string);
+
+export type PutDocumentTypeFolderByIdData = {
+    id: string;
+    requestBody?: (UpdateFolderResponseModel);
+};
+
+export type PutDocumentTypeFolderByIdResponse = (string);
+
+export type PostDocumentTypeImportData = {
+    requestBody?: (ImportDocumentTypeRequestModel);
+};
+
+export type PostDocumentTypeImportResponse = (string);
+
+export type GetItemDocumentTypeData = {
+    id?: Array<(string)>;
+};
+
+export type GetItemDocumentTypeResponse = (Array<(DocumentTypeItemResponseModel)>);
+
+export type GetItemDocumentTypeSearchData = {
+    query?: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetItemDocumentTypeSearchResponse = ((PagedModelDocumentTypeItemResponseModel));
+
+export type GetTreeDocumentTypeAncestorsData = {
+    descendantId?: string;
+};
+
+export type GetTreeDocumentTypeAncestorsResponse = (Array<(DocumentTypeTreeItemResponseModel)>);
+
+export type GetTreeDocumentTypeChildrenData = {
+    foldersOnly?: boolean;
+    parentId?: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetTreeDocumentTypeChildrenResponse = ((PagedDocumentTypeTreeItemResponseModel));
+
+export type GetTreeDocumentTypeRootData = {
+    foldersOnly?: boolean;
+    skip?: number;
+    take?: number;
+};
+
+export type GetTreeDocumentTypeRootResponse = ((PagedDocumentTypeTreeItemResponseModel));
+
+export type GetDocumentVersionData = {
+    culture?: string;
+    documentId: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetDocumentVersionResponse = ((PagedDocumentVersionItemResponseModel));
+
+export type GetDocumentVersionByIdData = {
+    id: string;
+};
+
+export type GetDocumentVersionByIdResponse = ((DocumentVersionResponseModel));
+
+export type PutDocumentVersionByIdPreventCleanupData = {
+    id: string;
+    preventCleanup?: boolean;
+};
+
+export type PutDocumentVersionByIdPreventCleanupResponse = (string);
+
+export type PostDocumentVersionByIdRollbackData = {
+    culture?: string;
+    id: string;
+};
+
+export type PostDocumentVersionByIdRollbackResponse = (string);
+
 export type PostDynamicRootQueryData = {
     requestBody?: (DynamicRootRequestModel);
 };
@@ -3848,170 +3852,6 @@ export type GetManifestManifestPrivateResponse = (Array<(ManifestResponseModel)>
 
 export type GetManifestManifestPublicResponse = (Array<(ManifestResponseModel)>);
 
-export type GetItemMediaTypeData = {
-    id?: Array<(string)>;
-};
-
-export type GetItemMediaTypeResponse = (Array<(MediaTypeItemResponseModel)>);
-
-export type GetItemMediaTypeAllowedData = {
-    fileExtension?: string;
-    skip?: number;
-    take?: number;
-};
-
-export type GetItemMediaTypeAllowedResponse = ((PagedModelMediaTypeItemResponseModel));
-
-export type GetItemMediaTypeFoldersData = {
-    skip?: number;
-    take?: number;
-};
-
-export type GetItemMediaTypeFoldersResponse = ((PagedModelMediaTypeItemResponseModel));
-
-export type GetItemMediaTypeSearchData = {
-    query?: string;
-    skip?: number;
-    take?: number;
-};
-
-export type GetItemMediaTypeSearchResponse = ((PagedModelMediaTypeItemResponseModel));
-
-export type PostMediaTypeData = {
-    requestBody?: (CreateMediaTypeRequestModel);
-};
-
-export type PostMediaTypeResponse = (string);
-
-export type GetMediaTypeByIdData = {
-    id: string;
-};
-
-export type GetMediaTypeByIdResponse = ((MediaTypeResponseModel));
-
-export type DeleteMediaTypeByIdData = {
-    id: string;
-};
-
-export type DeleteMediaTypeByIdResponse = (string);
-
-export type PutMediaTypeByIdData = {
-    id: string;
-    requestBody?: (UpdateMediaTypeRequestModel);
-};
-
-export type PutMediaTypeByIdResponse = (string);
-
-export type GetMediaTypeByIdAllowedChildrenData = {
-    id: string;
-    skip?: number;
-    take?: number;
-};
-
-export type GetMediaTypeByIdAllowedChildrenResponse = ((PagedAllowedMediaTypeModel));
-
-export type GetMediaTypeByIdCompositionReferencesData = {
-    id: string;
-};
-
-export type GetMediaTypeByIdCompositionReferencesResponse = (Array<(MediaTypeCompositionResponseModel)>);
-
-export type PostMediaTypeByIdCopyData = {
-    id: string;
-    requestBody?: (CopyMediaTypeRequestModel);
-};
-
-export type PostMediaTypeByIdCopyResponse = (string);
-
-export type GetMediaTypeByIdExportData = {
-    id: string;
-};
-
-export type GetMediaTypeByIdExportResponse = (((Blob | File)));
-
-export type PutMediaTypeByIdImportData = {
-    id: string;
-    requestBody?: (ImportMediaTypeRequestModel);
-};
-
-export type PutMediaTypeByIdImportResponse = (string);
-
-export type PutMediaTypeByIdMoveData = {
-    id: string;
-    requestBody?: (MoveMediaTypeRequestModel);
-};
-
-export type PutMediaTypeByIdMoveResponse = (string);
-
-export type GetMediaTypeAllowedAtRootData = {
-    skip?: number;
-    take?: number;
-};
-
-export type GetMediaTypeAllowedAtRootResponse = ((PagedAllowedMediaTypeModel));
-
-export type PostMediaTypeAvailableCompositionsData = {
-    requestBody?: (MediaTypeCompositionRequestModel);
-};
-
-export type PostMediaTypeAvailableCompositionsResponse = (Array<(AvailableMediaTypeCompositionResponseModel)>);
-
-export type GetMediaTypeConfigurationResponse = ((MediaTypeConfigurationResponseModel));
-
-export type PostMediaTypeFolderData = {
-    requestBody?: (CreateFolderRequestModel);
-};
-
-export type PostMediaTypeFolderResponse = (string);
-
-export type GetMediaTypeFolderByIdData = {
-    id: string;
-};
-
-export type GetMediaTypeFolderByIdResponse = ((FolderResponseModel));
-
-export type DeleteMediaTypeFolderByIdData = {
-    id: string;
-};
-
-export type DeleteMediaTypeFolderByIdResponse = (string);
-
-export type PutMediaTypeFolderByIdData = {
-    id: string;
-    requestBody?: (UpdateFolderResponseModel);
-};
-
-export type PutMediaTypeFolderByIdResponse = (string);
-
-export type PostMediaTypeImportData = {
-    requestBody?: (ImportMediaTypeRequestModel);
-};
-
-export type PostMediaTypeImportResponse = (string);
-
-export type GetTreeMediaTypeAncestorsData = {
-    descendantId?: string;
-};
-
-export type GetTreeMediaTypeAncestorsResponse = (Array<(MediaTypeTreeItemResponseModel)>);
-
-export type GetTreeMediaTypeChildrenData = {
-    foldersOnly?: boolean;
-    parentId?: string;
-    skip?: number;
-    take?: number;
-};
-
-export type GetTreeMediaTypeChildrenResponse = ((PagedMediaTypeTreeItemResponseModel));
-
-export type GetTreeMediaTypeRootData = {
-    foldersOnly?: boolean;
-    skip?: number;
-    take?: number;
-};
-
-export type GetTreeMediaTypeRootResponse = ((PagedMediaTypeTreeItemResponseModel));
-
 export type GetCollectionMediaData = {
     dataTypeId?: string;
     filter?: string;
@@ -4197,6 +4037,238 @@ export type GetTreeMediaRootData = {
 
 export type GetTreeMediaRootResponse = ((PagedMediaTreeItemResponseModel));
 
+export type GetItemMediaTypeData = {
+    id?: Array<(string)>;
+};
+
+export type GetItemMediaTypeResponse = (Array<(MediaTypeItemResponseModel)>);
+
+export type GetItemMediaTypeAllowedData = {
+    fileExtension?: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetItemMediaTypeAllowedResponse = ((PagedModelMediaTypeItemResponseModel));
+
+export type GetItemMediaTypeFoldersData = {
+    skip?: number;
+    take?: number;
+};
+
+export type GetItemMediaTypeFoldersResponse = ((PagedModelMediaTypeItemResponseModel));
+
+export type GetItemMediaTypeSearchData = {
+    query?: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetItemMediaTypeSearchResponse = ((PagedModelMediaTypeItemResponseModel));
+
+export type PostMediaTypeData = {
+    requestBody?: (CreateMediaTypeRequestModel);
+};
+
+export type PostMediaTypeResponse = (string);
+
+export type GetMediaTypeByIdData = {
+    id: string;
+};
+
+export type GetMediaTypeByIdResponse = ((MediaTypeResponseModel));
+
+export type DeleteMediaTypeByIdData = {
+    id: string;
+};
+
+export type DeleteMediaTypeByIdResponse = (string);
+
+export type PutMediaTypeByIdData = {
+    id: string;
+    requestBody?: (UpdateMediaTypeRequestModel);
+};
+
+export type PutMediaTypeByIdResponse = (string);
+
+export type GetMediaTypeByIdAllowedChildrenData = {
+    id: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetMediaTypeByIdAllowedChildrenResponse = ((PagedAllowedMediaTypeModel));
+
+export type GetMediaTypeByIdCompositionReferencesData = {
+    id: string;
+};
+
+export type GetMediaTypeByIdCompositionReferencesResponse = (Array<(MediaTypeCompositionResponseModel)>);
+
+export type PostMediaTypeByIdCopyData = {
+    id: string;
+    requestBody?: (CopyMediaTypeRequestModel);
+};
+
+export type PostMediaTypeByIdCopyResponse = (string);
+
+export type GetMediaTypeByIdExportData = {
+    id: string;
+};
+
+export type GetMediaTypeByIdExportResponse = (((Blob | File)));
+
+export type PutMediaTypeByIdImportData = {
+    id: string;
+    requestBody?: (ImportMediaTypeRequestModel);
+};
+
+export type PutMediaTypeByIdImportResponse = (string);
+
+export type PutMediaTypeByIdMoveData = {
+    id: string;
+    requestBody?: (MoveMediaTypeRequestModel);
+};
+
+export type PutMediaTypeByIdMoveResponse = (string);
+
+export type GetMediaTypeAllowedAtRootData = {
+    skip?: number;
+    take?: number;
+};
+
+export type GetMediaTypeAllowedAtRootResponse = ((PagedAllowedMediaTypeModel));
+
+export type PostMediaTypeAvailableCompositionsData = {
+    requestBody?: (MediaTypeCompositionRequestModel);
+};
+
+export type PostMediaTypeAvailableCompositionsResponse = (Array<(AvailableMediaTypeCompositionResponseModel)>);
+
+export type GetMediaTypeConfigurationResponse = ((MediaTypeConfigurationResponseModel));
+
+export type PostMediaTypeFolderData = {
+    requestBody?: (CreateFolderRequestModel);
+};
+
+export type PostMediaTypeFolderResponse = (string);
+
+export type GetMediaTypeFolderByIdData = {
+    id: string;
+};
+
+export type GetMediaTypeFolderByIdResponse = ((FolderResponseModel));
+
+export type DeleteMediaTypeFolderByIdData = {
+    id: string;
+};
+
+export type DeleteMediaTypeFolderByIdResponse = (string);
+
+export type PutMediaTypeFolderByIdData = {
+    id: string;
+    requestBody?: (UpdateFolderResponseModel);
+};
+
+export type PutMediaTypeFolderByIdResponse = (string);
+
+export type PostMediaTypeImportData = {
+    requestBody?: (ImportMediaTypeRequestModel);
+};
+
+export type PostMediaTypeImportResponse = (string);
+
+export type GetTreeMediaTypeAncestorsData = {
+    descendantId?: string;
+};
+
+export type GetTreeMediaTypeAncestorsResponse = (Array<(MediaTypeTreeItemResponseModel)>);
+
+export type GetTreeMediaTypeChildrenData = {
+    foldersOnly?: boolean;
+    parentId?: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetTreeMediaTypeChildrenResponse = ((PagedMediaTypeTreeItemResponseModel));
+
+export type GetTreeMediaTypeRootData = {
+    foldersOnly?: boolean;
+    skip?: number;
+    take?: number;
+};
+
+export type GetTreeMediaTypeRootResponse = ((PagedMediaTypeTreeItemResponseModel));
+
+export type GetFilterMemberData = {
+    filter?: string;
+    isApproved?: boolean;
+    isLockedOut?: boolean;
+    memberGroupName?: string;
+    memberTypeId?: string;
+    orderBy?: string;
+    orderDirection?: DirectionModel;
+    skip?: number;
+    take?: number;
+};
+
+export type GetFilterMemberResponse = ((PagedMemberResponseModel));
+
+export type GetItemMemberData = {
+    id?: Array<(string)>;
+};
+
+export type GetItemMemberResponse = (Array<(MemberItemResponseModel)>);
+
+export type GetItemMemberSearchData = {
+    query?: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetItemMemberSearchResponse = ((PagedModelMemberItemResponseModel));
+
+export type PostMemberData = {
+    requestBody?: (CreateMemberRequestModel);
+};
+
+export type PostMemberResponse = (string);
+
+export type GetMemberByIdData = {
+    id: string;
+};
+
+export type GetMemberByIdResponse = ((MemberResponseModel));
+
+export type DeleteMemberByIdData = {
+    id: string;
+};
+
+export type DeleteMemberByIdResponse = (string);
+
+export type PutMemberByIdData = {
+    id: string;
+    requestBody?: (UpdateMemberRequestModel);
+};
+
+export type PutMemberByIdResponse = (string);
+
+export type PutMemberByIdValidateData = {
+    id: string;
+    requestBody?: (UpdateMemberRequestModel);
+};
+
+export type PutMemberByIdValidateResponse = (string);
+
+export type GetMemberConfigurationResponse = ((MemberConfigurationResponseModel));
+
+export type PostMemberValidateData = {
+    requestBody?: (CreateMemberRequestModel);
+};
+
+export type PostMemberValidateResponse = (string);
+
 export type GetItemMemberGroupData = {
     id?: Array<(string)>;
 };
@@ -4307,74 +4379,6 @@ export type GetTreeMemberTypeRootData = {
 };
 
 export type GetTreeMemberTypeRootResponse = ((PagedMemberTypeTreeItemResponseModel));
-
-export type GetFilterMemberData = {
-    filter?: string;
-    isApproved?: boolean;
-    isLockedOut?: boolean;
-    memberGroupName?: string;
-    memberTypeId?: string;
-    orderBy?: string;
-    orderDirection?: DirectionModel;
-    skip?: number;
-    take?: number;
-};
-
-export type GetFilterMemberResponse = ((PagedMemberResponseModel));
-
-export type GetItemMemberData = {
-    id?: Array<(string)>;
-};
-
-export type GetItemMemberResponse = (Array<(MemberItemResponseModel)>);
-
-export type GetItemMemberSearchData = {
-    query?: string;
-    skip?: number;
-    take?: number;
-};
-
-export type GetItemMemberSearchResponse = ((PagedModelMemberItemResponseModel));
-
-export type PostMemberData = {
-    requestBody?: (CreateMemberRequestModel);
-};
-
-export type PostMemberResponse = (string);
-
-export type GetMemberByIdData = {
-    id: string;
-};
-
-export type GetMemberByIdResponse = ((MemberResponseModel));
-
-export type DeleteMemberByIdData = {
-    id: string;
-};
-
-export type DeleteMemberByIdResponse = (string);
-
-export type PutMemberByIdData = {
-    id: string;
-    requestBody?: (UpdateMemberRequestModel);
-};
-
-export type PutMemberByIdResponse = (string);
-
-export type PutMemberByIdValidateData = {
-    id: string;
-    requestBody?: (UpdateMemberRequestModel);
-};
-
-export type PutMemberByIdValidateResponse = (string);
-
-export type GetMemberConfigurationResponse = ((MemberConfigurationResponseModel));
-
-export type PostMemberValidateData = {
-    requestBody?: (CreateMemberRequestModel);
-};
-
-export type PostMemberValidateResponse = (string);
 
 export type PostModelsBuilderBuildResponse = (string);
 
@@ -4593,6 +4597,14 @@ export type PostRedirectManagementStatusData = {
 
 export type PostRedirectManagementStatusResponse = (string);
 
+export type GetRelationByRelationTypeIdData = {
+    id: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetRelationByRelationTypeIdResponse = ((PagedRelationResponseModel));
+
 export type GetItemRelationTypeData = {
     id?: Array<(string)>;
 };
@@ -4611,14 +4623,6 @@ export type GetRelationTypeByIdData = {
 };
 
 export type GetRelationTypeByIdResponse = ((RelationTypeResponseModel));
-
-export type GetRelationByRelationTypeIdData = {
-    id: string;
-    skip?: number;
-    take?: number;
-};
-
-export type GetRelationByRelationTypeIdResponse = ((PagedRelationResponseModel));
 
 export type GetItemScriptData = {
     path?: Array<(string)>;
@@ -4976,99 +4980,6 @@ export type PostUpgradeAuthorizeResponse = (string);
 
 export type GetUpgradeSettingsResponse = ((UpgradeSettingsResponseModel));
 
-export type PostUserDataData = {
-    requestBody?: (CreateUserDataRequestModel);
-};
-
-export type PostUserDataResponse = (string);
-
-export type GetUserDataData = {
-    groups?: Array<(string)>;
-    identifiers?: Array<(string)>;
-    skip?: number;
-    take?: number;
-};
-
-export type GetUserDataResponse = ((PagedUserDataResponseModel));
-
-export type PutUserDataData = {
-    requestBody?: (UpdateUserDataRequestModel);
-};
-
-export type PutUserDataResponse = (string);
-
-export type GetUserDataByIdData = {
-    id: string;
-};
-
-export type GetUserDataByIdResponse = ((UserDataModel));
-
-export type GetFilterUserGroupData = {
-    filter?: string;
-    skip?: number;
-    take?: number;
-};
-
-export type GetFilterUserGroupResponse = ((PagedUserGroupResponseModel));
-
-export type GetItemUserGroupData = {
-    id?: Array<(string)>;
-};
-
-export type GetItemUserGroupResponse = (Array<(UserGroupItemResponseModel)>);
-
-export type DeleteUserGroupData = {
-    requestBody?: (DeleteUserGroupsRequestModel);
-};
-
-export type DeleteUserGroupResponse = (string);
-
-export type PostUserGroupData = {
-    requestBody?: (CreateUserGroupRequestModel);
-};
-
-export type PostUserGroupResponse = (string);
-
-export type GetUserGroupData = {
-    skip?: number;
-    take?: number;
-};
-
-export type GetUserGroupResponse = ((PagedUserGroupResponseModel));
-
-export type GetUserGroupByIdData = {
-    id: string;
-};
-
-export type GetUserGroupByIdResponse = ((UserGroupResponseModel));
-
-export type DeleteUserGroupByIdData = {
-    id: string;
-};
-
-export type DeleteUserGroupByIdResponse = (string);
-
-export type PutUserGroupByIdData = {
-    id: string;
-    requestBody?: (UpdateUserGroupRequestModel);
-};
-
-export type PutUserGroupByIdResponse = (string);
-
-export type DeleteUserGroupByIdUsersData = {
-    id: string;
-    requestBody?: Array<(ReferenceByIdModel)>;
-};
-
-export type DeleteUserGroupByIdUsersResponse = (string);
-
-export type PostUserGroupByIdUsersData = {
-    id: string;
-    requestBody?: Array<(ReferenceByIdModel)>;
-};
-
-export type PostUserGroupByIdUsersResponse = (string);
-
 export type GetFilterUserData = {
     filter?: string;
     orderBy?: UserOrderModel;
@@ -5297,6 +5208,99 @@ export type PostUserUnlockData = {
 };
 
 export type PostUserUnlockResponse = (string);
+
+export type PostUserDataData = {
+    requestBody?: (CreateUserDataRequestModel);
+};
+
+export type PostUserDataResponse = (string);
+
+export type GetUserDataData = {
+    groups?: Array<(string)>;
+    identifiers?: Array<(string)>;
+    skip?: number;
+    take?: number;
+};
+
+export type GetUserDataResponse = ((PagedUserDataResponseModel));
+
+export type PutUserDataData = {
+    requestBody?: (UpdateUserDataRequestModel);
+};
+
+export type PutUserDataResponse = (string);
+
+export type GetUserDataByIdData = {
+    id: string;
+};
+
+export type GetUserDataByIdResponse = ((UserDataModel));
+
+export type GetFilterUserGroupData = {
+    filter?: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetFilterUserGroupResponse = ((PagedUserGroupResponseModel));
+
+export type GetItemUserGroupData = {
+    id?: Array<(string)>;
+};
+
+export type GetItemUserGroupResponse = (Array<(UserGroupItemResponseModel)>);
+
+export type DeleteUserGroupData = {
+    requestBody?: (DeleteUserGroupsRequestModel);
+};
+
+export type DeleteUserGroupResponse = (string);
+
+export type PostUserGroupData = {
+    requestBody?: (CreateUserGroupRequestModel);
+};
+
+export type PostUserGroupResponse = (string);
+
+export type GetUserGroupData = {
+    skip?: number;
+    take?: number;
+};
+
+export type GetUserGroupResponse = ((PagedUserGroupResponseModel));
+
+export type GetUserGroupByIdData = {
+    id: string;
+};
+
+export type GetUserGroupByIdResponse = ((UserGroupResponseModel));
+
+export type DeleteUserGroupByIdData = {
+    id: string;
+};
+
+export type DeleteUserGroupByIdResponse = (string);
+
+export type PutUserGroupByIdData = {
+    id: string;
+    requestBody?: (UpdateUserGroupRequestModel);
+};
+
+export type PutUserGroupByIdResponse = (string);
+
+export type DeleteUserGroupByIdUsersData = {
+    id: string;
+    requestBody?: Array<(ReferenceByIdModel)>;
+};
+
+export type DeleteUserGroupByIdUsersResponse = (string);
+
+export type PostUserGroupByIdUsersData = {
+    id: string;
+    requestBody?: Array<(ReferenceByIdModel)>;
+};
+
+export type PostUserGroupByIdUsersResponse = (string);
 
 export type GetItemWebhookData = {
     id?: Array<(string)>;
