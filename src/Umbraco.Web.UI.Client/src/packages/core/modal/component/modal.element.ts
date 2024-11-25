@@ -35,7 +35,16 @@ export class UmbModalElement extends UmbLitElement {
 	#modalExtensionObserver?: UmbObserverController<ManifestModal | undefined>;
 	#modalRouterElement?: HTMLDivElement | UmbRouterSlotElement;
 
-	#onClose = () => {
+	#onClose = (e: Event) => {
+		if (this.#modalContext?.isResolved() === false) {
+			// If not resolved, and has a router, then we do not want to close, but instead let the router try to change the path for that to eventually trigger another round of close.
+			if (this.#modalContext?.router) {
+				e.stopImmediatePropagation();
+				e.preventDefault();
+				this.#modalContext._internal_removeCurrentModal();
+				return;
+			}
+		}
 		this.element?.removeEventListener(UUIModalCloseEvent, this.#onClose);
 		this.#modalContext?.reject({ type: 'close' });
 	};

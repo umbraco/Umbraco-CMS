@@ -12,6 +12,8 @@ export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContex
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MODAL_MANAGER_CONTEXT);
+
+		window.addEventListener('navigationsuccess', this.#onNavigationSuccess);
 	}
 
 	/**
@@ -46,18 +48,42 @@ export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContex
 	/**
 	 * Closes a modal or sidebar modal
 	 * @private
-	 * @param {string} key
+	 * @param {string} key - The key of the modal to close
 	 * @memberof UmbModalManagerContext
 	 */
 	public close(key: string) {
 		const modal = this.#modals.getValue().find((modal) => modal.key === key);
 		if (modal) {
-			modal.reject();
+			modal.forceResolve();
 		}
 	}
 
 	public remove(key: string) {
 		this.#modals.setValue(this.#modals.getValue().filter((modal) => modal.key !== key));
+	}
+
+	/**
+	 * Closes all modals that is not routable
+	 * @private
+	 * @memberof UmbModalManagerContext
+	 */
+	#closeNoneRoutableModals() {
+		this.#modals
+			.getValue()
+			.filter((modal) => modal.router === null)
+			.forEach((modal) => {
+				modal.forceResolve();
+			});
+	}
+
+	#onNavigationSuccess = () => {
+		this.#closeNoneRoutableModals();
+	};
+
+	override destroy() {
+		super.destroy();
+		this.#modals.destroy();
+		window.removeEventListener('navigationsuccess', this.#onNavigationSuccess);
 	}
 }
 

@@ -14,6 +14,7 @@ import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import '../ref-rte-block/index.js';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * @class UmbBlockRteEntryElement
@@ -242,12 +243,26 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.#context.expose();
 	};
 
+	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
+		if (this._exposed) {
+			return ext.component;
+		} else {
+			return html`<div>
+				${ext.component}
+				<umb-block-overlay-expose-button
+					.contentTypeName=${this._contentTypeName}
+					@click=${this.#expose}></umb-block-overlay-expose-button>
+			</div>`;
+		}
+	};
+
 	#renderBlock() {
 		return html`
 			<div class="uui-text uui-font">
 				<umb-extension-slot
 					type="blockEditorCustomView"
 					default-element="umb-ref-rte-block"
+					.renderMethod=${this.#extensionSlotRenderMethod}
 					.props=${this._blockViewProps}
 					.filter=${this.#filterBlockCustomViews}
 					single>

@@ -1,9 +1,11 @@
-@using Umbraco.Cms.Core
 @using Umbraco.Cms.Core.Models.PublishedContent
+@using Umbraco.Cms.Core.PublishedCache
 @using Umbraco.Cms.Core.Routing
-@using Umbraco.Extensions
+@using Umbraco.Cms.Core.Services.Navigation
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @inject IVariationContextAccessor VariationContextAccessor
+@inject IPublishedContentCache PublishedContentCache
+@inject IDocumentNavigationQueryService DocumentNavigationQueryService
 @inject IPublishedValueFallback PublishedValueFallback
 @inject IPublishedUrlProvider PublishedUrlProvider
 @*
@@ -13,7 +15,7 @@
     (You can find the alias of your Document Type by editing it in the Settings section)
 *@
 
-@{ var selection = Model?.Content.Children<IPublishedContent>(VariationContextAccessor).Where(x => x.IsVisible(PublishedValueFallback)).ToArray(); }
+@{ var selection = Model?.Content.Children<IPublishedContent>(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService).Where(x => x.IsVisible(PublishedValueFallback)).ToArray(); }
 
 @if (selection?.Length > 0)
 {

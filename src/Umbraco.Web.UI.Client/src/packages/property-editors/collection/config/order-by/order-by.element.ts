@@ -31,11 +31,15 @@ export class UmbPropertyEditorUICollectionOrderByElement extends UmbLitElement i
 				await workspace.propertyValueByAlias<Array<UmbCollectionColumnConfiguration>>('includeProperties'),
 				(includeProperties) => {
 					if (!includeProperties) return;
-					this._options = includeProperties.map((property) => ({
+					const options = includeProperties.map((property) => ({
 						name: property.header,
 						value: property.alias,
 						selected: property.alias === this.value,
 					}));
+					this._options = [
+						{ name: this.localize.term('general_name'), value: 'name', selected: 'name' === this.value },
+						...options,
+					];
 				},
 				'_observeIncludeProperties',
 			);

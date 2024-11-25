@@ -1,10 +1,11 @@
 import type { UmbPagedModel } from '../../../repository/types.js';
 import type { UmbContentTypeStructureDataSource } from './content-type-structure-data-source.interface.js';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
-// Temp type
-type AllowedContentTypeModel = {
+// Keep this type internal
+type AllowedContentTypeBaseModel = {
 	id: string;
 	name: string;
 	description?: string | null;
@@ -12,16 +13,16 @@ type AllowedContentTypeModel = {
 };
 
 export interface UmbContentTypeStructureServerDataSourceBaseArgs<
-	ServerItemType extends AllowedContentTypeModel,
-	ClientItemType extends { unique: string },
+	ServerItemType extends AllowedContentTypeBaseModel,
+	ClientItemType extends UmbEntityModel,
 > {
 	getAllowedChildrenOf: (unique: string | null) => Promise<UmbPagedModel<ServerItemType>>;
 	mapper: (item: ServerItemType) => ClientItemType;
 }
 
 export abstract class UmbContentTypeStructureServerDataSourceBase<
-	ServerItemType extends AllowedContentTypeModel,
-	ClientItemType extends { unique: string },
+	ServerItemType extends AllowedContentTypeBaseModel,
+	ClientItemType extends UmbEntityModel,
 > implements UmbContentTypeStructureDataSource<ClientItemType>
 {
 	#host;

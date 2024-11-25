@@ -1,20 +1,29 @@
 import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
-import type { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import type { ManifestEntityBulkAction, MetaEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 
 /**
- *
- * @param manifest
+ * Generates API arguments for the given manifest.
+ * @param {string | null | undefined} entityType - The type of the entity.
+ * @param {ManifestEntityBulkAction<MetaEntityBulkAction>} manifest - The manifest object from the extension.
+ * @returns {Array<unknown>} An array with the meta object from the manifest.
  */
-function apiArgsMethod(manifest: ManifestEntityBulkAction<MetaEntityBulkAction>) {
-	return [{ meta: manifest.meta }] as unknown[];
+function apiArgsMethod(
+	entityType: string | null | undefined,
+	manifest: ManifestEntityBulkAction<MetaEntityBulkAction>,
+): Array<unknown> {
+	return [{ entityType, meta: manifest.meta }] as Array<unknown>;
 }
 
 @customElement('umb-collection-selection-actions')
 export class UmbCollectionSelectionActionsElement extends UmbLitElement {
+	@state()
+	private _entityType?: string | null;
+
 	@state()
 	private _totalItems = 0;
 
@@ -33,6 +42,10 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this._collectionContext = instance;
 			this._observeCollectionContext();
+		});
+
+		this.consumeContext(UMB_ENTITY_CONTEXT, (entityContext) => {
+			this._entityType = entityContext.getEntityType();
 		});
 	}
 
@@ -96,7 +109,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 					type="entityBulkAction"
 					default-element="umb-entity-bulk-action"
 					.apiProps=${this._apiProps}
-					.apiArgs=${apiArgsMethod}
+					.apiArgs=${(manifest: ManifestEntityBulkAction) => apiArgsMethod(this._entityType, manifest)}
 					@action-executed=${this.#onActionExecuted}>
 				</umb-extension-with-api-slot>
 			</div>
