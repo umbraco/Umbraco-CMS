@@ -3,16 +3,7 @@ import type {
 	UmbMediaCreateOptionsModalData,
 	UmbMediaCreateOptionsModalValue,
 } from './media-create-options-modal.token.js';
-import {
-	html,
-	nothing,
-	customElement,
-	state,
-	ifDefined,
-	repeat,
-	css,
-	when,
-} from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, state, repeat, css, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbMediaTypeStructureRepository, type UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -60,8 +51,9 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 		}
 	}
 
-	// close the modal when navigating to data type
+	// close the modal when navigating to media
 	#onNavigate(mediaType: UmbAllowedMediaTypeModel) {
+		// TODO: Use a URL builder instead of hardcoding the URL. [NL]
 		const url = `section/media/workspace/media/create/parent/${this.data?.parent.entityType}/${
 			this.data?.parent.unique ?? 'null'
 		}/${mediaType.unique}`;
@@ -110,7 +102,6 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 			(mediaType) => mediaType.unique,
 			(mediaType) => html`
 				<uui-ref-node-document-type
-					data-id=${ifDefined(mediaType.unique)}
 					.name=${this.localize.string(mediaType.name)}
 					.alias=${this.localize.string(mediaType.description ?? '')}
 					select-only

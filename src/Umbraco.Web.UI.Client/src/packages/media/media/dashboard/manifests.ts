@@ -1,14 +1,13 @@
 export const manifests: Array<UmbExtensionManifest> = [
 	{
-		type: 'sectionView',
-		alias: 'Umb.SectionView.Media',
-		name: 'Media Section View',
-		element: () => import('./media-section-view.element.js'),
+		type: 'dashboard',
+		alias: 'Umb.Dashboard.Media',
+		name: 'Media Dashboard',
+		element: () => import('./media-dashboard.element.js'),
 		weight: 200,
 		meta: {
 			label: '#general_media',
 			pathname: 'media',
-			icon: 'icon-user',
 		},
 		conditions: [
 			{
