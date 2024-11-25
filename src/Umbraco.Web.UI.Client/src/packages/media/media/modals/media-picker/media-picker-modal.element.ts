@@ -26,6 +26,7 @@ import { UmbMediaSearchProvider, type UmbMediaSearchItemModel } from '../../sear
 
 import '@umbraco-cms/backoffice/imaging';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { name } from 'src/packages/block/umbraco-package.js';
 
 const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
 
@@ -324,10 +325,18 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 			return nothing;
 		}
 
+		const startNode: UmbMediaPathModel | undefined = this._startNode
+			? {
+					entityType: this._startNode.entityType,
+					unique: this._startNode.unique,
+					name: this._startNode.name,
+				}
+			: undefined;
+
 		return html`<umb-media-picker-folder-path
 			slot="footer-info"
 			.currentMedia=${this._currentMediaEntity}
-			.startNode=${this._startNode}
+			.startNode=${startNode}
 			@change=${this.#onPathChange}></umb-media-picker-folder-path>`;
 	}
 
