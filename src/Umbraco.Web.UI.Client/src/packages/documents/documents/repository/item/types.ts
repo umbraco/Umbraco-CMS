@@ -1,5 +1,5 @@
-import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type { UmbDocumentEntityType } from '../../entity.js';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 

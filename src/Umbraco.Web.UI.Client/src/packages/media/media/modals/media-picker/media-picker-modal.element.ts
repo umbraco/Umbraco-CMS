@@ -2,6 +2,8 @@ import { UmbMediaItemRepository, type UmbMediaItemModel } from '../../repository
 import { UmbMediaTreeRepository } from '../../tree/media-tree.repository.js';
 import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDropzoneElement } from '../../dropzone/dropzone.element.js';
+import type { UmbMediaTreeItemModel } from '../../tree/index.js';
+import { UmbMediaSearchProvider, type UmbMediaSearchItemModel } from '../../search/index.js';
 import type { UmbMediaPathModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
@@ -21,8 +23,6 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_CONTENT_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { isUmbracoFolder } from '@umbraco-cms/backoffice/media-type';
-import type { UmbMediaTreeItemModel } from '../../tree/index.js';
-import { UmbMediaSearchProvider, type UmbMediaSearchItemModel } from '../../search/index.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 import '@umbraco-cms/backoffice/imaging';

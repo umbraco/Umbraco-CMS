@@ -7,7 +7,9 @@ import {
 } from '../../paths.js';
 import type { UmbDocumentTypeDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UmbDocumentTypeWorkspaceEditorElement } from './document-type-workspace-editor.element.js';
+import { UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import { UmbContentTypeWorkspaceContextBase } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbWorkspaceIsNewRedirectController,
@@ -18,8 +20,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbRoutableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbPathPatternTypeAsEncodedParamsType } from '@umbraco-cms/backoffice/router';
-import { UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS } from './constants.js';
-import { UMB_DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbTemplateDetailRepository } from '@umbraco-cms/backoffice/template';
 
@@ -185,6 +185,7 @@ export class UmbDocumentTypeWorkspaceContext
 
 	/**
 	 * @deprecated Use the createScaffold method instead. Will be removed in 17.
+	 * @param presetAlias
 	 * @param {UmbEntityModel} parent
 	 * @memberof UmbMediaTypeWorkspaceContext
 	 */

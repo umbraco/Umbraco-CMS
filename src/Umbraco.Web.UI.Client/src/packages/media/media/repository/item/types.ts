@@ -1,5 +1,5 @@
-import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type { UmbMediaEntityType } from '../../entity.js';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 export interface UmbMediaItemModel {
