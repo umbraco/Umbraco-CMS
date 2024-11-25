@@ -89,21 +89,23 @@ public class ContentService : RepositoryService, IContentService
         ICultureImpactFactory cultureImpactFactory,
         IUserIdKeyResolver userIdKeyResolver,
         PropertyEditorCollection propertyEditorCollection)
-        : base(provider, loggerFactory, eventMessagesFactory)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            documentRepository,
+            entityRepository,
+            auditRepository,
+            contentTypeRepository,
+            documentBlueprintRepository,
+            languageRepository,
+            propertyValidationService,
+            shortStringHelper,
+            cultureImpactFactory,
+            userIdKeyResolver,
+            propertyEditorCollection,
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
     {
-        _documentRepository = documentRepository;
-        _entityRepository = entityRepository;
-        _auditRepository = auditRepository;
-        _contentTypeRepository = contentTypeRepository;
-        _documentBlueprintRepository = documentBlueprintRepository;
-        _languageRepository = languageRepository;
-        _propertyValidationService = propertyValidationService;
-        _shortStringHelper = shortStringHelper;
-        _cultureImpactFactory = cultureImpactFactory;
-        _userIdKeyResolver = userIdKeyResolver;
-        _propertyEditorCollection = propertyEditorCollection;
-        _idKeyMap = StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>();
-        _logger = loggerFactory.CreateLogger<ContentService>();
     }
 
     [Obsolete("Use non-obsolete constructor. Scheduled for removal in V16.")]
