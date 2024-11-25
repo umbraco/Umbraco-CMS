@@ -1,6 +1,7 @@
 import type { UmbContentTypeCompositionModel, UmbContentTypeDetailModel, UmbContentTypeSortModel } from '../types.js';
 import { UmbContentTypeStructureManager } from '../structure/index.js';
 import type { UmbContentTypeWorkspaceContext } from './content-type-workspace-context.interface.js';
+import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import {
@@ -12,6 +13,7 @@ import {
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
@@ -95,6 +97,12 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 			this.setUnique(data.unique);
 			this.setIsNew(true);
 			this._data.setPersisted(data);
+
+			if (!args.preset && args.parent.entityType === UMB_DOCUMENT_TYPE_ENTITY_TYPE && args.parent.unique) {
+				this.setCompositions([
+					{ contentType: { unique: args.parent.unique }, compositionType: CompositionTypeModel.INHERITANCE },
+				]);
+			}
 		}
 
 		this.loading.removeState(LOADING_STATE_UNIQUE);
