@@ -40,22 +40,24 @@ export class UmbMediaSearchServerDataSource implements UmbSearchDataSource<UmbMe
 		if (data) {
 			const mappedItems: Array<UmbMediaSearchItemModel> = data.items.map((item) => {
 				return {
-					href: '/section/media/workspace/media/edit/' + item.id,
 					entityType: UMB_MEDIA_ENTITY_TYPE,
-					unique: item.id,
+					hasChildren: item.hasChildren,
+					href: '/section/media/workspace/media/edit/' + item.id,
 					isTrashed: item.isTrashed,
+					unique: item.id,
 					mediaType: {
-						unique: item.mediaType.id,
-						icon: item.mediaType.icon,
 						collection: item.mediaType.collection ? { unique: item.mediaType.collection.id } : null,
+						icon: item.mediaType.icon,
+						unique: item.mediaType.id,
 					},
+					name: item.variants[0]?.name, // TODO: get correct variant name
+					parent: item.parent ? { unique: item.parent.id } : null,
 					variants: item.variants.map((variant) => {
 						return {
 							culture: variant.culture || null,
 							name: variant.name,
 						};
 					}),
-					name: item.variants[0]?.name, // TODO: get correct variant name
 				};
 			});
 
