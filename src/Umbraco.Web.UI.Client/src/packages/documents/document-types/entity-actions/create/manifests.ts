@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../../tree/index.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -9,7 +9,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Create Document Type Entity Action',
 		weight: 1200,
 		api: () => import('./create.action.js'),
-		forEntityTypes: [UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE, UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE],
+		forEntityTypes: [
+			UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+			UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
+			UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
+		],
 		meta: {
 			icon: 'icon-add',
 			label: '#actions_create',
