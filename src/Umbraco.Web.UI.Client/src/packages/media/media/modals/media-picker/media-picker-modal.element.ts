@@ -23,10 +23,9 @@ import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { isUmbracoFolder } from '@umbraco-cms/backoffice/media-type';
 import type { UmbMediaTreeItemModel } from '../../tree/index.js';
 import { UmbMediaSearchProvider, type UmbMediaSearchItemModel } from '../../search/index.js';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 import '@umbraco-cms/backoffice/imaging';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { name } from 'src/packages/block/umbraco-package.js';
 
 const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
 
