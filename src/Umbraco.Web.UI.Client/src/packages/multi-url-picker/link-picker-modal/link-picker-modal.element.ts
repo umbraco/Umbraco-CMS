@@ -25,7 +25,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	};
 
 	@state()
-	private _allowedMediaTypeIds?: Array<string>;
+	private _allowedMediaTypeUniques?: Array<string>;
 
 	@query('umb-input-document')
 	private _documentPickerElement?: UmbInputDocumentElement;
@@ -41,7 +41,8 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		// Get all the media types, excluding the folders, so that files are selectable media items.
 		const mediaTypeStructureRepository = new UmbMediaTypeStructureRepository(this);
 		const { data: mediaTypes } = await mediaTypeStructureRepository.requestAllowedChildrenOf(null);
-		this._allowedMediaTypeIds = mediaTypes?.items.map((x) => x.unique).filter((x) => !isUmbracoFolder(x)) ?? [];
+		this._allowedMediaTypeUniques =
+			(mediaTypes?.items.map((x) => x.unique).filter((x) => x && !isUmbracoFolder(x)) as Array<string>) ?? [];
 	}
 
 	#partialUpdateLink(linkObject: Partial<UmbLinkPickerLink>) {
@@ -255,7 +256,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					</umb-input-document>
 					<umb-input-media
 						?hidden=${!this.value.link.unique || this.value.link.type !== 'media'}
-						.allowedContentTypeIds=${this._allowedMediaTypeIds}
+						.allowedContentTypeIds=${this._allowedMediaTypeUniques}
 						.max=${1}
 						.value=${this.value.link.unique && this.value.link.type === 'media' ? this.value.link.unique : ''}
 						@change=${(e: UmbInputPickerEvent) => this.#onPickerSelection(e, 'media')}></umb-input-media>

@@ -91,7 +91,7 @@ public class ViewHelper : IViewHelper
         return t.Content;
     }
 
-    public string ViewPath(string alias) => _viewFileSystem.GetRelativePath(CultureInfo.InvariantCulture.TextInfo.ToTitleCase(alias.Replace(" ", string.Empty)) + ".cshtml");
+    public string ViewPath(string alias) => _viewFileSystem.GetRelativePath(alias.Replace(" ", string.Empty) + ".cshtml");
 
     private string SaveTemplateToFile(ITemplate template)
     {

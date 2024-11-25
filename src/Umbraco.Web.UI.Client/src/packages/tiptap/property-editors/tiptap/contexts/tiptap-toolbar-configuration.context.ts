@@ -180,7 +180,11 @@ export class UmbTiptapToolbarConfigurationContext extends UmbContextBase<UmbTipt
 		this.#toolbar.setValue(toolbar);
 	}
 
-	/** @deprecated This will be removed in Umbraco 16. */
+	/**
+	 * @param {UmbTiptapToolbarValue | Array<string> | null} value - The value to migrate.
+	 * @returns {UmbTiptapToolbarValue} The migrated value.
+	 * @deprecated This will be removed in Umbraco 16.
+	 */
 	public migrateTinyMceToolbar(value?: UmbTiptapToolbarValue | Array<string> | null): UmbTiptapToolbarValue {
 		if (this.isValidToolbarValue(value)) return value;
 

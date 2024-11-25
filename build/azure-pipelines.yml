@@ -5,6 +5,10 @@ parameters:
     displayName: Run SQL Server Integration Tests
     type: boolean
     default: false
+  - name: sqlServerLinuxAcceptanceTests
+    displayName: Run SQL Server Linux Acceptance Tests
+    type: boolean
+    default: false
   - name: myGetDeploy
     displayName: Deploy to MyGet
     type: boolean
@@ -559,10 +563,11 @@ stages:
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
         strategy:
           matrix:
-            Linux:
-              vmImage: "ubuntu-latest"
-              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+            ${{ if eq(parameters.sqlServerLinuxAcceptanceTests, True) }} :
+              Linux:
+                vmImage: "ubuntu-latest"
+                SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
+                CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
             Windows:
               vmImage: "windows-latest"
         pool:

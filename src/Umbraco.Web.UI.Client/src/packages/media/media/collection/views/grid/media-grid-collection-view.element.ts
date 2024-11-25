@@ -7,15 +7,14 @@ import { UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE } from '../../../entity.js';
 import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 
 import '@umbraco-cms/backoffice/imaging';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-media-grid-collection-view')
 export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	@state()
-	private _editMediaPath = '';
+	private _workspacePathBuilder?: UmbModalRouteBuilder;
 
 	@state()
 	private _items: Array<UmbMediaCollectionItemModel> = [];
@@ -29,23 +28,16 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 		super();
 		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
+			collectionContext.setupView(this);
+			this.observe(
+				collectionContext.workspacePathBuilder,
+				(builder) => {
+					this._workspacePathBuilder = builder;
+				},
+				'observePath',
+			);
 			this.#observeCollectionContext();
 		});
-
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath('media')
-			.onSetup(() => {
-				return { data: { entityType: 'media', preset: {} } };
-			})
-			.onReject(() => {
-				this.#collectionContext?.requestCollection();
-			})
-			.onSubmit(() => {
-				this.#collectionContext?.requestCollection();
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._editMediaPath = routeBuilder({});
-			});
 	}
 
 	#observeCollectionContext() {
@@ -58,14 +50,6 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 			(selection) => (this._selection = selection),
 			'_observeSelection',
 		);
-	}
-
-	#onOpen(event: Event, unique: string) {
-		event.preventDefault();
-		event.stopPropagation();
-
-		const url = this._editMediaPath + UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({ unique });
-		window.history.pushState(null, '', url);
 	}
 
 	#onSelect(item: UmbMediaCollectionItemModel) {
@@ -82,6 +66,15 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 
 	#isSelected(item: UmbMediaCollectionItemModel) {
 		return this.#collectionContext?.selection.isSelected(item.unique);
+	}
+
+	#getEditUrl(item: UmbMediaCollectionItemModel) {
+		return item.unique && this._workspacePathBuilder
+			? this._workspacePathBuilder({ entityType: item.entityType }) +
+					UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({
+						unique: item.unique,
+					})
+			: '';
 	}
 
 	override render() {
@@ -106,7 +99,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				selectable
 				?select-only=${this._selection && this._selection.length > 0}
 				?selected=${this.#isSelected(item)}
-				@open=${(event: Event) => this.#onOpen(event, item.unique)}
+				href=${this.#getEditUrl(item)}
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}
 				class="media-item">

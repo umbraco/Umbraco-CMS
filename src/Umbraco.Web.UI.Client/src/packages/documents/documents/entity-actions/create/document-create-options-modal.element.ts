@@ -3,7 +3,7 @@ import type {
 	UmbDocumentCreateOptionsModalData,
 	UmbDocumentCreateOptionsModalValue,
 } from './document-create-options-modal.token.js';
-import { html, customElement, state, ifDefined, repeat, css, when } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, repeat, css, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import {
@@ -19,6 +19,7 @@ import {
 	UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 	type UmbDocumentEntityTypeUnion,
 } from '@umbraco-cms/backoffice/document';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 @customElement('umb-document-create-options-modal')
 export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
@@ -101,7 +102,10 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 		this._submitModal();
 	}
 
-	async #onSelectDocumentType(documentTypeUnique: string) {
+	async #onSelectDocumentType(documentTypeUnique: UmbEntityUnique) {
+		if (!documentTypeUnique) {
+			throw new Error('Document type unique is not defined');
+		}
 		this.#documentTypeUnique = documentTypeUnique;
 		this.#documentTypeIcon = this._allowedDocumentTypes.find((dt) => dt.unique === documentTypeUnique)?.icon ?? '';
 
@@ -171,7 +175,6 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 							(documentType) => documentType.unique,
 							(documentType) => html`
 								<uui-ref-node-document-type
-									data-id=${ifDefined(documentType.unique)}
 									.name=${this.localize.string(documentType.name)}
 									.alias=${this.localize.string(documentType.description ?? '')}
 									select-only
