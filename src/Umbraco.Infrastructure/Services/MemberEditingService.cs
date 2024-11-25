@@ -226,7 +226,7 @@ internal sealed class MemberEditingService : IMemberEditingService
             return MemberEditingOperationStatus.InvalidUsername;
         }
 
-        if (IsEmailValid(model.Email) is false)
+        if (model.Email.IsEmail() is false)
         {
             return MemberEditingOperationStatus.InvalidEmail;
         }
@@ -399,6 +399,4 @@ internal sealed class MemberEditingService : IMemberEditingService
 
         return true;
     }
-
-    private static bool IsEmailValid(string email) => new EmailAddressAttribute().IsValid(email);
 }
