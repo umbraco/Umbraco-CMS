@@ -73,6 +73,10 @@
 			"file": "paperclip.svg"
 		},
 		{
+			"name": "icon-audio-lines",
+			"file": "audio-lines.svg"
+		},
+		{
 			"name": "icon-autofill",
 			"file": "text-cursor-input.svg"
 		},
@@ -1373,6 +1377,10 @@
 		{
 			"name": "icon-ordered-list",
 			"file": "list-ordered.svg"
+		},
+		{
+			"name": "icon-origami",
+			"file": "origami.svg"
 		},
 		{
 			"name": "icon-out",
