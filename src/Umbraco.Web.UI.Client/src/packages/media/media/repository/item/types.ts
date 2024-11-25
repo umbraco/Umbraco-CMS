@@ -1,3 +1,4 @@
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type { UmbMediaEntityType } from '../../entity.js';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
@@ -12,7 +13,7 @@ export interface UmbMediaItemModel {
 		collection: UmbReferenceByUnique | null;
 	};
 	name: string; // TODO: get correct variant name
-	parent: UmbReferenceByUnique | null;
+	parent: { unique: UmbEntityUnique } | null; // TODO: Use UmbReferenceByUnique when it support unique as null
 	variants: Array<UmbMediaItemVariantModel>;
 }
 

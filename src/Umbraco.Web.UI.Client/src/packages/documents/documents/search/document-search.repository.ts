@@ -1,9 +1,9 @@
 import { UmbDocumentSearchServerDataSource } from './document-search.server.data-source.js';
-import type { UmbDocumentSearchItemModel } from './document.search-provider.js';
 import type { UmbSearchRepository, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbDocumentSearchItemModel } from './types.js';
 
 export class UmbDocumentSearchRepository
 	extends UmbControllerBase
