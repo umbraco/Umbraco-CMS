@@ -59,6 +59,9 @@ internal class SerilogJsonLogViewer : SerilogLogViewerSourceBase
 
         var count = 0;
 
+        var serializerSettings = GetJsonSerializerSettings();
+        var jsonSerializer =  JsonSerializer.Create(serializerSettings);
+
         // foreach full day in the range - see if we can find one or more filenames that end with
         // yyyyMMdd.json - Ends with due to MachineName in filenames - could be 1 or more due to load balancing
         for (DateTime day = logTimePeriod.StartTime.Date; day.Date <= logTimePeriod.EndTime.Date; day = day.AddDays(1))
@@ -77,7 +80,8 @@ internal class SerilogJsonLogViewer : SerilogLogViewerSourceBase
                 {
                     using (var stream = new StreamReader(fs))
                     {
-                        var reader = new LogEventReader(stream);
+                        var reader = new LogEventReader(stream, jsonSerializer);
+
                         while (TryRead(reader, out LogEvent? evt))
                         {
                             // We may get a null if log line is malformed
@@ -129,5 +133,15 @@ internal class SerilogJsonLogViewer : SerilogLogViewerSourceBase
             evt = null;
             return true;
         }
+    }
+
+    private JsonSerializerSettings GetJsonSerializerSettings()
+    {
+        return new JsonSerializerSettings
+        {
+            DateParseHandling = DateParseHandling.None,
+            Culture = System.Globalization.CultureInfo.InvariantCulture,
+            MaxDepth = 128
+        };
     }
 }
