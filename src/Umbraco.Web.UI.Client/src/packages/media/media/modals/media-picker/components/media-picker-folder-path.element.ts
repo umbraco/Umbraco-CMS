@@ -66,7 +66,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 				).data || []
 			: [];
 
-		let paths: Array<UmbMediaPathModel> = items.map((item) => ({
+		const paths: Array<UmbMediaPathModel> = items.map((item) => ({
 			name: item.name,
 			unique: item.unique,
 			entityType: item.entityType,
