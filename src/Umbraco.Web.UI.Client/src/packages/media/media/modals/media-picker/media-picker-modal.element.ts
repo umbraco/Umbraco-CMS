@@ -101,6 +101,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 					unique: this._startNode.unique,
 					entityType: this._startNode.entityType,
 				};
+
+				this._searchFrom = { unique: this._startNode.unique, entityType: this._startNode.entityType };
 			}
 		}
 
@@ -188,10 +190,25 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#onPathChange(e: CustomEvent) {
-		this._currentMediaEntity = (e.target as UmbMediaPickerFolderPathElement).currentMedia || {
-			unique: null,
-			entityType: UMB_MEDIA_ROOT_ENTITY_TYPE,
-		};
+		const newPath = e.target as UmbMediaPickerFolderPathElement;
+
+		if (newPath.currentMedia) {
+			this._currentMediaEntity = newPath.currentMedia;
+		} else if (this._startNode) {
+			this._currentMediaEntity = {
+				name: this._startNode.name,
+				unique: this._startNode.unique,
+				entityType: this._startNode.entityType,
+			};
+		} else {
+			this._currentMediaEntity = root;
+		}
+
+		if (this._currentMediaEntity.unique) {
+			this._searchFrom = { unique: this._currentMediaEntity.unique, entityType: this._currentMediaEntity.entityType };
+		} else {
+			this._searchFrom = undefined;
+		}
 
 		this.#loadChildrenOfCurrentMediaItem();
 	}
@@ -203,9 +220,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	#onSearchFromChange(e: CustomEvent) {
 		const checked = (e.target as HTMLInputElement).checked;
 
-		if (checked && this._startNode) {
-			this._searchFrom = { unique: this._startNode.unique, entityType: this._startNode.entityType };
-		} else if (checked) {
+		if (checked) {
 			this._searchFrom = { unique: this._currentMediaEntity.unique, entityType: this._currentMediaEntity.entityType };
 		} else {
 			this._searchFrom = undefined;
