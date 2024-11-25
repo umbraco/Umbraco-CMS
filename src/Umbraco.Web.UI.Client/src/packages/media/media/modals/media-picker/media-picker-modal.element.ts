@@ -29,6 +29,7 @@ import '@umbraco-cms/backoffice/imaging';
 
 const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
 
+// TODO: investigate how we can reuse the picker-search-field element, picker context etc.
 @customElement('umb-media-picker-modal')
 export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	UmbMediaPickerModalData<unknown>,
@@ -63,6 +64,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _startNode: UmbMediaItemModel | undefined;
+
+	@state()
+	_searching: boolean = false;
 
 	@query('#dropzone')
 	private _dropzone!: UmbDropzoneElement;
@@ -154,6 +158,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	async #searchMedia() {
 		if (!this._searchQuery) {
 			this.#clearSearch();
+			this._searching = false;
 			return;
 		}
 
@@ -163,11 +168,13 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 		if (!data) {
 			// No search results.
 			this._searchResult = [];
+			this._searching = false;
 			return;
 		}
 
 		// Map urls for search results as we are going to show for all folders (as long they aren't trashed).
 		this._searchResult = data.items;
+		this._searching = false;
 	}
 
 	#debouncedSearch = debounce(() => {
@@ -176,6 +183,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 
 	#onSearch(e: UUIInputEvent) {
 		this._searchQuery = (e.target.value as string).toLocaleLowerCase();
+		this._searching = true;
 		this.#debouncedSearch();
 	}
 
@@ -241,7 +249,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 
 	#renderSearchResult() {
 		return html`
-			${!this._searchResult.length
+			${!this._searchResult.length && !this._searching
 				? html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`
 				: html`<div id="media-grid">
 						${repeat(
@@ -278,7 +286,11 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 						placeholder=${this.localize.term('placeholders_search')}
 						@input=${this.#onSearch}
 						value=${this._searchQuery}>
-						<uui-icon slot="prepend" name="icon-search"></uui-icon>
+						<div slot="prepend">
+							${this._searching
+								? html`<uui-loader-circle id="searching-indicator"></uui-loader-circle>`
+								: html`<uui-icon name="search"></uui-icon>`}
+						</div>
 					</uui-input>
 
 					${this._currentMediaEntity.unique && this._currentMediaEntity.unique !== this._startNode?.unique
@@ -350,16 +362,17 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 			#search {
 				flex: 1;
 			}
+
 			#search uui-input {
 				width: 100%;
 				margin-bottom: var(--uui-size-3);
 			}
-			#search uui-icon {
-				height: 100%;
-				display: flex;
-				align-items: stretch;
-				padding-left: var(--uui-size-3);
+
+			#searching-indicator {
+				margin-left: 7px;
+				margin-top: 4px;
 			}
+
 			#media-grid {
 				display: grid;
 				grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
