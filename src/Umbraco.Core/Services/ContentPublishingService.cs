@@ -117,8 +117,14 @@ internal sealed class ContentPublishingService : IContentPublishingService
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.CultureMissing, new ContentPublishingResult());
             }
 
+            if (cultures.Any(x => x == Constants.System.InvariantCulture))
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.CannotPublishInvariantWhenVariant, new ContentPublishingResult());
+            }
+
             var validCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode);
-            if (cultures.Any(x => x == "*") || validCultures.ContainsAll(cultures) is false)
+            if (validCultures.ContainsAll(cultures) is false)
             {
                 scope.Complete();
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.InvalidCulture, new ContentPublishingResult());

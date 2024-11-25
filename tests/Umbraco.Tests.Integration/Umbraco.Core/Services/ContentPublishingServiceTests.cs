@@ -126,6 +126,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
             Constants.Security.SuperUserKey);
 
         Assert.IsFalse(publishAttempt.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.CannotPublishInvariantWhenVariant, publishAttempt.Status);
 
         var content = ContentService.GetById(setupData.Key);
         Assert.AreEqual(0, content!.PublishedCultures.Count());
@@ -171,6 +172,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
             Constants.Security.SuperUserKey);
 
         Assert.IsFalse(publishAttempt.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, publishAttempt.Status);
 
         var content = ContentService.GetById(setupData.Key);
         Assert.AreEqual(0, content!.PublishedCultures.Count());
@@ -209,6 +211,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
             Constants.Security.SuperUserKey);
 
         Assert.IsFalse(publishAttempt.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.CultureAwaitingRelease, publishAttempt.Status);
 
         var content = ContentService.GetById(setupData.Key);
         Assert.AreEqual(0, content!.PublishedCultures.Count());
@@ -420,6 +423,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
             Constants.Security.SuperUserKey);
 
         Assert.IsFalse(scheduleAttempt.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, scheduleAttempt.Status);
 
         var schedules = ContentService.GetContentScheduleByContentId(setupData.Id);
         var content = ContentService.GetById(setupData.Key);
@@ -637,6 +641,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
             Constants.Security.SuperUserKey);
 
         Assert.IsFalse(scheduleAttempt.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, scheduleAttempt.Status);
 
         var schedules = ContentService.GetContentScheduleByContentId(setupData.Id);
         var content = ContentService.GetById(setupData.Key);
@@ -881,6 +886,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
             Constants.Security.SuperUserKey);
 
         Assert.IsFalse(scheduleAttempt.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, scheduleAttempt.Status);
 
         var schedules = ContentService.GetContentScheduleByContentId(setupData.Id);
         var content = ContentService.GetById(setupData.Key);
@@ -1125,7 +1131,7 @@ public class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
             Constants.Security.SuperUserKey);
 
         Assert.IsFalse(scheduleAttempt.Success);
-
+        Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, scheduleAttempt.Status);
         var schedules = ContentService.GetContentScheduleByContentId(setupData.Id);
         var content = ContentService.GetById(setupData.Key);
 
