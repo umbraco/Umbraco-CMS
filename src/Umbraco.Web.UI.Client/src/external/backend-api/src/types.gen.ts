@@ -653,6 +653,8 @@ export type DocumentItemResponseModel = {
     id: string;
     isTrashed: boolean;
     isProtected: boolean;
+    parent?: ((ReferenceByIdModel) | null);
+    hasChildren: boolean;
     documentType: (DocumentTypeReferenceResponseModel);
     variants: Array<(DocumentVariantItemResponseModel)>;
 };
@@ -1185,6 +1187,8 @@ export type MediaConfigurationResponseModel = {
 export type MediaItemResponseModel = {
     id: string;
     isTrashed: boolean;
+    parent?: ((ReferenceByIdModel) | null);
+    hasChildren: boolean;
     mediaType: (MediaTypeReferenceResponseModel);
     variants: Array<(VariantItemResponseModel)>;
 };
