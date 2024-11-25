@@ -223,7 +223,7 @@
 		"monaco-editor": "^0.52.0",
 		"rxjs": "^7.8.1",
 		"tinymce": "^6.8.3",
-		"tinymce-i18n": "^24.11.11",
+		"tinymce-i18n": "^24.11.25",
 		"uuid": "^11.0.3"
 	},
 	"devDependencies": {
