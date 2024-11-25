@@ -301,7 +301,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#renderCard(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
-		const disabled = !this._selectableFilter(item);
+		const canNavigate = this.#allowNavigateToMedia(item);
+		const selectable = this._selectableFilter(item);
+		const disabled = !(selectable || canNavigate);
 		return html`
 			<uui-card-media
 				class=${ifDefined(disabled ? 'not-allowed' : undefined)}
@@ -310,8 +312,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 				@selected=${() => this.#onSelected(item)}
 				@deselected=${() => this.#onDeselected(item)}
 				?selected=${this.value?.selection?.find((value) => value === item.unique)}
-				?selectable=${!disabled}
-				?select-only=${this._isSelectionMode || this.#allowNavigateToMedia(item) === false}>
+				?selectable=${selectable}
+				?select-only=${this._isSelectionMode || canNavigate === false}>
 				<umb-imaging-thumbnail
 					unique=${item.unique}
 					alt=${item.name}

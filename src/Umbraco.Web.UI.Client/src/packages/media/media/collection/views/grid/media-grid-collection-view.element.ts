@@ -97,7 +97,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 			<uui-card-media
 				name=${ifDefined(item.name)}
 				selectable
-				?select-only=${this._selection && this._selection.length > 0}
+				?select-only=${this._selection.length > 0}
 				?selected=${this.#isSelected(item)}
 				href=${this.#getEditUrl(item)}
 				@selected=${() => this.#onSelect(item)}
