@@ -2509,16 +2509,20 @@ public static class PublishedContentExtensions
         }
     }
 
-    private static IEnumerable<IPublishedContent> EnumerateAncestorsOrSelfInternal(
+    private static IEnumerable<T> EnumerateAncestorsOrSelfInternal<T>(
         this IPublishedContent content,
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService,
         bool orSelf,
         string? contentTypeAlias = null)
+        where T : class, IPublishedContent
     {
         if (orSelf)
         {
-            yield return content;
+            if (content.TryYieldSelfOfType(contentTypeAlias, out T? self))
+            {
+                yield return self;
+            }
         }
 
         var nodeExists = contentTypeAlias is null
@@ -2533,10 +2537,32 @@ public static class PublishedContentExtensions
         foreach (Guid ancestorKey in ancestorsKeys)
         {
             IPublishedContent? ancestor = publishedCache.GetById(ancestorKey);
-            if (ancestor is not null)
+            if (ancestor is T ancestorOfTypeT)
             {
-                yield return ancestor;
+                yield return ancestorOfTypeT;
             }
         }
+    }
+
+    private static bool TryYieldSelfOfType<T>(
+        this IPublishedContent content,
+        string? contentTypeAlias,
+        [NotNullWhen(true)] out T? self)
+        where T : class, IPublishedContent
+    {
+        self = null;
+
+        if (content is not T contentOfTypeT)
+        {
+            return false;
+        }
+
+        if (contentTypeAlias is not null && contentOfTypeT.ContentType.Alias != contentTypeAlias)
+        {
+            return false;
+        }
+
+        self = contentOfTypeT;
+        return true;
     }
 }
