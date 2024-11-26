@@ -3,7 +3,7 @@ import { UmbClipboardEntryDetailLocalStorageDataSource } from './clipboard-entry
 import type { UmbClipboardEntryDetailModel } from '../types.js';
 import { UMB_CLIPBOARD_ENTRY_ENTITY_TYPE } from '../entity.js';
 
-describe('UmbClipboardLocalStorageDataSource', () => {
+describe('UmbClipboardEntryDetailLocalStorageDataSource', () => {
 	let dataSource: UmbClipboardEntryDetailLocalStorageDataSource;
 	const clipboardEntry: UmbClipboardEntryDetailModel = {
 		entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
