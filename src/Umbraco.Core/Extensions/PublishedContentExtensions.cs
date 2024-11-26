@@ -2458,6 +2458,23 @@ public static class PublishedContentExtensions
             : contentNodes.Where(x => x.IsInvariantOrHasCulture(culture));
     }
 
+    /// <summary>
+    ///     Gets the content type alias from the PublishedModelAttribute of a specified type.
+    /// </summary>
+    /// <typeparam name="T">The content type.</typeparam>
+    /// <returns>The content type alias.</returns>
+    private static string GetContentTypeAliasForType<T>()
+        where T : class, IPublishedContent
+    {
+        PublishedModelAttribute? attribute = typeof(T).GetCustomAttribute<PublishedModelAttribute>(false);
+        if (attribute is null)
+        {
+            throw new InvalidOperationException($"The type {typeof(T).FullName} does not have the {nameof(PublishedModelAttribute)}, so the content type alias cannot be inferred.");
+        }
+
+        return attribute.ContentTypeAlias;
+    }
+
     private static IEnumerable<IPublishedContent> EnumerateDescendantsOrSelfInternal(
         this IPublishedContent content,
         IVariationContextAccessor variationContextAccessor,
