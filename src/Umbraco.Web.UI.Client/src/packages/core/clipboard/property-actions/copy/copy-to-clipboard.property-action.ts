@@ -54,9 +54,6 @@ export class UmbColorPickerCopyToClipboardPropertyAction extends UmbPropertyActi
 		};
 
 		await this.#clipboardContext!.create(clipboardEntryDetail);
-
-		// TODO: Add correct message + localization
-		this.#notificationContext?.peek('positive', { data: { message: `${propertyLabel} copied to clipboard` } });
 	}
 }
 export { UmbColorPickerCopyToClipboardPropertyAction as api };
