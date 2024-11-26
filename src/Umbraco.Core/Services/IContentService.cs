@@ -526,15 +526,6 @@ public interface IContentService : IContentServiceBase<IContent>
 
     Task<OperationResult> EmptyRecycleBinAsync(Guid userId);
 
-    ContentScheduleCollection GetContentScheduleByContentId(Guid contentId)
-    {
-        // Todo clean up default implementation in v17
-        Attempt<int> idAttempt = StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>()
-            .GetIdForKey(contentId, UmbracoObjectTypes.Document);
-        if (idAttempt.Success is false)
-        {
-            throw new ArgumentException("Invalid contentId");
-        }
-        return GetContentScheduleByContentId(idAttempt.Result);
-    }
+ContentScheduleCollection GetContentScheduleByContentId(Guid contentId) => StaticServiceProvider.Instance
+    .GetRequiredService<ContentService>().GetContentScheduleByContentId(contentId);
 }
