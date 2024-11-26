@@ -1093,7 +1093,7 @@ public static class PublishedContentExtensions
         INavigationQueryService navigationQueryService,
         string contentTypeAlias,
         string? culture = null) =>
-        content.EnumerateDescendantsOrSelfInternal(
+        content.EnumerateDescendantsOrSelfInternal<IPublishedContent>(
             variationContextAccessor,
             publishedCache,
             navigationQueryService,
@@ -1144,7 +1144,7 @@ public static class PublishedContentExtensions
         INavigationQueryService navigationQueryService,
         string contentTypeAlias,
         string? culture = null) =>
-        content.EnumerateDescendantsOrSelfInternal(
+        content.EnumerateDescendantsOrSelfInternal<IPublishedContent>(
             variationContextAccessor,
             publishedCache,
             navigationQueryService,
@@ -1195,14 +1195,14 @@ public static class PublishedContentExtensions
         INavigationQueryService navigationQueryService,
         string contentTypeAlias,
         string? culture = null) => content
-            .EnumerateDescendantsOrSelfInternal(
-                variationContextAccessor,
-                publishedCache,
-                navigationQueryService,
-                culture,
-                false,
-                contentTypeAlias)
-            .FirstOrDefault();
+        .EnumerateDescendantsOrSelfInternal<IPublishedContent>(
+            variationContextAccessor,
+            publishedCache,
+            navigationQueryService,
+            culture,
+            false,
+            contentTypeAlias)
+        .FirstOrDefault();
 
     public static T? Descendant<T>(
         this IPublishedContent content,
@@ -1241,7 +1241,7 @@ public static class PublishedContentExtensions
         INavigationQueryService navigationQueryService,
         string contentTypeAlias,
         string? culture = null) => content
-        .EnumerateDescendantsOrSelfInternal(
+        .EnumerateDescendantsOrSelfInternal<IPublishedContent>(
             variationContextAccessor,
             publishedCache,
             navigationQueryService,
@@ -2142,6 +2142,7 @@ public static class PublishedContentExtensions
         IVariationContextAccessor variationContextAccessor,
         string contentTypeAlias, string? culture = null) =>
         content.EnumerateDescendantsOrSelfInternal(
+        content.EnumerateDescendantsOrSelfInternal<IPublishedContent>(
             variationContextAccessor,
             GetPublishedCache(content),
             GetNavigationQueryService(content),
@@ -2191,7 +2192,7 @@ public static class PublishedContentExtensions
         IVariationContextAccessor variationContextAccessor,
         string contentTypeAlias,
         string? culture = null) =>
-        content.EnumerateDescendantsOrSelfInternal(
+        content.EnumerateDescendantsOrSelfInternal<IPublishedContent>(
             variationContextAccessor,
             GetPublishedCache(content),
             GetNavigationQueryService(content),
@@ -2241,14 +2242,14 @@ public static class PublishedContentExtensions
         IVariationContextAccessor variationContextAccessor,
         string contentTypeAlias,
         string? culture = null) => content
-            .EnumerateDescendantsOrSelfInternal(
-                variationContextAccessor,
-                GetPublishedCache(content),
-                GetNavigationQueryService(content),
-                culture,
-                false,
-                contentTypeAlias)
-            .FirstOrDefault();
+        .EnumerateDescendantsOrSelfInternal<IPublishedContent>(
+            variationContextAccessor,
+            GetPublishedCache(content),
+            GetNavigationQueryService(content),
+            culture,
+            false,
+            contentTypeAlias)
+        .FirstOrDefault();
 
 
     public static T? Descendant<T>(
@@ -2284,14 +2285,14 @@ public static class PublishedContentExtensions
         IVariationContextAccessor variationContextAccessor,
         string contentTypeAlias,
         string? culture = null) => content
-            .EnumerateDescendantsOrSelfInternal(
-                variationContextAccessor,
-                GetPublishedCache(content),
-                GetNavigationQueryService(content),
-                culture,
-                true,
-                contentTypeAlias)
-            .FirstOrDefault();
+        .EnumerateDescendantsOrSelfInternal<IPublishedContent>(
+            variationContextAccessor,
+            GetPublishedCache(content),
+            GetNavigationQueryService(content),
+            culture,
+            true,
+            contentTypeAlias)
+        .FirstOrDefault();
 
 
     public static T? DescendantOrSelf<T>(
