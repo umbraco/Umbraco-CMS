@@ -36738,6 +36738,7 @@
       "DocumentItemResponseModel": {
         "required": [
           "documentType",
+          "hasChildren",
           "id",
           "isProtected",
           "isTrashed",
@@ -36753,6 +36754,17 @@
             "type": "boolean"
           },
           "isProtected": {
+            "type": "boolean"
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true
+          },
+          "hasChildren": {
             "type": "boolean"
           },
           "documentType": {
@@ -38895,6 +38907,7 @@
       },
       "MediaItemResponseModel": {
         "required": [
+          "hasChildren",
           "id",
           "isTrashed",
           "mediaType",
@@ -38907,6 +38920,17 @@
             "format": "uuid"
           },
           "isTrashed": {
+            "type": "boolean"
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true
+          },
+          "hasChildren": {
             "type": "boolean"
           },
           "mediaType": {

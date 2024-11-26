@@ -20,6 +20,9 @@ import {
 } from '@umbraco-cms/backoffice/extension-registry';
 import { filter, first, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { hasOwnOpener, retrieveStoredPath } from '@umbraco-cms/backoffice/utils';
+import type { UmbAppOauthElement } from './app-oauth.element.js';
+
+import './app-oauth.element.js';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
@@ -60,31 +63,27 @@ export class UmbAppElement extends UmbLitElement {
 		},
 		{
 			path: 'oauth_complete',
-			component: () => import('./app-error.element.js'),
+			component: () => import('./app-oauth.element.js'),
 			setup: (component) => {
 				if (!this.#authContext) {
-					throw new Error('[Fatal] Auth context is not available');
+					(component as UmbAppOauthElement).failure = true;
+					console.error('[Fatal] Auth context is not available');
+					return;
 				}
 
 				const searchParams = new URLSearchParams(window.location.search);
 				const hasCode = searchParams.has('code');
-				(component as UmbAppErrorElement).hideBackButton = true;
-				(component as UmbAppErrorElement).errorHeadline = this.localize.term('general_login');
+				if (!hasCode) {
+					(component as UmbAppOauthElement).failure = true;
+					console.error('[Fatal] No code in query parameters');
+					return;
+				}
 
-				// If there is an opener, we are in a popup window, and we should show a different message
-				// than if we are in the main window. If we are in the main window, we should redirect to the root.
+				// If we are in the main window (i.e. no opener), we should redirect to the root after the authorization request is completed.
 				// The authorization request will be completed in the active window (main or popup) and the authorization signal will be sent.
 				// If we are in a popup window, the storage event in UmbAuthContext will catch the signal and close the window.
 				// If we are in the main window, the signal will be caught right here and the user will be redirected to the root.
-				if (hasOwnOpener(this.backofficePath)) {
-					(component as UmbAppErrorElement).errorMessage = hasCode
-						? this.localize.term('errors_externalLoginSuccess')
-						: this.localize.term('errors_externalLoginFailed');
-				} else {
-					(component as UmbAppErrorElement).errorMessage = hasCode
-						? this.localize.term('errors_externalLoginRedirectSuccess')
-						: this.localize.term('errors_externalLoginFailed');
-
+				if (!hasOwnOpener(this.backofficePath)) {
 					this.observe(this.#authContext.authorizationSignal, () => {
 						// Redirect to the saved state or root
 						const url = retrieveStoredPath();
@@ -99,7 +98,7 @@ export class UmbAppElement extends UmbLitElement {
 				}
 
 				// Complete the authorization request, which will send the authorization signal
-				this.#authContext.completeAuthorizationRequest();
+				this.#authContext.completeAuthorizationRequest().catch(() => undefined);
 			},
 		},
 		{

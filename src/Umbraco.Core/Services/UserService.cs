@@ -917,7 +917,7 @@ internal partial class UserService : RepositoryService, IUserService
         {
             return UserOperationStatus.UserNameIsNotEmail;
         }
-        if (!IsEmailValid(model.Email))
+        if (model.Email.IsEmail() is false)
         {
             return UserOperationStatus.InvalidEmail;
         }
@@ -1136,7 +1136,7 @@ internal partial class UserService : RepositoryService, IUserService
             return UserOperationStatus.UserNameIsNotEmail;
         }
 
-        if (IsEmailValid(model.Email) is false)
+        if (model.Email.IsEmail() is false)
         {
             return UserOperationStatus.InvalidEmail;
         }
@@ -1163,8 +1163,6 @@ internal partial class UserService : RepositoryService, IUserService
 
         return UserOperationStatus.Success;
     }
-
-    private static bool IsEmailValid(string email) => new EmailAddressAttribute().IsValid(email);
 
     private List<int>? GetIdsFromKeys(IEnumerable<Guid>? guids, UmbracoObjectTypes type)
     {
