@@ -64,6 +64,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 				collectionContext.workspacePathBuilder,
 				(builder) => {
 					this._workspacePathBuilder = builder;
+					this.#createTableItems();
 				},
 				'observePath',
 			);
@@ -86,7 +87,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 			this.#collectionContext.items,
 			(items) => {
 				this._items = items;
-				this.#createTableItems(this._items);
+				this.#createTableItems();
 			},
 			'_observeItems',
 		);
@@ -117,12 +118,17 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 		}
 	}
 
-	#createTableItems(items: Array<UmbMediaCollectionItemModel>) {
+	#createTableItems() {
+		this._tableItems = [];
+
+		if (this._items === undefined) return;
+		if (this._workspacePathBuilder === undefined) return;
+
 		if (this._tableColumns.length === 0) {
 			this.#createTableHeadings();
 		}
 
-		this._tableItems = items.map((item) => {
+		this._tableItems = this._items.map((item) => {
 			if (!item.unique) throw new Error('Item id is missing.');
 
 			const data =
