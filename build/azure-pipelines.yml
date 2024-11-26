@@ -268,6 +268,7 @@ stages:
         pool:
           vmImage: $(vmImage)
         steps:
+          - checkout: none
           - task: DownloadPipelineArtifact@2
             displayName: Download build artifacts
             inputs:
@@ -308,6 +309,7 @@ stages:
         variables:
           Tests__Database__DatabaseType: "Sqlite"
         steps:
+          - checkout: none
           # Setup test environment
           - task: DownloadPipelineArtifact@2
             displayName: Download build artifacts
