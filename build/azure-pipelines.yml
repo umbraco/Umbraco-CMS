@@ -81,6 +81,7 @@ stages:
             submodules: false
             lfs: false,
             fetchDepth: 500
+            fetchFilter: tree:0
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
             inputs:
@@ -127,7 +128,10 @@ stages:
           vmImage: "ubuntu-latest"
         steps:
           - checkout: self
-            submodules: true
+            submodules: false
+            lfs: false,
+            fetchDepth: 1
+            fetchFilter: tree:0
           - template: templates/backoffice-install.yml
           - script: npm run build:for:npm
             displayName: Run build:for:npm
@@ -211,7 +215,10 @@ stages:
           BASE_PATH: /v$(umbracoMajorVersion)/ui
         steps:
           - checkout: self
-            submodules: true
+            submodules: false
+            lfs: false,
+            fetchDepth: 1
+            fetchFilter: tree:0
           - template: templates/backoffice-install.yml
           - script: npm run storybook:build
             displayName: Build Storybook
@@ -268,7 +275,11 @@ stages:
         pool:
           vmImage: $(vmImage)
         steps:
-          - checkout: none
+          - checkout: self
+            submodules: false
+            lfs: false,
+            fetchDepth: 1
+            fetchFilter: tree:0
           - task: DownloadPipelineArtifact@2
             displayName: Download build artifacts
             inputs:
@@ -309,7 +320,11 @@ stages:
         variables:
           Tests__Database__DatabaseType: "Sqlite"
         steps:
-          - checkout: none
+          - checkout: self
+            submodules: false
+            lfs: false,
+            fetchDepth: 1
+            fetchFilter: tree:0
           # Setup test environment
           - task: DownloadPipelineArtifact@2
             displayName: Download build artifacts
