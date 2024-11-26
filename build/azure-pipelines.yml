@@ -78,7 +78,9 @@ stages:
           vmImage: "windows-latest"
         steps:
           - checkout: self
-            submodules: true
+            submodules: false
+            lfs: false,
+            fetchDepth: 1
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
             inputs:
