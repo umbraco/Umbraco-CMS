@@ -10,7 +10,7 @@ import {
 	type UmbApiConstructorArgumentsMethodType,
 } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
@@ -153,7 +153,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 					<slot></slot>
 					<slot name="tag"></slot>
 				</button>
-				${this._isOpen === true ? this.#renderInside() : ''}
+				${this._isOpen === true ? this.#renderInside() : nothing}
 			</div>
 		`;
 	}
@@ -168,12 +168,17 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 					<umb-ufm-render id="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
 				</div>
 			</span>
+			${this.unpublished
+				? html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
+						><umb-localize key="blockEditor_notExposedLabel"></umb-localize
+					></uui-tag>`
+				: nothing}
 		`;
 	}
 
 	#renderInside() {
 		if (this._exposed === false) {
-			return html`<uui-button style="position:absolute; inset:0;" @click=${this.#expose}
+			return html`<uui-button style="width:100%; min-height:var(--uui-size-16);" @click=${this.#expose}
 				><uui-icon name="icon-add"></uui-icon>
 				<umb-localize
 					key="blockEditor_createThisFor"
@@ -218,7 +223,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				border-color: var(--uui-color-disabled-standalone);
 			}
 
-			:host([unpublished]) #open-part {
+			:host([unpublished]) #open-part #content {
 				opacity: 0.6;
 			}
 
@@ -282,6 +287,13 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 
 			#name {
 				font-weight: 700;
+			}
+
+			uui-tag {
+				margin-left: 0.5em;
+				margin-bottom: -0.3em;
+				margin-top: -0.3em;
+				vertical-align: text-top;
 			}
 
 			:host(:not([disabled])) #open-part:hover #icon {
