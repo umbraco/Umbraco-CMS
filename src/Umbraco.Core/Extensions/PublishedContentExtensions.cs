@@ -2466,10 +2466,11 @@ public static class PublishedContentExtensions
             .WhereNotNull();
     }
 
-    private static IEnumerable<IPublishedContent> FilterByCulture(
-        this IEnumerable<IPublishedContent> contentNodes,
+    private static IEnumerable<T> FilterByCulture<T>(
+        this IEnumerable<T> contentNodes,
         string? culture,
         IVariationContextAccessor? variationContextAccessor)
+        where T : class, IPublishedContent
     {
         // Determine the culture if not provided
         culture ??= variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
@@ -2496,7 +2497,7 @@ public static class PublishedContentExtensions
         return attribute.ContentTypeAlias;
     }
 
-    private static IEnumerable<IPublishedContent> EnumerateDescendantsOrSelfInternal(
+    private static IEnumerable<T> EnumerateDescendantsOrSelfInternal<T>(
         this IPublishedContent content,
         IVariationContextAccessor variationContextAccessor,
         IPublishedCache publishedCache,
@@ -2504,10 +2505,14 @@ public static class PublishedContentExtensions
         string? culture,
         bool orSelf,
         string? contentTypeAlias = null)
+        where T : class, IPublishedContent
     {
         if (orSelf)
         {
-            yield return content;
+            if (content.TryYieldSelfOfType(contentTypeAlias, out T? self))
+            {
+                yield return self;
+            }
         }
 
         var nodeExists = contentTypeAlias is null
@@ -2519,12 +2524,12 @@ public static class PublishedContentExtensions
             yield break;
         }
 
-        IEnumerable<IPublishedContent> descendants = descendantsKeys
-            .Select(publishedCache.GetById)
+        IEnumerable<T> descendants = descendantsKeys
+            .Select(key => publishedCache.GetById(key) as T)
             .WhereNotNull()
             .FilterByCulture(culture, variationContextAccessor);
 
-        foreach (IPublishedContent descendant in descendants)
+        foreach (T descendant in descendants)
         {
             yield return descendant;
         }
