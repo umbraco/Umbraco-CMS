@@ -581,8 +581,12 @@ public static class PublishedContentExtensions
         this IPublishedContent content,
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService)
-        where T : class, IPublishedContent =>
-        content.Ancestors(publishedCache, navigationQueryService).OfType<T>();
+        where T : class, IPublishedContent
+    {
+        var contentTypeAlias = GetContentTypeAliasForType<T>();
+
+        return content.EnumerateAncestorsOrSelfInternal<T>(publishedCache, navigationQueryService, false, contentTypeAlias);
+    }
 
     /// <summary>
     ///     Gets the ancestors of the content, at a level lesser or equal to a specified level, and of a specified content
@@ -606,8 +610,14 @@ public static class PublishedContentExtensions
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService,
         int maxLevel)
-        where T : class, IPublishedContent =>
-        content.Ancestors(publishedCache, navigationQueryService, maxLevel).OfType<T>();
+        where T : class, IPublishedContent
+    {
+        var contentTypeAlias = GetContentTypeAliasForType<T>();
+
+        IEnumerable<T> ancestors = content.EnumerateAncestorsOrSelfInternal<T>(publishedCache, navigationQueryService, false, contentTypeAlias);
+
+        return ancestors.Where(n => n.Level <= maxLevel);
+    }
 
     /// <summary>
     ///     Gets the content and its ancestors.
@@ -677,8 +687,12 @@ public static class PublishedContentExtensions
         this IPublishedContent content,
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService)
-        where T : class, IPublishedContent =>
-        content.AncestorsOrSelf(publishedCache, navigationQueryService).OfType<T>();
+        where T : class, IPublishedContent
+    {
+        var contentTypeAlias = GetContentTypeAliasForType<T>();
+
+        return content.EnumerateAncestorsOrSelfInternal<T>(publishedCache, navigationQueryService, true, contentTypeAlias);
+    }
 
     /// <summary>
     ///     Gets the content and its ancestor, at a lever lesser or equal to a specified level, and of a specified content
@@ -699,8 +713,14 @@ public static class PublishedContentExtensions
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService,
         int maxLevel)
-        where T : class, IPublishedContent =>
-        content.AncestorsOrSelf(publishedCache, navigationQueryService, maxLevel).OfType<T>();
+        where T : class, IPublishedContent
+    {
+        var contentTypeAlias = GetContentTypeAliasForType<T>();
+
+        IEnumerable<T> ancestorsOrSelf = content.EnumerateAncestorsOrSelfInternal<T>(publishedCache, navigationQueryService, true, contentTypeAlias);
+
+        return ancestorsOrSelf.Where(n => n.Level <= maxLevel);
+    }
 
     /// <summary>
     ///     Gets the ancestor of the content, ie its parent.
