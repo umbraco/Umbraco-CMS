@@ -80,7 +80,7 @@ stages:
           - checkout: self
             submodules: false
             lfs: false,
-            fetchDepth: 1
+            fetchDepth: 500
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
             inputs:
