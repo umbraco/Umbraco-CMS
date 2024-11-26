@@ -1634,7 +1634,7 @@ export type PackageDefinitionResponseModel = {
     languages: Array<(string)>;
     dictionaryItems: Array<(string)>;
     id: string;
-    packagePath: string;
+    readonly packagePath: string;
 };
 
 export type PackageMigrationStatusResponseModel = {
@@ -2072,10 +2072,10 @@ export type RelationReferenceModel = {
 export type RelationResponseModel = {
     id: string;
     relationType: (ReferenceByIdModel);
-    parent: (RelationReferenceModel);
-    child: (RelationReferenceModel);
-    createDate: string;
-    comment?: (string) | null;
+    readonly parent: (RelationReferenceModel);
+    readonly child: (RelationReferenceModel);
+    readonly createDate: string;
+    readonly comment?: (string) | null;
 };
 
 export type RelationTypeItemResponseModel = {
@@ -2592,7 +2592,7 @@ export type UpdatePackageRequestModel = {
     scripts: Array<(string)>;
     languages: Array<(string)>;
     dictionaryItems: Array<(string)>;
-    packagePath: string;
+    readonly packagePath: string;
 };
 
 export type UpdatePartialViewRequestModel = {
