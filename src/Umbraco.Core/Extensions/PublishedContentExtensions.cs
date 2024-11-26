@@ -1322,15 +1322,12 @@ public static class PublishedContentExtensions
     {
         ArgumentNullException.ThrowIfNull(content);
 
-        foreach (IPublishedContent desc in content.EnumerateDescendantsOrSelfInternal(
-                     variationContextAccessor,
-                     publishedCache,
-                     navigationQueryService,
-                     culture,
-                     orSelf))
-        {
-            yield return desc;
-        }
+        return content.EnumerateDescendantsOrSelfInternal<IPublishedContent>(
+            variationContextAccessor,
+            publishedCache,
+            navigationQueryService,
+            culture,
+            orSelf);
     }
 
     #endregion
