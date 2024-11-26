@@ -1301,26 +1301,6 @@ public static class PublishedContentExtensions
         }
     }
 
-    internal static IEnumerable<IPublishedContent> EnumerateDescendants(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string? culture = null)
-    {
-        yield return content;
-
-        foreach (IPublishedContent desc in content.EnumerateDescendantsOrSelfInternal(
-                     variationContextAccessor,
-                     publishedCache,
-                     navigationQueryService,
-                     culture,
-                     false))
-        {
-            yield return desc;
-        }
-    }
-
     #endregion
 
     #region Axes: children
@@ -2140,8 +2120,8 @@ public static class PublishedContentExtensions
     public static IEnumerable<IPublishedContent> DescendantsOfType(
         this IPublishedContent content,
         IVariationContextAccessor variationContextAccessor,
-        string contentTypeAlias, string? culture = null) =>
-        content.EnumerateDescendantsOrSelfInternal(
+        string contentTypeAlias,
+        string? culture = null) =>
         content.EnumerateDescendantsOrSelfInternal<IPublishedContent>(
             variationContextAccessor,
             GetPublishedCache(content),
@@ -2431,7 +2411,6 @@ public static class PublishedContentExtensions
             default:
                 throw new NotSupportedException("Unsupported content type.");
         }
-
     }
 
     private static IPublishedCache GetPublishedCache(IPublishedContent content)
