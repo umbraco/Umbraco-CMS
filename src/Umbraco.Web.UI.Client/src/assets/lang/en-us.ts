@@ -2531,6 +2531,8 @@ export default {
 			variantName ? `Create ${name} for ${variantName}` : `Create ${name}`,
 		insertBlock: 'Insert Block',
 		labelInlineMode: 'Display inline with text',
+		notExposedLabel: 'Draft',
+		notExposedDescription: 'This Block is not yet created for this variant',
 	},
 	contentTemplatesDashboard: {
 		whatHeadline: 'What are Document Blueprints?',
