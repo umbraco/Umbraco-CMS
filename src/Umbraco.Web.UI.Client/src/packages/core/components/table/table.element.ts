@@ -146,6 +146,18 @@ export class UmbTableElement extends LitElement {
 		this.dispatchEvent(new UmbTableOrderedEvent());
 	}
 
+	private _selectAllRows() {
+		this.selection = this.items.map((item: UmbTableItem) => item.id);
+		this._selectionMode = true;
+		this.dispatchEvent(new UmbTableSelectedEvent());
+	}
+
+	private _deselectAllRows() {
+		this.selection = [];
+		this._selectionMode = false;
+		this.dispatchEvent(new UmbTableDeselectedEvent());
+	}
+
 	private _selectRow(key: string) {
 		this.selection = [...this.selection, key];
 		this._selectionMode = this.selection.length > 0;
@@ -158,16 +170,14 @@ export class UmbTableElement extends LitElement {
 		this.dispatchEvent(new UmbTableDeselectedEvent());
 	}
 
-	private _selectAllRows() {
-		this.selection = this.items.map((item: UmbTableItem) => item.id);
-		this._selectionMode = true;
-		this.dispatchEvent(new UmbTableSelectedEvent());
-	}
-
-	private _deselectAllRows() {
-		this.selection = [];
-		this._selectionMode = false;
-		this.dispatchEvent(new UmbTableDeselectedEvent());
+	#onClickRow(key: string) {
+		if (this._selectionMode) {
+			if (this._isSelected(key)) {
+				this._deselectRow(key);
+			} else {
+				this._selectRow(key);
+			}
+		}
 	}
 
 	override render() {
@@ -234,7 +244,8 @@ export class UmbTableElement extends LitElement {
 				?select-only=${this._selectionMode}
 				?selected=${this._isSelected(item.id)}
 				@selected=${() => this._selectRow(item.id)}
-				@deselected=${() => this._deselectRow(item.id)}>
+				@deselected=${() => this._deselectRow(item.id)}
+				@click=${() => this.#onClickRow(item.id)}>
 				${this._renderRowCheckboxCell(item)} ${this.columns.map((column) => this._renderRowCell(column, item))}
 			</uui-table-row>
 		`;

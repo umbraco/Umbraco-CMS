@@ -126,9 +126,11 @@ const itemMapper = (model: UmbMockDocumentModel): DocumentItemResponseModel => {
 			icon: model.documentType.icon,
 			id: model.documentType.id,
 		},
+		hasChildren: model.hasChildren,
 		id: model.id,
 		isProtected: model.isProtected,
 		isTrashed: model.isTrashed,
+		parent: model.parent,
 		variants: model.variants,
 	};
 };
