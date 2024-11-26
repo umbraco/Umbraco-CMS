@@ -178,7 +178,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 
 	#renderInside() {
 		if (this._exposed === false) {
-			return html`<uui-button style="width:100%; min-height:var(--uui-size-16);" @click=${this.#expose}
+			return html`<uui-button id="exposeButton" @click=${this.#expose}
 				><uui-icon name="icon-add"></uui-icon>
 				<umb-localize
 					key="blockEditor_createThisFor"
@@ -206,6 +206,12 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 
 				min-width: 250px;
 			}
+
+			#exposeButton {
+				width: 100%;
+				min-height: var(--uui-size-16);
+			}
+
 			#open-part + * {
 				border-top: 1px solid var(--uui-color-border);
 			}
