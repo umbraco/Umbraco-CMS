@@ -564,7 +564,7 @@ public static class PublishedContentExtensions
     {
         ArgumentNullException.ThrowIfNull(content);
 
-        return content.EnumerateAncestorsOrSelfInternal(publishedCache, navigationQueryService, false, contentTypeAlias);
+        return content.EnumerateAncestorsOrSelfInternal<IPublishedContent>(publishedCache, navigationQueryService, false, contentTypeAlias);
     }
 
     /// <summary>
@@ -660,7 +660,7 @@ public static class PublishedContentExtensions
     {
         ArgumentNullException.ThrowIfNull(content);
 
-        return content.EnumerateAncestorsOrSelfInternal(publishedCache, navigationQueryService, true, contentTypeAlias);
+        return content.EnumerateAncestorsOrSelfInternal<IPublishedContent>(publishedCache, navigationQueryService, true, contentTypeAlias);
     }
 
     /// <summary>
@@ -749,7 +749,7 @@ public static class PublishedContentExtensions
         ArgumentNullException.ThrowIfNull(content);
 
         return content
-            .EnumerateAncestorsOrSelfInternal(publishedCache, navigationQueryService, false, contentTypeAlias)
+            .EnumerateAncestorsOrSelfInternal<IPublishedContent>(publishedCache, navigationQueryService, false, contentTypeAlias)
             .FirstOrDefault();
     }
 
@@ -832,7 +832,7 @@ public static class PublishedContentExtensions
         ArgumentNullException.ThrowIfNull(content);
 
         return content
-            .EnumerateAncestorsOrSelfInternal(publishedCache, navigationQueryService, true, contentTypeAlias)
+            .EnumerateAncestorsOrSelfInternal<IPublishedContent>(publishedCache, navigationQueryService, true, contentTypeAlias)
             .FirstOrDefault() ?? content;
     }
 
@@ -897,7 +897,7 @@ public static class PublishedContentExtensions
     {
         ArgumentNullException.ThrowIfNull(content);
 
-        return content.EnumerateAncestorsOrSelfInternal(publishedCache, navigationQueryService, orSelf);
+        return content.EnumerateAncestorsOrSelfInternal<IPublishedContent>(publishedCache, navigationQueryService, orSelf);
     }
 
     #endregion
