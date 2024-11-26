@@ -44,48 +44,9 @@ public interface IContentPublishingService
     /// <param name="culturesToPublishOrSchedule">The cultures to publish or schedule.</param>
     /// <param name="userKey">The identifier of the user performing the operation.</param>
     /// <returns></returns>
-    async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
+    Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
         Guid key,
         ICollection<CulturePublishScheduleModel> culturesToPublishOrSchedule,
-        Guid userKey)
-    {
-        // todo remove default implementation when superseded method is removed in v17+
-        var culturesToPublishImmediately =
-            culturesToPublishOrSchedule.Where(culture => culture.Schedule is null).Select(c => c.Culture ?? Constants.System.InvariantCulture).ToHashSet();
-
-        ContentScheduleCollection schedules = StaticServiceProvider.Instance.GetRequiredService<IContentService>().GetContentScheduleByContentId(key);
-
-        foreach (CulturePublishScheduleModel cultureToSchedule in culturesToPublishOrSchedule.Where(c => c.Schedule is not null))
-        {
-            var culture = cultureToSchedule.Culture ?? Constants.System.InvariantCulture;
-
-            if (cultureToSchedule.Schedule!.PublishDate is null)
-            {
-                schedules.RemoveIfExists(culture, ContentScheduleAction.Release);
-            }
-            else
-            {
-                schedules.AddOrUpdate(culture, cultureToSchedule.Schedule!.PublishDate.Value.UtcDateTime,ContentScheduleAction.Release);
-            }
-
-            if (cultureToSchedule.Schedule!.UnpublishDate is null)
-            {
-                schedules.RemoveIfExists(culture, ContentScheduleAction.Expire);
-            }
-            else
-            {
-                schedules.AddOrUpdate(culture, cultureToSchedule.Schedule!.UnpublishDate.Value.UtcDateTime, ContentScheduleAction.Expire);
-            }
-        }
-
-        var cultureAndSchedule = new CultureAndScheduleModel
-        {
-            CulturesToPublishImmediately = culturesToPublishImmediately,
-            Schedules = schedules,
-        };
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        return await PublishAsync(key, cultureAndSchedule, userKey);
-#pragma warning restore CS0618 // Type or member is obsolete
-    }
+        Guid userKey) => StaticServiceProvider.Instance.GetRequiredService<ContentPublishingService>()
+        .PublishAsync(key, culturesToPublishOrSchedule, userKey);
 }
