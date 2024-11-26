@@ -216,8 +216,6 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         });
     }
 
-    // NOTE: Keep the default implementation on the interface in line with this one until
-    // the default implementation can be removed
     public Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> CreateCulturePublishScheduleModels(PublishDocumentRequestModel requestModel)
     {
         var model = new List<CulturePublishScheduleModel>();

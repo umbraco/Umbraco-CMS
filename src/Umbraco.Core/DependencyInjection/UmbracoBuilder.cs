@@ -40,6 +40,7 @@ using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services.FileSystem;
 using Umbraco.Cms.Core.Services.ImportExport;
 using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Cms.Core.Services.Querying;
 using Umbraco.Cms.Core.Services.Querying.RecycleBin;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
@@ -416,6 +417,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // Add Query services
             Services.AddUnique<IDocumentRecycleBinQueryService, DocumentRecycleBinQueryService>();
             Services.AddUnique<IMediaRecycleBinQueryService, MediaRecycleBinQueryService>();
+            Services.AddUnique<IContentQueryService, ContentQueryService>();
 
             // Authorizers
             Services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();

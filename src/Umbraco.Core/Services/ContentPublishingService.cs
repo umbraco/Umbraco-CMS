@@ -33,9 +33,6 @@ internal sealed class ContentPublishingService : IContentPublishingService
         _languageService = languageService;
     }
 
-    // NOTE: Keep the default implementation on the interface in line with this one until
-    // the default implementation can be removed
-
     /// <inheritdoc />
     public async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
         Guid key,
