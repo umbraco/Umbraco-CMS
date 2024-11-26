@@ -107,8 +107,6 @@ const itemMapper = (model: UmbMockDocumentBlueprintModel): DocumentItemResponseM
 		isTrashed: model.isTrashed,
 		parent: model.parent,
 		variants: model.variants,
-		hasChildren: model.hasChildren,
-		parent: model.parent,
 	};
 };
 
