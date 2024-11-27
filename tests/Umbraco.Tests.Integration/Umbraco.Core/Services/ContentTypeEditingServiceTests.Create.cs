@@ -692,6 +692,32 @@ internal sealed partial class ContentTypeEditingServiceTests
     }
 
     [Test]
+    public async Task Cannot_Have_Same_Key_For_Inheritance_And_Parent()
+    {
+        var parentModel = ContentTypeCreateModel("Parent");
+        var parent = (await ContentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey)).Result;
+        Assert.IsNotNull(parent);
+
+        Composition[] composition =
+        {
+            new()
+            {
+                CompositionType = CompositionType.Inheritance, Key = parent.Key,
+            }
+        };
+
+        var childModel = ContentTypeCreateModel(
+            "Child",
+            containerKey: parent.Key,
+            compositions: composition);
+
+        var result = await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidParent, result.Status);
+    }
+
+    [Test]
     public async Task Cannot_Use_As_ParentKey()
     {
         var parentModel = ContentTypeCreateModel("Parent");
