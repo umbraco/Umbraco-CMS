@@ -1699,22 +1699,22 @@ public static class PublishedContentExtensions
         string? culture = null)
         where T : class, IPublishedContent
     {
+        var contentTypeAlias = GetContentTypeAliasForType<T>();
         var parentSuccess = navigationQueryService.TryGetParentKey(content.Key, out Guid? parentKey);
         IPublishedContent? parent = parentKey is null ? null : publishedCache.GetById(parentKey.Value);
 
         if (parentSuccess is false || parent is null)
         {
-            var rootSuccess = navigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
+            var rootSuccess = navigationQueryService.TryGetRootKeysOfType(contentTypeAlias, out IEnumerable<Guid> rootKeys);
             if (rootSuccess is false)
             {
                 return [];
             }
 
             return rootKeys
-                .Select(publishedCache.GetById)
+                .Select(key => publishedCache.GetById(key) as T)
                 .WhereNotNull()
-                .WhereIsInvariantOrHasCulture(variationContextAccessor, culture)
-                .OfType<T>();
+                .WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
         }
 
         IEnumerable<T> children = GetChildren<T>(navigationQueryService, publishedCache, parent.Key, contentTypeAlias);
