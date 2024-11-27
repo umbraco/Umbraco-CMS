@@ -14,7 +14,6 @@ import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { jsonStringComparison, type Observable } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
@@ -86,7 +85,8 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 
 		this.setUnique(data.unique);
 
-		if (!args.preset && args.parent.entityType === UMB_DOCUMENT_TYPE_ENTITY_TYPE && args.parent.unique) {
+		// TODO: [LK] Do not hardcode 'document-type' here! (Purely done as a work-in-progress.)
+		if (!args.preset && args.parent.entityType === 'document-type' && args.parent.unique) {
 			this.setCompositions([
 				{ contentType: { unique: args.parent.unique }, compositionType: CompositionTypeModel.INHERITANCE },
 			]);
