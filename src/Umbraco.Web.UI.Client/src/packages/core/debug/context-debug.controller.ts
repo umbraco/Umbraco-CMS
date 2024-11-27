@@ -18,11 +18,8 @@ export class UmbContextDebugController extends UmbControllerBase {
 		);
 	}
 
-	readonly #onContextDebug = async (event: any) => {
-		// Wait a frame to allow the event to bubble up and collect all the async instances
-		await new Promise((resolve) => setTimeout(resolve, 0));
-
-		// Once we got to the outer most component <umb-app>
+	#onContextDebug = (event: any) => {
+		// Once we got to the outter most component <umb-app>
 		// we can send the event containing all the contexts
 		// we have collected whilst coming up through the DOM
 		// and pass it back down to the callback in
