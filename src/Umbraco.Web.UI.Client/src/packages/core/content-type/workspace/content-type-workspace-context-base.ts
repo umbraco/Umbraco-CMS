@@ -1,7 +1,6 @@
 import type { UmbContentTypeCompositionModel, UmbContentTypeDetailModel, UmbContentTypeSortModel } from '../types.js';
 import { UmbContentTypeStructureManager } from '../structure/index.js';
 import type { UmbContentTypeWorkspaceContext } from './content-type-workspace-context.interface.js';
-import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import {
@@ -84,13 +83,6 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		if (!data) return undefined;
 
 		this.setUnique(data.unique);
-
-		// TODO: [LK] Do not hardcode 'document-type' here! (Purely done as a work-in-progress.)
-		if (!args.preset && args.parent.entityType === 'document-type' && args.parent.unique) {
-			this.setCompositions([
-				{ contentType: { unique: args.parent.unique }, compositionType: CompositionTypeModel.INHERITANCE },
-			]);
-		}
 
 		if (this.modalContext) {
 			data = { ...data, ...this.modalContext.data.preset };
