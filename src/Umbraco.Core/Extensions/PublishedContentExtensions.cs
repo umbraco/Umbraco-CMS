@@ -1369,7 +1369,7 @@ public static class PublishedContentExtensions
         INavigationQueryService navigationQueryService,
         string? culture = null)
     {
-        IEnumerable<IPublishedContent> children = GetChildren(navigationQueryService, publishedCache, content.Key);
+        IEnumerable<IPublishedContent> children = GetChildren<IPublishedContent>(navigationQueryService, publishedCache, content.Key);
 
         return children.FilterByCulture(culture, variationContextAccessor);
     }
@@ -1421,7 +1421,7 @@ public static class PublishedContentExtensions
         string? culture = null)
     {
         IEnumerable<IPublishedContent> children = contentTypeAlias is not null
-            ? GetChildren(navigationQueryService, publishedCache, content.Key, contentTypeAlias)
+            ? GetChildren<IPublishedContent>(navigationQueryService, publishedCache, content.Key, contentTypeAlias)
             : [];
 
         return children.FilterByCulture(culture, variationContextAccessor);
@@ -2092,7 +2092,7 @@ public static class PublishedContentExtensions
         string? culture = null)
     {
         IEnumerable<IPublishedContent> children = contentTypeAlias is not null
-            ? GetChildren(GetNavigationQueryService(content), GetPublishedCache(content), content.Key, contentTypeAlias)
+            ? GetChildren<IPublishedContent>(GetNavigationQueryService(content), GetPublishedCache(content), content.Key, contentTypeAlias)
             : [];
 
         return children.FilterByCulture(culture, variationContextAccessor);
