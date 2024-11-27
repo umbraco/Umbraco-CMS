@@ -89,5 +89,8 @@
     <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
     <!-- Both OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer bring in a vulnerable version of Microsoft.IdentityModel.JsonWebTokens -->
     <PackageVersion Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.7.1" />
+
+    <!-- Both OpenIddict.AspNetCore, Microsoft.EntityFrameworkCore.* bring in a vulnerable version of Microsoft.Extensions.Caching.Memory -->
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
   </ItemGroup>
 </Project>
