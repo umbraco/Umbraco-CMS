@@ -2484,8 +2484,6 @@ public class ContentService : RepositoryService, IContentService
             scope.Complete();
             return OperationResult.Succeed(eventMessages);
         }
-
-        return OperationResult.Succeed(eventMessages);
     }
 
     // MUST be called from within WriteLock
