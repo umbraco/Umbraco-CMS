@@ -80,6 +80,7 @@
   <!-- Transitive pinned versions (only required because our direct dependencies have vulnerable versions of transitive dependencies) -->
   <ItemGroup>
     <!-- Microsoft.EntityFrameworkCore.SqlServer and NPoco.SqlServer brings in a vulnerable version of Azure.Identity -->
+	<!-- Take top-level depedendency on Azure.Identity, because Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
     <PackageVersion Include="Azure.Identity" Version="1.13.1" />
     <!-- Microsoft.EntityFrameworkCore.SqlServer brings in a vulnerable version of System.Runtime.Caching -->
     <PackageVersion Include="System.Runtime.Caching" Version="9.0.0" />
@@ -90,6 +91,7 @@
     <!-- Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc brings in a vulnerable version of System.Text.RegularExpressions -->
     <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
     <!-- OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer brings in a vulnerable version of Microsoft.IdentityModel.JsonWebTokens -->
+	<!-- Take top-level depedendency on Microsoft.IdentityModel.JsonWebTokens, because OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
     <PackageVersion Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.2.1" />
     <!-- Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer and Dazinator.Extensions.FileProviders brings in a legacy version of System.Text.Encodings.Web -->
     <PackageVersion Include="System.Text.Encodings.Web" Version="9.0.0" />
