@@ -1449,8 +1449,14 @@ public static class PublishedContentExtensions
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService,
         string? culture = null)
-        where T : class, IPublishedContent =>
-        content.Children(variationContextAccessor, publishedCache, navigationQueryService, culture).OfType<T>();
+        where T : class, IPublishedContent
+    {
+        var contentTypeAlias = GetContentTypeAliasForType<T>();
+
+        IEnumerable<T> children = GetChildren<T>(navigationQueryService, publishedCache, content.Key, contentTypeAlias);
+
+        return children.FilterByCulture(culture, variationContextAccessor);
+    }
 
     public static IPublishedContent? FirstChild(
         this IPublishedContent content,
@@ -1711,7 +1717,9 @@ public static class PublishedContentExtensions
                 .OfType<T>();
         }
 
-        return parent.Children<T>(variationContextAccessor, publishedCache, navigationQueryService, culture);
+        IEnumerable<T> children = GetChildren<T>(navigationQueryService, publishedCache, parent.Key, contentTypeAlias);
+
+        return children.FilterByCulture(culture, variationContextAccessor);
     }
 
     #endregion
@@ -2094,9 +2102,14 @@ public static class PublishedContentExtensions
         this IPublishedContent content,
         IVariationContextAccessor variationContextAccessor,
         string? culture = null)
-        where T : class, IPublishedContent =>
-        content.Children(variationContextAccessor, GetPublishedCache(content),
-            GetNavigationQueryService(content), culture).OfType<T>();
+        where T : class, IPublishedContent
+    {
+        var contentTypeAlias = GetContentTypeAliasForType<T>();
+
+        IEnumerable<T> children = GetChildren<T>(GetNavigationQueryService(content), GetPublishedCache(content), content.Key, contentTypeAlias);
+
+        return children.FilterByCulture(culture, variationContextAccessor);
+    }
 
     public static DataTable ChildrenAsTable(
         this IPublishedContent content,
@@ -2483,11 +2496,12 @@ public static class PublishedContentExtensions
         }
     }
 
-    private static IEnumerable<IPublishedContent> GetChildren(
+    private static IEnumerable<T> GetChildren<T>(
         INavigationQueryService navigationQueryService,
         IPublishedCache publishedCache,
         Guid parentKey,
         string? contentTypeAlias = null)
+        where T : class, IPublishedContent
     {
         var nodeExists = contentTypeAlias is null
             ? navigationQueryService.TryGetChildrenKeys(parentKey, out IEnumerable<Guid> childrenKeys)
@@ -2499,7 +2513,7 @@ public static class PublishedContentExtensions
         }
 
         return childrenKeys
-            .Select(publishedCache.GetById)
+            .Select(key => publishedCache.GetById(key) as T)
             .WhereNotNull();
     }
 
