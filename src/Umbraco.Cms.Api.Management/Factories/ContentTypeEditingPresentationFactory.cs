@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using ContentTypeEditingModels = Umbraco.Cms.Core.Models.ContentTypeEditing;
@@ -38,10 +39,25 @@ internal abstract class ContentTypeEditingPresentationFactory<TContentType>
             VariesByCulture = viewModel.VariesByCulture,
             VariesBySegment = viewModel.VariesBySegment,
             Containers = MapContainers<TPropertyTypeContainerEditingModel>(viewModel.Containers),
-            Properties = MapProperties<TPropertyTypeEditingModel>(viewModel.Properties)
+            Properties = MapProperties<TPropertyTypeEditingModel>(viewModel.Properties),
         };
 
         return editingModel;
+    }
+
+    protected Guid? CalculateCreateContainerKey(ReferenceByIdModel? parent, IDictionary<Guid, ContentTypeViewModels.CompositionType> compositions)
+    {
+        // special case:
+        // the API is somewhat confusing when it comes to inheritance. the parent denotes a container (folder), but it
+        // is easily confused with the parent for inheritance.
+        // if the request model contains the same key for container and "inheritance composition", we'll be lenient and
+        // allow it - just remove the container, inheritance takes precedence as intent.
+        Guid? parentId = parent?.Id;
+        return parentId.HasValue
+               && compositions.TryGetValue(parentId.Value, out ContentTypeViewModels.CompositionType compositionType)
+               && compositionType is ContentTypeViewModels.CompositionType.Inheritance
+            ? null
+            : parentId;
     }
 
     protected T MapCompositionModel<T>(ContentTypeAvailableCompositionsResult compositionResult)
