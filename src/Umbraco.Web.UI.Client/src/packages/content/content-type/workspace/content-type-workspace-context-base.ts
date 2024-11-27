@@ -1,7 +1,6 @@
 import type { UmbContentTypeCompositionModel, UmbContentTypeDetailModel, UmbContentTypeSortModel } from '../types.js';
 import { UmbContentTypeStructureManager } from '../structure/index.js';
 import type { UmbContentTypeWorkspaceContext } from './content-type-workspace-context.interface.js';
-import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import {
@@ -19,6 +18,7 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
+import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbContentTypeWorkspaceContextArgs extends UmbEntityDetailWorkspaceContextArgs {}
