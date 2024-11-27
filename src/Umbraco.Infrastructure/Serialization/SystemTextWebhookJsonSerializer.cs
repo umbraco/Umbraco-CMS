@@ -10,7 +10,7 @@ public sealed class SystemTextWebhookJsonSerializer : SystemTextJsonSerializerBa
     private readonly JsonSerializerOptions _jsonSerializerOptions;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SystemTextConfigurationEditorJsonSerializer" /> class.
+    /// Initializes a new instance of the <see cref="SystemTextWebhookJsonSerializer" /> class.
     /// </summary>
     public SystemTextWebhookJsonSerializer()
         => _jsonSerializerOptions = new JsonSerializerOptions()
