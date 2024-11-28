@@ -89,11 +89,6 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 
 	static override styles = [
 		css`
-			:host {
-				display: block;
-				width: 100%;
-			}
-
 			umb-code-editor {
 				--editor-height: calc(100dvh - 260px);
 			}
