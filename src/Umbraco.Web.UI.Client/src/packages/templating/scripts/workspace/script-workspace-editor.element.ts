@@ -1,5 +1,5 @@
 import { UMB_SCRIPT_WORKSPACE_CONTEXT } from './script-workspace.context-token.js';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
@@ -74,6 +74,10 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#renderCodeEditor() {
+		if (this._content === undefined) {
+			return nothing;
+		}
+
 		return html`
 			<umb-code-editor
 				id="content"
