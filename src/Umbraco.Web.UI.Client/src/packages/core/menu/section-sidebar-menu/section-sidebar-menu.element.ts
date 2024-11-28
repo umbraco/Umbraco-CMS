@@ -27,6 +27,10 @@ export class UmbSectionSidebarMenuElement<
 	manifest?: ManifestType;
 
 	renderHeader() {
+		/*
+		Notice we are not using the UUI-H3 here, we would need to wrap it into uui-text for this to take action,
+		but it does look odd so lets return to this later. I have made a few corrections especially for this component. [NL]
+		*/
 		return html`<h3>${this.localize.string(this.manifest?.meta?.label ?? '')}</h3>`;
 	}
 
@@ -44,7 +48,9 @@ export class UmbSectionSidebarMenuElement<
 		UmbTextStyles,
 		css`
 			h3 {
+				margin: var(--uui-size-5) 0;
 				padding: var(--uui-size-4) var(--uui-size-8);
+				font-size: 15px;
 			}
 		`,
 	];

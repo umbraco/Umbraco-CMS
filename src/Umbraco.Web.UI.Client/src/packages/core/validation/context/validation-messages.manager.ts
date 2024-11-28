@@ -16,7 +16,7 @@ export class UmbValidationMessagesManager {
 	messages = this.#messages.asObservable();
 
 	debug(logName: string) {
-		this.#messages.asObservable().subscribe((x) => console.log(logName, x, this.#translators));
+		this.#messages.asObservable().subscribe((x) => console.log(logName, x));
 	}
 
 	getHasAnyMessages(): boolean {
@@ -86,6 +86,9 @@ export class UmbValidationMessagesManager {
 
 	removeMessageByKey(key: string): void {
 		this.#messages.removeOne(key);
+	}
+	removeMessageByKeys(keys: Array<string>): void {
+		this.#messages.filter((x) => keys.indexOf(x.key) === -1);
 	}
 	removeMessagesByTypeAndPath(type: UmbValidationMessageType, path: string): void {
 		//path = path.toLowerCase();

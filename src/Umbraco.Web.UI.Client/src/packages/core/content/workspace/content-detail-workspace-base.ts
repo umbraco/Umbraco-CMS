@@ -78,8 +78,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/* Content Data */
 	protected override readonly _data = new UmbContentWorkspaceDataManager<DetailModelType, VariantModelType>(this);
-	public override readonly entityType = this._data.createObservablePartOfCurrent((data) => data?.entityType);
-	public override readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
 	public readonly values = this._data.createObservablePartOfCurrent((data) => data?.values);
 	public readonly variants = this._data.createObservablePartOfCurrent((data) => data?.variants ?? []);
 
@@ -472,24 +470,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 	}
 
-	/**
-	 * Request a submit of the workspace, in the case of Content Workspaces the validation does not need to be valid for this to be submitted.
-	 * @returns {Promise<void>} a promise which resolves once it has been completed.
-	 */
-	public override requestSubmit() {
-		return this.#handleSubmit();
-	}
-
 	public override submit() {
-		return this.#handleSubmit();
+		return this._handleSubmit();
 	}
 
-	// Because we do not make validation prevent submission this also submits the workspace. [NL]
-	public override invalidSubmit() {
-		return this.#handleSubmit();
-	}
-
-	async #handleSubmit() {
+	protected async _handleSubmit() {
 		const data = this.getData();
 		if (!data) {
 			throw new Error('Data is missing');
@@ -573,6 +558,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		});
 		eventContext.dispatchEvent(event);
 		this.setIsNew(false);
+
+		this._closeModal();
 	}
 
 	async #update(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
@@ -604,6 +591,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		});
 
 		eventContext.dispatchEvent(event);
+		this._closeModal();
 	}
 
 	abstract getContentTypeUnique(): string | undefined;

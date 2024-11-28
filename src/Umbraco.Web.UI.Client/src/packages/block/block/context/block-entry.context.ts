@@ -91,7 +91,7 @@ export abstract class UmbBlockEntryContext<
 	_layout = new UmbObjectState<BlockLayoutType | undefined>(undefined);
 	public readonly layout = this._layout.asObservable();
 	public readonly contentKey = this._layout.asObservablePart((x) => x?.contentKey);
-	public readonly settingsKey = this._layout.asObservablePart((x) => x?.settingsKey);
+	public readonly settingsKey = this._layout.asObservablePart((x) => (x ? (x.settingsKey ?? null) : undefined));
 	public readonly unique = this._layout.asObservablePart((x) => x?.contentKey);
 
 	#label = new UmbStringState('');
@@ -218,7 +218,7 @@ export abstract class UmbBlockEntryContext<
 
 	#settings = new UmbObjectState<UmbBlockDataModel | undefined>(undefined);
 	//public readonly settings = this.#settings.asObservable();
-	protected readonly _settingsValueArray = this.#content.asObservablePart((x) => x?.values);
+	protected readonly _settingsValueArray = this.#settings.asObservablePart((x) => x?.values);
 	private readonly settingsDataContentTypeKey = this.#settings.asObservablePart((x) =>
 		x ? (x.contentTypeKey ?? undefined) : null,
 	);
@@ -296,7 +296,6 @@ export abstract class UmbBlockEntryContext<
 			this.settingsDataContentTypeKey,
 			(settingsElementTypeKey) => {
 				if (!settingsElementTypeKey) return;
-
 				this.#getSettingsStructure(settingsElementTypeKey);
 			},
 			null,
@@ -335,17 +334,17 @@ export abstract class UmbBlockEntryContext<
 		);
 
 		this.observe(
-			observeMultiple([this.layout, this.blockType]),
-			([layout, blockType]) => {
-				if (!this.#contentKey || !layout || !blockType) return;
-				if (layout.settingsKey == null && blockType.settingsElementTypeKey) {
+			observeMultiple([this.settingsKey, this.blockType]),
+			([settingsKey, blockType]) => {
+				if (!this.#contentKey || settingsKey === undefined || !blockType) return;
+				if (settingsKey == null && blockType.settingsElementTypeKey) {
 					// We have a settings ElementType in config but not in data, so lets create the scaffold for that: [NL]
 					const settingsData = this._manager!.createBlockSettingsData(blockType.contentElementTypeKey); // Yes its on purpose we use the contentElementTypeKey here, as this is our identifier for a BlockType. [NL]
 					this._manager?.setOneSettings(settingsData);
 					this._layout.update({ settingsKey: settingsData.key } as Partial<BlockLayoutType>);
-				} else if (layout.settingsKey && blockType.settingsElementTypeKey === undefined) {
+				} else if (settingsKey && blockType.settingsElementTypeKey === undefined) {
 					// We no longer have settings ElementType in config. So we remove the settingsData and settings key from the layout. [NL]
-					this._manager?.removeOneSettings(layout.settingsKey);
+					this._manager?.removeOneSettings(settingsKey);
 					this._layout.update({ settingsKey: undefined } as Partial<BlockLayoutType>);
 				}
 			},
@@ -464,18 +463,22 @@ export abstract class UmbBlockEntryContext<
 		);
 	}
 	#observeSettingsData() {
-		if (!this._manager) return;
 		// observe settings:
-		const settingsKey = this._layout.value?.settingsKey;
-		if (settingsKey) {
-			this.observe(
-				this._manager.settingsOf(settingsKey),
-				(settings) => {
-					this.#settings.setValue(settings);
-				},
-				'observeSettings',
-			);
-		}
+		this.observe(
+			this._manager ? this.settingsKey : undefined,
+			(settingsKey) => {
+				if (settingsKey) {
+					this.observe(
+						this._manager?.settingsOf(settingsKey),
+						(settings) => {
+							this.#settings.setValue(settings);
+						},
+						'observeSettings',
+					);
+				}
+			},
+			'observeSettingsKey',
+		);
 	}
 
 	abstract _gotContentType(contentType: UmbContentTypeModel | undefined): void;
@@ -617,9 +620,8 @@ export abstract class UmbBlockEntryContext<
 	#gotVariantId() {
 		const variantId = this.#variantId.getValue();
 		if (!variantId || !this.#contentKey) return;
-		// TODO: Handle variantId changes
 		this.observe(
-			this._manager?.hasExposeOf(this.#contentKey),
+			this._manager?.hasExposeOf(this.#contentKey, variantId),
 			(hasExpose) => {
 				this.#hasExpose.setValue(hasExpose);
 			},
@@ -657,8 +659,9 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	public expose() {
-		if (!this.#contentKey) return;
-		this._manager?.setOneExpose(this.#contentKey);
+		const variantId = this.#variantId.getValue();
+		if (!variantId || !this.#contentKey) return;
+		this._manager?.setOneExpose(this.#contentKey, variantId);
 	}
 
 	//copy

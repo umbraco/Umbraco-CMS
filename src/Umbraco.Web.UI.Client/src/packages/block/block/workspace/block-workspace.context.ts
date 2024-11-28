@@ -25,6 +25,7 @@ import {
 	UMB_BLOCK_ENTRY_CONTEXT,
 } from '@umbraco-cms/backoffice/block';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
@@ -44,6 +45,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	setOriginData(data: UmbBlockWorkspaceOriginData) {
 		this.#originData = data;
 	}
+	#modalContext?: typeof UMB_MODAL_CONTEXT.TYPE;
 	#retrieveModalContext;
 
 	#entityType: string;
@@ -83,6 +85,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.addValidationContext(this.settings.validation);
 
 		this.#retrieveModalContext = this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
+			this.#modalContext = context;
 			this.#originData = context?.data.originData;
 			context.onSubmit().catch(this.#modalRejected);
 		}).asPromise();
@@ -116,24 +119,24 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 					this.#variantId.setValue(variantId);
 				},
-				'observeBlockType',
+				'observeVariantIds',
 			);
 
 			this.removeUmbControllerByAlias('observeHasExpose');
 			this.observe(
-				this.contentKey,
-				(contentKey) => {
-					if (!contentKey) return;
+				observeMultiple([this.contentKey, this.variantId]),
+				([contentKey, variantId]) => {
+					if (!contentKey || !variantId) return;
 
 					this.observe(
-						manager.hasExposeOf(contentKey),
+						manager.hasExposeOf(contentKey, variantId),
 						(exposed) => {
 							this.#exposed.setValue(exposed);
 						},
 						'observeHasExpose',
 					);
 				},
-				'observeContentKey',
+				'observeContentKeyAndVariantId',
 			);
 
 			this.observe(
@@ -156,6 +159,22 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				},
 				'observeIsReadOnly',
 			);
+
+			this.observe(
+				this.content.contentTypeId,
+				(contentTypeId) => {
+					this.observe(
+						contentTypeId ? manager.blockTypeOf(contentTypeId) : undefined,
+						(blockType) => {
+							if (blockType?.editorSize) {
+								this.setEditorSize(blockType.editorSize);
+							}
+						},
+						'observeBlockType',
+					);
+				},
+				'observeContentTypeId',
+			);
 		});
 
 		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
@@ -176,8 +195,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				path: 'create/:elementTypeKey',
 				component: UmbBlockWorkspaceEditorElement,
 				setup: async (component, info) => {
-					(component as UmbBlockWorkspaceEditorElement).workspaceAlias = manifest.alias;
-
 					const elementTypeKey = info.match.params.elementTypeKey;
 					await this.create(elementTypeKey);
 
@@ -192,12 +209,15 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				path: 'edit/:key',
 				component: UmbBlockWorkspaceEditorElement,
 				setup: (component, info) => {
-					(component as UmbBlockWorkspaceEditorElement).workspaceAlias = manifest.alias;
 					const key = decodeFilePath(info.match.params.key);
 					this.load(key);
 				},
 			},
 		]);
+	}
+
+	setEditorSize(editorSize: UUIModalSidebarSize) {
+		this.#modalContext?.setModalSize(editorSize);
 	}
 
 	protected override resetState() {
@@ -229,7 +249,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		);
 
 		this.#observeBlockData(unique);
-
 		if (this.#liveEditingMode) {
 			this.establishLiveSync();
 		}
@@ -464,12 +483,14 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	expose() {
 		const contentKey = this.#layout.value?.contentKey;
-		if (!contentKey) throw new Error('Cannot expose block that does not exist.');
+		if (!contentKey) throw new Error('Failed to expose block, missing content key.');
 		this.#expose(contentKey);
 	}
 
 	#expose(unique: string) {
-		this.#blockManager?.setOneExpose(unique);
+		const variantId = this.#variantId.getValue();
+		if (!variantId) throw new Error('Failed to expose block, missing variant id.');
+		this.#blockManager?.setOneExpose(unique, variantId);
 	}
 
 	#modalRejected = () => {

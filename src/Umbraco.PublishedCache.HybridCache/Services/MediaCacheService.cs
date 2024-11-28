@@ -23,7 +23,7 @@ internal class MediaCacheService : IMediaCacheService
     private readonly ICacheNodeFactory _cacheNodeFactory;
     private readonly IEnumerable<IMediaSeedKeyProvider> _seedKeyProviders;
     private readonly IPublishedModelFactory _publishedModelFactory;
-    private readonly CacheEntrySettings _cacheEntrySettings;
+    private readonly CacheSettings _cacheSettings;
 
     private HashSet<Guid>? _seedKeys;
     private HashSet<Guid> SeedKeys
@@ -55,7 +55,7 @@ internal class MediaCacheService : IMediaCacheService
         ICacheNodeFactory cacheNodeFactory,
         IEnumerable<IMediaSeedKeyProvider> seedKeyProviders,
         IPublishedModelFactory publishedModelFactory,
-        IOptionsMonitor<CacheEntrySettings> cacheEntrySettings)
+        IOptions<CacheSettings> cacheSettings)
     {
         _databaseCacheRepository = databaseCacheRepository;
         _idKeyMap = idKeyMap;
@@ -65,7 +65,7 @@ internal class MediaCacheService : IMediaCacheService
         _cacheNodeFactory = cacheNodeFactory;
         _seedKeyProviders = seedKeyProviders;
         _publishedModelFactory = publishedModelFactory;
-        _cacheEntrySettings = cacheEntrySettings.Get(Constants.Configuration.NamedOptions.CacheEntry.Media);
+        _cacheSettings = cacheSettings.Value;
     }
 
     public async Task<IPublishedContent?> GetByKeyAsync(Guid key)
@@ -259,6 +259,17 @@ internal class MediaCacheService : IMediaCacheService
         scope.Complete();
     }
 
+    public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        IEnumerable<ContentCacheNode> nodes = _databaseCacheRepository.GetContentByContentTypeKey([contentType.Key], ContentCacheDataSerializerEntityType.Media);
+        scope.Complete();
+
+        return nodes
+            .Select(x => _publishedContentFactory.ToIPublishedContent(x, x.IsDraft).CreateModel(_publishedModelFactory))
+            .WhereNotNull();
+    }
+
     private HybridCacheEntryOptions GetEntryOptions(Guid key)
     {
         if (SeedKeys.Contains(key))
@@ -268,16 +279,16 @@ internal class MediaCacheService : IMediaCacheService
 
         return new HybridCacheEntryOptions
         {
-            Expiration = _cacheEntrySettings.RemoteCacheDuration,
-            LocalCacheExpiration = _cacheEntrySettings.LocalCacheDuration,
+            Expiration = _cacheSettings.Entry.Media.RemoteCacheDuration,
+            LocalCacheExpiration = _cacheSettings.Entry.Media.LocalCacheDuration,
         };
     }
 
 
     private HybridCacheEntryOptions GetSeedEntryOptions() => new()
     {
-        Expiration = _cacheEntrySettings.SeedCacheDuration,
-        LocalCacheExpiration = _cacheEntrySettings.SeedCacheDuration,
+        Expiration = _cacheSettings.SeedCacheDuration,
+        LocalCacheExpiration = _cacheSettings.SeedCacheDuration,
     };
 
     private string GetCacheKey(Guid key, bool preview) => preview ? $"{key}+draft" : $"{key}";

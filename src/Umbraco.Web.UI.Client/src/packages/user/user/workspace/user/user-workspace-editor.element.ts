@@ -2,7 +2,6 @@ import type { UmbUserDetailModel } from '../../index.js';
 import { UMB_USER_ROOT_WORKSPACE_PATH } from '../../paths.js';
 import type { UmbUserWorkspaceContext } from './user-workspace.context.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from './user-workspace.context-token.js';
-import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -36,27 +35,19 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	override render() {
-		if (!this._user) return html`User not found`;
-
 		return html`
-			<umb-workspace-editor
-				alias=${UMB_USER_WORKSPACE_ALIAS}
-				class="uui-text"
-				back-path=${UMB_USER_ROOT_WORKSPACE_PATH}>
+			<umb-entity-detail-workspace-editor class="uui-text" .backPath=${UMB_USER_ROOT_WORKSPACE_PATH}>
 				${this.#renderHeader()}
 				<div id="main">
 					<div id="left-column">${this.#renderLeftColumn()}</div>
 					<div id="right-column">${this.#renderRightColumn()}</div>
 				</div>
-			</umb-workspace-editor>
+			</umb-entity-detail-workspace-editor>
 		`;
 	}
 
 	#renderHeader() {
-		return html`
-			<umb-workspace-header-name-editable slot="header"></umb-workspace-header-name-editable>
-			<umb-workspace-entity-action-menu slot="action-menu"></umb-workspace-entity-action-menu>
-		`;
+		return html` <umb-workspace-header-name-editable slot="header"></umb-workspace-header-name-editable>`;
 	}
 
 	#renderLeftColumn() {

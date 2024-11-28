@@ -22,7 +22,7 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 	private _variantOptions?: Array<UmbDocumentVariantOptionModel>;
 
 	@state()
-	private _lookup: Record<string, string> = {};
+	private _lookup: Record<string, string[]> = {};
 
 	constructor() {
 		super();
@@ -37,6 +37,7 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 			this.observe(
 				observeMultiple([context.isNew, context.unique, context.variantOptions]),
 				([isNew, unique, variantOptions]) => {
+					if (!unique) return;
 					this._isNew = isNew === true;
 					this._unique = unique;
 					this._variantOptions = variantOptions;
@@ -48,15 +49,17 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 
 	async #requestUrls() {
 		if (this._isNew) return;
-
-		if (!this._unique) throw new Error('Document unique is required');
+		if (!this._unique) return;
 
 		const { data } = await this.#documentUrlRepository.requestItems([this._unique]);
 
 		if (data?.length) {
 			data[0].urls.forEach((item) => {
 				if (item.culture && item.url) {
-					this._lookup[item.culture] = item.url;
+					if(this._lookup[item.culture] == null){
+						this._lookup[item.culture] = [];
+					}
+					this._lookup[item.culture].push(item.url);
 				}
 			});
 			this.requestUpdate('_lookup');
@@ -108,18 +111,20 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 	#renderUrl(variantOption: UmbDocumentVariantOptionModel) {
 		const varies = !!variantOption.culture;
 		const culture = varies ? variantOption.culture! : variantOption.language.unique;
-		const url = this._lookup[culture];
+		const urls = this._lookup[culture];
 		return when(
-			url,
+			urls && urls.length >= 1,
 			() => html`
-				<a class="link-item" href=${url} target="_blank">
-					<span>
-						<span class="culture">${varies ? culture : nothing}</span>
-						<span>${url}</span>
-					</span>
-					<uui-icon name="icon-out"></uui-icon>
-				</a>
-			`,
+				${urls.map((url) =>
+					html`
+						<a class="link-item" href=${url} target="_blank">
+							<span>
+								<span class="culture">${varies ? culture : nothing}</span>
+								<span>${url}</span>
+							</span>
+							<uui-icon name="icon-out"></uui-icon>
+						</a>`
+				)}`,
 			() => html`
 				<div class="link-item">
 					<span>

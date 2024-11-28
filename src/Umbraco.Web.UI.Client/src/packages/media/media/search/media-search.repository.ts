@@ -1,5 +1,5 @@
 import { UmbMediaSearchServerDataSource } from './media-search.server.data-source.js';
-import type { UmbMediaSearchItemModel } from './media.search-provider.js';
+import type { UmbMediaSearchItemModel } from './types.js';
 import type { UmbSearchRepository, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

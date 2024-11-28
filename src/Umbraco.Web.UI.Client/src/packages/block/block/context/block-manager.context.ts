@@ -46,6 +46,9 @@ export abstract class UmbBlockManagerContext<
 	setVariantId(variantId: UmbVariantId | undefined) {
 		this.#variantId.setValue(variantId);
 	}
+	getVariantId(): UmbVariantId | undefined {
+		return this.#variantId.getValue();
+	}
 
 	readonly #structures: Array<UmbContentTypeStructureManager> = [];
 
@@ -192,8 +195,7 @@ export abstract class UmbBlockManagerContext<
 		);
 	}
 
-	hasExposeOf(contentKey: string) {
-		const variantId = this.#variantId.getValue();
+	hasExposeOf(contentKey: string, variantId: UmbVariantId) {
 		if (!variantId) return;
 		return this.#exposes.asObservablePart((source) =>
 			source.some((x) => x.contentKey === contentKey && variantId.compare(x)),
@@ -217,8 +219,7 @@ export abstract class UmbBlockManagerContext<
 	setOneSettings(settingsData: UmbBlockDataModel) {
 		this.#settings.appendOne(settingsData);
 	}
-	setOneExpose(contentKey: string) {
-		const variantId = this.#variantId.getValue();
+	setOneExpose(contentKey: string, variantId: UmbVariantId) {
 		if (!variantId) return;
 		this.#exposes.appendOne({ contentKey, ...variantId.toObject() });
 	}

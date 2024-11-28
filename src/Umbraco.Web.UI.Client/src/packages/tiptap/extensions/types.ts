@@ -42,10 +42,15 @@ export interface UmbTiptapToolbarElementApi extends UmbApi, UmbTiptapExtensionAr
 	/**
 	 * Executes the toolbar element action.
 	 */
-	execute(editor: Editor): void;
+	execute(editor?: Editor): void;
 
 	/**
 	 * Checks if the toolbar element is active.
 	 */
-	isActive(editor: Editor): boolean;
+	isActive(editor?: Editor): boolean;
+
+	/**
+	 * Checks if the toolbar element is disabled.
+	 */
+	isDisabled(editor?: Editor): boolean;
 }

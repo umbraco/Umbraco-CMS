@@ -50,8 +50,6 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 				path: 'create/:elementTypeKey/:groupKey',
 				component: UmbBlockTypeWorkspaceEditorElement,
 				setup: async (component, info) => {
-					(component as UmbBlockTypeWorkspaceEditorElement).workspaceAlias = manifest.alias;
-
 					const elementTypeKey = info.match.params.elementTypeKey;
 					const groupKey = info.match.params.groupKey === 'null' ? null : info.match.params.groupKey;
 					await this.create(elementTypeKey, groupKey);
@@ -67,8 +65,6 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 				path: 'edit/:id',
 				component: UmbBlockTypeWorkspaceEditorElement,
 				setup: (component, info) => {
-					(component as UmbBlockTypeWorkspaceEditorElement).workspaceAlias = manifest.alias;
-
 					const id = info.match.params.id;
 					this.load(id);
 				},

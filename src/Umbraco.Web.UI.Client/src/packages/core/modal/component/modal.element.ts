@@ -13,6 +13,7 @@ import {
 	type UUIDialogElement,
 	type UUIModalDialogElement,
 	type UUIModalSidebarElement,
+	type UUIModalSidebarSize,
 } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_ROUTE_CONTEXT, type UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
 import { createExtensionElement, loadManifestElement } from '@umbraco-cms/backoffice/extension-api';
@@ -34,7 +35,16 @@ export class UmbModalElement extends UmbLitElement {
 	#modalExtensionObserver?: UmbObserverController<ManifestModal | undefined>;
 	#modalRouterElement?: HTMLDivElement | UmbRouterSlotElement;
 
-	#onClose = () => {
+	#onClose = (e: Event) => {
+		if (this.#modalContext?.isResolved() === false) {
+			// If not resolved, and has a router, then we do not want to close, but instead let the router try to change the path for that to eventually trigger another round of close.
+			if (this.#modalContext?.router) {
+				e.stopImmediatePropagation();
+				e.preventDefault();
+				this.#modalContext._internal_removeCurrentModal();
+				return;
+			}
+		}
 		this.element?.removeEventListener(UUIModalCloseEvent, this.#onClose);
 		this.#modalContext?.reject({ type: 'close' });
 	};
@@ -117,7 +127,13 @@ export class UmbModalElement extends UmbLitElement {
 
 	#createSidebarElement() {
 		const sidebarElement = document.createElement('uui-modal-sidebar');
-		sidebarElement.size = this.#modalContext!.size;
+		this.observe(
+			this.#modalContext!.size,
+			(size) => {
+				sidebarElement.size = size as UUIModalSidebarSize;
+			},
+			'observeSize',
+		);
 		return sidebarElement;
 	}
 

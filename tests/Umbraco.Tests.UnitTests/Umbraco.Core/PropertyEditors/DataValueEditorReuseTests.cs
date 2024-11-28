@@ -36,11 +36,12 @@ public class DataValueEditorReuseTests
         _propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>));
         _dataValueReferenceFactories = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>);
 
-        var blockVarianceHandler = new BlockEditorVarianceHandler(Mock.Of<ILanguageService>());
+        var blockVarianceHandler = new BlockEditorVarianceHandler(Mock.Of<ILanguageService>(), Mock.Of<IContentTypeService>());
         _dataValueEditorFactoryMock
             .Setup(m =>
-                m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()))
+                m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>(), It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()))
             .Returns(() => new BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor(
+                new DataEditorAttribute("a"),
                 new BlockListEditorDataConverter(Mock.Of<IJsonSerializer>()),
                 _propertyEditorCollection,
                 _dataValueReferenceFactories,
@@ -52,7 +53,9 @@ public class DataValueEditorReuseTests
                 Mock.Of<IJsonSerializer>(),
                 Mock.Of<IPropertyValidationService>(),
                 blockVarianceHandler,
-                Mock.Of<ILanguageService>()));
+                Mock.Of<ILanguageService>(),
+                Mock.Of<IIOHelper>()
+                ));
     }
 
     [Test]
@@ -109,7 +112,7 @@ public class DataValueEditorReuseTests
         Assert.NotNull(dataValueEditor2);
         Assert.AreNotSame(dataValueEditor1, dataValueEditor2);
         _dataValueEditorFactoryMock.Verify(
-            m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()),
+            m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>(), It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()),
             Times.Exactly(2));
     }
 
@@ -131,7 +134,7 @@ public class DataValueEditorReuseTests
         Assert.AreEqual("config", ((DataValueEditor)dataValueEditor2).ConfigurationObject);
         Assert.AreNotSame(dataValueEditor1, dataValueEditor2);
         _dataValueEditorFactoryMock.Verify(
-            m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()),
+            m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>(), It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()),
             Times.Exactly(2));
     }
 }

@@ -4,5 +4,6 @@ public enum BackOfficeUserClientCredentialsOperationStatus
 {
     Success,
     DuplicateClientId,
-    InvalidUser
+    InvalidUser,
+    InvalidClientId
 }

@@ -5,9 +5,8 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 export class UmbWebhookWorkspaceEditorElement extends UmbLitElement {
 	override render() {
 		return html`
-			<umb-workspace-editor
-				alias="Umb.Workspace.Webhook"
-				back-path="section/settings/workspace/webhook-root"></umb-workspace-editor>
+			<umb-entity-detail-workspace-editor
+				back-path="section/settings/workspace/webhook-root"></umb-entity-detail-workspace-editor>
 		`;
 	}
 

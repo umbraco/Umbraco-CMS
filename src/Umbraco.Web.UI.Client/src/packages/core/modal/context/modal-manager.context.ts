@@ -1,29 +1,9 @@
 import type { UmbModalToken } from '../token/modal-token.js';
 import { UmbModalContext, type UmbModalContextClassArgs } from './modal.context.js';
-import type { UUIModalElement, UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbBasicState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
-
-export type UmbModalType = 'dialog' | 'sidebar' | 'custom';
-
-export interface UmbModalConfig {
-	key?: string;
-	type?: UmbModalType;
-	size?: UUIModalSidebarSize;
-
-	/**
-	 * Used to provide a custom modal element to replace the default uui-modal-dialog or uui-modal-sidebar
-	 */
-	element?: ElementLoaderProperty<UUIModalElement>;
-
-	/**
-	 * Set the background property of the modal backdrop
-	 */
-	backdropBackground?: string;
-}
 
 export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContext> {
 	// TODO: Investigate if we can get rid of HTML elements in our store, so we can use one of our states.
@@ -32,6 +12,8 @@ export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContex
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MODAL_MANAGER_CONTEXT);
+
+		window.addEventListener('navigationsuccess', this.#onNavigationSuccess);
 	}
 
 	/**
@@ -66,18 +48,42 @@ export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContex
 	/**
 	 * Closes a modal or sidebar modal
 	 * @private
-	 * @param {string} key
+	 * @param {string} key - The key of the modal to close
 	 * @memberof UmbModalManagerContext
 	 */
 	public close(key: string) {
 		const modal = this.#modals.getValue().find((modal) => modal.key === key);
 		if (modal) {
-			modal.reject();
+			modal.forceResolve();
 		}
 	}
 
 	public remove(key: string) {
 		this.#modals.setValue(this.#modals.getValue().filter((modal) => modal.key !== key));
+	}
+
+	/**
+	 * Closes all modals that is not routable
+	 * @private
+	 * @memberof UmbModalManagerContext
+	 */
+	#closeNoneRoutableModals() {
+		this.#modals
+			.getValue()
+			.filter((modal) => modal.router === null)
+			.forEach((modal) => {
+				modal.forceResolve();
+			});
+	}
+
+	#onNavigationSuccess = () => {
+		this.#closeNoneRoutableModals();
+	};
+
+	override destroy() {
+		super.destroy();
+		this.#modals.destroy();
+		window.removeEventListener('navigationsuccess', this.#onNavigationSuccess);
 	}
 }
 
