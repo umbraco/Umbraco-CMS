@@ -45,22 +45,33 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 	override render() {
 		return html`
 			<umb-entity-detail-workspace-editor>
-				<div id="workspace-header" slot="header">
-					<uui-input
-						placeholder=${this.localize.term('placeholders_entername')}
-						.value=${this._name}
-						@input=${this.#onNameInput}
-						label=${this.localize.term('placeholders_entername')}
-						?readonly=${this._isNew === false}
-						${umbFocus()}>
-					</uui-input>
-				</div>
-				<uui-box>
-					<!-- the div below in the header is to make the box display nicely with code editor -->
-					<div slot="header"></div>
-					${this.#renderCodeEditor()}
-				</uui-box>
+				${this.#renderHeader()} ${this.#renderBody()}
 			</umb-entity-detail-workspace-editor>
+		`;
+	}
+
+	#renderHeader() {
+		return html`
+			<div id="workspace-header" slot="header">
+				<uui-input
+					placeholder=${this.localize.term('placeholders_entername')}
+					.value=${this._name}
+					@input=${this.#onNameInput}
+					label=${this.localize.term('placeholders_entername')}
+					?readonly=${this._isNew === false}
+					${umbFocus()}>
+				</uui-input>
+			</div>
+		`;
+	}
+
+	#renderBody() {
+		return html`
+			<uui-box>
+				<!-- the div below in the header is to make the box display nicely with code editor -->
+				<div slot="header"></div>
+				${this.#renderCodeEditor()}
+			</uui-box>
 		`;
 	}
 
