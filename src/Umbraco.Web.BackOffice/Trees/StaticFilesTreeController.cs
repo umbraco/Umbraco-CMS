@@ -2,8 +2,10 @@ using System.Net;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
@@ -33,6 +35,17 @@ public class StaticFilesTreeController : TreeController
         _fileSystem = fileSystem;
         _menuItemCollectionFactory = menuItemCollectionFactory;
         _webHostEnvironment = webHostEnvironment;
+    }
+
+    [Obsolete("Obsolete, use ctor that takes an IWebHostEnvironment, will be removed in future versions.")]
+    public StaticFilesTreeController(
+        ILocalizedTextService localizedTextService,
+        UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+        IEventAggregator eventAggregator,
+        IPhysicalFileSystem fileSystem,
+        IMenuItemCollectionFactory menuItemCollectionFactory)
+        : this(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator, fileSystem, menuItemCollectionFactory, StaticServiceProvider.Instance.GetRequiredService<IWebHostEnvironment>())
+    {
     }
 
     protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
