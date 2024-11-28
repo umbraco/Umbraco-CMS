@@ -72,6 +72,7 @@ export class UmbItemPickerModalElement extends UmbModalBaseElement<UmbItemPicker
 										(item) => item.value,
 										(item) => html`
 											<umb-ref-item
+												select-only
 												name=${this.localize.string(item.label)}
 												detail=${ifDefined(item.description)}
 												icon=${ifDefined(item.icon)}

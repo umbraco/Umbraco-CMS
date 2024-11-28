@@ -73,6 +73,7 @@ export class UmbDynamicRootOriginPickerModalModalElement extends UmbModalBaseEle
 								(item) => item.alias,
 								(item) => html`
 									<umb-ref-item
+										select-only
 										name=${ifDefined(item.meta.label)}
 										detail=${ifDefined(item.meta.description)}
 										icon=${ifDefined(item.meta.icon)}
