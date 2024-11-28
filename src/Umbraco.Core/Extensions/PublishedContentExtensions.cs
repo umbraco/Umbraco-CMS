@@ -1653,15 +1653,20 @@ public static class PublishedContentExtensions
     {
         var contentTypeAlias = GetContentTypeAliasForTypeOrNull<T>();
         var parentSuccess = navigationQueryService.TryGetParentKey(content.Key, out Guid? parentKey);
-        IPublishedContent? parent = parentKey is null ? null : publishedCache.GetById(parentKey.Value);
 
-        if (parentSuccess && parent is not null)
+        if (parentSuccess is false)
         {
-            return GetChildren<T>(navigationQueryService, publishedCache, parent.Key, contentTypeAlias)
+            return [];
+        }
+
+        // parent exists so content is not at root - get the children of the parent
+        if (parentKey.HasValue)
+        {
+            return GetChildren<T>(navigationQueryService, publishedCache, parentKey.Value, contentTypeAlias)
                 .FilterByCulture(culture, variationContextAccessor);
         }
 
-        // Try to get the root keys
+        // parent does not exist but parentSuccess is true - this means that the content is at root
         var rootSuccess = contentTypeAlias is null
             ? navigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys)
             : navigationQueryService.TryGetRootKeysOfType(contentTypeAlias, out rootKeys);
