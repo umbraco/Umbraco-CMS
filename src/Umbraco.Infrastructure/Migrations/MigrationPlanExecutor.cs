@@ -148,6 +148,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
 
         if (plan.Transitions.TryGetValue(nextState, out MigrationPlan.Transition? transition) is false)
         {
+            _logger.LogCritical("Migration from {OrigState} not possible, check the value in umbracoKeyValue", string.IsNullOrWhiteSpace(nextState) ? "origin" : nextState);
             plan.ThrowOnUnknownInitialState(nextState);
         }
 
