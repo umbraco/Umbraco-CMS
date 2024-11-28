@@ -6,7 +6,6 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Serialization;
 
@@ -15,19 +14,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 [TestFixture]
 public class SliderValueEditorTests
 {
-    // annoyingly we can't use decimals etc. in attributes, so we can't turn these into test cases :(
-    private List<object?> _invalidValues = new();
-
-    [SetUp]
-    public void SetUp() => _invalidValues = new List<object?>
+    public static object[] InvalidCaseData = new object[]
     {
         123m,
         123,
         -123,
-        123.45d,
-        "123.45",
-        "1.234,56",
-        "1.2.3.4",
         "something",
         true,
         new object(),
@@ -36,21 +27,19 @@ public class SliderValueEditorTests
         new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid())
     };
 
-    [Test]
-    public void Can_Handle_Invalid_Values_From_Editor()
+    [TestCaseSource(nameof(InvalidCaseData))]
+    public void Can_Handle_Invalid_Values_From_Editor(object value)
     {
-        foreach (var value in _invalidValues)
-        {
-            var fromEditor = FromEditor(value);
-            Assert.IsNull(fromEditor, message: $"Failed for: {value}");
-        }
+        var fromEditor = FromEditor(value);
+        Assert.IsNull(fromEditor);
     }
 
     [TestCase("1", 1)]
     [TestCase("0", 0)]
     [TestCase("-1", -1)]
     [TestCase("123456789", 123456789)]
-    public void Can_Parse_Single_Value_To_Editor(string value, int expected)
+    [TestCase("123.45", 123.45)]
+    public void Can_Parse_Single_Value_To_Editor(string value, decimal expected)
     {
         var toEditor = ToEditor(value) as SliderPropertyEditor.SliderPropertyValueEditor.SliderRange;
         Assert.IsNotNull(toEditor);
@@ -62,7 +51,10 @@ public class SliderValueEditorTests
     [TestCase("0,0", 0, 0)]
     [TestCase("-1,-1", -1, -1)]
     [TestCase("10,123456789", 10, 123456789)]
-    public void Can_Parse_Range_Value_To_Editor(string value, int expectedFrom, int expectedTo)
+    [TestCase("1.234,56", 1.234, 56)]
+    [TestCase("4,6.234", 4, 6.234)]
+    [TestCase("10.45,15.3", 10.45, 15.3)]
+    public void Can_Parse_Range_Value_To_Editor(string value, decimal expectedFrom, decimal expectedTo)
     {
         var toEditor = ToEditor(value) as SliderPropertyEditor.SliderPropertyValueEditor.SliderRange;
         Assert.IsNotNull(toEditor);
@@ -75,21 +67,22 @@ public class SliderValueEditorTests
     [TestCase(0, 0, "0")]
     [TestCase(-10, -10, "-10")]
     [TestCase(10, 123456789, "10,123456789")]
-    public void Can_Parse_Valid_Value_From_Editor(int from, int to, string expectedResult)
+    [TestCase(1.5, 1.5, "1.5")]
+    [TestCase(0, 0.5, "0,0.5")]
+    [TestCase(5, 5.4, "5,5.4")]
+    [TestCase(0.5, 0.6, "0.5,0.6")]
+    public void Can_Parse_Valid_Value_From_Editor(decimal from, decimal to, string expectedResult)
     {
         var value = JsonNode.Parse($"{{\"from\": {from}, \"to\": {to}}}");
         var fromEditor = FromEditor(value) as string;
         Assert.AreEqual(expectedResult, fromEditor);
     }
 
-    [Test]
-    public void Can_Handle_Invalid_Values_To_Editor()
+    [TestCaseSource(nameof(InvalidCaseData))]
+    public void Can_Handle_Invalid_Values_To_Editor(object value)
     {
-        foreach (var value in _invalidValues)
-        {
-            var toEditor = ToEditor(value);
-            Assert.IsNull(toEditor, message: $"Failed for: {value}");
-        }
+        var toEditor = ToEditor(value);
+        Assert.IsNull(toEditor, message: $"Failed for: {value}");
     }
 
     [Test]

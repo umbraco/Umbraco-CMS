@@ -28,6 +28,15 @@ export class UmbMediaItemServerDataSource extends UmbItemServerDataSourceBase<
 		});
 		this.#host = host;
 	}
+
+	/**
+	 * @deprecated - The search method will be removed in v17. Use the
+	 * Use the UmbMediaSearchProvider instead.
+	 * Get it from:
+	 * ```ts
+	 * import { UmbMediaSearchProvider } from '@umbraco-cms/backoffice/media';
+	 * ```
+	 */
 	async search({ query, skip, take }: { query: string; skip: number; take: number }) {
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
@@ -44,19 +53,21 @@ const getItems = (uniques: Array<string>) => MediaService.getItemMedia({ id: uni
 const mapper = (item: MediaItemResponseModel): UmbMediaItemModel => {
 	return {
 		entityType: UMB_MEDIA_ENTITY_TYPE,
-		unique: item.id,
+		hasChildren: item.hasChildren,
 		isTrashed: item.isTrashed,
+		unique: item.id,
 		mediaType: {
 			unique: item.mediaType.id,
 			icon: item.mediaType.icon,
 			collection: item.mediaType.collection ? { unique: item.mediaType.collection.id } : null,
 		},
+		name: item.variants[0]?.name, // TODO: get correct variant name
+		parent: item.parent ? { unique: item.parent.id } : null,
 		variants: item.variants.map((variant) => {
 			return {
 				culture: variant.culture || null,
 				name: variant.name,
 			};
 		}),
-		name: item.variants[0]?.name, // TODO: get correct variant name
 	};
 };

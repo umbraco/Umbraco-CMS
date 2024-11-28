@@ -337,4 +337,12 @@ export class UmbDefaultCollectionContext<
 	public getManifest() {
 		return this._manifest;
 	}
+
+	/**
+	 * Returns the items in the collection.
+	 * @returns {Array<CollectionItemType>} - The items in the collection.
+	 */
+	public getItems() {
+		return this._items.getValue();
+	}
 }
