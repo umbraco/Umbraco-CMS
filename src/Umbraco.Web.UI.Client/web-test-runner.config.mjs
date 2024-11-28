@@ -17,6 +17,10 @@ const silencedLogs = [
 	'Multiple versions of Lit loaded.',
 	'-- Extension of alias "',
 	'Error: Failed to create extension api from alias',
+	'Documentation: ',
+	'Found an issue? https://github.com/mswjs/msw/issues',
+	'Worker script URL:',
+	'Worker scope:',
 ];
 
 /** @type {import('@web/dev-server').DevServerConfig} */
