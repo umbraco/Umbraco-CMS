@@ -13,6 +13,7 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UmbServerFileRenameWorkspaceRedirectController } from '@umbraco-cms/backoffice/server-file-system';
 
 export class UmbStylesheetWorkspaceContext
 	extends UmbEntityDetailWorkspaceContextBase<UmbStylesheetDetailModel, UmbStylesheetDetailRepository>
@@ -51,6 +52,12 @@ export class UmbStylesheetWorkspaceContext
 					// TODO: Decode uniques [NL]
 					const unique = info.match.params.unique;
 					this.load(unique);
+
+					new UmbServerFileRenameWorkspaceRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
 				},
 			},
 		]);
