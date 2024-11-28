@@ -7,6 +7,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-rename-modal')
 export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalData, UmbRenameServerFileModalValue> {
@@ -107,7 +108,8 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 									value=${this._name}
 									placeholder="Enter new name..."
 									required
-									required-message="Name is required"></uui-input>
+									required-message="Name is required"
+									${umbFocus()}></uui-input>
 							</uui-form-layout-item>
 						</form>
 					</uui-form>
