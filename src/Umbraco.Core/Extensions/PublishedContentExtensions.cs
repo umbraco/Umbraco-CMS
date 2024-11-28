@@ -1651,7 +1651,7 @@ public static class PublishedContentExtensions
         string? culture = null)
         where T : class, IPublishedContent
     {
-        var contentTypeAlias = GetContentTypeAliasForType<T>();
+        var contentTypeAlias = GetContentTypeAliasForTypeOrNull<T>();
         var parentSuccess = navigationQueryService.TryGetParentKey(content.Key, out Guid? parentKey);
         IPublishedContent? parent = parentKey is null ? null : publishedCache.GetById(parentKey.Value);
 
@@ -2432,11 +2432,7 @@ public static class PublishedContentExtensions
         string? contentTypeAlias = null)
         where T : class, IPublishedContent
     {
-        // If no content type alias is specified, attempt to get the alias from the type T
-        if (contentTypeAlias is null && typeof(T) != typeof(IPublishedContent))
-        {
-            contentTypeAlias = GetContentTypeAliasForType<T>();
-        }
+        contentTypeAlias ??= GetContentTypeAliasForTypeOrNull<T>();
 
         var nodeExists = contentTypeAlias is null
             ? navigationQueryService.TryGetChildrenKeys(parentKey, out IEnumerable<Guid> childrenKeys)
@@ -2470,11 +2466,18 @@ public static class PublishedContentExtensions
     ///     Gets the content type alias from the PublishedModelAttribute of a specified type.
     /// </summary>
     /// <typeparam name="T">The content type.</typeparam>
-    /// <returns>The content type alias.</returns>
-    private static string GetContentTypeAliasForType<T>()
+    /// <returns>The content type alias, or null if the type is IPublishedContent.</returns>
+    private static string? GetContentTypeAliasForTypeOrNull<T>()
         where T : class, IPublishedContent
     {
+        // IPublishedContent doesn't have PublishedModelAttribute
+        if (typeof(T) == typeof(IPublishedContent))
+        {
+            return null;
+        }
+
         PublishedModelAttribute? attribute = typeof(T).GetCustomAttribute<PublishedModelAttribute>(false);
+
         if (attribute is null)
         {
             throw new InvalidOperationException($"The type {typeof(T).FullName} does not have the {nameof(PublishedModelAttribute)}, so the content type alias cannot be inferred.");
@@ -2493,11 +2496,7 @@ public static class PublishedContentExtensions
         string? contentTypeAlias = null)
         where T : class, IPublishedContent
     {
-        // If no content type alias is specified, attempt to get the alias from the type T
-        if (contentTypeAlias is null && typeof(T) != typeof(IPublishedContent))
-        {
-            contentTypeAlias = GetContentTypeAliasForType<T>();
-        }
+        contentTypeAlias ??= GetContentTypeAliasForTypeOrNull<T>();
 
         // Yield the content node itself if it matches the type and alias (if applicable)
         if (orSelf && content.TryGetOfType(contentTypeAlias, out T? self))
@@ -2535,11 +2534,7 @@ public static class PublishedContentExtensions
         string? contentTypeAlias = null)
         where T : class, IPublishedContent
     {
-        // If no content type alias is specified, attempt to get the alias from the type T
-        if (contentTypeAlias is null && typeof(T) != typeof(IPublishedContent))
-        {
-            contentTypeAlias = GetContentTypeAliasForType<T>();
-        }
+        contentTypeAlias ??= GetContentTypeAliasForTypeOrNull<T>();
 
         // Yield the content node itself if it matches the type and alias (if applicable)
         if (orSelf && content.TryGetOfType(contentTypeAlias, out T? self))
