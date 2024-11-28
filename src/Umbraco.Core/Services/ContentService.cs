@@ -2695,13 +2695,17 @@ public class ContentService : RepositoryService, IContentService
                 var total = long.MaxValue;
                 while (page * pageSize < total)
                 {
-                    // when copying a branch into itself, the copy of a root would be seen as a descendant
-                    // and would be copied again => filter it out.
                     IEnumerable<IContent> descendants =
-                        GetPagedDescendants(content.Id, page++, pageSize, out total)
-                            .Where(descendant => descendant.Id != copy.Id);
+                        GetPagedDescendants(content.Id, page++, pageSize, out total);
                     foreach (IContent descendant in descendants)
                     {
+                        // when copying a branch into itself, the copy of a root would be seen as a descendant
+                        // and would be copied again => filter it out.
+                        if (descendant.Id == copy.Id)
+                        {
+                            continue;
+                        }
+
                         // if parent has not been copied, skip, else gets its copy id
                         if (idmap.TryGetValue(descendant.ParentId, out parentId) == false)
                         {
