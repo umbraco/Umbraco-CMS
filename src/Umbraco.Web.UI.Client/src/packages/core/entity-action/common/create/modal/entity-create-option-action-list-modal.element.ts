@@ -87,13 +87,15 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 				<uui-box>
 					${this._apiControllers.length === 0
 						? html`<div>No create options available.</div>`
-						: html`<uui-ref-list>
-								${repeat(
-									this._apiControllers,
-									(controller) => controller.manifest?.alias,
-									(controller, index) => this.#renderRefItem(controller, index),
-								)}
-							</uui-ref-list>`}
+						: html`
+								<uui-ref-list>
+									${repeat(
+										this._apiControllers,
+										(controller) => controller.manifest?.alias,
+										(controller, index) => this.#renderRefItem(controller, index),
+									)}
+								</uui-ref-list>
+							`}
 				</uui-box>
 				<uui-button
 					slot="actions"
@@ -108,19 +110,21 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 		if (!manifest) throw new Error('No manifest found');
 
 		const label = manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name;
+		const description = manifest.meta.description ? this.localize.string(manifest.meta.description) : undefined;
 		const href = this._hrefList[index];
 
 		return html`
-			<uui-ref-node
+			<umb-ref-item
 				name=${label}
-				detail=${ifDefined(manifest.meta.description)}
-				@click=${(event: Event) => this.#onClick(event, controller, href)}
+				detail=${ifDefined(description)}
+				icon=${manifest.meta.icon}
 				href=${ifDefined(href)}
 				target=${this.#getTarget(href)}
+				?readonly=${!href}
+				?selectOnly=${!href}
 				?selectable=${!href}
-				?readonly=${!href}>
-				<uui-icon slot="icon" name=${manifest.meta.icon}></uui-icon>
-			</uui-ref-node>
+				@click=${(event: Event) => this.#onClick(event, controller, href)}>
+			</umb-ref-item>
 		`;
 	}
 }
