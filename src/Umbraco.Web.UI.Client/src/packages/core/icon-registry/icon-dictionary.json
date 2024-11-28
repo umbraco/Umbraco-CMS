@@ -334,11 +334,11 @@
 		},
 		{
 			"name": "icon-checkbox-dotted",
-			"file": "box-select.svg"
+			"file": "square-dashed.svg"
 		},
 		{
 			"name": "icon-checkbox-empty",
-			"file": "box-select.svg",
+			"file": "square-dashed.svg",
 			"legacy": true
 		},
 		{

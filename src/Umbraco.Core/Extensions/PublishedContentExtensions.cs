@@ -2469,7 +2469,10 @@ public static class PublishedContentExtensions
     {
         if (orSelf)
         {
-            yield return content;
+            if (contentTypeAlias is null || content.ContentType.Alias == contentTypeAlias)
+            {
+                yield return content;
+            }
         }
 
         var nodeExists = contentTypeAlias is null
@@ -2501,7 +2504,10 @@ public static class PublishedContentExtensions
     {
         if (orSelf)
         {
-            yield return content;
+            if (contentTypeAlias is null || content.ContentType.Alias == contentTypeAlias)
+            {
+                yield return content;
+            }
         }
 
         var nodeExists = contentTypeAlias is null

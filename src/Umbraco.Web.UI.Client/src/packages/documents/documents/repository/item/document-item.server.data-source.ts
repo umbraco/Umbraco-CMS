@@ -32,15 +32,18 @@ const getItems = (uniques: Array<string>) => DocumentService.getItemDocument({ i
 
 const mapper = (item: DocumentItemResponseModel): UmbDocumentItemModel => {
 	return {
-		entityType: UMB_DOCUMENT_ENTITY_TYPE,
-		unique: item.id,
-		isTrashed: item.isTrashed,
-		isProtected: item.isProtected,
 		documentType: {
-			unique: item.documentType.id,
-			icon: item.documentType.icon,
 			collection: item.documentType.collection ? { unique: item.documentType.collection.id } : null,
+			icon: item.documentType.icon,
+			unique: item.documentType.id,
 		},
+		entityType: UMB_DOCUMENT_ENTITY_TYPE,
+		hasChildren: item.hasChildren,
+		isProtected: item.isProtected,
+		isTrashed: item.isTrashed,
+		name: item.variants[0]?.name, // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
+		parent: item.parent ? { unique: item.parent.id } : null,
+		unique: item.id,
 		variants: item.variants.map((variant) => {
 			return {
 				culture: variant.culture || null,
@@ -48,6 +51,5 @@ const mapper = (item: DocumentItemResponseModel): UmbDocumentItemModel => {
 				state: variant.state,
 			};
 		}),
-		name: item.variants[0]?.name, // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
 	};
 };
