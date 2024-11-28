@@ -71,6 +71,8 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 
 		if (!controller.api) throw new Error('No API found');
 		await controller.api.execute();
+
+		this._submitModal();
 	}
 
 	#getTarget(href?: string) {
