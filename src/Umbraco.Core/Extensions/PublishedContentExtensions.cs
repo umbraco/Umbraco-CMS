@@ -2558,11 +2558,19 @@ public static class PublishedContentExtensions
         string? contentTypeAlias = null)
         where T : class, IPublishedContent
     {
+        // If no content type alias is specified, attempt to get the alias from the type T
+        if (contentTypeAlias is null && typeof(T) != typeof(IPublishedContent))
+        {
+            contentTypeAlias = GetContentTypeAliasForType<T>();
+        }
+
+        // Yield the content node itself if it matches the type and alias (if applicable)
         if (orSelf && content.TryGetOfType(contentTypeAlias, out T? self))
         {
             yield return self;
         }
 
+        // Try to get the descendant keys
         var nodeExists = contentTypeAlias is null
             ? navigationQueryService.TryGetDescendantsKeys(content.Key, out IEnumerable<Guid> descendantsKeys)
             : navigationQueryService.TryGetDescendantsKeysOfType(content.Key, contentTypeAlias, out descendantsKeys);
@@ -2572,6 +2580,7 @@ public static class PublishedContentExtensions
             yield break;
         }
 
+        // Retrieve descendants from the cache
         IEnumerable<T> descendants = descendantsKeys
             .Select(key => publishedCache.GetById(key) as T)
             .WhereNotNull()
@@ -2591,11 +2600,19 @@ public static class PublishedContentExtensions
         string? contentTypeAlias = null)
         where T : class, IPublishedContent
     {
+        // If no content type alias is specified, attempt to get the alias from the type T
+        if (contentTypeAlias is null && typeof(T) != typeof(IPublishedContent))
+        {
+            contentTypeAlias = GetContentTypeAliasForType<T>();
+        }
+
+        // Yield the content node itself if it matches the type and alias (if applicable)
         if (orSelf && content.TryGetOfType(contentTypeAlias, out T? self))
         {
             yield return self;
         }
 
+        // Try to get the ancestors keys
         var nodeExists = contentTypeAlias is null
             ? navigationQueryService.TryGetAncestorsKeys(content.Key, out IEnumerable<Guid> ancestorsKeys)
             : navigationQueryService.TryGetAncestorsKeysOfType(content.Key, contentTypeAlias, out ancestorsKeys);
@@ -2605,6 +2622,7 @@ public static class PublishedContentExtensions
             yield break;
         }
 
+        // Retrieve ancestors from the cache
         foreach (Guid ancestorKey in ancestorsKeys)
         {
             IPublishedContent? ancestor = publishedCache.GetById(ancestorKey);
