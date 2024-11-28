@@ -54,7 +54,7 @@ export class UmbServerFileRenameWorkspaceRedirectController extends UmbControlle
 		});
 
 		this.destroy();
-		window.history.pushState({}, '', newPath);
+		window.history.replaceState({}, '', newPath);
 	}) as EventListener;
 
 	public override destroy(): void {
