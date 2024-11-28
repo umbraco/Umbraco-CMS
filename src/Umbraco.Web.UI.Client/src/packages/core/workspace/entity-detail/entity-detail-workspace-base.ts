@@ -90,7 +90,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @returns { string | undefined } The unique identifier
 	 */
 	getUnique(): UmbEntityUnique | undefined {
-		return this.getData()?.unique;
+		return this.#entityContext.getUnique();
 	}
 
 	setUnique(unique: string) {
