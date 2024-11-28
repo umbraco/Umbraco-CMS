@@ -81,6 +81,11 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 		const { data } = await this.#renameRepository.rename(this.data.unique, name);
 
 		if (data) {
+			this.value = {
+				name: data.name,
+				unique: data.unique,
+			};
+
 			this._submitModal();
 		} else {
 			this._rejectModal();
