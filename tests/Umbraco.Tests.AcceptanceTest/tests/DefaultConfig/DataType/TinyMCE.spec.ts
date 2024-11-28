@@ -40,7 +40,7 @@ test('can create a rich text editor tinyMCE', {tag: '@smoke'}, async ({umbracoAp
 test('can rename a rich text editor tinyMCE', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const wrongName = 'tinyMCETest';
-  await umbracoApi.dataType.createDefaultTinyMCE(wrongName);
+  await umbracoApi.dataType.createDefaultTinyMCEDataType(wrongName);
 
   // Act
   await umbracoUi.dataType.goToDataType(wrongName);
@@ -55,7 +55,7 @@ test('can rename a rich text editor tinyMCE', async ({umbracoApi, umbracoUi}) =>
 
 test('can delete a rich text editor tinyMCE', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.dataType.createDefaultTinyMCE(tinyMCEName);
+  await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
 
   // Act
   await umbracoUi.dataType.clickRootFolderCaretButton();
@@ -71,7 +71,7 @@ test('can delete a rich text editor tinyMCE', async ({umbracoApi, umbracoUi}) =>
 test('can enable toolbar options', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const toolbarValues = ["undo", "redo", "cut"];
-  await umbracoApi.dataType.createDefaultTinyMCE(tinyMCEName);
+  await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
   await umbracoUi.dataType.goToDataType(tinyMCEName);
   const toolbarItemCount = await umbracoApi.dataType.getTinyMCEToolbarItemsCount(tinyMCEName);
 
@@ -94,7 +94,7 @@ test('can add stylesheet', async ({umbracoApi, umbracoUi}) => {
     "alias": "stylesheets",
     "value": [stylesheetPath]
   };
-  await umbracoApi.dataType.createDefaultTinyMCE(tinyMCEName);
+  await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
   await umbracoUi.dataType.goToDataType(tinyMCEName);
 
   // Act
@@ -120,7 +120,7 @@ test('can add dimensions', async ({umbracoApi, umbracoUi}) => {
       "height": height
     }
   };
-  await umbracoApi.dataType.createDefaultTinyMCE(tinyMCEName);
+  await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
   await umbracoUi.dataType.goToDataType(tinyMCEName);
 
   // Act
@@ -139,7 +139,7 @@ test('can update maximum size for inserted images', async ({umbracoApi, umbracoU
     "alias": "maxImageSize",
     "value": maximumSize
   };
-  await umbracoApi.dataType.createDefaultTinyMCE(tinyMCEName);
+  await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
   await umbracoUi.dataType.goToDataType(tinyMCEName);
 
   // Act
@@ -158,7 +158,7 @@ test('can enable inline editing mode', async ({umbracoApi, umbracoUi}) => {
     "alias": "mode",
     "value": mode
   };
-  await umbracoApi.dataType.createDefaultTinyMCE(tinyMCEName);
+  await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
   await umbracoUi.dataType.goToDataType(tinyMCEName);
 
   // Act
@@ -184,7 +184,7 @@ test('can add an available block', async ({umbracoApi, umbracoUi}) => {
       }
     ]
   };
-  await umbracoApi.dataType.createDefaultTinyMCE(tinyMCEName);
+  await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
   await umbracoUi.dataType.goToDataType(tinyMCEName);
 
   // Act
@@ -206,7 +206,7 @@ test('can select overlay size', async ({umbracoApi, umbracoUi}) => {
     "alias": "overlaySize",
     "value": overlaySizeValue
   };
-  await umbracoApi.dataType.createDefaultTinyMCE(tinyMCEName);
+  await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
   await umbracoUi.dataType.goToDataType(tinyMCEName);
 
   // Act
@@ -224,7 +224,7 @@ test('can enable hide label', async ({umbracoApi, umbracoUi}) => {
     "alias": "hideLabel",
     "value": true
   };
-  await umbracoApi.dataType.createDefaultTinyMCE(tinyMCEName);
+  await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
   await umbracoUi.dataType.goToDataType(tinyMCEName);
 
   // Act
@@ -245,7 +245,7 @@ test('can add image upload folder', async ({umbracoApi, umbracoUi}) => {
     "alias": "mediaParentId",
     "value": mediaFolderId
   };
-  await umbracoApi.dataType.createDefaultTinyMCE(tinyMCEName);
+  await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
   await umbracoUi.dataType.goToDataType(tinyMCEName);
 
   // Act
@@ -266,7 +266,7 @@ test('can enable ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
     "alias": "ignoreUserStartNodes",
     "value": true
   };
-  await umbracoApi.dataType.createDefaultTinyMCE(tinyMCEName);
+  await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
   await umbracoUi.dataType.goToDataType(tinyMCEName);
 
   // Act
