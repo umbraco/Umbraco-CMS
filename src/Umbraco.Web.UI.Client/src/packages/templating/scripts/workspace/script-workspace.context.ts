@@ -62,7 +62,7 @@ export class UmbScriptWorkspaceContext
 
 	/**
 	 * @description Set the name of the script
-	 * @param {string} value
+	 * @param {string} value The name of the script
 	 * @memberof UmbScriptWorkspaceContext
 	 */
 	public setName(value: string) {
@@ -71,7 +71,7 @@ export class UmbScriptWorkspaceContext
 
 	/**
 	 * @description Set the content of the script
-	 * @param {string} value
+	 * @param {string} value The content of the script
 	 * @memberof UmbScriptWorkspaceContext
 	 */
 	public setContent(value: string) {
