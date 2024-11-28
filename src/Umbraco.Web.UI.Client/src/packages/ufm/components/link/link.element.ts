@@ -2,20 +2,18 @@ import { UmbUfmElementBase } from '../ufm-element-base.js';
 import { UMB_UFM_RENDER_CONTEXT } from '../ufm-render/ufm-render.context.js';
 import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentItemRepository, UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbMediaItemRepository, UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
-import { UmbMemberItemRepository, UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
+import type { UmbLinkPickerLink } from '@umbraco-cms/backoffice/multi-url-picker';
 
-const elementName = 'ufm-content-name';
+const elementName = 'ufm-link';
 
 @customElement(elementName)
-export class UmbUfmContentNameElement extends UmbUfmElementBase {
+export class UmbUfmLinkElement extends UmbUfmElementBase {
 	@property()
 	alias?: string;
 
 	#documentRepository?: UmbDocumentItemRepository;
 	#mediaRepository?: UmbMediaItemRepository;
-	#memberRepository?: UmbMemberItemRepository;
 
 	constructor() {
 		super();
@@ -31,39 +29,29 @@ export class UmbUfmContentNameElement extends UmbUfmElementBase {
 
 					if (!temp) return;
 
-					const entityType = this.#getEntityType(temp);
-					const uniques = this.#getUniques(temp);
-
-					this.value = await this.#getNames(entityType, uniques);
+					const items = Array.isArray(temp) ? temp : [temp];
+					const names = await Promise.all(items.map(async (item) => await this.#getName(item)));
+					this.value = names.filter((x) => x).join(', ');
 				},
 				'observeValue',
 			);
 		});
 	}
 
-	#getEntityType(value: unknown) {
-		if (Array.isArray(value) && value.length > 0) {
-			const item = value[0];
-			if (item.type) return item.type;
-			if (item.mediaKey) return UMB_MEDIA_ENTITY_TYPE;
+	async #getName(item?: unknown) {
+		const link = item as UmbLinkPickerLink;
+
+		if (link.name) {
+			return link.name;
 		}
 
-		return null;
-	}
+		const entityType = link.type;
+		const unique = link.unique;
 
-	#getUniques(value: unknown) {
-		if (Array.isArray(value)) {
-			return value.map((x) => x.unique ?? x.mediaKey ?? x).filter((x) => UmbId.validate(x));
-		}
-
-		return typeof value === 'string' && UmbId.validate(value) ? [value] : [];
-	}
-
-	async #getNames(entityType: string, uniques?: Array<string>) {
-		if (uniques?.length) {
+		if (unique) {
 			const repository = this.#getRepository(entityType);
 			if (repository) {
-				const { data } = await repository.requestItems(uniques);
+				const { data } = await repository.requestItems([unique]);
 				if (Array.isArray(data) && data.length > 0) {
 					return data.map((item) => item.name).join(', ');
 				}
@@ -79,10 +67,6 @@ export class UmbUfmContentNameElement extends UmbUfmElementBase {
 				if (!this.#mediaRepository) this.#mediaRepository = new UmbMediaItemRepository(this);
 				return this.#mediaRepository;
 
-			case UMB_MEMBER_ENTITY_TYPE:
-				if (!this.#memberRepository) this.#memberRepository = new UmbMemberItemRepository(this);
-				return this.#memberRepository;
-
 			case UMB_DOCUMENT_ENTITY_TYPE:
 			default:
 				if (!this.#documentRepository) this.#documentRepository = new UmbDocumentItemRepository(this);
@@ -91,10 +75,10 @@ export class UmbUfmContentNameElement extends UmbUfmElementBase {
 	}
 }
 
-export { UmbUfmContentNameElement as element };
+export { UmbUfmLinkElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbUfmContentNameElement;
+		[elementName]: UmbUfmLinkElement;
 	}
 }

@@ -74,10 +74,19 @@ public class DefaultShortStringHelperConfig
         {
             urlSegmentConvertTo = CleanStringType.Ascii;
         }
-
-        if (requestHandlerSettings.ShouldTryConvertUrlsToAscii)
+        else if (requestHandlerSettings.ShouldTryConvertUrlsToAscii)
         {
             urlSegmentConvertTo = CleanStringType.TryAscii;
+        }
+
+        CleanStringType fileNameSegmentConvertTo = CleanStringType.Utf8;
+        if (requestHandlerSettings.ShouldConvertFileNamesToAscii)
+        {
+            fileNameSegmentConvertTo = CleanStringType.Ascii;
+        }
+        else if (requestHandlerSettings.ShouldTryConvertFileNamesToAscii)
+        {
+            fileNameSegmentConvertTo = CleanStringType.TryAscii;
         }
 
         return WithConfig(CleanStringType.UrlSegment, new Config
@@ -92,7 +101,7 @@ public class DefaultShortStringHelperConfig
         {
             PreFilter = ApplyUrlReplaceCharacters,
             IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
-            StringType = CleanStringType.Utf8 | CleanStringType.LowerCase,
+            StringType = fileNameSegmentConvertTo | CleanStringType.LowerCase,
             BreakTermsOnUpper = false,
             Separator = '-',
         }).WithConfig(CleanStringType.Alias, new Config
