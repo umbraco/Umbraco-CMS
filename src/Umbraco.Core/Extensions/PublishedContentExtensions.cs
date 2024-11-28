@@ -2560,7 +2560,7 @@ public static class PublishedContentExtensions
     {
         if (orSelf)
         {
-            if (content.TryYieldSelfOfType(contentTypeAlias, out T? self))
+            if (content.TryGetOfType(contentTypeAlias, out T? self))
             {
                 yield return self;
             }
@@ -2596,7 +2596,7 @@ public static class PublishedContentExtensions
     {
         if (orSelf)
         {
-            if (content.TryYieldSelfOfType(contentTypeAlias, out T? self))
+            if (content.TryGetOfType(contentTypeAlias, out T? self))
             {
                 yield return self;
             }
@@ -2621,25 +2621,25 @@ public static class PublishedContentExtensions
         }
     }
 
-    private static bool TryYieldSelfOfType<T>(
+    private static bool TryGetOfType<T>(
         this IPublishedContent content,
         string? contentTypeAlias,
-        [NotNullWhen(true)] out T? self)
+        [NotNullWhen(true)] out T? contentOfType)
         where T : class, IPublishedContent
     {
-        self = null;
+        contentOfType = null;
 
-        if (content is not T contentOfTypeT)
+        if (content is not T typedContent)
         {
             return false;
         }
 
-        if (contentTypeAlias is not null && contentOfTypeT.ContentType.Alias != contentTypeAlias)
+        if (contentTypeAlias is not null && typedContent.ContentType.Alias != contentTypeAlias)
         {
             return false;
         }
 
-        self = contentOfTypeT;
+        contentOfType = typedContent;
         return true;
     }
 }
