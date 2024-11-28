@@ -2558,12 +2558,9 @@ public static class PublishedContentExtensions
         string? contentTypeAlias = null)
         where T : class, IPublishedContent
     {
-        if (orSelf)
+        if (orSelf && content.TryGetOfType(contentTypeAlias, out T? self))
         {
-            if (content.TryGetOfType(contentTypeAlias, out T? self))
-            {
-                yield return self;
-            }
+            yield return self;
         }
 
         var nodeExists = contentTypeAlias is null
@@ -2594,12 +2591,9 @@ public static class PublishedContentExtensions
         string? contentTypeAlias = null)
         where T : class, IPublishedContent
     {
-        if (orSelf)
+        if (orSelf && content.TryGetOfType(contentTypeAlias, out T? self))
         {
-            if (content.TryGetOfType(contentTypeAlias, out T? self))
-            {
-                yield return self;
-            }
+            yield return self;
         }
 
         var nodeExists = contentTypeAlias is null
