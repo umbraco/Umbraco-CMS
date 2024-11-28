@@ -1661,7 +1661,11 @@ public static class PublishedContentExtensions
 
         if (parentSuccess is false || parent is null)
         {
-            var rootSuccess = navigationQueryService.TryGetRootKeysOfType(contentTypeAlias, out IEnumerable<Guid> rootKeys);
+            // Try to get the root keys
+            var rootSuccess = contentTypeAlias is null
+                ? navigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys)
+                : navigationQueryService.TryGetRootKeysOfType(contentTypeAlias, out rootKeys);
+
             if (rootSuccess is false)
             {
                 return [];
