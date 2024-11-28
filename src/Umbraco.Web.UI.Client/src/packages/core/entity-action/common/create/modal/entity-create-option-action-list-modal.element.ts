@@ -83,7 +83,7 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 
 	override render() {
 		return html`
-			<umb-body-layout headline="${this.localize.term('user_createUser')}">
+			<umb-body-layout headline=${this.data?.headline ? this.localize.string(this.data.headline) : ''}>
 				<uui-box>
 					${this._apiControllers.length === 0
 						? html`<div>No create options available.</div>`

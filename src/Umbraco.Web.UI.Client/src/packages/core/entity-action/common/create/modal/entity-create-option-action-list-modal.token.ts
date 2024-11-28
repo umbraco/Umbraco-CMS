@@ -5,6 +5,7 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 export interface UmbEntityCreateOptionActionListModalData {
 	unique: UmbEntityUnique;
 	entityType: string;
+	headline?: string;
 }
 
 export type UmbEntityCreateOptionActionListModalValue = never;
