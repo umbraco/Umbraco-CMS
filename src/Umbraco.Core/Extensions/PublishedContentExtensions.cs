@@ -581,12 +581,8 @@ public static class PublishedContentExtensions
         this IPublishedContent content,
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService)
-        where T : class, IPublishedContent
-    {
-        var contentTypeAlias = GetContentTypeAliasForType<T>();
-
-        return content.EnumerateAncestorsOrSelfInternal<T>(publishedCache, navigationQueryService, false, contentTypeAlias);
-    }
+        where T : class, IPublishedContent =>
+        content.EnumerateAncestorsOrSelfInternal<T>(publishedCache, navigationQueryService, false);
 
     /// <summary>
     ///     Gets the ancestors of the content, at a level lesser or equal to a specified level, and of a specified content
@@ -610,14 +606,9 @@ public static class PublishedContentExtensions
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService,
         int maxLevel)
-        where T : class, IPublishedContent
-    {
-        var contentTypeAlias = GetContentTypeAliasForType<T>();
-
-        IEnumerable<T> ancestors = content.EnumerateAncestorsOrSelfInternal<T>(publishedCache, navigationQueryService, false, contentTypeAlias);
-
-        return ancestors.Where(n => n.Level <= maxLevel);
-    }
+        where T : class, IPublishedContent => content
+        .EnumerateAncestorsOrSelfInternal<T>(publishedCache, navigationQueryService, false)
+        .Where(n => n.Level <= maxLevel);
 
     /// <summary>
     ///     Gets the content and its ancestors.
@@ -687,12 +678,8 @@ public static class PublishedContentExtensions
         this IPublishedContent content,
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService)
-        where T : class, IPublishedContent
-    {
-        var contentTypeAlias = GetContentTypeAliasForType<T>();
-
-        return content.EnumerateAncestorsOrSelfInternal<T>(publishedCache, navigationQueryService, true, contentTypeAlias);
-    }
+        where T : class, IPublishedContent =>
+        content.EnumerateAncestorsOrSelfInternal<T>(publishedCache, navigationQueryService, true);
 
     /// <summary>
     ///     Gets the content and its ancestor, at a lever lesser or equal to a specified level, and of a specified content
@@ -713,14 +700,9 @@ public static class PublishedContentExtensions
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService,
         int maxLevel)
-        where T : class, IPublishedContent
-    {
-        var contentTypeAlias = GetContentTypeAliasForType<T>();
-
-        IEnumerable<T> ancestorsOrSelf = content.EnumerateAncestorsOrSelfInternal<T>(publishedCache, navigationQueryService, true, contentTypeAlias);
-
-        return ancestorsOrSelf.Where(n => n.Level <= maxLevel);
-    }
+        where T : class, IPublishedContent => content
+        .EnumerateAncestorsOrSelfInternal<T>(publishedCache, navigationQueryService, true)
+        .Where(n => n.Level <= maxLevel);
 
     /// <summary>
     ///     Gets the ancestor of the content, ie its parent.
@@ -1107,18 +1089,13 @@ public static class PublishedContentExtensions
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService,
         string? culture = null)
-        where T : class, IPublishedContent
-    {
-        var contentTypeAlias = GetContentTypeAliasForType<T>();
-
-        return content.EnumerateDescendantsOrSelfInternal<T>(
+        where T : class, IPublishedContent =>
+        content.EnumerateDescendantsOrSelfInternal<T>(
             variationContextAccessor,
             publishedCache,
             navigationQueryService,
             culture,
-            false,
-            contentTypeAlias);
-    }
+            false);
 
     public static IEnumerable<T> Descendants<T>(
         this IPublishedContent content,
@@ -1127,14 +1104,9 @@ public static class PublishedContentExtensions
         INavigationQueryService navigationQueryService,
         int level,
         string? culture = null)
-        where T : class, IPublishedContent
-    {
-        var contentTypeAlias = GetContentTypeAliasForType<T>();
-
-        IEnumerable<T> descendants = content.EnumerateDescendantsOrSelfInternal<T>(variationContextAccessor, publishedCache, navigationQueryService, culture, false, contentTypeAlias);
-
-        return descendants.Where(p => p.Level >= level);
-    }
+        where T : class, IPublishedContent => content
+        .EnumerateDescendantsOrSelfInternal<T>(variationContextAccessor, publishedCache, navigationQueryService, culture, false)
+        .Where(p => p.Level >= level);
 
     public static IEnumerable<IPublishedContent> DescendantsOrSelf(
         this IPublishedContent content,
@@ -1174,18 +1146,13 @@ public static class PublishedContentExtensions
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService,
         string? culture = null)
-        where T : class, IPublishedContent
-    {
-        var contentTypeAlias = GetContentTypeAliasForType<T>();
-
-        return content.EnumerateDescendantsOrSelfInternal<T>(
+        where T : class, IPublishedContent =>
+        content.EnumerateDescendantsOrSelfInternal<T>(
             variationContextAccessor,
             publishedCache,
             navigationQueryService,
             culture,
-            true,
-            contentTypeAlias);
-    }
+            true);
 
     public static IEnumerable<T> DescendantsOrSelf<T>(
         this IPublishedContent content,
@@ -1194,14 +1161,9 @@ public static class PublishedContentExtensions
         INavigationQueryService navigationQueryService,
         int level,
         string? culture = null)
-        where T : class, IPublishedContent
-    {
-        var contentTypeAlias = GetContentTypeAliasForType<T>();
-
-        IEnumerable<T> descendants = content.EnumerateDescendantsOrSelfInternal<T>(variationContextAccessor, publishedCache, navigationQueryService, culture, true, contentTypeAlias);
-
-        return descendants.Where(p => p.Level >= level);
-    }
+        where T : class, IPublishedContent => content
+        .EnumerateDescendantsOrSelfInternal<T>(variationContextAccessor, publishedCache, navigationQueryService, culture, true)
+        .Where(p => p.Level >= level);
 
     public static IPublishedContent? Descendant(
         this IPublishedContent content,
@@ -1449,14 +1411,8 @@ public static class PublishedContentExtensions
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService,
         string? culture = null)
-        where T : class, IPublishedContent
-    {
-        var contentTypeAlias = GetContentTypeAliasForType<T>();
-
-        IEnumerable<T> children = GetChildren<T>(navigationQueryService, publishedCache, content.Key, contentTypeAlias);
-
-        return children.FilterByCulture(culture, variationContextAccessor);
-    }
+        where T : class, IPublishedContent =>
+        GetChildren<T>(navigationQueryService, publishedCache, content.Key).FilterByCulture(culture, variationContextAccessor);
 
     public static IPublishedContent? FirstChild(
         this IPublishedContent content,
@@ -1717,9 +1673,7 @@ public static class PublishedContentExtensions
                 .WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
         }
 
-        IEnumerable<T> children = GetChildren<T>(navigationQueryService, publishedCache, parent.Key, contentTypeAlias);
-
-        return children.FilterByCulture(culture, variationContextAccessor);
+        return GetChildren<T>(navigationQueryService, publishedCache, parent.Key, contentTypeAlias).FilterByCulture(culture, variationContextAccessor);
     }
 
     #endregion
@@ -2102,14 +2056,8 @@ public static class PublishedContentExtensions
         this IPublishedContent content,
         IVariationContextAccessor variationContextAccessor,
         string? culture = null)
-        where T : class, IPublishedContent
-    {
-        var contentTypeAlias = GetContentTypeAliasForType<T>();
-
-        IEnumerable<T> children = GetChildren<T>(GetNavigationQueryService(content), GetPublishedCache(content), content.Key, contentTypeAlias);
-
-        return children.FilterByCulture(culture, variationContextAccessor);
-    }
+        where T : class, IPublishedContent =>
+        GetChildren<T>(GetNavigationQueryService(content), GetPublishedCache(content), content.Key).FilterByCulture(culture, variationContextAccessor);
 
     public static DataTable ChildrenAsTable(
         this IPublishedContent content,
@@ -2177,18 +2125,13 @@ public static class PublishedContentExtensions
         this IPublishedContent content,
         IVariationContextAccessor variationContextAccessor,
         string? culture = null)
-        where T : class, IPublishedContent
-    {
-        var contentTypeAlias = GetContentTypeAliasForType<T>();
-
-        return content.EnumerateDescendantsOrSelfInternal<T>(
+        where T : class, IPublishedContent =>
+        content.EnumerateDescendantsOrSelfInternal<T>(
             variationContextAccessor,
             GetPublishedCache(content),
             GetNavigationQueryService(content),
             culture,
-            false,
-            contentTypeAlias);
-    }
+            false);
 
 
     public static IEnumerable<T> Descendants<T>(
@@ -2196,14 +2139,9 @@ public static class PublishedContentExtensions
         IVariationContextAccessor variationContextAccessor,
         int level,
         string? culture = null)
-        where T : class, IPublishedContent
-    {
-        var contentTypeAlias = GetContentTypeAliasForType<T>();
-
-        IEnumerable<T> descendants = content.EnumerateDescendantsOrSelfInternal<T>(variationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture, false, contentTypeAlias);
-
-        return descendants.Where(p => p.Level >= level);
-    }
+        where T : class, IPublishedContent => content
+        .EnumerateDescendantsOrSelfInternal<T>(variationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture, false)
+        .Where(p => p.Level >= level);
 
 
     public static IEnumerable<IPublishedContent> DescendantsOrSelf(
@@ -2241,18 +2179,13 @@ public static class PublishedContentExtensions
         this IPublishedContent content,
         IVariationContextAccessor variationContextAccessor,
         string? culture = null)
-        where T : class, IPublishedContent
-    {
-        var contentTypeAlias = GetContentTypeAliasForType<T>();
-
-        return content.EnumerateDescendantsOrSelfInternal<T>(
+        where T : class, IPublishedContent =>
+        content.EnumerateDescendantsOrSelfInternal<T>(
             variationContextAccessor,
             GetPublishedCache(content),
             GetNavigationQueryService(content),
             culture,
-            true,
-            contentTypeAlias);
-    }
+            true);
 
 
     public static IEnumerable<T> DescendantsOrSelf<T>(
@@ -2260,14 +2193,9 @@ public static class PublishedContentExtensions
         IVariationContextAccessor variationContextAccessor,
         int level,
         string? culture = null)
-        where T : class, IPublishedContent
-    {
-        var contentTypeAlias = GetContentTypeAliasForType<T>();
-
-        IEnumerable<T> descendants = content.EnumerateDescendantsOrSelfInternal<T>(variationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture, true, contentTypeAlias);
-
-        return descendants.Where(p => p.Level >= level);
-    }
+        where T : class, IPublishedContent => content
+        .EnumerateDescendantsOrSelfInternal<T>(variationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture, true)
+        .Where(p => p.Level >= level);
 
 
     public static IPublishedContent? Descendant(
@@ -2503,6 +2431,12 @@ public static class PublishedContentExtensions
         string? contentTypeAlias = null)
         where T : class, IPublishedContent
     {
+        // If no content type alias is specified, attempt to get the alias from the type T
+        if (contentTypeAlias is null && typeof(T) != typeof(IPublishedContent))
+        {
+            contentTypeAlias = GetContentTypeAliasForType<T>();
+        }
+
         var nodeExists = contentTypeAlias is null
             ? navigationQueryService.TryGetChildrenKeys(parentKey, out IEnumerable<Guid> childrenKeys)
             : navigationQueryService.TryGetChildrenKeysOfType(parentKey, contentTypeAlias, out childrenKeys);
