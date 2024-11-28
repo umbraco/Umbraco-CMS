@@ -12,67 +12,64 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _name?: string;
 
-	#workspaceContext?: typeof UMB_STYLESHEET_WORKSPACE_CONTEXT.TYPE;
+	#context?: typeof UMB_STYLESHEET_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_STYLESHEET_WORKSPACE_CONTEXT, (context) => {
-			this.#workspaceContext = context;
-
-			this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeStylesheetName');
-
-			this.observe(this.#workspaceContext.isNew, (isNew) => {
-				this._isNew = isNew;
-			});
+			this.#context = context;
+			this.observe(this.#context.name, (name) => (this._name = name));
+			this.observe(this.#context.isNew, (isNew) => (this._isNew = isNew));
 		});
 	}
 
-	#onNameChange(event: UUIInputEvent) {
+	#onNameInput(event: UUIInputEvent) {
 		const target = event.target as UUIInputElement;
 		const value = target.value as string;
-		this.#workspaceContext?.setName(value);
+		this.#context?.setName(value);
 	}
 
 	override render() {
-		return this._isNew !== undefined
-			? html`
-					<umb-workspace-editor>
-						<div id="header" slot="header">
-							<uui-input
-								placeholder="Enter stylesheet name..."
-								label="Stylesheet name"
-								id="name"
-								.value=${this._name}
-								@input="${this.#onNameChange}"
-								?readonly=${this._isNew === false}
-								${umbFocus()}>
-							</uui-input>
-						</div>
-					</umb-workspace-editor>
-				`
-			: nothing;
+		return html` <umb-entity-detail-workspace-editor> ${this.#renderHeader()} </umb-entity-detail-workspace-editor> `;
+	}
+
+	#renderHeader() {
+		return html`
+			<div id="workspace-header" slot="header">
+				<uui-input
+					placeholder=${this.localize.term('placeholders_entername')}
+					.value=${this._name}
+					@input=${this.#onNameInput}
+					label=${this.localize.term('placeholders_entername')}
+					?readonly=${this._isNew === false}
+					${umbFocus()}>
+				</uui-input>
+			</div>
+		`;
 	}
 
 	static override styles = [
 		UmbTextStyles,
 		css`
-			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
+			umb-code-editor {
+				--editor-height: calc(100dvh - 260px);
 			}
 
-			#header {
-				display: flex;
-				flex: 1 1 auto;
-				flex-direction: column;
+			uui-box {
+				min-height: calc(100dvh - 260px);
+				margin: var(--uui-size-layout-1);
+				--uui-box-default-padding: 0;
+				/* remove header border bottom as code editor looks better in this box */
+				--uui-color-divider-standalone: transparent;
 			}
 
-			#name {
+			#workspace-header {
 				width: 100%;
-				flex: 1 1 auto;
-				align-items: center;
+			}
+
+			uui-input {
+				width: 100%;
 			}
 		`,
 	];
