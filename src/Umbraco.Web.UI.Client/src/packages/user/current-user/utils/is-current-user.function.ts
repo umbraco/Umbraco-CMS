@@ -12,5 +12,5 @@ export const isCurrentUser = async (host: UmbControllerHost, userUnique: string)
 	const currentUserContext = await ctrl.asPromise();
 	ctrl.destroy();
 
-	return currentUserContext!.isUserCurrentUser(userUnique);
+	return await currentUserContext!.isUserCurrentUser(userUnique);
 };
