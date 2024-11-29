@@ -436,16 +436,16 @@ stages:
           matrix:
             LinuxShard1Of2:
               vmImage: "ubuntu-latest"
-              testCommand: "npx playwright test DefaultConfig --grep "@smoke" --shard=1/2 --ignore-certificate-errors"
+              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\"--shard=1/2 --ignore-certificate-errors"
             LinuxShard2Of2:
               vmImage: "ubuntu-latest"
-              testCommand: "npx playwright test DefaultConfig --grep "@smoke" --shard=2/2 --ignore-certificate-errors"
+              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --shard=2/2 --ignore-certificate-errors"
             WindowsShard1Of2:
               vmImage: "windows-latest"
-              testCommand: "npx playwright test DefaultConfig --grep "@smoke" --shard=1/2 --ignore-certificate-errors"
+              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --shard=1/2 --ignore-certificate-errors"
             WindowsShard2Of2:
               vmImage: "windows-latest"
-              testCommand: "npx playwright test DefaultConfig --grep "@smoke" --shard=2/2 --ignore-certificate-errors"
+              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --shard=2/2 --ignore-certificate-errors"
         pool:
           vmImage: $(vmImage)
         steps:
