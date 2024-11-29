@@ -434,18 +434,18 @@ stages:
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.Sqlite
         strategy:
           matrix:
-            LinuxShard1Of2:
+            LinuxPart1Of2:
               vmImage: "ubuntu-latest"
-              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\"--shard=1/2 --ignore-certificate-errors"
-            LinuxShard2Of2:
+              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\"--shard=1/2"
+            LinuxPart2Of2:
               vmImage: "ubuntu-latest"
-              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --shard=2/2 --ignore-certificate-errors"
-            WindowsShard1Of2:
+              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --shard=2/2"
+            WindowsPart1Of2:
               vmImage: "windows-latest"
-              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --shard=1/2 --ignore-certificate-errors"
-            WindowsShard2Of2:
+              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --shard=1/2"
+            WindowsPart2Of2:
               vmImage: "windows-latest"
-              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --shard=2/2 --ignore-certificate-errors"
+              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --shard=2/2"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -571,13 +571,23 @@ stages:
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
         strategy:
           matrix:
-            ${{ if eq(parameters.sqlServerLinuxAcceptanceTests, True) }} :
-              Linux:
+            ${{ if eq(parameters.sqlServerLinuxAcceptanceTests, True) }}:
+              LinuxPart1Of2:
+                testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\" --shard=1/2"
                 vmImage: "ubuntu-latest"
                 SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
                 CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
-            Windows:
+              LinuxPart2Of2:
+                testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\" --shard=2/2"
+                vmImage: "ubuntu-latest"
+                SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
+                CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+            WindowsPart1Of2:
               vmImage: "windows-latest"
+              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\" --shard=1/2"
+            WindowsPart2Of2:
+              vmImage: "windows-latest"
+              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\" --shard=2/2"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -669,7 +679,7 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
-          - pwsh: npm run smokeTest --ignore-certificate-errors
+          - pwsh: $(testCommand)
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
