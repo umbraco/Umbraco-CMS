@@ -55,7 +55,7 @@ public abstract class UmbracoIntegrationTestBase
 
     [TearDown]
     public void TearDown_Logging() =>
-        TestContext.Write($"  {TestContext.CurrentContext.Result.Outcome.Status}");
+        TestContext.Out.Write($"  {TestContext.CurrentContext.Result.Outcome.Status}");
 
     [OneTimeTearDown]
     public void FixtureTearDown()
