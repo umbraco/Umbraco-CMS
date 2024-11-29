@@ -247,7 +247,7 @@ test('can disable extensions item', async ({umbracoApi, umbracoUi}) => {
   const extensionsCount = await umbracoApi.dataType.getTiptapExtensionsCount(tiptapName);
 
   // Act
-  await umbracoUi.dataType.clickExtensionItemHaveName(extensionItemName);
+  await umbracoUi.dataType.clickExtensionItemWithName(extensionItemName);
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert

@@ -76,7 +76,7 @@ test('can enable toolbar options', async ({umbracoApi, umbracoUi}) => {
   const toolbarItemCount = await umbracoApi.dataType.getTinyMCEToolbarItemsCount(tinyMCEName);
 
   // Act
-  await umbracoUi.dataType.clickTheToolbarOptionByValue(toolbarValues);
+  await umbracoUi.dataType.clickToolbarOptionByValue(toolbarValues);
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
