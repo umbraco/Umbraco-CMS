@@ -1,7 +1,7 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { foundConsts } from '../utils/all-umb-consts/index.js';
 
-import * as import0 from '@umbraco-cms/backoffice/class-api';
+import * as import0 from '@umbraco-cms/backoffice/app';
 import * as import1 from '@umbraco-cms/backoffice/context-api';
 import * as import2 from '@umbraco-cms/backoffice/embedded-media';
 import * as import3 from '@umbraco-cms/backoffice/localization-api';
@@ -53,32 +53,31 @@ import * as import48 from '@umbraco-cms/backoffice/property';
 import * as import49 from '@umbraco-cms/backoffice/recycle-bin';
 import * as import50 from '@umbraco-cms/backoffice/relation-type';
 import * as import51 from '@umbraco-cms/backoffice/relations';
-import * as import52 from '@umbraco-cms/backoffice/router';
-import * as import53 from '@umbraco-cms/backoffice/rte';
-import * as import54 from '@umbraco-cms/backoffice/script';
-import * as import55 from '@umbraco-cms/backoffice/search';
-import * as import56 from '@umbraco-cms/backoffice/section';
-import * as import57 from '@umbraco-cms/backoffice/server-file-system';
-import * as import58 from '@umbraco-cms/backoffice/settings';
-import * as import59 from '@umbraco-cms/backoffice/static-file';
-import * as import60 from '@umbraco-cms/backoffice/stylesheet';
-import * as import61 from '@umbraco-cms/backoffice/sysinfo';
-import * as import62 from '@umbraco-cms/backoffice/tags';
-import * as import63 from '@umbraco-cms/backoffice/template';
-import * as import64 from '@umbraco-cms/backoffice/themes';
-import * as import65 from '@umbraco-cms/backoffice/tiny-mce';
-import * as import66 from '@umbraco-cms/backoffice/tiptap';
-import * as import67 from '@umbraco-cms/backoffice/translation';
-import * as import68 from '@umbraco-cms/backoffice/tree';
-import * as import69 from '@umbraco-cms/backoffice/ufm';
-import * as import70 from '@umbraco-cms/backoffice/user-change-password';
-import * as import71 from '@umbraco-cms/backoffice/user-group';
-import * as import72 from '@umbraco-cms/backoffice/user-permission';
-import * as import73 from '@umbraco-cms/backoffice/user';
-import * as import74 from '@umbraco-cms/backoffice/validation';
-import * as import75 from '@umbraco-cms/backoffice/variant';
-import * as import76 from '@umbraco-cms/backoffice/webhook';
-import * as import77 from '@umbraco-cms/backoffice/workspace';
+import * as import52 from '@umbraco-cms/backoffice/rte';
+import * as import53 from '@umbraco-cms/backoffice/script';
+import * as import54 from '@umbraco-cms/backoffice/search';
+import * as import55 from '@umbraco-cms/backoffice/section';
+import * as import56 from '@umbraco-cms/backoffice/server-file-system';
+import * as import57 from '@umbraco-cms/backoffice/settings';
+import * as import58 from '@umbraco-cms/backoffice/static-file';
+import * as import59 from '@umbraco-cms/backoffice/stylesheet';
+import * as import60 from '@umbraco-cms/backoffice/sysinfo';
+import * as import61 from '@umbraco-cms/backoffice/tags';
+import * as import62 from '@umbraco-cms/backoffice/template';
+import * as import63 from '@umbraco-cms/backoffice/themes';
+import * as import64 from '@umbraco-cms/backoffice/tiny-mce';
+import * as import65 from '@umbraco-cms/backoffice/tiptap';
+import * as import66 from '@umbraco-cms/backoffice/translation';
+import * as import67 from '@umbraco-cms/backoffice/tree';
+import * as import68 from '@umbraco-cms/backoffice/ufm';
+import * as import69 from '@umbraco-cms/backoffice/user-change-password';
+import * as import70 from '@umbraco-cms/backoffice/user-group';
+import * as import71 from '@umbraco-cms/backoffice/user-permission';
+import * as import72 from '@umbraco-cms/backoffice/user';
+import * as import73 from '@umbraco-cms/backoffice/validation';
+import * as import74 from '@umbraco-cms/backoffice/variant';
+import * as import75 from '@umbraco-cms/backoffice/webhook';
+import * as import76 from '@umbraco-cms/backoffice/workspace';
 
 const imports = [
 	import0,
@@ -158,22 +157,30 @@ const imports = [
 	import74,
 	import75,
 	import76,
-	import77,
 ];
 
 describe('Export consts', () => {
 	it('all consts are exported', async () => {
 		const filteredConsts = foundConsts.filter(
 			(foundConst) =>
-				foundConst.path.indexOf('@umbraco-cms/backoffice/external') === -1 && foundConst.consts.length > 0,
+				foundConst.path.indexOf('@umbraco-cms/backoffice/external') === -1 && foundConst.consts?.length > 0,
 		);
+
+		/*console.log(
+			'filteredConsts',
+			filteredConsts.map((x, i) => 'import * as import' + i + " from '" + x.path + "';"),
+		);*/
 
 		// Check if all consts are exported
 		//const valid = await validateConstants(filteredConsts[6].consts, imports[6], filteredConsts[6].path);
 
-		const valid = (
+		const invalid = (
 			await Promise.all(
 				imports.map((p: any, i: number) => {
+					if (i === filteredConsts.length) {
+						console.log('No consts found for', i);
+						throw new Error('No consts found for ' + i);
+					}
 					return validateConstants(filteredConsts[i].consts, p, filteredConsts[i].path);
 				}),
 			)
@@ -199,7 +206,7 @@ describe('Export consts', () => {
 		).some((x) => x === false);
 		*/
 
-		expect(valid).to.be.true;
+		expect(invalid).to.be.false;
 	});
 });
 
