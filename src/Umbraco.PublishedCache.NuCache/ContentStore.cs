@@ -1306,7 +1306,11 @@ public class ContentStore
             return;
         }
 
+        // clear the entire branch
         ClearBranchLocked(link.Value);
+
+        // manage the tree
+        RemoveTreeNodeLocked(link.Value);
     }
 
     private void ClearBranchLocked(ContentNode? content)
