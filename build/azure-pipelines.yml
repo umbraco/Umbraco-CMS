@@ -81,6 +81,7 @@ stages:
             submodules: false
             lfs: false,
             fetchDepth: 500
+          - template: templates/backoffice-install.yml
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
             inputs:
