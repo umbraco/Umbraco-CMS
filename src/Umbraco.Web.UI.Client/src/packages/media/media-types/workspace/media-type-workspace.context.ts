@@ -1,6 +1,8 @@
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../entity.js';
 import type { UmbMediaTypeDetailModel } from '../types.js';
+import { UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UmbMediaTypeWorkspaceEditorElement } from './media-type-workspace-editor.element.js';
+import { UMB_MEDIA_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import {
 	type UmbRoutableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
@@ -9,8 +11,6 @@ import { UmbContentTypeWorkspaceContextBase } from '@umbraco-cms/backoffice/cont
 import type { UmbContentTypeSortModel, UmbContentTypeWorkspaceContext } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import { UMB_MEDIA_TYPE_WORKSPACE_ALIAS } from './constants.js';
-import { UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 type DetailModelType = UmbMediaTypeDetailModel;

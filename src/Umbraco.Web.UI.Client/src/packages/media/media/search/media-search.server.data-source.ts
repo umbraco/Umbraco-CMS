@@ -1,5 +1,5 @@
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
-import type { UmbMediaSearchItemModel } from './media.search-provider.js';
+import type { UmbMediaSearchItemModel } from './types.js';
 import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
@@ -33,28 +33,31 @@ export class UmbMediaSearchServerDataSource implements UmbSearchDataSource<UmbMe
 			this.#host,
 			MediaService.getItemMediaSearch({
 				query: args.query,
+				parentId: args.searchFrom?.unique || undefined,
 			}),
 		);
 
 		if (data) {
 			const mappedItems: Array<UmbMediaSearchItemModel> = data.items.map((item) => {
 				return {
-					href: '/section/media/workspace/media/edit/' + item.id,
 					entityType: UMB_MEDIA_ENTITY_TYPE,
-					unique: item.id,
+					hasChildren: item.hasChildren,
+					href: '/section/media/workspace/media/edit/' + item.id,
 					isTrashed: item.isTrashed,
+					unique: item.id,
 					mediaType: {
-						unique: item.mediaType.id,
-						icon: item.mediaType.icon,
 						collection: item.mediaType.collection ? { unique: item.mediaType.collection.id } : null,
+						icon: item.mediaType.icon,
+						unique: item.mediaType.id,
 					},
+					name: item.variants[0]?.name, // TODO: get correct variant name
+					parent: item.parent ? { unique: item.parent.id } : null,
 					variants: item.variants.map((variant) => {
 						return {
 							culture: variant.culture || null,
 							name: variant.name,
 						};
 					}),
-					name: item.variants[0]?.name, // TODO: get correct variant name
 				};
 			});
 

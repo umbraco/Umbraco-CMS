@@ -6,10 +6,6 @@ export const plugins: PluginOption[] = [
 	viteStaticCopy({
 		targets: [
 			{
-				src: 'src/shared/icon-registry/icons/*.js',
-				dest: 'icons',
-			},
-			{
 				src: 'public-assets/App_Plugins/*.js',
 				dest: 'App_Plugins',
 			},
@@ -36,6 +32,10 @@ export const plugins: PluginOption[] = [
 			{
 				src: 'node_modules/msw/lib/iife/**/*',
 				dest: 'umbraco/backoffice/msw',
+			},
+			{
+				src: 'node_modules/monaco-editor/esm/**/*',
+				dest: 'umbraco/backoffice/monaco-editor/esm',
 			},
 		],
 	}),
