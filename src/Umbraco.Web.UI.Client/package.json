@@ -172,6 +172,7 @@
 		"generate:jsonschema:imports": "node ./devops/json-schema-generator/index.js",
 		"generate:jsonschema:dist": "typescript-json-schema --required --include \"./src/json-schema/umbraco-package-schema.ts\" --out dist-cms/umbraco-package-schema.json tsconfig.json UmbracoPackage",
 		"generate:jsonschema": "typescript-json-schema --required --include \"./src/json-schema/umbraco-package-schema.ts\"",
+		"generate:check-const-test": "node ./devops/generate-check-const-test/index.js",
 		"lint:errors": "npm run lint -- --quiet",
 		"lint:fix": "npm run lint -- --fix",
 		"lint": "eslint src",
