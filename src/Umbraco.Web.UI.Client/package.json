@@ -131,7 +131,7 @@
 		"README.md"
 	],
 	"repository": {
-		"url": "https://github.com/umbraco/Umbraco.CMS.Backoffice",
+		"url": "https://github.com/umbraco/Umbraco-CMS",
 		"type": "git"
 	},
 	"bugs": {
