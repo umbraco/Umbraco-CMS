@@ -6,6 +6,8 @@ import type {
 	UmbContentTypeModel,
 } from '@umbraco-cms/backoffice/content-type';
 
+export type * from './entity.js';
+
 export interface UmbDocumentTypeDetailModel extends UmbContentTypeModel {
 	entityType: UmbDocumentTypeEntityType;
 	allowedTemplates: Array<{ id: string }>;
