@@ -11,7 +11,7 @@
     <ContentTargetFolders>.</ContentTargetFolders>
     <NoWarn>$(NoWarn),NU5128</NoWarn>
   </PropertyGroup>
-  
+
   <!-- Added project references as the sample API in umbraco-extension will fail -->
   <ItemGroup>
     <ProjectReference Include="..\src\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj" />
@@ -24,9 +24,7 @@
   <ItemGroup>
     <PackageReference Include="Umbraco.JsonSchema.Extensions" PrivateAssets="all" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Update="**\.template.config\template.json" Pack="false" />
-  </ItemGroup>
+
   <Target Name="GetUpdatedTemplateJsonPackageFiles" BeforeTargets="GenerateNuspec" AfterTargets="GetUmbracoBuildVersion">
     <ItemGroup>
       <_TemplateJsonFiles Include="**\.template.config\template.json" Exclude="bin\**;obj\**" />
@@ -63,5 +61,9 @@
       <Link>UmbracoProject\Views\_ViewImports.cshtml</Link>
       <PackagePath>UmbracoProject\Views</PackagePath>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="**\.template.config\template.json" Pack="false" />
   </ItemGroup>
 </Project>
