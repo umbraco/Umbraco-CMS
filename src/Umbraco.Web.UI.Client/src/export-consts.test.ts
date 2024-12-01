@@ -49,8 +49,8 @@ describe('Export consts', () => {
 					}
 					*/
 					const p = imports.find((x) => x.path === entry.path);
-					if (p) {
-						return await validateConstants(entry.consts, p, entry.path);
+					if (p?.package) {
+						return await validateConstants(entry.consts, p.package, entry.path);
 					} else {
 						throw new Error(`Could not validate consts in ${entry.path}, was unable to load package`);
 					}
