@@ -1,4 +1,4 @@
-import { expect, fixture, html } from '@open-wc/testing';
+import { expect } from '@open-wc/testing';
 import { foundConsts } from '../utils/all-umb-consts/index.js';
 
 import * as import0 from '@umbraco-cms/backoffice/app';
