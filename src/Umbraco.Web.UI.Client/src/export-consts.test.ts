@@ -1,6 +1,8 @@
 import { expect } from '@open-wc/testing';
 import { foundConsts } from '../utils/all-umb-consts/index.js';
+import { imports } from '../utils/all-umb-consts/imports.js';
 
+/*
 import * as import0 from '@umbraco-cms/backoffice/app';
 import * as import1 from '@umbraco-cms/backoffice/context-api';
 import * as import2 from '@umbraco-cms/backoffice/embedded-media';
@@ -158,6 +160,7 @@ const imports = [
 	import75,
 	import76,
 ];
+*/
 
 describe('Export consts', () => {
 	it('all consts are exported', async () => {
@@ -174,6 +177,7 @@ describe('Export consts', () => {
 		// Check if all consts are exported
 		//const valid = await validateConstants(filteredConsts[6].consts, imports[6], filteredConsts[6].path);
 
+		/*
 		const invalid = (
 			await Promise.all(
 				imports.map((p: any, i: number) => {
@@ -185,10 +189,12 @@ describe('Export consts', () => {
 				}),
 			)
 		).some((x) => x === false);
+		*/
 
-		/*const valid = (
+		const valid = (
 			await Promise.all(
-				filteredConsts.map(async (foundConst) => {
+				filteredConsts.map(async (entry) => {
+					/*
 					try {
 						if (await validatePackage(foundConst.consts, foundConst.path)) {
 							console.log(`All consts is exported from ${foundConst.path}`);
@@ -201,12 +207,18 @@ describe('Export consts', () => {
 						console.error(`Could not validate consts in ${foundConst.path}`);
 						return;
 					}
+					*/
+					const p = imports.find((x) => x.path === entry.path);
+					if (p) {
+						return validateConstants(entry.consts, p, entry.path);
+					} else {
+						throw new Error(`Could not validate consts in ${entry.path}, was unable to load package`);
+					}
 				}),
 			)
 		).some((x) => x === false);
-		*/
 
-		expect(invalid).to.be.false;
+		expect(valid).to.be.true;
 	});
 });
 

@@ -1,5 +1,14 @@
 import fs from 'fs';
 import path from 'path';
+import { createImportMap } from '../importmap/index.js';
+
+
+const excludeTheseMaps = [
+	'@umbraco-cms/backoffice/models',
+	'@umbraco-cms/backoffice/markdown-editor',
+	'@umbraco-cms/backoffice/external/',
+]
+
 
 /**
  * Recursively fetch all TypeScript files in the given directory.
@@ -68,7 +77,7 @@ export async function findUmbConstExports() {
 
 	const foundConsts = Object.entries(exportsField).map(([key, value]) => {
 		const path = value[0];
-		if(path && path.indexOf('dist-cms/external') === -1) {
+		if(path && excludeTheseMaps.some(x => path.indexOf(x) === 0) === false) {
 			const found = checkPackageExport(projectRoot, path);
 
 			return `{
@@ -84,6 +93,8 @@ export async function findUmbConstExports() {
 
 	const outputPath = path.join(projectRoot, './utils/all-umb-consts/index.ts');
 	fs.writeFileSync(outputPath, content);
+
+	generatetestImportFile(projectRoot);
 
 }
 
@@ -107,6 +118,41 @@ function checkPackageExport(projectRoot, packagePath) {
 
 
 }
+
+
+
+function generatetestImportFile(projectRoot) {
+
+	const importmap = createImportMap({
+		rootDir: './src',
+		replaceModuleExtensions: true,
+	});
+
+	const paths = Object.keys(importmap.imports).filter((path) => excludeTheseMaps.some(x => path.indexOf(x) === 0) === false);
+
+	const importEnties = [];
+	const dictionaryEntries = [];
+
+	paths.forEach((path, i) => {
+		importEnties.push(`import * as import${i.toString()} from '${path}';`);
+		dictionaryEntries.push(`{
+			path: '${path}',
+			package: import${i.toString()}
+		}`);
+	});
+
+	const content = `
+		${importEnties.join('\n')}
+
+		export const imports = [
+			${dictionaryEntries.join(',\n')}
+		];
+	`
+
+	const outputPath = path.join(projectRoot, './utils/all-umb-consts/imports.ts');
+	fs.writeFileSync(outputPath, content);
+}
+
 
 
 
