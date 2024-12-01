@@ -2699,6 +2699,13 @@ public class ContentService : RepositoryService, IContentService
                         GetPagedDescendants(content.Id, page++, pageSize, out total);
                     foreach (IContent descendant in descendants)
                     {
+                        // when copying a branch into itself, the copy of a root would be seen as a descendant
+                        // and would be copied again => filter it out.
+                        if (descendant.Id == copy.Id)
+                        {
+                            continue;
+                        }
+
                         // if parent has not been copied, skip, else gets its copy id
                         if (idmap.TryGetValue(descendant.ParentId, out parentId) == false)
                         {
