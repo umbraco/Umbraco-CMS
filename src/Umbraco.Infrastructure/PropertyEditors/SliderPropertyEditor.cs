@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Globalization;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -61,7 +62,7 @@ public class SliderPropertyEditor : DataEditor
 
             var parts = stringValue.Split(Constants.CharArrays.Comma);
             var parsed = parts
-                .Select(s => int.TryParse(s, out var i) ? i : (int?)null)
+                .Select(s => decimal.TryParse(s, CultureInfo.InvariantCulture, out var i) ? i : (decimal?)null)
                 .Where(i => i != null)
                 .Select(i => i!.Value)
                 .ToArray();
@@ -78,11 +79,11 @@ public class SliderPropertyEditor : DataEditor
 
         internal class SliderRange
         {
-            public int From { get; set; }
+            public decimal From { get; set; }
 
-            public int To { get; set; }
+            public decimal To { get; set; }
 
-            public override string ToString() => From == To ? $"{From}" : $"{From},{To}";
+            public override string ToString() => From == To ? string.Create(CultureInfo.InvariantCulture, $"{From}") : string.Create(CultureInfo.InvariantCulture, $"{From},{To}");
         }
     }
 }
