@@ -89,7 +89,7 @@ test.skip('can delete a relation type', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.relationType.clickRootFolderCaretButton();
   await umbracoUi.relationType.clickActionsMenuForRelationType(relationTypeName);
-  await umbracoUi.relationType.clickDeleteExactLabel();
+  await umbracoUi.relationType.clickDeleteButton();
   await umbracoUi.relationType.clickConfirmToDeleteButton();
 
   // Assert
