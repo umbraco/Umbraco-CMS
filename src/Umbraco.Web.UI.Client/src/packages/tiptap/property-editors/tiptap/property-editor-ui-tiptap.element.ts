@@ -40,12 +40,22 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 
 		this._latestMarkup = value;
 
-		this._value = this._value
-			? {
-					...this._value,
-					markup: this._latestMarkup,
-				}
-			: undefined;
+		if (this.value) {
+			this.value = {
+				...this.value,
+				markup: this._latestMarkup,
+			};
+		} else {
+			this.value = {
+				markup: this._latestMarkup,
+				blocks: {
+					layout: {},
+					contentData: [],
+					settingsData: [],
+					expose: [],
+				},
+			};
+		}
 
 		this._fireChangeEvent();
 	}

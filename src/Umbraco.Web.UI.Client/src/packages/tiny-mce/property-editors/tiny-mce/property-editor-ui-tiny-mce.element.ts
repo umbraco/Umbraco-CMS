@@ -45,12 +45,22 @@ export class UmbPropertyEditorUITinyMceElement extends UmbPropertyEditorUiRteEle
 
 		this._latestMarkup = markup;
 
-		this._value = this._value
-			? {
-					...this._value,
-					markup: markup,
-				}
-			: undefined;
+		if (this.value) {
+			this.value = {
+				...this.value,
+				markup: this._latestMarkup,
+			};
+		} else {
+			this.value = {
+				markup: this._latestMarkup,
+				blocks: {
+					layout: {},
+					contentData: [],
+					settingsData: [],
+					expose: [],
+				},
+			};
+		}
 
 		this._fireChangeEvent();
 	}
