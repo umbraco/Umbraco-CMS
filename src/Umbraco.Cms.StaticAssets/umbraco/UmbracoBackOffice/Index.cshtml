@@ -1,4 +1,5 @@
 @using Microsoft.Extensions.Options
+@using Umbraco.Cms.Api.Management.Controllers.Security
 @using Umbraco.Cms.Api.Management.Extensions
 @using Umbraco.Cms.Core.Configuration.Models
 @using Umbraco.Cms.Core.Logging
@@ -11,13 +12,12 @@
 @inject IJsonSerializer JsonSerializer
 @inject IProfilerHtml ProfilerHtml
 @inject IOptions<GlobalSettings> GlobalSettings
-@inject IOptions<ContentSettings> ContentSettings
 
 @{
     bool.TryParse(Context.Request.Query["umbDebug"], out var isDebug);
     var backOfficePath = BackOfficePathGenerator.BackOfficePath;
     var backOfficeAssetsPath = BackOfficePathGenerator.BackOfficeAssetsPath;
-    var loginLogoImage = ContentSettings.Value.LoginLogoImage;
+    var loginLogoImage = Url.RouteUrl(nameof(BackOfficeGraphicsController) + "." + nameof(BackOfficeGraphicsController.Logo), new {Version= "1"});
 }
 
 <!DOCTYPE html>

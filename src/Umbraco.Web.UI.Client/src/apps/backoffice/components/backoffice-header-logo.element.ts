@@ -57,7 +57,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 				<umb-popover-layout>
 					<div id="modal">
 						<img
-							src="/umbraco/backoffice/assets/umbraco_logo_blue.svg"
+							src="/umbraco/management/api/v1/security/back-office/graphics/logo-alternative"
 							alt="Umbraco"
 							width="300"
 							height="82"

@@ -39,12 +39,12 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 			<div id="layout">
 				<img
 					id="logo-on-background"
-					src="/umbraco/backoffice/assets/umbraco_logo_blue.svg"
+					src="/umbraco/management/api/v1/security/back-office/graphics/logo-alternative"
 					alt="Logo"
 					aria-hidden="true"
 					part="auth-logo-background" />
 				<div id="graphic" aria-hidden="true">
-					<img part="auth-logo" id="logo-on-image" src="/umbraco/backoffice/assets/umbraco_logo_white.svg" alt="Logo" />
+					<img part="auth-logo" id="logo-on-image" src="/umbraco/management/api/v1/security/back-office/graphics/logo" alt="Logo" />
 					<svg
 						id="curve-top"
 						width="1746"
@@ -119,7 +119,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 				display: block;
 				background: rgb(244, 244, 244);
 
-				--image: url('/umbraco/backoffice/assets/login.jpg') no-repeat center center/cover;
+				--image: url('/umbraco/management/api/v1/security/back-office/graphics/background') no-repeat center center/cover;
 				--curves-color: var(--umb-login-curves-color, #f5c1bc);
 				--curves-display: var(--umb-login-curves-display, inline);
 			}
