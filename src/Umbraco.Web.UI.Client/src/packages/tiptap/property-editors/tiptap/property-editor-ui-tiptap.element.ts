@@ -12,10 +12,11 @@ const elementName = 'umb-property-editor-ui-tiptap';
 @customElement(elementName)
 export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElementBase {
 	#onChange(event: CustomEvent & { target: UmbInputTiptapElement }) {
-		const value = event.target.value;
+		const tipTapElement = event.target;
+		const value = tipTapElement.value;
 
 		// If we don't get any markup clear the property editor value.
-		if (value === '') {
+		if (tipTapElement.isEmpty()) {
 			this.value = undefined;
 			this._fireChangeEvent();
 			return;
