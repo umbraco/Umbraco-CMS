@@ -12,6 +12,13 @@ export class UmbPropertyEditorUITinyMceElement extends UmbPropertyEditorUiRteEle
 	#onChange(event: CustomEvent & { target: UmbInputTinyMceElement }) {
 		const value = typeof event.target.value === 'string' ? event.target.value : '';
 
+		// If we don't get any markup clear the property editor value.
+		if (value === '') {
+			this.value = undefined;
+			this._fireChangeEvent();
+			return;
+		}
+
 		// Clone the DOM, to remove the classes and attributes on the original:
 		const div = document.createElement('div');
 		div.innerHTML = value;
@@ -38,10 +45,12 @@ export class UmbPropertyEditorUITinyMceElement extends UmbPropertyEditorUiRteEle
 
 		this._latestMarkup = markup;
 
-		this._value = {
-			...this._value,
-			markup: markup,
-		};
+		this._value = this._value
+			? {
+					...this._value,
+					markup: markup,
+				}
+			: undefined;
 
 		this._fireChangeEvent();
 	}
