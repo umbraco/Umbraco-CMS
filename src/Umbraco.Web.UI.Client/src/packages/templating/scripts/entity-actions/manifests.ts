@@ -1,6 +1,6 @@
-import { UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
-import { UMB_SCRIPT_ITEM_REPOSITORY_ALIAS } from '../repository/item/index.js';
+import { UMB_SCRIPT_ITEM_REPOSITORY_ALIAS } from '../repository/item/manifests.js';
+import { UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as renameManifests } from './rename/manifests.js';
 
