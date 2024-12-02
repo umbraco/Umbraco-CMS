@@ -37,6 +37,16 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 		},
 	})
 	public set value(value: UmbPropertyEditorUiValueType | undefined) {
+		if (!value) {
+			this._value = undefined;
+			this._markup = '';
+			this.#managerContext.setLayouts([]);
+			this.#managerContext.setContents([]);
+			this.#managerContext.setSettings([]);
+			this.#managerContext.setExposes([]);
+			return;
+		}
+
 		const buildUpValue: Partial<UmbPropertyEditorUiValueType> = value ? { ...value } : {};
 		buildUpValue.markup ??= '';
 		buildUpValue.blocks ??= { layout: {}, contentData: [], settingsData: [], expose: [] };
