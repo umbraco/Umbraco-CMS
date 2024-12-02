@@ -14,6 +14,13 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 	#onChange(event: CustomEvent & { target: UmbInputTiptapElement }) {
 		const value = event.target.value;
 
+		// If we don't get any markup clear the property editor value.
+		if (value === '') {
+			this.value = undefined;
+			this._fireChangeEvent();
+			return;
+		}
+
 		// Remove unused Blocks of Blocks Layout. Leaving only the Blocks that are present in Markup.
 		const usedContentKeys: string[] = [];
 
@@ -32,10 +39,12 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 
 		this._latestMarkup = value;
 
-		this._value = {
-			...this._value,
-			markup: this._latestMarkup,
-		};
+		this._value = this._value
+			? {
+					...this._value,
+					markup: this._latestMarkup,
+				}
+			: undefined;
 
 		this._fireChangeEvent();
 	}
