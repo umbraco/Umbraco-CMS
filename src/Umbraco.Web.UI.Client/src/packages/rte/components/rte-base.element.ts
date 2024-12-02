@@ -71,10 +71,7 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 	protected _config?: UmbPropertyEditorConfigCollection;
 
 	@state()
-	protected _value: UmbPropertyEditorUiValueType = {
-		markup: '',
-		blocks: { layout: {}, contentData: [], settingsData: [], expose: [] },
-	};
+	protected _value?: UmbPropertyEditorUiValueType | undefined;
 
 	/**
 	 * Separate state for markup, to avoid re-rendering/re-setting the value of the Tiptap editor when the value does not really change.
@@ -129,22 +126,26 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 
 			// Observe the value of the property and update the editor value.
 			this.observe(this.#managerContext.layouts, (layouts) => {
-				this.#setBlocksValue({
-					...this._value.blocks,
-					layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
-				});
+				const blocksValue = this._value
+					? { ...this._value.blocks, layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts } }
+					: undefined;
+
+				this.#setBlocksValue(blocksValue);
 			});
 
 			this.observe(this.#managerContext.contents, (contents) => {
-				this.#setBlocksValue({ ...this._value.blocks, contentData: contents });
+				const blocksValue = this._value ? { ...this._value.blocks, contentData: contents } : undefined;
+				this.#setBlocksValue(blocksValue);
 			});
 
 			this.observe(this.#managerContext.settings, (settings) => {
-				this.#setBlocksValue({ ...this._value.blocks, settingsData: settings });
+				const blocksValue = this._value ? { ...this._value.blocks, settingsData: settings } : undefined;
+				this.#setBlocksValue(blocksValue);
 			});
 
 			this.observe(this.#managerContext.exposes, (exposes) => {
-				this.#setBlocksValue({ ...this._value.blocks, expose: exposes });
+				const blocksValue = this._value ? { ...this._value.blocks, expose: exposes } : undefined;
+				this.#setBlocksValue(blocksValue);
 			});
 		});
 
@@ -169,7 +170,11 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 		});
 	}
 
-	#setBlocksValue(blocksValue: UmbBlockValueType<UmbBlockRteLayoutModel>) {
+	#setBlocksValue(blocksValue?: UmbBlockValueType<UmbBlockRteLayoutModel>) {
+		if (!blocksValue || !this._value) {
+			return;
+		}
+
 		this._value = {
 			...this._value,
 			blocks: blocksValue,
