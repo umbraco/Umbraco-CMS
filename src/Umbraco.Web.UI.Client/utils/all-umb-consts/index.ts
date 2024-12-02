@@ -348,7 +348,7 @@ export const foundConsts = [{
 			},
 {
 				path: '@umbraco-cms/backoffice/tags',
-				consts: ["UMB_TAG_REPOSITORY_ALIAS","UMB_TAG_STORE_ALIAS","UMB_TAG_STORE_CONTEXT"]
+				consts: ["UMB_TAG_REPOSITORY_ALIAS","UMB_TAG_STORE_ALIAS","UMB_TAG_STORE_CONTEXT_ALIAS","UMB_TAG_STORE_CONTEXT"]
 			},
 {
 				path: '@umbraco-cms/backoffice/template',
