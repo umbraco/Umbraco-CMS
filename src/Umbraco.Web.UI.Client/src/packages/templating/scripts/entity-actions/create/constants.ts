@@ -1,1 +1,1 @@
-export * from './options-modal/constants.js';
+export * from './options-modal/index.js';
