@@ -212,7 +212,7 @@
 		"@tiptap/pm": "^2.10.2",
 		"@tiptap/starter-kit": "^2.10.2",
 		"@types/diff": "^6.0.0",
-		"@umbraco-ui/uui": "^1.12.1",
+		"@umbraco-ui/uui": "^1.12.2",
 		"@umbraco-ui/uui-css": "^1.12.1",
 		"base64-js": "^1.5.1",
 		"diff": "^7.0.0",

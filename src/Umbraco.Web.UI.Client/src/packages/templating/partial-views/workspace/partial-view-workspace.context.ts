@@ -17,6 +17,7 @@ import {
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
+import { UmbServerFileRenameWorkspaceRedirectController } from '@umbraco-cms/backoffice/server-file-system';
 
 export interface UmbPartialViewWorkspaceContextCreateArgs
 	extends UmbEntityDetailWorkspaceContextCreateArgs<UmbPartialViewDetailModel> {
@@ -73,6 +74,12 @@ export class UmbPartialViewWorkspaceContext
 				setup: (component: PageComponent, info: IRoutingInfo) => {
 					const unique = info.match.params.unique;
 					this.load(unique);
+
+					new UmbServerFileRenameWorkspaceRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
 				},
 			},
 		]);

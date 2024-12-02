@@ -90,7 +90,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @returns { string | undefined } The unique identifier
 	 */
 	getUnique(): UmbEntityUnique | undefined {
-		return this.getData()?.unique;
+		return this.#entityContext.getUnique();
 	}
 
 	setUnique(unique: string) {
@@ -242,6 +242,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			throw error?.message ?? 'Repository did not return data after create.';
 		}
 
+		this.#entityContext.setUnique(data.unique);
 		this._data.setPersisted(data);
 		this._data.setCurrent(data);
 

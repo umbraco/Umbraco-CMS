@@ -11,6 +11,7 @@ import {
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
+import { UmbServerFileRenameWorkspaceRedirectController } from '@umbraco-cms/backoffice/server-file-system';
 
 export class UmbScriptWorkspaceContext
 	extends UmbEntityDetailWorkspaceContextBase<UmbScriptDetailModel, UmbScriptDetailRepository>
@@ -48,6 +49,12 @@ export class UmbScriptWorkspaceContext
 				setup: (component: PageComponent, info: IRoutingInfo) => {
 					const unique = info.match.params.unique;
 					this.load(unique);
+
+					new UmbServerFileRenameWorkspaceRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
 				},
 			},
 		]);
@@ -55,7 +62,7 @@ export class UmbScriptWorkspaceContext
 
 	/**
 	 * @description Set the name of the script
-	 * @param {string} value
+	 * @param {string} value The name of the script
 	 * @memberof UmbScriptWorkspaceContext
 	 */
 	public setName(value: string) {
@@ -64,7 +71,7 @@ export class UmbScriptWorkspaceContext
 
 	/**
 	 * @description Set the content of the script
-	 * @param {string} value
+	 * @param {string} value The content of the script
 	 * @memberof UmbScriptWorkspaceContext
 	 */
 	public setContent(value: string) {
