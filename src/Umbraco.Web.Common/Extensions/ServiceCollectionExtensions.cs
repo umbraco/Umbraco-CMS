@@ -208,7 +208,7 @@ public static class ServiceCollectionExtensions
         var typeFinder = new TypeFinder(
             loggerFactory.CreateLogger<TypeFinder>(),
             assemblyProvider,
-            typeFinderSettings.AdditionalAssemblyExclusionEntries,
+            typeFinderSettings.AdditionalAssemblyExclusionEntries.ToArray(),
             typeFinderConfig);
 
         var typeLoader = new TypeLoader(typeFinder, loggerFactory.CreateLogger<TypeLoader>());
