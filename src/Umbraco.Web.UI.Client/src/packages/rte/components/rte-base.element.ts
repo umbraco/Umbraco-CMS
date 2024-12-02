@@ -126,9 +126,10 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 
 			// Observe the value of the property and update the editor value.
 			this.observe(this.#managerContext.layouts, (layouts) => {
-				const blocksValue = this._value
-					? { ...this._value.blocks, layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts } }
-					: undefined;
+				const blocksValue =
+					this._value && layouts?.length > 0
+						? { ...this._value.blocks, layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts } }
+						: undefined;
 
 				this.#setBlocksValue(blocksValue);
 			});
