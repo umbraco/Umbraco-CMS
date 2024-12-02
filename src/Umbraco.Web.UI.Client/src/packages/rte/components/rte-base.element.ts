@@ -146,31 +146,8 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 			this.observe(this.#managerContext.exposes, (exposes) => {
 				this.#setBlocksValue({ ...this._value.blocks, expose: exposes });
 			});
-
-			// The above could potentially be replaced with a single observeMultiple call, but it is not done for now to avoid potential issues with the order of the updates.
-			/*this.observe(
-				observeMultiple([
-					this.#managerContext.layouts,
-					this.#managerContext.contents,
-					this.#managerContext.settings,
-					this.#managerContext.exposes,
-				]).pipe(debounceTime(20)),
-				([layouts, contents, settings, exposes]) => {
-					this._value = {
-						...this._value,
-						blocks: {
-							layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
-							contentData: contents,
-							settingsData: settings,
-							expose: exposes,
-						},
-					};
-
-					this._fireChangeEvent();
-				},
-				'motherObserver',
-			);*/
 		});
+
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
 			this.#managerContext.setVariantId(context.getVariantId());
 		});
