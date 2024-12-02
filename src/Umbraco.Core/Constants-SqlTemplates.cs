@@ -30,6 +30,7 @@ public static partial class Constants
         public static class NuCacheDatabaseDataSource
         {
             public const string WhereNodeId = "Umbraco.Web.PublishedCache.NuCache.DataSource.WhereNodeId";
+            public const string WhereNodeKey = "Umbraco.Web.PublishedCache.NuCache.DataSource.WhereNodeKey";
             public const string WhereNodeIdX = "Umbraco.Web.PublishedCache.NuCache.DataSource.WhereNodeIdX";
 
             public const string SourcesSelectUmbracoNodeJoin =

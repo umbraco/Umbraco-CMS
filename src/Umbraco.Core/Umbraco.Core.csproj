@@ -6,6 +6,35 @@
     <RootNamespace>Umbraco.Cms.Core</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!--
+      TODO: Fix and remove overrides:
+      [SA1117] params all on same line
+      [SA1401] make fields private
+      [SA1134] own line attributes
+      [SA1649] file name match type
+      [CS0618]/[CS0672]/[SYSLIB0051]/[SYSLIB0044]/[SYSLIB0023]/[SYSLIB0003]/[SYSLIB0045] adjust obsolete references
+      [CS0067] unused event
+      [SA1405] debug provide message text
+      [CS0168]/[CS0169] unused fields/variables
+      [CS0183] always of type
+      [SA1111] adjust parenthesis
+      [CA2017] match parameters number
+      [CS0108] hidden inherited member
+      [CS0612] obsolete
+      [CS0649] default value always null
+      [CS1574] unresolveable cref
+      [CS1998] remove async or make method synchronous
+      [CS8073] result always true/false
+      [IDE0060] remove unused parameter
+      [IDE1006] naming prefix
+      [SA1306] field name
+      [CS1723] XML TEntity
+      [CS0419] ambiguous cref
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),SA1117,SA1401,SA1134,SA1649,CS0618,CS0672,SYSLIB0051,SYSLIB0044,SYSLIB0023,SYSLIB0003,SYSLIB0045,CS0067,SA1405,CS0168,CS0169,CS0183,SA1111,CA2017,CS0108,CS0612,CS0649,CS1574,CS1998,CS8073,IDE0060,IDE1006,SA1306,CS1723,CS0419</WarningsNotAsErrors>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" />

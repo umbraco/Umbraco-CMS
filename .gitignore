@@ -47,9 +47,6 @@ NDependOut/
 QueryResult.htm
 tools/docfx/
 
-# Ignore rule for clearing out Belle (avoid rebuilding all the time)
-preserve.belle
-
 # csharp-docs
 /build/csharp-docs/api/
 /build/csharp-docs/_site/
@@ -73,10 +70,6 @@ preserve.belle
 /src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/login
 
 # Environment specific data
-/src/Umbraco.Web.UI.Client/[Bb]uild/
-/src/Umbraco.Web.UI.Client/[Bb]uild/[Bb]elle/
-/src/Umbraco.Web.UI.Client/src/[Ll]ess/*.css
-/src/Umbraco.Web.UI.Client/TESTS-*.xml
 /src/Umbraco.Web.UI/wwwroot/[Mm]edia/
 /src/Umbraco.Web.UI/App_Code/
 /src/Umbraco.Web.UI/App_Plugins/

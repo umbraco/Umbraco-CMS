@@ -32,7 +32,9 @@ public class FilePermissionHelper : IFilePermissionHelper
     /// <summary>
     ///     Initializes a new instance of the <see cref="FilePermissionHelper" /> class.
     /// </summary>
-    public FilePermissionHelper(IOptions<GlobalSettings> globalSettings, IIOHelper ioHelper,
+    public FilePermissionHelper(
+        IOptions<GlobalSettings> globalSettings,
+        IIOHelper ioHelper,
         IHostingEnvironment hostingEnvironment)
     {
         _globalSettings = globalSettings.Value;
@@ -91,12 +93,9 @@ public class FilePermissionHelper : IFilePermissionHelper
                 continue;
             }
 
-            if (temp == null)
-            {
-                temp = new List<string>();
-            }
+            temp ??= new List<string>();
 
-            temp.Add(dir.TrimStartExact(_basePath));
+            temp.Add(dir.TrimStart(_basePath));
             success = false;
         }
 
@@ -116,12 +115,9 @@ public class FilePermissionHelper : IFilePermissionHelper
                 continue;
             }
 
-            if (temp == null)
-            {
-                temp = new List<string>();
-            }
+            temp ??= new List<string>();
 
-            temp.Add(file.TrimStartExact(_basePath));
+            temp.Add(file.TrimStart(_basePath));
             success = false;
         }
 
@@ -144,10 +140,7 @@ public class FilePermissionHelper : IFilePermissionHelper
                 continue;
             }
 
-            if (temp == null)
-            {
-                temp = new List<string>();
-            }
+            temp ??= new List<string>();
 
             temp.Add(dir);
             success = false;

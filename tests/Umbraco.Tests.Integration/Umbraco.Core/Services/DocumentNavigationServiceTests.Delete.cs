@@ -3,7 +3,6 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-// TODO: Test that the descendants of the node have also been removed from both structures
 public partial class DocumentNavigationServiceTests
 {
     [Test]
@@ -38,6 +37,44 @@ public partial class DocumentNavigationServiceTests
                 var descendantExistsInRecycleBin = DocumentNavigationQueryService.TryGetParentKeyInBin(descendant, out _);
                 Assert.IsFalse(descendantExistsInRecycleBin);
             }
+        });
+    }
+
+    // TODO: Add more test cases
+    [Test]
+    public async Task Sort_Order_Of_Siblings_Updates_When_Deleting_Content_And_Adding_New_One()
+    {
+        // Arrange
+        Guid nodeToDelete = Child3.Key;
+        Guid node = Child1.Key;
+
+        // Act
+        await ContentEditingService.DeleteAsync(nodeToDelete, Constants.Security.SuperUserKey);
+
+        // Assert
+        DocumentNavigationQueryService.TryGetSiblingsKeys(node, out IEnumerable<Guid> siblingsKeysAfterDeletion);
+        var siblingsKeysAfterDeletionList = siblingsKeysAfterDeletion.ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, siblingsKeysAfterDeletionList.Count);
+            Assert.AreEqual(Child2.Key, siblingsKeysAfterDeletionList[0]);
+        });
+
+        // Create a new sibling under the same parent
+        var key = Guid.NewGuid();
+        var createModel = CreateContentCreateModel("Child 4", key, parentKey: Root.Key);
+        await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        DocumentNavigationQueryService.TryGetSiblingsKeys(node, out IEnumerable<Guid> siblingsKeysAfterCreation);
+        var siblingsKeysAfterCreationList = siblingsKeysAfterCreation.ToList();
+
+        // Verify sibling order after creating the new content
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, siblingsKeysAfterCreationList.Count);
+            Assert.AreEqual(Child2.Key, siblingsKeysAfterCreationList[0]);
+            Assert.AreEqual(key, siblingsKeysAfterCreationList[1]);
         });
     }
 }

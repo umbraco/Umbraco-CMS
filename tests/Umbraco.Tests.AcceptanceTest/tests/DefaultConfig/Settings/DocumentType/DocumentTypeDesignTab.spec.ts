@@ -95,8 +95,7 @@ test('can delete a group in a document type', {tag: '@smoke'}, async ({umbracoAp
   expect(documentTypeData.properties.length).toBe(0);
 });
 
-// TODO: Currently I am getting an error If I delete a tab that contains children. The children are not cleaned up when deleting the tab.
-test.skip('can delete a tab in a document type', async ({umbracoApi, umbracoUi}) => {
+test('can delete a tab in a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditorInTab(documentTypeName, dataTypeName, dataTypeData.id, tabName);
@@ -108,7 +107,7 @@ test.skip('can delete a tab in a document type', async ({umbracoApi, umbracoUi})
   await umbracoUi.documentType.clickConfirmToDeleteButton();
   await umbracoUi.documentType.clickSaveButton();
 
-  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
+  await umbracoApi.documentType.getByName(documentTypeName);
   // Assert
   await umbracoUi.documentType.isSuccessNotificationVisible();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
@@ -229,7 +228,7 @@ test('can create a document type with a composition', {tag: '@smoke'}, async ({u
   await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
 });
 
-test('can remove a composition form a document type', async ({umbracoApi, umbracoUi}) => {
+test('can remove a composition from a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const compositionDocumentTypeName = 'CompositionDocumentType';
   await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
@@ -248,7 +247,7 @@ test('can remove a composition form a document type', async ({umbracoApi, umbrac
 
   // Assert
   await umbracoUi.documentType.isSuccessNotificationVisible();
-  expect(await umbracoUi.documentType.doesGroupHaveValue(groupName)).toBeFalsy();
+  await umbracoUi.documentType.isGroupVisible(groupName, false);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.compositions).toEqual([]);
 
@@ -279,7 +278,7 @@ test('can reorder groups in a document type', async ({umbracoApi, umbracoUi}) =>
   expect(await umbracoApi.documentType.doesDocumentTypeGroupNameContainCorrectSortOrder(documentTypeName, firstGroupValue, 1)).toBeTruthy();
 });
 
-// TODO: Unskip when it works. Sometimes the properties are not dragged correctly.
+// Skip this flaky tests as sometimes the properties are not dragged correctly.
 test.skip('can reorder properties in a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -305,7 +304,7 @@ test.skip('can reorder properties in a document type', async ({umbracoApi, umbra
   expect(documentTypeData.properties[1].name).toBe(dataTypeName);
 });
 
-// TODO: Unskip when the frontend does not give the secondTab -1 as the sortOrder
+// TODO: Remove skip when the frontend is ready. Currently it is impossible to reorder tab by drag and drop
 test.skip('can reorder tabs in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -396,7 +395,7 @@ test('can enable validation for a property in a document type', async ({umbracoA
 test('can allow vary by culture for a property in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName, true);
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName, false);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
 
   // Act

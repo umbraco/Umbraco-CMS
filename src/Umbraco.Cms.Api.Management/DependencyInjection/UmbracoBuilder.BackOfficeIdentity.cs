@@ -52,8 +52,7 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IUserRepository>(),
                 factory.GetRequiredService<IRuntimeState>(),
                 factory.GetRequiredService<IEventMessagesFactory>(),
-                factory.GetRequiredService<ILogger<BackOfficeUserStore>>()
-            ))
+                factory.GetRequiredService<ILogger<BackOfficeUserStore>>()))
             .AddUserManager<IBackOfficeUserManager, BackOfficeUserManager>()
             .AddSignInManager<IBackOfficeSignInManager, BackOfficeSignInManager>()
             .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory>()
@@ -95,14 +94,16 @@ public static partial class UmbracoBuilderExtensions
     /// <summary>
     ///     Adds support for external login providers in Umbraco
     /// </summary>
-    public static IUmbracoBuilder AddBackOfficeExternalLogins(this IUmbracoBuilder umbracoBuilder,
+    public static IUmbracoBuilder AddBackOfficeExternalLogins(
+        this IUmbracoBuilder umbracoBuilder,
         Action<BackOfficeExternalLoginsBuilder> builder)
     {
         builder(new BackOfficeExternalLoginsBuilder(umbracoBuilder.Services));
         return umbracoBuilder;
     }
 
-    public static BackOfficeIdentityBuilder AddTwoFactorProvider<T>(this BackOfficeIdentityBuilder identityBuilder,
+    public static BackOfficeIdentityBuilder AddTwoFactorProvider<T>(
+        this BackOfficeIdentityBuilder identityBuilder,
         string providerName) where T : class, ITwoFactorProvider
     {
         identityBuilder.Services.AddSingleton<ITwoFactorProvider, T>();

@@ -641,9 +641,11 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.AreNotEqual(contentType.Key, category.Key);
         Assert.AreNotEqual(contentType.Path, category.Path);
         Assert.AreNotEqual(contentType.SortOrder, category.SortOrder);
-        Assert.AreNotEqual(contentType.PropertyTypes.First(x => x.Alias.Equals("title")).Id,
+        Assert.AreNotEqual(
+            contentType.PropertyTypes.First(x => x.Alias.Equals("title")).Id,
             category.PropertyTypes.First(x => x.Alias.Equals("title")).Id);
-        Assert.AreNotEqual(contentType.PropertyGroups.First(x => x.Name.Equals("Content")).Id,
+        Assert.AreNotEqual(
+            contentType.PropertyGroups.First(x => x.Name.Equals("Content")).Id,
             category.PropertyGroups.First(x => x.Name.Equals("Content")).Id);
     }
 

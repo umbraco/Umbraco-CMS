@@ -3,7 +3,7 @@ using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Media;
 
-public class MediaResponseModel : ContentResponseModelBase<MediaValueModel, MediaVariantResponseModel>
+public class MediaResponseModel : ContentResponseModelBase<MediaValueResponseModel, MediaVariantResponseModel>
 {
     public IEnumerable<MediaUrlInfo> Urls { get; set; } = Enumerable.Empty<MediaUrlInfo>();
 

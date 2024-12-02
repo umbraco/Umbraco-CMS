@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 [TestFixture]
 public class CultureImpactTests
 {
-    private CultureImpactFactory BasicImpactFactory => createCultureImpactService();
+    private CultureImpactFactory BasicImpactFactory => CreateCultureImpactService();
 
     [Test]
     public void Get_Culture_For_Invariant_Errors()
@@ -28,8 +28,8 @@ public class CultureImpactTests
             Mock.Of<IContent>(x => x.Published == false),
             new[] { "fr-FR" },
             "en-US");
-        Assert.AreEqual("fr-FR",
-            result); // default culture not being saved with not published version, use the first culture being saved
+        Assert.AreEqual("fr-FR", result); // default culture not being saved with not published version,
+                                          // use the first culture being saved
 
         result = BasicImpactFactory.GetCultureForInvariantErrors(
             Mock.Of<IContent>(x => x.Published == true),
@@ -179,7 +179,7 @@ public class CultureImpactTests
     [TestCase(false)]
     public void Edit_Invariant_From_Non_Default_Impacts_Invariant_Properties(bool allowEditInvariantFromNonDefault)
     {
-        var sut = createCultureImpactService(new ContentSettings
+        var sut = CreateCultureImpactService(new ContentSettings
         {
             AllowEditInvariantFromNonDefault = allowEditInvariantFromNonDefault
         });
@@ -188,7 +188,7 @@ public class CultureImpactTests
         Assert.AreEqual(allowEditInvariantFromNonDefault, impact.ImpactsAlsoInvariantProperties);
     }
 
-    private CultureImpactFactory createCultureImpactService(ContentSettings contentSettings = null)
+    private CultureImpactFactory CreateCultureImpactService(ContentSettings contentSettings = null)
     {
         contentSettings ??= new ContentSettings { AllowEditInvariantFromNonDefault = false, };
 

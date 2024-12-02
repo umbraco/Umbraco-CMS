@@ -13,7 +13,7 @@ WebApplication app = builder.Build();
 
 await app.BootUmbracoAsync();
 
-#if (UseHttpsRedirect)
+#if UseHttpsRedirect
 app.UseHttpsRedirection();
 #endif
 

@@ -1,0 +1,14 @@
+{
+  "id": "Umbraco.Extension",
+  "name": "Umbraco.Extension",
+  "version": "0.0.0",
+  "allowPackageTelemetry": true,
+  "extensions": [
+    {
+      "name": "Umbraco ExtensionBundle",
+      "alias": "Umbraco.Extension.Bundle",
+      "type": "bundle",
+      "js": "/App_Plugins/UmbracoExtension/umbraco-extension.js"
+    }
+  ]
+}

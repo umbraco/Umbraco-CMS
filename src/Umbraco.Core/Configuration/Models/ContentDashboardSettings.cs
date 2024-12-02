@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Core.Configuration;
 /// <summary>
 ///     Typed configuration options for content dashboard settings.
 /// </summary>
+[Obsolete("Scheduled for removal in v16, dashboard manipulation is now done trough frontend extensions.")]
 [UmbracoOptions(Constants.Configuration.ConfigContentDashboard)]
 public class ContentDashboardSettings
 {

@@ -367,7 +367,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                     $"The {nameof(Scope)} {InstanceId} being disposed is not the Ambient {nameof(Scope)} {_scopeProvider.AmbientScope?.InstanceId.ToString() ?? "NULL"}. This typically indicates that a child {nameof(Scope)} was not disposed, or flowed to a child thread that was not awaited, or concurrent threads are accessing the same {nameof(Scope)} (Ambient context) which is not supported. If using Task.Run (or similar) as a fire and forget tasks or to run threads in parallel you must suppress execution context flow with ExecutionContext.SuppressFlow() and ExecutionContext.RestoreFlow().";
 
 #if DEBUG_SCOPES
-                Scope ambient = _scopeProvider.AmbientScope;
+                Scope? ambient = _scopeProvider.AmbientScope;
                 _logger.LogWarning("Dispose error (" + (ambient == null ? "no" : "other") + " ambient)");
                 if (ambient == null)
                 {
@@ -377,8 +377,8 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 ScopeInfo ambientInfos = _scopeProvider.GetScopeInfo(ambient);
                 ScopeInfo disposeInfos = _scopeProvider.GetScopeInfo(this);
                 throw new InvalidOperationException($"{failedMessage} (see ctor stack traces).\r\n"
-                                                    + "- ambient ->\r\n" + ambientInfos.ToString() + "\r\n"
-                                                    + "- dispose ->\r\n" + disposeInfos.ToString() + "\r\n");
+                                                    + "- ambient ->\r\n" + ambientInfos + "\r\n"
+                                                    + "- dispose ->\r\n" + disposeInfos + "\r\n");
 #else
                 throw new InvalidOperationException(failedMessage);
 #endif
@@ -565,8 +565,8 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 
             TryFinally(
                 HandleScopedFileSystems,
-                HandleScopedNotifications,
                 HandleScopeContext,
+                HandleScopedNotifications,
                 HandleDetachedScopes);
         }
 

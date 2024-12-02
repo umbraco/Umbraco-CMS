@@ -76,4 +76,27 @@ public partial class MediaNavigationServiceTests : MediaNavigationServiceTestsBa
         // Assert
         Assert.IsFalse(nodeExists);
     }
+
+    [Test]
+    public void Can_Filter_Children_By_Type()
+    {
+        // Arrange
+        MediaNavigationQueryService.TryGetChildrenKeys(Album.Key, out IEnumerable<Guid> allChildrenKeys);
+        List<Guid> allChildrenList = allChildrenKeys.ToList();
+
+        // Act
+        MediaNavigationQueryService.TryGetChildrenKeysOfType(Album.Key, ImageMediaType.Alias, out IEnumerable<Guid> childrenKeysOfTypeImage);
+        List<Guid> imageChildrenList = childrenKeysOfTypeImage.ToList();
+
+        MediaNavigationQueryService.TryGetChildrenKeysOfType(Album.Key, FolderMediaType.Alias, out IEnumerable<Guid> childrenKeysOfTypeFolder);
+        List<Guid> folderChildrenList = childrenKeysOfTypeFolder.ToList();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, imageChildrenList.Count);
+            Assert.AreEqual(2, folderChildrenList.Count);
+            Assert.AreEqual(3, allChildrenList.Count);
+        });
+    }
 }

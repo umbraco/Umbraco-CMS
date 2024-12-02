@@ -105,7 +105,7 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddOutputCache(options =>
         {
-            options.AddBasePolicy(_ => { });
+            options.AddBasePolicy(build => build.AddPolicy<NoOutputCachePolicy>());
 
             if (outputCacheSettings.ContentDuration.TotalSeconds > 0)
             {

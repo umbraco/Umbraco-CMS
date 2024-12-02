@@ -183,10 +183,7 @@ public abstract class TestHelperBase
     {
         get
         {
-            if (_uriUtility == null)
-            {
-                _uriUtility = new UriUtility(GetHostingEnvironment());
-            }
+            _uriUtility ??= new UriUtility(GetHostingEnvironment());
 
             return _uriUtility;
         }
@@ -197,12 +194,7 @@ public abstract class TestHelperBase
     public TypeLoader GetMockedTypeLoader() =>
         new(
             Mock.Of<ITypeFinder>(),
-            new VaryingRuntimeHash(),
-            Mock.Of<IAppPolicyCache>(),
-            new DirectoryInfo(GetHostingEnvironment()
-                .MapPathContentRoot(Constants.SystemDirectories.TempData)),
-            Mock.Of<ILogger<TypeLoader>>(),
-            Mock.Of<IProfiler>());
+            Mock.Of<ILogger<TypeLoader>>());
 
     /// <summary>
     ///     Some test files are copied to the /bin (/bin/debug) on build, this is a utility to return their physical path based

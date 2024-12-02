@@ -8,6 +8,8 @@ public class ProfilingViewEngine : IViewEngine
 {
     private readonly string _name;
     private readonly IProfiler _profiler;
+
+    //TODO: can this be made private and with underscore?
     internal readonly IViewEngine Inner;
 
     public ProfilingViewEngine(IViewEngine inner, IProfiler profiler)

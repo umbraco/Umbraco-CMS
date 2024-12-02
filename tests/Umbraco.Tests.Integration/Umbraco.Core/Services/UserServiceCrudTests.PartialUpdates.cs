@@ -11,7 +11,7 @@ public partial class UserServiceCrudTests
     [Test]
     public async Task Can_Enable_User()
     {
-        var editorUserGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+        var editorUserGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
 
         var userCreateModel = new UserCreateModel
         {
@@ -39,7 +39,7 @@ public partial class UserServiceCrudTests
     [Test]
     public async Task Can_Disable_User()
     {
-        var editorUserGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+        var editorUserGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
 
         var userCreateModel = new UserCreateModel
         {
@@ -63,7 +63,7 @@ public partial class UserServiceCrudTests
     [Test]
     public async Task User_Cannot_Disable_Self()
     {
-        var adminUserGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
+        var adminUserGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupKey);
 
         var userCreateModel = new UserCreateModel
         {
@@ -85,7 +85,7 @@ public partial class UserServiceCrudTests
     [Test]
     public async Task Cannot_Disable_Invited_User()
     {
-        var editorUserGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+        var editorUserGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
 
         var userInviteModel = new UserInviteModel
         {
@@ -108,7 +108,7 @@ public partial class UserServiceCrudTests
     [Test]
     public async Task Enable_Missing_User_Fails_With_Not_Found()
     {
-        var editorUserGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+        var editorUserGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
 
         var userCreateModel = new UserCreateModel
         {
@@ -132,7 +132,7 @@ public partial class UserServiceCrudTests
     [Test]
     public async Task Disable_Missing_User_Fails_With_Not_Found()
     {
-        var editorUserGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+        var editorUserGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
 
         var userCreateModel = new UserCreateModel
         {

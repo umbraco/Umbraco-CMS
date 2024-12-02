@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
@@ -12,13 +13,15 @@ namespace Umbraco.Cms.Api.Delivery.Services;
 /// <inheritdoc />
 internal sealed class ApiMediaQueryService : IApiMediaQueryService
 {
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IPublishedMediaCache _publishedMediaCache;
     private readonly ILogger<ApiMediaQueryService> _logger;
+    private readonly IMediaNavigationQueryService _mediaNavigationQueryService;
 
-    public ApiMediaQueryService(IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger<ApiMediaQueryService> logger)
+    public ApiMediaQueryService(IPublishedMediaCache publishedMediaCache, ILogger<ApiMediaQueryService> logger, IMediaNavigationQueryService mediaNavigationQueryService)
     {
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
+        _publishedMediaCache = publishedMediaCache;
         _logger = logger;
+        _mediaNavigationQueryService = mediaNavigationQueryService;
     }
 
     /// <inheritdoc/>
@@ -52,8 +55,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
         => TryGetByPath(path, GetRequiredPublishedMediaCache());
 
     private IPublishedMediaCache GetRequiredPublishedMediaCache()
-        => _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Media
-           ?? throw new InvalidOperationException("Could not obtain the published media cache");
+        => _publishedMediaCache;
 
     private IPublishedContent? TryGetByPath(string path, IPublishedMediaCache mediaCache)
     {
@@ -69,7 +71,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
                 break;
             }
 
-            currentChildren = resolvedMedia.Children;
+            currentChildren = resolvedMedia.Children(null, _publishedMediaCache, _mediaNavigationQueryService);
         }
 
         return resolvedMedia;
@@ -85,7 +87,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
             return null;
         }
 
-        var childrenOf = fetch.TrimStartExact(childrenOfParameter);
+        var childrenOf = fetch.TrimStart(childrenOfParameter);
         if (childrenOf.IsNullOrWhiteSpace())
         {
             // this mirrors the current behavior of the Content Delivery API :-)
@@ -102,7 +104,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
             ? mediaCache.GetById(parentKey)
             : TryGetByPath(childrenOf, mediaCache);
 
-        return parent?.Children ?? Array.Empty<IPublishedContent>();
+        return parent?.Children(null, _publishedMediaCache, _mediaNavigationQueryService) ?? Array.Empty<IPublishedContent>();
     }
 
     private IEnumerable<IPublishedContent>? ApplyFilters(IEnumerable<IPublishedContent> source, IEnumerable<string> filters)

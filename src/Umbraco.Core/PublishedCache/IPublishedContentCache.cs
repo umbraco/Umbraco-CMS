@@ -5,6 +5,25 @@ namespace Umbraco.Cms.Core.PublishedCache;
 public interface IPublishedContentCache : IPublishedCache
 {
     /// <summary>
+    ///     Gets a content identified by its unique identifier.
+    /// </summary>
+    /// <param name="id">The content unique identifier.</param>
+    /// <param name="preview">A value indicating whether to consider unpublished content.</param>
+    /// <returns>The content, or null.</returns>
+    /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
+    Task<IPublishedContent?> GetByIdAsync(int id, bool? preview = null);
+
+    /// <summary>
+    ///     Gets a content identified by its unique identifier.
+    /// </summary>
+    /// <param name="key">The content unique identifier.</param>
+    /// <param name="preview">A value indicating whether to consider unpublished content.</param>
+    /// <returns>The content, or null.</returns>
+    /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
+    Task<IPublishedContent?> GetByIdAsync(Guid key, bool? preview = null);
+
+    // FIXME: All these routing methods needs to be removed, as they are no longer part of the content cache
+    /// <summary>
     ///     Gets content identified by a route.
     /// </summary>
     /// <param name="preview">A value indicating whether to consider unpublished content.</param>
@@ -24,6 +43,7 @@ public interface IPublishedContentCache : IPublishedCache
     ///     </para>
     ///     <para>The value of <paramref name="preview" /> overrides defaults.</para>
     /// </remarks>
+    [Obsolete]
     IPublishedContent? GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string? culture = null);
 
     /// <summary>
@@ -45,6 +65,7 @@ public interface IPublishedContentCache : IPublishedCache
     ///     </para>
     ///     <para>Considers published or unpublished content depending on defaults.</para>
     /// </remarks>
+    [Obsolete]
     IPublishedContent? GetByRoute(string route, bool? hideTopLevelNode = null, string? culture = null);
 
     /// <summary>
@@ -62,6 +83,7 @@ public interface IPublishedContentCache : IPublishedCache
     ///     </para>
     ///     <para>The value of <paramref name="preview" /> overrides defaults.</para>
     /// </remarks>
+    [Obsolete]
     string? GetRouteById(bool preview, int contentId, string? culture = null);
 
     /// <summary>
@@ -76,5 +98,6 @@ public interface IPublishedContentCache : IPublishedCache
     ///     for the current route. If a domain is present the string will be prefixed with the domain ID integer, example:
     ///     {domainId}/route-path-of-item
     /// </para>
+    [Obsolete]
     string? GetRouteById(int contentId, string? culture = null);
 }

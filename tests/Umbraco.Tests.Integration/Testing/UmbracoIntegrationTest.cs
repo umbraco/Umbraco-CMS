@@ -21,7 +21,7 @@ using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
-using Umbraco.Cms.Tests.Integration.TestServerTest;
+
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
@@ -84,7 +84,11 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
     }
 
     [TearDown]
-    public void TearDownAsync() => _host.StopAsync();
+    public void TearDownAsync()
+    {
+        _host.StopAsync();
+        Services.DisposeIfDisposable();
+    }
 
     /// <summary>
     ///     Create the Generic Host and execute startup ConfigureServices/Configure calls
@@ -162,6 +166,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
             .AddExamine()
             .AddUmbracoSqlServerSupport()
             .AddUmbracoSqliteSupport()
+            .AddUmbracoHybridCache()
             .AddTestServices(TestHelper);
 
         if (TestOptions.Mapper)
@@ -171,6 +176,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
                 .AddCoreMappingProfiles();
         }
 
+        services.RemoveAll(x=>x.ImplementationType == typeof(DocumentUrlServiceInitializerNotificationHandler));
         services.AddSignalR();
         services.AddMvc();
 

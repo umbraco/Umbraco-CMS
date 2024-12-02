@@ -20,6 +20,7 @@ public interface IUrlSegmentProvider
     ///     URL per culture.
     /// </remarks>
     string? GetUrlSegment(IContentBase content, string? culture = null);
+    string? GetUrlSegment(IContentBase content, bool published, string? culture = null) => GetUrlSegment(content, culture);
 
     // TODO: For the 301 tracking, we need to add another extended interface to this so that
     // the RedirectTrackingEventHandler can ask the IUrlSegmentProvider if the URL is changing.
