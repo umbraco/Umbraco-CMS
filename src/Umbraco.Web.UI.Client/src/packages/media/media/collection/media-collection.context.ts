@@ -50,7 +50,7 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 
 	/**
 	 * Requests the collection from the repository.
-	 * @returns {*}
+	 * @returns {Promise<void>}
 	 * @memberof UmbCollectionContext
 	 */
 	public override async requestCollection() {

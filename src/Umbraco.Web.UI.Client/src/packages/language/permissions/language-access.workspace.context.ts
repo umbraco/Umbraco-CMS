@@ -1,4 +1,4 @@
-import { UMB_LANGUAGE_ACCESS_WORKSPACE_CONTEXT } from './language-access.workspace-context.token.js';
+import { UMB_LANGUAGE_ACCESS_WORKSPACE_CONTEXT } from './language-access.workspace.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
