@@ -262,9 +262,9 @@ internal sealed class ContentEditingService
         => await HandleSortAsync(parentKey, sortingModels, userKey);
 
     private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCulturesAndPropertiesAsync(
-            ContentEditingModelBase contentEditingModelBase,
-            Guid contentTypeKey,
-            IEnumerable<string?>? culturesToValidate = null)
+        ContentEditingModelBase contentEditingModelBase,
+        Guid contentTypeKey,
+        IEnumerable<string?>? culturesToValidate = null)
         => await ValidateCulturesAsync(contentEditingModelBase) is false
             ? Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentValidationResult())
             : await ValidatePropertiesAsync(contentEditingModelBase, contentTypeKey, culturesToValidate);
