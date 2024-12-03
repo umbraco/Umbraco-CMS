@@ -1,3 +1,6 @@
+import type { UmbContentTypeCompositionModel, UmbContentTypeDetailModel, UmbContentTypeSortModel } from '../types.js';
+import { UmbContentTypeStructureManager } from '../structure/index.js';
+import type { UmbContentTypeWorkspaceContext } from './content-type-workspace-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import {
@@ -6,10 +9,7 @@ import {
 	type UmbEntityDetailWorkspaceContextCreateArgs,
 	type UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
-import type { UmbContentTypeWorkspaceContext } from './content-type-workspace-context.interface.js';
-import type { UmbContentTypeCompositionModel, UmbContentTypeDetailModel, UmbContentTypeSortModel } from '../types.js';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
-import { UmbContentTypeStructureManager } from '../structure/index.js';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { jsonStringComparison, type Observable } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
@@ -221,7 +221,6 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 	 * Sets the compositions of the content type
 	 * @param { string } compositions The compositions of the content type
 	 * @returns { void }
-	 *
 	 */
 	public setCompositions(compositions: Array<UmbContentTypeCompositionModel>) {
 		this.structure.updateOwnerContentType({ compositions } as Partial<DetailModelType>);

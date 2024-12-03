@@ -14,6 +14,7 @@ export interface UmbNumberRangeValueType {
 	max?: number;
 }
 
+// TODO: this needs to use the UmbEntityUnique so we ensure that unique can be null
 export interface UmbReferenceByUnique {
 	unique: string;
 }

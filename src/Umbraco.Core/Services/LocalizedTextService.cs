@@ -350,7 +350,13 @@ public class LocalizedTextService : ILocalizedTextService
         IEnumerable<XElement> areas = xmlSource[cult].Value.XPathSelectElements("//area");
         foreach (XElement area in areas)
         {
-            var result = new Dictionary<string, string>(StringComparer.InvariantCulture);
+            var areaAlias = area.Attribute("alias")!.Value;
+
+            if (!overallResult.TryGetValue(areaAlias, out IDictionary<string, string>? result))
+            {
+                result = new Dictionary<string, string>(StringComparer.InvariantCulture);
+            }
+
             IEnumerable<XElement> keys = area.XPathSelectElements("./key");
             foreach (XElement key in keys)
             {
@@ -364,7 +370,10 @@ public class LocalizedTextService : ILocalizedTextService
                 }
             }
 
-            overallResult.Add(area.Attribute("alias")!.Value, result);
+            if (!overallResult.ContainsKey(areaAlias))
+            {
+                overallResult.Add(areaAlias, result);
+            }
         }
 
         // Merge English Dictionary
@@ -374,11 +383,11 @@ public class LocalizedTextService : ILocalizedTextService
             IEnumerable<XElement> enUS = xmlSource[englishCulture].Value.XPathSelectElements("//area");
             foreach (XElement area in enUS)
             {
-                IDictionary<string, string>
-                    result = new Dictionary<string, string>(StringComparer.InvariantCulture);
-                if (overallResult.ContainsKey(area.Attribute("alias")!.Value))
+                var areaAlias = area.Attribute("alias")!.Value;
+
+                if (!overallResult.TryGetValue(areaAlias, out IDictionary<string, string>? result))
                 {
-                    result = overallResult[area.Attribute("alias")!.Value];
+                    result = new Dictionary<string, string>(StringComparer.InvariantCulture);
                 }
 
                 IEnumerable<XElement> keys = area.XPathSelectElements("./key");
@@ -394,9 +403,9 @@ public class LocalizedTextService : ILocalizedTextService
                     }
                 }
 
-                if (!overallResult.ContainsKey(area.Attribute("alias")!.Value))
+                if (!overallResult.ContainsKey(areaAlias))
                 {
-                    overallResult.Add(area.Attribute("alias")!.Value, result);
+                    overallResult.Add(areaAlias, result);
                 }
             }
         }

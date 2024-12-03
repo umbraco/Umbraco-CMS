@@ -32,7 +32,7 @@ import { handlers as templateHandlers } from './handlers/template/index.js';
 import { handlers as upgradeHandlers } from './handlers/upgrade.handlers.js';
 import { handlers as userGroupsHandlers } from './handlers/user-group/index.js';
 import { handlers as userHandlers } from './handlers/user/index.js';
-import * as manifestsHandlers from './handlers/manifests.handlers.js';
+//import * as manifestsHandlers from './handlers/manifests.handlers.js';
 import * as serverHandlers from './handlers/server.handlers.js';
 import { handlers as documentBlueprintHandlers } from './handlers/document-blueprint/index.js';
 import { handlers as temporaryFileHandlers } from './handlers/temporary-file/index.js';
@@ -75,8 +75,10 @@ const handlers = [
 	...documentBlueprintHandlers,
 	...temporaryFileHandlers,
 	...serverHandlers.serverInformationHandlers,
+	serverHandlers.serverRunningHandler,
 ];
 
+/* TODO: find solution to run with different handlers across vite mocks and web-test-runner mocks
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {
 	case 'must-install':
 		handlers.push(serverHandlers.serverMustInstallHandler);
@@ -96,5 +98,6 @@ switch (import.meta.env.VITE_UMBRACO_EXTENSION_MOCKS) {
 	default:
 		handlers.push(...manifestsHandlers.manifestEmptyHandlers);
 }
+*/
 
 export { handlers };

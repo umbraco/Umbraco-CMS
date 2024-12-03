@@ -7,10 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '@umbraco-cms/backoffice/document';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
-import type {
-	UmbCollectionBulkActionPermissions,
-	UmbCollectionConfiguration,
-} from '@umbraco-cms/backoffice/collection';
+import type { UmbCollectionConfiguration } from '@umbraco-cms/backoffice/collection';
 
 /**
  * @element umb-property-editor-ui-collection
@@ -58,7 +55,6 @@ export class UmbPropertyEditorUICollectionElement extends UmbLitElement implemen
 	): UmbCollectionConfiguration {
 		const pageSize = Number(config?.getValueByAlias('pageSize'));
 		return {
-			allowedEntityBulkActions: config?.getValueByAlias<UmbCollectionBulkActionPermissions>('bulkActionPermissions'),
 			layouts: config?.getValueByAlias('layouts'),
 			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
 			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',

@@ -5,9 +5,8 @@ import { getPropertyValueByAlias } from '../index.js';
 import { css, customElement, html, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbDefaultCollectionContext, UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
 
@@ -16,7 +15,7 @@ import '@umbraco-cms/backoffice/ufm';
 @customElement('umb-document-grid-collection-view')
 export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 	@state()
-	private _editDocumentPath = '';
+	private _workspacePathBuilder?: UmbModalRouteBuilder;
 
 	@state()
 	private _items: Array<UmbDocumentCollectionItemModel> = [];
@@ -34,23 +33,16 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 
 		this.consumeContext(UMB_DOCUMENT_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
+			collectionContext.setupView(this);
+			this.observe(
+				collectionContext.workspacePathBuilder,
+				(builder) => {
+					this._workspacePathBuilder = builder;
+				},
+				'observePath',
+			);
 			this.#observeCollectionContext();
 		});
-
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath('document')
-			.onSetup(() => {
-				return { data: { entityType: 'document', preset: {} } };
-			})
-			.onReject(() => {
-				this.#collectionContext?.requestCollection();
-			})
-			.onSubmit(() => {
-				this.#collectionContext?.requestCollection();
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._editDocumentPath = routeBuilder({});
-			});
 	}
 
 	#observeCollectionContext() {
@@ -73,14 +65,6 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 		);
 	}
 
-	#onOpen(event: Event, unique: string) {
-		event.preventDefault();
-		event.stopPropagation();
-
-		const url = this._editDocumentPath + UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique });
-		window.history.pushState(null, '', url);
-	}
-
 	#onSelect(item: UmbDocumentCollectionItemModel) {
 		this.#collectionContext?.selection.select(item.unique);
 	}
@@ -91,6 +75,15 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 
 	#isSelected(item: UmbDocumentCollectionItemModel) {
 		return this.#collectionContext?.selection.isSelected(item.unique);
+	}
+
+	#getEditUrl(item: UmbDocumentCollectionItemModel) {
+		return item.unique && this._workspacePathBuilder
+			? this._workspacePathBuilder({ entityType: item.entityType }) +
+					UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({
+						unique: item.unique,
+					})
+			: '';
 	}
 
 	override render() {
@@ -112,7 +105,7 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				selectable
 				?select-only=${this._selection.length > 0}
 				?selected=${this.#isSelected(item)}
-				@open=${(event: Event) => this.#onOpen(event, item.unique)}
+				href=${this.#getEditUrl(item)}
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}>
 				<umb-icon slot="icon" name=${item.icon}></umb-icon>
@@ -158,7 +151,7 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 		const value = getPropertyValueByAlias(item, column.alias);
 		return html`
 			<li>
-				<span>${column.header}:</span>
+				<span>${this.localize.string(column.header)}:</span>
 				${when(
 					column.nameTemplate,
 					() => html`<umb-ufm-render inline .markdown=${column.nameTemplate} .value=${{ value }}></umb-ufm-render>`,

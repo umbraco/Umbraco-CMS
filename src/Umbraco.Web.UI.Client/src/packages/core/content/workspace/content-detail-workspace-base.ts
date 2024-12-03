@@ -470,24 +470,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 	}
 
-	/**
-	 * Request a submit of the workspace, in the case of Content Workspaces the validation does not need to be valid for this to be submitted.
-	 * @returns {Promise<void>} a promise which resolves once it has been completed.
-	 */
-	public override requestSubmit() {
-		return this.#handleSubmit();
-	}
-
 	public override submit() {
-		return this.#handleSubmit();
+		return this._handleSubmit();
 	}
 
-	// Because we do not make validation prevent submission this also submits the workspace. [NL]
-	public override invalidSubmit() {
-		return this.#handleSubmit();
-	}
-
-	async #handleSubmit() {
+	protected async _handleSubmit() {
 		const data = this.getData();
 		if (!data) {
 			throw new Error('Data is missing');

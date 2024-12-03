@@ -71,7 +71,7 @@ export class UmbBlockGridManagerContext<
 	override setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
 		this.#initAppUrl.then(() => {
 			// we await initAppUrl, So the appUrl begin here is available when retrieving the layoutStylesheet.
-			this._editorConfiguration.setValue(configs);
+			super.setEditorConfiguration(configs);
 		});
 	}
 

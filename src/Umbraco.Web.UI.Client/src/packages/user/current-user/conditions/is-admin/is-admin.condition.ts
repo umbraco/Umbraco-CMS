@@ -1,4 +1,4 @@
-import { isCurrentUserAnAdmin } from '../../utils/is-current-user.function.js';
+import { isCurrentUserAnAdmin } from '../../utils/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	UmbConditionConfigBase,
