@@ -100,7 +100,7 @@ async function validateConstants(constants: Array<string>, contentOfPackage: any
 		}
 
 		if (!isExported) {
-			console.error(`Error: Constant "${constant}" is not exported in of ${packagePath}`);
+			console.error(`Error: Constant "${constant}" is not exported of ${packagePath}`);
 			allValid = false;
 		}
 	}
