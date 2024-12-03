@@ -17,6 +17,10 @@ namespace Umbraco.Cms.Api.Management.Controllers.Security;
 [ApiExplorerSettings(IgnoreApi = true)]
 public class BackOfficeGraphicsController : Controller
 {
+    public const string BackGroundRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(Background);
+    public const string LogoRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(Logo);
+    public const string LogoAlternativeRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LogoAlternative);
+
     private readonly IOptions<ContentSettings> _contentSettings;
     private readonly IContentTypeProvider _contentTypeProvider;
     private readonly IWebHostEnvironment _webHostEnvironment;
@@ -28,17 +32,17 @@ public class BackOfficeGraphicsController : Controller
         _contentTypeProvider = staticFileOptions.Value.ContentTypeProvider ?? new FileExtensionContentTypeProvider();
     }
 
-    [HttpGet("background", Name = nameof(BackOfficeGraphicsController) + "." + nameof(Background))]
+    [HttpGet("background", Name = BackGroundRouteName)]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
     public IActionResult Background() => HandleFileRequest(_contentSettings.Value.LoginBackgroundImage);
 
-    [HttpGet("logo", Name = nameof(BackOfficeGraphicsController) + "." + nameof(Logo))]
+    [HttpGet("logo", Name = LogoRouteName)]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
     public IActionResult Logo() => HandleFileRequest(_contentSettings.Value.LoginLogoImage);
 
-    [HttpGet("logo-alternative", Name = nameof(BackOfficeGraphicsController) + "." + nameof(LogoAlternative))]
+    [HttpGet("logo-alternative", Name = LogoAlternativeRouteName)]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
     public IActionResult LogoAlternative() => HandleFileRequest(_contentSettings.Value.LoginLogoImageAlternative);

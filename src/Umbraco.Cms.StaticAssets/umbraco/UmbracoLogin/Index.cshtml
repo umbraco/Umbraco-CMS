@@ -23,9 +23,9 @@
 @{
     bool.TryParse(Context.Request.Query["umbDebug"], out var isDebug);
     var backOfficePath = GlobalSettings.Value.GetBackOfficePath(HostingEnvironment);
-    var loginLogoImage = Url.RouteUrl(nameof(BackOfficeGraphicsController) + "." + nameof(BackOfficeGraphicsController.Logo), new {Version= "1"});
-    var loginLogoImageAlternative = Url.RouteUrl(nameof(BackOfficeGraphicsController) + "." + nameof(BackOfficeGraphicsController.LogoAlternative), new {Version= "1"});
-    var loginBackgroundImage = Url.RouteUrl(nameof(BackOfficeGraphicsController) + "." + nameof(BackOfficeGraphicsController.Background), new {Version= "1"});
+    var loginLogoImage = Url.RouteUrl(BackOfficeGraphicsController.LogoRouteName, new {Version= "1"});
+    var loginLogoImageAlternative = Url.RouteUrl(BackOfficeGraphicsController.LogoAlternativeRouteName, new {Version= "1"});
+    var loginBackgroundImage = Url.RouteUrl(BackOfficeGraphicsController.BackGroundRouteName, new {Version= "1"});
     var usernameIsEmail = SecuritySettings.Value.UsernameIsEmail;
     var allowUserInvite = EmailSender.CanSendRequiredEmail();
     var allowPasswordReset = SecuritySettings.Value.AllowPasswordReset && EmailSender.CanSendRequiredEmail();
