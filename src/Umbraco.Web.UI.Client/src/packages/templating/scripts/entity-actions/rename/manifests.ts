@@ -1,4 +1,4 @@
-import { UMB_SCRIPT_ITEM_REPOSITORY_ALIAS } from '../../repository/item/manifests.js';
+import { UMB_SCRIPT_ITEM_REPOSITORY_ALIAS } from '../../repository/item/constants.js';
 import { UMB_SCRIPT_ENTITY_TYPE } from '../../entity.js';
 
 export const UMB_RENAME_SCRIPT_REPOSITORY_ALIAS = 'Umb.Repository.Script.Rename';
