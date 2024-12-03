@@ -11,9 +11,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
-internal sealed class ContentEditingService
-    : ContentEditingServiceWithSortingBase<IContent, IContentType, IContentService, IContentTypeService>,
-        IContentEditingService
+internal sealed class ContentEditingService : ContentEditingServiceWithSortingBase<IContent, IContentType, IContentService, IContentTypeService>, IContentEditingService
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly ITemplateService _templateService;
@@ -38,8 +36,7 @@ internal sealed class ContentEditingService
         ILocalizationService localizationService,
         ILanguageService languageService,
         IOptions<ContentSettings> contentSettings)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider,
-            userIdKeyResolver, contentValidationService, treeEntitySortingService)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, contentValidationService, treeEntitySortingService)
     {
         _propertyEditorCollection = propertyEditorCollection;
         _templateService = templateService;
@@ -75,19 +72,16 @@ internal sealed class ContentEditingService
 
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(
         ContentCreateModel createModel)
-        => await ValidateCulturesAndPropertiesAsync(createModel, createModel.ContentTypeKey,
-            createModel.Variants.Select(variant => variant.Culture));
+        => await ValidateCulturesAndPropertiesAsync(createModel, createModel.ContentTypeKey, createModel.Variants.Select(variant => variant.Culture));
 
-    public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(
-        ContentCreateModel createModel, Guid userKey)
+    public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey)
     {
         if (await ValidateCulturesAsync(createModel) is false)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentCreateResult());
         }
 
-        Attempt<ContentCreateResult, ContentEditingOperationStatus> result =
-            await MapCreate<ContentCreateResult>(createModel);
+        Attempt<ContentCreateResult, ContentEditingOperationStatus> result = await MapCreate<ContentCreateResult>(createModel);
         if (result.Success == false)
         {
             return result;
@@ -99,8 +93,7 @@ internal sealed class ContentEditingService
         ContentValidationResult validationResult = result.Result.ValidationResult;
 
         IContent content = await EnsureOnlyAllowedFieldsAreUpdated(result.Result.Content!, userKey);
-        ContentEditingOperationStatus updateTemplateStatus =
-            await UpdateTemplateAsync(content, createModel.TemplateKey);
+        ContentEditingOperationStatus updateTemplateStatus = await UpdateTemplateAsync(content, createModel.TemplateKey);
         if (updateTemplateStatus != ContentEditingOperationStatus.Success)
         {
             return Attempt.FailWithStatus(updateTemplateStatus, new ContentCreateResult { Content = content });
