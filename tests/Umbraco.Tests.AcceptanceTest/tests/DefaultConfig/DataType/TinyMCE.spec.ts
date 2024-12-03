@@ -1,4 +1,4 @@
-import {test} from "@umbraco/playwright-testhelpers";
+import {NotificationConstantHelper, test} from "@umbraco/playwright-testhelpers";
 import {expect} from "@playwright/test";
 
 const tinyMCEName = 'TestTinyMCE';
@@ -13,7 +13,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(tinyMCEName);
 });
 
-test('can create a rich text editor tinyMCE', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can create a rich text editor with tinyMCE', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   //  Arrange
   const tinyMCELocatorName = 'Rich Text Editor [TinyMCE]';
   const tinyMCEFilterKeyword = 'Rich Text Editor';
@@ -30,14 +30,14 @@ test('can create a rich text editor tinyMCE', {tag: '@smoke'}, async ({umbracoAp
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.dataType.doesNameExist(tinyMCEName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(tinyMCEName);
   expect(dataTypeData.editorAlias).toBe(tinyMCEAlias);
   expect(dataTypeData.editorUiAlias).toBe(tinyMCEUiAlias);
 });
 
-test('can rename a rich text editor tinyMCE', async ({umbracoApi, umbracoUi}) => {
+test('can rename a rich text editor with tinyMCE', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const wrongName = 'tinyMCETest';
   await umbracoApi.dataType.createDefaultTinyMCEDataType(wrongName);
@@ -48,12 +48,12 @@ test('can rename a rich text editor tinyMCE', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   expect(await umbracoApi.dataType.doesNameExist(tinyMCEName)).toBeTruthy();
   expect(await umbracoApi.dataType.doesNameExist(wrongName)).toBeFalsy();
 });
 
-test('can delete a rich text editor tinyMCE', async ({umbracoApi, umbracoUi}) => {
+test('can delete a rich text editor with tinyMCE', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createDefaultTinyMCEDataType(tinyMCEName);
 
@@ -63,7 +63,7 @@ test('can delete a rich text editor tinyMCE', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.dataType.clickDeleteAndConfirmButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
   expect(await umbracoApi.dataType.doesNameExist(tinyMCEName)).toBeFalsy();
   await umbracoUi.dataType.isTreeItemVisible(tinyMCEName, false);
 });
@@ -80,6 +80,7 @@ test('can enable toolbar options', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const expectedToolbarItems = toolbarItemCount + toolbarValues.length;
   expect(await umbracoApi.dataType.doesTinyMCEToolbarItemsMatchCount(tinyMCEName, expectedToolbarItems)).toBeTruthy();
   expect(await umbracoApi.dataType.doesTinyMCEToolbarHaveItems(tinyMCEName, toolbarValues)).toBeTruthy();
@@ -102,6 +103,7 @@ test('can add stylesheet', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const tinyMCEData = await umbracoApi.dataType.getByName(tinyMCEName);
   expect(tinyMCEData.values).toContainEqual(expectedTinyMCEValues);
 
@@ -128,6 +130,7 @@ test('can add dimensions', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const tinyMCEData = await umbracoApi.dataType.getByName(tinyMCEName);
   expect(tinyMCEData.values).toContainEqual(expectedTinyMCEValues);
 });
@@ -147,6 +150,7 @@ test('can update maximum size for inserted images', async ({umbracoApi, umbracoU
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const tinyMCEData = await umbracoApi.dataType.getByName(tinyMCEName);
   expect(tinyMCEData.values).toContainEqual(expectedTinyMCEValues);
 });
@@ -166,6 +170,7 @@ test('can enable inline editing mode', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const tinyMCEData = await umbracoApi.dataType.getByName(tinyMCEName);
   expect(tinyMCEData.values).toContainEqual(expectedTinyMCEValues);
 });
@@ -192,6 +197,7 @@ test('can add an available block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const tinyMCEData = await umbracoApi.dataType.getByName(tinyMCEName);
   expect(tinyMCEData.values).toContainEqual(expectedTinyMCEValues);
 
@@ -214,6 +220,7 @@ test('can select overlay size', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const tinyMCEData = await umbracoApi.dataType.getByName(tinyMCEName);
   expect(tinyMCEData.values).toContainEqual(expectedTinyMCEValues);
 });
@@ -232,6 +239,7 @@ test('can enable hide label', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const tinyMCEData = await umbracoApi.dataType.getByName(tinyMCEName);
   expect(tinyMCEData.values).toContainEqual(expectedTinyMCEValues);
 });
@@ -253,6 +261,7 @@ test('can add image upload folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const tinyMCEData = await umbracoApi.dataType.getByName(tinyMCEName);
   expect(tinyMCEData.values).toContainEqual(expectedTinyMCEValues);
 
@@ -274,6 +283,7 @@ test('can enable ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const tinyMCEData = await umbracoApi.dataType.getByName(tinyMCEName);
   expect(tinyMCEData.values).toContainEqual(expectedTinyMCEValues);
 });

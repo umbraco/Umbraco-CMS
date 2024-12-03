@@ -1,13 +1,12 @@
 ﻿import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
-const dataTypeName = 'Richtext editor';
-
-test('titap is the default plugins in rich text editor', async ({umbracoApi, umbracoUi}) => {
+test('tiptap is the default property editor in rich text editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const tiptapPropertyEditorName = 'Rich Text Editor [Tiptap] Property Editor UI';
-  const tiptapAlias = 'Umbraco.RichText';
-  const tiptapUiAlias = 'Umb.PropertyEditorUi.Tiptap';
+  const dataTypeName = 'Richtext editor';
+  const tipTapPropertyEditorName = 'Rich Text Editor [Tiptap] Property Editor UI';
+  const tipTapAlias = 'Umbraco.RichText';
+  const tipTapUiAlias = 'Umb.PropertyEditorUi.Tiptap';
   await umbracoUi.goToBackOffice();
   await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
 
@@ -15,10 +14,10 @@ test('titap is the default plugins in rich text editor', async ({umbracoApi, umb
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
   // Assert
-  await umbracoUi.dataType.doesPropertyEditorHaveName(tiptapPropertyEditorName);
-  await umbracoUi.dataType.doesPropertyEditorHaveSchemaAlias(tiptapAlias);
-  await umbracoUi.dataType.doesPropertyEditorHaveAlias(tiptapUiAlias);
+  await umbracoUi.dataType.doesPropertyEditorHaveName(tipTapPropertyEditorName);
+  await umbracoUi.dataType.doesPropertyEditorHaveSchemaAlias(tipTapAlias);
+  await umbracoUi.dataType.doesPropertyEditorHaveAlias(tipTapUiAlias);
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  expect(dataTypeData.editorAlias).toBe(tiptapAlias);
-  expect(dataTypeData.editorUiAlias).toBe(tiptapUiAlias);
+  expect(dataTypeData.editorAlias).toBe(tipTapAlias);
+  expect(dataTypeData.editorUiAlias).toBe(tipTapUiAlias);
 });
