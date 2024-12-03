@@ -1,4 +1,4 @@
-import { rest } from 'msw';
+const { rest } = window.MockServiceWorker;
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import type { ServertimeOffset } from '@umbraco-cms/backoffice/models';
 

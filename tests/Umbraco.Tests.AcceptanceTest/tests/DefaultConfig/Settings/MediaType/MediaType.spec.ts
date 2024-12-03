@@ -68,6 +68,7 @@ test('can add an icon for a media type', {tag: '@smoke'}, async ({umbracoApi, um
 
   // Act
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.mediaType.updateIcon(bugIcon);
   await umbracoUi.mediaType.clickSaveButton();
 
