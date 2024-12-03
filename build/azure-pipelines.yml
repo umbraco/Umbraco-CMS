@@ -305,7 +305,7 @@ stages:
               testFilter: '(FullyQualifiedName~Umbraco.Infrastructure.Service)'
             LinuxPart3Of3:
               vmImage: "ubuntu-24.04"
-              testFilter: '(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
+              testFilter: '(FullyQualifiedName!~Umbraco.Infrastructure)'
             macOSPart1Of3:
               vmImage: "macOS-latest"
               testFilter: '(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
@@ -314,7 +314,7 @@ stages:
               testFilter: '(FullyQualifiedName~Umbraco.Infrastructure.Service)'
             macOSPart3Of3:
               vmImage: "macOS-latest"
-              testFilter: '(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
+              testFilter: '(FullyQualifiedName!~Umbraco.Infrastructure)'
         pool:
           vmImage: $(vmImage)
         variables:
@@ -374,7 +374,7 @@ stages:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
-              testFilter: '(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
+              testFilter: '(FullyQualifiedName!~Umbraco.Infrastructure)'
             LinuxPart1Of3:
               vmImage: "ubuntu-latest"
               SA_PASSWORD: UmbracoIntegration123!
@@ -392,7 +392,7 @@ stages:
                 SA_PASSWORD: UmbracoIntegration123!
                 Tests__Database__DatabaseType: SqlServer
                 Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
-                testFilter: '(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
+                testFilter: '(FullyQualifiedName!~Umbraco.Infrastructure)'
         pool:
           vmImage: $(vmImage)
         steps:
