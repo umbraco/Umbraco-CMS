@@ -175,7 +175,6 @@ test('can enable inline editing mode', async ({umbracoApi, umbracoUi}) => {
   expect(tinyMCEData.values).toContainEqual(expectedTinyMCEValues);
 });
 
-
 test('can add an available block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementTypeName = 'TestElementType';
