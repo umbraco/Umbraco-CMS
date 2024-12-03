@@ -1,4 +1,4 @@
-export const UMB_ROLLBACK_REPOSITORY_ALIAS = 'Umb.Repository.Rollback';
+import { UMB_ROLLBACK_REPOSITORY_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
-import type { UmbDocumentPropertyDatasetContext } from './document-property-dataset-context.js';
+import type { UmbDocumentPropertyDatasetContext } from './document-property-dataset.context.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
