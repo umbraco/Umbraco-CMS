@@ -34,16 +34,17 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
-			this.observe(
-				observeMultiple([context.isNew, context.unique, context.variantOptions]),
-				([isNew, unique, variantOptions]) => {
-					if (!unique) return;
-					this._isNew = isNew === true;
+			this.observe(observeMultiple([context.isNew, context.unique]), ([isNew, unique]) => {
+				if (!unique) return;
+				this._isNew = isNew === true;
+
+				if (unique !== this._unique) {
 					this._unique = unique;
-					this._variantOptions = variantOptions;
 					this.#requestUrls();
-				},
-			);
+				}
+			});
+
+			this.observe(context.variantOptions, (variantOptions) => (this._variantOptions = variantOptions));
 		});
 	}
 
@@ -56,7 +57,7 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		if (data?.length) {
 			data[0].urls.forEach((item) => {
 				if (item.culture && item.url) {
-					if(this._lookup[item.culture] == null){
+					if (this._lookup[item.culture] == null) {
 						this._lookup[item.culture] = [];
 					}
 					this._lookup[item.culture].push(item.url);
@@ -114,16 +115,16 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		const urls = this._lookup[culture];
 		return when(
 			urls && urls.length >= 1,
-			() => html`
-				${urls.map((url) =>
-					html`
-						<a class="link-item" href=${url} target="_blank">
+			() =>
+				html` ${urls.map(
+					(url) =>
+						html` <a class="link-item" href=${url} target="_blank">
 							<span>
 								<span class="culture">${varies ? culture : nothing}</span>
 								<span>${url}</span>
 							</span>
 							<uui-icon name="icon-out"></uui-icon>
-						</a>`
+						</a>`,
 				)}`,
 			() => html`
 				<div class="link-item">
