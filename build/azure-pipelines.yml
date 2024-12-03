@@ -351,7 +351,7 @@ stages:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
-              testFilter: '--filter \"(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)\"'
+              testFilter: '(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
             WindowsPart2Of3:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
@@ -361,25 +361,25 @@ stages:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
-              testFilter: '--filter \"(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)\"'
+              testFilter: '(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
             LinuxPart1Of3:
               vmImage: "ubuntu-latest"
               SA_PASSWORD: UmbracoIntegration123!
               Tests__Database__DatabaseType: SqlServer
               Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
-              testFilter: '--filter \"(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)\"'
+              testFilter: '(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
             LinuxPart2Of3:
                 vmImage: "ubuntu-latest"
                 SA_PASSWORD: UmbracoIntegration123!
                 Tests__Database__DatabaseType: SqlServer
                 Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
-                testFilter: '--filter \"(FullyQualifiedName~Umbraco.Infrastructure.Service)\"'
+                testFilter: '(FullyQualifiedName~Umbraco.Infrastructure.Service)'
             LinuxPart3Of3:
                 vmImage: "ubuntu-latest"
                 SA_PASSWORD: UmbracoIntegration123!
                 Tests__Database__DatabaseType: SqlServer
                 Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
-                testFilter: '--filter \"(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)\"'
+                testFilter: '(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
         pool:
           vmImage: $(vmImage)
         steps:
@@ -412,13 +412,13 @@ stages:
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
               ${{ if and(eq(variables['Agent.OS'],'Windows_NT'), or(variables.releaseTestFilter, parameters.forceReleaseTestFilter)) }}:
-                arguments: "$(testFilter) --configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}"
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
               ${{ elseif eq(variables['Agent.OS'],'Windows_NT') }}:
-                arguments: "$(testFilter) --configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}"
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}'
               ${{ elseif or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
-                arguments: "$(testFilter) --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}"
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
               ${{ else }}:
-                arguments: "$(testFilter) --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}"
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
 
           # Stop SQL Server
           - pwsh: docker stop mssql
