@@ -1276,48 +1276,42 @@ public class ContentStore
 
         // try to find the content
         // if it is not there, nothing to do
-        _contentNodes.TryGetValue(id, out LinkedNode<ContentNode?>? link); // else null
-        if (link?.Value == null)
+        if (_contentNodes.TryGetValue(id, out LinkedNode<ContentNode?>? link) &&
+            link.Value is ContentNode content)
         {
-            return false;
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Clear content ID: {ContentId}", content.Id);
+            }
+
+            // clear the entire branch
+            ClearBranchLocked(content);
+
+            // manage the tree
+            RemoveTreeNodeLocked(content);
+
+            return true;
         }
 
-        ContentNode? content = link.Value;
-
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("Clear content ID: {ContentId}", content.Id);
-        }
-
-        // clear the entire branch
-        ClearBranchLocked(content);
-
-        // manage the tree
-        RemoveTreeNodeLocked(content);
-
-        return true;
+        return false;
     }
 
     private void ClearBranchLocked(int id)
     {
-        _contentNodes.TryGetValue(id, out LinkedNode<ContentNode?>? link);
-        if (link?.Value == null)
+        if (_contentNodes.TryGetValue(id, out LinkedNode<ContentNode?>? link) &&
+            link.Value is ContentNode content)
         {
-            return;
-        }
+            // clear the entire branch
+            ClearBranchLocked(content);
 
-        ClearBranchLocked(link.Value);
+            // manage the tree
+            RemoveTreeNodeLocked(content);
+        }
     }
 
-    private void ClearBranchLocked(ContentNode? content)
+    private void ClearBranchLocked(ContentNode content)
     {
-        // This should never be null, all code that calls this method is null checking but we've seen
-        // issues of null ref exceptions in issue reports so we'll double check here
-        if (content == null)
-        {
-            throw new ArgumentNullException(nameof(content));
-        }
-
+        // Clear content node
         SetValueLocked(_contentNodes, content.Id, null);
         if (_localDb != null)
         {
@@ -1326,14 +1320,21 @@ public class ContentStore
 
         _contentKeyToIdMap.TryRemove(content.Uid, out _);
 
-        var id = content.FirstChildContentId;
-        while (id > 0)
+        // Clear children
+        int childId = content.FirstChildContentId;
+        if (childId > 0)
         {
-            // get the required link node, this ensures that both `link` and `link.Value` are not null
-            LinkedNode<ContentNode> link = GetRequiredLinkedNode(id, "child", null);
-            ContentNode? linkValue = link.Value; // capture local since clearing in recurse can clear it
-            ClearBranchLocked(linkValue); // recurse
-            id = linkValue?.NextSiblingContentId ?? 0;
+            ContentNode childContent = GetRequiredLinkedNode(childId, "first child", null).Value!;
+            ClearBranchLocked(childContent); // recurse
+
+            // Clear all siblings of child
+            int siblingId = childContent.NextSiblingContentId;
+            while (siblingId > 0)
+            {
+                ContentNode siblingContent = GetRequiredLinkedNode(siblingId, "next sibling", null).Value!;
+                ClearBranchLocked(siblingContent); // recurse
+                siblingId = siblingContent.NextSiblingContentId;
+            }
         }
     }
 
