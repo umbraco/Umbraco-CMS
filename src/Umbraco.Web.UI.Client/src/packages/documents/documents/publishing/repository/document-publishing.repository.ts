@@ -1,7 +1,7 @@
-import type { UmbDocumentVariantPublishModel } from '../../types.js';
+import type { UmbDocumentDetailModel, UmbDocumentVariantPublishModel } from '../../types.js';
 import { UmbDocumentPublishingServerDataSource } from './document-publishing.server.data-source.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import { UmbRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
@@ -92,6 +92,16 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 		}
 
 		return { error };
+	}
+
+	/**
+	 * Get the published data of a document
+	 * @param {string} unique Document unique
+	 * @returns { Promise<UmbRepositoryResponse<UmbDocumentDetailModel>>} Published document
+	 * @memberof UmbDocumentPublishingRepository
+	 */
+	async published(unique: string): Promise<UmbRepositoryResponse<UmbDocumentDetailModel>> {
+		return this.#publishingDataSource.published(unique);
 	}
 }
 

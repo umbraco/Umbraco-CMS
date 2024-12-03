@@ -1,4 +1,5 @@
-import type { UmbDocumentVariantPublishModel } from '../../types.js';
+import type { UmbDocumentDetailModel, UmbDocumentVariantPublishModel } from '../../types.js';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import type {
 	CultureAndScheduleRequestModel,
 	PublishDocumentRequestModel,
@@ -9,6 +10,7 @@ import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A server data source for Document publishing
@@ -108,5 +110,64 @@ export class UmbDocumentPublishingServerDataSource {
 			this.#host,
 			DocumentService.putDocumentByIdPublishWithDescendants({ id: unique, requestBody }),
 		);
+	}
+
+	/**
+	 * Get a published Document by its unique identifier
+	 * @param {string} unique - Document unique identifier
+	 * @returns {Promise<UmbDataSourceResponse<UmbDocumentDetailModel>>} Published document
+	 * @memberof UmbDocumentPublishingServerDataSource
+	 */
+	async published(unique: string): Promise<UmbDataSourceResponse<UmbDocumentDetailModel>> {
+		if (!unique) throw new Error('Unique is missing');
+
+		const { data, error } = await tryExecuteAndNotify(
+			this.#host,
+			DocumentService.getDocumentByIdPublished({ id: unique }),
+		);
+
+		if (error || !data) {
+			return { error };
+		}
+
+		// TODO: make data mapper to prevent errors
+		const document: UmbDocumentDetailModel = {
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
+			unique: data.id,
+			values: data.values.map((value) => {
+				return {
+					editorAlias: value.editorAlias,
+					alias: value.alias,
+					culture: value.culture || null,
+					segment: value.segment || null,
+					value: value.value,
+				};
+			}),
+			variants: data.variants.map((variant) => {
+				return {
+					state: variant.state,
+					culture: variant.culture || null,
+					segment: variant.segment || null,
+					name: variant.name,
+					publishDate: variant.publishDate || null,
+					createDate: variant.createDate,
+					updateDate: variant.updateDate,
+				};
+			}),
+			urls: data.urls.map((url) => {
+				return {
+					culture: url.culture || null,
+					url: url.url,
+				};
+			}),
+			template: data.template ? { unique: data.template.id } : null,
+			documentType: {
+				unique: data.documentType.id,
+				collection: data.documentType.collection ? { unique: data.documentType.collection.id } : null,
+			},
+			isTrashed: data.isTrashed,
+		};
+
+		return { data: document };
 	}
 }
