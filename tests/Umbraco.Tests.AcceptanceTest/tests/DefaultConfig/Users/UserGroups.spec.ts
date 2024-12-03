@@ -51,11 +51,10 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
 });
 
-test('can create an empty user group', async ({page, umbracoApi, umbracoUi}) => {
+test('can create an empty user group', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.userGroup.clickUserGroupsButton();
-  await page.pause();
-  await umbracoUi.userGroup.clickCreateButton();
+  await umbracoUi.userGroup.clickCreateLabelButton();
   await umbracoUi.userGroup.enterUserGroupName(userGroupName);
   await umbracoUi.userGroup.clickSaveButton();
 
@@ -114,7 +113,7 @@ test('can delete a user group', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.userGroup.clickActionsButton();
-  await umbracoUi.userGroup.clickDeleteThreeDotsButton();
+  await umbracoUi.userGroup.clickDeleteLabelThreeDotsButton();
   await umbracoUi.userGroup.clickConfirmToDeleteButton();
 
   // Assert
