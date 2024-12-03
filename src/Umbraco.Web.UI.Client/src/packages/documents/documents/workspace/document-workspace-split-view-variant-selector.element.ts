@@ -1,9 +1,9 @@
 import type { UmbDocumentVariantOptionModel } from '../types.js';
 import { sortVariants } from '../utils.js';
-import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from '../publishing/index.js';
+import { customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbWorkspaceSplitViewVariantSelectorElement } from '@umbraco-cms/backoffice/workspace';
-import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from '../publishing/index.js';
 
 const elementName = 'umb-document-workspace-split-view-variant-selector';
 @customElement(elementName)
@@ -18,7 +18,10 @@ export class UmbDocumentWorkspaceSplitViewVariantSelectorElement extends UmbWork
 	#publishStateLocalizationMap = {
 		[DocumentVariantStateModel.DRAFT]: 'content_unpublished',
 		[DocumentVariantStateModel.PUBLISHED]: 'content_published',
-		[DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES]: 'content_publishedPendingChanges',
+		// TODO: The pending changes state can be removed once the management Api removes this state
+		// We only keep it here to make typescript happy
+		// We should also make our own state model for this
+		[DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES]: 'content_publishedPending',
 		[DocumentVariantStateModel.NOT_CREATED]: 'content_notCreated',
 	};
 
@@ -44,11 +47,16 @@ export class UmbDocumentWorkspaceSplitViewVariantSelectorElement extends UmbWork
 		return this._variantsWithPendingChanges.some((x) => x.variantId.compare(variant));
 	}
 
+	#getVariantState(variantOption: UmbDocumentVariantOptionModel) {
+		const term = this.#hasPendingChanges(variantOption)
+			? 'content_publishedPendingChanges'
+			: this.#publishStateLocalizationMap[variantOption.variant?.state || DocumentVariantStateModel.NOT_CREATED];
+
+		return this.localize.term(term);
+	}
+
 	override _renderVariantDetails(variantOption: UmbDocumentVariantOptionModel) {
-		return html`${this.#hasPendingChanges(variantOption) ? html`<uui-tag>Pending changes</uui-tag>` : nothing}
-		${this.localize.term(
-			this.#publishStateLocalizationMap[variantOption.variant?.state || DocumentVariantStateModel.NOT_CREATED],
-		)}`;
+		return html` ${this.#getVariantState(variantOption)}`;
 	}
 }
 
