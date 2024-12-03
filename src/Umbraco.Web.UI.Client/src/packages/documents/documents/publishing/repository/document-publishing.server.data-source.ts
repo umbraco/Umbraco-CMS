@@ -145,9 +145,9 @@ export class UmbDocumentPublishingServerDataSource {
 			}),
 			variants: data.variants.map((variant) => {
 				return {
-					state: variant.state,
 					culture: variant.culture || null,
 					segment: variant.segment || null,
+					state: variant.state,
 					name: variant.name,
 					publishDate: variant.publishDate || null,
 					createDate: variant.createDate,
@@ -164,6 +164,7 @@ export class UmbDocumentPublishingServerDataSource {
 			documentType: {
 				unique: data.documentType.id,
 				collection: data.documentType.collection ? { unique: data.documentType.collection.id } : null,
+				icon: data.documentType.icon,
 			},
 			isTrashed: data.isTrashed,
 		};

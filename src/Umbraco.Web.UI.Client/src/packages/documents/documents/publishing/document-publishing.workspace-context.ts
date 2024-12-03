@@ -13,16 +13,16 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT);
 
-		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, async (instance) => {
+		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, async (context) => {
 			// No need to check pending changes for new documents
-			if (instance.getIsNew()) {
+			if (context.getIsNew()) {
 				return;
 			}
 
-			this.observe(instance.unique, async (unique) => {
+			this.observe(context.unique, async (unique) => {
 				if (unique) {
 					const { data: publishedData } = await this.#publishingRepository.published(unique);
-					const currentData = instance.getData();
+					const currentData = context.getData();
 
 					if (!currentData || !publishedData) {
 						return;
