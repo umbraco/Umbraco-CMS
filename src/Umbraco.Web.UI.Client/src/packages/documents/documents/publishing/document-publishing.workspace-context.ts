@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../workspace/document-workspace.context-token.js';
-import { UmbDocumentPublishingRepository } from '../repository/index.js';
+import { UmbDocumentPublishingRepository } from './repository/index.js';
 import { UmbDocumentPublishedPendingChangesManager } from './document-published-pending-changes.manager.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from './document-publishing.workspace-context.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

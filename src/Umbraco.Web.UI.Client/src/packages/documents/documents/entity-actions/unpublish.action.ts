@@ -1,4 +1,5 @@
-import { UmbDocumentDetailRepository, UmbDocumentPublishingRepository } from '../repository/index.js';
+import { UmbDocumentDetailRepository } from '../repository/index.js';
+import { UmbDocumentPublishingRepository } from '../publishing/repository/index.js';
 import type { UmbDocumentVariantOptionModel } from '../types.js';
 import { UMB_DOCUMENT_UNPUBLISH_MODAL } from '../modals/index.js';
 import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';

@@ -1,6 +1,6 @@
 import { UmbUnpublishDocumentEntityAction } from '../../entity-actions/unpublish.action.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
-import { UmbDocumentPublishingRepository } from '../../repository/index.js';
+import { UmbDocumentPublishingRepository } from '../../publishing/index.js';
 import type { UmbDocumentVariantOptionModel } from '../../types.js';
 import { UMB_DOCUMENT_UNPUBLISH_MODAL } from '../../modals/index.js';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';

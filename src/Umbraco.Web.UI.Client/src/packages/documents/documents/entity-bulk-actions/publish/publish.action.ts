@@ -1,4 +1,4 @@
-import { UmbDocumentPublishingRepository } from '../../repository/index.js';
+import { UmbDocumentPublishingRepository } from '../../publishing/index.js';
 import { UmbPublishDocumentEntityAction } from '../../entity-actions/publish.action.js';
 import type { UmbDocumentVariantOptionModel } from '../../types.js';
 import { UMB_DOCUMENT_PUBLISH_MODAL } from '../../modals/index.js';
