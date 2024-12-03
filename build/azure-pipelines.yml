@@ -297,10 +297,24 @@ stages:
           matrix:
             #            Windows:
             #              vmImage: 'windows-latest'
-            Linux:
+            LinuxPart1Of3:
               vmImage: "ubuntu-24.04"
-            macOS:
+              testFilter: '(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
+            LinuxPart2Of3:
+              vmImage: "ubuntu-24.04"
+              testFilter: '(FullyQualifiedName~Umbraco.Infrastructure.Service)'
+            LinuxPart3Of3:
+              vmImage: "ubuntu-24.04"
+              testFilter: '(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
+            macOSPart1Of3:
               vmImage: "macOS-latest"
+              testFilter: '(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
+            macOSPart2Of3:
+              vmImage: "macOS-latest"
+              testFilter: '(FullyQualifiedName~Umbraco.Infrastructure.Service)'
+            macOSPart3Of3:
+              vmImage: "macOS-latest"
+              testFilter: '(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
         pool:
           vmImage: $(vmImage)
         variables:
@@ -331,14 +345,13 @@ stages:
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
               ${{ if and(eq(variables['Agent.OS'],'Windows_NT'), or(variables.releaseTestFilter, parameters.forceReleaseTestFilter)) }}:
-                arguments: "--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}"
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
               ${{ elseif eq(variables['Agent.OS'],'Windows_NT') }}:
-                arguments: "--configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}"
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}'
               ${{ elseif or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
-                arguments: "--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}"
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
               ${{ else }}:
-                arguments: "--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}"
-
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
       # Integration Tests (SQL Server)
       - job:
         timeoutInMinutes: 180
