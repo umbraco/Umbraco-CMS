@@ -39,7 +39,7 @@ const umbRteBlock = Node.create({
 	},
 
 	renderHTML({ HTMLAttributes }) {
-		return ['umb-rte-block', HTMLAttributes, 0];
+		return ['umb-rte-block', HTMLAttributes];
 	},
 
 	addCommands() {
