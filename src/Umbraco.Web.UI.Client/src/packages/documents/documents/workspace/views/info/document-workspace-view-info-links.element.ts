@@ -3,10 +3,12 @@ import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { css, customElement, html, map, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { debounce } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-document-workspace-view-info-links')
 export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
@@ -24,16 +26,28 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 	@state()
 	private _lookup: Record<string, string[]> = {};
 
+	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
+	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
-			context.addEventListener(UmbRequestReloadStructureForEntityEvent.TYPE, () => {
-				this.#requestUrls();
-			});
+			this.#eventContext = context;
+
+			this.#eventContext.removeEventListener(
+				UmbRequestReloadStructureForEntityEvent.TYPE,
+				this.#onReloadRequest as unknown as EventListener,
+			);
+
+			this.#eventContext.addEventListener(
+				UmbRequestReloadStructureForEntityEvent.TYPE,
+				this.#onReloadRequest as unknown as EventListener,
+			);
 		});
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
+			this.#documentWorkspaceContext = context;
 			this.observe(observeMultiple([context.isNew, context.unique]), ([isNew, unique]) => {
 				if (!unique) return;
 				this._isNew = isNew === true;
@@ -81,6 +95,15 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 				return 'content_parentNotPublishedAnomaly';
 		}
 	}
+
+	#debounceRequestUrls = debounce(() => this.#requestUrls(), 50);
+
+	#onReloadRequest = (event: UmbEntityActionEvent) => {
+		// TODO: Introduce "Published Event". We only need to update the url when the document is published.
+		if (event.getUnique() !== this.#documentWorkspaceContext?.getUnique()) return;
+		if (event.getEntityType() !== this.#documentWorkspaceContext.getEntityType()) return;
+		this.#debounceRequestUrls();
+	};
 
 	override render() {
 		return html`
@@ -134,6 +157,15 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 					</span>
 				</div>
 			`,
+		);
+	}
+
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+
+		this.#eventContext?.removeEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadRequest as unknown as EventListener,
 		);
 	}
 
