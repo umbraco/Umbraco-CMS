@@ -26,6 +26,9 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 	@state()
 	private _lookup: Record<string, string[]> = {};
 
+	@state()
+	private _loading = false;
+
 	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
@@ -66,6 +69,8 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		if (this._isNew) return;
 		if (!this._unique) return;
 
+		this._loading = true;
+
 		const { data } = await this.#documentUrlRepository.requestItems([this._unique]);
 
 		if (data?.length) {
@@ -79,6 +84,8 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 			});
 			this.requestUpdate('_lookup');
 		}
+
+		this._loading = false;
 	}
 
 	#getStateLocalizationKey(variantOption: UmbDocumentVariantOptionModel) {
@@ -109,11 +116,25 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		return html`
 			<uui-box headline=${this.localize.term('general_links')}>
 				${when(
-					this._isNew,
-					() => this.#renderNotCreated(),
-					() => this.#renderUrls(),
+					this._loading,
+					() => this.#renderLoading(),
+					() => this.#renderContent(),
 				)}
 			</uui-box>
+		`;
+	}
+
+	#renderLoading() {
+		return html`<div id="loader-container"><uui-loader></uui-loader></div>`;
+	}
+
+	#renderContent() {
+		return html`
+			${when(
+				this._isNew,
+				() => this.#renderNotCreated(),
+				() => this.#renderUrls(),
+			)}
 		`;
 	}
 
@@ -173,6 +194,13 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		css`
 			uui-box {
 				--uui-box-default-padding: 0;
+			}
+
+			#loader-container {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: var(--uui-size-space-2);
 			}
 
 			.link-item {
