@@ -176,7 +176,7 @@ internal sealed class ContentEditingService
         }
 
         // If property does not support merging, we still need to overwrite if we are not allowed to edit invariant properties.
-        if (_contentSettings.AllowEditInvariantFromNonDefault is false && allowedToEditDefaultLanguage)
+        if (_contentSettings.AllowEditInvariantFromNonDefault is false && allowedToEditDefaultLanguage is false)
         {
             foreach (IProperty property in invariantProperties)
             {
