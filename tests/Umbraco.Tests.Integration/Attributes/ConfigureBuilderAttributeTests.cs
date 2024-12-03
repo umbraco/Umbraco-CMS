@@ -35,7 +35,7 @@ public class ConfigureBuilderAttributeTests : UmbracoIntegrationTest
     [TestCase(1, "IdOne")]
     [TestCase(2, "IdTwo")]
     [TestCase(3, "IdThree")]
-    [ConfigureBuilderTestCaseAttribute(ActionName = nameof(ConfigureWithValue), IndexOfParamater = 1)]
+    [ConfigureBuilderTestCase(ActionName = nameof(ConfigureWithValue), IndexOfParameter = 1)]
     public void CaseAttributeOverwritesSetupForSpecificCase(int testValue, string telemetryId)
     {
         var settings = GetRequiredService<IOptions<GlobalSettings>>().Value;
