@@ -351,35 +351,35 @@ stages:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
-              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
+              testFilter: '(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
             WindowsPart2Of3:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
-              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
+              testFilter: '(FullyQualifiedName~Umbraco.Infrastructure.Service)'
             WindowsPart3Of3:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
+              testFilter: '(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
             LinuxPart1Of3:
               vmImage: "ubuntu-latest"
               SA_PASSWORD: UmbracoIntegration123!
               Tests__Database__DatabaseType: SqlServer
               Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
-              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
+              testFilter: '(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
             LinuxPart2Of3:
                 vmImage: "ubuntu-latest"
                 SA_PASSWORD: UmbracoIntegration123!
                 Tests__Database__DatabaseType: SqlServer
                 Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
-                testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
+                testFilter: '(FullyQualifiedName~Umbraco.Infrastructure.Service)'
             LinuxPart3Of3:
                 vmImage: "ubuntu-latest"
                 SA_PASSWORD: UmbracoIntegration123!
                 Tests__Database__DatabaseType: SqlServer
                 Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
-                testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
+                testFilter: '(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
         pool:
           vmImage: $(vmImage)
         steps:
