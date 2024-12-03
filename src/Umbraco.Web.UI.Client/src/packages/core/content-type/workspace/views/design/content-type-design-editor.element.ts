@@ -187,21 +187,20 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			});
 		}
 
-		routes.push({
-			path: 'root',
-			component: () => import('./content-type-design-editor-tab.element.js'),
-			setup: (component) => {
-				(component as UmbContentTypeDesignEditorTabElement).containerId = null;
-			},
-		});
-
-		if (this._hasRootGroups) {
+		if (this._hasRootGroups || this._tabs.length === 0) {
+			routes.push({
+				path: 'root',
+				component: () => import('./content-type-design-editor-tab.element.js'),
+				setup: (component) => {
+					(component as UmbContentTypeDesignEditorTabElement).containerId = null;
+				},
+			});
 			routes.push({
 				path: '',
 				redirectTo: 'root',
 				guards: [() => this._activeTabId === undefined],
 			});
-		} else if (routes.length !== 0) {
+		} else {
 			routes.push({
 				path: '',
 				redirectTo: routes[0]?.path,
