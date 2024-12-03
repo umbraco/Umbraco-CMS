@@ -70,11 +70,14 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		if (!this._unique) return;
 
 		this._loading = true;
+		this._lookup = {};
 
 		const { data } = await this.#documentUrlRepository.requestItems([this._unique]);
 
 		if (data?.length) {
-			data[0].urls.forEach((item) => {
+			const item = data[0];
+
+			item.urls.forEach((item) => {
 				if (item.culture && item.url) {
 					if (this._lookup[item.culture] == null) {
 						this._lookup[item.culture] = [];
