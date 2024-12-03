@@ -11,7 +11,8 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
-internal sealed class ContentEditingService : ContentEditingServiceWithSortingBase<IContent, IContentType, IContentService, IContentTypeService>, IContentEditingService
+internal sealed class ContentEditingService
+    : ContentEditingServiceWithSortingBase<IContent, IContentType, IContentService, IContentTypeService>, IContentEditingService
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly ITemplateService _templateService;
@@ -70,8 +71,7 @@ internal sealed class ContentEditingService : ContentEditingServiceWithSortingBa
             : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
     }
 
-    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(
-        ContentCreateModel createModel)
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ContentCreateModel createModel)
         => await ValidateCulturesAndPropertiesAsync(createModel, createModel.ContentTypeKey, createModel.Variants.Select(variant => variant.Culture));
 
     public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey)
@@ -214,8 +214,7 @@ internal sealed class ContentEditingService : ContentEditingServiceWithSortingBa
             return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentUpdateResult { Content = content });
         }
 
-        Attempt<ContentUpdateResult, ContentEditingOperationStatus> result =
-            await MapUpdate<ContentUpdateResult>(content, updateModel);
+        Attempt<ContentUpdateResult, ContentEditingOperationStatus> result = await MapUpdate<ContentUpdateResult>(content, updateModel);
         if (result.Success == false)
         {
             return Attempt.FailWithStatus(result.Status, result.Result);
@@ -228,8 +227,7 @@ internal sealed class ContentEditingService : ContentEditingServiceWithSortingBa
 
         content = await EnsureOnlyAllowedFieldsAreUpdated(content, userKey);
 
-        ContentEditingOperationStatus updateTemplateStatus =
-            await UpdateTemplateAsync(content, updateModel.TemplateKey);
+        ContentEditingOperationStatus updateTemplateStatus = await UpdateTemplateAsync(content, updateModel.TemplateKey);
         if (updateTemplateStatus != ContentEditingOperationStatus.Success)
         {
             return Attempt.FailWithStatus(updateTemplateStatus, new ContentUpdateResult { Content = content });
@@ -250,24 +248,20 @@ internal sealed class ContentEditingService : ContentEditingServiceWithSortingBa
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteAsync(Guid key, Guid userKey)
         => await HandleDeleteAsync(key, userKey, false);
 
-    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey,
-        Guid userKey)
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleMoveAsync(key, parentKey, userKey);
 
-    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey,
-        Guid userKey)
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleMoveAsync(key, parentKey, userKey, true);
 
-    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey,
-        bool relateToOriginal, bool includeDescendants, Guid userKey)
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
         => await HandleCopyAsync(key, parentKey, relateToOriginal, includeDescendants, userKey);
 
     public async Task<ContentEditingOperationStatus> SortAsync(Guid? parentKey, IEnumerable<SortingModel> sortingModels,
         Guid userKey)
         => await HandleSortAsync(parentKey, sortingModels, userKey);
 
-    private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>>
-        ValidateCulturesAndPropertiesAsync(
+    private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCulturesAndPropertiesAsync(
             ContentEditingModelBase contentEditingModelBase,
             Guid contentTypeKey,
             IEnumerable<string?>? culturesToValidate = null)
@@ -306,8 +300,7 @@ internal sealed class ContentEditingService : ContentEditingServiceWithSortingBa
     protected override OperationResult? Move(IContent content, int newParentId, int userId)
         => ContentService.Move(content, newParentId, userId);
 
-    protected override IContent? Copy(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants,
-        int userId)
+    protected override IContent? Copy(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
         => ContentService.Copy(content, newParentId, relateToOriginal, includeDescendants, userId);
 
     protected override OperationResult? MoveToRecycleBin(IContent content, int userId)
