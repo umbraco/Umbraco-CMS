@@ -37,7 +37,7 @@ public class DecimalValueConverter : PropertyValueConverterBase
             return Convert.ToDecimal(sourceDouble);
         }
 
-        // is it a integer?
+        // is it an integer?
         if (source is int sourceInteger)
         {
             return Convert.ToDecimal(sourceInteger);
