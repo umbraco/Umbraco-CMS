@@ -83,7 +83,6 @@ stages:
       SERILOG__WRITETO__0__NAME: Async
       SERILOG__WRITETO__0__ARGS__CONFIGURE__0__NAME: Console
       # Set unattended install settings
-      UMBRACO__CMS__UNATTENDED__INSTALLUNATTENDED: true
       UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERNAME: Playwright Test
       UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD: UmbracoAcceptance123!
       UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL: playwright@umbraco.com
@@ -111,22 +110,28 @@ stages:
           matrix:
             LinuxPart1Of3:
               vmImage: "ubuntu-latest"
-              testCommand: "npx playwright test DefaultConfig --shard=1/3"
+              testFolder: "DefaultConfig"
+              testCommand: "npx playwright test $testFolder --shard=1/3"
             LinuxPart2Of3:
               vmImage: "ubuntu-latest"
-              testCommand: "npx playwright test DefaultConfig --shard=2/3"
+              testFolder: "DefaultConfig"
+              testCommand: "npx playwright test $testFolder --shard=2/3"
             LinuxPart3Of3:
               vmImage: "ubuntu-latest"
-              testCommand: "npx playwright test DefaultConfig --shard=3/3"
+              testFolder: "DefaultConfig"
+              testCommand: "npx playwright test $testFolder --shard=3/3"
             WindowsPart1Of3:
               vmImage: "windows-latest"
-              testCommand: "npx playwright test DefaultConfig --shard=1/3"
+              testFolder: "DefaultConfig"
+              testCommand: "npx playwright test $testFolder --shard=1/3"
             WindowsPart2Of3:
               vmImage: "windows-latest"
-              testCommand: "npx playwright test DefaultConfig --shard=2/3"
+              testFolder: "DefaultConfig"
+              testCommand: "npx playwright test $testFolder --shard=2/3"
             WindowsPart3Of3:
               vmImage: "windows-latest"
-              testCommand: "npx playwright test DefaultConfig --shard=3/3"
+              testFolder: "DefaultConfig"
+              testCommand: "npx playwright test $testFolder --shard=3/3"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -170,7 +175,7 @@ stages:
             workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
             displayName: Restore NPM packages
 
-          # Build application
+
           - pwsh: |
               $cmsVersion = "$(Build.BuildNumber)" -replace "\+",".g"
               dotnet new nugetconfig
@@ -178,7 +183,17 @@ stages:
               dotnet new install Umbraco.Templates::$cmsVersion
               dotnet new umbraco --name UmbracoProject --version $cmsVersion --exclude-gitignore --no-restore --no-update-check
               dotnet restore UmbracoProject
-              cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/*.cs UmbracoProject
+            displayName: Install Template
+            workingDirectory: $(Agent.BuildDirectory)/app
+
+          - pwsh: |
+              cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.cs UmbracoProject
+              cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.json UmbracoProject
+            displayName: Update application
+            workingDirectory: $(Agent.BuildDirectory)/app
+
+          # Build application
+          - pwsh: |
               dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore
               dotnet dev-certs https
             displayName: Build application
