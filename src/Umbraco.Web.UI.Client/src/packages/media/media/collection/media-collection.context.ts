@@ -1,6 +1,6 @@
 import { UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE } from '../entity.js';
 import type { UmbFileDropzoneItemStatus } from '../dropzone/types.js';
-import { UMB_MEDIA_GRID_COLLECTION_VIEW_ALIAS } from './views/index.js';
+import { UMB_MEDIA_GRID_COLLECTION_VIEW_ALIAS } from './views/constants.js';
 import type { UmbMediaCollectionFilterModel, UmbMediaCollectionItemModel } from './types.js';
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -50,7 +50,7 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 
 	/**
 	 * Requests the collection from the repository.
-	 * @returns {*}
+	 * @returns {Promise<void>}
 	 * @memberof UmbCollectionContext
 	 */
 	public override async requestCollection() {

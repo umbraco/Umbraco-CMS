@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_TYPE_COMPOSITION_REPOSITORY_ALIAS } from '../../repository/composition/index.js';
+import { UMB_DOCUMENT_TYPE_COMPOSITION_REPOSITORY_ALIAS } from '../../constants.js';
 import { UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS, UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 

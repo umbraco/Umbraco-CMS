@@ -1,5 +1,4 @@
-export const UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.DocumentType.Item';
-export const UMB_DOCUMENT_TYPE_ITEM_STORE_ALIAS = 'Umb.Store.DocumentType.Item';
+import { UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS, UMB_DOCUMENT_TYPE_ITEM_STORE_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

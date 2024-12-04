@@ -1,4 +1,4 @@
-import { UMB_SETTINGS_SECTION_ALIAS } from '../section/index.js';
+import { UMB_SETTINGS_SECTION_ALIAS } from '../constants.js';
 import { UMB_STRUCTURE_SETTINGS_MENU_ALIAS } from './constants.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 

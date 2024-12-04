@@ -187,7 +187,7 @@ export abstract class UmbBlockManagerContext<
 		return this.#settings.asObservablePart((source) => source.find((x) => x.key === key));
 	}
 	currentExposeOf(contentKey: string) {
-		const variantId = this.#variantId.getValue();
+		const variantId = this.getVariantId();
 		if (!variantId) return;
 		return mergeObservables(
 			[this.#exposes.asObservablePart((source) => source.filter((x) => x.contentKey === contentKey)), this.variantId],
@@ -234,7 +234,7 @@ export abstract class UmbBlockManagerContext<
 		this.#exposes.filter((x) => x.contentKey !== contentKey);
 	}
 	removeCurrentExpose(contentKey: string) {
-		const variantId = this.#variantId.getValue();
+		const variantId = this.getVariantId();
 		if (!variantId) return;
 		this.#exposes.filter((x) => !(x.contentKey === contentKey && variantId.compare(x)));
 	}
@@ -340,6 +340,23 @@ export abstract class UmbBlockManagerContext<
 		if (settings && layoutEntry.settingsKey) {
 			this.#settings.appendOne(settings);
 		}
+
+		// Expose inserted block:
+		this.contentTypesLoaded.then(() => {
+			const contentStructure = this.getStructure(content.contentTypeKey);
+			if (!contentStructure) {
+				throw new Error(`Cannot expose block, missing content structure for ${content.contentTypeKey}`);
+			}
+			const variantId = this.getVariantId();
+			if (!variantId) {
+				throw new Error(`Cannot expose block, missing variantId`);
+			}
+			const blockVariantId = variantId.toVariant(
+				contentStructure.getVariesByCulture(),
+				contentStructure.getVariesBySegment(),
+			);
+			this.setOneExpose(content.key, blockVariantId);
+		});
 	}
 
 	protected removeBlockKey(contentKey: string) {

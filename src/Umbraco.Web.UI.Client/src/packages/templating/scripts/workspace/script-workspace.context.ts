@@ -1,6 +1,7 @@
 import type { UmbScriptDetailModel } from '../types.js';
 import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
-import { UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS, type UmbScriptDetailRepository } from '../repository/index.js';
+import type { UmbScriptDetailRepository } from '../repository/index.js';
+import { UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS } from '../constants.js';
 import { UMB_SCRIPT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbScriptWorkspaceEditorElement } from './script-workspace-editor.element.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
