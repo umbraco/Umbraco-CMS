@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Api.Delivery.Services;
 
+// NOTE: this is public and unsealed to allow overriding the default claims with minimal effort.
 public class CurrentMemberClaimsProvider : ICurrentMemberClaimsProvider
 {
     private readonly IMemberManager _memberManager;
