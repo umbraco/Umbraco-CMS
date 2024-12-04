@@ -8,5 +8,6 @@ public enum TemplateOperationStatus
     DuplicateAlias,
     TemplateNotFound,
     MasterTemplateNotFound,
-    CircularMasterTemplateReference
+    CircularMasterTemplateReference,
+    MasterTemplateCannotBeDeleted,
 }

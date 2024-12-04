@@ -85,8 +85,7 @@ test('can open content picker in the content', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.addContentPicker(contentPickerName);
 
   // Assert
-  await umbracoUi.content.isOpenButtonVisibleInContentPicker(contentPickerName);
-  await umbracoUi.content.clickContentPickerOpenButton(contentPickerName);
+  await umbracoUi.content.clickReferenceNodeLinkWithName(contentPickerName);
   await umbracoUi.content.isNodeOpenForContentPicker(contentPickerName);
 
   // Clean

@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from '@playwright/test';
 
 const stylesheetName = 'TestStyleSheetFile.css';
@@ -27,7 +27,7 @@ test('can create a empty stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbra
   await umbracoUi.stylesheet.clickSaveButton();
 
   // Assert
-  await umbracoUi.stylesheet.isSuccessNotificationVisible();
+  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeTruthy();
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetName);
 });
@@ -46,7 +46,7 @@ test('can create a stylesheet with content', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.stylesheet.clickSaveButton();
 
   // Assert
-  await umbracoUi.stylesheet.isSuccessNotificationVisible();
+  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeTruthy();
   const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
   expect(stylesheetData.content).toEqual(stylesheetContent);
@@ -67,7 +67,7 @@ test.skip('can create a new Rich Text Editor stylesheet file', {tag: '@smoke'}, 
   await umbracoUi.stylesheet.clickSaveButton();
 
   // Assert
-  await umbracoUi.stylesheet.isSuccessNotificationVisible();
+  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.stylesheet.doesExist(stylesheetName)).toBeTruthy();
   const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
   expect(stylesheetData.content).toEqual(stylesheetContent);
@@ -87,7 +87,7 @@ test.skip('can update a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbrac
   await umbracoUi.stylesheet.clickSaveButton();
 
   // Assert
-  await umbracoUi.stylesheet.isSuccessNotificationVisible();
+  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
   expect(stylesheetData.content).toEqual(stylesheetContent);
 });
@@ -103,7 +103,7 @@ test('can delete a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
   await umbracoUi.stylesheet.clickDeleteAndConfirmButton();
 
   // Assert
-  await umbracoUi.stylesheet.isSuccessNotificationVisible();
+  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
   expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeFalsy();
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetName, false, false);
 });
@@ -121,7 +121,7 @@ test('can rename a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
   await umbracoUi.stylesheet.rename(stylesheetName);
 
   // Assert
-  await umbracoUi.stylesheet.isSuccessNotificationVisible();
+  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.renamed);
   expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeTruthy();
   expect(await umbracoApi.stylesheet.doesNameExist(wrongStylesheetName)).toBeFalsy();
 });
@@ -143,7 +143,7 @@ test('can edit rich text editor styles', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.stylesheet.clickSaveButton();
 
   // Assert
-  await umbracoUi.stylesheet.isSuccessNotificationVisible();
+  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
   expect(stylesheetData.content).toEqual(newStylesheetContent);
 });
@@ -161,7 +161,7 @@ test('can remove rich text editor styles', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.stylesheet.clickSaveButton();
 
   // Assert
-  await umbracoUi.stylesheet.isSuccessNotificationVisible();
+  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
   expect(stylesheetData.content).toEqual('');
 });
