@@ -1,4 +1,4 @@
-import { UMB_CONTENT_WORKSPACE_CONTEXT } from '../../../../content-workspace.context-token.js';
+import { UMB_CONTENT_WORKSPACE_CONTEXT } from '../../constants.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	UmbConditionConfigBase,

@@ -15,7 +15,6 @@ import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import '../../components/block-grid-entries/index.js';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
@@ -23,6 +22,8 @@ import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type { UmbBlockGridTypeModel, UmbBlockGridValueModel } from '@umbraco-cms/backoffice/block-grid';
 import { UmbBlockElementDataValidationPathTranslator } from '@umbraco-cms/backoffice/block';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
+
+import '../../components/block-grid-entries/index.js';
 
 /**
  * @element umb-property-editor-ui-block-grid
