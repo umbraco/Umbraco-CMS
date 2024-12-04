@@ -1,4 +1,4 @@
-import { UMB_MEDIA_TREE_REPOSITORY_ALIAS } from '../tree/index.js';
+import { UMB_MEDIA_TREE_REPOSITORY_ALIAS } from '../constants.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbMenuVariantTreeStructureWorkspaceContextBase } from '@umbraco-cms/backoffice/menu';
 
