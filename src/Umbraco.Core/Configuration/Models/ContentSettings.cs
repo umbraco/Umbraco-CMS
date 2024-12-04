@@ -19,9 +19,9 @@ public class ContentSettings
 
     internal const string StaticDisallowedUploadFiles = "ashx,aspx,ascx,config,cshtml,vbhtml,asmx,air,axd,xamlx";
     internal const bool StaticShowDeprecatedPropertyEditors = false;
-    internal const string StaticLoginBackgroundImage = "login/login.jpg";
-    internal const string StaticLoginLogoImage = "login/logo_light.svg";
-    internal const string StaticLoginLogoImageAlternative = "login/logo_dark.svg";
+    internal const string StaticLoginBackgroundImage = "assets/login.jpg";
+    internal const string StaticLoginLogoImage = "assets/logo_light.svg";
+    internal const string StaticLoginLogoImageAlternative = "assets/logo_dark.svg";
     internal const bool StaticHideBackOfficeLogo = false;
     internal const bool StaticDisableDeleteWhenReferenced = false;
     internal const bool StaticDisableUnpublishWhenReferenced = false;
