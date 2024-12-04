@@ -1,4 +1,5 @@
 @using Microsoft.Extensions.Options
+@using Umbraco.Cms.Api.Management.Controllers.Security
 @using Umbraco.Cms.Core.Configuration.Models
 @using Umbraco.Cms.Core.Hosting
 @using Umbraco.Cms.Core.Routing
@@ -6,8 +7,10 @@
 @model Umbraco.Cms.Web.Website.Models.NoNodesViewModel
 @inject IHostingEnvironment hostingEnvironment
 @inject IOptions<GlobalSettings> globalSettings
+@inject IOptions<ContentSettings> contentSettings
 @{
     var backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
+    var logoImage = Url.RouteUrl(BackOfficeGraphicsController.LogoRouteName, new {Version= "1"});
 }
 <!doctype html>
 <html class="no-js" lang="en">
@@ -25,9 +28,12 @@
     <section>
         <article>
             <div>
-                <div class="logo" aria-hidden="true">
-                    <img alt="" src="/umbraco/management/api/v1/security/back-office/graphics/logo" height="91" />
-                </div>
+                @if (contentSettings.Value.HideBackOfficeLogo == false)
+                {
+                    <div class="logo" aria-hidden="true">
+                        <img alt="" src="@logoImage" height="91"/>
+                    </div>
+                }
 
                 <h1>Welcome to your Umbraco installation</h1>
                 <h3>You're seeing this wonderful page because your website doesn't contain any published content yet.</h3>
