@@ -80,6 +80,7 @@ test('can delete a template', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  await umbracoUi.template.reloadTemplateTree();
   expect(await umbracoApi.template.doesNameExist(templateName)).toBeFalsy();
   await umbracoUi.template.isTemplateRootTreeItemVisible(templateName, false);
 });
