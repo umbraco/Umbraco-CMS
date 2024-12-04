@@ -32,7 +32,7 @@ import { handlers as templateHandlers } from './handlers/template/index.js';
 import { handlers as upgradeHandlers } from './handlers/upgrade.handlers.js';
 import { handlers as userGroupsHandlers } from './handlers/user-group/index.js';
 import { handlers as userHandlers } from './handlers/user/index.js';
-//import * as manifestsHandlers from './handlers/manifests.handlers.js';
+import * as manifestsHandlers from './handlers/manifests.handlers.js';
 import * as serverHandlers from './handlers/server.handlers.js';
 import { handlers as documentBlueprintHandlers } from './handlers/document-blueprint/index.js';
 import { handlers as temporaryFileHandlers } from './handlers/temporary-file/index.js';
@@ -76,6 +76,7 @@ const handlers = [
 	...temporaryFileHandlers,
 	...serverHandlers.serverInformationHandlers,
 	serverHandlers.serverRunningHandler,
+	...manifestsHandlers.manifestEmptyHandlers,
 ];
 
 /* TODO: find solution to run with different handlers across vite mocks and web-test-runner mocks
