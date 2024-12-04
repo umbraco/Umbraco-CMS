@@ -13,6 +13,7 @@ internal static class PreviewBuilderExtensions
         builder.Services.AddSignalR();
         builder.Services.AddSingleton<PreviewRoutes>();
         builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, PreviewHubUpdater>();
+        builder.AddNotificationHandler<ContentSavedNotification, ServerEventSender>();
 
         return builder;
     }
