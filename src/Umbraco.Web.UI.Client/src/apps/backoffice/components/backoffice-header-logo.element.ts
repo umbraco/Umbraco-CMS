@@ -51,7 +51,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 	override render() {
 		return html`
 			<uui-button id="logo" look="primary" label="Umbraco" compact popovertarget="logo-popover">
-				<img src="/umbraco/backoffice/assets/umbraco_logomark_white.svg" alt="Umbraco" />
+				<img src="/umbraco/management/api/v1/security/back-office/graphics/logo" alt="" />
 			</uui-button>
 			<uui-popover-container id="logo-popover" placement="bottom-start">
 				<umb-popover-layout>

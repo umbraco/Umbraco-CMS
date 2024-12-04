@@ -22,6 +22,7 @@ public class ContentSettings
     internal const string StaticLoginBackgroundImage = "assets/login.jpg";
     internal const string StaticLoginLogoImage = "assets/logo_light.svg";
     internal const string StaticLoginLogoImageAlternative = "assets/logo_dark.svg";
+    internal const string StaticBackOfficeLogo = "assets/logo.svg";
     internal const bool StaticHideBackOfficeLogo = false;
     internal const bool StaticDisableDeleteWhenReferenced = false;
     internal const bool StaticDisableUnpublishWhenReferenced = false;
@@ -82,6 +83,12 @@ public class ContentSettings
     /// <remarks>This is the alternative version to the regular logo found at <see cref="LoginLogoImage"/>.</remarks>
     [DefaultValue(StaticLoginLogoImageAlternative)]
     public string LoginLogoImageAlternative { get; set; } = StaticLoginLogoImageAlternative;
+
+    /// <summary>
+    ///     Gets or sets a value for the path to the backoffice logo.
+    /// </summary>
+    [DefaultValue(StaticBackOfficeLogo)]
+    public string BackOfficeLogo { get; set; } = StaticBackOfficeLogo;
 
     /// <summary>
     ///     Gets or sets a value indicating whether to hide the backoffice umbraco logo or not.

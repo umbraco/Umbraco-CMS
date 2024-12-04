@@ -6,10 +6,11 @@ The files in this directory are static assets that are used by the Umbraco backo
 
 The assets are structured in the following way:
 
-| Name | Description | Usage |
-| ---- | ----------- | ----- |
-| `login.jpg` | The background image for the login screen. | /umbraco/management/api/v1/security/back-office/graphics/background |
-| `logo_dark.svg` | The Umbraco logo in dark mode for the login screen. | /umbraco/management/api/v1/security/back-office/graphics/logo-alternative |
-| `logo_light.svg` | The Umbraco logo in light mode for the login screen. | /umbraco/management/api/v1/security/back-office/graphics/logo |
+| Name | Description                                                        | Usage                                                                           |
+| ---- |--------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| `login.jpg` | The background image for the login screen.                         | /umbraco/management/api/v1/security/back-office/graphics/login-background       |
+| `logo.svg` | The Umbraco logo for the Backoffice and other public facing sites. | /umbraco/management/api/v1/security/back-office/graphics/logo                   |
+| `logo_dark.svg` | The Umbraco logo in dark mode for the login screen.                | /umbraco/management/api/v1/security/back-office/graphics/login-logo-alternative |
+| `logo_light.svg` | The Umbraco logo in light mode for the login screen.               | /umbraco/management/api/v1/security/back-office/graphics/login-logo             |
 
-All assets are linked up through the BackOfficeController which uses the constants defined in [ContentSettings](../../../../Umbraco.Core/Configuration/Models/ContentSettings.cs).
+All assets are linked up through the BackOfficeGraphicsController which uses the constants defined in [ContentSettings](../../../../Umbraco.Core/Configuration/Models/ContentSettings.cs).

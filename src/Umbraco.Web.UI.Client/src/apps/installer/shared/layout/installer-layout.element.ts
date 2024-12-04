@@ -5,10 +5,8 @@ import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/ex
 export class UmbInstallerLayoutElement extends LitElement {
 	override render() {
 		return html`
-			<!-- <div id="background" aria-hidden="true"></div> -->
-
 			<div id="logo" aria-hidden="true">
-				<img src="/umbraco/backoffice/assets/umbraco_logomark_white.svg" alt="Umbraco" />
+				<img src="/umbraco/management/api/v1/security/back-office/graphics/logo" alt="" />
 			</div>
 
 			<main id="container">
@@ -32,7 +30,6 @@ export class UmbInstallerLayoutElement extends LitElement {
 				position: relative;
 				height: 100%;
 
-				background-color: var(--uui-color-default);
 				background-color: hsla(240, 68%, 11%, 1);
 				background-image: radial-gradient(at 99% 2%, hsla(212, 40%, 12%, 1) 0px, transparent 50%),
 					radial-gradient(at 98% 95%, hsla(255, 40%, 12%, 1) 0px, transparent 50%),
