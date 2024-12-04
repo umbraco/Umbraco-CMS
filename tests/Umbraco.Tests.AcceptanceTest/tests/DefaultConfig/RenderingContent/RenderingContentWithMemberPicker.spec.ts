@@ -25,6 +25,7 @@ test.afterEach(async ({umbracoApi}) => {
 test('can render content with member picker value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   // Create member
+  await umbracoApi.memberType.ensureNameNotExists(memberTypeName);
   const memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
   const memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, email, username, password);
   const templateId = await umbracoApi.template.createTemplateWithDisplayingMemberPickerValue(templateName, AliasHelper.toAlias(propertyName));
