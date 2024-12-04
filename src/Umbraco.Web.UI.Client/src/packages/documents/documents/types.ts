@@ -10,11 +10,14 @@ import type { UmbContentDetailModel, UmbElementValueModel } from '@umbraco-cms/b
 export { UmbDocumentVariantState };
 
 export type * from './audit-log/types.js';
+export type * from './recycle-bin/types.js';
 export type * from './collection/types.js';
 export type * from './modals/types.js';
 export type * from './repository/types.js';
 export type * from './tree/types.js';
 export type * from './user-permissions/types.js';
+export type * from './entity.js';
+export type * from './workspace/types.js';
 
 export interface UmbDocumentDetailModel extends UmbContentDetailModel {
 	documentType: {

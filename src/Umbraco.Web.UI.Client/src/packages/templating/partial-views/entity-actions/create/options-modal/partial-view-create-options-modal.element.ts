@@ -1,5 +1,5 @@
-import { UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS } from '../../../tree/folder/index.js';
-import { UMB_PARTIAL_VIEW_FROM_SNIPPET_MODAL } from '../snippet-modal/create-from-snippet-modal.token.js';
+import { UMB_PARTIAL_VIEW_FROM_SNIPPET_MODAL } from '../snippet-modal/index.js';
+import { UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS } from '../../../constants.js';
 import type { UmbPartialViewCreateOptionsModalData } from './index.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_MODAL_MANAGER_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';

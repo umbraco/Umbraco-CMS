@@ -1,5 +1,5 @@
-import type { UmbMediaTypeItemModel } from '../../repository/index.js';
-import { UMB_MEDIA_TYPE_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
+import type { UmbMediaTypeItemModel } from '../../types.js';
+import { UMB_MEDIA_TYPE_ITEM_REPOSITORY_ALIAS } from '../../constants.js';
 import type {
 	UmbMediaTypePickerModalData,
 	UmbMediaTypePickerModalValue,

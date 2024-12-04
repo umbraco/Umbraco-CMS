@@ -1,7 +1,5 @@
-import { UMB_MEMBER_TYPE_COMPOSITION_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_MEMBER_TYPE_COMPOSITION_REPOSITORY_ALIAS, UMB_MEMBER_TYPE_WORKSPACE_ALIAS } from '../constants.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS, UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-
-export const UMB_MEMBER_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.MemberType';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

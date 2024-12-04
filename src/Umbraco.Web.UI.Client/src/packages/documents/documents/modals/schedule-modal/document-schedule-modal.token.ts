@@ -1,5 +1,5 @@
 import type { UmbDocumentVariantPickerData } from '../types.js';
-import { UMB_DOCUMENT_SCHEDULE_MODAL_ALIAS } from '../manifests.js';
+import { UMB_DOCUMENT_SCHEDULE_MODAL_ALIAS } from './manifest.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import type { ScheduleRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 

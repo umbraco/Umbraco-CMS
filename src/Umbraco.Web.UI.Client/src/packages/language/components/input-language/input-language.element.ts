@@ -1,4 +1,4 @@
-import type { UmbLanguageItemModel } from '../../repository/index.js';
+import type { UmbLanguageItemModel } from '../../types.js';
 import { UmbLanguagePickerInputContext } from './input-language.context.js';
 import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';

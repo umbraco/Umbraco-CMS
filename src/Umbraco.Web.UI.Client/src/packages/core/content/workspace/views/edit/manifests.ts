@@ -1,4 +1,3 @@
-import { manifests as conditionsManifests } from './conditions/manifests.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 const contentEditorManifest: UmbExtensionManifestKind = {
@@ -19,4 +18,4 @@ const contentEditorManifest: UmbExtensionManifestKind = {
 	},
 };
 
-export const manifests = [contentEditorManifest, ...conditionsManifests];
+export const manifests = [contentEditorManifest];

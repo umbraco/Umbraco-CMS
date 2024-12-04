@@ -65,6 +65,14 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		await Promise.all([await this.#loadExtensions(), await this.#loadEditor()]);
 	}
 
+	/**
+	 * Checks if the editor is empty.
+	 * @returns {boolean}
+	 */
+	public isEmpty(): boolean {
+		return this._editor.isEmpty;
+	}
+
 	async #loadExtensions() {
 		await new Promise<void>((resolve) => {
 			this.observe(umbExtensionsRegistry.byType('tiptapExtension'), async (manifests) => {

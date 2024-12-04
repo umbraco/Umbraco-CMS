@@ -2,7 +2,7 @@ import type { UmbDictionaryDetailModel } from '../types.js';
 import { UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS, type UmbDictionaryDetailRepository } from '../repository/index.js';
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
 import { UmbDictionaryWorkspaceEditorElement } from './dictionary-workspace-editor.element.js';
-import { UMB_DICTIONARY_WORKSPACE_ALIAS } from './manifests.js';
+import { UMB_DICTIONARY_WORKSPACE_ALIAS } from './constants.js';
 import {
 	type UmbSubmittableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,

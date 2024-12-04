@@ -1,6 +1,8 @@
-import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_USER_PERMISSION_DOCUMENT_ROLLBACK } from '../../user-permissions/index.js';
-import { UMB_DOCUMENT_WORKSPACE_ALIAS } from '../../workspace/index.js';
+import {
+	UMB_USER_PERMISSION_DOCUMENT_ROLLBACK,
+	UMB_DOCUMENT_ENTITY_TYPE,
+	UMB_DOCUMENT_WORKSPACE_ALIAS,
+} from '../../constants.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 
