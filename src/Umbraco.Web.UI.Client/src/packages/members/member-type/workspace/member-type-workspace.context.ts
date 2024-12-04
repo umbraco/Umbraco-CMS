@@ -1,7 +1,7 @@
 import type { UmbMemberTypeDetailModel } from '../types.js';
 import { UMB_MEMBER_TYPE_DETAIL_REPOSITORY_ALIAS, UMB_MEMBER_TYPE_ENTITY_TYPE } from '../index.js';
 import { UmbMemberTypeWorkspaceEditorElement } from './member-type-workspace-editor.element.js';
-import { UMB_MEMBER_TYPE_WORKSPACE_ALIAS } from './manifests.js';
+import { UMB_MEMBER_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import {
 	type UmbRoutableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,

@@ -1,4 +1,4 @@
-import { UMB_USER_GROUP_ENTITY_TYPE } from '../../index.js';
+import { UMB_USER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import type { UmbUserGroupWorkspaceContext } from './user-group-workspace.context.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
