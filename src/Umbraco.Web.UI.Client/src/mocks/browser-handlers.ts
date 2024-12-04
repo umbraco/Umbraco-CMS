@@ -1,3 +1,4 @@
+import { handlers as backofficeHandlers } from './handlers/backoffice.handlers.js';
 import { handlers as configHandlers } from './handlers/config.handlers.js';
 import { handlers as cultureHandlers } from './handlers/culture.handlers.js';
 import { handlers as dataTypeHandlers } from './handlers/data-type/index.js';
@@ -38,6 +39,7 @@ import { handlers as documentBlueprintHandlers } from './handlers/document-bluep
 import { handlers as temporaryFileHandlers } from './handlers/temporary-file/index.js';
 
 const handlers = [
+	...backofficeHandlers,
 	...configHandlers,
 	...cultureHandlers,
 	...dataTypeHandlers,
