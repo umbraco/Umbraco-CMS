@@ -12,9 +12,7 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import './tiptap-hover-menu.element.js';
 import './tiptap-toolbar.element.js';
 
-const elementName = 'umb-input-tiptap';
-
-@customElement(elementName)
+@customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
 	readonly #requiredExtensions = [
 		StarterKit,
@@ -58,7 +56,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	readonly = false;
 
 	@state()
-	private _editor!: Editor;
+	private _editor?: Editor;
 
 	@state()
 	_toolbar: UmbTiptapToolbarValue = [[[]]];
@@ -92,8 +90,12 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		if (!element) return;
 
 		const dimensions = this.configuration?.getValueByAlias<{ width?: number; height?: number }>('dimensions');
-		if (dimensions?.width) this.setAttribute('style', `max-width: ${dimensions.width}px;`);
-		if (dimensions?.height) element.setAttribute('style', `height: ${dimensions.height}px;`);
+		if (dimensions?.width) {
+			this.setAttribute('style', `max-width: ${dimensions.width}px;`);
+		}
+		if (dimensions?.height) {
+			element.setAttribute('style', `height: ${dimensions.height}px;`);
+		}
 
 		this._toolbar = this.configuration?.getValueByAlias<UmbTiptapToolbarValue>('toolbar') ?? [[[]]];
 
@@ -336,6 +338,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbInputTiptapElement;
+		'umb-input-tiptap': UmbInputTiptapElement;
 	}
 }
