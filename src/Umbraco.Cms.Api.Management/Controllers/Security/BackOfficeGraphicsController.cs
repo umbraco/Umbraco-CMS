@@ -32,20 +32,20 @@ public class BackOfficeGraphicsController : Controller
         _contentTypeProvider = staticFileOptions.Value.ContentTypeProvider ?? new FileExtensionContentTypeProvider();
     }
 
-    [HttpGet("background", Name = BackGroundRouteName)]
+    [HttpGet("login-background", Name = LoginBackGroundRouteName)]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
-    public IActionResult Background() => HandleFileRequest(_contentSettings.Value.LoginBackgroundImage);
+    public IActionResult LoginBackground() => HandleFileRequest(_contentSettings.Value.LoginBackgroundImage);
 
     [HttpGet("logo", Name = LogoRouteName)]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
-    public IActionResult Logo() => HandleFileRequest(_contentSettings.Value.LoginLogoImage);
+    public IActionResult LoginLogo() => HandleFileRequest(_contentSettings.Value.LoginLogoImage);
 
-    [HttpGet("logo-alternative", Name = LogoAlternativeRouteName)]
+    [HttpGet("login-logo-alternative", Name = LoginLogoAlternativeRouteName)]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
-    public IActionResult LogoAlternative() => HandleFileRequest(_contentSettings.Value.LoginLogoImageAlternative);
+    public IActionResult LoginLogoAlternative() => HandleFileRequest(_contentSettings.Value.LoginLogoImageAlternative);
 
     private IActionResult HandleFileRequest(string virtualPath)
     {

@@ -17,7 +17,7 @@
     bool.TryParse(Context.Request.Query["umbDebug"], out var isDebug);
     var backOfficePath = BackOfficePathGenerator.BackOfficePath;
     var backOfficeAssetsPath = BackOfficePathGenerator.BackOfficeAssetsPath;
-    var loginLogoImage = Url.RouteUrl(nameof(BackOfficeGraphicsController) + "." + nameof(BackOfficeGraphicsController.Logo), new {Version= "1"});
+    var loginLogoImage = Url.RouteUrl(nameof(BackOfficeGraphicsController) + "." + nameof(BackOfficeGraphicsController.LoginLogo), new {Version= "1"});
 }
 
 <!DOCTYPE html>
