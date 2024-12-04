@@ -56,7 +56,7 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		if (data?.length) {
 			data[0].urls.forEach((item) => {
 				if (item.culture && item.url) {
-					if(this._lookup[item.culture] == null){
+					if (this._lookup[item.culture] == null) {
 						this._lookup[item.culture] = [];
 					}
 					this._lookup[item.culture].push(item.url);
@@ -114,16 +114,16 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		const urls = this._lookup[culture];
 		return when(
 			urls && urls.length >= 1,
-			() => html`
-				${urls.map((url) =>
-					html`
-						<a class="link-item" href=${url} target="_blank">
+			() =>
+				html` ${urls.map(
+					(url) =>
+						html` <a class="link-item" href=${url} target="_blank">
 							<span>
 								<span class="culture">${varies ? culture : nothing}</span>
 								<span>${url}</span>
 							</span>
 							<uui-icon name="icon-out"></uui-icon>
-						</a>`
+						</a>`,
 				)}`,
 			() => html`
 				<div class="link-item">

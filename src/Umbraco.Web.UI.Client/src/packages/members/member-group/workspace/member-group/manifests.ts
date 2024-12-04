@@ -1,12 +1,11 @@
 import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../../entity.js';
+import { UMB_MEMBER_GROUP_WORKSPACE_ALIAS } from './constants.js';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbSubmitWorkspaceAction, UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
-
-export const UMB_MEMBER_GROUP_WORKSPACE_ALIAS = 'Umb.Workspace.MemberGroup';
 
 const workspace: ManifestWorkspaces = {
 	type: 'workspace',

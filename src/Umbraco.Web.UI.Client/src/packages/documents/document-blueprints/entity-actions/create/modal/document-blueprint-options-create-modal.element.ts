@@ -5,7 +5,7 @@ import {
 import type {
 	UmbDocumentBlueprintOptionsCreateModalData,
 	UmbDocumentBlueprintOptionsCreateModalValue,
-} from './index.js';
+} from './constants.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, css, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
