@@ -1,8 +1,8 @@
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace.context-token.js';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '../../../types.js';
 import { UmbContentTypePropertyStructureHelper } from '../../../structure/index.js';
-import { UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT } from './content-type-design-editor.context.js';
 import type { UmbContentTypeDesignEditorPropertyElement } from './content-type-design-editor-property.element.js';
+import { UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT } from './content-type-design-editor.context-token.js';
 import {
 	css,
 	customElement,

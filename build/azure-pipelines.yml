@@ -298,10 +298,31 @@ stages:
           matrix:
             #            Windows:
             #              vmImage: 'windows-latest'
-            Linux:
+            # We split the tests into 3 parts for each OS to reduce the time it takes to run them on the pipeline
+            LinuxPart1Of3:
               vmImage: "ubuntu-latest"
-            macOS:
+              # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
+              testFilter: '(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
+            LinuxPart2Of3:
+              vmImage: "ubuntu-latest"
+              # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
+              testFilter: '(FullyQualifiedName~Umbraco.Infrastructure.Service)'
+            LinuxPart3Of3:
+              vmImage: "ubuntu-latest"
+              # Filter tests that are not part of the Umbraco.Infrastructure namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
+              testFilter: '(FullyQualifiedName!~Umbraco.Infrastructure)'
+            macOSPart1Of3:
               vmImage: "macOS-latest"
+              # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
+              testFilter: '(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
+            macOSPart2Of3:
+              vmImage: "macOS-latest"
+              # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
+              testFilter: '(FullyQualifiedName~Umbraco.Infrastructure.Service)'
+            macOSPart3Of3:
+              vmImage: "macOS-latest"
+              # Filter tests that are not part of the Umbraco.Infrastructure namespace.
+              testFilter: '(FullyQualifiedName!~Umbraco.Infrastructure)'
         pool:
           vmImage: $(vmImage)
         variables:
@@ -332,14 +353,13 @@ stages:
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
               ${{ if and(eq(variables['Agent.OS'],'Windows_NT'), or(variables.releaseTestFilter, parameters.forceReleaseTestFilter)) }}:
-                arguments: "--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}"
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
               ${{ elseif eq(variables['Agent.OS'],'Windows_NT') }}:
-                arguments: "--configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}"
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}'
               ${{ elseif or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
-                arguments: "--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}"
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
               ${{ else }}:
-                arguments: "--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}"
-
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
       # Integration Tests (SQL Server)
       - job:
         timeoutInMinutes: 180
@@ -348,15 +368,46 @@ stages:
         displayName: Integration Tests (SQL Server)
         strategy:
           matrix:
-            Windows:
+            # We split the tests into 3 parts for each OS to reduce the time it takes to run them on the pipeline
+            WindowsPart1Of3:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
-            Linux:
+              # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
+              testFilter: '(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
+            WindowsPart2Of3:
+              vmImage: "windows-latest"
+              Tests__Database__DatabaseType: LocalDb
+              Tests__Database__SQLServerMasterConnectionString: N/A
+              # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
+              testFilter: '(FullyQualifiedName~Umbraco.Infrastructure.Service)'
+            WindowsPart3Of3:
+              vmImage: "windows-latest"
+              Tests__Database__DatabaseType: LocalDb
+              Tests__Database__SQLServerMasterConnectionString: N/A
+              # Filter tests that are not part of the Umbraco.Infrastructure namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
+              testFilter: '(FullyQualifiedName!~Umbraco.Infrastructure)'
+            LinuxPart1Of3:
               vmImage: "ubuntu-latest"
               SA_PASSWORD: UmbracoIntegration123!
               Tests__Database__DatabaseType: SqlServer
               Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+              # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
+              testFilter: '(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)'
+            LinuxPart2Of3:
+              vmImage: "ubuntu-latest"
+              SA_PASSWORD: UmbracoIntegration123!
+              Tests__Database__DatabaseType: SqlServer
+              Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+              # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
+              testFilter: '(FullyQualifiedName~Umbraco.Infrastructure.Service)'
+            LinuxPart3Of3:
+              vmImage: "ubuntu-latest"
+              SA_PASSWORD: UmbracoIntegration123!
+              Tests__Database__DatabaseType: SqlServer
+              Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+              # Filter tests that are not part of the Umbraco.Infrastructure namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
+              testFilter: '(FullyQualifiedName!~Umbraco.Infrastructure)'
         pool:
           vmImage: $(vmImage)
         steps:
@@ -389,13 +440,13 @@ stages:
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
               ${{ if and(eq(variables['Agent.OS'],'Windows_NT'), or(variables.releaseTestFilter, parameters.forceReleaseTestFilter)) }}:
-                arguments: "--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}"
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
               ${{ elseif eq(variables['Agent.OS'],'Windows_NT') }}:
-                arguments: "--configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}"
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}'
               ${{ elseif or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
-                arguments: "--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}"
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
               ${{ else }}:
-                arguments: "--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}"
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
 
           # Stop SQL Server
           - pwsh: docker stop mssql
@@ -440,10 +491,24 @@ stages:
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.Sqlite
         strategy:
           matrix:
-            Linux:
+            LinuxPart1Of3:
               vmImage: "ubuntu-latest"
-            Windows:
+              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\"--shard=1/3"
+            LinuxPart2Of3:
+              vmImage: "ubuntu-latest"
+              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --shard=2/3"
+            LinuxPart3Of3:
+              vmImage: "ubuntu-latest"
+              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --shard=3/3"
+            WindowsPart1Of3:
               vmImage: "windows-latest"
+              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --shard=1/3"
+            WindowsPart2Of3:
+              vmImage: "windows-latest"
+              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --shard=2/3"
+            WindowsPart3Of3:
+              vmImage: "windows-latest"
+              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --shard=3/3"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -527,7 +592,7 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
-          - pwsh: npm run smokeTestSqlite --ignore-certificate-errors
+          - pwsh: $(testCommand)
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
@@ -569,13 +634,31 @@ stages:
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
         strategy:
           matrix:
-            ${{ if eq(parameters.sqlServerLinuxAcceptanceTests, True) }} :
-              Linux:
+            ${{ if eq(parameters.sqlServerLinuxAcceptanceTests, True) }}:
+              LinuxPart1Of3:
+                testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\" --shard=1/3"
                 vmImage: "ubuntu-latest"
                 SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
                 CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
-            Windows:
+              LinuxPart2Of3:
+                testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\" --shard=2/3"
+                vmImage: "ubuntu-latest"
+                SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
+                CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+              LinuxPart3Of3:
+                testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\" --shard=3/3"
+                vmImage: "ubuntu-latest"
+                SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
+                CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+            WindowsPart1Of3:
               vmImage: "windows-latest"
+              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\" --shard=1/3"
+            WindowsPart2Of3:
+              vmImage: "windows-latest"
+              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\" --shard=2/3"
+            WindowsPart3Of3:
+              vmImage: "windows-latest"
+              testCommand: "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\" --shard=3/3"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -667,7 +750,7 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
-          - pwsh: npm run smokeTest --ignore-certificate-errors
+          - pwsh: $(testCommand)
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest

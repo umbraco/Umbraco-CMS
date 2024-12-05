@@ -1,4 +1,4 @@
-export const UMB_WEBHOOK_COLLECTION_REPOSITORY_ALIAS = 'Umb.Repository.WebhookCollection';
+import { UMB_WEBHOOK_COLLECTION_REPOSITORY_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
