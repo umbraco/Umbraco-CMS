@@ -5,8 +5,8 @@ import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/ex
 export class UmbInstallerLayoutElement extends LitElement {
 	override render() {
 		return html`
-			<div id="logo" aria-hidden="true">
-				<img src="/umbraco/management/api/v1/security/back-office/graphics/logo" alt="" />
+			<div id="logo">
+				<umb-app-logo></umb-app-logo>
 			</div>
 
 			<main id="container">
@@ -47,10 +47,6 @@ export class UmbInstallerLayoutElement extends LitElement {
 				left: var(--uui-size-space-5);
 				height: 30px;
 				z-index: 10;
-			}
-
-			#logo img {
-				height: 100%;
 			}
 
 			#container {
