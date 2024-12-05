@@ -38,8 +38,8 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 				);
 	}
 
-	constructor() {
-		super();
+	override connectedCallback(): void {
+		super.connectedCallback();
 
 		this.consumeContext(UMB_APP_CONTEXT, (context) => {
 			this._serverUrl = context.getServerUrl();
