@@ -7,7 +7,6 @@
 @model Umbraco.Cms.Web.Website.Models.NoNodesViewModel
 @inject IHostingEnvironment hostingEnvironment
 @inject IOptions<GlobalSettings> globalSettings
-@inject IOptions<ContentSettings> contentSettings
 @{
     var backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
     var logoImage = Url.RouteUrl(BackOfficeGraphicsController.LogoRouteName, new {Version= "1"});
@@ -28,12 +27,9 @@
     <section>
         <article>
             <div>
-                @if (contentSettings.Value.HideBackOfficeLogo == false)
-                {
-                    <div class="logo" aria-hidden="true">
-                        <img alt="" src="@logoImage" height="91"/>
-                    </div>
-                }
+                <div class="logo" aria-hidden="true">
+                    <img alt="logo" src="@logoImage" height="91"/>
+                </div>
 
                 <h1>Welcome to your Umbraco installation</h1>
                 <h3>You're seeing this wonderful page because your website doesn't contain any published content yet.</h3>
