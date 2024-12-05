@@ -67,10 +67,10 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 	/**
 	 * Checks if the editor is empty.
-	 * @returns {boolean}
+	 * @returns {boolean} returns true if the editor contains no markup
 	 */
 	public isEmpty(): boolean {
-		return this._editor.isEmpty;
+		return this._editor?.isEmpty ?? false;
 	}
 
 	async #loadExtensions() {
