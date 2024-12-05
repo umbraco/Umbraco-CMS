@@ -94,6 +94,7 @@ public class ContentSettings
     ///     Gets or sets a value indicating whether to hide the backoffice umbraco logo or not.
     /// </summary>
     [DefaultValue(StaticHideBackOfficeLogo)]
+    [Obsolete("This setting is no longer used and will be removed in future versions. An alternative BackOffice logo can be set using the BackOfficeLogo setting.")]
     public bool HideBackOfficeLogo { get; set; } = StaticHideBackOfficeLogo;
 
     /// <summary>
