@@ -113,7 +113,9 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<IShortStringHelper>(),
             factory.GetRequiredService<IConfigurationEditorJsonSerializer>(),
             factory.GetRequiredService<IMediaService>(),
-            factory.GetRequiredService<IMediaTypeService>());
+            factory.GetRequiredService<IMediaTypeService>(),
+            factory.GetRequiredService<ITemplateContentParserService>(),
+            factory.GetRequiredService<ITemplateService>());
 
     private static LocalizedTextServiceFileSources CreateLocalizedTextServiceFileSourcesFactory(
         IServiceProvider container)

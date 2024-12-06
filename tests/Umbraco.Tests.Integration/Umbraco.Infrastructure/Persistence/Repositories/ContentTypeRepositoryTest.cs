@@ -404,7 +404,7 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var repository = ContentTypeRepository;
 
             // Act
-            var contentTypes = repository.Get(provider.CreateQuery<IContentType>().Where(x => x.ParentId == contentType.Id)).ToArray();;
+            var contentTypes = repository.Get(provider.CreateQuery<IContentType>().Where(x => x.ParentId == contentType.Id)).ToArray();
 
             // Assert
             Assert.That(contentTypes.Count(), Is.EqualTo(3));

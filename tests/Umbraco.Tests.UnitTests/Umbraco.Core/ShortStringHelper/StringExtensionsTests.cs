@@ -360,9 +360,19 @@ public class StringExtensionsTests
         TryIsFullPath(@"\dir", false); // An "absolute", but not "full" path
 
         // Invalid on both Windows and Linux
-        TryIsFullPath("", false, false);
+        TryIsFullPath(string.Empty, false, false);
         TryIsFullPath("   ", false, false); // technically, a valid filename on Linux
     }
+
+    [TestCase("test@test.com", true)]
+    [TestCase("test@test", true)]
+    [TestCase("testtest.com", false)]
+    [TestCase("test@test.dk", true)]
+    [TestCase("test@test.se", true)]
+    [TestCase(null, false)]
+    [TestCase("", false)]
+    [TestCase(" ", false)]
+    public void IsEmail(string? email, bool isEmail) => Assert.AreEqual(isEmail, email.IsEmail());
 
     private static void TryIsFullPath(string path, bool expectedIsFull, bool expectedIsValid = true)
     {

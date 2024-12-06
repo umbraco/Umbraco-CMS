@@ -10,9 +10,9 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
-/// Used to deserialize json values and clean up any values based on the existence of element types and layout structure
+/// Used to deserialize json values and clean up any values based on the existence of element types and layout structure.
 /// </summary>
-internal class BlockEditorValues<TValue, TLayout>
+public class BlockEditorValues<TValue, TLayout>
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
 {

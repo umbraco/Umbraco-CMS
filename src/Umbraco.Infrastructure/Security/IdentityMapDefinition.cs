@@ -112,7 +112,7 @@ public class IdentityMapDefinition : IMapDefinition
         target.PasswordConfig = source.PasswordConfiguration;
         target.IsApproved = source.IsApproved;
         target.SecurityStamp = source.SecurityStamp;
-        DateTime? lockedOutUntil = source.LastLockoutDate?.AddMinutes(_securitySettings.UserDefaultLockoutTimeInMinutes);
+        DateTime? lockedOutUntil = source.LastLockoutDate?.AddMinutes(_securitySettings.MemberDefaultLockoutTimeInMinutes);
         target.LockoutEnd = source.IsLockedOut ? (lockedOutUntil ?? DateTime.MaxValue).ToUniversalTime() : null;
         target.Comments = source.Comments;
         target.LastLockoutDateUtc = source.LastLockoutDate == DateTime.MinValue

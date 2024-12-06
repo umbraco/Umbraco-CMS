@@ -93,6 +93,12 @@ public abstract class BlockListPropertyEditorBase : DataEditor
                 return ValidateNumberOfBlocks(blockEditorData, validationLimit.Min, validationLimit.Max);
             }
         }
+
+        public override IEnumerable<Guid> ConfiguredElementTypeKeys()
+        {
+            var configuration = ConfigurationObject as BlockListConfiguration;
+            return configuration?.Blocks.SelectMany(ConfiguredElementTypeKeys) ?? Enumerable.Empty<Guid>();
+        }
     }
 
     #endregion

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="en" intName="English (UK)" localName="English (UK)" lcid="" culture="en-GB">
   <creator>
     <name>The Umbraco community</name>
@@ -428,6 +428,8 @@
     <key alias="compilationDebugCheckErrorMessage">Debug compilation mode is currently enabled. It is recommended to
       disable this setting before go live.
     </key>
+    <key alias="runtimeModeCheckSuccessMessage">Runtime mode is set to production.</key>
+    <key alias="runtimeModeCheckErrorMessage">Runtime mode is not set to Production. It is recommended to set the Runtime Mode to Production for live/production environments.</key>
     <!-- The following keys get these tokens passed in:
 	    0: Path to the file not found
   	-->
@@ -465,6 +467,12 @@
     You can read about this on the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection" target="_blank" rel="noopener" class="btn-link -underline">Mozilla</a> website ]]></key>
     <key alias="xssProtectionCheckHeaderNotFound">
       <![CDATA[The header <strong>X-XSS-Protection</strong> was not found.]]></key>
+    <key alias="contentSecurityPolicyCheckHeaderFound">
+      <![CDATA[The header <strong>Content-Security-Policy (CSP)</strong> was found. ]]>
+    </key>
+    <key alias="contentSecurityPolicyCheckHeaderNotFound">
+      <![CDATA[The header <strong>Content-Security-Policy</strong> (CSP) used to prevent cross-site scripting (XSS) attacks and other code injection vulnerabilities was not found.]]>
+    </key>
     <key alias="excessiveHeadersFound"><![CDATA[The following headers revealing information about the website technology were found: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">No headers revealing information about the website technology were found.
     </key>

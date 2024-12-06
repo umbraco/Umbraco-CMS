@@ -225,8 +225,7 @@ public class DatabaseSchemaCreator
 
         var unknownConstraintsInDatabase = constraintsInDatabase.Where(
             x => x.Item3.InvariantStartsWith("FK_") == false && x.Item3.InvariantStartsWith("PK_") == false &&
-                 x.Item3.InvariantStartsWith("IX_") == false
-        ).Select(x => x.Item3).ToList();
+                 x.Item3.InvariantStartsWith("IX_") == false).Select(x => x.Item3).ToList();
 
         var foreignKeysInSchema = result.TableDefinitions.SelectMany(x => x.ForeignKeys.Select(y => y.Name))
             .Where(x => x is not null).ToList();
@@ -303,7 +302,8 @@ public class DatabaseSchemaCreator
 
         IEnumerable<string> invalidColumnDifferences =
             columnsPerTableInDatabase.Except(columnsPerTableInSchema, StringComparer.InvariantCultureIgnoreCase)
-                .Union(columnsPerTableInSchema.Except(columnsPerTableInDatabase,
+                .Union(columnsPerTableInSchema.Except(
+                    columnsPerTableInDatabase,
                     StringComparer.InvariantCultureIgnoreCase));
         foreach (var column in invalidColumnDifferences)
         {

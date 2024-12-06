@@ -159,7 +159,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         // prepare and de-duplicate post-migrations, only keeping the 1st occurence
         var executedTypes = new HashSet<Type>();
 
-        foreach (var executedMigrationContext in result.ExecutedMigrationContexts)
+        foreach (IMigrationContext executedMigrationContext in result.ExecutedMigrationContexts)
         {
             if (executedMigrationContext is MigrationContext migrationContext)
             {

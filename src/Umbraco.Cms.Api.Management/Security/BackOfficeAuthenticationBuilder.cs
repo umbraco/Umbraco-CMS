@@ -32,8 +32,10 @@ public class BackOfficeAuthenticationBuilder : AuthenticationBuilder
     /// <param name="displayName"></param>
     /// <param name="configureOptions"></param>
     /// <returns></returns>
-    public override AuthenticationBuilder AddRemoteScheme<TOptions, THandler>(string authenticationScheme,
-        string? displayName, Action<TOptions>? configureOptions)
+    public override AuthenticationBuilder AddRemoteScheme<TOptions, THandler>(
+        string authenticationScheme,
+        string? displayName,
+        Action<TOptions>? configureOptions)
     {
         // Validate that the prefix is set
         if (!authenticationScheme.StartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix))

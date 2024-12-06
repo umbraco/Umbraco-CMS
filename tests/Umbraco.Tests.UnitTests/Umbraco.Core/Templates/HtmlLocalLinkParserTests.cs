@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -13,7 +12,6 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers.Objects;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Templates;
 
@@ -111,10 +109,44 @@ public class HtmlLocalLinkParserTests
     // current
     [TestCase(
         "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
-        "<a type=\"document\" href=\"/my-test-url\" title=\"world\">world</a>")]
+        "<a href=\"/my-test-url\" title=\"world\">world</a>")]
     [TestCase(
         "<a type=\"media\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
-        "<a type=\"media\" href=\"/media/1001/my-image.jpg\" title=\"world\">world</a>")]
+        "<a href=\"/media/1001/my-image.jpg\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\"type=\"document\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\"type=\"media\">world</a>",
+        "<a href=\"/media/1001/my-image.jpg\" title=\"world\">world</a>")]
+    [TestCase(
+        "<p><a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a></p><p><a href=\"/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}\" title=\"world\" type=\"media\">world</a></p>",
+        "<p><a href=\"/my-test-url\" title=\"world\">world</a></p><p><a href=\"/media/1001/my-image.jpg\" title=\"world\">world</a></p>")]
+
+    // attributes order should not matter
+    [TestCase(
+        "<a rel=\"noopener\" title=\"world\" type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\">world</a>",
+        "<a rel=\"noopener\" title=\"world\" href=\"/my-test-url\">world</a>")]
+    [TestCase(
+        "<a rel=\"noopener\" title=\"world\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" type=\"document\">world</a>",
+        "<a rel=\"noopener\" title=\"world\" href=\"/my-test-url\">world</a>")]
+    [TestCase(
+        "<a rel=\"noopener\" title=\"world\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}#anchor\" type=\"document\">world</a>",
+        "<a rel=\"noopener\" title=\"world\" href=\"/my-test-url#anchor\">world</a>")]
+
+    // anchors and query strings
+    [TestCase(
+        "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}#anchor\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url#anchor\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}?v=1\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url?v=1\" title=\"world\">world</a>")]
+
+    // custom type ignored
+    [TestCase(
+        "<a type=\"custom\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
+        "<a type=\"custom\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>")]
+
     // legacy
     [TestCase(
         "hello href=\"{localLink:1234}\" world ",
@@ -126,8 +158,14 @@ public class HtmlLocalLinkParserTests
         "hello href=\"{localLink:umb://document/9931BDE0AAC34BABB838909A7B47570E}\" world ",
         "hello href=\"/my-test-url\" world ")]
     [TestCase(
+        "hello href=\"{localLink:umb://document/9931BDE0AAC34BABB838909A7B47570E}#anchor\" world ",
+        "hello href=\"/my-test-url#anchor\" world ")]
+    [TestCase(
         "hello href=\"{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}\" world ",
         "hello href=\"/media/1001/my-image.jpg\" world ")]
+    [TestCase(
+        "hello href='{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}' world ",
+        "hello href='/media/1001/my-image.jpg' world ")]
 
     // This one has an invalid char so won't match.
     [TestCase(
@@ -135,7 +173,7 @@ public class HtmlLocalLinkParserTests
         "hello href=\"{localLink:umb^://document/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ")]
     [TestCase(
         "hello href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ",
-        "hello href=\"#\" world ")]
+        "hello href=\"\" world ")]
     public void ParseLocalLinks(string input, string result)
     {
         // setup a mock URL provider which we'll use for testing

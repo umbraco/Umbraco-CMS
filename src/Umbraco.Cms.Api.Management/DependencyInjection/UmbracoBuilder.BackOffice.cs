@@ -52,8 +52,7 @@ public static partial class UmbracoBuilderExtensions
                 hostingEnvironment,
                 factory.GetRequiredService<ILogger<PhysicalFileSystem>>(),
                 hostingEnvironment.MapPathContentRoot(path),
-                hostingEnvironment.ToAbsolute(path)
-            );
+                hostingEnvironment.ToAbsolute(path));
         });
 
         return builder;

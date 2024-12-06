@@ -33,6 +33,7 @@ internal static class ApplicationBuilderExtensions
             {
                 innerBuilder.UseExceptionHandler(exceptionBuilder => exceptionBuilder.Run(async context =>
                 {
+                    var isDebug = context.RequestServices.GetRequiredService<IHostingEnvironment>().IsDebugMode;
                     Exception? exception = context.Features.Get<IExceptionHandlerPathFeature>()?.Error;
                     if (exception is null)
                     {
@@ -42,16 +43,16 @@ internal static class ApplicationBuilderExtensions
                     var response = new ProblemDetails
                     {
                         Title = exception.Message,
-                        Detail = exception.StackTrace,
+                        Detail = isDebug ? exception.StackTrace : null,
                         Status = StatusCodes.Status500InternalServerError,
-                        Instance = exception.GetType().Name,
+                        Instance = isDebug ? exception.GetType().Name : null,
                         Type = "Error"
                     };
                     await context.Response.WriteAsJsonAsync(response);
                 }));
             });
 
-    internal static IApplicationBuilder UseEndpoints(this IApplicationBuilder applicationBuilder)
+internal static IApplicationBuilder UseEndpoints(this IApplicationBuilder applicationBuilder)
     {
         IServiceProvider provider = applicationBuilder.ApplicationServices;
 

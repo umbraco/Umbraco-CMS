@@ -45,7 +45,8 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
         IEntitySlim[] children = base.GetPagedChildEntities(parentKey, skip, take, out totalItems);
         return UserHasRootAccess() || IgnoreUserStartNodes()
             ? children
-            : CalculateAccessMap(() => _userStartNodeEntitiesService.ChildUserAccessEntities(children, UserStartNodePaths), out totalItems);
+            // Keeping the correct totalItems amount from GetPagedChildEntities
+            : CalculateAccessMap(() => _userStartNodeEntitiesService.ChildUserAccessEntities(children, UserStartNodePaths), out _);
     }
 
     protected override TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)

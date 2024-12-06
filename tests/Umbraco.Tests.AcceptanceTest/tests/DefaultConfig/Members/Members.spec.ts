@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 let memberId = '';
@@ -38,7 +38,7 @@ test('can create a member', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.isSuccessNotificationVisible();
+  await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeTruthy();
 });
 
@@ -55,7 +55,7 @@ test('can edit comments', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.isSuccessNotificationVisible();
+  await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.values[0].value).toBe(comment);
 });
@@ -73,7 +73,7 @@ test('can edit username', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.isSuccessNotificationVisible();
+  await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.username).toBe(updatedUsername);
 });
@@ -91,7 +91,7 @@ test('can edit email', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.isSuccessNotificationVisible();
+  await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.email).toBe(updatedEmail);
 });
@@ -107,11 +107,11 @@ test('can edit password', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.clickMemberLinkByName(memberName);
   await umbracoUi.member.clickChangePasswordButton();
   await umbracoUi.member.enterNewPassword(updatedPassword);
-  await umbracoUi.member.enterConfirmPassword(updatedPassword);
+  await umbracoUi.member.enterConfirmNewPassword(updatedPassword);
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.isSuccessNotificationVisible();
+  await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
 });
 
 test('can add member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -129,7 +129,7 @@ test('can add member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.isSuccessNotificationVisible();
+  await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.groups[0]).toBe(memberGroupId);
 
@@ -153,7 +153,7 @@ test('can remove member group', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.isSuccessNotificationVisible();
+  await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.groups.length).toBe(0);
 
@@ -173,9 +173,16 @@ test('can view member info', async ({umbracoApi, umbracoUi}) => {
   // Assert
   const memberData = await umbracoApi.member.get(memberId);
   await umbracoUi.member.doesMemberInfoHaveValue('Failed login attempts', memberData.failedPasswordAttempts.toString());
-  await umbracoUi.member.doesMemberInfoHaveValue('Last lockout date', memberData.lastLoginDate == null ? 'never' : memberData.lastLoginDate);
-  await umbracoUi.member.doesMemberInfoHaveValue('Last login', memberData.lastLoginDate == null ? 'never' : memberData.lastLoginDate);
-  await umbracoUi.member.doesMemberInfoHaveValue('Password changed', new Date(memberData.lastPasswordChangeDate).toLocaleString());
+  await umbracoUi.member.doesMemberInfoHaveValue('Last lockout date', memberData.lastLoginDate == null ? 'Never' : memberData.lastLoginDate);
+  await umbracoUi.member.doesMemberInfoHaveValue('Last login', memberData.lastLoginDate == null ? 'Never' : memberData.lastLoginDate);
+  await umbracoUi.member.doesMemberInfoHaveValue('Password changed', new Date(memberData.lastPasswordChangeDate).toLocaleString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  }));
 });
 
 test('can enable approved', async ({umbracoApi, umbracoUi}) => {
@@ -190,7 +197,7 @@ test('can enable approved', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.isSuccessNotificationVisible();
+  await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.isApproved).toBe(true);
 });
@@ -208,7 +215,7 @@ test('can delete member', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.memberGroup.clickConfirmToDeleteButton();
 
   // Assert
-  await umbracoUi.member.isSuccessNotificationVisible();
+  await umbracoUi.member.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeFalsy();
 });
 
@@ -229,7 +236,7 @@ test('cannot create member with invalid email', async ({umbracoApi, umbracoUi}) 
   await umbracoUi.member.clickSaveButton();
 
   // Assert
-  await umbracoUi.member.isErrorNotificationVisible();
+  await umbracoUi.member.doesErrorNotificationHaveText(NotificationConstantHelper.error.invalidEmail);
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeFalsy();
 });
 
