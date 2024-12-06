@@ -1,11 +1,19 @@
 {
   "version": "0.2.0",
+  "inputs": [
+    {
+      "id": "AskForMockServer",
+      "type": "promptString",
+      "description": "Use Mock Service Worker (MSW) for Backoffice API calls (off requires a running server)?",
+      "default": "on"
+    }
+  ],
   "configurations": [
     {
-      "name": "Backoffice Launch (Chrome)",
+      "name": "Backoffice Launch Vite (Chrome)",
       "request": "launch",
       "env": {
-        "VITE_UMBRACO_USE_MSW": "off"
+        "VITE_UMBRACO_USE_MSW": "${input:AskForMockServer}"
       },
       "runtimeExecutable": "npx",
       "runtimeArgs": ["vite"],
