@@ -76,9 +76,7 @@ internal class MediaCacheService : IMediaCacheService
             return null;
         }
 
-        var id = idAttempt.Result;
-
-        return await GetNodeAsync(id, key);
+        return await GetNodeAsync(key);
     }
 
     public async Task<IPublishedContent?> GetByIdAsync(int id)
@@ -91,10 +89,10 @@ internal class MediaCacheService : IMediaCacheService
 
         Guid key = keyAttempt.Result;
 
-        return await GetNodeAsync(id, key);
+        return await GetNodeAsync(key);
     }
 
-    private async Task<IPublishedContent?> GetNodeAsync(int id, Guid key)
+    private async Task<IPublishedContent?> GetNodeAsync(Guid key)
     {
         var cacheKey = $"{key}";
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
@@ -102,7 +100,7 @@ internal class MediaCacheService : IMediaCacheService
             async cancel =>
             {
                 using ICoreScope scope = _scopeProvider.CreateCoreScope();
-                ContentCacheNode? mediaCacheNode = await _databaseCacheRepository.GetMediaSourceAsync(id);
+                ContentCacheNode? mediaCacheNode = await _databaseCacheRepository.GetMediaSourceAsync(key);
                 scope.Complete();
                 return mediaCacheNode;
             }, GetEntryOptions(key));
