@@ -28,14 +28,7 @@ export class UmbAppLogoElement extends UmbLitElement {
 			return nothing;
 		}
 
-		return html`
-			<img
-				aria-hidden="true"
-				loading="eager"
-				src="/umbraco/management/api/v1/security/back-office/graphics/logo"
-				alt="logo"
-				style="height: 100%" />
-		`;
+		return html`<img .src=${this._logoUrl} aria-hidden="true" loading="eager" alt="logo" style="height: 100%" />`;
 	}
 }
 
