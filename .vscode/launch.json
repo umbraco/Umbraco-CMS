@@ -21,7 +21,9 @@
       "cwd": "${workspaceFolder}/src/Umbraco.Web.UI.Client",
       "skipFiles": ["<node_internals>/**", "node_modules/**"],
       "smartStep": true,
+      "autoAttachChildProcesses": true,
       "serverReadyAction": {
+        "killOnServerStop": true,
         "action": "debugWithChrome",
         "pattern": "Local:   http://localhost:([0-9]+)",
         "uriFormat": "http://localhost:%s",
