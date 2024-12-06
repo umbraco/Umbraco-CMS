@@ -1,11 +1,7 @@
-import {
-	manifests as collectionRepositoryManifests,
-	UMB_WEBHOOK_COLLECTION_REPOSITORY_ALIAS,
-} from './repository/manifests.js';
+import { manifests as collectionRepositoryManifests } from './repository/manifests.js';
 import { manifests as collectionViewManifests } from './views/manifests.js';
 import { manifests as collectionActionManifests } from './action/manifests.js';
-
-export const UMB_WEBHOOK_COLLECTION_ALIAS = 'Umb.Collection.Webhook';
+import { UMB_WEBHOOK_COLLECTION_ALIAS, UMB_WEBHOOK_COLLECTION_REPOSITORY_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

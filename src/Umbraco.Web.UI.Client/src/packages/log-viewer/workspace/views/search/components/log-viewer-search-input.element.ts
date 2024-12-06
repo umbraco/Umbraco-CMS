@@ -1,29 +1,16 @@
 import type { UmbLogViewerWorkspaceContext } from '../../../logviewer-workspace.context.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
-import type {
-	UmbContextSaveSearchModalData,
-	UmbContextSaveSearchModalValue,
-} from './log-viewer-search-input-modal.element.js';
+import { UMB_LOG_VIEWER_SAVE_SEARCH_MODAL } from './log-viewer-search-input-modal.modal-token.js';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { Subject, debounceTime, tap } from '@umbraco-cms/backoffice/external/rxjs';
 import type { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/router';
-import { UMB_MODAL_MANAGER_CONTEXT, UmbModalToken, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
 import './log-viewer-search-input-modal.element.js';
 import type { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
-
-export const UMB_LOG_VIEWER_SAVE_SEARCH_MODAL = new UmbModalToken<
-	UmbContextSaveSearchModalData,
-	UmbContextSaveSearchModalValue
->('Umb.Modal.LogViewer.SaveSearch', {
-	modal: {
-		type: 'dialog',
-		size: 'small',
-	},
-});
 
 @customElement('umb-log-viewer-search-input')
 export class UmbLogViewerSearchInputElement extends UmbLitElement {
