@@ -31,26 +31,7 @@
       }
     },
     {
-      "name": "Backoffice Launch With Mocks (Chrome)",
-      "request": "launch",
-      "env": {
-        "VITE_UMBRACO_USE_MSW": "on"
-      },
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["vite"],
-      "type": "node",
-      "cwd": "${workspaceFolder}/src/Umbraco.Web.UI.Client",
-      "skipFiles": ["<node_internals>/**", "node_modules/**"],
-      "smartStep": true,
-      "serverReadyAction": {
-        "action": "debugWithChrome",
-        "pattern": "Local:   http://localhost:([0-9]+)",
-        "uriFormat": "http://localhost:%s",
-        "webRoot": "${workspaceFolder}/src/Umbraco.Web.UI.Client"
-      }
-    },
-    {
-      "name": "Backoffice Attach (Chrome)",
+      "name": "Backoffice Attach Vite (Chrome)",
       "request": "launch",
       "type": "chrome",
       "smartStep": true,
