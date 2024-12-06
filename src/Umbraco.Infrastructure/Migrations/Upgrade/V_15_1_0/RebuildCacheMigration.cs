@@ -1,6 +1,6 @@
 ﻿using Umbraco.Cms.Core.PublishedCache;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_2_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_1_0;
 
 [Obsolete("Will be removed in V18")]
 public class RebuildCacheMigration : MigrationBase

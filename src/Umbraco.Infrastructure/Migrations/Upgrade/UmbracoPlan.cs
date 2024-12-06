@@ -104,6 +104,6 @@ public class UmbracoPlan : MigrationPlan
         To<V_15_0_0.ConvertBlockGridEditorProperties>("{9D3CE7D4-4884-41D4-98E8-302EB6CB0CF6}");
         To<V_15_0_0.ConvertRichTextEditorProperties>("{37875E80-5CDD-42FF-A21A-7D4E3E23E0ED}");
         To<V_15_0_0.ConvertLocalLinks>("{42E44F9E-7262-4269-922D-7310CB48E724}");
-        To<V_15_2_0.RebuildCacheMigration>("7B51B4DE-5574-4484-993E-05D12D9ED703");
+        To<V_15_1_0.RebuildCacheMigration>("7B51B4DE-5574-4484-993E-05D12D9ED703");
     }
 }
