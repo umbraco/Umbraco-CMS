@@ -1,11 +1,16 @@
 {
   "version": "0.2.0",
-  "inputs": [
+  "compounds": [
     {
-      "id": "AskForMockServer",
-      "type": "promptString",
-      "description": "Use Mock Service Worker (MSW) for Backoffice API calls (off requires a running server)?",
-      "default": "on"
+      "name": "Backoffice Launch (Vite + .NET Core)",
+      "configurations": [
+        "Backoffice Launch Vite (Chrome)",
+        ".NET Core Serve with External Auth (web)"
+      ],
+      "stopAll": true,
+      "presentation": {
+        "group": "1"
+      }
     }
   ],
   "configurations": [
@@ -28,6 +33,9 @@
         "pattern": "Local:   http://localhost:([0-9]+)",
         "uriFormat": "http://localhost:%s",
         "webRoot": "${workspaceFolder}/src/Umbraco.Web.UI.Client"
+      },
+      "presentation": {
+        "group": "2"
       }
     },
     {
@@ -37,7 +45,10 @@
       "smartStep": true,
       "url": "http://localhost:5173/",
       "skipFiles": ["<node_internals>/**", "node_modules/**"],
-      "webRoot": "${workspaceFolder}/src/Umbraco.Web.UI.Client"
+      "webRoot": "${workspaceFolder}/src/Umbraco.Web.UI.Client",
+      "presentation": {
+        "group": "2"
+      }
     },
     {
       // Use IntelliSense to find out which attributes exist for C# debugging
@@ -60,14 +71,53 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "sourceFileMap": {
-        "/Views": "${workspaceFolder}/Views"
+        "/Views": "${workspaceFolder}/Umbraco.Web.UI/Views"
+      },
+      "presentation": {
+        "group": "3"
       }
     },
     {
       "name": ".NET Core Attach",
       "type": "coreclr",
       "request": "attach",
-      "processId": "${command:pickProcess}"
+      "processId": "${command:pickProcess}",
+      "presentation": {
+        "group": "3"
+      }
+    },
+    {
+      "name": ".NET Core Serve with External Auth (web)",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "dotnet",
+      "args": ["run"],
+      "cwd": "${workspaceFolder}/src/Umbraco.Web.UI",
+      "stopAtEntry": false,
+      "requireExactSource": false,
+      "checkForDevCert": true,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "https://localhost:44339",
+        "UMBRACO__CMS__SECURITY__BACKOFFICEHOST": "http://localhost:5173",
+        "UMBRACO__CMS__SECURITY__AUTHORIZECALLBACKPATHNAME": "/oauth_complete",
+        "UMBRACO__CMS__SECURITY__AUTHORIZECALLBACKLOGOUTPATHNAME": "/logout",
+        "UMBRACO__CMS__SECURITY__AUTHORIZECALLBACKERRORPATHNAME": "/error"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/Umbraco.Web.UI/Views"
+      },
+      "presentation": {
+        "group": "3"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "AskForMockServer",
+      "type": "promptString",
+      "description": "Use Mock Service Worker (MSW) for Backoffice API calls (off requires a running server)?",
+      "default": "off"
     }
   ]
 }
