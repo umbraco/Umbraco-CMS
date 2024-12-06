@@ -1,5 +1,4 @@
-import { UMB_RELATION_TYPE_COLLECTION_ALIAS } from './constants.js';
-import { UMB_RELATION_TYPE_COLLECTION_REPOSITORY_ALIAS } from './repository/index.js';
+import { UMB_RELATION_TYPE_COLLECTION_ALIAS, UMB_RELATION_TYPE_COLLECTION_REPOSITORY_ALIAS } from './constants.js';
 import { manifests as collectionRepositoryManifests } from './repository/manifests.js';
 import { manifests as collectionViewManifests } from './views/manifests.js';
 

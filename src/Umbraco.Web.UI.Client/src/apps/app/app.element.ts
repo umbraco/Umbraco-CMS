@@ -4,6 +4,7 @@ import { UmbAppContext } from './app.context.js';
 import { UmbServerConnection } from './server-connection.js';
 import { UmbAppAuthController } from './app-auth.controller.js';
 import { UmbApiInterceptorController } from './api-interceptor.controller.js';
+import type { UmbAppOauthElement } from './app-oauth.element.js';
 import type { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
@@ -20,7 +21,6 @@ import {
 } from '@umbraco-cms/backoffice/extension-registry';
 import { filter, first, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { hasOwnOpener, retrieveStoredPath } from '@umbraco-cms/backoffice/utils';
-import type { UmbAppOauthElement } from './app-oauth.element.js';
 
 import './app-oauth.element.js';
 

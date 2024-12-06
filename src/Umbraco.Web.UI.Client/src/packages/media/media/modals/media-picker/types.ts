@@ -1,4 +1,4 @@
-import type { UmbMediaItemModel } from '../../repository/index.js';
+import type { UmbMediaItemModel } from '../../types.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export interface UmbMediaCardItemModel extends UmbMediaItemModel {

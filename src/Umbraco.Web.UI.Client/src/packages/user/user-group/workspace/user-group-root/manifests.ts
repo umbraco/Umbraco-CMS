@@ -1,13 +1,13 @@
 import { UMB_USER_GROUP_COLLECTION_ALIAS } from '../../collection/index.js';
 import { UMB_USER_GROUP_ROOT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_USER_GROUP_WORKSPACE_ALIAS } from './constants.js';
+import { UMB_USER_GROUP_ROOT_WORKSPACE_ALIAS } from './constants.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspace',
 		kind: 'default',
-		alias: UMB_USER_GROUP_WORKSPACE_ALIAS,
+		alias: UMB_USER_GROUP_ROOT_WORKSPACE_ALIAS,
 		name: 'User Group Root Workspace View',
 		meta: {
 			entityType: UMB_USER_GROUP_ROOT_ENTITY_TYPE,
@@ -28,7 +28,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				match: UMB_USER_GROUP_WORKSPACE_ALIAS,
+				match: UMB_USER_GROUP_ROOT_WORKSPACE_ALIAS,
 			},
 		],
 	},

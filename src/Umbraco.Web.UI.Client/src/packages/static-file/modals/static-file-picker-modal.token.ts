@@ -1,4 +1,4 @@
-import { UMB_STATIC_FILE_TREE_ALIAS } from '../tree/index.js';
+import { UMB_STATIC_FILE_TREE_ALIAS } from '../tree/constants.js';
 import type { UmbStaticFileItemModel } from '../repository/item/types.js';
 import {
 	type UmbTreePickerModalValue,
