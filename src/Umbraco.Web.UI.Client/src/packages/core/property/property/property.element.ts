@@ -19,6 +19,7 @@ import type {
 	UmbPropertyTypeValidationModel,
 } from '@umbraco-cms/backoffice/content-type';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
 
 /**
  *  @element umb-property
@@ -74,6 +75,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 */
 	@property({ type: String })
 	public set alias(alias: string) {
+		this.setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'property/' + alias);
 		this.#propertyContext.setAlias(alias);
 	}
 	public get alias() {

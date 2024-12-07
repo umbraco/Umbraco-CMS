@@ -130,7 +130,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	}
 
 	#renderTrigger() {
-		return html`<button id="toggle" popovertarget="dropdown-popover">
+		return html`<button id="toggle" data-mark="app-language-menu-open" popovertarget="dropdown-popover">
 			<span
 				>${this._appLanguage?.name}
 				${this._appLanguageIsReadOnly ? this.#renderReadOnlyTag(this._appLanguage?.unique) : nothing}</span
@@ -140,7 +140,10 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	}
 
 	#renderContent() {
-		return html` <uui-popover-container id="dropdown-popover" @beforetoggle=${this.#onPopoverToggle}>
+		return html` <uui-popover-container
+			id="dropdown-popover"
+			data-mark="app-language-menu"
+			@beforetoggle=${this.#onPopoverToggle}>
 			<umb-popover-layout>
 				${repeat(
 					this._languages,
@@ -148,9 +151,9 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 					(language) => html`
 						<uui-menu-item
 							label=${ifDefined(language.name)}
-							@click-label=${this.#onLabelClick}
-							data-unique=${ifDefined(language.unique)}
-							?active=${language.unique === this._appLanguage?.unique}>
+							data-mark="${language.entityType}/${language.unique}"
+							?active=${language.unique === this._appLanguage?.unique}
+							@click-label=${this.#onLabelClick}>
 							${this.#isLanguageReadOnly(language.unique) ? this.#renderReadOnlyTag(language.unique) : nothing}
 						</uui-menu-item>
 					`,

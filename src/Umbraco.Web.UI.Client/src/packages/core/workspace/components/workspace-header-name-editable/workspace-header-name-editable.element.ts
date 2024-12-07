@@ -48,6 +48,7 @@ export class UmbWorkspaceHeaderNameEditableElement extends UmbLitElement {
 	override render() {
 		return html`<uui-input
 			id="nameInput"
+			data-mark="workspace-name-input"
 			.value=${this._name}
 			@input="${this.#onNameInput}"
 			required
