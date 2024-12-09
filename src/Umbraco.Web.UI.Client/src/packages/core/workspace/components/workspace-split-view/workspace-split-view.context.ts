@@ -46,8 +46,6 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase<UmbWorkspaceSpl
 			async (activeVariantInfo) => {
 				if (!activeVariantInfo) return;
 
-				// TODO: Ask workspace context to create the specific variant context.
-
 				this.#datasetContext?.destroy();
 				const variantId = UmbVariantId.Create(activeVariantInfo);
 				this.#datasetContext = this.#workspaceContext?.createPropertyDatasetContext(this, variantId);
