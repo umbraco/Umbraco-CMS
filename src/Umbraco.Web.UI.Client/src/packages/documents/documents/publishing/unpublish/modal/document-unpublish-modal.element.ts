@@ -1,6 +1,6 @@
-import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
-import { UmbDocumentReferenceRepository } from '../../reference/index.js';
-import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../../global-contexts/index.js';
+import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
+import { UmbDocumentReferenceRepository } from '../../../reference/index.js';
+import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../../../global-contexts/index.js';
 import type {
 	UmbDocumentUnpublishModalData,
 	UmbDocumentUnpublishModalValue,
@@ -10,7 +10,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 
-import '../shared/document-variant-language-picker.element.js';
+import '../../../modals/shared/document-variant-language-picker.element.js';
 
 /**
  * @function isPublished
