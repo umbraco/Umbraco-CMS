@@ -1469,6 +1469,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="publishWithMissingDomain">Der er ikke noget domæne konfigureret for %0%, kontakt vensligst en
       administrator, se loggen for mere information
     </key>
+    <key alias="publishWithNoUrl">Dokumentet har ikke nogen URL, muligvis grundet en kollision med et andet dokuments navn. Flere detaljer kan ses under Info.</key>
     <key alias="copySuccessMessage">Dit systems information er blevet kopieret til udklipsholderen</key>
     <key alias="cannotCopyInformation">Kunne desværre ikke kopiere dit systems information til udklipsholderen</key>
     <key alias="webhookSaved">Webhook gemt</key>
