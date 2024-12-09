@@ -48,7 +48,7 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase<UmbWorkspaceSpl
 				this.#datasetContext?.destroy();
 				const variantId = UmbVariantId.Create(activeVariantInfo);
 				this.#datasetContext = this.#workspaceContext?.createPropertyDatasetContext(this, variantId);
-				this.getHostElement().setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'split-view/' + variantId.toString());
+				this.getHostElement().setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'workspace-split-view/' + variantId.toString());
 			},
 			'_observeActiveVariant',
 		);
