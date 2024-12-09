@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Models.DeliveryApi;
 
 namespace Umbraco.Cms.Infrastructure.Serialization;
 
-public class ContentJsonTypeResolverBase : DefaultJsonTypeInfoResolver
+public abstract class ContentJsonTypeResolverBase : DefaultJsonTypeInfoResolver
 {
     public override JsonTypeInfo GetTypeInfo(Type type, JsonSerializerOptions options)
     {
