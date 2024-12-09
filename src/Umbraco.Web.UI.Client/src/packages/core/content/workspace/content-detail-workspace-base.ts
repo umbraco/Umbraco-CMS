@@ -428,7 +428,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this._data.finishPropertyValueChange();
 	};
 
-	protected async _determineVariantOptions() {
+	protected async _determineVariantOptions(): Promise<{
+		options: VariantOptionModelType[];
+		selected: string[];
+	}> {
 		const options = await firstValueFrom(this.variantOptions);
 
 		const activeVariants = this.splitView.getActiveVariants();
