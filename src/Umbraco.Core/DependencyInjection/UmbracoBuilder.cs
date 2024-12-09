@@ -26,8 +26,6 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.PublishedCache.Internal;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
@@ -37,6 +35,7 @@ using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.DynamicRoot;
 using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Security.Authorization;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services.FileSystem;
 using Umbraco.Cms.Core.Services.ImportExport;
 using Umbraco.Cms.Core.Services.Querying.RecycleBin;
@@ -373,7 +372,10 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IWebhookService, WebhookService>();
             Services.AddUnique<IWebhookLogService, WebhookLogService>();
             Services.AddUnique<IWebhookLogFactory, WebhookLogFactory>();
-            Services.AddUnique<IWebhookRequestService, WebhookRequestService>();
+            Services.AddUnique<IWebhookRequestService>(factory => new WebhookRequestService(
+                factory.GetRequiredService<ICoreScopeProvider>(),
+                factory.GetRequiredService<IWebhookRequestRepository>(),
+                factory.GetRequiredService<IWebhookJsonSerializer>()));
 
             // Data type configuration cache
             Services.AddUnique<IDataTypeConfigurationCache, DataTypeConfigurationCache>();

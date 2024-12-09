@@ -123,6 +123,7 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IJsonSerializer, SystemTextJsonSerializer>();
         builder.Services.AddSingleton<IConfigurationEditorJsonSerializer, SystemTextConfigurationEditorJsonSerializer>();
+        builder.Services.AddUnique<IWebhookJsonSerializer, SystemTextWebhookJsonSerializer>();
 
         // register database builder
         // *not* a singleton, don't want to keep it around
