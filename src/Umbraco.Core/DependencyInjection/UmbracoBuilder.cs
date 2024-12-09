@@ -34,6 +34,8 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.DynamicRoot;
 using Umbraco.Cms.Core.Preview;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.PublishedCache.Internal;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services.FileSystem;
