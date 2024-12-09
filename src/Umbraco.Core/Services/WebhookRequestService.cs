@@ -13,7 +13,7 @@ public class WebhookRequestService : IWebhookRequestService
     private readonly IWebhookRequestRepository _webhookRequestRepository;
     private readonly IWebhookJsonSerializer _webhookJsonSerializer;
 
-    [Obsolete("This constructor is obsolete and will be removed in future versions.")]
+    [Obsolete("This constructor is obsolete and will be removed in future versions. Scheduled for removal in V17")]
     public WebhookRequestService(ICoreScopeProvider coreScopeProvider, IWebhookRequestRepository webhookRequestRepository, IJsonSerializer jsonSerializer)
     : this (coreScopeProvider, webhookRequestRepository, StaticServiceProvider.Instance.GetRequiredService<IWebhookJsonSerializer>())
     {
