@@ -4,7 +4,6 @@ import type { UmbDocumentDetailRepository } from '../repository/index.js';
 import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import type { UmbDocumentVariantPublishModel, UmbDocumentDetailModel, UmbDocumentVariantModel } from '../types.js';
 import { UmbDocumentPublishingRepository } from '../publishing/index.js';
-import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
 import {
 	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
 	UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN,
@@ -44,6 +43,7 @@ import {
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import UmbUnpublishDocumentEntityAction from '../publishing/unpublish/entity-action/unpublish.action.js';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
