@@ -1,5 +1,4 @@
-import { UmbUnpublishDocumentEntityAction } from '../../entity-actions/unpublish.action.js';
-import { UmbDocumentPublishingRepository } from '../../index.js';
+import { UmbUnpublishDocumentEntityAction } from '../entity-action/index.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_UNPUBLISH_MODAL } from '../../../constants.js';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -10,6 +9,7 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbDocumentPublishingRepository } from '../../repository/index.js';
 
 export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {

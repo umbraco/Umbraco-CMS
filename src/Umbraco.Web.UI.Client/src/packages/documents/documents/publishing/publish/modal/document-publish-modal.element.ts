@@ -1,5 +1,5 @@
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
-import { isNotPublishedMandatory } from '../../../modals/utils.js';
+import { isNotPublishedMandatory } from '../../utils.js';
 import type { UmbDocumentPublishModalData, UmbDocumentPublishModalValue } from './document-publish-modal.token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
