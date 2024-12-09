@@ -1732,6 +1732,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="publishWithMissingDomain">There is no domain configured for %0%, please contact an administrator, see
       log for more information
     </key>
+    <key alias="publishWithNoUrl">The document does not have a URL, possibly due to a naming collision with another document. More details can be found under Info.</key>
     <key alias="preventCleanupEnableError">An error occurred while enabling version cleanup for %0%</key>
     <key alias="preventCleanupDisableError">An error occurred while disabling version cleanup for %0%</key>
     <key alias="copySuccessMessage">Your system information has successfully been copied to the clipboard</key>
