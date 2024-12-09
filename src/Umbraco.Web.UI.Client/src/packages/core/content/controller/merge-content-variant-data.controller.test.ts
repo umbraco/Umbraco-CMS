@@ -31,19 +31,14 @@ export class TestPropertyValueResolver
 		valuesCallback: (values: Array<UmbPropertyValueData>) => Promise<Array<UmbPropertyValueData> | undefined>,
 	) {
 		if (property.value) {
-			const processedValues = (await valuesCallback([property.value.nestedValue])) ?? [];
+			const processedValues = await valuesCallback([property.value.nestedValue]);
 			return {
 				...property,
-				values: processedValues[0],
-			};
+				value: {
+					nestedValue: processedValues?.[0] ?? property.value.nestedValue,
+				} as TestPropertyValueNestedType,
+			} as UmbPropertyValueData<TestPropertyValueNestedType>;
 		}
-		return property;
-	}
-
-	async processVariants(
-		property: UmbPropertyValueData<TestPropertyValueNestedType>,
-		variantsCallback: (values: Array<UmbVariantDataModel>) => Promise<Array<UmbVariantDataModel> | undefined>,
-	) {
 		return property;
 	}
 
@@ -51,21 +46,21 @@ export class TestPropertyValueResolver
 }
 
 describe('UmbMergeContentVariantDataController', () => {
-	describe('Manifest without conditions', () => {
-		let manifest: ManifestPropertyValueResolver;
-
+	describe('Simple resolver', () => {
 		beforeEach(async () => {
-			manifest = {
+			const manifest: ManifestPropertyValueResolver = {
 				type: 'propertyValueResolver',
-				name: 'test-section-1',
-				alias: 'Umb.Test.Section.1',
+				name: 'test-resolver-1',
+				alias: 'Umb.Test.Resolver.1',
 				api: TestPropertyValueResolver,
-				meta: {
-					editorAlias: 'test-editor',
-				},
+				forEditorAlias: 'test-editor',
 			};
 
 			umbExtensionsRegistry.register(manifest);
+		});
+
+		afterEach(async () => {
+			umbExtensionsRegistry.unregister('Umb.Test.Resolver.1');
 		});
 
 		it('transfers inner values of select variants', async () => {

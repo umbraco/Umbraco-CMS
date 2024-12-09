@@ -9,58 +9,93 @@ export class UmbPropertyValueTransformController extends UmbControllerBase {
 	 * @param {UmbPropertyValueData} property - The property data.
 	 * @returns {Promise<UmbPropertyValueData>} - A promise that resolves to the transformed property data.
 	 */
-	async transform(property: UmbPropertyValueData): Promise<ModelType> {
-		const result = this.#transformValue(property);
+	async transform(property: UmbPropertyValueData): Promise<UmbPropertyValueData> {
+		const result = await this.#transformProperty(property);
 
 		this.destroy();
 
-		return result;
+		return result ?? property;
 	}
 
-	async #transformValue(propertyData: UmbPropertyValueData): Promise<UmbPropertyValueData | undefined> {
-		const editorAlias = propertyData?.editorAlias;
+	async #transformProperty(property: UmbPropertyValueData): Promise<UmbPropertyValueData> {
+		const result = await this.#transformValue(property);
+		return await this.#transformInnerValues(result);
+	}
+
+	async #transformValue(property: UmbPropertyValueData): Promise<UmbPropertyValueData> {
+		// TODO: make a public type for UmbPropertyValueData with editorAlias property — one that is not the UmbPotentialContentValueModel, cause that is bound to content... [NL]
+
+		const editorAlias = (property as any).editorAlias as string | undefined;
 		if (!editorAlias) {
-			console.error(`Editor alias not found for ${propertyData.alias}`);
-			return propertyData;
+			console.error(`Editor alias not found for ${property.alias}`);
+			return property;
 		}
 
-		// Transform the property value it self:
-
-		let result = propertyData;
-
-		// Transform sub values of this property:
-
-		// Find the resolver for this editor alias:
+		// Find the transformer for this editor alias:
 		const manifest = umbExtensionsRegistry.getByTypeAndFilter(
-			'propertyValueResolver',
-			// TODO: Remove depcrated filter in v.17 [NL]
-			(x) => x.forEditorAlias === editorAlias || x.meta?.editorAlias === editorAlias,
+			'propertyValueTransformer',
+			(x) => x.forEditorAlias === editorAlias,
 		)[0];
 
 		if (!manifest) {
-			// No resolver found, then we can continue using the draftValue as is.
-			return result;
+			return property;
 		}
 
 		const api = await createExtensionApi(this, manifest);
 		if (!api) {
-			// If api is not to be found, then we can continue using the draftValue as is.
-			return result;
+			return property;
+		}
+
+		let result = property;
+
+		if (api.transformValue) {
+			const transformedValue = await api.transformValue(property.value);
+			if (transformedValue) {
+				result = { ...property, value: transformedValue };
+			}
+		}
+
+		return result;
+	}
+
+	async #transformInnerValues(property: UmbPropertyValueData): Promise<UmbPropertyValueData> {
+		const editorAlias = (property as any).editorAlias as string | undefined;
+		if (!editorAlias) {
+			return property;
+		}
+
+		// Find the resolver for this editor alias:
+		const manifest = umbExtensionsRegistry.getByTypeAndFilter(
+			'propertyValueResolver',
+			// TODO: Remove depcrated filter option in v.17 [NL]
+			(x) => x.forEditorAlias === editorAlias || x.meta?.editorAlias === editorAlias,
+		)[0];
+
+		if (!manifest) {
+			return property;
+		}
+
+		const api = await createExtensionApi(this, manifest);
+		if (!api) {
+			return property;
 		}
 
 		if (api.processValues) {
-			let valuesIndex = 0;
-			result =
-				(await api.processValues(result, async (values) => {
-					// got some values (content and/or settings):
-					// but how to get the persisted and the draft of this.....
-					const persistedValues = persistedValuesHolder[valuesIndex++];
+			return (
+				(await api.processValues(property, async (properties) => {
+					// Transform the values:
+					const persistedValues = await Promise.all(
+						properties.map(async (value) => {
+							return (await this.#transformProperty(value)) ?? value;
+						}),
+					);
 
-					return await this.#processValues(persistedValues);
-				})) ?? result;
+					return persistedValues;
+				})) ?? property
+			);
 		}
 
 		// the api did not provide a value processor, so we will return the draftValue:
-		return result;
+		return property;
 	}
 }

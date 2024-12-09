@@ -2,19 +2,25 @@ import { expect } from '@open-wc/testing';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	ManifestPropertyValueResolver,
+	ManifestPropertyValueTransformer,
 	UmbPropertyValueData,
 	UmbPropertyValueResolver,
-} from '@umbraco-cms/backoffice/property';
-import { UmbVariantId, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
-import { UmbMergeContentVariantDataController } from './property-value-transform.controller.js';
+	UmbPropertyValueTransformer,
+} from '../types.js';
+import type { UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbPropertyValueTransformController } from './property-value-transform.controller';
 
 @customElement('umb-test-controller-host')
 export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-type TestPropertyValueNestedType = {
-	nestedValue: UmbPropertyValueData;
+type TestPropertyValueWithId = {
+	id: string;
+};
+
+type TestPropertyValueNestedType = TestPropertyValueWithId & {
+	nestedValue?: UmbPropertyValueData<TestPropertyValueWithId>;
 };
 
 export class TestPropertyValueResolver
@@ -28,13 +34,17 @@ export class TestPropertyValueResolver
 	async processValues(
 		property: UmbPropertyValueData<TestPropertyValueNestedType>,
 		valuesCallback: (values: Array<UmbPropertyValueData>) => Promise<Array<UmbPropertyValueData> | undefined>,
-	) {
+	): Promise<UmbPropertyValueData<TestPropertyValueNestedType>> {
 		if (property.value) {
-			const processedValues = (await valuesCallback([property.value.nestedValue])) ?? [];
+			const nestedValue = property.value.nestedValue;
+			const processedValues = nestedValue ? await valuesCallback([nestedValue]) : undefined;
 			return {
 				...property,
-				values: processedValues[0],
-			};
+				value: {
+					...property.value,
+					nestedValue: processedValues ? processedValues[0] : undefined,
+				},
+			} as UmbPropertyValueData<TestPropertyValueNestedType>;
 		}
 		return property;
 	}
@@ -49,121 +59,215 @@ export class TestPropertyValueResolver
 	destroy(): void {}
 }
 
-describe('UmbMergeContentVariantDataController', () => {
-	describe('Manifest without conditions', () => {
-		let manifest: ManifestPropertyValueResolver;
+export class TestPropertyValueTransformer implements UmbPropertyValueTransformer<TestPropertyValueWithId> {
+	async transformValue(value: TestPropertyValueWithId): Promise<TestPropertyValueWithId> {
+		return { ...value, id: 'updated-id' };
+	}
 
+	destroy(): void {}
+}
+
+describe('UmbPropertyValueTransformController', () => {
+	describe('Transformer', () => {
 		beforeEach(async () => {
-			manifest = {
-				type: 'propertyValueResolver',
-				name: 'test-section-1',
-				alias: 'Umb.Test.Section.1',
-				api: TestPropertyValueResolver,
-				meta: {
-					editorAlias: 'test-editor',
+			const manifestTransformer: ManifestPropertyValueTransformer = {
+				type: 'propertyValueTransformer',
+				name: 'test-transformer-1',
+				alias: 'Umb.Test.Transformer.1',
+				api: TestPropertyValueTransformer,
+				forEditorAlias: 'test-editor',
+			};
+
+			umbExtensionsRegistry.register(manifestTransformer);
+		});
+		afterEach(async () => {
+			umbExtensionsRegistry.unregister('Umb.Test.Transformer.1');
+		});
+
+		it('transfers value', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbPropertyValueTransformController(ctrlHost);
+
+			const value = {
+				editorAlias: 'test-editor',
+				alias: 'test',
+				culture: null,
+				segment: null,
+				value: {
+					id: 'not-updated-id',
 				},
 			};
 
-			umbExtensionsRegistry.register(manifest);
+			const result = await ctrl.transform(value);
+
+			expect((result.value as TestPropertyValueNestedType | undefined)?.id).to.be.equal('updated-id');
+		});
+	});
+
+	describe('Resolvers and transformer', () => {
+		beforeEach(async () => {
+			const manifestResolver: ManifestPropertyValueResolver = {
+				type: 'propertyValueResolver',
+				name: 'test-resolver-1',
+				alias: 'Umb.Test.Resolver.1',
+				api: TestPropertyValueResolver,
+				forEditorAlias: 'test-editor',
+			};
+
+			umbExtensionsRegistry.register(manifestResolver);
+
+			const manifestResolverOnly: ManifestPropertyValueResolver = {
+				type: 'propertyValueResolver',
+				name: 'test-resolver-1',
+				alias: 'Umb.Test.Resolver.2',
+				api: TestPropertyValueResolver,
+				forEditorAlias: 'only-resolver-editor',
+			};
+
+			umbExtensionsRegistry.register(manifestResolverOnly);
+
+			const manifestTransformer: ManifestPropertyValueTransformer = {
+				type: 'propertyValueTransformer',
+				name: 'test-transformer-1',
+				alias: 'Umb.Test.Transformer.1',
+				api: TestPropertyValueTransformer,
+				forEditorAlias: 'test-editor',
+			};
+
+			umbExtensionsRegistry.register(manifestTransformer);
+		});
+		afterEach(async () => {
+			umbExtensionsRegistry.unregister('Umb.Test.Resolver.1');
+			umbExtensionsRegistry.unregister('Umb.Test.Resolver.2');
+			umbExtensionsRegistry.unregister('Umb.Test.Transformer.1');
 		});
 
-		it('transfers inner values of select variants', async () => {
+		it('transfers value and inner values', async () => {
 			const ctrlHost = new UmbTestControllerHostElement();
-			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
+			const ctrl = new UmbPropertyValueTransformController(ctrlHost);
 
-			const persistedData: UmbContentLikeDetailModel = {
-				values: [
-					{
+			const value = {
+				editorAlias: 'test-editor',
+				alias: 'test',
+				culture: null,
+				segment: null,
+				value: {
+					id: 'not-updated-id',
+				},
+			};
+
+			const result = await ctrl.transform(value);
+
+			expect((result.value as TestPropertyValueNestedType | undefined)?.id).to.be.equal('updated-id');
+		});
+
+		it('transfers only inner values', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbPropertyValueTransformController(ctrlHost);
+
+			const value = {
+				editorAlias: 'only-resolver-editor',
+				alias: 'not-to-be-handled',
+				culture: null,
+				segment: null,
+				value: {
+					id: 'not-updated-id',
+					nestedValue: {
 						editorAlias: 'test-editor',
-						alias: 'test',
+						alias: 'some',
 						culture: null,
 						segment: null,
 						value: {
-							nestedValue: {
-								editorAlias: 'some-editor',
-								alias: 'some',
-								culture: null,
-								segment: null,
-								value: 'saved-nested-value-invariant',
-							},
+							id: 'inner-not-updated-id',
 						},
 					},
-				],
+				},
 			};
 
-			const runtimeData: UmbContentLikeDetailModel = {
-				values: [
-					{
-						editorAlias: 'test-editor',
-						alias: 'test',
-						culture: null,
-						segment: null,
-						value: {
-							nestedValue: {
-								editorAlias: 'some-editor',
-								alias: 'some',
-								value: 'updated-nested-value-invariant',
-							},
-						},
-					},
-				],
-			};
+			const result = await ctrl.transform(value);
 
-			const result = await ctrl.process(persistedData, runtimeData, [], [UmbVariantId.CreateInvariant()]);
-
-			expect((result.values[0].value as TestPropertyValueNestedType).nestedValue.value).to.be.equal(
-				'updated-nested-value-invariant',
+			expect((result.value as TestPropertyValueNestedType | undefined)?.id).to.be.equal('not-updated-id');
+			expect((result.value as TestPropertyValueNestedType | undefined)?.nestedValue?.value?.id).to.be.equal(
+				'updated-id',
 			);
 		});
 
-		it('does not transfers inner values of a not selected variant', async () => {
+		it('transfers value and inner values', async () => {
 			const ctrlHost = new UmbTestControllerHostElement();
-			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
+			const ctrl = new UmbPropertyValueTransformController(ctrlHost);
 
-			const persistedData: UmbContentLikeDetailModel = {
-				values: [
-					{
+			const value = {
+				editorAlias: 'test-editor',
+				alias: 'test',
+				culture: null,
+				segment: null,
+				value: {
+					id: 'not-updated-id',
+					nestedValue: {
 						editorAlias: 'test-editor',
-						alias: 'test',
+						alias: 'some',
 						culture: null,
 						segment: null,
 						value: {
+							id: 'inner-not-updated-id',
+						},
+					},
+				},
+			};
+
+			const result = await ctrl.transform(value);
+
+			expect((result.value as TestPropertyValueNestedType | undefined)?.id).to.be.equal('updated-id');
+			expect((result.value as TestPropertyValueNestedType | undefined)?.nestedValue?.value?.id).to.be.equal(
+				'updated-id',
+			);
+		});
+
+		it('transfers value and inner values for two levels', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbPropertyValueTransformController(ctrlHost);
+
+			const value = {
+				editorAlias: 'test-editor',
+				alias: 'test',
+				culture: null,
+				segment: null,
+				value: {
+					id: 'not-updated-id',
+					nestedValue: {
+						editorAlias: 'test-editor',
+						alias: 'some',
+						culture: null,
+						segment: null,
+						value: {
+							id: 'inner-not-updated-id',
 							nestedValue: {
-								editorAlias: 'some-editor',
-								alias: 'some',
+								editorAlias: 'test-editor',
+								alias: 'another',
 								culture: null,
 								segment: null,
-								value: 'saved-nested-value-invariant',
+								value: {
+									id: 'inner-inner-not-updated-id',
+								},
 							},
 						},
 					},
-				],
+				},
 			};
 
-			const runtimeData: UmbContentLikeDetailModel = {
-				values: [
-					{
-						editorAlias: 'test-editor',
-						alias: 'test',
-						culture: null,
-						segment: null,
-						value: {
-							nestedValue: {
-								editorAlias: 'some-editor',
-								alias: 'some',
-								value: 'updated-nested-value-invariant',
-							},
-						},
-					},
-				],
-			};
+			const result = await ctrl.transform(value);
 
-			const variants = [new UmbVariantId('da')];
-			const result = await ctrl.process(persistedData, runtimeData, variants, variants);
-
-			expect((result.values[0].value as TestPropertyValueNestedType).nestedValue.value).to.be.equal(
-				'saved-nested-value-invariant',
+			expect((result.value as TestPropertyValueNestedType | undefined)?.id).to.be.equal('updated-id');
+			expect((result.value as TestPropertyValueNestedType | undefined)?.nestedValue?.value?.id).to.be.equal(
+				'updated-id',
 			);
+			expect(
+				(
+					(result.value as TestPropertyValueNestedType | undefined)?.nestedValue?.value as
+						| TestPropertyValueNestedType
+						| undefined
+				)?.nestedValue?.value?.id,
+			).to.be.equal('updated-id');
 		});
 	});
 });
