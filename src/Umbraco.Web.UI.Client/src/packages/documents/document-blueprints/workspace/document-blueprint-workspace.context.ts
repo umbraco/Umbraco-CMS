@@ -1,10 +1,10 @@
 import { UmbDocumentBlueprintPropertyDatasetContext } from '../property-dataset-context/document-blueprint-property-dataset-context.js';
 import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentBlueprintDetailRepository } from '../repository/index.js';
-import { UMB_DOCUMENT_BLUEPRINT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_DOCUMENT_BLUEPRINT_DETAIL_REPOSITORY_ALIAS } from '../constants.js';
 import type { UmbDocumentBlueprintDetailModel, UmbDocumentBlueprintVariantModel } from '../types.js';
 import { UMB_CREATE_DOCUMENT_BLUEPRINT_WORKSPACE_PATH_PATTERN } from '../paths.js';
-import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS } from './manifests.js';
+import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS } from './constants.js';
 import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,

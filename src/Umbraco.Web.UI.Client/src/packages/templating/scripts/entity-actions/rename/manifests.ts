@@ -1,5 +1,5 @@
+import { UMB_SCRIPT_ITEM_REPOSITORY_ALIAS } from '../../repository/item/constants.js';
 import { UMB_SCRIPT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_SCRIPT_ITEM_REPOSITORY_ALIAS } from '../../repository/item/index.js';
 
 export const UMB_RENAME_SCRIPT_REPOSITORY_ALIAS = 'Umb.Repository.Script.Rename';
 export const UMB_RENAME_SCRIPT_ENTITY_ACTION_ALIAS = 'Umb.EntityAction.Script.Rename';

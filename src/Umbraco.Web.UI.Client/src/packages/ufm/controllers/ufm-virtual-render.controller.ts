@@ -1,12 +1,11 @@
 import { UmbUfmRenderElement } from '../components/index.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * Renders a UFM
  */
 export class UmbUfmVirtualRenderController extends UmbControllerBase {
-	#element: UmbUfmRenderElement;
+	#element?: UmbUfmRenderElement;
 
 	#getTextFromDescendants(element?: Element | null): string {
 		if (!element) return '';
@@ -31,30 +30,42 @@ export class UmbUfmVirtualRenderController extends UmbControllerBase {
 	}
 
 	set markdown(markdown: string | undefined) {
-		this.#element.markdown = markdown;
+		this.#markdown = markdown;
+		if (this.#element) {
+			this.#element.markdown = markdown;
+		}
 	}
 	get markdown(): string | undefined {
-		return this.#element.markdown;
+		return this.#markdown;
 	}
+	#markdown: string | undefined;
 
 	set value(value: unknown | undefined) {
-		this.#element.value = value;
+		this.#value = value;
+		if (this.#element) {
+			this.#element.value = value;
+		}
 	}
 	get value(): unknown | undefined {
-		return this.#element.value;
+		return this.#value;
 	}
+	#value: unknown | undefined;
 
-	constructor(host: UmbControllerHost) {
-		super(host);
-
+	override hostConnected(): void {
 		const element = new UmbUfmRenderElement();
 		element.inline = true;
 		element.style.visibility = 'hidden';
+
+		element.markdown = this.#markdown;
+		element.value = this.#value;
+
 		this.getHostElement().appendChild(element);
 		this.#element = element;
 	}
 
-	override hostConnected(): void {}
+	override hostDisconnected(): void {
+		this.#element?.remove();
+	}
 
 	override toString(): string {
 		return this.#getTextFromDescendants(this.#element);

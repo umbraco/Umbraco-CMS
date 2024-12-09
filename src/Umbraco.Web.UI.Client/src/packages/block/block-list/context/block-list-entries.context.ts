@@ -7,7 +7,7 @@ import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context-tok
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_CONTENT_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/content';
 
 export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT,
@@ -83,7 +83,8 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 				this._workspacePath.setValue(newPath);
 			});
 
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (dataset) => {
+		// TODO: This must later be switched out with a smarter Modal Registration System, cause here is a issue with Block Editors in inline mode in Block Editors, cause the hosting Block is also of type Content. [NL]
+		this.consumeContext(UMB_CONTENT_PROPERTY_DATASET_CONTEXT, (dataset) => {
 			const variantId = dataset.getVariantId();
 			this.#catalogueModal.setUniquePathValue('variantId', variantId?.toString());
 			this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());

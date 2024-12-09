@@ -1,5 +1,5 @@
 import type { UmbDictionaryDetailModel } from '../../types.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_DICTIONARY_DETAIL_STORE_CONTEXT } from './dictionary-detail.store.context-token.js';
 import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -18,9 +18,5 @@ export class UmbDictionaryDetailStore extends UmbDetailStoreBase<UmbDictionaryDe
 		super(host, UMB_DICTIONARY_DETAIL_STORE_CONTEXT.toString());
 	}
 }
-
-export const UMB_DICTIONARY_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbDictionaryDetailStore>(
-	'UmbDictionaryDetailStore',
-);
 
 export { UmbDictionaryDetailStore as api };

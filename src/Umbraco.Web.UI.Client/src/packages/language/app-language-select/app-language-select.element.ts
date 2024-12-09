@@ -1,6 +1,7 @@
 import { UmbLanguageCollectionRepository } from '../collection/index.js';
 import type { UmbLanguageDetailModel } from '../types.js';
-import { type UmbAppLanguageContext, UMB_APP_LANGUAGE_CONTEXT } from '../global-contexts/index.js';
+import type { UmbAppLanguageContext } from '../global-contexts/index.js';
+import { UMB_APP_LANGUAGE_CONTEXT } from '../constants.js';
 import type { UUIMenuItemEvent, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,

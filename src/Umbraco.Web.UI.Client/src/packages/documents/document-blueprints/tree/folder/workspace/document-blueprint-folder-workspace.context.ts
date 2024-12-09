@@ -1,8 +1,6 @@
 import { UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE } from '../../../entity.js';
-import {
-	UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS,
-	type UmbDocumentBlueprintFolderRepository,
-} from '../repository/index.js';
+import type { UmbDocumentBlueprintFolderRepository } from '../repository/index.js';
+import { UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS } from '../constants.js';
 import { UMB_DOCUMENT_BLUEPRINT_FOLDER_WORKSPACE_ALIAS } from './constants.js';
 import { UmbDocumentBlueprintFolderWorkspaceEditorElement } from './document-blueprint-folder-editor.element.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -41,8 +39,7 @@ export class UmbDocumentBlueprintFolderWorkspaceContext
 
 	/**
 	 * @description Set the name of the document blueprint folder
-	 * @param {string} value
-	 * @memberof UmbDocumentBlueprintFolderWorkspaceContext
+	 * @param {string} value - The name of the document blueprint folder
 	 */
 	public setName(value: string) {
 		this._data.updateCurrent({ name: value });
@@ -50,8 +47,7 @@ export class UmbDocumentBlueprintFolderWorkspaceContext
 
 	/**
 	 * @description Get the name of the document blueprint folder
-	 * @returns {string}
-	 * @memberof UmbDocumentBlueprintFolderWorkspaceContext
+	 * @returns {string} The name of the document blueprint folder
 	 */
 	public getName() {
 		return this._data.getCurrent()?.name;

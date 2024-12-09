@@ -4,7 +4,7 @@ import {
 	UmbContentTypeContainerStructureHelper,
 	UmbContentTypeMoveRootGroupsIntoFirstTabHelper,
 } from '../../../structure/index.js';
-import { UMB_COMPOSITION_PICKER_MODAL } from '../../../modals/index.js';
+import { UMB_COMPOSITION_PICKER_MODAL } from '../../../modals/constants.js';
 import type { UmbContentTypeDesignEditorTabElement } from './content-type-design-editor-tab.element.js';
 import { UmbContentTypeDesignEditorContext } from './content-type-design-editor.context.js';
 import { css, html, customElement, state, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
