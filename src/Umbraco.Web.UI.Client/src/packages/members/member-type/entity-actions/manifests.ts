@@ -1,6 +1,5 @@
+import { UMB_MEMBER_TYPE_DETAIL_REPOSITORY_ALIAS, UMB_MEMBER_TYPE_ITEM_REPOSITORY_ALIAS } from '../constants.js';
 import { UMB_MEMBER_TYPE_ENTITY_TYPE, UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UMB_MEMBER_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/detail/index.js';
-import { UMB_MEMBER_TYPE_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UmbCreateMemberTypeEntityAction } from './create.action.js';
 import { manifests as duplicateManifests } from './duplicate/manifests.js';
 

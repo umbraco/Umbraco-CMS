@@ -4,10 +4,10 @@ import type {
 	UmbTiptapToolbarGroupViewModel,
 	UmbTiptapToolbarRowViewModel,
 } from '../types.js';
+import { UMB_TIPTAP_TOOLBAR_CONFIGURATION_CONTEXT } from './tiptap-toolbar-configuration.context-token.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -311,7 +311,3 @@ export class UmbTiptapToolbarConfigurationContext extends UmbContextBase<UmbTipt
 		this.#toolbar.setValue(toolbar);
 	}
 }
-
-export const UMB_TIPTAP_TOOLBAR_CONFIGURATION_CONTEXT = new UmbContextToken<UmbTiptapToolbarConfigurationContext>(
-	'UmbTiptapToolbarConfigurationContext',
-);

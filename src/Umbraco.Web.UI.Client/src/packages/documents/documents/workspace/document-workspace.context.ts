@@ -1,25 +1,23 @@
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
-import { UmbDocumentPropertyDatasetContext } from '../property-dataset-context/document-property-dataset-context.js';
-import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
+import { UmbDocumentPropertyDatasetContext } from '../property-dataset-context/document-property-dataset.context.js';
 import type { UmbDocumentDetailRepository } from '../repository/index.js';
 import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import type { UmbDocumentVariantPublishModel, UmbDocumentDetailModel, UmbDocumentVariantModel } from '../types.js';
 import {
+	UMB_DOCUMENT_COLLECTION_ALIAS,
+	UMB_DOCUMENT_ENTITY_TYPE,
 	UMB_DOCUMENT_PUBLISH_MODAL,
 	UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL,
 	UMB_DOCUMENT_SAVE_MODAL,
 	UMB_DOCUMENT_SCHEDULE_MODAL,
-} from '../modals/index.js';
-import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
-import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
-import { UmbDocumentValidationRepository } from '../repository/validation/document-validation.repository.js';
-import {
 	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
 	UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
-} from '../paths.js';
+} from '../constants.js';
+import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
+import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
+import { UmbDocumentValidationRepository } from '../repository/validation/document-validation.repository.js';
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
-import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../collection/index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';

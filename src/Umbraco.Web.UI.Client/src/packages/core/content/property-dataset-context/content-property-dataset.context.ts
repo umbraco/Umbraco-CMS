@@ -23,6 +23,8 @@ export class UmbContentPropertyDatasetContext<
 	culture = this.#currentVariant.asObservablePart((x) => x?.culture);
 	segment = this.#currentVariant.asObservablePart((x) => x?.segment);
 
+	readonly IS_CONTENT = true;
+
 	getName(): string | undefined {
 		return this._dataOwner.getName(this.getVariantId());
 	}
