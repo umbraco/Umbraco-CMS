@@ -1,10 +1,12 @@
 import type { TagResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
-export const UMB_TAG_STORE_CONTEXT = new UmbContextToken<UmbTagStore>('UmbTagStore');
+export const UMB_TAG_STORE_CONTEXT_ALIAS = 'UMB_TAG_STORE';
+export const UMB_TAG_STORE_CONTEXT = new UmbContextToken<UmbTagStore>(UMB_TAG_STORE_CONTEXT_ALIAS);
+
 /**
  * @class UmbTagStore
  * @augments {UmbStoreBase}

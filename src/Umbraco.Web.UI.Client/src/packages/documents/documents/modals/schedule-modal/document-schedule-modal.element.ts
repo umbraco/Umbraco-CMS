@@ -136,7 +136,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 			<uui-checkbox
 				@change=${this.#onSelectAllChange}
 				label=${this.localize.term('general_selectAll')}
-				.checked=${this._isAllSelected}></uui-checkbox>
+				.checked=${this._isAllSelected ?? false}></uui-checkbox>
 
 			${repeat(
 				this._options,

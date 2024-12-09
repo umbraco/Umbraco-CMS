@@ -1,5 +1,5 @@
 import type { UmbDocumentVariantPickerData, UmbDocumentVariantPickerValue } from '../types.js';
-import { UMB_DOCUMENT_UNPUBLISH_MODAL_ALIAS } from '../manifests.js';
+import { UMB_DOCUMENT_UNPUBLISH_MODAL_ALIAS } from './manifest.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbDocumentUnpublishModalData extends UmbDocumentVariantPickerData {

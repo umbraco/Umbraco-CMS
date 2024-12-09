@@ -35,7 +35,7 @@ const umbRteBlock = Node.create({
 	},
 
 	parseHTML() {
-		return [{ tag: 'umb-rte-block' }];
+		return [{ tag: `umb-rte-block[${UMB_BLOCK_RTE_DATA_CONTENT_KEY}]` }];
 	},
 
 	renderHTML({ HTMLAttributes }) {
@@ -63,7 +63,7 @@ const umbRteBlockInline = umbRteBlock.extend({
 	inline: true,
 
 	parseHTML() {
-		return [{ tag: 'umb-rte-block-inline' }];
+		return [{ tag: `umb-rte-block-inline[${UMB_BLOCK_RTE_DATA_CONTENT_KEY}]` }];
 	},
 
 	renderHTML({ HTMLAttributes }) {

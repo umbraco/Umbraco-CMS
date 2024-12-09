@@ -90,7 +90,7 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 	];
 }
 
-export default UmbDashboardExamineManagementElement;
+export { UmbDashboardExamineManagementElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
