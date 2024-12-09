@@ -12,7 +12,7 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import type { UmbDocumentValidationRepository } from '../repository/validation/index.js';
+import { UmbDocumentValidationRepository } from '../repository/validation/index.js';
 import { UMB_DOCUMENT_SCHEDULE_MODAL } from './schedule-publish/constants.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from './publish-with-descendants/constants.js';
