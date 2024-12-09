@@ -9,7 +9,7 @@ import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from './block-rte-manager.context-token
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_CONTENT_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/content';
 
 export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 	typeof UMB_BLOCK_RTE_MANAGER_CONTEXT,
@@ -79,7 +79,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 				this._workspacePath.setValue(newPath);
 			});
 
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (dataset) => {
+		this.consumeContext(UMB_CONTENT_PROPERTY_DATASET_CONTEXT, (dataset) => {
 			const variantId = dataset.getVariantId();
 			this.#catalogueModal.setUniquePathValue('variantId', variantId?.toString());
 			this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());

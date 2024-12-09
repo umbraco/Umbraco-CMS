@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE } from '../../entity.js';
-import { UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS } from './repository/index.js';
+import { UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS } from './constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 

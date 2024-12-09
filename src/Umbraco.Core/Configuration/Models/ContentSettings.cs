@@ -19,9 +19,10 @@ public class ContentSettings
 
     internal const string StaticDisallowedUploadFiles = "ashx,aspx,ascx,config,cshtml,vbhtml,asmx,air,axd,xamlx";
     internal const bool StaticShowDeprecatedPropertyEditors = false;
-    internal const string StaticLoginBackgroundImage = "login/login.jpg";
-    internal const string StaticLoginLogoImage = "login/logo_light.svg";
-    internal const string StaticLoginLogoImageAlternative = "login/logo_dark.svg";
+    internal const string StaticLoginBackgroundImage = "assets/login.jpg";
+    internal const string StaticLoginLogoImage = "assets/logo_light.svg";
+    internal const string StaticLoginLogoImageAlternative = "assets/logo_dark.svg";
+    internal const string StaticBackOfficeLogo = "assets/logo.svg";
     internal const bool StaticHideBackOfficeLogo = false;
     internal const bool StaticDisableDeleteWhenReferenced = false;
     internal const bool StaticDisableUnpublishWhenReferenced = false;
@@ -84,9 +85,16 @@ public class ContentSettings
     public string LoginLogoImageAlternative { get; set; } = StaticLoginLogoImageAlternative;
 
     /// <summary>
+    ///     Gets or sets a value for the path to the backoffice logo.
+    /// </summary>
+    [DefaultValue(StaticBackOfficeLogo)]
+    public string BackOfficeLogo { get; set; } = StaticBackOfficeLogo;
+
+    /// <summary>
     ///     Gets or sets a value indicating whether to hide the backoffice umbraco logo or not.
     /// </summary>
     [DefaultValue(StaticHideBackOfficeLogo)]
+    [Obsolete("This setting is no longer used and will be removed in future versions. An alternative BackOffice logo can be set using the BackOfficeLogo setting.")]
     public bool HideBackOfficeLogo { get; set; } = StaticHideBackOfficeLogo;
 
     /// <summary>

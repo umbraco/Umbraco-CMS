@@ -268,6 +268,15 @@ export class UmbContentTypeStructureManager<
 		return this.#ownerContentTypeUnique;
 	}
 
+	getVariesByCulture() {
+		const ownerContentType = this.getOwnerContentType();
+		return ownerContentType?.variesByCulture;
+	}
+	getVariesBySegment() {
+		const ownerContentType = this.getOwnerContentType();
+		return ownerContentType?.variesBySegment;
+	}
+
 	/**
 	 * Figure out if any of the Content Types has a Property.
 	 * @returns {boolean} - true if any of the Content Type in this composition has a Property.

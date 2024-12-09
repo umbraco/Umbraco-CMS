@@ -51,11 +51,11 @@ public abstract class UmbracoIntegrationTestBase
 
     [SetUp]
     public void SetUp_Logging() =>
-        TestContext.Progress.Write($"Start test {s_testCount++}: {TestContext.CurrentContext.Test.Name}");
+        TestContext.Out.Write($"Start test {s_testCount++}: {TestContext.CurrentContext.Test.Name}");
 
     [TearDown]
     public void TearDown_Logging() =>
-        TestContext.Progress.Write($"  {TestContext.CurrentContext.Result.Outcome.Status}");
+        TestContext.Out.Write($"  {TestContext.CurrentContext.Result.Outcome.Status}");
 
     [OneTimeTearDown]
     public void FixtureTearDown()

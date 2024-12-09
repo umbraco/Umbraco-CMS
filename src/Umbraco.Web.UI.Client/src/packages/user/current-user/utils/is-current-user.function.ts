@@ -12,17 +12,5 @@ export const isCurrentUser = async (host: UmbControllerHost, userUnique: string)
 	const currentUserContext = await ctrl.asPromise();
 	ctrl.destroy();
 
-	return currentUserContext!.isUserCurrentUser(userUnique);
-};
-
-/**
- * Check if the current user is an admin
- * @param host
- */
-export const isCurrentUserAnAdmin = async (host: UmbControllerHost) => {
-	const ctrl = new UmbContextConsumerController(host, UMB_CURRENT_USER_CONTEXT);
-	const currentUserContext = await ctrl.asPromise();
-	ctrl.destroy();
-
-	return currentUserContext!.isCurrentUserAdmin();
+	return await currentUserContext!.isUserCurrentUser(userUnique);
 };
