@@ -1,7 +1,7 @@
 import { UmbUnpublishDocumentEntityAction } from '../../entity-actions/unpublish.action.js';
-import { UmbDocumentPublishingRepository } from '../../publishing/index.js';
-import type { UmbDocumentVariantOptionModel } from '../../types.js';
-import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_UNPUBLISH_MODAL } from '../../constants.js';
+import { UmbDocumentPublishingRepository } from '../../index.js';
+import type { UmbDocumentVariantOptionModel } from '../../../types.js';
+import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_UNPUBLISH_MODAL } from '../../../constants.js';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
