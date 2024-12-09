@@ -65,7 +65,7 @@ export class UmbContentWorkspaceViewEditTabElement extends UmbLitElement {
 				(group) =>
 					html`<uui-box .headline=${this.localize.string(group.name) ?? ''}>
 						<umb-content-workspace-view-edit-properties
-							data-mark="property-group/${group.id}"
+							data-mark="property-group/${group.name}"
 							.containerId=${group.id}></umb-content-workspace-view-edit-properties>
 					</uui-box>`,
 			)}
