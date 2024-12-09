@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public abstract class BlockEditorElementVariationTestBase : UmbracoIntegrationTest
+internal abstract class BlockEditorElementVariationTestBase : UmbracoIntegrationTest
 {
     protected ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 

@@ -13,7 +13,7 @@ using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
-public partial class BlockListElementLevelVariationTests
+internal partial class BlockListElementLevelVariationTests
 {
     [TestCase(true)]
     [TestCase(false)]

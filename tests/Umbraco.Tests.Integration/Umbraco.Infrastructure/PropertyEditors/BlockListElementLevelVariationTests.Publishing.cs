@@ -22,7 +22,7 @@ This means that an invariant element cannot be "turned off" for a single variati
 
 It also means that in a variant setting, the parent property variance has no effect for the variance notation for any nested blocks.
 */
-public partial class BlockListElementLevelVariationTests
+internal partial class BlockListElementLevelVariationTests
 {
     [Test]
     public async Task Can_Publish_Cultures_Independently_Invariant_Blocks()
