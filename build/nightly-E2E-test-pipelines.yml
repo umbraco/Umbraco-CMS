@@ -132,6 +132,16 @@ stages:
               vmImage: "windows-latest"
               testFolder: "DefaultConfig"
               testCommand: "npx playwright test $testFolder --shard=3/3"
+            # Additional test configurations can be added here
+            # UnattendedInstallConfig
+            WindowsUnattendedInstallConfig:
+                vmImage: "windows-latest"
+                testFolder: "UnattendedInstallConfig"
+                testCommand: "npx playwright test $testFolder"
+            LinuxUnattendedInstallConfig:
+                vmImage: "ubuntu-latest"
+                testFolder: "UnattendedInstallConfig"
+                testCommand: "npx playwright test $testFolder"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -189,7 +199,7 @@ stages:
           - pwsh: |
               cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.cs UmbracoProject
               cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.json UmbracoProject
-            displayName: Update application
+            displayName: Update application to use necessary app settings and classes
             workingDirectory: $(Agent.BuildDirectory)/app
 
           # Build application
