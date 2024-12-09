@@ -2,6 +2,7 @@ import { UmbDocumentPublishingRepository } from '../../index.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { UMB_DOCUMENT_PUBLISH_MODAL } from '../../../constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
+import { UmbPublishDocumentEntityAction } from '../entity-action/index.js';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -10,7 +11,6 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbPublishDocumentEntityAction } from '../entity-action/index.js';
 
 export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {

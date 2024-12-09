@@ -1,5 +1,7 @@
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { UMB_DOCUMENT_UNPUBLISH_MODAL } from '../constants.js';
+import { UmbDocumentDetailRepository } from '../../../repository/index.js';
+import { UmbDocumentPublishingRepository } from '../../repository/index.js';
 import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import {
 	type UmbEntityActionArgs,
@@ -11,8 +13,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
-import { UmbDocumentDetailRepository } from '../../../repository/index.js';
-import { UmbDocumentPublishingRepository } from '../../repository/index.js';
 
 export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never> {
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {

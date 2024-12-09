@@ -1,5 +1,5 @@
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import type { UmbDocumentVariantPickerData, UmbDocumentVariantPickerValue } from '../../../modals/types.js';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export const UMB_DOCUMENT_PUBLISH_MODAL_ALIAS = 'Umb.Modal.DocumentPublish';
 

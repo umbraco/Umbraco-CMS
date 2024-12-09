@@ -1,7 +1,7 @@
-import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../../../collection/constants.js';
 import { UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH } from '../../../user-permissions/constants.js';
+import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
