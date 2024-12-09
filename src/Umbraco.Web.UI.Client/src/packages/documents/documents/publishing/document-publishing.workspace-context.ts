@@ -16,6 +16,8 @@ import type { UmbDocumentValidationRepository } from '../repository/validation/i
 import { UMB_DOCUMENT_SCHEDULE_MODAL } from './schedule-publish/constants.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from './publish-with-descendants/constants.js';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UMB_DOCUMENT_PUBLISH_MODAL } from './publish/constants.js';
 
 export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDocumentPublishingWorkspaceContext> {
 	public readonly publishedPendingChanges = new UmbDocumentPublishedPendingChangesManager(this);
@@ -59,6 +61,12 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	}
 
 	public async schedule() {
+		await this.#init;
+		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
+
+		const unique = this.#documentWorkspaceContext.getUnique();
+		if (!unique) throw new Error('Unique is missing');
+
 		const { options, selected } = await this._determineVariantOptions();
 
 		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
@@ -85,9 +93,6 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		if (!variants.length) return;
 
 		// TODO: Validate content & Save changes for the selected variants — This was how it worked in v.13 [NL]
-
-		const unique = this.getUnique();
-		if (!unique) throw new Error('Unique is missing');
 		await this.#publishingRepository.publish(unique, variants);
 	}
 
@@ -205,8 +210,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		this.#validationRepository ??= new UmbDocumentValidationRepository(this);
 
 		// We ask the server first to get a concatenated set of validation messages. So we see both front-end and back-end validation messages [NL]
-		if (this.getIsNew()) {
-			const parent = this.getParent();
+		if (this.#documentWorkspaceContext.getIsNew()) {
+			const parent = this.#documentWorkspaceContext.getParent();
 			if (!parent) throw new Error('Parent is not set');
 			this.#serverValidation.askServerForValidation(
 				saveData,
@@ -220,7 +225,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		}
 
 		// TODO: Only validate the specified selection.. [NL]
-		return this.validateAndSubmit(
+		return this.#documentWorkspaceContext.validateAndSubmit(
 			async () => {
 				return this.#performSaveAndPublish(variantIds, saveData);
 			},

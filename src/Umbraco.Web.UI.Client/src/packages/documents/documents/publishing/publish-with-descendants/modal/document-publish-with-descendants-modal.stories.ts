@@ -1,6 +1,4 @@
-import './document-publish-with-descendants-modal.element.js';
-
-import { UmbDocumentVariantState } from '../../types.js';
+import { UmbDocumentVariantState } from '../../../types.js';
 import type {
 	UmbDocumentPublishWithDescendantsModalData,
 	UmbDocumentPublishWithDescendantsModalValue,
@@ -8,6 +6,8 @@ import type {
 import type { UmbDocumentPublishWithDescendantsModalElement } from './document-publish-with-descendants-modal.element.js';
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
+
+import './document-publish-with-descendants-modal.element.js';
 
 const modalData: UmbDocumentPublishWithDescendantsModalData = {
 	options: [
