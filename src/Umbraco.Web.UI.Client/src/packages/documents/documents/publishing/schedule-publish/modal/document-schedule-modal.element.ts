@@ -1,5 +1,4 @@
-import { UmbDocumentVariantLanguagePickerElement } from '../shared/document-variant-language-picker.element.js';
-import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
+import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
 import type { UmbDocumentScheduleModalData, UmbDocumentScheduleModalValue } from './document-schedule-modal.token.js';
 import { css, customElement, html, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -7,6 +6,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';
 import type { UUIBooleanInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { UmbDocumentVariantLanguagePickerElement } from '../../../modals/index.js';
 
 @customElement('umb-document-schedule-modal')
 export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
