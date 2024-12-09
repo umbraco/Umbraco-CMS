@@ -1,8 +1,10 @@
-﻿namespace Umbraco.Cms.Api.Management.Routing;
+﻿using Umbraco.Cms.Api.Management.ServerEvents.Models;
+
+namespace Umbraco.Cms.Api.Management.Routing;
 
 public interface IServerEventHub
 {
 #pragma warning disable SA1300
-    Task notify();
+    Task notify(ServerEvent payload);
 #pragma warning restore SA1300
 }

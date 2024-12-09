@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Umbraco.Cms.Api.Management.ViewModels.Events;
+using Umbraco.Cms.Api.Management.ServerEvents.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Api.Management.Routing;
@@ -17,14 +18,27 @@ public class ServerEventSender : INotificationHandler<ContentSavedNotification>
 
     public void Handle(ContentSavedNotification notification)
     {
-        foreach (var entity in notification.SavedEntities)
+        foreach (IContent entity in notification.SavedEntities)
         {
-            var eventType = EventType.Updated;
+            EventType eventType = EventType.Updated;
             if (entity.CreateDate == entity.UpdateDate)
             {
                 // This is a new entity
                 eventType = EventType.Created;
             }
+
+            var eventModel = new ServerEvent()
+            {
+                EventType = eventType,
+                Key = entity.Key,
+                SourceType = entity.GetType().Name,
+            };
+
+            _eventHub.Clients.All.notify(eventModel);
+            // foreach (var VARIABLE in _eventHub.Clients.Users())
+            // {
+            //
+            // }
         }
     }
 }

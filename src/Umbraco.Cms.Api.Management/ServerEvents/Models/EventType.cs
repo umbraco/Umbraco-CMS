@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Events;
+﻿namespace Umbraco.Cms.Api.Management.ServerEvents.Models;
 
 public enum EventType
 {

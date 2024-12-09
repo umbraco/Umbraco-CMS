@@ -54,7 +54,7 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
             case RuntimeLevel.Run:
                 MapMinimalBackOffice(endpoints);
                 endpoints.MapHub<BackofficeHub>(_umbracoPathSegment + Constants.Web.BackofficeSignalRHub);
-                endpoints.MapHub<ServerEventHub>(_umbracoPathSegment + "/serveEventHub");
+                endpoints.MapHub<ServerEventHub>(_umbracoPathSegment + "/serverEventHub");
                 break;
             case RuntimeLevel.BootFailed:
             case RuntimeLevel.Unknown:

@@ -1,6 +1,6 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Events;
+﻿namespace Umbraco.Cms.Api.Management.ServerEvents.Models;
 
-public class SeverEventViewModel
+public class ServerEvent
 {
     public EventType EventType { get; set; }
 
