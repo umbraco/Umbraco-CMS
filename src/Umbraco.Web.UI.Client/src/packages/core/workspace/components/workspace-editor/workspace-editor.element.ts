@@ -86,7 +86,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<umb-body-layout main-no-padding data-mark="workspace" .headline=${this.headline} ?loading=${this.loading}>
+			<umb-body-layout main-no-padding .headline=${this.headline} ?loading=${this.loading}>
 				${this.#renderBackButton()}
 				<slot name="header" slot="header"></slot>
 				${this.#renderViews()}
