@@ -1,4 +1,3 @@
-export * from './publish-modal/constants.js';
 export * from './publish-with-descendants-modal/constants.js';
 export * from './save-modal/constants.js';
 export * from './unpublish-modal/constants.js';
