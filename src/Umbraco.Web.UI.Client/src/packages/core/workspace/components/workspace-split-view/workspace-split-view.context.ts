@@ -40,7 +40,6 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase<UmbWorkspaceSpl
 		const index = this.#index.getValue();
 		if (index === undefined) return;
 
-		// TODO: Should splitView be put into its own context?... a split view manager context?   one which might have a reference to the workspace context, so we still can ask that about how to create the variant context.
 		this.observe(
 			this.#workspaceContext.splitView.activeVariantByIndex(index),
 			async (activeVariantInfo) => {
