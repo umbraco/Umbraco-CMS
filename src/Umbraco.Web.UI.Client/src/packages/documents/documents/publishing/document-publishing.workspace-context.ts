@@ -5,7 +5,11 @@ import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from './document-publishing
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { UmbDocumentDetailModel, UmbDocumentVariantPublishModel } from '../types.js';
+import type {
+	UmbDocumentDetailModel,
+	UmbDocumentVariantOptionModel,
+	UmbDocumentVariantPublishModel,
+} from '../types.js';
 import { UmbServerModelValidatorContext } from '@umbraco-cms/backoffice/validation';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
@@ -18,6 +22,8 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from './publish-with-descendants/constants.js';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UMB_DOCUMENT_PUBLISH_MODAL } from './publish/constants.js';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbUnpublishDocumentEntityAction } from './unpublish/index.js';
 
 export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDocumentPublishingWorkspaceContext> {
 	public readonly publishedPendingChanges = new UmbDocumentPublishedPendingChangesManager(this);
@@ -67,14 +73,14 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		const unique = this.#documentWorkspaceContext.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 
-		const { options, selected } = await this._determineVariantOptions();
+		const { options, selected } = await this.#determineVariantOptions();
 
 		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const result = await modalManagerContext
 			.open(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
 				data: {
 					options,
-					pickableFilter: this._readOnlyLanguageVariantsFilter,
+					pickableFilter: this.#readOnlyLanguageVariantsFilter,
 				},
 				value: { selection: selected.map((unique) => ({ unique, schedule: {} })) },
 			})
@@ -106,14 +112,14 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		const entityType = this.#documentWorkspaceContext.getEntityType();
 		if (!entityType) throw new Error('Entity type is missing');
 
-		const { options, selected } = await this._determineVariantOptions();
+		const { options, selected } = await this.#determineVariantOptions();
 
 		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const result = await modalManagerContext
 			.open(this, UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL, {
 				data: {
 					options,
-					pickableFilter: this._readOnlyLanguageVariantsFilter,
+					pickableFilter: this.#readOnlyLanguageVariantsFilter,
 				},
 				value: { selection: selected },
 			})
@@ -176,7 +182,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 
 		let variantIds: Array<UmbVariantId> = [];
 
-		const { options, selected } = await this._determineVariantOptions();
+		const { options, selected } = await this.#determineVariantOptions();
 
 		// If there is only one variant, we don't need to open the modal.
 		if (options.length === 0) {
@@ -191,7 +197,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 				.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
 					data: {
 						options,
-						pickableFilter: this._readOnlyLanguageVariantsFilter,
+						pickableFilter: this.#readOnlyLanguageVariantsFilter,
 					},
 					value: { selection: selected },
 				})
@@ -268,6 +274,41 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			eventContext.dispatchEvent(event);
 			this._closeModal();
 		}
+	}
+
+	#readOnlyLanguageVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
+		const readOnlyCultures =
+			this.#documentWorkspaceContext?.readOnlyState.getStates().map((s) => s.variantId.culture) ?? [];
+		return readOnlyCultures.includes(option.culture) === false;
+	};
+
+	async #determineVariantOptions(): Promise<{
+		options: UmbDocumentVariantOptionModel[];
+		selected: string[];
+	}> {
+		await this.#init;
+		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
+
+		const options = await firstValueFrom(this.#documentWorkspaceContext.variantOptions);
+
+		//const activeVariants = this.splitView.getActiveVariants();
+		//const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
+		//const changedVariantIds = this._data.getChangedVariants();
+		//const selectedVariantIds = activeVariantIds.concat(changedVariantIds);
+
+		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
+		/*
+		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
+		let selected = selectedVariantIds.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i);
+		selected = selected.filter((x) => readOnlyCultures.includes(x) === false);
+		*/
+
+		const selected: Array<string> = [];
+
+		return {
+			options,
+			selected,
+		};
 	}
 }
 
