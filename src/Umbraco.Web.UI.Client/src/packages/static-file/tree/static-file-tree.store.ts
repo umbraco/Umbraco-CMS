@@ -1,4 +1,4 @@
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_STATIC_FILE_TREE_STORE_CONTEXT } from './static-file-tree.store.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 
@@ -19,5 +19,3 @@ export class UmbStaticFileTreeStore extends UmbUniqueTreeStore {
 }
 
 export default UmbStaticFileTreeStore;
-
-export const UMB_STATIC_FILE_TREE_STORE_CONTEXT = new UmbContextToken<UmbStaticFileTreeStore>('UmbStaticFileTreeStore');

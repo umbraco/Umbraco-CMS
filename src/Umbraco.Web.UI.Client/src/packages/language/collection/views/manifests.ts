@@ -1,6 +1,5 @@
+import { UMB_LANGUAGE_TABLE_COLLECTION_VIEW_ALIAS } from './constants.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
-
-export const UMB_LANGUAGE_TABLE_COLLECTION_VIEW_ALIAS = 'Umb.CollectionView.Language.Table';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

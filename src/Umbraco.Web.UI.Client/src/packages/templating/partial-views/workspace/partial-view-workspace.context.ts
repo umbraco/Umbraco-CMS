@@ -1,7 +1,7 @@
 import type { UmbPartialViewDetailModel } from '../types.js';
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
 import type { UmbPartialViewDetailRepository } from '../repository/index.js';
-import { UMB_PARTIAL_VIEW_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_PARTIAL_VIEW_DETAIL_REPOSITORY_ALIAS } from '../constants.js';
 import { UmbPartialViewWorkspaceEditorElement } from './partial-view-workspace-editor.element.js';
 import { UMB_PARTIAL_VIEW_WORKSPACE_ALIAS } from './manifests.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

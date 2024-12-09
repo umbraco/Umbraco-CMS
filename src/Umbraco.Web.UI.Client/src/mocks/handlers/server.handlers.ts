@@ -1,4 +1,5 @@
 const { rest } = window.MockServiceWorker;
+import { version } from '../../../package.json';
 import {
 	RuntimeLevelModel,
 	RuntimeModeModel,
@@ -67,8 +68,8 @@ export const serverInformationHandlers = [
 			// Respond with a 200 status code
 			ctx.status(200),
 			ctx.json<GetServerInformationResponse>({
-				version: '14.0.0',
-				assemblyVersion: '14.0.0',
+				version,
+				assemblyVersion: version,
 				baseUtcOffset: '01:00:00',
 				runtimeMode: RuntimeModeModel.BACKOFFICE_DEVELOPMENT,
 			}),
@@ -82,7 +83,7 @@ export const serverInformationHandlers = [
 				items: [
 					{ name: 'Umbraco base url', data: location.origin },
 					{ name: 'Mocked server', data: 'true' },
-					{ name: 'Umbraco version', data: '14.0.0-preview004' },
+					{ name: 'Umbraco version', data: version },
 				],
 			}),
 		);

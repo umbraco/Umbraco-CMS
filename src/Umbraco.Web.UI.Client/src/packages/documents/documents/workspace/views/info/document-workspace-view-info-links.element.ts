@@ -3,10 +3,12 @@ import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { css, customElement, html, map, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { debounce } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-document-workspace-view-info-links')
 export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
@@ -24,26 +26,42 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 	@state()
 	private _lookup: Record<string, string[]> = {};
 
+	@state()
+	private _loading = false;
+
+	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
+	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
-			context.addEventListener(UmbRequestReloadStructureForEntityEvent.TYPE, () => {
-				this.#requestUrls();
-			});
+			this.#eventContext = context;
+
+			this.#eventContext.removeEventListener(
+				UmbRequestReloadStructureForEntityEvent.TYPE,
+				this.#onReloadRequest as unknown as EventListener,
+			);
+
+			this.#eventContext.addEventListener(
+				UmbRequestReloadStructureForEntityEvent.TYPE,
+				this.#onReloadRequest as unknown as EventListener,
+			);
 		});
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
-			this.observe(
-				observeMultiple([context.isNew, context.unique, context.variantOptions]),
-				([isNew, unique, variantOptions]) => {
-					if (!unique) return;
-					this._isNew = isNew === true;
+			this.#documentWorkspaceContext = context;
+			this.observe(observeMultiple([context.isNew, context.unique]), ([isNew, unique]) => {
+				if (!unique) return;
+				this._isNew = isNew === true;
+
+				if (unique !== this._unique) {
 					this._unique = unique;
-					this._variantOptions = variantOptions;
 					this.#requestUrls();
-				},
-			);
+				}
+			});
+
+			this.observe(context.variantOptions, (variantOptions) => (this._variantOptions = variantOptions));
 		});
 	}
 
@@ -51,12 +69,17 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		if (this._isNew) return;
 		if (!this._unique) return;
 
+		this._loading = true;
+		this._lookup = {};
+
 		const { data } = await this.#documentUrlRepository.requestItems([this._unique]);
 
 		if (data?.length) {
-			data[0].urls.forEach((item) => {
+			const item = data[0];
+
+			item.urls.forEach((item) => {
 				if (item.culture && item.url) {
-					if(this._lookup[item.culture] == null){
+					if (this._lookup[item.culture] == null) {
 						this._lookup[item.culture] = [];
 					}
 					this._lookup[item.culture].push(item.url);
@@ -64,6 +87,8 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 			});
 			this.requestUpdate('_lookup');
 		}
+
+		this._loading = false;
 	}
 
 	#getStateLocalizationKey(variantOption: UmbDocumentVariantOptionModel) {
@@ -81,15 +106,38 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		}
 	}
 
+	#debounceRequestUrls = debounce(() => this.#requestUrls(), 50);
+
+	#onReloadRequest = (event: UmbEntityActionEvent) => {
+		// TODO: Introduce "Published Event". We only need to update the url when the document is published.
+		if (event.getUnique() !== this.#documentWorkspaceContext?.getUnique()) return;
+		if (event.getEntityType() !== this.#documentWorkspaceContext.getEntityType()) return;
+		this.#debounceRequestUrls();
+	};
+
 	override render() {
 		return html`
 			<uui-box headline=${this.localize.term('general_links')}>
 				${when(
-					this._isNew,
-					() => this.#renderNotCreated(),
-					() => this.#renderUrls(),
+					this._loading,
+					() => this.#renderLoading(),
+					() => this.#renderContent(),
 				)}
 			</uui-box>
+		`;
+	}
+
+	#renderLoading() {
+		return html`<div id="loader-container"><uui-loader></uui-loader></div>`;
+	}
+
+	#renderContent() {
+		return html`
+			${when(
+				this._isNew,
+				() => this.#renderNotCreated(),
+				() => this.#renderUrls(),
+			)}
 		`;
 	}
 
@@ -114,16 +162,16 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		const urls = this._lookup[culture];
 		return when(
 			urls && urls.length >= 1,
-			() => html`
-				${urls.map((url) =>
-					html`
-						<a class="link-item" href=${url} target="_blank">
+			() =>
+				html` ${urls.map(
+					(url) =>
+						html` <a class="link-item" href=${url} target="_blank">
 							<span>
 								<span class="culture">${varies ? culture : nothing}</span>
 								<span>${url}</span>
 							</span>
 							<uui-icon name="icon-out"></uui-icon>
-						</a>`
+						</a>`,
 				)}`,
 			() => html`
 				<div class="link-item">
@@ -136,10 +184,26 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		);
 	}
 
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+
+		this.#eventContext?.removeEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadRequest as unknown as EventListener,
+		);
+	}
+
 	static override styles = [
 		css`
 			uui-box {
 				--uui-box-default-padding: 0;
+			}
+
+			#loader-container {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: var(--uui-size-space-2);
 			}
 
 			.link-item {
