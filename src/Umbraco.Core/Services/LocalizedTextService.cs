@@ -364,10 +364,7 @@ public class LocalizedTextService : ILocalizedTextService
                     (string)key.Attribute("alias")!;
 
                 // there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
-                if (result.ContainsKey(dictionaryKey) == false)
-                {
-                    result.Add(dictionaryKey, key.Value);
-                }
+                result.TryAdd(dictionaryKey, key.Value);
             }
 
             if (!overallResult.ContainsKey(areaAlias))
@@ -397,16 +394,10 @@ public class LocalizedTextService : ILocalizedTextService
                         (string)key.Attribute("alias")!;
 
                     // there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
-                    if (result.ContainsKey(dictionaryKey) == false)
-                    {
-                        result.Add(dictionaryKey, key.Value);
-                    }
+                    result.TryAdd(dictionaryKey, key.Value);
                 }
 
-                if (!overallResult.ContainsKey(areaAlias))
-                {
-                    overallResult.Add(areaAlias, result);
-                }
+                overallResult.TryAdd(areaAlias, result);
             }
         }
 
@@ -425,10 +416,7 @@ public class LocalizedTextService : ILocalizedTextService
                 (string)key.Attribute("alias")!;
 
             // there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
-            if (result.ContainsKey(dictionaryKey) == false)
-            {
-                result.Add(dictionaryKey, key.Value);
-            }
+            result.TryAdd(dictionaryKey, key.Value);
         }
 
         // Merge English Dictionary
@@ -443,10 +431,7 @@ public class LocalizedTextService : ILocalizedTextService
                     (string)key.Attribute("alias")!;
 
                 // there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
-                if (result.ContainsKey(dictionaryKey) == false)
-                {
-                    result.Add(dictionaryKey, key.Value);
-                }
+                result.TryAdd(dictionaryKey, key.Value);
             }
         }
 

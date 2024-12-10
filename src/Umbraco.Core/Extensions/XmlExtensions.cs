@@ -137,13 +137,13 @@ public static class XmlExtensions
             return default;
         }
 
-        if (xml.Attributes[attributeName] == null)
+        XmlAttribute? xmlAttribute = xml.Attributes[attributeName];
+        if (xmlAttribute == null)
         {
             return default;
         }
 
-        var val = xml.Attributes[attributeName]?.Value;
-        Attempt<T> result = val.TryConvertTo<T>();
+        Attempt<T> result = xmlAttribute.Value.TryConvertTo<T>();
         if (result.Success)
         {
             return result.Result;
