@@ -133,7 +133,7 @@ public class LocalizedTextService : ILocalizedTextService
         // TODO: Hack, see notes on ConvertToSupportedCultureWithRegionCode
         culture = ConvertToSupportedCultureWithRegionCode(culture);
 
-        if (DictionarySource.TryGetValue(culture, out var valueForCulture) == false)
+        if (DictionarySource.TryGetValue(culture, out Lazy<IDictionary<string, IDictionary<string, string>>>? valueForCulture) == false)
         {
             _logger.LogWarning(
                 "The culture specified {Culture} was not found in any configured sources for this service",
@@ -216,7 +216,7 @@ public class LocalizedTextService : ILocalizedTextService
         // TODO: Hack, see notes on ConvertToSupportedCultureWithRegionCode
         culture = ConvertToSupportedCultureWithRegionCode(culture);
 
-        if (DictionarySource.TryGetValue(culture, out var valueForCulture) == false)
+        if (DictionarySource.TryGetValue(culture, out Lazy<IDictionary<string, IDictionary<string, string>>>? valueForCulture) == false)
         {
             _logger.LogWarning(
                 "The culture specified {Culture} was not found in any configured sources for this service",
@@ -460,7 +460,7 @@ public class LocalizedTextService : ILocalizedTextService
 
     private string GetFromDictionarySource(CultureInfo culture, string? area, string key, IDictionary<string, string?>? tokens)
     {
-        if (DictionarySource.TryGetValue(culture, out var valueForCulture) == false)
+        if (DictionarySource.TryGetValue(culture, out Lazy<IDictionary<string, IDictionary<string, string>>>? valueForCulture) == false)
         {
             _logger.LogWarning(
                 "The culture specified {Culture} was not found in any configured sources for this service",
@@ -475,7 +475,7 @@ public class LocalizedTextService : ILocalizedTextService
         }
         else
         {
-            if (valueForCulture.Value.TryGetValue(area, out var areaDictionary))
+            if (valueForCulture.Value.TryGetValue(area, out IDictionary<string, string>? areaDictionary))
             {
                 areaDictionary.TryGetValue(key, out found);
             }

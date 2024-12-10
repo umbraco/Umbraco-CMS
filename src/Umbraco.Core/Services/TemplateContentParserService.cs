@@ -14,7 +14,7 @@ public partial class TemplateContentParserService : ITemplateContentParserServic
 
         Match match = LayoutRegex().Match(viewContent);
 
-        if (match.Success == false || match.Groups.TryGetValue("layout", out var layoutGroup) == false)
+        if (match.Success == false || match.Groups.TryGetValue("layout", out Group? layoutGroup) == false)
         {
             return null;
         }

@@ -32,7 +32,7 @@ public static class DictionaryExtensions
             return existing;
         }
 
-        var value = new TVal();
+        TVal value = new();
         dict.Add(key, value);
         return value;
     }

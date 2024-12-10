@@ -773,7 +773,7 @@ public class ContentStore
         foreach (IPublishedContentType contentType in contentTypes)
         {
             // again, weird situation
-            if (contentTypeNodes.TryGetValue(contentType.Id, out var contentTypeNode) == false)
+            if (contentTypeNodes.TryGetValue(contentType.Id, out List<int>? contentTypeNode) == false)
             {
                 continue;
             }

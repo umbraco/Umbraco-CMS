@@ -149,7 +149,7 @@ namespace Umbraco.Cms.Core.Routing
                     Sites = null;
                 }
 
-                if (Bindings != null && Bindings.TryGetValue(key, out var binding))
+                if (Bindings != null && Bindings.TryGetValue(key, out List<string>? binding))
                 {
                     foreach (var b in binding)
                     {
@@ -292,7 +292,7 @@ namespace Umbraco.Cms.Core.Routing
                 if (!currentSite.Equals(default(KeyValuePair<string, string[]>)))
                 {
                     candidateSites = new[] { currentSite };
-                    if (Bindings != null && Bindings.TryGetValue(currentSite.Key, out var bindingForSite))
+                    if (Bindings != null && Bindings.TryGetValue(currentSite.Key, out List<string>? bindingForSite))
                     {
                         IEnumerable<KeyValuePair<string, string[]>> boundSites =
                             qualifiedSites.Where(site => bindingForSite.Contains(site.Key));
@@ -346,7 +346,7 @@ namespace Umbraco.Cms.Core.Routing
             }
 
             // cached?
-            if (_qualifiedSites != null && _qualifiedSites.TryGetValue(current.Scheme, out var qualifiedSite))
+            if (_qualifiedSites != null && _qualifiedSites.TryGetValue(current.Scheme, out Dictionary<string, string[]>? qualifiedSite))
             {
                 return qualifiedSite;
             }
