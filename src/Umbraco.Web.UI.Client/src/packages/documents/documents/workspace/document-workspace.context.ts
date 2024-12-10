@@ -12,7 +12,7 @@ import {
 	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 } from '../constants.js';
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
-import { UmbDocumentPublishingRepository } from '../publishing/index.js';
+import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, UmbDocumentPublishingRepository } from '../publishing/index.js';
 import { UmbDocumentValidationRepository } from '../repository/validation/index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
@@ -64,6 +64,7 @@ export class UmbDocumentWorkspaceContext
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
+	#publishingContext?: typeof UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -78,6 +79,11 @@ export class UmbDocumentWorkspaceContext
 		});
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
+
+		// TODO: Remove this in v17 as we have moved the publishing methods to the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.
+		this.consumeContext(UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, (context) => {
+			this.#publishingContext = context;
+		});
 
 		this.routes.setRoutes([
 			{
@@ -259,7 +265,8 @@ export class UmbDocumentWorkspaceContext
 	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
 	 */
 	public async saveAndPublish(): Promise<void> {
-		alert('WRONG METHOD');
+		if (!this.#publishingContext) throw new Error('Publishing context is missing');
+		this.#publishingContext.saveAndPublish();
 	}
 
 	/**
@@ -267,7 +274,8 @@ export class UmbDocumentWorkspaceContext
 	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
 	 */
 	public async schedule() {
-		alert('WRONG METHOD');
+		if (!this.#publishingContext) throw new Error('Publishing context is missing');
+		this.#publishingContext.schedule();
 	}
 
 	/**
@@ -275,7 +283,8 @@ export class UmbDocumentWorkspaceContext
 	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
 	 */
 	public async unpublish() {
-		alert('WRONG METHOD');
+		if (!this.#publishingContext) throw new Error('Publishing context is missing');
+		this.#publishingContext.unpublish();
 	}
 
 	/**
@@ -283,7 +292,8 @@ export class UmbDocumentWorkspaceContext
 	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
 	 */
 	public async publishWithDescendants() {
-		alert('WRONG METHOD');
+		if (!this.#publishingContext) throw new Error('Publishing context is missing');
+		this.#publishingContext.publishWithDescendants();
 	}
 
 	public createPropertyDatasetContext(
