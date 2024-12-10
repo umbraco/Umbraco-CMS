@@ -5,7 +5,7 @@ import { UmbMergeContentVariantDataController } from '@umbraco-cms/backoffice/co
 import { jsonStringComparison, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 interface UmbDocumentPublishedPendingChangesManagerProcessArgs {
-	currentData: UmbDocumentDetailModel;
+	persistedData: UmbDocumentDetailModel;
 	publishedData: UmbDocumentDetailModel;
 }
 
@@ -26,15 +26,15 @@ export class UmbDocumentPublishedPendingChangesManager extends UmbControllerBase
 	 * @memberof UmbPublishedPendingChangesManager
 	 */
 	async process(args: UmbDocumentPublishedPendingChangesManagerProcessArgs): Promise<void> {
-		if (!args.currentData) throw new Error('Current Data is missing');
+		if (!args.persistedData) throw new Error('Current Data is missing');
 		if (!args.publishedData) throw new Error('Published Data is missing');
 
-		const variantIds = args.currentData.variants?.map((x) => UmbVariantId.Create(x)) ?? [];
+		const variantIds = args.persistedData.variants?.map((x) => UmbVariantId.Create(x)) ?? [];
 
 		const pendingChangesPromises = variantIds.map(async (variantId) => {
 			const mergedData = await new UmbMergeContentVariantDataController(this).process(
 				args.publishedData,
-				args.currentData,
+				args.persistedData,
 				[variantId],
 				[variantId],
 			);
