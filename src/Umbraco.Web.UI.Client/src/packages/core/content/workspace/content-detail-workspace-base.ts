@@ -332,6 +332,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		return this._data.getCurrent()?.variants?.find((x) => variantId.compare(x));
 	}
 
+	public getVariants(): Array<VariantModelType> | undefined {
+		return this._data.getCurrent()?.variants;
+	}
+
 	/**
 	 * Observe the property type
 	 * @param {string} propertyId - The id of the property
