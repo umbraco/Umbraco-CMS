@@ -257,6 +257,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		);
 
 		if (!error) {
+			// reload the document so all states are updated after the publish operation
+			await this.#documentWorkspaceContext.reload();
+			this.#loadAndProcessLastPublished();
+
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 			eventContext.dispatchEvent(event);
@@ -295,36 +299,30 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 
 	async #initPendingChanges() {
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
-
 		this.observe(
-			this.#documentWorkspaceContext.unique,
-			async (unique) => {
-				if (!unique) return;
-
-				// No need to check pending changes for new documents
-				if (this.#documentWorkspaceContext!.getIsNew()) return;
-
-				const { data } = await this.#publishingRepository.published(unique);
-				this.#publishedDocumentData = data;
-				this.#processPendingChanges();
+			observeMultiple([this.#documentWorkspaceContext.unique, this.#documentWorkspaceContext.isNew]),
+			([unique, isNew]) => {
+				if (isNew === false && unique) {
+					this.#loadAndProcessLastPublished();
+				}
 			},
-			'umbUniqueObserver',
+			'uniqueObserver',
 		);
 	}
 
-	/*
-	#observeDocumentDataChanges() {
+	async #loadAndProcessLastPublished() {
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 
-		this.observe(
-			observeMultiple([this.#documentWorkspaceContext.variants, this.#documentWorkspaceContext.values]),
-			async ([variants, values]) => {
-				if (!variants || !values) return;
-				this.#processPendingChanges();
-			},
-		);
+		// No need to check pending changes for new documents
+		if (this.#documentWorkspaceContext.getIsNew()) return;
+
+		const unique = this.#documentWorkspaceContext.getUnique();
+		if (!unique) throw new Error('Unique is missing');
+
+		const { data } = await this.#publishingRepository.published(unique);
+		this.#publishedDocumentData = data;
+		this.#processPendingChanges();
 	}
-	*/
 
 	#processPendingChanges() {
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
