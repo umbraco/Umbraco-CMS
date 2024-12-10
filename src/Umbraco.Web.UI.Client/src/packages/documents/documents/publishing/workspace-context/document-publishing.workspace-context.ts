@@ -22,6 +22,7 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDocumentPublishingWorkspaceContext> {
 	/**
@@ -33,6 +34,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	#init: Promise<unknown>;
 	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 	#publishingRepository = new UmbDocumentPublishingRepository(this);
+	#publishedDocumentData?: UmbDocumentDetailModel;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT);
@@ -40,24 +42,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		this.#init = Promise.all([
 			this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, async (context) => {
 				this.#documentWorkspaceContext = context;
-
-				// No need to check pending changes for new documents
-				if (context.getIsNew()) {
-					return;
-				}
-
-				this.observe(context.unique, async (unique) => {
-					if (unique) {
-						const { data: publishedData } = await this.#publishingRepository.published(unique);
-						const currentData = context.getData();
-
-						if (!currentData || !publishedData) {
-							return;
-						}
-
-						this.publishedPendingChanges.process({ currentData, publishedData });
-					}
-				});
+				this.#initPendingChanges();
 			}).asPromise(),
 		]);
 	}
@@ -308,6 +293,37 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			options,
 			selected,
 		};
+	}
+
+	async #initPendingChanges() {
+		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
+
+		// No need to check pending changes for new documents
+		if (this.#documentWorkspaceContext.getIsNew()) return;
+
+		const unique = this.#documentWorkspaceContext.getUnique();
+		if (!unique) throw new Error('Unique is missing');
+
+		const { data } = await this.#publishingRepository.published(unique);
+		this.#publishedDocumentData = data;
+		this.#observeDocumentDataChanges();
+	}
+
+	#observeDocumentDataChanges() {
+		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
+
+		this.observe(
+			observeMultiple([this.#documentWorkspaceContext.variants, this.#documentWorkspaceContext.values]),
+			async ([variants, values]) => {
+				if (!variants || !values) return;
+
+				const currentData = this.#documentWorkspaceContext!.getData();
+				const publishedData = this.#publishedDocumentData;
+				if (!currentData || !publishedData) return;
+
+				this.publishedPendingChanges.process({ currentData, publishedData });
+			},
+		);
 	}
 }
 
