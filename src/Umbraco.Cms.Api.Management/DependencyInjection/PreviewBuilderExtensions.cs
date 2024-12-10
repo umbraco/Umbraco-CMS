@@ -11,11 +11,9 @@ internal static class PreviewBuilderExtensions
 {
     internal static IUmbracoBuilder AddPreview(this IUmbracoBuilder builder)
     {
-        builder.Services.AddSignalR().AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-        builder.Services.AddSingleton<IServerEventRouter, ServerEventRouter>();
+        builder.Services.AddSignalR();
         builder.Services.AddSingleton<PreviewRoutes>();
         builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, PreviewHubUpdater>();
-        builder.AddNotificationHandler<ContentSavedNotification, ServerEventSender>();
 
         return builder;
     }
