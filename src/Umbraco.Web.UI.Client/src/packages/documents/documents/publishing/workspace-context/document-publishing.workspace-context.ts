@@ -260,8 +260,6 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 			eventContext.dispatchEvent(event);
-			// TODO: Figure out how to "finish" the save and publish process.
-			//this._closeModal();
 		}
 	}
 
@@ -301,12 +299,16 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		// No need to check pending changes for new documents
 		if (this.#documentWorkspaceContext.getIsNew()) return;
 
-		const unique = this.#documentWorkspaceContext.getUnique();
-		if (!unique) throw new Error('Unique is missing');
-
-		const { data } = await this.#publishingRepository.published(unique);
-		this.#publishedDocumentData = data;
-		this.#observeDocumentDataChanges();
+		this.observe(
+			this.#documentWorkspaceContext.unique,
+			async (unique) => {
+				if (!unique) return;
+				const { data } = await this.#publishingRepository.published(unique);
+				this.#publishedDocumentData = data;
+				this.#observeDocumentDataChanges();
+			},
+			'umbUniqueObserver',
+		);
 	}
 
 	#observeDocumentDataChanges() {
