@@ -1,4 +1,4 @@
-import type { UmbDocumentDetailModel } from '../types.js';
+import type { UmbDocumentDetailModel } from '../../types.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbMergeContentVariantDataController } from '@umbraco-cms/backoffice/content';
@@ -9,12 +9,12 @@ interface UmbDocumentPublishedPendingChangesManagerProcessArgs {
 	publishedData: UmbDocumentDetailModel;
 }
 
-interface UmbVariantWithChanges {
+interface UmbPublishedVariantWithPendingChanges {
 	variantId: UmbVariantId;
 }
 
 export class UmbDocumentPublishedPendingChangesManager extends UmbControllerBase {
-	#variantsWithChanges = new UmbArrayState<UmbVariantWithChanges>([], (x) => x.variantId.toString());
+	#variantsWithChanges = new UmbArrayState<UmbPublishedVariantWithPendingChanges>([], (x) => x.variantId.toString());
 	public readonly variantsWithChanges = this.#variantsWithChanges.asObservable();
 
 	/**
@@ -49,5 +49,14 @@ export class UmbDocumentPublishedPendingChangesManager extends UmbControllerBase
 		const variantsWithPendingChanges = (await Promise.all(pendingChangesPromises)).filter((x) => x !== null);
 
 		this.#variantsWithChanges.setValue(variantsWithPendingChanges);
+	}
+
+	/**
+	 * Gets the variants with changes.
+	 * @returns {Array<UmbPublishedVariantWithPendingChanges>}  {Array<UmbVariantWithChanges>}
+	 * @memberof UmbDocumentPublishedPendingChangesManager
+	 */
+	getVariantsWithChanges(): Array<UmbPublishedVariantWithPendingChanges> {
+		return this.#variantsWithChanges.getValue();
 	}
 }
