@@ -1,16 +1,16 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../workspace/document-workspace.context-token.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/document-workspace.context-token.js';
 import type {
 	UmbDocumentDetailModel,
 	UmbDocumentVariantOptionModel,
 	UmbDocumentVariantPublishModel,
-} from '../types.js';
-import { UmbDocumentPublishingRepository } from './repository/index.js';
-import { UmbDocumentPublishedPendingChangesManager } from './pending-changes/index.js';
+} from '../../types.js';
+import { UmbDocumentPublishingRepository } from '../repository/index.js';
+import { UmbDocumentPublishedPendingChangesManager } from '../pending-changes/index.js';
+import { UMB_DOCUMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
+import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from '../publish-with-descendants/constants.js';
+import { UMB_DOCUMENT_PUBLISH_MODAL } from '../publish/constants.js';
+import { UmbUnpublishDocumentEntityAction } from '../unpublish/index.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from './document-publishing.workspace-context.token.js';
-import { UMB_DOCUMENT_SCHEDULE_MODAL } from './schedule-publish/constants.js';
-import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from './publish-with-descendants/constants.js';
-import { UMB_DOCUMENT_PUBLISH_MODAL } from './publish/constants.js';
-import { UmbUnpublishDocumentEntityAction } from './unpublish/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -227,7 +227,6 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 
 		const saveData = await this.#documentWorkspaceContext.constructSaveData(variantIds);
 		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData);
-
 		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
 
 		// TODO: Only validate the specified selection.. [NL]
@@ -272,7 +271,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 			eventContext.dispatchEvent(event);
-			this._closeModal();
+			// TODO: Figure out how to "finish" the save and publish process.
+			//this._closeModal();
 		}
 	}
 
@@ -290,6 +290,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 
 		const options = await firstValueFrom(this.#documentWorkspaceContext.variantOptions);
+		debugger;
 
 		//const activeVariants = this.splitView.getActiveVariants();
 		//const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
