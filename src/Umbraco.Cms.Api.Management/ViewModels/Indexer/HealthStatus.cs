@@ -4,5 +4,6 @@ public enum HealthStatus
 {
     Healthy,
     Unhealthy,
+    Corrupt,
     Rebuilding
 }
