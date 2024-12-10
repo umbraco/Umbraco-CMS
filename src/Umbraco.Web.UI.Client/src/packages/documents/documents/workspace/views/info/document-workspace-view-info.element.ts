@@ -182,10 +182,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		const editDocumentTypePath = this._routeBuilder?.({ entityType: 'document-type' }) ?? '';
 
 		return html`
-			<div class="general-item">
-				<strong><umb-localize key="content_publishStatus">Publication Status</umb-localize></strong>
-				<span>${this.#renderStateTag()}</span>
-			</div>
+			<div class="general-item"><span>${this.#renderStateTag()}</span></div>
 			${this.#renderCreateDate()}
 
 			<div class="general-item">
