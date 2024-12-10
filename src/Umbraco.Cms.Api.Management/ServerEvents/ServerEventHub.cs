@@ -1,11 +1,10 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using Umbraco.Cms.Api.Management.ServerEvents;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Management.Routing;
+namespace Umbraco.Cms.Api.Management.ServerEvents;
 
 [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
 public class ServerEventHub : Hub<IServerEventHub>

@@ -34,6 +34,21 @@ public class ServerEventUserManager : IServerEventUserManager
             { EventSource.MediaType, AuthorizationPolicies.TreeAccessMediaTypes },
             { EventSource.Member, AuthorizationPolicies.TreeAccessMembersOrMemberTypes },
             { EventSource.MemberType, AuthorizationPolicies.TreeAccessMemberTypes },
+            { EventSource.MemberGroup, AuthorizationPolicies.TreeAccessMemberGroups },
+            { EventSource.DataType, AuthorizationPolicies.TreeAccessDataTypes },
+            { EventSource.Language, AuthorizationPolicies.TreeAccessLanguages },
+            { EventSource.Script, AuthorizationPolicies.TreeAccessScripts },
+            { EventSource.Stylesheet, AuthorizationPolicies.TreeAccessStylesheets },
+            { EventSource.Template, AuthorizationPolicies.TreeAccessTemplates },
+            { EventSource.DictionaryItem, AuthorizationPolicies.TreeAccessDictionary },
+            { EventSource.Domain, AuthorizationPolicies.TreeAccessDocuments },
+            { EventSource.PartialView, AuthorizationPolicies.TreeAccessPartialViews },
+            { EventSource.PublicAccessEntry, AuthorizationPolicies.TreeAccessDocuments },
+            { EventSource.Relation, AuthorizationPolicies.TreeAccessDocuments },
+            { EventSource.RelationType, AuthorizationPolicies.TreeAccessRelationTypes },
+            { EventSource.UserGroup, AuthorizationPolicies.SectionAccessUsers },
+            { EventSource.User, AuthorizationPolicies.SectionAccessUsers },
+            { EventSource.Webhook, AuthorizationPolicies.TreeAccessWebhooks },
         }.ToFrozenDictionary();
     }
 

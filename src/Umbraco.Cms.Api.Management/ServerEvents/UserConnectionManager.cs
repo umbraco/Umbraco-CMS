@@ -1,6 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ServerEvents;
-
-namespace Umbraco.Cms.Api.Management.Routing;
+﻿namespace Umbraco.Cms.Api.Management.ServerEvents;
 
 internal sealed class UserConnectionManager : IUserConnectionManager
 {

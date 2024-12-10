@@ -1,6 +1,6 @@
 ﻿using Umbraco.Cms.Api.Management.ServerEvents.Models;
 
-namespace Umbraco.Cms.Api.Management.Routing;
+namespace Umbraco.Cms.Api.Management.ServerEvents;
 
 public interface IServerEventHub
 {

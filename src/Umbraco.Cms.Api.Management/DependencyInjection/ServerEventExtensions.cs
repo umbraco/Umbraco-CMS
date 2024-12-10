@@ -25,5 +25,25 @@ internal static class ServerEventExtensions
     private static void AddEvents(IUmbracoBuilder builder)
     {
         builder.AddNotificationAsyncHandler<ContentSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<ContentTypeSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<MediaSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<MediaTypeSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<MemberSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<MemberTypeSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<MemberGroupSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<DataTypeSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<LanguageSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<ScriptSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<StylesheetSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<TemplateSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<DictionaryItemSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<DomainSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<PartialViewSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<PublicAccessEntrySavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<RelationSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<RelationTypeSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<UserGroupSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<UserSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<WebhookSavedNotification, ServerEventSender>();
     }
 }
