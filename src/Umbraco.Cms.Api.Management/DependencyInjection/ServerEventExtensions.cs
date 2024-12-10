@@ -14,6 +14,7 @@ internal static class ServerEventExtensions
         builder.Services.AddSignalR().AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
         builder.Services.AddSingleton<IUserConnectionManager, UserConnectionManager>();
         builder.Services.AddSingleton<IServerEventRouter, ServerEventRouter>();
+        builder.Services.AddSingleton<IServerEventUserManager, ServerEventUserManager>();
         AddEvents(builder);
 
         return builder;
@@ -21,6 +22,6 @@ internal static class ServerEventExtensions
 
     private static void AddEvents(IUmbracoBuilder builder)
     {
-        builder.AddNotificationHandler<ContentSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<ContentSavedNotification, ServerEventSender>();
     }
 }

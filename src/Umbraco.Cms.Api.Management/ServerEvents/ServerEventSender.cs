@@ -1,22 +1,20 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using Umbraco.Cms.Api.Management.ServerEvents.Models;
+﻿using Umbraco.Cms.Api.Management.ServerEvents.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Api.Management.Routing;
 
-public class ServerEventSender : INotificationHandler<ContentSavedNotification>
+public class ServerEventSender : INotificationAsyncHandler<ContentSavedNotification>
 {
-    private readonly IHubContext<ServerEventHub, IServerEventHub> _eventHub;
+    private readonly IServerEventRouter _serverEventRouter;
 
-
-    public ServerEventSender(IHubContext<ServerEventHub, IServerEventHub> eventHub)
+    public ServerEventSender(IServerEventRouter serverEventRouter)
     {
-        _eventHub = eventHub;
+        _serverEventRouter = serverEventRouter;
     }
 
-    public void Handle(ContentSavedNotification notification)
+    public async Task HandleAsync(ContentSavedNotification notification, CancellationToken cancellationToken)
     {
         foreach (IContent entity in notification.SavedEntities)
         {
@@ -34,11 +32,7 @@ public class ServerEventSender : INotificationHandler<ContentSavedNotification>
                 EventSource = EventSource.Document,
             };
 
-            _eventHub.Clients.All.notify(eventModel);
-            // foreach (var VARIABLE in _eventHub.Clients.Users())
-            // {
-            //
-            // }
+            await _serverEventRouter.RouteEventAsync(eventModel);
         }
     }
 }
