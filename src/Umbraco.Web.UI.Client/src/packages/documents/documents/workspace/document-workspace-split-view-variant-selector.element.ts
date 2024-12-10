@@ -21,7 +21,7 @@ export class UmbDocumentWorkspaceSplitViewVariantSelectorElement extends UmbWork
 		// TODO: The pending changes state can be removed once the management Api removes this state
 		// We only keep it here to make typescript happy
 		// We should also make our own state model for this
-		[DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES]: 'content_publishedPending',
+		[DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES]: 'content_publishedPendingChanges',
 		[DocumentVariantStateModel.NOT_CREATED]: 'content_notCreated',
 	};
 
