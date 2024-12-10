@@ -9,7 +9,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Routing;
 
-public class ServerEventRouter : IServerEventRouter
+internal sealed class ServerEventRouter : IServerEventRouter
 {
     private readonly IHubContext<ServerEventHub, IServerEventHub> _eventHub;
     private readonly IAuthorizationService _authorizationService;
@@ -23,7 +23,7 @@ public class ServerEventRouter : IServerEventRouter
         _eventHub = eventHub;
         _authorizationService = authorizationService;
 
-        _groupMappings = new Dictionary<EventSource, string>()
+        _groupMappings = new Dictionary<EventSource, string>
         {
             { EventSource.Document, AuthorizationPolicies.TreeAccessDocuments },
             { EventSource.DocumentType, AuthorizationPolicies.TreeAccessDocumentTypes },
@@ -34,7 +34,8 @@ public class ServerEventRouter : IServerEventRouter
         }.ToFrozenDictionary();
     }
 
-    public Task RouteEventAsync(ServerEvent serverEvent) => throw new NotImplementedException();
+    public Task RouteEventAsync(ServerEvent serverEvent)
+        => _eventHub.Clients.Group(serverEvent.EventSource.ToString()).notify(serverEvent);
 
     public async Task AssignToGroups(ClaimsPrincipal user, string connectionId)
     {
