@@ -1,29 +1,27 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../workspace/document-workspace.context-token.js';
-import { UmbDocumentPublishingRepository } from './repository/index.js';
-import { UmbDocumentPublishedPendingChangesManager } from './document-published-pending-changes.manager.js';
-import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from './document-publishing.workspace-context.token.js';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type {
 	UmbDocumentDetailModel,
 	UmbDocumentVariantOptionModel,
 	UmbDocumentVariantPublishModel,
 } from '../types.js';
-import { UmbServerModelValidatorContext } from '@umbraco-cms/backoffice/validation';
+import { UmbDocumentPublishingRepository } from './repository/index.js';
+import { UmbDocumentPublishedPendingChangesManager } from './document-published-pending-changes.manager.js';
+import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from './document-publishing.workspace-context.token.js';
+import { UMB_DOCUMENT_SCHEDULE_MODAL } from './schedule-publish/constants.js';
+import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from './publish-with-descendants/constants.js';
+import { UMB_DOCUMENT_PUBLISH_MODAL } from './publish/constants.js';
+import { UmbUnpublishDocumentEntityAction } from './unpublish/index.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbDocumentValidationRepository } from '../repository/validation/index.js';
-import { UMB_DOCUMENT_SCHEDULE_MODAL } from './schedule-publish/constants.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from './publish-with-descendants/constants.js';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import { UMB_DOCUMENT_PUBLISH_MODAL } from './publish/constants.js';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbUnpublishDocumentEntityAction } from './unpublish/index.js';
 
 export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDocumentPublishingWorkspaceContext> {
 	public readonly publishedPendingChanges = new UmbDocumentPublishedPendingChangesManager(this);
@@ -31,8 +29,6 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	#init: Promise<unknown>;
 	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 	#publishingRepository = new UmbDocumentPublishingRepository(this);
-	#serverValidation = new UmbServerModelValidatorContext(this);
-	#validationRepository?: UmbDocumentValidationRepository;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT);
@@ -62,11 +58,21 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		]);
 	}
 
+	/**
+	 * Save and publish the document
+	 * @returns {Promise<void>}
+	 * @memberof UmbDocumentPublishingWorkspaceContext
+	 */
 	public async saveAndPublish(): Promise<void> {
 		return this.#handleSaveAndPublish();
 	}
 
-	public async schedule() {
+	/**
+	 * Schedule the document for publishing
+	 * @returns {Promise<void>}
+	 * @memberof UmbDocumentPublishingWorkspaceContext
+	 */
+	public async schedule(): Promise<void> {
 		await this.#init;
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 
@@ -102,7 +108,12 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		await this.#publishingRepository.publish(unique, variants);
 	}
 
-	public async publishWithDescendants() {
+	/**
+	 * Publish the document with descendants
+	 * @returns {Promise<void>}
+	 * @memberof UmbDocumentPublishingWorkspaceContext
+	 */
+	public async publishWithDescendants(): Promise<void> {
 		await this.#init;
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 
@@ -159,7 +170,12 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		}
 	}
 
-	public async unpublish() {
+	/**
+	 * Unpublish the document
+	 * @returns {Promise<void>}
+	 * @memberof UmbDocumentPublishingWorkspaceContext
+	 */
+	public async unpublish(): Promise<void> {
 		await this.#init;
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 
@@ -209,26 +225,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		}
 
-		const saveData = await this._data.constructData(variantIds);
-		await this._runMandatoryValidationForSaveData(saveData);
+		const saveData = await this.#documentWorkspaceContext.constructSaveData(variantIds);
+		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData);
 
-		// Create the validation repository if it does not exist. (we first create this here when we need it) [NL]
-		this.#validationRepository ??= new UmbDocumentValidationRepository(this);
-
-		// We ask the server first to get a concatenated set of validation messages. So we see both front-end and back-end validation messages [NL]
-		if (this.#documentWorkspaceContext.getIsNew()) {
-			const parent = this.#documentWorkspaceContext.getParent();
-			if (!parent) throw new Error('Parent is not set');
-			this.#serverValidation.askServerForValidation(
-				saveData,
-				this.#validationRepository.validateCreate(saveData, parent.unique),
-			);
-		} else {
-			this.#serverValidation.askServerForValidation(
-				saveData,
-				this.#validationRepository.validateSave(saveData, variantIds),
-			);
-		}
+		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
 
 		// TODO: Only validate the specified selection.. [NL]
 		return this.#documentWorkspaceContext.validateAndSubmit(
@@ -237,7 +237,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			},
 			async () => {
 				// If data of the selection is not valid Then just save:
-				await this._performCreateOrUpdate(variantIds, saveData);
+				await this.#documentWorkspaceContext!.performCreateOrUpdate(variantIds, saveData);
 				// Notifying that the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
 				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 				// TODO: Get rid of the save notification.
@@ -261,7 +261,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		const entityType = this.#documentWorkspaceContext.getEntityType();
 		if (!entityType) throw new Error('Entity type is missing');
 
-		await this._performCreateOrUpdate(variantIds, saveData);
+		await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
 
 		const { error } = await this.#publishingRepository.publish(
 			unique,
