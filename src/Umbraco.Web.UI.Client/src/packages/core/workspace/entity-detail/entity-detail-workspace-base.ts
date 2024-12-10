@@ -86,6 +86,14 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	/**
+	 * Get the persisted data
+	 * @returns { DetailModelType | undefined } The persisted data
+	 */
+	public getPersistedData(): DetailModelType | undefined {
+		return this._data.getPersisted();
+	}
+
+	/**
 	 * Get the unique
 	 * @returns { string | undefined } The unique identifier
 	 */
