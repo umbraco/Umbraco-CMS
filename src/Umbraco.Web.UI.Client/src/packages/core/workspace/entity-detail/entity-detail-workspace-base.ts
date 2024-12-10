@@ -130,10 +130,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	async load(unique: string) {
+		this.resetState();
 		this.#entityContext.setUnique(unique);
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Loading ${this.getEntityType()} Details` });
 		await this.#init;
-		this.resetState();
 		this._getDataPromise = this._detailRepository!.requestByUnique(unique);
 		type GetDataType = Awaited<ReturnType<UmbDetailRepository<DetailModelType>['requestByUnique']>>;
 		const response = (await this._getDataPromise) as GetDataType;
@@ -189,9 +189,9 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @returns { Promise<any> | undefined } The data of the scaffold.
 	 */
 	public async createScaffold(args: CreateArgsType) {
+		this.resetState();
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Creating ${this.getEntityType()} scaffold` });
 		await this.#init;
-		this.resetState();
 		this.setParent(args.parent);
 
 		const request = this._detailRepository!.createScaffold(args.preset);
