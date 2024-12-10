@@ -296,13 +296,14 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	async #initPendingChanges() {
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 
-		// No need to check pending changes for new documents
-		if (this.#documentWorkspaceContext.getIsNew()) return;
-
 		this.observe(
 			this.#documentWorkspaceContext.unique,
 			async (unique) => {
 				if (!unique) return;
+
+				// No need to check pending changes for new documents
+				if (this.#documentWorkspaceContext!.getIsNew()) return;
+
 				const { data } = await this.#publishingRepository.published(unique);
 				this.#publishedDocumentData = data;
 				this.#observeDocumentDataChanges();
@@ -318,14 +319,19 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			observeMultiple([this.#documentWorkspaceContext.variants, this.#documentWorkspaceContext.values]),
 			async ([variants, values]) => {
 				if (!variants || !values) return;
-
-				const currentData = this.#documentWorkspaceContext!.getData();
-				const publishedData = this.#publishedDocumentData;
-				if (!currentData || !publishedData) return;
-
-				this.publishedPendingChanges.process({ currentData, publishedData });
+				this.#processPendingChanges();
 			},
 		);
+	}
+
+	#processPendingChanges() {
+		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
+
+		const currentData = this.#documentWorkspaceContext.getData();
+		const publishedData = this.#publishedDocumentData;
+		if (!currentData || !publishedData) return;
+
+		this.publishedPendingChanges.process({ currentData, publishedData });
 	}
 }
 
