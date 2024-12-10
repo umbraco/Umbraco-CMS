@@ -227,8 +227,8 @@ export class UmbDocumentWorkspaceContext
 			culture = selected[0];
 			const variantIds = [UmbVariantId.FromString(culture)];
 			const saveData = await this._data.constructData(variantIds);
-			await this._runMandatoryValidationForSaveData(saveData);
-			await this._performCreateOrUpdate(variantIds, saveData);
+			await this.runMandatoryValidationForSaveData(saveData);
+			await this.performCreateOrUpdate(variantIds, saveData);
 		}
 
 		// Tell the server that we're entering preview mode.
