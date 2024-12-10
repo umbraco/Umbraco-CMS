@@ -23,6 +23,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDocumentPublishingWorkspaceContext> {
 	/**
@@ -311,13 +312,28 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	async #initPendingChanges() {
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 		this.observe(
-			observeMultiple([this.#documentWorkspaceContext.unique, this.#documentWorkspaceContext.isNew]),
-			([unique, isNew]) => {
-				if (isNew === false && unique) {
+			observeMultiple([
+				this.#documentWorkspaceContext.unique,
+				this.#documentWorkspaceContext.isNew,
+				this.#documentWorkspaceContext.variants,
+			]),
+			([unique, isNew, variants]) => {
+				if (isNew === false && unique && variants.length > 0) {
 					this.#loadAndProcessLastPublished();
 				}
 			},
 			'uniqueObserver',
+		);
+	}
+
+	#hasPublishedVariant() {
+		const variants = this.#documentWorkspaceContext?.getVariants();
+		return (
+			variants?.some(
+				(variant) =>
+					variant.state === DocumentVariantStateModel.PUBLISHED ||
+					variant.state === DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES,
+			) ?? false
 		);
 	}
 
@@ -329,6 +345,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 
 		const unique = this.#documentWorkspaceContext.getUnique();
 		if (!unique) throw new Error('Unique is missing');
+
+		// Only load the published data if the document is already published or has been published before
+		const hasPublishedVariant = this.#hasPublishedVariant();
+		if (!hasPublishedVariant) return;
 
 		const { data } = await this.#publishingRepository.published(unique);
 		this.#publishedDocumentData = data;
