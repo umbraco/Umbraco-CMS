@@ -33,6 +33,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 
 	#init: Promise<unknown>;
 	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
+	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 	#publishingRepository = new UmbDocumentPublishingRepository(this);
 	#publishedDocumentData?: UmbDocumentDetailModel;
 
@@ -43,6 +44,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, async (context) => {
 				this.#documentWorkspaceContext = context;
 				this.#initPendingChanges();
+			}).asPromise(),
+
+			this.consumeContext(UMB_ACTION_EVENT_CONTEXT, async (context) => {
+				this.#eventContext = context;
 			}).asPromise(),
 		]);
 	}
@@ -67,6 +72,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 
 		const unique = this.#documentWorkspaceContext.getUnique();
 		if (!unique) throw new Error('Unique is missing');
+
+		const entityType = this.#documentWorkspaceContext.getEntityType();
+		if (!entityType) throw new Error('Entity type is missing');
 
 		const { options, selected } = await this.#determineVariantOptions();
 
@@ -94,7 +102,16 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		if (!variants.length) return;
 
 		// TODO: Validate content & Save changes for the selected variants — This was how it worked in v.13 [NL]
-		await this.#publishingRepository.publish(unique, variants);
+		const { error } = await this.#publishingRepository.publish(unique, variants);
+		if (!error) {
+			// reload the document so all states are updated after the publish operation
+			await this.#documentWorkspaceContext.reload();
+			this.#loadAndProcessLastPublished();
+
+			// request reload of this entity
+			const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
+			this.#eventContext?.dispatchEvent(structureEvent);
+		}
 	}
 
 	/**
@@ -140,22 +157,17 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		);
 
 		if (!error) {
-			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			// reload the document so all states are updated after the publish operation
+			await this.#documentWorkspaceContext.reload();
+			this.#loadAndProcessLastPublished();
 
 			// request reload of this entity
-			const structureEvent = new UmbRequestReloadStructureForEntityEvent({
-				entityType,
-				unique,
-			});
+			const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
+			this.#eventContext?.dispatchEvent(structureEvent);
 
 			// request reload of the children
-			const childrenEvent = new UmbRequestReloadChildrenOfEntityEvent({
-				entityType,
-				unique,
-			});
-
-			eventContext.dispatchEvent(structureEvent);
-			eventContext.dispatchEvent(childrenEvent);
+			const childrenEvent = new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique });
+			this.#eventContext?.dispatchEvent(childrenEvent);
 		}
 	}
 
@@ -261,9 +273,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			await this.#documentWorkspaceContext.reload();
 			this.#loadAndProcessLastPublished();
 
-			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
-			eventContext.dispatchEvent(event);
+			this.#eventContext?.dispatchEvent(event);
 		}
 	}
 
