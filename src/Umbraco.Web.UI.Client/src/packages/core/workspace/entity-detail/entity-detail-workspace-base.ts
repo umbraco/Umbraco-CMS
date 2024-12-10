@@ -156,6 +156,21 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	/**
+	 * Reload the workspace data
+	 * @returns { Promise<void> } The promise of the reload
+	 */
+	public async reload(): Promise<void> {
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is not set');
+		const { data } = await this._detailRepository!.requestByUnique(unique);
+
+		if (data) {
+			this._data.setPersisted(data);
+			this._data.setCurrent(data);
+		}
+	}
+
+	/**
 	 * Method to check if the workspace data is loaded.
 	 * @returns { Promise<any> | undefined } true if the workspace data is loaded.
 	 * @memberof UmbEntityWorkspaceContextBase
