@@ -51,7 +51,7 @@ public class ServerEventUserManager : IServerEventUserManager
     }
 
     /// <inheritdoc />
-    public async Task RefreshGroups(ClaimsPrincipal user)
+    public async Task RefreshGroupsAsync(ClaimsPrincipal user)
     {
         Guid? userKey = user.Identity?.GetUserKey();
 
@@ -74,9 +74,14 @@ public class ServerEventUserManager : IServerEventUserManager
         {
             AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(user, mapping.Value);
 
-            // The user is authorized, we don't need to remove them from the group.
+            // It's safe to add an existing connection to a group
             if (authorizationResult.Succeeded)
             {
+                foreach (var connection in connections)
+                {
+                    await _eventHub.Groups.AddToGroupAsync(connection, mapping.Key.ToString());
+                }
+
                 continue;
             }
 

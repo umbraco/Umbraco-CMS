@@ -20,5 +20,5 @@ public interface IServerEventUserManager
     /// </summary>
     /// <param name="user">The user to reauthorize.</param>
     /// <returns></returns>
-    Task RefreshGroups(ClaimsPrincipal user);
+    Task RefreshGroupsAsync(ClaimsPrincipal user);
 }
