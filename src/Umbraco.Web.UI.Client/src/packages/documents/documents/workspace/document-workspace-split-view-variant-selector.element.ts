@@ -33,7 +33,7 @@ export class UmbDocumentWorkspaceSplitViewVariantSelectorElement extends UmbWork
 		});
 	}
 
-	async #observePendingChanges() {
+	#observePendingChanges() {
 		this.observe(
 			this.#documentPublishingWorkspaceContext?.publishedPendingChanges.variantsWithChanges,
 			(variants) => {
