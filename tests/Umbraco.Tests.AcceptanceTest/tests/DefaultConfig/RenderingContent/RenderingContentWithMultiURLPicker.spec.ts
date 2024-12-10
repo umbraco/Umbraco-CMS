@@ -102,6 +102,6 @@ test('can render content with multiple url value', async ({umbracoApi, umbracoUi
   await umbracoUi.contentRender.doesContentRenderValueContainText(linkTitle);
   await umbracoUi.contentRender.doesContentRenderValueContainText(mediaFileName);
 
-  // Assert
-  await umbracoUi.contentRender.doesContentRenderValueContainText(linkTitle);
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(mediaFileName);
 });
