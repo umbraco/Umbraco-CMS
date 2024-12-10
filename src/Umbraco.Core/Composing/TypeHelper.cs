@@ -376,10 +376,10 @@ public static class TypeHelper
         if (contract.IsGenericParameter)
         {
             // eg <T>
-            if (bindings.ContainsKey(contract.Name))
+            if (bindings.TryGetValue(contract.Name, out Type? binding))
             {
                 // already bound: ensure it's compatible
-                return bindings[contract.Name] == implementation;
+                return binding == implementation;
             }
 
             // not already bound: bind
