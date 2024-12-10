@@ -2699,6 +2699,13 @@ public class ContentService : RepositoryService, IContentService
                         GetPagedDescendants(content.Id, page++, pageSize, out total);
                     foreach (IContent descendant in descendants)
                     {
+                        // when copying a branch into itself, the copy of a root would be seen as a descendant
+                        // and would be copied again => filter it out.
+                        if (descendant.Id == copy.Id)
+                        {
+                            continue;
+                        }
+
                         // if parent has not been copied, skip, else gets its copy id
                         if (idmap.TryGetValue(descendant.ParentId, out parentId) == false)
                         {
@@ -2723,6 +2730,9 @@ public class ContentService : RepositoryService, IContentService
 
                         descendantCopy.CreatorId = userId;
                         descendantCopy.WriterId = userId;
+
+                        // since the repository relies on the dirty state to figure out whether it needs to update the sort order, we mark it dirty here
+                        descendantCopy.SortOrder = descendantCopy.SortOrder;
 
                         // save and flush (see above)
                         _documentRepository.Save(descendantCopy);
