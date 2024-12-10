@@ -113,8 +113,8 @@ export class UmbDocumentPublishingServerDataSource {
 	}
 
 	/**
-	 * Get a published Document by its unique identifier
-	 * @param {string} unique - Document unique identifier
+	 * Get the published Document by its unique
+	 * @param {string} unique - Document unique
 	 * @returns {Promise<UmbDataSourceResponse<UmbDocumentDetailModel>>} Published document
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
