@@ -306,12 +306,13 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 
 				const { data } = await this.#publishingRepository.published(unique);
 				this.#publishedDocumentData = data;
-				this.#observeDocumentDataChanges();
+				this.#processPendingChanges();
 			},
 			'umbUniqueObserver',
 		);
 	}
 
+	/*
 	#observeDocumentDataChanges() {
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 
@@ -323,15 +324,16 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			},
 		);
 	}
+	*/
 
 	#processPendingChanges() {
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 
-		const currentData = this.#documentWorkspaceContext.getData();
+		const persistedData = this.#documentWorkspaceContext.getPersistedData();
 		const publishedData = this.#publishedDocumentData;
-		if (!currentData || !publishedData) return;
+		if (!persistedData || !publishedData) return;
 
-		this.publishedPendingChanges.process({ currentData, publishedData });
+		this.publishedPendingChanges.process({ persistedData, publishedData });
 	}
 }
 
