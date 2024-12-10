@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import * as base64 from '@umbraco-cms/backoffice/external/base64-js';
+import { fromByteArray } from '@umbraco-cms/backoffice/external/base64-js';
 
 import { AppAuthError } from './errors.js';
 
@@ -31,7 +31,7 @@ export function bufferToString(buffer: Uint8Array) {
 }
 
 export function urlSafe(buffer: Uint8Array): string {
-	const encoded = base64.fromByteArray(new Uint8Array(buffer));
+	const encoded = fromByteArray(new Uint8Array(buffer));
 	return encoded.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
 

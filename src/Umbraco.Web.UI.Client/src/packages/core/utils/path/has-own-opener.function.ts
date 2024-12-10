@@ -22,7 +22,8 @@ export function hasOwnOpener(pathname?: string, windowLike: Window = globalThis.
 			return false;
 		}
 
-		if (pathname && openerLocation.pathname !== pathname) {
+		// If there is a pathname, check if the opener has the same pathname
+		if (typeof pathname !== 'undefined' && !openerLocation.pathname.startsWith(pathname)) {
 			return false;
 		}
 

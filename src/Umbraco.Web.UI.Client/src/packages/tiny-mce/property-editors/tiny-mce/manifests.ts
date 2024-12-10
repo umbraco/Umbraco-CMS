@@ -1,6 +1,5 @@
+import { UMB_BLOCK_RTE_PROPERTY_EDITOR_UI_ALIAS } from './constants.js';
 import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '@umbraco-cms/backoffice/rte';
-
-export const UMB_BLOCK_RTE_PROPERTY_EDITOR_UI_ALIAS = 'Umb.PropertyEditorUi.TinyMCE';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

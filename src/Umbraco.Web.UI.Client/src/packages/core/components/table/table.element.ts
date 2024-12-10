@@ -146,18 +146,6 @@ export class UmbTableElement extends LitElement {
 		this.dispatchEvent(new UmbTableOrderedEvent());
 	}
 
-	private _selectRow(key: string) {
-		this.selection = [...this.selection, key];
-		this._selectionMode = this.selection.length > 0;
-		this.dispatchEvent(new UmbTableSelectedEvent());
-	}
-
-	private _deselectRow(key: string) {
-		this.selection = this.selection.filter((selectionKey) => selectionKey !== key);
-		this._selectionMode = this.selection.length > 0;
-		this.dispatchEvent(new UmbTableDeselectedEvent());
-	}
-
 	private _selectAllRows() {
 		this.selection = this.items.map((item: UmbTableItem) => item.id);
 		this._selectionMode = true;
@@ -167,6 +155,18 @@ export class UmbTableElement extends LitElement {
 	private _deselectAllRows() {
 		this.selection = [];
 		this._selectionMode = false;
+		this.dispatchEvent(new UmbTableDeselectedEvent());
+	}
+
+	private _selectRow(key: string) {
+		this.selection = [...this.selection, key];
+		this._selectionMode = this.selection.length > 0;
+		this.dispatchEvent(new UmbTableSelectedEvent());
+	}
+
+	private _deselectRow(key: string) {
+		this.selection = this.selection.filter((selectionKey) => selectionKey !== key);
+		this._selectionMode = this.selection.length > 0;
 		this.dispatchEvent(new UmbTableDeselectedEvent());
 	}
 
