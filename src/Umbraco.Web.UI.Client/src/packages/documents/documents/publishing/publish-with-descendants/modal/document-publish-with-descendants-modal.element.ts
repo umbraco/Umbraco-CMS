@@ -1,3 +1,5 @@
+import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
+import { isNotPublishedMandatory } from '../../utils.js';
 import type {
 	UmbDocumentPublishWithDescendantsModalData,
 	UmbDocumentPublishWithDescendantsModalValue,
@@ -6,10 +8,8 @@ import { css, customElement, html, state } from '@umbraco-cms/backoffice/externa
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
-import { isNotPublishedMandatory } from '../../utils.js';
 
-import '../shared/document-variant-language-picker.element.js';
+import '../../../modals/shared/document-variant-language-picker.element.js';
 
 @customElement('umb-document-publish-with-descendants-modal')
 export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseElement<
