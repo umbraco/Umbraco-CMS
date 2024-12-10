@@ -24,6 +24,10 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDocumentPublishingWorkspaceContext> {
+	/**
+	 * Manages the pending changes for the published document.
+	 * @memberof UmbDocumentPublishingWorkspaceContext
+	 */
 	public readonly publishedPendingChanges = new UmbDocumentPublishedPendingChangesManager(this);
 
 	#init: Promise<unknown>;
@@ -290,21 +294,15 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 
 		const options = await firstValueFrom(this.#documentWorkspaceContext.variantOptions);
-		debugger;
-
-		//const activeVariants = this.splitView.getActiveVariants();
-		//const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
-		//const changedVariantIds = this._data.getChangedVariants();
-		//const selectedVariantIds = activeVariantIds.concat(changedVariantIds);
+		const variantsWithPendingChanges = this.publishedPendingChanges.getVariantsWithChanges();
+		let selected = variantsWithPendingChanges.map((x) => x.variantId.toString());
 
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
-		/*
-		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
-		let selected = selectedVariantIds.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i);
-		selected = selected.filter((x) => readOnlyCultures.includes(x) === false);
-		*/
+		selected = selected.filter((x) => options.some((o) => o.unique === x));
 
-		const selected: Array<string> = [];
+		// Filter out read-only variants
+		const readOnlyCultures = this.#documentWorkspaceContext.readOnlyState.getStates().map((s) => s.variantId.culture);
+		selected = selected.filter((x) => readOnlyCultures.includes(x) === false);
 
 		return {
 			options,
