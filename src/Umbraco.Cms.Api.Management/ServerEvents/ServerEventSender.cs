@@ -31,7 +31,7 @@ public class ServerEventSender : INotificationHandler<ContentSavedNotification>
             {
                 EventType = eventType,
                 Key = entity.Key,
-                SourceType = entity.GetType().Name,
+                EventSource = EventSource.Document,
             };
 
             _eventHub.Clients.All.notify(eventModel);

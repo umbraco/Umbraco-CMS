@@ -4,7 +4,7 @@ public class ServerEvent
 {
     public EventType EventType { get; set; }
 
-    public required string SourceType { get; set; }
+    public EventSource EventSource { get; set; }
 
     public Guid Key { get; set; }
 }
