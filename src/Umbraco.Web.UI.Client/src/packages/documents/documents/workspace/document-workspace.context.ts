@@ -12,6 +12,8 @@ import {
 	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 } from '../constants.js';
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
+import { UmbDocumentPublishingRepository } from '../publishing/index.js';
+import { UmbDocumentValidationRepository } from '../repository/validation/index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -30,7 +32,6 @@ import {
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import { UmbDocumentPublishingRepository } from '../publishing/index.js';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
@@ -70,6 +71,8 @@ export class UmbDocumentWorkspaceContext
 			workspaceAlias: UMB_DOCUMENT_WORKSPACE_ALIAS,
 			detailRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbDocumentTypeDetailRepository,
+			contentValidationRepository: UmbDocumentValidationRepository,
+			skipValidationOnSubmit: true,
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
 			saveModalToken: UMB_DOCUMENT_SAVE_MODAL,
 		});
@@ -247,7 +250,7 @@ export class UmbDocumentWorkspaceContext
 	/**
 	 * @deprecated Will be removed in v17.
 	 */
-	async publish() {
+	public async publish() {
 		throw new Error('Method not implemented.');
 	}
 
@@ -255,7 +258,7 @@ export class UmbDocumentWorkspaceContext
 	 * Save the document and publish it.
 	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
 	 */
-	async saveAndPublish(): Promise<void> {
+	public async saveAndPublish(): Promise<void> {
 		alert('WRONG METHOD');
 	}
 

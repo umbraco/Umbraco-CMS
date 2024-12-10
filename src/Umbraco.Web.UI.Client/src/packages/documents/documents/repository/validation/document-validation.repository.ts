@@ -3,10 +3,14 @@ import { UmbDocumentValidationServerDataSource } from './document-validation.ser
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import type { UmbContentValidationRepository } from '@umbraco-cms/backoffice/content';
 
 type DetailModelType = UmbDocumentDetailModel;
 
-export class UmbDocumentValidationRepository extends UmbRepositoryBase {
+export class UmbDocumentValidationRepository
+	extends UmbRepositoryBase
+	implements UmbContentValidationRepository<DetailModelType>
+{
 	#validationDataSource: UmbDocumentValidationServerDataSource;
 
 	constructor(host: UmbControllerHost) {
