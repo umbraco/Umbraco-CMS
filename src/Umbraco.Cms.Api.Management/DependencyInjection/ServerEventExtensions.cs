@@ -45,5 +45,28 @@ internal static class ServerEventExtensions
         builder.AddNotificationAsyncHandler<UserGroupSavedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<UserSavedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<WebhookSavedNotification, ServerEventSender>();
+
+        builder.AddNotificationAsyncHandler<ContentDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<ContentTypeDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<MediaDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<MediaTypeDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<MemberDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<MemberTypeDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<MemberGroupDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<DataTypeDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<LanguageDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<ScriptDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<StylesheetDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<TemplateDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<DictionaryItemDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<DomainDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<PartialViewDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<PublicAccessEntryDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<RelationDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<RelationTypeDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<UserGroupDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<UserDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<WebhookDeletedNotification, ServerEventSender>();
+
     }
 }

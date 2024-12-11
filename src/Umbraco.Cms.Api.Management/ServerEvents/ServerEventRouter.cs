@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ServerEvents.Models;
 
 namespace Umbraco.Cms.Api.Management.ServerEvents;
