@@ -95,7 +95,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 				return html`<umb-icon name="icon-check color-green"></umb-icon>${msg}`;
 			case HealthStatusModel.CORRUPT:
 				return html`<umb-icon name="icon-alert color-red"></umb-icon><div>
-					<umb-localize key="examineManagement_corruptStatus">Possible corrupt index detected</umb-localize>
+					<a href="https://umbra.co/corrupt-indexes" target="_blank"><umb-localize key="examineManagement_corruptStatus">Possible corrupt index detected</umb-localize></a>
 					<p><umb-localize key="examineManagement_corruptErrorDescription">Error received when evaluating the index:</umb-localize> </br> </p>${msg}</div>`;
 			case HealthStatusModel.UNHEALTHY:
 				return html`<umb-icon name="icon-alert color-red"></umb-icon>${msg}`;
