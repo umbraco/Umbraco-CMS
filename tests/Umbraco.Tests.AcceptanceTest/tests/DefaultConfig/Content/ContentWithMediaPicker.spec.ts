@@ -34,7 +34,7 @@ test('can create content with the media picker data type', {tag: '@smoke'}, asyn
   await umbracoUi.content.clickCreateButton();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.selectMediaByName(mediaFileName);
+  await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(mediaFileName);
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
 
@@ -63,7 +63,7 @@ test('can publish content with the media picker data type', async ({umbracoApi, 
   await umbracoUi.content.clickCreateButton();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.selectMediaByName(mediaFileName);
+  await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(mediaFileName);
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveAndPublishButton();
 

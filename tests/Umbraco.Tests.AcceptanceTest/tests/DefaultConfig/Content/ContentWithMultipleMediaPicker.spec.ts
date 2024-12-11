@@ -80,8 +80,8 @@ test('can add multiple media files to the multiple media picker', async ({umbrac
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickChooseMediaPickerButton();
-  await umbracoUi.content.clickMediaByNameInMediaPicker(firstMediaFileName);
-  await umbracoUi.content.clickMediaByNameInMediaPicker(secondMediaFileName);
+  await umbracoUi.content.selectMediaWithName(firstMediaFileName);
+  await umbracoUi.content.selectMediaWithName(secondMediaFileName);
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
 
