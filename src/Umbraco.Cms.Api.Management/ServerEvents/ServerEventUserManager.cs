@@ -2,15 +2,15 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Api.Management.ServerEvents.Models;
+using Umbraco.Cms.Core.Models.ServerEvents;
+using Umbraco.Cms.Core.ServerEvents;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.ServerEvents;
 
 /// <inheritdoc />
-public class ServerEventUserManager : IServerEventUserManager
+internal sealed class ServerEventUserManager : IServerEventUserManager
 {
     private readonly IUserConnectionManager _userConnectionManager;
     private readonly IAuthorizationService _authorizationService;

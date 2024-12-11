@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Api.Management.ServerEvents.Models;
+﻿namespace Umbraco.Cms.Core.Models.ServerEvents;
 
 public enum EventSource
 {

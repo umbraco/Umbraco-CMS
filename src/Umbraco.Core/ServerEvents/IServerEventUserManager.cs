@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace Umbraco.Cms.Api.Management.ServerEvents;
+namespace Umbraco.Cms.Core.ServerEvents;
 
 /// <summary>
 /// Manages group access for a user.

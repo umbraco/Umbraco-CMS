@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using Umbraco.Cms.Core.ServerEvents;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
 

@@ -1,9 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ServerEvents;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.ServerEvents;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
 

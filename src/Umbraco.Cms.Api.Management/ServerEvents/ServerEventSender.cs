@@ -1,11 +1,12 @@
-﻿using Umbraco.Cms.Api.Management.ServerEvents.Models;
-using Umbraco.Cms.Core.Events;
+﻿using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.ServerEvents;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.ServerEvents;
 
 namespace Umbraco.Cms.Api.Management.ServerEvents;
 
-public class ServerEventSender :
+internal sealed class ServerEventSender :
     INotificationAsyncHandler<ContentSavedNotification>,
     INotificationAsyncHandler<ContentTypeSavedNotification>,
     INotificationAsyncHandler<MediaSavedNotification>,

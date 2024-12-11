@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Api.Management.ServerEvents;
+﻿namespace Umbraco.Cms.Core.ServerEvents;
 
 /// <summary>
 /// A manager that tracks connection ids for users.
@@ -9,7 +9,7 @@ public interface IUserConnectionManager
     /// Get all connections held by a user.
     /// </summary>
     /// <param name="userKey">The key of the user to get connections for.</param>
-    /// <returns>The users connections</returns>
+    /// <returns>The users connections.</returns>
     ISet<string> GetConnections(Guid userKey);
 
     /// <summary>

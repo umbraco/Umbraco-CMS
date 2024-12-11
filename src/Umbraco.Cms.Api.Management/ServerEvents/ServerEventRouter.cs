@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Umbraco.Cms.Api.Management.ServerEvents.Models;
+using Umbraco.Cms.Core.Models.ServerEvents;
+using Umbraco.Cms.Core.ServerEvents;
 
 namespace Umbraco.Cms.Api.Management.ServerEvents;
 

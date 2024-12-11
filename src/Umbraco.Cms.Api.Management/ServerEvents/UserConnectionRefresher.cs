@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.ServerEvents;
 using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Api.Management.ServerEvents;
@@ -9,7 +10,7 @@ namespace Umbraco.Cms.Api.Management.ServerEvents;
 /// <summary>
 /// updates the user's connections if any, when a user is saved
 /// </summary>
-public class UserConnectionRefresher : INotificationAsyncHandler<UserSavedNotification>
+internal sealed class UserConnectionRefresher : INotificationAsyncHandler<UserSavedNotification>
 {
     private readonly IBackOfficeSignInManager _backOfficeSignInManager;
     private readonly IServerEventUserManager _serverEventUserManager;

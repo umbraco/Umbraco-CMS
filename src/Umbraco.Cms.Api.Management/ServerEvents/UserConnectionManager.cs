@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Api.Management.ServerEvents;
+﻿using Umbraco.Cms.Core.ServerEvents;
+
+namespace Umbraco.Cms.Api.Management.ServerEvents;
 
 internal sealed class UserConnectionManager : IUserConnectionManager
 {

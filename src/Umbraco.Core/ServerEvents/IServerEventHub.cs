@@ -1,6 +1,6 @@
-﻿using Umbraco.Cms.Api.Management.ServerEvents.Models;
+﻿using Umbraco.Cms.Core.Models.ServerEvents;
 
-namespace Umbraco.Cms.Api.Management.ServerEvents;
+namespace Umbraco.Cms.Core.ServerEvents;
 
 public interface IServerEventHub
 {
