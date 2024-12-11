@@ -293,8 +293,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 
 		const options = await firstValueFrom(this.#documentWorkspaceContext.variantOptions);
-		const variantsWithPendingChanges = this.publishedPendingChanges.getVariantsWithChanges();
-		let selected = variantsWithPendingChanges.map((x) => x.variantId.toString());
+
+		// TODO: this is a temporary copy of the content-detail workspace context method.
+		// we need to implement custom selection that makes sense for each the publishing modal.
+		let selected = this.#getChangedVariantsSelection();
 
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
 		selected = selected.filter((x) => options.some((o) => o.unique === x));
@@ -307,6 +309,17 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			options,
 			selected,
 		};
+	}
+
+	#getChangedVariantsSelection() {
+		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
+		const activeVariants = this.#documentWorkspaceContext.splitView
+			.getActiveVariants()
+			.map((activeVariant) => UmbVariantId.Create(activeVariant))
+			.map((x) => x.toString());
+		const changedVariants = this.#documentWorkspaceContext.getChangedVariants().map((x) => x.toString());
+		const selection = [...activeVariants, ...changedVariants];
+		return [...new Set(selection)];
 	}
 
 	async #initPendingChanges() {
