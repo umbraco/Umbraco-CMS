@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Preview;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core.DependencyInjection;
