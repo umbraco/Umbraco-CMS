@@ -3,7 +3,7 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 } from '../../../user-permissions/constants.js';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../../workspace/constants.js';
+import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from '../../workspace-context/constants.js';
 import { UmbWorkspaceActionBase } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -32,7 +32,7 @@ export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceAction
 	}
 
 	override async execute() {
-		const workspaceContext = await this.getContext(UMB_DOCUMENT_WORKSPACE_CONTEXT);
+		const workspaceContext = await this.getContext(UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT);
 		return workspaceContext.saveAndPublish();
 	}
 }
