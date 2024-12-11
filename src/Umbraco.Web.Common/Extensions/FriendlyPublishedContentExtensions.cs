@@ -289,7 +289,7 @@ public static class FriendlyPublishedContentExtensions
     /// <returns>The ancestors of the content, in down-top order.</returns>
     /// <remarks>Does not consider the content itself.</remarks>
     public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content)
-        => content.Ancestors(GetPublishedCache(content), GetNavigationQueryService(content));
+        => content.Ancestors(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService);
 
     /// <summary>
     ///     Gets the content and its ancestors.
@@ -297,7 +297,7 @@ public static class FriendlyPublishedContentExtensions
     /// <param name="content">The content.</param>
     /// <returns>The content and its ancestors, in down-top order.</returns>
     public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content)
-        => content.AncestorsOrSelf(GetPublishedCache(content), GetNavigationQueryService(content));
+        => content.AncestorsOrSelf(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService);
 
     /// <summary>
     ///     Gets the content and its ancestors, of a specified content type.
@@ -308,7 +308,7 @@ public static class FriendlyPublishedContentExtensions
     /// <remarks>May or may not begin with the content itself, depending on its content type.</remarks>
     public static IEnumerable<T> AncestorsOrSelf<T>(this IPublishedContent content)
         where T : class, IPublishedContent
-        => content.AncestorsOrSelf<T>(GetPublishedCache(content), GetNavigationQueryService(content));
+        => content.AncestorsOrSelf<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService);
 
     /// <summary>
     ///     Gets the ancestor of the content, i.e. its parent.
@@ -327,7 +327,7 @@ public static class FriendlyPublishedContentExtensions
     /// <remarks>Does not consider the content itself. May return <c>null</c>.</remarks>
     public static T? Ancestor<T>(this IPublishedContent content)
         where T : class, IPublishedContent
-        => content.Ancestor<T>(GetPublishedCache(content), GetNavigationQueryService(content));
+        => content.Ancestor<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService);
 
     /// <summary>
     ///     Gets the content or its nearest ancestor, of a specified content type.
@@ -338,7 +338,7 @@ public static class FriendlyPublishedContentExtensions
     /// <remarks>May or may not return the content itself depending on its content type. May return <c>null</c>.</remarks>
     public static T? AncestorOrSelf<T>(this IPublishedContent content)
         where T : class, IPublishedContent
-        => content.AncestorOrSelf<T>(GetPublishedCache(content), GetNavigationQueryService(content));
+        => content.AncestorOrSelf<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService);
 
     /// <summary>
     ///     Returns all DescendantsOrSelf of all content referenced
