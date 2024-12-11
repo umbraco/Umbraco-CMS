@@ -67,7 +67,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 									? this.localize.string(section.manifest?.meta.label)
 									: section.manifest?.name,
 							)}"
-							data-mark="section-link/${section.alias}"></uui-tab>
+							data-mark="section-link:${section.alias}"></uui-tab>
 					`,
 				)}
 			</uui-tab-group>

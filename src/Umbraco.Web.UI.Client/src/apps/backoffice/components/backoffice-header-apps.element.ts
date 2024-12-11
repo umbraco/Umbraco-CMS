@@ -18,7 +18,7 @@ export class UmbBackofficeHeaderAppsElement extends LitElement {
 
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestHeaderApp>) => {
 		if (ext.component) {
-			ext.component.setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'header-app/' + ext.manifest?.alias);
+			ext.component.setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'header-app:' + ext.manifest?.alias);
 		}
 		return ext.component;
 	};

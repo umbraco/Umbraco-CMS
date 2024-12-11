@@ -56,7 +56,7 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 		if (this._isNew) return nothing;
 		return html`<umb-workspace-entity-action-menu
 			slot="action-menu"
-			data-mark="workspace-action-menu"></umb-workspace-entity-action-menu>`;
+			data-mark="workspace:action-menu"></umb-workspace-entity-action-menu>`;
 	}
 
 	static override styles = [

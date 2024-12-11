@@ -94,7 +94,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 	#renderChooseButton() {
 		return html`
 			<umb-property-layout
-				data-mark="property/editorUiAlias"
+				data-mark="property:editorUiAlias"
 				label="Property Editor"
 				description=${this.localize.term('propertyEditorPicker_title')}>
 				<uui-button
@@ -114,7 +114,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 		if (!this._propertyEditorUiAlias || !this._propertyEditorSchemaAlias) return nothing;
 		return html`
 			<umb-property-layout
-				data-mark="property/editorUiAlias"
+				data-mark="property:editorUiAlias"
 				label="Property Editor"
 				description=${this.localize.term('propertyEditorPicker_title')}>
 				<umb-ref-property-editor-ui

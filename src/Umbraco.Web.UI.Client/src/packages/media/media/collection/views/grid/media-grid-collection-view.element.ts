@@ -96,7 +96,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 		return html`
 			<uui-card-media
 				name=${ifDefined(item.name)}
-				data-mark="${item.entityType}/${item.unique}"
+				data-mark="${item.entityType}:${item.unique}"
 				selectable
 				?select-only=${this._selection.length > 0}
 				?selected=${this.#isSelected(item)}

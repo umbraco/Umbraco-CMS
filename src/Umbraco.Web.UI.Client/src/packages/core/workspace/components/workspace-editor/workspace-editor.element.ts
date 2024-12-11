@@ -96,9 +96,9 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				${when(
 					!this.enforceNoFooter,
 					() => html`
-						<umb-workspace-footer slot="footer" data-mark="workspace-footer">
+						<umb-workspace-footer slot="footer" data-mark="workspace:footer">
 							<slot name="footer-info"></slot>
-							<slot name="actions" slot="actions" data-mark="workspace-footer-actions"></slot>
+							<slot name="actions" slot="actions" data-mark="workspace:footer-actions"></slot>
 						</umb-workspace-footer>
 					`,
 				)}
@@ -110,7 +110,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		return html`
 			${!this.hideNavigation && this._workspaceViews.length > 1
 				? html`
-						<uui-tab-group slot="navigation" data-mark="workspace-view-links">
+						<uui-tab-group slot="navigation" data-mark="workspace:view-links">
 							${repeat(
 								this._workspaceViews,
 								(view) => view.alias,
@@ -122,7 +122,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 											.label="${view.meta.label ? this.localize.string(view.meta.label) : view.name}"
 											?active=${'view/' + view.meta.pathname === this._activePath ||
 											(index === 0 && this._activePath === '')}
-											data-mark="workspace-view-link/${view.alias}">
+											data-mark="workspace:view-link:${view.alias}">
 											<umb-icon slot="icon" name=${view.meta.icon}></umb-icon>
 											${view.meta.label ? this.localize.string(view.meta.label) : view.name}
 										</uui-tab>
@@ -143,7 +143,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				compact
 				href=${this.backPath}
 				label=${this.localize.term('general_back')}
-				data-mark="workspace-back-button">
+				data-mark="action:back">
 				<uui-icon name="icon-arrow-left"></uui-icon>
 			</uui-button>
 		`;

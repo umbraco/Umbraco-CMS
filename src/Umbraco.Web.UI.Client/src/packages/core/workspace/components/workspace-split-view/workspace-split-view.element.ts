@@ -52,7 +52,7 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 				${this.displayNavigation
 					? html`<umb-workspace-entity-action-menu
 							slot="action-menu"
-							data-mark="workspace-action-menu"></umb-workspace-entity-action-menu>`
+							data-mark="workspace:action-menu"></umb-workspace-entity-action-menu>`
 					: ''}
 				<slot name="action-menu" slot="action-menu"></slot>
 			</umb-workspace-editor>
