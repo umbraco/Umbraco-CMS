@@ -312,13 +312,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	async #initPendingChanges() {
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 		this.observe(
-			observeMultiple([
-				this.#documentWorkspaceContext.unique,
-				this.#documentWorkspaceContext.isNew,
-				this.#documentWorkspaceContext.variants,
-			]),
-			([unique, isNew, variants]) => {
-				if (isNew === false && unique && variants.length > 0) {
+			observeMultiple([this.#documentWorkspaceContext.unique, this.#documentWorkspaceContext.isNew]),
+			([unique, isNew]) => {
+				if (isNew === false && unique) {
 					this.#loadAndProcessLastPublished();
 				}
 			},
