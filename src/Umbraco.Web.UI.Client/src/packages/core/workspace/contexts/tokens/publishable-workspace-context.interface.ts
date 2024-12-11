@@ -2,6 +2,5 @@ import type { UmbSubmittableWorkspaceContext } from './submittable-workspace-con
 
 export interface UmbPublishableWorkspaceContext extends UmbSubmittableWorkspaceContext {
 	saveAndPublish(): Promise<void>;
-	publish(): Promise<void>;
 	unpublish(): Promise<void>;
 }

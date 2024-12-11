@@ -32,6 +32,7 @@ import {
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
@@ -265,6 +266,11 @@ export class UmbDocumentWorkspaceContext
 	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
 	 */
 	public async saveAndPublish(): Promise<void> {
+		new UmbDeprecation({
+			deprecated: 'The SaveAndPublish method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
+			removeInVersion: '17',
+			solution: 'Use the SaveAndPublish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
+		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
 		this.#publishingContext.saveAndPublish();
 	}
@@ -274,6 +280,11 @@ export class UmbDocumentWorkspaceContext
 	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
 	 */
 	public async schedule() {
+		new UmbDeprecation({
+			deprecated: 'The Schedule method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
+			removeInVersion: '17',
+			solution: 'Use the Schedule method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
+		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
 		this.#publishingContext.schedule();
 	}
@@ -283,6 +294,11 @@ export class UmbDocumentWorkspaceContext
 	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
 	 */
 	public async unpublish() {
+		new UmbDeprecation({
+			deprecated: 'The Unpublish method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
+			removeInVersion: '17',
+			solution: 'Use the Unpublish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
+		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
 		this.#publishingContext.unpublish();
 	}
@@ -292,6 +308,11 @@ export class UmbDocumentWorkspaceContext
 	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
 	 */
 	public async publishWithDescendants() {
+		new UmbDeprecation({
+			deprecated: 'The PublishWithDescendants method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
+			removeInVersion: '17',
+			solution: 'Use the PublishWithDescendants method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
+		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
 		this.#publishingContext.publishWithDescendants();
 	}
