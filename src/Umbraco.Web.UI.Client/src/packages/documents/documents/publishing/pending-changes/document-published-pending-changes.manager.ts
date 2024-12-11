@@ -1,18 +1,18 @@
-import type { UmbDocumentDetailModel } from '../../types.js';
+import type {
+	UmbDocumentPublishedPendingChangesManagerProcessArgs,
+	UmbPublishedVariantWithPendingChanges,
+} from './types.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbMergeContentVariantDataController } from '@umbraco-cms/backoffice/content';
 import { jsonStringComparison, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
-interface UmbDocumentPublishedPendingChangesManagerProcessArgs {
-	persistedData: UmbDocumentDetailModel;
-	publishedData: UmbDocumentDetailModel;
-}
-
-interface UmbPublishedVariantWithPendingChanges {
-	variantId: UmbVariantId;
-}
-
+/**
+ * Manages the pending changes for a published document.
+ * @exports
+ * @class UmbDocumentPublishedPendingChangesManager
+ * @augments {UmbControllerBase}
+ */
 export class UmbDocumentPublishedPendingChangesManager extends UmbControllerBase {
 	#variantsWithChanges = new UmbArrayState<UmbPublishedVariantWithPendingChanges>([], (x) => x.variantId.toString());
 	public readonly variantsWithChanges = this.#variantsWithChanges.asObservable();
@@ -23,11 +23,11 @@ export class UmbDocumentPublishedPendingChangesManager extends UmbControllerBase
 	 * @param {string} args.unique - The unique identifier of the document.
 	 * @param {UmbDocumentDetailModel} args.currentData - The current document data.
 	 * @returns {Promise<void>}
-	 * @memberof UmbPublishedPendingChangesManager
+	 * @memberof UmbDocumentPublishedPendingChangesManager
 	 */
 	async process(args: UmbDocumentPublishedPendingChangesManagerProcessArgs): Promise<void> {
-		if (!args.persistedData) throw new Error('Current Data is missing');
-		if (!args.publishedData) throw new Error('Published Data is missing');
+		if (!args.persistedData) throw new Error('Persisted data is missing');
+		if (!args.publishedData) throw new Error('Published data is missing');
 
 		const variantIds = args.persistedData.variants?.map((x) => UmbVariantId.Create(x)) ?? [];
 
