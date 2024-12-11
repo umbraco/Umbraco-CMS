@@ -1,11 +1,11 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../document-workspace.context-token.js';
+import { UmbDocumentUserPermissionCondition } from '../../../user-permissions/conditions/document-user-permission.condition.js';
 import {
 	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-} from '../../user-permissions/constants.js';
-import { UmbDocumentUserPermissionCondition } from '../../user-permissions/conditions/document-user-permission.condition.js';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+} from '../../../user-permissions/constants.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../../workspace/constants.js';
 import { UmbWorkspaceActionBase } from '@umbraco-cms/backoffice/workspace';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceActionBase {
 	constructor(host: UmbControllerHost, args: any) {
