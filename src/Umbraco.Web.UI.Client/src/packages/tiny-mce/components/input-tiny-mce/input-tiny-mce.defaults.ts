@@ -76,31 +76,31 @@ export const defaultFallbackConfig: RawEditorOptions = {
 			// If we try to open link in a new tab, then we want to skip skip:
 			//if ((isWindows && e.ctrlKey) || (!isWindows && e.metaKey)) return;
 
+			const composedPaths = 'composedPath' in e ? e.composedPath() : null;
+
 			// Find the target by using the composed path to get the element through the shadow boundaries.
 			// Notice the difference here compared to RouterSlots implementation [NL]
-			const $anchor: HTMLAnchorElement = (('composedPath' in e) as any)
-				? (e
-						.composedPath()
-						.find(($elem) => $elem instanceof HTMLAnchorElement || ($elem as any).tagName === 'A') as HTMLAnchorElement)
-				: (e.target as HTMLAnchorElement);
+			const $anchor: HTMLAnchorElement =
+				(composedPaths?.find(
+					($elem) => $elem instanceof HTMLAnchorElement || ($elem as any).tagName === 'A',
+				) as HTMLAnchorElement) ?? (e.target as HTMLAnchorElement);
 
-			// Abort if the event is not about the anchor tag
-			if ($anchor == null || !($anchor instanceof HTMLAnchorElement || ($anchor as any).tagName === 'A')) {
+			// Abort if the event is not about the anchor tag or the anchor tag has the attribute [data-router-slot]="disabled"
+			if (
+				$anchor == null ||
+				!($anchor instanceof HTMLAnchorElement || ($anchor as any).tagName === 'A') ||
+				$anchor.dataset['routerSlot'] === 'disabled'
+			) {
 				return;
 			}
 
-			// Get the HREF value from the anchor tag
-			const href = $anchor.href;
+			// Abort if the anchor tag is not inside a block element
+			const isInsideBlockElement =
+				composedPaths?.some(
+					($elem) => ($elem as any).tagName === 'UMB-RTE-BLOCK' || ($elem as any).tagName === 'UMB-RTE-BLOCK-INLINE',
+				) ?? false;
 
-			// Only handle the anchor tag if the follow holds true:
-			// - The HREF is relative to the origin of the current location.
-			// - The target is targeting the current frame.
-			// - The anchor doesn't have the attribute [data-router-slot]="disabled"
-			if (
-				!href.startsWith(location.origin) ||
-				($anchor.target !== '' && $anchor.target !== '_self') ||
-				$anchor.dataset['routerSlot'] === 'disabled'
-			) {
+			if (!isInsideBlockElement) {
 				return;
 			}
 

@@ -300,9 +300,9 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				? html`<uui-button
 						@click=${this.#expose}
 						label=${this.localize.term('blockEditor_createThisFor', this._contentTypeName)}
-						look="secondary"
-						><uui-icon name="icon-add"></uui-icon
-					></uui-button>`
+						look="secondary">
+						<uui-icon name="icon-add"></uui-icon>
+					</uui-button>`
 				: nothing;
 	}
 
