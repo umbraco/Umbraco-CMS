@@ -355,7 +355,7 @@ public static class FriendlyPublishedContentExtensions
     /// </remarks>
     public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(
         this IEnumerable<IPublishedContent> parentNodes, string docTypeAlias, string? culture = null)
-        => parentNodes.DescendantsOrSelfOfType(VariationContextAccessor, GetPublishedCache(parentNodes.First()), GetNavigationQueryService(parentNodes.First()), docTypeAlias, culture);
+        => parentNodes.DescendantsOrSelfOfType(VariationContextAccessor, GetPublishedCache(parentNodes.First()), GetNavigationQueryService(parentNodes.First()), PublishStatusQueryService, docTypeAlias, culture);
 
     /// <summary>
     ///     Returns all DescendantsOrSelf of all content referenced
@@ -373,77 +373,77 @@ public static class FriendlyPublishedContentExtensions
         this IEnumerable<IPublishedContent> parentNodes,
         string? culture = null)
         where T : class, IPublishedContent
-        => parentNodes.DescendantsOrSelf<T>(VariationContextAccessor, GetPublishedCache(parentNodes.First()), GetNavigationQueryService(parentNodes.First()), culture);
+        => parentNodes.DescendantsOrSelf<T>(VariationContextAccessor, GetPublishedCache(parentNodes.First()), GetNavigationQueryService(parentNodes.First()), PublishStatusQueryService, culture);
 
     public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, string? culture = null)
-        => content.Descendants(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
+        => content.Descendants(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, culture);
 
     public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, int level, string? culture = null)
-        => content.Descendants(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), level, culture);
+        => content.Descendants(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, level, culture);
 
     public static IEnumerable<IPublishedContent> DescendantsOfType(this IPublishedContent content, string contentTypeAlias, string? culture = null)
-        => content.DescendantsOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), contentTypeAlias, culture);
+        => content.DescendantsOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, contentTypeAlias, culture);
 
     public static IEnumerable<T> Descendants<T>(this IPublishedContent content, string? culture = null)
         where T : class, IPublishedContent
-        => content.Descendants<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
+        => content.Descendants<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, culture);
 
     public static IEnumerable<T> Descendants<T>(this IPublishedContent content, int level, string? culture = null)
         where T : class, IPublishedContent
-        => content.Descendants<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), level, culture);
+        => content.Descendants<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, level, culture);
 
     public static IEnumerable<IPublishedContent> DescendantsOrSelf(
         this IPublishedContent content,
         string? culture = null)
-        => content.DescendantsOrSelf(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
+        => content.DescendantsOrSelf(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, culture);
 
     public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, int level, string? culture = null)
-        => content.DescendantsOrSelf(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), level, culture);
+        => content.DescendantsOrSelf(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, level, culture);
 
     public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(this IPublishedContent content, string contentTypeAlias, string? culture = null)
-        => content.DescendantsOrSelfOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), contentTypeAlias, culture);
+        => content.DescendantsOrSelfOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, contentTypeAlias, culture);
 
     public static IEnumerable<T> DescendantsOrSelf<T>(this IPublishedContent content, string? culture = null)
         where T : class, IPublishedContent
-        => content.DescendantsOrSelf<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
+        => content.DescendantsOrSelf<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, culture);
 
     public static IEnumerable<T> DescendantsOrSelf<T>(this IPublishedContent content, int level, string? culture = null)
         where T : class, IPublishedContent
-        => content.DescendantsOrSelf<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), level, culture);
+        => content.DescendantsOrSelf<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, level, culture);
 
     public static IPublishedContent? Descendant(this IPublishedContent content, string? culture = null)
-        => content.Descendant(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
+        => content.Descendant(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, culture);
 
     public static IPublishedContent? Descendant(this IPublishedContent content, int level, string? culture = null)
-        => content.Descendant(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), level, culture);
+        => content.Descendant(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, level, culture);
 
     public static IPublishedContent? DescendantOfType(this IPublishedContent content, string contentTypeAlias, string? culture = null)
-        => content.DescendantOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), contentTypeAlias, culture);
+        => content.DescendantOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, contentTypeAlias, culture);
 
     public static T? Descendant<T>(this IPublishedContent content, string? culture = null)
         where T : class, IPublishedContent
-        => content.Descendant<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
+        => content.Descendant<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, culture);
 
     public static T? Descendant<T>(this IPublishedContent content, int level, string? culture = null)
         where T : class, IPublishedContent
-        => content.Descendant<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), level, culture);
+        => content.Descendant<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, level, culture);
 
     public static IPublishedContent DescendantOrSelf(this IPublishedContent content, string? culture = null)
-        => content.DescendantOrSelf(VariationContextAccessor, culture);
+        => content.DescendantOrSelf(VariationContextAccessor, PublishStatusQueryService, culture);
 
     public static IPublishedContent? DescendantOrSelf(this IPublishedContent content, int level, string? culture = null)
-        => content.DescendantOrSelf(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), level, culture);
+        => content.DescendantOrSelf(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, level, culture);
 
     public static IPublishedContent? DescendantOrSelfOfType(this IPublishedContent content, string contentTypeAlias, string? culture = null)
-        => content.DescendantOrSelfOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), contentTypeAlias, culture);
+        => content.DescendantOrSelfOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, contentTypeAlias, culture);
 
     public static T? DescendantOrSelf<T>(this IPublishedContent content, string? culture = null)
         where T : class, IPublishedContent
-        => content.DescendantOrSelf<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
+        => content.DescendantOrSelf<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, culture);
 
     public static T? DescendantOrSelf<T>(this IPublishedContent content, int level, string? culture = null)
         where T : class, IPublishedContent
-        => content.DescendantOrSelf<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), level, culture);
+        => content.DescendantOrSelf<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, level, culture);
 
     /// <summary>
     ///     Gets the children of the content item.
