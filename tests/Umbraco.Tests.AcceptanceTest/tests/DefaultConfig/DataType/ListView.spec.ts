@@ -192,7 +192,8 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test('can update bulk action permission', async ({umbracoApi, umbracoUi}) => {
+    // Skip this test as currently there is no setting for bulk action permission
+    test.skip('can update bulk action permission', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const bulkActionPermissionValue = 'Allow bulk trash';
       const expectedDataTypeValues = {

@@ -94,7 +94,7 @@ test.skip('can update a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbrac
 
 test('can delete a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.stylesheet.create(stylesheetName, '', '/');
+  await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
   await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
 
   //Act
@@ -112,7 +112,7 @@ test('can rename a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
   // Arrange
   const wrongStylesheetName = 'WrongStylesheetName.css';
   await umbracoApi.stylesheet.ensureNameNotExists(wrongStylesheetName);
-  await umbracoApi.stylesheet.create(wrongStylesheetName, '', '/');
+  await umbracoApi.stylesheet.createDefaultStylesheet(wrongStylesheetName);
   await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
 
   //Act
@@ -133,7 +133,7 @@ test('can edit rich text editor styles', async ({umbracoApi, umbracoUi}) => {
   const newStyleStyles = 'color: white';
   const newStylesheetContent = '/**umb_name:' + newStyleName + '*/\n' + newStyleSelector + ' {\n\t' +  newStyleStyles + '\n}';
   const stylesheetContent = '/**umb_name:' + styleName + '*/\n' + styleSelector + ' {\n\t' +  styleStyles + '\n}';
-  await umbracoApi.stylesheet.create(stylesheetName, stylesheetContent, '/');
+  await umbracoApi.stylesheet.create(stylesheetName, stylesheetContent);
   expect(await umbracoApi.stylesheet.doesExist(stylesheetName)).toBeTruthy();
   await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
 
@@ -151,7 +151,7 @@ test('can edit rich text editor styles', async ({umbracoApi, umbracoUi}) => {
 test('can remove rich text editor styles', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetContent = '/**umb_name:' + styleName + '*/\n' + styleSelector + ' {\n\t' +  styleStyles + '\n}';
-  await umbracoApi.stylesheet.create(stylesheetName, stylesheetContent, '/');
+  await umbracoApi.stylesheet.create(stylesheetName, stylesheetContent);
   expect(await umbracoApi.stylesheet.doesExist(stylesheetName)).toBeTruthy();
   await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
 
