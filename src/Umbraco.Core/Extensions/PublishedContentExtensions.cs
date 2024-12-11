@@ -2759,6 +2759,7 @@ public static class PublishedContentExtensions
     /// <param name="content">The content.</param>
     /// <param name="navigationQueryService">The navigation service</param>
     /// <param name="variationContextAccessor">Variation context accessor.</param>
+    /// <param name="publishStatusQueryService"></param>
     /// <param name="culture">
     ///     The specific culture to filter for. If null is used the current culture is used. (Default is
     ///     null)
@@ -2773,9 +2774,68 @@ public static class PublishedContentExtensions
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService,
         IVariationContextAccessor variationContextAccessor,
+        IPublishStatusQueryService publishStatusQueryService,
         string? culture = null) =>
-        SiblingsAndSelf(content, publishedCache, navigationQueryService, variationContextAccessor, culture)
+        SiblingsAndSelf(content, publishedCache, navigationQueryService, variationContextAccessor, publishStatusQueryService, culture)
             ?.Where(x => x.Id != content.Id) ?? Enumerable.Empty<IPublishedContent>();
+
+    /// <summary>
+    ///     Gets the siblings of the content.
+    /// </summary>
+    /// <param name="content">The content.</param>
+    /// <param name="navigationQueryService">The navigation service</param>
+    /// <param name="variationContextAccessor">Variation context accessor.</param>
+    /// <param name="culture">
+    ///     The specific culture to filter for. If null is used the current culture is used. (Default is
+    ///     null)
+    /// </param>
+    /// <param name="publishedCache">The content cache instance.</param>
+    /// <returns>The siblings of the content.</returns>
+    /// <remarks>
+    ///     <para>Note that in V7 this method also return the content node self.</para>
+    /// </remarks>
+    [Obsolete("Use the overload with IPublishStatusQueryService, scheduled for removal in v17")]
+    public static IEnumerable<IPublishedContent> Siblings(
+        this IPublishedContent content,
+        IPublishedCache publishedCache,
+        INavigationQueryService navigationQueryService,
+        IVariationContextAccessor variationContextAccessor,
+        string? culture = null) =>
+        Siblings(
+            content,
+            publishedCache,
+            navigationQueryService,
+            variationContextAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>(),
+            culture);
+
+    /// <summary>
+    ///     Gets the siblings of the content, of a given content type.
+    /// </summary>
+    /// <param name="content">The content.</param>
+    /// <param name="variationContextAccessor">Variation context accessor.</param>
+    /// <param name="culture">
+    ///     The specific culture to filter for. If null is used the current culture is used. (Default is
+    ///     null)
+    /// </param>
+    /// <param name="publishedCache"></param>
+    /// <param name="navigationQueryService"></param>
+    /// <param name="publishStatusQueryService"></param>
+    /// <param name="contentTypeAlias">The content type alias.</param>
+    /// <returns>The siblings of the content, of the given content type.</returns>
+    /// <remarks>
+    ///     <para>Note that in V7 this method also return the content node self.</para>
+    /// </remarks>
+    public static IEnumerable<IPublishedContent> SiblingsOfType(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        IPublishedCache publishedCache,
+        INavigationQueryService navigationQueryService,
+        IPublishStatusQueryService publishStatusQueryService,
+        string contentTypeAlias,
+        string? culture = null) =>
+        SiblingsAndSelfOfType(content, variationContextAccessor, publishedCache, navigationQueryService, publishStatusQueryService, contentTypeAlias, culture)
+            .Where(x => x.Id != content.Id);
 
     /// <summary>
     ///     Gets the siblings of the content, of a given content type.
@@ -2793,6 +2853,7 @@ public static class PublishedContentExtensions
     /// <remarks>
     ///     <para>Note that in V7 this method also return the content node self.</para>
     /// </remarks>
+    [Obsolete("Use the overload with IPublishStatusQueryService, scheduled for removal in v17")]
     public static IEnumerable<IPublishedContent> SiblingsOfType(
         this IPublishedContent content,
         IVariationContextAccessor variationContextAccessor,
@@ -2800,8 +2861,42 @@ public static class PublishedContentExtensions
         INavigationQueryService navigationQueryService,
         string contentTypeAlias,
         string? culture = null) =>
-        SiblingsAndSelfOfType(content, variationContextAccessor, publishedCache, navigationQueryService, contentTypeAlias, culture)
-            .Where(x => x.Id != content.Id);
+        SiblingsOfType(
+            content,
+            variationContextAccessor,
+            publishedCache,
+            navigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>(),
+            contentTypeAlias,
+            culture);
+
+    /// <summary>
+    ///     Gets the siblings of the content, of a given content type.
+    /// </summary>
+    /// <typeparam name="T">The content type.</typeparam>
+    /// <param name="content">The content.</param>
+    /// <param name="variationContextAccessor">Variation context accessor.</param>
+    /// <param name="publishedCache"></param>
+    /// <param name="navigationQueryService"></param>
+    /// <param name="publishStatusQueryService"></param>
+    /// <param name="culture">
+    ///     The specific culture to filter for. If null is used the current culture is used. (Default is
+    ///     null)
+    /// </param>
+    /// <returns>The siblings of the content, of the given content type.</returns>
+    /// <remarks>
+    ///     <para>Note that in V7 this method also return the content node self.</para>
+    /// </remarks>
+    public static IEnumerable<T> Siblings<T>(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        IPublishedCache publishedCache,
+        INavigationQueryService navigationQueryService,
+        IPublishStatusQueryService publishStatusQueryService,
+        string? culture = null)
+        where T : class, IPublishedContent =>
+        SiblingsAndSelf<T>(content, variationContextAccessor, publishedCache, navigationQueryService, publishStatusQueryService, culture)
+            ?.Where(x => x.Id != content.Id) ?? Enumerable.Empty<T>();
 
     /// <summary>
     ///     Gets the siblings of the content, of a given content type.
@@ -2819,6 +2914,7 @@ public static class PublishedContentExtensions
     /// <remarks>
     ///     <para>Note that in V7 this method also return the content node self.</para>
     /// </remarks>
+    [Obsolete("Use the overload with IPublishStatusQueryService, scheduled for removal in v17")]
     public static IEnumerable<T> Siblings<T>(
         this IPublishedContent content,
         IVariationContextAccessor variationContextAccessor,
@@ -2826,8 +2922,56 @@ public static class PublishedContentExtensions
         INavigationQueryService navigationQueryService,
         string? culture = null)
         where T : class, IPublishedContent =>
-        SiblingsAndSelf<T>(content, variationContextAccessor, publishedCache, navigationQueryService, culture)
-            ?.Where(x => x.Id != content.Id) ?? Enumerable.Empty<T>();
+        Siblings<T>(
+            content,
+            variationContextAccessor,
+            publishedCache,
+            navigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>(),
+            culture);
+
+    /// <summary>
+    ///     Gets the siblings of the content including the node itself to indicate the position.
+    /// </summary>
+    /// <param name="content">The content.</param>
+    /// <param name="publishedCache">Cache instance.</param>
+    /// <param name="navigationQueryService">The navigation service.</param>
+    /// <param name="variationContextAccessor">Variation context accessor.</param>
+    /// <param name="publishStatusQueryService"></param>
+    /// <param name="culture">
+    ///     The specific culture to filter for. If null is used the current culture is used. (Default is
+    ///     null)
+    /// </param>
+    /// <returns>The siblings of the content including the node itself.</returns>
+    public static IEnumerable<IPublishedContent>? SiblingsAndSelf(
+        this IPublishedContent content,
+        IPublishedCache publishedCache,
+        INavigationQueryService navigationQueryService,
+        IVariationContextAccessor variationContextAccessor,
+        IPublishStatusQueryService publishStatusQueryService,
+        string? culture = null)
+    {
+        var success = navigationQueryService.TryGetParentKey(content.Key, out Guid? parentKey);
+
+        if (success is false || parentKey is null)
+        {
+            if (navigationQueryService.TryGetRootKeys(out IEnumerable<Guid> childrenKeys) is false)
+            {
+                return null;
+            }
+
+            culture ??= variationContextAccessor.VariationContext?.Culture ?? string.Empty;
+            return childrenKeys
+                .Where(x => publishStatusQueryService.IsDocumentPublished(x , culture))
+                .Select(publishedCache.GetById)
+                .WhereNotNull()
+                .WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
+        }
+
+        return navigationQueryService.TryGetChildrenKeys(parentKey.Value, out IEnumerable<Guid> siblingKeys) is false
+            ? null
+            : siblingKeys.Select(publishedCache.GetById).WhereNotNull();
+    }
 
     /// <summary>
     ///     Gets the siblings of the content including the node itself to indicate the position.
@@ -2841,31 +2985,66 @@ public static class PublishedContentExtensions
     ///     null)
     /// </param>
     /// <returns>The siblings of the content including the node itself.</returns>
+    [Obsolete("Use the overload with IPublishStatusQueryService, scheduled for removal in v17")]
     public static IEnumerable<IPublishedContent>? SiblingsAndSelf(
         this IPublishedContent content,
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService,
         IVariationContextAccessor variationContextAccessor,
+        string? culture = null) =>
+        SiblingsAndSelf(
+            content,
+            publishedCache,
+            navigationQueryService,
+            variationContextAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>(),
+            culture);
+
+    /// <summary>
+    ///     Gets the siblings of the content including the node itself to indicate the position, of a given content type.
+    /// </summary>
+    /// <param name="content">The content.</param>
+    /// <param name="variationContextAccessor">Variation context accessor.</param>
+    /// <param name="culture">
+    ///     The specific culture to filter for. If null is used the current culture is used. (Default is
+    ///     null)
+    /// </param>
+    /// <param name="navigationQueryService"></param>
+    /// <param name="publishStatusQueryService"></param>
+    /// <param name="contentTypeAlias">The content type alias.</param>
+    /// <param name="publishedCache"></param>
+    /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
+    public static IEnumerable<IPublishedContent> SiblingsAndSelfOfType(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        IPublishedCache publishedCache,
+        INavigationQueryService navigationQueryService,
+        IPublishStatusQueryService publishStatusQueryService,
+        string contentTypeAlias,
         string? culture = null)
     {
-        var success = navigationQueryService.TryGetParentKey(content.Key, out Guid? parentKey);
+        var parentExists = navigationQueryService.TryGetParentKey(content.Key, out Guid? parentKey);
 
-        if (success is false || parentKey is null)
+        IPublishedContent? parent = parentKey is null
+            ? null
+            : publishedCache.GetById(parentKey.Value);
+
+        if (parentExists && parent is not null)
         {
-            if (navigationQueryService.TryGetRootKeys(out IEnumerable<Guid> childrenKeys) is false)
-            {
-                return null;
-            }
-
-            return childrenKeys
-                .Select(publishedCache.GetById)
-                .WhereNotNull()
-                .WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
+            return parent.ChildrenOfType(variationContextAccessor, publishedCache, navigationQueryService, publishStatusQueryService, contentTypeAlias, culture);
         }
 
-        return navigationQueryService.TryGetChildrenKeys(parentKey.Value, out IEnumerable<Guid> siblingKeys) is false
-            ? null
-            : siblingKeys.Select(publishedCache.GetById).WhereNotNull();
+        if (navigationQueryService.TryGetRootKeysOfType(contentTypeAlias, out IEnumerable<Guid> rootKeysOfType) is false)
+        {
+            return [];
+        }
+
+        culture ??= variationContextAccessor.VariationContext?.Culture ?? string.Empty;
+        return rootKeysOfType
+            .Where(x => publishStatusQueryService.IsDocumentPublished(x, culture))
+            .Select(publishedCache.GetById)
+            .WhereNotNull()
+            .WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
     }
 
     /// <summary>
@@ -2881,35 +3060,22 @@ public static class PublishedContentExtensions
     /// <param name="contentTypeAlias">The content type alias.</param>
     /// <param name="publishedCache"></param>
     /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
+    [Obsolete("Use the overload with IPublishStatusQueryService, scheduled for removal in v17")]
     public static IEnumerable<IPublishedContent> SiblingsAndSelfOfType(
         this IPublishedContent content,
         IVariationContextAccessor variationContextAccessor,
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService,
         string contentTypeAlias,
-        string? culture = null)
-    {
-        var parentExists = navigationQueryService.TryGetParentKey(content.Key, out Guid? parentKey);
-
-        IPublishedContent? parent = parentKey is null
-            ? null
-            : publishedCache.GetById(parentKey.Value);
-
-        if (parentExists && parent is not null)
-        {
-            return parent.ChildrenOfType(variationContextAccessor, publishedCache, navigationQueryService, contentTypeAlias, culture);
-        }
-
-        if (navigationQueryService.TryGetRootKeysOfType(contentTypeAlias, out IEnumerable<Guid> rootKeysOfType) is false)
-        {
-            return [];
-        }
-
-        return rootKeysOfType
-            .Select(publishedCache.GetById)
-            .WhereNotNull()
-            .WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
-    }
+        string? culture = null) =>
+        SiblingsAndSelfOfType(
+            content,
+            variationContextAccessor,
+            publishedCache,
+            navigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>(),
+            contentTypeAlias,
+            culture);
 
     /// <summary>
     ///     Gets the siblings of the content including the node itself to indicate the position, of a given content type.
@@ -2945,7 +3111,9 @@ public static class PublishedContentExtensions
                 return [];
             }
 
+            culture ??= variationContextAccessor.VariationContext?.Culture ?? string.Empty;
             return rootKeys
+                .Where(x => publishStatusQueryService.IsDocumentPublished(x, culture))
                 .Select(publishedCache.GetById)
                 .WhereNotNull()
                 .WhereIsInvariantOrHasCulture(variationContextAccessor, culture)
@@ -2975,14 +3143,13 @@ public static class PublishedContentExtensions
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService,
         string? culture = null)
-        where T : class, IPublishedContent =>
-    SiblingsAndSelf<T>(
-        content,
-        variationContextAccessor,
-        publishedCache,
-        navigationQueryService,
-        StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>(),
-        culture);
+        where T : class, IPublishedContent => SiblingsAndSelf<T>(
+            content,
+            variationContextAccessor,
+            publishedCache,
+            navigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>(),
+            culture);
 
     #endregion
 
@@ -4147,9 +4314,27 @@ public static class PublishedContentExtensions
     public static IEnumerable<T> SiblingsAndSelf<T>(
         this IPublishedContent content,
         IVariationContextAccessor variationContextAccessor,
+        IPublishStatusQueryService publishStatusQueryService,
         string? culture = null)
-        where T : class, IPublishedContent => SiblingsAndSelf<T>(content, variationContextAccessor, GetPublishedCache(content),
-        GetNavigationQueryService(content), culture);
+        where T : class, IPublishedContent =>
+        SiblingsAndSelf<T>(
+            content,
+            variationContextAccessor,
+            GetPublishedCache(content),
+            GetNavigationQueryService(content),
+            publishStatusQueryService,
+            culture);
+
+    [Obsolete("Use the overload with IPublishStatusQueryService, scheduled for removal in v17")]
+    public static IEnumerable<T> SiblingsAndSelf<T>(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        string? culture = null)
+        where T : class, IPublishedContent => SiblingsAndSelf<T>(
+            content,
+            variationContextAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>(),
+            culture);
 
 
     private static INavigationQueryService GetNavigationQueryService(IPublishedContent content)

@@ -558,7 +558,7 @@ public static class FriendlyPublishedContentExtensions
     ///     <para>Note that in V7 this method also return the content node self.</para>
     /// </remarks>
     public static IEnumerable<IPublishedContent>? Siblings(this IPublishedContent content, string? culture = null)
-        => content.Siblings(GetPublishedCache(content), GetNavigationQueryService(content), VariationContextAccessor, culture);
+        => content.Siblings(GetPublishedCache(content), GetNavigationQueryService(content), VariationContextAccessor, PublishStatusQueryService, culture);
 
     /// <summary>
     ///     Gets the siblings of the content, of a given content type.
@@ -574,7 +574,7 @@ public static class FriendlyPublishedContentExtensions
     ///     <para>Note that in V7 this method also return the content node self.</para>
     /// </remarks>
     public static IEnumerable<IPublishedContent>? SiblingsOfType(this IPublishedContent content, string contentTypeAlias, string? culture = null)
-        => content.SiblingsOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), contentTypeAlias, culture);
+        => content.SiblingsOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, contentTypeAlias, culture);
 
     /// <summary>
     ///     Gets the siblings of the content, of a given content type.
@@ -591,7 +591,7 @@ public static class FriendlyPublishedContentExtensions
     /// </remarks>
     public static IEnumerable<T>? Siblings<T>(this IPublishedContent content, string? culture = null)
         where T : class, IPublishedContent
-        => content.Siblings<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
+        => content.Siblings<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, culture);
 
     /// <summary>
     ///     Gets the siblings of the content including the node itself to indicate the position.
@@ -605,7 +605,7 @@ public static class FriendlyPublishedContentExtensions
     public static IEnumerable<IPublishedContent>? SiblingsAndSelf(
         this IPublishedContent content,
         string? culture = null)
-        => content.SiblingsAndSelf(GetPublishedCache(content), GetNavigationQueryService(content), VariationContextAccessor, culture);
+        => content.SiblingsAndSelf(GetPublishedCache(content), GetNavigationQueryService(content), VariationContextAccessor, PublishStatusQueryService, culture);
 
     /// <summary>
     ///     Gets the siblings of the content including the node itself to indicate the position, of a given content type.
@@ -621,7 +621,7 @@ public static class FriendlyPublishedContentExtensions
         this IPublishedContent content,
         string contentTypeAlias,
         string? culture = null)
-        => content.SiblingsAndSelfOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), contentTypeAlias, culture);
+        => content.SiblingsAndSelfOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, contentTypeAlias, culture);
 
     /// <summary>
     ///     Gets the siblings of the content including the node itself to indicate the position, of a given content type.
@@ -635,7 +635,7 @@ public static class FriendlyPublishedContentExtensions
     /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
     public static IEnumerable<T>? SiblingsAndSelf<T>(this IPublishedContent content, string? culture = null)
         where T : class, IPublishedContent
-        => content.SiblingsAndSelf<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), culture);
+        => content.SiblingsAndSelf<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, culture);
 
     /// <summary>
     ///     Gets the url of the content item.
