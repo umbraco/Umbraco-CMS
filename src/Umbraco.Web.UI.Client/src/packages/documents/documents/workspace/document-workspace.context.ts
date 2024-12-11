@@ -255,13 +255,6 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	/**
-	 * @deprecated Will be removed in v17.
-	 */
-	public async publish() {
-		throw new Error('Method not implemented.');
-	}
-
-	/**
 	 * Save the document and publish it.
 	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
 	 */
