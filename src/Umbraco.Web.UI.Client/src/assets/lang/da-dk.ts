@@ -2570,4 +2570,21 @@ export default {
 		wordWrapConfigDescription:
 			'Slå ordbrydning til eller fra, så tekst automatisk brydes ved vinduets kant i stedet for at skabe en horisontal scrollbar.',
 	},
+	tiptap: {
+		extGroup_formatting: 'Text formattering',
+		extGroup_interactive: 'Inaktive elementer',
+		extGroup_media: 'Medier',
+		extGroup_structure: 'Indholds struktur',
+		extGroup_unknown: 'Ukategoriseret',
+		toobar_availableItems: 'Tilgængelige handlinger',
+		toobar_availableItemsEmpty: 'Ingen handler at vise',
+		toolbar_designer: 'Handlings designer',
+		toolbar_addRow: 'Tilføj række',
+		toolbar_addGroup: 'Tilføj gruppe',
+		toolbar_addItems: 'Tilføj handlinger',
+		toolbar_removeRow: 'Fjern række',
+		toolbar_removeGroup: 'Fjern gruppe',
+		toolbar_removeItem: 'Fjern handling',
+		toolbar_emptyGroup: 'Tom',
+	},
 } as UmbLocalizationDictionary;

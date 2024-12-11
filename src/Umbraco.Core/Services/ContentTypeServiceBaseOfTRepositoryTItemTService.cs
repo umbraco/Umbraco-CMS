@@ -947,8 +947,18 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 // this is illegal
                 //var copyingb = (ContentTypeCompositionBase) copying;
                 // but we *know* it has to be a ContentTypeCompositionBase anyways
-                var copyingb = (ContentTypeCompositionBase) (object)copying;
-                copy = (TItem) (object) copyingb.DeepCloneWithResetIdentities(alias);
+
+                // TODO: Fix back to only calling the copyingb.DeepCloneWithResetIdentities when
+                // when ContentTypeBase.DeepCloneWithResetIdentities is overrideable.
+                if (copying is IMediaType mediaTypeToCope)
+                {
+                    copy = (TItem)mediaTypeToCope.DeepCloneWithResetIdentities(alias);
+                }
+                else
+                {
+                    var copyingb = (ContentTypeCompositionBase) (object)copying;
+                    copy = (TItem) (object) copyingb.DeepCloneWithResetIdentities(alias);
+                }
 
                 copy.Name = copy.Name + " (copy)"; // might not be unique
 

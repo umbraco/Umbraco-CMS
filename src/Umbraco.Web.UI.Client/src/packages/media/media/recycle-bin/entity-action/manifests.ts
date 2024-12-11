@@ -1,8 +1,9 @@
-import { UMB_MEDIA_RECYCLE_BIN_REPOSITORY_ALIAS } from '../repository/index.js';
-import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
-import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
-import { UMB_MEDIA_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UMB_MEDIA_TREE_PICKER_MODAL } from '../../tree/index.js';
+import {
+	UMB_MEDIA_ITEM_REPOSITORY_ALIAS,
+	UMB_MEDIA_TREE_PICKER_MODAL,
+	UMB_MEDIA_ENTITY_TYPE,
+} from '../../constants.js';
+import { UMB_MEDIA_RECYCLE_BIN_ROOT_ENTITY_TYPE, UMB_MEDIA_RECYCLE_BIN_REPOSITORY_ALIAS } from '../constants.js';
 import {
 	UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 	UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS,

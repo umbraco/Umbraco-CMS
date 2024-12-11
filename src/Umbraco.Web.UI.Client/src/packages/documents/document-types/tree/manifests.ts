@@ -1,14 +1,15 @@
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UMB_DOCUMENT_TYPE_ROOT_WORKSPACE_ALIAS } from '../workspace/document-type-root/index.js';
+import { UMB_DOCUMENT_TYPE_ROOT_WORKSPACE_ALIAS } from '../constants.js';
 import {
 	UMB_DOCUMENT_TYPE_TREE_ALIAS,
 	UMB_DOCUMENT_TYPE_TREE_REPOSITORY_ALIAS,
 	UMB_DOCUMENT_TYPE_TREE_STORE_ALIAS,
+	UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
+	UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS,
+	UMB_DOCUMENT_TYPE_TREE_ITEM_CHILDREN_COLLECTION_ALIAS,
 } from './constants.js';
-import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE, UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS } from './folder/index.js';
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as treeItemChildrenManifests } from './tree-item-children/manifests.js';
-import { UMB_DOCUMENT_TYPE_TREE_ITEM_CHILDREN_COLLECTION_ALIAS } from './tree-item-children/collection/index.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

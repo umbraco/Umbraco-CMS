@@ -1,7 +1,6 @@
 import { UMB_LANGUAGE_WORKSPACE_CONTEXT } from '../language-workspace.context-token.js';
 import type { UmbInputLanguageElement } from '../../../components/input-language/input-language.element.js';
-import type { UmbLanguageDetailModel } from '../../../types.js';
-import type { UmbLanguageItemModel } from '../../../repository/index.js';
+import type { UmbLanguageDetailModel, UmbLanguageItemModel } from '../../../types.js';
 import type { UmbInputCultureSelectElement } from '@umbraco-cms/backoffice/culture';
 import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';

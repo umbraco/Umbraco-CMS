@@ -1,7 +1,7 @@
 import type { UmbPackage } from '../../types.js';
+import { UMB_PACKAGE_STORE_TOKEN } from './package.store.context-token.js';
 import { ReplaySubject } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
@@ -9,8 +9,6 @@ import type {
 	PackageConfigurationResponseModel,
 	PackageMigrationStatusResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-
-export const UMB_PACKAGE_STORE_TOKEN = new UmbContextToken<UmbPackageStore>('UmbPackageStore');
 
 /**
  * Store for Packages

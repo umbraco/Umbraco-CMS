@@ -1,5 +1,4 @@
-import type { UmbMediaCardItemModel } from '../../modals/index.js';
-import type { UmbMediaItemModel } from '../../repository/index.js';
+import type { UmbMediaCardItemModel, UmbMediaItemModel } from '../../types.js';
 import { UmbMediaPickerInputContext } from './input-media.context.js';
 import {
 	css,
