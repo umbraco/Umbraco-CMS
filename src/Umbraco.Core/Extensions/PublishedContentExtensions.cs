@@ -3159,8 +3159,10 @@ public static class PublishedContentExtensions
     ///     Gets the root content (ancestor or self at level 1) for the specified <paramref name="content" />.
     /// </summary>
     /// <param name="content">The content.</param>
+    /// <param name="variationContextAccessor"></param>
     /// <param name="publishedCache">The content cache.</param>
     /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
+    /// <param name="publishStatusQueryService"></param>
     /// <returns>
     ///     The root content (ancestor or self at level 1) for the specified <paramref name="content" />.
     /// </returns>
@@ -3171,8 +3173,63 @@ public static class PublishedContentExtensions
     /// </remarks>
     public static IPublishedContent Root(
         this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
         IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService) => content.AncestorOrSelf(publishedCache, navigationQueryService, 1);
+        INavigationQueryService navigationQueryService,
+        IPublishStatusQueryService publishStatusQueryService) => content.AncestorOrSelf(variationContextAccessor, publishedCache, navigationQueryService, publishStatusQueryService, 1);
+
+    /// <summary>
+    ///     Gets the root content (ancestor or self at level 1) for the specified <paramref name="content" />.
+    /// </summary>
+    /// <param name="content">The content.</param>
+    /// <param name="publishedCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
+    /// <returns>
+    ///     The root content (ancestor or self at level 1) for the specified <paramref name="content" />.
+    /// </returns>
+    /// <remarks>
+    ///     This is the same as calling
+    ///     <see cref="AncestorOrSelf(IPublishedContent, int)" /> with <c>maxLevel</c>
+    ///     set to 1.
+    /// </remarks>
+    [Obsolete("Use the overload with IVariationContextAccessor & IPublishStatusQueryService, scheduled for removal in v17")]
+    public static IPublishedContent Root(
+        this IPublishedContent content,
+        IPublishedCache publishedCache,
+        INavigationQueryService navigationQueryService) => Root(
+            content,
+            StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>(),
+            publishedCache,
+            navigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>());
+
+    /// <summary>
+    ///     Gets the root content (ancestor or self at level 1) for the specified <paramref name="content" /> if it's of the
+    ///     specified content type <typeparamref name="T" />.
+    /// </summary>
+    /// <typeparam name="T">The content type.</typeparam>
+    /// <param name="content">The content.</param>
+    /// <param name="variationContextAccessor"></param>
+    /// <param name="publishedCache">The content cache.</param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
+    /// <param name="publishStatusQueryService"></param>
+    /// <returns>
+    ///     The root content (ancestor or self at level 1) for the specified <paramref name="content" /> of content type
+    ///     <typeparamref name="T" />.
+    /// </returns>
+    /// <remarks>
+    ///     This is the same as calling
+    ///     <see cref="AncestorOrSelf{T}(IPublishedContent, int)" /> with
+    ///     <c>maxLevel</c> set to 1.
+    /// </remarks>
+    public static T? Root<T>(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        IPublishedCache publishedCache,
+        INavigationQueryService navigationQueryService,
+        IPublishStatusQueryService publishStatusQueryService)
+        where T : class, IPublishedContent =>
+        content.AncestorOrSelf<T>(variationContextAccessor, publishedCache, navigationQueryService, publishStatusQueryService, 1);
 
     /// <summary>
     ///     Gets the root content (ancestor or self at level 1) for the specified <paramref name="content" /> if it's of the
@@ -3191,12 +3248,18 @@ public static class PublishedContentExtensions
     ///     <see cref="AncestorOrSelf{T}(IPublishedContent, int)" /> with
     ///     <c>maxLevel</c> set to 1.
     /// </remarks>
+    [Obsolete("Use the overload with IVariationContextAccessor & PublishStatusQueryService, scheduled for removal in v17")]
     public static T? Root<T>(
         this IPublishedContent content,
         IPublishedCache publishedCache,
         INavigationQueryService navigationQueryService)
         where T : class, IPublishedContent =>
-        content.AncestorOrSelf<T>(publishedCache, navigationQueryService, 1);
+        Root<T>(
+            content,
+            StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>(),
+            publishedCache,
+            navigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>());
 
     #endregion
 

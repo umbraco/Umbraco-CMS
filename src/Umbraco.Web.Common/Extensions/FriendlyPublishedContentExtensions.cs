@@ -243,7 +243,7 @@ public static class FriendlyPublishedContentExtensions
     ///     set to 1.
     /// </remarks>
     public static IPublishedContent Root(this IPublishedContent content)
-        => content.Root(GetPublishedCache(content), GetNavigationQueryService(content));
+        => content.Root(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService);
 
     /// <summary>
     ///     Gets the root content (ancestor or self at level 1) for the specified <paramref name="content" /> if it's of the
@@ -262,7 +262,7 @@ public static class FriendlyPublishedContentExtensions
     /// </remarks>
     public static T? Root<T>(this IPublishedContent content)
         where T : class, IPublishedContent
-        => content.Root<T>(GetPublishedCache(content), GetNavigationQueryService(content));
+        => content.Root<T>(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService);
 
     /// <summary>
     ///     Gets the parent of the content item.
