@@ -63,6 +63,20 @@ export interface UmbContentDetailWorkspaceContextArgs<
 	saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
 }
 
+/**
+ * The base class for a content detail workspace context.
+ * @exports
+ * @abstract
+ * @class UmbContentDetailWorkspaceContextBase
+ * @augments {UmbEntityDetailWorkspaceContextBase<DetailModelType, DetailRepositoryType, CreateArgsType>}
+ * @implements {UmbContentWorkspaceContext<DetailModelType, ContentTypeDetailModelType, VariantModelType>}
+ * @template DetailModelType
+ * @template DetailRepositoryType
+ * @template ContentTypeDetailModelType
+ * @template VariantModelType
+ * @template VariantOptionModelType
+ * @template CreateArgsType
+ */
 export abstract class UmbContentDetailWorkspaceContextBase<
 		DetailModelType extends UmbContentDetailModel<VariantModelType>,
 		DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
@@ -443,6 +457,15 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	public finishPropertyValueChange = () => {
 		this._data.finishPropertyValueChange();
 	};
+
+	/**
+	 * Gets the changed variant ids
+	 * @returns {Array<UmbVariantId>} - The changed variant ids
+	 * @memberof UmbContentDetailWorkspaceContextBase
+	 */
+	public getChangedVariants(): Array<UmbVariantId> {
+		return this._data.getChangedVariants();
+	}
 
 	protected async _determineVariantOptions(): Promise<{
 		options: VariantOptionModelType[];
