@@ -22,7 +22,7 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
         ILogger<PublishStatusService> logger,
         IPublishStatusRepository publishStatusRepository,
         ICoreScopeProvider coreScopeProvider)
-        : this(logger, publishStatusRepository, coreScopeProvider, StaticServiceProvider.Instance.GetRequiredService<LanguageService>())
+        : this(logger, publishStatusRepository, coreScopeProvider, StaticServiceProvider.Instance.GetRequiredService<ILanguageService>())
     {
 
     }
