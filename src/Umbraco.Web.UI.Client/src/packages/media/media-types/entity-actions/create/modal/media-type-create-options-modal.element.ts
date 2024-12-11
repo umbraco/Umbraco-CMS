@@ -1,5 +1,5 @@
-import { UMB_MEDIA_TYPE_FOLDER_REPOSITORY_ALIAS } from '../../../tree/index.js';
-import type { UmbMediaTypeCreateOptionsModalData } from './index.js';
+import { UMB_MEDIA_TYPE_FOLDER_REPOSITORY_ALIAS } from '../../../constants.js';
+import type { UmbMediaTypeCreateOptionsModalData } from './constants.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';

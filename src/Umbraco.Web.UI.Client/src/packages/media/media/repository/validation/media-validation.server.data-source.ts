@@ -10,9 +10,7 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 /**
- * A server data source for Document Validation
- * @class UmbDocumentPublishingServerDataSource
- * @implements {DocumentTreeDataSource}
+ * A server data source for Media Validatiom
  */
 export class UmbMediaValidationServerDataSource {
 	//#host: UmbControllerHost;

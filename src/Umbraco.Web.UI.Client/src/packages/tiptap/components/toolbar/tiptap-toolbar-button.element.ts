@@ -4,9 +4,7 @@ import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import { customElement, html, ifDefined, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-const elementName = 'umb-tiptap-toolbar-button';
-
-@customElement(elementName)
+@customElement('umb-tiptap-toolbar-button')
 export class UmbTiptapToolbarButtonElement extends UmbLitElement {
 	public api?: UmbTiptapToolbarElementApi;
 	public editor?: Editor;
@@ -62,6 +60,6 @@ export { UmbTiptapToolbarButtonElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbTiptapToolbarButtonElement;
+		'umb-tiptap-toolbar-button': UmbTiptapToolbarButtonElement;
 	}
 }

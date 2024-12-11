@@ -3,10 +3,14 @@ import type {
 	UmbContentTypeCompositionCompatibleModel,
 	UmbContentTypeCompositionReferenceModel,
 	UmbContentTypeAvailableCompositionRequestModel,
-	UmbContentTypeModel,
+	UmbContentTypeDetailModel,
 } from '@umbraco-cms/backoffice/content-type';
 
-export interface UmbDocumentTypeDetailModel extends UmbContentTypeModel {
+export type * from './repository/types.js';
+export type * from './tree/types.js';
+export type * from './entity.js';
+
+export interface UmbDocumentTypeDetailModel extends UmbContentTypeDetailModel {
 	entityType: UmbDocumentTypeEntityType;
 	allowedTemplates: Array<{ id: string }>;
 	defaultTemplate: { id: string } | null;

@@ -107,10 +107,11 @@ test('can delete a tab in a document type', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.documentType.clickConfirmToDeleteButton();
   await umbracoUi.documentType.clickSaveButton();
 
-  await umbracoApi.documentType.getByName(documentTypeName);
   // Assert
   await umbracoUi.documentType.isSuccessNotificationVisible();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
+  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
+  expect(documentTypeData.containers.length).toBe(0);
 });
 
 test('can delete a property editor in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
