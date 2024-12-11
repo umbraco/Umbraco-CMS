@@ -44,6 +44,7 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
             return Attempt.FailWithStatus<IDataType, DataTypeOperationStatus>(parentAttempt.Status, new DataType(new VoidEditor(_dataValueEditorFactory), _configurationEditorJsonSerializer));
         }
 
+        var createDate = DateTime.Now;
         var dataType = new DataType(editor, _configurationEditorJsonSerializer)
         {
             Name = requestModel.Name,
@@ -51,7 +52,8 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
             DatabaseType = GetEditorValueStorageType(editor),
             ConfigurationData = MapConfigurationData(requestModel, editor),
             ParentId = parentAttempt.Result,
-            CreateDate = DateTime.Now,
+            CreateDate = createDate,
+            UpdateDate = createDate,
         };
 
         if (requestModel.Id.HasValue)
