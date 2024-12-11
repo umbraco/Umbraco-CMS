@@ -20,8 +20,8 @@ export class UmbDocumentPublishedPendingChangesManager extends UmbControllerBase
 	/**
 	 * Checks each variant if there are any pending changes to publish.
 	 * @param {UmbDocumentPublishedPendingChangesManagerProcessArgs} args - The arguments for the process.
-	 * @param {string} args.unique - The unique identifier of the document.
-	 * @param {UmbDocumentDetailModel} args.currentData - The current document data.
+	 * @param {UmbDocumentDetailModel} args.persistedData - The persisted document data.
+	 * @param {UmbDocumentDetailModel} args.publishedData - The published document data.
 	 * @returns {Promise<void>}
 	 * @memberof UmbDocumentPublishedPendingChangesManager
 	 */
