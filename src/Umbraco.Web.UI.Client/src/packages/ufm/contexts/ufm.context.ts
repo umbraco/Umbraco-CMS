@@ -2,7 +2,7 @@ import { ufm } from '../plugins/marked-ufm.plugin.js';
 import type { UfmPlugin } from '../plugins/marked-ufm.plugin.js';
 import type { ManifestUfmComponent } from '../ufm-component.extension.js';
 import type { ManifestUfmFilter } from '../ufm-filter.extension.js';
-import { DOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
+import { DOMPurify, type Config } from '@umbraco-cms/backoffice/external/dompurify';
 import { Marked } from '@umbraco-cms/backoffice/external/marked';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -13,7 +13,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 const UmbDomPurify = DOMPurify(window);
-const UmbDomPurifyConfig: DOMPurify.Config = {
+const UmbDomPurifyConfig: Config = {
 	USE_PROFILES: { html: true },
 	CUSTOM_ELEMENT_HANDLING: {
 		tagNameCheck: /^(?:ufm|umb|uui)-.*$/,
@@ -24,7 +24,7 @@ const UmbDomPurifyConfig: DOMPurify.Config = {
 
 UmbDomPurify.addHook('afterSanitizeAttributes', function (node) {
 	// set all elements owning target to target=_blank
-	if ('target' in node) {
+	if ('target' in node && node instanceof HTMLElement) {
 		node.setAttribute('target', '_blank');
 	}
 });

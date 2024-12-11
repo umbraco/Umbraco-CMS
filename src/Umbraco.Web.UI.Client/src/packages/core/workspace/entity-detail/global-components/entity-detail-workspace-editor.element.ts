@@ -1,5 +1,5 @@
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '../entity-detail-workspace.context-token.js';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-entity-detail-workspace-editor')

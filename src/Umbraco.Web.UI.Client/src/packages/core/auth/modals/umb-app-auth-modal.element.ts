@@ -5,11 +5,15 @@ import { UMB_AUTH_CONTEXT } from '../auth.context.token.js';
 import type { UmbAuthProviderDefaultProps } from '../types.js';
 import type { UmbModalAppAuthConfig, UmbModalAppAuthValue } from './umb-app-auth-modal.token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 
 @customElement('umb-app-auth-modal')
 export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthConfig, UmbModalAppAuthValue> {
 	@state()
 	private _error?: string;
+
+	@state()
+	private _serverUrl = '';
 
 	get props(): UmbAuthProviderDefaultProps {
 		return {
@@ -34,17 +38,33 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 				);
 	}
 
+	override connectedCallback(): void {
+		super.connectedCallback();
+
+		this.consumeContext(UMB_APP_CONTEXT, (context) => {
+			this._serverUrl = context.getServerUrl();
+			this.style.setProperty(
+				'--image',
+				`url('${this._serverUrl}/umbraco/management/api/v1/security/back-office/graphics/login-background') no-repeat center center/cover`,
+			);
+		});
+	}
+
 	override render() {
 		return html`
 			<div id="layout">
 				<img
 					id="logo-on-background"
-					src="/umbraco/backoffice/assets/umbraco_logo_blue.svg"
+					src="${this._serverUrl}/umbraco/management/api/v1/security/back-office/graphics/login-logo-alternative"
 					alt="Logo"
 					aria-hidden="true"
 					part="auth-logo-background" />
 				<div id="graphic" aria-hidden="true">
-					<img part="auth-logo" id="logo-on-image" src="/umbraco/backoffice/assets/umbraco_logo_white.svg" alt="Logo" />
+					<img
+						part="auth-logo"
+						id="logo-on-image"
+						src="${this._serverUrl}/umbraco/management/api/v1/security/back-office/graphics/login-logo"
+						alt="Logo" />
 					<svg
 						id="curve-top"
 						width="1746"
@@ -119,7 +139,6 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 				display: block;
 				background: rgb(244, 244, 244);
 
-				--image: url('/umbraco/backoffice/assets/login.jpg') no-repeat center center/cover;
 				--curves-color: var(--umb-login-curves-color, #f5c1bc);
 				--curves-display: var(--umb-login-curves-display, inline);
 			}

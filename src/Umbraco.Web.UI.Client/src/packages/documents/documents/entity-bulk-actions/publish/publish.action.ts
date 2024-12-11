@@ -1,7 +1,7 @@
 import { UmbDocumentPublishingRepository } from '../../repository/index.js';
 import { UmbPublishDocumentEntityAction } from '../../entity-actions/publish.action.js';
 import type { UmbDocumentVariantOptionModel } from '../../types.js';
-import { UMB_DOCUMENT_PUBLISH_MODAL } from '../../modals/index.js';
+import { UMB_DOCUMENT_PUBLISH_MODAL } from '../../constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';

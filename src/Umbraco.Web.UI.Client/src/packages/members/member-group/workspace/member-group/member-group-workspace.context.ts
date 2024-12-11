@@ -1,7 +1,7 @@
-import { UMB_MEMBER_GROUP_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import type { UmbMemberGroupDetailModel } from '../../types.js';
 import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../../entity.js';
-import { UMB_MEMBER_GROUP_WORKSPACE_ALIAS } from './manifests.js';
+import { UMB_MEMBER_GROUP_DETAIL_REPOSITORY_ALIAS } from '../../constants.js';
+import { UMB_MEMBER_GROUP_WORKSPACE_ALIAS } from './constants.js';
 import { UmbMemberGroupWorkspaceEditorElement } from './member-group-workspace-editor.element.js';
 import {
 	type UmbSubmittableWorkspaceContext,

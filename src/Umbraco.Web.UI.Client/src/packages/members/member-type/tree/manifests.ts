@@ -1,9 +1,10 @@
 import { UMB_MEMBER_TYPE_ENTITY_TYPE, UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
+import {
+	UMB_MEMBER_TYPE_TREE_ALIAS,
+	UMB_MEMBER_TYPE_TREE_REPOSITORY_ALIAS,
+	UMB_MEMBER_TYPE_TREE_STORE_ALIAS,
+} from './constants.js';
 import { manifests as reloadTreeItemChildrenManifest } from './reload-tree-item-children/manifests.js';
-
-export const UMB_MEMBER_TYPE_TREE_REPOSITORY_ALIAS = 'Umb.Repository.MemberType.Tree';
-export const UMB_MEMBER_TYPE_TREE_STORE_ALIAS = 'Umb.Store.MemberType.Tree';
-export const UMB_MEMBER_TYPE_TREE_ALIAS = 'Umb.Tree.MemberType';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

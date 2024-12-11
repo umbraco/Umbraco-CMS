@@ -1,5 +1,4 @@
-import type { UmbMediaCardItemModel } from '../../modals/index.js';
-import type { UmbMediaItemModel } from '../../repository/index.js';
+import type { UmbMediaCardItemModel, UmbMediaItemModel } from '../../types.js';
 import { UmbMediaPickerInputContext } from './input-media.context.js';
 import {
 	css,
@@ -246,7 +245,6 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		return html`
 			<uui-card-media
 				name=${ifDefined(item.name === null ? undefined : item.name)}
-				detail=${ifDefined(item.unique)}
 				href="${ifDefined(href)}"
 				?readonly=${this.readonly}>
 				<umb-imaging-thumbnail

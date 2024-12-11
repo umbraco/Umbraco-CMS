@@ -1,4 +1,4 @@
-export default `<!-- @license lucide-static v0.446.0 - ISC -->
+export default `<!-- @license lucide-static v0.460.0 - ISC -->
 <svg
   class="lucide lucide-indent-decrease"
   xmlns="http://www.w3.org/2000/svg"
@@ -9,9 +9,9 @@ export default `<!-- @license lucide-static v0.446.0 - ISC -->
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <polyline points="7 8 3 12 7 16" />
-  <line x1="21" x2="11" y1="12" y2="12" />
-  <line x1="21" x2="11" y1="6" y2="6" />
-  <line x1="21" x2="11" y1="18" y2="18" />
+  <path d="M21 12H11" />
+  <path d="M21 18H11" />
+  <path d="M21 6H11" />
+  <path d="m7 8-4 4 4 4" />
 </svg>
 `;

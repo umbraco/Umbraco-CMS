@@ -225,6 +225,11 @@ internal sealed class MemberEditingService : IMemberEditingService
             return MemberEditingOperationStatus.InvalidUsername;
         }
 
+        if (model.Email.IsEmail() is false)
+        {
+            return MemberEditingOperationStatus.InvalidEmail;
+        }
+
         if (password is not null)
         {
             IdentityResult validatePassword = await _memberManager.ValidatePasswordAsync(password);
