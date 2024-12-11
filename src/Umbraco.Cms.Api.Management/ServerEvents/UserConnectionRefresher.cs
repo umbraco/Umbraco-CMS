@@ -17,8 +17,7 @@ internal sealed class UserConnectionRefresher : INotificationAsyncHandler<UserSa
 
     public UserConnectionRefresher(
         IBackOfficeSignInManager backOfficeSignInManager,
-        IServerEventUserManager serverEventUserManager
-        )
+        IServerEventUserManager serverEventUserManager)
     {
         _backOfficeSignInManager = backOfficeSignInManager;
         _serverEventUserManager = serverEventUserManager;
