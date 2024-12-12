@@ -1,4 +1,4 @@
-import { UMB_DATA_TYPE_CREATE_OPTIONS_MODAL } from './modal/index.js';
+import { UMB_DATA_TYPE_CREATE_OPTIONS_MODAL } from './constants.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 

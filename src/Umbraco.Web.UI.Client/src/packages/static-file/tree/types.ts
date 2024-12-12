@@ -1,4 +1,8 @@
-import type { UmbStaticFileEntityType, UmbStaticFileFolderEntityType, UmbStaticFileRootEntityType } from '../entity.js';
+import type {
+	UmbStaticFileEntityType,
+	UmbStaticFileFolderEntityType,
+	UmbStaticFileRootEntityType,
+} from './constants.js';
 import type { UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
 export interface UmbStaticFileTreeItemModel extends UmbTreeItemModel {

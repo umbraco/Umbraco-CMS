@@ -1,12 +1,7 @@
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT } from './content-type-design-editor.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-
-export const UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT = new UmbContextToken<
-	UmbContentTypeDesignEditorContext,
-	UmbContentTypeDesignEditorContext
->('UmbContentTypeDesignEditorContext');
 
 export class UmbContentTypeDesignEditorContext extends UmbContextBase<UmbContentTypeDesignEditorContext> {
 	#isSorting = new UmbBooleanState(false);

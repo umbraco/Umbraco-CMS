@@ -1,8 +1,5 @@
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../entity.js';
-import {
-	UMB_DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
-	UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
-} from '../repository/index.js';
+import { UMB_DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS, UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS } from '../constants.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as moveManifests } from './move-to/manifests.js';
 import { manifests as duplicateManifests } from './duplicate/manifests.js';

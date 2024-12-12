@@ -1,8 +1,11 @@
-@using Umbraco.Cms.Core
 @using Umbraco.Cms.Core.Models.PublishedContent
+@using Umbraco.Cms.Core.PublishedCache
 @using Umbraco.Cms.Core.Routing
-@using Umbraco.Extensions
+@using Umbraco.Cms.Core.Services.Navigation
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@inject IVariationContextAccessor VariationContextAccessor
+@inject IPublishedContentCache PublishedContentCache
+@inject IDocumentNavigationQueryService DocumentNavigationQueryService
 @inject IPublishedValueFallback PublishedValueFallback
 @inject IPublishedUrlProvider PublishedUrlProvider
 @*
@@ -13,7 +16,7 @@
     - It then generates links so the visitor can go to each page
 *@
 
-@{ var selection = Model?.Content.Children.Where(x => x.IsVisible(PublishedValueFallback)).ToArray(); }
+@{ var selection = Model?.Content.Children(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService).Where(x => x.IsVisible(PublishedValueFallback)).ToArray(); }
 
 @if (selection?.Length > 0)
 {

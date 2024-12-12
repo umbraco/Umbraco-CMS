@@ -67,6 +67,7 @@ test('can create child content in a collection', async ({umbracoApi, umbracoUi})
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickReloadButton();
   await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.doesDocumentTableColumnNameValuesMatch(expectedNames);
 
   // Clean
@@ -103,6 +104,7 @@ test('can create multiple child nodes in a collection', async ({umbracoApi, umbr
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickReloadButton();
   await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.doesDocumentTableColumnNameValuesMatch(expectedNames);
 
   // Clean

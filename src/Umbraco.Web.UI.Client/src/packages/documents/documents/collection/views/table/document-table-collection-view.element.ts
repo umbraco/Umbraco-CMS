@@ -73,6 +73,9 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				collectionContext.workspacePathBuilder,
 				(builder) => {
 					this._workspacePathBuilder = builder;
+					if (this.#collectionContext) {
+						this.#createTableItems(this.#collectionContext.getItems());
+					}
 				},
 				'observePath',
 			);
