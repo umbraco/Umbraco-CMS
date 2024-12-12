@@ -75,7 +75,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 */
 	@property({ type: String })
 	public set alias(alias: string) {
-		this.setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'property/' + alias);
+		this.setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'property:' + alias);
 		this.#propertyContext.setAlias(alias);
 	}
 	public get alias() {

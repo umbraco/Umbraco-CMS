@@ -51,7 +51,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 		new UmbExtensionsElementInitializer(this, umbExtensionsRegistry, 'sectionSidebarApp', null, (sidebarApps) => {
 			const oldValue = this._sidebarApps;
 			sidebarApps.forEach((sidebarApp) => {
-				sidebarApp.component?.setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'section-sidebar/' + sidebarApp.manifest.alias);
+				sidebarApp.component?.setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'section-sidebar:' + sidebarApp.manifest.alias);
 			});
 			this._sidebarApps = sidebarApps;
 			this.requestUpdate('_sidebarApps', oldValue);
