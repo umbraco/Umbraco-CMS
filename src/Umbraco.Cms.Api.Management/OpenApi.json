@@ -38339,6 +38339,7 @@
         "enum": [
           "Healthy",
           "Unhealthy",
+          "Corrupt",
           "Rebuilding"
         ],
         "type": "string"
@@ -40758,7 +40759,8 @@
             "format": "uuid"
           },
           "packagePath": {
-            "type": "string"
+            "type": "string",
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -42742,22 +42744,26 @@
               {
                 "$ref": "#/components/schemas/RelationReferenceModel"
               }
-            ]
+            ],
+            "readOnly": true
           },
           "child": {
             "oneOf": [
               {
                 "$ref": "#/components/schemas/RelationReferenceModel"
               }
-            ]
+            ],
+            "readOnly": true
           },
           "createDate": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "readOnly": true
           },
           "comment": {
             "type": "string",
-            "nullable": true
+            "nullable": true,
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -44939,7 +44945,8 @@
             }
           },
           "packagePath": {
-            "type": "string"
+            "type": "string",
+            "readOnly": true
           }
         },
         "additionalProperties": false
