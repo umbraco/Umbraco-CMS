@@ -34,13 +34,9 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 	private _loading = false;
 
 	@state()
-	private _urls: Array<UmbDocumentUrlModel> = [];
-
-	@state()
 	private _links: Array<UmbDocumentInfoViewLink> = [];
 
-	@state()
-	private _documentVaries = false;
+	#urls: Array<UmbDocumentUrlModel> = [];
 
 	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
@@ -78,20 +74,18 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 				this._variantOptions = variantOptions;
 				this.#setLinks();
 			});
-
-			this.observe(context.varies, (varies) => (this._documentVaries = varies === true));
 		});
 	}
 
 	#setLinks() {
 		const possibleVariantCultures = this._variantOptions?.map((variantOption) => variantOption.culture) ?? [];
-		const possibleUrlCultures = this._urls.map((link) => link.culture);
+		const possibleUrlCultures = this.#urls.map((link) => link.culture);
 		const possibleCultures = [...new Set([...possibleVariantCultures, ...possibleUrlCultures])].filter(
 			Boolean,
 		) as string[];
 
 		const links: Array<UmbDocumentInfoViewLink> = possibleCultures.map((culture) => {
-			const url = this._urls.find((link) => link.culture === culture)?.url;
+			const url = this.#urls.find((link) => link.culture === culture)?.url;
 			const state = this._variantOptions?.find((variantOption) => variantOption.culture === culture)?.variant?.state;
 			return { culture, url, state };
 		});
@@ -104,13 +98,13 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		if (!this._unique) return;
 
 		this._loading = true;
-		this._urls = [];
+		this.#urls = [];
 
 		const { data } = await this.#documentUrlRepository.requestItems([this._unique]);
 
 		if (data?.length) {
 			const item = data[0];
-			this._urls = item.urls;
+			this.#urls = item.urls;
 			this.#setLinks();
 		}
 
