@@ -13,8 +13,8 @@ import { debounce } from '@umbraco-cms/backoffice/utils';
 
 interface UmbDocumentInfoViewLink {
 	culture: string;
-	url: string;
-	state: DocumentVariantStateModel;
+	url: string | undefined;
+	state: DocumentVariantStateModel | null | undefined;
 }
 
 @customElement('umb-document-workspace-view-info-links')
@@ -86,7 +86,9 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 	#setLinks() {
 		const possibleVariantCultures = this._variantOptions?.map((variantOption) => variantOption.culture) ?? [];
 		const possibleUrlCultures = this._urls.map((link) => link.culture);
-		const possibleCultures = [...new Set([...possibleVariantCultures, ...possibleUrlCultures])].filter(Boolean);
+		const possibleCultures = [...new Set([...possibleVariantCultures, ...possibleUrlCultures])].filter(
+			Boolean,
+		) as string[];
 
 		const links: Array<UmbDocumentInfoViewLink> = possibleCultures.map((culture) => {
 			const url = this._urls.find((link) => link.culture === culture)?.url;
@@ -115,7 +117,7 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		this._loading = false;
 	}
 
-	#getStateLocalizationKey(state: DocumentVariantStateModel): string {
+	#getStateLocalizationKey(state: DocumentVariantStateModel | null | undefined): string {
 		switch (state) {
 			case null:
 			case undefined:
@@ -166,25 +168,7 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 	}
 
 	#renderNotCreated() {
-		return html`
-			<div class="link-item">
-				<span>
-					<em><umb-localize key="content_notCreated"></umb-localize></em>
-				</span>
-			</div>
-		`;
-	}
-
-	#renderNoLinks() {
-		return html`${this._variantOptions?.map(
-			(variantOption) =>
-				html`<div class="link-item">
-					<span>
-						${this._documentVaries ? html`<span class="culture">${variantOption.culture}</span>` : nothing}
-						<em><umb-localize key=${this.#getStateLocalizationKey(variantOption.variant?.state)}></umb-localize></em>
-					</span>
-				</div>`,
-		)}`;
+		return html`${this.#renderEmptyLink(null, null)}`;
 	}
 
 	#renderLinks() {
@@ -199,23 +183,39 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 
 	#renderLink(link: UmbDocumentInfoViewLink) {
 		if (!link.url) {
-			return html`<div class="link-item">
-				<span>
-					${this._documentVaries ? html`<span class="culture">${link.culture}</span>` : nothing}
-					<em><umb-localize key=${this.#getStateLocalizationKey(link.state)}></umb-localize></em>
-				</span>
-			</div>`;
+			return this.#renderEmptyLink(link.culture, link.state);
 		}
 
 		return html`
 			<a class="link-item" href=${link.url} target="_blank">
 				<span>
-					<span class="culture">${link.culture}</span>
+					${this.#renderLinkCulture(link.culture)}
 					<span>${link.url}</span>
 				</span>
 				<uui-icon name="icon-out"></uui-icon>
 			</a>
 		`;
+	}
+
+	#renderNoLinks() {
+		return html` ${this._variantOptions?.map((variantOption) =>
+			this.#renderEmptyLink(variantOption.culture, variantOption.variant?.state),
+		)}`;
+	}
+
+	#renderEmptyLink(culture: string | null, state: DocumentVariantStateModel | null | undefined) {
+		return html`<div class="link-item">
+			<span>
+				${this.#renderLinkCulture(culture)}
+				<em><umb-localize key=${this.#getStateLocalizationKey(state)}></umb-localize></em>
+			</span>
+		</div>`;
+	}
+
+	#renderLinkCulture(culture: string | null) {
+		if (!culture) return nothing;
+		if (this._links.length === 1) return nothing;
+		return html`<span class="culture">${culture}</span>`;
 	}
 
 	override disconnectedCallback(): void {
