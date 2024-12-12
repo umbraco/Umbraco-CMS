@@ -109,30 +109,30 @@ stages:
         strategy:
           matrix:
             # Default configuration
-#            LinuxPart1Of3:
-#              vmImage: "ubuntu-latest"
-#              testFolder: "DefaultConfig"
-#              testCommand: "npx playwright test $testFolder --shard=1/3"
-#            LinuxPart2Of3:
-#              vmImage: "ubuntu-latest"
-#              testFolder: "DefaultConfig"
-#              testCommand: "npx playwright test $testFolder --shard=2/3"
-#            LinuxPart3Of3:
-#              vmImage: "ubuntu-latest"
-#              testFolder: "DefaultConfig"
-#              testCommand: "npx playwright test $testFolder --shard=3/3"
-#            WindowsPart1Of3:
-#              vmImage: "windows-latest"
-#              testFolder: "DefaultConfig"
-#              testCommand: "npx playwright test $testFolder --shard=1/3"
-#            WindowsPart2Of3:
-#              vmImage: "windows-latest"
-#              testFolder: "DefaultConfig"
-#              testCommand: "npx playwright test $testFolder --shard=2/3"
-#            WindowsPart3Of3:
-#              vmImage: "windows-latest"
-#              testFolder: "DefaultConfig"
-#              testCommand: "npx playwright test $testFolder --shard=3/3"
+            #            LinuxPart1Of3:
+            #              vmImage: "ubuntu-latest"
+            #              testFolder: "DefaultConfig"
+            #              testCommand: "npx playwright test $testFolder --shard=1/3"
+            #            LinuxPart2Of3:
+            #              vmImage: "ubuntu-latest"
+            #              testFolder: "DefaultConfig"
+            #              testCommand: "npx playwright test $testFolder --shard=2/3"
+            #            LinuxPart3Of3:
+            #              vmImage: "ubuntu-latest"
+            #              testFolder: "DefaultConfig"
+            #              testCommand: "npx playwright test $testFolder --shard=3/3"
+            #            WindowsPart1Of3:
+            #              vmImage: "windows-latest"
+            #              testFolder: "DefaultConfig"
+            #              testCommand: "npx playwright test $testFolder --shard=1/3"
+            #            WindowsPart2Of3:
+            #              vmImage: "windows-latest"
+            #              testFolder: "DefaultConfig"
+            #              testCommand: "npx playwright test $testFolder --shard=2/3"
+            #            WindowsPart3Of3:
+            #              vmImage: "windows-latest"
+            #              testFolder: "DefaultConfig"
+            #              testCommand: "npx playwright test $testFolder --shard=3/3"
             # Additional test configurations can be added here
             # UnattendedInstallConfig
             WindowsUnattendedInstallConfig:
@@ -198,12 +198,16 @@ stages:
             workingDirectory: $(Agent.BuildDirectory)/app
 
           - pwsh: |
-              cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.json UmbracoProject
+              if (Test-Path $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.json ) {
+                cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.json UmbracoProject
+              }
             displayName: Update application to use necessary app settings
             workingDirectory: $(Agent.BuildDirectory)/app
 
           - pwsh: |
-              cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.cs UmbracoProject
+              if (Test-Path $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.cs ) {
+                cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.cs UmbracoProject
+              }
             displayName: Update application to use necessary classes
             workingDirectory: $(Agent.BuildDirectory)/app
 
