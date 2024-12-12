@@ -108,6 +108,7 @@ stages:
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.Sqlite
         strategy:
           matrix:
+            # Default configuration
             LinuxPart1Of3:
               vmImage: "ubuntu-latest"
               testFolder: "DefaultConfig"
@@ -135,13 +136,13 @@ stages:
             # Additional test configurations can be added here
             # UnattendedInstallConfig
             WindowsUnattendedInstallConfig:
-                vmImage: "windows-latest"
-                testFolder: "UnattendedInstallConfig"
-                testCommand: "npx playwright test $testFolder"
+              vmImage: "windows-latest"
+              testFolder: "UnattendedInstallConfig"
+              testCommand: "npx playwright test $testFolder"
             LinuxUnattendedInstallConfig:
-                vmImage: "ubuntu-latest"
-                testFolder: "UnattendedInstallConfig"
-                testCommand: "npx playwright test $testFolder"
+              vmImage: "ubuntu-latest"
+              testFolder: "UnattendedInstallConfig"
+              testCommand: "npx playwright test $testFolder"
         pool:
           vmImage: $(vmImage)
         steps:
