@@ -1,7 +1,8 @@
 import { UmbDocumentUrlRepository } from '../../../repository/url/document-url.repository.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
-import { css, customElement, html, map, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbDocumentUrlModel } from '../../../repository/url/types.js';
+import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -24,10 +25,13 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 	private _variantOptions?: Array<UmbDocumentVariantOptionModel>;
 
 	@state()
-	private _lookup: Record<string, string[]> = {};
+	private _loading = false;
 
 	@state()
-	private _loading = false;
+	private _links: Array<UmbDocumentUrlModel> = [];
+
+	@state()
+	private _documentVaries = false;
 
 	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
@@ -62,6 +66,7 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 			});
 
 			this.observe(context.variantOptions, (variantOptions) => (this._variantOptions = variantOptions));
+			this.observe(context.varies, (varies) => (this._documentVaries = varies === true));
 		});
 	}
 
@@ -70,22 +75,13 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		if (!this._unique) return;
 
 		this._loading = true;
-		this._lookup = {};
+		this._links = [];
 
 		const { data } = await this.#documentUrlRepository.requestItems([this._unique]);
 
 		if (data?.length) {
 			const item = data[0];
-
-			item.urls.forEach((item) => {
-				if (item.culture && item.url) {
-					if (this._lookup[item.culture] == null) {
-						this._lookup[item.culture] = [];
-					}
-					this._lookup[item.culture].push(item.url);
-				}
-			});
-			this.requestUpdate('_lookup');
+			this._links = item.urls;
 		}
 
 		this._loading = false;
@@ -136,7 +132,7 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 			${when(
 				this._isNew,
 				() => this.#renderNotCreated(),
-				() => this.#renderUrls(),
+				() => (this._links.length === 0 ? this.#renderNoLinks() : this.#renderLinks()),
 			)}
 		`;
 	}
@@ -151,37 +147,40 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		`;
 	}
 
-	#renderUrls() {
-		if (!this._variantOptions?.length) return nothing;
-		return map(this._variantOptions, (variantOption) => this.#renderUrl(variantOption));
-	}
-
-	#renderUrl(variantOption: UmbDocumentVariantOptionModel) {
-		const varies = !!variantOption.culture;
-		const culture = varies ? variantOption.culture! : variantOption.language.unique;
-		const urls = this._lookup[culture];
-		return when(
-			urls && urls.length >= 1,
-			() =>
-				html` ${urls.map(
-					(url) =>
-						html` <a class="link-item" href=${url} target="_blank">
-							<span>
-								<span class="culture">${varies ? culture : nothing}</span>
-								<span>${url}</span>
-							</span>
-							<uui-icon name="icon-out"></uui-icon>
-						</a>`,
-				)}`,
-			() => html`
-				<div class="link-item">
+	#renderNoLinks() {
+		return html`${this._variantOptions?.map(
+			(variantOption) =>
+				html`<div class="link-item">
 					<span>
-						${when(varies, () => html`<span class="culture">${culture}</span>`)}
+						${this._documentVaries ? html`<span class="culture">${variantOption.culture}</span>` : nothing}
 						<em><umb-localize key=${this.#getStateLocalizationKey(variantOption)}></umb-localize></em>
 					</span>
-				</div>
-			`,
-		);
+				</div>`,
+		)}`;
+	}
+
+	#renderLinks() {
+		return html`
+			${repeat(
+				this._links,
+				(link) => link.url,
+				(link) => this.#renderLink(link),
+			)}
+		`;
+	}
+
+	#renderLink(link: UmbDocumentUrlModel) {
+		if (!link.url) return nothing;
+
+		return html`
+			<a class="link-item" href=${link.url} target="_blank">
+				<span>
+					<span class="culture">${link.culture}</span>
+					<span>${link.url}</span>
+				</span>
+				<uui-icon name="icon-out"></uui-icon>
+			</a>
+		`;
 	}
 
 	override disconnectedCallback(): void {
