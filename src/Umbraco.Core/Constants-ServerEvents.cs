@@ -53,7 +53,7 @@ public static partial class Constants
         {
             public static string Created = "Created";
 
-            public static string Saved = "Saved";
+            public static string Updated = "Updated";
 
             public static string Deleted = "Deleted";
         }

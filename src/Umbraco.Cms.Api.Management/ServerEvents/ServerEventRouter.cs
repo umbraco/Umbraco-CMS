@@ -15,5 +15,5 @@ internal sealed class ServerEventRouter : IServerEventRouter
 
     /// <inheritdoc/>
     public Task RouteEventAsync(ServerEvent serverEvent)
-        => _eventHub.Clients.Group(serverEvent.EventSource.ToString()).notify(serverEvent);
+        => _eventHub.Clients.Group(serverEvent.EventSource).notify(serverEvent);
 }

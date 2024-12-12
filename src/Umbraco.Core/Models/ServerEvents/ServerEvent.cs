@@ -2,9 +2,9 @@
 
 public class ServerEvent
 {
-    public EventType EventType { get; set; }
+    public required string EventType { get; set; }
 
-    public EventSource EventSource { get; set; }
+    public required string EventSource { get; set; }
 
     public Guid Key { get; set; }
 }

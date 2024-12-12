@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Events;
+﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.ServerEvents;
 using Umbraco.Cms.Core.Notifications;
@@ -54,16 +55,16 @@ internal sealed class ServerEventSender :
 
     public ServerEventSender(IServerEventRouter serverEventRouter) => _serverEventRouter = serverEventRouter;
 
-    private async Task NotifySavedAsync<T>(SavedNotification<T> notification, EventSource source)
+    private async Task NotifySavedAsync<T>(SavedNotification<T> notification, string source)
         where T : IEntity
     {
         foreach (T entity in notification.SavedEntities)
         {
-            EventType eventType = EventType.Updated;
+            string eventType = Constants.ServerEvents.EventType.Updated;
             if (entity.CreateDate == entity.UpdateDate)
             {
                 // This is a new entity
-                eventType = EventType.Created;
+                eventType = Constants.ServerEvents.EventType.Created;
             }
 
             var eventModel = new ServerEvent
@@ -77,141 +78,141 @@ internal sealed class ServerEventSender :
         }
     }
 
-    private async Task NotifyDeletedAsync<T>(DeletedNotification<T> notification, EventSource source)
+    private async Task NotifyDeletedAsync<T>(DeletedNotification<T> notification, string source)
         where T : IEntity
     {
         foreach (T entity in notification.DeletedEntities)
         {
             await _serverEventRouter.RouteEventAsync(new ServerEvent
             {
-                EventType = EventType.Deleted, EventSource = source, Key = entity.Key,
+                EventType = Constants.ServerEvents.EventType.Deleted, EventSource = source, Key = entity.Key,
             });
         }
     }
 
     public async Task HandleAsync(ContentSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.Document);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.Document);
 
     public async Task HandleAsync(ContentTypeSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.DocumentType);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.DocumentType);
 
     public async Task HandleAsync(MediaSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.Media);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.Media);
 
     public async Task HandleAsync(MediaTypeSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.MediaType);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.MediaType);
 
     public async Task HandleAsync(MemberSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.Member);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.Member);
 
     public async Task HandleAsync(MemberTypeSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.MemberType);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.MemberType);
 
     public async Task HandleAsync(MemberGroupSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.MemberGroup);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.MemberGroup);
 
     public async Task HandleAsync(DataTypeSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.DataType);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.DataType);
 
     public async Task HandleAsync(LanguageSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.Language);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.Language);
 
     public async Task HandleAsync(ScriptSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.Script);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.Script);
 
     public async Task HandleAsync(StylesheetSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.Stylesheet);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.Stylesheet);
 
     public async Task HandleAsync(TemplateSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.Template);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.Template);
 
     public async Task HandleAsync(DictionaryItemSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.DictionaryItem);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.DictionaryItem);
 
     public async Task HandleAsync(DomainSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.Domain);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.Domain);
 
     public async Task HandleAsync(PartialViewSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.PartialView);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.PartialView);
 
     public async Task HandleAsync(PublicAccessEntrySavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.PublicAccessEntry);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.PublicAccessEntry);
 
     public async Task HandleAsync(RelationSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.Relation);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.Relation);
 
     public async Task HandleAsync(RelationTypeSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.RelationType);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.RelationType);
 
     public async Task HandleAsync(UserGroupSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.UserGroup);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.UserGroup);
 
     public async Task HandleAsync(UserSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.User);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.User);
 
     public async Task HandleAsync(WebhookSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, EventSource.Webhook);
+        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.Webhook);
 
     public async Task HandleAsync(ContentDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.Document);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.Document);
 
     public async Task HandleAsync(ContentTypeDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.DocumentType);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.DocumentType);
 
     public async Task HandleAsync(MediaDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.Media);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.Media);
 
     public async Task HandleAsync(MediaTypeDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.MediaType);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.MediaType);
 
     public async Task HandleAsync(MemberDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.Member);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.Member);
 
     public async Task HandleAsync(MemberTypeDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.MemberType);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.MemberType);
 
     public async Task HandleAsync(MemberGroupDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.MemberGroup);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.MemberGroup);
 
     public async Task HandleAsync(DataTypeDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.DataType);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.DataType);
 
     public async Task HandleAsync(LanguageDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.Language);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.Language);
 
     public async Task HandleAsync(ScriptDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.Script);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.Script);
 
     public async Task HandleAsync(StylesheetDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.Stylesheet);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.Stylesheet);
 
     public async Task HandleAsync(TemplateDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.Template);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.Template);
 
     public async Task HandleAsync(DictionaryItemDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.DictionaryItem);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.DictionaryItem);
 
     public async Task HandleAsync(DomainDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.Domain);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.Domain);
 
     public async Task HandleAsync(PartialViewDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.PartialView);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.PartialView);
 
     public async Task HandleAsync(PublicAccessEntryDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.PublicAccessEntry);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.PublicAccessEntry);
 
     public async Task HandleAsync(RelationDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.Relation);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.Relation);
 
     public async Task HandleAsync(RelationTypeDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.RelationType);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.RelationType);
 
     public async Task HandleAsync(UserGroupDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.UserGroup);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.UserGroup);
 
     public async Task HandleAsync(UserDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.User);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.User);
 
     public async Task HandleAsync(WebhookDeletedNotification notification, CancellationToken cancellationToken) =>
-        await NotifyDeletedAsync(notification, EventSource.Webhook);
+        await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.Webhook);
 }
