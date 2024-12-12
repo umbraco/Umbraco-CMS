@@ -182,7 +182,7 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 				html`<div class="link-item">
 					<span>
 						${this._documentVaries ? html`<span class="culture">${variantOption.culture}</span>` : nothing}
-						<em><umb-localize key=${this.#getStateLocalizationKey(variantOption)}></umb-localize></em>
+						<em><umb-localize key=${this.#getStateLocalizationKey(variantOption.variant?.state)}></umb-localize></em>
 					</span>
 				</div>`,
 		)}`;
