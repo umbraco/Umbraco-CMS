@@ -76,14 +76,14 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 
 			this.observe(context.variantOptions, (variantOptions) => {
 				this._variantOptions = variantOptions;
-				this.#something();
+				this.#setLinks();
 			});
 
 			this.observe(context.varies, (varies) => (this._documentVaries = varies === true));
 		});
 	}
 
-	#something() {
+	#setLinks() {
 		const possibleVariantCultures = this._variantOptions?.map((variantOption) => variantOption.culture) ?? [];
 		const possibleUrlCultures = this._urls.map((link) => link.culture);
 		const possibleCultures = [...new Set([...possibleVariantCultures, ...possibleUrlCultures])].filter(Boolean);
@@ -91,7 +91,6 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		const links: Array<UmbDocumentInfoViewLink> = possibleCultures.map((culture) => {
 			const url = this._urls.find((link) => link.culture === culture)?.url;
 			const state = this._variantOptions?.find((variantOption) => variantOption.culture === culture)?.variant?.state;
-			console.log(this._variantOptions);
 			return { culture, url, state };
 		});
 
@@ -110,7 +109,7 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		if (data?.length) {
 			const item = data[0];
 			this._urls = item.urls;
-			this.#something();
+			this.#setLinks();
 		}
 
 		this._loading = false;
