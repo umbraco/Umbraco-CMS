@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ServerEvents;
+using Umbraco.Cms.Api.Management.ServerEvents.Authorizers;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.ServerEvents;
@@ -17,12 +18,14 @@ internal static class ServerEventExtensions
         builder.Services.AddSingleton<IServerEventUserManager, ServerEventUserManager>();
         builder.AddNotificationAsyncHandler<UserSavedNotification, UserConnectionRefresher>();
 
-        AddEvents(builder);
+        builder
+            .AddEvents()
+            .AddAuthorizers();
 
         return builder;
     }
 
-    private static void AddEvents(IUmbracoBuilder builder)
+    private static IUmbracoBuilder AddEvents(this IUmbracoBuilder builder)
     {
         builder.AddNotificationAsyncHandler<ContentSavedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<ContentTypeSavedNotification, ServerEventSender>();
@@ -68,5 +71,33 @@ internal static class ServerEventExtensions
         builder.AddNotificationAsyncHandler<UserDeletedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<WebhookDeletedNotification, ServerEventSender>();
 
+        return builder;
+    }
+
+    private static IUmbracoBuilder AddAuthorizers(this IUmbracoBuilder builder)
+    {
+        builder.EventSourceAuthorizers()
+            .Append<DocumentEventAuthorizer>()
+            .Append<DocumentTypeEventAuthorizer>()
+            .Append<MediaEventAuthorizer>()
+            .Append<MediaTypeEventAuthorizer>()
+            .Append<MemberEventAuthorizer>()
+            .Append<MemberGroupEventAuthorizer>()
+            .Append<MemberTypeEventAuthorizer>()
+            .Append<DataTypeEventAuthorizer>()
+            .Append<LanguageEventAuthorizer>()
+            .Append<ScriptEventAuthorizer>()
+            .Append<StylesheetEventAuthorizer>()
+            .Append<TemplateEventAuthorizer>()
+            .Append<DictionaryItemEventAuthorizer>()
+            .Append<DomainEventAuthorizer>()
+            .Append<PartialViewEventAuthorizer>()
+            .Append<PublicAccessEntryEventAuthorizer>()
+            .Append<RelationEventAuthorizer>()
+            .Append<RelationTypeEventAuthorizer>()
+            .Append<UserGroupEventAuthorizer>()
+            .Append<UserEventAuthorizer>()
+            .Append<WebhookEventAuthorizer>();
+        return builder;
     }
 }

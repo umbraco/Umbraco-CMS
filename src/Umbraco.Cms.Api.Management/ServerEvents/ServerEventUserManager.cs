@@ -1,10 +1,6 @@
-﻿using System.Collections.Frozen;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
-using Umbraco.Cms.Core.Models.ServerEvents;
 using Umbraco.Cms.Core.ServerEvents;
-using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.ServerEvents;
@@ -13,54 +9,31 @@ namespace Umbraco.Cms.Api.Management.ServerEvents;
 internal sealed class ServerEventUserManager : IServerEventUserManager
 {
     private readonly IUserConnectionManager _userConnectionManager;
-    private readonly IAuthorizationService _authorizationService;
+    private readonly EventSourceAuthorizerCollection _eventSourceAuthorizerCollection;
     private readonly IHubContext<ServerEventHub, IServerEventHub> _eventHub;
-    private readonly FrozenDictionary<EventSource, string> _groupMappings;
 
     public ServerEventUserManager(
         IUserConnectionManager userConnectionManager,
-        IAuthorizationService authorizationService,
+        EventSourceAuthorizerCollection eventSourceAuthorizerCollection,
         IHubContext<ServerEventHub, IServerEventHub> eventHub)
     {
         _userConnectionManager = userConnectionManager;
-        _authorizationService = authorizationService;
+        _eventSourceAuthorizerCollection = eventSourceAuthorizerCollection;
         _eventHub = eventHub;
-
-        _groupMappings = new Dictionary<EventSource, string>
-        {
-            { EventSource.Document, AuthorizationPolicies.TreeAccessDocuments },
-            { EventSource.DocumentType, AuthorizationPolicies.TreeAccessDocumentTypes },
-            { EventSource.Media, AuthorizationPolicies.TreeAccessMediaOrMediaTypes },
-            { EventSource.MediaType, AuthorizationPolicies.TreeAccessMediaTypes },
-            { EventSource.Member, AuthorizationPolicies.TreeAccessMembersOrMemberTypes },
-            { EventSource.MemberType, AuthorizationPolicies.TreeAccessMemberTypes },
-            { EventSource.MemberGroup, AuthorizationPolicies.TreeAccessMemberGroups },
-            { EventSource.DataType, AuthorizationPolicies.TreeAccessDataTypes },
-            { EventSource.Language, AuthorizationPolicies.TreeAccessLanguages },
-            { EventSource.Script, AuthorizationPolicies.TreeAccessScripts },
-            { EventSource.Stylesheet, AuthorizationPolicies.TreeAccessStylesheets },
-            { EventSource.Template, AuthorizationPolicies.TreeAccessTemplates },
-            { EventSource.DictionaryItem, AuthorizationPolicies.TreeAccessDictionary },
-            { EventSource.Domain, AuthorizationPolicies.TreeAccessDocuments },
-            { EventSource.PartialView, AuthorizationPolicies.TreeAccessPartialViews },
-            { EventSource.PublicAccessEntry, AuthorizationPolicies.TreeAccessDocuments },
-            { EventSource.Relation, AuthorizationPolicies.TreeAccessDocuments },
-            { EventSource.RelationType, AuthorizationPolicies.TreeAccessRelationTypes },
-            { EventSource.UserGroup, AuthorizationPolicies.SectionAccessUsers },
-            { EventSource.User, AuthorizationPolicies.SectionAccessUsers },
-            { EventSource.Webhook, AuthorizationPolicies.TreeAccessWebhooks },
-        }.ToFrozenDictionary();
     }
 
     /// <inheritdoc />
     public async Task AssignToGroupsAsync(ClaimsPrincipal user, string connectionId)
     {
-        foreach (KeyValuePair<EventSource, string> mapping in _groupMappings)
+        foreach (IEventSourceAuthorizer authorizer in _eventSourceAuthorizerCollection)
         {
-            AuthorizationResult result = await _authorizationService.AuthorizeAsync(user, mapping.Value);
-            if (result.Succeeded)
+            foreach (var eventSource in authorizer.AuthorizedEventSources)
             {
-                await _eventHub.Groups.AddToGroupAsync(connectionId, mapping.Key.ToString());
+                var isAuthorized = await authorizer.AuthorizeAsync(user, eventSource);
+                if (isAuthorized)
+                {
+                    await _eventHub.Groups.AddToGroupAsync(connectionId, eventSource);
+                }
             }
         }
     }
@@ -85,24 +58,26 @@ internal sealed class ServerEventUserManager : IServerEventUserManager
             return;
         }
 
-        foreach (KeyValuePair<EventSource, string> mapping in _groupMappings)
+        foreach (IEventSourceAuthorizer authorizer in _eventSourceAuthorizerCollection)
         {
-            AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(user, mapping.Value);
-
-            // It's safe to add an existing connection to a group
-            if (authorizationResult.Succeeded)
+            foreach (var eventSource in authorizer.AuthorizedEventSources)
             {
-                foreach (var connection in connections)
+                var isAuthorized = await authorizer.AuthorizeAsync(user, eventSource);
+
+                if (isAuthorized)
                 {
-                    await _eventHub.Groups.AddToGroupAsync(connection, mapping.Key.ToString());
+                    foreach (var connection in connections)
+                    {
+                        await _eventHub.Groups.AddToGroupAsync(connection, eventSource);
+                    }
+
+                    continue;
                 }
 
-                continue;
-            }
-
-            foreach (var connection in connections)
-            {
-                await _eventHub.Groups.RemoveFromGroupAsync(connection, mapping.Key.ToString());
+                foreach (var connection in connections)
+                {
+                    await _eventHub.Groups.RemoveFromGroupAsync(connection, eventSource);
+                }
             }
         }
     }
