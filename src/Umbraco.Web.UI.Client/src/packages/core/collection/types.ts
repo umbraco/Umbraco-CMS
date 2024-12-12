@@ -1,9 +1,11 @@
-import type { ManifestCollection } from './extensions/index.js';
+import type { ManifestCollection } from './extensions/types.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
-export type * from './extensions/index.js';
+export type * from './action/create/types.js';
+export type * from './extensions/types.js';
 export type * from './conditions/types.js';
+export type * from './workspace-view/types.js';
 
 /** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
 export interface UmbCollectionBulkActionPermissions {
@@ -50,5 +52,3 @@ export interface UmbCollectionContext {
 	items: Observable<any[]>;
 	totalItems: Observable<number>;
 }
-
-export type * from './extensions/index.js';
