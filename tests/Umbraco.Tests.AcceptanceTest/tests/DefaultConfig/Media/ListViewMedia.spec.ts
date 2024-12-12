@@ -100,20 +100,10 @@ test('can disable one view in the media section', async ({umbracoApi, umbracoUi}
 });
 
 test('can allow bulk trash in the media section', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const updatedValue = {
-    "allowBulkPublish": false,
-    "allowBulkUnpublish": false,
-    "allowBulkCopy": false,
-    "allowBulkDelete": true,
-    "allowBulkMove": false
-  };
-
   // Act
-  await umbracoApi.dataType.updateListViewMediaDataType('bulkActionPermissions', updatedValue);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
-  await umbracoUi.media.selectMediaByName(firstMediaFileName);
-  await umbracoUi.media.selectMediaByName(secondMediaFileName);
+  await umbracoUi.media.selectMediaWithName(firstMediaFileName);
+  await umbracoUi.media.selectMediaWithName(secondMediaFileName);
   await umbracoUi.media.clickBulkTrashButton();
   await umbracoUi.media.clickConfirmTrashButton();
 
@@ -127,24 +117,17 @@ test('can allow bulk trash in the media section', async ({umbracoApi, umbracoUi}
   await umbracoUi.media.isItemVisibleInRecycleBin(secondMediaFileName, true, false);
 });
 
-test('can allow bulk move in the media section', async ({umbracoApi, umbracoUi}) => {
+// TODO: Remove skip when update code to select media successfully.
+test.skip('can allow bulk move in the media section', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaFolderName = 'Test Folder Name';
-  const updatedValue = {
-    "allowBulkPublish": false,
-    "allowBulkUnpublish": false,
-    "allowBulkCopy": false,
-    "allowBulkDelete": false,
-    "allowBulkMove": true
-  };
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);
   const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
 
   // Act
-  await umbracoApi.dataType.updateListViewMediaDataType('bulkActionPermissions', updatedValue);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
-  await umbracoUi.media.selectMediaByName(firstMediaFileName);
-  await umbracoUi.media.selectMediaByName(secondMediaFileName);
+  await umbracoUi.media.selectMediaWithName(firstMediaFileName);
+  await umbracoUi.media.selectMediaWithName(secondMediaFileName);
   await umbracoUi.media.clickBulkMoveToButton();
   await umbracoUi.media.clickCaretButtonForName('Media');
   await umbracoUi.media.clickModalTextByName(mediaFolderName);

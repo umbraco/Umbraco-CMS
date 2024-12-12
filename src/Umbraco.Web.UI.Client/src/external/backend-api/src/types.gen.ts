@@ -1027,6 +1027,7 @@ export type HealthCheckWithResultPresentationModel = {
 export enum HealthStatusModel {
     HEALTHY = 'Healthy',
     UNHEALTHY = 'Unhealthy',
+    CORRUPT = 'Corrupt',
     REBUILDING = 'Rebuilding'
 }
 
