@@ -55,8 +55,7 @@ test('can create content with the document link', {tag: '@smoke'}, async ({page,
   expect(contentData.values[0].value[0].icon).toEqual('icon-document');
   expect(contentData.values[0].value[0].target).toBeNull();
   expect(contentData.values[0].value[0].unique).toEqual(linkedDocumentId);
-  // Uncomment this when the front-end is ready. Currently the link title is not auto filled after choosing document to link
-  //expect(contentData.values[0].value[0].name).toEqual(linkedDocumentId);
+  expect(contentData.values[0].value[0].name).toEqual(linkedDocumentName);
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentTypeForLinkedDocumentName);
@@ -99,8 +98,7 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   expect(contentData.values[0].value[0].icon).toEqual('icon-document');
   expect(contentData.values[0].value[0].target).toBeNull();
   expect(contentData.values[0].value[0].unique).toEqual(linkedDocumentId);
-  // Uncomment this when the front-end is ready. Currently the link title is not auto filled after choosing document to link
-  //expect(contentData.values[0].value[0].name).toEqual(linkedDocumentId);
+  expect(contentData.values[0].value[0].name).toEqual(linkedDocumentName);
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentTypeForLinkedDocumentName);
@@ -166,8 +164,7 @@ test('can create content with the media link', async ({umbracoApi, umbracoUi}) =
   expect(contentData.values[0].value[0].type).toEqual('media');
   expect(contentData.values[0].value[0].icon).toEqual('icon-picture');
   expect(contentData.values[0].value[0].unique).toEqual(mediaFileId);
-  // Uncomment this when the front-end is ready. Currently the link title is not auto filled after choosing media to link
-  //expect(contentData.values[0].value[0].name).toEqual(mediaFileName);
+  expect(contentData.values[0].value[0].name).toEqual(mediaFileName);
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(mediaFileName);
@@ -211,8 +208,7 @@ test('can add multiple links in the content', async ({umbracoApi, umbracoUi}) =>
   expect(contentData.values[0].value[0].type).toEqual('media');
   expect(contentData.values[0].value[0].icon).toEqual('icon-picture');
   expect(contentData.values[0].value[0].unique).toEqual(mediaFileId);
-  // Uncomment this when the front-end is ready. Currently the link title is not auto filled after choosing media to link
-  //expect(contentData.values[0].value[0].name).toEqual(mediaFileName);
+  expect(contentData.values[0].value[0].name).toEqual(mediaFileName);
   // Verify the information of the second URL picker
   expect(contentData.values[0].value[1].type).toEqual('external');
   expect(contentData.values[0].value[1].icon).toEqual('icon-link');

@@ -100,7 +100,7 @@
 //   await umbracoUi.package.clickCreatePackageButton();
 //   await umbracoUi.package.enterPackageName(packageName);
 //   await umbracoUi.package.clickAddMediaToPackageButton();
-//   await umbracoUi.media.selectMediaByName(mediaName);
+//   await umbracoUi.media.selectMediaWithName(mediaName);
 //   await umbracoUi.package.clickSubmitButton();
 //   await umbracoUi.package.clickCreateButton();
 //
