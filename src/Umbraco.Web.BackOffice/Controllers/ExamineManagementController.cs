@@ -205,7 +205,7 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
             documentCount = indexDiag.GetDocumentCount();
             fieldCount = indexDiag.GetFieldNames().Count();
         }
-        catch (FileNotFoundException ex)
+        catch (Exception ex)
         {
             // Safe catch that will allow to rebuild a corrupted index
             documentCount = 0;
