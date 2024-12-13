@@ -91,6 +91,10 @@ export const foundConsts = [{
 				consts: []
 			},
 {
+				path: '@umbraco-cms/backoffice/const',
+				consts: ["UMB_MARK_ATTRIBUTE_NAME"]
+			},
+{
 				path: '@umbraco-cms/backoffice/content-type',
 				consts: ["UMB_COMPOSITION_PICKER_MODAL","UMB_CONTENT_TYPE_WORKSPACE_CONTEXT","UMB_PROPERTY_TYPE_CONTEXT","UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT"]
 			},
