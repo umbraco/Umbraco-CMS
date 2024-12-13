@@ -38,6 +38,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
     private readonly ITagRepository _tagRepository;
     private bool _passwordConfigInitialized;
     private string? _passwordConfigJson;
+    private const string UsernameCacheKey = "uRepo_userNameKey+";
 
     public MemberRepository(
         IScopeAccessor scopeAccessor,
@@ -228,7 +229,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
     }
 
     public IMember? GetByUsername(string? username) =>
-        _memberByUsernameCachePolicy.GetByUserName("uRepo_userNameKey+", username, PerformGetByUsername, PerformGetAllByUsername);
+        _memberByUsernameCachePolicy.GetByUserName(UsernameCacheKey, username, PerformGetByUsername, PerformGetAllByUsername);
 
     public int[] GetMemberIds(string[] usernames)
     {
@@ -506,6 +507,12 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         }
 
         return sql;
+    }
+
+    protected override void PersistDeletedItem(IMember entity)
+    {
+        _memberByUsernameCachePolicy.DeleteByUserName(UsernameCacheKey, entity.Username);
+        base.PersistDeletedItem(entity);
     }
 
     // TODO: move that one up to Versionable! or better: kill it!
