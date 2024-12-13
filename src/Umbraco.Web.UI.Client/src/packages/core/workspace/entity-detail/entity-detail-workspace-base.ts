@@ -38,6 +38,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	public readonly unique = this.#entityContext.unique;
 
 	public readonly data = this._data.current;
+	public readonly persistedData = this._data.persisted;
 	public readonly loading = new UmbStateManager(this);
 
 	protected _getDataPromise?: Promise<any>;

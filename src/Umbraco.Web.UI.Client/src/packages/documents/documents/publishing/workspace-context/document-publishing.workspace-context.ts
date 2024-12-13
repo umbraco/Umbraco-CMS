@@ -333,6 +333,12 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			},
 			'uniqueObserver',
 		);
+
+		this.observe(
+			this.#documentWorkspaceContext.persistedData,
+			() => this.#processPendingChanges(),
+			'umbPersistedDataObserver',
+		);
 	}
 
 	#hasPublishedVariant() {

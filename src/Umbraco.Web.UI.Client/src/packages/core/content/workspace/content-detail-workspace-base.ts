@@ -97,8 +97,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/* Content Data */
 	protected override readonly _data = new UmbContentWorkspaceDataManager<DetailModelType, VariantModelType>(this);
+
+	public override readonly data = this._data.current;
 	public readonly values = this._data.createObservablePartOfCurrent((data) => data?.values);
 	public readonly variants = this._data.createObservablePartOfCurrent((data) => data?.variants ?? []);
+	public override readonly persistedData = this._data.persisted;
 
 	/* Content Type (Structure) Data */
 	public readonly structure;
