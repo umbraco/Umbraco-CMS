@@ -5,7 +5,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-section-sidebar')
 export class UmbSectionSidebarElement extends UmbLitElement {
-	//
 	constructor() {
 		super();
 		new UmbSectionSidebarContext(this);
