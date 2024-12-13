@@ -8,10 +8,8 @@ let customDataTypeId = null;
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   customDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customDataTypeName);
-  console.log()
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoUi.goToBackOffice();
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -24,6 +22,7 @@ test('can create content with empty RTE Tiptap property editor', async ({umbraco
   // Arrange
   const expectedState = 'Draft'; 
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -44,7 +43,9 @@ test('can create content with empty RTE Tiptap property editor', async ({umbraco
 test('can create content with non-empty RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft'; 
+  const inputText = 'Test Tiptap here';
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -52,6 +53,7 @@ test('can create content with non-empty RTE Tiptap property editor', async ({umb
   await umbracoUi.content.clickCreateButton();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.enterRTETiptapEditor(inputText);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
@@ -59,19 +61,21 @@ test('can create content with non-empty RTE Tiptap property editor', async ({umb
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values).toEqual([]);
+  expect(contentData.values[0].value.markup).toEqual('<p>' + inputText + '</p>');
 });
 
 test('can publish content with RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
+  const inputText = 'Test Tiptap here';
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-
+  await umbracoUi.content.enterRTETiptapEditor(inputText);
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
@@ -79,5 +83,61 @@ test('can publish content with RTE Tiptap property editor', async ({umbracoApi, 
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
+  expect(contentData.values[0].value.markup).toEqual('<p>' + inputText + '</p>');
 });
 
+test('can add a media in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const iconTitle = 'Media picker';
+  const imageName = 'Test Image For Content';
+  await umbracoApi.media.ensureNameNotExists(imageName);
+  await umbracoApi.media.createDefaultMediaWithImage(imageName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickTitapToolbarIconWithTitle(iconTitle);
+  await umbracoUi.content.selectMediaWithName(imageName);
+  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickMediaCaptionAltTextModalSubmitButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value.markup).toContain('<img');
+  expect(contentData.values[0].value.markup).toContain(imageName);
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(imageName);
+});
+
+test('can add video in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const iconTitle = 'Embed';
+  const videoURL = 'https://www.youtube.com/watch?v=Yu29dE-0OoI';
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickTitapToolbarIconWithTitle(iconTitle);
+  await umbracoUi.content.enterEmbeddedURL(videoURL);
+  await umbracoUi.content.clickRetrieveButton();
+  await umbracoUi.content.waitForPreviewEmbeddedVisible();
+  await umbracoUi.content.clickEmbeddedMediaModalConfirmButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value.markup).toContain('data-embed-url');
+  expect(contentData.values[0].value.markup).toContain(videoURL);
+});
