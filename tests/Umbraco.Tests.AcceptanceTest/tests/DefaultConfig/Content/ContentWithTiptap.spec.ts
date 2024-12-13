@@ -6,7 +6,7 @@ const documentTypeName = 'TestDocumentTypeForContent';
 const customDataTypeName = 'Test RTE Tiptap';
 let customDataTypeId = null;
 
-test.beforeEach(async ({umbracoApi, umbracoUi}) => {
+test.beforeEach(async ({umbracoApi}) => {
   customDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customDataTypeName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
