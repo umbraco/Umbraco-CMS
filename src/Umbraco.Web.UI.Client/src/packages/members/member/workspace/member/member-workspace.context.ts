@@ -38,6 +38,8 @@ export class UmbMemberWorkspaceContext
 			workspaceAlias: UMB_MEMBER_WORKSPACE_ALIAS,
 			detailRepositoryAlias: UMB_MEMBER_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbMemberTypeDetailRepository,
+			// TODO: Enable Validation Repository when we have UI for showing validation issues on other tabs. [NL]
+			//contentValidationRepository: UmbMemberValidationRepository,
 			contentVariantScaffold: UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD,
 		});
 

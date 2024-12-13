@@ -1,22 +1,22 @@
-import type { UmbMediaDetailModel } from '../../types.js';
-import { UmbMediaValidationServerDataSource } from './media-validation.server.data-source.js';
+import type { UmbMemberDetailModel } from '../../types.js';
+import { UmbMemberValidationServerDataSource } from './member-validation.server.data-source.js';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbContentValidationRepository } from '@umbraco-cms/backoffice/content';
 
-type DetailModelType = UmbMediaDetailModel;
+type DetailModelType = UmbMemberDetailModel;
 
-export class UmbMediaValidationRepository
+export class UmbMemberValidationRepository
 	extends UmbRepositoryBase
 	implements UmbContentValidationRepository<DetailModelType>
 {
-	#validationDataSource: UmbMediaValidationServerDataSource;
+	#validationDataSource: UmbMemberValidationServerDataSource;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.#validationDataSource = new UmbMediaValidationServerDataSource(this);
+		this.#validationDataSource = new UmbMemberValidationServerDataSource(this);
 	}
 
 	/**
@@ -45,4 +45,4 @@ export class UmbMediaValidationRepository
 	}
 }
 
-export { UmbMediaValidationRepository as api };
+export { UmbMemberValidationRepository as api };

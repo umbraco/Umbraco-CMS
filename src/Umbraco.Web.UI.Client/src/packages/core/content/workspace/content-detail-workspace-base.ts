@@ -3,6 +3,7 @@ import { UmbContentWorkspaceDataManager } from '../manager/index.js';
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
 import type { UmbContentVariantPickerData, UmbContentVariantPickerValue } from '../variant-picker/index.js';
 import type { UmbContentPropertyDatasetContext } from '../property-dataset-context/index.js';
+import type { UmbContentValidationRepository } from '../repository/content-validation-repository.interface.js';
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailRepository, UmbDetailRepositoryConstructor } from '@umbraco-cms/backoffice/repository';
@@ -33,6 +34,7 @@ import {
 	UMB_VALIDATION_CONTEXT,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 	UmbDataPathVariantQuery,
+	UmbServerModelValidatorContext,
 	UmbValidationContext,
 	UmbVariantsValidationPathTranslator,
 	UmbVariantValuesValidationPathTranslator,
@@ -44,6 +46,7 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
+import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -54,6 +57,8 @@ export interface UmbContentDetailWorkspaceContextArgs<
 	VariantOptionModelType extends UmbEntityVariantOptionModel = UmbEntityVariantOptionModel<VariantModelType>,
 > extends UmbEntityDetailWorkspaceContextArgs {
 	contentTypeDetailRepository: UmbDetailRepositoryConstructor<ContentTypeDetailModelType>;
+	contentValidationRepository?: ClassConstructor<UmbContentValidationRepository<DetailModelType>>;
+	skipValidationOnSubmit?: boolean;
 	contentVariantScaffold: VariantModelType;
 	saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
 }
@@ -118,6 +123,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	// TODO: fix type error
 	public readonly variantOptions;
 
+	#validateOnSubmit: boolean;
+	#serverValidation = new UmbServerModelValidatorContext(this);
+	#validationRepositoryClass?: ClassConstructor<UmbContentValidationRepository<DetailModelType>>;
+	#validationRepository?: UmbContentValidationRepository<DetailModelType>;
+
 	#saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
 
 	constructor(
@@ -135,6 +145,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.#saveModalToken = args.saveModalToken;
 
 		const contentTypeDetailRepository = new args.contentTypeDetailRepository(this);
+		this.#validationRepositoryClass = args.contentValidationRepository;
+		this.#validateOnSubmit = args.skipValidationOnSubmit ? !args.skipValidationOnSubmit : true;
 		this.structure = new UmbContentTypeStructureManager<ContentTypeDetailModelType>(this, contentTypeDetailRepository);
 		this.variesByCulture = this.structure.ownerContentTypeObservablePart((x) => x?.variesByCulture);
 		this.variesBySegment = this.structure.ownerContentTypeObservablePart((x) => x?.variesBySegment);
@@ -470,6 +482,36 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 	}
 
+	protected async _askServerToValidate(saveData: DetailModelType, variantIds: Array<UmbVariantId>) {
+		if (this.#validationRepositoryClass) {
+			// Create the validation repository if it does not exist. (we first create this here when we need it) [NL]
+			this.#validationRepository ??= new this.#validationRepositoryClass(this);
+
+			// We ask the server first to get a concatenated set of validation messages. So we see both front-end and back-end validation messages [NL]
+			if (this.getIsNew()) {
+				const parent = this.getParent();
+				if (!parent) throw new Error('Parent is not set');
+				await this.#serverValidation.askServerForValidation(
+					saveData,
+					this.#validationRepository.validateCreate(saveData, parent.unique),
+				);
+			} else {
+				await this.#serverValidation.askServerForValidation(
+					saveData,
+					this.#validationRepository.validateSave(saveData, variantIds),
+				);
+			}
+		}
+	}
+
+	/**
+	 * Request a submit of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be submitted.
+	 * @returns {Promise<void>} a promise which resolves once it has been completed.
+	 */
+	public override requestSubmit() {
+		return this._handleSubmit();
+	}
+
 	public override submit() {
 		return this._handleSubmit();
 	}
@@ -513,7 +555,19 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 		const saveData = await this._data.constructData(variantIds);
 		await this._runMandatoryValidationForSaveData(saveData);
-		await this._performCreateOrUpdate(variantIds, saveData);
+		if (this.#validateOnSubmit) {
+			await this._askServerToValidate(saveData, variantIds);
+			return this.validateAndSubmit(
+				async () => {
+					return this._performCreateOrUpdate(variantIds, saveData);
+				},
+				async () => {
+					return this.invalidSubmit();
+				},
+			);
+		} else {
+			await this._performCreateOrUpdate(variantIds, saveData);
+		}
 	}
 
 	protected async _performCreateOrUpdate(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
