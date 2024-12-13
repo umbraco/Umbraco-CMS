@@ -53,6 +53,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		]);
 	}
 
+	public async publish() {
+		throw new Error('Method not implemented.');
+	}
+
 	/**
 	 * Save and publish the document
 	 * @returns {Promise<void>}

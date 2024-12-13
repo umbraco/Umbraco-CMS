@@ -254,6 +254,16 @@ export class UmbDocumentWorkspaceContext
 		previewWindow?.focus();
 	}
 
+	public async publish() {
+		new UmbDeprecation({
+			deprecated: 'The Publish method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
+			removeInVersion: '17',
+			solution: 'Use the Publish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
+		}).warn();
+		if (!this.#publishingContext) throw new Error('Publishing context is missing');
+		this.#publishingContext.publish();
+	}
+
 	/**
 	 * Save the document and publish it.
 	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
