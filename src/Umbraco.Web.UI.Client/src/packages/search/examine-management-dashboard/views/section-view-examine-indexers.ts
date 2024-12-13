@@ -93,8 +93,12 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 		switch (healthStatus.status) {
 			case HealthStatusModel.HEALTHY:
 				return html`<umb-icon name="icon-check color-green"></umb-icon>${msg}`;
+			case HealthStatusModel.CORRUPT:
+				return html`<umb-icon name="icon-alert color-red"></umb-icon><div>
+					<a href="https://umbra.co/corrupt-indexes" target="_blank"><umb-localize key="examineManagement_corruptStatus">Possible corrupt index detected</umb-localize></a>
+					<p><umb-localize key="examineManagement_corruptErrorDescription">Error received when evaluating the index:</umb-localize> </br> </p>${msg}</div>`;
 			case HealthStatusModel.UNHEALTHY:
-				return html`<umb-icon name="icon-error color-red"></umb-icon>${msg}`;
+				return html`<umb-icon name="icon-alert color-red"></umb-icon>${msg}`;
 			case HealthStatusModel.REBUILDING:
 				return html`<umb-icon name="icon-time color-yellow"></umb-icon>${msg}`;
 			default:
@@ -174,7 +178,12 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 		css`
 			#health-status {
 				display: flex;
+				align-items: start;
 				gap: var(--uui-size-6);
+			}
+
+			#health-status umb-icon {
+				margin-top: var(--uui-size-1);
 			}
 
 			:host {

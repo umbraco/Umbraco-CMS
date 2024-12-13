@@ -1,4 +1,4 @@
-import type { ManifestCollectionAction } from '../../extensions/index.js';
+import type { ManifestCollectionAction } from '../../extensions/types.js';
 
 export interface ManifestCollectionActionCreateKind extends ManifestCollectionAction {
 	type: 'collectionAction';
