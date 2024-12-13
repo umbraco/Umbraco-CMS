@@ -844,6 +844,8 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
         OnUowRefreshedEntity(new MemberRefreshNotification(entity, new EventMessages()));
 
+        _memberByUsernameCachePolicy.DeleteByUserName(UsernameCacheKey, entity.Username);
+
         entity.ResetDirtyProperties();
     }
 
