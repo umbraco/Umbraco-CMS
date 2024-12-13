@@ -13,6 +13,10 @@ export class UmbMediaItemRepository extends UmbItemRepositoryBase<UmbMediaItemMo
 	}
 
 	/**
+	 * @param root0
+	 * @param root0.query
+	 * @param root0.skip
+	 * @param root0.take
 	 * @deprecated - The search method will be removed in v17. Use the
 	 * Use the UmbMediaSearchProvider instead.
 	 * Get it from:
