@@ -1,9 +1,7 @@
 using System.Collections.Concurrent;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Scoping;
@@ -15,34 +13,33 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_1_0;
 
-public class ConvertLocalLinks : MigrationBase
+public class FixConvertLocalLinks : MigrationBase
 {
     private readonly IUmbracoContextFactory _umbracoContextFactory;
     private readonly IContentTypeService _contentTypeService;
-    private readonly ILogger<ConvertLocalLinks> _logger;
+    private readonly ILogger<FixConvertLocalLinks> _logger;
     private readonly IDataTypeService _dataTypeService;
     private readonly ILanguageService _languageService;
     private readonly IJsonSerializer _jsonSerializer;
-    private readonly LocalLinkProcessor _localLinkProcessor;
+    private readonly LocalLinkProcessorForFaultyLinks _localLinkProcessor;
     private readonly IMediaTypeService _mediaTypeService;
     private readonly ICoreScopeProvider _coreScopeProvider;
-    private readonly LocalLinkMigrationTracker _linkMigrationTracker;
+    private readonly LocalLinkMigrationTracker _localLinkMigrationTracker;
 
-    [Obsolete("Use non obsoleted contructor instead")]
-    public ConvertLocalLinks(
+    public FixConvertLocalLinks(
         IMigrationContext context,
         IUmbracoContextFactory umbracoContextFactory,
         IContentTypeService contentTypeService,
-        ILogger<ConvertLocalLinks> logger,
+        ILogger<FixConvertLocalLinks> logger,
         IDataTypeService dataTypeService,
         ILanguageService languageService,
         IJsonSerializer jsonSerializer,
-        LocalLinkProcessor localLinkProcessor,
+        LocalLinkProcessorForFaultyLinks localLinkProcessor,
         IMediaTypeService mediaTypeService,
         ICoreScopeProvider coreScopeProvider,
-        LocalLinkMigrationTracker linkMigrationTracker)
+        LocalLinkMigrationTracker localLinkMigrationTracker)
         : base(context)
     {
         _umbracoContextFactory = umbracoContextFactory;
@@ -54,37 +51,19 @@ public class ConvertLocalLinks : MigrationBase
         _localLinkProcessor = localLinkProcessor;
         _mediaTypeService = mediaTypeService;
         _coreScopeProvider = coreScopeProvider;
-        _linkMigrationTracker = linkMigrationTracker;
-    }
-
-    public ConvertLocalLinks(
-        IMigrationContext context,
-        IUmbracoContextFactory umbracoContextFactory,
-        IContentTypeService contentTypeService,
-        ILogger<ConvertLocalLinks> logger,
-        IDataTypeService dataTypeService,
-        ILanguageService languageService,
-        IJsonSerializer jsonSerializer,
-        LocalLinkProcessor localLinkProcessor,
-        IMediaTypeService mediaTypeService,
-        ICoreScopeProvider coreScopeProvider)
-        : this(
-            context,
-            umbracoContextFactory,
-            contentTypeService,
-            logger,
-            dataTypeService,
-            languageService,
-            jsonSerializer,
-            localLinkProcessor,
-            mediaTypeService,
-            coreScopeProvider,
-            StaticServiceProvider.Instance.GetRequiredService<LocalLinkMigrationTracker>())
-    {
+        _localLinkMigrationTracker = localLinkMigrationTracker;
     }
 
     protected override void Migrate()
     {
+        // the original migration was fixed, we only run this if
+        // this migration hits
+        // and the fixed original migration has not run, so it must have run in the past
+        if (_localLinkMigrationTracker.HasFixedMigrationRun)
+        {
+            return;
+        }
+
         IEnumerable<string> propertyEditorAliases = _localLinkProcessor.GetSupportedPropertyEditorAliases();
 
         using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
@@ -129,8 +108,6 @@ public class ConvertLocalLinks : MigrationBase
                     propertyEditorAlias);
             }
         }
-
-        _linkMigrationTracker.MarkFixedMigrationRan();
     }
 
     private bool ProcessPropertyTypes(IPropertyType[] propertyTypes, IDictionary<int, ILanguage> languagesById)
