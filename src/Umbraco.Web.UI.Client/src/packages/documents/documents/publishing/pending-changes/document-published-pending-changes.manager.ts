@@ -1,3 +1,4 @@
+import type { UmbDocumentVariantModel } from '../../types.js';
 import type {
 	UmbDocumentPublishedPendingChangesManagerProcessArgs,
 	UmbPublishedVariantWithPendingChanges,
@@ -39,7 +40,16 @@ export class UmbDocumentPublishedPendingChangesManager extends UmbControllerBase
 				[variantId],
 			);
 
-			if (jsonStringComparison(mergedData, args.publishedData) === false) {
+			const mergedDataClone = structuredClone(mergedData);
+			const publishedDataClone = structuredClone(args.publishedData);
+
+			// remove dates from the comparison
+			mergedDataClone.variants.forEach((variant) => this.#cleanVariantForComparison(variant));
+			publishedDataClone.variants.forEach((variant) => this.#cleanVariantForComparison(variant));
+
+			const hasChanges = jsonStringComparison(mergedDataClone, publishedDataClone) === false;
+
+			if (hasChanges) {
 				return { variantId };
 			} else {
 				return null;
@@ -59,4 +69,13 @@ export class UmbDocumentPublishedPendingChangesManager extends UmbControllerBase
 	getVariantsWithChanges(): Array<UmbPublishedVariantWithPendingChanges> {
 		return this.#variantsWithChanges.getValue();
 	}
+
+	#cleanVariantForComparison = (variant: UmbDocumentVariantModel) => {
+		// The server seems to have some date mismatches when quickly
+		// fetching a document after a save and comparing it to the published version.
+		// This is a temporary workaround to not include these dates in the comparison.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-expect-error
+		delete variant.updateDate;
+	};
 }
