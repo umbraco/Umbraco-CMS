@@ -49,7 +49,9 @@ internal sealed class ServerEventSender :
     INotificationAsyncHandler<RelationTypeDeletedNotification>,
     INotificationAsyncHandler<UserGroupDeletedNotification>,
     INotificationAsyncHandler<UserDeletedNotification>,
-    INotificationAsyncHandler<WebhookDeletedNotification>
+    INotificationAsyncHandler<WebhookDeletedNotification>,
+    INotificationAsyncHandler<ContentMovedToRecycleBinNotification>,
+    INotificationAsyncHandler<MediaMovedToRecycleBinNotification>
 {
     private readonly IServerEventRouter _serverEventRouter;
 
@@ -90,14 +92,28 @@ internal sealed class ServerEventSender :
         }
     }
 
+    private async Task NotifyTrashedAsync<T>(MovedToRecycleBinNotification<T> notification, string source)
+        where T : IEntity
+    {
+        foreach (MoveToRecycleBinEventInfo<T> movedEvent in notification.MoveInfoCollection)
+        {
+            await _serverEventRouter.RouteEventAsync(new ServerEvent
+            {
+                EventType = Constants.ServerEvents.EventType.Trashed,
+                EventSource = source,
+                Key = movedEvent.Entity.Key,
+            });
+        }
+    }
+
     public async Task HandleAsync(ContentSavedNotification notification, CancellationToken cancellationToken) =>
         await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.Document);
 
     public async Task HandleAsync(ContentTypeSavedNotification notification, CancellationToken cancellationToken) =>
         await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.DocumentType);
 
-    public async Task HandleAsync(MediaSavedNotification notification, CancellationToken cancellationToken) =>
-        await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.Media);
+    public async Task HandleAsync(MediaSavedNotification notification, CancellationToken cancellationToken)
+        => await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.Media);
 
     public async Task HandleAsync(MediaTypeSavedNotification notification, CancellationToken cancellationToken) =>
         await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.MediaType);
@@ -215,4 +231,10 @@ internal sealed class ServerEventSender :
 
     public async Task HandleAsync(WebhookDeletedNotification notification, CancellationToken cancellationToken) =>
         await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.Webhook);
+
+    public async Task HandleAsync(ContentMovedToRecycleBinNotification notification, CancellationToken cancellationToken) =>
+        await NotifyTrashedAsync(notification, Constants.ServerEvents.EventSource.Document);
+
+    public async Task HandleAsync(MediaMovedToRecycleBinNotification notification, CancellationToken cancellationToken) =>
+        await NotifyTrashedAsync(notification, Constants.ServerEvents.EventSource.Media);
 }

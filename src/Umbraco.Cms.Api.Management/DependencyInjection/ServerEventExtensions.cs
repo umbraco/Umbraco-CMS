@@ -70,6 +70,9 @@ internal static class ServerEventExtensions
         builder.AddNotificationAsyncHandler<UserDeletedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<WebhookDeletedNotification, ServerEventSender>();
 
+        builder.AddNotificationAsyncHandler<ContentMovedToRecycleBinNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<MediaMovedToRecycleBinNotification, ServerEventSender>();
+
         return builder;
     }
 

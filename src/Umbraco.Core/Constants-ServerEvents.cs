@@ -56,6 +56,8 @@ public static partial class Constants
             public static string Updated = "Updated";
 
             public static string Deleted = "Deleted";
+
+            public static string Trashed = "Trashed";
         }
     }
 }
