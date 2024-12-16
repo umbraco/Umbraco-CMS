@@ -25,7 +25,7 @@ export class UmbClipboardEntryItemLocalStorageDataSource implements UmbItemDataS
 					unique: entry.unique,
 					type: entry.type,
 					name: entry.name,
-					icons: entry.icons,
+					icon: entry.icon,
 					meta: entry.meta,
 				};
 				return item;

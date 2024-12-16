@@ -14,11 +14,11 @@ export interface UmbClipboardEntryItemModel<Type extends string = string, MetaTy
 	/**
 	 * The name of this clipboard entry.
 	 */
-	name: string;
+	name: string | null;
 	/**
-	 * The icons of the copied pieces for this clipboard entry.
+	 * The icon of the clipboard entry.
 	 */
-	icons: Array<string>;
+	icon: string | null;
 	/**
 	 * The aliases of the content-types of these entries.
 	 */

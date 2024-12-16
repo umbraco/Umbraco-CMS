@@ -7,8 +7,8 @@ describe('UmbClipboardEntryDetailLocalStorageDataSource', () => {
 	let dataSource: UmbClipboardEntryDetailLocalStorageDataSource;
 	const clipboardEntry: UmbClipboardEntryDetailModel = {
 		entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
-		value: ['test'],
-		icons: ['icon'],
+		value: 'test',
+		icon: 'icon',
 		meta: {},
 		name: 'Test',
 		type: 'test',

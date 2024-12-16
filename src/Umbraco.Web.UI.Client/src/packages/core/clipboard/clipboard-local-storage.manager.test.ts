@@ -13,7 +13,7 @@ describe('UmbClipboardLocalStorageManager', () => {
 		{
 			entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
 			value: 'test1',
-			icons: ['icon1'],
+			icon: 'icon1',
 			meta: {},
 			name: 'Test1',
 			type: 'test1',
@@ -22,7 +22,7 @@ describe('UmbClipboardLocalStorageManager', () => {
 		{
 			entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
 			value: 'test2',
-			icons: ['icon2'],
+			icon: 'icon2',
 			meta: {},
 			name: 'Test2',
 			type: 'test2',
@@ -31,7 +31,7 @@ describe('UmbClipboardLocalStorageManager', () => {
 		{
 			entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
 			value: 'test3',
-			icons: ['icon3'],
+			icon: 'icon3',
 			meta: {},
 			name: 'Test3',
 			type: 'test3',
@@ -81,7 +81,7 @@ describe('UmbClipboardLocalStorageManager', () => {
 			const newEntry: UmbClipboardEntryDetailModel = {
 				entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
 				value: 'test4',
-				icons: ['icon4'],
+				icon: 'icon4',
 				meta: {},
 				name: 'Test4',
 				type: 'test4',

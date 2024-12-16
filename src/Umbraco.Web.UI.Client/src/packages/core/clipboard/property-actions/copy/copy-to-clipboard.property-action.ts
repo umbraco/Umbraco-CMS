@@ -55,7 +55,7 @@ export class UmbColorPickerCopyToClipboardPropertyAction extends UmbPropertyActi
 		const { data } = await this.#clipboardDetailRepository.createScaffold({
 			type: this.#entryType,
 			name: entryName,
-			icons: ['icon-color'], // TODO: make this value dynamic
+			icon: 'icon-color', // TODO: make this value dynamic
 			meta: {},
 			value: [propertyValue],
 		});
