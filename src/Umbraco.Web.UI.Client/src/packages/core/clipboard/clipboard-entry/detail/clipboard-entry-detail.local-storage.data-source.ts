@@ -38,6 +38,8 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 			name: null,
 			type: '',
 			unique: UmbId.new(),
+			createDate: null,
+			updateDate: null,
 			...preset,
 		};
 

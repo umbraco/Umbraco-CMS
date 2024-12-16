@@ -18,6 +18,8 @@ describe('UmbClipboardLocalStorageManager', () => {
 			name: 'Test1',
 			type: 'test1',
 			unique: '1',
+			createDate: null,
+			updateDate: null,
 		},
 		{
 			entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
@@ -27,6 +29,8 @@ describe('UmbClipboardLocalStorageManager', () => {
 			name: 'Test2',
 			type: 'test2',
 			unique: '2',
+			createDate: null,
+			updateDate: null,
 		},
 		{
 			entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
@@ -36,6 +40,8 @@ describe('UmbClipboardLocalStorageManager', () => {
 			name: 'Test3',
 			type: 'test3',
 			unique: '3',
+			createDate: null,
+			updateDate: null,
 		},
 	];
 
@@ -86,6 +92,8 @@ describe('UmbClipboardLocalStorageManager', () => {
 				name: 'Test4',
 				type: 'test4',
 				unique: '4',
+				createDate: null,
+				updateDate: null,
 			};
 			manager.setEntries([...clipboardEntries, newEntry]);
 			const { entries, total } = manager.getEntries();

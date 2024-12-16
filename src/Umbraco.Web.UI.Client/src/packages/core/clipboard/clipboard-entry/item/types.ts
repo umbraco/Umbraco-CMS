@@ -23,4 +23,14 @@ export interface UmbClipboardEntryItemModel<Type extends string = string, MetaTy
 	 * The aliases of the content-types of these entries.
 	 */
 	meta: MetaType;
+
+	/**
+	 * The date the clipboard entry was created.
+	 */
+	createDate: Date | null;
+
+	/**
+	 * The date the clipboard entry was last updated.
+	 */
+	updateDate: Date | null;
 }

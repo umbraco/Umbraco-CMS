@@ -13,6 +13,8 @@ describe('UmbClipboardEntryDetailLocalStorageDataSource', () => {
 		name: 'Test',
 		type: 'test',
 		unique: '123',
+		createDate: null,
+		updateDate: null,
 	};
 
 	beforeEach(() => {
