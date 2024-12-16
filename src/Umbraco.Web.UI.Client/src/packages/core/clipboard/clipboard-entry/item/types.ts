@@ -27,10 +27,10 @@ export interface UmbClipboardEntryItemModel<Type extends string = string, MetaTy
 	/**
 	 * The date the clipboard entry was created.
 	 */
-	createDate: Date | null;
+	createDate: string | null;
 
 	/**
 	 * The date the clipboard entry was last updated.
 	 */
-	updateDate: Date | null;
+	updateDate: string | null;
 }

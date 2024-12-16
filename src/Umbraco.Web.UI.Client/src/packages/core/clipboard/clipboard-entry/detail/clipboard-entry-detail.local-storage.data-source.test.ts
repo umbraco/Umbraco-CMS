@@ -53,6 +53,13 @@ describe('UmbClipboardEntryDetailLocalStorageDataSource', () => {
 			const response = await dataSource.create();
 			expect(response.error).to.be.an.instanceOf(Error);
 		});
+
+		it('has a createDate of today', async () => {
+			const today = new Date().toISOString().split('T')[0];
+			const response = await dataSource.create(clipboardEntry);
+			expect(response.data?.createDate).to.be.a('string');
+			expect(response.data?.createDate).to.include(today);
+		});
 	});
 
 	describe('Read', () => {
@@ -91,6 +98,15 @@ describe('UmbClipboardEntryDetailLocalStorageDataSource', () => {
 		it('returns an error if entry is not found', async () => {
 			const response = await dataSource.update(clipboardEntry);
 			expect(response.error).to.be.an.instanceOf(Error);
+		});
+
+		it('has an updateDate of today', async () => {
+			await dataSource.create(clipboardEntry);
+			const today = new Date().toISOString().split('T')[0];
+			const updatedEntry = { ...clipboardEntry, data: ['updated'] };
+			const response = await dataSource.update(updatedEntry);
+			expect(response.data?.updateDate).to.be.a('string');
+			expect(response.data?.updateDate).to.include(today);
 		});
 	});
 
