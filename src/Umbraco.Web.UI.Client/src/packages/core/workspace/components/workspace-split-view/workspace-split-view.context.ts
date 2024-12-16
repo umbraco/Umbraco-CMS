@@ -5,6 +5,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
 
 export class UmbWorkspaceSplitViewContext extends UmbContextBase<UmbWorkspaceSplitViewContext> {
 	#workspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;
@@ -12,7 +13,7 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase<UmbWorkspaceSpl
 		return this.#workspaceContext;
 	}
 
-	#variantContext?: UmbPropertyDatasetContext;
+	#datasetContext?: UmbPropertyDatasetContext;
 
 	#index = new UmbNumberState(undefined);
 	index = this.#index.asObservable();
@@ -39,17 +40,15 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase<UmbWorkspaceSpl
 		const index = this.#index.getValue();
 		if (index === undefined) return;
 
-		// TODO: Should splitView be put into its own context?... a split view manager context?   one which might have a reference to the workspace context, so we still can ask that about how to create the variant context.
 		this.observe(
 			this.#workspaceContext.splitView.activeVariantByIndex(index),
 			async (activeVariantInfo) => {
 				if (!activeVariantInfo) return;
 
-				// TODO: Ask workspace context to create the specific variant context.
-
-				this.#variantContext?.destroy();
+				this.#datasetContext?.destroy();
 				const variantId = UmbVariantId.Create(activeVariantInfo);
-				this.#variantContext = this.#workspaceContext?.createPropertyDatasetContext(this, variantId);
+				this.#datasetContext = this.#workspaceContext?.createPropertyDatasetContext(this, variantId);
+				this.getHostElement().setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'workspace-split-view:' + variantId.toString());
 			},
 			'_observeActiveVariant',
 		);

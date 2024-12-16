@@ -625,10 +625,18 @@ export abstract class UmbBlockEntryContext<
 
 	//activate
 	public edit() {
-		window.location.href = this.#generateWorkspaceEditContentPath(this.#workspacePath.value, this.getContentKey());
+		window.history.pushState(
+			{},
+			'',
+			this.#generateWorkspaceEditContentPath(this.#workspacePath.value, this.getContentKey()),
+		);
 	}
 	public editSettings() {
-		window.location.href = this.#generateWorkspaceEditSettingsPath(this.#workspacePath.value, this.getContentKey());
+		window.history.pushState(
+			{},
+			'',
+			this.#generateWorkspaceEditSettingsPath(this.#workspacePath.value, this.getContentKey()),
+		);
 	}
 
 	async requestDelete() {

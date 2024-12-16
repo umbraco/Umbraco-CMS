@@ -1,7 +1,7 @@
 import type { UUIModalElement, UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
 
-export type * from './extensions/index.js';
+export type * from './extensions/types.js';
 
 export interface UmbPickerModalData<ItemType> {
 	multiple?: boolean;
