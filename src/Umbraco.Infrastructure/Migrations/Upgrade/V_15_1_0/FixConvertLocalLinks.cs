@@ -108,6 +108,8 @@ public class FixConvertLocalLinks : MigrationBase
                     propertyEditorAlias);
             }
         }
+
+        RebuildCache = true;
     }
 
     private bool ProcessPropertyTypes(IPropertyType[] propertyTypes, IDictionary<int, ILanguage> languagesById)
