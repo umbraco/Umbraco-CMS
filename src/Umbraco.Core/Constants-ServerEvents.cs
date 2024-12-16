@@ -46,6 +46,8 @@ public static partial class Constants
 
             public const string User = "Umbraco:CMS:User";
 
+            public const string CurrentUser = "Umbraco:CMS:CurrentUser";
+
             public const string Webhook = "Umbraco:CMS:Webhook";
         }
 

@@ -1,6 +1,7 @@
 ﻿using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.ServerEvents;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.ServerEvents;
@@ -55,7 +56,10 @@ internal sealed class ServerEventSender :
 {
     private readonly IServerEventRouter _serverEventRouter;
 
-    public ServerEventSender(IServerEventRouter serverEventRouter) => _serverEventRouter = serverEventRouter;
+    public ServerEventSender(IServerEventRouter serverEventRouter)
+    {
+        _serverEventRouter = serverEventRouter;
+    }
 
     private async Task NotifySavedAsync<T>(SavedNotification<T> notification, string source)
         where T : IEntity
@@ -163,8 +167,24 @@ internal sealed class ServerEventSender :
     public async Task HandleAsync(UserGroupSavedNotification notification, CancellationToken cancellationToken) =>
         await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.UserGroup);
 
-    public async Task HandleAsync(UserSavedNotification notification, CancellationToken cancellationToken) =>
+    public async Task HandleAsync(UserSavedNotification notification, CancellationToken cancellationToken)
+    {
+        // We still need to notify of saved entities like any other event source.
         await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.User);
+
+        // But for users we also want to notify each updated user that they have been updated separately.
+        foreach (IUser user in notification.SavedEntities)
+        {
+            var eventModel = new ServerEvent
+            {
+                EventType = Constants.ServerEvents.EventType.Updated,
+                Key = user.Key,
+                EventSource = Constants.ServerEvents.EventSource.CurrentUser,
+            };
+
+            await _serverEventRouter.NotifyUserAsync(eventModel, user.Key);
+        }
+    }
 
     public async Task HandleAsync(WebhookSavedNotification notification, CancellationToken cancellationToken) =>
         await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.Webhook);

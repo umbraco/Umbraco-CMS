@@ -13,4 +13,13 @@ public interface IServerEventRouter
     /// <param name="serverEvent">The server event to route.</param>
     /// <returns></returns>
     Task RouteEventAsync(ServerEvent serverEvent);
+
+    /// <summary>
+    /// Notify a specific user about a server event.
+    /// <remarks>Does not consider authorization.</remarks>
+    /// </summary>
+    /// <param name="serverEvent">The server event to send to the user.</param>
+    /// <param name="userKey">Key of the user.</param>
+    /// <returns></returns>
+    Task NotifyUserAsync(ServerEvent serverEvent, Guid userKey);
 }
