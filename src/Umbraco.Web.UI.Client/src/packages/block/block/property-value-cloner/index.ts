@@ -1,2 +1,2 @@
-export * from './block-value-cloner.api.js';
-export * from './standard-block-value-cloner.api.js';
+export * from './block-property-value-cloner.api.js';
+export * from './flat-layout-block-property-value-cloner.api.js';
