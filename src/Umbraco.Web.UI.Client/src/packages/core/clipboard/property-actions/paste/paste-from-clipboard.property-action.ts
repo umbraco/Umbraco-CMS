@@ -6,11 +6,11 @@ import { UmbPropertyActionBase, type UmbPropertyActionArgs } from '@umbraco-cms/
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbColorPickerPasteFromClipboardPropertyAction extends UmbPropertyActionBase<MetaPropertyActionPasteFromClipboardKind> {
+	#detailRepository = new UmbClipboardEntryDetailRepository(this);
+	#init: Promise<unknown>;
+	#entryType: string;
 	#propertyContext?: typeof UMB_PROPERTY_CONTEXT.TYPE;
 	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
-	#clipboardEntryDetailRepository = new UmbClipboardEntryDetailRepository(this);
-	#init?: Promise<unknown>;
-	#entryType?: string;
 
 	constructor(host: UmbControllerHost, args: UmbPropertyActionArgs<MetaPropertyActionPasteFromClipboardKind>) {
 		super(host, args);
@@ -18,6 +18,8 @@ export class UmbColorPickerPasteFromClipboardPropertyAction extends UmbPropertyA
 		if (!args.meta?.entry?.type) {
 			throw new Error('The "entry.type" meta property is required');
 		}
+
+		this.#entryType = args.meta.entry.type;
 
 		this.#init = Promise.all([
 			this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
@@ -33,22 +35,26 @@ export class UmbColorPickerPasteFromClipboardPropertyAction extends UmbPropertyA
 	override async execute() {
 		await this.#init;
 
-		try {
-			const modalContext = this.#modalManagerContext?.open(this, UMB_CLIPBOARD_ENTRY_PICKER_MODAL);
-			const value = await modalContext?.onSubmit();
-			const clipboardEntryUnique = value?.selection?.[0];
-			console.log(this.#entryType);
-			if (clipboardEntryUnique) {
-				const { data: clipboardEntry, error } =
-					await this.#clipboardEntryDetailRepository.requestByUnique(clipboardEntryUnique);
+		const modalContext = this.#modalManagerContext?.open(this, UMB_CLIPBOARD_ENTRY_PICKER_MODAL, {
+			data: {
+				entry: {
+					type: this.#entryType,
+				},
+			},
+		});
 
-				const clipboardEntryData = clipboardEntry?.data[0];
+		const value = await modalContext?.onSubmit();
+		const clipboardEntryUnique = value?.selection?.[0];
 
-				if (clipboardEntryData) {
-					this.#propertyContext?.setValue(clipboardEntryData);
-				}
+		if (clipboardEntryUnique) {
+			const { data: entry } = await this.#detailRepository.requestByUnique(clipboardEntryUnique);
+
+			const entryValue = entry?.data[0];
+
+			if (entryValue) {
+				this.#propertyContext?.setValue(entryValue);
 			}
-		} catch (error) {}
+		}
 	}
 }
 export { UmbColorPickerPasteFromClipboardPropertyAction as api };

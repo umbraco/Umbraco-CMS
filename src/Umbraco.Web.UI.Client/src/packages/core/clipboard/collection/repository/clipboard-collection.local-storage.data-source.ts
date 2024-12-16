@@ -9,7 +9,7 @@ export class UmbClipboardCollectionLocalStorageDataSource
 	#localStorageManager = new UmbClipboardLocalStorageManager();
 
 	async getCollection(filter: UmbClipboardCollectionFilterModel) {
-		const { entries, total } = this.#localStorageManager.getEntries();
+		const { entries, total } = this.#localStorageManager.filter(filter);
 		return { data: { items: entries, total } };
 	}
 }

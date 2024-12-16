@@ -2,6 +2,14 @@ import type { UmbClipboardEntryDetailModel } from './clipboard-entry/index.js';
 
 const UMB_CLIPBOARD_LOCALSTORAGE_KEY = 'umb:clipboard';
 
+interface UmbClipboardLocalStorageFilterModel {
+	entry?: {
+		type?: string;
+	};
+	skip?: number;
+	take?: number;
+}
+
 // keep internal
 export class UmbClipboardLocalStorageManager {
 	// Gets all entries from local storage
@@ -28,5 +36,25 @@ export class UmbClipboardLocalStorageManager {
 	// Sets all entries in local storage
 	setEntries(entries: Array<UmbClipboardEntryDetailModel>) {
 		localStorage.setItem(UMB_CLIPBOARD_LOCALSTORAGE_KEY, JSON.stringify(entries));
+	}
+
+	// gets a filtered list of entries
+	filter(filter: UmbClipboardLocalStorageFilterModel) {
+		const { entries } = this.getEntries();
+		const filteredEntries = this.#filterEntries(entries, filter);
+		const total = filteredEntries.length;
+		const skip = filter.skip || 0;
+		const take = filter.take || total;
+		const pagedEntries = filteredEntries.slice(skip, skip + take);
+		return { entries: pagedEntries, total };
+	}
+
+	#filterEntries(entries: Array<UmbClipboardEntryDetailModel>, filter: UmbClipboardLocalStorageFilterModel) {
+		return entries.filter((entry) => {
+			if (filter.entry?.type && entry.type !== filter.entry.type) {
+				return false;
+			}
+			return true;
+		});
 	}
 }

@@ -31,7 +31,9 @@ export class UmbClipboardEntryPickerModalElement extends UmbModalBaseElement<
 	}
 
 	override async firstUpdated() {
-		const { data } = await this.#collectionRepository.requestCollection({});
+		const entryType = this.data?.entry?.type;
+
+		const { data } = await this.#collectionRepository.requestCollection({ entry: { type: entryType } });
 		this._items = data?.items ?? [];
 	}
 
