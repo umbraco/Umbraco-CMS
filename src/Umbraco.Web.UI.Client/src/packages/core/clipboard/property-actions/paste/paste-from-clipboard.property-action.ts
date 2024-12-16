@@ -49,7 +49,7 @@ export class UmbColorPickerPasteFromClipboardPropertyAction extends UmbPropertyA
 		if (clipboardEntryUnique) {
 			const { data: entry } = await this.#detailRepository.requestByUnique(clipboardEntryUnique);
 
-			const entryValue = entry?.data[0];
+			const entryValue = entry?.value;
 
 			if (entryValue) {
 				this.#propertyContext?.setValue(entryValue);

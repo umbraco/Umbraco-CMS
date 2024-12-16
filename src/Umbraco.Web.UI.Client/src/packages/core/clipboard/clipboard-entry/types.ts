@@ -4,7 +4,7 @@ import type { UmbClipboardEntryEntityType } from './entity.js';
  * A Clipboard entry is a composed set of data representing one entry in the clipboard.
  * The entry has enough knowledge for the context of the clipboard to filter away unsupported entries.
  */
-export interface UmbClipboardEntryDetailModel<Type extends string = string, MetaType = object, DataType = unknown> {
+export interface UmbClipboardEntryDetailModel<Type extends string = string, MetaType = object, ValueType = unknown> {
 	entityType: UmbClipboardEntryEntityType;
 	/**
 	 * The type of clipboard entry, this determines the data type of the entry. Making the entry as general as possible.
@@ -28,9 +28,9 @@ export interface UmbClipboardEntryDetailModel<Type extends string = string, Meta
 	 */
 	meta: MetaType;
 	/**
-	 * The data of the copied pieces for this clipboard entry.
+	 * The value of the clipboard entry.
 	 */
-	data: Array<DataType>;
+	value: ValueType;
 }
 
 /**

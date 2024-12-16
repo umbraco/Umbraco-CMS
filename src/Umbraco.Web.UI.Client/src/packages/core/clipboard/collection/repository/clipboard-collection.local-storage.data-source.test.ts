@@ -26,7 +26,7 @@ describe('UmbClipboardLocalStorageDataSource', () => {
 	const clipboardEntries: Array<UmbClipboardEntryDetailModel> = [
 		{
 			entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
-			data: ['test1'],
+			value: ['test1'],
 			icons: ['icon1'],
 			meta: {},
 			name: 'Test1',
@@ -35,7 +35,7 @@ describe('UmbClipboardLocalStorageDataSource', () => {
 		},
 		{
 			entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
-			data: ['test2'],
+			value: ['test2'],
 			icons: ['icon2'],
 			meta: {},
 			name: 'Test2',
@@ -44,7 +44,7 @@ describe('UmbClipboardLocalStorageDataSource', () => {
 		},
 		{
 			entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
-			data: ['test3'],
+			value: ['test3'],
 			icons: ['icon3'],
 			meta: {},
 			name: 'Test3',

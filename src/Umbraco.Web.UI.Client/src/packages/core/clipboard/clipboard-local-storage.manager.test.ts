@@ -1,17 +1,18 @@
 import { expect } from '@open-wc/testing';
-import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbClipboardLocalStorageManager } from './clipboard-local-storage.manager.js';
 import { UMB_CLIPBOARD_ENTRY_ENTITY_TYPE } from './clipboard-entry/entity.js';
 import type { UmbClipboardEntryDetailModel } from './clipboard-entry/index.js';
 
+type UmbTestClipboardEntryType = 'test1' | 'test2' | 'test3' | 'test4';
+interface UmbTestClipboardEntryDetailModel
+	extends UmbClipboardEntryDetailModel<UmbTestClipboardEntryType, object, string> {}
+
 describe('UmbClipboardLocalStorageManager', () => {
 	let manager: UmbClipboardLocalStorageManager;
-	const clipboardEntries: Array<UmbClipboardEntryDetailModel> = [
+	const clipboardEntries: Array<UmbTestClipboardEntryDetailModel> = [
 		{
 			entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
-			data: ['test1'],
+			value: 'test1',
 			icons: ['icon1'],
 			meta: {},
 			name: 'Test1',
@@ -20,7 +21,7 @@ describe('UmbClipboardLocalStorageManager', () => {
 		},
 		{
 			entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
-			data: ['test2'],
+			value: 'test2',
 			icons: ['icon2'],
 			meta: {},
 			name: 'Test2',
@@ -29,7 +30,7 @@ describe('UmbClipboardLocalStorageManager', () => {
 		},
 		{
 			entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
-			data: ['test3'],
+			value: 'test3',
 			icons: ['icon3'],
 			meta: {},
 			name: 'Test3',
@@ -79,7 +80,7 @@ describe('UmbClipboardLocalStorageManager', () => {
 		it('sets entries in local storage', () => {
 			const newEntry: UmbClipboardEntryDetailModel = {
 				entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
-				data: ['test4'],
+				value: 'test4',
 				icons: ['icon4'],
 				meta: {},
 				name: 'Test4',
