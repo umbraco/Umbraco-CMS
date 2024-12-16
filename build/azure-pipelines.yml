@@ -622,8 +622,8 @@ stages:
             displayName: Publish test artifacts
             condition: succeededOrFailed()
             inputs:
-              targetPath: $(Build.ArtifactStagingDirectory)
-              artifact: "Acceptance Tests - $(Agent.OS) - Attempt #$(System.JobAttempt)"
+              targetPath: "$(Build.ArtifactStagingDirectory)/Acceptance Tests"
+              artifact: "$(Agent.OS) - Attempt #$(System.JobAttempt)"
 
       - job:
         displayName: E2E Tests (SQL Server)
@@ -776,7 +776,7 @@ stages:
             displayName: Stop SQL Server LocalDB (Windows)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
 
-          # Copy artifacts
+           # Copy artifacts
           - pwsh: |
               if (Test-Path tests/Umbraco.Tests.AcceptanceTest/results/*) {
                 Copy-Item tests/Umbraco.Tests.AcceptanceTest/results $(Build.ArtifactStagingDirectory) -Recurse
@@ -791,7 +791,6 @@ stages:
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
               artifact: "Acceptance Tests - $(Agent.OS) - Attempt #$(System.JobAttempt)"
-
   ###############################################
   ## Release
   ###############################################
