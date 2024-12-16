@@ -37,7 +37,9 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 
 		switch (type) {
 			case CodeSnippetType.partialView: {
-				this.value = getInsertPartialSnippet(value);
+				const regex = /^%2F|%25dot%25cshtml$/g;
+				const prettyPath = value.replace(regex, '').replace(/%2F/g, '/');
+				this.value = getInsertPartialSnippet(prettyPath);
 				this.#dispatchInsertEvent();
 				break;
 			}

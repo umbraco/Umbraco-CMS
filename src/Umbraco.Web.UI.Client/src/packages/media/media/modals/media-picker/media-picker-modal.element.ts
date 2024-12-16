@@ -1,9 +1,9 @@
-import { UmbMediaItemRepository, type UmbMediaItemModel } from '../../repository/index.js';
+import { UmbMediaItemRepository } from '../../repository/index.js';
 import { UmbMediaTreeRepository } from '../../tree/media-tree.repository.js';
 import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDropzoneElement } from '../../dropzone/dropzone.element.js';
-import type { UmbMediaTreeItemModel } from '../../tree/index.js';
-import { UmbMediaSearchProvider, type UmbMediaSearchItemModel } from '../../search/index.js';
+import type { UmbMediaTreeItemModel, UmbMediaSearchItemModel, UmbMediaItemModel } from '../../types.js';
+import { UmbMediaSearchProvider } from '../../search/index.js';
 import type { UmbMediaPathModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
@@ -323,6 +323,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 			<uui-card-media
 				class=${ifDefined(disabled ? 'not-allowed' : undefined)}
 				.name=${item.name}
+				data-mark="${item.entityType}:${item.unique}"
 				@open=${() => this.#onOpen(item)}
 				@selected=${() => this.#onSelected(item)}
 				@deselected=${() => this.#onDeselected(item)}

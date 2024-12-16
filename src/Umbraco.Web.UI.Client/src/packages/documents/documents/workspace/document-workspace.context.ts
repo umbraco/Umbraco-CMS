@@ -1,25 +1,23 @@
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
-import { UmbDocumentPropertyDatasetContext } from '../property-dataset-context/document-property-dataset-context.js';
-import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
+import { UmbDocumentPropertyDatasetContext } from '../property-dataset-context/document-property-dataset.context.js';
 import type { UmbDocumentDetailRepository } from '../repository/index.js';
 import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import type { UmbDocumentVariantPublishModel, UmbDocumentDetailModel, UmbDocumentVariantModel } from '../types.js';
 import {
+	UMB_DOCUMENT_COLLECTION_ALIAS,
+	UMB_DOCUMENT_ENTITY_TYPE,
 	UMB_DOCUMENT_PUBLISH_MODAL,
 	UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL,
 	UMB_DOCUMENT_SAVE_MODAL,
 	UMB_DOCUMENT_SCHEDULE_MODAL,
-} from '../modals/index.js';
-import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
-import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
-import { UmbDocumentValidationRepository } from '../repository/validation/document-validation.repository.js';
-import {
 	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
 	UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
-} from '../paths.js';
+} from '../constants.js';
+import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
+import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
+import { UmbDocumentValidationRepository } from '../repository/validation/document-validation.repository.js';
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
-import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../collection/index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -35,7 +33,6 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UmbServerModelValidatorContext } from '@umbraco-cms/backoffice/validation';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import {
@@ -64,9 +61,6 @@ export class UmbDocumentWorkspaceContext
 {
 	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);
 
-	#serverValidation = new UmbServerModelValidatorContext(this);
-	#validationRepository?: UmbDocumentValidationRepository;
-
 	readonly isTrashed = this._data.createObservablePartOfCurrent((data) => data?.isTrashed);
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.documentType.unique);
 	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent(
@@ -83,6 +77,8 @@ export class UmbDocumentWorkspaceContext
 			workspaceAlias: UMB_DOCUMENT_WORKSPACE_ALIAS,
 			detailRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbDocumentTypeDetailRepository,
+			contentValidationRepository: UmbDocumentValidationRepository,
+			skipValidationOnSubmit: true,
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
 			saveModalToken: UMB_DOCUMENT_SAVE_MODAL,
 		});
@@ -208,19 +204,6 @@ export class UmbDocumentWorkspaceContext
 		this._data.updateCurrent({ template: { unique: templateUnique } });
 	}
 
-	/**
-	 * Request a submit of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be submitted.
-	 * @returns {Promise<void>} a promise which resolves once it has been completed.
-	 */
-	public override requestSubmit() {
-		return this._handleSubmit();
-	}
-
-	// Because we do not make validation prevent submission this also submits the workspace. [NL]
-	public override invalidSubmit() {
-		return this._handleSubmit();
-	}
-
 	async #handleSaveAndPreview() {
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
@@ -289,23 +272,7 @@ export class UmbDocumentWorkspaceContext
 		const saveData = await this._data.constructData(variantIds);
 		await this._runMandatoryValidationForSaveData(saveData);
 
-		// Create the validation repository if it does not exist. (we first create this here when we need it) [NL]
-		this.#validationRepository ??= new UmbDocumentValidationRepository(this);
-
-		// We ask the server first to get a concatenated set of validation messages. So we see both front-end and back-end validation messages [NL]
-		if (this.getIsNew()) {
-			const parent = this.getParent();
-			if (!parent) throw new Error('Parent is not set');
-			this.#serverValidation.askServerForValidation(
-				saveData,
-				this.#validationRepository.validateCreate(saveData, parent.unique),
-			);
-		} else {
-			this.#serverValidation.askServerForValidation(
-				saveData,
-				this.#validationRepository.validateSave(saveData, variantIds),
-			);
-		}
+		await this._askServerToValidate(saveData, variantIds);
 
 		// TODO: Only validate the specified selection.. [NL]
 		return this.validateAndSubmit(

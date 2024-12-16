@@ -1,7 +1,7 @@
 import { UmbEntityActionBase } from '../../entity-action-base.js';
 import type { UmbEntityActionArgs } from '../../types.js';
 import type { MetaEntityActionCreateKind } from './types.js';
-import { UMB_ENTITY_CREATE_OPTION_ACTION_LIST_MODAL } from './modal/index.js';
+import { UMB_ENTITY_CREATE_OPTION_ACTION_LIST_MODAL } from './modal/constants.js';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';

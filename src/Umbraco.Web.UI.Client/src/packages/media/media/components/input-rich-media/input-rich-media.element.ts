@@ -1,7 +1,6 @@
 import { UmbMediaItemRepository } from '../../repository/index.js';
 import { UMB_IMAGE_CROPPER_EDITOR_MODAL, UMB_MEDIA_PICKER_MODAL } from '../../modals/index.js';
-import type { UmbCropModel, UmbMediaPickerPropertyValue } from '../../types.js';
-import type { UmbMediaItemModel } from '../../repository/index.js';
+import type { UmbMediaItemModel, UmbCropModel, UmbMediaPickerPropertyValue } from '../../types.js';
 import type { UmbUploadableItem } from '../../dropzone/types.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbConfirmModal, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';

@@ -653,6 +653,8 @@ export default {
 			'The process is taking longer than expected, check the Umbraco log to see if there have been any errors during this operation',
 		indexCannotRebuild: 'This index cannot be rebuilt because it has no assigned',
 		iIndexPopulator: 'IIndexPopulator',
+		corruptStatus: 'Possible corrupt index detected',
+		corruptErrorDescription: 'Error received when evaluating the index:'
 	},
 	placeholders: {
 		username: 'Enter your username',

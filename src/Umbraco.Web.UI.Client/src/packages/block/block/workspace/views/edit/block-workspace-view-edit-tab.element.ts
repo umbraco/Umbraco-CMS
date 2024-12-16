@@ -80,7 +80,7 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 			${this._hasProperties
 				? html` <umb-block-workspace-view-edit-properties
 						.managerName=${this.#managerName}
-						class="properties"
+						data-mark="property-group:root"
 						.containerId=${this._containerId}></umb-block-workspace-view-edit-properties>`
 				: ''}
 			${this.hideSingleGroup && this._groups.length === 1
@@ -97,7 +97,7 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 		return html`
 			<umb-block-workspace-view-edit-properties
 				.managerName=${this.#managerName}
-				class="properties"
+				data-mark="property-group:${group.name}"
 				.containerId=${group.id}></umb-block-workspace-view-edit-properties>
 		`;
 	}

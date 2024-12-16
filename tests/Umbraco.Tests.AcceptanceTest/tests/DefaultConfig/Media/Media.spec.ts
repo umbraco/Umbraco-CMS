@@ -116,6 +116,7 @@ test('can trash a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
+  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
   await umbracoUi.media.isTreeItemVisible(folderName, false);
   expect(await umbracoApi.media.doesNameExist(folderName)).toBeFalsy();
 });
@@ -154,11 +155,11 @@ test('can search for a media file', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
   // Act
-  await umbracoUi.media.searchForMediaItemByName(mediaFileName);
+  await umbracoUi.media.searchForMediaItemByName(secondMediaFile);
 
   // Assert
   await umbracoUi.media.doesMediaCardsContainAmount(1);
-  await umbracoUi.media.doesMediaCardContainText(mediaFileName);
+  await umbracoUi.media.doesMediaCardContainText(secondMediaFile);
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(secondMediaFile);
