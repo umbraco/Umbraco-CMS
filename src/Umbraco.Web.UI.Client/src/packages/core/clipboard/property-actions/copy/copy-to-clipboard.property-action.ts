@@ -10,11 +10,18 @@ export class UmbColorPickerCopyToClipboardPropertyAction extends UmbPropertyActi
 	#propertyContext?: typeof UMB_PROPERTY_CONTEXT.TYPE;
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	#init?: Promise<unknown>;
+	#entryType?: string;
 
 	#clipboardDetailRepository = new UmbClipboardEntryDetailRepository(this);
 
-	constructor(host: UmbControllerHost, args: UmbPropertyActionArgs<never>) {
+	constructor(host: UmbControllerHost, args: UmbPropertyActionArgs<MetaPropertyActionCopyToClipboardKind>) {
 		super(host, args);
+
+		if (!args.meta?.entry?.type) {
+			throw new Error('The "entry.type" meta property is required');
+		}
+
+		this.#entryType = args.meta.entry.type;
 
 		this.#init = Promise.all([
 			this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
@@ -36,7 +43,7 @@ export class UmbColorPickerCopyToClipboardPropertyAction extends UmbPropertyActi
 		const workspaceName = this.#propertyDatasetContext?.getName() || 'Unnamed workspace';
 		const propertyLabel = this.#propertyContext?.getLabel() || 'Unnamed property';
 		const propertyValue = this.#propertyContext?.getValue();
-		const clipboardEntryName = workspaceName ? `${workspaceName} - ${propertyLabel}` : propertyLabel;
+		const entryName = workspaceName ? `${workspaceName} - ${propertyLabel}` : propertyLabel;
 
 		if (!propertyValue) {
 			// TODO: Add correct message + localization
@@ -46,8 +53,8 @@ export class UmbColorPickerCopyToClipboardPropertyAction extends UmbPropertyActi
 
 		// TODO: Add correct meta data
 		const { data } = await this.#clipboardDetailRepository.createScaffold({
-			type: 'color', // TODO: make this value dynamic
-			name: clipboardEntryName,
+			type: this.#entryType,
+			name: entryName,
 			icons: ['icon-color'], // TODO: make this value dynamic
 			meta: {},
 			data: [propertyValue],

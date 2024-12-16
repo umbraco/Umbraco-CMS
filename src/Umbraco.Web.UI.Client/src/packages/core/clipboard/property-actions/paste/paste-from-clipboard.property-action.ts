@@ -10,9 +10,14 @@ export class UmbColorPickerPasteFromClipboardPropertyAction extends UmbPropertyA
 	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 	#clipboardEntryDetailRepository = new UmbClipboardEntryDetailRepository(this);
 	#init?: Promise<unknown>;
+	#entryType?: string;
 
-	constructor(host: UmbControllerHost, args: UmbPropertyActionArgs<never>) {
+	constructor(host: UmbControllerHost, args: UmbPropertyActionArgs<MetaPropertyActionPasteFromClipboardKind>) {
 		super(host, args);
+
+		if (!args.meta?.entry?.type) {
+			throw new Error('The "entry.type" meta property is required');
+		}
 
 		this.#init = Promise.all([
 			this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
@@ -32,6 +37,7 @@ export class UmbColorPickerPasteFromClipboardPropertyAction extends UmbPropertyA
 			const modalContext = this.#modalManagerContext?.open(this, UMB_CLIPBOARD_ENTRY_PICKER_MODAL);
 			const value = await modalContext?.onSubmit();
 			const clipboardEntryUnique = value?.selection?.[0];
+			console.log(this.#entryType);
 			if (clipboardEntryUnique) {
 				const { data: clipboardEntry, error } =
 					await this.#clipboardEntryDetailRepository.requestByUnique(clipboardEntryUnique);
