@@ -7,6 +7,10 @@ import type {
 	UmbDataSourceResponse,
 	UmbDetailDataSource,
 } from '@umbraco-cms/backoffice/repository';
+import { ApiError } from '@umbraco-cms/backoffice/external/backend-api';
+
+// TODO: these are temp solutions to comply to the ApiError interface
+const localstorageFakeUrl = 'localstorage';
 
 /**
  * Manage clipboard entries in local storage
@@ -47,11 +51,45 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
 	async create(model: UmbClipboardEntryDetailModel): Promise<UmbDataSourceResponse<UmbClipboardEntryDetailModel>> {
-		if (!model) return { error: new Error('Clipboard entry is missing') };
+		if (!model) {
+			return {
+				error: new ApiError(
+					{
+						method: 'POST',
+						url: localstorageFakeUrl,
+					},
+					{
+						ok: false,
+						status: 400,
+						statusText: 'Bad Request',
+						url: localstorageFakeUrl,
+						body: {},
+					},
+					'Clipboard entry is missing',
+				),
+			};
+		}
 
 		// check if entry already exists
 		const { entries, entry } = this.#localStorageManager.getEntry(model.unique);
-		if (entry) return { error: new Error('Clipboard entry already exists') };
+		if (entry) {
+			return {
+				error: new ApiError(
+					{
+						method: 'POST',
+						url: localstorageFakeUrl,
+					},
+					{
+						ok: false,
+						status: 400,
+						statusText: 'Bad Request',
+						url: localstorageFakeUrl,
+						body: {},
+					},
+					'Clipboard entry already exists',
+				),
+			};
+		}
 
 		const updatedEntries = [...entries, model];
 
@@ -67,11 +105,45 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
 	async read(unique: string): Promise<UmbDataSourceResponse<UmbClipboardEntryDetailModel>> {
-		if (!unique) return { error: new Error('Unique is missing') };
+		if (!unique) {
+			return {
+				error: new ApiError(
+					{
+						method: 'GET',
+						url: localstorageFakeUrl,
+					},
+					{
+						ok: false,
+						status: 400,
+						statusText: 'Bad Request',
+						url: localstorageFakeUrl,
+						body: {},
+					},
+					'Unique is missing',
+				),
+			};
+		}
 
 		// check if entry exists
 		const { entry } = this.#localStorageManager.getEntry(unique);
-		if (!entry) return { error: new Error('Clipboard entry not found') };
+		if (!entry) {
+			return {
+				error: new ApiError(
+					{
+						method: 'GET',
+						url: localstorageFakeUrl,
+					},
+					{
+						ok: false,
+						status: 404,
+						statusText: 'Not Found',
+						url: localstorageFakeUrl,
+						body: {},
+					},
+					'Entry not found',
+				),
+			};
+		}
 
 		return { data: entry };
 	}
@@ -83,11 +155,45 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
 	async update(model: UmbClipboardEntryDetailModel): Promise<UmbDataSourceResponse<UmbClipboardEntryDetailModel>> {
-		if (!model) return { error: new Error('Clipboard entry is missing') };
+		if (!model) {
+			return {
+				error: new ApiError(
+					{
+						method: 'PUT',
+						url: localstorageFakeUrl,
+					},
+					{
+						ok: false,
+						status: 400,
+						statusText: 'Bad Request',
+						url: localstorageFakeUrl,
+						body: {},
+					},
+					'Clipboard entry is missing',
+				),
+			};
+		}
 
 		// check if entry exists so it can be updated
 		const { entry, entries } = this.#localStorageManager.getEntry(model.unique);
-		if (!entry) return { error: new Error('Clipboard entry not found') };
+		if (!entry) {
+			return {
+				error: new ApiError(
+					{
+						method: 'GET',
+						url: localstorageFakeUrl,
+					},
+					{
+						ok: false,
+						status: 404,
+						statusText: 'Not Found',
+						url: localstorageFakeUrl,
+						body: {},
+					},
+					'Entry not found',
+				),
+			};
+		}
 
 		const updatedEntries = entries.map((storedEntry) => (storedEntry.unique === model.unique ? model : storedEntry));
 
@@ -102,11 +208,45 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
 	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
-		if (!unique) return { error: new Error('Unique is missing') };
+		if (!unique) {
+			return {
+				error: new ApiError(
+					{
+						method: 'DELETE',
+						url: localstorageFakeUrl,
+					},
+					{
+						ok: false,
+						status: 400,
+						statusText: 'Bad Request',
+						url: localstorageFakeUrl,
+						body: {},
+					},
+					'Unique is missing',
+				),
+			};
+		}
 
 		// check if entry exist so it can be deleted
 		const { entry, entries } = this.#localStorageManager.getEntry(unique);
-		if (!entry) return { error: new Error('Clipboard entry not found') };
+		if (!entry) {
+			return {
+				error: new ApiError(
+					{
+						method: 'GET',
+						url: localstorageFakeUrl,
+					},
+					{
+						ok: false,
+						status: 404,
+						statusText: 'Not Found',
+						url: localstorageFakeUrl,
+						body: {},
+					},
+					'Entry not found',
+				),
+			};
+		}
 
 		const updatedEntriesArray = entries.filter((x) => x.unique !== unique);
 
