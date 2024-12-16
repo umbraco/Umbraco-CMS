@@ -22,4 +22,11 @@ public interface IServerEventRouter
     /// <param name="userKey">Key of the user.</param>
     /// <returns></returns>
     Task NotifyUserAsync(ServerEvent serverEvent, Guid userKey);
+
+    /// <summary>
+    /// Broadcast a server event to all users, regardless of authorization.
+    /// </summary>
+    /// <param name="serverEvent">The event to broadcast.</param>
+    /// <returns></returns>
+    Task BroadcastEventAsync(ServerEvent serverEvent);
 }

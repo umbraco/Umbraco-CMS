@@ -34,4 +34,8 @@ internal sealed class ServerEventRouter : IServerEventRouter
 
         await _eventHub.Clients.Clients(userConnections).notify(serverEvent);
     }
+
+
+    /// <inheritdoc/>
+    public async Task BroadcastEventAsync(ServerEvent serverEvent) => await _eventHub.Clients.All.notify(serverEvent);
 }
