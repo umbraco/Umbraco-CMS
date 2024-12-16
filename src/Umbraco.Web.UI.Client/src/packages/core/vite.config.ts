@@ -14,6 +14,7 @@ export default defineConfig({
 			'action/index': './action/index.ts',
 			'audit-log/index': './audit-log/index.ts',
 			'auth/index': './auth/index.ts',
+			'clipboard/index': './clipboard/index.ts',
 			'collection/index': './collection/index.ts',
 			'components/index': './components/index.ts',
 			'const/index': './const/index.ts',
