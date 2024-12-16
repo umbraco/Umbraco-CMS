@@ -65,7 +65,7 @@ export class UmbClipboardEntryPickerModalElement extends UmbModalBaseElement<
 									@selected=${() => this.#selectionManager.select(item.unique)}
 									@deselected=${() => this.#selectionManager.deselect(item.unique)}
 									?selected=${this.value.selection.includes(item.unique)}>
-									<uui-icon slot="icon" name="icon-globe"></uui-icon>
+									<uui-icon slot="icon" name="icon-clipboard-entry"></uui-icon>
 									<umb-entity-actions-bundle
 										slot="actions"
 										.entityType=${item.entityType}

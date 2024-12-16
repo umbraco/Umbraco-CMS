@@ -12,9 +12,9 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			type: 'propertyAction',
 			kind: 'pasteFromClipboard',
 			api: () => import('./paste-from-clipboard.property-action.js'),
-			weight: 1200,
+			weight: 1190,
 			meta: {
-				icon: 'icon-paste-in',
+				icon: 'icon-clipboard-paste',
 				label: 'Paste',
 			},
 		},

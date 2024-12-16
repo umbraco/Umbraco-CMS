@@ -14,7 +14,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			api: () => import('./copy-to-clipboard.property-action.js'),
 			weight: 1200,
 			meta: {
-				icon: 'icon-paste-in',
+				icon: 'icon-clipboard-copy',
 				label: 'Copy',
 			},
 		},

@@ -380,6 +380,18 @@
 			"legacy": true
 		},
 		{
+			"name": "icon-clipboard-copy",
+			"file": "clipboard-copy.svg"
+		},
+		{
+			"name": "icon-clipboard-entry",
+			"file": "clipboard.svg"
+		},
+		{
+			"name": "icon-clipboard-paste",
+			"file": "clipboard-paste.svg"
+		},
+		{
 			"name": "icon-cloud-drive",
 			"file": "hard-drive.svg"
 		},
