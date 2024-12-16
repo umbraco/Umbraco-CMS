@@ -1,4 +1,3 @@
-import { UMB_CLIPBOARD_CONTEXT } from '../../context/index.js';
 import { UmbClipboardEntryDetailRepository } from '../../clipboard-entry/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
