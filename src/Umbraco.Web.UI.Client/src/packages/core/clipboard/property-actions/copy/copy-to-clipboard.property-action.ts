@@ -40,6 +40,7 @@ export class UmbColorPickerCopyToClipboardPropertyAction extends UmbPropertyActi
 		if (!propertyValue) {
 			// TODO: Add correct message + localization
 			this.#notificationContext!.peek('danger', { data: { message: 'The property does not have a value to copy' } });
+			return;
 		}
 
 		// TODO: Add correct meta data
