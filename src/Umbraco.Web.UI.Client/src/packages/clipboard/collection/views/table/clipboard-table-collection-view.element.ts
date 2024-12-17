@@ -44,7 +44,7 @@ export class UmbClipboardTableCollectionViewElement extends UmbLitElement {
 		this._tableItems = items.map((item) => {
 			return {
 				id: item.unique,
-				icon: 'icon-globe',
+				icon: item.icon ?? 'icon-clipboard-entry',
 				data: [
 					{
 						columnAlias: 'name',
