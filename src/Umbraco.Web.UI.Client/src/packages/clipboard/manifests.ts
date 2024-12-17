@@ -1,4 +1,4 @@
-import type { UmbExtensionManifestKind } from '../extension-registry/registry.js';
+import type { UmbExtensionManifestKind } from '../core/extension-registry/registry.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as entryManifests } from './clipboard-entry/manifests.js';
 import { manifests as propertyActionManifests } from './property-actions/manifests.js';

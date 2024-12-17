@@ -15,8 +15,6 @@ import type {
 } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UUIBlinkAnimationValue } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbClipboardEntryDetailRepository } from '@umbraco-cms/backoffice/clipboard';
 
 /**
  * @element umb-block-list-entry
