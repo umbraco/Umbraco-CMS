@@ -38,13 +38,6 @@ public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
             Name = "Test Name",
             Sections = new [] {"Umb.Section.Content"},
             Permissions = new HashSet<IPermissionPresentationModel>()
-            {
-                // new DocumentPermissionPresentationModel()
-                // {
-                //     Document = new ReferenceByIdModel(Guid.NewGuid()),
-                //     Verbs = new HashSet<string>()
-                // }
-            }
         };
 
         var attempt = await UserGroupPresentationFactory.CreateAsync(updateModel);
@@ -58,6 +51,7 @@ public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
         {
             Assert.IsTrue(userGroupCreateAttempt.Success);
             Assert.IsNotNull(userGroup);
+            Assert.IsEmpty(userGroup.GranularPermissions);
         });
     }
 
@@ -97,7 +91,6 @@ public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Create_Usergroup_With_Empty_Granluar_Permissions_For_Document()
     {
-
         var contentKey = await CreateContent();
 
         var updateModel = new CreateUserGroupRequestModel()
@@ -129,6 +122,8 @@ public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
             Assert.IsTrue(userGroupCreateAttempt.Success);
             Assert.IsNotNull(userGroup);
             Assert.IsNotEmpty(userGroup.GranularPermissions);
+            Assert.AreEqual(contentKey, userGroup.GranularPermissions.First().Key);
+            Assert.AreEqual(string.Empty, userGroup.GranularPermissions.First().Permission);
         });
     }
 
