@@ -24,6 +24,8 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
+import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UmbClipboardEntryDetailRepository } from '@umbraco-cms/backoffice/clipboard';
 
 export abstract class UmbBlockEntryContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType>,
@@ -712,5 +714,39 @@ export abstract class UmbBlockEntryContext<
 		this._manager?.setOneExpose(this.#contentKey, variantId);
 	}
 
-	//copy
+	public async copyToClipboard() {
+		// TODO: move to context
+		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
+		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
+		const clipboardDetailRepository = new UmbClipboardEntryDetailRepository(this);
+
+		const workspaceName = propertyDatasetContext?.getName();
+		const propertyLabel = propertyContext?.getLabel();
+		const blockLabel = this.getName();
+		const entryName = workspaceName
+			? `${workspaceName} - ${propertyLabel} - ${blockLabel}`
+			: `${propertyLabel} - ${blockLabel}`;
+
+		const content = this.getContent();
+		const layout = this.getLayout();
+		const settings = this.getSettings();
+
+		const entryValue = {
+			contentData: content ? [structuredClone(content)] : [],
+			layout: layout ? [structuredClone(layout)] : [],
+			settingsData: settings ? [structuredClone(settings)] : [],
+		};
+
+		const { data } = await clipboardDetailRepository.createScaffold({
+			type: 'block',
+			name: entryName,
+			icon: this.getContentElementTypeIcon(),
+			meta: {}, // TODO: Add correct meta data
+			value: entryValue,
+		});
+
+		if (data) {
+			await clipboardDetailRepository.create(data);
+		}
+	}
 }
