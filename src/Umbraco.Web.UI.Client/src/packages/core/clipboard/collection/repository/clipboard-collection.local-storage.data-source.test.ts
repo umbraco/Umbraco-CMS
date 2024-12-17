@@ -32,6 +32,8 @@ describe('UmbClipboardLocalStorageDataSource', () => {
 			name: 'Test1',
 			type: 'test1',
 			unique: '1',
+			createDate: null,
+			updateDate: null,
 		},
 		{
 			entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
@@ -41,6 +43,8 @@ describe('UmbClipboardLocalStorageDataSource', () => {
 			name: 'Test2',
 			type: 'test2',
 			unique: '2',
+			createDate: null,
+			updateDate: null,
 		},
 		{
 			entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
@@ -50,6 +54,8 @@ describe('UmbClipboardLocalStorageDataSource', () => {
 			name: 'Test3',
 			type: 'test3',
 			unique: '3',
+			createDate: null,
+			updateDate: null,
 		},
 	];
 

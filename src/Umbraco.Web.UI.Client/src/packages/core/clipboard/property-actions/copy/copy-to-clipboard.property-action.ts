@@ -57,7 +57,7 @@ export class UmbColorPickerCopyToClipboardPropertyAction extends UmbPropertyActi
 			name: entryName,
 			icon: 'icon-color', // TODO: make this value dynamic
 			meta: {},
-			value: [propertyValue],
+			value: propertyValue,
 		});
 
 		if (data) {

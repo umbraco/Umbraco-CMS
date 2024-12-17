@@ -38,6 +38,8 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 			name: null,
 			type: '',
 			unique: UmbId.new(),
+			createDate: null,
+			updateDate: null,
 			...preset,
 		};
 
@@ -91,7 +93,10 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 			};
 		}
 
-		const updatedEntries = [...entries, model];
+		const newEntry: UmbClipboardEntryDetailModel = structuredClone(model);
+		newEntry.createDate = new Date().toISOString();
+
+		const updatedEntries = [...entries, newEntry];
 
 		this.#localStorageManager.setEntries(updatedEntries);
 
@@ -195,7 +200,15 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 			};
 		}
 
-		const updatedEntries = entries.map((storedEntry) => (storedEntry.unique === model.unique ? model : storedEntry));
+		const updatedEntries = entries.map((storedEntry) => {
+			if (storedEntry.unique === model.unique) {
+				const updatedEntry: UmbClipboardEntryDetailModel = structuredClone(model);
+				updatedEntry.updateDate = new Date().toISOString();
+				return updatedEntry;
+			}
+
+			return storedEntry;
+		});
 
 		this.#localStorageManager.setEntries(updatedEntries);
 		return { data: model };

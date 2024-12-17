@@ -333,7 +333,7 @@ export class UmbPropertyEditorUIBlockListElement
 				look="placeholder"
 				href=${this._catalogueRouteBuilder?.({ view: 'clipboard', index: -1 }) ?? ''}
 				?disabled=${this.readonly}>
-				<uui-icon name="icon-paste-in"></uui-icon>
+				<uui-icon name="icon-clipboard-paste"></uui-icon>
 			</uui-button>
 		`;
 	}

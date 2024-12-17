@@ -15,6 +15,8 @@ import type {
 } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UUIBlinkAnimationValue } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UmbClipboardEntryDetailRepository } from '@umbraco-cms/backoffice/clipboard';
 
 /**
  * @element umb-block-list-entry
@@ -328,7 +330,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 							>${this._inlineEditingMode ? this.#renderInlineBlock() : this.#renderRefBlock()}</umb-extension-slot
 						>
 						<uui-action-bar>
-							${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderDeleteAction()}
+							${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()}
+							${this.#renderCopyToClipboardAction()} ${this.#renderDeleteAction()}
 						</uui-action-bar>
 						${!this._showContentEdit && this._contentInvalid
 							? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
@@ -381,6 +384,41 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		if (this._isReadOnly) return nothing;
 		return html` <uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()}>
 			<uui-icon name="icon-remove"></uui-icon>
+		</uui-button>`;
+	}
+
+	async #copyToClipboard() {
+		// TODO: move to context
+		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
+		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
+		const clipboardDetailRepository = new UmbClipboardEntryDetailRepository(this);
+
+		const workspaceName = propertyDatasetContext?.getName();
+		const propertyLabel = propertyContext?.getLabel();
+		const blockLabel = this._label;
+		const entryName = workspaceName
+			? `${workspaceName} - ${propertyLabel} - ${blockLabel}`
+			: `${propertyLabel} - ${blockLabel}`;
+
+		const blockValue = this._blockViewProps.content;
+		const blockIcon = this._icon;
+
+		const { data } = await clipboardDetailRepository.createScaffold({
+			type: 'block', // TODO: what is the correct type?
+			name: entryName,
+			icon: blockIcon,
+			meta: {}, // TODO: Add correct meta data
+			value: blockValue,
+		});
+
+		if (data) {
+			await clipboardDetailRepository.create(data);
+		}
+	}
+
+	#renderCopyToClipboardAction() {
+		return html`<uui-button label="Copy to clipboard" look="secondary" @click=${() => this.#copyToClipboard()}>
+			<uui-icon name="icon-clipboard-copy"></uui-icon>
 		</uui-button>`;
 	}
 
