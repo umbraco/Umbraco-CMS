@@ -131,6 +131,7 @@ public class ConvertLocalLinks : MigrationBase
         }
 
         _linkMigrationTracker.MarkFixedMigrationRan();
+        RebuildCache = true;
     }
 
     private bool ProcessPropertyTypes(IPropertyType[] propertyTypes, IDictionary<int, ILanguage> languagesById)
