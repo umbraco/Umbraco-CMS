@@ -1,7 +1,8 @@
-import { html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, property, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/workspace';
 import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
+import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
@@ -11,6 +12,11 @@ const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest:
 export class UmbWorkspaceElement extends UmbLitElement {
 	@property({ type: String, attribute: 'entity-type' })
 	entityType = '';
+
+	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.firstUpdated(_changedProperties);
+		this.setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'workspace');
+	}
 
 	override render() {
 		if (!this.entityType) return nothing;

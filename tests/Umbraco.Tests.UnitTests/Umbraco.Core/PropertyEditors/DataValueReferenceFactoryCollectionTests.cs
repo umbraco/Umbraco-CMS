@@ -36,7 +36,8 @@ public class DataValueReferenceFactoryCollectionTests
                  Mock.Of<ITemporaryFileService>(),
                  Mock.Of<IScopeProvider>(),
                  Mock.Of<IBackOfficeSecurityAccessor>(),
-                 Mock.Of<IDataTypeConfigurationCache>()));
+                 Mock.Of<IDataTypeConfigurationCache>(),
+                 Mock.Of<ILocalizedTextService>()));
 
     private IIOHelper IOHelper { get; } = Mock.Of<IIOHelper>();
 
