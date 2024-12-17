@@ -113,24 +113,38 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 			? repeat(
 					this.#filteredItems,
 					(item) => item.unique,
-					(item) => html`
-						<uui-menu-item
-							label=${item.name ?? ''}
-							selectable
-							@selected=${() => this.#selectionManager.select(item.unique)}
-							@deselected=${() => this.#selectionManager.deselect(item.unique)}
-							?selected=${this.selection.includes(item.unique)}>
-							<uui-icon slot="icon" name="icon-clipboard-entry"></uui-icon>
-							<umb-entity-actions-bundle
-								slot="actions"
-								.entityType=${item.entityType}
-								.unique=${item.unique}
-								.label=${item.name}>
-							</umb-entity-actions-bundle>
-						</uui-menu-item>
-					`,
+					(item) => this.#renderItem(item),
 				)
 			: html`There are no items in the clipboard`}`;
+	}
+
+	#renderItem(item: UmbClipboardEntryDetailModel) {
+		return html`
+			<uui-menu-item
+				label=${item.name ?? ''}
+				selectable
+				@selected=${() => this.#selectionManager.select(item.unique)}
+				@deselected=${() => this.#selectionManager.deselect(item.unique)}
+				?selected=${this.selection.includes(item.unique)}>
+				${this.#renderItemIcon(item)} ${this.#renderItemActions(item)}
+			</uui-menu-item>
+		`;
+	}
+
+	#renderItemIcon(item: UmbClipboardEntryDetailModel) {
+		const iconName = item.icon ?? 'icon-clipboard-entry';
+		return html`<uui-icon slot="icon" name=${iconName}></uui-icon>`;
+	}
+
+	#renderItemActions(item: UmbClipboardEntryDetailModel) {
+		return html`
+			<umb-entity-actions-bundle
+				slot="actions"
+				.entityType=${item.entityType}
+				.unique=${item.unique}
+				.label=${item.name}>
+			</umb-entity-actions-bundle>
+		`;
 	}
 
 	override destroy(): void {
