@@ -6,8 +6,10 @@ export type UmbBlockPropertyValueClonerArgs = {
 	contentIdUpdatedCallback?: (oldContentKey: string, newContentKey: string) => void;
 };
 
-export abstract class UmbBlockPropertyValueCloner<ValueType extends UmbBlockValueType>
-	implements UmbPropertyValueCloner<ValueType>
+export abstract class UmbBlockPropertyValueCloner<
+	ValueType extends UmbBlockValueType,
+	LayoutEntryType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
+> implements UmbPropertyValueCloner<ValueType>
 {
 	#contentIdUpdatedCallback?: UmbBlockPropertyValueClonerArgs['contentIdUpdatedCallback'];
 
@@ -30,7 +32,9 @@ export abstract class UmbBlockPropertyValueCloner<ValueType extends UmbBlockValu
 			const result = {
 				...value,
 				layout: {
-					[this.#propertyEditorAlias]: await this._cloneLayout(value.layout[this.#propertyEditorAlias]),
+					[this.#propertyEditorAlias]: await this._cloneLayout(
+						value.layout[this.#propertyEditorAlias] as unknown as Array<LayoutEntryType>,
+					),
 				},
 				contentData: this.#contentData,
 				settingsData: this.#settingsData,
@@ -43,10 +47,10 @@ export abstract class UmbBlockPropertyValueCloner<ValueType extends UmbBlockValu
 	}
 
 	protected abstract _cloneLayout(
-		layouts: Array<UmbBlockLayoutBaseModel> | undefined,
-	): Promise<Array<UmbBlockLayoutBaseModel> | undefined> | undefined;
+		layouts: Array<LayoutEntryType> | undefined,
+	): Promise<Array<LayoutEntryType> | undefined> | undefined;
 
-	protected async _cloneBlock(layoutEntry: UmbBlockLayoutBaseModel): Promise<UmbBlockLayoutBaseModel> {
+	protected async _cloneBlock(layoutEntry: LayoutEntryType): Promise<LayoutEntryType> {
 		const clonedLayoutEntry = { ...layoutEntry };
 
 		const contentKey = layoutEntry.contentKey;
