@@ -90,6 +90,7 @@ public class ContentFinderByKeyPath : ContentFinderByIdentifierPathBase, IConten
         }
 
         ResolveAndSetCultureOnRequest(frequest);
+        ResolveAndSetSegmentOnRequest(frequest);
 
         frequest.SetPublishedContent(node);
         if (_logger.IsEnabled(LogLevel.Debug))
