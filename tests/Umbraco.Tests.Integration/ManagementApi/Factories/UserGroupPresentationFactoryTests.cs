@@ -1,5 +1,7 @@
-﻿using NUnit.Framework;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Mapping.Permissions;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
@@ -8,6 +10,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -25,6 +28,16 @@ public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
     public IContentTypeEditingService ContentTypeEditingService => GetRequiredService<IContentTypeEditingService>();
 
     public IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
+
+    protected override void ConfigureTestServices(IServiceCollection services)
+    {
+        services.AddTransient<IUserGroupPresentationFactory, UserGroupPresentationFactory>();
+        services.AddSingleton<IPermissionPresentationFactory, PermissionPresentationFactory>();
+        services.AddSingleton<DocumentPermissionMapper>();
+        services.AddSingleton<IPermissionMapper>(x=>x.GetRequiredService<DocumentPermissionMapper>());
+        services.AddSingleton<IPermissionPresentationMapper>(x=>x.GetRequiredService<DocumentPermissionMapper>());
+    }
+
 
     [Test]
     public async Task Can_Map_Create_Model_And_Create()
