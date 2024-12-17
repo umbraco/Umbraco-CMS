@@ -4,6 +4,7 @@ import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
 import { UMB_MEDIA_DETAIL_REPOSITORY_ALIAS } from '../constants.js';
 import type { UmbMediaDetailModel, UmbMediaVariantModel } from '../types.js';
 import { UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN, UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../paths.js';
+import { UmbMediaValidationRepository } from '../repository/validation/media-validation.repository.js';
 import { UMB_MEDIA_COLLECTION_ALIAS } from '../collection/constants.js';
 import type { UmbMediaDetailRepository } from '../repository/index.js';
 import { UMB_MEDIA_WORKSPACE_ALIAS, UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD } from './constants.js';
@@ -48,6 +49,7 @@ export class UmbMediaWorkspaceContext
 			workspaceAlias: UMB_MEDIA_WORKSPACE_ALIAS,
 			detailRepositoryAlias: UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbMediaTypeDetailRepository,
+			contentValidationRepository: UmbMediaValidationRepository,
 			contentVariantScaffold: UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD,
 		});
 

@@ -38,12 +38,9 @@ export class UmbPropertyEditorUIBlockGridElement
 	#settingsDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 	#managerContext = new UmbBlockGridManagerContext(this);
 	//
-	private _value: UmbBlockGridValueModel = {
-		layout: {},
-		contentData: [],
-		settingsData: [],
-		expose: [],
-	};
+	private _value: UmbBlockGridValueModel | undefined = undefined;
+
+	#lastValue: UmbBlockGridValueModel | undefined = undefined;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -68,6 +65,13 @@ export class UmbPropertyEditorUIBlockGridElement
 
 	@property({ attribute: false })
 	public override set value(value: UmbBlockGridValueModel | undefined) {
+		this.#lastValue = value;
+
+		if (!value) {
+			this._value = undefined;
+			return;
+		}
+
 		const buildUpValue: Partial<UmbBlockGridValueModel> = value ? { ...value } : {};
 		buildUpValue.layout ??= {};
 		buildUpValue.contentData ??= [];
@@ -80,7 +84,7 @@ export class UmbPropertyEditorUIBlockGridElement
 		this.#managerContext.setSettings(this._value.settingsData);
 		this.#managerContext.setExposes(this._value.expose);
 	}
-	public override get value(): UmbBlockGridValueModel {
+	public override get value(): UmbBlockGridValueModel | undefined {
 		return this._value;
 	}
 
@@ -116,13 +120,24 @@ export class UmbPropertyEditorUIBlockGridElement
 					this.#managerContext.exposes,
 				]).pipe(debounceTime(20)),
 				([layouts, contents, settings, exposes]) => {
-					this._value = {
-						...this._value,
-						layout: { [UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
-						contentData: contents,
-						settingsData: settings,
-						expose: exposes,
-					};
+					if (layouts.length === 0) {
+						this._value = undefined;
+					} else {
+						this._value = {
+							...this._value,
+							layout: { [UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
+							contentData: contents,
+							settingsData: settings,
+							expose: exposes,
+						};
+					}
+
+					// If we don't have a value set from the outside or an internal value, we don't want to set the value.
+					// This is added to prevent the block grid from setting an empty value on startup.
+					if (this.#lastValue === undefined && this._value === undefined) {
+						return;
+					}
+
 					propertyContext.setValue(this._value);
 				},
 				'motherObserver',
