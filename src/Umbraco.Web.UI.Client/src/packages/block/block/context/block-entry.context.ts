@@ -1,5 +1,5 @@
 import type { UmbBlockManagerContext, UmbBlockWorkspaceOriginData } from '../index.js';
-import type { UmbBlockLayoutBaseModel, UmbBlockDataModel, UmbBlockDataType } from '../types.js';
+import type { UmbBlockLayoutBaseModel, UmbBlockDataModel, UmbBlockDataType, UmbBlockExposeModel } from '../types.js';
 import type { UmbBlockEntriesContext } from './block-entries.context.js';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -714,6 +714,15 @@ export abstract class UmbBlockEntryContext<
 		this._manager?.setOneExpose(this.#contentKey, variantId);
 	}
 
+	/**
+	 * Get the expose of the block.
+	 * @returns {UmbBlockExposeModel | undefined} - the expose of the block.
+	 */
+	public getExpose(): UmbBlockExposeModel | undefined {
+		const exposes = this._manager?.getExposes();
+		return exposes?.find((x) => x.contentKey === this.#contentKey);
+	}
+
 	public async copyToClipboard() {
 		// TODO: move to context
 		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
@@ -730,11 +739,13 @@ export abstract class UmbBlockEntryContext<
 		const content = this.getContent();
 		const layout = this.getLayout();
 		const settings = this.getSettings();
+		const expose = this.getExpose();
 
 		const entryValue = {
 			contentData: content ? [structuredClone(content)] : [],
 			layout: layout ? [structuredClone(layout)] : [],
 			settingsData: settings ? [structuredClone(settings)] : [],
+			expose: expose ? [structuredClone(expose)] : [],
 		};
 
 		const { data } = await clipboardDetailRepository.createScaffold({
