@@ -2,16 +2,23 @@ import type { UmbBlockLayoutBaseModel, UmbBlockValueType } from '../types.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyValueCloner } from '@umbraco-cms/backoffice/property';
 
+export type UmbBlockPropertyValueClonerArgs = {
+	contentIdUpdatedCallback?: (oldContentKey: string, newContentKey: string) => void;
+};
+
 export abstract class UmbBlockPropertyValueCloner<ValueType extends UmbBlockValueType>
 	implements UmbPropertyValueCloner<ValueType>
 {
+	#contentIdUpdatedCallback?: UmbBlockPropertyValueClonerArgs['contentIdUpdatedCallback'];
+
 	#propertyEditorAlias: string;
 	#contentData?: ValueType['contentData'];
 	#settingsData?: ValueType['settingsData'];
 	#expose?: ValueType['expose'];
 
-	constructor(propertyEditorAlias: string) {
+	constructor(propertyEditorAlias: string, args?: UmbBlockPropertyValueClonerArgs) {
 		this.#propertyEditorAlias = propertyEditorAlias;
+		this.#contentIdUpdatedCallback = args?.contentIdUpdatedCallback;
 	}
 
 	async cloneValue(value: ValueType) {
@@ -50,14 +57,12 @@ export abstract class UmbBlockPropertyValueCloner<ValueType extends UmbBlockValu
 		clonedLayoutEntry.contentKey = newContentKey;
 
 		// Replace contentKeys in contentData
-		if (contentKey) {
-			this.#contentData = this.#contentData?.map((contentData) => {
-				if (contentData.key === contentKey) {
-					return { ...contentData, key: newContentKey };
-				}
-				return contentData;
-			});
-		}
+		this.#contentData = this.#contentData?.map((contentData) => {
+			if (contentData.key === contentKey) {
+				return { ...contentData, key: newContentKey };
+			}
+			return contentData;
+		});
 
 		// Replace contentKey in expose:
 		this.#expose = this.#expose?.map((expose) => {
@@ -66,6 +71,8 @@ export abstract class UmbBlockPropertyValueCloner<ValueType extends UmbBlockValu
 			}
 			return expose;
 		});
+
+		this.#contentIdUpdatedCallback?.(contentKey, newContentKey);
 
 		if (settingsKey) {
 			const newSettingsKey = UmbId.new();
