@@ -17,7 +17,9 @@ export class UmbBlockGridPropertyValueCloner extends UmbBlockPropertyValueCloner
 	}
 
 	#cloneLayoutEntry = async (layout: UmbBlockGridLayoutModel): Promise<UmbBlockGridLayoutModel> => {
+		// Clone the specific layout entry:
 		const entryClone = await this._cloneBlock(layout);
+		// And then clone the items of its areas:
 		entryClone.areas = await Promise.all(
 			entryClone.areas.map(async (area) => {
 				return {
