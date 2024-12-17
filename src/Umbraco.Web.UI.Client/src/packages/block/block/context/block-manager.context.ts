@@ -98,23 +98,68 @@ export abstract class UmbBlockManagerContext<
 		return this.#blockTypes.value;
 	}
 
+	/**
+	 * Set all layouts.
+	 * @param {Array<BlockLayoutType>} layouts - All layouts.
+	 */
 	setLayouts(layouts: Array<BlockLayoutType>) {
 		this._layouts.setValue(layouts);
 	}
-	getLayouts() {
+
+	/**
+	 * Get all layouts.
+	 * @returns {Array<BlockLayoutType>} - All layouts.
+	 */
+	getLayouts(): Array<BlockLayoutType> {
 		return this._layouts.getValue();
 	}
+
+	/**
+	 * Set all contents.
+	 * @param {Array<UmbBlockDataModel>} contents - All contents.
+	 */
 	setContents(contents: Array<UmbBlockDataModel>) {
 		this.#contents.setValue(contents);
 	}
-	getContents() {
+
+	/**
+	 * Get all contents.
+	 * @returns {Array<UmbBlockDataModel>} - All contents.
+	 */
+	getContents(): Array<UmbBlockDataModel> {
 		return this.#contents.value;
 	}
+
+	/**
+	 * Set all settings.
+	 * @param {Array<UmbBlockDataModel>} settings - All settings.
+	 */
 	setSettings(settings: Array<UmbBlockDataModel>) {
 		this.#settings.setValue(settings);
 	}
+
+	/**
+	 * Get all settings.
+	 * @returns {Array<UmbBlockDataModel>} - All settings.
+	 */
+	getSettings(): Array<UmbBlockDataModel> {
+		return this.#settings.value;
+	}
+
+	/**
+	 * Set all exposes.
+	 * @param {Array<UmbBlockExposeModel>} exposes - All exposes.
+	 */
 	setExposes(exposes: Array<UmbBlockExposeModel>) {
 		this.#exposes.setValue(exposes);
+	}
+
+	/**
+	 * Get all exposes.
+	 * @returns {Array<UmbBlockExposeModel>} - All exposes.
+	 */
+	getExposes(): Array<UmbBlockExposeModel> {
+		return this.#exposes.value;
 	}
 
 	constructor(host: UmbControllerHost) {
