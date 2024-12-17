@@ -17,7 +17,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can create content with the document link', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
+test('can create content with the document link', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -27,7 +27,7 @@ test('can create content with the document link', {tag: '@smoke'}, async ({page,
   const documentTypeForLinkedDocumentId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeForLinkedDocumentName);
   const linkedDocumentName = 'LinkedDocument';
   const linkedDocumentId = await umbracoApi.document.createDefaultDocument(linkedDocumentName, documentTypeForLinkedDocumentId);
-  await umbracoUi.waitForTimeout(2000);
+  // await umbracoUi.waitForTimeout(2000);
   await umbracoApi.document.publish(linkedDocumentId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);

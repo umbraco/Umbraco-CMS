@@ -408,11 +408,11 @@ test('can disable hide content editor in a block', async ({umbracoApi, umbracoUi
 });
 
 // TODO: Thumbnails are not showing in the UI
-test.skip('can add a thumbnail to a block ', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can add a thumbnail to a block ', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
 
 });
 
 // TODO: Thumbnails are not showing in the UI
-test.skip('can remove a thumbnail to a block ', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can remove a thumbnail to a block ', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
 
 });

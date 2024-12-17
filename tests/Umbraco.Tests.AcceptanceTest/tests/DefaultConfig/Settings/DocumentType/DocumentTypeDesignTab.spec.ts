@@ -84,7 +84,7 @@ test('can delete a group in a document type', {tag: '@smoke'}, async ({umbracoAp
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.documentType.deleteGroup(groupName, true);
+  await umbracoUi.documentType.deleteGroup(groupName);
   await umbracoUi.documentType.clickConfirmToDeleteButton();
   await umbracoUi.documentType.clickSaveButton();
 
@@ -213,6 +213,7 @@ test('can create a document type with a composition', {tag: '@smoke'}, async ({u
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
+  // await umbracoUi.waitForTimeout(500);
   await umbracoUi.documentType.clickCompositionsButton();
   await umbracoUi.documentType.clickButtonWithName(compositionDocumentTypeName);
   await umbracoUi.documentType.clickSubmitButton();
@@ -240,6 +241,7 @@ test('can remove a composition from a document type', async ({umbracoApi, umbrac
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
+  // await umbracoUi.waitForTimeout(500);
   await umbracoUi.documentType.clickCompositionsButton();
   await umbracoUi.documentType.clickButtonWithName(compositionDocumentTypeName);
   await umbracoUi.documentType.clickSubmitButton();

@@ -153,6 +153,7 @@ test('can empty recycle bin with delete permission enabled', async ({umbracoApi,
 
   // Act
   await umbracoUi.content.clickRecycleBinButton();
+  // await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.clickEmptyRecycleBinButton();
   await umbracoUi.content.clickConfirmEmptyRecycleBinButton();
 
