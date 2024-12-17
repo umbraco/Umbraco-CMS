@@ -723,8 +723,10 @@ export abstract class UmbBlockEntryContext<
 		return exposes?.find((x) => x.contentKey === this.#contentKey);
 	}
 
+	/**
+	 *  Copy the block to the clipboard.
+	 */
 	public async copyToClipboard() {
-		// TODO: move to context
 		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
 		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
 		const clipboardDetailRepository = new UmbClipboardEntryDetailRepository(this);
