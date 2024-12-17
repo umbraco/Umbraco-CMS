@@ -1,5 +1,6 @@
 import { manifest as blockListSchemaManifest } from './Umbraco.BlockList.js';
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from './constants.js';
+import { manifests as clipboardManifests } from './clipboard/manifests.js';
 import { UmbStandardBlockValueResolver } from '@umbraco-cms/backoffice/block';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -56,4 +57,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	blockListSchemaManifest,
+	...clipboardManifests,
 ];
