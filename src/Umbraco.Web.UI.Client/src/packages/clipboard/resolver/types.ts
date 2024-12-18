@@ -2,7 +2,7 @@ import type { UmbClipboardEntryDetailModel } from '../clipboard-entry/types.js';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export interface UmbClipboardCopyResolver<PropertyValueType = unknown, ClipboardValueType = unknown> extends UmbApi {
-	resolve: (value: PropertyValueType) => Promise<ClipboardValueType>;
+	execute: (value: PropertyValueType, name: any, meta: any) => Promise<ClipboardValueType>;
 }
 
 export interface UmbClipboardPasteResolver<

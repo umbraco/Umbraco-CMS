@@ -13,12 +13,9 @@ export class UmbCopyToClipboardPropertyAction extends UmbPropertyActionBase<Meta
 	#propertyContext?: typeof UMB_PROPERTY_CONTEXT.TYPE;
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	#init?: Promise<unknown>;
-	#entryType?: string;
 
 	#copyResolverAlias?: string;
 	#copyResolver?: UmbClipboardCopyResolver;
-
-	#clipboardDetailRepository = new UmbClipboardEntryDetailRepository(this);
 
 	constructor(host: UmbControllerHost, args: UmbPropertyActionArgs<MetaPropertyActionCopyToClipboardKind>) {
 		super(host, args);
@@ -27,7 +24,6 @@ export class UmbCopyToClipboardPropertyAction extends UmbPropertyActionBase<Meta
 			throw new Error('The "entry.type" meta property is required');
 		}
 
-		this.#entryType = args.meta.entry.type;
 		this.#copyResolverAlias = args.meta.clipboardCopyResolverAlias;
 
 		this.#init = Promise.all([
@@ -70,26 +66,11 @@ export class UmbCopyToClipboardPropertyAction extends UmbPropertyActionBase<Meta
 			return;
 		}
 
-		let entryValue;
-
-		if (this.#copyResolverAlias) {
-			if (!this.#copyResolver) throw new Error('The copy resolver is not initialized');
-			entryValue = this.#copyResolver.resolve(propertyValue);
-		} else {
-			entryValue = propertyValue;
+		if (!this.#copyResolver) {
+			throw new Error('The copy resolver is not initialized');
 		}
 
-		// TODO: Add correct meta data
-		const { data } = await this.#clipboardDetailRepository.createScaffold({
-			type: this.#entryType,
-			name: entryName,
-			meta: {},
-			value: entryValue,
-		});
-
-		if (data) {
-			await this.#clipboardDetailRepository.create(data);
-		}
+		await this.#copyResolver.execute(propertyValue, entryName);
 	}
 }
 export { UmbCopyToClipboardPropertyAction as api };

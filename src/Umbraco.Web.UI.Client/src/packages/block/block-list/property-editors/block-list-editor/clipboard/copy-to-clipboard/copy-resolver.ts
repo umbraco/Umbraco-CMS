@@ -1,18 +1,40 @@
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../constants.js';
-import type { UmbBlockListLayoutModel } from '../../../../types.js';
+import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../../../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbClipboardCopyResolver } from '@umbraco-cms/backoffice/clipboard';
+import { UmbClipboardEntryDetailRepository, type UmbClipboardCopyResolver } from '@umbraco-cms/backoffice/clipboard';
 
 export class UmbBlockListClipboardCopyResolver extends UmbControllerBase implements UmbClipboardCopyResolver {
-	resolve(propertyValue: unknown): Promise<unknown> {
+	#entryType = 'block';
+	#clipboardDetailRepository = new UmbClipboardEntryDetailRepository(this);
+
+	async execute(propertyValue: UmbBlockListValueModel, name: string, meta: Record<string, unknown>) {
+		const entryValue = this.#constructEntryValue(propertyValue);
+
+		// TODO: Add correct meta data
+		const { data } = await this.#clipboardDetailRepository.createScaffold({
+			type: this.#entryType,
+			name: name,
+			meta: meta,
+			value: entryValue,
+		});
+
+		if (data) {
+			await this.#clipboardDetailRepository.create(data);
+		}
+
+		return entryValue;
+	}
+
+	#constructEntryValue(propertyValue: UmbBlockListValueModel) {
 		const contentData = structuredClone(propertyValue.contentData);
 		const layout = propertyValue.layout?.[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]
 			? structuredClone(propertyValue.layout?.[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS])
 			: undefined;
-		const settingsData = structuredClone(propertyValue.settings);
+		const settingsData = structuredClone(propertyValue.settingsData);
 		const expose = structuredClone(propertyValue.expose);
 
-		layout.forEach((layoutItem: UmbBlockListLayoutModel) => {
+		layout?.forEach((layoutItem: UmbBlockListLayoutModel) => {
+			// @ts-expect-error - We are removing the $type property from the layout item
 			delete layoutItem.$type;
 		});
 

@@ -5,7 +5,7 @@ export class UmbBlockListClipboardCopyResolver extends UmbControllerBase impleme
 	#detailRepository = new UmbClipboardEntryDetailRepository(this);
 
 	async getAcceptedTypes(): Promise<string[]> {
-		return ['blockList'];
+		return ['block'];
 	}
 
 	async resolve(unique: string) {
