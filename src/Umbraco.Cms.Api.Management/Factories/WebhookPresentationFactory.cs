@@ -57,7 +57,7 @@ internal class WebhookPresentationFactory : IWebhookPresentationFactory
         return target;
     }
 
-    WebhookLogResponseModel CreateResponseModel(WebhookLog webhookLog)
+    public WebhookLogResponseModel CreateResponseModel(WebhookLog webhookLog)
     {
         var webhookLogResponseModel = new WebhookLogResponseModel
         {

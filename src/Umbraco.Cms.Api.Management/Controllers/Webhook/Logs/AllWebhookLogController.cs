@@ -9,7 +9,8 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Webhook.Logs;
 
-public class AllWebhookLogController : ManagementApiControllerBase
+[ApiVersion("1.0")]
+public class AllWebhookLogController : WebhookLogControllerBase
 {
     private readonly IWebhookLogService _webhookLogService;
     private readonly IWebhookPresentationFactory _webhookPresentationFactory;
