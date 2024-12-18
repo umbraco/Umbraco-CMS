@@ -457,6 +457,9 @@ public class DocumentUrlService : IDocumentUrlService
             return "#";
         }
 
+        // We have to bypass the cache here to check if content is published, as
+        // if this is called during a <see cref="ContentPublishedNotification" /> call, the cache
+        // is still not populated with the correct urls
         if(isDraft is false && string.IsNullOrWhiteSpace(culture) is false && IsContentPublishedBypassCache(documentKey, culture) is false)
         {
             return "#";
