@@ -7,9 +7,6 @@ export interface ManifestPropertyActionCopyToClipboardKind
 }
 
 export interface MetaPropertyActionCopyToClipboardKind extends MetaPropertyAction {
-	entry: {
-		type: string;
-	};
 	clipboardCopyResolverAlias?: string;
 }
 

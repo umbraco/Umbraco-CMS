@@ -66,13 +66,13 @@ export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<M
 			throw new Error('No clipboard entry was returned');
 		}
 
-		const entry = await this.#pasteResolver.resolve(selectedUnique);
+		const propertyValue = await this.#pasteResolver.resolve(selectedUnique);
 
-		if (!entry) {
-			throw new Error('No clipboard entry was resolved');
+		if (!propertyValue) {
+			throw new Error('No clipboard property value was returned');
 		}
 
-		this.#propertyContext?.setValue(entry.value);
+		this.#propertyContext?.setValue(propertyValue);
 	}
 }
 export { UmbPasteFromClipboardPropertyAction as api };

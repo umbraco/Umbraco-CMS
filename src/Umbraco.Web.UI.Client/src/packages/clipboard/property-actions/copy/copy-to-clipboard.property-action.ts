@@ -20,10 +20,6 @@ export class UmbCopyToClipboardPropertyAction extends UmbPropertyActionBase<Meta
 	constructor(host: UmbControllerHost, args: UmbPropertyActionArgs<MetaPropertyActionCopyToClipboardKind>) {
 		super(host, args);
 
-		if (!args.meta?.entry?.type) {
-			throw new Error('The "entry.type" meta property is required');
-		}
-
 		this.#copyResolverAlias = args.meta.clipboardCopyResolverAlias;
 
 		this.#init = Promise.all([

@@ -9,9 +9,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Block List Copy To Clipboard Property Action',
 		forPropertyEditorUis: [UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS],
 		meta: {
-			entry: {
-				type: 'blockList',
-			},
 			clipboardCopyResolverAlias: 'Umb.ClipBoardCopyResolver.BlockList',
 		},
 		conditions: [

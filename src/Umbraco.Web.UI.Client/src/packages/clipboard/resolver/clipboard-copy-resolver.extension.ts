@@ -1,5 +1,5 @@
+import type { UmbClipboardCopyResolver } from './types.js';
 import type { ManifestApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbClipboardCopyResolver } from './types';
 
 export interface ManifestClipboardCopyResolver
 	extends ManifestApi<UmbClipboardCopyResolver>,
