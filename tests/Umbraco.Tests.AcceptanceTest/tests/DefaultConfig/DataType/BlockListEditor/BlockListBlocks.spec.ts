@@ -147,6 +147,9 @@ test('can add a settings model to a block', {tag: '@smoke'}, async ({umbracoApi,
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithSettingsTypeIds(blockListEditorName, [settingsElementTypeId])).toBeTruthy();
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(secondElementName);
 });
 
 test('can remove a settings model from a block', async ({umbracoApi, umbracoUi}) => {
@@ -169,6 +172,9 @@ test('can remove a settings model from a block', async ({umbracoApi, umbracoUi})
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithSettingsTypeIds(blockListEditorName, [settingsElementTypeId])).toBeFalsy();
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(secondElementName);
 });
 
 test('can add a background color to a block', async ({umbracoApi, umbracoUi}) => {

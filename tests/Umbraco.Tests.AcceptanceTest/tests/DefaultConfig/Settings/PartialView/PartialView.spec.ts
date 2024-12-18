@@ -180,7 +180,6 @@ test('can use query builder with Where statement for a partial view', async ({um
 
   // Act
   await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
-  await umbracoUi.waitForTimeout(500);
   await umbracoUi.partialView.addQueryBuilderWithWhereStatement(propertyAliasValue, operatorValue, constrainValue);
   // Verify that the code is shown
   await umbracoUi.partialView.isQueryBuilderCodeShown(expectedCode);

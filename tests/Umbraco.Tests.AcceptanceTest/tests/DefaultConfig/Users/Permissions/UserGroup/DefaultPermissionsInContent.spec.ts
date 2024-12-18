@@ -505,7 +505,7 @@ test('can set culture and hostnames with culture and hostnames permission enable
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   await umbracoUi.content.clickCultureAndHostnamesButton();
   await umbracoUi.content.clickAddNewDomainButton();
-  await umbracoUi.content.enterDomain('/en');
+  await umbracoUi.content.enterDomain('/domain');
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
