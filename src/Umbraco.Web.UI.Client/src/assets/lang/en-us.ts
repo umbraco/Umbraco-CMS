@@ -654,7 +654,7 @@ export default {
 		indexCannotRebuild: 'This index cannot be rebuilt because it has no assigned',
 		iIndexPopulator: 'IIndexPopulator',
 		corruptStatus: 'Possible corrupt index detected',
-		corruptErrorDescription: 'Error received when evaluating the index:'
+		corruptErrorDescription: 'Error received when evaluating the index:',
 	},
 	placeholders: {
 		username: 'Enter your username',
