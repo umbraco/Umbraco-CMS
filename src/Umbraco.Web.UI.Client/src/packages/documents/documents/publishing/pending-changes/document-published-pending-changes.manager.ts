@@ -29,6 +29,8 @@ export class UmbDocumentPublishedPendingChangesManager extends UmbControllerBase
 	async process(args: UmbDocumentPublishedPendingChangesManagerProcessArgs): Promise<void> {
 		if (!args.persistedData) throw new Error('Persisted data is missing');
 		if (!args.publishedData) throw new Error('Published data is missing');
+		if (args.persistedData.unique !== args.publishedData.unique)
+			throw new Error('Persisted and published data does not have the same unique');
 
 		const variantIds = args.persistedData.variants?.map((x) => UmbVariantId.Create(x)) ?? [];
 
