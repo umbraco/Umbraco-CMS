@@ -269,9 +269,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	#deleteTab(tabId?: string) {
 		if (!tabId) return;
 		this.#workspaceContext?.structure.removeContainer(null, tabId);
-		// TODO: We should only navigate away if it was the last tab and if it was the active one... [NL]
-		if (this.#tabsStructureHelper?.isOwnerChildContainer(tabId)) {
-			window.history.replaceState(null, '', this._routerPath + (this._routes[0]?.path ?? '/root'));
+		if (this._activeTabId === tabId) {
+			this._activeTabId = undefined;
 		}
 	}
 	async #addTab() {

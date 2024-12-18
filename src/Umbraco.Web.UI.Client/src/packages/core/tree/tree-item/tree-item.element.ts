@@ -1,4 +1,4 @@
-import type { ManifestTreeItem } from '../extensions/index.js';
+import type { ManifestTreeItem } from '../extensions/types.js';
 import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbExtensionElementAndApiSlotElementBase,
