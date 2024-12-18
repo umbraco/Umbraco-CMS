@@ -4,7 +4,7 @@ const UMB_CLIPBOARD_LOCALSTORAGE_KEY = 'umb:clipboard';
 
 interface UmbClipboardLocalStorageFilterModel {
 	entry?: {
-		type?: string;
+		types: Array<string>;
 	};
 	skip?: number;
 	take?: number;
@@ -51,8 +51,8 @@ export class UmbClipboardLocalStorageManager {
 
 	#filterEntries(entries: Array<UmbClipboardEntryDetailModel>, filter: UmbClipboardLocalStorageFilterModel) {
 		return entries.filter((entry) => {
-			if (filter.entry?.type && entry.type !== filter.entry.type) {
-				return false;
+			if (filter.entry?.types) {
+				return filter.entry.types.includes(entry.type);
 			}
 			return true;
 		});

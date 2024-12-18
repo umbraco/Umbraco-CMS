@@ -5,12 +5,11 @@ export class UmbBlockListClipboardCopyResolver extends UmbControllerBase impleme
 	#detailRepository = new UmbClipboardEntryDetailRepository(this);
 
 	async getAcceptedTypes(): Promise<string[]> {
-		return ['block'];
+		return ['blockList'];
 	}
 
 	async resolve(unique: string) {
 		const { data: entry } = await this.#detailRepository.requestByUnique(unique);
-		debugger;
 		return entry;
 	}
 }
