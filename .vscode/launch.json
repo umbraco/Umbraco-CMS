@@ -1,35 +1,123 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            // Use IntelliSense to find out which attributes exist for C# debugging
-            // Use hover for the description of the existing attributes
-            // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
-            "name": ".NET Core Launch (web)",
-            "type": "coreclr",
-            "request": "launch",
-            "program": "dotnet",
-            "args": ["run"],
-            "cwd": "${workspaceFolder}/src/Umbraco.Web.UI",
-            "stopAtEntry": false,
-            "requireExactSource": false,
-            // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
-            "serverReadyAction": {
-                "action": "openExternally",
-                "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)"
-            },
-            "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            },
-            "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
-            }
-        },
-        {
-            "name": ".NET Core Attach",
-            "type": "coreclr",
-            "request": "attach",
-            "processId": "${command:pickProcess}"
-        }
-    ]
+  "version": "0.2.0",
+  "compounds": [
+    {
+      "name": "Backoffice Launch (Vite + .NET Core)",
+      "configurations": [
+        "Backoffice Launch Vite (Chrome)",
+        ".NET Core Serve with External Auth (web)"
+      ],
+      "stopAll": true,
+      "presentation": {
+        "group": "1"
+      }
+    }
+  ],
+  "configurations": [
+    {
+      "name": "Backoffice Launch Vite (Chrome)",
+      "request": "launch",
+      "env": {
+        "VITE_UMBRACO_USE_MSW": "${input:AskForMockServer}"
+      },
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite"],
+      "type": "node",
+      "cwd": "${workspaceFolder}/src/Umbraco.Web.UI.Client",
+      "skipFiles": ["<node_internals>/**", "node_modules/**"],
+      "smartStep": true,
+      "autoAttachChildProcesses": true,
+      "serverReadyAction": {
+        "killOnServerStop": true,
+        "action": "debugWithChrome",
+        "pattern": "Local:   http://localhost:([0-9]+)",
+        "uriFormat": "http://localhost:%s",
+        "webRoot": "${workspaceFolder}/src/Umbraco.Web.UI.Client"
+      },
+      "presentation": {
+        "group": "2"
+      }
+    },
+    {
+      "name": "Backoffice Attach Vite (Chrome)",
+      "request": "launch",
+      "type": "chrome",
+      "smartStep": true,
+      "url": "http://localhost:5173/",
+      "skipFiles": ["<node_internals>/**", "node_modules/**"],
+      "webRoot": "${workspaceFolder}/src/Umbraco.Web.UI.Client",
+      "presentation": {
+        "group": "2"
+      }
+    },
+    {
+      // Use IntelliSense to find out which attributes exist for C# debugging
+      // Use hover for the description of the existing attributes
+      // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
+      "name": ".NET Core Launch (web)",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "dotnet",
+      "args": ["run"],
+      "cwd": "${workspaceFolder}/src/Umbraco.Web.UI",
+      "stopAtEntry": false,
+      "requireExactSource": false,
+      // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/Umbraco.Web.UI/Views"
+      },
+      "presentation": {
+        "group": "3"
+      }
+    },
+    {
+      "name": ".NET Core Attach",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickProcess}",
+      "presentation": {
+        "group": "3"
+      }
+    },
+    {
+      "name": ".NET Core Serve with External Auth (web)",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "dotnet",
+      "args": ["run"],
+      "cwd": "${workspaceFolder}/src/Umbraco.Web.UI",
+      "stopAtEntry": false,
+      "requireExactSource": false,
+      "checkForDevCert": true,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "https://localhost:44339",
+        "UMBRACO__CMS__SECURITY__BACKOFFICEHOST": "http://localhost:5173",
+        "UMBRACO__CMS__SECURITY__AUTHORIZECALLBACKPATHNAME": "/oauth_complete",
+        "UMBRACO__CMS__SECURITY__AUTHORIZECALLBACKLOGOUTPATHNAME": "/logout",
+        "UMBRACO__CMS__SECURITY__AUTHORIZECALLBACKERRORPATHNAME": "/error"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/Umbraco.Web.UI/Views"
+      },
+      "presentation": {
+        "group": "3"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "AskForMockServer",
+      "type": "promptString",
+      "description": "Use Mock Service Worker (MSW) for Backoffice API calls (off requires a running server)?",
+      "default": "off"
+    }
+  ]
 }

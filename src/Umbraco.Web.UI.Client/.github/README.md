@@ -53,6 +53,16 @@ Open this file in an editor: `src/Umbraco.Web.UI/appsettings.Development.json` a
 
 Now start the vite server by running the command: `npm run dev:server` in the `Umbraco.Web.UI.Client` folder, and finally open the http://localhost:5173 URL in your browser.
 
+### VS Code
+
+If you are using VS Code, you can use the `launch.json` file to start the development server. This will also start the Umbraco instance and open the browser.
+
+You should run the task **Backoffice Launch (Vite + .NET Core)** in the **Run and Debug** panel, which will start the Vite server and the Umbraco instance. It automatically configures Umbraco (using environment variables) to use the Vite server as the Backoffice host. This task will also open a browser window, so you can start developing right away. The first time you run this task, it will take a little longer to start the Umbraco instance, but subsequent runs will be faster. Keep an eye on the Debug Console to see when the Umbraco instance is ready and then refresh the browser.
+
+If you want to run the Vite server only, you can run the task **Backoffice Launch Vite**, which will start the Vite server only and launch a browser.
+
+If you have an existing Vite server running, you can run the task **Backoffice Attach Vite** to attach the debugger to the Vite server.
+
 ### Storybook
 
 You can test the Storybook locally by running `npm run storybook`. This will start the Storybook server and open a browser window with the Storybook UI.
