@@ -63,6 +63,20 @@ export interface UmbContentDetailWorkspaceContextArgs<
 	saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
 }
 
+/**
+ * The base class for a content detail workspace context.
+ * @exports
+ * @abstract
+ * @class UmbContentDetailWorkspaceContextBase
+ * @augments {UmbEntityDetailWorkspaceContextBase<DetailModelType, DetailRepositoryType, CreateArgsType>}
+ * @implements {UmbContentWorkspaceContext<DetailModelType, ContentTypeDetailModelType, VariantModelType>}
+ * @template DetailModelType
+ * @template DetailRepositoryType
+ * @template ContentTypeDetailModelType
+ * @template VariantModelType
+ * @template VariantOptionModelType
+ * @template CreateArgsType
+ */
 export abstract class UmbContentDetailWorkspaceContextBase<
 		DetailModelType extends UmbContentDetailModel<VariantModelType>,
 		DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
@@ -83,8 +97,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/* Content Data */
 	protected override readonly _data = new UmbContentWorkspaceDataManager<DetailModelType, VariantModelType>(this);
+
+	public override readonly data = this._data.current;
 	public readonly values = this._data.createObservablePartOfCurrent((data) => data?.values);
 	public readonly variants = this._data.createObservablePartOfCurrent((data) => data?.variants ?? []);
+	public override readonly persistedData = this._data.persisted;
 
 	/* Content Type (Structure) Data */
 	public readonly structure;
@@ -332,6 +349,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		return this._data.getCurrent()?.variants?.find((x) => variantId.compare(x));
 	}
 
+	public getVariants(): Array<VariantModelType> | undefined {
+		return this._data.getCurrent()?.variants;
+	}
+
 	/**
 	 * Observe the property type
 	 * @param {string} propertyId - The id of the property
@@ -440,7 +461,19 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this._data.finishPropertyValueChange();
 	};
 
-	protected async _determineVariantOptions() {
+	/**
+	 * Gets the changed variant ids
+	 * @returns {Array<UmbVariantId>} - The changed variant ids
+	 * @memberof UmbContentDetailWorkspaceContextBase
+	 */
+	public getChangedVariants(): Array<UmbVariantId> {
+		return this._data.getChangedVariants();
+	}
+
+	protected async _determineVariantOptions(): Promise<{
+		options: VariantOptionModelType[];
+		selected: string[];
+	}> {
 		const options = await firstValueFrom(this.variantOptions);
 
 		const activeVariants = this.splitView.getActiveVariants();
@@ -465,7 +498,23 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	};
 
 	/* validation */
+	/**
+	 * Run the mandatory validation for the save data
+	 * @deprecated Use the public runMandatoryValidationForSaveData instead. Will be removed in v. 17.
+	 * @protected
+	 * @param {DetailModelType} saveData - The data to validate
+	 * @memberof UmbContentDetailWorkspaceContextBase
+	 */
 	protected async _runMandatoryValidationForSaveData(saveData: DetailModelType) {
+		this.runMandatoryValidationForSaveData(saveData);
+	}
+
+	/**
+	 * Run the mandatory validation for the save data
+	 * @param {DetailModelType} saveData - The data to validate
+	 * @memberof UmbContentDetailWorkspaceContextBase
+	 */
+	public async runMandatoryValidationForSaveData(saveData: DetailModelType) {
 		// Check that the data is valid before we save it.
 		// Check variants have a name:
 		const variantsWithoutAName = saveData.variants.filter((x) => !x.name);
@@ -482,7 +531,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 	}
 
-	protected async _askServerToValidate(saveData: DetailModelType, variantIds: Array<UmbVariantId>) {
+	/**
+	 * Ask the server to validate the save data
+	 * @param {DetailModelType} saveData - The data to validate
+	 * @param {Array<UmbVariantId>} variantIds - The variant ids to validate
+	 * @memberof UmbContentDetailWorkspaceContextBase
+	 */
+	public async askServerToValidate(saveData: DetailModelType, variantIds: Array<UmbVariantId>) {
 		if (this.#validationRepositoryClass) {
 			// Create the validation repository if it does not exist. (we first create this here when we need it) [NL]
 			this.#validationRepository ??= new this.#validationRepositoryClass(this);
@@ -514,6 +569,16 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	public override submit() {
 		return this._handleSubmit();
+	}
+
+	/**
+	 * Get the data to save
+	 * @param {Array<UmbVariantId>} variantIds - The variant ids to save
+	 * @returns {Promise<DetailModelType>}  {Promise<DetailModelType>}
+	 * @memberof UmbContentDetailWorkspaceContextBase
+	 */
+	public constructSaveData(variantIds: Array<UmbVariantId>): Promise<DetailModelType> {
+		return this._data.constructData(variantIds);
 	}
 
 	protected async _handleSubmit() {
@@ -553,24 +618,42 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			throw new Error('No variant picker modal token is set. There are multiple variants to save. Cannot proceed.');
 		}
 
-		const saveData = await this._data.constructData(variantIds);
-		await this._runMandatoryValidationForSaveData(saveData);
+		const saveData = await this.constructSaveData(variantIds);
+		await this.runMandatoryValidationForSaveData(saveData);
 		if (this.#validateOnSubmit) {
-			await this._askServerToValidate(saveData, variantIds);
+			await this.askServerToValidate(saveData, variantIds);
 			return this.validateAndSubmit(
 				async () => {
-					return this._performCreateOrUpdate(variantIds, saveData);
+					return this.performCreateOrUpdate(variantIds, saveData);
 				},
 				async () => {
 					return this.invalidSubmit();
 				},
 			);
 		} else {
-			await this._performCreateOrUpdate(variantIds, saveData);
+			await this.performCreateOrUpdate(variantIds, saveData);
 		}
 	}
 
+	/**
+	 * Perform the create or update of the content
+	 * @deprecated Use the public performCreateOrUpdate instead. Will be removed in v. 17.
+	 * @protected
+	 * @param {Array<UmbVariantId>} variantIds
+	 * @param {DetailModelType} saveData
+	 * @memberof UmbContentDetailWorkspaceContextBase
+	 */
 	protected async _performCreateOrUpdate(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
+		await this.performCreateOrUpdate(variantIds, saveData);
+	}
+
+	/**
+	 * Perform the create or update of the content
+	 * @param {Array<UmbVariantId>} variantIds - The variant ids to save
+	 * @param {DetailModelType} saveData - The data to save
+	 * @memberof UmbContentDetailWorkspaceContextBase
+	 */
+	public async performCreateOrUpdate(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
 		if (this.getIsNew()) {
 			await this.#create(variantIds, saveData);
 		} else {
