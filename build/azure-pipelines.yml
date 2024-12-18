@@ -622,8 +622,8 @@ stages:
             displayName: Publish test artifacts
             condition: succeededOrFailed()
             inputs:
-              targetPath: "$(Build.ArtifactStagingDirectory)/AcceptanceTests"
-#              artifact: "$(Agent.OS) - Attempt #$(System.JobAttempt)"
+              targetPath: "$(Build.ArtifactStagingDirectory)"
+              artifact: "Acceptance Tests - $(Agent.OS) - Attempt #$(System.JobAttempt)"
 
       - job:
         displayName: E2E Tests (SQL Server)
@@ -789,8 +789,8 @@ stages:
             displayName: Publish test artifacts
             condition: succeededOrFailed()
             inputs:
-              targetPath: $(Build.ArtifactStagingDirectory)/AcceptanceTests
-#              artifact: "Acceptance Tests - $(Agent.OS) - Attempt #$(System.JobAttempt)"
+              targetPath: $(Build.ArtifactStagingDirectory)
+              artifact: "Acceptance Tests - $(Agent.OS) - Attempt #$(System.JobAttempt)"
   ###############################################
   ## Release
   ###############################################
