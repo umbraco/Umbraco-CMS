@@ -1,23 +1,26 @@
+using System.Text.RegularExpressions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Templates;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0.LocalLinks;
 
 [Obsolete("Will be removed in V18")]
-public class LocalLinkProcessor
+public class LocalLinkProcessorForFaultyLinks
 {
-    private readonly HtmlLocalLinkParser _localLinkParser;
     private readonly IIdKeyMap _idKeyMap;
     private readonly IEnumerable<ITypedLocalLinkProcessor> _localLinkProcessors;
+    private const string LocalLinkLocation = "__LOCALLINKLOCATION__";
+    private const string TypeAttributeLocation = "__TYPEATTRIBUTELOCATION__";
 
-    public LocalLinkProcessor(
-        HtmlLocalLinkParser localLinkParser,
+    internal static readonly Regex FaultyHrefPattern = new(
+        @"<a (?<faultyHref>href=['""] ?(?<typeAttribute> type=*?['""][^'""]*?['""] )?(?<localLink>\/{localLink:[a-fA-F0-9-]+}['""])).*?>",
+        RegexOptions.IgnoreCase | RegexOptions.Singleline);
+
+    public LocalLinkProcessorForFaultyLinks(
         IIdKeyMap idKeyMap,
         IEnumerable<ITypedLocalLinkProcessor> localLinkProcessors)
     {
-        _localLinkParser = localLinkParser;
         _idKeyMap = idKeyMap;
         _localLinkProcessors = localLinkProcessors;
     }
@@ -35,36 +38,16 @@ public class LocalLinkProcessor
 
     public string ProcessStringValue(string input)
     {
-        // find all legacy tags
-        var tags = _localLinkParser.FindLegacyLocalLinkIds(input).ToList();
+        MatchCollection faultyTags = FaultyHrefPattern.Matches(input);
 
-        foreach (HtmlLocalLinkParser.LocalLinkTag tag in tags)
+        foreach (Match fullTag in faultyTags)
         {
-            string newTagHref;
-            if (tag.Udi is not null)
-            {
-                newTagHref = tag.TagHref.Replace(tag.Udi.ToString(), tag.Udi.Guid.ToString())
-                             + $"\" type=\"{tag.Udi.EntityType}";
-            }
-            else if (tag.IntId is not null)
-            {
-                // try to get the key and type from the int, else do nothing
-                (Guid Key, string EntityType)? conversionResult = CreateIntBasedKeyType(tag.IntId.Value);
-                if (conversionResult is null)
-                {
-                    continue;
-                }
-
-                newTagHref = tag.TagHref.Replace(tag.IntId.Value.ToString(), conversionResult.Value.Key.ToString())
-                             + $"\" type=\"{conversionResult.Value.EntityType}";
-            }
-            else
-            {
-                // tag does not contain enough information to convert
-                continue;
-            }
-
-            input = input.Replace(tag.TagHref, newTagHref);
+            var newValue =
+                fullTag.Value.Replace(fullTag.Groups["typeAttribute"].Value, LocalLinkLocation)
+                    .Replace(fullTag.Groups["localLink"].Value, TypeAttributeLocation)
+                    .Replace(LocalLinkLocation, fullTag.Groups["localLink"].Value)
+                    .Replace(TypeAttributeLocation, fullTag.Groups["typeAttribute"].Value);
+            input = input.Replace(fullTag.Value, newValue);
         }
 
         return input;
