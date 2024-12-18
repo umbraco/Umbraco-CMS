@@ -48,9 +48,15 @@ export class UmbDocumentWorkspaceSplitViewVariantSelectorElement extends UmbWork
 	}
 
 	#getVariantState(variantOption: UmbDocumentVariantOptionModel) {
-		const term = this.#hasPendingChanges(variantOption)
-			? 'content_publishedPendingChanges'
-			: this.#publishStateLocalizationMap[variantOption.variant?.state || DocumentVariantStateModel.NOT_CREATED];
+		let term = this.#publishStateLocalizationMap[variantOption.variant?.state || DocumentVariantStateModel.NOT_CREATED];
+
+		if (
+			(variantOption.variant?.state === DocumentVariantStateModel.PUBLISHED ||
+				variantOption.variant?.state === DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES) &&
+			this.#hasPendingChanges(variantOption)
+		) {
+			term = 'content_publishedPendingChanges';
+		}
 
 		return this.localize.term(term);
 	}
