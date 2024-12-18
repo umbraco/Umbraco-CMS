@@ -24,6 +24,7 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDocumentPublishingWorkspaceContext> {
 	/**
@@ -37,6 +38,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 	#publishingRepository = new UmbDocumentPublishingRepository(this);
 	#publishedDocumentData?: UmbDocumentDetailModel;
+	#currentUnique?: UmbEntityUnique;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT);
@@ -331,6 +333,13 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		this.observe(
 			observeMultiple([this.#documentWorkspaceContext.unique, this.#documentWorkspaceContext.isNew]),
 			([unique, isNew]) => {
+				// We have loaded in a new document, so we need to clear the states
+				if (unique !== this.#currentUnique) {
+					this.#clear();
+				}
+
+				this.#currentUnique = unique;
+
 				if (isNew === false && unique) {
 					this.#loadAndProcessLastPublished();
 				}
@@ -382,6 +391,11 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		if (!persistedData || !publishedData) return;
 
 		this.publishedPendingChanges.process({ persistedData, publishedData });
+	}
+
+	#clear() {
+		this.#publishedDocumentData = undefined;
+		this.publishedPendingChanges.clear();
 	}
 }
 

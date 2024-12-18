@@ -80,4 +80,11 @@ export class UmbDocumentPublishedPendingChangesManager extends UmbControllerBase
 		// @ts-expect-error
 		delete variant.updateDate;
 	};
+
+	/**
+	 * Clear all states/values,
+	 */
+	clear() {
+		this.#variantsWithChanges.setValue([]);
+	}
 }
