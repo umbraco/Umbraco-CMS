@@ -10,6 +10,7 @@ export interface MetaPropertyActionCopyToClipboardKind extends MetaPropertyActio
 	entry: {
 		type: string;
 	};
+	clipboardCopyResolverAlias?: string;
 }
 
 declare global {

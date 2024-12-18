@@ -12,11 +12,18 @@ export const manifests: Array<UmbExtensionManifest> = [
 			entry: {
 				type: 'blockList',
 			},
+			clipboardCopyResolverAlias: 'Umb.ClipBoardCopyResolver.BlockList',
 		},
 		conditions: [
 			{
 				alias: UMB_WRITABLE_PROPERTY_CONDITION_ALIAS,
 			},
 		],
+	},
+	{
+		type: 'clipboardCopyResolver',
+		alias: 'Umb.ClipBoardCopyResolver.BlockList',
+		name: 'Block List Clipboard Copy Resolver',
+		api: () => import('./copy-resolver.js'),
 	},
 ];

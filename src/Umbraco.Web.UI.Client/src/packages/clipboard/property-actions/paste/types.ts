@@ -10,6 +10,7 @@ export interface MetaPropertyActionPasteFromClipboardKind extends MetaPropertyAc
 	entry: {
 		type: string;
 	};
+	clipboardPasteResolverAlias: string;
 }
 
 declare global {

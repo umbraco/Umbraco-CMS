@@ -1,25 +1,25 @@
-import { UMB_CLIPBOARD_ENTRY_PICKER_MODAL, UmbClipboardEntryDetailRepository } from '../../clipboard-entry/index.js';
+import { UMB_CLIPBOARD_ENTRY_PICKER_MODAL } from '../../clipboard-entry/index.js';
+import type { UmbClipboardPasteResolver } from '../../resolver/types.js';
 import type { MetaPropertyActionPasteFromClipboardKind } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbPropertyActionBase, type UmbPropertyActionArgs } from '@umbraco-cms/backoffice/property-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbColorPickerPasteFromClipboardPropertyAction extends UmbPropertyActionBase<MetaPropertyActionPasteFromClipboardKind> {
-	#detailRepository = new UmbClipboardEntryDetailRepository(this);
+export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<MetaPropertyActionPasteFromClipboardKind> {
 	#init: Promise<unknown>;
-	#entryType: string;
 	#propertyContext?: typeof UMB_PROPERTY_CONTEXT.TYPE;
 	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
+
+	#pasteResolverAlias?: string;
+	#pasteResolver?: UmbClipboardPasteResolver;
 
 	constructor(host: UmbControllerHost, args: UmbPropertyActionArgs<MetaPropertyActionPasteFromClipboardKind>) {
 		super(host, args);
 
-		if (!args.meta?.entry?.type) {
-			throw new Error('The "entry.type" meta property is required');
-		}
-
-		this.#entryType = args.meta.entry.type;
+		this.#pasteResolverAlias = args.meta.clipboardPasteResolverAlias;
 
 		this.#init = Promise.all([
 			this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
@@ -30,31 +30,49 @@ export class UmbColorPickerPasteFromClipboardPropertyAction extends UmbPropertyA
 				this.#modalManagerContext = context;
 			}).asPromise(),
 		]);
+
+		if (this.#pasteResolverAlias) {
+			new UmbExtensionApiInitializer(
+				this,
+				umbExtensionsRegistry,
+				this.#pasteResolverAlias,
+				[this],
+				(permitted, ctrl) => {
+					this.#pasteResolver = permitted ? (ctrl.api as UmbClipboardPasteResolver) : undefined;
+				},
+			);
+		}
 	}
 
 	override async execute() {
 		await this.#init;
 
+		if (!this.#pasteResolver) {
+			throw new Error('No paste resolver was found');
+		}
+
+		const entryTypes = await this.#pasteResolver.getAcceptedTypes();
+
 		const modalContext = this.#modalManagerContext?.open(this, UMB_CLIPBOARD_ENTRY_PICKER_MODAL, {
 			data: {
-				entry: {
-					type: this.#entryType,
-				},
+				entryTypes,
 			},
 		});
 
 		const value = await modalContext?.onSubmit();
-		const clipboardEntryUnique = value?.selection?.[0];
+		const selectedUnique = value?.selection?.[0];
 
-		if (clipboardEntryUnique) {
-			const { data: entry } = await this.#detailRepository.requestByUnique(clipboardEntryUnique);
-
-			const entryValue = entry?.value;
-
-			if (entryValue) {
-				this.#propertyContext?.setValue(entryValue);
-			}
+		if (!selectedUnique) {
+			throw new Error('No clipboard entry was returned');
 		}
+
+		const entry = await this.#pasteResolver.resolve(selectedUnique);
+
+		if (!entry) {
+			throw new Error('No clipboard entry was resolved');
+		}
+
+		this.#propertyContext?.setValue(entry.value);
 	}
 }
-export { UmbColorPickerPasteFromClipboardPropertyAction as api };
+export { UmbPasteFromClipboardPropertyAction as api };

@@ -1,16 +1,22 @@
 import { UmbClipboardEntryDetailRepository } from '../../clipboard-entry/index.js';
+import type { UmbClipboardCopyResolver } from '../../resolver/types.js';
 import type { MetaPropertyActionCopyToClipboardKind } from './types.js';
+import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbPropertyActionBase, type UmbPropertyActionArgs } from '@umbraco-cms/backoffice/property-action';
 
-export class UmbColorPickerCopyToClipboardPropertyAction extends UmbPropertyActionBase<MetaPropertyActionCopyToClipboardKind> {
+export class UmbCopyToClipboardPropertyAction extends UmbPropertyActionBase<MetaPropertyActionCopyToClipboardKind> {
 	#propertyDatasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 	#propertyContext?: typeof UMB_PROPERTY_CONTEXT.TYPE;
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	#init?: Promise<unknown>;
 	#entryType?: string;
+
+	#copyResolverAlias?: string;
+	#copyResolver?: UmbClipboardCopyResolver;
 
 	#clipboardDetailRepository = new UmbClipboardEntryDetailRepository(this);
 
@@ -22,6 +28,7 @@ export class UmbColorPickerCopyToClipboardPropertyAction extends UmbPropertyActi
 		}
 
 		this.#entryType = args.meta.entry.type;
+		this.#copyResolverAlias = args.meta.clipboardCopyResolverAlias;
 
 		this.#init = Promise.all([
 			this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
@@ -36,6 +43,18 @@ export class UmbColorPickerCopyToClipboardPropertyAction extends UmbPropertyActi
 				this.#notificationContext = context;
 			}).asPromise(),
 		]);
+
+		if (this.#copyResolverAlias) {
+			new UmbExtensionApiInitializer(
+				this,
+				umbExtensionsRegistry,
+				this.#copyResolverAlias,
+				[this],
+				(permitted, ctrl) => {
+					this.#copyResolver = permitted ? (ctrl.api as UmbClipboardCopyResolver) : undefined;
+				},
+			);
+		}
 	}
 
 	override async execute() {
@@ -51,13 +70,21 @@ export class UmbColorPickerCopyToClipboardPropertyAction extends UmbPropertyActi
 			return;
 		}
 
+		let entryValue;
+
+		if (this.#copyResolverAlias) {
+			if (!this.#copyResolver) throw new Error('The copy resolver is not initialized');
+			entryValue = this.#copyResolver.resolve(propertyValue);
+		} else {
+			entryValue = propertyValue;
+		}
+
 		// TODO: Add correct meta data
 		const { data } = await this.#clipboardDetailRepository.createScaffold({
 			type: this.#entryType,
 			name: entryName,
-			icon: 'icon-color', // TODO: make this value dynamic
 			meta: {},
-			value: propertyValue,
+			value: entryValue,
 		});
 
 		if (data) {
@@ -65,4 +92,4 @@ export class UmbColorPickerCopyToClipboardPropertyAction extends UmbPropertyActi
 		}
 	}
 }
-export { UmbColorPickerCopyToClipboardPropertyAction as api };
+export { UmbCopyToClipboardPropertyAction as api };
