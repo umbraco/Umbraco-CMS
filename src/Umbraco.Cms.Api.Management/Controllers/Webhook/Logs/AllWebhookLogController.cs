@@ -21,11 +21,11 @@ public class AllWebhookLogController : WebhookLogControllerBase
         _webhookPresentationFactory = webhookPresentationFactory;
     }
 
-    [HttpGet]
+    [HttpGet("logs")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(WebhookResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> All(CancellationToken cancellationToken, int skip = 0, int take = 100)
+    public async Task<IActionResult> Logs(CancellationToken cancellationToken, int skip = 0, int take = 100)
     {
         PagedModel<WebhookLog> logs = await _webhookLogService.Get(skip, take);
         IEnumerable<WebhookLogResponseModel> logResponseModels = logs.Items.Select(x => _webhookPresentationFactory.CreateResponseModel(x));
