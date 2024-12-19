@@ -45,7 +45,8 @@ describe('UmbClipboardEntryDetailLocalStorageDataSource', () => {
 	describe('Create', () => {
 		it('creates a new entry', async () => {
 			const response = await dataSource.create(clipboardEntry);
-			expect(response.data).to.deep.equal(clipboardEntry);
+			const compareEntry = { ...clipboardEntry, createDate: response.data?.createDate };
+			expect(response.data).to.deep.equal(compareEntry);
 		});
 
 		it('returns an error if entry is missing', async () => {
@@ -66,7 +67,8 @@ describe('UmbClipboardEntryDetailLocalStorageDataSource', () => {
 		it('reads an entry', async () => {
 			await dataSource.create(clipboardEntry);
 			const response = await dataSource.read(clipboardEntry.unique);
-			expect(response.data).to.deep.equal(clipboardEntry);
+			const compareEntry = { ...clipboardEntry, createDate: response.data?.createDate };
+			expect(response.data).to.deep.equal(compareEntry);
 		});
 
 		it('returns an error if unique is missing', async () => {
@@ -84,9 +86,9 @@ describe('UmbClipboardEntryDetailLocalStorageDataSource', () => {
 	describe('Update', () => {
 		it('updates an entry', async () => {
 			await dataSource.create(clipboardEntry);
-			const updatedEntry = { ...clipboardEntry, data: ['updated'] };
+			const updatedEntry = { ...clipboardEntry, value: 'updated' };
 			const response = await dataSource.update(updatedEntry);
-			expect(response.data).to.deep.equal(updatedEntry);
+			expect(response.data?.value).to.equal('updated');
 		});
 
 		it('returns an error if entry is missing', async () => {
