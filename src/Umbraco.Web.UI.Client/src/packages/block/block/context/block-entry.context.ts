@@ -1,5 +1,5 @@
 import type { UmbBlockManagerContext, UmbBlockWorkspaceOriginData } from '../index.js';
-import type { UmbBlockLayoutBaseModel, UmbBlockDataModel, UmbBlockDataType } from '../types.js';
+import type { UmbBlockLayoutBaseModel, UmbBlockDataModel, UmbBlockDataType, UmbBlockExposeModel } from '../types.js';
 import type { UmbBlockEntriesContext } from './block-entries.context.js';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -24,6 +24,8 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
+import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UmbClipboardEntryDetailRepository } from '@umbraco-cms/backoffice/clipboard';
 
 export abstract class UmbBlockEntryContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType>,
@@ -81,6 +83,30 @@ export abstract class UmbBlockEntryContext<
 	public readonly contentElementTypeAlias = this.#contentElementType.asObservablePart((x) => x?.alias);
 	public readonly contentElementTypeIcon = this.#contentElementType.asObservablePart((x) => x?.icon);
 
+	/**
+	 * Get the name of the content element type.
+	 * @returns {string | undefined} - the name of the content element type.
+	 */
+	public getContentElementTypeName(): string | undefined {
+		return this.#contentElementType.getValue()?.name;
+	}
+
+	/**
+	 * Get the alias of the content element type.
+	 * @returns {string | undefined} - the alias of the content element type.
+	 */
+	public getContentElementTypeAlias(): string | undefined {
+		return this.#contentElementType.getValue()?.alias;
+	}
+
+	/**
+	 * Get the icon of the content element type.
+	 * @returns {string | undefined} - the icon of the content element type.
+	 */
+	public getContentElementTypeIcon(): string | undefined {
+		return this.#contentElementType.getValue()?.icon;
+	}
+
 	_blockType = new UmbObjectState<BlockType | undefined>(undefined);
 	public readonly blockType = this._blockType.asObservable();
 	public readonly contentElementTypeKey = this._blockType.asObservablePart((x) => x?.contentElementTypeKey);
@@ -93,6 +119,14 @@ export abstract class UmbBlockEntryContext<
 	public readonly contentKey = this._layout.asObservablePart((x) => x?.contentKey);
 	public readonly settingsKey = this._layout.asObservablePart((x) => (x ? (x.settingsKey ?? null) : undefined));
 	public readonly unique = this._layout.asObservablePart((x) => x?.contentKey);
+
+	/**
+	 * Get the layout of the block.
+	 * @returns {BlockLayoutType | undefined} - the layout of the block.
+	 */
+	public getLayout(): BlockLayoutType | undefined {
+		return this._layout.getValue();
+	}
 
 	#label = new UmbStringState('');
 	public readonly label = this.#label.asObservable();
@@ -216,6 +250,14 @@ export abstract class UmbBlockEntryContext<
 		return this.#contentValuesObservable;
 	}
 
+	/**
+	 * Get the content of the block.
+	 * @returns {UmbBlockDataModel | undefined} - the content of the block.
+	 */
+	public getContent(): UmbBlockDataModel | undefined {
+		return this.#content.getValue();
+	}
+
 	#settings = new UmbObjectState<UmbBlockDataModel | undefined>(undefined);
 	//public readonly settings = this.#settings.asObservable();
 	protected readonly _settingsValueArray = this.#settings.asObservablePart((x) => x?.values);
@@ -241,6 +283,14 @@ export abstract class UmbBlockEntryContext<
 			);
 		}
 		return this.#settingsValuesObservable;
+	}
+
+	/**
+	 * Get the settings of the block.
+	 * @returns {UmbBlockDataModel | undefined} - the settings of the block.
+	 */
+	public getSettings(): UmbBlockDataModel | undefined {
+		return this.#settings.getValue();
 	}
 
 	abstract readonly showContentEdit: Observable<boolean>;
@@ -664,5 +714,52 @@ export abstract class UmbBlockEntryContext<
 		this._manager?.setOneExpose(this.#contentKey, variantId);
 	}
 
-	//copy
+	/**
+	 * Get the expose of the block.
+	 * @returns {UmbBlockExposeModel | undefined} - the expose of the block.
+	 */
+	public getExpose(): UmbBlockExposeModel | undefined {
+		const exposes = this._manager?.getExposes();
+		return exposes?.find((x) => x.contentKey === this.#contentKey);
+	}
+
+	/**
+	 *  Copy the block to the clipboard.
+	 */
+	public async copyToClipboard() {
+		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
+		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
+		const clipboardDetailRepository = new UmbClipboardEntryDetailRepository(this);
+
+		const workspaceName = propertyDatasetContext?.getName();
+		const propertyLabel = propertyContext?.getLabel();
+		const blockLabel = this.getName();
+		const entryName = workspaceName
+			? `${workspaceName} - ${propertyLabel} - ${blockLabel}`
+			: `${propertyLabel} - ${blockLabel}`;
+
+		const content = this.getContent();
+		const layout = this.getLayout();
+		const settings = this.getSettings();
+		const expose = this.getExpose();
+
+		const entryValue = {
+			contentData: content ? [structuredClone(content)] : [],
+			layout: layout ? [structuredClone(layout)] : [],
+			settingsData: settings ? [structuredClone(settings)] : [],
+			expose: expose ? [structuredClone(expose)] : [],
+		};
+
+		const { data } = await clipboardDetailRepository.createScaffold({
+			type: 'block',
+			name: entryName,
+			icon: this.getContentElementTypeIcon(),
+			meta: {}, // TODO: Add correct meta data
+			value: entryValue,
+		});
+
+		if (data) {
+			await clipboardDetailRepository.create(data);
+		}
+	}
 }

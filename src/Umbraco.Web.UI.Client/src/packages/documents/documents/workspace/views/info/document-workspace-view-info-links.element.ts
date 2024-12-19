@@ -1,7 +1,8 @@
 import { UmbDocumentUrlRepository } from '../../../repository/url/document-url.repository.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
-import { css, customElement, html, map, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbDocumentUrlModel } from '../../../repository/url/types.js';
+import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -9,6 +10,12 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { debounce } from '@umbraco-cms/backoffice/utils';
+
+interface UmbDocumentInfoViewLink {
+	culture: string;
+	url: string | undefined;
+	state: DocumentVariantStateModel | null | undefined;
+}
 
 @customElement('umb-document-workspace-view-info-links')
 export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
@@ -24,10 +31,12 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 	private _variantOptions?: Array<UmbDocumentVariantOptionModel>;
 
 	@state()
-	private _lookup: Record<string, string[]> = {};
+	private _loading = false;
 
 	@state()
-	private _loading = false;
+	private _links: Array<UmbDocumentInfoViewLink> = [];
+
+	#urls: Array<UmbDocumentUrlModel> = [];
 
 	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
@@ -61,8 +70,27 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 				}
 			});
 
-			this.observe(context.variantOptions, (variantOptions) => (this._variantOptions = variantOptions));
+			this.observe(context.variantOptions, (variantOptions) => {
+				this._variantOptions = variantOptions;
+				this.#setLinks();
+			});
 		});
+	}
+
+	#setLinks() {
+		const possibleVariantCultures = this._variantOptions?.map((variantOption) => variantOption.culture) ?? [];
+		const possibleUrlCultures = this.#urls.map((link) => link.culture);
+		const possibleCultures = [...new Set([...possibleVariantCultures, ...possibleUrlCultures])].filter(
+			Boolean,
+		) as string[];
+
+		const links: Array<UmbDocumentInfoViewLink> = possibleCultures.map((culture) => {
+			const url = this.#urls.find((link) => link.culture === culture)?.url;
+			const state = this._variantOptions?.find((variantOption) => variantOption.culture === culture)?.variant?.state;
+			return { culture, url, state };
+		});
+
+		this._links = links;
 	}
 
 	async #requestUrls() {
@@ -70,29 +98,21 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		if (!this._unique) return;
 
 		this._loading = true;
-		this._lookup = {};
+		this.#urls = [];
 
 		const { data } = await this.#documentUrlRepository.requestItems([this._unique]);
 
 		if (data?.length) {
 			const item = data[0];
-
-			item.urls.forEach((item) => {
-				if (item.culture && item.url) {
-					if (this._lookup[item.culture] == null) {
-						this._lookup[item.culture] = [];
-					}
-					this._lookup[item.culture].push(item.url);
-				}
-			});
-			this.requestUpdate('_lookup');
+			this.#urls = item.urls;
+			this.#setLinks();
 		}
 
 		this._loading = false;
 	}
 
-	#getStateLocalizationKey(variantOption: UmbDocumentVariantOptionModel) {
-		switch (variantOption.variant?.state) {
+	#getStateLocalizationKey(state: DocumentVariantStateModel | null | undefined): string {
+		switch (state) {
 			case null:
 			case undefined:
 			case DocumentVariantStateModel.NOT_CREATED:
@@ -136,52 +156,60 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 			${when(
 				this._isNew,
 				() => this.#renderNotCreated(),
-				() => this.#renderUrls(),
+				() => (this._links.length === 0 ? this.#renderNoLinks() : this.#renderLinks()),
 			)}
 		`;
 	}
 
 	#renderNotCreated() {
+		return html`${this.#renderEmptyLink(null, null)}`;
+	}
+
+	#renderLinks() {
 		return html`
-			<div class="link-item">
-				<span>
-					<em><umb-localize key="content_notCreated"></umb-localize></em>
-				</span>
-			</div>
+			${repeat(
+				this._links,
+				(link) => link.url,
+				(link) => this.#renderLink(link),
+			)}
 		`;
 	}
 
-	#renderUrls() {
-		if (!this._variantOptions?.length) return nothing;
-		return map(this._variantOptions, (variantOption) => this.#renderUrl(variantOption));
+	#renderLink(link: UmbDocumentInfoViewLink) {
+		if (!link.url) {
+			return this.#renderEmptyLink(link.culture, link.state);
+		}
+
+		return html`
+			<a class="link-item" href=${link.url} target="_blank">
+				<span>
+					${this.#renderLinkCulture(link.culture)}
+					<span>${link.url}</span>
+				</span>
+				<uui-icon name="icon-out"></uui-icon>
+			</a>
+		`;
 	}
 
-	#renderUrl(variantOption: UmbDocumentVariantOptionModel) {
-		const varies = !!variantOption.culture;
-		const culture = varies ? variantOption.culture! : variantOption.language.unique;
-		const urls = this._lookup[culture];
-		return when(
-			urls && urls.length >= 1,
-			() =>
-				html` ${urls.map(
-					(url) =>
-						html` <a class="link-item" href=${url} target="_blank">
-							<span>
-								<span class="culture">${varies ? culture : nothing}</span>
-								<span>${url}</span>
-							</span>
-							<uui-icon name="icon-out"></uui-icon>
-						</a>`,
-				)}`,
-			() => html`
-				<div class="link-item">
-					<span>
-						${when(varies, () => html`<span class="culture">${culture}</span>`)}
-						<em><umb-localize key=${this.#getStateLocalizationKey(variantOption)}></umb-localize></em>
-					</span>
-				</div>
-			`,
-		);
+	#renderNoLinks() {
+		return html` ${this._variantOptions?.map((variantOption) =>
+			this.#renderEmptyLink(variantOption.culture, variantOption.variant?.state),
+		)}`;
+	}
+
+	#renderEmptyLink(culture: string | null, state: DocumentVariantStateModel | null | undefined) {
+		return html`<div class="link-item">
+			<span>
+				${this.#renderLinkCulture(culture)}
+				<em><umb-localize key=${this.#getStateLocalizationKey(state)}></umb-localize></em>
+			</span>
+		</div>`;
+	}
+
+	#renderLinkCulture(culture: string | null) {
+		if (!culture) return nothing;
+		if (this._links.length === 1) return nothing;
+		return html`<span class="culture">${culture}</span>`;
 	}
 
 	override disconnectedCallback(): void {
