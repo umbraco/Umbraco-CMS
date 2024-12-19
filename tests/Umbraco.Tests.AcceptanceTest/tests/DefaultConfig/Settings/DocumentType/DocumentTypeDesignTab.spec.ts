@@ -240,7 +240,6 @@ test('can remove a composition from a document type', async ({umbracoApi, umbrac
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  // await umbracoUi.waitForTimeout(500);
   await umbracoUi.documentType.clickCompositionsButton();
   await umbracoUi.documentType.clickButtonWithName(compositionDocumentTypeName);
   await umbracoUi.documentType.clickSubmitButton();
