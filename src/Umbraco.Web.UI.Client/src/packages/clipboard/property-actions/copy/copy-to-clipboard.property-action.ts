@@ -1,4 +1,3 @@
-import { UmbClipboardEntryDetailRepository } from '../../clipboard-entry/index.js';
 import type { UmbClipboardCopyResolver } from '../../resolver/types.js';
 import type { MetaPropertyActionCopyToClipboardKind } from './types.js';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -66,7 +65,12 @@ export class UmbCopyToClipboardPropertyAction extends UmbPropertyActionBase<Meta
 			throw new Error('The copy resolver is not initialized');
 		}
 
-		await this.#copyResolver.copy(propertyValue, entryName);
+		await this.#copyResolver.copy({
+			icon: undefined, // TODO: Add icon
+			meta: {}, // TODO: Add meta data
+			name: entryName,
+			propertyValue,
+		});
 	}
 }
 export { UmbCopyToClipboardPropertyAction as api };

@@ -1,20 +1,24 @@
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../property-editors/block-list-editor/constants.js';
 import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbClipboardEntryDetailRepository, type UmbClipboardCopyResolver } from '@umbraco-cms/backoffice/clipboard';
+import {
+	UmbClipboardEntryDetailRepository,
+	type UmbClipboardCopyResolver,
+	type UmbClipboardCopyResolverCopyArgs,
+} from '@umbraco-cms/backoffice/clipboard';
 
 export class UmbBlockListClipboardCopyResolver extends UmbControllerBase implements UmbClipboardCopyResolver {
 	#entryType = 'block';
 	#clipboardDetailRepository = new UmbClipboardEntryDetailRepository(this);
 
-	async copy(propertyValue: UmbBlockListValueModel, name: string, meta: Record<string, unknown>) {
-		const entryValue = this.#constructEntryValue(propertyValue);
+	async copy(args: UmbClipboardCopyResolverCopyArgs<UmbBlockListValueModel>) {
+		const entryValue = this.#constructEntryValue(args.propertyValue);
 
 		// TODO: Add correct meta data
 		const { data } = await this.#clipboardDetailRepository.createScaffold({
 			type: this.#entryType,
-			name: name,
-			meta: meta,
+			name: args.name,
+			meta: args.meta,
 			value: entryValue,
 		});
 

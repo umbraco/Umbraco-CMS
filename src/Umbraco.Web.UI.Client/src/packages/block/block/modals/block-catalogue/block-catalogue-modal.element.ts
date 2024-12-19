@@ -111,13 +111,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		const target = event.target as any;
 		const selection = target?.selection || [];
 		const selectedUnique = selection[0];
-
-		const detailRepository = new UmbClipboardEntryDetailRepository(this);
-
-		if (selectedUnique) {
-			const { data } = await detailRepository.requestByUnique(selectedUnique);
-			console.log(data);
-		}
+		console.log('selectedUnique', selectedUnique);
 	}
 
 	override render() {

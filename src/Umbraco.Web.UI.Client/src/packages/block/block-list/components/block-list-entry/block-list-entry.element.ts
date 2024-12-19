@@ -295,8 +295,12 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		};
 
 		const copyResolver = new UmbBlockListClipboardCopyResolver(this);
-		copyResolver.copy(value, entryName, {});
-		debugger;
+		copyResolver.copy({
+			name: entryName,
+			propertyValue: value,
+			icon: this._icon,
+			meta: {},
+		});
 	}
 
 	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
