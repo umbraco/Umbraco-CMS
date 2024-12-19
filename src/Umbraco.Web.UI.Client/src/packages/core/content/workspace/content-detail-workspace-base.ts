@@ -116,7 +116,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	/**
 	 * Data Type Schema Map is used for lookup, this should make coder simpler and give better performance. [NL]
 	 */
-	#dataTypeSchemaAliasMap = new Map<string, string>();
+	//#dataTypeSchemaAliasMap = new Map<string, string>();
 
 	#varies?: boolean;
 	#variesByCulture?: boolean;
@@ -237,6 +237,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			},
 			null,
 		);
+		/*
 		this.observe(
 			this.#dataTypeItemManager.items,
 			(dataTypes) => {
@@ -249,6 +250,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			},
 			null,
 		);
+		*/
 
 		this.loadLanguages();
 	}
@@ -426,7 +428,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			throw new Error(`Property alias "${alias}" not found.`);
 		}
 
-		const editorAlias = this.#dataTypeSchemaAliasMap.get(property.dataType.unique);
+		const editorAlias = (await this.#dataTypeItemManager.getItemByUnique(property.dataType.unique))
+			.propertyEditorSchemaAlias;
+		//const editorAlias = this.#dataTypeSchemaAliasMap.get(property.dataType.unique);
 		if (!editorAlias) {
 			throw new Error(`Editor Alias of "${property.dataType.unique}" not found.`);
 		}
