@@ -13,7 +13,6 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 // TODO: This is across packages, how should we go about getting just a single element from another package? like here we just need the umb-block-type-card element
 import '@umbraco-cms/backoffice/block-type';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbClipboardEntryDetailRepository } from '@umbraco-cms/backoffice/clipboard';
 
 @customElement('umb-block-catalogue-modal')
 export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
@@ -111,13 +110,11 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		const target = event.target as any;
 		const selection = target?.selection || [];
 		const selectedUnique = selection[0];
-
-		const detailRepository = new UmbClipboardEntryDetailRepository(this);
-
-		if (selectedUnique) {
-			const { data } = await detailRepository.requestByUnique(selectedUnique);
-			console.log(data);
-		}
+		this.value = {
+			pasteFromClipboard: {
+				unique: selectedUnique,
+			},
+		};
 	}
 
 	override render() {

@@ -8,11 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.PropertyAction.ColorPicker.PasteFromClipboard',
 		name: 'Color Picker Paste From Clipboard Property Action',
 		forPropertyEditorUis: [UMB_COLOR_PICKER_PROPERTY_EDITOR_UI_ALIAS],
-		meta: {
-			entry: {
-				type: 'color',
-			},
-		},
+		meta: {},
 		conditions: [
 			{
 				alias: UMB_WRITABLE_PROPERTY_CONDITION_ALIAS,

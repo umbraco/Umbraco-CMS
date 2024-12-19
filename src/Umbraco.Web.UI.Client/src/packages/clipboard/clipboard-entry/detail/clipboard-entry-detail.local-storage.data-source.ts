@@ -100,7 +100,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 
 		this.#localStorageManager.setEntries(updatedEntries);
 
-		return { data: model };
+		return { data: newEntry };
 	}
 
 	/**
@@ -211,7 +211,10 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 		});
 
 		this.#localStorageManager.setEntries(updatedEntries);
-		return { data: model };
+
+		const updatedEntry = updatedEntries.find((x) => x.unique === model.unique);
+
+		return { data: updatedEntry };
 	}
 
 	/**

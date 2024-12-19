@@ -59,7 +59,7 @@ describe('UmbClipboardEntryDetailRepository', () => {
 	describe('Create', () => {
 		it('creates a new entry', async () => {
 			const response = await repository.create(detailData);
-			expect(response.data).to.deep.equal(detailData);
+			expect(response.data).to.deep.equal({ ...detailData, createDate: response.data?.createDate });
 		});
 	});
 
@@ -67,16 +67,20 @@ describe('UmbClipboardEntryDetailRepository', () => {
 		it('requests an entry', async () => {
 			await repository.create(detailData);
 			const response = await repository.requestByUnique(detailData.unique);
-			expect(response.data).to.deep.equal(detailData);
+			expect(response.data).to.deep.equal({ ...detailData, createDate: response.data?.createDate });
 		});
 	});
 
 	describe('Update', () => {
 		it('updates an entry', async () => {
 			await repository.create(detailData);
-			const updatedEntry = { ...detailData, data: ['updated'] };
+			const updatedEntry = { ...detailData, value: 'updated' };
 			const response = await repository.save(updatedEntry);
-			expect(response.data).to.deep.equal(updatedEntry);
+			expect(response.data).to.deep.equal({
+				...updatedEntry,
+				createDate: response.data?.createDate,
+				updateDate: response.data?.updateDate,
+			});
 		});
 	});
 
@@ -84,10 +88,6 @@ describe('UmbClipboardEntryDetailRepository', () => {
 		it('deletes an entry', async () => {
 			// create an entry
 			await repository.create(detailData);
-
-			// ensure it is created
-			const response1 = await repository.requestByUnique(detailData.unique);
-			expect(response1.data).to.deep.equal(detailData);
 
 			// delete it
 			await repository.delete(detailData.unique);

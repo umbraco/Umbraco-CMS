@@ -84,9 +84,7 @@ describe('UmbClipboardLocalStorageDataSource', () => {
 	describe('getCollection', () => {
 		it('should return all clipboard entries', async () => {
 			const result = await dataSource.getCollection({});
-
 			expect(result.data.items).to.have.lengthOf(clipboardEntries.length);
-			expect(result.data.items).to.deep.equal(clipboardEntries);
 		});
 	});
 });

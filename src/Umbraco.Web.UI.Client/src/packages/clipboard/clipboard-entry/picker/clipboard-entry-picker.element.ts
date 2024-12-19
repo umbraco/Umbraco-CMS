@@ -51,9 +51,9 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 	}
 
 	async #requestItems() {
-		const entryType = this.config?.entry?.type;
+		const args = this.config?.entryTypes ? { entry: { types: this.config.entryTypes } } : { entry: undefined };
 
-		const { data } = await this.#collectionRepository.requestCollection({ entry: { type: entryType } });
+		const { data } = await this.#collectionRepository.requestCollection(args);
 		this._items = data?.items ?? [];
 	}
 

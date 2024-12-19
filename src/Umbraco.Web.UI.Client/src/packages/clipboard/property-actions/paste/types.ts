@@ -7,9 +7,7 @@ export interface ManifestPropertyActionPasteFromClipboardKind
 }
 
 export interface MetaPropertyActionPasteFromClipboardKind extends MetaPropertyAction {
-	entry: {
-		type: string;
-	};
+	clipboardPasteResolverAlias: string;
 }
 
 declare global {
