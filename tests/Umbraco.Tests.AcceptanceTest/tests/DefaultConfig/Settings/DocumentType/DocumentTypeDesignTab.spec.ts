@@ -213,7 +213,6 @@ test('can create a document type with a composition', {tag: '@smoke'}, async ({u
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.waitForTimeout(500);
   await umbracoUi.documentType.clickCompositionsButton();
   await umbracoUi.documentType.clickButtonWithName(compositionDocumentTypeName);
   await umbracoUi.documentType.clickSubmitButton();
