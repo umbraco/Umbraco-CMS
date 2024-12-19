@@ -27,7 +27,6 @@ test('can create content with the document link', {tag: '@smoke'}, async ({umbra
   const documentTypeForLinkedDocumentId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeForLinkedDocumentName);
   const linkedDocumentName = 'LinkedDocument';
   const linkedDocumentId = await umbracoApi.document.createDefaultDocument(linkedDocumentName, documentTypeForLinkedDocumentId);
-  // await umbracoUi.waitForTimeout(2000);
   await umbracoApi.document.publish(linkedDocumentId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
