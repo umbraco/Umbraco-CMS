@@ -622,9 +622,8 @@ stages:
             displayName: Publish test artifacts
             condition: succeededOrFailed()
             inputs:
-              targetPath: "$(Build.ArtifactStagingDirectory)"
-              artifact: "Acceptance Tests - $(Agent.OS) - Attempt #$(System.JobAttempt)"
-
+              targetPath: $(Build.ArtifactStagingDirectory)
+              artifact: "Acceptance Tests - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
       - job:
         displayName: E2E Tests (SQL Server)
         variables:
@@ -784,7 +783,7 @@ stages:
             displayName: Copy Playwright results
             condition: succeededOrFailed()
 
-          # Publish
+            # Publish
           - task: PublishPipelineArtifact@1
             displayName: Publish test artifacts
             condition: succeededOrFailed()
