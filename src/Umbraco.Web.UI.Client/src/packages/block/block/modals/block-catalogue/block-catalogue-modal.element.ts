@@ -110,7 +110,11 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		const target = event.target as any;
 		const selection = target?.selection || [];
 		const selectedUnique = selection[0];
-		console.log('selectedUnique', selectedUnique);
+		this.value = {
+			pasteFromClipboard: {
+				unique: selectedUnique,
+			},
+		};
 	}
 
 	override render() {
