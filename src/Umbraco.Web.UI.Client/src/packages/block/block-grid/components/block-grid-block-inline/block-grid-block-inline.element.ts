@@ -2,7 +2,7 @@ import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../../context/block-grid-entry.con
 import type { UmbBlockGridWorkspaceOriginData } from '../../workspace/block-grid-workspace.modal-token.js';
 import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from '../../context/block-grid-entries.context-token.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import '../block-grid-areas-container/index.js';
 import '../ref-grid-block/index.js';
@@ -172,6 +172,11 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 					<umb-ufm-render id="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
 				</div>
 			</span>
+			${this.unpublished
+				? html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
+						><umb-localize key="blockEditor_notExposedLabel"></umb-localize
+					></uui-tag>`
+				: nothing}
 		`;
 	}
 
@@ -205,7 +210,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 
 			#exposeButton {
 				width: 100%;
-				min-height: var(--uui-size-layout-3);
+				min-height: var(--uui-size-16);
 			}
 
 			#host {
@@ -239,7 +244,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 				border-color: var(--uui-color-disabled-standalone);
 			}
 
-			:host([unpublished]) #open-part {
+			:host([unpublished]) #open-part #content {
 				opacity: 0.6;
 			}
 
@@ -303,6 +308,13 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 
 			#name {
 				font-weight: 700;
+			}
+
+			uui-tag {
+				margin-left: 0.5em;
+				margin-bottom: -0.3em;
+				margin-top: -0.3em;
+				vertical-align: text-top;
 			}
 
 			:host(:not([disabled])) #open-part:hover #icon {
