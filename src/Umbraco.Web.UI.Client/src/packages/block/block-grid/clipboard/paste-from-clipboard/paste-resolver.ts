@@ -1,8 +1,9 @@
-import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../property-editors/block-list-editor/constants.js';
-import type { UmbBlockListLayoutModel } from '../../types.js';
+import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../property-editors/constants.js';
+import type { UmbBlockGridLayoutModel, UmbBlockGridValueModel } from '../../types.js';
 import { UmbPropertyValueCloneController } from '@umbraco-cms/backoffice/property';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbClipboardEntryDetailRepository, type UmbClipboardPasteResolver } from '@umbraco-cms/backoffice/clipboard';
+import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 
 export class UmbBlockListClipboardPasteResolver extends UmbControllerBase implements UmbClipboardPasteResolver {
 	#detailRepository = new UmbClipboardEntryDetailRepository(this);
@@ -32,7 +33,7 @@ export class UmbBlockListClipboardPasteResolver extends UmbControllerBase implem
 
 		const cloner = new UmbPropertyValueCloneController(this);
 		const clonedValue = await cloner.clone({
-			editorAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
+			editorAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
 			value: propertyValue,
 		});
 
@@ -48,20 +49,22 @@ export class UmbBlockListClipboardPasteResolver extends UmbControllerBase implem
 
 		const clone = structuredClone(value);
 
-		const propertyValue = {
+		const propertyValue: UmbBlockGridValueModel = {
 			contentData: clone.contentData,
 			settingsData: clone.settingsData,
 			expose: clone.expose,
-			layout: clone.layout
-				? {
-						[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: clone.layout.map((layout: UmbBlockListLayoutModel) => {
-							return {
-								...layout,
-								$type: 'BlockListLayoutItem',
-							};
-						}),
-					}
-				: [],
+			layout: {
+				[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]: clone.layout.map((baseLayout: UmbBlockLayoutBaseModel) => {
+					const gridLayout: UmbBlockGridLayoutModel = {
+						...baseLayout,
+						columnSpan: 12,
+						rowSpan: 1,
+						areas: [],
+					};
+
+					return gridLayout;
+				}),
+			},
 		};
 
 		return propertyValue;
