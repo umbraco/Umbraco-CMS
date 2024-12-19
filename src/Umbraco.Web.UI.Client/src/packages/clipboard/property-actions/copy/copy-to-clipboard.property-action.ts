@@ -66,7 +66,7 @@ export class UmbCopyToClipboardPropertyAction extends UmbPropertyActionBase<Meta
 			throw new Error('The copy resolver is not initialized');
 		}
 
-		await this.#copyResolver.execute(propertyValue, entryName);
+		await this.#copyResolver.copy(propertyValue, entryName);
 	}
 }
 export { UmbCopyToClipboardPropertyAction as api };

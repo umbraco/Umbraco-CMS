@@ -1,9 +1,9 @@
-import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../constants.js';
+import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../property-editors/block-list-editor/constants.js';
+import type { UmbBlockListLayoutModel } from '../../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbClipboardEntryDetailRepository, type UmbClipboardPasteResolver } from '@umbraco-cms/backoffice/clipboard';
-import type { UmbBlockListLayoutModel } from 'src/packages/block/block-list/types.js';
 
-export class UmbBlockListClipboardCopyResolver extends UmbControllerBase implements UmbClipboardPasteResolver {
+export class UmbBlockListClipboardPasteResolver extends UmbControllerBase implements UmbClipboardPasteResolver {
 	#detailRepository = new UmbClipboardEntryDetailRepository(this);
 
 	async getAcceptedTypes(): Promise<string[]> {
@@ -57,4 +57,4 @@ export class UmbBlockListClipboardCopyResolver extends UmbControllerBase impleme
 	}
 }
 
-export { UmbBlockListClipboardCopyResolver as api };
+export { UmbBlockListClipboardPasteResolver as api };

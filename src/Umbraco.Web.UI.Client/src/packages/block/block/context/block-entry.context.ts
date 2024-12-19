@@ -722,44 +722,4 @@ export abstract class UmbBlockEntryContext<
 		const exposes = this._manager?.getExposes();
 		return exposes?.find((x) => x.contentKey === this.#contentKey);
 	}
-
-	/**
-	 *  Copy the block to the clipboard.
-	 */
-	public async copyToClipboard() {
-		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
-		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
-		const clipboardDetailRepository = new UmbClipboardEntryDetailRepository(this);
-
-		const workspaceName = propertyDatasetContext?.getName();
-		const propertyLabel = propertyContext?.getLabel();
-		const blockLabel = this.getName();
-		const entryName = workspaceName
-			? `${workspaceName} - ${propertyLabel} - ${blockLabel}`
-			: `${propertyLabel} - ${blockLabel}`;
-
-		const content = this.getContent();
-		const layout = this.getLayout();
-		const settings = this.getSettings();
-		const expose = this.getExpose();
-
-		const entryValue = {
-			contentData: content ? [structuredClone(content)] : [],
-			layout: layout ? [structuredClone(layout)] : [],
-			settingsData: settings ? [structuredClone(settings)] : [],
-			expose: expose ? [structuredClone(expose)] : [],
-		};
-
-		const { data } = await clipboardDetailRepository.createScaffold({
-			type: 'block',
-			name: entryName,
-			icon: this.getContentElementTypeIcon(),
-			meta: {}, // TODO: Add correct meta data
-			value: entryValue,
-		});
-
-		if (data) {
-			await clipboardDetailRepository.create(data);
-		}
-	}
 }

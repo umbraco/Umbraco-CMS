@@ -1,7 +1,7 @@
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export interface UmbClipboardCopyResolver<PropertyValueType = unknown, ClipboardValueType = unknown> extends UmbApi {
-	execute: (value: PropertyValueType, name: any, meta: any) => Promise<ClipboardValueType>;
+export interface UmbClipboardCopyResolver<PropertyValueType = unknown> extends UmbApi {
+	copy: (value: PropertyValueType, name: any, meta: any) => Promise<void>;
 }
 
 export interface UmbClipboardPasteResolver extends UmbApi {
