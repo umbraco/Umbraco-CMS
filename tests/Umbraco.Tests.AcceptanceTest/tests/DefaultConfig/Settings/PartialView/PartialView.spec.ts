@@ -50,7 +50,6 @@ test('can create a partial view from snippet', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
   const partialViewData = await umbracoApi.partialView.getByName(partialViewFileName);
-  console.log(partialViewData.content);
 
   switch (process.platform) {
     case 'win32':
