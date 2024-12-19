@@ -775,7 +775,7 @@ stages:
             displayName: Stop SQL Server LocalDB (Windows)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
 
-           # Copy artifacts
+          # Copy artifacts
           - pwsh: |
               if (Test-Path tests/Umbraco.Tests.AcceptanceTest/results/*) {
                 Copy-Item tests/Umbraco.Tests.AcceptanceTest/results/* $(Build.ArtifactStagingDirectory) -Recurse
@@ -783,13 +783,13 @@ stages:
             displayName: Copy Playwright results
             condition: succeededOrFailed()
 
-            # Publish
+          # Publish
           - task: PublishPipelineArtifact@1
             displayName: Publish test artifacts
             condition: succeededOrFailed()
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
-              artifact: "Acceptance Tests - $(Agent.OS) - Attempt #$(System.JobAttempt)"
+              artifact: "Acceptance Tests - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
   ###############################################
   ## Release
   ###############################################
