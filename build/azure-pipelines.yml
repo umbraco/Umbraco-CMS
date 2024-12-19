@@ -623,7 +623,7 @@ stages:
             condition: succeededOrFailed()
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
-              artifact: "Acceptance Tests - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
+              artifact: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
       - job:
         displayName: E2E Tests (SQL Server)
         variables:
@@ -789,7 +789,7 @@ stages:
             condition: succeededOrFailed()
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
-              artifact: "Acceptance Tests - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
+              artifact: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
   ###############################################
   ## Release
   ###############################################
