@@ -429,9 +429,10 @@ public class ContentRouteBuilderTests : DeliveryApiTests
     {
         var variantContextAccessor = Mock.Of<IVariationContextAccessor>();
 
+
         string Url(IPublishedContent content, string? culture)
         {
-            var ancestorsOrSelf = content.AncestorsOrSelf(contentCache, navigationQueryService).ToArray();
+            var ancestorsOrSelf = content.AncestorsOrSelf(variantContextAccessor, contentCache, navigationQueryService, PublishStatusQueryService).ToArray();
             return ancestorsOrSelf.All(c => c.IsPublished(culture))
                 ? string.Join("/", ancestorsOrSelf.Reverse().Skip(hideTopLevelNodeFromPath ? 1 : 0).Select(c => c.UrlSegment(variantContextAccessor, culture))).EnsureStartsWith("/")
                 : "#";

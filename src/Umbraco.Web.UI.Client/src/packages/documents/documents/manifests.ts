@@ -6,6 +6,7 @@ import { manifests as menuManifests } from './menu/manifests.js';
 import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as pickerManifests } from './picker/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editors/manifests.js';
+import { manifests as publishingManifests } from './publishing/manifests.js';
 import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as rollbackManifests } from './rollback/manifests.js';
@@ -26,6 +27,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...modalManifests,
 	...pickerManifests,
 	...propertyEditorManifests,
+	...publishingManifests,
 	...recycleBinManifests,
 	...repositoryManifests,
 	...rollbackManifests,

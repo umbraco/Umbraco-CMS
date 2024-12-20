@@ -10,11 +10,10 @@ import type {
 import {
 	UmbBlockRteEntriesContext,
 	UmbBlockRteManagerContext,
-	type UmbBlockRteLayoutModel,
 	type UmbBlockRteTypeModel,
 } from '@umbraco-cms/backoffice/block-rte';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import type { UmbBlockValueType } from '@umbraco-cms/backoffice/block';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 // eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name
 export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement implements UmbPropertyEditorUiElement {
@@ -39,7 +38,7 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 	public set value(value: UmbPropertyEditorUiValueType | undefined) {
 		if (!value) {
 			this._value = undefined;
-			this._markup = '';
+			this._markup = this._latestMarkup = '';
 			this.#managerContext.setLayouts([]);
 			this.#managerContext.setContents([]);
 			this.#managerContext.setSettings([]);
@@ -134,30 +133,38 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 				this.#managerContext.setLayouts(layouts);
 			});
 
-			// Observe the value of the property and update the editor value.
-			this.observe(this.#managerContext.layouts, (layouts) => {
-				const blocksValue =
-					this._value && layouts?.length > 0
-						? { ...this._value.blocks, layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts } }
-						: undefined;
+			this.observe(
+				observeMultiple([
+					this.#managerContext.layouts,
+					this.#managerContext.contents,
+					this.#managerContext.settings,
+					this.#managerContext.exposes,
+				]),
+				([layouts, contents, settings, exposes]) => {
+					if (layouts.length === 0) {
+						this._value = undefined;
+					} else {
+						this._value = {
+							markup: this._latestMarkup,
+							blocks: {
+								layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
+								contentData: contents,
+								settingsData: settings,
+								expose: exposes,
+							},
+						};
+					}
 
-				this.#setBlocksValue(blocksValue);
-			});
+					// If we don't have a value set from the outside or an internal value, we don't want to set the value.
+					// This is added to prevent the block list from setting an empty value on startup.
+					if (!this._latestMarkup && !this._value?.markup) {
+						return;
+					}
 
-			this.observe(this.#managerContext.contents, (contents) => {
-				const blocksValue = this._value ? { ...this._value.blocks, contentData: contents } : undefined;
-				this.#setBlocksValue(blocksValue);
-			});
-
-			this.observe(this.#managerContext.settings, (settings) => {
-				const blocksValue = this._value ? { ...this._value.blocks, settingsData: settings } : undefined;
-				this.#setBlocksValue(blocksValue);
-			});
-
-			this.observe(this.#managerContext.exposes, (exposes) => {
-				const blocksValue = this._value ? { ...this._value.blocks, expose: exposes } : undefined;
-				this.#setBlocksValue(blocksValue);
-			});
+					context.setValue(this._value);
+				},
+				'motherObserver',
+			);
 		});
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
@@ -179,19 +186,6 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 		unusedBlocks.forEach((blockLayout) => {
 			this.#managerContext.removeOneLayout(blockLayout.contentKey);
 		});
-	}
-
-	#setBlocksValue(blocksValue?: UmbBlockValueType<UmbBlockRteLayoutModel>) {
-		if (!blocksValue || !this._value) {
-			return;
-		}
-
-		this._value = {
-			...this._value,
-			blocks: blocksValue,
-		};
-
-		this._fireChangeEvent();
 	}
 
 	protected _fireChangeEvent() {
