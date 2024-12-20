@@ -53,20 +53,36 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	 * @param {UmbClipboardEntryDetailModel} entry A clipboard entry to insert into the clipboard
 	 * @memberof UmbClipboardContext
 	 */
-	async write(entry: UmbClipboardEntryDetailModel): Promise<void> {
+	async create(entry: UmbClipboardEntryDetailModel): Promise<void> {
 		if (!entry) throw new Error('Entry is required');
 		if (!entry.unique) throw new Error('Entry must have a unique property');
 		this.#clipboardDetailRepository.create(entry);
 	}
 
 	/**
-	 * Pick a clipboard entry
+	 * Read a clipboard entry for a property. The entry will be translated to the property editor value
+	 * @param {string} unique - The unique id of the clipboard entry
+	 * @param {string} propertyEditorUiAlias - The alias of the property editor to match
+	 * @returns { Promise<UmbClipboardEntryDetailModel | undefined> } - Returns a clipboard entry matching the unique id
+	 */
+	async readForProperty(
+		unique: string,
+		propertyEditorUiAlias: string,
+	): Promise<UmbClipboardEntryDetailModel | undefined> {
+		if (!unique) throw new Error('Unique id is required');
+		if (!propertyEditorUiAlias) throw new Error('Property Editor UI alias is required');
+		const manifest = await this.#findPropertyEditorUiManifest(propertyEditorUiAlias);
+		return this.#resolveEntry(unique, manifest);
+	}
+
+	/**
+	 * Pick a clipboard entry for a property. The entry will be translated to the property editor value
 	 * @param args - Arguments for picking a clipboard entry
 	 * @param {boolean} args.multiple - Allow multiple clipboard entries to be picked
 	 * @param {string} args.propertyEditorUiAlias - The alias of the property editor to match
 	 * @returns { Promise<Array<any>> } - Returns an array of property values matching the property editor alias
 	 */
-	async pick(args: { multiple: boolean; propertyEditorUiAlias: string }): Promise<Array<any>> {
+	async pickForProperty(args: { multiple: boolean; propertyEditorUiAlias: string }): Promise<Array<any>> {
 		await this.#init;
 		const modal = this.#modalManagerContext?.open(this, UMB_CLIPBOARD_ENTRY_PICKER_MODAL);
 		const result = await modal?.onSubmit();
@@ -75,21 +91,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 			throw new Error('No clipboard entry selected');
 		}
 
-		const propertyEditorUiManifest = umbExtensionsRegistry.getByAlias<ManifestPropertyEditorUi>(
-			args.propertyEditorUiAlias,
-		);
-
-		if (!propertyEditorUiManifest) {
-			throw new Error(`Could not find property editor with alias: ${args.propertyEditorUiAlias}`);
-		}
-
-		if (propertyEditorUiManifest.type !== 'propertyEditorUi') {
-			throw new Error(`Alias ${args.propertyEditorUiAlias} is not a property editor ui`);
-		}
-
-		if (!propertyEditorUiManifest.meta.propertyEditorSchemaAlias) {
-			throw new Error('Property editor does not have a schema alias');
-		}
+		const propertyEditorUiManifest = await this.#findPropertyEditorUiManifest(args.propertyEditorUiAlias);
 
 		let propertyValues: Array<any> = [];
 
@@ -102,20 +104,38 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 				throw new Error('No clipboard entry selected');
 			}
 
-			const propertyValue = await this.#resolveEntry(selected, propertyEditorUiManifest.meta.propertyEditorSchemaAlias);
+			const propertyValue = await this.#resolveEntry(selected, propertyEditorUiManifest);
 			propertyValues = [propertyValue];
 		}
 
 		return propertyValues;
 	}
 
-	async #resolveEntry(unique: string, schemaAlias: string): Promise<any> {
+	async #findPropertyEditorUiManifest(alias: string): Promise<ManifestPropertyEditorUi> {
+		const manifest = umbExtensionsRegistry.getByAlias<ManifestPropertyEditorUi>(alias);
+
+		if (!manifest) {
+			throw new Error(`Could not find property editor with alias: ${alias}`);
+		}
+
+		if (manifest.type !== 'propertyEditorUi') {
+			throw new Error(`Alias ${alias} is not a property editor ui`);
+		}
+
+		return manifest;
+	}
+
+	async #resolveEntry(unique: string, manifest: ManifestPropertyEditorUi): Promise<any> {
 		if (!unique) {
 			throw new Error('Unique id is required');
 		}
 
-		if (!schemaAlias) {
-			throw new Error('Editor alias is required');
+		if (!manifest.alias) {
+			throw new Error('Property Editor UI alias is required');
+		}
+
+		if (!manifest.meta.propertyEditorSchemaAlias) {
+			throw new Error('Property Editor UI Schema alias is required');
 		}
 
 		const { data: entry } = await this.#clipboardDetailRepository.requestByUnique(unique);
@@ -127,11 +147,11 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		let propertyValue = undefined;
 
 		const translator = new UmbClipboardEntryPasteTranslatorResolver(this);
-		propertyValue = await translator.translate(entry);
+		propertyValue = await translator.translate(entry, manifest.alias);
 
 		const cloner = new UmbPropertyValueCloneController(this);
 		const clonedValue = await cloner.clone({
-			editorAlias: schemaAlias,
+			editorAlias: manifest.meta.propertyEditorSchemaAlias,
 			value: propertyValue,
 		});
 

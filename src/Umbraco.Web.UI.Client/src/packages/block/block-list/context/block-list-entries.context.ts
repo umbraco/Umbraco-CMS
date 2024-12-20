@@ -1,14 +1,14 @@
 import type { UmbBlockDataModel } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
 import type { UmbBlockListWorkspaceOriginData } from '../index.js';
-import { UMB_BLOCK_LIST_WORKSPACE_MODAL } from '../index.js';
+import { UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS, UMB_BLOCK_LIST_WORKSPACE_MODAL } from '../index.js';
 import type { UmbBlockListLayoutModel, UmbBlockListTypeModel } from '../types.js';
-import { UmbBlockListClipboardPasteResolver } from '../clipboard/index.js';
 import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context-token.js';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_CONTENT_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/content';
+import { UMB_CLIPBOARD_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 
 export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT,
@@ -65,16 +65,17 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 						throw new Error('Failed to create block');
 					}
 				} else if (value?.pasteFromClipboard && value.pasteFromClipboard.unique && data) {
-					console.log('pasteFromClipboard', value.pasteFromClipboard);
-
-					const pasteResolver = new UmbBlockListClipboardPasteResolver(this);
-					const propertyValue = await pasteResolver.resolve(value.pasteFromClipboard.unique);
+					const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
+					const propertyValue = await clipboardContext.readForProperty(
+						value.pasteFromClipboard.unique,
+						UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
+					);
 
 					if (!propertyValue) {
-						throw new Error('Failed to paste block');
+						throw new Error('Failed to read clipboard entry');
 					}
 
-					console.log('pasteResolver', propertyValue);
+					console.log('Clipboard entry:', propertyValue);
 				}
 			})
 			.observeRouteBuilder((routeBuilder) => {

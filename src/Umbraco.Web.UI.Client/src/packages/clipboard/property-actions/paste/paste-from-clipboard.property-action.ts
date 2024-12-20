@@ -34,7 +34,7 @@ export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<M
 			throw new Error('Property editor manifest not found');
 		}
 
-		const propertyValues = await this.#clipboardContext.pick({
+		const propertyValues = await this.#clipboardContext.pickForProperty({
 			propertyEditorUiAlias: propertyEditorManifest.alias,
 			multiple: false,
 		});

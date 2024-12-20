@@ -1,12 +1,8 @@
-import type { UmbClipboardEntryPasteTranslator } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbClipboardEntryPasteTranslatorResolver
-	extends UmbControllerBase
-	implements UmbClipboardEntryPasteTranslator
-{
+export class UmbClipboardEntryPasteTranslatorResolver extends UmbControllerBase {
 	async translate(entry: any, propertyEditorUiAlias: string): Promise<any> {
 		if (!entry) {
 			throw new Error('Clipboard entry is required.');
@@ -16,14 +12,16 @@ export class UmbClipboardEntryPasteTranslatorResolver
 			throw new Error('Clipboard entry type is required.');
 		}
 
+		if (!propertyEditorUiAlias) {
+			throw new Error('Property editor UI alias is required.');
+		}
+
 		// Find the cloner for this editor alias:
 		const manifest = umbExtensionsRegistry.getByTypeAndFilter(
-			'pasteClipboardEntryTranslator',
+			'clipboardEntryPasteTranslator',
 			(x) =>
 				x.forClipboardEntryTypes.includes(entry.type) && x.forPropertyEditorUiAliases.includes(propertyEditorUiAlias),
 		)[0];
-
-		debugger;
 
 		if (!manifest) {
 			return entry.value;
