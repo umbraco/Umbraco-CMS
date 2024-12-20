@@ -272,6 +272,7 @@ export class UmbPropertyElement extends UmbLitElement {
 
 	private async _gotEditorUI(manifest?: ManifestPropertyEditorUi | null): Promise<void> {
 		this.#propertyContext.setEditor(undefined);
+		this.#propertyContext.setEditorManifest(manifest ?? undefined);
 
 		if (!manifest) {
 			// TODO: if propertyEditorUiAlias didn't exist in store, we should do some nice fail UI.

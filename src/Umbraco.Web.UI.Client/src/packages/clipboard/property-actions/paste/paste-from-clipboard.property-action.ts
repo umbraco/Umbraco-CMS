@@ -1,77 +1,46 @@
-import { UMB_CLIPBOARD_ENTRY_PICKER_MODAL } from '../../clipboard-entry/index.js';
-import type { UmbClipboardPasteResolver } from '../../resolver/types.js';
+import { UMB_CLIPBOARD_CONTEXT } from '../../context/clipboard.context-token.js';
 import type { MetaPropertyActionPasteFromClipboardKind } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbPropertyActionBase, type UmbPropertyActionArgs } from '@umbraco-cms/backoffice/property-action';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<MetaPropertyActionPasteFromClipboardKind> {
 	#init: Promise<unknown>;
 	#propertyContext?: typeof UMB_PROPERTY_CONTEXT.TYPE;
-	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
-
-	#pasteResolverAlias?: string;
-	#pasteResolver?: UmbClipboardPasteResolver;
+	#clipboardContext?: typeof UMB_CLIPBOARD_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost, args: UmbPropertyActionArgs<MetaPropertyActionPasteFromClipboardKind>) {
 		super(host, args);
-
-		this.#pasteResolverAlias = args.meta.clipboardPasteResolverAlias;
 
 		this.#init = Promise.all([
 			this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 				this.#propertyContext = context;
 			}).asPromise(),
 
-			this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
-				this.#modalManagerContext = context;
+			this.consumeContext(UMB_CLIPBOARD_CONTEXT, (context) => {
+				this.#clipboardContext = context;
 			}).asPromise(),
 		]);
-
-		if (this.#pasteResolverAlias) {
-			new UmbExtensionApiInitializer(
-				this,
-				umbExtensionsRegistry,
-				this.#pasteResolverAlias,
-				[this],
-				(permitted, ctrl) => {
-					this.#pasteResolver = permitted ? (ctrl.api as UmbClipboardPasteResolver) : undefined;
-				},
-			);
-		}
 	}
 
 	override async execute() {
 		await this.#init;
+		if (!this.#clipboardContext) throw new Error('Clipboard context not found');
+		if (!this.#propertyContext) throw new Error('Property context not found');
 
-		if (!this.#pasteResolver) {
-			throw new Error('No paste resolver was found');
+		const propertyEditorManifest = this.#propertyContext.getEditorManifest();
+
+		if (!propertyEditorManifest) {
+			throw new Error('Property editor manifest not found');
 		}
 
-		const entryTypes = await this.#pasteResolver.getAcceptedTypes();
-
-		const modalContext = this.#modalManagerContext?.open(this, UMB_CLIPBOARD_ENTRY_PICKER_MODAL, {
-			data: {
-				entryTypes,
-			},
+		const propertyValues = await this.#clipboardContext.pick({
+			propertyEditorUiAlias: propertyEditorManifest.alias,
+			multiple: false,
 		});
 
-		const value = await modalContext?.onSubmit();
-		const selectedUnique = value?.selection?.[0];
-
-		if (!selectedUnique) {
-			throw new Error('No clipboard entry was returned');
-		}
-
-		const propertyValue = await this.#pasteResolver.resolve(selectedUnique);
-
-		if (!propertyValue) {
-			throw new Error('No clipboard property value was returned');
-		}
-
+		const propertyValue = propertyValues[0];
+		debugger;
 		this.#propertyContext?.setValue(propertyValue);
 	}
 }

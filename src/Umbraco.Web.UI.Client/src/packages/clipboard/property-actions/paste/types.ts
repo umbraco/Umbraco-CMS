@@ -6,9 +6,7 @@ export interface ManifestPropertyActionPasteFromClipboardKind
 	kind: 'pasteFromClipboard';
 }
 
-export interface MetaPropertyActionPasteFromClipboardKind extends MetaPropertyAction {
-	clipboardPasteResolverAlias: string;
-}
+export interface MetaPropertyActionPasteFromClipboardKind extends MetaPropertyAction {}
 
 declare global {
 	interface UmbExtensionManifestMap {

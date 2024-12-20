@@ -13,6 +13,7 @@ import {
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type {
+	ManifestPropertyEditorUi,
 	UmbPropertyEditorConfigProperty,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
@@ -56,14 +57,42 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 	#editor = new UmbBasicState<UmbPropertyEditorUiElement | undefined>(undefined);
 	public readonly editor = this.#editor.asObservable();
 
+	#editorManifest = new UmbBasicState<ManifestPropertyEditorUi | undefined>(undefined);
+	public readonly editorManifest = this.#editorManifest.asObservable();
+
 	#isReadOnly = new UmbBooleanState(false);
 	public readonly isReadOnly = this.#isReadOnly.asObservable();
 
-	setEditor(editor: UmbPropertyEditorUiElement | undefined) {
-		this.#editor.setValue(editor ?? undefined);
+	/**
+	 * Set the property editor UI element for this property.
+	 * @param {UmbPropertyEditorUiElement | undefined} editorElement The property editor UI element
+	 */
+	setEditor(editorElement: UmbPropertyEditorUiElement | undefined) {
+		this.#editor.setValue(editorElement ?? undefined);
 	}
-	getEditor() {
+
+	/**
+	 * Get the property editor UI element for this property.
+	 * @returns {UmbPropertyEditorUiElement | undefined} The property editor UI element
+	 */
+	getEditor(): UmbPropertyEditorUiElement | undefined {
 		return this.#editor.getValue();
+	}
+
+	/**
+	 * Set the property editor manifest for this property.
+	 * @param {ManifestPropertyEditorUi | undefined} manifest The property editor manifest
+	 */
+	setEditorManifest(manifest: ManifestPropertyEditorUi | undefined) {
+		this.#editorManifest.setValue(manifest ?? undefined);
+	}
+
+	/**
+	 * Get the property editor manifest for this property.
+	 * @returns {UmbPropertyEditorUiElement | undefined} The property editor manifest
+	 */
+	getEditorManifest(): ManifestPropertyEditorUi | undefined {
+		return this.#editorManifest.getValue();
 	}
 
 	// property variant ID:
