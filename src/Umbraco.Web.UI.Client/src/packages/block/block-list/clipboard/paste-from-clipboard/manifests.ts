@@ -23,4 +23,14 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Block List Clipboard Paste Resolver',
 		api: () => import('./paste-resolver.js'),
 	},
+	{
+		type: 'pasteClipboardEntryTranslator',
+		alias: 'Umb.PasteClipboardEntryTranslator.BlockToBlockList',
+		name: 'Block To Block List Paste Clipboard Entry Translator',
+		api: () => import('./paste-block-translator.js'),
+		forClipboardEntryTypes: ['block'],
+		meta: {
+			propertyEditorUiAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
+		},
+	},
 ];

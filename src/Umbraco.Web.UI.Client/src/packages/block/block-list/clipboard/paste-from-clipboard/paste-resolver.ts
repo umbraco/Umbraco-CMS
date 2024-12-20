@@ -1,8 +1,11 @@
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../property-editors/block-list-editor/constants.js';
-import type { UmbBlockListLayoutModel } from '../../types.js';
 import { UmbPropertyValueCloneController } from '@umbraco-cms/backoffice/property';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbClipboardEntryDetailRepository, type UmbClipboardPasteResolver } from '@umbraco-cms/backoffice/clipboard';
+import {
+	UmbClipboardEntryDetailRepository,
+	UmbPasteClipboardEntryTranslateController,
+	type UmbClipboardPasteResolver,
+} from '@umbraco-cms/backoffice/clipboard';
 
 export class UmbBlockListClipboardPasteResolver extends UmbControllerBase implements UmbClipboardPasteResolver {
 	#detailRepository = new UmbClipboardEntryDetailRepository(this);
@@ -27,7 +30,8 @@ export class UmbBlockListClipboardPasteResolver extends UmbControllerBase implem
 		let propertyValue = undefined;
 
 		if (entry.type === 'block') {
-			propertyValue = await this.#transformBlockValue(entry.value);
+			const translator = new UmbPasteClipboardEntryTranslateController(this);
+			propertyValue = await translator.translate(entry);
 		}
 
 		const cloner = new UmbPropertyValueCloneController(this);
@@ -37,32 +41,6 @@ export class UmbBlockListClipboardPasteResolver extends UmbControllerBase implem
 		});
 
 		propertyValue = clonedValue.value;
-
-		return propertyValue;
-	}
-
-	async #transformBlockValue(value: any) {
-		if (!value) {
-			throw new Error('Clipboard entry value is missing.');
-		}
-
-		const clone = structuredClone(value);
-
-		const propertyValue = {
-			contentData: clone.contentData,
-			settingsData: clone.settingsData,
-			expose: clone.expose,
-			layout: clone.layout
-				? {
-						[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: clone.layout.map((layout: UmbBlockListLayoutModel) => {
-							return {
-								...layout,
-								$type: 'BlockListLayoutItem',
-							};
-						}),
-					}
-				: [],
-		};
 
 		return propertyValue;
 	}

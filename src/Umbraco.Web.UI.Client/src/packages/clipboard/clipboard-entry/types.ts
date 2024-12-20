@@ -1,5 +1,7 @@
 import type { UmbClipboardEntryItemModel } from './item/types.js';
 
+export type * from './translator/types.js';
+
 /**
  * A Clipboard entry is a composed set of data representing one entry in the clipboard.
  * The entry has enough knowledge for the context of the clipboard to filter away unsupported entries.
