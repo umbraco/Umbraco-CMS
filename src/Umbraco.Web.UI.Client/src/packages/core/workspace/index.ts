@@ -15,7 +15,4 @@ export * from './utils/object-to-property-value-array.function.js';
 export * from './workspace-property-dataset/index.js';
 export * from './workspace.context-token.js';
 export * from './workspace.element.js';
-export type * from './conditions/index.js';
-export type * from './data-manager/index.js';
 export type * from './types.js';
-export type * from './workspace-context.interface.js';

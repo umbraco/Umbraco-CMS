@@ -200,8 +200,8 @@ test('can enable ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  const tiptapData = await umbracoApi.dataType.getByName(tipTapName);
-  expect(tiptapData.values).toContainEqual(expectedTiptapValues);
+  const tipTapData = await umbracoApi.dataType.getByName(tipTapName);
+  expect(tipTapData.values).toContainEqual(expectedTiptapValues);
 });
 
 test('can delete toolbar group', async ({umbracoApi, umbracoUi}) => {
