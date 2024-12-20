@@ -1,7 +1,7 @@
 import type { UmbClipboardCopyTranslator } from './types.js';
 import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestClipboardCopyTranslator extends ManifestApi<UmbClipboardCopyTranslator> {
+export interface ManifestClipboardCopyTranslator extends ManifestApi<UmbClipboardCopyTranslator<any>> {
 	type: 'clipboardCopyTranslator';
 	forPropertyEditorUis: Array<string>;
 }

@@ -7,7 +7,7 @@ export interface UmbClipboardEntryValueModel {
 
 export type UmbClipboardEntryValuesType = Array<UmbClipboardEntryValueModel>;
 
-export interface UmbClipboardCopyTranslator<PropertyValueModelType = unknown> extends UmbApi {
+export interface UmbClipboardCopyTranslator<PropertyValueModelType> extends UmbApi {
 	translate: (propertyValue: PropertyValueModelType) => Promise<UmbClipboardEntryValuesType>;
 }
 
