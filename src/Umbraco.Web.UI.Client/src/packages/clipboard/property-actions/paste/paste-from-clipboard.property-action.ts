@@ -40,7 +40,6 @@ export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<M
 		});
 
 		const propertyValue = propertyValues[0];
-		debugger;
 		this.#propertyContext?.setValue(propertyValue);
 	}
 }
