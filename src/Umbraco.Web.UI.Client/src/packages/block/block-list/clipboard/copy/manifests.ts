@@ -4,13 +4,10 @@ import { UMB_WRITABLE_PROPERTY_CONDITION_ALIAS } from '@umbraco-cms/backoffice/p
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyAction',
-		kind: 'pasteFromClipboard',
-		alias: 'Umb.PropertyEditorUi.BlockList.PasteFromClipboard',
-		name: 'Block List Paste From Clipboard Property Action',
+		kind: 'copyToClipboard',
+		alias: 'Umb.PropertyEditorUi.BlockList.CopyToClipboard',
+		name: 'Block List Copy To Clipboard Property Action',
 		forPropertyEditorUis: [UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS],
-		meta: {
-			clipboardPasteResolverAlias: 'Umb.ClipBoardPasteResolver.BlockList',
-		},
 		conditions: [
 			{
 				alias: UMB_WRITABLE_PROPERTY_CONDITION_ALIAS,
@@ -18,11 +15,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 		],
 	},
 	{
-		type: 'clipboardEntryPasteTranslator',
-		alias: 'Umb.ClipboardEntryPasteTranslator.BlockToBlockList',
-		name: 'Block To Block List Clipboard Entry Paste Translator',
-		api: () => import('./paste-block-translator.js'),
-		forClipboardEntryTypes: ['block'],
+		type: 'clipboardCopyTranslator',
+		alias: 'Umb.ClipboardCopyTranslator.BlockListToBlock',
+		name: 'Block List Clipboard Copy Translator',
+		api: () => import('./copy-translator.js'),
 		forPropertyEditorUiAliases: [UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS],
 	},
 ];

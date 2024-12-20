@@ -1,1 +1,2 @@
-export * from './clipboard-entry-paste-translator-resolver.js';
+export * from './clipboard-copy-translator-value-resolver.js';
+export * from './clipboard-paste-translator-resolver.js';

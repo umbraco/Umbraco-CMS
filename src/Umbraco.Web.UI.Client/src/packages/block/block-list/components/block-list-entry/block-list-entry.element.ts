@@ -1,7 +1,10 @@
 import { UmbBlockListEntryContext } from '../../context/block-list-entry.context.js';
 import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../types.js';
-import { UMB_BLOCK_LIST, UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../constants.js';
-import { UmbBlockListClipboardCopyResolver } from '../../clipboard/index.js';
+import {
+	UMB_BLOCK_LIST,
+	UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
+	UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
+} from '../../constants.js';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
@@ -17,6 +20,7 @@ import type {
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UUIBlinkAnimationValue } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_CLIPBOARD_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 
 /**
  * @element umb-block-list-entry
@@ -271,6 +275,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	async #copyToClipboard() {
 		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
 		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
+		const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
 
 		const workspaceName = propertyDatasetContext?.getName();
 		const propertyLabel = propertyContext?.getLabel();
@@ -285,7 +290,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		const settings = this.#context.getSettings();
 		const expose = this.#context.getExpose();
 
-		const value: UmbBlockListValueModel = {
+		const propertyValue: UmbBlockListValueModel = {
 			contentData: content ? [structuredClone(content)] : [],
 			layout: {
 				[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: layout ? [structuredClone(layout)] : undefined,
@@ -294,12 +299,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			expose: expose ? [structuredClone(expose)] : [],
 		};
 
-		const copyResolver = new UmbBlockListClipboardCopyResolver(this);
-		copyResolver.copy({
-			name: entryName,
-			propertyValue: value,
+		clipboardContext.writeFromProperty({
 			icon: this._icon,
-			meta: {},
+			name: entryName,
+			propertyValue,
+			propertyEditorUiAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
 		});
 	}
 

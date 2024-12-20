@@ -1,8 +1,6 @@
-import type { UmbClipboardCopyResolver } from '../../resolver/types.js';
+import { UMB_CLIPBOARD_CONTEXT } from '../../context/clipboard.context-token.js';
 import type { MetaPropertyActionCopyToClipboardKind } from './types.js';
-import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbPropertyActionBase, type UmbPropertyActionArgs } from '@umbraco-cms/backoffice/property-action';
@@ -11,15 +9,11 @@ export class UmbCopyToClipboardPropertyAction extends UmbPropertyActionBase<Meta
 	#propertyDatasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 	#propertyContext?: typeof UMB_PROPERTY_CONTEXT.TYPE;
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+	#clipboardContext?: typeof UMB_CLIPBOARD_CONTEXT.TYPE;
 	#init?: Promise<unknown>;
-
-	#copyResolverAlias?: string;
-	#copyResolver?: UmbClipboardCopyResolver;
 
 	constructor(host: UmbControllerHost, args: UmbPropertyActionArgs<MetaPropertyActionCopyToClipboardKind>) {
 		super(host, args);
-
-		this.#copyResolverAlias = args.meta.clipboardCopyResolverAlias;
 
 		this.#init = Promise.all([
 			this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
@@ -33,27 +27,32 @@ export class UmbCopyToClipboardPropertyAction extends UmbPropertyActionBase<Meta
 			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
 				this.#notificationContext = context;
 			}).asPromise(),
-		]);
 
-		if (this.#copyResolverAlias) {
-			new UmbExtensionApiInitializer(
-				this,
-				umbExtensionsRegistry,
-				this.#copyResolverAlias,
-				[this],
-				(permitted, ctrl) => {
-					this.#copyResolver = permitted ? (ctrl.api as UmbClipboardCopyResolver) : undefined;
-				},
-			);
-		}
+			this.consumeContext(UMB_CLIPBOARD_CONTEXT, (context) => {
+				this.#clipboardContext = context;
+			}).asPromise(),
+		]);
 	}
 
 	override async execute() {
 		await this.#init;
-		const workspaceName = this.#propertyDatasetContext?.getName() || 'Unnamed workspace';
-		const propertyLabel = this.#propertyContext?.getLabel() || 'Unnamed property';
-		const propertyValue = this.#propertyContext?.getValue();
+
+		if (!this.#propertyDatasetContext) throw new Error('Property dataset context is not available');
+		if (!this.#propertyContext) throw new Error('Property context is not available');
+		if (!this.#notificationContext) throw new Error('Notification context is not available');
+		if (!this.#clipboardContext) throw new Error('Clipboard context is not available');
+
+		const propertyEditorUiAlias = this.#propertyContext.getEditorManifest()?.alias;
+
+		if (!propertyEditorUiAlias) {
+			throw new Error('Property editor alias is not available');
+		}
+
+		const workspaceName = this.#propertyDatasetContext.getName();
+		const propertyLabel = this.#propertyContext.getLabel()!;
 		const entryName = workspaceName ? `${workspaceName} - ${propertyLabel}` : propertyLabel;
+
+		const propertyValue = this.#propertyContext.getValue();
 
 		if (!propertyValue) {
 			// TODO: Add correct message + localization
@@ -61,15 +60,13 @@ export class UmbCopyToClipboardPropertyAction extends UmbPropertyActionBase<Meta
 			return;
 		}
 
-		if (!this.#copyResolver) {
-			throw new Error('The copy resolver is not initialized');
-		}
+		const propertyEditorUiIcon = this.#propertyContext.getEditorManifest()?.meta.icon;
 
-		await this.#copyResolver.copy({
-			icon: undefined, // TODO: Add icon
-			meta: {}, // TODO: Add meta data
+		this.#clipboardContext.writeFromProperty({
 			name: entryName,
+			icon: propertyEditorUiIcon,
 			propertyValue,
+			propertyEditorUiAlias,
 		});
 	}
 }

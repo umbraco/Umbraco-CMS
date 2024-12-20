@@ -1,11 +1,11 @@
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../property-editors/block-list-editor/constants.js';
 import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbClipboardEntryPasteTranslator } from '@umbraco-cms/backoffice/clipboard';
+import type { UmbClipboardCopyTranslator } from '@umbraco-cms/backoffice/clipboard';
 
-export class UmbCopyBlockListClipboardEntryTranslator
+export class UmbBlockListClipboardCopyTranslator
 	extends UmbControllerBase
-	implements UmbClipboardEntryPasteTranslator<UmbBlockListValueModel, any>
+	implements UmbClipboardCopyTranslator<UmbBlockListValueModel>
 {
 	async translate(propertyValue: UmbBlockListValueModel) {
 		if (!propertyValue) {
@@ -24,13 +24,25 @@ export class UmbCopyBlockListClipboardEntryTranslator
 			delete layoutItem.$type;
 		});
 
-		return {
+		const blockValue = {
 			contentData: contentData ?? [],
 			layout: layout ?? [],
 			settingsData: settingsData ?? [],
 			expose: expose ?? [],
 		};
+
+		return [
+			{
+				type: 'block',
+				value: blockValue,
+			},
+			// TODO: this is just for testing purposes, remove this before merging
+			{
+				type: 'text',
+				value: JSON.stringify(blockValue),
+			},
+		];
 	}
 }
 
-export { UmbCopyBlockListClipboardEntryTranslator as api };
+export { UmbBlockListClipboardCopyTranslator as api };

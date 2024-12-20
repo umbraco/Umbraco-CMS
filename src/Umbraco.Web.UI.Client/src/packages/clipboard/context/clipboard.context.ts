@@ -1,7 +1,8 @@
 import { UMB_CLIPBOARD_ENTRY_PICKER_MODAL } from '../clipboard-entry/picker-modal/index.js';
 import {
+	UmbClipboardCopyTranslatorValueResolver,
 	UmbClipboardEntryDetailRepository,
-	UmbClipboardEntryPasteTranslatorResolver,
+	UmbClipboardPasteTranslatorResolver,
 	type UmbClipboardEntryDetailModel,
 } from '../clipboard-entry/index.js';
 import { UMB_CLIPBOARD_CONTEXT } from './clipboard.context-token.js';
@@ -12,6 +13,7 @@ import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbPropertyValueCloneController } from '@umbraco-cms/backoffice/property';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
+import { name } from '../umbraco-package.js';
 
 /**
  * Clipboard context for managing clipboard entries
@@ -48,31 +50,50 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		]);
 	}
 
-	/**
-	 * Create an entry in the clipboard
-	 * @param {UmbClipboardEntryDetailModel} entry A clipboard entry to insert into the clipboard
-	 * @memberof UmbClipboardContext
-	 */
-	async create(entry: UmbClipboardEntryDetailModel): Promise<void> {
-		if (!entry) throw new Error('Entry is required');
-		if (!entry.unique) throw new Error('Entry must have a unique property');
-		this.#clipboardDetailRepository.create(entry);
+	async write(entryPreset: Partial<UmbClipboardEntryDetailModel>): Promise<void> {
+		if (!entryPreset) throw new Error('Entry is required');
+
+		const { data: scaffoldData } = await this.#clipboardDetailRepository.createScaffold(entryPreset);
+		if (!scaffoldData) return;
+
+		await this.#clipboardDetailRepository.create(scaffoldData);
 	}
 
 	/**
 	 * Read a clipboard entry for a property. The entry will be translated to the property editor value
-	 * @param {string} unique - The unique id of the clipboard entry
+	 * @param {string} clipboardEntryUnique - The unique id of the clipboard entry
 	 * @param {string} propertyEditorUiAlias - The alias of the property editor to match
 	 * @returns { Promise<UmbClipboardEntryDetailModel | undefined> } - Returns a clipboard entry matching the unique id
 	 */
 	async readForProperty(
-		unique: string,
+		clipboardEntryUnique: string,
 		propertyEditorUiAlias: string,
 	): Promise<UmbClipboardEntryDetailModel | undefined> {
-		if (!unique) throw new Error('Unique id is required');
+		if (!clipboardEntryUnique) throw new Error('The Clipboard Entry unique is required');
 		if (!propertyEditorUiAlias) throw new Error('Property Editor UI alias is required');
 		const manifest = await this.#findPropertyEditorUiManifest(propertyEditorUiAlias);
-		return this.#resolveEntry(unique, manifest);
+		return this.#resolveEntry(clipboardEntryUnique, manifest);
+	}
+
+	async writeFromProperty(args: {
+		name: string;
+		icon?: string;
+		propertyValue: any;
+		propertyEditorUiAlias: string;
+	}): Promise<void> {
+		const copyResolver = new UmbClipboardCopyTranslatorValueResolver(this);
+		const values = await copyResolver.resolve(args.propertyValue, args.propertyEditorUiAlias);
+
+		const entryPreset = {
+			name: args.name,
+			value: values,
+			icon: args.icon,
+		};
+
+		const { data: scaffoldData } = await this.#clipboardDetailRepository.createScaffold(entryPreset);
+		if (!scaffoldData) return;
+
+		await this.#clipboardDetailRepository.create(scaffoldData);
 	}
 
 	/**
@@ -146,7 +167,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 
 		let propertyValue = undefined;
 
-		const translator = new UmbClipboardEntryPasteTranslatorResolver(this);
+		const translator = new UmbClipboardPasteTranslatorResolver(this);
 		propertyValue = await translator.translate(entry, manifest.alias);
 
 		const cloner = new UmbPropertyValueCloneController(this);

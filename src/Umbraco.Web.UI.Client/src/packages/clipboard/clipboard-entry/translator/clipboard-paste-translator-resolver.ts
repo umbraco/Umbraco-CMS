@@ -2,7 +2,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbClipboardEntryPasteTranslatorResolver extends UmbControllerBase {
+export class UmbClipboardPasteTranslatorResolver extends UmbControllerBase {
 	async translate(entry: any, propertyEditorUiAlias: string): Promise<any> {
 		if (!entry) {
 			throw new Error('Clipboard entry is required.');
@@ -18,7 +18,7 @@ export class UmbClipboardEntryPasteTranslatorResolver extends UmbControllerBase 
 
 		// Find the cloner for this editor alias:
 		const manifest = umbExtensionsRegistry.getByTypeAndFilter(
-			'clipboardEntryPasteTranslator',
+			'clipboardPasteTranslator',
 			(x) =>
 				x.forClipboardEntryTypes.includes(entry.type) && x.forPropertyEditorUiAliases.includes(propertyEditorUiAlias),
 		)[0];
