@@ -3,7 +3,7 @@ import { UmbPropertyValueCloneController } from '@umbraco-cms/backoffice/propert
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import {
 	UmbClipboardEntryDetailRepository,
-	UmbPasteClipboardEntryTranslateController,
+	UmbClipboardEntryPasteTranslatorResolver,
 	type UmbClipboardPasteResolver,
 } from '@umbraco-cms/backoffice/clipboard';
 

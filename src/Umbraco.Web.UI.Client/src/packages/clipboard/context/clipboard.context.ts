@@ -1,7 +1,7 @@
 import { UMB_CLIPBOARD_ENTRY_PICKER_MODAL } from '../clipboard-entry/picker-modal/index.js';
 import {
 	UmbClipboardEntryDetailRepository,
-	UmbPasteClipboardEntryTranslateController,
+	UmbClipboardEntryPasteTranslatorResolver,
 	type UmbClipboardEntryDetailModel,
 } from '../clipboard-entry/index.js';
 import { UMB_CLIPBOARD_CONTEXT } from './clipboard.context-token.js';
@@ -59,6 +59,13 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		this.#clipboardDetailRepository.create(entry);
 	}
 
+	/**
+	 * Pick a clipboard entry
+	 * @param args - Arguments for picking a clipboard entry
+	 * @param {boolean} args.multiple - Allow multiple clipboard entries to be picked
+	 * @param {string} args.propertyEditorUiAlias - The alias of the property editor to match
+	 * @returns { Promise<Array<any>> } - Returns an array of property values matching the property editor alias
+	 */
 	async pick(args: { multiple: boolean; propertyEditorUiAlias: string }): Promise<Array<any>> {
 		await this.#init;
 		const modal = this.#modalManagerContext?.open(this, UMB_CLIPBOARD_ENTRY_PICKER_MODAL);
@@ -119,7 +126,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 
 		let propertyValue = undefined;
 
-		const translator = new UmbPasteClipboardEntryTranslateController(this);
+		const translator = new UmbClipboardEntryPasteTranslatorResolver(this);
 		propertyValue = await translator.translate(entry);
 
 		const cloner = new UmbPropertyValueCloneController(this);

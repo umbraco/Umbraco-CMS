@@ -1,11 +1,11 @@
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../property-editors/block-list-editor/constants.js';
 import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbPasteClipboardEntryTranslator } from '@umbraco-cms/backoffice/clipboard';
+import type { UmbClipboardEntryPasteTranslator } from '@umbraco-cms/backoffice/clipboard';
 
 export class UmbCopyBlockListClipboardEntryTranslator
 	extends UmbControllerBase
-	implements UmbPasteClipboardEntryTranslator<UmbBlockListValueModel, any>
+	implements UmbClipboardEntryPasteTranslator<UmbBlockListValueModel, any>
 {
 	async translate(propertyValue: UmbBlockListValueModel) {
 		if (!propertyValue) {
