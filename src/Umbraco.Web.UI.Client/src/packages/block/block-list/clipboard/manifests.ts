@@ -1,4 +1,4 @@
-import { manifests as copyToClipboardManifests } from './copy/manifests.js';
-import { manifests as pasteFromClipboardManifests } from './paste/manifests.js';
+import { manifests as copyManifests } from './copy/manifests.js';
+import { manifests as pasteManifests } from './paste/manifests.js';
 
-export const manifests: Array<UmbExtensionManifest> = [...copyToClipboardManifests, ...pasteFromClipboardManifests];
+export const manifests: Array<UmbExtensionManifest> = [...copyManifests, ...pasteManifests];

@@ -8,9 +8,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.PropertyEditorUi.BlockGrid.PasteFromClipboard',
 		name: 'Block Grid Paste From Clipboard Property Action',
 		forPropertyEditorUis: [UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS],
-		meta: {
-			clipboardPasteResolverAlias: 'Umb.ClipBoardPasteResolver.BlockGrid',
-		},
 		conditions: [
 			{
 				alias: UMB_WRITABLE_PROPERTY_CONDITION_ALIAS,
@@ -18,9 +15,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 		],
 	},
 	{
-		type: 'clipboardPasteResolver',
-		alias: 'Umb.ClipBoardPasteResolver.BlockGrid',
-		name: 'Block Grid Clipboard Paste Resolver',
-		api: () => import('./paste-resolver.js'),
+		type: 'clipboardPasteTranslator',
+		alias: 'Umb.ClipboardPasteTranslator.BlockGrid',
+		name: 'Block Grid Clipboard Paste Translator',
+		api: () => import('./paste-translator.js'),
+		forClipboardEntryTypes: ['block'],
+		forPropertyEditorUiAliases: [UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS],
 	},
 ];

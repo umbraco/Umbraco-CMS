@@ -3,17 +3,17 @@ import type { UmbBlockListValueModel } from '../../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbClipboardPasteTranslator } from '@umbraco-cms/backoffice/clipboard';
 
-export class UmbBlockToBlockListClipboardPasteTranslator
+export class UmbBlockListClipboardPasteTranslator
 	extends UmbControllerBase
 	implements UmbClipboardPasteTranslator<any, UmbBlockListValueModel>
 {
 	// TODO: add model for BlockClipboardEntryModel
-	async translate(entry: any) {
-		if (!entry) {
-			throw new Error('Clipboard entry is missing.');
+	async translate(clipboardEntryValue: any) {
+		if (!clipboardEntryValue) {
+			throw new Error('Value is missing.');
 		}
 
-		const valueClone = structuredClone(entry.value);
+		const valueClone = structuredClone(clipboardEntryValue.value);
 
 		const propertyValue: UmbBlockListValueModel = {
 			contentData: valueClone.contentData,
@@ -28,4 +28,4 @@ export class UmbBlockToBlockListClipboardPasteTranslator
 	}
 }
 
-export { UmbBlockToBlockListClipboardPasteTranslator as api };
+export { UmbBlockListClipboardPasteTranslator as api };

@@ -7,11 +7,10 @@ describe('UmbClipboardEntryDetailLocalStorageDataSource', () => {
 	let dataSource: UmbClipboardEntryDetailLocalStorageDataSource;
 	const clipboardEntry: UmbClipboardEntryDetailModel = {
 		entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
-		value: 'test',
+		values: [{ type: 'default', value: 'test' }],
 		icon: 'icon',
 		meta: {},
 		name: 'Test',
-		type: 'test',
 		unique: '123',
 		createDate: null,
 		updateDate: null,
@@ -88,7 +87,7 @@ describe('UmbClipboardEntryDetailLocalStorageDataSource', () => {
 			await dataSource.create(clipboardEntry);
 			const updatedEntry = { ...clipboardEntry, value: 'updated' };
 			const response = await dataSource.update(updatedEntry);
-			expect(response.data?.value).to.equal('updated');
+			expect(response.data?.values).to.equal('updated');
 		});
 
 		it('returns an error if entry is missing', async () => {

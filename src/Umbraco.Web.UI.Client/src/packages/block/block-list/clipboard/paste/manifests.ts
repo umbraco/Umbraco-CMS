@@ -8,9 +8,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.PropertyEditorUi.BlockList.PasteFromClipboard',
 		name: 'Block List Paste From Clipboard Property Action',
 		forPropertyEditorUis: [UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS],
-		meta: {
-			clipboardPasteResolverAlias: 'Umb.ClipBoardPasteResolver.BlockList',
-		},
 		conditions: [
 			{
 				alias: UMB_WRITABLE_PROPERTY_CONDITION_ALIAS,
@@ -19,8 +16,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'clipboardPasteTranslator',
-		alias: 'Umb.ClipboardEntryPasteTranslator.BlockToBlockList',
-		name: 'Block To Block List Clipboard Entry Paste Translator',
+		alias: 'Umb.ClipboardPasteTranslator.BlockList',
+		name: 'Block List Clipboard Paste Translator',
 		api: () => import('./paste-translator.js'),
 		forClipboardEntryTypes: ['block'],
 		forPropertyEditorUiAliases: [UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS],

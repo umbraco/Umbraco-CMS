@@ -23,7 +23,6 @@ export class UmbClipboardEntryItemLocalStorageDataSource implements UmbItemDataS
 				const item: UmbClipboardEntryItemModel = {
 					entityType: entry.entityType,
 					unique: entry.unique,
-					type: entry.type,
 					name: entry.name,
 					icon: entry.icon,
 					meta: entry.meta,

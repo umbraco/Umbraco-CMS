@@ -18,11 +18,10 @@ describe('UmbClipboardEntryDetailRepository', () => {
 	let repository: UmbClipboardEntryDetailRepository;
 	const detailData: UmbClipboardEntryDetailModel = {
 		entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
-		value: 'test',
+		values: [{ type: 'default', value: 'test' }],
 		icon: 'icon',
 		meta: {},
 		name: 'Test',
-		type: 'test',
 		unique: '123',
 		createDate: null,
 		updateDate: null,

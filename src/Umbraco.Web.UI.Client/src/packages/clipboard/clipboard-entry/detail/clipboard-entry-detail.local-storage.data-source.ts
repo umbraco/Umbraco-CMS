@@ -31,12 +31,11 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 	 */
 	async createScaffold(preset: Partial<UmbClipboardEntryDetailModel> = {}) {
 		const data: UmbClipboardEntryDetailModel = {
-			value: undefined,
+			values: [],
 			entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
 			icon: null,
 			meta: {},
 			name: null,
-			type: '',
 			unique: UmbId.new(),
 			createDate: null,
 			updateDate: null,

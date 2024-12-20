@@ -1,7 +1,5 @@
 export interface UmbClipboardCollectionFilterModel {
-	entry?: {
-		types: Array<string>;
-	};
+	types?: Array<string>;
 	skip?: number;
 	take?: number;
 }

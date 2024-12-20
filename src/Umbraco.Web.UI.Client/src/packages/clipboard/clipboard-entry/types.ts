@@ -1,3 +1,4 @@
+import type { UmbClipboardEntryValues } from '../types.js';
 import type { UmbClipboardEntryItemModel } from './item/types.js';
 
 export type * from './translator/types.js';
@@ -6,12 +7,11 @@ export type * from './translator/types.js';
  * A Clipboard entry is a composed set of data representing one entry in the clipboard.
  * The entry has enough knowledge for the context of the clipboard to filter away unsupported entries.
  */
-export interface UmbClipboardEntryDetailModel<Type extends string = string, MetaType = object, ValueType = unknown>
-	extends UmbClipboardEntryItemModel<Type, MetaType> {
+export interface UmbClipboardEntryDetailModel<MetaType = object> extends UmbClipboardEntryItemModel<MetaType> {
 	/**
-	 * The value of the clipboard entry.
+	 * The values of the clipboard entry.
 	 */
-	value: ValueType;
+	values: UmbClipboardEntryValues;
 }
 
 /**

@@ -3,9 +3,7 @@ import type { UmbClipboardEntryDetailModel } from './clipboard-entry/index.js';
 const UMB_CLIPBOARD_LOCALSTORAGE_KEY = 'umb:clipboard';
 
 interface UmbClipboardLocalStorageFilterModel {
-	entry?: {
-		types: Array<string>;
-	};
+	types?: Array<string>;
 	skip?: number;
 	take?: number;
 }
@@ -51,8 +49,9 @@ export class UmbClipboardLocalStorageManager {
 
 	#filterEntries(entries: Array<UmbClipboardEntryDetailModel>, filter: UmbClipboardLocalStorageFilterModel) {
 		return entries.filter((entry) => {
-			if (filter.entry?.types) {
-				return filter.entry.types.includes(entry.type);
+			if (filter.types) {
+				const valueTypes = entry.values.map((x) => x.type);
+				return filter.types.some((type) => valueTypes.includes(type));
 			}
 			return true;
 		});

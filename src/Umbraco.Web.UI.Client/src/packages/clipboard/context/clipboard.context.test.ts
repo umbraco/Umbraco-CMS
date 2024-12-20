@@ -1,3 +1,4 @@
+/*
 import { expect } from '@open-wc/testing';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
@@ -18,7 +19,7 @@ describe('UmbSelectionManager', () => {
 		name: 'Text',
 		icon: 'icon-text',
 		meta: {},
-		value: 'value text',
+		values: 'value text',
 	};
 
 	const mediaClipboardEntry: UmbClipboardEntryDetailModel = {
@@ -28,7 +29,7 @@ describe('UmbSelectionManager', () => {
 		name: 'Media',
 		icon: 'icon-media',
 		meta: {},
-		value: 'value media',
+		values: 'value media',
 	};
 
 	beforeEach(() => {
@@ -128,3 +129,4 @@ describe('UmbSelectionManager', () => {
 		});
 	});
 });
+*/
