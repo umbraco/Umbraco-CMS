@@ -83,9 +83,9 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		const copyResolver = new UmbClipboardCopyTranslatorValueResolver(this);
 		const values = await copyResolver.resolve(args.propertyValue, args.propertyEditorUiAlias);
 
-		const entryPreset = {
+		const entryPreset: Partial<UmbClipboardEntryDetailModel> = {
 			name: args.name,
-			value: values,
+			values,
 			icon: args.icon,
 		};
 

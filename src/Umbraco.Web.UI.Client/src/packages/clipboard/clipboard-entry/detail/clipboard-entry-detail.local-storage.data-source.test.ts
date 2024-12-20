@@ -85,9 +85,9 @@ describe('UmbClipboardEntryDetailLocalStorageDataSource', () => {
 	describe('Update', () => {
 		it('updates an entry', async () => {
 			await dataSource.create(clipboardEntry);
-			const updatedEntry = { ...clipboardEntry, value: 'updated' };
+			const updatedEntry = { ...clipboardEntry, values: [{ type: 'default', value: 'updated' }] };
 			const response = await dataSource.update(updatedEntry);
-			expect(response.data?.values).to.equal('updated');
+			expect(response.data?.values[0]).to.equal('updated');
 		});
 
 		it('returns an error if entry is missing', async () => {

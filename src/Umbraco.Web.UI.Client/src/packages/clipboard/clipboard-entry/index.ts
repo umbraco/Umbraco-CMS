@@ -5,6 +5,6 @@ export { UmbClipboardEntryDetailRepository, UMB_CLIPBOARD_ENTRY_DETAIL_REPOSITOR
 export { UmbClipboardEntryDetailStore } from './detail/index.js';
 export { UmbClipboardEntryItemRepository, UMB_CLIPBOARD_ENTRY_ITEM_REPOSITORY_ALIAS } from './item/index.js';
 export * from './entity.js';
-export * from './translator/index.js';
+export * from '../translator/index.js';
 
 export type * from './types.js';
