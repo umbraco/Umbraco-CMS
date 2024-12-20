@@ -92,8 +92,10 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 			};
 		}
 
+		const now = new Date().toISOString();
 		const newEntry: UmbClipboardEntryDetailModel = structuredClone(model);
-		newEntry.createDate = new Date().toISOString();
+		newEntry.createDate = now;
+		newEntry.updateDate = now;
 
 		const updatedEntries = [...entries, newEntry];
 
