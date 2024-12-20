@@ -37,6 +37,7 @@ public class DataTypeBuilder
     private int? _sortOrder;
     private bool? _trashed;
     private DateTime? _updateDate;
+    private Dictionary<string, object> _configurationData = [];
 
     public DataTypeBuilder() => _dataEditorBuilder = new DataEditorBuilder<DataTypeBuilder>(this);
 
@@ -118,6 +119,12 @@ public class DataTypeBuilder
         return this;
     }
 
+    public DataTypeBuilder WithConfigurationData(Dictionary<string, object> configurationData)
+    {
+        _configurationData = configurationData;
+        return this;
+    }
+
     public DataEditorBuilder<DataTypeBuilder> AddEditor() => _dataEditorBuilder;
 
     public override DataType Build()
@@ -136,6 +143,7 @@ public class DataTypeBuilder
         var databaseType = _databaseType ?? ValueStorageType.Ntext;
         var sortOrder = _sortOrder ?? 0;
         var serializer = new SystemTextConfigurationEditorJsonSerializer();
+        var configurationData = _configurationData;
 
         return new DataType(editor, serializer, parentId)
         {
@@ -150,7 +158,8 @@ public class DataTypeBuilder
             Path = path,
             CreatorId = creatorId,
             DatabaseType = databaseType,
-            SortOrder = sortOrder
+            SortOrder = sortOrder,
+            ConfigurationData = configurationData,
         };
     }
 }

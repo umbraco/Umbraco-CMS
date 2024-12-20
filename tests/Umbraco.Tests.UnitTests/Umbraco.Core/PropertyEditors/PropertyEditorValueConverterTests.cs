@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Serialization;
+using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
@@ -46,26 +47,45 @@ public class PropertyEditorValueConverterTests
         }
     }
 
-    [TestCase("TRUE", true)]
-    [TestCase("True", true)]
-    [TestCase("true", true)]
-    [TestCase("1", true)]
-    [TestCase(1, true)]
-    [TestCase(true, true)]
-    [TestCase("FALSE", false)]
-    [TestCase("False", false)]
-    [TestCase("false", false)]
-    [TestCase("0", false)]
-    [TestCase(0, false)]
-    [TestCase(false, false)]
-    [TestCase("", false)]
-    [TestCase(null, false)]
-    [TestCase("blah", false)]
-    public void CanConvertYesNoPropertyEditor(object value, bool expected)
+    [TestCase("TRUE", null, true)]
+    [TestCase("True", null, true)]
+    [TestCase("true", null, true)]
+    [TestCase("1", null, true)]
+    [TestCase(1, null, true)]
+    [TestCase(true, null, true)]
+    [TestCase("FALSE", null, false)]
+    [TestCase("False", null, false)]
+    [TestCase("false", null, false)]
+    [TestCase("0", null, false)]
+    [TestCase(0, null, false)]
+    [TestCase(false, null, false)]
+    [TestCase("", null, false)]
+    [TestCase("blah", null, false)]
+    [TestCase(null, null, false)]
+    [TestCase(null, false, false)]
+    [TestCase(null, true, true)]
+    public void CanConvertYesNoPropertyEditor(object value, bool? initialStateConfigurationValue, bool expected)
     {
+        var dataTypeConfiguration = new Dictionary<string, object>();
+        if (initialStateConfigurationValue.HasValue)
+        {
+            dataTypeConfiguration.Add("default", initialStateConfigurationValue.Value);
+        }
+
+        var dataType = new DataTypeBuilder()
+            .WithConfigurationData(dataTypeConfiguration)
+            .Build();
+
+        var publishedDataType = new PublishedDataType(dataType.Id, dataType.EditorAlias, dataType.EditorUiAlias, new Lazy<object>(() => dataTypeConfiguration));
+
+        var publishedPropertyTypeMock = new Mock<IPublishedPropertyType>();
+        publishedPropertyTypeMock
+            .SetupGet(p => p.DataType)
+            .Returns(publishedDataType);
+
         var converter = new YesNoValueConverter();
         var result =
-            converter.ConvertSourceToIntermediate(null, null, value, false); // does not use type for conversion
+            converter.ConvertSourceToIntermediate(null, publishedPropertyTypeMock.Object, value, false); // does not use type for conversion
 
         Assert.AreEqual(expected, result);
     }
