@@ -19,7 +19,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.ClipboardPasteTranslator.BlockList',
 		name: 'Block List Clipboard Paste Translator',
 		api: () => import('./paste-translator.js'),
-		forClipboardEntryTypes: ['block'],
-		forPropertyEditorUis: [UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS],
+		fromClipboardEntryValueTypes: ['block'],
+		toPropertyEditorUis: [UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS],
 	},
 ];

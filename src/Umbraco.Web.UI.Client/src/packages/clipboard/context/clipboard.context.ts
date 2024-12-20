@@ -2,7 +2,7 @@ import { UMB_CLIPBOARD_ENTRY_PICKER_MODAL } from '../clipboard-entry/picker-moda
 import {
 	UmbClipboardCopyTranslatorValueResolver,
 	UmbClipboardEntryDetailRepository,
-	UmbClipboardPasteTranslatorResolver,
+	UmbClipboardPasteTranslatorValueResolver,
 	type UmbClipboardEntryDetailModel,
 } from '../clipboard-entry/index.js';
 import { UMB_CLIPBOARD_CONTEXT } from './clipboard.context-token.js';
@@ -145,33 +145,33 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		return manifest;
 	}
 
-	async #resolveEntry(unique: string, manifest: ManifestPropertyEditorUi): Promise<any> {
-		if (!unique) {
+	async #resolveEntry(clipboardEntryUnique: string, propertyEditorUiManifest: ManifestPropertyEditorUi): Promise<any> {
+		if (!clipboardEntryUnique) {
 			throw new Error('Unique id is required');
 		}
 
-		if (!manifest.alias) {
+		if (!propertyEditorUiManifest.alias) {
 			throw new Error('Property Editor UI alias is required');
 		}
 
-		if (!manifest.meta.propertyEditorSchemaAlias) {
+		if (!propertyEditorUiManifest.meta.propertyEditorSchemaAlias) {
 			throw new Error('Property Editor UI Schema alias is required');
 		}
 
-		const { data: entry } = await this.#clipboardDetailRepository.requestByUnique(unique);
+		const { data: entry } = await this.#clipboardDetailRepository.requestByUnique(clipboardEntryUnique);
 
 		if (!entry) {
-			throw new Error(`Could not find clipboard entry with unique id: ${unique}`);
+			throw new Error(`Could not find clipboard entry with unique id: ${clipboardEntryUnique}`);
 		}
 
 		let propertyValue = undefined;
 
-		const translator = new UmbClipboardPasteTranslatorResolver(this);
-		propertyValue = await translator.translate(entry, manifest.alias);
+		const valueResolver = new UmbClipboardPasteTranslatorValueResolver(this);
+		propertyValue = await valueResolver.resolve(entry.values, propertyEditorUiManifest.alias);
 
 		const cloner = new UmbPropertyValueCloneController(this);
 		const clonedValue = await cloner.clone({
-			editorAlias: manifest.meta.propertyEditorSchemaAlias,
+			editorAlias: propertyEditorUiManifest.meta.propertyEditorSchemaAlias,
 			value: propertyValue,
 		});
 

@@ -1,10 +1,10 @@
-import type { UmbClipboardEntryValues } from './types.js';
+import type { UmbClipboardEntryValuesType } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbClipboardCopyTranslatorValueResolver extends UmbControllerBase {
-	async resolve(propertyValue: any, propertyEditorUiAlias: string): Promise<UmbClipboardEntryValues> {
+	async resolve(propertyValue: any, propertyEditorUiAlias: string): Promise<UmbClipboardEntryValuesType> {
 		if (!propertyValue) {
 			throw new Error('Property value is required.');
 		}

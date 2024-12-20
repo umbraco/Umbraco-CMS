@@ -5,13 +5,12 @@ export interface UmbClipboardEntryValueModel {
 	value: any;
 }
 
-export type UmbClipboardEntryValues = Array<UmbClipboardEntryValueModel>;
+export type UmbClipboardEntryValuesType = Array<UmbClipboardEntryValueModel>;
 
-export interface UmbClipboardCopyTranslator<PropertyValueModelType = any> extends UmbApi {
-	translate: (propertyValue: PropertyValueModelType) => Promise<Array<UmbClipboardEntryValueModel> | undefined>;
+export interface UmbClipboardCopyTranslator<PropertyValueModelType = unknown> extends UmbApi {
+	translate: (propertyValue: PropertyValueModelType) => Promise<UmbClipboardEntryValuesType | undefined>;
 }
 
-export interface UmbClipboardPasteTranslator<ClipboardEntryModelType = any, PropertyValueModelType = any>
-	extends UmbApi {
-	translate: (clipboardEntry: ClipboardEntryModelType) => Promise<PropertyValueModelType | undefined>;
+export interface UmbClipboardPasteTranslator<PropertyValueModelType = unknown> extends UmbApi {
+	translate: (clipboardEntryValues: UmbClipboardEntryValuesType) => Promise<Array<PropertyValueModelType>>;
 }

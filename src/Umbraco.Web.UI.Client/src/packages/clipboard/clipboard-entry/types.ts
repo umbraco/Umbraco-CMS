@@ -1,4 +1,4 @@
-import type { UmbClipboardEntryValues } from '../types.js';
+import type { UmbClipboardEntryValuesType } from '../types.js';
 import type { UmbClipboardEntryItemModel } from './item/types.js';
 
 /**
@@ -9,7 +9,7 @@ export interface UmbClipboardEntryDetailModel<MetaType = object> extends UmbClip
 	/**
 	 * The values of the clipboard entry.
 	 */
-	values: UmbClipboardEntryValues;
+	values: UmbClipboardEntryValuesType;
 }
 
 /**
