@@ -49,7 +49,7 @@ export class UmbClipboardLocalStorageManager {
 
 	#filterEntries(entries: Array<UmbClipboardEntryDetailModel>, filter: UmbClipboardLocalStorageFilterModel) {
 		return entries.filter((entry) => {
-			if (filter.types) {
+			if (filter.types?.length) {
 				const valueTypes = entry.values.map((x) => x.type);
 				return filter.types.some((type) => valueTypes.includes(type));
 			}
