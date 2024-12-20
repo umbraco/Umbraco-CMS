@@ -8,7 +8,7 @@ export interface UmbClipboardEntryValueModel {
 export type UmbClipboardEntryValuesType = Array<UmbClipboardEntryValueModel>;
 
 export interface UmbClipboardCopyTranslator<PropertyValueModelType = unknown> extends UmbApi {
-	translate: (propertyValue: PropertyValueModelType) => Promise<UmbClipboardEntryValuesType | undefined>;
+	translate: (propertyValue: PropertyValueModelType) => Promise<UmbClipboardEntryValuesType>;
 }
 
 export interface UmbClipboardPasteTranslator<PropertyValueModelType = unknown> extends UmbApi {

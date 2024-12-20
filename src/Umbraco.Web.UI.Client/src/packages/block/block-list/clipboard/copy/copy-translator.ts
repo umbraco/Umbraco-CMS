@@ -1,13 +1,13 @@
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../property-editors/block-list-editor/constants.js';
 import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbClipboardCopyTranslator } from '@umbraco-cms/backoffice/clipboard';
+import type { UmbClipboardCopyTranslator, UmbClipboardEntryValuesType } from '@umbraco-cms/backoffice/clipboard';
 
 export class UmbBlockListClipboardCopyTranslator
 	extends UmbControllerBase
 	implements UmbClipboardCopyTranslator<UmbBlockListValueModel>
 {
-	async translate(propertyValue: UmbBlockListValueModel) {
+	async translate(propertyValue: UmbBlockListValueModel): Promise<UmbClipboardEntryValuesType> {
 		if (!propertyValue) {
 			throw new Error('Property value is missing.');
 		}

@@ -1,21 +1,22 @@
 import type { UmbBlockGridLayoutModel, UmbBlockGridValueModel } from '../../types.js';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../constants.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbClipboardPasteTranslator } from '@umbraco-cms/backoffice/clipboard';
+import type { UmbClipboardEntryValuesType, UmbClipboardPasteTranslator } from '@umbraco-cms/backoffice/clipboard';
 import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 
 export class UmbBlockGridClipboardPasteTranslator
 	extends UmbControllerBase
-	implements UmbClipboardPasteTranslator<any, UmbBlockGridValueModel>
+	implements UmbClipboardPasteTranslator<UmbBlockGridValueModel>
 {
-	async translate(clipboardEntryValue: any) {
-		if (!clipboardEntryValue) {
-			throw new Error('Clipboard entry value is missing.');
+	async translate(values: UmbClipboardEntryValuesType) {
+		if (!values.length) {
+			throw new Error('Values are missing.');
 		}
 
-		const clone = structuredClone(clipboardEntryValue);
+		const blockTypeValue = values.find((x) => x.type === 'block');
+		const clone = structuredClone(blockTypeValue?.value);
 
-		const propertyValue: UmbBlockGridValueModel = {
+		const blockGridPropertyValue: UmbBlockGridValueModel = {
 			contentData: clone.contentData,
 			settingsData: clone.settingsData,
 			expose: clone.expose,
@@ -33,7 +34,7 @@ export class UmbBlockGridClipboardPasteTranslator
 			},
 		};
 
-		return propertyValue;
+		return [blockGridPropertyValue];
 	}
 }
 

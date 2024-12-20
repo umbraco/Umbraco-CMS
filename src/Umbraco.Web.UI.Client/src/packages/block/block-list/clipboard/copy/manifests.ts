@@ -5,7 +5,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyAction',
 		kind: 'copyToClipboard',
-		alias: 'Umb.PropertyEditorUi.BlockList.CopyToClipboard',
+		alias: 'Umb.PropertyAction.BlockList.Clipboard.Copy',
 		name: 'Block List Copy To Clipboard Property Action',
 		forPropertyEditorUis: [UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS],
 		conditions: [
@@ -16,7 +16,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'clipboardCopyTranslator',
-		alias: 'Umb.ClipboardCopyTranslator.BlockListToBlock',
+		alias: 'Umb.ClipboardCopyTranslator.BlockList',
 		name: 'Block List Clipboard Copy Translator',
 		api: () => import('./copy-translator.js'),
 		forPropertyEditorUis: [UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS],

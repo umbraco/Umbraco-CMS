@@ -5,7 +5,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyAction',
 		kind: 'pasteFromClipboard',
-		alias: 'Umb.PropertyEditorUi.BlockList.PasteFromClipboard',
+		alias: 'Umb.PropertyAction.BlockList.Clipboard.Paste',
 		name: 'Block List Paste From Clipboard Property Action',
 		forPropertyEditorUis: [UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS],
 		conditions: [
