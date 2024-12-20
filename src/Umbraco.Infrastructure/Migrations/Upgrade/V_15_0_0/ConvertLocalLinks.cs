@@ -1,7 +1,9 @@
 using System.Collections.Concurrent;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Scoping;
@@ -26,6 +28,34 @@ public class ConvertLocalLinks : MigrationBase
     private readonly LocalLinkProcessor _localLinkProcessor;
     private readonly IMediaTypeService _mediaTypeService;
     private readonly ICoreScopeProvider _coreScopeProvider;
+    private readonly LocalLinkMigrationTracker _linkMigrationTracker;
+
+    [Obsolete("Use non obsoleted contructor instead")]
+    public ConvertLocalLinks(
+        IMigrationContext context,
+        IUmbracoContextFactory umbracoContextFactory,
+        IContentTypeService contentTypeService,
+        ILogger<ConvertLocalLinks> logger,
+        IDataTypeService dataTypeService,
+        ILanguageService languageService,
+        IJsonSerializer jsonSerializer,
+        LocalLinkProcessor localLinkProcessor,
+        IMediaTypeService mediaTypeService,
+        ICoreScopeProvider coreScopeProvider,
+        LocalLinkMigrationTracker linkMigrationTracker)
+        : base(context)
+    {
+        _umbracoContextFactory = umbracoContextFactory;
+        _contentTypeService = contentTypeService;
+        _logger = logger;
+        _dataTypeService = dataTypeService;
+        _languageService = languageService;
+        _jsonSerializer = jsonSerializer;
+        _localLinkProcessor = localLinkProcessor;
+        _mediaTypeService = mediaTypeService;
+        _coreScopeProvider = coreScopeProvider;
+        _linkMigrationTracker = linkMigrationTracker;
+    }
 
     public ConvertLocalLinks(
         IMigrationContext context,
@@ -38,17 +68,19 @@ public class ConvertLocalLinks : MigrationBase
         LocalLinkProcessor localLinkProcessor,
         IMediaTypeService mediaTypeService,
         ICoreScopeProvider coreScopeProvider)
-        : base(context)
+        : this(
+            context,
+            umbracoContextFactory,
+            contentTypeService,
+            logger,
+            dataTypeService,
+            languageService,
+            jsonSerializer,
+            localLinkProcessor,
+            mediaTypeService,
+            coreScopeProvider,
+            StaticServiceProvider.Instance.GetRequiredService<LocalLinkMigrationTracker>())
     {
-        _umbracoContextFactory = umbracoContextFactory;
-        _contentTypeService = contentTypeService;
-        _logger = logger;
-        _dataTypeService = dataTypeService;
-        _languageService = languageService;
-        _jsonSerializer = jsonSerializer;
-        _localLinkProcessor = localLinkProcessor;
-        _mediaTypeService = mediaTypeService;
-        _coreScopeProvider = coreScopeProvider;
     }
 
     protected override void Migrate()
@@ -97,6 +129,9 @@ public class ConvertLocalLinks : MigrationBase
                     propertyEditorAlias);
             }
         }
+
+        _linkMigrationTracker.MarkFixedMigrationRan();
+        RebuildCache = true;
     }
 
     private bool ProcessPropertyTypes(IPropertyType[] propertyTypes, IDictionary<int, ILanguage> languagesById)

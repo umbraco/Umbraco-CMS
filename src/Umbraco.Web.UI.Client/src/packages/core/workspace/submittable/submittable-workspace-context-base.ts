@@ -63,7 +63,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		this.#isNew.setValue(undefined);
 	}
 
-	getIsNew() {
+	public getIsNew() {
 		return this.#isNew.getValue();
 	}
 
@@ -75,19 +75,19 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	 * If a Workspace has multiple validation contexts, then this method can be overwritten to return the correct one.
 	 * @returns Promise that resolves to void when the validation is complete.
 	 */
-	async validate(): Promise<Array<void>> {
+	public async validate(): Promise<Array<void>> {
 		//return this.validation.validate();
 		return Promise.all(this.#validationContexts.map((context) => context.validate()));
 	}
 
-	async requestSubmit(): Promise<void> {
+	public async requestSubmit(): Promise<void> {
 		return this.validateAndSubmit(
 			() => this.submit(),
 			() => this.invalidSubmit(),
 		);
 	}
 
-	protected async validateAndSubmit(onValid: () => Promise<void>, onInvalid: () => Promise<void>): Promise<void> {
+	public async validateAndSubmit(onValid: () => Promise<void>, onInvalid: () => Promise<void>): Promise<void> {
 		if (this.#submitPromise) {
 			return this.#submitPromise;
 		}
