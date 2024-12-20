@@ -119,7 +119,7 @@ test('cannot add block element if allow in root is disabled', async ({umbracoApi
 
 test('cannot add number of block element greater than the maxiumm amount', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const customDataTypeId = await umbracoApi.dataType.createBlockGridWithABlockAndMinAndMaxAmount(customDataTypeName, elementTypeId, 0, 0, true);
+  const customDataTypeId = await umbracoApi.dataType.createBlockGridWithABlockAndMinAndMaxAmount(customDataTypeName, elementTypeId, 0, 0);
   const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentId);
   await umbracoUi.goToBackOffice();
@@ -170,7 +170,7 @@ test('can set the label of block element in the content', async ({umbracoApi, um
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.doesBlockListBlockNameHaveName(blockLabel);
+  await umbracoUi.content.doesBlockHaveName(blockLabel);
 });
 
 test('can set the number of columns for the layout in the content', async ({umbracoApi, umbracoUi}) => {
