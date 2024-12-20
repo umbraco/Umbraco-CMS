@@ -19,8 +19,7 @@ export class UmbClipboardPasteTranslatorResolver extends UmbControllerBase {
 		// Find the cloner for this editor alias:
 		const manifest = umbExtensionsRegistry.getByTypeAndFilter(
 			'clipboardPasteTranslator',
-			(x) =>
-				x.forClipboardEntryTypes.includes(entry.type) && x.forPropertyEditorUiAliases.includes(propertyEditorUiAlias),
+			(x) => x.forClipboardEntryTypes.includes(entry.type) && x.forPropertyEditorUis.includes(propertyEditorUiAlias),
 		)[0];
 
 		if (!manifest) {

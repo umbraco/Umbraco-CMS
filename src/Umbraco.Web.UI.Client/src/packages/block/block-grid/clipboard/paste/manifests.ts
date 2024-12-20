@@ -20,6 +20,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Block Grid Clipboard Paste Translator',
 		api: () => import('./paste-translator.js'),
 		forClipboardEntryTypes: ['block'],
-		forPropertyEditorUiAliases: [UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS],
+		forPropertyEditorUis: [UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS],
 	},
 ];
