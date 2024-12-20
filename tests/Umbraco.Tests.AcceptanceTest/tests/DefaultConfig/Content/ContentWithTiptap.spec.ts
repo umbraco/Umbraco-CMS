@@ -53,7 +53,7 @@ test('can create content with non-empty RTE Tiptap property editor', async ({umb
   await umbracoUi.content.clickCreateButton();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.enterRTETiptapEditor(inputText);
+  await umbracoUi.content.enterRTETipTapEditor(inputText);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
@@ -75,7 +75,7 @@ test('can publish content with RTE Tiptap property editor', async ({umbracoApi, 
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.enterRTETiptapEditor(inputText);
+  await umbracoUi.content.enterRTETipTapEditor(inputText);
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
@@ -99,7 +99,7 @@ test('can add a media in RTE Tiptap property editor', async ({umbracoApi, umbrac
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickTitapToolbarIconWithTitle(iconTitle);
+  await umbracoUi.content.clickTipTapToolbarIconWithTitle(iconTitle);
   await umbracoUi.content.selectMediaWithName(imageName);
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickMediaCaptionAltTextModalSubmitButton();
@@ -127,10 +127,10 @@ test('can add video in RTE Tiptap property editor', async ({umbracoApi, umbracoU
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickTitapToolbarIconWithTitle(iconTitle);
+  await umbracoUi.content.clickTipTapToolbarIconWithTitle(iconTitle);
   await umbracoUi.content.enterEmbeddedURL(videoURL);
-  await umbracoUi.content.clickRetrieveButton();
-  await umbracoUi.content.waitForPreviewEmbeddedVisible();
+  await umbracoUi.content.clickEmbeddedRetrieveButton();
+  await umbracoUi.content.waitForEmbeddedPreviewVisible();
   await umbracoUi.content.clickEmbeddedMediaModalConfirmButton();
   await umbracoUi.content.clickSaveButton();
 
