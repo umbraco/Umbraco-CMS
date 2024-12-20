@@ -113,10 +113,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/* Data Type */
 	readonly #dataTypeItemManager = new UmbDataTypeItemRepositoryManager(this);
-	/**
-	 * Data Type Schema Map is used for lookup, this should make coder simpler and give better performance. [NL]
-	 */
-	//#dataTypeSchemaAliasMap = new Map<string, string>();
 
 	#varies?: boolean;
 	#variesByCulture?: boolean;
@@ -237,20 +233,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			},
 			null,
 		);
-		/*
-		this.observe(
-			this.#dataTypeItemManager.items,
-			(dataTypes) => {
-				// Make a map of the data type unique and editorAlias
-				this.#dataTypeSchemaAliasMap = new Map(
-					dataTypes.map((dataType) => {
-						return [dataType.unique, dataType.propertyEditorSchemaAlias];
-					}),
-				);
-			},
-			null,
-		);
-		*/
 
 		this.loadLanguages();
 	}
@@ -430,7 +412,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 		const editorAlias = (await this.#dataTypeItemManager.getItemByUnique(property.dataType.unique))
 			.propertyEditorSchemaAlias;
-		//const editorAlias = this.#dataTypeSchemaAliasMap.get(property.dataType.unique);
 		if (!editorAlias) {
 			throw new Error(`Editor Alias of "${property.dataType.unique}" not found.`);
 		}
