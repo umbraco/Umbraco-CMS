@@ -116,7 +116,7 @@ test('can add a media in RTE Tiptap property editor', async ({umbracoApi, umbrac
   await umbracoApi.media.ensureNameNotExists(imageName);
 });
 
-test('can add video in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
+test('can add a video in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconTitle = 'Embed';
   const videoURL = 'https://www.youtube.com/watch?v=Yu29dE-0OoI';
