@@ -16,6 +16,21 @@ public class YesNoValueConverter : PropertyValueConverterBase
 
     public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
+        // If source is null, whether we return true or false depends on the configured default value (initial state).
+        if (source is null)
+        {
+            const string DefaultValueKey = "default"; // Aligns with key defined client-side in Umb.PropertyEditorUi.Toggle
+
+            var dataTypeConfiguration = propertyType.DataType.ConfigurationObject as Dictionary<string, object>;
+            if (dataTypeConfiguration?.TryGetValue(DefaultValueKey, out object? defaultValue) ?? false)
+            {
+                return defaultValue is bool boolValue && boolValue;
+            }
+
+            // Default if no default value is set is false.
+            return false;
+        }
+
         // in xml a boolean is: string
         // in the database a boolean is: string "1" or "0" or empty
         // typically the converter does not need to handle anything else ("true"...)
@@ -35,23 +50,23 @@ public class YesNoValueConverter : PropertyValueConverterBase
             return bool.TryParse(s, out var result) && result;
         }
 
-        if (source is int)
+        if (source is int sourceAsInt)
         {
-            return (int)source == 1;
+            return sourceAsInt == 1;
         }
 
         // this is required for correct true/false handling in nested content elements
-        if (source is long)
+        if (source is long sourceAsLong)
         {
-            return (long)source == 1;
+            return sourceAsLong == 1;
         }
 
-        if (source is bool)
+        if (source is bool sourceAsBoolean)
         {
-            return (bool)source;
+            return sourceAsBoolean;
         }
 
-        // default value is: false
+        // false for any other value
         return false;
     }
 }
