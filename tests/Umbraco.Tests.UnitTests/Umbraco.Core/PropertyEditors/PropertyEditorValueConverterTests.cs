@@ -66,17 +66,7 @@ public class PropertyEditorValueConverterTests
     [TestCase(null, true, true)]
     public void CanConvertYesNoPropertyEditor(object value, bool? initialStateConfigurationValue, bool expected)
     {
-        var dataTypeConfiguration = new Dictionary<string, object>();
-        if (initialStateConfigurationValue.HasValue)
-        {
-            dataTypeConfiguration.Add("default", initialStateConfigurationValue.Value);
-        }
-
-        var dataType = new DataTypeBuilder()
-            .WithConfigurationData(dataTypeConfiguration)
-            .Build();
-
-        var publishedDataType = new PublishedDataType(dataType.Id, dataType.EditorAlias, dataType.EditorUiAlias, new Lazy<object>(() => dataTypeConfiguration));
+        var publishedDataType = CreatePublishedDataType(initialStateConfigurationValue);
 
         var publishedPropertyTypeMock = new Mock<IPublishedPropertyType>();
         publishedPropertyTypeMock
@@ -88,6 +78,26 @@ public class PropertyEditorValueConverterTests
             converter.ConvertSourceToIntermediate(null, publishedPropertyTypeMock.Object, value, false); // does not use type for conversion
 
         Assert.AreEqual(expected, result);
+    }
+
+    private static PublishedDataType CreatePublishedDataType(bool? initialStateConfigurationValue)
+    {
+        var dataTypeConfiguration = new Dictionary<string, object>();
+        if (initialStateConfigurationValue.HasValue)
+        {
+            dataTypeConfiguration.Add("default", initialStateConfigurationValue.Value);
+        }
+
+        var dataTypeBuilder = new DataTypeBuilder();
+
+        if (initialStateConfigurationValue.HasValue)
+        {
+            dataTypeBuilder = dataTypeBuilder.AddOrUpdateConfigurationDataValue("default", initialStateConfigurationValue.Value);
+        }
+
+        var dataType = dataTypeBuilder.Build();
+
+        return new PublishedDataType(dataType.Id, dataType.EditorAlias, dataType.EditorUiAlias, new Lazy<object>(() => dataTypeConfiguration));
     }
 
     [TestCase("[\"apples\"]", new[] { "apples" })]

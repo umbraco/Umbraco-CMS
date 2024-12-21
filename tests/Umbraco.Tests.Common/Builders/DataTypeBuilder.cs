@@ -119,9 +119,9 @@ public class DataTypeBuilder
         return this;
     }
 
-    public DataTypeBuilder WithConfigurationData(Dictionary<string, object> configurationData)
+    public DataTypeBuilder AddOrUpdateConfigurationDataValue(string key, object value)
     {
-        _configurationData = configurationData;
+        _configurationData[key] = value;
         return this;
     }
 
@@ -143,9 +143,8 @@ public class DataTypeBuilder
         var databaseType = _databaseType ?? ValueStorageType.Ntext;
         var sortOrder = _sortOrder ?? 0;
         var serializer = new SystemTextConfigurationEditorJsonSerializer();
-        var configurationData = _configurationData;
 
-        return new DataType(editor, serializer, parentId)
+        var dataType = new DataType(editor, serializer, parentId)
         {
             Id = id,
             Key = key,
@@ -158,8 +157,14 @@ public class DataTypeBuilder
             Path = path,
             CreatorId = creatorId,
             DatabaseType = databaseType,
-            SortOrder = sortOrder,
-            ConfigurationData = configurationData,
+            SortOrder = sortOrder
         };
+
+        foreach (var item in _configurationData)
+        {
+            dataType.ConfigurationData[item.Key] = item.Value;
+        }
+
+        return dataType;
     }
 }
