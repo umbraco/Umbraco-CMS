@@ -3,7 +3,7 @@ namespace Umbraco.Cms.Core.Models.Email;
 public class EmailMessage
 {
     public EmailMessage(string? from, string? to, string? subject, string? body, bool isBodyHtml)
-        : this(from, new[] { to }, null, null, null, subject, body, isBodyHtml, null)
+        : this(from, new[] { to }, null, null, null, subject, body, isBodyHtml, null, null)
     {
     }
 
@@ -16,7 +16,8 @@ public class EmailMessage
         string? subject,
         string? body,
         bool isBodyHtml,
-        IEnumerable<EmailMessageAttachment>? attachments)
+        IEnumerable<EmailMessageAttachment>? attachments,
+        IEnumerable<EmailMessageLinkedResource>? linkedResources)
     {
         ArgumentIsNotNullOrEmpty(to, nameof(to));
         ArgumentIsNotNullOrEmpty(subject, nameof(subject));
@@ -31,6 +32,7 @@ public class EmailMessage
         Body = body;
         IsBodyHtml = isBodyHtml;
         Attachments = attachments?.ToList();
+        LinkedResources = linkedResources?.ToList();
     }
 
     public string? From { get; }
@@ -51,7 +53,11 @@ public class EmailMessage
 
     public IList<EmailMessageAttachment>? Attachments { get; }
 
+    public IList<EmailMessageLinkedResource>? LinkedResources { get; }
+
     public bool HasAttachments => Attachments != null && Attachments.Count > 0;
+
+    public bool HasLinkedResources => LinkedResources != null && LinkedResources.Count > 0;
 
     private static void ArgumentIsNotNullOrEmpty(string? arg, string argName)
     {
