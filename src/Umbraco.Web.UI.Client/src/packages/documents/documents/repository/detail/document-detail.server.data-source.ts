@@ -109,6 +109,8 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 					publishDate: variant.publishDate || null,
 					createDate: variant.createDate,
 					updateDate: variant.updateDate,
+					publishAtDate: variant.publishAtDate || null,
+					unPublishAtDate: variant.unPublishAtDate || null,
 				};
 			}),
 			urls: data.urls.map((url) => {

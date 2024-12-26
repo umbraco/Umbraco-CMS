@@ -37,6 +37,8 @@ export interface UmbDocumentDetailModel extends UmbContentDetailModel {
 export interface UmbDocumentVariantModel extends UmbEntityVariantModel {
 	state: UmbDocumentVariantState | null;
 	publishDate: string | null;
+	publishAtDate: string | null;
+	unPublishAtDate: string | null;
 }
 
 export interface UmbDocumentUrlInfoModel {

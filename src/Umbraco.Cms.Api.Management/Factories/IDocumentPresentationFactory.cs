@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
@@ -13,6 +13,9 @@ namespace Umbraco.Cms.Api.Management.Factories;
 public interface IDocumentPresentationFactory
 {
     Task<DocumentResponseModel> CreateResponseModelAsync(IContent content);
+
+    // TODO (V16): Remove default implementation.
+    void UpdateResponseModelWithContentSchedule(DocumentResponseModel model, ContentScheduleCollection schedule) { }
 
     Task<PublishedDocumentResponseModel> CreatePublishedResponseModelAsync(IContent content);
 

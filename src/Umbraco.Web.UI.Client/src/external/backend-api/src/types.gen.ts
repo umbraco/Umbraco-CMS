@@ -865,6 +865,8 @@ export type DocumentVariantResponseModel = {
     updateDate: string;
     state: DocumentVariantStateModel;
     publishDate?: (string) | null;
+    publishAtDate?: (string) | null;
+    unPublishAtDate?: (string) | null;
 };
 
 export enum DocumentVariantStateModel {
