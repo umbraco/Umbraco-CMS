@@ -1,6 +1,7 @@
 import type {
 	UMB_WORKSPACE_CONDITION_ALIAS,
 	UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS,
+	UMB_WORKSPACE_ENTITY_IS_NOT_NEW_CONDITION_ALIAS,
 	UMB_WORKSPACE_HAS_COLLECTION_CONDITION_ALIAS,
 } from './const.js';
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
@@ -51,6 +52,11 @@ export type WorkspaceHasCollectionConditionConfig = UmbConditionConfigBase<
 
 export interface WorkspaceEntityIsNewConditionConfig
 	extends UmbConditionConfigBase<typeof UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS> {
+	match: boolean;
+}
+
+export interface WorkspaceEntityIsNotNewConditionConfig
+	extends UmbConditionConfigBase<typeof UMB_WORKSPACE_ENTITY_IS_NOT_NEW_CONDITION_ALIAS> {
 	match: boolean;
 }
 
