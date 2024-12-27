@@ -30,12 +30,21 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 			this.#selectionManager.selection,
 			(selection) => {
 				this._selection = selection.map((unique) => {
-					return { unique, schedule: {} };
+					return { unique, schedule: this.#getSchedule(unique) };
 				});
 				this._isAllSelected = this.#isAllSelected();
 			},
 			'_selection',
 		);
+	}
+
+	#getSchedule(unique: string) {
+		const matchedItem = this.value?.selection.filter(s => s.unique === unique);
+		if (matchedItem.length === 0) {
+			return {};
+		}
+
+		return matchedItem[0].schedule;
 	}
 
 	override firstUpdated() {
@@ -171,6 +180,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				<div>
 					<umb-input-date
 						type="datetime-local"
+						.value=${this.#getFromDate(option.unique)}
 						@change=${(e: Event) => this.#onFromDateChange(e, option.unique)}
 						label=${this.localize.term('general_publishDate')}></umb-input-date>
 				</div>
@@ -180,11 +190,22 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				<div>
 					<umb-input-date
 						type="datetime-local"
+						.value=${this.#getToDate(option.unique)}
 						@change=${(e: Event) => this.#onToDateChange(e, option.unique)}
 						label=${this.localize.term('general_publishDate')}></umb-input-date>
 				</div>
 			</uui-form-layout-item>
 		</div>`;
+	}
+
+	#getFromDate(unique: string) {
+		const variant = this._selection.find((s) => s.unique === unique);
+		return variant?.schedule?.publishTime?.substring(0, 16);	// Only want date/time up to an including the minutes.
+	}
+
+	#getToDate(unique: string) {
+		const variant = this._selection.find((s) => s.unique === unique);
+		return variant?.schedule?.unpublishTime?.substring(0, 16);
 	}
 
 	#onFromDateChange(e: Event, unique: string) {
@@ -230,6 +251,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				gap: 1rem;
 				border-top: 1px solid var(--uui-color-border);
 				border-bottom: 1px solid var(--uui-color-border);
+				margin-top: var(--uui-size-space-4);
 			}
 
 			.publish-date > uui-form-layout-item {

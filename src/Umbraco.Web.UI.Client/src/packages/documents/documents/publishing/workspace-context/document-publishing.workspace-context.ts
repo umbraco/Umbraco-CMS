@@ -92,7 +92,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 					options,
 					pickableFilter: this.#readOnlyLanguageVariantsFilter,
 				},
-				value: { selection: selected.map((unique) => ({ unique, schedule: {} })) },
+				value: {
+					selection: selected.map((unique) => ({ unique, schedule: this.#getSchedule(unique, options) }))
+				},
 			})
 			.onSubmit()
 			.catch(() => undefined);
@@ -118,6 +120,19 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			// request reload of this entity
 			const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
 			this.#eventContext?.dispatchEvent(structureEvent);
+		}
+	}
+
+	#getSchedule(unique: string, options: UmbDocumentVariantOptionModel[]) {
+		const matchingOptions = options.filter(o => o.culture === unique || (o.culture === null && unique === "invariant"));
+		if (matchingOptions.length === 0) {
+			return {};
+		}
+
+		const matchingOption = matchingOptions[0];
+		return {
+			publishTime: matchingOption.variant?.publishAtDate,
+			unpublishTime: matchingOption.variant?.unPublishAtDate
 		}
 	}
 
