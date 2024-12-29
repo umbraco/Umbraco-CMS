@@ -151,6 +151,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	}
 
 	#getScheduleFromModal(selection: UmbDocumentScheduleSelectionModel, localUtcOffset: number, serverUtcOffset: number) {
+		console.log(selection);
 		return {
 			publishTime: this.#convertToServerTime(selection.schedule?.publishTime, localUtcOffset, serverUtcOffset),
 			unpublishTime: this.#convertToServerTime(selection.schedule?.unpublishTime, localUtcOffset, serverUtcOffset),
@@ -158,7 +159,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	}
 
 	#convertToLocalTime(dateString: string | null | undefined, localUtcOffset: number, serverUtcOffset: number) {
-		if (!dateString) {
+		if (!dateString || dateString.length === 0) {
 			return null;
 		}
 
@@ -170,7 +171,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	}
 
 	#convertToServerTime(dateString: string | null | undefined, localUtcOffset: number, serverUtcOffset: number) {
-		if (!dateString) {
+		if (!dateString || dateString.length === 0) {
 			return null;
 		}
 

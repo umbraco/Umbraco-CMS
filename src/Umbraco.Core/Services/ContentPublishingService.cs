@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentPublishing;
@@ -90,15 +90,13 @@ internal sealed class ContentPublishingService : IContentPublishingService
 
         var userId = await _userIdKeyResolver.GetAsync(userKey);
 
-        PublishResult? result = null;
+        // Persist the provided schedule even if publishing, as we may have expiry date to update or clear.
+        _contentService.PersistContentSchedule(content, cultureAndSchedule.Schedules);
+        var result = new PublishResult(PublishResultType.SuccessPublish, new EventMessages(), content);
+
         if (cultureAndSchedule.CulturesToPublishImmediately.Any())
         {
             result = _contentService.Publish(content, cultureAndSchedule.CulturesToPublishImmediately.ToArray(), userId);
-        }
-        else if(cultureAndSchedule.Schedules.FullSchedule.Any())
-        {
-            _contentService.PersistContentSchedule(content, cultureAndSchedule.Schedules);
-            result = new PublishResult(PublishResultType.SuccessPublish, new EventMessages(), content);
         }
 
         scope.Complete();

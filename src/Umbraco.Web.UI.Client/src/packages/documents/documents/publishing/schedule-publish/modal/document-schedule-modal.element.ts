@@ -213,7 +213,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		if (variant) {
 			variant.schedule = {
 				...variant.schedule,
-				publishTime: (e.target as UmbInputDateElement).value.toString(),
+				publishTime: this.#getDateValue(e),
 			};
 		}
 	}
@@ -223,9 +223,14 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		if (variant) {
 			variant.schedule = {
 				...variant.schedule,
-				unpublishTime: (e.target as UmbInputDateElement).value.toString(),
+				unpublishTime: this.#getDateValue(e),
 			};
 		}
+	}
+
+	#getDateValue(e: Event) {
+		const value = (e.target as UmbInputDateElement).value.toString();
+		return value.length > 0 ? value : null;
 	}
 
 	static override styles = [
