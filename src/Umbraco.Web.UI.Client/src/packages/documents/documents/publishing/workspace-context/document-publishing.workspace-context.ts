@@ -1,6 +1,7 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/document-workspace.context-token.js';
 import type {
 	UmbDocumentDetailModel,
+	UmbDocumentScheduleSelectionModel,
 	UmbDocumentVariantOptionModel,
 	UmbDocumentVariantPublishModel,
 } from '../../types.js';
@@ -25,6 +26,7 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import { UmbSysinfoRepository } from '@umbraco-cms/backoffice/sysinfo';
 
 export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDocumentPublishingWorkspaceContext> {
 	/**
@@ -85,6 +87,13 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 
 		const { options, selected } = await this.#determineVariantOptions();
 
+		// Get the server-time offset for conversion to/from the local time provided via the UI.
+		const sysInfoRepository = new UmbSysinfoRepository(this._host);
+		const serverInformation  = await sysInfoRepository.requestServerInformation();
+		if (!serverInformation) throw new Error('Server information for base UTC offset could not be retrieved');
+		const serverUtcOffset = this.#getMinutesForTimeSpan(serverInformation.baseUtcOffset);
+		const localUtcOffset = new Date().getTimezoneOffset() * -1;
+
 		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const result = await modalManagerContext
 			.open(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
@@ -93,7 +102,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 					pickableFilter: this.#readOnlyLanguageVariantsFilter,
 				},
 				value: {
-					selection: selected.map((unique) => ({ unique, schedule: this.#getSchedule(unique, options) }))
+					selection: selected.map((unique) => ({ unique, schedule: this.#getScheduleForModal(unique, options, localUtcOffset, serverUtcOffset) }))
 				},
 			})
 			.onSubmit()
@@ -105,7 +114,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		const variants =
 			result?.selection.map<UmbDocumentVariantPublishModel>((x) => ({
 				variantId: UmbVariantId.FromString(x.unique),
-				schedule: x.schedule,
+				schedule: this.#getScheduleFromModal(x, localUtcOffset, serverUtcOffset),
 			})) ?? [];
 
 		if (!variants.length) return;
@@ -123,7 +132,12 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		}
 	}
 
-	#getSchedule(unique: string, options: UmbDocumentVariantOptionModel[]) {
+	#getMinutesForTimeSpan(timeSpan: string) {
+		const timeSpanParts = timeSpan.split(':');
+		return parseInt(timeSpanParts[0]) * 60 + parseInt(timeSpanParts[1]);
+	}
+
+	#getScheduleForModal(unique: string, options: UmbDocumentVariantOptionModel[], localUtcOffset: number, serverUtcOffset: number) {
 		const matchingOptions = options.filter(o => o.culture === unique || (o.culture === null && unique === "invariant"));
 		if (matchingOptions.length === 0) {
 			return {};
@@ -131,9 +145,48 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 
 		const matchingOption = matchingOptions[0];
 		return {
-			publishTime: matchingOption.variant?.publishAtDate,
-			unpublishTime: matchingOption.variant?.unPublishAtDate
+			publishTime: this.#convertToLocalTime(matchingOption.variant?.publishAtDate, localUtcOffset, serverUtcOffset),
+			unpublishTime: this.#convertToLocalTime(matchingOption.variant?.unPublishAtDate, localUtcOffset, serverUtcOffset),
 		}
+	}
+
+	#getScheduleFromModal(selection: UmbDocumentScheduleSelectionModel, localUtcOffset: number, serverUtcOffset: number) {
+		return {
+			publishTime: this.#convertToServerTime(selection.schedule?.publishTime, localUtcOffset, serverUtcOffset),
+			unpublishTime: this.#convertToServerTime(selection.schedule?.unpublishTime, localUtcOffset, serverUtcOffset),
+		}
+	}
+
+	#convertToLocalTime(dateString: string | null | undefined, localUtcOffset: number, serverUtcOffset: number) {
+		if (!dateString) {
+			return null;
+		}
+
+		const date = new Date(dateString);
+		date.setMinutes(date.getMinutes() - localUtcOffset);
+		date.setMinutes(date.getMinutes() + serverUtcOffset);
+
+		return this.#formatDateAsString(date);
+	}
+
+	#convertToServerTime(dateString: string | null | undefined, localUtcOffset: number, serverUtcOffset: number) {
+		if (!dateString) {
+			return null;
+		}
+
+		const date = new Date(dateString);
+		date.setMinutes(date.getMinutes() - serverUtcOffset);
+		date.setMinutes(date.getMinutes() + localUtcOffset);
+
+		return this.#formatDateAsString(date);
+	}
+
+	#formatDateAsString(d: Date) {
+		return d.getFullYear() + "-" +
+			String((d.getMonth() + 1)).padStart(2, '0') + "-" +
+			String((d.getDate())).padStart(2, '0') + "T" +
+			String((d.getHours())).padStart(2, '0') + ":" +
+			String((d.getMinutes())).padStart(2, '0');
 	}
 
 	/**
