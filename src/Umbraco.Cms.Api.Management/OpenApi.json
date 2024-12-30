@@ -37718,6 +37718,16 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          },
+          "publishAtDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "unPublishAtDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           }
         },
         "additionalProperties": false
