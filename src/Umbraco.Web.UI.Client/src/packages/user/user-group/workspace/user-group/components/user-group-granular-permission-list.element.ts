@@ -3,7 +3,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import type { ManifestGranularUserPermission } from '@umbraco-cms/backoffice/user-permission';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { filterFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 
@@ -31,7 +31,7 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 				return;
 			}
 
-			manifests.forEach(async (manifest) => this.#extensionElementSetup(manifest));
+			manifests.forEach(async (manifest) => await this.#extensionElementSetup(manifest));
 		});
 	}
 
@@ -39,6 +39,8 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 		const element = (await createExtensionElement(manifest)) as any;
 		if (!element) throw new Error(`Failed to create extension element for manifest ${manifest.alias}`);
 		if (!this.#workspaceContext) throw new Error('User Group Workspace context is not available');
+
+		this._extensionElements.push(element);
 
 		this.observe(
 			this.#workspaceContext.data,
@@ -52,12 +54,10 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 				element.permissions = permissionsForSchemaType;
 				element.manifest = manifest;
 				element.addEventListener(UmbChangeEvent.TYPE, this.#onValueChange);
+				this.requestUpdate('_extensionElements');
 			},
 			'umbUserGroupGranularPermissionObserver',
 		);
-
-		this._extensionElements.push(element);
-		this.requestUpdate('_extensionElements');
 	}
 
 	#onValueChange = (e: UmbChangeEvent) => {
@@ -88,6 +88,11 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 
 	#renderProperty(element: any) {
 		const manifest = element.manifest as ManifestGranularUserPermission;
+		if (!manifest) {
+			console.log("no manifest");
+			return nothing;
+		}
+
 		const label = manifest.meta.labelKey ? this.localize.term(manifest.meta.labelKey) : manifest.meta.label;
 		const description = manifest.meta.descriptionKey
 			? this.localize.term(manifest.meta.descriptionKey)
