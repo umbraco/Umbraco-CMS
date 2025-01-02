@@ -38,6 +38,14 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 		this._max = this.#parseInt(config.getValueByAlias('max'));
 		this._step = this.#parseInt(config.getValueByAlias('step'));
 		this._placeholder = config.getValueByAlias('placeholder');
+
+		if (this._min && this._max && this._min > this._max) {
+			this._max = this._min;
+			//TODO Maybe we want to show some kind of error element rather than trying to fix the mistake made by the user...?
+			throw new Error(
+				`Property Editor Number: max is greater than min and set to be equal. Please change your data type configuration.`,
+			);
+		}
 	}
 
 	#parseInt(input: unknown): number | undefined {

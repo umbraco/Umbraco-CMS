@@ -27,6 +27,14 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 		this._min = this.#parseInt(config.getValueByAlias('minNumber'), 0);
 		this._max = this.#parseInt(config.getValueByAlias('maxNumber'), Infinity);
 		this._overlaySize = config.getValueByAlias<UUIModalSidebarSize>('overlaySize') ?? 'small';
+
+		if (this._min && this._max && this._min > this._max) {
+			this._max = this._min;
+			//TODO Maybe we want to show some kind of error element rather than trying to fix the mistake made by the user...?
+			throw new Error(
+				`Property Editor Multi URL Picker: max is greater than min and set to be equal. Please change your data type configuration.`,
+			);
+		}
 	}
 
 	/**

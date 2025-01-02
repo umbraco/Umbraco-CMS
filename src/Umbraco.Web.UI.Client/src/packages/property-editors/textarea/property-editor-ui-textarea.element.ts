@@ -44,6 +44,14 @@ export class UmbPropertyEditorUITextareaElement
 		this._minHeight = Number(config?.getValueByAlias('minHeight')) || undefined;
 		this._maxHeight = Number(config?.getValueByAlias('maxHeight')) || undefined;
 
+		if (this._minHeight && this._maxHeight && this._minHeight > this._maxHeight) {
+			this._maxHeight = this._minHeight;
+			//TODO Maybe we want to show some kind of error element rather than trying to fix the mistake made by the user...?
+			throw new Error(
+				`Property Editor Text Area: max is greater than min and set to be equal. Please change your data type configuration.`,
+			);
+		}
+
 		this._css = {
 			'--uui-textarea-min-height': this._minHeight ? `${this._minHeight}px` : 'reset',
 			'--uui-textarea-max-height': this._maxHeight ? `${this._maxHeight}px` : 'reset',
