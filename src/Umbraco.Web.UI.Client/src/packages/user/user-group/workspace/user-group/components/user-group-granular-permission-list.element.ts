@@ -89,7 +89,6 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 	#renderProperty(element: any) {
 		const manifest = element.manifest as ManifestGranularUserPermission;
 		if (!manifest) {
-			console.log("no manifest");
 			return nothing;
 		}
 
