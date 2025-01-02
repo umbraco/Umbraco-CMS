@@ -4,7 +4,7 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/propert
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
-import { UmbSorterController, type UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 export type UmbCrop = {
 	label: string;
