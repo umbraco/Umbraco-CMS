@@ -2,7 +2,7 @@ import { UMB_DUPLICATE_DOCUMENT_MODAL } from './modal/index.js';
 import { UmbDuplicateDocumentRepository } from './repository/index.js';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbEntityActionBase, UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never> {
 	override async execute() {
@@ -32,22 +32,21 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 			});
 
 			if (!error) {
-				this.#reloadMenu();
+				this.#reloadMenu(destinationUnique);
 			}
 		} catch (error) {
 			console.log(error);
 		}
 	}
 
-	async #reloadMenu() {
+	async #reloadMenu(destinationUnique: string | null) {
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		const event = new UmbRequestReloadStructureForEntityEvent({
-			unique: this.args.unique,
+		const event = new UmbRequestReloadChildrenOfEntityEvent({
+			unique: destinationUnique,
 			entityType: this.args.entityType,
 		});
 
 		actionEventContext.dispatchEvent(event);
-		// TODO: Reload destination
 	}
 }
 
