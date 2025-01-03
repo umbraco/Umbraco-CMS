@@ -37,7 +37,6 @@ public class DataTypeBuilder
     private int? _sortOrder;
     private bool? _trashed;
     private DateTime? _updateDate;
-    private Dictionary<string, object> _configurationData = [];
 
     public DataTypeBuilder() => _dataEditorBuilder = new DataEditorBuilder<DataTypeBuilder>(this);
 
@@ -119,12 +118,6 @@ public class DataTypeBuilder
         return this;
     }
 
-    public DataTypeBuilder AddOrUpdateConfigurationDataValue(string key, object value)
-    {
-        _configurationData[key] = value;
-        return this;
-    }
-
     public DataEditorBuilder<DataTypeBuilder> AddEditor() => _dataEditorBuilder;
 
     public override DataType Build()
@@ -159,11 +152,6 @@ public class DataTypeBuilder
             DatabaseType = databaseType,
             SortOrder = sortOrder
         };
-
-        foreach (var item in _configurationData)
-        {
-            dataType.ConfigurationData[item.Key] = item.Value;
-        }
 
         return dataType;
     }

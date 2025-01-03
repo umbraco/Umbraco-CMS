@@ -61,10 +61,9 @@ public class PropertyEditorValueConverterTests
     [TestCase(false, null, false)]
     [TestCase("", null, false)]
     [TestCase("blah", null, false)]
-    [TestCase(null, null, false)]
     [TestCase(null, false, false)]
     [TestCase(null, true, true)]
-    public void CanConvertYesNoPropertyEditor(object value, bool? initialStateConfigurationValue, bool expected)
+    public void CanConvertTrueFalsePropertyEditor(object value, bool initialStateConfigurationValue, bool expected)
     {
         var publishedDataType = CreatePublishedDataType(initialStateConfigurationValue);
 
@@ -74,30 +73,26 @@ public class PropertyEditorValueConverterTests
             .Returns(publishedDataType);
 
         var converter = new YesNoValueConverter();
-        var result =
-            converter.ConvertSourceToIntermediate(null, publishedPropertyTypeMock.Object, value, false); // does not use type for conversion
+        var intermediateResult = converter.ConvertSourceToIntermediate(null, publishedPropertyTypeMock.Object, value, false);
+        var result = converter.ConvertIntermediateToObject(null, publishedPropertyTypeMock.Object, PropertyCacheLevel.Element, intermediateResult, false);
 
         Assert.AreEqual(expected, result);
     }
 
-    private static PublishedDataType CreatePublishedDataType(bool? initialStateConfigurationValue)
+    private static PublishedDataType CreatePublishedDataType(bool initialStateConfigurationValue)
     {
-        var dataTypeConfiguration = new Dictionary<string, object>();
-        if (initialStateConfigurationValue.HasValue)
+        var dataTypeConfiguration = new TrueFalseConfiguration
         {
-            dataTypeConfiguration.Add("default", initialStateConfigurationValue.Value);
-        }
+            InitialState = initialStateConfigurationValue
+        };
 
-        var dataTypeBuilder = new DataTypeBuilder();
+        var dateTypeMock = new Mock<IDataType>();
+        dateTypeMock.SetupGet(x => x.Id).Returns(1000);
+        dateTypeMock.SetupGet(x => x.EditorAlias).Returns(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.Boolean);
+        dateTypeMock.SetupGet(x => x.EditorUiAlias).Returns("Umb.PropertyEditorUi.Toggle");
+        dateTypeMock.SetupGet(x => x.ConfigurationObject).Returns(dataTypeConfiguration);
 
-        if (initialStateConfigurationValue.HasValue)
-        {
-            dataTypeBuilder = dataTypeBuilder.AddOrUpdateConfigurationDataValue("default", initialStateConfigurationValue.Value);
-        }
-
-        var dataType = dataTypeBuilder.Build();
-
-        return new PublishedDataType(dataType.Id, dataType.EditorAlias, dataType.EditorUiAlias, new Lazy<object>(() => dataTypeConfiguration));
+        return new PublishedDataType(dateTypeMock.Object.Id, dateTypeMock.Object.EditorAlias, dateTypeMock.Object.EditorUiAlias, new Lazy<object>(() => dataTypeConfiguration));
     }
 
     [TestCase("[\"apples\"]", new[] { "apples" })]
