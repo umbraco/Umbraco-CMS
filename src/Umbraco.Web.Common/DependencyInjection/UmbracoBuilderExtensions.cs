@@ -326,7 +326,7 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
-    // TODO: Does this need to exist and/or be public?
+    [Obsolete("This is not necessary any more. This will be removed in v17")]
     public static IUmbracoBuilder AddWebServer(this IUmbracoBuilder builder)
     {
         return builder;
