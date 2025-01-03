@@ -11,17 +11,10 @@ import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 /**
  * A server data source for Document Validation
- * @class UmbDocumentPublishingServerDataSource
- * @implements {DocumentTreeDataSource}
  */
 export class UmbDocumentValidationServerDataSource {
 	//#host: UmbControllerHost;
 
-	/**
-	 * Creates an instance of UmbDocumentPublishingServerDataSource.
-	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @memberof UmbDocumentPublishingServerDataSource
-	 */
 	// TODO: [v15]: ignoring unused var here here to prevent a breaking change
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	constructor(host: UmbControllerHost) {
