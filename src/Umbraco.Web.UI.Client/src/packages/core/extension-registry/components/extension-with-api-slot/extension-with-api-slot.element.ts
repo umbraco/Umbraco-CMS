@@ -172,6 +172,9 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 				undefined, // We can leave the alias to undefined, as we destroy this our selfs.
 				this.defaultElement,
 				this.defaultApi,
+				{
+					single: this.single,
+				},
 			);
 			this.#extensionsController.apiProperties = this.#apiProps;
 			this.#extensionsController.elementProperties = this.#elProps;
@@ -181,9 +184,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	override render() {
 		return this._permitted
 			? this._permitted.length > 0
-				? this.single
-					? this.#renderExtension(this._permitted[0], 0)
-					: repeat(this._permitted, (ext) => ext.alias, this.#renderExtension)
+				? repeat(this._permitted, (ext) => ext.alias, this.#renderExtension)
 				: html`<slot></slot>`
 			: nothing;
 	}
