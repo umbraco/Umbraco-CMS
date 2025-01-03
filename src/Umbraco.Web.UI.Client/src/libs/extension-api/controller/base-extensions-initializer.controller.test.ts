@@ -126,6 +126,7 @@ describe('UmbBaseExtensionsController', () => {
 						expect(permitted.length).to.eq(2);
 						extensionsInitController.destroy();
 					} else if (count === 2) {
+						// because we destroy above there is a last callback with no permitted controllers. [NL]
 						done();
 					}
 				},
@@ -142,11 +143,11 @@ describe('UmbBaseExtensionsController', () => {
 				null,
 				(permitted) => {
 					count++;
-					console.log('permitted', permitted);
 					if (count === 1) {
 						expect(permitted.length).to.eq(1);
 						extensionsInitController.destroy();
 					} else if (count === 2) {
+						// because we destroy above there is a last callback with no permitted controllers. [NL]
 						done();
 					}
 				},
@@ -236,6 +237,33 @@ describe('UmbBaseExtensionsController', () => {
 						extensionsInitController.destroy();
 					}
 				},
+			);
+		});
+
+		it('change the exposed manifests even in single mode', (done) => {
+			let count = 0;
+			const extensionsInitController = new UmbTestExtensionsController(
+				hostElement,
+				testExtensionRegistry,
+				'extension-type',
+				null,
+				(permitted) => {
+					count++;
+					if (count === 1) {
+						// Still just equal one, as the second one overwrites the first one. [NL]
+						expect(permitted.length).to.eq(1);
+						expect(permitted[0].alias).to.eq('Umb.Test.Extension.B');
+
+						// lets remove the overwriting extension to see the original coming back. [NL]
+						testExtensionRegistry.unregister('Umb.Test.Extension.B');
+					} else if (count === 2) {
+						expect(permitted.length).to.eq(1);
+						expect(permitted[0].alias).to.eq('Umb.Test.Extension.A');
+						done();
+						extensionsInitController.destroy();
+					}
+				},
+				{ single: true },
 			);
 		});
 	});
