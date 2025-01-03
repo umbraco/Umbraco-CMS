@@ -11,6 +11,10 @@ export type PermittedControllerType<ControllerType extends { manifest: any }> = 
 	manifest: Required<Pick<ControllerType, 'manifest'>>;
 };
 
+export interface UmbBaseExtensionsInitializerArgs {
+	single?: boolean;
+}
+
 /**
  * This abstract Controller holds the core to manage a multiple Extensions.
  * When one or more extensions are permitted to be used, then the extender of this class can instantiate the relevant single extension initiator relevant for this type.
@@ -28,6 +32,7 @@ export abstract class UmbBaseExtensionsInitializer<
 	#extensionRegistry: UmbExtensionRegistry<ManifestType>;
 	#type: ManifestTypeName | Array<ManifestTypeName>;
 	#filter: undefined | null | ((manifest: ManifestType) => boolean);
+	#single: boolean = false;
 	#onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void;
 	protected _extensions: Array<ControllerType> = [];
 	#permittedExts: Array<MyPermittedControllerType> = [];
@@ -51,12 +56,14 @@ export abstract class UmbBaseExtensionsInitializer<
 		filter: undefined | null | ((manifest: ManifestType) => boolean),
 		onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void,
 		controllerAlias?: string,
+		args: UmbBaseExtensionsInitializerArgs = {},
 	) {
 		super(host, controllerAlias ?? 'extensionsInitializer_' + (Array.isArray(type) ? type.join('_') : type));
 		this.#extensionRegistry = extensionRegistry;
 		this.#type = type;
 		this.#filter = filter;
 		this.#onChange = onChange;
+		this.#single = args.single ?? false;
 	}
 	protected _init() {
 		let source;
@@ -90,6 +97,10 @@ export abstract class UmbBaseExtensionsInitializer<
 			// _permittedExts should have been cleared via the destroy callbacks.
 			this.#permittedExts.length = 0;
 			return;
+		}
+
+		if (this.#single && manifests.length > 1) {
+			manifests = [manifests[0]];
 		}
 
 		// If we get no manifests and we have not exposed any extensions yet, then we should notify to let the listener know that we have our first response. [NL]
