@@ -2,6 +2,7 @@ import { nothing, customElement, property, type PropertyValueMap, state } from '
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/workspace';
 import {
+	UmbExtensionsApiInitializer,
 	UmbExtensionsElementAndApiInitializer,
 	type UmbApiConstructorArgumentsMethodType,
 } from '@umbraco-cms/backoffice/extension-api';
@@ -46,7 +47,12 @@ export class UmbWorkspaceElement extends UmbLitElement {
 			apiArgsCreator,
 			(manifest: ManifestWorkspace) => manifest.meta.entityType === entityType,
 			(extensionControllers) => {
-				this._component = extensionControllers[0].component;
+				this._component = extensionControllers[0]?.component;
+				const api = extensionControllers[0]?.api;
+				if (api) {
+					// We create the additional workspace contexts with the Workspace API as its host, to ensure they can use the same Context-Alias with different API-Aliases and still be reached cause they will then be provided at the same host. [NL]
+					new UmbExtensionsApiInitializer(api, umbExtensionsRegistry, 'workspaceContext', [api]);
+				}
 			},
 			undefined, // We can leave the alias to undefined, as we destroy this our selfs.
 			undefined,
