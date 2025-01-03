@@ -73,8 +73,8 @@ test('can add a block element in the content', async ({umbracoApi, umbracoUi}) =
   // Arrange
   const inputText = 'This is block test';
   const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, elementTypeId);
-  const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
-  await umbracoApi.document.createDefaultDocument(contentName, documentId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -95,18 +95,48 @@ test('can add a block element in the content', async ({umbracoApi, umbracoUi}) =
   expect(blockListValue).toBeTruthy();
 });
 
-test.skip('can edit block element in the content', async ({umbracoApi, umbracoUi}) => {
+test('can edit block element in the content', async ({umbracoApi, umbracoUi}) => {
+  const updatedText = 'This updated block test';
+  await umbracoApi.document.createDefaultDocumentWithABlockListEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickEditBlockListBlockBtn();
+  await umbracoUi.content.enterTextstring(updatedText);
+  await umbracoUi.content.clickUpdateButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(updatedText);
 });
 
-test.skip('can delete block element in the content', async ({umbracoApi, umbracoUi}) => {
+test('can delete block element in the content', async ({umbracoApi, umbracoUi}) => {
+  await umbracoApi.document.createDefaultDocumentWithABlockListEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickDeleteBlockListBlockBtn();
+  await umbracoUi.content.clickConfirmToDeleteButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  const contentData = await umbracoApi.document.getByName(contentName);
+  const blockGridValue = contentData.values.find(item => item.value);
+  expect(blockGridValue).toBeFalsy();
 });
 
 test('cannot add number of block element greater than the maxiumm amount', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const customDataTypeId = await umbracoApi.dataType.createBlockListWithABlockAndMinAndMaxAmount(customDataTypeName, elementTypeId, 0, 0);
-  const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
-  await umbracoApi.document.createDefaultDocument(contentName, documentId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -125,8 +155,8 @@ test('can set the label of block element in the content', async ({umbracoApi, um
   // Arrange
   const blockLabel = 'Test Block Label';
   const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithLabel(customDataTypeName, elementTypeId, blockLabel);
-  const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
-  await umbracoApi.document.createDefaultDocument(contentName, documentId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -151,8 +181,8 @@ test('can add settings model for the block in the content', async ({umbracoApi, 
   const textAreaData = await umbracoApi.dataType.getByName(textAreaDataTypeName);
   const settingsElementTypeId = await umbracoApi.documentType.createDefaultElementType(settingModelName, groupName, textAreaDataTypeName, textAreaData.id);
   const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithContentAndSettingsElementType(customDataTypeName, elementTypeId, settingsElementTypeId, true);
-  const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
-  await umbracoApi.document.createDefaultDocument(contentName, documentId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
