@@ -1,30 +1,60 @@
+using System.Collections.Concurrent;
+
 namespace Umbraco.Cms.Core.Models.Navigation;
 
 public sealed class NavigationNode
 {
-    private List<NavigationNode> _children;
+    private HashSet<Guid> _children;
 
     public Guid Key { get; private set; }
 
-    public NavigationNode? Parent { get; private set; }
+    public Guid ContentTypeKey { get; private set; }
 
-    public IEnumerable<NavigationNode> Children => _children.AsEnumerable();
+    public int SortOrder { get; private set; }
 
-    public NavigationNode(Guid key)
+    public Guid? Parent { get; private set; }
+
+    public ISet<Guid> Children => _children;
+
+    public NavigationNode(Guid key, Guid contentTypeKey, int sortOrder = 0)
     {
         Key = key;
-        _children = new List<NavigationNode>();
+        ContentTypeKey = contentTypeKey;
+        SortOrder = sortOrder;
+        _children = new HashSet<Guid>();
     }
 
-    public void AddChild(NavigationNode child)
+    public void UpdateSortOrder(int newSortOrder) => SortOrder = newSortOrder;
+
+    public void AddChild(ConcurrentDictionary<Guid, NavigationNode> navigationStructure, Guid childKey)
     {
-        child.Parent = this;
-        _children.Add(child);
+        if (navigationStructure.TryGetValue(childKey, out NavigationNode? child) is false)
+        {
+            throw new KeyNotFoundException($"Item with key '{childKey}' was not found in the navigation structure.");
+        }
+
+        child.Parent = Key;
+
+        // Add it as the last item
+        child.SortOrder = _children.Count;
+
+        _children.Add(childKey);
+
+        // Update the navigation structure
+        navigationStructure[childKey] = child;
     }
 
-    public void RemoveChild(NavigationNode child)
+    public void RemoveChild(ConcurrentDictionary<Guid, NavigationNode> navigationStructure, Guid childKey)
     {
-        _children.Remove(child);
+        if (navigationStructure.TryGetValue(childKey, out NavigationNode? child) is false)
+        {
+            throw new KeyNotFoundException($"Item with key '{childKey}' was not found in the navigation structure.");
+        }
+
+        _children.Remove(childKey);
         child.Parent = null;
+
+        // Update the navigation structure
+        navigationStructure[childKey] = child;
     }
 }

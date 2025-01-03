@@ -3,6 +3,7 @@
     <Title>Umbraco CMS - API Common</Title>
     <Description>Contains the bits and pieces that are shared between the Umbraco CMS APIs.</Description>
   </PropertyGroup>
+
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
@@ -13,14 +14,15 @@
     <PackageReference Include="Swashbuckle.AspNetCore" />
     <PackageReference Include="OpenIddict.Abstractions" />
     <PackageReference Include="OpenIddict.AspNetCore" />
+  </ItemGroup>
 
-    <!-- Both OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer bring in a vulnerable version of Microsoft.IdentityModel.JsonWebTokens -->
-    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens"/>
+  <ItemGroup>
+    <!-- Take top-level depedendency on OpenIddict.AspNetCore depends on a vulnerable version -->
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
     <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
-
   </ItemGroup>
 </Project>

@@ -6,9 +6,11 @@
     "config": "node config.js",
     "ui": "npx playwright test --headed DefaultConfig",
     "test": "npx playwright test DefaultConfig",
+    "testSqlite": "npx playwright test DefaultConfig --grep-invert \"Users\"",
     "all": "npx playwright test",
     "createTest": "node createTest.js",
-    "smokeTest": "npx playwright test DefaultConfig --grep \"@smoke\""
+    "smokeTest": "npx playwright test DefaultConfig --grep \"@smoke\"",
+    "smokeTestSqlite": "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\""
   },
   "devDependencies": {
     "@playwright/test": "^1.43",
@@ -18,8 +20,8 @@
     "typescript": "^4.8.3"
   },
   "dependencies": {
-    "@umbraco/json-models-builders": "^2.0.20",
-    "@umbraco/playwright-testhelpers": "^2.0.0-beta.84",
+    "@umbraco/json-models-builders": "^2.0.26",
+    "@umbraco/playwright-testhelpers": "^15.0.7",
     "camelize": "^1.0.0",
     "dotenv": "^16.3.1",
     "node-fetch": "^2.6.7"

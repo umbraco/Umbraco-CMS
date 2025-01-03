@@ -125,6 +125,7 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
     /// <param name="culture"></param>
     /// <param name="name"></param>
     /// <param name="id"></param>
+    /// <param name="kind"></param>
     public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string? username, string email, string culture, string? name = null, Guid? id = null, UserKind kind = UserKind.Default)
     {
         if (string.IsNullOrWhiteSpace(username))

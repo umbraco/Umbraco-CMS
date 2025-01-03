@@ -120,11 +120,21 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
         }
     }
 
+    public void ClearContentTypes(IEnumerable<int> ids)
+    {
+        foreach (var id in ids)
+        {
+            ClearContentType(id);
+        }
+    }
+
     /// <summary>
     ///     Clears all cached content types referencing a data type.
     /// </summary>
     /// <param name="id">A data type identifier.</param>
-    public void ClearDataType(int id)
+    public void ClearDataType(int id) => ClearByDataTypeId(id);
+
+    public IEnumerable<IPublishedContentType> ClearByDataTypeId(int id)
     {
         if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
         {
@@ -135,11 +145,12 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
         // properties ie both its own properties and those that were inherited (it's based upon an
         // IContentTypeComposition) and so every PublishedContentType having a property based upon
         // the cleared data type, be it local or inherited, will be cleared.
+        IPublishedContentType[] toRemove;
         try
         {
             _lock.EnterWriteLock();
 
-            IPublishedContentType[] toRemove = _typesById.Values
+            toRemove = _typesById.Values
                 .Where(x => x.PropertyTypes.Any(xx => xx.DataType.Id == id)).ToArray();
             foreach (IPublishedContentType type in toRemove)
             {
@@ -154,6 +165,8 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
                 _lock.ExitWriteLock();
             }
         }
+
+        return toRemove;
     }
 
     /// <summary>
@@ -302,6 +315,9 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
             case PublishedItemType.Member:
                 k = "m";
                 break;
+            case PublishedItemType.Element:
+                k = "e";
+                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(itemType));
         }
@@ -314,6 +330,7 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
         IContentTypeComposition? contentType = itemType switch
         {
             PublishedItemType.Content => _contentTypeService?.Get(key),
+            PublishedItemType.Element => _contentTypeService?.Get(key),
             PublishedItemType.Media => _mediaTypeService?.Get(key),
             PublishedItemType.Member => _memberTypeService?.Get(key),
             _ => throw new ArgumentOutOfRangeException(nameof(itemType)),

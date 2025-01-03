@@ -1,12 +1,15 @@
-﻿using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
+using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
@@ -19,6 +22,7 @@ internal class MediaCacheService : IMediaCacheService
     private readonly IPublishedContentFactory _publishedContentFactory;
     private readonly ICacheNodeFactory _cacheNodeFactory;
     private readonly IEnumerable<IMediaSeedKeyProvider> _seedKeyProviders;
+    private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly CacheSettings _cacheSettings;
 
     private HashSet<Guid>? _seedKeys;
@@ -50,6 +54,7 @@ internal class MediaCacheService : IMediaCacheService
         IPublishedContentFactory publishedContentFactory,
         ICacheNodeFactory cacheNodeFactory,
         IEnumerable<IMediaSeedKeyProvider> seedKeyProviders,
+        IPublishedModelFactory publishedModelFactory,
         IOptions<CacheSettings> cacheSettings)
     {
         _databaseCacheRepository = databaseCacheRepository;
@@ -59,6 +64,7 @@ internal class MediaCacheService : IMediaCacheService
         _publishedContentFactory = publishedContentFactory;
         _cacheNodeFactory = cacheNodeFactory;
         _seedKeyProviders = seedKeyProviders;
+        _publishedModelFactory = publishedModelFactory;
         _cacheSettings = cacheSettings.Value;
     }
 
@@ -70,14 +76,7 @@ internal class MediaCacheService : IMediaCacheService
             return null;
         }
 
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
-
-        ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
-            $"{key}", // Unique key to the cache entry
-            async cancel => await _databaseCacheRepository.GetMediaSourceAsync(idAttempt.Result));
-
-        scope.Complete();
-        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedMedia(contentCacheNode);
+        return await GetNodeAsync(key);
     }
 
     public async Task<IPublishedContent?> GetByIdAsync(int id)
@@ -88,12 +87,32 @@ internal class MediaCacheService : IMediaCacheService
             return null;
         }
 
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        Guid key = keyAttempt.Result;
+
+        return await GetNodeAsync(key);
+    }
+
+    private async Task<IPublishedContent?> GetNodeAsync(Guid key)
+    {
+        var cacheKey = $"{key}";
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
-            $"{keyAttempt.Result}", // Unique key to the cache entry
-            async cancel => await _databaseCacheRepository.GetMediaSourceAsync(id));
-        scope.Complete();
-        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedMedia(contentCacheNode);
+            cacheKey, // Unique key to the cache entry
+            async cancel =>
+            {
+                using ICoreScope scope = _scopeProvider.CreateCoreScope();
+                ContentCacheNode? mediaCacheNode = await _databaseCacheRepository.GetMediaSourceAsync(key);
+                scope.Complete();
+                return mediaCacheNode;
+            }, GetEntryOptions(key));
+
+        // We don't want to cache removed items, this may cause issues if the L2 serializer changes.
+        if (contentCacheNode is null)
+        {
+            await _hybridCache.RemoveAsync(cacheKey);
+            return null;
+        }
+
+        return _publishedContentFactory.ToIPublishedMedia(contentCacheNode).CreateModel(_publishedModelFactory);
     }
 
     public async Task<bool> HasContentByIdAsync(int id)
@@ -124,7 +143,6 @@ internal class MediaCacheService : IMediaCacheService
         // We have nodes seperate in the cache, cause 99% of the time, you are only using one
         // and thus we won't get too much data when retrieving from the cache.
         var cacheNode = _cacheNodeFactory.ToContentCacheNode(media);
-        await _hybridCache.SetAsync(GetCacheKey(media.Key, false), cacheNode);
         await _databaseCacheRepository.RefreshMediaAsync(cacheNode);
         scope.Complete();
     }
@@ -133,17 +151,15 @@ internal class MediaCacheService : IMediaCacheService
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         await _databaseCacheRepository.DeleteContentItemAsync(media.Id);
-        await _hybridCache.RemoveAsync(media.Key.ToString());
         scope.Complete();
     }
 
     public async Task SeedAsync(CancellationToken cancellationToken)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         foreach (Guid key in SeedKeys)
         {
-            if(cancellationToken.IsCancellationRequested)
+            if (cancellationToken.IsCancellationRequested)
             {
                 break;
             }
@@ -152,7 +168,13 @@ internal class MediaCacheService : IMediaCacheService
 
             ContentCacheNode? cachedValue = await _hybridCache.GetOrCreateAsync<ContentCacheNode?>(
                 cacheKey,
-                async cancel => await _databaseCacheRepository.GetMediaSourceAsync(key),
+                async cancel =>
+                {
+                    using ICoreScope scope = _scopeProvider.CreateCoreScope();
+                    ContentCacheNode? mediaCacheNode = await _databaseCacheRepository.GetMediaSourceAsync(key);
+                    scope.Complete();
+                    return mediaCacheNode;
+                },
                 GetSeedEntryOptions());
 
             if (cachedValue is null)
@@ -160,13 +182,117 @@ internal class MediaCacheService : IMediaCacheService
                 await _hybridCache.RemoveAsync(cacheKey);
             }
         }
+    }
+
+    public async Task RefreshMemoryCacheAsync(Guid key)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        ContentCacheNode? publishedNode = await _databaseCacheRepository.GetMediaSourceAsync(key);
+        if (publishedNode is not null)
+        {
+            await _hybridCache.SetAsync(GetCacheKey(publishedNode.Key, false), publishedNode, GetEntryOptions(publishedNode.Key));
+        }
 
         scope.Complete();
     }
 
+    public async Task ClearMemoryCacheAsync(CancellationToken cancellationToken)
+    {
+        // TODO: This should be done with tags, however this is not implemented yet, so for now we have to naively get all content keys and clear them all.
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        // We have to get ALL document keys in order to be able to remove them from the cache,
+        IEnumerable<Guid> documentKeys = await _databaseCacheRepository.GetContentKeysAsync(Constants.ObjectTypes.Media);
+
+        foreach (Guid documentKey in documentKeys)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            // We'll remove both the draft and published cache
+            await _hybridCache.RemoveAsync(GetCacheKey(documentKey, false), cancellationToken);
+        }
+
+        // We have to run seeding again after the cache is cleared
+        await SeedAsync(cancellationToken);
+
+        scope.Complete();
+    }
+
+    public async Task RemoveFromMemoryCacheAsync(Guid key)
+        => await _hybridCache.RemoveAsync(GetCacheKey(key, false));
+
+    public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> mediaTypeIds)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        IEnumerable<ContentCacheNode> contentByContentTypeKey = _databaseCacheRepository.GetContentByContentTypeKey(mediaTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.MediaType).Result), ContentCacheDataSerializerEntityType.Media);
+
+        foreach (ContentCacheNode content in contentByContentTypeKey)
+        {
+            _hybridCache.RemoveAsync(GetCacheKey(content.Key, true)).GetAwaiter().GetResult();
+
+            if (content.IsDraft is false)
+            {
+                _hybridCache.RemoveAsync(GetCacheKey(content.Key, false)).GetAwaiter().GetResult();
+            }
+        }
+        scope.Complete();
+    }
+
+    public void Rebuild(IReadOnlyCollection<int> contentTypeIds)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        _databaseCacheRepository.Rebuild(contentTypeIds.ToList());
+
+        IEnumerable<Guid> mediaTypeKeys = contentTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.MediaType))
+            .Where(x => x.Success)
+            .Select(x => x.Result);
+
+        IEnumerable<ContentCacheNode> mediaCacheNodesByContentTypeKey =
+            _databaseCacheRepository.GetContentByContentTypeKey(mediaTypeKeys, ContentCacheDataSerializerEntityType.Media);
+
+        foreach (ContentCacheNode media in mediaCacheNodesByContentTypeKey)
+        {
+            _hybridCache.RemoveAsync(GetCacheKey(media.Key, false));
+        }
+
+        scope.Complete();
+    }
+
+    public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        IEnumerable<ContentCacheNode> nodes = _databaseCacheRepository.GetContentByContentTypeKey([contentType.Key], ContentCacheDataSerializerEntityType.Media);
+        scope.Complete();
+
+        return nodes
+            .Select(x => _publishedContentFactory.ToIPublishedContent(x, x.IsDraft).CreateModel(_publishedModelFactory))
+            .WhereNotNull();
+    }
+
+    private HybridCacheEntryOptions GetEntryOptions(Guid key)
+    {
+        if (SeedKeys.Contains(key))
+        {
+            return GetSeedEntryOptions();
+        }
+
+        return new HybridCacheEntryOptions
+        {
+            Expiration = _cacheSettings.Entry.Media.RemoteCacheDuration,
+            LocalCacheExpiration = _cacheSettings.Entry.Media.LocalCacheDuration,
+        };
+    }
+
+
     private HybridCacheEntryOptions GetSeedEntryOptions() => new()
     {
-        Expiration = _cacheSettings.SeedCacheDuration, LocalCacheExpiration = _cacheSettings.SeedCacheDuration,
+        Expiration = _cacheSettings.SeedCacheDuration,
+        LocalCacheExpiration = _cacheSettings.SeedCacheDuration,
     };
 
     private string GetCacheKey(Guid key, bool preview) => preview ? $"{key}+draft" : $"{key}";

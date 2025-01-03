@@ -1,5 +1,6 @@
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using Microsoft.Extensions.Options;
+@using Umbraco.Cms.Api.Management.Controllers.Security
 @using Umbraco.Cms.Api.Management.Extensions
 @using Umbraco.Cms.Api.Management.Security
 @using Umbraco.Cms.Core.Configuration.Models
@@ -10,7 +11,6 @@
 @using Umbraco.Cms.Core.Serialization
 @using Umbraco.Cms.Web.Common.Hosting
 @using Umbraco.Extensions
-@inject IOptions<ContentSettings> ContentSettings
 @inject IOptions<SecuritySettings> SecuritySettings
 @inject IEmailSender EmailSender
 @inject IHostingEnvironment HostingEnvironment
@@ -23,14 +23,15 @@
 @{
     bool.TryParse(Context.Request.Query["umbDebug"], out var isDebug);
     var backOfficePath = GlobalSettings.Value.GetBackOfficePath(HostingEnvironment);
-    var loginLogoImage = ContentSettings.Value.LoginLogoImage;
-    var loginLogoImageAlternative = ContentSettings.Value.LoginLogoImageAlternative;
-    var loginBackgroundImage = ContentSettings.Value.LoginBackgroundImage;
+    var loginLogoImage = Url.RouteUrl(BackOfficeGraphicsController.LoginLogoRouteName, new {Version= "1"});
+    var loginLogoImageAlternative = Url.RouteUrl(BackOfficeGraphicsController.LoginLogoAlternativeRouteName, new {Version= "1"});
+    var loginBackgroundImage = Url.RouteUrl(BackOfficeGraphicsController.LoginBackGroundRouteName, new {Version= "1"});
     var usernameIsEmail = SecuritySettings.Value.UsernameIsEmail;
     var allowUserInvite = EmailSender.CanSendRequiredEmail();
     var allowPasswordReset = SecuritySettings.Value.AllowPasswordReset && EmailSender.CanSendRequiredEmail();
     var disableLocalLogin = ExternalLogins.HasDenyLocalLogin();
 }
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 <!DOCTYPE html>
 <html lang="@GlobalSettings.Value.DefaultUILanguage">
@@ -39,12 +40,12 @@
     <base href="@backOfficePath.EnsureEndsWith('/')"/>
     <link rel="icon" type="image/svg+xml" href="~/umbraco/login/favicon.svg"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="mobile-web-app-capable" content="yes"/>
     <meta name="robots" content="noindex, nofollow"/>
     <meta name="pinterest" content="nopin"/>
     <title>Umbraco</title>
 
-    <link rel="stylesheet" href="~/umbraco/backoffice/css/uui-css.css" />
+    <link rel="stylesheet" href="~/umbraco/backoffice/css/uui-css.css" asp-append-version="true" />
     <style>
       body {
         margin: 0;
@@ -54,7 +55,7 @@
     </style>
 
     @await Html.BackOfficeImportMapScriptAsync(JsonSerializer, BackOfficePathGenerator, PackageManifestService)
-    <script type="module" src="~/umbraco/login/login.js"></script>
+    <script type="module" src="~/umbraco/login/login.js" asp-append-version="true"></script>
 </head>
 
 <body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
@@ -72,8 +73,8 @@
         }
     </style>
     <div id="noscript-container">
-        <h1 class="uui-h3" style="display: inline-flex; align-items: center; gap: 10px">
-            <img aria-hidden="true" alt="logo" src="@loginLogoImage" style="width: 100%" />
+        <h1 aria-hidden="true" class="uui-h3" style="display: inline-flex; align-items: center; gap: 10px">
+            <img alt="logo" src="@loginLogoImageAlternative" style="width: 100%" />
         </h1>
         <p>For full functionality of Umbraco CMS it is necessary to enable JavaScript.</p>
         <p>Here are the <a href="https://www.enable-javascript.com/" target="_blank" rel="noopener" style="text-decoration: underline;">instructions how to enable JavaScript in your web browser</a>.</p>

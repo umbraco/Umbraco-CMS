@@ -62,8 +62,7 @@ test('can delete a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.clickActionsMenuForDataType(blockGridEditorName);
-  await umbracoUi.dataType.clickDeleteExactButton();
-  await umbracoUi.dataType.clickConfirmToDeleteButton();
+  await umbracoUi.dataType.clickDeleteAndConfirmButton();
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
@@ -187,7 +186,7 @@ test('can add multiple blocks to a group in a block grid editor', async ({umbrac
   await umbracoApi.documentType.ensureNameNotExists(secondElementName);
 });
 
-test('can delete a block in a group from a block grid editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can remove a block in a group from a block grid editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);

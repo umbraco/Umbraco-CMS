@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Security.Cryptography;
@@ -287,14 +288,14 @@ public static class StringExtensions
     /// <param name="value">The value.</param>
     /// <param name="forRemoving">For removing.</param>
     /// <returns></returns>
-    public static string TrimExact(this string value, string forRemoving)
+    public static string Trim(this string value, string forRemoving)
     {
         if (string.IsNullOrEmpty(value))
         {
             return value;
         }
 
-        return value.TrimEndExact(forRemoving).TrimStartExact(forRemoving);
+        return value.TrimEnd(forRemoving).TrimStart(forRemoving);
     }
 
     public static string EncodeJsString(this string s)
@@ -343,7 +344,7 @@ public static class StringExtensions
         return sb.ToString();
     }
 
-    public static string TrimEndExact(this string value, string forRemoving)
+    public static string TrimEnd(this string value, string forRemoving)
     {
         if (string.IsNullOrEmpty(value))
         {
@@ -363,7 +364,7 @@ public static class StringExtensions
         return value;
     }
 
-    public static string TrimStartExact(this string value, string forRemoving)
+    public static string TrimStart(this string value, string forRemoving)
     {
         if (string.IsNullOrEmpty(value))
         {
@@ -390,7 +391,7 @@ public static class StringExtensions
             return input;
         }
 
-        return toStartWith + input.TrimStartExact(toStartWith);
+        return toStartWith + input.TrimStart(toStartWith);
     }
 
     public static string EnsureStartsWith(this string input, char value) =>
@@ -1557,6 +1558,14 @@ public static class StringExtensions
 
         yield return sb.ToString();
     }
+
+    /// <summary>
+    ///     Checks whether a string is a valid email address.
+    /// </summary>
+    /// <param name="email">The string check</param>
+    /// <returns>Returns a bool indicating whether the string is an email address.</returns>
+    public static bool IsEmail(this string? email) =>
+        string.IsNullOrWhiteSpace(email) is false && new EmailAddressAttribute().IsValid(email);
 
     // having benchmarked various solutions (incl. for/foreach, split and LINQ based ones),
     // this is by far the fastest way to find string needles in a string haystack
