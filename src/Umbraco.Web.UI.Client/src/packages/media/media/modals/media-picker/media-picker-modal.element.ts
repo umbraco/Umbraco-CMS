@@ -323,6 +323,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 			<uui-card-media
 				class=${ifDefined(disabled ? 'not-allowed' : undefined)}
 				.name=${item.name}
+				data-mark="${item.entityType}:${item.unique}"
 				@open=${() => this.#onOpen(item)}
 				@selected=${() => this.#onSelected(item)}
 				@deselected=${() => this.#onDeselected(item)}

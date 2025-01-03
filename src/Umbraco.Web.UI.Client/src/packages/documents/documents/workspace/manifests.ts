@@ -1,8 +1,3 @@
-import {
-	UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
-	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
-} from '../user-permissions/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
@@ -79,28 +74,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
-	{
-		type: 'workspaceAction',
-		kind: 'default',
-		alias: 'Umb.WorkspaceAction.Document.SaveAndPublish',
-		name: 'Save And Publish Document Workspace Action',
-		weight: 70,
-		api: () => import('./actions/save-and-publish.action.js'),
-		meta: {
-			label: '#buttons_saveAndPublish',
-			look: 'primary',
-			color: 'positive',
-		},
-		conditions: [
-			{
-				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				match: UMB_DOCUMENT_WORKSPACE_ALIAS,
-			},
-			{
-				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
-			},
-		],
-	},
+
 	{
 		type: 'workspaceAction',
 		kind: 'default',
@@ -137,72 +111,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_DOCUMENT_WORKSPACE_ALIAS,
-			},
-			{
-				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
-			},
-		],
-	},
-	{
-		type: 'workspaceActionMenuItem',
-		kind: 'default',
-		alias: 'Umb.Document.WorkspaceActionMenuItem.Unpublish',
-		name: 'Unpublish',
-		weight: 0,
-		api: () => import('./actions/unpublish.action.js'),
-		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
-		meta: {
-			label: '#actions_unpublish',
-			icon: 'icon-globe',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.UserPermission.Document',
-				allOf: [UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH],
-			},
-			{
-				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
-			},
-		],
-	},
-	{
-		type: 'workspaceActionMenuItem',
-		kind: 'default',
-		alias: 'Umb.Document.WorkspaceActionMenuItem.PublishWithDescendants',
-		name: 'Publish with descendants',
-		weight: 10,
-		api: () => import('./actions/publish-with-descendants.action.js'),
-		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
-		meta: {
-			label: '#buttons_publishDescendants',
-			icon: 'icon-globe',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.UserPermission.Document',
-				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE, UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
-			},
-			{
-				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
-			},
-		],
-	},
-	{
-		type: 'workspaceActionMenuItem',
-		kind: 'default',
-		alias: 'Umb.Document.WorkspaceActionMenuItem.SchedulePublishing',
-		name: 'Schedule publishing',
-		weight: 20,
-		api: () => import('./actions/save-and-schedule.action.js'),
-		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
-		meta: {
-			label: '#buttons_schedulePublish',
-			icon: 'icon-globe',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.UserPermission.Document',
-				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE, UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
 			},
 			{
 				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
