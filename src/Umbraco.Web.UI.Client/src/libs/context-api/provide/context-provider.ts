@@ -55,7 +55,10 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 	/**
 	 * @memberof UmbContextProvider
 	 */
-	public hostDisconnected(): void {}
+	public hostDisconnected(): void {
+		// Out-commented for now, but kept if we like to reintroduce this:
+		//window.dispatchEvent(new UmbContextUnprovidedEventImplementation(this._contextAlias, this.#instance));
+	}
 
 	/**
 	 * @private
