@@ -8,6 +8,5 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class TrueFalseConfiguration
 {
     [ConfigurationField("default")]
-    [JsonPropertyName("default")]
     public bool InitialState { get; set; }
 }
