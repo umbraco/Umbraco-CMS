@@ -14,21 +14,11 @@ public class YesNoValueConverter : PropertyValueConverterBase
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
-    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
+    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
-        // If source is null, whether we return true or false depends on the configured default value (initial state).
         if (source is null)
         {
-            const string DefaultValueKey = "default"; // Aligns with key defined client-side in Umb.PropertyEditorUi.Toggle
-
-            var dataTypeConfiguration = propertyType.DataType.ConfigurationObject as Dictionary<string, object>;
-            if (dataTypeConfiguration?.TryGetValue(DefaultValueKey, out object? defaultValue) ?? false)
-            {
-                return defaultValue is bool boolValue && boolValue;
-            }
-
-            // Default if no default value is set is false.
-            return false;
+            return null;
         }
 
         // in xml a boolean is: string
@@ -68,5 +58,18 @@ public class YesNoValueConverter : PropertyValueConverterBase
 
         // false for any other value
         return false;
+    }
+
+    /// <inheritdoc />
+    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object? source, bool preview)
+    {
+        // If source is null, whether we return true or false depends on the configured default value (initial state).
+        if (source is null)
+        {
+            TrueFalseConfiguration? configuration = propertyType.DataType.ConfigurationAs<TrueFalseConfiguration>();
+            return configuration?.InitialState ?? false;
+        }
+
+        return (bool)source;
     }
 }
