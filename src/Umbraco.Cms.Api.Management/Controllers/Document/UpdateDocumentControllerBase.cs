@@ -20,18 +20,19 @@ public abstract class UpdateDocumentControllerBase : DocumentControllerBase
         // TODO This have temporarily been uncommented, to support the client sends values from all cultures, even when the user do not have access to the languages.
         // The values are ignored in the ContentEditingService
 
-        // IEnumerable<string> cultures = requestModel.Variants
-        //     .Where(v => v.Culture is not null)
-        //     .Select(v => v.Culture!);
-        // AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
-        //     User,
-        //     ContentPermissionResource.WithKeys(ActionUpdate.ActionLetter, id, cultures),
-        //     AuthorizationPolicies.ContentPermissionByResource);
-        //
-        // if (!authorizationResult.Succeeded)
-        // {
-        //     return Forbidden();
-        // }
+        //IEnumerable<string> cultures = requestModel.Variants
+        //    .Where(v => v.Culture is not null)
+        //    .Select(v => v.Culture!);
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            // We set empty cultures to ingore them (ContentEditingService check them), but we still check permission to update
+            ContentPermissionResource.WithKeys(ActionUpdate.ActionLetter, id, Array.Empty<string>()),
+            AuthorizationPolicies.ContentPermissionByResource);
+
+        if (!authorizationResult.Succeeded)
+        {
+            return Forbidden();
+        }
 
         return await authorizedHandler();
     }
