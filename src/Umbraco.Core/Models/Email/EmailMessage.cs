@@ -16,6 +16,20 @@ public class EmailMessage
         string? subject,
         string? body,
         bool isBodyHtml,
+        IEnumerable<EmailMessageAttachment>? attachments)
+        : this(from, to, cc, bcc, replyTo, subject, body, isBodyHtml, attachments, null)
+    {
+    }
+
+    public EmailMessage(
+        string? from,
+        string?[] to,
+        string[]? cc,
+        string[]? bcc,
+        string[]? replyTo,
+        string? subject,
+        string? body,
+        bool isBodyHtml,
         IEnumerable<EmailMessageAttachment>? attachments,
         IEnumerable<EmailMessageLinkedResource>? linkedResources)
     {
