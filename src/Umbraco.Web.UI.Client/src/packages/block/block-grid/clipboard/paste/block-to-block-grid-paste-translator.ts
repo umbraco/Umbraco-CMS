@@ -1,30 +1,26 @@
 import type { UmbBlockGridLayoutModel, UmbBlockGridValueModel } from '../../types.js';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../constants.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbClipboardEntryValueModel, UmbClipboardPasteTranslator } from '@umbraco-cms/backoffice/clipboard';
-import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
+import type { UmbClipboardPasteTranslator } from '@umbraco-cms/backoffice/clipboard';
+import type { UmbBlockClipboardEntryValueModel, UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 
 export class UmbBlockToBlockGridClipboardPasteTranslator
 	extends UmbControllerBase
-	implements UmbClipboardPasteTranslator<UmbBlockGridValueModel>
+	implements UmbClipboardPasteTranslator<UmbBlockClipboardEntryValueModel, UmbBlockGridValueModel>
 {
-	async translate(model: UmbClipboardEntryValueModel) {
-		if (!model) {
+	async translate(value: UmbBlockClipboardEntryValueModel): Promise<UmbBlockGridValueModel> {
+		if (!value) {
 			throw new Error('Values is missing.');
 		}
 
-		if (model.type !== 'block') {
-			throw new Error('Invalid value type.');
-		}
-
-		const valueClone = structuredClone(model.value);
+		const valueClone = structuredClone(value);
 
 		const blockGridPropertyValue: UmbBlockGridValueModel = {
 			contentData: valueClone.contentData,
 			settingsData: valueClone.settingsData,
 			expose: valueClone.expose,
 			layout: {
-				[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]: valueClone.layout.map((baseLayout: UmbBlockLayoutBaseModel) => {
+				[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]: valueClone.layout?.map((baseLayout: UmbBlockLayoutBaseModel) => {
 					const gridLayout: UmbBlockGridLayoutModel = {
 						...baseLayout,
 						columnSpan: 12,

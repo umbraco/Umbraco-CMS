@@ -22,12 +22,4 @@ export const manifests: Array<UmbExtensionManifest> = [
 		fromClipboardEntryValueType: 'block',
 		toPropertyEditorUi: UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
 	},
-	{
-		type: 'clipboardPasteTranslator',
-		alias: 'Umb.ClipboardPasteTranslator.GridBlockToBlockList',
-		name: 'Grid Block To Block List Clipboard Paste Translator',
-		api: () => import('./grid-block-to-block-list-paste-translator.js'),
-		fromClipboardEntryValueType: 'gridBlock',
-		toPropertyEditorUi: UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
-	},
 ];

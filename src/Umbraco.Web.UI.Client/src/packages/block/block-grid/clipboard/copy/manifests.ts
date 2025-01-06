@@ -16,9 +16,18 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'clipboardCopyTranslator',
-		alias: 'Umb.ClipboardCopyTranslator.BlockGrid',
-		name: 'Block Grid Clipboard Copy Translator',
-		api: () => import('./copy-translator.js'),
-		forPropertyEditorUis: [UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS],
+		alias: 'Umb.ClipboardCopyTranslator.BlockGridToGridBlock',
+		name: 'Block Grid To Grid Block Clipboard Copy Translator',
+		api: () => import('./block-grid-to-grid-block-copy-translator.js'),
+		fromPropertyEditorUi: UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
+		toClipboardEntryValueType: 'gridBlock',
+	},
+	{
+		type: 'clipboardCopyTranslator',
+		alias: 'Umb.ClipboardCopyTranslator.BlockGridToBlock',
+		name: 'Block Grid to Block Clipboard Copy Translator',
+		api: () => import('./block-grid-to-block-copy-translator.js'),
+		fromPropertyEditorUi: UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
+		toClipboardEntryValueType: 'block',
 	},
 ];

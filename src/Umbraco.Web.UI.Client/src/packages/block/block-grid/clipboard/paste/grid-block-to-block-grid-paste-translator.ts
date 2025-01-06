@@ -1,21 +1,30 @@
+import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../property-editors/constants.js';
 import type { UmbBlockGridValueModel } from '../../types.js';
+import type { UmbGridBlockClipboardEntryValueModel } from '../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbClipboardEntryValueModel, UmbClipboardPasteTranslator } from '@umbraco-cms/backoffice/clipboard';
+import type { UmbClipboardPasteTranslator } from '@umbraco-cms/backoffice/clipboard';
 
 export class UmbGridBlockToBlockGridClipboardPasteTranslator
 	extends UmbControllerBase
-	implements UmbClipboardPasteTranslator<UmbBlockGridValueModel>
+	implements UmbClipboardPasteTranslator<UmbGridBlockClipboardEntryValueModel, UmbBlockGridValueModel>
 {
-	async translate(model: UmbClipboardEntryValueModel) {
-		if (!model) {
-			throw new Error('Value model is missing.');
+	async translate(value: UmbGridBlockClipboardEntryValueModel): Promise<UmbBlockGridValueModel> {
+		if (!value) {
+			throw new Error('Value is missing.');
 		}
 
-		const valueClone = structuredClone(model.value);
+		const valueClone = structuredClone(value);
 
-		debugger;
+		const blockGridPropertyValue: UmbBlockGridValueModel = {
+			contentData: valueClone.contentData,
+			settingsData: valueClone.settingsData,
+			expose: valueClone.expose,
+			layout: {
+				[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]: valueClone.layout,
+			},
+		};
 
-		//return structuredClone(model.value);
+		return blockGridPropertyValue;
 	}
 }
 

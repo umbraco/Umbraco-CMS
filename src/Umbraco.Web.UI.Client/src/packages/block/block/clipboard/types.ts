@@ -1,11 +1,8 @@
-//import type { UmbClipboardEntry } from '@umbraco-cms/backoffice/clipboard';
+import type { UmbBlockDataModel, UmbBlockExposeModel, UmbBlockLayoutBaseModel } from '../types.js';
 
-/**
- * A Clipboard entry for Blocks.
- */
-//export type UmbBlockClipboardEntry = UmbClipboardEntry<'block', UmbBlockClipboardEntryMeta, any>;
-
-/*interface UmbBlockClipboardEntryMeta {
-	contentTypeAliases: Array<string>;
+export interface UmbBlockClipboardEntryValueModel {
+	contentData: Array<UmbBlockDataModel>;
+	settingsData: Array<UmbBlockDataModel>;
+	expose: Array<UmbBlockExposeModel>;
+	layout: Array<UmbBlockLayoutBaseModel> | undefined;
 }
-*/

@@ -13,25 +13,29 @@ export class UmbClipboardCopyTranslatorValueResolver extends UmbControllerBase {
 			throw new Error('Property editor UI alias is required.');
 		}
 
-		const defaultValue = {
-			type: 'default',
-			value: propertyValue,
-		};
-
-		const manifests = umbExtensionsRegistry.getByTypeAndFilter('clipboardCopyTranslator', (x) =>
-			x.forPropertyEditorUis.includes(propertyEditorUiAlias),
+		const manifests = umbExtensionsRegistry.getByTypeAndFilter(
+			'clipboardCopyTranslator',
+			(x) => x.fromPropertyEditorUi === propertyEditorUiAlias,
 		);
 
-		if (!manifests || manifests.length === 0) {
-			return [defaultValue];
+		if (!manifests.length) {
+			throw new Error('No clipboard copy translators found.');
 		}
 
+		// Create translators
 		const apiPromises = manifests.map((manifest) => createExtensionApi(this, manifest));
 		const apis = await Promise.all(apiPromises);
 
+		// Translate values
 		const valuePromises = apis.map(async (api) => api?.translate(propertyValue));
 		const translatedValues = await Promise.all(valuePromises);
 
-		return [defaultValue, ...translatedValues.filter((x) => x !== undefined).flat()];
+		// Map to clipboard entry value models with entry type and value
+		const entryValues: UmbClipboardEntryValuesType = translatedValues.map((value, index) => {
+			const valueType = manifests[index].toClipboardEntryValueType;
+			return { type: valueType, value };
+		});
+
+		return entryValues;
 	}
 }

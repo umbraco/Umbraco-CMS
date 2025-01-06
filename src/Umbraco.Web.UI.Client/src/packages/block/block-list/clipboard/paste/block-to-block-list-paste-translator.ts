@@ -1,18 +1,19 @@
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../property-editors/block-list-editor/constants.js';
 import type { UmbBlockListValueModel } from '../../types.js';
+import type { UmbBlockClipboardEntryValueModel } from '@umbraco-cms/backoffice/block';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbClipboardEntryValueModel, UmbClipboardPasteTranslator } from '@umbraco-cms/backoffice/clipboard';
+import type { UmbClipboardPasteTranslator } from '@umbraco-cms/backoffice/clipboard';
 
 export class UmbBlockToBlockListClipboardPasteTranslator
 	extends UmbControllerBase
-	implements UmbClipboardPasteTranslator<UmbBlockListValueModel>
+	implements UmbClipboardPasteTranslator<UmbBlockClipboardEntryValueModel, UmbBlockListValueModel>
 {
-	async translate(model: UmbClipboardEntryValueModel) {
-		if (!model) {
-			throw new Error('Model is missing.');
+	async translate(value: UmbBlockClipboardEntryValueModel) {
+		if (!value) {
+			throw new Error('Value is missing.');
 		}
 
-		const valueClone = structuredClone(model.value);
+		const valueClone = structuredClone(value);
 
 		const blockListPropertyValue: UmbBlockListValueModel = {
 			contentData: valueClone.contentData,
@@ -22,6 +23,8 @@ export class UmbBlockToBlockListClipboardPasteTranslator
 				[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: valueClone.layout ?? undefined,
 			},
 		};
+
+		debugger;
 
 		return blockListPropertyValue;
 	}

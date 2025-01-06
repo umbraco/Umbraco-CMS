@@ -3,7 +3,8 @@ import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestClipboardCopyTranslator extends ManifestApi<UmbClipboardCopyTranslator<any>> {
 	type: 'clipboardCopyTranslator';
-	forPropertyEditorUis: Array<string>;
+	fromPropertyEditorUi: string;
+	toClipboardEntryValueType: string;
 }
 
 declare global {
