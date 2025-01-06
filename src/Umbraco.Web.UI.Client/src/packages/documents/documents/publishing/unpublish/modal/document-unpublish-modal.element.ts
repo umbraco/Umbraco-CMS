@@ -47,9 +47,20 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	@state()
 	_hasInvalidSelection = true;
 
+	@state()
+	_isInvariant = false;
+
 	override firstUpdated() {
-		this.#configureSelectionManager();
 		this.#getReferences();
+
+		// If invariant, don't display the variant selection component.
+		if (this.data?.options.length === 1 && this.data.options[0].unique === "invariant") {
+			this._isInvariant = true;
+			this._hasInvalidSelection = false;
+			return;
+		}
+
+		this.#configureSelectionManager();
 	}
 
 	async #configureSelectionManager() {
@@ -104,7 +115,10 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 
 	#submit() {
 		if (this._hasUnpublishPermission) {
-			this.value = { selection: this._selection };
+			const selection = this._isInvariant
+				? ["invariant"]
+				: this._selection;
+			this.value = { selection };
 			this.modalContext?.submit();
 			return;
 		}
@@ -121,17 +135,21 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`<umb-body-layout headline=${this.localize.term('content_unpublish')}>
-			<p id="subtitle">
-				<umb-localize key="content_languagesToUnpublish">
-					Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.
-				</umb-localize>
-			</p>
 
-			<umb-document-variant-language-picker
-				.selectionManager=${this._selectionManager}
-				.variantLanguageOptions=${this._options}
-				.requiredFilter=${this._hasInvalidSelection ? this._requiredFilter : undefined}
-				.pickableFilter=${this.data?.pickableFilter}></umb-document-variant-language-picker>
+			${!this._isInvariant
+				? html`
+					<p id="subtitle">
+						<umb-localize key="content_languagesToUnpublish">
+							Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.
+						</umb-localize>
+					</p>
+					<umb-document-variant-language-picker
+						.selectionManager=${this._selectionManager}
+						.variantLanguageOptions=${this._options}
+						.requiredFilter=${this._hasInvalidSelection ? this._requiredFilter : undefined}
+						.pickableFilter=${this.data?.pickableFilter}></umb-document-variant-language-picker>
+					`
+				: nothing}
 
 			<p>
 				<umb-localize key="prompt_confirmUnpublish">
@@ -159,7 +177,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				<uui-button
 					label="${this.localize.term('actions_unpublish')}"
-					?disabled=${this._hasInvalidSelection || !this._hasUnpublishPermission || this._selection.length === 0}
+					?disabled=${this._hasInvalidSelection || !this._hasUnpublishPermission || (!this._isInvariant && this._selection.length === 0)}
 					look="primary"
 					color="warning"
 					@click=${this.#submit}></uui-button>
