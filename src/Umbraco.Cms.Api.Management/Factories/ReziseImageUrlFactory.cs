@@ -52,7 +52,7 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
                     yield return new MediaUrlInfo
                     {
                         Culture = null,
-                        Url = url,
+                        Url = _absoluteUrlBuilder.ToAbsoluteUrl(url).ToString(),
                     };
                 }
 
