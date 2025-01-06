@@ -24,8 +24,6 @@ export class UmbBlockToBlockListClipboardPasteTranslator
 			},
 		};
 
-		debugger;
-
 		return blockListPropertyValue;
 	}
 }
