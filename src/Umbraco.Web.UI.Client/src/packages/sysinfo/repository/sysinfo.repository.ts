@@ -20,11 +20,6 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 		return data;
 	}
 
-	async requestServerConfiguration() {
-		const { data } = await tryExecute(ServerService.getServerConfiguration());
-		return data;
-	}
-
 	async serverUpgradeCheck(): Promise<UmbServerUpgradeCheck | null> {
 		// Check if we are allowed to check again
 		const versionCheckPeriod = await this.#getVersionCheckPeriod();
