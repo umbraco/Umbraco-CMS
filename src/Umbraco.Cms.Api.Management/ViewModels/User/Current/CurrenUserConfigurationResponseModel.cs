@@ -10,8 +10,4 @@ public class CurrenUserConfigurationResponseModel
     public bool UsernameIsEmail { get; set; }
 
     public required PasswordConfigurationResponseModel PasswordConfiguration { get; set; }
-
-    public bool AllowChangePassword { get; set; }
-
-    public bool AllowTwoFactor { get; set; }
 }
