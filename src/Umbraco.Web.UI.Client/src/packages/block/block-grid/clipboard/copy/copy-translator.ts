@@ -1,4 +1,4 @@
-import type { UmbBlockGridLayoutModel, UmbBlockGridValueModel } from '../../types.js';
+import type { UmbBlockGridValueModel } from '../../types.js';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../property-editors/constants.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbClipboardCopyTranslator } from '@umbraco-cms/backoffice/clipboard';
@@ -12,6 +12,19 @@ export class UmbBlockGridClipboardCopyTranslator
 			throw new Error('Property value is missing.');
 		}
 
+		return [
+			{
+				type: 'gridBlock',
+				value: this.#constructGridBlockValue(propertyValue),
+			},
+			{
+				type: 'block',
+				value: this.#constructBlockValue(propertyValue),
+			},
+		];
+	}
+
+	#constructGridBlockValue(propertyValue: UmbBlockGridValueModel) {
 		const clone = structuredClone(propertyValue);
 
 		const contentData = clone.contentData;
@@ -19,28 +32,33 @@ export class UmbBlockGridClipboardCopyTranslator
 		const settingsData = clone.settingsData;
 		const expose = clone.expose;
 
-		layout?.forEach((layoutItem: UmbBlockGridLayoutModel) => {
-			// @ts-expect-error - We are removing the $type property from the layout item
-			delete layoutItem.$type;
-		});
-
-		const blockValue = {
+		const gridBlockValue = {
 			contentData: contentData ?? [],
 			layout: layout ?? [],
 			settingsData: settingsData ?? [],
 			expose: expose ?? [],
 		};
 
-		return [
-			{
-				type: 'block',
-				value: blockValue,
-			},
-			{
-				type: 'gridBlock',
-				value: 'This is a grid block value',
-			},
-		];
+		return gridBlockValue;
+	}
+
+	#constructBlockValue(propertyValue: UmbBlockGridValueModel): UmbBlockGridValueModel {
+		const gridBlockValue = this.#constructGridBlockValue(propertyValue);
+
+		const layout = gridBlockValue.layout.map((gridLayout) => {
+			delete gridLayout.areas;
+			delete gridLayout.columnSpan;
+			delete gridLayout.rowSpan;
+			return gridLayout.$type;
+		});
+		debugger;
+
+		return {
+			contentData: gridBlockValue.contentData,
+			layout: layout,
+			settingsData: gridBlockValue.settingsData,
+			expose: gridBlockValue.expose,
+		};
 	}
 }
 
