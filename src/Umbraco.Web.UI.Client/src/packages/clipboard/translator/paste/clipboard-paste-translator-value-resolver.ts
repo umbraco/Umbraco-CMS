@@ -1,4 +1,5 @@
-import type { UmbClipboardEntryValuesType, UmbClipboardPasteTranslator } from '../types.js';
+import type { UmbClipboardEntryValuesType } from '../../clipboard-entry/types.js';
+import type { UmbClipboardPasteTranslator } from './types.js';
 import type { ManifestClipboardPasteTranslator } from './clipboard-paste-translator.extension.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi, type ManifestBase } from '@umbraco-cms/backoffice/extension-api';

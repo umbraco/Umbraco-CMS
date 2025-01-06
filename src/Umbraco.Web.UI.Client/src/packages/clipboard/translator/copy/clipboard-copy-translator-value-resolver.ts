@@ -1,4 +1,5 @@
-import type { UmbClipboardEntryValuesType } from './types.js';
+import type { UmbClipboardEntryValuesType } from '../../clipboard-entry/types.js';
+import type { UmbClipboardCopyTranslator } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -27,11 +28,13 @@ export class UmbClipboardCopyTranslatorValueResolver extends UmbControllerBase {
 		const apis = await Promise.all(apiPromises);
 
 		// Translate values
-		const valuePromises = apis.map(async (api) => api?.translate(propertyValue));
+		const valuePromises = apis.map(async (api: UmbClipboardCopyTranslator | undefined) =>
+			api?.translate(propertyValue),
+		);
 		const translatedValues = await Promise.all(valuePromises);
 
 		// Map to clipboard entry value models with entry type and value
-		const entryValues: UmbClipboardEntryValuesType = translatedValues.map((value, index) => {
+		const entryValues = translatedValues.map((value: any, index: number) => {
 			const valueType = manifests[index].toClipboardEntryValueType;
 			return { type: valueType, value };
 		});

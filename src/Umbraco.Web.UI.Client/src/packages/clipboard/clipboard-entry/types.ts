@@ -1,5 +1,11 @@
-import type { UmbClipboardEntryValuesType } from '../types.js';
 import type { UmbClipboardEntryItemModel } from './item/types.js';
+
+export interface UmbClipboardEntryValueModel<ValueType = any> {
+	type: string;
+	value: ValueType;
+}
+
+export type UmbClipboardEntryValuesType = Array<UmbClipboardEntryValueModel>;
 
 /**
  * A Clipboard entry is a composed set of data representing one entry in the clipboard.
