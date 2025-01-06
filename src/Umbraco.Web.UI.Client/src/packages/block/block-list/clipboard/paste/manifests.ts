@@ -16,10 +16,18 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'clipboardPasteTranslator',
-		alias: 'Umb.ClipboardPasteTranslator.BlockList',
-		name: 'Block List Clipboard Paste Translator',
-		api: () => import('./paste-translator.js'),
-		fromClipboardEntryValueTypes: ['block'],
-		toPropertyEditorUis: [UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS],
+		alias: 'Umb.ClipboardPasteTranslator.BlockToBlockList',
+		name: 'Block To Block List Clipboard Paste Translator',
+		api: () => import('./block-to-block-list-paste-translator.js'),
+		fromClipboardEntryValueType: 'block',
+		toPropertyEditorUi: UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
+	},
+	{
+		type: 'clipboardPasteTranslator',
+		alias: 'Umb.ClipboardPasteTranslator.GridBlockToBlockList',
+		name: 'Grid Block To Block List Clipboard Paste Translator',
+		api: () => import('./grid-block-to-block-list-paste-translator.js'),
+		fromClipboardEntryValueType: 'gridBlock',
+		toPropertyEditorUi: UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
 	},
 ];

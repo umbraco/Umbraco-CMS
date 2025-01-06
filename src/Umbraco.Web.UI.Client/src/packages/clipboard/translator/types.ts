@@ -1,8 +1,8 @@
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export interface UmbClipboardEntryValueModel {
+export interface UmbClipboardEntryValueModel<ValueType = any> {
 	type: string;
-	value: any;
+	value: ValueType;
 }
 
 export type UmbClipboardEntryValuesType = Array<UmbClipboardEntryValueModel>;
@@ -12,5 +12,5 @@ export interface UmbClipboardCopyTranslator<PropertyValueModelType> extends UmbA
 }
 
 export interface UmbClipboardPasteTranslator<PropertyValueModelType = unknown> extends UmbApi {
-	translate: (clipboardEntryValues: UmbClipboardEntryValuesType) => Promise<Array<PropertyValueModelType>>;
+	translate: (clipboardEntryValue: UmbClipboardEntryValueModel) => Promise<PropertyValueModelType>;
 }
