@@ -4,7 +4,7 @@ import type { UmbBlockClipboardEntryValueModel } from '@umbraco-cms/backoffice/b
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbClipboardCopyTranslator } from '@umbraco-cms/backoffice/clipboard';
 
-export class UmbBlockListClipboardCopyTranslator
+export class UmbBlockListToBlockClipboardCopyTranslator
 	extends UmbControllerBase
 	implements UmbClipboardCopyTranslator<UmbBlockListValueModel>
 {
@@ -36,4 +36,4 @@ export class UmbBlockListClipboardCopyTranslator
 	}
 }
 
-export { UmbBlockListClipboardCopyTranslator as api };
+export { UmbBlockListToBlockClipboardCopyTranslator as api };
