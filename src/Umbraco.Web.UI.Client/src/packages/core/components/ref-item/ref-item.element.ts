@@ -1,37 +1,29 @@
 import { customElement, css, property, type PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
-import { UUIRefEvent, UUIRefNodeElement } from '@umbraco-cms/backoffice/external/uui';
+import { UUIRefNodeElement } from '@umbraco-cms/backoffice/external/uui';
 
-const elementName = 'umb-ref-item';
-
-@customElement(elementName)
+@customElement('umb-ref-item')
 export class UmbRefItemElement extends UmbElementMixin(UUIRefNodeElement) {
 	@property({ type: String })
 	icon = '';
 
-	constructor() {
-		super();
-
-		this.selectable = true;
-
-		this.addEventListener(UUIRefEvent.OPEN, () => this.dispatchEvent(new Event('click')));
-	}
+	#iconElement = document.createElement('umb-icon');
 
 	protected override firstUpdated(_changedProperties: PropertyValues): void {
 		super.firstUpdated(_changedProperties);
 
-		if (this.icon) {
-			const umbIcon = document.createElement('umb-icon');
-			umbIcon.setAttribute('name', this.icon);
-			this.shadowRoot?.querySelector('#icon')?.replaceWith(umbIcon);
-		}
+		// Temporary fix for the icon appending, this could in the future be changed to override a renderIcon method, or other ways to make this happen without appending children.
+		this.#iconElement.setAttribute('slot', 'icon');
+		this.#iconElement.setAttribute('name', this.icon);
+		this.appendChild(this.#iconElement);
 	}
 
 	static override styles = [
 		...UUIRefNodeElement.styles,
 		css`
 			:host {
-				padding: calc(var(--uui-size-4) + 1px);
+				padding-top: var(--uui-size-3);
+				padding-bottom: var(--uui-size-3);
 			}
 		`,
 	];
@@ -39,6 +31,6 @@ export class UmbRefItemElement extends UmbElementMixin(UUIRefNodeElement) {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbRefItemElement;
+		'umb-ref-item': UmbRefItemElement;
 	}
 }

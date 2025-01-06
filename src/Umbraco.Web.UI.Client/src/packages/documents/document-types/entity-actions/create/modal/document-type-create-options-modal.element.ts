@@ -111,7 +111,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 									name=${item.label}
 									detail=${item.description}
 									icon=${item.icon}
-									@click=${() => this.#onClick(item.preset)}></umb-ref-item>
+									@open=${() => this.#onClick(item.preset)}></umb-ref-item>
 							`,
 						)}
 					</uui-ref-list>

@@ -18,8 +18,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 type ManifestType = ManifestEntityCreateOptionAction;
 
-const elementName = 'umb-entity-create-option-action-list-modal';
-@customElement(elementName)
+@customElement('umb-entity-create-option-action-list-modal')
 export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseElement<
 	UmbEntityCreateOptionActionListModalData,
 	UmbEntityCreateOptionActionListModalValue
@@ -122,10 +121,7 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 				icon=${manifest.meta.icon}
 				href=${ifDefined(href)}
 				target=${this.#getTarget(href)}
-				?readonly=${!href}
-				?selectOnly=${!href}
-				?selectable=${!href}
-				@click=${(event: Event) => this.#onClick(event, controller, href)}>
+				@open=${(event: Event) => this.#onClick(event, controller, href)}>
 			</umb-ref-item>
 		`;
 	}
@@ -135,6 +131,6 @@ export { UmbEntityCreateOptionActionListModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbEntityCreateOptionActionListModalElement;
+		'umb-entity-create-option-action-list-modal': UmbEntityCreateOptionActionListModalElement;
 	}
 }

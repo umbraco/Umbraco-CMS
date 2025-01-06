@@ -60,11 +60,10 @@ export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBase
 								(item) => item.alias,
 								(item) => html`
 									<umb-ref-item
-										select-only
 										name=${ifDefined(item.meta.label)}
 										detail=${ifDefined(item.meta.description)}
 										icon=${ifDefined(item.meta.icon)}
-										@click=${() => this.#choose(item)}></umb-ref-item>
+										@open=${() => this.#choose(item)}></umb-ref-item>
 								`,
 							)}
 						</uui-ref-list>
