@@ -143,6 +143,10 @@ public class UserPresentationFactory : IUserPresentationFactory
             KeepUserLoggedIn = _securitySettings.KeepUserLoggedIn,
             UsernameIsEmail = _securitySettings.UsernameIsEmail,
             PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
+
+            // You should not be able to change any password or set 2fa if any providers has deny local login set.
+            AllowChangePassword = _externalLoginProviders.HasDenyLocalLogin(),
+            AllowTwoFactor = _externalLoginProviders.HasDenyLocalLogin(),
         };
 
         return await Task.FromResult(model);
@@ -155,6 +159,10 @@ public class UserPresentationFactory : IUserPresentationFactory
             CanInviteUsers = _emailSender.CanSendRequiredEmail() && _externalLoginProviders.HasDenyLocalLogin() is false,
             UsernameIsEmail = _securitySettings.UsernameIsEmail,
             PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
+
+            // You should not be able to change any password or set 2fa if any providers has deny local login set.
+            AllowChangePassword = _externalLoginProviders.HasDenyLocalLogin(),
+            AllowTwoFactor = _externalLoginProviders.HasDenyLocalLogin(),
         });
 
     public async Task<UserUpdateModel> CreateUpdateModelAsync(Guid existingUserKey, UpdateUserRequestModel updateModel)
