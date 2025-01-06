@@ -15,6 +15,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
+				alias: 'Umb.Condition.User.IsDefaultKind',
+			},
+			{
 				alias: 'Umb.Condition.User.AllowChangePassword',
 			},
 		],
