@@ -25276,16 +25276,8 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
           }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
+        }
       }
     },
     "/umbraco/management/api/v1/server/information": {
@@ -35871,6 +35863,8 @@
       },
       "CurrenUserConfigurationResponseModel": {
         "required": [
+          "allowChangePassword",
+          "allowTwoFactor",
           "keepUserLoggedIn",
           "passwordConfiguration",
           "usernameIsEmail"
@@ -35890,6 +35884,12 @@
                 "$ref": "#/components/schemas/PasswordConfigurationResponseModel"
               }
             ]
+          },
+          "allowChangePassword": {
+            "type": "boolean"
+          },
+          "allowTwoFactor": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -38339,8 +38339,8 @@
         "enum": [
           "Healthy",
           "Unhealthy",
-          "Corrupt",
-          "Rebuilding"
+          "Rebuilding",
+          "Corrupt"
         ],
         "type": "string"
       },
@@ -43184,6 +43184,7 @@
       },
       "ServerConfigurationResponseModel": {
         "required": [
+          "allowLocalLogin",
           "allowPasswordReset",
           "versionCheckPeriod"
         ],
@@ -43195,6 +43196,9 @@
           "versionCheckPeriod": {
             "type": "integer",
             "format": "int32"
+          },
+          "allowLocalLogin": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -45313,6 +45317,8 @@
       },
       "UserConfigurationResponseModel": {
         "required": [
+          "allowChangePassword",
+          "allowTwoFactor",
           "canInviteUsers",
           "passwordConfiguration",
           "usernameIsEmail"
@@ -45331,6 +45337,12 @@
                 "$ref": "#/components/schemas/PasswordConfigurationResponseModel"
               }
             ]
+          },
+          "allowChangePassword": {
+            "type": "boolean"
+          },
+          "allowTwoFactor": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
