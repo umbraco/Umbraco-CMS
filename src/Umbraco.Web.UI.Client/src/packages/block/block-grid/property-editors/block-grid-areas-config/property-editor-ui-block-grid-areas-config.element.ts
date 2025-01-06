@@ -1,6 +1,5 @@
-import { UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_MODAL } from '../../components/block-grid-area-config-entry/index.js';
-import { UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET } from '../../context/block-grid-manager.context.js';
-import type { UmbBlockGridTypeAreaType } from '../../index.js';
+import { UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET, type UmbBlockGridTypeAreaType } from '../../index.js';
+import { UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_MODAL } from '../../components/block-grid-area-config-entry/constants.js';
 import { UmbBlockGridAreaTypeEntriesContext } from './block-grid-area-type-entries.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
@@ -12,6 +11,7 @@ import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { incrementString } from '@umbraco-cms/backoffice/utils';
 
+import '../../components/block-grid-area-config-entry/index.js';
 @customElement('umb-property-editor-ui-block-grid-areas-config')
 export class UmbPropertyEditorUIBlockGridAreasConfigElement
 	extends UmbLitElement

@@ -87,7 +87,10 @@ export class UmbVariantId {
 		return Object.freeze(new UmbVariantId(this.culture, null));
 	}
 	public toCultureInvariant(): UmbVariantId {
-		return Object.freeze(new UmbVariantId(null, this.culture));
+		return Object.freeze(new UmbVariantId(null, this.segment));
+	}
+	public toVariant(varyByCulture?: boolean, varyBySegment?: boolean): UmbVariantId {
+		return Object.freeze(new UmbVariantId(varyByCulture ? this.culture : null, varyBySegment ? this.segment : null));
 	}
 
 	// TODO: needs localization option:

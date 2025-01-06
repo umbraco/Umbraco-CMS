@@ -1,9 +1,7 @@
 import { UmbTiptapToolbarButtonElement } from './tiptap-toolbar-button.element.js';
 import { customElement, html, ifDefined, when } from '@umbraco-cms/backoffice/external/lit';
 
-const elementName = 'umb-tiptap-toolbar-button-disabled';
-
-@customElement(elementName)
+@customElement('umb-tiptap-toolbar-button-disabled')
 export class UmbTiptapToolbarButtonDisabledElement extends UmbTiptapToolbarButtonElement {
 	override render() {
 		return html`
@@ -28,6 +26,6 @@ export { UmbTiptapToolbarButtonDisabledElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbTiptapToolbarButtonDisabledElement;
+		'umb-tiptap-toolbar-button-disabled': UmbTiptapToolbarButtonDisabledElement;
 	}
 }

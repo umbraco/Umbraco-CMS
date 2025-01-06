@@ -1,5 +1,6 @@
-import { UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS, type UmbPartialViewFolderRepository } from '../repository/index.js';
+import type { UmbPartialViewFolderRepository } from '../repository/index.js';
 import { UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE } from '../../../entity.js';
+import { UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS } from '../constants.js';
 import { UMB_PARTIAL_VIEW_FOLDER_WORKSPACE_ALIAS } from './constants.js';
 import { UmbPartialViewFolderWorkspaceEditorElement } from './partial-view-folder-workspace-editor.element.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

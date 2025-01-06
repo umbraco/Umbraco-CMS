@@ -43,8 +43,8 @@ public class LocalLinkProcessor
             string newTagHref;
             if (tag.Udi is not null)
             {
-                newTagHref = $" type=\"{tag.Udi.EntityType}\" "
-                             + tag.TagHref.Replace(tag.Udi.ToString(), tag.Udi.Guid.ToString());
+                newTagHref = tag.TagHref.Replace(tag.Udi.ToString(), tag.Udi.Guid.ToString())
+                             + $"\" type=\"{tag.Udi.EntityType}";
             }
             else if (tag.IntId is not null)
             {
@@ -55,8 +55,8 @@ public class LocalLinkProcessor
                     continue;
                 }
 
-                newTagHref = $" type=\"{conversionResult.Value.EntityType}\" "
-                             + tag.TagHref.Replace(tag.IntId.Value.ToString(), conversionResult.Value.Key.ToString());
+                newTagHref = tag.TagHref.Replace(tag.IntId.Value.ToString(), conversionResult.Value.Key.ToString())
+                             + $"\" type=\"{conversionResult.Value.EntityType}";
             }
             else
             {

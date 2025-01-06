@@ -311,12 +311,17 @@ public class DomainService : RepositoryService, IDomainService
         var sortOrder = 0;
         foreach (DomainModel domainModel in updateModel.Domains)
         {
-            IDomain assignedDomain = currentlyAssignedDomains.FirstOrDefault(domain => domainModel.DomainName.InvariantEquals(domain.DomainName))
-                                     ?? new UmbracoDomain(domainModel.DomainName)
-                                     {
-                                         LanguageId = languageIdByIsoCode[domainModel.IsoCode],
-                                         RootContentId = contentId
-                                     };
+            IDomain? assignedDomain = currentlyAssignedDomains.FirstOrDefault(domain => domainModel.DomainName.InvariantEquals(domain.DomainName));
+
+            // If we do not have an assigned domain, or the domain-language has been changed, create new domain.
+            if (assignedDomain is null || assignedDomain.LanguageId != languageIdByIsoCode[domainModel.IsoCode])
+            {
+                assignedDomain = new UmbracoDomain(domainModel.DomainName)
+                {
+                    LanguageId = languageIdByIsoCode[domainModel.IsoCode],
+                    RootContentId = contentId
+                };
+            }
 
             assignedDomain.SortOrder = sortOrder++;
             newAssignedDomains.Add(assignedDomain);

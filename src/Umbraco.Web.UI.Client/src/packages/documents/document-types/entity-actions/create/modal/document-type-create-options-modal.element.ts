@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS } from '../../../tree/index.js';
-import type { UmbDocumentTypeCreateOptionsModalData } from './index.js';
+import type { UmbDocumentTypeCreateOptionsModalData } from './constants.js';
 import {
 	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN,
 	type UmbCreateDocumentTypeWorkspacePresetType,
