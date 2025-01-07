@@ -18,6 +18,7 @@ export type * from './tree/types.js';
 export type * from './user-permissions/types.js';
 export type * from './entity.js';
 export type * from './workspace/types.js';
+export type * from './publishing/types.js';
 
 export interface UmbDocumentDetailModel extends UmbContentDetailModel {
 	documentType: {

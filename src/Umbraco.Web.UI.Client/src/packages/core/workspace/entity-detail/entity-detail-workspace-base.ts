@@ -38,6 +38,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	public readonly unique = this.#entityContext.unique;
 
 	public readonly data = this._data.current;
+	public readonly persistedData = this._data.persisted;
 	public readonly loading = new UmbStateManager(this);
 
 	protected _getDataPromise?: Promise<any>;
@@ -86,6 +87,14 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	/**
+	 * Get the persisted data
+	 * @returns { DetailModelType | undefined } The persisted data
+	 */
+	public getPersistedData(): DetailModelType | undefined {
+		return this._data.getPersisted();
+	}
+
+	/**
 	 * Get the unique
 	 * @returns { string | undefined } The unique identifier
 	 */
@@ -122,10 +131,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	async load(unique: string) {
+		this.resetState();
 		this.#entityContext.setUnique(unique);
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Loading ${this.getEntityType()} Details` });
 		await this.#init;
-		this.resetState();
 		this._getDataPromise = this._detailRepository!.requestByUnique(unique);
 		type GetDataType = Awaited<ReturnType<UmbDetailRepository<DetailModelType>['requestByUnique']>>;
 		const response = (await this._getDataPromise) as GetDataType;
@@ -148,6 +157,21 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	/**
+	 * Reload the workspace data
+	 * @returns { Promise<void> } The promise of the reload
+	 */
+	public async reload(): Promise<void> {
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is not set');
+		const { data } = await this._detailRepository!.requestByUnique(unique);
+
+		if (data) {
+			this._data.setPersisted(data);
+			this._data.setCurrent(data);
+		}
+	}
+
+	/**
 	 * Method to check if the workspace data is loaded.
 	 * @returns { Promise<any> | undefined } true if the workspace data is loaded.
 	 * @memberof UmbEntityWorkspaceContextBase
@@ -166,9 +190,9 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @returns { Promise<any> | undefined } The data of the scaffold.
 	 */
 	public async createScaffold(args: CreateArgsType) {
+		this.resetState();
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Creating ${this.getEntityType()} scaffold` });
 		await this.#init;
-		this.resetState();
 		this.setParent(args.parent);
 
 		const request = this._detailRepository!.createScaffold(args.preset);
