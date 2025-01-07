@@ -6,9 +6,7 @@ export interface ManifestEntityActionCreateKind extends ManifestEntityAction<Met
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface MetaEntityActionCreateKind extends MetaEntityActionDefaultKind {
-	headline?: string;
-}
+export interface MetaEntityActionCreateKind extends MetaEntityActionDefaultKind {}
 
 declare global {
 	interface UmbExtensionManifestMap {

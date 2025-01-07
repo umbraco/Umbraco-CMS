@@ -12,9 +12,6 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		alias: 'Umb.EntityAction.User.Create',
 		name: 'Create User Entity Action',
 		forEntityTypes: [UMB_USER_ROOT_ENTITY_TYPE],
-		meta: {
-			headline: '#user_createUser',
-		},
 	},
 	...apiUser,
 	...defaultUser,

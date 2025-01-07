@@ -49,7 +49,6 @@ export class UmbCreateEntityAction extends UmbEntityActionBase<MetaEntityActionC
 			data: {
 				unique: this.args.unique,
 				entityType: this.args.entityType,
-				headline: this.args.meta?.headline,
 			},
 		});
 
