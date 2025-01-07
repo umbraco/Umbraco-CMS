@@ -129,10 +129,12 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 	}
 
 	#filterProvider = (provider: ManifestAuthProvider) => {
-		if (!this._allowLocalLogin) {
-			return provider.forProviderName.toLowerCase() !== 'umbraco';
+		if (this._allowLocalLogin) {
+			return true;
 		}
-		return true;
+
+		// Do not show any Umbraco auth provider if local login is disabled
+		return provider.forProviderName.toLowerCase() !== 'umbraco';
 	};
 
 	private onSubmit = async (providerOrManifest: string | ManifestAuthProvider, loginHint?: string) => {
