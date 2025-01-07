@@ -27,6 +27,10 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 	@state()
 	_totalPages = 1;
 
+	#hasMorePages() {
+		return this._currentPage < this._totalPages;;
+	}
+
 	#pagination = new UmbPaginationManager();
 	#sortedUniques = new Set<string>();
 	#sorter?: UmbSorterController<UmbTreeItemModel>;
@@ -237,7 +241,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 				)}
 			</uui-table>
 
-			${this._currentPage < this._totalPages
+			${this.#hasMorePages()
 				? html`
 						<uui-button id="loadMoreButton" look="secondary" @click=${this.#onLoadMore}
 							>Load More (${this._currentPage}/${this._totalPages})</uui-button
@@ -248,15 +252,22 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 	}
 
 	#renderHeaderCell(key: string, labelKey: string) {
+		// Only provide buttons for sorting via the column headers if all pages have been loaded.
 		return html`
 			<uui-table-head-cell>
-				<button @click=${() => this.#sortChildrenBy(key)}>
-					${this.localize.term(labelKey)}
-					<uui-symbol-sort
-						?active=${this.#sortBy === key}
-						?descending=${this.#sortDirection === "desc"}
-					></uui-symbol-sort>
-				</button>
+				${this.#hasMorePages()
+					? html`
+						<span>${this.localize.term(labelKey)}</span>
+					`
+					: html`
+						<button @click=${() => this.#sortChildrenBy(key)}>
+							${this.localize.term(labelKey)}
+							<uui-symbol-sort
+								?active=${this.#sortBy === key}
+								?descending=${this.#sortDirection === "desc"}
+							></uui-symbol-sort>
+						</button>
+					`}
 
 			</uui-table-head-cell>`;
 	}
