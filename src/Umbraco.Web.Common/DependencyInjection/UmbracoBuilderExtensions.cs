@@ -326,20 +326,9 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
-    // TODO: Does this need to exist and/or be public?
+    [Obsolete("This is not necessary any more. This will be removed in v17")]
     public static IUmbracoBuilder AddWebServer(this IUmbracoBuilder builder)
     {
-        // TODO: We need to figure out why this is needed and fix those endpoints to not need them, we don't want to change global things
-        // If using Kestrel: https://stackoverflow.com/a/55196057
-        builder.Services.Configure<KestrelServerOptions>(options =>
-        {
-            options.AllowSynchronousIO = true;
-        });
-        builder.Services.Configure<IISServerOptions>(options =>
-        {
-            options.AllowSynchronousIO = true;
-        });
-
         return builder;
     }
 
