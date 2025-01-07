@@ -348,7 +348,6 @@ public static partial class UmbracoBuilderExtensions
         {
             // Ignoring this exception because it's expected on non-windows machines
         }
-
         return builder;
     }
 
