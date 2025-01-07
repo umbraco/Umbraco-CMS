@@ -329,8 +329,35 @@ public static partial class UmbracoBuilderExtensions
     [Obsolete("This is not necessary any more. This will be removed in v17")]
     public static IUmbracoBuilder AddWebServer(this IUmbracoBuilder builder)
     {
+        builder.Services.Configure<KestrelServerOptions>(options =>
+        {
+            options.AllowSynchronousIO = true;
+        });
+
+        try
+        {
+            // See https://github.com/umbraco/Umbraco-CMS/pull/17886. This is a workaround for non-windows machines
+            // they won't have IIS available and trying to set this option will throw an exception.
+            //
+            // We're deferring this call to a method because if we just try to set the options here, we still get a
+            // TypeLoadException on non-windows machines.
+            // This workaround came from this comment: https://stackoverflow.com/a/3346975
+            AllowSynchronousIOForIIS(builder);
+        }
+        catch (Exception)
+        {
+            // Ignoring this exception because it's expected on non-windows machines
+        }
+
         return builder;
     }
+
+    private static void AllowSynchronousIOForIIS(IUmbracoBuilder builder) =>
+        builder.Services.Configure<IISServerOptions>(
+            options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
 
     private static IProfiler GetWebProfiler(IConfiguration config, IHttpContextAccessor httpContextAccessor)
     {
