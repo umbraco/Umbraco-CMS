@@ -8,6 +8,8 @@ import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-reg
 import type { UmbTreeRepository, UmbTreeItemModel, UmbSortChildrenOfRepository } from '@umbraco-cms/backoffice/tree';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbDocumentTreeItemModel } from '@umbraco-cms/backoffice/document';
+import type { UmbMediaTreeItemModel } from '@umbraco-cms/backoffice/media';
 
 const elementName = 'umb-sort-children-of-modal';
 
@@ -28,6 +30,17 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 	#pagination = new UmbPaginationManager();
 	#sortedUniques = new Set<string>();
 	#sorter?: UmbSorterController<UmbTreeItemModel>;
+
+	#sortBy: string = "";
+	#sortDirection: string = "";
+
+	#localizeDateOptions: Intl.DateTimeFormatOptions = {
+		day: 'numeric',
+		month: 'short',
+		year: 'numeric',
+		hour: 'numeric',
+		minute: '2-digit',
+	};
 
 	constructor() {
 		super();
@@ -68,8 +81,6 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 			take: this.#pagination.getPageSize(),
 		});
 
-		console.log(data);
-
 		if (data) {
 			this._children = [...this._children, ...data.items];
 			this.#pagination.setTotalItems(data.total);
@@ -92,8 +103,8 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 				return modelEntry.unique;
 			},
 			identifier: 'Umb.SorterIdentifier.SortChildrenOfModal',
-			itemSelector: 'uui-ref-node',
-			containerSelector: 'uui-ref-list',
+			itemSelector: 'uui-table-row',
+			containerSelector: 'uui-table',
 			onChange: ({ model }) => {
 				const oldValue = this._children;
 				this._children = model;
@@ -150,6 +161,56 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		return sorting;
 	}
 
+	#sortChildrenBy(key: string) {
+
+		const oldValue = this._children;
+
+		// If switching column, revert to ascending sort. Otherwise switch from whatever was previously selected.
+		if (this.#sortBy !== key) {
+			this.#sortDirection = "asc";
+		} else {
+			this.#sortDirection = this.#sortDirection === "asc" ? "desc" : "asc";
+		}
+
+		// Sort by the new column.
+		this.#sortBy = key;
+		this._children = [...this._children].sort((a, b) => {
+			switch (key) {
+				case "name":
+					return a.name.localeCompare(b.name);
+				case "createDate":
+					return Date.parse(this.#getCreateDate(a)) - Date.parse(this.#getCreateDate(b));
+				default:
+					return 0;
+				}
+		});
+
+		// Reverse the order if sorting descending.
+		if (this.#sortDirection === "desc") {
+			this._children.reverse();
+		}
+
+		this.#sortedUniques.clear();
+		this._children.map(c => c.unique).forEach(u => this.#sortedUniques.add(u));
+
+		this.requestUpdate('_children', oldValue);
+	}
+
+	#getCreateDate(item: UmbTreeItemModel) : string {
+		let date = "";
+		const itemAsDocumentTreeItemModel = item as UmbDocumentTreeItemModel;
+		if (itemAsDocumentTreeItemModel) {
+			date = itemAsDocumentTreeItemModel.createDate;
+		} else {
+			const itemAsMediaTreeItemModel = item as UmbMediaTreeItemModel;
+			if (itemAsMediaTreeItemModel) {
+				date = itemAsMediaTreeItemModel.createDate;
+			}
+		}
+
+		return date;
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout headline=${'Sort Children'}>
@@ -163,13 +224,18 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 	#renderChildren() {
 		if (this._children.length === 0) return html`<uui-label>There are no children</uui-label>`;
 		return html`
-			<uui-ref-list>
+			<uui-table>
+				<uui-table-head>
+					<uui-table-head-cell></uui-table-head-cell>
+					${this.#renderHeaderCell("name", "general_name")}
+					${this.#renderHeaderCell("createDate", "content_createDate")}
+				</uui-table-head>
 				${repeat(
 					this._children,
 					(child) => child.unique,
 					(child) => this.#renderChild(child),
 				)}
-			</uui-ref-list>
+			</uui-table>
 
 			${this._currentPage < this._totalPages
 				? html`
@@ -181,8 +247,36 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		`;
 	}
 
+	#renderHeaderCell(key: string, labelKey: string) {
+		return html`
+			<uui-table-head-cell>
+				<button @click=${() => this.#sortChildrenBy(key)}>
+					${this.localize.term(labelKey)}
+					<uui-symbol-sort
+						?active=${this.#sortBy === key}
+						?descending=${this.#sortDirection === "desc"}
+					></uui-symbol-sort>
+				</button>
+
+			</uui-table-head-cell>`;
+	}
+
 	#renderChild(item: UmbTreeItemModel) {
-		return html`<uui-ref-node .name=${item.name} data-unique=${item.unique}></uui-ref-node>`;
+		return html`
+			<uui-table-row data-unique=${item.unique}>
+				<uui-table-cell><uui-icon name="icon-navigation" aria-hidden="true"></uui-icon></uui-table-cell>
+				<uui-table-cell>${item.name}</uui-table-cell>
+				<uui-table-cell>${this.#renderCreateDate(item)}</uui-table-cell>
+			</uui-table-row>`;
+	}
+
+	#renderCreateDate(item: UmbTreeItemModel) {
+		const date = this.#getCreateDate(item);
+		if (date.length === 0) {
+			return nothing;
+		}
+
+		return html`<umb-localize-date date="${date}" .options=${this.#localizeDateOptions}></umb-localize-date>`;
 	}
 
 	static override styles = [
@@ -190,6 +284,24 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		css`
 			#loadMoreButton {
 				width: 100%;
+			}
+
+			uui-table-head-cell button {
+				background-color: transparent;
+				color: inherit;
+				border: none;
+				cursor: pointer;
+				font-weight: inherit;
+				font-size: inherit;
+				display: inline-flex;
+				align-items: center;
+				justify-content: space-between;
+				width: 100%;
+				padding: var(--uui-size-5) var(--uui-size-1);
+			}
+
+			uui-icon[name="icon-navigation"] {
+				cursor: hand
 			}
 		`,
 	];
