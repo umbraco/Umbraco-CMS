@@ -4,20 +4,24 @@ import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-a
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbUserAllowChangePasswordActionCondition extends UmbConditionBase<UmbConditionConfigBase> {
+	#configRepository = new UmbUserConfigRepository(this._host);
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	constructor(host: UmbControllerHost, args: any) {
 		super(host, args);
+		this.#init();
+	}
 
-		const configRepository = new UmbUserConfigRepository(host);
+	async #init() {
+		await this.#configRepository.initialized;
 
-		this.observe(configRepository.initialized, () => {
-			this.observe(
-				configRepository.part('allowChangePassword'),
-				(isAllowed) => {
-					this.permitted = isAllowed;
-				},
-				'_userAllowChangePasswordActionCondition',
-			);
-		});
+		this.observe(
+			this.#configRepository.part('allowChangePassword'),
+			(isAllowed) => {
+				this.permitted = isAllowed;
+			},
+			'_userAllowChangePasswordActionCondition',
+		);
 	}
 }
 
