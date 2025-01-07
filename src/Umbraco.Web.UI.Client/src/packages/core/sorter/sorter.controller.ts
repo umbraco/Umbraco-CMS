@@ -203,7 +203,7 @@ export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = 
 	Partial<Pick<INTERNAL_UmbSorterConfig<T, ElementType>, 'ignorerSelector' | 'containerSelector' | 'identifier'>>;
 
 /**
- 
+
  * @class UmbSorterController
  * @implements {UmbControllerInterface}
  * @description This controller can make user able to sort items.
@@ -367,6 +367,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	}
 
 	#initialize = () => {
+		if (this.#isConnected === false) return;
+
 		const containerEl =
 			(this.#config.containerSelector
 				? this.#host.shadowRoot!.querySelector(this.#config.containerSelector)
@@ -379,9 +381,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		const containerElement = this.#useContainerShadowRoot
 			? (this.#containerElement.shadowRoot ?? this.#containerElement)
 			: this.#containerElement;
-		containerElement.addEventListener('dragover', this._itemDraggedOver as unknown as EventListener);
-
-		// TODO: Do we need to handle dragleave?
+		containerElement.addEventListener('dragover', this.#itemDraggedOver as unknown as EventListener);
 
 		this.#observer.disconnect();
 
@@ -405,14 +405,14 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				? (this.#containerElement.shadowRoot ?? this.#containerElement)
 				: this.#containerElement;
 
-			containerElement.removeEventListener('dragover', this._itemDraggedOver as unknown as EventListener);
+			containerElement.removeEventListener('dragover', this.#itemDraggedOver as unknown as EventListener);
 			(this.#containerElement as unknown) = undefined;
 		}
 
 		this.#items.forEach((item) => this.destroyItem(item));
 	}
 
-	_itemDraggedOver = (e: DragEvent) => {
+	#itemDraggedOver = (e: DragEvent) => {
 		//if(UmbSorterController.activeSorter === this) return;
 		const dropSorter = UmbSorterController.dropSorter as unknown as UmbSorterController<T, ElementType>;
 		if (!dropSorter || dropSorter.identifier !== this.identifier) return;
@@ -487,8 +487,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		const draggableElement = this.#getDraggableElement(element);
 		draggableElement.removeEventListener('dragstart', this.#handleDragStart);
-		// We are not ready to remove the dragend or drop, as this is might be the active one just moving container:
-		//draggableElement.removeEventListener('dragend', this.#handleDragEnd);
+		draggableElement.removeEventListener('dragend', this.#handleDragEnd);
 
 		(draggableElement as HTMLElement).draggable = false;
 
@@ -523,14 +522,13 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 					this.#config.draggableSelector +
 					'"',
 			);
-			return;
 		}
 
 		this.#setupPlaceholderStyle();
 	}
 
 	#handleDragStart = (event: DragEvent) => {
-		const element = (event.target as HTMLElement).closest(this.#config.itemSelector);
+		const element = (event.target as HTMLElement).closest(this.#config.itemSelector) as HTMLElement | null;
 		if (!element) return;
 
 		if (UmbSorterController.activeElement && UmbSorterController.activeElement !== element) {
@@ -549,6 +547,13 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 
 		this.#setCurrentElement(element as ElementType);
+
+		element.addEventListener('dragend', this.#handleDragEnd);
+		window.addEventListener('mouseup', this.#handleMouseUp);
+		window.addEventListener('mouseout', this.#handleMouseUp);
+		window.addEventListener('mouseleave', this.#handleMouseUp);
+		window.addEventListener('mousemove', this.#handleMouseMove);
+
 		UmbSorterController.activeItem = this.getItemOfElement(UmbSorterController.activeElement! as ElementType);
 
 		UmbSorterController.originalSorter = this as unknown as UmbSorterController<unknown>;
@@ -592,11 +597,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		return true;
 	};
 
-	#handleDragEnd = async (event?: DragEvent) => {
-		if (!UmbSorterController.activeElement || !UmbSorterController.activeItem) {
-			return;
-		}
-
+	#handleDragEnd = (event?: DragEvent) => {
 		// If browser thinks this was a cancelled move, we should revert the move. (based on dropEffect === 'none') [NL]
 		// But notice, this also count when releasing the mouse outside the sorters element, this i'm not sure if I agree on, would be ideal only to revert if ESC was pressed. [NL]
 		if (UmbSorterController.originalSorter && event?.dataTransfer != null && event.dataTransfer.dropEffect === 'none') {
@@ -607,9 +608,38 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			);
 		}
 
+		this.#handleMoveEnd();
+	};
+
+	/**
+	 * Listen to mouse move, to check if the mouse is still down.
+	 * This event does not happen while dragging, so its a indication that the drag is over.
+	 */
+	#handleMouseMove = (event: MouseEvent) => {
+		// buttons should reprensent which buttons are held, and 0 => represents no button is pressed. [NL]
+		if (event.buttons === 0) {
+			this.#handleMoveEnd();
+		}
+	};
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	#handleMouseUp = (event?: MouseEvent) => {
+		this.#handleMoveEnd();
+	};
+
+	#handleMoveEnd() {
+		if (!UmbSorterController.activeElement || !UmbSorterController.activeItem) {
+			return;
+		}
+
+		UmbSorterController.activeElement.removeEventListener('dragend', this.#handleDragEnd);
+		window.removeEventListener('mouseup', this.#handleMouseUp);
+		window.removeEventListener('mouseout', this.#handleMouseUp);
+		window.removeEventListener('mouseleave', this.#handleMouseUp);
+		window.removeEventListener('mousemove', this.#handleMouseMove);
+
 		UmbSorterController.activeElement.style.transform = '';
 		this.#removePlaceholderStyle();
-
 		this.#stopAutoScroll();
 		this.removeAllowIndication();
 
@@ -634,7 +664,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		UmbSorterController.originalSorter = undefined;
 		this.#dragX = 0;
 		this.#dragY = 0;
-	};
+	}
 
 	#handleDragMove(event: DragEvent) {
 		if (!UmbSorterController.activeElement) {
