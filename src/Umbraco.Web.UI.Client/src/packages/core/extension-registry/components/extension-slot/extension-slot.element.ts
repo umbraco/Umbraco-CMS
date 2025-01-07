@@ -1,6 +1,6 @@
 import { umbExtensionsRegistry } from '../../registry.js';
 import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
-import { css, repeat, customElement, property, state, html } from '@umbraco-cms/backoffice/external/lit';
+import { css, repeat, customElement, property, state, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import {
 	type UmbExtensionElementInitializer,
 	UmbExtensionsElementInitializer,
@@ -124,6 +124,9 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 				},
 				undefined, // We can leave the alias undefined as we destroy this our selfs.
 				this.defaultElement,
+				{
+					single: this.single,
+				},
 			);
 			this.#extensionsController.properties = this.#props;
 		}
@@ -132,11 +135,9 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	override render() {
 		return this._permitted
 			? this._permitted.length > 0
-				? this.single
-					? this.#renderExtension(this._permitted[0], 0)
-					: repeat(this._permitted, (ext) => ext.alias, this.#renderExtension)
+				? repeat(this._permitted, (ext) => ext.alias, this.#renderExtension)
 				: html`<slot></slot>`
-			: '';
+			: nothing;
 	}
 
 	#renderExtension = (ext: UmbExtensionElementInitializer, i: number) => {
