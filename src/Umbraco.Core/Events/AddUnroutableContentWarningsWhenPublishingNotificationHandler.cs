@@ -58,9 +58,10 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INo
         _eventMessagesFactory = eventMessagesFactory;
         _contentSettings = contentSettings.Value;
     }
+
     public async Task HandleAsync(ContentPublishedNotification notification, CancellationToken cancellationToken)
     {
-        if (_contentSettings.ShowDomainWarnings is false)
+        if (_contentSettings.ShowUnroutableContentWarnings is false)
         {
             return;
         }
