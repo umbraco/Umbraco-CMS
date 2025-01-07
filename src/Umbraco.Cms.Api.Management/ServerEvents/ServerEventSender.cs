@@ -66,16 +66,9 @@ internal sealed class ServerEventSender :
     {
         foreach (T entity in notification.SavedEntities)
         {
-            string eventType = Constants.ServerEvents.EventType.Updated;
-            if (entity.CreateDate == entity.UpdateDate)
-            {
-                // This is a new entity
-                eventType = Constants.ServerEvents.EventType.Created;
-            }
-
             var eventModel = new ServerEvent
             {
-                EventType = eventType,
+                EventType = entity.CreateDate == entity.UpdateDate ? Constants.ServerEvents.EventType.Created : Constants.ServerEvents.EventType.Updated,
                 Key = entity.Key,
                 EventSource = source,
             };
