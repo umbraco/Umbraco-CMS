@@ -26,14 +26,14 @@ public class ServerEventHub : Hub<IServerEventHub>
         ClaimsPrincipal? principal = Context.User;
         Guid? userKey = principal?.Identity?.GetUserKey();
 
-        if (principal is null || userKey is null)
+        if (userKey is null)
         {
             Context.Abort();
             return;
         }
 
         _userConnectionManager.AddConnection(userKey.Value, Context.ConnectionId);
-        await _serverEventUserManager.AssignToGroupsAsync(principal, Context.ConnectionId);
+        await _serverEventUserManager.AssignToGroupsAsync(principal!, Context.ConnectionId);
     }
 
     public override Task OnDisconnectedAsync(Exception? exception)
@@ -41,7 +41,7 @@ public class ServerEventHub : Hub<IServerEventHub>
         ClaimsPrincipal? principal = Context.User;
         Guid? userKey = principal?.Identity?.GetUserKey();
 
-        if (principal is null || userKey is null)
+        if (userKey is null)
         {
             return Task.CompletedTask;
         }
