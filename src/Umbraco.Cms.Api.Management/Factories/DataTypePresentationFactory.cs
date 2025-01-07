@@ -1,6 +1,8 @@
 ﻿
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -16,17 +18,35 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IDataValueEditorFactory _dataValueEditorFactory;
     private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
+    private readonly TimeProvider _timeProvider;
 
     public DataTypePresentationFactory(
         IDataTypeContainerService dataTypeContainerService,
         PropertyEditorCollection propertyEditorCollection,
         IDataValueEditorFactory dataValueEditorFactory,
-        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer,
+        TimeProvider timeProvider)
     {
         _dataTypeContainerService = dataTypeContainerService;
         _propertyEditorCollection = propertyEditorCollection;
         _dataValueEditorFactory = dataValueEditorFactory;
         _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
+        _timeProvider = timeProvider;
+    }
+
+    [Obsolete("Use constructor that takes a TimeProvider")]
+    public DataTypePresentationFactory(
+        IDataTypeContainerService dataTypeContainerService,
+        PropertyEditorCollection propertyEditorCollection,
+        IDataValueEditorFactory dataValueEditorFactory,
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+    : this(
+        dataTypeContainerService,
+        propertyEditorCollection,
+        dataValueEditorFactory,
+        configurationEditorJsonSerializer,
+        StaticServiceProvider.Instance.GetRequiredService<TimeProvider>())
+    {
     }
 
     /// <inheritdoc />
@@ -44,7 +64,7 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
             return Attempt.FailWithStatus<IDataType, DataTypeOperationStatus>(parentAttempt.Status, new DataType(new VoidEditor(_dataValueEditorFactory), _configurationEditorJsonSerializer));
         }
 
-        var createDate = DateTime.Now;
+        DateTime createDate = _timeProvider.GetLocalNow().DateTime;
         var dataType = new DataType(editor, _configurationEditorJsonSerializer)
         {
             Name = requestModel.Name,
