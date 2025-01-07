@@ -53,6 +53,7 @@ export class UmbDefaultPickerSearchResultItemElement extends UmbLitElement {
 				name=${item.name}
 				id=${item.unique}
 				icon=${item.icon ?? 'icon-document'}
+				select-only
 				selectable
 				@selected=${() => this.#pickerContext?.selection.select(item.unique)}
 				@deselected=${() => this.#pickerContext?.selection.deselect(item.unique)}

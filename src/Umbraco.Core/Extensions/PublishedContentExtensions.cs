@@ -4453,7 +4453,8 @@ public static class PublishedContentExtensions
         return childrenKeys
             .Where(x => publishStatusQueryService.IsDocumentPublished(x, culture))
             .Select(publishedCache.GetById)
-            .WhereNotNull();
+            .WhereNotNull()
+            .OrderBy(x => x.SortOrder);
     }
 
     private static IEnumerable<IPublishedContent> FilterByCulture(
