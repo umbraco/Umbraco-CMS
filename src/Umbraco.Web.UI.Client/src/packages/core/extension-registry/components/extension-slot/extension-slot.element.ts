@@ -1,5 +1,5 @@
 import { umbExtensionsRegistry } from '../../registry.js';
-import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
+import type { TemplateResult, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { css, repeat, customElement, property, state, html } from '@umbraco-cms/backoffice/external/lit';
 import {
 	type UmbExtensionElementInitializer,
@@ -95,7 +95,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	public renderMethod?: (
 		extension: UmbExtensionElementInitializer,
 		index: number,
-	) => TemplateResult | HTMLElement | null | undefined;
+	) => TemplateResult | TemplateResult<1> | HTMLElement | null | undefined | typeof nothing;
 
 	override connectedCallback(): void {
 		super.connectedCallback();
