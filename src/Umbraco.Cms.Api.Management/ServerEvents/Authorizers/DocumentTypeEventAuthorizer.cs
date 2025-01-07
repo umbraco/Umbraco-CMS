@@ -10,7 +10,7 @@ public class DocumentTypeEventAuthorizer : EventSourcePolicyAuthorizer
     {
     }
 
-    public override IEnumerable<string> AuthorizedEventSources => [Constants.ServerEvents.EventSource.DocumentType];
+    public override IEnumerable<string> AuthorizableEventSources => [Constants.ServerEvents.EventSource.DocumentType];
 
     protected override string Policy => AuthorizationPolicies.TreeAccessDocumentTypes;
 }

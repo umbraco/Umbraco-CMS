@@ -13,7 +13,7 @@ public abstract class EventSourcePolicyAuthorizer : IEventSourceAuthorizer
         _authorizationService = authorizationService;
     }
 
-    public abstract IEnumerable<string> AuthorizedEventSources { get; }
+    public abstract IEnumerable<string> AuthorizableEventSources { get; }
 
     protected abstract string Policy { get; }
 

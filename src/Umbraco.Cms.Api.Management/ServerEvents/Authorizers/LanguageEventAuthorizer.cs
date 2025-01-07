@@ -10,7 +10,7 @@ public class LanguageEventAuthorizer : EventSourcePolicyAuthorizer
     {
     }
 
-    public override IEnumerable<string> AuthorizedEventSources => [Constants.ServerEvents.EventSource.Language];
+    public override IEnumerable<string> AuthorizableEventSources => [Constants.ServerEvents.EventSource.Language];
 
     protected override string Policy => AuthorizationPolicies.TreeAccessLanguages;
 }

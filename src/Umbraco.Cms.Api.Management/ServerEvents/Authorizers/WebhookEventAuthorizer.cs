@@ -10,7 +10,7 @@ public class WebhookEventAuthorizer : EventSourcePolicyAuthorizer
     {
     }
 
-    public override IEnumerable<string> AuthorizedEventSources => [Constants.ServerEvents.EventSource.Webhook];
+    public override IEnumerable<string> AuthorizableEventSources => [Constants.ServerEvents.EventSource.Webhook];
 
     protected override string Policy => AuthorizationPolicies.TreeAccessWebhooks;
 }

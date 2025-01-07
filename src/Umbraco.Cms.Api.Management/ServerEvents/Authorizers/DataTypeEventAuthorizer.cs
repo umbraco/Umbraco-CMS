@@ -10,7 +10,7 @@ public class DataTypeEventAuthorizer : EventSourcePolicyAuthorizer
     {
     }
 
-    public override IEnumerable<string> AuthorizedEventSources => [Constants.ServerEvents.EventSource.DataType];
+    public override IEnumerable<string> AuthorizableEventSources => [Constants.ServerEvents.EventSource.DataType];
 
     protected override string Policy => AuthorizationPolicies.TreeAccessDataTypes;
 }

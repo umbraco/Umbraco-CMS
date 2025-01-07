@@ -10,7 +10,7 @@ public class StylesheetEventAuthorizer : EventSourcePolicyAuthorizer
     {
     }
 
-    public override IEnumerable<string> AuthorizedEventSources => [Constants.ServerEvents.EventSource.Stylesheet];
+    public override IEnumerable<string> AuthorizableEventSources => [Constants.ServerEvents.EventSource.Stylesheet];
 
     protected override string Policy => AuthorizationPolicies.TreeAccessStylesheets;
 }

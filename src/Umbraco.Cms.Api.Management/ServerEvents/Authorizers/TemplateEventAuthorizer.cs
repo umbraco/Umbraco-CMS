@@ -10,7 +10,7 @@ public class TemplateEventAuthorizer : EventSourcePolicyAuthorizer
     {
     }
 
-    public override IEnumerable<string> AuthorizedEventSources => [Constants.ServerEvents.EventSource.Template];
+    public override IEnumerable<string> AuthorizableEventSources => [Constants.ServerEvents.EventSource.Template];
 
     protected override string Policy => AuthorizationPolicies.TreeAccessTemplates;
 }

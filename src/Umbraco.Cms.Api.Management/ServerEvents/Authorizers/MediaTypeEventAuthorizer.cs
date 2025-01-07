@@ -10,7 +10,7 @@ public class MediaTypeEventAuthorizer : EventSourcePolicyAuthorizer
     {
     }
 
-    public override IEnumerable<string> AuthorizedEventSources => [Constants.ServerEvents.EventSource.MediaType];
+    public override IEnumerable<string> AuthorizableEventSources => [Constants.ServerEvents.EventSource.MediaType];
 
     protected override string Policy => AuthorizationPolicies.TreeAccessMediaTypes;
 }

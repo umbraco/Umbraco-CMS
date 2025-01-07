@@ -10,7 +10,7 @@ public class UserEventAuthorizer : EventSourcePolicyAuthorizer
     {
     }
 
-    public override IEnumerable<string> AuthorizedEventSources => [Constants.ServerEvents.EventSource.User];
+    public override IEnumerable<string> AuthorizableEventSources => [Constants.ServerEvents.EventSource.User];
 
     protected override string Policy => AuthorizationPolicies.SectionAccessUsers;
 }

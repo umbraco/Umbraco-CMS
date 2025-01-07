@@ -10,7 +10,7 @@ public class PartialViewEventAuthorizer : EventSourcePolicyAuthorizer
     {
     }
 
-    public override IEnumerable<string> AuthorizedEventSources => [Constants.ServerEvents.EventSource.PartialView];
+    public override IEnumerable<string> AuthorizableEventSources => [Constants.ServerEvents.EventSource.PartialView];
 
     protected override string Policy => AuthorizationPolicies.TreeAccessPartialViews;
 }

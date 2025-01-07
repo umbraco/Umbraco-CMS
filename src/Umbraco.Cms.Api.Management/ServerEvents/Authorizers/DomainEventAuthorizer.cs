@@ -10,7 +10,7 @@ public class DomainEventAuthorizer : EventSourcePolicyAuthorizer
     {
     }
 
-    public override IEnumerable<string> AuthorizedEventSources => [Constants.ServerEvents.EventSource.Domain];
+    public override IEnumerable<string> AuthorizableEventSources => [Constants.ServerEvents.EventSource.Domain];
 
     protected override string Policy => AuthorizationPolicies.TreeAccessDocuments;
 }

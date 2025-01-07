@@ -10,7 +10,7 @@ public class MemberGroupEventAuthorizer : EventSourcePolicyAuthorizer
     {
     }
 
-    public override IEnumerable<string> AuthorizedEventSources => [Constants.ServerEvents.EventSource.MemberGroup];
+    public override IEnumerable<string> AuthorizableEventSources => [Constants.ServerEvents.EventSource.MemberGroup];
 
     protected override string Policy => AuthorizationPolicies.TreeAccessMemberGroups;
 }

@@ -10,7 +10,7 @@ public class PublicAccessEntryEventAuthorizer : EventSourcePolicyAuthorizer
     {
     }
 
-    public override IEnumerable<string> AuthorizedEventSources => [Constants.ServerEvents.EventSource.PublicAccessEntry];
+    public override IEnumerable<string> AuthorizableEventSources => [Constants.ServerEvents.EventSource.PublicAccessEntry];
 
     protected override string Policy => AuthorizationPolicies.TreeAccessDocuments;
 }

@@ -10,7 +10,7 @@ public class ScriptEventAuthorizer : EventSourcePolicyAuthorizer
     {
     }
 
-    public override IEnumerable<string> AuthorizedEventSources => [Constants.ServerEvents.EventSource.Script];
+    public override IEnumerable<string> AuthorizableEventSources => [Constants.ServerEvents.EventSource.Script];
 
     protected override string Policy => AuthorizationPolicies.TreeAccessScripts;
 }

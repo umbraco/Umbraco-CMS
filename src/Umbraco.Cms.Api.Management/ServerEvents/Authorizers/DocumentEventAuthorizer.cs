@@ -11,7 +11,7 @@ public class DocumentEventAuthorizer : EventSourcePolicyAuthorizer
     }
 
 
-    public override IEnumerable<string> AuthorizedEventSources => [Constants.ServerEvents.EventSource.Document];
+    public override IEnumerable<string> AuthorizableEventSources => [Constants.ServerEvents.EventSource.Document];
 
     protected override string Policy => AuthorizationPolicies.TreeAccessDocuments;
 }

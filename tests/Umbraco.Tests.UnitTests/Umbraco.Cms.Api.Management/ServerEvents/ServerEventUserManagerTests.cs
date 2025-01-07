@@ -128,10 +128,10 @@ public class ServerEventUserManagerTests
         public FakeAuthorizer(IEnumerable<string> sources, Func<ClaimsPrincipal, string, bool>? authorizeFunc = null)
         {
             this.authorizeFunc = authorizeFunc ?? ((_, _) => true);
-            AuthorizedEventSources = sources;
+            AuthorizableEventSources = sources;
         }
 
-        public IEnumerable<string> AuthorizedEventSources { get; }
+        public IEnumerable<string> AuthorizableEventSources { get; }
 
         public Task<bool> AuthorizeAsync(ClaimsPrincipal principal, string connectionId) => Task.FromResult(authorizeFunc(principal, connectionId));
     }

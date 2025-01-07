@@ -27,7 +27,7 @@ internal sealed class ServerEventUserManager : IServerEventUserManager
     {
         foreach (IEventSourceAuthorizer authorizer in _eventSourceAuthorizerCollection)
         {
-            foreach (var eventSource in authorizer.AuthorizedEventSources)
+            foreach (var eventSource in authorizer.AuthorizableEventSources)
             {
                 var isAuthorized = await authorizer.AuthorizeAsync(user, eventSource);
                 if (isAuthorized)
@@ -60,7 +60,7 @@ internal sealed class ServerEventUserManager : IServerEventUserManager
 
         foreach (IEventSourceAuthorizer authorizer in _eventSourceAuthorizerCollection)
         {
-            foreach (var eventSource in authorizer.AuthorizedEventSources)
+            foreach (var eventSource in authorizer.AuthorizableEventSources)
             {
                 var isAuthorized = await authorizer.AuthorizeAsync(user, eventSource);
 

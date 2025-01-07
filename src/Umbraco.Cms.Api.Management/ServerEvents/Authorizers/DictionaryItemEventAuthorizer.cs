@@ -10,7 +10,7 @@ public class DictionaryItemEventAuthorizer : EventSourcePolicyAuthorizer
     {
     }
 
-    public override IEnumerable<string> AuthorizedEventSources => [Constants.ServerEvents.EventSource.DictionaryItem];
+    public override IEnumerable<string> AuthorizableEventSources => [Constants.ServerEvents.EventSource.DictionaryItem];
 
     protected override string Policy => AuthorizationPolicies.TreeAccessDictionary;
 }
