@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
@@ -21,7 +22,7 @@ This means that an invariant element cannot be "turned off" for a single variati
 
 It also means that in a variant setting, the parent property variance has no effect for the variance notation for any nested blocks.
 */
-public partial class BlockListElementLevelVariationTests
+internal partial class BlockListElementLevelVariationTests
 {
     [Test]
     public async Task Can_Publish_Cultures_Independently_Invariant_Blocks()
@@ -1387,6 +1388,7 @@ public partial class BlockListElementLevelVariationTests
     }
 
     [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Publish_Invariant_Properties_Without_Default_Culture_With_AllowEditInvariantFromNonDefault()
     {
         var elementType = CreateElementType(ContentVariation.Culture);
