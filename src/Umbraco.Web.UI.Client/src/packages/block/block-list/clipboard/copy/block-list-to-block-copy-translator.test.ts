@@ -2,7 +2,6 @@ import { expect } from '@open-wc/testing';
 import { customElement } from 'lit/decorators.js';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbBlockListValueModel } from '../../types';
-import type { UmbClipboardCopyTranslator } from '@umbraco-cms/backoffice/clipboard';
 import type { UmbBlockClipboardEntryValueModel } from 'src/packages/block/block/types';
 import { UmbBlockListToBlockClipboardCopyTranslator } from './block-list-to-block-copy-translator';
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../property-editors/constants';
@@ -12,7 +11,7 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 
 describe('UmbBlockListToBlockClipboardCopyTranslator', () => {
 	let hostElement: UmbTestControllerHostElement;
-	let copyTranslator: UmbClipboardCopyTranslator<UmbBlockListValueModel, UmbBlockClipboardEntryValueModel>;
+	let copyTranslator: UmbBlockListToBlockClipboardCopyTranslator;
 
 	const blockListPropertyValue: UmbBlockListValueModel = {
 		contentData: [
