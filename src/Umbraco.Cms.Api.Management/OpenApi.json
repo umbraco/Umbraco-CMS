@@ -36843,6 +36843,7 @@
       },
       "DocumentRecycleBinItemResponseModel": {
         "required": [
+          "createDate",
           "documentType",
           "hasChildren",
           "id",
@@ -36853,6 +36854,10 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
           },
           "hasChildren": {
             "type": "boolean"
@@ -38961,6 +38966,7 @@
       },
       "MediaRecycleBinItemResponseModel": {
         "required": [
+          "createDate",
           "hasChildren",
           "id",
           "mediaType",
@@ -38971,6 +38977,10 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
           },
           "hasChildren": {
             "type": "boolean"

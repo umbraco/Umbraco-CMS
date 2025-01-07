@@ -673,6 +673,7 @@ export type DocumentPermissionPresentationModel = {
 
 export type DocumentRecycleBinItemResponseModel = {
     id: string;
+    createDate: string;
     hasChildren: boolean;
     parent?: ((ItemReferenceByIdResponseModel) | null);
     documentType: (DocumentTypeReferenceResponseModel);
@@ -1197,6 +1198,7 @@ export type MediaItemResponseModel = {
 
 export type MediaRecycleBinItemResponseModel = {
     id: string;
+    createDate: string;
     hasChildren: boolean;
     parent?: ((ItemReferenceByIdResponseModel) | null);
     mediaType: (MediaTypeReferenceResponseModel);
