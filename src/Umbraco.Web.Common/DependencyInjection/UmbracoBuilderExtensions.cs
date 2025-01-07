@@ -1,6 +1,7 @@
 using System.Data.Common;
 using System.Net.Http.Headers;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
@@ -326,7 +327,7 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
-    [Obsolete("This is not necessary any more. This will be removed in v17")]
+    [Obsolete("This is not necessary any more. This will be removed in v16")]
     public static IUmbracoBuilder AddWebServer(this IUmbracoBuilder builder)
     {
         builder.Services.Configure<KestrelServerOptions>(options =>
@@ -344,13 +345,15 @@ public static partial class UmbracoBuilderExtensions
             // This workaround came from this comment: https://stackoverflow.com/a/3346975
             AllowSynchronousIOForIIS(builder);
         }
-        catch (Exception)
+        catch (TypeLoadException)
         {
             // Ignoring this exception because it's expected on non-windows machines
         }
         return builder;
     }
 
+    // Prevents the compiler from inlining the method
+    [MethodImpl(MethodImplOptions.NoInlining)]
     private static void AllowSynchronousIOForIIS(IUmbracoBuilder builder) =>
         builder.Services.Configure<IISServerOptions>(
             options =>
