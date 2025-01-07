@@ -437,12 +437,6 @@ public class DocumentUrlService : IDocumentUrlService
 
     private bool IsContentPublished(Guid contentKey, string culture) => _publishStatusQueryService.IsDocumentPublished(contentKey, culture);
 
-    private bool IsContentPublishedBypassCache(Guid contentKey, string culture)
-    {
-        IContent? content = _contentService.GetById(contentKey);
-        return content?.PublishedCultures.Contains(culture) ?? false;
-    }
-
     public string GetLegacyRouteFormat(Guid documentKey, string? culture, bool isDraft)
     {
         Attempt<int> documentIdAttempt = _idKeyMap.GetIdForKey(documentKey, UmbracoObjectTypes.Document);
@@ -460,7 +454,7 @@ public class DocumentUrlService : IDocumentUrlService
         // We have to bypass the cache here to check if content is published, as
         // if this is called during a <see cref="ContentPublishedNotification" /> call, the cache
         // is still not populated with the correct urls
-        if(isDraft is false && string.IsNullOrWhiteSpace(culture) is false && IsContentPublishedBypassCache(documentKey, culture) is false)
+        if(isDraft is false && string.IsNullOrWhiteSpace(culture) is false && _publishStatusQueryService.IsDocumentPublished(documentKey, culture) is false)
         {
             return "#";
         }
