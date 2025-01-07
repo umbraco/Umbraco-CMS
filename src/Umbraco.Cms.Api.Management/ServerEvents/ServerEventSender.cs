@@ -68,7 +68,8 @@ internal sealed class ServerEventSender :
         {
             var eventModel = new ServerEvent
             {
-                EventType = entity.CreateDate == entity.UpdateDate ? Constants.ServerEvents.EventType.Created : Constants.ServerEvents.EventType.Updated,
+                EventType = entity.CreateDate == entity.UpdateDate
+                    ? Constants.ServerEvents.EventType.Created : Constants.ServerEvents.EventType.Updated,
                 Key = entity.Key,
                 EventSource = source,
             };
@@ -84,7 +85,9 @@ internal sealed class ServerEventSender :
         {
             await _serverEventRouter.RouteEventAsync(new ServerEvent
             {
-                EventType = Constants.ServerEvents.EventType.Deleted, EventSource = source, Key = entity.Key,
+                EventType = Constants.ServerEvents.EventType.Deleted,
+                EventSource = source,
+                Key = entity.Key,
             });
         }
     }
