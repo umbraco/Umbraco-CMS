@@ -18,8 +18,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 type ManifestType = ManifestEntityCreateOptionAction;
 
-const elementName = 'umb-entity-create-option-action-list-modal';
-@customElement(elementName)
+@customElement('umb-entity-create-option-action-list-modal')
 export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseElement<
 	UmbEntityCreateOptionActionListModalData,
 	UmbEntityCreateOptionActionListModalValue
@@ -71,6 +70,8 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 
 		if (!controller.api) throw new Error('No API found');
 		await controller.api.execute();
+
+		this._submitModal();
 	}
 
 	#getTarget(href?: string) {
@@ -83,17 +84,19 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 
 	override render() {
 		return html`
-			<umb-body-layout headline="${this.localize.term('user_createUser')}">
+			<umb-body-layout headline="${this.localize.term('general_create')}">
 				<uui-box>
 					${this._apiControllers.length === 0
 						? html`<div>No create options available.</div>`
-						: html`<uui-ref-list>
-								${repeat(
-									this._apiControllers,
-									(controller) => controller.manifest?.alias,
-									(controller, index) => this.#renderRefItem(controller, index),
-								)}
-							</uui-ref-list>`}
+						: html`
+								<uui-ref-list>
+									${repeat(
+										this._apiControllers,
+										(controller) => controller.manifest?.alias,
+										(controller, index) => this.#renderRefItem(controller, index),
+									)}
+								</uui-ref-list>
+							`}
 				</uui-box>
 				<uui-button
 					slot="actions"
@@ -108,19 +111,18 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 		if (!manifest) throw new Error('No manifest found');
 
 		const label = manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name;
+		const description = manifest.meta.description ? this.localize.string(manifest.meta.description) : undefined;
 		const href = this._hrefList[index];
 
 		return html`
-			<uui-ref-node
+			<umb-ref-item
 				name=${label}
-				detail=${ifDefined(manifest.meta.description)}
-				@click=${(event: Event) => this.#onClick(event, controller, href)}
+				detail=${ifDefined(description)}
+				icon=${manifest.meta.icon}
 				href=${ifDefined(href)}
 				target=${this.#getTarget(href)}
-				?selectable=${!href}
-				?readonly=${!href}>
-				<uui-icon slot="icon" name=${manifest.meta.icon}></uui-icon>
-			</uui-ref-node>
+				@open=${(event: Event) => this.#onClick(event, controller, href)}>
+			</umb-ref-item>
 		`;
 	}
 }
@@ -129,6 +131,6 @@ export { UmbEntityCreateOptionActionListModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbEntityCreateOptionActionListModalElement;
+		'umb-entity-create-option-action-list-modal': UmbEntityCreateOptionActionListModalElement;
 	}
 }
