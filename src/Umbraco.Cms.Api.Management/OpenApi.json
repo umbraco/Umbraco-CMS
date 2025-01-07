@@ -36982,6 +36982,7 @@
       },
       "DocumentTreeItemResponseModel": {
         "required": [
+          "createDate",
           "documentType",
           "hasChildren",
           "id",
@@ -37012,6 +37013,10 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
           },
           "isProtected": {
             "type": "boolean"
@@ -39083,6 +39088,7 @@
       },
       "MediaTreeItemResponseModel": {
         "required": [
+          "createDate",
           "hasChildren",
           "id",
           "isTrashed",
@@ -39112,6 +39118,10 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
           },
           "mediaType": {
             "oneOf": [

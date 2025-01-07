@@ -702,6 +702,7 @@ export type DocumentTreeItemResponseModel = {
     noAccess: boolean;
     isTrashed: boolean;
     id: string;
+    createDate: string;
     isProtected: boolean;
     documentType: (DocumentTypeReferenceResponseModel);
     variants: Array<(DocumentVariantItemResponseModel)>;
@@ -1027,8 +1028,8 @@ export type HealthCheckWithResultPresentationModel = {
 export enum HealthStatusModel {
     HEALTHY = 'Healthy',
     UNHEALTHY = 'Unhealthy',
-    CORRUPT = 'Corrupt',
-    REBUILDING = 'Rebuilding'
+    REBUILDING = 'Rebuilding',
+    CORRUPT = 'Corrupt'
 }
 
 export type HealthStatusResponseModel = {
@@ -1223,6 +1224,7 @@ export type MediaTreeItemResponseModel = {
     noAccess: boolean;
     isTrashed: boolean;
     id: string;
+    createDate: string;
     mediaType: (MediaTypeReferenceResponseModel);
     variants: Array<(VariantItemResponseModel)>;
 };

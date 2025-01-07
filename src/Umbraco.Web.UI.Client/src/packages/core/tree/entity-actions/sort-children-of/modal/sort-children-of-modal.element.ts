@@ -68,6 +68,8 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 			take: this.#pagination.getPageSize(),
 		});
 
+		console.log(data);
+
 		if (data) {
 			this._children = [...this._children, ...data.items];
 			this.#pagination.setTotalItems(data.total);
