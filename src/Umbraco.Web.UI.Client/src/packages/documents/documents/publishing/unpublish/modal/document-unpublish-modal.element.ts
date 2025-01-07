@@ -67,8 +67,9 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 		this._selectionManager.setMultiple(true);
 		this._selectionManager.setSelectable(true);
 
-		// Only display variants that are relevant to pick from, i.e. variants that are draft or published with pending changes:
-		this._options = this.data?.options.filter((option) => isPublished(option)) ?? [];
+		// Only display variants that are relevant to pick from, i.e. variants that are published or published with pending changes.
+		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
+		this._options = this.data?.options.filter((option) => (option.variant && option.variant.state === null) || isPublished(option)) ?? [];
 
 		let selected = this.value?.selection ?? [];
 

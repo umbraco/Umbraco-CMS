@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentPublishing;
@@ -47,12 +47,35 @@ internal sealed class ContentPublishingService : IContentPublishingService
             return Attempt.FailWithStatus(ContentPublishingOperationStatus.ContentNotFound, new ContentPublishingResult());
         }
 
+        ISet<string> culturesToPublishImmediately = cultureAndSchedule.CulturesToPublishImmediately;
 
         var cultures =
-            cultureAndSchedule.CulturesToPublishImmediately.Union(
+            culturesToPublishImmediately.Union(
                 cultureAndSchedule.Schedules.FullSchedule.Select(x => x.Culture)).ToArray();
 
-        if (content.ContentType.VariesByCulture())
+        // If cultures are provided for non variant content, and they include the default culture, consider
+        // the request as valid for publishing the content.
+        // This is necessary as in a bulk publishing context the cultures are selected and provided from the
+        // list of languages.
+        bool variesByCulture = content.ContentType.VariesByCulture();
+        if (!variesByCulture)
+        {
+            ILanguage? defaultLanguage = await _languageService.GetDefaultLanguageAsync();
+            if (defaultLanguage is not null)
+            {
+                if (cultures.Contains(defaultLanguage.IsoCode))
+                {
+                    cultures = ["*"];
+                }
+
+                if (culturesToPublishImmediately.Contains(defaultLanguage.IsoCode))
+                {
+                    culturesToPublishImmediately = new HashSet<string> { "*" };
+                }
+            }
+        }
+
+        if (variesByCulture)
         {
             if (cultures.Any() is false)
             {
@@ -60,7 +83,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.CultureMissing, new ContentPublishingResult());
             }
 
-            var validCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode);
+            IEnumerable<string> validCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode);
             if (cultures.Any(x => x == "*") || cultures.All(x=> validCultures.Contains(x) is false))
             {
                 scope.Complete();
@@ -91,9 +114,9 @@ internal sealed class ContentPublishingService : IContentPublishingService
         var userId = await _userIdKeyResolver.GetAsync(userKey);
 
         PublishResult? result = null;
-        if (cultureAndSchedule.CulturesToPublishImmediately.Any())
+        if (culturesToPublishImmediately.Any())
         {
-            result = _contentService.Publish(content, cultureAndSchedule.CulturesToPublishImmediately.ToArray(), userId);
+            result = _contentService.Publish(content, culturesToPublishImmediately.ToArray(), userId);
         }
         else if(cultureAndSchedule.Schedules.FullSchedule.Any())
         {
@@ -209,6 +232,20 @@ internal sealed class ContentPublishingService : IContentPublishingService
         var userId = await _userIdKeyResolver.GetAsync(userKey);
 
         Attempt<ContentPublishingOperationStatus> attempt;
+
+        // If cultures are provided for non variant content, and they include the default culture, consider
+        // the request as valid for unpublishing the content.
+        // This is necessary as in a bulk unpublishing context the cultures are selected and provided from the
+        // list of languages.
+        if (cultures is not null && !content.ContentType.VariesByCulture())
+        {
+            ILanguage? defaultLanguage = await _languageService.GetDefaultLanguageAsync();
+            if (defaultLanguage is not null && cultures.Contains(defaultLanguage.IsoCode))
+            {
+                cultures = null;
+            }
+        }
+
         if (cultures is null)
         {
             attempt = await UnpublishInvariantAsync(

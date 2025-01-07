@@ -29,10 +29,13 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setMultiple(true);
 		this.#selectionManager.setSelectable(true);
 
-		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes:
+		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes.
+		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
 		this._options =
 			this.data?.options.filter(
-				(option) => isNotPublishedMandatory(option) || option.variant?.state !== UmbDocumentVariantState.NOT_CREATED,
+				(option) => (option.variant && option.variant.state === null) ||
+					isNotPublishedMandatory(option) ||
+					option.variant?.state !== UmbDocumentVariantState.NOT_CREATED,
 			) ?? [];
 
 		let selected = this.value?.selection ?? [];
