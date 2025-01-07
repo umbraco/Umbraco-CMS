@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
@@ -25,6 +27,7 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INo
     private readonly IPublishedContentCache _publishedContentCache;
     private readonly IDocumentNavigationQueryService _navigationQueryService;
     private readonly IEventMessagesFactory _eventMessagesFactory;
+    private readonly ContentSettings _contentSettings;
 
     public AddUnroutableContentWarningsWhenPublishingNotificationHandler(
         IPublishedRouter publishedRouter,
@@ -38,7 +41,8 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INo
         IPublishedUrlProvider publishedUrlProvider,
         IPublishedContentCache publishedContentCache,
         IDocumentNavigationQueryService navigationQueryService,
-        IEventMessagesFactory eventMessagesFactory)
+        IEventMessagesFactory eventMessagesFactory,
+        IOptions<ContentSettings> contentSettings)
     {
         _publishedRouter = publishedRouter;
         _umbracoContextAccessor = umbracoContextAccessor;
@@ -52,9 +56,15 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INo
         _publishedContentCache = publishedContentCache;
         _navigationQueryService = navigationQueryService;
         _eventMessagesFactory = eventMessagesFactory;
+        _contentSettings = contentSettings.Value;
     }
     public async Task HandleAsync(ContentPublishedNotification notification, CancellationToken cancellationToken)
     {
+        if (_contentSettings.ShowDomainWarnings is false)
+        {
+            return;
+        }
+
         foreach (IContent content in notification.PublishedEntities)
         {
             string[]? successfulCultures;
