@@ -18,7 +18,7 @@ describe('UmbClipboardEntryDetailRepository', () => {
 	let repository: UmbClipboardEntryDetailRepository;
 	const detailData: UmbClipboardEntryDetailModel = {
 		entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
-		values: [{ type: 'default', value: 'test' }],
+		values: [{ type: 'test', value: 'test' }],
 		icon: 'icon',
 		meta: {},
 		name: 'Test',
@@ -58,7 +58,12 @@ describe('UmbClipboardEntryDetailRepository', () => {
 	describe('Create', () => {
 		it('creates a new entry', async () => {
 			const response = await repository.create(detailData);
-			expect(response.data).to.deep.equal({ ...detailData, createDate: response.data?.createDate });
+			expect(response.data).to.deep.equal({
+				...detailData,
+				// TODO: this is not testing anything. We can't use the response data to check the createDate and updateDate
+				createDate: response.data?.createDate,
+				updateDate: response.data?.updateDate,
+			});
 		});
 	});
 
@@ -66,7 +71,12 @@ describe('UmbClipboardEntryDetailRepository', () => {
 		it('requests an entry', async () => {
 			await repository.create(detailData);
 			const response = await repository.requestByUnique(detailData.unique);
-			expect(response.data).to.deep.equal({ ...detailData, createDate: response.data?.createDate });
+			expect(response.data).to.deep.equal({
+				...detailData,
+				// TODO: this is not testing anything. We can't use the response data to check the createDate and updateDate
+				createDate: response.data?.createDate,
+				updateDate: response.data?.updateDate,
+			});
 		});
 	});
 
@@ -77,6 +87,7 @@ describe('UmbClipboardEntryDetailRepository', () => {
 			const response = await repository.save(updatedEntry);
 			expect(response.data).to.deep.equal({
 				...updatedEntry,
+				// TODO: this is not testing anything. We can't use the response data to check the createDate and updateDate
 				createDate: response.data?.createDate,
 				updateDate: response.data?.updateDate,
 			});

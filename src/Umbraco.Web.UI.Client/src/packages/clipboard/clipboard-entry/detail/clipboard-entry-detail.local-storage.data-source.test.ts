@@ -7,7 +7,7 @@ describe('UmbClipboardEntryDetailLocalStorageDataSource', () => {
 	let dataSource: UmbClipboardEntryDetailLocalStorageDataSource;
 	const clipboardEntry: UmbClipboardEntryDetailModel = {
 		entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
-		values: [{ type: 'default', value: 'test' }],
+		values: [{ type: 'test', value: 'test' }],
 		icon: 'icon',
 		meta: {},
 		name: 'Test',
@@ -44,7 +44,11 @@ describe('UmbClipboardEntryDetailLocalStorageDataSource', () => {
 	describe('Create', () => {
 		it('creates a new entry', async () => {
 			const response = await dataSource.create(clipboardEntry);
-			const compareEntry = { ...clipboardEntry, createDate: response.data?.createDate };
+			const compareEntry = {
+				...clipboardEntry,
+				createDate: response.data?.createDate,
+				updateDate: response.data?.updateDate,
+			};
 			expect(response.data).to.deep.equal(compareEntry);
 		});
 
@@ -66,7 +70,11 @@ describe('UmbClipboardEntryDetailLocalStorageDataSource', () => {
 		it('reads an entry', async () => {
 			await dataSource.create(clipboardEntry);
 			const response = await dataSource.read(clipboardEntry.unique);
-			const compareEntry = { ...clipboardEntry, createDate: response.data?.createDate };
+			const compareEntry = {
+				...clipboardEntry,
+				createDate: response.data?.createDate,
+				updateDate: response.data?.updateDate,
+			};
 			expect(response.data).to.deep.equal(compareEntry);
 		});
 
@@ -85,9 +93,9 @@ describe('UmbClipboardEntryDetailLocalStorageDataSource', () => {
 	describe('Update', () => {
 		it('updates an entry', async () => {
 			await dataSource.create(clipboardEntry);
-			const updatedEntry = { ...clipboardEntry, values: [{ type: 'default', value: 'updated' }] };
+			const updatedEntry = { ...clipboardEntry, values: [{ type: 'test', value: 'updated' }] };
 			const response = await dataSource.update(updatedEntry);
-			expect(response.data?.values[0]).to.equal('updated');
+			expect(response.data?.values[0].value).to.equal('updated');
 		});
 
 		it('returns an error if entry is missing', async () => {
