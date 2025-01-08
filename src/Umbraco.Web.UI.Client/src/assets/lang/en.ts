@@ -1731,7 +1731,7 @@ export default {
 		changeDataTypeHelpText:
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		collection: 'Collection',
-		collectionDescription: 'Configure a overview of child content.',
+		collectionDescription: 'Configures an overview of child content.',
 		collections: 'Collections',
 		collectionsDescription: 'Configures the content item to show list of its children.',
 		structure: 'Structure',
