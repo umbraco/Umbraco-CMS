@@ -53,7 +53,6 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 
 	override render() {
 		if (!this._userGroupPermissions) return;
-		//return html`${this._extensionElements.map((element) => this.#renderProperty(element))}`;
 		return html`<umb-extension-slot
 			type="userGranularPermission"
 			.renderMethod=${this.#renderProperty}></umb-extension-slot>`;
