@@ -631,9 +631,16 @@ public partial class ContentPublishingServiceTests
     }
 
     [Test]
-    public async Task Can_Publish_Invariant_Content_With_Cultures_Provided_If_The_Default_Culture_Is_Included()
+    public async Task Can_Publish_Invariant_Content_With_Cultures_Provided_If_The_Default_Culture_Is_Exclusively_Provided()
     {
         var result = await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(new HashSet<string>() { "en-US" }), Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+    }
+
+    [Test]
+    public async Task Can_Publish_Invariant_Content_With_Cultures_Provided_If_The_Default_Culture_Is_Provided_With_Other_Cultures()
+    {
+        var result = await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(new HashSet<string>() { "en-US", "da-DK" }), Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
     }
 
