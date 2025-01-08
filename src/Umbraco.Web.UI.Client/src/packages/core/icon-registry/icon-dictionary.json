@@ -380,6 +380,10 @@
 			"legacy": true
 		},
 		{
+			"name": "icon-clipboard",
+			"file": "clipboard.svg"
+		},
+		{
 			"name": "icon-clipboard-copy",
 			"file": "clipboard-copy.svg"
 		},

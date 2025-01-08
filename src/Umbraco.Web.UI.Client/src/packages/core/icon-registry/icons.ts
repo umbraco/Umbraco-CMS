@@ -367,6 +367,10 @@ name: "icon-client",
 legacy: true,
 path: () => import("./icons/icon-client.js"),
 },{
+name: "icon-clipboard",
+
+path: () => import("./icons/icon-clipboard.js"),
+},{
 name: "icon-clipboard-copy",
 
 path: () => import("./icons/icon-clipboard-copy.js"),
