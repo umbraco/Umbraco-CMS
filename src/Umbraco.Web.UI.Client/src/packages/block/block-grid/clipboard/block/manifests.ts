@@ -16,7 +16,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Block To Block Grid Clipboard Paste Translator',
 		weight: 900,
 		api: () => import('./paste/block-to-block-grid-paste-translator.js'),
-		fromClipboardEntryValueType: 'block',
+		fromClipboardEntryValueType: UMB_BLOCK_CLIPBOARD_ENTRY_VALUE_TYPE,
 		toPropertyEditorUi: UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
 	},
 ];
