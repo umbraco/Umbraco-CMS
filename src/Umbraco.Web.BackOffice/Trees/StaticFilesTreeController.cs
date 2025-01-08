@@ -107,6 +107,17 @@ public class StaticFilesTreeController : TreeController
             TreeNode node = CreateTreeNode(WebUtility.UrlEncode(file), path, queryStrings, name, Constants.Icons.DefaultIcon, false);
             nodes.Add(node);
         }
+
+        IEnumerable<string> directories = _fileSystem.GetDirectories(path);
+
+        foreach (var directory in directories)
+        {
+            var hasChildren = _fileSystem.GetFiles(directory).Any() || _fileSystem.GetDirectories(directory).Any();
+
+            var name = Path.GetFileName(directory);
+            TreeNode node = CreateTreeNode(WebUtility.UrlEncode(directory), path, queryStrings, name, Constants.Icons.Folder, hasChildren);
+            nodes.Add(node);
+        }
     }
 
     private void AddWebRootFiles(string path, FormCollection queryStrings, TreeNodeCollection nodes)
@@ -114,16 +125,14 @@ public class StaticFilesTreeController : TreeController
 
         var calculatedPath = path.TrimStart(Webroot);
         IDirectoryContents files = _webHostEnvironment.WebRootFileProvider.GetDirectoryContents(calculatedPath);
-        foreach (IFileInfo file in files)
+        foreach (IFileInfo file in files.OrderBy(x => x.IsDirectory))
         {
             TreeNode? node = null;
             if (file.IsDirectory)
             {
-                if (file.PhysicalPath != null)
-                {
-                    var hasChildren = _fileSystem.GetFiles(file.PhysicalPath).Any() || _fileSystem.GetDirectories(file.PhysicalPath).Any();
-                    node = CreateTreeNode(WebUtility.UrlEncode(string.Join("/", path, file.Name)), path, queryStrings, file.Name, Constants.Icons.Folder, hasChildren);
-                }
+                var calculatedFilePaths = _webHostEnvironment.WebRootPath + calculatedPath;
+                var hasChildren = _fileSystem.GetFiles(calculatedFilePaths).Any() || _fileSystem.GetDirectories(calculatedFilePaths).Any();
+                node = CreateTreeNode(WebUtility.UrlEncode(string.Join("/", path, file.Name)), path, queryStrings, file.Name, Constants.Icons.Folder, hasChildren);
             }
             else
             {
