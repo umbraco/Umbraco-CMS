@@ -112,11 +112,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	abstract readonly contentTypeUnique: Observable<string | undefined>;
 
 	/* Data Type */
+	// This dataTypeItemManager is used to load the data type items for this content type, so we have all data-types for this content type up front. [NL]
+	// But once we have a propert application cache this could be solved in a way where we ask the cache for the data type items. [NL]
+	// And then we do not need to store them here in a local manager, but instead just request them here up-front and then again needed(which would get them from the cache, which as well could be update while this runs) [NL]
 	readonly #dataTypeItemManager = new UmbDataTypeItemRepositoryManager(this);
-	/**
-	 * Data Type Schema Map is used for lookup, this should make coder simpler and give better performance. [NL]
-	 */
-	#dataTypeSchemaAliasMap = new Map<string, string>();
 
 	#varies?: boolean;
 	#variesByCulture?: boolean;
@@ -234,18 +233,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this.structure.contentTypeDataTypeUniques,
 			(dataTypeUniques: Array<string>) => {
 				this.#dataTypeItemManager.setUniques(dataTypeUniques);
-			},
-			null,
-		);
-		this.observe(
-			this.#dataTypeItemManager.items,
-			(dataTypes) => {
-				// Make a map of the data type unique and editorAlias
-				this.#dataTypeSchemaAliasMap = new Map(
-					dataTypes.map((dataType) => {
-						return [dataType.unique, dataType.propertyEditorSchemaAlias];
-					}),
-				);
 			},
 			null,
 		);
@@ -426,7 +413,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			throw new Error(`Property alias "${alias}" not found.`);
 		}
 
-		const editorAlias = this.#dataTypeSchemaAliasMap.get(property.dataType.unique);
+		// the getItemByUnique is a async method that first resolves once the item is loaded.
+		const editorAlias = (await this.#dataTypeItemManager.getItemByUnique(property.dataType.unique))
+			.propertyEditorSchemaAlias;
+		// This means if its not loaded this will never resolve and the error below will never happen.
 		if (!editorAlias) {
 			throw new Error(`Editor Alias of "${property.dataType.unique}" not found.`);
 		}

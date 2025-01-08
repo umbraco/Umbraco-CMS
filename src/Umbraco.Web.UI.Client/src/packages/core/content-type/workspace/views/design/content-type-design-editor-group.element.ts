@@ -150,7 +150,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 				${this.#renderContainerHeader()}
 				<umb-content-type-design-editor-properties
 					.editContentTypePath=${this.editContentTypePath}
-					container-id=${this._groupId}></umb-content-type-design-editor-properties>
+					.containerId=${this._groupId}></umb-content-type-design-editor-properties>
 			</uui-box>
 		`;
 	}
