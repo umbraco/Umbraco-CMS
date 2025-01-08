@@ -155,6 +155,10 @@ public class UserPresentationFactory : IUserPresentationFactory
             CanInviteUsers = _emailSender.CanSendRequiredEmail() && _externalLoginProviders.HasDenyLocalLogin() is false,
             UsernameIsEmail = _securitySettings.UsernameIsEmail,
             PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
+
+            // You should not be able to change any password or set 2fa if any providers has deny local login set.
+            AllowChangePassword = _externalLoginProviders.HasDenyLocalLogin() is false,
+            AllowTwoFactor = _externalLoginProviders.HasDenyLocalLogin() is false,
         });
 
     public async Task<UserUpdateModel> CreateUpdateModelAsync(Guid existingUserKey, UpdateUserRequestModel updateModel)

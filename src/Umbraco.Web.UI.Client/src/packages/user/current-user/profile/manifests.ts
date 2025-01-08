@@ -39,5 +39,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: '#general_changePassword',
 			icon: 'lock',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.User.AllowChangePassword',
+			},
+		],
 	},
 ];
