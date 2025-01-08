@@ -113,7 +113,6 @@ public class StaticFilesTreeController : TreeController
         foreach (var directory in directories)
         {
             var hasChildren = _fileSystem.GetFiles(directory).Any() || _fileSystem.GetDirectories(directory).Any();
-
             var name = Path.GetFileName(directory);
             TreeNode node = CreateTreeNode(WebUtility.UrlEncode(directory), path, queryStrings, name, Constants.Icons.Folder, hasChildren);
             nodes.Add(node);
@@ -122,16 +121,44 @@ public class StaticFilesTreeController : TreeController
 
     private void AddWebRootFiles(string path, FormCollection queryStrings, TreeNodeCollection nodes)
     {
-
         var calculatedPath = path.TrimStart(Webroot);
         IDirectoryContents files = _webHostEnvironment.WebRootFileProvider.GetDirectoryContents(calculatedPath);
-        foreach (IFileInfo file in files.OrderBy(x => x.IsDirectory))
+        foreach (IFileInfo file in files.OrderByDescending(x => x.IsDirectory))
         {
-            TreeNode? node = null;
+            // This logic looks a little wierd, but because the WebrootFileProvider can actually detect
+            // our files from App_Plugins, we have to manually exclude them, luckily they are always physical files
+            // so we can just check if the files are in there, and then exclude them.
+            bool isPhysicalFile = file.PhysicalPath is not null;
+            if (isPhysicalFile)
+            {
+                if (file.PhysicalPath!.StartsWith(_webHostEnvironment.ContentRootPath + $"\\{AppPlugins}", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+            }
+
+            TreeNode? node;
             if (file.IsDirectory)
             {
-                var calculatedFilePaths = _webHostEnvironment.WebRootPath + calculatedPath;
-                var hasChildren = _fileSystem.GetFiles(calculatedFilePaths).Any() || _fileSystem.GetDirectories(calculatedFilePaths).Any();
+                // We don't want to include the umbraco folder, so exclude it.
+                if (calculatedPath == string.Empty && file.Name is "umbraco")
+                {
+                    continue;
+                }
+
+                bool hasChildren;
+
+                if (isPhysicalFile)
+                {
+                    var calculatedFilePaths = _webHostEnvironment.WebRootPath + calculatedPath;
+                    hasChildren = _fileSystem.GetFiles(calculatedFilePaths).Any() || _fileSystem.GetDirectories(calculatedFilePaths).Any();
+                }
+                else
+                {
+                    IDirectoryContents childFiles = _webHostEnvironment.WebRootFileProvider.GetDirectoryContents(calculatedPath + $"/{file.Name}");
+                    hasChildren = childFiles.Any();
+                }
+
                 node = CreateTreeNode(WebUtility.UrlEncode(string.Join("/", path, file.Name)), path, queryStrings, file.Name, Constants.Icons.Folder, hasChildren);
             }
             else
@@ -139,10 +166,7 @@ public class StaticFilesTreeController : TreeController
                 node = CreateTreeNode(WebUtility.UrlEncode(string.Join("/", path, file.Name)), path, queryStrings, file.Name, Constants.Icons.DefaultIcon, false);
             }
 
-            if (node != null)
-            {
-                nodes.Add(node);
-            }
+            nodes.Add(node);
         }
     }
 }
