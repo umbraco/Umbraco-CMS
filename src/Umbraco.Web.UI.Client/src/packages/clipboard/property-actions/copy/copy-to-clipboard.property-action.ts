@@ -62,7 +62,7 @@ export class UmbCopyToClipboardPropertyAction extends UmbPropertyActionBase<Meta
 
 		const propertyEditorUiIcon = this.#propertyContext.getEditorManifest()?.meta.icon;
 
-		this.#clipboardContext.writeFromProperty({
+		this.#clipboardContext.writeForProperty({
 			name: entryName,
 			icon: propertyEditorUiIcon,
 			propertyValue,

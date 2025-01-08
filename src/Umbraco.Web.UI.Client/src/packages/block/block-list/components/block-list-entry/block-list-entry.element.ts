@@ -299,7 +299,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			expose: expose ? [structuredClone(expose)] : [],
 		};
 
-		clipboardContext.writeFromProperty({
+		clipboardContext.writeForProperty({
 			icon: this._icon,
 			name: entryName,
 			propertyValue,

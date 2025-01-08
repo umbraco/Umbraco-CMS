@@ -74,14 +74,14 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		return this.#resolveEntry(clipboardEntryUnique, manifest);
 	}
 
-	async writeFromProperty(args: {
+	async writeForProperty(args: {
 		name: string;
 		icon?: string;
 		propertyValue: any;
 		propertyEditorUiAlias: string;
 	}): Promise<void> {
-		const copyResolver = new UmbClipboardCopyTranslatorValueResolver(this);
-		const values = await copyResolver.resolve(args.propertyValue, args.propertyEditorUiAlias);
+		const copyValueResolver = new UmbClipboardCopyTranslatorValueResolver(this);
+		const values = await copyValueResolver.resolve(args.propertyValue, args.propertyEditorUiAlias);
 
 		const entryPreset: Partial<UmbClipboardEntryDetailModel> = {
 			name: args.name,
