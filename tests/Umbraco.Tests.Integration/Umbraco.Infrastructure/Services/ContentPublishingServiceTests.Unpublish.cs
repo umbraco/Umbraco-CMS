@@ -336,6 +336,6 @@ public partial class ContentPublishingServiceTests
     {
         var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, new HashSet<string>() { "it-IT" }, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, result.Result);
+        Assert.AreEqual(ContentPublishingOperationStatus.CannotPublishVariantWhenNotVariant, result.Result);
     }
 }
