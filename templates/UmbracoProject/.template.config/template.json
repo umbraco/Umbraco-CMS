@@ -94,7 +94,7 @@
         "cases": [
           {
             "condition": "(UmbracoRelease == 'Latest')",
-            "value": "15.1.0-rc"
+            "value": "*"
           },
           {
             "condition": "(UmbracoRelease == 'LTS')",

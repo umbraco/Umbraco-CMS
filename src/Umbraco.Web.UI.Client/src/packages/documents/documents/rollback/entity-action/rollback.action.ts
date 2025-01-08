@@ -1,4 +1,4 @@
-import { UMB_ROLLBACK_MODAL } from '../modal/rollback-modal.token.js';
+import { UMB_ROLLBACK_MODAL } from '../constants.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';

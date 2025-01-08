@@ -1,4 +1,4 @@
-import type { UmbMemberGroupItemModel } from '../../repository/index.js';
+import type { UmbMemberGroupItemModel } from '../../types.js';
 import { UmbMemberGroupPickerInputContext } from './input-member-group.context.js';
 import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';

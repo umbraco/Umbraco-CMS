@@ -1027,7 +1027,8 @@ export type HealthCheckWithResultPresentationModel = {
 export enum HealthStatusModel {
     HEALTHY = 'Healthy',
     UNHEALTHY = 'Unhealthy',
-    REBUILDING = 'Rebuilding'
+    REBUILDING = 'Rebuilding',
+    CORRUPT = 'Corrupt'
 }
 
 export type HealthStatusResponseModel = {
@@ -2203,6 +2204,7 @@ export type ServerConfigurationItemResponseModel = {
 export type ServerConfigurationResponseModel = {
     allowPasswordReset: boolean;
     versionCheckPeriod: number;
+    allowLocalLogin: boolean;
 };
 
 export type ServerInformationResponseModel = {
@@ -2680,6 +2682,8 @@ export type UserConfigurationResponseModel = {
     canInviteUsers: boolean;
     usernameIsEmail: boolean;
     passwordConfiguration: (PasswordConfigurationResponseModel);
+    allowChangePassword: boolean;
+    allowTwoFactor: boolean;
 };
 
 export type UserDataModel = {

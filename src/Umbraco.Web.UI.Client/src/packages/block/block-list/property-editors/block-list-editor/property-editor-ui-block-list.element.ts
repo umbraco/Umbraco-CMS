@@ -2,7 +2,7 @@ import { UmbBlockListManagerContext } from '../../context/block-list-manager.con
 import { UmbBlockListEntriesContext } from '../../context/block-list-entries.context.js';
 import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../types.js';
 import type { UmbBlockListEntryElement } from '../../components/block-list-entry/index.js';
-import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from './manifests.js';
+import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from './constants.js';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, property, state, repeat, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -56,15 +56,19 @@ export class UmbPropertyEditorUIBlockListElement
 
 	//#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
 
-	private _value: UmbBlockListValueModel = {
-		layout: {},
-		contentData: [],
-		settingsData: [],
-		expose: [],
-	};
+	private _value: UmbBlockListValueModel | undefined = undefined;
+
+	#lastValue: UmbBlockListValueModel | undefined = undefined;
 
 	@property({ attribute: false })
 	public override set value(value: UmbBlockListValueModel | undefined) {
+		this.#lastValue = value;
+
+		if (!value) {
+			this._value = undefined;
+			return;
+		}
+
 		const buildUpValue: Partial<UmbBlockListValueModel> = value ? { ...value } : {};
 		buildUpValue.layout ??= {};
 		buildUpValue.contentData ??= [];
@@ -188,13 +192,24 @@ export class UmbPropertyEditorUIBlockListElement
 					this.#managerContext.exposes,
 				]).pipe(debounceTime(20)),
 				([layouts, contents, settings, exposes]) => {
-					this._value = {
-						...this._value,
-						layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
-						contentData: contents,
-						settingsData: settings,
-						expose: exposes,
-					};
+					if (layouts.length === 0) {
+						this._value = undefined;
+					} else {
+						this._value = {
+							...this._value,
+							layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
+							contentData: contents,
+							settingsData: settings,
+							expose: exposes,
+						};
+					}
+
+					// If we don't have a value set from the outside or an internal value, we don't want to set the value.
+					// This is added to prevent the block list from setting an empty value on startup.
+					if (this.#lastValue === undefined && this._value === undefined) {
+						return;
+					}
+
 					context.setValue(this._value);
 				},
 				'motherObserver',

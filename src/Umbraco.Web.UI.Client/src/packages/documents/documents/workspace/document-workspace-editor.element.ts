@@ -102,11 +102,11 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 
 					if (!route) {
 						// TODO: Notice: here is a specific index used for fallback, this could be made more solid [NL]
-						history.pushState({}, '', `${this.#workspaceRoute}/${routes[routes.length - 3].path}`);
+						history.replaceState({}, '', `${this.#workspaceRoute}/${routes[routes.length - 3].path}`);
 						return;
 					}
 
-					history.pushState({}, '', `${this.#workspaceRoute}/${route?.path}`);
+					history.replaceState({}, '', `${this.#workspaceRoute}/${route?.path}`);
 				},
 			});
 		}

@@ -72,7 +72,7 @@ test('can add an image to the image media picker', async ({umbracoApi, umbracoUi
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.selectMediaByName(mediaName);
+  await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(mediaName);
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
 
@@ -141,7 +141,7 @@ test.skip('image count can not be more than max amount set in image media picker
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.selectMediaByName(mediaName);
+  await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(mediaName);
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
 
@@ -167,7 +167,7 @@ test('can add an image from the image media picker with a start node', async ({u
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.selectMediaByName(mediaName);
+  await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(mediaName);
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
 

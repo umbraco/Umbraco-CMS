@@ -499,15 +499,7 @@ export abstract class UmbBlockEntryContext<
 			]),
 			([variantId, variesByCulture, variesBySegment]) => {
 				if (!variantId || variesByCulture === undefined || variesBySegment === undefined) return;
-				if (!variesBySegment && !variesByCulture) {
-					variantId = UmbVariantId.CreateInvariant();
-				} else if (!variesBySegment) {
-					variantId = variantId.toSegmentInvariant();
-				} else if (!variesByCulture) {
-					variantId = variantId.toCultureInvariant();
-				}
-
-				this.#variantId.setValue(variantId);
+				this.#variantId.setValue(variantId.toVariant(variesByCulture, variesBySegment));
 				this.#gotVariantId();
 			},
 			'observeBlockType',
@@ -633,10 +625,18 @@ export abstract class UmbBlockEntryContext<
 
 	//activate
 	public edit() {
-		window.location.href = this.#generateWorkspaceEditContentPath(this.#workspacePath.value, this.getContentKey());
+		window.history.pushState(
+			{},
+			'',
+			this.#generateWorkspaceEditContentPath(this.#workspacePath.value, this.getContentKey()),
+		);
 	}
 	public editSettings() {
-		window.location.href = this.#generateWorkspaceEditSettingsPath(this.#workspacePath.value, this.getContentKey());
+		window.history.pushState(
+			{},
+			'',
+			this.#generateWorkspaceEditSettingsPath(this.#workspacePath.value, this.getContentKey()),
+		);
 	}
 
 	async requestDelete() {
