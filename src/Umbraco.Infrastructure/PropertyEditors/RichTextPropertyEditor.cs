@@ -60,6 +60,16 @@ public class RichTextPropertyEditor : DataEditor
         return valueEditor.MergePartialPropertyValueForCulture(sourceValue, targetValue, culture);
     }
 
+    public override object? MergeVariantInvariantPropertyValue(
+        object? sourceValue,
+        object? targetValue,
+        bool canUpdateInvariantData,
+        HashSet<string> allowedCultures)
+    {
+        var valueEditor = (RichTextPropertyValueEditor)GetValueEditor();
+        return valueEditor.MergeVariantInvariantPropertyValue(sourceValue, targetValue, canUpdateInvariantData,allowedCultures);
+    }
+
     /// <summary>
     ///     Create a custom value editor
     /// </summary>
