@@ -1,7 +1,10 @@
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS } from '../property-editors/constants.js';
 import { manifests as blockManifests } from './block/manifests.js';
 import { manifests as gridBlockManifests } from './grid-block/manifests.js';
-import { UMB_WRITABLE_PROPERTY_CONDITION_ALIAS } from '@umbraco-cms/backoffice/property';
+import {
+	UMB_PROPERTY_HAS_VALUE_CONDITION_ALIAS,
+	UMB_WRITABLE_PROPERTY_CONDITION_ALIAS,
+} from '@umbraco-cms/backoffice/property';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -13,6 +16,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: UMB_WRITABLE_PROPERTY_CONDITION_ALIAS,
+			},
+			{
+				alias: UMB_PROPERTY_HAS_VALUE_CONDITION_ALIAS,
 			},
 		],
 	},

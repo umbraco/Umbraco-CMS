@@ -1,4 +1,4 @@
-import { UMB_PROPERTY_CONTEXT } from '../components/property/property.context.js';
+import { UMB_PROPERTY_CONTEXT } from '../../components/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	UmbConditionConfigBase,
