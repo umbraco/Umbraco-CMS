@@ -197,7 +197,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 					?active=${this._openClipboard}
 					@click=${() => (this._openClipboard = true)}>
 					<umb-localize key=${this.localize.term('blockEditor_tabClipboard')}>Clipboard</umb-localize>
-					<uui-icon slot="icon" name="icon-clipboard-paste"></uui-icon>
+					<uui-icon slot="icon" name="icon-clipboard"></uui-icon>
 				</uui-tab>
 			</uui-tab-group>
 		`;
