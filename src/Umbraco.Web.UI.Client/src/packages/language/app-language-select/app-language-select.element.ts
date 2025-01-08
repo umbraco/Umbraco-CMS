@@ -2,7 +2,7 @@ import { UmbLanguageCollectionRepository } from '../collection/index.js';
 import type { UmbLanguageDetailModel } from '../types.js';
 import type { UmbAppLanguageContext } from '../global-contexts/index.js';
 import { UMB_APP_LANGUAGE_CONTEXT } from '../constants.js';
-import type { UUIMenuItemEvent, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
 	html,
@@ -112,16 +112,9 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		}
 	}
 
-	#onLabelClick(event: UUIMenuItemEvent) {
-		const menuItem = event.target;
-		const unique = menuItem.dataset.unique;
-		if (!unique) throw new Error('Missing unique on menu item');
-
+	#chooseLanguage(unique: string) {
 		this.#appLanguageContext?.setLanguage(unique);
 		this._isOpen = false;
-
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
 		this._popoverElement?.hidePopover();
 	}
 
@@ -153,7 +146,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 							label=${ifDefined(language.name)}
 							data-mark="${language.entityType}:${language.unique}"
 							?active=${language.unique === this._appLanguage?.unique}
-							@click-label=${this.#onLabelClick}>
+							@click-label=${() => this.#chooseLanguage(language.unique)}>
 							${this.#isLanguageReadOnly(language.unique) ? this.#renderReadOnlyTag(language.unique) : nothing}
 						</uui-menu-item>
 					`,
