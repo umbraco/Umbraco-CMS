@@ -1,4 +1,4 @@
-import { manifests as copyManifests } from './copy/manifests.js';
-import { manifests as pasteManifests } from './paste/manifests.js';
+import { manifests as blockCopyManifests } from './block/copy/manifests.js';
+import { manifests as blockPasteManifests } from './block/paste/manifests.js';
 
-export const manifests: Array<UmbExtensionManifest> = [...copyManifests, ...pasteManifests];
+export const manifests: Array<UmbExtensionManifest> = [...blockCopyManifests, ...blockPasteManifests];
