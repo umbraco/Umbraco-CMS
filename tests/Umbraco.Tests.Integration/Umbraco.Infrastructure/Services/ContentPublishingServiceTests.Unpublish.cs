@@ -334,7 +334,7 @@ public partial class ContentPublishingServiceTests
     [Test]
     public async Task Cannot_Unpublish_Invariant_Content_With_Cultures_Provided_That_Do_Not_Include_The_Default_Culture()
     {
-        var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, new HashSet<string>() { "it-IT" }, Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, new HashSet<string>() { "da-DK" }, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.CannotPublishVariantWhenNotVariant, result.Result);
     }
