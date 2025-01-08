@@ -46,13 +46,13 @@
       "datatype": "choice",
       "choices": [
         {
-          "displayName": ".NET 8.0",
-          "description": "Target net8.0",
-          "choice": "net8.0"
+          "displayName": ".NET 9.0",
+          "description": "Target net9.0",
+          "choice": "net9.0"
         }
       ],
-      "defaultValue": "net8.0",
-      "replaces": "net8.0"
+      "defaultValue": "net9.0",
+      "replaces": "net9.0"
     },
     "UmbracoRelease": {
       "displayName": "Umbraco Version",
@@ -108,14 +108,18 @@
       "type": "generated",
       "generator": "switch",
       "datatype": "text",
-      "description": "Not relevant at the moment, but if we need to change the dotnet version based on the Umbraco version, we can do it here",
+      "description": "Used to calculate the dotnet version to use, for latest we want to use dotnet 9 and for LTS we want to use dotnet 8",
       "replaces": "DOTNET_VERSION_FROM_TEMPLATE",
       "parameters": {
         "evaluator": "C++",
         "datatype": "text",
         "cases": [
           {
-            "condition": "(true)",
+            "condition": "(UmbracoRelease == 'Latest')",
+            "value": "net9.0"
+          },
+          {
+            "condition": "(UmbracoRelease == 'LTS')",
             "value": "net8.0"
           }
         ]

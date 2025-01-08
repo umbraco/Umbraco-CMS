@@ -96,7 +96,7 @@ test('can rename a script', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.script.rename(scriptName);
 
   // Assert
-  await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.renamed);
   expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
   expect(await umbracoApi.script.doesNameExist(wrongScriptName)).toBeFalsy();
 });
@@ -104,7 +104,7 @@ test('can rename a script', async ({umbracoApi, umbracoUi}) => {
 test('cannot create a script with an empty name', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
-  
+
   // Act
   await umbracoUi.script.clickActionsMenuAtRoot();
   await umbracoUi.script.clickCreateButton();

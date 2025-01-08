@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
@@ -35,7 +36,7 @@ namespace Umbraco.Cms.Core.Services;
 ///     Represents the UserService, which is an easy access to operations involving <see cref="IProfile" />,
 ///     <see cref="IMembershipUser" /> and eventually Backoffice Users.
 /// </summary>
-internal class UserService : RepositoryService, IUserService
+internal partial class UserService : RepositoryService, IUserService
 {
     private readonly GlobalSettings _globalSettings;
     private readonly SecuritySettings _securitySettings;
@@ -477,6 +478,7 @@ internal class UserService : RepositoryService, IUserService
     ///     This is just the default user group that the membership provider will use
     /// </summary>
     /// <returns></returns>
+    [Obsolete("No (backend) code path is using this anymore, so it can not be considered the default. Planned for removal in V16.")]
     public string GetDefaultMemberType() => Constants.Security.WriterGroupAlias;
 
     /// <summary>
@@ -915,7 +917,7 @@ internal class UserService : RepositoryService, IUserService
         {
             return UserOperationStatus.UserNameIsNotEmail;
         }
-        if (!IsEmailValid(model.Email))
+        if (model.Email.IsEmail() is false)
         {
             return UserOperationStatus.InvalidEmail;
         }
@@ -1134,7 +1136,7 @@ internal class UserService : RepositoryService, IUserService
             return UserOperationStatus.UserNameIsNotEmail;
         }
 
-        if (IsEmailValid(model.Email) is false)
+        if (model.Email.IsEmail() is false)
         {
             return UserOperationStatus.InvalidEmail;
         }
@@ -1162,8 +1164,6 @@ internal class UserService : RepositoryService, IUserService
         return UserOperationStatus.Success;
     }
 
-    private static bool IsEmailValid(string email) => new EmailAddressAttribute().IsValid(email);
-
     private List<int>? GetIdsFromKeys(IEnumerable<Guid>? guids, UmbracoObjectTypes type)
     {
         var keys = guids?
@@ -1185,6 +1185,11 @@ internal class UserService : RepositoryService, IUserService
         if (user is null)
         {
             return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, new PasswordChangedModel());
+        }
+
+        if (user.Kind != UserKind.Default)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.InvalidUserType, new PasswordChangedModel());
         }
 
         IUser? performingUser = await userStore.GetAsync(performingUserKey);
@@ -2476,6 +2481,56 @@ internal class UserService : RepositoryService, IUserService
         return CalculatePermissionsForPathForUser(groupPermissions, nodeIds);
     }
 
+    public async Task<UserClientCredentialsOperationStatus> AddClientIdAsync(Guid userKey, string clientId)
+    {
+        if (ValidClientId().IsMatch(clientId) is false)
+        {
+            return UserClientCredentialsOperationStatus.InvalidClientId;
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        IEnumerable<string> currentClientIds = _userRepository.GetAllClientIds();
+        if (currentClientIds.InvariantContains(clientId))
+        {
+            return UserClientCredentialsOperationStatus.DuplicateClientId;
+        }
+
+        IUser? user = await GetAsync(userKey);
+        if (user is null || user.Kind != UserKind.Api)
+        {
+            return UserClientCredentialsOperationStatus.InvalidUser;
+        }
+
+        _userRepository.AddClientId(user.Id, clientId);
+
+        return UserClientCredentialsOperationStatus.Success;
+    }
+
+    public async Task<bool> RemoveClientIdAsync(Guid userKey, string clientId)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        var userId = await _userIdKeyResolver.GetAsync(userKey);
+        return _userRepository.RemoveClientId(userId, clientId);
+    }
+
+    public Task<IUser?> FindByClientIdAsync(string clientId)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        IUser? user = _userRepository.GetByClientId(clientId);
+        return Task.FromResult(user?.Kind == UserKind.Api ? user : null);
+    }
+
+    public async Task<IEnumerable<string>> GetClientIdsAsync(Guid userKey)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        var userId = await _userIdKeyResolver.GetAsync(userKey);
+        return _userRepository.GetClientIds(userId);
+    }
+
     /// <summary>
     ///     This performs the calculations for inherited nodes based on this
     ///     http://issues.umbraco.org/issue/U4-10075#comment=67-40085
@@ -2619,6 +2674,9 @@ internal class UserService : RepositoryService, IUserService
             assignedPermissions.Add(additionalPermission);
         }
     }
+
+    [GeneratedRegex(@"^[\w\d\-\._~]{1,255}$")]
+    private static partial Regex ValidClientId();
 
     #endregion
 }

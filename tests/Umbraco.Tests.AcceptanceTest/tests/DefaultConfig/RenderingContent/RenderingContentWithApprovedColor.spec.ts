@@ -1,4 +1,4 @@
-﻿import {AliasHelper, test} from '@umbraco/playwright-testhelpers';
+import {AliasHelper, test} from '@umbraco/playwright-testhelpers';
 
 const contentName = 'Test Rendering Content';
 const documentTypeName = 'TestDocumentTypeForContent';
@@ -9,11 +9,11 @@ const colorValue = {label: "Test Label", value: "038c33"};
 let dataTypeId = null;
 
 test.beforeEach(async ({umbracoApi}) => {
-  dataTypeId = await umbracoApi.dataType.createApprovedColorDataTypeWithOneItem(customDataTypeName, colorValue.label, colorValue.value); 
+  dataTypeId = await umbracoApi.dataType.createApprovedColorDataTypeWithOneItem(customDataTypeName, colorValue.label, colorValue.value);
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.template.ensureNameNotExists(templateName);
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
@@ -30,7 +30,7 @@ test('can render content with an approved color with label', async ({umbracoApi,
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
   // Assert
-  await umbracoUi.contentRender.doesContentRenderValueHaveText(colorValue.label);
+  await umbracoUi.contentRender.doesContentRenderValueContainText(colorValue.label);
 });
 
 test('can render content with an approved color without label', async ({umbracoApi, umbracoUi}) => {
@@ -44,5 +44,5 @@ test('can render content with an approved color without label', async ({umbracoA
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
   // Assert
-  await umbracoUi.contentRender.doesContentRenderValueHaveText(colorValue.value);
+  await umbracoUi.contentRender.doesContentRenderValueContainText(colorValue.value);
 });

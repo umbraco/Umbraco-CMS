@@ -71,13 +71,17 @@ public class MigrationPlanTests
             Mock.Of<IServerMessenger>(),
             new CacheRefresherCollection(() => Enumerable.Empty<ICacheRefresher>()));
 
+        var isolatedCaches = new IsolatedCaches(type => NoAppCache.Instance);
+
+        var appCaches = new AppCaches(Mock.Of<IAppPolicyCache>(), Mock.Of<IRequestCache>(), isolatedCaches);
+
         var executor = new MigrationPlanExecutor(
             scopeProvider,
             scopeProvider,
             loggerFactory,
             migrationBuilder,
             databaseFactory,
-            Mock.Of<IPublishedSnapshotService>(), distributedCache, Mock.Of<IKeyValueService>(), Mock.Of<IServiceScopeFactory>());
+            Mock.Of<IDatabaseCacheRebuilder>(), distributedCache, Mock.Of<IKeyValueService>(), Mock.Of<IServiceScopeFactory>(), appCaches);
 
         var plan = new MigrationPlan("default")
             .From(string.Empty)

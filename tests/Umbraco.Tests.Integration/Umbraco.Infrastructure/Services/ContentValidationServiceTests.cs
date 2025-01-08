@@ -42,65 +42,102 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
                                 {
                                   "layout": {
                                     "Umbraco.BlockList": [{
-                                        "contentUdi": "umb://element/9addc377c02c4db088c273b933704f7b",
-                                        "settingsUdi": "umb://element/65db1ecd78e041a584f07296123a0a73"
+                                        "contentKey": "9addc377-c02c-4db0-88c2-73b933704f7b",
+                                        "settingsKey": "65db1ecd-78e0-41a5-84f0-7296123a0a73"
                                       }, {
-                                        "contentUdi": "umb://element/3af93b5b5e404c64b1422564309fc4c7",
-                                        "settingsUdi": "umb://element/efb9583ce67043f282fb2a0cb0f3e736"
+                                        "contentKey": "3af93b5b-5e40-4c64-b142-2564309fc4c7",
+                                        "settingsKey": "efb9583c-e670-43f2-82fb-2a0cb0f3e736"
                                       }
                                     ]
                                   },
                                   "contentData": [{
                                       "contentTypeKey": "{{setup.ElementType.Key}}",
-                                      "udi": "umb://element/9addc377c02c4db088c273b933704f7b",
-                                      "title": "Valid root content",
-                                      "blocks": {
-                                        "layout": {
-                                          "Umbraco.BlockList": [{
-                                              "contentUdi": "umb://element/f36cebfad03b44519e604bf32c5b1e2f",
-                                              "settingsUdi": "umb://element/c9129a4671bb4b4e8f0ad525ad4a5de3"
-                                            }, {
-                                              "contentUdi": "umb://element/b8173e4a0618475c8277c3c6af68bee6",
-                                              "settingsUdi": "umb://element/77f7ea3507664395bf7f0c9df04530f7"
-                                            }
-                                          ]
-                                        },
-                                        "contentData": [{
-                                            "contentTypeKey": "{{setup.ElementType.Key}}",
-                                            "udi": "umb://element/f36cebfad03b44519e604bf32c5b1e2f",
-                                            "title": "Invalid nested content"
-                                          }, {
-                                            "contentTypeKey": "{{setup.ElementType.Key}}",
-                                            "udi": "umb://element/b8173e4a0618475c8277c3c6af68bee6",
-                                            "title": "Valid nested content"
+                                      "key": "9addc377-c02c-4db0-88c2-73b933704f7b",
+                                      "values": [
+                                          {
+                                            "alias": "title",
+                                            "value": "Valid root content title"
+                                          },
+                                          {
+                                            "alias": "blocks",
+                                            "value": {
+                                                "layout": {
+                                                  "Umbraco.BlockList": [{
+                                                      "contentKey": "f36cebfa-d03b-4451-9e60-4bf32c5b1e2f",
+                                                      "settingsKey": "c9129a46-71bb-4b4e-8f0a-d525ad4a5de3"
+                                                    }, {
+                                                      "contentKey": "b8173e4a-0618-475c-8277-c3c6af68bee6",
+                                                      "settingsKey": "77f7ea35-0766-4395-bf7f-0c9df04530f7"
+                                                    }
+                                                  ]
+                                                },
+                                                "contentData": [{
+                                                    "contentTypeKey": "{{setup.ElementType.Key}}",
+                                                    "key": "f36cebfa-d03b-4451-9e60-4bf32c5b1e2f",
+                                                    "values": [
+                                                        { "alias": "title", "value": "Invalid nested content title (ref #4)" },
+                                                        { "alias": "text", "value": "Valid nested content text" }
+                                                    ]
+                                                  }, {
+                                                    "contentTypeKey": "{{setup.ElementType.Key}}",
+                                                    "key": "b8173e4a-0618-475c-8277-c3c6af68bee6",
+                                                    "values": [
+                                                        { "alias": "title", "value": "Valid nested content title" },
+                                                        { "alias": "text", "value": "Invalid nested content text (ref #5)" }
+                                                    ]
+                                                  }
+                                                ],
+                                                "settingsData": [{
+                                                    "contentTypeKey": "{{setup.ElementType.Key}}",
+                                                    "key": "c9129a46-71bb-4b4e-8f0a-d525ad4a5de3",
+                                                    "values": [
+                                                        { "alias": "title", "value": "Valid nested setting title" },
+                                                        { "alias": "text", "value": "Invalid nested setting text (ref #6)" }
+                                                    ]
+                                                  }, {
+                                                    "contentTypeKey": "{{setup.ElementType.Key}}",
+                                                    "key": "77f7ea35-0766-4395-bf7f-0c9df04530f7",
+                                                    "values": [
+                                                        { "alias": "title", "value": "Invalid nested setting title (ref #7)" },
+                                                        { "alias": "text", "value": "Valid nested setting text)" }
+                                                    ]
+                                                  }
+                                                ],
+                                                "expose": [
+                                                    { "contentKey": "f36cebfa-d03b-4451-9e60-4bf32c5b1e2f", "culture": null, "segment": null },
+                                                    { "contentKey": "b8173e4a-0618-475c-8277-c3c6af68bee6", "culture": null, "segment": null }
+                                                ]
+                                              }
                                           }
-                                        ],
-                                        "settingsData": [{
-                                            "contentTypeKey": "{{setup.ElementType.Key}}",
-                                            "udi": "umb://element/c9129a4671bb4b4e8f0ad525ad4a5de3",
-                                            "title": "Valid nested setting"
-                                          }, {
-                                            "contentTypeKey": "{{setup.ElementType.Key}}",
-                                            "udi": "umb://element/77f7ea3507664395bf7f0c9df04530f7",
-                                            "title": "Invalid nested setting"
-                                          }
-                                        ]
-                                      }
+                                      ]
                                     }, {
                                       "contentTypeKey": "{{setup.ElementType.Key}}",
-                                      "udi": "umb://element/3af93b5b5e404c64b1422564309fc4c7",
-                                      "title": "Invalid root content"
+                                      "key": "3af93b5b-5e40-4c64-b142-2564309fc4c7",
+                                      "values": [
+                                          { "alias": "title", "value": "Invalid root content title (ref #1)" },
+                                          { "alias": "text", "value": "Valid root content text" }
+                                      ]
                                     }
                                   ],
                                   "settingsData": [{
                                         "contentTypeKey": "{{setup.ElementType.Key}}",
-                                        "udi": "umb://element/65db1ecd78e041a584f07296123a0a73",
-                                        "title": "Invalid root setting"
+                                        "key": "65db1ecd-78e0-41a5-84f0-7296123a0a73",
+                                        "values": [
+                                            { "alias": "title", "value": "Invalid root setting title (ref #2)" },
+                                            { "alias": "text", "value": "Valid root setting text" }
+                                        ]
                                       }, {
                                         "contentTypeKey": "{{setup.ElementType.Key}}",
-                                        "udi": "umb://element/efb9583ce67043f282fb2a0cb0f3e736",
-                                        "title": "Valid root setting"
+                                        "key": "efb9583c-e670-43f2-82fb-2a0cb0f3e736",
+                                        "values": [
+                                            { "alias": "title", "value": "Valid root setting title" },
+                                            { "alias": "text", "value": "Invalid root setting text (ref #3)" }
+                                        ]
                                       }
+                                  ],
+                                  "expose": [
+                                      { "contentKey": "9addc377-c02c-4db0-88c2-73b933704f7b", "culture": null, "segment": null },
+                                      { "contentKey": "3af93b5b-5e40-4c64-b142-2564309fc4c7", "culture": null, "segment": null }
                                   ]
                                 }
                                 """
@@ -109,11 +146,23 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
             },
             setup.DocumentType);
 
-        Assert.AreEqual(4, validationResult.ValidationErrors.Count());
-        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].blocks.contentData[0].title"));
-        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].blocks.settingsData[1].title"));
-        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[1].title"));
-        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".settingsData[0].title"));
+        Assert.AreEqual(7, validationResult.ValidationErrors.Count());
+
+        // ref #1
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[1].values[0].value"));
+        // ref #2
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".settingsData[0].values[0].value"));
+        // ref #3
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".settingsData[1].values[1].value"));
+
+        // ref #4
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].values[1].value.contentData[0].values[0].value"));
+        // ref #5
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].values[1].value.contentData[1].values[1].value"));
+        // ref #6
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].values[1].value.settingsData[0].values[1].value"));
+        // ref #7
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].values[1].value.settingsData[1].values[0].value"));
     }
 
     [TestCase(true)]
@@ -317,6 +366,93 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual(expectedResult, result);
     }
 
+    [Test]
+    public async Task Can_Validate_For_All_Languages()
+    {
+        var contentType = await SetupLanguageTest();
+
+        var validationResult = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Variants = [
+                    new()
+                    {
+                        Name = "Test Document (EN)",
+                        Culture = "en-US",
+                        Properties = [
+                            new()
+                            {
+                                Alias = "title",
+                                Value = "Invalid value in English",
+                            }
+                        ]
+                    },
+                    new()
+                    {
+                        Name = "Test Document (DA)",
+                        Culture = "da-DK",
+                        Properties = [
+                            new()
+                            {
+                                Alias = "title",
+                                Value = "Invalid value in Danish",
+                            }
+                        ]
+                    }
+                ]
+            },
+            contentType);
+
+        Assert.AreEqual(2, validationResult.ValidationErrors.Count());
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "title" && r.Culture == "en-US" && r.JsonPath == string.Empty));
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "title" && r.Culture == "da-DK" && r.JsonPath == string.Empty));
+    }
+
+    [TestCase("da-DK")]
+    [TestCase("en-US")]
+    public async Task Can_Validate_For_Specific_Language(string culture)
+    {
+        var contentType = await SetupLanguageTest();
+
+        var validationResult = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Variants = [
+                    new()
+                    {
+                        Name = "Test Document (EN)",
+                        Culture = "en-US",
+                        Properties = [
+                            new()
+                            {
+                                Alias = "title",
+                                Value = "Invalid value in English",
+                            }
+                        ]
+                    },
+                    new()
+                    {
+                        Name = "Test Document (DA)",
+                        Culture = "da-DK",
+                        Properties = [
+                            new()
+                            {
+                                Alias = "title",
+                                Value = "Invalid value in Danish",
+                            }
+                        ]
+                    }
+                ]
+            },
+            contentType,
+            [culture]);
+
+        Assert.AreEqual(1, validationResult.ValidationErrors.Count());
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "title" && r.Culture == culture && r.JsonPath == string.Empty));
+    }
+
     private async Task<(IContentType DocumentType, IContentType ElementType)> SetupBlockListTest()
     {
         var propertyEditorCollection = GetRequiredService<PropertyEditorCollection>();
@@ -374,6 +510,10 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
         {
             ValidationRegExp = "^Valid.*$"
         });
+        elementType.AddPropertyType(new PropertyType(ShortStringHelper, textBoxDataType, "text")
+        {
+            ValidationRegExp = "^Valid.*$"
+        });
         await ContentTypeService.SaveAsync(elementType, Constants.Security.SuperUserKey);
 
         // create a document type with the block list and a regex validated text box
@@ -395,6 +535,24 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
         contentType.PropertyTypes.First(pt => pt.Alias == "author").ValidationRegExp = "^Valid.*$";
         contentType.AllowedAsRoot = true;
         ContentTypeService.Save(contentType);
+
+        return contentType;
+    }
+
+    private async Task<IContentType> SetupLanguageTest()
+    {
+        var language = new LanguageBuilder()
+            .WithCultureInfo("da-DK")
+            .Build();
+        await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type");
+        contentType.Variations = ContentVariation.Culture;
+        var titlePropertyType = contentType.PropertyTypes.First(pt => pt.Alias == "title");
+        titlePropertyType.Variations = ContentVariation.Culture;
+        titlePropertyType.ValidationRegExp = "^Valid.*$";
+        contentType.AllowedAsRoot = true;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         return contentType;
     }

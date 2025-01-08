@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers.Objects;
@@ -30,8 +31,7 @@ public class HtmlLocalLinkParserTests
 <a type=""media"" href=""/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}"" title=""media"">media</a>
 </p>";
 
-        var umbracoContextAccessor = new TestUmbracoContextAccessor();
-        var parser = new HtmlLocalLinkParser(umbracoContextAccessor, Mock.Of<IPublishedUrlProvider>());
+        var parser = new HtmlLocalLinkParser(Mock.Of<IPublishedUrlProvider>());
 
         var result = parser.FindUdisFromLocalLinks(input).ToList();
 
@@ -56,8 +56,7 @@ public class HtmlLocalLinkParserTests
 <a href=""{locallink:umb://document-type/2D692FCB070B4CDA92FB6883FDBFD6E2}"">hello</a>
 </p>";
 
-        var umbracoContextAccessor = new TestUmbracoContextAccessor();
-        var parser = new HtmlLocalLinkParser(umbracoContextAccessor, Mock.Of<IPublishedUrlProvider>());
+        var parser = new HtmlLocalLinkParser(Mock.Of<IPublishedUrlProvider>());
 
         var result = parser.FindUdisFromLocalLinks(input).ToList();
 
@@ -90,8 +89,7 @@ public class HtmlLocalLinkParserTests
 <a type=""media"" href=""/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}"" title=""media"">media</a>
 </p>";
 
-        var umbracoContextAccessor = new TestUmbracoContextAccessor();
-        var parser = new HtmlLocalLinkParser(umbracoContextAccessor, Mock.Of<IPublishedUrlProvider>());
+        var parser = new HtmlLocalLinkParser(Mock.Of<IPublishedUrlProvider>());
 
         var result = parser.FindUdisFromLocalLinks(input).ToList();
 
@@ -222,12 +220,11 @@ public class HtmlLocalLinkParserTests
             umbracoContextAccessor: umbracoContextAccessor);
 
         var webRoutingSettings = new WebRoutingSettings();
-        var publishedUrlProvider = new UrlProvider(
-            umbracoContextAccessor,
-            Options.Create(webRoutingSettings),
-            new UrlProviderCollection(() => new[] { contentUrlProvider.Object }),
-            new MediaUrlProviderCollection(() => new[] { mediaUrlProvider.Object }),
-            Mock.Of<IVariationContextAccessor>());
+
+        var navigationQueryService = new Mock<IDocumentNavigationQueryService>();
+        Guid? parentKey = null;
+        navigationQueryService.Setup(x => x.TryGetParentKey(It.IsAny<Guid>(), out parentKey)).Returns(true);
+
         using (var reference = umbracoContextFactory.EnsureUmbracoContext())
         {
             var contentCache = Mock.Get(reference.UmbracoContext.Content);
@@ -238,7 +235,22 @@ public class HtmlLocalLinkParserTests
             mediaCache.Setup(x => x.GetById(It.IsAny<int>())).Returns(media.Object);
             mediaCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(media.Object);
 
-            var linkParser = new HtmlLocalLinkParser(umbracoContextAccessor, publishedUrlProvider);
+            var publishStatusQueryService = new Mock<IPublishStatusQueryService>();
+            publishStatusQueryService
+                .Setup(x => x.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()))
+                .Returns(true);
+
+            var publishedUrlProvider = new UrlProvider(
+                umbracoContextAccessor,
+                Options.Create(webRoutingSettings),
+                new UrlProviderCollection(() => new[] { contentUrlProvider.Object }),
+                new MediaUrlProviderCollection(() => new[] { mediaUrlProvider.Object }),
+                Mock.Of<IVariationContextAccessor>(),
+                contentCache.Object,
+                navigationQueryService.Object,
+                publishStatusQueryService.Object);
+
+            var linkParser = new HtmlLocalLinkParser(publishedUrlProvider);
 
             var output = linkParser.EnsureInternalLinks(input);
 

@@ -1,4 +1,4 @@
-﻿import {AliasHelper, test} from '@umbraco/playwright-testhelpers';
+import {AliasHelper, test} from '@umbraco/playwright-testhelpers';
 
 const contentName = 'Test Rendering Content';
 const documentTypeName = 'TestDocumentTypeForContent';
@@ -8,11 +8,11 @@ const propertyName = 'Test Textarea';
 let dataTypeData = null;
 
 test.beforeEach(async ({umbracoApi}) => {
-  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName); 
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.template.ensureNameNotExists(templateName);
 });
@@ -39,6 +39,6 @@ for (const textarea of textareas) {
     await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
     // Assert
-    await umbracoUi.contentRender.doesContentRenderValueHaveText(textareaValue);
+    await umbracoUi.contentRender.doesContentRenderValueContainText(textareaValue);
   });
 }

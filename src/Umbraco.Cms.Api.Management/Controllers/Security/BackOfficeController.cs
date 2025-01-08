@@ -42,6 +42,7 @@ public class BackOfficeController : SecurityControllerBase
     private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
     private readonly IUserTwoFactorLoginService _userTwoFactorLoginService;
     private readonly IBackOfficeExternalLoginService _externalLoginService;
+    private readonly IBackOfficeUserClientCredentialsManager _backOfficeUserClientCredentialsManager;
 
     private const string RedirectFlowParameter = "flow";
     private const string RedirectStatusParameter = "status";
@@ -55,7 +56,8 @@ public class BackOfficeController : SecurityControllerBase
         ILogger<BackOfficeController> logger,
         IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions,
         IUserTwoFactorLoginService userTwoFactorLoginService,
-        IBackOfficeExternalLoginService externalLoginService)
+        IBackOfficeExternalLoginService externalLoginService,
+        IBackOfficeUserClientCredentialsManager backOfficeUserClientCredentialsManager)
     {
         _httpContextAccessor = httpContextAccessor;
         _backOfficeSignInManager = backOfficeSignInManager;
@@ -65,6 +67,7 @@ public class BackOfficeController : SecurityControllerBase
         _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
         _userTwoFactorLoginService = userTwoFactorLoginService;
         _externalLoginService = externalLoginService;
+        _backOfficeUserClientCredentialsManager = backOfficeUserClientCredentialsManager;
     }
 
     [HttpPost("login")]
@@ -166,18 +169,79 @@ public class BackOfficeController : SecurityControllerBase
         OpenIddictRequest? request = context.GetOpenIddictServerRequest();
         if (request == null)
         {
-            return BadRequest("Unable to obtain OpenID data from the current request");
+            return BadRequest(new OpenIddictResponse
+            {
+                Error = "No context found", ErrorDescription = "Unable to obtain context from the current request."
+            });
         }
 
         // make sure we keep member authentication away from this endpoint
         if (request.ClientId is Constants.OAuthClientIds.Member)
         {
-            return BadRequest("The specified client ID cannot be used here.");
+            return BadRequest(new OpenIddictResponse
+            {
+                Error = "Invalid 'client ID'", ErrorDescription = "The specified 'client_id' is not valid."
+            });
         }
 
         return request.IdentityProvider.IsNullOrWhiteSpace()
             ? await AuthorizeInternal(request)
             : await AuthorizeExternal(request);
+    }
+
+    [AllowAnonymous]
+    [HttpPost("token")]
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> Token()
+    {
+        HttpContext context = _httpContextAccessor.GetRequiredHttpContext();
+        OpenIddictRequest? request = context.GetOpenIddictServerRequest();
+        if (request == null)
+        {
+            return BadRequest(new OpenIddictResponse
+            {
+                Error = "No context found", ErrorDescription = "Unable to obtain context from the current request."
+            });
+        }
+
+        if (request.IsAuthorizationCodeGrantType() || request.IsRefreshTokenGrantType())
+        {
+            // attempt to authorize against the supplied the authorization code
+            AuthenticateResult authenticateResult = await context.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+
+            return authenticateResult is { Succeeded: true, Principal: not null }
+                ? new SignInResult(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, authenticateResult.Principal)
+                : BadRequest(new OpenIddictResponse
+                {
+                    Error = "Authorization failed", ErrorDescription = "The supplied authorization could not be verified."
+                });
+        }
+
+        if (request.IsClientCredentialsGrantType())
+        {
+            // if we get here, the client ID and secret are valid (verified by OpenIddict)
+
+            // grab the user associated with the client ID
+            BackOfficeIdentityUser? associatedUser = await _backOfficeUserClientCredentialsManager.FindUserAsync(request.ClientId!);
+
+            if (associatedUser is not null)
+            {
+                // log current datetime as last login (this also ensures that the user is not flagged as inactive)
+                associatedUser.LastLoginDateUtc = DateTime.UtcNow;
+                await _backOfficeUserManager.UpdateAsync(associatedUser);
+
+                return await SignInBackOfficeUser(associatedUser, request);
+            }
+
+            // if this happens, the OpenIddict applications have somehow gone out of sync with the Umbraco users
+            _logger.LogError("The user associated with the client ID ({clientId}) could not be found", request.ClientId);
+            return BadRequest(new OpenIddictResponse
+            {
+                Error = "Authorization failed", ErrorDescription = "The user associated with the supplied 'client_id' could not be found."
+            });
+        }
+
+        throw new InvalidOperationException("The requested grant type is not supported.");
     }
 
     [AllowAnonymous]

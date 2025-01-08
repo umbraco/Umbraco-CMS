@@ -132,7 +132,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
             {
                 OpenIddictConstants.Permissions.Endpoints.Authorization,
                 OpenIddictConstants.Permissions.Endpoints.Token,
-                OpenIddictConstants.Permissions.Endpoints.Logout,
+                OpenIddictConstants.Permissions.Endpoints.EndSession,
                 OpenIddictConstants.Permissions.Endpoints.Revocation,
                 OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                 OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
@@ -140,6 +140,28 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
             },
         };
     }
+
+    public async Task EnsureBackOfficeClientCredentialsApplicationAsync(string clientId, string clientSecret, CancellationToken cancellationToken = default)
+    {
+        var applicationDescriptor = new OpenIddictApplicationDescriptor
+        {
+            DisplayName = $"Umbraco client credentials back-office access: {clientId}",
+            ClientId = clientId,
+            ClientSecret = clientSecret,
+            ClientType = OpenIddictConstants.ClientTypes.Confidential,
+            Permissions =
+            {
+                OpenIddictConstants.Permissions.Endpoints.Token,
+                OpenIddictConstants.Permissions.Endpoints.Revocation,
+                OpenIddictConstants.Permissions.GrantTypes.ClientCredentials
+            }
+        };
+
+        await CreateOrUpdate(applicationDescriptor, cancellationToken);
+    }
+
+    public async Task DeleteBackOfficeClientCredentialsApplicationAsync(string clientId, CancellationToken cancellationToken = default)
+        => await Delete(clientId, cancellationToken);
 
     private static Uri CallbackUrlFor(Uri url, string relativePath) => new Uri($"{url.GetLeftPart(UriPartial.Authority)}/{relativePath.TrimStart(Constants.CharArrays.ForwardSlash)}");
 }

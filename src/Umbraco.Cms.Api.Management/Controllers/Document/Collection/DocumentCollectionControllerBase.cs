@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Collection;
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Collection}/{Constants.UdiEntityType.Document}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
-public abstract class DocumentCollectionControllerBase : ContentCollectionControllerBase<IContent, DocumentCollectionResponseModel, DocumentValueModel, DocumentVariantResponseModel>
+public abstract class DocumentCollectionControllerBase : ContentCollectionControllerBase<IContent, DocumentCollectionResponseModel, DocumentValueResponseModel, DocumentVariantResponseModel>
 {
     protected DocumentCollectionControllerBase(IUmbracoMapper mapper)
         : base(mapper)

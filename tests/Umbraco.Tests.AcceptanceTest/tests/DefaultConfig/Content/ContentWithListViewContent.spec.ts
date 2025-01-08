@@ -103,6 +103,7 @@ test('can publish content with a child in the list', async ({umbracoApi, umbraco
 
   // Act
   await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   await umbracoUi.content.goToContentInListViewWithName(childContentName);
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
@@ -161,10 +162,10 @@ test('child is removed from list after child content is deleted', async ({umbrac
   await umbracoUi.content.clickActionsMenuForContent(childContentName);
   await umbracoUi.content.clickTrashButton();
   await umbracoUi.content.clickConfirmTrashButton();
-  await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.doesListViewHaveNoItemsInList();
 
   // Assert
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.doesContentListHaveNoItemsInList();
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(0);
   expect(await umbracoApi.document.doesNameExist(childContentName)).toBeFalsy();
 });

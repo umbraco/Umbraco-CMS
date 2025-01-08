@@ -30,6 +30,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.BackgroundJobs;
@@ -193,6 +194,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton(RecurringBackgroundJobHostedService.CreateHostedServiceFactory);
         builder.Services.AddHostedService<RecurringBackgroundJobHostedServiceRunner>();
         builder.Services.AddHostedService<QueuedHostedService>();
+        builder.AddNotificationAsyncHandler<PostRuntimePremigrationsUpgradeNotification, NavigationInitializationNotificationHandler>();
+        builder.AddNotificationAsyncHandler<PostRuntimePremigrationsUpgradeNotification, PublishStatusInitializationNotificationHandler>();
 
         return builder;
     }
@@ -263,6 +266,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.ConfigureOptions<ConfigureApiVersioningOptions>();
         builder.Services.ConfigureOptions<ConfigureApiExplorerOptions>();
         builder.Services.AddApiVersioning().AddApiExplorer();
+        builder.Services.AddEndpointsApiExplorer();
         builder.Services.ConfigureOptions<UmbracoMvcConfigureOptions>();
         builder.Services.ConfigureOptions<UmbracoRequestLocalizationOptions>();
         builder.Services.TryAddEnumerable(ServiceDescriptor

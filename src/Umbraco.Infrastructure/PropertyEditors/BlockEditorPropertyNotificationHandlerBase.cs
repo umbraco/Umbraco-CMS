@@ -11,26 +11,26 @@ public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutIte
     where TBlockLayoutItem : IBlockLayoutItem, new()
 {
     private readonly ILogger<BlockEditorPropertyNotificationHandlerBase<TBlockLayoutItem>> _logger;
-    private readonly List<string> _udisToReplace = new List<string>();
+    private readonly List<string> _keysToReplace = new List<string>();
 
     protected BlockEditorPropertyNotificationHandlerBase(ILogger<BlockEditorPropertyNotificationHandlerBase<TBlockLayoutItem>> logger) => _logger = logger;
 
     protected override string FormatPropertyValue(string rawJson, bool onlyMissingKeys)
     {
-        // the block editor doesn't ever have missing UDIs so when this is true there's nothing to process
+        // the block editor doesn't ever have missing keys so when this is true there's nothing to process
         if (onlyMissingKeys)
         {
             return rawJson;
         }
 
-        return ReplaceBlockEditorUdis(rawJson);
+        return ReplaceBlockEditorKeys(rawJson);
     }
 
     // internal for tests
-    // the purpose of this method is to replace the content and settings UDIs throughout the JSON structure of a block editor value.
-    // the challenge is nested block editor values, which must also have their UDIs replaced. this becomes particularly tricky because
-    // other nested property values could also contain UDIs, which should *not* be replaced (i.e. a content picker value).
-    internal string ReplaceBlockEditorUdis(string rawJson, Func<Guid, Guid>? createGuid = null)
+    // the purpose of this method is to replace the content and settings keys throughout the JSON structure of a block editor value.
+    // the challenge is nested block editor values, which must also have their keys replaced. this becomes particularly tricky because
+    // other nested property values could also contain keys, which should *not* be replaced (i.e. a content picker value).
+    internal string ReplaceBlockEditorKeys(string rawJson, Func<Guid, Guid>? createGuid = null)
     {
         // used so we can test nicely
         createGuid ??= _ => Guid.NewGuid();
@@ -52,21 +52,21 @@ public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutIte
 
         rawJson = Regex.Replace(
             rawJson,
-            @"(umb:\/\/\w*\/)(\w*)",
+            @"\w{8}-\w{4}-\w{4}-\w{4}-\w{12}",
             match =>
             {
-                if (_udisToReplace.Contains(match.Value) == false)
+                if (_keysToReplace.Contains(match.Value) is false)
                 {
                     return match.Value;
                 }
 
-                var oldKey = Guid.Parse(match.Groups[2].Value);
+                var oldKey = Guid.Parse(match.Value);
                 if (oldToNewKeys.ContainsKey(oldKey) == false)
                 {
                     oldToNewKeys[oldKey] = createGuid(oldKey);
                 }
 
-                return $"{match.Groups[1]}{oldToNewKeys[oldKey].ToString("N")}";
+                return match.Value.Replace(match.Value, oldToNewKeys[oldKey].ToString("D"));
             });
 
         return rawJson;
@@ -109,7 +109,7 @@ public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutIte
         // we'll assume that the object is a data representation of a block based editor if it contains "contentData" and "settingsData".
         if (obj["contentData"] is JsonArray contentData && obj["settingsData"] is JsonArray settingsData)
         {
-            ParseUdis(contentData, settingsData);
+            ParseKeys(contentData, settingsData);
             return;
         }
 
@@ -119,28 +119,28 @@ public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutIte
         }
     }
 
-    private void ParseUdis(JsonArray contentData, JsonArray settingsData)
+    private void ParseKeys(JsonArray contentData, JsonArray settingsData)
     {
-        // grab all UDIs from the objects of contentData and settingsData
-        var udis = contentData.Select(c => c?["udi"])
-            .Union(settingsData.Select(s => s?["udi"]))
-            .Select(udiToken => udiToken?.GetValue<string>().NullOrWhiteSpaceAsNull())
+        // grab all keys from the objects of contentData and settingsData
+        var keys = contentData.Select(c => c?["key"])
+            .Union(settingsData.Select(s => s?["key"]))
+            .Select(keyToken => keyToken?.GetValue<string>().NullOrWhiteSpaceAsNull())
             .ToArray();
 
         // the following is solely for avoiding functionality wise breakage. we should consider removing it eventually, but for the time being it's harmless.
-        foreach (var udiToReplace in udis)
+        foreach (var keyToReplace in keys)
         {
-            if (UdiParser.TryParse(udiToReplace ?? string.Empty, out Udi? udi) == false || udi is not GuidUdi)
+            if (Guid.TryParse(keyToReplace ?? string.Empty, out Guid _) is false)
             {
-                throw new FormatException($"Could not parse a valid {nameof(GuidUdi)} from the string: \"{udiToReplace}\"");
+                throw new FormatException($"Could not parse a valid {nameof(Guid)} from the string: \"{keyToReplace}\"");
             }
         }
 
-        _udisToReplace.AddRange(udis.WhereNotNull());
+        _keysToReplace.AddRange(keys.WhereNotNull());
 
         foreach (JsonObject item in contentData.Union(settingsData).WhereNotNull().OfType<JsonObject>())
         {
-            foreach (JsonNode property in item.Where(p => p.Key != "contentTypeKey" && p.Key != "udi").Select(p => p.Value).WhereNotNull())
+            foreach (JsonNode property in item.Where(p => p.Key != "contentTypeKey" && p.Key != "key").Select(p => p.Value).WhereNotNull())
             {
                 TraverseProperty(property);
             }

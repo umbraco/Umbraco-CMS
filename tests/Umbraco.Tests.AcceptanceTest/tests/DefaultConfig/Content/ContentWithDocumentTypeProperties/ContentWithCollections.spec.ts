@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
@@ -16,13 +16,12 @@ test.beforeEach(async ({umbracoApi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
 test('can create content configured as a collection', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const noItemsToShowMessage = 'There are no items to show in the list.';
   await umbracoApi.documentType.createDocumentTypeWithCollectionId(documentTypeName, dataTypeData.id);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -33,11 +32,11 @@ test('can create content configured as a collection', async ({umbracoApi, umbrac
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButton();
-  
+
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isTabNameVisible('Collection');
-  await umbracoUi.content.doesDocumentWorkspaceHaveText(noItemsToShowMessage);
+  await umbracoUi.content.doesContentListHaveNoItemsInList();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
 });
 
@@ -68,6 +67,7 @@ test('can create child content in a collection', async ({umbracoApi, umbracoUi})
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickReloadButton();
   await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.doesDocumentTableColumnNameValuesMatch(expectedNames);
 
   // Clean
@@ -104,6 +104,7 @@ test('can create multiple child nodes in a collection', async ({umbracoApi, umbr
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickReloadButton();
   await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.doesDocumentTableColumnNameValuesMatch(expectedNames);
 
   // Clean

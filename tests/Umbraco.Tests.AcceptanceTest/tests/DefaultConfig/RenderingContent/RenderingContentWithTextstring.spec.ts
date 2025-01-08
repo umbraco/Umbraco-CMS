@@ -1,4 +1,4 @@
-﻿import {AliasHelper, test} from '@umbraco/playwright-testhelpers';
+import {AliasHelper, test} from '@umbraco/playwright-testhelpers';
 
 const contentName = 'Test Rendering Content';
 const documentTypeName = 'TestDocumentTypeForContent';
@@ -8,11 +8,11 @@ const propertyName = 'Test Textstring';
 let dataTypeData = null;
 
 test.beforeEach(async ({umbracoApi}) => {
-  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName); 
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.template.ensureNameNotExists(templateName);
 });
@@ -27,7 +27,7 @@ const textstrings = [
 ];
 
 for (const textstring of textstrings) {
-  test(`can render content with ${textstring.type}`, async ({umbracoApi, umbracoUi}) => {
+  test(`can render content with ${textstring.type}`, {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const textstringValue = textstring.value;
     const templateId = await umbracoApi.template.createTemplateWithDisplayingStringValue(templateName, AliasHelper.toAlias(propertyName));
@@ -39,6 +39,6 @@ for (const textstring of textstrings) {
     await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
     // Assert
-    await umbracoUi.contentRender.doesContentRenderValueHaveText(textstringValue);
+    await umbracoUi.contentRender.doesContentRenderValueContainText(textstringValue);
   });
 }

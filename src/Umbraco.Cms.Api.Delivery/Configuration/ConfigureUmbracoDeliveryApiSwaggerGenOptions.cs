@@ -21,6 +21,7 @@ public class ConfigureUmbracoDeliveryApiSwaggerGenOptions: IConfigureOptions<Swa
             });
 
         swaggerGenOptions.DocumentFilter<MimeTypeDocumentFilter>(DeliveryApiConfiguration.ApiName);
+        swaggerGenOptions.DocumentFilter<RemoveSecuritySchemesDocumentFilter>(DeliveryApiConfiguration.ApiName);
 
         swaggerGenOptions.OperationFilter<SwaggerContentDocumentationFilter>();
         swaggerGenOptions.OperationFilter<SwaggerMediaDocumentationFilter>();

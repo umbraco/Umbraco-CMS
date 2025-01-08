@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Serialization;
 
@@ -22,15 +23,17 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
 
     private BlockListPropertyValueConverter CreateConverter()
     {
-        var publishedSnapshotAccessor = GetPublishedSnapshotAccessor();
         var publishedModelFactory = new NoopPublishedModelFactory();
+        var blockVarianceHandler = new BlockEditorVarianceHandler(Mock.Of<ILanguageService>(), Mock.Of<IContentTypeService>());
         var editor = new BlockListPropertyValueConverter(
             Mock.Of<IProfilingLogger>(),
-            new BlockEditorConverter(publishedSnapshotAccessor, publishedModelFactory),
+            new BlockEditorConverter(GetPublishedContentTypeCache(), Mock.Of<ICacheManager>(), publishedModelFactory, Mock.Of<IVariationContextAccessor>(), blockVarianceHandler),
             Mock.Of<IContentTypeService>(),
             new ApiElementBuilder(Mock.Of<IOutputExpansionStrategyAccessor>()),
             new SystemTextJsonSerializer(),
-            new BlockListPropertyValueConstructorCache());
+            new BlockListPropertyValueConstructorCache(),
+            Mock.Of<IVariationContextAccessor>(),
+            blockVarianceHandler);
         return editor;
     }
 
@@ -123,7 +126,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         var editor = CreateConverter();
         var config = ConfigForMany();
         var propertyType = GetPropertyType(config);
-        var publishedElement = Mock.Of<IPublishedElement>();
+        var publishedElement = GetPublishedElement();
 
         string json = null;
         var converted =
@@ -146,7 +149,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         var editor = CreateConverter();
         var config = ConfigForMany();
         var propertyType = GetPropertyType(config);
-        var publishedElement = Mock.Of<IPublishedElement>();
+        var publishedElement = GetPublishedElement();
 
         var json = "{}";
         var converted =
@@ -170,11 +173,16 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
     ""layout"": {
         """ + Constants.PropertyEditors.Aliases.BlockList + @""": [
             {
-                ""contentUdi"": ""umb://element/e7dba547615b4e9ab4ab2a7674845bc9""
+                ""contentKey"": ""e7dba547-615b-4e9a-b4ab-2a7674845bc9""
             }
         ]
     },
-    ""contentData"": []
+    ""contentData"": [],
+    ""expose"": [
+        {
+            ""contentKey"": ""e7dba547-615b-4e9a-b4ab-2a7674845bc9""
+        }
+    ]
 }";
 
         converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
@@ -188,13 +196,18 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
     ""layout"": {
         """ + Constants.PropertyEditors.Aliases.BlockList + @""": [
             {
-                ""contentUdi"": ""umb://element/e7dba547615b4e9ab4ab2a7674845bc9""
+                ""contentKey"": ""e7dba547-615b-4e9a-b4ab-2a7674845bc9""
             }
         ]
     },
     ""contentData"": [
         {
-            ""udi"": ""umb://element/e7dba547615b4e9ab4ab2a7674845bc9""
+            ""key"": ""e7dba547-615b-4e9a-b4ab-2a7674845bc9""
+        }
+    ],
+    ""expose"": [
+        {
+            ""contentKey"": ""e7dba547-615b-4e9a-b4ab-2a7674845bc9""
         }
     ]
 }";
@@ -210,7 +223,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
     ""layout"": {
         """ + Constants.PropertyEditors.Aliases.BlockList + @""": [
             {
-                ""contentUdi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D""
+                ""contentKey"": ""1304E1DD-AC87-4396-84FE-8A399231CB3D""
             }
         ]
     },
@@ -218,6 +231,11 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         {
             ""contentTypeKey"": """ + ContentKey1 + @""",
             ""key"": ""1304E1DD-0000-4396-84FE-8A399231CB3D""
+        }
+    ],
+    ""expose"": [
+        {
+            ""contentKey"": ""1304E1DD-0000-4396-84FE-8A399231CB3D""
         }
     ]
 }";
@@ -234,21 +252,26 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         var editor = CreateConverter();
         var config = ConfigForMany();
         var propertyType = GetPropertyType(config);
-        var publishedElement = Mock.Of<IPublishedElement>();
+        var publishedElement = GetPublishedElement();
 
         var json = @"
 {
     ""layout"": {
         """ + Constants.PropertyEditors.Aliases.BlockList + @""": [
             {
-                ""contentUdi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D""
+                ""contentKey"": ""1304E1DD-AC87-4396-84FE-8A399231CB3D""
             }
         ]
     },
     ""contentData"": [
         {
             ""contentTypeKey"": """ + ContentKey1 + @""",
-            ""udi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D""
+            ""key"": ""1304E1DD-AC87-4396-84FE-8A399231CB3D""
+        }
+    ],
+    ""expose"": [
+        {
+            ""contentKey"": ""1304E1DD-AC87-4396-84FE-8A399231CB3D""
         }
     ]
 }";
@@ -262,7 +285,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), item0.Key);
         Assert.AreEqual("Test1", item0.ContentType.Alias);
         Assert.IsNull(converted[0].Settings);
-        Assert.AreEqual(UdiParser.Parse("umb://element/1304E1DDAC87439684FE8A399231CB3D"), converted[0].ContentUdi);
+        Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), converted[0].ContentKey);
     }
 
     [Test]
@@ -271,51 +294,61 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         var editor = CreateConverter();
         var config = ConfigForMany();
         var propertyType = GetPropertyType(config);
-        var publishedElement = Mock.Of<IPublishedElement>();
+        var publishedElement = GetPublishedElement();
 
         var json = @"
 {
     ""layout"": {
         """ + Constants.PropertyEditors.Aliases.BlockList + @""": [
             {
-                ""contentUdi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D"",
-                ""settingsUdi"": ""umb://element/1F613E26CE274898908A561437AF5100""
+                ""contentKey"": ""1304E1DD-AC87-4396-84FE-8A399231CB3D"",
+                ""settingsKey"": ""1F613E26-CE27-4898-908A-561437AF5100""
             },
             {
-                ""contentUdi"": ""umb://element/0A4A416E547D464FABCC6F345C17809A"",
-                ""settingsUdi"": ""umb://element/63027539B0DB45E7B70459762D4E83DD""
+                ""contentKey"": ""0A4A416E-547D-464F-ABCC-6F345C17809A"",
+                ""settingsKey"": ""63027539-B0DB-45E7-B704-59762D4E83DD""
             }
         ]
     },
     ""contentData"": [
         {
             ""contentTypeKey"": """ + ContentKey1 + @""",
-            ""udi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D""
+            ""key"": ""1304E1DD-AC87-4396-84FE-8A399231CB3D""
         },
         {
             ""contentTypeKey"": """ + ContentKey2 + @""",
-            ""udi"": ""umb://element/E05A034704424AB3A520E048E6197E79""
+            ""key"": ""E05A0347-0442-4AB3-A520-E048E6197E79""
         },
         {
             ""contentTypeKey"": """ + ContentKey2 + @""",
-            ""udi"": ""umb://element/0A4A416E547D464FABCC6F345C17809A""
+            ""key"": ""0A4A416E-547D-464F-ABCC-6F345C17809A""
         }
     ],
     ""settingsData"": [
         {
             ""contentTypeKey"": """ + SettingKey1 + @""",
-            ""udi"": ""umb://element/63027539B0DB45E7B70459762D4E83DD""
+            ""key"": ""63027539-B0DB-45E7-B704-59762D4E83DD""
         },
         {
             ""contentTypeKey"": """ + SettingKey2 + @""",
-            ""udi"": ""umb://element/1F613E26CE274898908A561437AF5100""
+            ""key"": ""1F613E26-CE27-4898-908A-561437AF5100""
         },
         {
             ""contentTypeKey"": """ + SettingKey2 + @""",
-            ""udi"": ""umb://element/BCF4BA3DA40C496C93EC58FAC85F18B9""
+            ""key"": ""BCF4BA3D-A40C-496C-93EC-58FAC85F18B9""
         }
-    ]
-}";
+    ],
+    ""expose"": [
+        {
+            ""contentKey"": ""1304E1DD-AC87-4396-84FE-8A399231CB3D""
+        },
+        {
+            ""contentKey"": ""E05A0347-0442-4AB3-A520-E048E6197E79""
+        },
+        {
+            ""contentKey"": ""0A4A416E-547D-464F-ABCC-6F345C17809A""
+        }
+    ]}";
 
         var converted =
             editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as
@@ -327,13 +360,13 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         var item0 = converted[0];
         Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), item0.Content.Key);
         Assert.AreEqual("Test1", item0.Content.ContentType.Alias);
-        Assert.AreEqual(Guid.Parse("1F613E26CE274898908A561437AF5100"), item0.Settings.Key);
+        Assert.AreEqual(Guid.Parse("1F613E26-CE27-4898-908A-561437AF5100"), item0.Settings!.Key);
         Assert.AreEqual("Setting2", item0.Settings.ContentType.Alias);
 
         var item1 = converted[1];
         Assert.AreEqual(Guid.Parse("0A4A416E-547D-464F-ABCC-6F345C17809A"), item1.Content.Key);
         Assert.AreEqual("Test2", item1.Content.ContentType.Alias);
-        Assert.AreEqual(Guid.Parse("63027539B0DB45E7B70459762D4E83DD"), item1.Settings.Key);
+        Assert.AreEqual(Guid.Parse("63027539-B0DB-45E7-B704-59762D4E83DD"), item1.Settings!.Key);
         Assert.AreEqual("Setting1", item1.Settings.ContentType.Alias);
     }
 
@@ -357,48 +390,59 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         };
 
         var propertyType = GetPropertyType(config);
-        var publishedElement = Mock.Of<IPublishedElement>();
+        var publishedElement = GetPublishedElement();
 
         var json = @"
 {
     ""layout"": {
         """ + Constants.PropertyEditors.Aliases.BlockList + @""": [
             {
-                ""contentUdi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D"",
-                ""settingsUdi"": ""umb://element/1F613E26CE274898908A561437AF5100""
+                ""contentKey"": ""1304E1DD-AC87-4396-84FE-8A399231CB3D"",
+                ""settingsKey"": ""1F613E26-CE27-4898-908A-561437AF5100""
             },
             {
-                ""contentUdi"": ""umb://element/0A4A416E547D464FABCC6F345C17809A"",
-                ""settingsUdi"": ""umb://element/63027539B0DB45E7B70459762D4E83DD""
+                ""contentKey"": ""0A4A416E-547D-464F-ABCC-6F345C17809A"",
+                ""settingsKey"": ""63027539-B0DB-45E7-B704-59762D4E83DD""
             }
         ]
     },
     ""contentData"": [
         {
             ""contentTypeKey"": """ + ContentKey1 + @""",
-            ""udi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D""
+            ""key"": ""1304E1DD-AC87-4396-84FE-8A399231CB3D""
         },
         {
             ""contentTypeKey"": """ + ContentKey2 + @""",
-            ""udi"": ""umb://element/E05A034704424AB3A520E048E6197E79""
+            ""key"": ""E05A0347-0442-4AB3-A520-E048E6197E79""
         },
         {
             ""contentTypeKey"": """ + ContentKey2 + @""",
-            ""udi"": ""umb://element/0A4A416E547D464FABCC6F345C17809A""
+            ""key"": ""0A4A416E-547D-464F-ABCC-6F345C17809A""
         }
     ],
     ""settingsData"": [
         {
             ""contentTypeKey"": """ + SettingKey1 + @""",
-            ""udi"": ""umb://element/63027539B0DB45E7B70459762D4E83DD""
+            ""key"": ""63027539-B0DB-45E7-B704-59762D4E83DD""
         },
         {
             ""contentTypeKey"": """ + SettingKey2 + @""",
-            ""udi"": ""umb://element/1F613E26CE274898908A561437AF5100""
+            ""key"": ""1F613E26-CE27-4898-908A-561437AF5100""
         },
         {
             ""contentTypeKey"": """ + SettingKey2 + @""",
-            ""udi"": ""umb://element/BCF4BA3DA40C496C93EC58FAC85F18B9""
+            ""key"": ""BCF4BA3D-A40C-496C-93EC-58FAC85F18B9""
+        }
+    ],
+    ""expose"": [
+        {
+            ""contentKey"": ""1304E1DD-AC87-4396-84FE-8A399231CB3D""
+        },
+        {
+            ""contentKey"": ""E05A0347-0442-4AB3-A520-E048E6197E79""
+        },
+        {
+            ""contentKey"": ""0A4A416E-547D-464F-ABCC-6F345C17809A""
         }
     ]
 }";

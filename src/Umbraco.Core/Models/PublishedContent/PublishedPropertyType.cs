@@ -196,7 +196,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
 
             var deliveryApiPropertyValueConverter = _converter as IDeliveryApiPropertyValueConverter;
 
-            _cacheLevel = _converter?.GetPropertyCacheLevel(this) ?? PropertyCacheLevel.Snapshot;
+            _cacheLevel = _converter?.GetPropertyCacheLevel(this) ?? PropertyCacheLevel.Elements;
             _deliveryApiCacheLevel = deliveryApiPropertyValueConverter?.GetDeliveryApiPropertyCacheLevel(this) ?? _cacheLevel;
             _deliveryApiCacheLevelForExpansion = deliveryApiPropertyValueConverter?.GetDeliveryApiPropertyCacheLevelForExpansion(this) ?? _cacheLevel;
             _modelClrType = _converter?.GetPropertyValueType(this) ?? typeof(object);

@@ -1,4 +1,4 @@
-﻿import {AliasHelper, test} from '@umbraco/playwright-testhelpers';
+import {AliasHelper, test} from '@umbraco/playwright-testhelpers';
 
 const contentName = 'Test Rendering Content';
 const documentTypeName = 'TestDocumentTypeForContent';
@@ -8,11 +8,11 @@ const propertyName = 'Test Numeric';
 let dataTypeData = null;
 
 test.beforeEach(async ({umbracoApi}) => {
-  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName); 
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.template.ensureNameNotExists(templateName);
 });
@@ -35,6 +35,6 @@ for (const numeric of numerics) {
     await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
     // Assert
-    await umbracoUi.contentRender.doesContentRenderValueHaveText(numericValue);
+    await umbracoUi.contentRender.doesContentRenderValueContainText(numericValue);
   });
 }

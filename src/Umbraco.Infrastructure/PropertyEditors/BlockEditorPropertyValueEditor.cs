@@ -1,12 +1,15 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -18,11 +21,8 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
     where TLayout : class, IBlockLayoutItem, new()
 {
     private readonly IJsonSerializer _jsonSerializer;
-    private BlockEditorValues<TValue, TLayout>? _blockEditorValues;
-    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
-    private readonly PropertyEditorCollection _propertyEditors;
-    private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactories;
 
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V16.")]
     protected BlockEditorPropertyValueEditor(
         DataEditorAttribute attribute,
         PropertyEditorCollection propertyEditors,
@@ -33,77 +33,50 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper)
-        : base(attribute, propertyEditors, dataTypeConfigurationCache, textService, logger, shortStringHelper, jsonSerializer, ioHelper, dataValueReferenceFactories)
+        : this(propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, shortStringHelper, jsonSerializer,
+            StaticServiceProvider.Instance.GetRequiredService<BlockEditorVarianceHandler>(),
+            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
+            ioHelper,
+            attribute)
     {
-        _propertyEditors = propertyEditors;
-        _dataValueReferenceFactories = dataValueReferenceFactories;
-        _dataTypeConfigurationCache = dataTypeConfigurationCache;
-        _jsonSerializer = jsonSerializer;
     }
 
-    protected BlockEditorValues<TValue, TLayout> BlockEditorValues
-    {
-        get => _blockEditorValues ?? throw new NullReferenceException($"The property {nameof(BlockEditorValues)} must be initialized at value editor construction");
-        set => _blockEditorValues = value;
-    }
+    protected BlockEditorPropertyValueEditor(
+        PropertyEditorCollection propertyEditors,
+        DataValueReferenceFactoryCollection dataValueReferenceFactories,
+        IDataTypeConfigurationCache dataTypeConfigurationCache,
+        IShortStringHelper shortStringHelper,
+        IJsonSerializer jsonSerializer,
+        BlockEditorVarianceHandler blockEditorVarianceHandler,
+        ILanguageService languageService,
+        IIOHelper ioHelper,
+        DataEditorAttribute attribute)
+        : base(propertyEditors, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, dataValueReferenceFactories, blockEditorVarianceHandler, languageService, ioHelper, attribute) =>
+        _jsonSerializer = jsonSerializer;
 
     /// <inheritdoc />
     public override IEnumerable<UmbracoEntityReference> GetReferences(object? value)
     {
-        // Group by property editor alias to avoid duplicate lookups and optimize value parsing
-        foreach (var valuesByPropertyEditorAlias in GetAllPropertyValues(value).GroupBy(x => x.PropertyType.PropertyEditorAlias, x => x.Value))
-        {
-            if (!_propertyEditors.TryGet(valuesByPropertyEditorAlias.Key, out IDataEditor? dataEditor))
-            {
-                continue;
-            }
-
-            // Use distinct values to avoid duplicate parsing of the same value
-            foreach (UmbracoEntityReference reference in _dataValueReferenceFactories.GetReferences(dataEditor, valuesByPropertyEditorAlias.Distinct()))
-            {
-                yield return reference;
-            }
-        }
+        TValue? blockValue = ParseBlockValue(value);
+        return blockValue is not null
+            ? GetBlockValueReferences(blockValue)
+            : Enumerable.Empty<UmbracoEntityReference>();
     }
 
     /// <inheritdoc />
     public override IEnumerable<ITag> GetTags(object? value, object? dataTypeConfiguration, int? languageId)
     {
-        foreach (BlockItemData.BlockPropertyValue propertyValue in GetAllPropertyValues(value))
-        {
-            if (!_propertyEditors.TryGet(propertyValue.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor) ||
-                dataEditor.GetValueEditor() is not IDataValueTags dataValueTags)
-            {
-                continue;
-            }
-
-            object? configuration = _dataTypeConfigurationCache.GetConfiguration(propertyValue.PropertyType.DataTypeKey);
-            foreach (ITag tag in dataValueTags.GetTags(propertyValue.Value, configuration, languageId))
-            {
-                yield return tag;
-            }
-        }
+        TValue? blockValue = ParseBlockValue(value);
+        return blockValue is not null
+            ? GetBlockValueTags(blockValue, languageId)
+            : Enumerable.Empty<ITag>();
     }
 
-    private IEnumerable<BlockItemData.BlockPropertyValue> GetAllPropertyValues(object? value)
+    private TValue? ParseBlockValue(object? value)
     {
         var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
-
-        BlockEditorData<TValue, TLayout>? blockEditorData = BlockEditorValues.DeserializeAndClean(rawJson);
-        if (blockEditorData is null)
-        {
-            yield break;
-        }
-
-        // Return all property values from the content and settings data
-        IEnumerable<BlockItemData> data = blockEditorData.BlockValue.ContentData.Concat(blockEditorData.BlockValue.SettingsData);
-        foreach (BlockItemData.BlockPropertyValue propertyValue in data.SelectMany(x => x.PropertyValues.Select(x => x.Value)))
-        {
-            yield return propertyValue;
-        }
+        return BlockEditorValues.DeserializeAndClean(rawJson)?.BlockValue;
     }
-
-    // note: there is NO variant support here
 
     /// <summary>
     ///     Ensure that sub-editor values are translated through their ToEditor methods
@@ -132,7 +105,7 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
             return string.Empty;
         }
 
-        MapBlockValueToEditor(property, blockEditorData.BlockValue);
+        MapBlockValueToEditor(property, blockEditorData.BlockValue, culture, segment);
 
         // return json convertable object
         return blockEditorData.BlockValue;

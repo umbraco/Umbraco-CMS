@@ -14,7 +14,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(mediaFileName);
 });
 
-//TODO: It is currently possible to create an empty mediaFile, should not be possible
+//TODO: Remove skip when the frontend is ready. Currently it is possible to create an empty media file, should not be possible
 test.skip('can not create a empty media file', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
@@ -27,7 +27,7 @@ test.skip('can not create a empty media file', async ({umbracoApi, umbracoUi}) =
 
   // Assert
   await umbracoUi.media.isErrorNotificationVisible();
-  await umbracoUi.media.isTreeItemVisible(mediaFileName, false);
+  await umbracoUi.media.isMediaTreeItemVisible(mediaFileName, false);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
 });
 
@@ -40,13 +40,13 @@ test('can rename a media file', async ({umbracoApi, umbracoUi}) => {
 
   // Arrange
   await umbracoUi.waitForTimeout(1000);
-  await umbracoUi.media.clickLabelWithName(wrongMediaFileName, true, true);
+  await umbracoUi.media.clickLabelWithName(wrongMediaFileName, true);
   await umbracoUi.media.enterMediaItemName(mediaFileName);
   await umbracoUi.media.clickSaveButton();
 
   // Assert
   await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.media.isTreeItemVisible(mediaFileName);
+  await umbracoUi.media.isMediaTreeItemVisible(mediaFileName);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeTruthy();
 });
 
@@ -66,7 +66,6 @@ for (const mediaFileType of mediaFileTypes) {
     await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
     // Act
-    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.media.clickCreateMediaWithType(mediaFileType.fileName);
     await umbracoUi.media.enterMediaItemName(mediaFileType.fileName);
     await umbracoUi.media.uploadFile('./fixtures/mediaLibrary/' + mediaFileType.filePath);
@@ -74,29 +73,14 @@ for (const mediaFileType of mediaFileTypes) {
 
     // Assert
     await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-    await umbracoUi.media.isTreeItemVisible(mediaFileType.fileName);
+    await umbracoUi.media.reloadMediaTree();
+    await umbracoUi.media.isMediaTreeItemVisible(mediaFileType.fileName);
     expect(await umbracoApi.media.doesNameExist(mediaFileType.fileName)).toBeTruthy();
 
     // Clean
     await umbracoApi.media.ensureNameNotExists(mediaFileType.fileName);
   });
 }
-
-// TODO: Currently there is no delete button for the media, only trash, is this correct?
-test.skip('can delete a media file', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
-  await umbracoUi.media.goToSection(ConstantHelper.sections.media);
-  await umbracoApi.media.doesNameExist(mediaFileName);
-
-  // Act
-  await umbracoUi.media.deleteMediaItem(mediaFileName);
-
-  // Assert
-  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
-  await umbracoUi.media.isTreeItemVisible(mediaFileName, false);
-  expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
-});
 
 test('can create a folder', async ({umbracoApi, umbracoUi}) => {
   // Arrange
@@ -110,16 +94,15 @@ test('can create a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickSaveButton();
 
   // Assert
-  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.folderCreated);
-  await umbracoUi.media.isTreeItemVisible(folderName);
+  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.media.isMediaTreeItemVisible(folderName);
   expect(await umbracoApi.media.doesNameExist(folderName)).toBeTruthy();
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(folderName);
 });
 
-// TODO: Currently there is no delete button for the media, only trash, is this correct?
-test.skip('can delete a folder', async ({umbracoApi, umbracoUi}) => {
+test('can trash a folder', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.media.ensureNameNotExists(folderName);
   await umbracoApi.media.createDefaultMediaFolder(folderName);
@@ -128,11 +111,11 @@ test.skip('can delete a folder', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.media.clickActionsMenuForName(folderName);
-  await umbracoUi.media.clickDeleteButton();
-  await umbracoUi.media.clickConfirmToDeleteButton();
+  await umbracoUi.media.clickTrashButton();
+  await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
-  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.folderDeleted);
+  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
   await umbracoUi.media.isTreeItemVisible(folderName, false);
   expect(await umbracoApi.media.doesNameExist(folderName)).toBeFalsy();
 });
@@ -152,10 +135,11 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickSaveButton();
 
   // Assert
-  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.folderCreated);
-  await umbracoUi.media.isTreeItemVisible(parentFolderName);
+  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.media.isMediaTreeItemVisible(parentFolderName);
+  await umbracoUi.media.isMediaTreeItemVisible(folderName, false);
   await umbracoUi.media.clickMediaCaretButtonForName(parentFolderName);
-  await umbracoUi.media.isTreeItemVisible(folderName);
+  await umbracoUi.media.isMediaTreeItemVisible(folderName, true);
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(parentFolderName);
@@ -170,11 +154,11 @@ test('can search for a media file', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
   // Act
-  await umbracoUi.media.searchForMediaItemByName(mediaFileName);
+  await umbracoUi.media.searchForMediaItemByName(secondMediaFile);
 
   // Assert
   await umbracoUi.media.doesMediaCardsContainAmount(1);
-  await umbracoUi.media.doesMediaCardContainText(mediaFileName);
+  await umbracoUi.media.doesMediaCardContainText(secondMediaFile);
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(secondMediaFile);
@@ -217,7 +201,7 @@ test('can restore a media item from the recycle bin', async ({umbracoApi, umbrac
   await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.restored);
   await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false);
   await umbracoUi.media.reloadMediaTree();
-  await umbracoUi.media.isTreeItemVisible(mediaFileName);
+  await umbracoUi.media.isMediaTreeItemVisible(mediaFileName);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeTruthy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeFalsy();
 
@@ -256,8 +240,8 @@ test('can empty the recycle bin', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickConfirmEmptyRecycleBinButton();
 
   // Assert
-  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.emptiedRecycleBin);
   await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false);
+  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.emptiedRecycleBin);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeFalsy();
 });

@@ -199,6 +199,10 @@ public class CoreRuntime : IRuntime
                 break;
         }
 
+        //
+        var postRuntimePremigrationsUpgradeNotification = new PostRuntimePremigrationsUpgradeNotification();
+        await _eventAggregator.PublishAsync(postRuntimePremigrationsUpgradeNotification, cancellationToken);
+
         // If level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
         var unattendedUpgradeNotification = new RuntimeUnattendedUpgradeNotification();
         await _eventAggregator.PublishAsync(unattendedUpgradeNotification, cancellationToken);
@@ -222,7 +226,7 @@ public class CoreRuntime : IRuntime
         }
 
         // Initialize the components
-        _components.Initialize();
+        await _components.InitializeAsync(isRestarting, cancellationToken);
 
         await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(State.Level, isRestarting), cancellationToken);
 
@@ -236,7 +240,7 @@ public class CoreRuntime : IRuntime
 
     private async Task StopAsync(CancellationToken cancellationToken, bool isRestarting)
     {
-        _components.Terminate();
+        await _components.TerminateAsync(isRestarting, cancellationToken);
         await _eventAggregator.PublishAsync(new UmbracoApplicationStoppingNotification(isRestarting), cancellationToken);
     }
 

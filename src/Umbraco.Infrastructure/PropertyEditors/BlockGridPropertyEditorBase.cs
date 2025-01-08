@@ -8,6 +8,8 @@ using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -38,7 +40,7 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<BlockGridEditorPropertyValueEditor>(Attribute!);
 
-    private class BlockGridEditorPropertyValueEditor : BlockEditorPropertyValueEditor<BlockGridValue, BlockGridLayoutItem>
+    internal class BlockGridEditorPropertyValueEditor : BlockEditorPropertyValueEditor<BlockGridValue, BlockGridLayoutItem>
     {
         public BlockGridEditorPropertyValueEditor(
             DataEditorAttribute attribute,
@@ -49,15 +51,19 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
             ILogger<BlockGridEditorPropertyValueEditor> logger,
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
-            IIOHelper ioHelper,
             IBlockEditorElementTypeCache elementTypeCache,
-            IPropertyValidationService propertyValidationService)
-            : base(attribute, propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
+            IPropertyValidationService propertyValidationService,
+            BlockEditorVarianceHandler blockEditorVarianceHandler,
+            ILanguageService languageService,
+            IIOHelper ioHelper)
+            : base(propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, blockEditorVarianceHandler, languageService, ioHelper, attribute)
         {
             BlockEditorValues = new BlockEditorValues<BlockGridValue, BlockGridLayoutItem>(new BlockGridEditorDataConverter(jsonSerializer), elementTypeCache, logger);
             Validators.Add(new BlockEditorValidator<BlockGridValue, BlockGridLayoutItem>(propertyValidationService, BlockEditorValues, elementTypeCache));
             Validators.Add(new MinMaxValidator(BlockEditorValues, textService));
         }
+
+        protected override BlockGridValue CreateWithLayout(IEnumerable<BlockGridLayoutItem> layout) => new(layout);
 
         private class MinMaxValidator : BlockEditorMinMaxValidatorBase<BlockGridValue, BlockGridLayoutItem>
         {
@@ -67,7 +73,7 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
                 : base(textService) =>
                 _blockEditorValues = blockEditorValues;
 
-            public override IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+            public override IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
             {
                 if (dataTypeConfiguration is not BlockGridConfiguration blockConfig)
                 {

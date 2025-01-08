@@ -30,13 +30,13 @@ public static class UserGroupExtensions
     }
 
     public static bool IsSystemUserGroup(this IUserGroup group) =>
-        IsSystemUserGroup(group.Alias);
+        IsSystemUserGroup(group.Key);
 
     public static bool IsSystemUserGroup(this IReadOnlyUserGroup group) =>
-        IsSystemUserGroup(group.Alias);
+        IsSystemUserGroup(group.Key);
 
-    private static bool IsSystemUserGroup(this string? groupAlias) =>
-        groupAlias == Constants.Security.AdminGroupAlias
-        || groupAlias == Constants.Security.SensitiveDataGroupAlias
-        || groupAlias == Constants.Security.TranslatorGroupAlias;
+    private static bool IsSystemUserGroup(this Guid? groupKey) =>
+        groupKey == Constants.Security.AdminGroupKey
+        || groupKey == Constants.Security.SensitiveDataGroupKey
+        || groupKey == Constants.Security.TranslatorGroupKey;
 }

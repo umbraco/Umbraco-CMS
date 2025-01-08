@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -35,6 +36,7 @@ public class DataValueEditorReuseTests
         _propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>));
         _dataValueReferenceFactories = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>);
 
+        var blockVarianceHandler = new BlockEditorVarianceHandler(Mock.Of<ILanguageService>(), Mock.Of<IContentTypeService>());
         _dataValueEditorFactoryMock
             .Setup(m =>
                 m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>(), It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()))
@@ -49,8 +51,11 @@ public class DataValueEditorReuseTests
                 Mock.Of<ILogger<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>>(),
                 Mock.Of<IShortStringHelper>(),
                 Mock.Of<IJsonSerializer>(),
-                Mock.Of<IIOHelper>(),
-                Mock.Of<IPropertyValidationService>()));
+                Mock.Of<IPropertyValidationService>(),
+                blockVarianceHandler,
+                Mock.Of<ILanguageService>(),
+                Mock.Of<IIOHelper>()
+                ));
     }
 
     [Test]
@@ -96,7 +101,6 @@ public class DataValueEditorReuseTests
     {
         var blockListPropertyEditor = new BlockListPropertyEditor(
             _dataValueEditorFactoryMock.Object,
-            _propertyEditorCollection,
             Mock.Of<IIOHelper>(),
             Mock.Of<IBlockValuePropertyIndexValueFactory>(),
             Mock.Of<IJsonSerializer>());
@@ -117,7 +121,6 @@ public class DataValueEditorReuseTests
     {
         var blockListPropertyEditor = new BlockListPropertyEditor(
             _dataValueEditorFactoryMock.Object,
-            _propertyEditorCollection,
             Mock.Of<IIOHelper>(),
             Mock.Of<IBlockValuePropertyIndexValueFactory>(),
             Mock.Of<IJsonSerializer>());

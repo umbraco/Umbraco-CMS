@@ -27,13 +27,8 @@ public sealed class HtmlLocalLinkParser
 
     private readonly IPublishedUrlProvider _publishedUrlProvider;
 
-    private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-
-    public HtmlLocalLinkParser(
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IPublishedUrlProvider publishedUrlProvider)
+    public HtmlLocalLinkParser(IPublishedUrlProvider publishedUrlProvider)
     {
-        _umbracoContextAccessor = umbracoContextAccessor;
         _publishedUrlProvider = publishedUrlProvider;
     }
 
@@ -54,23 +49,7 @@ public sealed class HtmlLocalLinkParser
     /// <param name="text"></param>
     /// <param name="preview"></param>
     /// <returns></returns>
-    public string EnsureInternalLinks(string text, bool preview)
-    {
-        if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
-        {
-            throw new InvalidOperationException("Could not parse internal links, there is no current UmbracoContext");
-        }
-
-        if (!preview)
-        {
-            return EnsureInternalLinks(text);
-        }
-
-        using (umbracoContext.ForcedPreview(preview)) // force for URL provider
-        {
-            return EnsureInternalLinks(text);
-        }
-    }
+    public string EnsureInternalLinks(string text, bool preview) => EnsureInternalLinks(text);
 
     /// <summary>
     ///     Parses the string looking for the {localLink} syntax and updates them to their correct links.
@@ -79,11 +58,6 @@ public sealed class HtmlLocalLinkParser
     /// <returns></returns>
     public string EnsureInternalLinks(string text)
     {
-        if (!_umbracoContextAccessor.TryGetUmbracoContext(out _))
-        {
-            throw new InvalidOperationException("Could not parse internal links, there is no current UmbracoContext");
-        }
-
         foreach (LocalLinkTag tagData in FindLocalLinkIds(text))
         {
             if (tagData.Udi is not null)
@@ -144,8 +118,8 @@ public sealed class HtmlLocalLinkParser
         }
     }
 
-    // todo remove at some point?
-    private IEnumerable<LocalLinkTag> FindLegacyLocalLinkIds(string text)
+    [Obsolete("This is a temporary method to support legacy formats until we are sure all data has been migration. Scheduled for removal in v17")]
+    public IEnumerable<LocalLinkTag> FindLegacyLocalLinkIds(string text)
     {
         // Parse internal links
         MatchCollection tags = LocalLinkPattern.Matches(text);
@@ -174,7 +148,8 @@ public sealed class HtmlLocalLinkParser
         }
     }
 
-    private class LocalLinkTag
+    [Obsolete("This is a temporary method to support legacy formats until we are sure all data has been migration. Scheduled for removal in v17")]
+    public class LocalLinkTag
     {
         public LocalLinkTag(int? intId, GuidUdi? udi, string tagHref)
         {

@@ -20,11 +20,10 @@ test('can create a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.stylesheet.clickActionsMenuAtRoot();
   await umbracoUi.stylesheet.createFolder(stylesheetFolderName);
-  // TODO: remove it later
   await umbracoUi.waitForTimeout(1000);
 
   // Assert
-  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.folderCreated);
+  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.stylesheet.doesFolderExist(stylesheetFolderName)).toBeTruthy();
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetFolderName);
 });
@@ -40,7 +39,7 @@ test('can delete a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.stylesheet.deleteFolder();
 
   // Assert
-  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.folderDeleted);
+  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
   expect(await umbracoApi.stylesheet.doesFolderExist(stylesheetFolderName)).toBeFalsy();
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetFolderName, false, false);
 });
@@ -57,7 +56,7 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.stylesheet.createFolder(childFolderName);
 
   //Assert
-  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.folderCreated);
+  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.stylesheet.doesNameExist(childFolderName)).toBeTruthy();
   const styleChildren = await umbracoApi.stylesheet.getChildren('/' + stylesheetFolderName);
   expect(styleChildren[0].path).toBe('/' + stylesheetFolderName + '/' + childFolderName);
@@ -79,8 +78,8 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   await umbracoUi.stylesheet.clickActionsMenuForStylesheet(childFolderName);
   await umbracoUi.stylesheet.createFolder(childOfChildFolderName);
 
-  //Assert
-  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.folderCreated);
+  // Assert
+  await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.stylesheet.doesNameExist(childOfChildFolderName)).toBeTruthy();
   const styleChildren = await umbracoApi.stylesheet.getChildren('/' + stylesheetFolderName + '/' + childFolderName);
   expect(styleChildren[0].path).toBe('/' + stylesheetFolderName + '/' + childFolderName + '/' + childOfChildFolderName);

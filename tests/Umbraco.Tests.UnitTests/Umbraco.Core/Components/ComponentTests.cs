@@ -80,7 +80,9 @@ public class ComponentTests
             Options.Create(new ContentSettings()));
         var eventAggregator = Mock.Of<IEventAggregator>();
         var scopeProvider = new ScopeProvider(
-            new AmbientScopeStack(), new AmbientScopeContextStack(),Mock.Of<IDistributedLockingMechanismFactory>(),
+            new AmbientScopeStack(),
+            new AmbientScopeContextStack(),
+            Mock.Of<IDistributedLockingMechanismFactory>(),
             f,
             fs,
             new TestOptionsMonitor<CoreDebugSettings>(coreDebug),
@@ -106,14 +108,10 @@ public class ComponentTests
 
     private static TypeLoader MockTypeLoader() => new(
         Mock.Of<ITypeFinder>(),
-        new VaryingRuntimeHash(),
-        Mock.Of<IAppPolicyCache>(),
-        new DirectoryInfo(TestHelper.GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)),
-        Mock.Of<ILogger<TypeLoader>>(),
-        Mock.Of<IProfiler>());
+        Mock.Of<ILogger<TypeLoader>>());
 
     [Test]
-    public void Boot1A()
+    public async Task Boot1A()
     {
         var register = MockRegister();
         var composition = new UmbracoBuilder(register, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
@@ -136,16 +134,6 @@ public class ComponentTests
                 if (type == typeof(Composer1))
                 {
                     return new Composer1();
-                }
-
-                if (type == typeof(Composer5))
-                {
-                    return new Composer5();
-                }
-
-                if (type == typeof(Component5))
-                {
-                    return new Component5(new SomeResource());
                 }
 
                 if (type == typeof(IProfilingLogger))
@@ -176,9 +164,9 @@ public class ComponentTests
         var components = builder.CreateCollection(factory);
 
         Assert.IsEmpty(components);
-        components.Initialize();
+        await components.InitializeAsync(false, default);
         Assert.IsEmpty(Initialized);
-        components.Terminate();
+        await components.TerminateAsync(false, default);
         Assert.IsEmpty(Terminated);
     }
 
@@ -277,7 +265,7 @@ public class ComponentTests
     }
 
     [Test]
-    public void Initialize()
+    public async Task Initialize()
     {
         Composed.Clear();
         Initialized.Clear();
@@ -293,26 +281,6 @@ public class ComponentTests
                 if (type == typeof(Composer1))
                 {
                     return new Composer1();
-                }
-
-                if (type == typeof(Composer5))
-                {
-                    return new Composer5();
-                }
-
-                if (type == typeof(Composer5a))
-                {
-                    return new Composer5a();
-                }
-
-                if (type == typeof(Component5))
-                {
-                    return new Component5(new SomeResource());
-                }
-
-                if (type == typeof(Component5a))
-                {
-                    return new Component5a();
                 }
 
                 if (type == typeof(IProfilingLogger))
@@ -335,24 +303,15 @@ public class ComponentTests
         });
         var composition = new UmbracoBuilder(register, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
 
-        Type[] types = { typeof(Composer1), typeof(Composer5), typeof(Composer5a) };
+        Type[] types = { typeof(Composer1) };
         var composers = new ComposerGraph(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<ILogger<ComposerGraph>>());
 
         Assert.IsEmpty(Composed);
         composers.Compose();
-        AssertTypeArray(TypeArray<Composer1, Composer5, Composer5a>(), Composed);
 
         var builder = composition.WithCollectionBuilder<ComponentCollectionBuilder>();
         builder.RegisterWith(register);
         var components = builder.CreateCollection(factory);
-
-        Assert.IsEmpty(Initialized);
-        components.Initialize();
-        AssertTypeArray(TypeArray<Component5, Component5a>(), Initialized);
-
-        Assert.IsEmpty(Terminated);
-        components.Terminate();
-        AssertTypeArray(TypeArray<Component5a, Component5>(), Terminated);
     }
 
     [Test]
@@ -489,11 +448,7 @@ public class ComponentTests
         var typeFinder = TestHelper.GetTypeFinder();
         var typeLoader = new TypeLoader(
             typeFinder,
-            new VaryingRuntimeHash(),
-            AppCaches.Disabled.RuntimeCache,
-            new DirectoryInfo(TestHelper.GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)),
-            Mock.Of<ILogger<TypeLoader>>(),
-            Mock.Of<IProfiler>());
+            Mock.Of<ILogger<TypeLoader>>());
 
         var register = MockRegister();
         var builder = new UmbracoBuilder(register, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
@@ -532,43 +487,6 @@ public class ComponentTests
     }
 
     public class Composer4 : TestComposerBase
-    {
-    }
-
-    public class Composer5 : TestComposerBase
-    {
-        public override void Compose(IUmbracoBuilder builder)
-        {
-            base.Compose(builder);
-            builder.Components().Append<Component5>();
-        }
-    }
-
-    [ComposeAfter(typeof(Composer5))]
-    public class Composer5a : TestComposerBase
-    {
-        public override void Compose(IUmbracoBuilder builder)
-        {
-            base.Compose(builder);
-            builder.Components().Append<Component5a>();
-        }
-    }
-
-    public class TestComponentBase : IComponent
-    {
-        public virtual void Initialize() => Initialized.Add(GetType());
-
-        public virtual void Terminate() => Terminated.Add(GetType());
-    }
-
-    public class Component5 : TestComponentBase
-    {
-        private readonly ISomeResource _resource;
-
-        public Component5(ISomeResource resource) => _resource = resource;
-    }
-
-    public class Component5a : TestComponentBase
     {
     }
 
