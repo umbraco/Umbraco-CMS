@@ -1,5 +1,5 @@
-import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../property-editors/block-list-editor/constants.js';
-import type { UmbBlockListValueModel } from '../../types.js';
+import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../../property-editors/block-list-editor/constants.js';
+import type { UmbBlockListValueModel } from '../../../types.js';
 import type { UmbBlockClipboardEntryValueModel } from '@umbraco-cms/backoffice/block';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbClipboardPasteTranslator } from '@umbraco-cms/backoffice/clipboard';

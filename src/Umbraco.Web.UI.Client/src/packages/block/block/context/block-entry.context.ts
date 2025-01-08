@@ -24,8 +24,6 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbClipboardEntryDetailRepository } from '@umbraco-cms/backoffice/clipboard';
 
 export abstract class UmbBlockEntryContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType>,

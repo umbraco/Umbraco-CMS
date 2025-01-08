@@ -2,10 +2,9 @@ import { expect } from '@open-wc/testing';
 import { customElement } from 'lit/decorators.js';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbBlockClipboardEntryValueModel } from 'src/packages/block/block/types';
-import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../property-editors/constants';
-import type { UmbBlockGridValueModel } from '../../types';
-import { UmbBlockGridToBlockClipboardCopyTranslator } from './block-grid-to-block-copy-translator';
-import { UmbBlockGridToGridBlockClipboardCopyTranslator } from './block-grid-to-grid-block-copy-translator';
+import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../../property-editors/constants';
+import type { UmbBlockGridValueModel } from '../../../types';
+import { UmbBlockGridToGridBlockClipboardCopyTranslator } from './block-grid-to-grid-block-copy-translator.js';
 
 @customElement('test-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}

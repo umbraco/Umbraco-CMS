@@ -1,5 +1,5 @@
-import type { UmbBlockGridLayoutModel, UmbBlockGridValueModel } from '../../types.js';
-import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../constants.js';
+import type { UmbBlockGridLayoutModel, UmbBlockGridValueModel } from '../../../types.js';
+import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../../constants.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbClipboardPasteTranslator } from '@umbraco-cms/backoffice/clipboard';
 import type { UmbBlockClipboardEntryValueModel, UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';

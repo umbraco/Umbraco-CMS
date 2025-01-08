@@ -6,6 +6,7 @@ export interface ManifestPropertyActionPasteFromClipboardKind
 	kind: 'pasteFromClipboard';
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MetaPropertyActionPasteFromClipboardKind extends MetaPropertyAction {}
 
 declare global {

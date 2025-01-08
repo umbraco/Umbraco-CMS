@@ -1,9 +1,9 @@
 import { expect } from '@open-wc/testing';
 import { customElement } from 'lit/decorators.js';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbBlockListValueModel } from '../../types';
+import type { UmbBlockListValueModel } from '../../../types.js';
 import type { UmbBlockClipboardEntryValueModel } from 'src/packages/block/block/types';
-import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../property-editors/constants';
+import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../../property-editors/constants.js';
 import { UmbBlockToBlockListClipboardPasteTranslator } from './block-to-block-list-paste-translator';
 
 @customElement('test-controller-host')
