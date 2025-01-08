@@ -1,16 +1,15 @@
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.context-token.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { ManifestGranularUserPermission } from '@umbraco-cms/backoffice/user-permission';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { filterFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-user-group-granular-permission-list')
 export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 	@state()
-	_extensionElements: Array<HTMLElement> = [];
+	_userGroupPermissions?: Array<any>;
 
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
@@ -19,45 +18,15 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 
 		this.consumeContext(UMB_USER_GROUP_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
+
+			this.observe(
+				this.#workspaceContext.data,
+				(userGroup) => {
+					this._userGroupPermissions = userGroup?.permissions;
+				},
+				'umbUserGroupGranularPermissionObserver',
+			);
 		});
-
-		this.#observeExtensionRegistry();
-	}
-
-	#observeExtensionRegistry() {
-		this.observe(umbExtensionsRegistry.byType('userGranularPermission'), (manifests) => {
-			if (!manifests) {
-				this._extensionElements = [];
-				return;
-			}
-
-			manifests.forEach(async (manifest) => this.#extensionElementSetup(manifest));
-		});
-	}
-
-	async #extensionElementSetup(manifest: ManifestGranularUserPermission) {
-		const element = (await createExtensionElement(manifest)) as any;
-		if (!element) throw new Error(`Failed to create extension element for manifest ${manifest.alias}`);
-		if (!this.#workspaceContext) throw new Error('User Group Workspace context is not available');
-
-		this.observe(
-			this.#workspaceContext.data,
-			(userGroup) => {
-				if (!userGroup) return;
-
-				const schemaType = manifest.meta.schemaType;
-				const permissionsForSchemaType =
-					userGroup.permissions.filter((permission) => permission.$type === schemaType) || [];
-
-				element.permissions = permissionsForSchemaType;
-				element.manifest = manifest;
-				element.addEventListener(UmbChangeEvent.TYPE, this.#onValueChange);
-			},
-			'umbUserGroupGranularPermissionObserver',
-		);
-
-		this._extensionElements.push(element);
-		this.requestUpdate('_extensionElements');
 	}
 
 	#onValueChange = (e: UmbChangeEvent) => {
@@ -83,27 +52,37 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 	};
 
 	override render() {
-		return html`${this._extensionElements.map((element) => this.#renderProperty(element))}`;
+		if (!this._userGroupPermissions) return;
+		return html`<umb-extension-slot
+			type="userGranularPermission"
+			.renderMethod=${this.#renderProperty}></umb-extension-slot>`;
 	}
 
-	#renderProperty(element: any) {
-		const manifest = element.manifest as ManifestGranularUserPermission;
+	#renderProperty = (extension: UmbExtensionElementInitializer<ManifestGranularUserPermission>) => {
+		if (!this._userGroupPermissions) return nothing;
+		if (!extension.component) return nothing;
+
+		const manifest = extension.manifest;
+		if (!manifest) throw new Error('Manifest is not available');
+
 		const label = manifest.meta.labelKey ? this.localize.term(manifest.meta.labelKey) : manifest.meta.label;
 		const description = manifest.meta.descriptionKey
 			? this.localize.term(manifest.meta.descriptionKey)
 			: manifest.meta.description;
 
+		const schemaType = manifest.meta.schemaType;
+		const permissionsForSchemaType =
+			this._userGroupPermissions.filter((permission) => permission.$type === schemaType) || [];
+
+		(extension.component as any).permissions = permissionsForSchemaType;
+		extension.component.addEventListener(UmbChangeEvent.TYPE, this.#onValueChange);
+
 		return html`
 			<umb-property-layout .label=${label || ''} .description=${description || ''}>
-				<div slot="editor">${element}</div>
+				<div slot="editor">${extension.component}</div>
 			</umb-property-layout>
 		`;
-	}
-
-	override disconnectedCallback(): void {
-		this._extensionElements.forEach((element) => element.removeEventListener(UmbChangeEvent.TYPE, this.#onValueChange));
-		super.disconnectedCallback();
-	}
+	};
 }
 
 export default UmbUserGroupGranularPermissionListElement;

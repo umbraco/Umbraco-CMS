@@ -25276,16 +25276,8 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
           }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
+        }
       }
     },
     "/umbraco/management/api/v1/server/information": {
@@ -33875,6 +33867,72 @@
           }
         ]
       }
+    },
+    "/umbraco/management/api/v1/webhook/logs": {
+      "get": {
+        "tags": [
+          "Webhook"
+        ],
+        "operationId": "GetWebhookLogs",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WebhookResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -36843,6 +36901,7 @@
       },
       "DocumentRecycleBinItemResponseModel": {
         "required": [
+          "createDate",
           "documentType",
           "hasChildren",
           "id",
@@ -36853,6 +36912,10 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
           },
           "hasChildren": {
             "type": "boolean"
@@ -36982,6 +37045,7 @@
       },
       "DocumentTreeItemResponseModel": {
         "required": [
+          "createDate",
           "documentType",
           "hasChildren",
           "id",
@@ -37012,6 +37076,10 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
           },
           "isProtected": {
             "type": "boolean"
@@ -38339,8 +38407,8 @@
         "enum": [
           "Healthy",
           "Unhealthy",
-          "Corrupt",
-          "Rebuilding"
+          "Rebuilding",
+          "Corrupt"
         ],
         "type": "string"
       },
@@ -38956,6 +39024,7 @@
       },
       "MediaRecycleBinItemResponseModel": {
         "required": [
+          "createDate",
           "hasChildren",
           "id",
           "mediaType",
@@ -38966,6 +39035,10 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
           },
           "hasChildren": {
             "type": "boolean"
@@ -39083,6 +39156,7 @@
       },
       "MediaTreeItemResponseModel": {
         "required": [
+          "createDate",
           "hasChildren",
           "id",
           "isTrashed",
@@ -39112,6 +39186,10 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
           },
           "mediaType": {
             "oneOf": [
@@ -43184,6 +43262,7 @@
       },
       "ServerConfigurationResponseModel": {
         "required": [
+          "allowLocalLogin",
           "allowPasswordReset",
           "versionCheckPeriod"
         ],
@@ -43195,6 +43274,9 @@
           "versionCheckPeriod": {
             "type": "integer",
             "format": "int32"
+          },
+          "allowLocalLogin": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -45313,6 +45395,8 @@
       },
       "UserConfigurationResponseModel": {
         "required": [
+          "allowChangePassword",
+          "allowTwoFactor",
           "canInviteUsers",
           "passwordConfiguration",
           "usernameIsEmail"
@@ -45331,6 +45415,12 @@
                 "$ref": "#/components/schemas/PasswordConfigurationResponseModel"
               }
             ]
+          },
+          "allowChangePassword": {
+            "type": "boolean"
+          },
+          "allowTwoFactor": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

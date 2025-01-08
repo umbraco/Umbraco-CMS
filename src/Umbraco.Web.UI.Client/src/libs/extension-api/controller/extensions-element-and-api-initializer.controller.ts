@@ -1,13 +1,16 @@
 import type { ApiLoaderProperty, ManifestBase } from '../types/index.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
-import type { UmbApiConstructorArgumentsMethodType } from '../index.js';
+import type { UmbApiConstructorArgumentsMethodType, UmbBaseExtensionsInitializerArgs } from '../index.js';
 import { UmbExtensionElementAndApiInitializer } from './extension-element-and-api-initializer.controller.js';
 import {
 	type PermittedControllerType,
 	UmbBaseExtensionsInitializer,
 } from './base-extensions-initializer.controller.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbExtensionsElementAndApiInitializerArgs extends UmbBaseExtensionsInitializerArgs {}
 
 /**
  */
@@ -63,8 +66,9 @@ export class UmbExtensionsElementAndApiInitializer<
 		controllerAlias?: string,
 		defaultElement?: string,
 		defaultApi?: ApiLoaderProperty,
+		args?: UmbExtensionsElementAndApiInitializerArgs,
 	) {
-		super(host, extensionRegistry, type, filter, onChange, controllerAlias);
+		super(host, extensionRegistry, type, filter, onChange, controllerAlias, args);
 		this.#extensionRegistry = extensionRegistry;
 		this.#constructorArgs = constructorArguments;
 		this.#defaultElement = defaultElement;

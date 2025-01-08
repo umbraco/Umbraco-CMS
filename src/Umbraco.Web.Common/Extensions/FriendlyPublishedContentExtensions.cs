@@ -19,6 +19,9 @@ public static class FriendlyPublishedContentExtensions
     private static IVariationContextAccessor VariationContextAccessor { get; } =
         StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>();
 
+    private static IDomainCache DomainCache { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IDomainCache>();
+
     private static IPublishedContentCache PublishedContentCache { get; } =
         StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>();
 
@@ -731,7 +734,7 @@ public static class FriendlyPublishedContentExtensions
     public static string? GetCultureFromDomains(
         this IPublishedContent content,
         Uri? current = null)
-        => content.GetCultureFromDomains(UmbracoContextAccessor, SiteDomainHelper, current);
+        => content.GetCultureFromDomains(UmbracoContextAccessor, SiteDomainHelper, DomainCache, PublishedContentCache, DocumentNavigationQueryService, current);
 
     public static IEnumerable<PublishedSearchResult> SearchDescendants(
         this IPublishedContent content,

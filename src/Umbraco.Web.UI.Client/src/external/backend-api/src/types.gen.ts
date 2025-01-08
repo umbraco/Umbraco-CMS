@@ -673,6 +673,7 @@ export type DocumentPermissionPresentationModel = {
 
 export type DocumentRecycleBinItemResponseModel = {
     id: string;
+    createDate: string;
     hasChildren: boolean;
     parent?: ((ItemReferenceByIdResponseModel) | null);
     documentType: (DocumentTypeReferenceResponseModel);
@@ -702,6 +703,7 @@ export type DocumentTreeItemResponseModel = {
     noAccess: boolean;
     isTrashed: boolean;
     id: string;
+    createDate: string;
     isProtected: boolean;
     documentType: (DocumentTypeReferenceResponseModel);
     variants: Array<(DocumentVariantItemResponseModel)>;
@@ -1027,8 +1029,8 @@ export type HealthCheckWithResultPresentationModel = {
 export enum HealthStatusModel {
     HEALTHY = 'Healthy',
     UNHEALTHY = 'Unhealthy',
-    CORRUPT = 'Corrupt',
-    REBUILDING = 'Rebuilding'
+    REBUILDING = 'Rebuilding',
+    CORRUPT = 'Corrupt'
 }
 
 export type HealthStatusResponseModel = {
@@ -1196,6 +1198,7 @@ export type MediaItemResponseModel = {
 
 export type MediaRecycleBinItemResponseModel = {
     id: string;
+    createDate: string;
     hasChildren: boolean;
     parent?: ((ItemReferenceByIdResponseModel) | null);
     mediaType: (MediaTypeReferenceResponseModel);
@@ -1223,6 +1226,7 @@ export type MediaTreeItemResponseModel = {
     noAccess: boolean;
     isTrashed: boolean;
     id: string;
+    createDate: string;
     mediaType: (MediaTypeReferenceResponseModel);
     variants: Array<(VariantItemResponseModel)>;
 };
@@ -2204,6 +2208,7 @@ export type ServerConfigurationItemResponseModel = {
 export type ServerConfigurationResponseModel = {
     allowPasswordReset: boolean;
     versionCheckPeriod: number;
+    allowLocalLogin: boolean;
 };
 
 export type ServerInformationResponseModel = {
@@ -2681,6 +2686,8 @@ export type UserConfigurationResponseModel = {
     canInviteUsers: boolean;
     usernameIsEmail: boolean;
     passwordConfiguration: (PasswordConfigurationResponseModel);
+    allowChangePassword: boolean;
+    allowTwoFactor: boolean;
 };
 
 export type UserDataModel = {
