@@ -71,6 +71,10 @@ name: "icon-attachment",
 
 path: () => import("./icons/icon-attachment.js"),
 },{
+name: "icon-audio-lines",
+
+path: () => import("./icons/icon-audio-lines.js"),
+},{
 name: "icon-autofill",
 
 path: () => import("./icons/icon-autofill.js"),
@@ -1298,6 +1302,10 @@ path: () => import("./icons/icon-operator.js"),
 name: "icon-ordered-list",
 
 path: () => import("./icons/icon-ordered-list.js"),
+},{
+name: "icon-origami",
+
+path: () => import("./icons/icon-origami.js"),
 },{
 name: "icon-out",
 

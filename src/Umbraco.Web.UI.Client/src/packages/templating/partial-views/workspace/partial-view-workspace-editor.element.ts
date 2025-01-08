@@ -1,7 +1,7 @@
 import { getQuerySnippet } from '../../utils/index.js';
 import type { UmbTemplatingInsertMenuElement } from '../../local-components/insert-menu/index.js';
 import { UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT } from './partial-view-workspace.context-token.js';
-import { css, customElement, html, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '@umbraco-cms/backoffice/template';
@@ -107,6 +107,10 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#renderCodeEditor() {
+		if (this._content === undefined) {
+			return nothing;
+		}
+
 		return html`
 			<umb-code-editor
 				id="content"

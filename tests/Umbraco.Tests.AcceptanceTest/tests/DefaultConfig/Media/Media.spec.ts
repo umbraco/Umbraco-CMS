@@ -40,7 +40,7 @@ test('can rename a media file', async ({umbracoApi, umbracoUi}) => {
 
   // Arrange
   await umbracoUi.waitForTimeout(1000);
-  await umbracoUi.media.clickLabelWithName(wrongMediaFileName, true, true);
+  await umbracoUi.media.clickLabelWithName(wrongMediaFileName, true);
   await umbracoUi.media.enterMediaItemName(mediaFileName);
   await umbracoUi.media.clickSaveButton();
 
@@ -66,7 +66,6 @@ for (const mediaFileType of mediaFileTypes) {
     await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
     // Act
-    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.media.clickCreateMediaWithType(mediaFileType.fileName);
     await umbracoUi.media.enterMediaItemName(mediaFileType.fileName);
     await umbracoUi.media.uploadFile('./fixtures/mediaLibrary/' + mediaFileType.filePath);
@@ -116,6 +115,7 @@ test('can trash a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
+  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
   await umbracoUi.media.isTreeItemVisible(folderName, false);
   expect(await umbracoApi.media.doesNameExist(folderName)).toBeFalsy();
 });
@@ -154,11 +154,11 @@ test('can search for a media file', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
   // Act
-  await umbracoUi.media.searchForMediaItemByName(mediaFileName);
+  await umbracoUi.media.searchForMediaItemByName(secondMediaFile);
 
   // Assert
   await umbracoUi.media.doesMediaCardsContainAmount(1);
-  await umbracoUi.media.doesMediaCardContainText(mediaFileName);
+  await umbracoUi.media.doesMediaCardContainText(secondMediaFile);
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(secondMediaFile);

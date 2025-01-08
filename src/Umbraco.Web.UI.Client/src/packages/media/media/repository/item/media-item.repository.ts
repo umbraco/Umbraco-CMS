@@ -12,6 +12,17 @@ export class UmbMediaItemRepository extends UmbItemRepositoryBase<UmbMediaItemMo
 		this.#dataSource = new UmbMediaItemServerDataSource(this);
 	}
 
+	/**
+	 * @param root0
+	 * @param root0.query
+	 * @param root0.skip
+	 * @param root0.take
+	 * @deprecated - The search method will be removed in v17. Use the
+	 * Use the UmbMediaSearchProvider instead.
+	 * Get it from:
+	 * ```ts
+	 * import { UmbMediaSearchProvider } from '@umbraco-cms/backoffice/media';
+	 */
 	async search({ query, skip, take }: { query: string; skip: number; take: number }) {
 		return this.#dataSource.search({ query, skip, take });
 	}

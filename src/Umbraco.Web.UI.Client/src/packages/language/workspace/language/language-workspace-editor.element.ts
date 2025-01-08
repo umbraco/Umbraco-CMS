@@ -1,8 +1,8 @@
+import { UMB_LANGUAGE_ROOT_WORKSPACE_PATH } from '../language-root/paths.js';
 import { UMB_LANGUAGE_WORKSPACE_CONTEXT } from './language-workspace.context-token.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_LANGUAGE_ROOT_WORKSPACE_PATH } from '../language-root/paths.js';
 @customElement('umb-language-workspace-editor')
 export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 	#workspaceContext?: typeof UMB_LANGUAGE_WORKSPACE_CONTEXT.TYPE;

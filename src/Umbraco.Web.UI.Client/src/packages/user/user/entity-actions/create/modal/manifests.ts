@@ -1,4 +1,4 @@
-import { UMB_CREATE_USER_MODAL_ALIAS } from './constants.js';
+export const UMB_CREATE_USER_MODAL_ALIAS = 'Umb.Modal.User.Create';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

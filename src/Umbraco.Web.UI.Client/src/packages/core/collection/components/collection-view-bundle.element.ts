@@ -1,5 +1,5 @@
 import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
-import type { ManifestCollectionView } from '../extensions/index.js';
+import type { ManifestCollectionView } from '../extensions/types.js';
 import type { UmbCollectionLayoutConfiguration } from '../types.js';
 import { UMB_ROUTE_CONTEXT } from '../../router/route.context.js';
 import { css, customElement, html, nothing, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';

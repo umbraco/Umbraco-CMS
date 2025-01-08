@@ -33875,6 +33875,72 @@
           }
         ]
       }
+    },
+    "/umbraco/management/api/v1/webhook/logs": {
+      "get": {
+        "tags": [
+          "Webhook"
+        ],
+        "operationId": "GetWebhookLogs",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WebhookResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -36738,6 +36804,7 @@
       "DocumentItemResponseModel": {
         "required": [
           "documentType",
+          "hasChildren",
           "id",
           "isProtected",
           "isTrashed",
@@ -36753,6 +36820,17 @@
             "type": "boolean"
           },
           "isProtected": {
+            "type": "boolean"
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true
+          },
+          "hasChildren": {
             "type": "boolean"
           },
           "documentType": {
@@ -38327,7 +38405,8 @@
         "enum": [
           "Healthy",
           "Unhealthy",
-          "Rebuilding"
+          "Rebuilding",
+          "Corrupt"
         ],
         "type": "string"
       },
@@ -38895,6 +38974,7 @@
       },
       "MediaItemResponseModel": {
         "required": [
+          "hasChildren",
           "id",
           "isTrashed",
           "mediaType",
@@ -38907,6 +38987,17 @@
             "format": "uuid"
           },
           "isTrashed": {
+            "type": "boolean"
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true
+          },
+          "hasChildren": {
             "type": "boolean"
           },
           "mediaType": {
@@ -40734,7 +40825,8 @@
             "format": "uuid"
           },
           "packagePath": {
-            "type": "string"
+            "type": "string",
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -42718,22 +42810,26 @@
               {
                 "$ref": "#/components/schemas/RelationReferenceModel"
               }
-            ]
+            ],
+            "readOnly": true
           },
           "child": {
             "oneOf": [
               {
                 "$ref": "#/components/schemas/RelationReferenceModel"
               }
-            ]
+            ],
+            "readOnly": true
           },
           "createDate": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "readOnly": true
           },
           "comment": {
             "type": "string",
-            "nullable": true
+            "nullable": true,
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -44915,7 +45011,8 @@
             }
           },
           "packagePath": {
-            "type": "string"
+            "type": "string",
+            "readOnly": true
           }
         },
         "additionalProperties": false

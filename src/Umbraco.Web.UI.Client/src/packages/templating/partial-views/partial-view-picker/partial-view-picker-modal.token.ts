@@ -1,5 +1,5 @@
 import { UMB_PARTIAL_VIEW_TREE_ALIAS } from '../../partial-views/tree/manifests.js';
-import type { UmbPartialViewTreeItemModel } from '../../partial-views/tree/index.js';
+import type { UmbPartialViewTreeItemModel } from '../types.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import type { UmbTreePickerModalValue, UmbTreePickerModalData } from '@umbraco-cms/backoffice/tree';
 import { UMB_TREE_PICKER_MODAL_ALIAS } from '@umbraco-cms/backoffice/tree';

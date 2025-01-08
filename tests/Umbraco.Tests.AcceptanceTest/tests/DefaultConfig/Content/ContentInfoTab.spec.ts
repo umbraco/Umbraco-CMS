@@ -33,6 +33,7 @@ test('can see correct information when published', async ({umbracoApi, umbracoUi
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.waitForTimeout(2000);
   const contentData = await umbracoApi.document.getByName(contentName);
   await umbracoUi.content.doesIdHaveText(contentData.id);
@@ -106,6 +107,7 @@ test('can change template', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveButton();
 
   // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.template.id).toBe(secondTemplateId);
 

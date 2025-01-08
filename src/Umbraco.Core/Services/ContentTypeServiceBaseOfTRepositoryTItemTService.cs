@@ -947,8 +947,18 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 // this is illegal
                 //var copyingb = (ContentTypeCompositionBase) copying;
                 // but we *know* it has to be a ContentTypeCompositionBase anyways
-                var copyingb = (ContentTypeCompositionBase) (object)copying;
-                copy = (TItem) (object) copyingb.DeepCloneWithResetIdentities(alias);
+
+                // TODO: Fix back to only calling the copyingb.DeepCloneWithResetIdentities when
+                // when ContentTypeBase.DeepCloneWithResetIdentities is overrideable.
+                if (copying is IMediaType mediaTypeToCope)
+                {
+                    copy = (TItem)mediaTypeToCope.DeepCloneWithResetIdentities(alias);
+                }
+                else
+                {
+                    var copyingb = (ContentTypeCompositionBase) (object)copying;
+                    copy = (TItem) (object) copyingb.DeepCloneWithResetIdentities(alias);
+                }
 
                 copy.Name = copy.Name + " (copy)"; // might not be unique
 
@@ -1161,10 +1171,14 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         }
         else
         {
-            TItem[] allowedChildren = GetMany(parent.AllowedContentTypes.Select(x => x.Key)).ToArray();
+            // Get the sorted keys. Whilst we can't guarantee the order that comes back from GetMany, we can use
+            // this to sort the resulting list of allowed children.
+            Guid[] sortedKeys = parent.AllowedContentTypes.OrderBy(x => x.SortOrder).Select(x => x.Key).ToArray();
+
+            TItem[] allowedChildren = GetMany(sortedKeys).ToArray();
             result = new PagedModel<TItem>
             {
-                Items = allowedChildren.Take(take).Skip(skip),
+                Items = allowedChildren.OrderBy(x => sortedKeys.IndexOf(x.Key)).Take(take).Skip(skip),
                 Total = allowedChildren.Length,
             };
         }

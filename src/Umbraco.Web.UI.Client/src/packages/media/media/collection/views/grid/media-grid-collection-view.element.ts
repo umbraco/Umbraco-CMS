@@ -96,13 +96,13 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 		return html`
 			<uui-card-media
 				name=${ifDefined(item.name)}
+				data-mark="${item.entityType}:${item.unique}"
 				selectable
-				?select-only=${this._selection && this._selection.length > 0}
+				?select-only=${this._selection.length > 0}
 				?selected=${this.#isSelected(item)}
 				href=${this.#getEditUrl(item)}
 				@selected=${() => this.#onSelect(item)}
-				@deselected=${() => this.#onDeselect(item)}
-				class="media-item">
+				@deselected=${() => this.#onDeselect(item)}>
 				<umb-imaging-thumbnail
 					unique=${item.unique}
 					alt=${ifDefined(item.name)}
@@ -134,6 +134,11 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 
 			.media-placeholder-item {
 				font-style: italic;
+			}
+
+			/** TODO: Remove this fix when UUI gets upgrade to 1.3 */
+			umb-imaging-thumbnail {
+				pointer-events: none;
 			}
 
 			#media-grid {

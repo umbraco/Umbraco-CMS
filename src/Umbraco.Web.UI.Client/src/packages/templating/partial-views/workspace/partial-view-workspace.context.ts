@@ -1,7 +1,7 @@
 import type { UmbPartialViewDetailModel } from '../types.js';
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
 import type { UmbPartialViewDetailRepository } from '../repository/index.js';
-import { UMB_PARTIAL_VIEW_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_PARTIAL_VIEW_DETAIL_REPOSITORY_ALIAS } from '../constants.js';
 import { UmbPartialViewWorkspaceEditorElement } from './partial-view-workspace-editor.element.js';
 import { UMB_PARTIAL_VIEW_WORKSPACE_ALIAS } from './manifests.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -17,6 +17,7 @@ import {
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
+import { UmbServerFileRenameWorkspaceRedirectController } from '@umbraco-cms/backoffice/server-file-system';
 
 export interface UmbPartialViewWorkspaceContextCreateArgs
 	extends UmbEntityDetailWorkspaceContextCreateArgs<UmbPartialViewDetailModel> {
@@ -73,6 +74,12 @@ export class UmbPartialViewWorkspaceContext
 				setup: (component: PageComponent, info: IRoutingInfo) => {
 					const unique = info.match.params.unique;
 					this.load(unique);
+
+					new UmbServerFileRenameWorkspaceRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
 				},
 			},
 		]);

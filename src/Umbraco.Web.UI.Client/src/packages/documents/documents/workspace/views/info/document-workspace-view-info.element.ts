@@ -1,6 +1,6 @@
-import { UMB_DOCUMENT_PROPERTY_DATASET_CONTEXT } from '../../../property-dataset-context/index.js';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
+import { UMB_DOCUMENT_PROPERTY_DATASET_CONTEXT, UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../../constants.js';
 import type { UmbDocumentVariantModel } from '../../../types.js';
+import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from '../../../publishing/index.js';
 import { TimeOptions } from './utils.js';
 import { css, customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -45,9 +45,12 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	@state()
 	private _variant?: UmbDocumentVariantModel;
 
-	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
+	@state()
+	private _variantsWithPendingChanges: Array<any> = [];
 
+	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 	#templateRepository = new UmbTemplateItemRepository(this);
+	#documentPublishingWorkspaceContext?: typeof UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	private _routeBuilder?: UmbModalRouteBuilder;
@@ -74,6 +77,11 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			this.observe(context.currentVariant, (currentVariant) => {
 				this._variant = currentVariant;
 			});
+		});
+
+		this.consumeContext(UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, (instance) => {
+			this.#documentPublishingWorkspaceContext = instance;
+			this.#observePendingChanges();
 		});
 	}
 
@@ -112,6 +120,20 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		);
 	}
 
+	#observePendingChanges() {
+		this.observe(
+			this.#documentPublishingWorkspaceContext?.publishedPendingChanges.variantsWithChanges,
+			(variants) => {
+				this._variantsWithPendingChanges = variants || [];
+			},
+			'_observePendingChanges',
+		);
+	}
+
+	#hasPendingChanges(variant: UmbDocumentVariantModel) {
+		return this._variantsWithPendingChanges.some((x) => x.variantId.compare(variant));
+	}
+
 	#renderStateTag() {
 		switch (this._variant?.state) {
 			case DocumentVariantStateModel.DRAFT:
@@ -120,18 +142,17 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 						${this.localize.term('content_unpublished')}
 					</uui-tag>
 				`;
+			// TODO: The pending changes state can be removed once the management Api removes this state
+			// We should also make our own state model for this
 			case DocumentVariantStateModel.PUBLISHED:
+			case DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES: {
+				const term = this.#hasPendingChanges(this._variant) ? 'content_publishedPendingChanges' : 'content_published';
 				return html`
-					<uui-tag color="positive" look="primary" label=${this.localize.term('content_published')}>
-						${this.localize.term('content_published')}
+					<uui-tag color="positive" look="primary" label=${this.localize.term(term)}>
+						${this.localize.term(term)}
 					</uui-tag>
 				`;
-			case DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES:
-				return html`
-					<uui-tag color="positive" look="primary" label=${this.localize.term('content_publishedPendingChanges')}>
-						${this.localize.term('content_publishedPendingChanges')}
-					</uui-tag>
-				`;
+			}
 			default:
 				return html`
 					<uui-tag look="primary" label=${this.localize.term('content_notCreated')}>
@@ -161,10 +182,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		const editDocumentTypePath = this._routeBuilder?.({ entityType: 'document-type' }) ?? '';
 
 		return html`
-			<div class="general-item">
-				<strong><umb-localize key="content_publishStatus">Publication Status</umb-localize></strong>
-				<span>${this.#renderStateTag()}</span>
-			</div>
+			<div class="general-item"><span>${this.#renderStateTag()}</span></div>
 			${this.#renderCreateDate()}
 
 			<div class="general-item">

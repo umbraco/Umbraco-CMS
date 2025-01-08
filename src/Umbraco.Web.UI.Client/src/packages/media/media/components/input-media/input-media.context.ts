@@ -1,4 +1,4 @@
-import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
+import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../constants.js';
 import { UMB_MEDIA_PICKER_MODAL } from '../../modals/index.js';
 import type { UmbMediaItemModel } from '../../repository/item/types.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from '../../modals/index.js';

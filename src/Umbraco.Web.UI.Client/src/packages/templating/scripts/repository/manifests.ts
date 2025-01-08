@@ -1,7 +1,5 @@
+import { UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS, UMB_SCRIPT_DETAIL_STORE_ALIAS } from './constants.js';
 import { manifests as itemManifests } from './item/manifests.js';
-
-export const UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS = 'Umb.Repository.Script.Detail';
-export const UMB_SCRIPT_DETAIL_STORE_ALIAS = 'Umb.Store.Script.Detail';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
