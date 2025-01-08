@@ -151,7 +151,6 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	}
 
 	#getScheduleFromModal(selection: UmbDocumentScheduleSelectionModel, localUtcOffset: number, serverUtcOffset: number) {
-		console.log(selection);
 		return {
 			publishTime: this.#convertToServerTime(selection.schedule?.publishTime, localUtcOffset, serverUtcOffset),
 			unpublishTime: this.#convertToServerTime(selection.schedule?.unpublishTime, localUtcOffset, serverUtcOffset),
