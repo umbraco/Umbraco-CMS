@@ -95,7 +95,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	public renderMethod?: (
 		extension: UmbExtensionElementInitializer,
 		index: number,
-	) => TemplateResult | HTMLElement | null | undefined;
+	) => TemplateResult | TemplateResult<1> | HTMLElement | null | undefined | typeof nothing;
 
 	override connectedCallback(): void {
 		super.connectedCallback();

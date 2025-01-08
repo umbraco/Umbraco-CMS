@@ -16,7 +16,7 @@ export class UmbSortChildrenOfEntityAction extends UmbEntityActionBase<MetaEntit
 			},
 		});
 
-		await modal.onSubmit();
+		await modal.onSubmit().catch(() => undefined);
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 

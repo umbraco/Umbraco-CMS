@@ -17,6 +17,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		template: null,
 		id: 'the-simplest-document-id',
+		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
 		documentType: {
 			id: 'the-simplest-document-type-id',
@@ -56,6 +57,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		template: null,
 		id: 'all-property-editors-document-id',
+		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
 		documentType: {
 			id: 'all-property-editors-document-type-id',
@@ -601,6 +603,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		template: null,
 		id: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
+		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
 		documentType: {
 			id: '29643452-cff9-47f2-98cd-7de4b6807681',
@@ -734,6 +737,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		urls: [],
 		template: null,
 		id: 'fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
+		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
 		documentType: {
 			id: '29643452-cff9-47f2-98cd-7de4b6807681',
@@ -822,6 +826,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		template: null,
 		id: 'simple-document-id',
+		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
 		documentType: {
 			id: 'simple-document-type-id',
@@ -869,6 +874,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		template: null,
 		id: 'all-rtes-id',
+		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
 		documentType: {
 			id: 'all-rtes-document-type-id',
@@ -938,6 +944,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		template: null,
 		id: 'block-editors-document-id',
+		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
 		documentType: {
 			id: 'block-editors-document-type-id',

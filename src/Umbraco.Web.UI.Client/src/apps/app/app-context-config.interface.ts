@@ -1,3 +1,5 @@
+import type { UmbServerConnection } from './server-connection.js';
+
 /**
  * Configuration interface for the Umbraco App Context
  * @interface UmbAppContextConfig
@@ -16,4 +18,10 @@ export interface UmbAppContextConfig {
 	 * @memberof UmbAppContextConfig
 	 */
 	backofficePath: string;
+
+	/**
+	 * Configuration for the server connection.
+	 * @memberof UmbAppContextConfig
+	 */
+	serverConnection: UmbServerConnection;
 }

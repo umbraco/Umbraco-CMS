@@ -17,6 +17,7 @@ export interface UmbMediaTreeItemModel extends UmbTreeItemModel {
 		collection: UmbReferenceByUnique | null;
 	};
 	variants: Array<UmbMediaTreeItemVariantModel>;
+	createDate: string;
 }
 
 export interface UmbMediaTreeRootModel extends UmbTreeRootModel {
