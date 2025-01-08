@@ -6,10 +6,11 @@ import { manifest as workspaceHasCollectionCondition } from './workspace-has-col
 import { manifest as workspaceContentTypeAliasCondition } from './workspace-content-type-alias.condition.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
+	workspaceEntityIsNewCondition,
 	workspaceAliasCondition,
+	workspaceContentTypeAliasCondition,
 	workspaceEntityTypeCondition,
 	workspaceEntityIsNewCondition,
 	workspaceEntityIsNotNewCondition,
 	workspaceHasCollectionCondition,
-	workspaceContentTypeAliasCondition,
 ];

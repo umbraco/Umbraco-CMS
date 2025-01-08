@@ -8,9 +8,13 @@ import type {
 	ManifestApi,
 	ManifestBase,
 	UmbApiConstructorArgumentsMethodType,
+	UmbBaseExtensionsInitializerArgs,
 	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbExtensionsApiInitializerArgs extends UmbBaseExtensionsInitializerArgs {}
 
 /**
  * This Controller manages a set of Extensions and their Manifest.
@@ -63,8 +67,9 @@ export class UmbExtensionsApiInitializer<
 		filter?: undefined | null | ((manifest: ManifestTypeAsApi) => boolean),
 		onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void,
 		controllerAlias?: string,
+		args?: UmbExtensionsApiInitializerArgs,
 	) {
-		super(host, extensionRegistry, type, filter, onChange, controllerAlias);
+		super(host, extensionRegistry, type, filter, onChange, controllerAlias, args);
 		this.#extensionRegistry = extensionRegistry;
 		this.#constructorArgs = constructorArguments;
 		this._init();

@@ -7,9 +7,9 @@ using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Querying;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
 
@@ -19,34 +19,42 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document;
 public class ByKeyDocumentController : DocumentControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
-    private readonly IContentEditingService _contentEditingService;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
-    private readonly IContentService _contentService;
+    private readonly IContentQueryService _contentQueryService;
 
-    [Obsolete("Please use the constructor taking all parameters. This constructor will be removed in V16.")]
+    [Obsolete("Scheduled for removal in v17")]
     public ByKeyDocumentController(
         IAuthorizationService authorizationService,
         IContentEditingService contentEditingService,
         IDocumentPresentationFactory documentPresentationFactory)
-        : this(
-            authorizationService,
-            contentEditingService,
-            documentPresentationFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IContentService>())
     {
+        _authorizationService = authorizationService;
+        _documentPresentationFactory = documentPresentationFactory;
+        _contentQueryService = StaticServiceProvider.Instance.GetRequiredService<IContentQueryService>();
+    }
+
+    // needed for greedy selection until other constructor remains in v17
+    [Obsolete("Scheduled for removal in v17")]
+    public ByKeyDocumentController(
+        IAuthorizationService authorizationService,
+        IContentEditingService contentEditingService,
+        IDocumentPresentationFactory documentPresentationFactory,
+        IContentQueryService contentQueryService)
+    {
+        _authorizationService = authorizationService;
+        _documentPresentationFactory = documentPresentationFactory;
+        _contentQueryService = contentQueryService;
     }
 
     [ActivatorUtilitiesConstructor]
     public ByKeyDocumentController(
         IAuthorizationService authorizationService,
-        IContentEditingService contentEditingService,
         IDocumentPresentationFactory documentPresentationFactory,
-        IContentService contentService)
+        IContentQueryService contentQueryService)
     {
         _authorizationService = authorizationService;
-        _contentEditingService = contentEditingService;
         _documentPresentationFactory = documentPresentationFactory;
-        _contentService = contentService;
+        _contentQueryService = contentQueryService;
     }
 
     [HttpGet("{id:guid}")]
@@ -65,17 +73,16 @@ public class ByKeyDocumentController : DocumentControllerBase
             return Forbidden();
         }
 
-        IContent? content = await _contentEditingService.GetAsync(id);
-        if (content == null)
+        var contentWithScheduleAttempt = await _contentQueryService.GetWithSchedulesAsync(id);
+
+        if (contentWithScheduleAttempt.Success == false)
         {
-            return DocumentNotFound();
+            return ContentQueryOperationStatusResult(contentWithScheduleAttempt.Status);
         }
 
-        DocumentResponseModel model = await _documentPresentationFactory.CreateResponseModelAsync(content);
-
-        ContentScheduleCollection schedule = _contentService.GetContentScheduleByContentId(content.Id);
-        _documentPresentationFactory.UpdateResponseModelWithContentSchedule(model, schedule);
-
+        DocumentResponseModel model = await _documentPresentationFactory.CreateResponseModelAsync(
+            contentWithScheduleAttempt.Result!.Content,
+            contentWithScheduleAttempt.Result.Schedules);
         return Ok(model);
     }
 }

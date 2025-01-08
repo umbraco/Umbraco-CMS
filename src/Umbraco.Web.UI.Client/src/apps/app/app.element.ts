@@ -163,7 +163,11 @@ export class UmbAppElement extends UmbLitElement {
 		this.#serverConnection = await new UmbServerConnection(this.serverUrl).connect();
 
 		this.#authContext = new UmbAuthContext(this, this.serverUrl, this.backofficePath, this.bypassAuth);
-		new UmbAppContext(this, { backofficePath: this.backofficePath, serverUrl: this.serverUrl });
+		new UmbAppContext(this, {
+			backofficePath: this.backofficePath,
+			serverUrl: this.serverUrl,
+			serverConnection: this.#serverConnection,
+		});
 
 		// Register Core extensions (this is specifically done here because we need these extensions to be registered before the application is initialized)
 		onInit(this, umbExtensionsRegistry);
