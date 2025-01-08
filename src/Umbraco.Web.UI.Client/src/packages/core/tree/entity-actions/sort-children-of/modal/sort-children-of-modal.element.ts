@@ -27,6 +27,9 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 	@state()
 	_totalPages = 1;
 
+	@state()
+	_isSorting: boolean = false;
+
 	#hasMorePages() {
 		return this._currentPage < this._totalPages;;
 	}
@@ -146,26 +149,13 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		}
 	}
 
-	#getSortOrderOfSortedItems() {
-		const sorting = [];
+	#onSortChildrenBy(key: string) {
 
-		// get the new sort order from the sorted uniques
-		for (const value of this.#sortedUniques) {
-			const index = this._children.findIndex((child) => child.unique === value);
-			if (index !== -1) {
-				const entry = {
-					unique: value,
-					sortOrder: index,
-				};
-
-				sorting.push(entry);
-			}
+		if (this._isSorting) {
+			return;
 		}
 
-		return sorting;
-	}
-
-	#sortChildrenBy(key: string) {
+		this._isSorting = true;
 
 		const oldValue = this._children;
 
@@ -198,6 +188,27 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		this._children.map(c => c.unique).forEach(u => this.#sortedUniques.add(u));
 
 		this.requestUpdate('_children', oldValue);
+
+		this._isSorting = false;
+	}
+
+	#getSortOrderOfSortedItems() {
+		const sorting = [];
+
+		// get the new sort order from the sorted uniques
+		for (const value of this.#sortedUniques) {
+			const index = this._children.findIndex((child) => child.unique === value);
+			if (index !== -1) {
+				const entry = {
+					unique: value,
+					sortOrder: index,
+				};
+
+				sorting.push(entry);
+			}
+		}
+
+		return sorting;
 	}
 
 	#getCreateDate(item: UmbTreeItemModel) : string {
@@ -234,11 +245,20 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 					${this.#renderHeaderCell("name", "general_name")}
 					${this.#renderHeaderCell("createDate", "content_createDate")}
 				</uui-table-head>
+				${this._isSorting
+					? html`
+						<uui-table-row>
+							<uui-table-cell></uui-table-cell>
+							<uui-table-cell><uui-loader-circle></uui-loader-circle></uui-table-cell>
+							<uui-table-cell></uui-table-cell>
+						</uui-table-row>
+					`
+					: nothing}
 				${repeat(
-					this._children,
-					(child) => child.unique,
-					(child) => this.#renderChild(child),
-				)}
+						this._children,
+						(child) => child.unique,
+						(child) => this.#renderChild(child),
+					)}
 			</uui-table>
 
 			${this.#hasMorePages()
@@ -260,7 +280,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 						<span>${this.localize.term(labelKey)}</span>
 					`
 					: html`
-						<button @click=${() => this.#sortChildrenBy(key)}>
+						<button @click=${() => this.#onSortChildrenBy(key)}>
 							${this.localize.term(labelKey)}
 							<uui-symbol-sort
 								?active=${this.#sortBy === key}
@@ -274,7 +294,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 
 	#renderChild(item: UmbTreeItemModel) {
 		return html`
-			<uui-table-row data-unique=${item.unique}>
+			<uui-table-row data-unique=${item.unique} class="${this._isSorting ? "hidden" : ""}">
 				<uui-table-cell><uui-icon name="icon-navigation" aria-hidden="true"></uui-icon></uui-table-cell>
 				<uui-table-cell>${item.name}</uui-table-cell>
 				<uui-table-cell>${this.#renderCreateDate(item)}</uui-table-cell>
@@ -309,6 +329,10 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 				justify-content: space-between;
 				width: 100%;
 				padding: var(--uui-size-5) var(--uui-size-1);
+			}
+
+			uui-table-row.hidden {
+				visibility: hidden;
 			}
 
 			uui-icon[name="icon-navigation"] {
