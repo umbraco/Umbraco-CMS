@@ -1,6 +1,6 @@
 import { UMB_DUPLICATE_TO_MODAL } from './modal/duplicate-to-modal.token.js';
 import type { MetaEntityActionDuplicateToKind, UmbDuplicateToRepository } from './types.js';
-import { UmbEntityActionBase, UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
@@ -37,17 +37,17 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 			});
 
 			if (!error) {
-				this.#reloadMenu(destinationUnique);
+				this.#reloadMenu();
 			}
 		} catch (error) {
 			console.error(error);
 		}
 	}
 
-	async #reloadMenu(destinationUnique: string | null) {
+	async #reloadMenu() {
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		const event = new UmbRequestReloadChildrenOfEntityEvent({
-			unique: destinationUnique,
+		const event = new UmbRequestReloadStructureForEntityEvent({
+			unique: this.args.unique,
 			entityType: this.args.entityType,
 		});
 
