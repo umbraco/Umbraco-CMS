@@ -50,6 +50,16 @@ public class BlockListPropertyEditor : BlockListPropertyEditorBase
         return valueEditor.MergePartialPropertyValueForCulture(sourceValue, targetValue, culture);
     }
 
+    public override object? MergeVariantInvariantPropertyValue(
+        object? sourceValue,
+        object? targetValue,
+        bool canUpdateInvariantData,
+        HashSet<string> allowedCultures)
+    {
+        var valueEditor = (BlockListEditorPropertyValueEditor)GetValueEditor();
+        return valueEditor.MergeVariantInvariantPropertyValue(sourceValue, targetValue, canUpdateInvariantData, allowedCultures);
+    }
+
     #region Pre Value Editor
 
     protected override IConfigurationEditor CreateConfigurationEditor() =>

@@ -4,7 +4,7 @@ import { UmbTextStyles } from '../../style/text-style.style.js';
 import { UMB_AUTH_CONTEXT } from '../auth.context.token.js';
 import type { UmbAuthProviderDefaultProps } from '../types.js';
 import type { UmbModalAppAuthConfig, UmbModalAppAuthValue } from './umb-app-auth-modal.token.js';
-import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 
 @customElement('umb-app-auth-modal')
@@ -14,6 +14,12 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 
 	@state()
 	private _serverUrl = '';
+
+	@state()
+	private _loading = true;
+
+	@state()
+	private _allowLocalLogin = false;
 
 	get props(): UmbAuthProviderDefaultProps {
 		return {
@@ -38,15 +44,23 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 				);
 	}
 
-	override connectedCallback(): void {
-		super.connectedCallback();
-
+	override firstUpdated(): void {
 		this.consumeContext(UMB_APP_CONTEXT, (context) => {
 			this._serverUrl = context.getServerUrl();
 			this.style.setProperty(
 				'--image',
 				`url('${this._serverUrl}/umbraco/management/api/v1/security/back-office/graphics/login-background') no-repeat center center/cover`,
 			);
+
+			const serverConnection = context.getServerConnection();
+
+			this.observe(serverConnection.allowLocalLogin, (allowLocalLogin) => {
+				this._allowLocalLogin = allowLocalLogin;
+			});
+
+			this.observe(serverConnection.isConnected, (isConnected) => {
+				this._loading = !isConnected;
+			});
 		});
 	}
 
@@ -93,16 +107,35 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 						${this.data?.userLoginState === 'timedOut'
 							? html`<p style="margin-top:0">${this.localize.term('login_timeout')}</p>`
 							: ''}
-						<umb-extension-slot
-							id="providers"
-							type="authProvider"
-							default-element="umb-auth-provider-default"
-							.props=${this.props}></umb-extension-slot>
+						${when(
+							this._loading,
+							() => html`
+								<div id="loader">
+									<uui-loader></uui-loader>
+								</div>
+							`,
+							() =>
+								html` <umb-extension-slot
+									id="providers"
+									type="authProvider"
+									default-element="umb-auth-provider-default"
+									.props=${this.props}
+									.filter=${this.#filterProvider}></umb-extension-slot>`,
+						)}
 					</div>
 				</div>
 			</div>
 		`;
 	}
+
+	#filterProvider = (provider: ManifestAuthProvider) => {
+		if (this._allowLocalLogin) {
+			return true;
+		}
+
+		// Do not show any Umbraco auth provider if local login is disabled
+		return provider.forProviderName.toLowerCase() !== 'umbraco';
+	};
 
 	private onSubmit = async (providerOrManifest: string | ManifestAuthProvider, loginHint?: string) => {
 		try {
@@ -229,6 +262,12 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-space-5);
+			}
+
+			#loader {
+				display: flex;
+				justify-content: center;
+				align-items: center;
 			}
 
 			@media (max-width: 900px) {

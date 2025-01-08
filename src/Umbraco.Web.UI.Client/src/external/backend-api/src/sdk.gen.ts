@@ -6685,10 +6685,7 @@ export class ServerService {
     public static getServerConfiguration(): CancelablePromise<GetServerConfigurationResponse> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/server/configuration',
-            errors: {
-                401: 'The resource is protected and requires an authentication token'
-            }
+            url: '/umbraco/management/api/v1/server/configuration'
         });
     }
     

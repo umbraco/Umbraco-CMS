@@ -49,6 +49,7 @@ export const serverInformationHandlers = [
 			ctx.json<GetServerConfigurationResponse>({
 				allowPasswordReset: true,
 				versionCheckPeriod: 7, // days
+				allowLocalLogin: true,
 			}),
 		);
 	}),

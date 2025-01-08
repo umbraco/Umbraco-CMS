@@ -4,8 +4,10 @@ using Examine.Search;
 using Microsoft.AspNetCore.Html;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Examine;
 
@@ -20,7 +22,36 @@ public static class PublishedContentExtensions
     /// </summary>
     /// <param name="content">The document.</param>
     /// <param name="umbracoContextAccessor"></param>
-    /// <param name="siteDomainHelper"></param>
+    /// <param name="siteDomainHelper">The site domain helper.</param>
+    /// <param name="current">An optional current Uri.</param>
+    /// <returns>The culture assigned to the document by domains.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         In 1:1 multilingual setup, a document contains several cultures (there is not
+    ///         one document per culture), and domains, withing the context of a current Uri, assign
+    ///         a culture to that document.
+    ///     </para>
+    /// </remarks>
+    [Obsolete("Please use the method taking all parameters. This overload will be removed in V17.")]
+    public static string? GetCultureFromDomains(
+        this IPublishedContent content,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        ISiteDomainMapper siteDomainHelper,
+        Uri? current = null)
+    {
+        IUmbracoContext umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
+        return DomainUtilities.GetCultureFromDomains(content.Id, content.Path, current, umbracoContext, siteDomainHelper);
+    }
+
+    /// <summary>
+    ///     Gets the culture assigned to a document by domains, in the context of a current Uri.
+    /// </summary>
+    /// <param name="content">The document.</param>
+    /// <param name="umbracoContextAccessor"></param>
+    /// <param name="siteDomainHelper">The site domain helper.</param>
+    /// <param name="domainCache">The domain cache.</param>
+    /// <param name="publishedCache">The published content cache.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
     /// <param name="current">An optional current Uri.</param>
     /// <returns>The culture assigned to the document by domains.</returns>
     /// <remarks>
@@ -34,10 +65,13 @@ public static class PublishedContentExtensions
         this IPublishedContent content,
         IUmbracoContextAccessor umbracoContextAccessor,
         ISiteDomainMapper siteDomainHelper,
+        IDomainCache domainCache,
+        IPublishedCache publishedCache,
+        INavigationQueryService navigationQueryService,
         Uri? current = null)
     {
         IUmbracoContext umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
-        return DomainUtilities.GetCultureFromDomains(content.Id, content.Path, current, umbracoContext, siteDomainHelper);
+        return DomainUtilities.GetCultureFromDomains(content.Id, content.Path, current, umbracoContext, siteDomainHelper, domainCache, publishedCache, navigationQueryService);
     }
 
     #endregion

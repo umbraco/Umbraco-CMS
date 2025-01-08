@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Models.Blocks;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
-public partial class BlockListElementLevelVariationTests
+internal partial class BlockListElementLevelVariationTests
 {
     [TestCase("en-US", "The culture variant content value in English", "The culture variant settings value in English")]
     [TestCase("da-DK", "The culture variant content value in Danish", "The culture variant settings value in Danish")]

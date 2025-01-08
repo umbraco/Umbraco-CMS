@@ -3,6 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
@@ -44,7 +45,7 @@ public class ContentScheduleTests
         var now = DateTime.Now;
         var schedule = new ContentScheduleCollection();
         schedule.Add(now, null);
-        var invariantSched = schedule.GetSchedule(string.Empty);
+        var invariantSched = schedule.GetSchedule(Constants.System.InvariantCulture);
         schedule.Remove(invariantSched.First());
         Assert.AreEqual(0, schedule.FullSchedule.Count());
     }
@@ -56,7 +57,7 @@ public class ContentScheduleTests
         var schedule = new ContentScheduleCollection();
         schedule.Add(now, null);
         schedule.Add("en-US", now, null);
-        var invariantSched = schedule.GetSchedule(string.Empty);
+        var invariantSched = schedule.GetSchedule(Constants.System.InvariantCulture);
         schedule.Remove(invariantSched.First());
         Assert.AreEqual(0, schedule.GetSchedule(string.Empty).Count());
         Assert.AreEqual(1, schedule.FullSchedule.Count());

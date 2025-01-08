@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class RichTextEditorPastedImagesTests : UmbracoIntegrationTest
+internal class RichTextEditorPastedImagesTests : UmbracoIntegrationTest
 {
     private static readonly Guid GifFileKey = Guid.Parse("E625C7FA-6CA7-4A01-92CD-FB5C6F89973D");
 
