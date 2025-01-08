@@ -51,7 +51,7 @@ public sealed class SystemTextConfigurationEditorJsonSerializer : SystemTextJson
     /// </remarks>
     private static Action<JsonTypeInfo> UseAttributeConfiguredPropertyNames() => typeInfo =>
     {
-        if (typeInfo.Kind != JsonTypeInfoKind.Object)
+        if (typeInfo.Kind is not JsonTypeInfoKind.Object)
         {
             return;
         }
@@ -60,9 +60,9 @@ public sealed class SystemTextConfigurationEditorJsonSerializer : SystemTextJson
         {
             if (property.AttributeProvider?.GetCustomAttributes(typeof(ConfigurationFieldAttribute), true) is { } attributes)
             {
-                foreach (ConfigurationFieldAttribute attr in attributes)
+                foreach (ConfigurationFieldAttribute attribute in attributes)
                 {
-                    property.Name = attr.Key;
+                    property.Name = attribute.Key;
                 }
             }
         }
