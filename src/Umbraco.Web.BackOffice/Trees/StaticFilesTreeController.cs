@@ -23,6 +23,7 @@ public class StaticFilesTreeController : TreeController
     private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
     private readonly IWebHostEnvironment _webHostEnvironment;
 
+    [ActivatorUtilitiesConstructor]
     public StaticFilesTreeController(
         ILocalizedTextService localizedTextService,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
