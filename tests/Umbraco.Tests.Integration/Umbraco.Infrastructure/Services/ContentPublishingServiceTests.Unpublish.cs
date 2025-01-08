@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -322,5 +322,20 @@ public partial class ContentPublishingServiceTests
 
         content = ContentService.GetById(content.Key)!;
         Assert.AreEqual(2, content.PublishedCultures.Count());
+    }
+
+    [Test]
+    public async Task Can_Unpublish_Invariant_Content_With_Cultures_Provided_If_The_Default_Culture_Is_Included()
+    {
+        var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, new HashSet<string>() { "en-US" }, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+    }
+
+    [Test]
+    public async Task Cannot_Unpublish_Invariant_Content_With_Cultures_Provided_That_Do_Not_Include_The_Default_Culture()
+    {
+        var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, new HashSet<string>() { "it-IT" }, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, result.Result);
     }
 }
