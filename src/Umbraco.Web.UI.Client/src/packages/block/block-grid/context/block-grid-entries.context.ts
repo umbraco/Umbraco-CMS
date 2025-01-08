@@ -2,6 +2,7 @@ import type { UmbBlockDataModel } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
 import {
 	UMB_BLOCK_GRID_ENTRY_CONTEXT,
+	UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
 	UMB_BLOCK_GRID_WORKSPACE_MODAL,
 	type UmbBlockGridWorkspaceOriginData,
 } from '../index.js';
@@ -20,6 +21,7 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { pathFolderName } from '@umbraco-cms/backoffice/utils';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import { UMB_CONTENT_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/content';
+import { UMB_CLIPBOARD_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 
 interface UmbBlockGridAreaTypeInvalidRuleType {
 	groupKey?: string;
@@ -192,6 +194,18 @@ export class UmbBlockGridEntriesContext
 					} else {
 						throw new Error('Failed to create block');
 					}
+				} else if (value?.pasteFromClipboard && value.pasteFromClipboard.unique && data) {
+					const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
+					const propertyValue = await clipboardContext.readForProperty(
+						value.pasteFromClipboard.unique,
+						UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
+					);
+
+					if (!propertyValue) {
+						throw new Error('Failed to read clipboard entry');
+					}
+
+					console.log('Clipboard entry:', propertyValue);
 				}
 			})
 			.observeRouteBuilder((routeBuilder) => {
