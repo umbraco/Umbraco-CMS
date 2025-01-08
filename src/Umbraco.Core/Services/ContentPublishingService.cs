@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentPublishing;
@@ -54,7 +54,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             }
             else
             {
-                schedules.AddOrUpdate(culture, cultureToSchedule.Schedule!.PublishDate.Value.UtcDateTime,ContentScheduleAction.Release);
+                schedules.AddOrUpdate(culture, cultureToSchedule.Schedule!.PublishDate.Value.UtcDateTime, ContentScheduleAction.Release);
             }
 
             if (cultureToSchedule.Schedule!.UnpublishDate is null)
@@ -91,7 +91,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             return Attempt.FailWithStatus(ContentPublishingOperationStatus.ContentNotFound, new ContentPublishingResult());
         }
 
-        // clear all schedules and publish nothing
+        // If nothing is requested for publish or scheduling, clear all schedules and publish nothing.
         if (cultureAndSchedule.CulturesToPublishImmediately.Count == 0 &&
             cultureAndSchedule.Schedules.FullSchedule.Count == 0)
         {
@@ -102,11 +102,35 @@ internal sealed class ContentPublishingService : IContentPublishingService
                 new ContentPublishingResult { Content = content });
         }
 
+        ISet<string> culturesToPublishImmediately = cultureAndSchedule.CulturesToPublishImmediately;
+
         var cultures =
-            cultureAndSchedule.CulturesToPublishImmediately.Union(
+            culturesToPublishImmediately.Union(
                 cultureAndSchedule.Schedules.FullSchedule.Select(x => x.Culture)).ToArray();
 
-        if (content.ContentType.VariesByCulture())
+        // If cultures are provided for non variant content, and they include the default culture, consider
+        // the request as valid for publishing the content.
+        // This is necessary as in a bulk publishing context the cultures are selected and provided from the
+        // list of languages.
+        bool variesByCulture = content.ContentType.VariesByCulture();
+        if (!variesByCulture)
+        {
+            ILanguage? defaultLanguage = await _languageService.GetDefaultLanguageAsync();
+            if (defaultLanguage is not null)
+            {
+                if (cultures.Contains(defaultLanguage.IsoCode))
+                {
+                    cultures = ["*"];
+                }
+
+                if (culturesToPublishImmediately.Contains(defaultLanguage.IsoCode))
+                {
+                    culturesToPublishImmediately = new HashSet<string> { "*" };
+                }
+            }
+        }
+
+        if (variesByCulture)
         {
             if (cultures.Any() is false)
             {
@@ -120,7 +144,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.CannotPublishInvariantWhenVariant, new ContentPublishingResult());
             }
 
-            var validCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode);
+            IEnumerable<string> validCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode);
             if (validCultures.ContainsAll(cultures) is false)
             {
                 scope.Complete();
@@ -151,9 +175,9 @@ internal sealed class ContentPublishingService : IContentPublishingService
         var userId = await _userIdKeyResolver.GetAsync(userKey);
 
         PublishResult? result = null;
-        if (cultureAndSchedule.CulturesToPublishImmediately.Any())
+        if (culturesToPublishImmediately.Any())
         {
-            result = _contentService.Publish(content, cultureAndSchedule.CulturesToPublishImmediately.ToArray(), userId);
+            result = _contentService.Publish(content, culturesToPublishImmediately.ToArray(), userId);
         }
 
         if (result?.Success != false && cultureAndSchedule.Schedules.FullSchedule.Any())
@@ -202,10 +226,10 @@ internal sealed class ContentPublishingService : IContentPublishingService
                 Name = content.GetPublishName(culture) ?? string.Empty,
                 Culture = culture,
                 Segment = null,
-                Properties = content.Properties.Where(prop=>prop.PropertyType.VariesByCulture()).Select(prop=> new PropertyValueModel()
+                Properties = content.Properties.Where(prop => prop.PropertyType.VariesByCulture()).Select(prop => new PropertyValueModel()
                 {
                     Alias = prop.Alias,
-                    Value = prop.GetValue(culture: culture, segment:null, published:false)
+                    Value = prop.GetValue(culture: culture, segment: null, published: false)
                 })
             })
         };
@@ -271,6 +295,19 @@ internal sealed class ContentPublishingService : IContentPublishingService
         }
 
         var userId = await _userIdKeyResolver.GetAsync(userKey);
+
+        // If cultures are provided for non variant content, and they include the default culture, consider
+        // the request as valid for unpublishing the content.
+        // This is necessary as in a bulk unpublishing context the cultures are selected and provided from the
+        // list of languages.
+        if (cultures is not null && !content.ContentType.VariesByCulture())
+        {
+            ILanguage? defaultLanguage = await _languageService.GetDefaultLanguageAsync();
+            if (defaultLanguage is not null && cultures.Contains(defaultLanguage.IsoCode))
+            {
+                cultures = null;
+            }
+        }
 
         Attempt<ContentPublishingOperationStatus> attempt;
         if (cultures is null)
