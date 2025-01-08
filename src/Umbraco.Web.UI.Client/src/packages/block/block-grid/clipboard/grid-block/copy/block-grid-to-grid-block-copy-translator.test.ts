@@ -1,9 +1,8 @@
 import { expect } from '@open-wc/testing';
 import { customElement } from 'lit/decorators.js';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbBlockClipboardEntryValueModel } from 'src/packages/block/block/types';
-import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../../property-editors/constants';
-import type { UmbBlockGridValueModel } from '../../../types';
+import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../../property-editors/constants.js';
+import type { UmbBlockGridValueModel, UmbGridBlockClipboardEntryValueModel } from '../../../types.js';
 import { UmbBlockGridToGridBlockClipboardCopyTranslator } from './block-grid-to-grid-block-copy-translator.js';
 
 @customElement('test-controller-host')
@@ -50,7 +49,7 @@ describe('UmbBlockListToBlockClipboardCopyTranslator', () => {
 		],
 	};
 
-	const blockClipboardEntryValue: UmbBlockClipboardEntryValueModel = {
+	const gridBlockClipboardEntryValue: UmbGridBlockClipboardEntryValueModel = {
 		contentData: blockGridPropertyValue.contentData,
 		layout: blockGridPropertyValue.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS],
 		settingsData: blockGridPropertyValue.settingsData,
@@ -73,9 +72,9 @@ describe('UmbBlockListToBlockClipboardCopyTranslator', () => {
 	});
 
 	describe('translate', () => {
-		it('returns the block clipboard entry value model', async () => {
+		it('returns the grid block clipboard entry value', async () => {
 			const result = await copyTranslator.translate(blockGridPropertyValue);
-			expect(result).to.deep.equal(blockClipboardEntryValue);
+			expect(result).to.deep.equal(gridBlockClipboardEntryValue);
 		});
 	});
 });
