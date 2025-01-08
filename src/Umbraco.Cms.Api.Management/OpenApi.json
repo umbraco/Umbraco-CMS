@@ -37787,12 +37787,12 @@
             "format": "date-time",
             "nullable": true
           },
-          "publishAtDate": {
+          "scheduledPublishDate": {
             "type": "string",
             "format": "date-time",
             "nullable": true
           },
-          "unPublishAtDate": {
+          "scheduledUnpublishDate": {
             "type": "string",
             "format": "date-time",
             "nullable": true

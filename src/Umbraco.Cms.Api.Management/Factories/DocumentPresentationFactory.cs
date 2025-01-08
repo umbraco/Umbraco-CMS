@@ -58,27 +58,6 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         return responseModel;
     }
 
-    public void UpdateResponseModelWithContentSchedule(DocumentResponseModel model, ContentScheduleCollection schedule)
-    {
-        foreach (DocumentVariantResponseModel variant in model.Variants)
-        {
-            ContentSchedule? publishSchedule = GetScheduleForAction(schedule, variant.Culture, ContentScheduleAction.Release);
-            if (publishSchedule is not null)
-            {
-                variant.PublishAtDate = publishSchedule.Date;
-            }
-
-            ContentSchedule? unPublishSchedule = GetScheduleForAction(schedule, variant.Culture, ContentScheduleAction.Expire);
-            if (unPublishSchedule is not null)
-            {
-                variant.UnPublishAtDate = unPublishSchedule.Date;
-            }
-        }
-    }
-
-    private static ContentSchedule? GetScheduleForAction(ContentScheduleCollection schedule, string? culture, ContentScheduleAction action)
-        => schedule.FullSchedule.SingleOrDefault(x => x.Culture == (culture ?? string.Empty) && x.Action == action);
-
     public async Task<PublishedDocumentResponseModel> CreatePublishedResponseModelAsync(IContent content)
     {
         PublishedDocumentResponseModel responseModel = _umbracoMapper.Map<PublishedDocumentResponseModel>(content)!;

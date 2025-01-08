@@ -1,4 +1,4 @@
-import { UMB_WORKSPACE_ENTITY_IS_NOT_NEW_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import {
 	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
@@ -27,7 +27,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 			{
-				alias: UMB_WORKSPACE_ENTITY_IS_NOT_NEW_CONDITION_ALIAS,
+				alias: UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS,
+				match: false
 			},
 		],
 	},

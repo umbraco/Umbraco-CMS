@@ -145,8 +145,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 
 		const matchingOption = matchingOptions[0];
 		return {
-			publishTime: this.#convertToLocalTime(matchingOption.variant?.publishAtDate, localUtcOffset, serverUtcOffset),
-			unpublishTime: this.#convertToLocalTime(matchingOption.variant?.unPublishAtDate, localUtcOffset, serverUtcOffset),
+			publishTime: this.#convertToLocalTime(matchingOption.variant?.scheduledPublishDate, localUtcOffset, serverUtcOffset),
+			unpublishTime: this.#convertToLocalTime(matchingOption.variant?.scheduledUnpublishDate, localUtcOffset, serverUtcOffset),
 		}
 	}
 

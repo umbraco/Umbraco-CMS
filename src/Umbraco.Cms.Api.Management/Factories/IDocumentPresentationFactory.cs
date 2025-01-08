@@ -17,9 +17,6 @@ public interface IDocumentPresentationFactory
     [Obsolete("Schedule for removal in v17")]
     Task<DocumentResponseModel> CreateResponseModelAsync(IContent content);
 
-    // TODO (V16): Remove default implementation.
-    void UpdateResponseModelWithContentSchedule(DocumentResponseModel model, ContentScheduleCollection schedule) { }
-
     Task<PublishedDocumentResponseModel> CreatePublishedResponseModelAsync(IContent content);
 
     Task<DocumentResponseModel> CreateResponseModelAsync(IContent content, ContentScheduleCollection schedule)

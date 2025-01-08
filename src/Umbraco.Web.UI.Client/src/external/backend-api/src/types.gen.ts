@@ -867,8 +867,8 @@ export type DocumentVariantResponseModel = {
     updateDate: string;
     state: DocumentVariantStateModel;
     publishDate?: (string) | null;
-    publishAtDate?: (string) | null;
-    unPublishAtDate?: (string) | null;
+    scheduledPublishDate?: (string) | null;
+    scheduledUnpublishDate?: (string) | null;
 };
 
 export enum DocumentVariantStateModel {
@@ -5356,3 +5356,10 @@ export type GetWebhookEventsData = {
 };
 
 export type GetWebhookEventsResponse = ((PagedWebhookEventModel));
+
+export type GetWebhookLogsData = {
+    skip?: number;
+    take?: number;
+};
+
+export type GetWebhookLogsResponse = ((WebhookResponseModel));
