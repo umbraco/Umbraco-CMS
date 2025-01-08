@@ -37,6 +37,13 @@ export class UmbRouteContext extends UmbContextBase<UmbRouteContext> {
 		});
 	}
 
+	getBasePath() {
+		return this.#basePath.getValue();
+	}
+	getActivePath() {
+		return this.getBasePath() + '/' + this.#activeLocalPath;
+	}
+
 	public registerModal(registration: UmbModalRouteRegistration) {
 		this.#modalRegistrations.push(registration);
 		this.#createNewUrlBuilder(registration);
