@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
-public partial class BlockListElementLevelVariationTests
+internal partial class BlockListElementLevelVariationTests
 {
     private IContentValidationService ContentValidationService => GetRequiredService<IContentValidationService>();
 

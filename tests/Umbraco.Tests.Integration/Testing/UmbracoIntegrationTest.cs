@@ -19,6 +19,7 @@ using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Persistence.Sqlite;
 using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Integration.Attributes;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
 
@@ -181,8 +182,30 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         services.AddMvc();
 
         CustomTestSetup(builder);
+        ExecuteBuilderAttributes(builder);
 
         builder.Build();
+    }
+
+    private void ExecuteBuilderAttributes(IUmbracoBuilder builder)
+    {
+        // todo better errors
+
+        // execute builder attributes defined on method
+        foreach (ConfigureBuilderAttribute builderAttribute in Type.GetType(TestContext.CurrentContext.Test.ClassName)
+                     .GetMethods().First(m => m.Name == TestContext.CurrentContext.Test.MethodName)
+                     .GetCustomAttributes(typeof(ConfigureBuilderAttribute), true))
+        {
+            builderAttribute.Execute(builder);
+        }
+
+        // execute builder attributes defined on method with param value passtrough from testcase
+        foreach (ConfigureBuilderTestCaseAttribute builderAttribute in Type.GetType(TestContext.CurrentContext.Test.ClassName)
+                     .GetMethods().First(m => m.Name == TestContext.CurrentContext.Test.MethodName)
+                     .GetCustomAttributes(typeof(ConfigureBuilderTestCaseAttribute), true))
+        {
+            builderAttribute.Execute(builder);
+        }
     }
 
     /// <summary>
