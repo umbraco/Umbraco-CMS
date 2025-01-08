@@ -22,7 +22,8 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 
 	async serverUpgradeCheck(): Promise<UmbServerUpgradeCheck | null> {
 		// Check if we are allowed to check again
-		const versionCheckPeriod = await this.#getVersionCheckPeriod();
+		const appContext = await this.getContext(UMB_APP_CONTEXT);
+		const versionCheckPeriod = await this.observe(appContext.getServerConnection().versionCheckPeriod).asPromise();
 
 		if (versionCheckPeriod <= 0) {
 			return null;
@@ -69,13 +70,6 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 		}
 
 		return null;
-	}
-
-	async #getVersionCheckPeriod(): Promise<number> {
-		const appContext = await this.getContext(UMB_APP_CONTEXT);
-		return this.observe(appContext.getServerConnection().versionCheckPeriod, (period) => {
-			return period;
-		}).asPromise();
 	}
 
 	#getStoredServerUpgradeCheck(lastCheck: Date): UmbServerUpgradeCheck | null {
