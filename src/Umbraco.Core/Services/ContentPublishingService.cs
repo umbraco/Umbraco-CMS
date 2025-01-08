@@ -36,6 +36,50 @@ internal sealed class ContentPublishingService : IContentPublishingService
     /// <inheritdoc />
     public async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
         Guid key,
+        ICollection<CulturePublishScheduleModel> culturesToPublishOrSchedule,
+        Guid userKey)
+    {
+        var culturesToPublishImmediately =
+            culturesToPublishOrSchedule.Where(culture => culture.Schedule is null).Select(c => c.Culture ?? Constants.System.InvariantCulture).ToHashSet();
+
+        ContentScheduleCollection schedules = _contentService.GetContentScheduleByContentId(key);
+
+        foreach (CulturePublishScheduleModel cultureToSchedule in culturesToPublishOrSchedule.Where(c => c.Schedule is not null))
+        {
+            var culture = cultureToSchedule.Culture ?? Constants.System.InvariantCulture;
+
+            if (cultureToSchedule.Schedule!.PublishDate is null)
+            {
+                schedules.RemoveIfExists(culture, ContentScheduleAction.Release);
+            }
+            else
+            {
+                schedules.AddOrUpdate(culture, cultureToSchedule.Schedule!.PublishDate.Value.UtcDateTime,ContentScheduleAction.Release);
+            }
+
+            if (cultureToSchedule.Schedule!.UnpublishDate is null)
+            {
+                schedules.RemoveIfExists(culture, ContentScheduleAction.Expire);
+            }
+            else
+            {
+                schedules.AddOrUpdate(culture, cultureToSchedule.Schedule!.UnpublishDate.Value.UtcDateTime, ContentScheduleAction.Expire);
+            }
+        }
+
+        var cultureAndSchedule = new CultureAndScheduleModel
+        {
+            CulturesToPublishImmediately = culturesToPublishImmediately,
+            Schedules = schedules,
+        };
+
+        return await PublishAsync(key, cultureAndSchedule, userKey);
+    }
+
+    /// <inheritdoc />
+    [Obsolete("Use non obsoleted version instead. Scheduled for removal in v17")]
+    public async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
+        Guid key,
         CultureAndScheduleModel cultureAndSchedule,
         Guid userKey)
     {
@@ -47,6 +91,16 @@ internal sealed class ContentPublishingService : IContentPublishingService
             return Attempt.FailWithStatus(ContentPublishingOperationStatus.ContentNotFound, new ContentPublishingResult());
         }
 
+        // clear all schedules and publish nothing
+        if (cultureAndSchedule.CulturesToPublishImmediately.Count == 0 &&
+            cultureAndSchedule.Schedules.FullSchedule.Count == 0)
+        {
+            _contentService.PersistContentSchedule(content, cultureAndSchedule.Schedules);
+            scope.Complete();
+            return Attempt.SucceedWithStatus(
+                ContentPublishingOperationStatus.Success,
+                new ContentPublishingResult { Content = content });
+        }
 
         var cultures =
             cultureAndSchedule.CulturesToPublishImmediately.Union(
@@ -60,8 +114,14 @@ internal sealed class ContentPublishingService : IContentPublishingService
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.CultureMissing, new ContentPublishingResult());
             }
 
+            if (cultures.Any(x => x == Constants.System.InvariantCulture))
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.CannotPublishInvariantWhenVariant, new ContentPublishingResult());
+            }
+
             var validCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode);
-            if (cultures.Any(x => x == "*") || cultures.All(x=> validCultures.Contains(x) is false))
+            if (validCultures.ContainsAll(cultures) is false)
             {
                 scope.Complete();
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.InvalidCulture, new ContentPublishingResult());
@@ -69,7 +129,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
         }
         else
         {
-            if (cultures.Length != 1 || cultures.Any(x => x != "*"))
+            if (cultures.Length != 1 || cultures.Any(x => x != Constants.System.InvariantCulture))
             {
                 scope.Complete();
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.InvalidCulture, new ContentPublishingResult());
@@ -95,10 +155,14 @@ internal sealed class ContentPublishingService : IContentPublishingService
         {
             result = _contentService.Publish(content, cultureAndSchedule.CulturesToPublishImmediately.ToArray(), userId);
         }
-        else if(cultureAndSchedule.Schedules.FullSchedule.Any())
+
+        if (result?.Success != false && cultureAndSchedule.Schedules.FullSchedule.Any())
         {
-            _contentService.PersistContentSchedule(content, cultureAndSchedule.Schedules);
-            result = new PublishResult(PublishResultType.SuccessPublish, new EventMessages(), content);
+            _contentService.PersistContentSchedule(result?.Content ?? content, cultureAndSchedule.Schedules);
+            result = new PublishResult(
+                PublishResultType.SuccessPublish,
+                result?.EventMessages ?? new EventMessages(),
+                result?.Content ?? content);
         }
 
         scope.Complete();
