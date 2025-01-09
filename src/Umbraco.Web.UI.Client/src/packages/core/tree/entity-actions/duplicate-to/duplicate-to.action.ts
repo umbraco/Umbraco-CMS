@@ -52,6 +52,8 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 		});
 
 		actionEventContext.dispatchEvent(event);
+
+		// TODO: Reload destination
 	}
 }
 
