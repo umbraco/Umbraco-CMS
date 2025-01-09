@@ -23,7 +23,6 @@ import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-
  * @augments {UmbContextBase<UmbClipboardContext>}
  */
 export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
-	#entries = new UmbArrayState<UmbClipboardEntryDetailModel>([], (x) => x.unique);
 	#init?: Promise<unknown>;
 
 	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
