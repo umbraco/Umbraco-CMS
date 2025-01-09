@@ -103,7 +103,6 @@ describe('UmbRoutepathAddendum', () => {
 		});
 
 		it('returns late set child addendum', (done) => {
-			addendumContext.setAddendum('hello/here');
 			const innerChild = new UmbTestChildElement();
 			child.appendChild(innerChild);
 			const childAddendumContext = new UmbRoutePathAddendumContext(innerChild);
@@ -116,6 +115,8 @@ describe('UmbRoutepathAddendum', () => {
 			});
 
 			childAddendumContext.setAddendum('child-specification');
+
+			addendumContext.setAddendum('hello/here');
 		});
 	});
 });
