@@ -119,4 +119,19 @@ describe('UmbRoutepathAddendum', () => {
 			addendumContext.setAddendum('hello/here');
 		});
 	});
+
+	it('work with empty string addendum', (done) => {
+		addendumContext.setAddendum('hello/here');
+		const innerChild = new UmbTestChildElement();
+		child.appendChild(innerChild);
+		const childAddendumContext = new UmbRoutePathAddendumContext(innerChild);
+		childAddendumContext.setAddendum('');
+
+		childAddendumContext.observe(childAddendumContext.addendum, (addendum) => {
+			if (addendum) {
+				expect(addendum).to.equal('hello/here');
+				done();
+			}
+		});
+	});
 });
