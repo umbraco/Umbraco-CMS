@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
+using Umbraco.Cms.Core.Models.ServerEvents;
 using Umbraco.Cms.Core.ServerEvents;
 using Umbraco.Extensions;
 
@@ -9,32 +10,27 @@ namespace Umbraco.Cms.Api.Management.ServerEvents;
 internal sealed class ServerEventUserManager : IServerEventUserManager
 {
     private readonly IUserConnectionManager _userConnectionManager;
-    private readonly EventSourceAuthorizerCollection _eventSourceAuthorizerCollection;
+    private readonly IServerEventAuthorizationService _serverEventAuthorizationService;
     private readonly IHubContext<ServerEventHub, IServerEventHub> _eventHub;
 
     public ServerEventUserManager(
         IUserConnectionManager userConnectionManager,
-        EventSourceAuthorizerCollection eventSourceAuthorizerCollection,
+        IServerEventAuthorizationService serverEventAuthorizationService,
         IHubContext<ServerEventHub, IServerEventHub> eventHub)
     {
         _userConnectionManager = userConnectionManager;
-        _eventSourceAuthorizerCollection = eventSourceAuthorizerCollection;
+        _serverEventAuthorizationService = serverEventAuthorizationService;
         _eventHub = eventHub;
     }
 
     /// <inheritdoc />
     public async Task AssignToGroupsAsync(ClaimsPrincipal user, string connectionId)
     {
-        foreach (IEventSourceAuthorizer authorizer in _eventSourceAuthorizerCollection)
+        SeverEventAuthorizationResult authorizationResult = await _serverEventAuthorizationService.AuthorizeAsync(user);
+
+        foreach (var authorizedEventSource in authorizationResult.AuthorizedEventSources)
         {
-            foreach (var eventSource in authorizer.AuthorizableEventSources)
-            {
-                var isAuthorized = await authorizer.AuthorizeAsync(user, eventSource);
-                if (isAuthorized)
-                {
-                    await _eventHub.Groups.AddToGroupAsync(connectionId, eventSource);
-                }
-            }
+           await _eventHub.Groups.AddToGroupAsync(connectionId, authorizedEventSource);
         }
     }
 
@@ -58,26 +54,23 @@ internal sealed class ServerEventUserManager : IServerEventUserManager
             return;
         }
 
-        foreach (IEventSourceAuthorizer authorizer in _eventSourceAuthorizerCollection)
+        SeverEventAuthorizationResult authorizationResult = await _serverEventAuthorizationService.AuthorizeAsync(user);
+
+        // Add the user to the authorized groups, and remove them from the unauthorized groups.
+        // Note that it's safe to add a user to a group multiple times, so we don't have ot worry about that.
+        foreach (var authorizedEventSource in authorizationResult.AuthorizedEventSources)
         {
-            foreach (var eventSource in authorizer.AuthorizableEventSources)
+            foreach (var connection in connections)
             {
-                var isAuthorized = await authorizer.AuthorizeAsync(user, eventSource);
+                await _eventHub.Groups.AddToGroupAsync(connection, authorizedEventSource);
+            }
+        }
 
-                if (isAuthorized)
-                {
-                    foreach (var connection in connections)
-                    {
-                        await _eventHub.Groups.AddToGroupAsync(connection, eventSource);
-                    }
-
-                    continue;
-                }
-
-                foreach (var connection in connections)
-                {
-                    await _eventHub.Groups.RemoveFromGroupAsync(connection, eventSource);
-                }
+        foreach (var unauthorizedEventSource in authorizationResult.UnauthorizedEventSources)
+        {
+            foreach (var connection in connections)
+            {
+                await _eventHub.Groups.RemoveFromGroupAsync(connection, unauthorizedEventSource);
             }
         }
     }

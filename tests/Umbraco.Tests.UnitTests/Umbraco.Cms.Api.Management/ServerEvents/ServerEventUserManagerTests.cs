@@ -16,7 +16,7 @@ public class ServerEventUserManagerTests
     {
         var userKey = Guid.NewGuid();
         var user = CreateFakeUser(userKey);
-        var authorizers = CreateAuthorizerCollection(new FakeAuthorizer(["source"]));
+        var authorizationService = CreateServeEventAuthorizationService(new FakeAuthorizer(["source"]));
         var mocks = CreateHubContextMocks();
 
         // Add a connection to the user
@@ -24,7 +24,7 @@ public class ServerEventUserManagerTests
         var connectionManager = new UserConnectionManager();
         connectionManager.AddConnection(userKey, connection);
 
-        var sut = new ServerEventUserManager(connectionManager, authorizers, mocks.HubContextMock.Object);
+        var sut = new ServerEventUserManager(connectionManager, authorizationService, mocks.HubContextMock.Object);
         await sut.AssignToGroupsAsync(user, connection);
 
         // Ensure AddToGroupAsync was called once, and only once with the expected parameters.
@@ -37,7 +37,7 @@ public class ServerEventUserManagerTests
     {
         var userKey = Guid.NewGuid();
         var user = CreateFakeUser(userKey);
-        var authorizers = CreateAuthorizerCollection(new FakeAuthorizer(["source"], (_, _) => false));
+        var authorizationService = CreateServeEventAuthorizationService(new FakeAuthorizer(["source"], (_, _) => false));
         var mocks = CreateHubContextMocks();
 
         // Add a connection to the user
@@ -45,7 +45,7 @@ public class ServerEventUserManagerTests
         var connectionManager = new UserConnectionManager();
         connectionManager.AddConnection(userKey, connection);
 
-        var sut = new ServerEventUserManager(connectionManager, authorizers, mocks.HubContextMock.Object);
+        var sut = new ServerEventUserManager(connectionManager, authorizationService, mocks.HubContextMock.Object);
         await sut.AssignToGroupsAsync(user, connection);
 
         // Ensure AddToGroupAsync was never called.
@@ -59,7 +59,7 @@ public class ServerEventUserManagerTests
         var user = CreateFakeUser(userKey);
         var allowedSource = "allowedSource";
         var disallowedSource = "NotAllowed";
-        var authorizers = CreateAuthorizerCollection(new FakeAuthorizer([allowedSource]), new FakeAuthorizer([disallowedSource], (_, _) => false));
+        var authorizationService = CreateServeEventAuthorizationService(new FakeAuthorizer([allowedSource]), new FakeAuthorizer([disallowedSource], (_, _) => false));
         var mocks = CreateHubContextMocks();
 
         // Add a connection to the user
@@ -67,7 +67,7 @@ public class ServerEventUserManagerTests
         var connectionManager = new UserConnectionManager();
         connectionManager.AddConnection(userKey, connection);
 
-        var sut = new ServerEventUserManager(connectionManager, authorizers, mocks.HubContextMock.Object);
+        var sut = new ServerEventUserManager(connectionManager, authorizationService, mocks.HubContextMock.Object);
         await sut.RefreshGroupsAsync(user);
 
         // Ensure AddToGroupAsync was called once, and only once with the expected parameters.
@@ -84,12 +84,12 @@ public class ServerEventUserManagerTests
     {
         var userKey = Guid.NewGuid();
         var user = CreateFakeUser(userKey);
-        var authorizers = CreateAuthorizerCollection(new FakeAuthorizer(["source"]), new FakeAuthorizer(["disallowedSource"], (_, _) => false));
+        var authorizationService = CreateServeEventAuthorizationService(new FakeAuthorizer(["source"]), new FakeAuthorizer(["disallowedSource"], (_, _) => false)) ?? throw new ArgumentNullException("CreateServeEventAuthorizationService(new FakeAuthorizer([\"source\"]), new FakeAuthorizer([\"disallowedSource\"], (_, _) => false))");
         var mocks = CreateHubContextMocks();
 
         var connectionManager = new UserConnectionManager();
 
-        var sut = new ServerEventUserManager(connectionManager, authorizers, mocks.HubContextMock.Object);
+        var sut = new ServerEventUserManager(connectionManager, authorizationService, mocks.HubContextMock.Object);
         await sut.RefreshGroupsAsync(user);
 
         // Ensure AddToGroupAsync was never called.
@@ -103,8 +103,8 @@ public class ServerEventUserManagerTests
             new Claim(Constants.Security.OpenIdDictSubClaimType, key.ToString())
         ]));
 
-    private EventSourceAuthorizerCollection CreateAuthorizerCollection(params IEnumerable<IEventSourceAuthorizer> authorizers)
-        => new(() => authorizers);
+    private IServerEventAuthorizationService CreateServeEventAuthorizationService(params IEnumerable<IEventSourceAuthorizer> authorizers)
+        => new ServerEventAuthorizationService(new EventSourceAuthorizerCollection(() => authorizers));
 
     private (Mock<IServerEventHub> HubMock, Mock<IHubClients<IServerEventHub>> HubClientsMock, Mock<IGroupManager> GroupManagerMock, Mock<IHubContext<ServerEventHub, IServerEventHub>> HubContextMock) CreateHubContextMocks()
     {
@@ -121,18 +121,4 @@ public class ServerEventUserManagerTests
         return (hubMock, hubClients, groupManagerMock, hubContext);
     }
 
-    private class FakeAuthorizer : IEventSourceAuthorizer
-    {
-        private readonly Func<ClaimsPrincipal, string, bool> authorizeFunc;
-
-        public FakeAuthorizer(IEnumerable<string> sources, Func<ClaimsPrincipal, string, bool>? authorizeFunc = null)
-        {
-            this.authorizeFunc = authorizeFunc ?? ((_, _) => true);
-            AuthorizableEventSources = sources;
-        }
-
-        public IEnumerable<string> AuthorizableEventSources { get; }
-
-        public Task<bool> AuthorizeAsync(ClaimsPrincipal principal, string connectionId) => Task.FromResult(authorizeFunc(principal, connectionId));
-    }
 }
