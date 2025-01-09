@@ -10,7 +10,7 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { debounce } from '@umbraco-cms/backoffice/utils';
-import { UMB_APP_LANGUAGE_CONTEXT, UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
+import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 
 interface UmbDocumentInfoViewLink {
 	culture: string;
