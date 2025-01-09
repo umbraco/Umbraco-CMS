@@ -1,4 +1,4 @@
-import {test} from "@umbraco/playwright-testhelpers";
+import {NotificationConstantHelper, test} from "@umbraco/playwright-testhelpers";
 import {expect} from "@playwright/test";
 
 const blockGridEditorName = 'TestBlockGridEditor';
@@ -390,9 +390,42 @@ test('can update grid columns in a block grid editor', async ({umbracoApi, umbra
   expect(await umbracoApi.dataType.doesBlockGridContainGridColumns(blockGridEditorName, gridColumns)).toBeTruthy();
 });
 
-// TODO: wait until fixed by frontend, currently you are able to insert multiple stylesheets
-test.skip('can add a stylesheet a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test('can add a stylesheet a block grid editor', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const stylesheetName = 'TestStylesheet.css';
+  await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
+  await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockGridEditorName);
+  await umbracoUi.dataType.clickChooseButton();
+  await umbracoUi.dataType.clickCaretButtonForName('wwwroot');
+  await umbracoUi.dataType.clickLabelWithName('Expand child items for css');
+  await umbracoUi.dataType.clickLabelWithName(stylesheetName);
+  await umbracoUi.dataType.clickChooseModalButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.dataType.doesBlockGridContainLayoutStylesheet(blockGridEditorName, stylesheetName)).toBeTruthy();
 });
 
-test.skip('can remove a stylesheet in a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test('can remove a stylesheet in a block grid editor', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const stylesheetName = 'TestStylesheet.css';
+  await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
+  await umbracoApi.dataType.createBlockGridWithLayoutStylesheet(blockGridEditorName, stylesheetName);
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockGridEditorName);
+  await umbracoUi.dataType.clickRemoveStylesheetButton(stylesheetName);
+  await umbracoUi.dataType.clickConfirmRemoveButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.dataType.doesBlockGridContainLayoutStylesheet(blockGridEditorName, stylesheetName)).toBeFalsy();
+
+  // Clean
+  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
 });
