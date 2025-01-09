@@ -51,8 +51,14 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		]);
 	}
 
+	/**
+	 * Write to the clipboard
+	 * @param {Partial<UmbClipboardEntryDetailModel>} entryPreset - The preset for the clipboard entry
+	 * @returns {Promise<void>}
+	 * @memberof UmbClipboardContext
+	 */
 	async write(entryPreset: Partial<UmbClipboardEntryDetailModel>): Promise<void> {
-		if (!entryPreset) throw new Error('Entry is required');
+		if (!entryPreset) throw new Error('Entry preset is required');
 
 		const { data: scaffoldData } = await this.#clipboardDetailRepository.createScaffold(entryPreset);
 		if (!scaffoldData) return;
