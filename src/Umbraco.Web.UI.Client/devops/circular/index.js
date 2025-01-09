@@ -42,7 +42,7 @@ if (circular.length) {
 	try {
 		const image = await madgeSetup.image(join(__dirname, '../../madge/circular.svg'), true);
 		console.log('Circular dependencies graph generated:', image);
-	} catch { console.warn('No image generated. Make sure Graphviz is in your $PATH if you want a visualization'); }
+	} catch (e) { console.warn('No image generated. Make sure Graphviz is in your $PATH if you want a visualization', e); }
 
 	process.exit(1);
 }
