@@ -1,4 +1,4 @@
-import { UMB_ROUTE_CONTEXT } from '../route.context.js';
+import { UMB_ROUTE_CONTEXT } from '../index.js';
 import { encodeFolderName } from '../encode-folder-name.function.js';
 import type { UmbModalRouteRegistration } from './modal-route-registration.interface.js';
 import type {

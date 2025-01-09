@@ -1,5 +1,5 @@
 import { UmbModalToken } from '../token/modal-token.js';
-import { UMB_ROUTE_CONTEXT } from '../../router/route.context.js';
+import { UMB_ROUTE_CONTEXT } from '../../router/components/router-slot/route.context.js';
 import type { UmbModalConfig, UmbModalType } from '../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';

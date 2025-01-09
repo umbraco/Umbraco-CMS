@@ -1,7 +1,7 @@
 import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
 import type { ManifestCollectionView } from '../extensions/types.js';
 import type { UmbCollectionLayoutConfiguration } from '../types.js';
-import { UMB_ROUTE_CONTEXT } from '../../router/route.context.js';
+import { UMB_ROUTE_CONTEXT } from '../../router/components/router-slot/route.context.js';
 import { css, customElement, html, nothing, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
