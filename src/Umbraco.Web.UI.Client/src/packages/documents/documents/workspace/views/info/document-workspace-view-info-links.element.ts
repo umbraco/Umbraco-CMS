@@ -105,7 +105,7 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		}
 
 		if (url.includes(".") && !url.includes("//")) {
-			return "https://" + url;
+			return "//" + url;
 		}
 
 		return url;
