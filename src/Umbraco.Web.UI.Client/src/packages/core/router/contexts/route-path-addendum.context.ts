@@ -8,33 +8,35 @@ export class UmbRoutePathAddendumContext
 	extends UmbContextBase<UmbRoutePathAddendum, typeof UMB_ROUTE_PATH_ADDENDUM_CONTEXT>
 	implements UmbRoutePathAddendum
 {
-	#parentAddendum?: string;
-	#currentAddendum?: string;
+	#parent?: string;
+	#current?: string;
 
-	#pathAddendum = new UmbStringState(undefined);
-	readonly addendum = this.#pathAddendum.asObservable();
+	#addendum = new UmbStringState(undefined);
+	readonly addendum = this.#addendum.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_ROUTE_PATH_ADDENDUM_CONTEXT);
 
 		this.consumeContext(UMB_ROUTE_PATH_ADDENDUM_CONTEXT, (context) => {
 			this.observe(context.addendum, (addendum) => {
-				this.#parentAddendum = addendum;
+				this.#parent = addendum;
+				console.log('parent addendum', addendum, (context as any).getHostElement());
 				this.#update();
 			});
 		}).skipHost();
 	}
 
-	setAddendum(addendum: string) {
-		this.#currentAddendum = addendum;
+	setAddendum(addendum: string | undefined) {
+		this.#current = addendum;
 		this.#update();
 	}
 
 	#update() {
-		if (this.#parentAddendum === undefined || this.#currentAddendum === undefined) {
+		if (this.#parent === undefined || this.#current === undefined) {
 			return;
 		}
-		const base = this.#parentAddendum === '' ? this.#parentAddendum : this.#parentAddendum + '/';
-		this.#pathAddendum.setValue(base + this.#currentAddendum);
+		// if none of the strings are empty strings, then we should add a slash in front of the currentAddendum. So we get one in between.
+		const add = this.#current === '' || this.#parent === '' ? this.#current : '/' + this.#current;
+		this.#addendum.setValue(this.#parent + add);
 	}
 }

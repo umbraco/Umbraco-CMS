@@ -20,6 +20,7 @@ import type {
 } from '@umbraco-cms/backoffice/content-type';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
+import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 
 /**
  *  @element umb-property
@@ -171,6 +172,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	private _isReadOnly = false;
 
 	#propertyContext = new UmbPropertyContext(this);
+	#pathAddendum = new UmbRoutePathAddendumContext(this);
 
 	#controlValidator?: UmbFormControlValidator;
 	#validationMessageBinder?: UmbBindServerValidationToFormControl;
@@ -184,6 +186,7 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#propertyContext.alias,
 			(alias) => {
 				this._alias = alias;
+				this.#pathAddendum.setAddendum(alias);
 			},
 			null,
 		);

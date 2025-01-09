@@ -5,6 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbEntityVariantModel, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
+import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 
 export class UmbContentPropertyDatasetContext<
 	ContentModel extends UmbContentDetailModel = UmbContentDetailModel,
@@ -16,6 +17,7 @@ export class UmbContentPropertyDatasetContext<
 	UmbContentWorkspaceContext<ContentModel, ContentTypeModel, VariantModelType>
 > {
 	//
+	#pathAddendum = new UmbRoutePathAddendumContext(this);
 	#currentVariant = new UmbObjectState<VariantModelType | undefined>(undefined);
 	currentVariant = this.#currentVariant.asObservable();
 
@@ -46,6 +48,8 @@ export class UmbContentPropertyDatasetContext<
 	) {
 		// The controller alias, is a very generic name cause we want only one of these for this controller host.
 		super(host, dataOwner, variantId);
+
+		this.#pathAddendum.setAddendum(variantId ? variantId.toString() : '');
 
 		this.observe(
 			this._dataOwner.variantById(this.getVariantId()),

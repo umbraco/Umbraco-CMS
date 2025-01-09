@@ -21,6 +21,9 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	#modalRouter: IRouterSlot = document.createElement('router-slot') as IRouterSlot;
 	#listening = false;
 
+	@property({ type: Boolean, attribute: 'parse-addendum', reflect: false })
+	public parseAddendum?: boolean;
+
 	@property({ attribute: false })
 	public get routes(): UmbRoute[] | undefined {
 		return this.#router.routes;
@@ -63,8 +66,6 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		new UmbRoutePathAddendumResetContext(this);
-
 		this.#modalRouter.parent = this.#router;
 		this.#modalRouter.style.display = 'none';
 		this.#router.addEventListener('changestate', this._updateRouterPath.bind(this));
@@ -80,6 +81,10 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	}
 
 	override connectedCallback() {
+		if (this.parseAddendum !== true) {
+			new UmbRoutePathAddendumResetContext(this);
+		}
+
 		super.connectedCallback();
 		// Currently we have to set this every time as RouteSlot looks for its parent every-time it is connected. Aka it has not way to explicitly set the parent.
 		// And we cannot insert the modal router as a slotted-child of the router, as it flushes its children on every route change.
