@@ -44,6 +44,10 @@ jobs:
       - run: npm run build:for:cms
       - run: npm run check:paths
       - run: npm run generate:jsonschema:dist
+      - name: Setup Graphviz
+        uses: ts-graphviz/setup-graphviz@v2.0.2
+      - name: Check for circular dependencies
+        run: node devops/circular/index.js src
 
   test:
     runs-on: ubuntu-latest
