@@ -7,6 +7,7 @@
 
 import madge from 'madge';
 import { join } from 'path';
+import { mkdirSync } from 'fs';
 
 const __dirname = import.meta.dirname;
 const IS_GITHUB_ACTIONS = process.env.GITHUB_ACTIONS === 'true';
@@ -40,7 +41,9 @@ if (circular.length) {
 	console.error('\nPlease fix the circular dependencies before proceeding.\n');
 
 	try {
-		const image = await madgeSetup.image(join(__dirname, '../../madge/circular.svg'), true);
+		const imagePath = join(__dirname, '../../madge');
+		mkdirSync(imagePath, { recursive: true });
+		const image = await madgeSetup.image(join(imagePath, 'circular.svg'), true);
 		console.log('Circular dependencies graph generated:', image);
 	} catch (e) { console.warn('No image generated. Make sure Graphviz is in your $PATH if you want a visualization', e); }
 
