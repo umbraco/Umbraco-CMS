@@ -1,4 +1,4 @@
-import { UMB_ROUTE_CONTEXT } from '../index.js';
+import { UMB_ROUTE_CONTEXT, UMB_ROUTE_PATH_ADDENDUM_CONTEXT } from '../index.js';
 import { encodeFolderName } from '../encode-folder-name.function.js';
 import type { UmbModalRouteRegistration } from './modal-route-registration.interface.js';
 import type {
@@ -51,6 +51,7 @@ export class UmbModalRouteRegistrationController<
 	#init;
 	#contextConsumer;
 
+	#addendum?: string;
 	#additionalPath?: string;
 	#uniquePaths: Map<string, string | undefined> = new Map();
 
@@ -89,9 +90,19 @@ export class UmbModalRouteRegistrationController<
 		super(host, ctrlAlias ?? alias.toString());
 		this.#key = UmbId.new();
 		this.#modalAlias = alias;
-		//this.#path = path;
 
-		this.#contextConsumer = new UmbContextConsumerController(this, UMB_ROUTE_CONTEXT, (_routeContext) => {
+		this.consumeContext(UMB_ROUTE_PATH_ADDENDUM_CONTEXT, (context) => {
+			this.observe(
+				context.addendum,
+				(addendum) => {
+					this.#addendum = addendum;
+					this.#registerModal();
+				},
+				'observeAddendum',
+			);
+		});
+
+		this.#contextConsumer = this.consumeContext(UMB_ROUTE_CONTEXT, (_routeContext) => {
 			this.#routeContext = _routeContext;
 			this.#registerModal();
 		});
@@ -176,12 +187,18 @@ export class UmbModalRouteRegistrationController<
 	async #registerModal() {
 		await this.#init;
 		if (!this.#routeContext) return;
+		if (this.#addendum === undefined) return;
 
 		const pathParts = Array.from(this.#uniquePaths.values());
 
 		// Check if there is any undefined values of unique map:
 		if (pathParts.some((value) => value === undefined)) {
 			this.#unregisterModal();
+		}
+
+		if (this.#addendum !== '') {
+			// append in the start of pathParts:
+			pathParts.unshift(this.#addendum);
 		}
 
 		if (this.#additionalPath) {

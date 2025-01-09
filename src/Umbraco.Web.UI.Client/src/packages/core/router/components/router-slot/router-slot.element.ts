@@ -1,4 +1,5 @@
 import '@umbraco-cms/backoffice/external/router-slot';
+import { UmbRoutePathAddendumResetContext } from '../../contexts/route-path-addendum-reset.context.js';
 import { UmbRouterSlotInitEvent } from './router-slot-init.event.js';
 import { UmbRouterSlotChangeEvent } from './router-slot-change.event.js';
 import type { UmbRoute } from './route.interface.js';
@@ -61,6 +62,9 @@ export class UmbRouterSlotElement extends UmbLitElement {
 
 	constructor() {
 		super();
+
+		new UmbRoutePathAddendumResetContext(this);
+
 		this.#modalRouter.parent = this.#router;
 		this.#modalRouter.style.display = 'none';
 		this.#router.addEventListener('changestate', this._updateRouterPath.bind(this));
