@@ -34,6 +34,7 @@ export class UmbRoutePathAddendumContext
 		if (this.#parentAddendum === undefined || this.#currentAddendum === undefined) {
 			return;
 		}
-		this.#pathAddendum.setValue(this.#parentAddendum + this.#currentAddendum);
+		const base = this.#parentAddendum === '' ? this.#parentAddendum : this.#parentAddendum + '/';
+		this.#pathAddendum.setValue(base + this.#currentAddendum);
 	}
 }

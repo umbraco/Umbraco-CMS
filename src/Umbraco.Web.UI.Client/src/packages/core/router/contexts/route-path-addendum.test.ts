@@ -60,11 +60,11 @@ describe('UmbRoutepathAddendum', () => {
 		it('returns late set addendum', (done) => {
 			addendumContext.observe(addendumContext.addendum, (addendum) => {
 				if (addendum) {
-					expect(addendum).to.equal('/hello/here');
+					expect(addendum).to.equal('hello/here');
 					done();
 				}
 			});
-			addendumContext.setAddendum('/hello/here');
+			addendumContext.setAddendum('hello/here');
 		});
 
 		it('returns an updated addendum', (done) => {
@@ -73,49 +73,49 @@ describe('UmbRoutepathAddendum', () => {
 				count++;
 				if (count === 1) {
 					if (addendum) {
-						expect(addendum).to.equal('/hello/here');
+						expect(addendum).to.equal('hello/here');
 						done();
 					}
 				} else if (count === 2) {
 					if (addendum) {
-						expect(addendum).to.equal('/hello/updateded');
+						expect(addendum).to.equal('hello/updateded');
 						done();
 					}
 				}
 			});
-			addendumContext.setAddendum('/hello/here');
-			addendumContext.setAddendum('/hello/updateded');
+			addendumContext.setAddendum('hello/here');
+			addendumContext.setAddendum('hello/updateded');
 		});
 
 		it('returns early set child addendum', (done) => {
-			addendumContext.setAddendum('/hello/here');
+			addendumContext.setAddendum('hello/here');
 			const innerChild = new UmbTestChildElement();
 			child.appendChild(innerChild);
 			const childAddendumContext = new UmbRoutePathAddendumContext(innerChild);
-			childAddendumContext.setAddendum('/child-specification');
+			childAddendumContext.setAddendum('child-specification');
 
 			childAddendumContext.observe(childAddendumContext.addendum, (addendum) => {
 				if (addendum) {
-					expect(addendum).to.equal('/hello/here/child-specification');
+					expect(addendum).to.equal('hello/here/child-specification');
 					done();
 				}
 			});
 		});
 
 		it('returns late set child addendum', (done) => {
-			addendumContext.setAddendum('/hello/here');
+			addendumContext.setAddendum('hello/here');
 			const innerChild = new UmbTestChildElement();
 			child.appendChild(innerChild);
 			const childAddendumContext = new UmbRoutePathAddendumContext(innerChild);
 
 			childAddendumContext.observe(childAddendumContext.addendum, (addendum) => {
 				if (addendum) {
-					expect(addendum).to.equal('/hello/here/child-specification');
+					expect(addendum).to.equal('hello/here/child-specification');
 					done();
 				}
 			});
 
-			childAddendumContext.setAddendum('/child-specification');
+			childAddendumContext.setAddendum('child-specification');
 		});
 	});
 });
