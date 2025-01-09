@@ -158,15 +158,26 @@ export class UmbBlockGridEntriesContext
 		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
 			.addUniquePaths(['propertyAlias', 'variantId', 'parentUnique', 'areaKey'])
 			.addAdditionalPath(':view/:index')
-			.onSetup((routingInfo) => {
+			.onSetup(async (routingInfo) => {
 				if (!this._manager) return false;
 				// Idea: Maybe on setup should be async, so it can retrieve the values when needed? [NL]
 				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
+				const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
+				const pasteTranslatorManifests = clipboardContext.getPasteTranslatorManifestsForPropertyEditorUi(
+					UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
+				);
 				return {
 					data: {
 						blocks: this.#allowedBlockTypes.getValue(),
 						blockGroups: this._manager.getBlockGroups() ?? [],
 						openClipboard: routingInfo.view === 'clipboard',
+						clipboardFilter: (clipboardEntryDetailModel) => {
+							const hasSupportedTranslator = clipboardContext.hasSupportedPasteTranslator(
+								pasteTranslatorManifests,
+								clipboardEntryDetailModel.values,
+							);
+							return hasSupportedTranslator;
+						},
 						originData: {
 							index: index,
 							areaKey: this.#areaKey,

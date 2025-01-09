@@ -37,11 +37,22 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 				await this._retrieveManager;
 				if (!this._manager) return false;
 				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
+				const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
+				const pasteTranslatorManifests = clipboardContext.getPasteTranslatorManifestsForPropertyEditorUi(
+					UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
+				);
 				return {
 					data: {
 						blocks: this._manager?.getBlockTypes() ?? [],
 						blockGroups: [],
 						openClipboard: routingInfo.view === 'clipboard',
+						clipboardFilter: (clipboardEntryDetailModel) => {
+							const hasSupportedTranslator = clipboardContext.hasSupportedPasteTranslator(
+								pasteTranslatorManifests,
+								clipboardEntryDetailModel.values,
+							);
+							return hasSupportedTranslator;
+						},
 						originData: { index: index },
 						createBlockInWorkspace: this._manager.getInlineEditingMode() === false,
 					},

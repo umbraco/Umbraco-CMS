@@ -135,12 +135,12 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	async pickForProperty(args: { multiple: boolean; propertyEditorUiAlias: string }): Promise<Array<any>> {
 		await this.#init;
 
-		const pasteTranslatorManifests = this.#getPasteTranslatorManifestsForPropertyEditorUi(args.propertyEditorUiAlias);
+		const pasteTranslatorManifests = this.getPasteTranslatorManifestsForPropertyEditorUi(args.propertyEditorUiAlias);
 
 		const modal = this.#modalManagerContext?.open(this, UMB_CLIPBOARD_ENTRY_PICKER_MODAL, {
 			data: {
 				filter: (clipboardEntryDetail) =>
-					this.#hasSupportedPasteTranslator(pasteTranslatorManifests, clipboardEntryDetail.values),
+					this.hasSupportedPasteTranslator(pasteTranslatorManifests, clipboardEntryDetail.values),
 			},
 		});
 
@@ -219,14 +219,25 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		return propertyValue;
 	}
 
-	#getPasteTranslatorManifestsForPropertyEditorUi(propertyEditorUiAlias: string) {
+	/**
+	 * Get all clipboard paste translators for a property editor ui
+	 * @param {string} propertyEditorUiAlias - The alias of the property editor to match
+	 * @returns {Array<ManifestClipboardPasteTranslator>} - Returns an array of clipboard paste translators
+	 */
+	getPasteTranslatorManifestsForPropertyEditorUi(propertyEditorUiAlias: string) {
 		return umbExtensionsRegistry.getByTypeAndFilter(
 			'clipboardPasteTranslator',
 			(manifest) => manifest.toPropertyEditorUi === propertyEditorUiAlias,
 		);
 	}
 
-	#hasSupportedPasteTranslator(
+	/**
+	 * Check if the clipboard entry values has supported paste translator
+	 * @param {Array<ManifestClipboardPasteTranslator>} manifests - The paste translator manifests
+	 * @param {UmbClipboardEntryValuesType} clipboardEntryValues - The clipboard entry values
+	 * @returns {boolean} - Returns true if the clipboard entry values has supported paste translator
+	 */
+	hasSupportedPasteTranslator(
 		manifests: Array<ManifestClipboardPasteTranslator>,
 		clipboardEntryValues: UmbClipboardEntryValuesType,
 	): boolean {
