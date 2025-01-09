@@ -64,18 +64,51 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	 * Read a clipboard entry for a property. The entry will be translated to the property editor value
 	 * @param {string} clipboardEntryUnique - The unique id of the clipboard entry
 	 * @param {string} propertyEditorUiAlias - The alias of the property editor to match
-	 * @returns { Promise<UmbClipboardEntryDetailModel | undefined> } - Returns a clipboard entry matching the unique id
+	 * @returns { Promise<unknown> } - Returns the resolved property value
 	 */
-	async readForProperty(
-		clipboardEntryUnique: string,
-		propertyEditorUiAlias: string,
-	): Promise<UmbClipboardEntryDetailModel | undefined> {
+	async readForProperty(clipboardEntryUnique: string, propertyEditorUiAlias: string): Promise<unknown> {
 		if (!clipboardEntryUnique) throw new Error('The Clipboard Entry unique is required');
 		if (!propertyEditorUiAlias) throw new Error('Property Editor UI alias is required');
 		const manifest = await this.#findPropertyEditorUiManifest(propertyEditorUiAlias);
 		return this.#resolveEntry(clipboardEntryUnique, manifest);
 	}
 
+	async readMultipleForProperty(
+		clipboardEntryUniques: Array<string>,
+		propertyEditorUiAlias: string,
+	): Promise<Array<unknown>> {
+		if (!clipboardEntryUniques || !clipboardEntryUniques.length) {
+			throw new Error('Clipboard entry uniques are required');
+		}
+
+		const promises = Promise.allSettled(
+			clipboardEntryUniques.map((unique) => this.readForProperty(unique, propertyEditorUiAlias)),
+		);
+
+		const readResult = await promises;
+
+		// TODO:show message if some entries are not fulfilled
+		const fulfilledResult = readResult.filter((result) => result.status === 'fulfilled' && result.value) as Array<
+			PromiseFulfilledResult<unknown>
+		>;
+		const propertyValues = fulfilledResult.map((result) => result.value);
+
+		if (!propertyValues.length) {
+			throw new Error('Failed to read clipboard entries');
+		}
+
+		return propertyValues;
+	}
+
+	/**
+	 * Write a clipboard entry for a property. The property value will be translated to the clipboard entry values
+	 * @param args - Arguments for writing a clipboard entry
+	 * @param {string} args.name - The name of the clipboard entry
+	 * @param {string} args.icon - The icon of the clipboard entry
+	 * @param {any} args.propertyValue - The property value to write
+	 * @param {string} args.propertyEditorUiAlias - The alias of the property editor to match
+	 * @returns { Promise<void> }
+	 */
 	async writeForProperty(args: {
 		name: string;
 		icon?: string;
