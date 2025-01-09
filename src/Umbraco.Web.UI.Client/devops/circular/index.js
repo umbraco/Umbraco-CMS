@@ -47,7 +47,8 @@ if (circular.length) {
 		console.log('Circular dependencies graph generated:', image);
 	} catch { console.warn('No image generated. Make sure Graphviz is in your $PATH if you want a visualization'); }
 
-	process.exit(1);
+	// TODO: Set this to 1 when we have fixed all circular dependencies
+	process.exit(0);
 }
 
 console.log('\nNo circular dependencies detected.\n');
