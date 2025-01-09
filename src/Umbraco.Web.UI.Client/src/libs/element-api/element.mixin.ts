@@ -35,7 +35,8 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 			// Fallback to use a hash of the provided method, but only if the alias is undefined and there is a callback.
 			if (controllerAlias === undefined && callback) {
 				controllerAlias = simpleHashCode(callback.toString());
-			} else {
+			} else if (controllerAlias === null) {
+				// if value is null, then reset it to undefined. Null is used to explicitly tell that we do not want a controller alias. [NL]
 				controllerAlias = undefined;
 			}
 
