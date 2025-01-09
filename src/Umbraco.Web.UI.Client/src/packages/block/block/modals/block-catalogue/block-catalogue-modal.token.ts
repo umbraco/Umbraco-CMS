@@ -16,7 +16,7 @@ export type UmbBlockCatalogueModalValue =
 				contentElementTypeKey: string;
 			};
 			pasteFromClipboard?: {
-				unique: string;
+				selection: Array<string>;
 			};
 	  }
 	| undefined;

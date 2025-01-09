@@ -64,18 +64,28 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 					} else {
 						throw new Error('Failed to create block');
 					}
-				} else if (value?.pasteFromClipboard && value.pasteFromClipboard.unique && data) {
+				} else if (value?.pasteFromClipboard && value.pasteFromClipboard.selection?.length && data) {
 					const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
-					const propertyValue = await clipboardContext.readForProperty(
-						value.pasteFromClipboard.unique,
-						UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
+
+					const promises = Promise.allSettled(
+						value.pasteFromClipboard.selection.map((unique) =>
+							clipboardContext.readForProperty(unique, UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS),
+						),
 					);
 
-					if (!propertyValue) {
+					const readResult = await promises;
+					const fulfilledResult = readResult.filter((result) => result.status === 'fulfilled' && result.value) as Array<
+						PromiseFulfilledResult<unknown>
+					>;
+					// TODO:show message if some entries are not fulfilled
+
+					const propertyValues = fulfilledResult.map((result) => result.value);
+
+					if (!propertyValues.length) {
 						throw new Error('Failed to read clipboard entry');
 					}
 
-					console.log('Property entry:', propertyValue);
+					console.log('Property values:', propertyValues);
 				}
 			})
 			.observeRouteBuilder((routeBuilder) => {
