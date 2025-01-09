@@ -33,7 +33,7 @@ console.log('-'.repeat(80));
 
 const circular = madgeSetup.circular();
 
-if (circular.length > 0) {
+if (circular.length) {
 	console.error(circular.length, 'circular dependencies detected:\n');
 	for (let i = 0; i < circular.length; i++) {
 		printCircularDependency(circular[i], i + 1);
@@ -41,10 +41,9 @@ if (circular.length > 0) {
 	console.error('\nPlease fix the circular dependencies before proceeding.\n');
 
 	try {
-		const svg = await madgeSetup.svg();
-		const svgString = svg.toString();
-		writeFileSync(join(__dirname, '../..', 'circular-dependencies.svg'), svgString);
-	} catch { }
+		const image = await madgeSetup.image(join(__dirname, '../../madge'), true);
+		console.log('Circular dependencies graph generated:', image);
+	} catch { console.warn('No image generated. Make sure Graphviz is in your $PATH if you want a visualization'); }
 
 	process.exit(1);
 }
