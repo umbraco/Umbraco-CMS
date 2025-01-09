@@ -26,18 +26,6 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	#entries = new UmbArrayState<UmbClipboardEntryDetailModel>([], (x) => x.unique);
 	#init?: Promise<unknown>;
 
-	/**
-	 * Observable that emits all entries in the clipboard
-	 * @memberof UmbClipboardContext
-	 */
-	public readonly entries = this.#entries.asObservable();
-
-	/**
-	 * Observable that emits true if there are any entries in the clipboard
-	 * @memberof UmbClipboardContext
-	 */
-	public hasEntries = this.#entries.asObservablePart((x) => x.length > 0);
-
 	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 	#clipboardDetailRepository = new UmbClipboardEntryDetailRepository(this);
 
