@@ -48,11 +48,10 @@ internal sealed class BackOfficeUserManagerAuditer :
     public void Handle(UserLoginFailedNotification notification) =>
         WriteAudit(
             notification.PerformingUserId,
-            "0",
+            null,
             notification.IpAddress,
             "umbraco/user/sign-in/failed",
-            "login failed",
-            string.Empty);
+            "login failed");
 
     public void Handle(UserLoginSuccessNotification notification)
         => WriteAudit(
@@ -94,55 +93,48 @@ internal sealed class BackOfficeUserManagerAuditer :
         string? affectedId,
         string ipAddress,
         string eventType,
-        string eventDetails,
-        string? affectedDetails = null)
+        string eventDetails)
     {
-        IUser? performingUser = null;
-        if (int.TryParse(performingId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var asInt))
-        {
-            performingUser = _userService.GetUserById(asInt);
-        }
+        int? performingIdAsInt = ParseUserId(performingId);
+        int? affectedIdAsInt = ParseUserId(affectedId);
 
-        var performingDetails = performingUser == null
-            ? $"User UNKNOWN:{performingId}"
-            : $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}";
-
-        if (!int.TryParse(performingId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var performingIdAsInt))
-        {
-            performingIdAsInt = 0;
-        }
-
-        if (!int.TryParse(affectedId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var affectedIdAsInt))
-        {
-            affectedIdAsInt = 0;
-        }
-
-        WriteAudit(performingIdAsInt, performingDetails, affectedIdAsInt, ipAddress, eventType, eventDetails, affectedDetails);
+        WriteAudit(performingIdAsInt, affectedIdAsInt, ipAddress, eventType, eventDetails);
     }
 
+    private static int? ParseUserId(string? id)
+        => int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var isAsInt) ? isAsInt : null;
+
     private void WriteAudit(
-        int performingId,
-        string performingDetails,
-        int affectedId,
+        int? performingId,
+        int? affectedId,
         string ipAddress,
         string eventType,
-        string eventDetails,
-        string? affectedDetails = null)
+        string eventDetails)
     {
-        if (affectedDetails == null)
+        var performingDetails = "User UNKNOWN:0";
+        if (performingId.HasValue)
         {
-            IUser? affectedUser = _userService.GetUserById(affectedId);
-            affectedDetails = affectedUser == null
-                ? $"User UNKNOWN:{affectedId}"
+            IUser? performingUser = _userService.GetUserById(performingId.Value);
+            performingDetails = performingUser is null
+                ? $"User UNKNOWN:{performingId.Value}"
+                : $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}";
+        }
+
+        var affectedDetails = "User UNKNOWN:0";
+        if (affectedId.HasValue)
+        {
+            IUser? affectedUser = _userService.GetUserById(affectedId.Value);
+            affectedDetails = affectedUser is null
+                ? $"User UNKNOWN:{affectedId.Value}"
                 : $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}";
         }
 
         _auditService.Write(
-            performingId,
+            performingId ?? 0,
             performingDetails,
             ipAddress,
             DateTime.UtcNow,
-            affectedId,
+            affectedId ?? 0,
             affectedDetails,
             eventType,
             eventDetails);
