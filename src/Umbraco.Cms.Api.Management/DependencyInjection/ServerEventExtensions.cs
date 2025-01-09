@@ -15,6 +15,7 @@ internal static class ServerEventExtensions
         builder.Services.AddSingleton<IUserConnectionManager, UserConnectionManager>();
         builder.Services.AddSingleton<IServerEventRouter, ServerEventRouter>();
         builder.Services.AddSingleton<IServerEventUserManager, ServerEventUserManager>();
+        builder.Services.AddSingleton<IServerEventAuthorizationService, ServerEventAuthorizationService>();
         builder.AddNotificationAsyncHandler<UserSavedNotification, UserConnectionRefresher>();
 
         builder
