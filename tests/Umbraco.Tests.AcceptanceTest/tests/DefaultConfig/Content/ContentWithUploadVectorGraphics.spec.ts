@@ -82,8 +82,7 @@ test(`can upload a file with the svg extension in the content`, async ({umbracoA
   expect(contentData.values[0].value.src).toContain(AliasHelper.toAlias(vectorGraphicsName));
 });
 
-// TODO: Remove skip when the front-end is ready. Currently the uploaded vector graphics file still displays after removing.
-test.skip('can remove an svg file in the content', async ({umbracoApi, umbracoUi}) => {
+test('can remove an svg file in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const uploadVectorGraphicsName = 'VectorGraphics.svg';
   const mineType = 'image/svg+xml';

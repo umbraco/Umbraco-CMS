@@ -457,8 +457,7 @@ test('can enable a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.clickConfirmEnableButton();
 
   // Assert
-  // TODO: Unskip when it shows userEnabled/userInactive instead of userDisabled
-  // await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.userEnabled);
+  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.userEnabled);
   await umbracoUi.user.isUserActiveTextVisible();
   // The state of the user is not enabled. The reason for this is that the user has not logged in, resulting in the state Inactive.
   const userData = await umbracoApi.user.getByName(newTestUser);

@@ -89,8 +89,7 @@ for (const uploadFile of uploadFiles) {
   });
 }
 
-// TODO: Remove skip when the front-end is ready. Currently the uploaded file still displays after removing.
-test.skip('can remove an audio file in the content', async ({umbracoApi, umbracoUi}) => {
+test('can remove an audio file in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const uploadFileName = 'Audio.mp3';
   const mineType = 'audio/mpeg';

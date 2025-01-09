@@ -117,8 +117,7 @@ test('can allow bulk trash in the media section', async ({umbracoApi, umbracoUi}
   await umbracoUi.media.isItemVisibleInRecycleBin(secondMediaFileName, true, false);
 });
 
-// TODO: Remove skip when update code to select media successfully.
-test.skip('can allow bulk move in the media section', async ({umbracoApi, umbracoUi}) => {
+test('can allow bulk move in the media section', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaFolderName = 'Test Folder Name';
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);
