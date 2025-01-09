@@ -40,10 +40,6 @@ jobs:
           cache: npm
           cache-dependency-path: ./src/Umbraco.Web.UI.Client/package-lock.json
       - run: npm ci --no-audit --no-fund --prefer-offline
-      - run: npm run lint:errors
-      - run: npm run build:for:cms
-      - run: npm run check:paths
-      - run: npm run generate:jsonschema:dist
       - name: Setup Graphviz
         uses: ts-graphviz/setup-graphviz@v2.0.2
       - name: Check for circular dependencies
@@ -54,6 +50,10 @@ jobs:
           name: circular-dependencies
           path: circular-dependencies.svg
         if: failure()
+      - run: npm run lint:errors
+      - run: npm run build:for:cms
+      - run: npm run check:paths
+      - run: npm run generate:jsonschema:dist
 
   test:
     runs-on: ubuntu-latest
