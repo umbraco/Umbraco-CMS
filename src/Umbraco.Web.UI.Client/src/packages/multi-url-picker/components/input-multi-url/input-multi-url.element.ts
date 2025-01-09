@@ -52,6 +52,7 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	@property()
+	/** @deprecated will be removed in v17 */
 	public set alias(value: string | undefined) {
 		//this.#linkPickerModal.setUniquePathValue('propertyAlias', value);
 	}
@@ -60,6 +61,7 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	@property()
+	/** @deprecated will be removed in v17 */
 	public set variantId(value: string | UmbVariantId | undefined) {
 		//this.#linkPickerModal.setUniquePathValue('variantId', value?.toString());
 	}
