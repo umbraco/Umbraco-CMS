@@ -1,4 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
+
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -539,4 +542,7 @@ public interface IContentService : IContentServiceBase<IContent>
     #endregion
 
     Task<OperationResult> EmptyRecycleBinAsync(Guid userId);
+
+ContentScheduleCollection GetContentScheduleByContentId(Guid contentId) => StaticServiceProvider.Instance
+    .GetRequiredService<ContentService>().GetContentScheduleByContentId(contentId);
 }

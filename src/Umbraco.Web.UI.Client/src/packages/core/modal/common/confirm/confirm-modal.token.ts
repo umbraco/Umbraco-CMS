@@ -4,7 +4,7 @@ import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 export interface UmbConfirmModalData {
 	headline: string;
 	content: TemplateResult | string;
-	color?: 'positive' | 'danger';
+	color?: 'positive' | 'danger' | 'warning';
 	cancelLabel?: string;
 	confirmLabel?: string;
 }

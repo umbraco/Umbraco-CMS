@@ -14,6 +14,7 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [
 		],
 		template: null,
 		id: 'the-simplest-document-id',
+		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
 		documentType: {
 			id: 'the-simplest-document-type-id',
