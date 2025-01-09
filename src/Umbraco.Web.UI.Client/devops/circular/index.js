@@ -45,7 +45,7 @@ if (circular.length) {
 		mkdirSync(imagePath, { recursive: true });
 		const image = await madgeSetup.image(join(imagePath, 'circular.svg'), true);
 		console.log('Circular dependencies graph generated:', image);
-	} catch (e) { console.warn('No image generated. Make sure Graphviz is in your $PATH if you want a visualization', e); }
+	} catch { console.warn('No image generated. Make sure Graphviz is in your $PATH if you want a visualization'); }
 
 	process.exit(1);
 }
