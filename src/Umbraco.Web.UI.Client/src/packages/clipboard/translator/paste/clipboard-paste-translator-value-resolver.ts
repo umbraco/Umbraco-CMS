@@ -18,8 +18,9 @@ export class UmbClipboardPasteTranslatorValueResolver<PropertyValueType = any> e
 			throw new Error('Property editor UI alias is required.');
 		}
 
+		const entryValueTypes = clipboardEntryValues.map((x) => x.type);
+
 		const supportedManifests = umbExtensionsRegistry.getByTypeAndFilter('clipboardPasteTranslator', (manifest) => {
-			const entryValueTypes = clipboardEntryValues.map((x) => x.type);
 			const canTranslateValue = entryValueTypes.includes(manifest.fromClipboardEntryValueType);
 			const supportsPropertyEditorUi = manifest.toPropertyEditorUi === propertyEditorUiAlias;
 			return canTranslateValue && supportsPropertyEditorUi;
