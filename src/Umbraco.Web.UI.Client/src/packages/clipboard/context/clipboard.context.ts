@@ -10,7 +10,6 @@ import type { ManifestClipboardPasteTranslator } from '../translator/types.js';
 import { UMB_CLIPBOARD_CONTEXT } from './clipboard.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbPropertyValueCloneController } from '@umbraco-cms/backoffice/property';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
