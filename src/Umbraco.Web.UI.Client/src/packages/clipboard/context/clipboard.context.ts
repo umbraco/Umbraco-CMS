@@ -4,7 +4,9 @@ import {
 	UmbClipboardEntryDetailRepository,
 	UmbClipboardPasteTranslatorValueResolver,
 	type UmbClipboardEntryDetailModel,
+	type UmbClipboardEntryValuesType,
 } from '../clipboard-entry/index.js';
+import type { ManifestClipboardPasteTranslator } from '../translator/types.js';
 import { UMB_CLIPBOARD_CONTEXT } from './clipboard.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -104,7 +106,16 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	 */
 	async pickForProperty(args: { multiple: boolean; propertyEditorUiAlias: string }): Promise<Array<any>> {
 		await this.#init;
-		const modal = this.#modalManagerContext?.open(this, UMB_CLIPBOARD_ENTRY_PICKER_MODAL);
+
+		const pasteTranslatorManifests = this.#getPasteTranslatorManifestsForPropertyEditorUi(args.propertyEditorUiAlias);
+
+		const modal = this.#modalManagerContext?.open(this, UMB_CLIPBOARD_ENTRY_PICKER_MODAL, {
+			data: {
+				filter: (clipboardEntryDetail) =>
+					this.#hasSupportedPasteTranslator(pasteTranslatorManifests, clipboardEntryDetail.values),
+			},
+		});
+
 		const result = await modal?.onSubmit();
 
 		if (!result?.selection.length) {
@@ -178,6 +189,27 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		propertyValue = clonedValue.value;
 
 		return propertyValue;
+	}
+
+	#getPasteTranslatorManifestsForPropertyEditorUi(propertyEditorUiAlias: string) {
+		return umbExtensionsRegistry.getByTypeAndFilter(
+			'clipboardPasteTranslator',
+			(manifest) => manifest.toPropertyEditorUi === propertyEditorUiAlias,
+		);
+	}
+
+	#hasSupportedPasteTranslator(
+		manifests: Array<ManifestClipboardPasteTranslator>,
+		clipboardEntryValues: UmbClipboardEntryValuesType,
+	): boolean {
+		const entryValueTypes = clipboardEntryValues.map((x) => x.type);
+
+		const supportedManifests = manifests.filter((manifest) => {
+			const canTranslateValue = entryValueTypes.includes(manifest.fromClipboardEntryValueType);
+			return canTranslateValue;
+		});
+
+		return supportedManifests.length > 0;
 	}
 }
 
