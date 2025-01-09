@@ -9,7 +9,6 @@ import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from './block-rte-manager.context-token
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UMB_CONTENT_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/content';
 
 export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 	typeof UMB_BLOCK_RTE_MANAGER_CONTEXT,
@@ -19,11 +18,6 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 	UmbBlockRteWorkspaceOriginData
 > {
 	//
-	readonly #catalogueModal: UmbModalRouteRegistrationController<
-		typeof UMB_BLOCK_CATALOGUE_MODAL.DATA,
-		typeof UMB_BLOCK_CATALOGUE_MODAL.VALUE
-	>;
-	readonly #workspaceModal;
 
 	// We will just say its always allowed for RTE for now: [NL]
 	public readonly canCreate = new UmbBooleanState(true).asObservable();
@@ -31,9 +25,8 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_RTE_MANAGER_CONTEXT);
 
-		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
-			.addUniquePaths(['propertyAlias', 'variantId'])
-			.addAdditionalPath(':view')
+		new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
+			.addAdditionalPath('_catalogue/:view')
 			.onSetup((routingInfo) => {
 				return {
 					data: {
@@ -68,8 +61,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 				this._catalogueRouteBuilderState.setValue(routeBuilder);
 			});
 
-		this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_RTE_WORKSPACE_MODAL)
-			.addUniquePaths(['propertyAlias', 'variantId'])
+		new UmbModalRouteRegistrationController(this, UMB_BLOCK_RTE_WORKSPACE_MODAL)
 			.addAdditionalPath('block')
 			.onSetup(() => {
 				return { data: { entityType: 'block', preset: {}, baseDataPath: this._dataPath }, modal: { size: 'medium' } };
@@ -78,12 +70,6 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 				const newPath = routeBuilder({});
 				this._workspacePath.setValue(newPath);
 			});
-
-		this.consumeContext(UMB_CONTENT_PROPERTY_DATASET_CONTEXT, (dataset) => {
-			const variantId = dataset.getVariantId();
-			this.#catalogueModal.setUniquePathValue('variantId', variantId?.toString());
-			this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
-		});
 	}
 
 	protected _gotBlockManager() {
@@ -102,15 +88,6 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 				this._manager?.setLayouts(layouts);
 			},
 			'observeThisLayouts',
-		);
-
-		this.observe(
-			this._manager.propertyAlias,
-			(alias) => {
-				this.#catalogueModal.setUniquePathValue('propertyAlias', alias ?? 'null');
-				this.#workspaceModal.setUniquePathValue('propertyAlias', alias ?? 'null');
-			},
-			'observePropertyAlias',
 		);
 	}
 

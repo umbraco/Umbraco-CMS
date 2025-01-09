@@ -39,7 +39,6 @@ export class UmbInputBlockTypeElement<
 			this.dispatchEvent(new CustomEvent('change', { detail: { moveComplete: true } }));
 		},
 	});
-	#elementPickerModal;
 
 	@property({ type: Array, attribute: false })
 	public set value(items) {
@@ -50,9 +49,10 @@ export class UmbInputBlockTypeElement<
 		return this._items;
 	}
 
+	/** @deprecated will be removed in v17 */
 	@property({ type: String })
 	public set propertyAlias(value: string | undefined) {
-		this.#elementPickerModal.setUniquePathValue('propertyAlias', value);
+		//this.#elementPickerModal.setUniquePathValue('propertyAlias', value);
 	}
 	public get propertyAlias(): string | undefined {
 		return undefined;
@@ -75,13 +75,16 @@ export class UmbInputBlockTypeElement<
 		super();
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (instance) => {
 			this.#datasetContext = instance;
-			this.observe(await this.#datasetContext?.propertyValueByAlias('blocks'), (value) => {
-				this.#filter = value as Array<UmbBlockTypeBaseModel>;
-			});
+			this.observe(
+				await this.#datasetContext?.propertyValueByAlias('blocks'),
+				(value) => {
+					this.#filter = value as Array<UmbBlockTypeBaseModel>;
+				},
+				'observeBlocks',
+			);
 		});
 
-		this.#elementPickerModal = new UmbModalRouteRegistrationController(this, UMB_DOCUMENT_TYPE_PICKER_MODAL)
-			.addUniquePaths(['propertyAlias'])
+		new UmbModalRouteRegistrationController(this, UMB_DOCUMENT_TYPE_PICKER_MODAL)
 			.onSetup(() => {
 				return {
 					data: {
