@@ -185,9 +185,12 @@ public class BackOfficeController : SecurityControllerBase
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Signout(CancellationToken cancellationToken)
     {
-        var userName = await GetUserNameFromAuthCookie();
+        AuthenticateResult cookieAuthResult = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+        var userName = cookieAuthResult.Principal?.Identity?.Name;
+        var userId = cookieAuthResult.Principal?.Identity?.GetUserId();
 
         await _backOfficeSignInManager.SignOutAsync();
+        _backOfficeUserManager.NotifyLogoutSuccess(cookieAuthResult.Principal ?? User, userId);
 
         _logger.LogInformation(
             "User {UserName} from IP address {RemoteIpAddress} has logged out",
