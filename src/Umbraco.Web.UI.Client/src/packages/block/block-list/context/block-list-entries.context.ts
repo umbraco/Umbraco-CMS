@@ -75,7 +75,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 						throw new Error('Failed to read clipboard entry');
 					}
 
-					console.log('Clipboard entry:', propertyValue);
+					console.log('Property entry:', propertyValue);
 				}
 			})
 			.observeRouteBuilder((routeBuilder) => {

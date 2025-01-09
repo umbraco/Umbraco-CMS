@@ -205,7 +205,7 @@ export class UmbBlockGridEntriesContext
 						throw new Error('Failed to read clipboard entry');
 					}
 
-					console.log('Clipboard entry:', propertyValue);
+					console.log('Property value:', propertyValue);
 				}
 			})
 			.observeRouteBuilder((routeBuilder) => {
