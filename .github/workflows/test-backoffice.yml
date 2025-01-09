@@ -48,6 +48,11 @@ jobs:
         uses: ts-graphviz/setup-graphviz@v2.0.2
       - name: Check for circular dependencies
         run: node devops/circular/index.js src
+      - name: Upload report
+        uses: actions/upload-artifact@v2
+        with:
+          path: circular-dependencies.svg
+        if: failure()
 
   test:
     runs-on: ubuntu-latest
