@@ -141,7 +141,7 @@ public class StaticFilesTreeController : TreeController
             if (file.IsDirectory)
             {
                 // We don't want to include the umbraco folder, so exclude it.
-                if (calculatedPath == string.Empty && file.Name is "umbraco")
+                if (calculatedPath == string.Empty && "umbraco".InvariantEquals(file.Name))
                 {
                     continue;
                 }
