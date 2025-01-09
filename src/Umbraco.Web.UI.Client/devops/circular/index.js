@@ -1,13 +1,12 @@
 /**
  * This module is used to detect circular dependencies in the Umbraco backoffice.
  * It is used in the build process to ensure that we don't have circular dependencies.
- * @example node devops/circular/index.js
+ * @example node devops/circular/index.js src
  * @author Umbraco HQ
  */
 
 import madge from 'madge';
 import { join } from 'path';
-import { writeFileSync } from 'fs';
 
 const __dirname = import.meta.dirname;
 const IS_GITHUB_ACTIONS = process.env.GITHUB_ACTIONS === 'true';
@@ -59,13 +58,14 @@ process.exit(0);
 function printCircularDependency(circular, idx) {
 	circular = circular.map(file => `${baseDir}/${file}`);
 	const circularPath = circular.join(' -> ');
-	console.error(idx, '=', circularPath, '\n');
 
 	if (IS_GITHUB_ACTIONS) {
 		console.error(`::error file=${circular[0]},title=Circular dependency::Circular dependencies detected: ${circularPath}`);
 	}
 	else if (IS_AZURE_PIPELINES) {
 		console.error(`##vso[task.logissue type=error;sourcepath=${circular[0]};]Circular dependencies detected: ${circularPath}`);
+	} else {
+		console.error(idx, '=', circularPath, '\n');
 	}
 
 }
