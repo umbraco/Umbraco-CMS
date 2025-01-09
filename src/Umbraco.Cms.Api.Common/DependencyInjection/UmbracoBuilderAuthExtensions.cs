@@ -40,7 +40,9 @@ public static class UmbracoBuilderAuthExtensions
                     .SetLogoutEndpointUris(
                         Paths.MemberApi.LogoutEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
                     .SetRevocationEndpointUris(
-                        Paths.MemberApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash));
+                        Paths.MemberApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
+                    .SetUserinfoEndpointUris(
+                        Paths.MemberApi.UserinfoEndpoint.TrimStart(Constants.CharArrays.ForwardSlash));
 
                 // Enable authorization code flow with PKCE
                 options
@@ -52,7 +54,8 @@ public static class UmbracoBuilderAuthExtensions
                 options
                     .UseAspNetCore()
                     .EnableAuthorizationEndpointPassthrough()
-                    .EnableLogoutEndpointPassthrough();
+                    .EnableLogoutEndpointPassthrough()
+                    .EnableUserinfoEndpointPassthrough();
 
                 // Enable reference tokens
                 // - see https://documentation.openiddict.com/configuration/token-storage.html
