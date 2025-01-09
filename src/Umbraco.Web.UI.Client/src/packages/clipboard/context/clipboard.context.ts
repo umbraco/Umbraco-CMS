@@ -91,10 +91,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 			icon: args.icon,
 		};
 
-		const { data: scaffoldData } = await this.#clipboardDetailRepository.createScaffold(entryPreset);
-		if (!scaffoldData) return;
-
-		await this.#clipboardDetailRepository.create(scaffoldData);
+		await this.write(entryPreset);
 	}
 
 	/**
