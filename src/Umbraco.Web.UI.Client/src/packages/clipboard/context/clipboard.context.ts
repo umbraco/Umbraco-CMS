@@ -73,6 +73,12 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		return this.#resolveEntry(clipboardEntryUnique, manifest);
 	}
 
+	/**
+	 * Read multiple clipboard entries for a property. The entries will be translated to the property editor values
+	 * @param {Array<string>} clipboardEntryUniques - The unique ids of the clipboard entries
+	 * @param {string} propertyEditorUiAlias - The alias of the property editor to match
+	 * @returns { Promise<Array<unknown>> } - Returns an array of resolved property values
+	 */
 	async readMultipleForProperty(
 		clipboardEntryUniques: Array<string>,
 		propertyEditorUiAlias: string,
