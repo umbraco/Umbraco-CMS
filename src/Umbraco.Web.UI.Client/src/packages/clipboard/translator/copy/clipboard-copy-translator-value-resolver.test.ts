@@ -41,10 +41,11 @@ const copyTranslatorManifest1 = {
 };
 
 const copyTranslatorManifest2 = {
-	...copyTranslatorManifest1,
+	type: 'clipboardCopyTranslator',
 	alias: 'Test.ClipboardCopyTranslator2',
 	name: 'Test Clipboard Copy Translator 2',
 	api: UmbTestClipboardCopyTranslator2,
+	fromPropertyEditorUi: TEST_PROPERTY_EDITOR_UI_ALIAS,
 	toClipboardEntryValueType: TEST_CLIPBOARD_ENTRY_VALUE_TYPE_2,
 };
 

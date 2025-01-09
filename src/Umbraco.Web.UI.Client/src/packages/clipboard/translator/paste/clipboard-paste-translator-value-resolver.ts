@@ -5,8 +5,11 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi, type ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbClipboardPasteTranslatorValueResolver extends UmbControllerBase {
-	async resolve(clipboardEntryValues: UmbClipboardEntryValuesType, propertyEditorUiAlias: string): Promise<unknown> {
+export class UmbClipboardPasteTranslatorValueResolver<PropertyValueType = any> extends UmbControllerBase {
+	async resolve(
+		clipboardEntryValues: UmbClipboardEntryValuesType,
+		propertyEditorUiAlias: string,
+	): Promise<PropertyValueType> {
 		if (!clipboardEntryValues.length) {
 			throw new Error('Clipboard entry values are required.');
 		}
@@ -15,20 +18,19 @@ export class UmbClipboardPasteTranslatorValueResolver extends UmbControllerBase 
 			throw new Error('Property editor UI alias is required.');
 		}
 
-		// Find the translator for this editor alias:
-		const manifests = umbExtensionsRegistry.getByTypeAndFilter('clipboardPasteTranslator', (manifest) => {
+		const supportedManifests = umbExtensionsRegistry.getByTypeAndFilter('clipboardPasteTranslator', (manifest) => {
 			const entryValueTypes = clipboardEntryValues.map((x) => x.type);
 			const canTranslateValue = entryValueTypes.includes(manifest.fromClipboardEntryValueType);
-			const supportsPropertyEditorUi = manifest.toPropertyEditorUi.includes(propertyEditorUiAlias);
+			const supportsPropertyEditorUi = manifest.toPropertyEditorUi === propertyEditorUiAlias;
 			return canTranslateValue && supportsPropertyEditorUi;
 		});
 
-		if (!manifests.length) {
+		if (!supportedManifests.length) {
 			throw new Error('No paste translator found for the given property editor ui and entry value type.');
 		}
 
 		// Pick the manifest with the highest priority
-		const manifest: ManifestClipboardPasteTranslator = manifests.sort(
+		const manifest: ManifestClipboardPasteTranslator = supportedManifests.sort(
 			(a: ManifestBase, b: ManifestBase): number => (b.weight || 0) - (a.weight || 0),
 		)[0];
 

@@ -1,0 +1,100 @@
+import { expect } from '@open-wc/testing';
+import { customElement } from 'lit/decorators.js';
+import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbClipboardPasteTranslatorValueResolver } from './clipboard-paste-translator-value-resolver.js';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbClipboardPasteTranslator } from './types.js';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { type UmbClipboardEntryValuesType } from '../../clipboard-entry';
+
+const TEST_PROPERTY_EDITOR_UI_ALIAS = 'testPropertyEditorUiAlias';
+const TEST_CLIPBOARD_ENTRY_VALUE_TYPE_1 = 'testClipboardEntryValueType1';
+const TEST_CLIPBOARD_ENTRY_VALUE_TYPE_2 = 'testClipboardEntryValueType2';
+
+type TestValueType = String;
+
+class UmbTestClipboardPasteTranslator1
+	extends UmbControllerBase
+	implements UmbClipboardPasteTranslator<TestValueType, TestValueType>
+{
+	async translate(value: TestValueType): Promise<TestValueType> {
+		return value + '1';
+	}
+}
+
+class UmbTestClipboardPasteTranslator2
+	extends UmbControllerBase
+	implements UmbClipboardPasteTranslator<TestValueType, TestValueType>
+{
+	async translate(value: TestValueType): Promise<TestValueType> {
+		return value + '2';
+	}
+}
+
+const pasteTranslatorManifest1 = {
+	type: 'clipboardPasteTranslator',
+	alias: 'Test.ClipboardPasteTranslator1',
+	name: 'Test Clipboard Paste Translator 1',
+	api: UmbTestClipboardPasteTranslator1,
+	weight: 1,
+	fromClipboardEntryValueType: TEST_CLIPBOARD_ENTRY_VALUE_TYPE_1,
+	toPropertyEditorUi: TEST_PROPERTY_EDITOR_UI_ALIAS,
+};
+
+const copyTranslatorManifest2 = {
+	type: 'clipboardPasteTranslator',
+	alias: 'Test.ClipboardPasteTranslator2',
+	name: 'Test Clipboard Paste Translator 2',
+	api: UmbTestClipboardPasteTranslator2,
+	weight: 2,
+	fromClipboardEntryValueType: TEST_CLIPBOARD_ENTRY_VALUE_TYPE_2,
+	toPropertyEditorUi: TEST_PROPERTY_EDITOR_UI_ALIAS,
+};
+
+@customElement('test-controller-host')
+class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+
+describe('UmbClipboardCopyTranslatorValueResolver', () => {
+	let hostElement: UmbTestControllerHostElement;
+	let resolver: UmbClipboardPasteTranslatorValueResolver;
+
+	const clipboardEntryValues: UmbClipboardEntryValuesType = [
+		{
+			type: TEST_CLIPBOARD_ENTRY_VALUE_TYPE_1,
+			value: 'testValue',
+		},
+		{
+			type: TEST_CLIPBOARD_ENTRY_VALUE_TYPE_2,
+			value: 'testValue',
+		},
+	];
+
+	beforeEach(async () => {
+		umbExtensionsRegistry.clear();
+		umbExtensionsRegistry.registerMany([pasteTranslatorManifest1, copyTranslatorManifest2]);
+		hostElement = new UmbTestControllerHostElement();
+		resolver = new UmbClipboardPasteTranslatorValueResolver<String>(hostElement);
+		document.body.innerHTML = '';
+		document.body.appendChild(hostElement);
+	});
+
+	describe('Public API', () => {
+		describe('methods', () => {
+			it('has a resolve method', () => {
+				expect(resolver).to.have.property('resolve').that.is.a('function');
+			});
+		});
+	});
+
+	describe('resolve', async () => {
+		let propertyValue: String;
+
+		beforeEach(async () => {
+			propertyValue = await resolver.resolve(clipboardEntryValues, TEST_PROPERTY_EDITOR_UI_ALIAS);
+		});
+
+		it('should return the property value translated by the paste translator with the highest weight', async () => {
+			await expect(propertyValue).to.equal('testValue2');
+		});
+	});
+});
