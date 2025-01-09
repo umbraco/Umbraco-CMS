@@ -21,8 +21,8 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	#modalRouter: IRouterSlot = document.createElement('router-slot') as IRouterSlot;
 	#listening = false;
 
-	@property({ type: Boolean, attribute: 'parse-addendum', reflect: false })
-	public parseAddendum?: boolean;
+	@property({ type: Boolean, attribute: 'inherit-addendum', reflect: false })
+	public inheritAddendum?: boolean;
 
 	@property({ attribute: false })
 	public get routes(): UmbRoute[] | undefined {
@@ -81,7 +81,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	}
 
 	override connectedCallback() {
-		if (this.parseAddendum !== true) {
+		if (this.inheritAddendum !== true) {
 			new UmbRoutePathAddendumResetContext(this);
 		}
 

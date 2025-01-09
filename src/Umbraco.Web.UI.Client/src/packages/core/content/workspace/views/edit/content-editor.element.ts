@@ -148,7 +148,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 					: ''}
 
 				<umb-router-slot
-					parse-addendum
+					inherit-addendum
 					.routes=${this._routes}
 					@init=${(event: UmbRouterSlotInitEvent) => {
 						this._routerPath = event.target.absoluteRouterPath;
