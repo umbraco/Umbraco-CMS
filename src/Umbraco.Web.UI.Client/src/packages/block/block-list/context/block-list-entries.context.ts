@@ -83,7 +83,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 						UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
 					);
 
-					console.log('Property values:', propertyValues);
+					this.#insertPropertyValues(propertyValues);
 				}
 			})
 			.observeRouteBuilder((routeBuilder) => {
@@ -110,6 +110,10 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 			this.#catalogueModal.setUniquePathValue('variantId', variantId?.toString());
 			this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
 		});
+	}
+
+	#insertPropertyValues(values: Array<>) {
+		console.log('Property values:', values);
 	}
 
 	protected _gotBlockManager() {

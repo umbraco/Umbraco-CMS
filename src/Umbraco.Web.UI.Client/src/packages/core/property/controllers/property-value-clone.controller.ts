@@ -9,26 +9,26 @@ export class UmbPropertyValueCloneController extends UmbControllerBase {
 	 * @param {UmbPropertyValueDataPotentiallyWithEditorAlias} property - The property data.
 	 * @returns {Promise<UmbPropertyValueDataPotentiallyWithEditorAlias>} - A promise that resolves to the cloned property data.
 	 */
-	async clone(
-		property: UmbPropertyValueDataPotentiallyWithEditorAlias,
-	): Promise<UmbPropertyValueDataPotentiallyWithEditorAlias> {
-		const result = await this.#cloneProperty(property);
+	async clone<ValueType = unknown>(
+		property: UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>,
+	): Promise<UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>> {
+		const result = await this.#cloneProperty<ValueType>(property);
 
 		this.destroy();
 
 		return result ?? property;
 	}
 
-	async #cloneProperty(
-		property: UmbPropertyValueDataPotentiallyWithEditorAlias,
-	): Promise<UmbPropertyValueDataPotentiallyWithEditorAlias> {
+	async #cloneProperty<ValueType>(
+		property: UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>,
+	): Promise<UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>> {
 		const clonedProperty = await this.#cloneValue(property);
-		return await this.#cloneInnerValues(clonedProperty);
+		return await this.#cloneInnerValues<ValueType>(clonedProperty);
 	}
 
-	async #cloneValue(
-		incomingProperty: UmbPropertyValueDataPotentiallyWithEditorAlias,
-	): Promise<UmbPropertyValueDataPotentiallyWithEditorAlias> {
+	async #cloneValue<ValueType>(
+		incomingProperty: UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>,
+	): Promise<UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>> {
 		const editorAlias = (incomingProperty as any).editorAlias as string | undefined;
 		if (!editorAlias) {
 			console.error(`Editor alias not found for ${incomingProperty.alias}`);
@@ -62,9 +62,9 @@ export class UmbPropertyValueCloneController extends UmbControllerBase {
 		return clonedProperty;
 	}
 
-	async #cloneInnerValues(
-		incomingProperty: UmbPropertyValueDataPotentiallyWithEditorAlias,
-	): Promise<UmbPropertyValueDataPotentiallyWithEditorAlias> {
+	async #cloneInnerValues<ValueType>(
+		incomingProperty: UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>,
+	): Promise<UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>> {
 		const editorAlias = (incomingProperty as any).editorAlias as string | undefined;
 		if (!editorAlias) {
 			return incomingProperty;
