@@ -1,132 +1,203 @@
-/*
 import { expect } from '@open-wc/testing';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbClipboardContext } from './clipboard.context.js';
-import type { UmbClipboardEntryDetailModel } from '../clipboard-entry/index.js';
+import { UmbClipboardEntryDetailStore, type UmbClipboardEntryDetailModel } from '../clipboard-entry/index.js';
 import { UMB_CLIPBOARD_ENTRY_ENTITY_TYPE } from '../clipboard-entry/entity.js';
+import { UmbCurrentUserContext, UmbCurrentUserStore } from '@umbraco-cms/backoffice/current-user';
+import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type {
+	UmbClipboardCopyPropertyValueTranslator,
+	UmbClipboardPastePropertyValueTranslator,
+} from '../property-value-translator/types.js';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-@customElement('test-my-controller-host')
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+const TEST_PROPERTY_EDITOR_UI_ALIAS = 'testPropertyEditorUiAlias';
+const TEST_CLIPBOARD_ENTRY_VALUE_TYPE = 'testClipboardEntryValueType';
 
-describe('UmbSelectionManager', () => {
-	let context: UmbClipboardContext;
-	const textClipboardEntry: UmbClipboardEntryDetailModel = {
-		entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
-		unique: '1',
-		type: 'text',
-		name: 'Text',
-		icon: 'icon-text',
-		meta: {},
-		values: 'value text',
-	};
+class UmbTestClipboardCopyPropertyValueTranslator
+	extends UmbControllerBase
+	implements UmbClipboardCopyPropertyValueTranslator<string, string>
+{
+	async translate(propertyValue: string): Promise<string> {
+		const cleanedValue = propertyValue.replaceAll(' property value', '');
+		return cleanedValue + ' clipboard value';
+	}
+}
 
-	const mediaClipboardEntry: UmbClipboardEntryDetailModel = {
-		entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
-		unique: '2',
-		type: 'media',
-		name: 'Media',
-		icon: 'icon-media',
-		meta: {},
-		values: 'value media',
-	};
+const copyTranslatorManifest = {
+	type: 'clipboardCopyPropertyValueTranslator',
+	alias: 'Test.ClipboardCopyPropertyValueTranslator1',
+	name: 'Test Clipboard Copy Property Value Translator 1',
+	api: UmbTestClipboardCopyPropertyValueTranslator,
+	fromPropertyEditorUi: TEST_PROPERTY_EDITOR_UI_ALIAS,
+	toClipboardEntryValueType: TEST_CLIPBOARD_ENTRY_VALUE_TYPE,
+};
 
-	beforeEach(() => {
-		const hostElement = new UmbTestControllerHostElement();
-		context = new UmbClipboardContext(hostElement);
+class UmbTestClipboardPastePropertyValueTranslator
+	extends UmbControllerBase
+	implements UmbClipboardPastePropertyValueTranslator<string, string>
+{
+	async translate(clipboardEntryValue: string): Promise<string> {
+		const cleanedValue = clipboardEntryValue.replaceAll(' clipboard value', '');
+		return cleanedValue + ' property value';
+	}
+}
+
+const pasteTranslatorManifest = {
+	type: 'clipboardPastePropertyValueTranslator',
+	alias: 'Test.ClipboardPastePropertyValueTranslator1',
+	name: 'Test Clipboard Paste Property Value Translator 1',
+	api: UmbTestClipboardPastePropertyValueTranslator,
+	weight: 1,
+	fromClipboardEntryValueType: TEST_CLIPBOARD_ENTRY_VALUE_TYPE,
+	toPropertyEditorUi: TEST_PROPERTY_EDITOR_UI_ALIAS,
+};
+
+const propertyEditorManifest = {
+	type: 'propertyEditorUi',
+	alias: TEST_PROPERTY_EDITOR_UI_ALIAS,
+	name: 'Test Property Editor UI',
+	meta: {
+		label: 'Test Property Editor',
+		icon: 'document',
+		group: 'Common',
+		propertyEditorSchemaAlias: 'Umbraco.TextBox',
+	},
+};
+
+@customElement('test-controller-host')
+class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {
+	currentUserContext = new UmbCurrentUserContext(this);
+
+	constructor() {
+		super();
+		new UmbClipboardEntryDetailStore(this);
+		new UmbNotificationContext(this);
+		new UmbCurrentUserStore(this);
+	}
+
+	async init() {
+		await this.currentUserContext.load();
+	}
+}
+
+describe('UmbClipboardContext', () => {
+	let hostElement: UmbTestControllerHostElement;
+	let clipboardContext: UmbClipboardContext;
+
+	beforeEach(async () => {
+		localStorage.clear();
+		hostElement = new UmbTestControllerHostElement();
+		clipboardContext = new UmbClipboardContext(hostElement);
+		document.body.innerHTML = '';
+		document.body.appendChild(hostElement);
+		await hostElement.init();
 	});
 
-	describe('Public API', () => {
-		describe('methods', () => {
-			it('has a create method', () => {
-				expect(context).to.have.property('create').that.is.a('function');
+	describe('write', () => {
+		it('should write an entry to the clipboard', async () => {
+			const preset: Partial<UmbClipboardEntryDetailModel> = {
+				values: [{ type: 'test', value: 'test1' }],
+				icon: 'icon1',
+				meta: {},
+				name: 'Test1',
+			};
+
+			const entry = await clipboardContext.write(preset);
+			expect(entry?.name).to.equal('Test1');
+		});
+	});
+
+	describe('read', () => {
+		it('should read an entry from the clipboard', async () => {
+			const preset: Partial<UmbClipboardEntryDetailModel> = {
+				values: [{ type: 'test', value: 'test1' }],
+				icon: 'icon1',
+				meta: {},
+				name: 'Test1',
+			};
+
+			const entry = await clipboardContext.write(preset);
+			const read = await clipboardContext.read(entry!.unique);
+			expect(read?.name).to.equal('Test1');
+		});
+	});
+
+	describe('clipboard for property values', () => {
+		describe('writeForProperty', () => {
+			let clipboardEntry: UmbClipboardEntryDetailModel | undefined;
+
+			beforeEach(async () => {
+				umbExtensionsRegistry.registerMany([pasteTranslatorManifest, copyTranslatorManifest, propertyEditorManifest]);
+
+				clipboardEntry = await clipboardContext.writeForProperty({
+					name: 'Test1',
+					icon: 'icon1',
+					propertyValue: 'test1',
+					propertyEditorUiAlias: TEST_PROPERTY_EDITOR_UI_ALIAS,
+				});
 			});
 
-			it('has a read method', () => {
-				expect(context).to.have.property('read').that.is.a('function');
+			afterEach(() => {
+				umbExtensionsRegistry.clear();
 			});
 
-			it('has a update method', () => {
-				expect(context).to.have.property('update').that.is.a('function');
+			it('should read an entry from the clipboard for a property', async () => {
+				expect(clipboardEntry?.name).to.equal('Test1');
+				expect(clipboardEntry?.values[0].type).to.equal(TEST_CLIPBOARD_ENTRY_VALUE_TYPE);
+				expect(clipboardEntry?.values[0].value).to.equal('test1 clipboard value');
 			});
 
-			it('has a delete method', () => {
-				expect(context).to.have.property('delete').that.is.a('function');
+			it('should read an entry from the clipboard for a property', async () => {
+				const propertyValue = await clipboardContext.readForProperty<string>(
+					clipboardEntry!.unique,
+					TEST_PROPERTY_EDITOR_UI_ALIAS,
+				);
+				expect(propertyValue).to.equal('test1 property value');
 			});
-
-			it('has a clear method', () => {
-				expect(context).to.have.property('clear').that.is.a('function');
-			});
 		});
 	});
 
-	describe('Create', () => {
-		it('throws an error if the entry is not provided', () => {
-			// @ts-ignore - Testing invalid input
-			expect(() => context.create()).to.throw('Entry is required');
+	describe('getPastePropertyValueTranslatorManifests', () => {
+		beforeEach(async () => {
+			umbExtensionsRegistry.registerMany([pasteTranslatorManifest]);
 		});
 
-		it('throws an error if the entry does not have a unique property', () => {
-			// @ts-ignore - Testing invalid input
-			expect(() => context.create({})).to.throw('Entry must have a unique property');
+		afterEach(() => {
+			umbExtensionsRegistry.clear();
 		});
 
-		it('creates an entry in the clipboard', () => {
-			context.create(textClipboardEntry);
-			expect(context.getEntries()).to.have.lengthOf(1);
-			const entry = context.read('1');
-			expect(entry).to.deep.equal(textClipboardEntry);
+		it('should return the paste property value translator manifests', () => {
+			const manifests = clipboardContext.getPastePropertyValueTranslatorManifests(TEST_PROPERTY_EDITOR_UI_ALIAS);
+			expect(manifests).to.have.lengthOf(1);
+			expect(manifests[0].alias).to.equal(pasteTranslatorManifest.alias);
 		});
 	});
 
-	describe('Read', () => {
-		it('throws an error if the entry is not found', () => {
-			expect(() => context.read('1')).to.throw('Entry with unique 1 not found');
+	describe('hasSupportedPastePropertyValueTranslator', () => {
+		beforeEach(async () => {
+			umbExtensionsRegistry.registerMany([pasteTranslatorManifest]);
 		});
 
-		it('reads an entry from the clipboard', () => {
-			context.create(textClipboardEntry);
-			const entry = context.read('1');
-			expect(entry).to.deep.equal(textClipboardEntry);
-		});
-	});
-
-	describe('Update', () => {
-		it('throws an error if the entry is not provided', () => {
-			// @ts-ignore - Testing invalid input
-			expect(() => context.update()).to.throw('Entry is required');
+		afterEach(() => {
+			umbExtensionsRegistry.clear();
 		});
 
-		it('throws an error if the entry does not have a unique property', () => {
-			// @ts-ignore - Testing invalid input
-			expect(() => context.update({})).to.throw('Entry must have a unique property');
+		it('should return true if a supported paste property value translator is available', () => {
+			const manifests = clipboardContext.getPastePropertyValueTranslatorManifests(TEST_PROPERTY_EDITOR_UI_ALIAS);
+			const values = [{ type: TEST_CLIPBOARD_ENTRY_VALUE_TYPE, value: 'test clipboard value' }];
+			const hasSupported = clipboardContext.hasSupportedPastePropertyValueTranslator(manifests, values);
+			expect(hasSupported).to.be.true;
 		});
 
-		it('updates an entry in the clipboard', () => {
-			context.create(textClipboardEntry);
-			const updatedEntry = { ...textClipboardEntry, name: 'Updated Text' };
-			context.update(updatedEntry);
-			const entry = context.readForProperty('1');
-			expect(entry).to.deep.equal(updatedEntry);
-		});
-	});
-
-	describe('Delete', () => {
-		it('deletes an entry from the clipboard', () => {
-			context.create(textClipboardEntry);
-			context.delete('1');
-			expect(context.getEntries).to.have.lengthOf(0);
-			expect(() => context.readForProperty('1')).to.throw('Entry with unique 1 not found');
-		});
-	});
-
-	describe('Clear', () => {
-		it('clears all entries from the clipboard', () => {
-			context.create(textClipboardEntry);
-			context.clear();
-			expect(context.getEntries).to.have.lengthOf(0);
+		it('should return false if no supported paste property value translator is available', () => {
+			const manifests = clipboardContext.getPastePropertyValueTranslatorManifests(TEST_PROPERTY_EDITOR_UI_ALIAS);
+			const values = [{ type: 'unsupported', value: 'test clipboard value' }];
+			const hasSupported = clipboardContext.hasSupportedPastePropertyValueTranslator(manifests, values);
+			expect(hasSupported).to.be.false;
 		});
 	});
 });
-*/
