@@ -43,48 +43,58 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	 * @returns {Promise<void>}
 	 * @memberof UmbClipboardContext
 	 */
-	async write(entryPreset: Partial<UmbClipboardEntryDetailModel>): Promise<void> {
+	async write(entryPreset: Partial<UmbClipboardEntryDetailModel>): Promise<UmbClipboardEntryDetailModel | undefined> {
 		if (!entryPreset) throw new Error('Entry preset is required');
 
 		const { data: scaffoldData } = await this.#clipboardDetailRepository.createScaffold(entryPreset);
 		if (!scaffoldData) return;
 
-		await this.#clipboardDetailRepository.create(scaffoldData);
+		const { data } = await this.#clipboardDetailRepository.create(scaffoldData);
+		return data;
+	}
+
+	/**
+	 * Read from the clipboard
+	 * @param {string} unique - The unique id of the clipboard entry
+	 * @returns {Promise<UmbClipboardEntryDetailModel | undefined>} - Returns the clipboard entry
+	 * @memberof UmbClipboardContext
+	 */
+	async read(unique: string): Promise<UmbClipboardEntryDetailModel | undefined> {
+		const { data } = await this.#clipboardDetailRepository.requestByUnique(unique);
+		return data;
 	}
 
 	/**
 	 * Read a clipboard entry for a property. The entry will be translated to the property editor value
-	 * @param {string} clipboardEntryUnique - The unique id of the clipboard entry
+	 * @param {string} unique - The unique id of the clipboard entry
 	 * @param {string} propertyEditorUiAlias - The alias of the property editor to match
 	 * @returns { Promise<unknown> } - Returns the resolved property value
 	 */
 	async readForProperty<ReturnType = unknown>(
-		clipboardEntryUnique: string,
+		unique: string,
 		propertyEditorUiAlias: string,
 	): Promise<ReturnType | undefined> {
-		if (!clipboardEntryUnique) throw new Error('The Clipboard Entry unique is required');
+		if (!unique) throw new Error('The Clipboard Entry unique is required');
 		if (!propertyEditorUiAlias) throw new Error('Property Editor UI alias is required');
 		const manifest = await this.#findPropertyEditorUiManifest(propertyEditorUiAlias);
-		return this.#resolveEntry<ReturnType>(clipboardEntryUnique, manifest);
+		return this.#resolveEntry<ReturnType>(unique, manifest);
 	}
 
 	/**
 	 * Read multiple clipboard entries for a property. The entries will be translated to the property editor values
-	 * @param {Array<string>} clipboardEntryUniques - The unique ids of the clipboard entries
+	 * @param {Array<string>} uniques - The unique ids of the clipboard entries
 	 * @param {string} propertyEditorUiAlias - The alias of the property editor to match
 	 * @returns { Promise<Array<unknown>> } - Returns an array of resolved property values
 	 */
 	async readMultipleForProperty<ReturnType = unknown>(
-		clipboardEntryUniques: Array<string>,
+		uniques: Array<string>,
 		propertyEditorUiAlias: string,
 	): Promise<Array<ReturnType>> {
-		if (!clipboardEntryUniques || !clipboardEntryUniques.length) {
+		if (!uniques || !uniques.length) {
 			throw new Error('Clipboard entry uniques are required');
 		}
 
-		const promises = Promise.allSettled(
-			clipboardEntryUniques.map((unique) => this.readForProperty(unique, propertyEditorUiAlias)),
-		);
+		const promises = Promise.allSettled(uniques.map((unique) => this.readForProperty(unique, propertyEditorUiAlias)));
 
 		const readResult = await promises;
 		// TODO:show message if some entries are not fulfilled
@@ -115,7 +125,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		icon?: string;
 		propertyValue: any;
 		propertyEditorUiAlias: string;
-	}): Promise<void> {
+	}): Promise<UmbClipboardEntryDetailModel | undefined> {
 		const copyValueResolver = new UmbClipboardCopyPropertyValueTranslatorValueResolver(this);
 		const values = await copyValueResolver.resolve(args.propertyValue, args.propertyEditorUiAlias);
 
@@ -125,7 +135,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 			icon: args.icon,
 		};
 
-		await this.write(entryPreset);
+		return await this.write(entryPreset);
 	}
 
 	/**
