@@ -20,7 +20,6 @@ export class UmbRoutePathAddendumContext
 		this.consumeContext(UMB_ROUTE_PATH_ADDENDUM_CONTEXT, (context) => {
 			this.observe(context.addendum, (addendum) => {
 				this.#parent = addendum;
-				console.log('parent addendum', addendum, (context as any).getHostElement());
 				this.#update();
 			});
 		}).skipHost();

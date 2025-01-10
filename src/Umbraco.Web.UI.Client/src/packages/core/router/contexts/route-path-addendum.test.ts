@@ -78,13 +78,13 @@ describe('UmbRoutepathAddendum', () => {
 					}
 				} else if (count === 2) {
 					if (addendum) {
-						expect(addendum).to.equal('hello/updateded');
+						expect(addendum).to.equal('hello/updated');
 						done();
 					}
 				}
 			});
 			addendumContext.setAddendum('hello/here');
-			addendumContext.setAddendum('hello/updateded');
+			addendumContext.setAddendum('hello/updated');
 		});
 
 		it('returns early set child addendum', (done) => {
