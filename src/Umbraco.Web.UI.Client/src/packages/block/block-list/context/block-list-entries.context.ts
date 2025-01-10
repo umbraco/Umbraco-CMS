@@ -2,7 +2,7 @@ import type { UmbBlockDataModel } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
 import type { UmbBlockListWorkspaceOriginData } from '../index.js';
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS, UMB_BLOCK_LIST_WORKSPACE_MODAL } from '../index.js';
-import type { UmbBlockListLayoutModel, UmbBlockListTypeModel } from '../types.js';
+import type { UmbBlockListLayoutModel, UmbBlockListTypeModel, UmbBlockListValueModel } from '../types.js';
 import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context-token.js';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -78,7 +78,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 				} else if (value?.pasteFromClipboard && value.pasteFromClipboard.selection?.length && data) {
 					const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
 
-					const propertyValues = await clipboardContext.readMultipleForProperty(
+					const propertyValues = await clipboardContext.readMultipleForProperty<UmbBlockListValueModel>(
 						value.pasteFromClipboard.selection,
 						UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
 					);
@@ -112,7 +112,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 		});
 	}
 
-	#insertPropertyValues(values: Array<>) {
+	#insertPropertyValues(values: Array<UmbBlockListValueModel>) {
 		console.log('Property values:', values);
 	}
 
