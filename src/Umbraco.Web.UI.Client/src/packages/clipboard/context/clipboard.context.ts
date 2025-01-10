@@ -6,7 +6,7 @@ import {
 	type UmbClipboardEntryDetailModel,
 	type UmbClipboardEntryValuesType,
 } from '../clipboard-entry/index.js';
-import type { ManifestClipboardPastePropertyValueTranslator } from '../translator/types.js';
+import type { ManifestClipboardPastePropertyValueTranslator } from '../property-value-translator/types.js';
 import { UMB_CLIPBOARD_CONTEXT } from './clipboard.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
