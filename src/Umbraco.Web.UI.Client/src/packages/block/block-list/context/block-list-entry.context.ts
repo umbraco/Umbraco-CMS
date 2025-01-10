@@ -27,17 +27,13 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 	}
 
 	_gotManager() {
-		if (this._manager) {
-			this.observe(
-				this._manager.inlineEditingMode,
-				(inlineEditingMode) => {
-					this.#inlineEditingMode.setValue(inlineEditingMode);
-				},
-				'observeInlineEditingMode',
-			);
-		} else {
-			this.removeUmbControllerByAlias('observeInlineEditingMode');
-		}
+		this.observe(
+			this._manager?.inlineEditingMode,
+			(inlineEditingMode) => {
+				this.#inlineEditingMode.setValue(inlineEditingMode);
+			},
+			'observeInlineEditingMode',
+		);
 	}
 
 	_gotEntries() {}

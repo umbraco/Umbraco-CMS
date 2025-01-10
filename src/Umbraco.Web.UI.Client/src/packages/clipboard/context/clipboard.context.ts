@@ -58,11 +58,14 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	 * @param {string} propertyEditorUiAlias - The alias of the property editor to match
 	 * @returns { Promise<unknown> } - Returns the resolved property value
 	 */
-	async readForProperty(clipboardEntryUnique: string, propertyEditorUiAlias: string): Promise<unknown> {
+	async readForProperty<ReturnType = unknown>(
+		clipboardEntryUnique: string,
+		propertyEditorUiAlias: string,
+	): Promise<ReturnType | undefined> {
 		if (!clipboardEntryUnique) throw new Error('The Clipboard Entry unique is required');
 		if (!propertyEditorUiAlias) throw new Error('Property Editor UI alias is required');
 		const manifest = await this.#findPropertyEditorUiManifest(propertyEditorUiAlias);
-		return this.#resolveEntry(clipboardEntryUnique, manifest);
+		return this.#resolveEntry<ReturnType>(clipboardEntryUnique, manifest);
 	}
 
 	/**
@@ -71,10 +74,10 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	 * @param {string} propertyEditorUiAlias - The alias of the property editor to match
 	 * @returns { Promise<Array<unknown>> } - Returns an array of resolved property values
 	 */
-	async readMultipleForProperty(
+	async readMultipleForProperty<ReturnType = unknown>(
 		clipboardEntryUniques: Array<string>,
 		propertyEditorUiAlias: string,
-	): Promise<Array<unknown>> {
+	): Promise<Array<ReturnType>> {
 		if (!clipboardEntryUniques || !clipboardEntryUniques.length) {
 			throw new Error('Clipboard entry uniques are required');
 		}
@@ -84,12 +87,12 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		);
 
 		const readResult = await promises;
-
 		// TODO:show message if some entries are not fulfilled
 		const fulfilledResult = readResult.filter((result) => result.status === 'fulfilled' && result.value) as Array<
-			PromiseFulfilledResult<unknown>
+			PromiseFulfilledResult<ReturnType>
 		>;
-		const propertyValues = fulfilledResult.map((result) => result.value);
+		// Map the values and remove undefined.
+		const propertyValues = fulfilledResult.map((result) => result.value).filter((x) => x);
 
 		if (!propertyValues.length) {
 			throw new Error('Failed to read clipboard entries');
@@ -184,10 +187,10 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		return manifest;
 	}
 
-	async #resolveEntry(
+	async #resolveEntry<ValueType>(
 		clipboardEntryUnique: string,
 		propertyEditorUiManifest: ManifestPropertyEditorUi,
-	): Promise<unknown> {
+	): Promise<ValueType | undefined> {
 		if (!clipboardEntryUnique) {
 			throw new Error('Unique id is required');
 		}
@@ -206,11 +209,11 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 			throw new Error(`Could not find clipboard entry with unique id: ${clipboardEntryUnique}`);
 		}
 
-		const valueResolver = new UmbClipboardPasteTranslatorValueResolver(this);
+		const valueResolver = new UmbClipboardPasteTranslatorValueResolver<ValueType>(this);
 		const propertyValue = await valueResolver.resolve(entry.values, propertyEditorUiManifest.alias);
 
 		const cloner = new UmbPropertyValueCloneController(this);
-		const clonedValue = await cloner.clone({
+		const clonedValue = await cloner.clone<ValueType>({
 			editorAlias: propertyEditorUiManifest.meta.propertyEditorSchemaAlias,
 			alias: propertyEditorUiManifest.alias,
 			value: propertyValue,
