@@ -59,12 +59,15 @@ describe('UmbClipboardCopyPropertyValueTranslatorValueResolver', () => {
 	const propertyValue = 'testValue';
 
 	beforeEach(async () => {
-		umbExtensionsRegistry.clear();
 		umbExtensionsRegistry.registerMany([copyTranslatorManifest1, copyTranslatorManifest2]);
 		hostElement = new UmbTestControllerHostElement();
 		resolver = new UmbClipboardCopyPropertyValueTranslatorValueResolver(hostElement);
-		document.body.innerHTML = '';
 		document.body.appendChild(hostElement);
+	});
+
+	afterEach(() => {
+		umbExtensionsRegistry.clear();
+		document.body.innerHTML = '';
 	});
 
 	describe('Public API', () => {
