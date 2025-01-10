@@ -41,7 +41,7 @@ const pasteTranslatorManifest1 = {
 	toPropertyEditorUi: TEST_PROPERTY_EDITOR_UI_ALIAS,
 };
 
-const copyTranslatorManifest2 = {
+const pasteTranslatorManifest2 = {
 	type: 'clipboardPastePropertyValueTranslator',
 	alias: 'Test.ClipboardPastePropertyValueTranslator2',
 	name: 'Test Clipboard Paste Property Value Translator 2',
@@ -71,7 +71,7 @@ describe('UmbClipboardCopyPropertyValueTranslatorValueResolver', () => {
 
 	beforeEach(async () => {
 		umbExtensionsRegistry.clear();
-		umbExtensionsRegistry.registerMany([pasteTranslatorManifest1, copyTranslatorManifest2]);
+		umbExtensionsRegistry.registerMany([pasteTranslatorManifest1, pasteTranslatorManifest2]);
 		hostElement = new UmbTestControllerHostElement();
 		resolver = new UmbClipboardPastePropertyValueTranslatorValueResolver<string>(hostElement);
 		document.body.innerHTML = '';
