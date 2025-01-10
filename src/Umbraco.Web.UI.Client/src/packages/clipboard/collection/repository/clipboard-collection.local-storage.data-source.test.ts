@@ -9,13 +9,21 @@ import { UmbClipboardCollectionLocalStorageDataSource } from './clipboard-collec
 import { customElement } from 'lit/decorators.js';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UmbCurrentUserContext, UmbCurrentUserStore } from '@umbraco-cms/backoffice/current-user';
 
-@customElement('test-my-app-controller-host')
+@customElement('test-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {
+	currentUserContext = new UmbCurrentUserContext(this);
+
 	constructor() {
 		super();
 		new UmbClipboardEntryDetailStore(this);
 		new UmbNotificationContext(this);
+		new UmbCurrentUserStore(this);
+	}
+
+	async init() {
+		await this.currentUserContext.load();
 	}
 }
 
@@ -60,14 +68,13 @@ describe('UmbClipboardLocalStorageDataSource', () => {
 		localStorage.clear();
 		hostElement = new UmbTestControllerHostElement();
 		detailRepository = new UmbClipboardEntryDetailRepository(hostElement);
-		dataSource = new UmbClipboardCollectionLocalStorageDataSource();
+		dataSource = new UmbClipboardCollectionLocalStorageDataSource(hostElement);
 		document.body.innerHTML = '';
 		document.body.appendChild(hostElement);
-		const createPromises = Promise.all(
-			clipboardEntries.map((clipboardEntry) => detailRepository.create(clipboardEntry)),
-		);
-
-		await createPromises;
+		await hostElement.init();
+		await detailRepository.create(clipboardEntries[0]);
+		await detailRepository.create(clipboardEntries[1]);
+		await detailRepository.create(clipboardEntries[2]);
 	});
 
 	describe('Public API', () => {
@@ -82,6 +89,10 @@ describe('UmbClipboardLocalStorageDataSource', () => {
 		it('should return all clipboard entries', async () => {
 			const result = await dataSource.getCollection({});
 			expect(result.data.items).to.have.lengthOf(clipboardEntries.length);
+			expect(result.data.total).to.equal(clipboardEntries.length);
+			expect(result.data.items[0]).to.have.property('unique', '1');
+			expect(result.data.items[1]).to.have.property('unique', '2');
+			expect(result.data.items[2]).to.have.property('unique', '3');
 		});
 	});
 });

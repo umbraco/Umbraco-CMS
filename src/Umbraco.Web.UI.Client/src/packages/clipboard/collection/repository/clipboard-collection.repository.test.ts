@@ -9,13 +9,21 @@ import { customElement } from 'lit/decorators.js';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UmbClipboardCollectionRepository } from './clipboard-collection.repository.js';
+import { UmbCurrentUserContext, UmbCurrentUserStore } from '@umbraco-cms/backoffice/current-user';
 
-@customElement('test-my-app-controller-host')
+@customElement('test-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {
+	currentUserContext = new UmbCurrentUserContext(this);
+
 	constructor() {
 		super();
 		new UmbClipboardEntryDetailStore(this);
 		new UmbNotificationContext(this);
+		new UmbCurrentUserStore(this);
+	}
+
+	async init() {
+		await this.currentUserContext.load();
 	}
 }
 
@@ -63,11 +71,10 @@ describe('UmbClipboardLocalStorageDataSource', () => {
 		collectionRepository = new UmbClipboardCollectionRepository(hostElement);
 		document.body.innerHTML = '';
 		document.body.appendChild(hostElement);
-		const createPromises = Promise.all(
-			clipboardEntries.map((clipboardEntry) => detailRepository.create(clipboardEntry)),
-		);
-
-		await createPromises;
+		await hostElement.init();
+		await detailRepository.create(clipboardEntries[0]);
+		await detailRepository.create(clipboardEntries[1]);
+		await detailRepository.create(clipboardEntries[2]);
 	});
 
 	describe('Public API', () => {

@@ -8,6 +8,7 @@ import type {
 	UmbDetailDataSource,
 } from '@umbraco-cms/backoffice/repository';
 import { ApiError } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 // TODO: these are temp solutions to comply to the ApiError interface
 const localstorageFakeUrl = 'localstorage';
@@ -19,9 +20,10 @@ const localstorageFakeUrl = 'localstorage';
  * @implements {UmbDetailDataSource<UmbClipboardEntryDetailModel>}
  */
 export class UmbClipboardEntryDetailLocalStorageDataSource
+	extends UmbControllerBase
 	implements UmbDetailDataSource<UmbClipboardEntryDetailModel>
 {
-	#localStorageManager = new UmbClipboardLocalStorageManager();
+	#localStorageManager = new UmbClipboardLocalStorageManager(this);
 
 	/**
 	 * Scaffold a new clipboard entry
@@ -72,7 +74,8 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 		}
 
 		// check if entry already exists
-		const { entries, entry } = this.#localStorageManager.getEntry(model.unique);
+		const entry = await this.#localStorageManager.getEntry(model.unique);
+
 		if (entry) {
 			return {
 				error: new ApiError(
@@ -97,9 +100,10 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 		newEntry.createDate = now;
 		newEntry.updateDate = now;
 
-		const updatedEntries = [...entries, newEntry];
+		const entriesResult = await this.#localStorageManager.getEntries();
+		const updatedEntries = [...entriesResult.entries, newEntry];
 
-		this.#localStorageManager.setEntries(updatedEntries);
+		await this.#localStorageManager.setEntries(updatedEntries);
 
 		return { data: newEntry };
 	}
@@ -131,7 +135,8 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 		}
 
 		// check if entry exists
-		const { entry } = this.#localStorageManager.getEntry(unique);
+		const entry = await this.#localStorageManager.getEntry(unique);
+
 		if (!entry) {
 			return {
 				error: new ApiError(
@@ -181,7 +186,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 		}
 
 		// check if entry exists so it can be updated
-		const { entry, entries } = this.#localStorageManager.getEntry(model.unique);
+		const entry = await this.#localStorageManager.getEntry(model.unique);
 		if (!entry) {
 			return {
 				error: new ApiError(
@@ -201,7 +206,9 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 			};
 		}
 
-		const updatedEntries = entries.map((storedEntry) => {
+		const entriesResult = await this.#localStorageManager.getEntries();
+
+		const updatedEntries = entriesResult.entries.map((storedEntry) => {
 			if (storedEntry.unique === model.unique) {
 				const updatedEntry: UmbClipboardEntryDetailModel = structuredClone(model);
 				updatedEntry.updateDate = new Date().toISOString();
@@ -211,7 +218,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 			return storedEntry;
 		});
 
-		this.#localStorageManager.setEntries(updatedEntries);
+		await this.#localStorageManager.setEntries(updatedEntries);
 
 		const updatedEntry = updatedEntries.find((x) => x.unique === model.unique);
 
@@ -245,7 +252,8 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 		}
 
 		// check if entry exist so it can be deleted
-		const { entry, entries } = this.#localStorageManager.getEntry(unique);
+		const entry = await this.#localStorageManager.getEntry(unique);
+
 		if (!entry) {
 			return {
 				error: new ApiError(
@@ -265,9 +273,10 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 			};
 		}
 
-		const updatedEntriesArray = entries.filter((x) => x.unique !== unique);
+		const entriesResult = await this.#localStorageManager.getEntries();
+		const updatedEntriesArray = entriesResult.entries.filter((x) => x.unique !== unique);
 
-		this.#localStorageManager.setEntries(updatedEntriesArray);
+		await this.#localStorageManager.setEntries(updatedEntriesArray);
 		return {};
 	}
 }

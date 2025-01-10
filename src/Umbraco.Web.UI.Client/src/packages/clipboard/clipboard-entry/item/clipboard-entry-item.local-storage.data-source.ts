@@ -1,5 +1,6 @@
 import { UmbClipboardLocalStorageManager } from '../../clipboard-local-storage.manager.js';
 import type { UmbClipboardEntryItemModel } from './types.js';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
@@ -7,8 +8,11 @@ import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
  * @class UmbClipboardEntryItemServerDataSource
  * @implements {UmbItemServerDataSourceBase}
  */
-export class UmbClipboardEntryItemLocalStorageDataSource implements UmbItemDataSource<UmbClipboardEntryItemModel> {
-	#localStorageManager = new UmbClipboardLocalStorageManager();
+export class UmbClipboardEntryItemLocalStorageDataSource
+	extends UmbControllerBase
+	implements UmbItemDataSource<UmbClipboardEntryItemModel>
+{
+	#localStorageManager = new UmbClipboardLocalStorageManager(this);
 
 	/**
 	 * Gets items from local storage
@@ -16,7 +20,7 @@ export class UmbClipboardEntryItemLocalStorageDataSource implements UmbItemDataS
 	 * @memberof UmbClipboardEntryItemLocalStorageDataSource
 	 */
 	async getItems(unique: Array<string>) {
-		const { entries } = this.#localStorageManager.getEntries();
+		const { entries } = await this.#localStorageManager.getEntries();
 		const items = entries
 			.filter((entry) => unique.includes(entry.unique))
 			.map((entry) => {

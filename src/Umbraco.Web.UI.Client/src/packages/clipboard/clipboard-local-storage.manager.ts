@@ -1,6 +1,9 @@
 import type { UmbClipboardEntryDetailModel } from './clipboard-entry/index.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
-const UMB_CLIPBOARD_LOCALSTORAGE_KEY = 'umb:clipboard';
+const UMB_CLIPBOARD_LOCAL_STORAGE_KEY_PREFIX = 'umb:clipboard';
 
 interface UmbClipboardLocalStorageFilterModel {
 	types?: Array<string>;
@@ -9,36 +12,47 @@ interface UmbClipboardLocalStorageFilterModel {
 }
 
 // keep internal
-export class UmbClipboardLocalStorageManager {
+export class UmbClipboardLocalStorageManager extends UmbControllerBase {
+	#currentUserUnique?: string;
+
+	constructor(host: UmbControllerHost) {
+		super(host);
+	}
+
 	// Gets all entries from local storage
-	getEntries(): {
+	async getEntries(): Promise<{
 		entries: Array<UmbClipboardEntryDetailModel>;
 		total: number;
-	} {
-		const localStorageItem = localStorage.getItem(UMB_CLIPBOARD_LOCALSTORAGE_KEY);
+	}> {
+		const localStorageKey = await this.#requestLocalStorageKey();
+		const localStorageItem = localStorage.getItem(localStorageKey);
 		const entries = localStorageItem ? JSON.parse(localStorageItem) : [];
 		const total = entries.length;
 		return { entries, total };
 	}
 
 	// Gets a single entry from local storage
-	getEntry(unique: string): {
-		entry: UmbClipboardEntryDetailModel | undefined;
-		entries: Array<UmbClipboardEntryDetailModel>;
-	} {
-		const { entries } = this.getEntries();
-		const entry = entries.find((x) => x.unique === unique);
-		return { entries, entry };
+	async getEntry(unique: string): Promise<UmbClipboardEntryDetailModel | undefined> {
+		const { entries } = await this.getEntries();
+		return entries.find((x) => x.unique === unique);
 	}
 
 	// Sets all entries in local storage
-	setEntries(entries: Array<UmbClipboardEntryDetailModel>) {
-		localStorage.setItem(UMB_CLIPBOARD_LOCALSTORAGE_KEY, JSON.stringify(entries));
+	async setEntries(entries: Array<UmbClipboardEntryDetailModel>) {
+		const currentUserUnique = await this.#requestCurrentUserUnique();
+
+		if (!currentUserUnique) {
+			throw new Error('Could not get current user unique');
+		}
+
+		const localStorageKey = await this.#requestLocalStorageKey();
+
+		localStorage.setItem(localStorageKey, JSON.stringify(entries));
 	}
 
 	// gets a filtered list of entries
-	filter(filter: UmbClipboardLocalStorageFilterModel) {
-		const { entries } = this.getEntries();
+	async filter(filter: UmbClipboardLocalStorageFilterModel) {
+		const { entries } = await this.getEntries();
 		const filteredEntries = this.#filterEntries(entries, filter);
 		const total = filteredEntries.length;
 		const skip = filter.skip || 0;
@@ -55,5 +69,20 @@ export class UmbClipboardLocalStorageManager {
 			}
 			return true;
 		});
+	}
+
+	async #requestLocalStorageKey() {
+		const currentUserUnique = await this.#requestCurrentUserUnique();
+		return `${UMB_CLIPBOARD_LOCAL_STORAGE_KEY_PREFIX}:${currentUserUnique}`;
+	}
+
+	async #requestCurrentUserUnique() {
+		if (this.#currentUserUnique) {
+			return this.#currentUserUnique;
+		}
+
+		const context = await this.getContext(UMB_CURRENT_USER_CONTEXT);
+		this.#currentUserUnique = context.getUnique();
+		return this.#currentUserUnique;
 	}
 }

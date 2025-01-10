@@ -6,11 +6,22 @@ import UmbClipboardEntryDetailStore from './clipboard-entry-detail.store.js';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbCurrentUserContext, UmbCurrentUserStore } from '@umbraco-cms/backoffice/current-user';
 
-@customElement('test-my-app-controller-host')
+@customElement('test-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {
-	#store = new UmbClipboardEntryDetailStore(this);
-	#notificationContext = new UmbNotificationContext(this);
+	currentUserContext = new UmbCurrentUserContext(this);
+
+	constructor() {
+		super();
+		new UmbCurrentUserStore(this);
+		new UmbClipboardEntryDetailStore(this);
+		new UmbNotificationContext(this);
+	}
+
+	async init() {
+		await this.currentUserContext.load();
+	}
 }
 
 describe('UmbClipboardEntryDetailRepository', () => {
@@ -33,6 +44,7 @@ describe('UmbClipboardEntryDetailRepository', () => {
 		repository = new UmbClipboardEntryDetailRepository(hostElement);
 		document.body.innerHTML = '';
 		document.body.appendChild(hostElement);
+		await hostElement.init();
 	});
 
 	describe('Public API', () => {

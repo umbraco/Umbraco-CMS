@@ -2,11 +2,30 @@ import { expect } from '@open-wc/testing';
 import { UmbClipboardLocalStorageManager } from './clipboard-local-storage.manager.js';
 import { UMB_CLIPBOARD_ENTRY_ENTITY_TYPE } from './clipboard-entry/entity.js';
 import type { UmbClipboardEntryDetailModel } from './clipboard-entry/index.js';
+import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbCurrentUserContext, UmbCurrentUserStore } from '@umbraco-cms/backoffice/current-user';
+import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 
-type UmbTestClipboardEntryType = 'test1' | 'test2' | 'test3' | 'test4';
 interface UmbTestClipboardEntryDetailModel extends UmbClipboardEntryDetailModel<object> {}
 
+@customElement('test-controller-host')
+class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {
+	currentUserContext = new UmbCurrentUserContext(this);
+
+	constructor() {
+		super();
+		new UmbNotificationContext(this);
+		new UmbCurrentUserStore(this);
+	}
+
+	async init() {
+		await this.currentUserContext.load();
+	}
+}
+
 describe('UmbClipboardLocalStorageManager', () => {
+	let hostElement: UmbTestControllerHostElement;
 	let manager: UmbClipboardLocalStorageManager;
 	const clipboardEntries: Array<UmbTestClipboardEntryDetailModel> = [
 		{
@@ -41,10 +60,14 @@ describe('UmbClipboardLocalStorageManager', () => {
 		},
 	];
 
-	beforeEach(() => {
+	beforeEach(async () => {
 		localStorage.clear();
-		manager = new UmbClipboardLocalStorageManager();
-		manager.setEntries(clipboardEntries);
+		hostElement = new UmbTestControllerHostElement();
+		manager = new UmbClipboardLocalStorageManager(hostElement);
+		document.body.innerHTML = '';
+		document.body.appendChild(hostElement);
+		await hostElement.init();
+		await manager.setEntries(clipboardEntries);
 	});
 
 	describe('Public API', () => {
@@ -64,22 +87,22 @@ describe('UmbClipboardLocalStorageManager', () => {
 	});
 
 	describe('getEntries', () => {
-		it('returns all entries from local storage', () => {
-			const { entries, total } = manager.getEntries();
+		it('returns all entries from local storage', async () => {
+			const { entries, total } = await manager.getEntries();
 			expect(entries).to.deep.equal(clipboardEntries);
 			expect(total).to.equal(clipboardEntries.length);
 		});
 	});
 
 	describe('getEntry', () => {
-		it('returns a single entry from local storage', () => {
-			const { entry } = manager.getEntry('2');
+		it('returns a single entry from local storage', async () => {
+			const entry = await manager.getEntry('2');
 			expect(entry).to.deep.equal(clipboardEntries[1]);
 		});
 	});
 
 	describe('setEntries', () => {
-		it('sets entries in local storage', () => {
+		it('sets entries in local storage', async () => {
 			const newEntry: UmbClipboardEntryDetailModel = {
 				entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
 				values: [{ type: 'test', value: 'test4' }],
@@ -90,8 +113,8 @@ describe('UmbClipboardLocalStorageManager', () => {
 				createDate: null,
 				updateDate: null,
 			};
-			manager.setEntries([...clipboardEntries, newEntry]);
-			const { entries, total } = manager.getEntries();
+			await manager.setEntries([...clipboardEntries, newEntry]);
+			const { entries, total } = await manager.getEntries();
 			expect(entries).to.deep.equal([...clipboardEntries, newEntry]);
 			expect(total).to.equal(clipboardEntries.length + 1);
 		});

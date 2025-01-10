@@ -2,8 +2,28 @@ import { expect } from '@open-wc/testing';
 import { UmbClipboardEntryDetailLocalStorageDataSource } from './clipboard-entry-detail.local-storage.data-source.js';
 import type { UmbClipboardEntryDetailModel } from '../types.js';
 import { UMB_CLIPBOARD_ENTRY_ENTITY_TYPE } from '../entity.js';
+import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbCurrentUserContext, UmbCurrentUserStore } from '@umbraco-cms/backoffice/current-user';
+import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+
+@customElement('test-controller-host')
+class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {
+	currentUserContext = new UmbCurrentUserContext(this);
+
+	constructor() {
+		super();
+		new UmbNotificationContext(this);
+		new UmbCurrentUserStore(this);
+	}
+
+	async init() {
+		await this.currentUserContext.load();
+	}
+}
 
 describe('UmbClipboardEntryDetailLocalStorageDataSource', () => {
+	let hostElement: UmbTestControllerHostElement;
 	let dataSource: UmbClipboardEntryDetailLocalStorageDataSource;
 	const clipboardEntry: UmbClipboardEntryDetailModel = {
 		entityType: UMB_CLIPBOARD_ENTRY_ENTITY_TYPE,
@@ -16,9 +36,13 @@ describe('UmbClipboardEntryDetailLocalStorageDataSource', () => {
 		updateDate: null,
 	};
 
-	beforeEach(() => {
+	beforeEach(async () => {
 		localStorage.clear();
-		dataSource = new UmbClipboardEntryDetailLocalStorageDataSource();
+		hostElement = new UmbTestControllerHostElement();
+		dataSource = new UmbClipboardEntryDetailLocalStorageDataSource(hostElement);
+		document.body.innerHTML = '';
+		document.body.appendChild(hostElement);
+		await hostElement.init();
 	});
 
 	describe('Public API', () => {
