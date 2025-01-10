@@ -97,7 +97,7 @@ describe('UmbClipboardContext', () => {
 		await hostElement.init();
 	});
 
-	describe('read and write', () => {
+	describe('write', () => {
 		it('should write an entry to the clipboard', async () => {
 			const preset: Partial<UmbClipboardEntryDetailModel> = {
 				values: [{ type: 'test', value: 'test1' }],
