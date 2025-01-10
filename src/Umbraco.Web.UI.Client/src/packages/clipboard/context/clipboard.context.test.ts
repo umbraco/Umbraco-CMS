@@ -131,7 +131,6 @@ describe('UmbClipboardContext', () => {
 			let clipboardEntry: UmbClipboardEntryDetailModel | undefined;
 
 			beforeEach(async () => {
-				umbExtensionsRegistry.clear();
 				umbExtensionsRegistry.registerMany([pasteTranslatorManifest, copyTranslatorManifest, propertyEditorManifest]);
 
 				clipboardEntry = await clipboardContext.writeForProperty({
@@ -140,6 +139,10 @@ describe('UmbClipboardContext', () => {
 					propertyValue: 'test1',
 					propertyEditorUiAlias: TEST_PROPERTY_EDITOR_UI_ALIAS,
 				});
+			});
+
+			afterEach(() => {
+				umbExtensionsRegistry.clear();
 			});
 
 			it('should read an entry from the clipboard for a property', async () => {
@@ -155,6 +158,46 @@ describe('UmbClipboardContext', () => {
 				);
 				expect(propertyValue).to.equal('test1 property value');
 			});
+		});
+	});
+
+	describe('getPastePropertyValueTranslatorManifests', () => {
+		beforeEach(async () => {
+			umbExtensionsRegistry.registerMany([pasteTranslatorManifest]);
+		});
+
+		afterEach(() => {
+			umbExtensionsRegistry.clear();
+		});
+
+		it('should return the paste property value translator manifests', () => {
+			const manifests = clipboardContext.getPastePropertyValueTranslatorManifests(TEST_PROPERTY_EDITOR_UI_ALIAS);
+			expect(manifests).to.have.lengthOf(1);
+			expect(manifests[0].alias).to.equal(pasteTranslatorManifest.alias);
+		});
+	});
+
+	describe('hasSupportedPastePropertyValueTranslator', () => {
+		beforeEach(async () => {
+			umbExtensionsRegistry.registerMany([pasteTranslatorManifest]);
+		});
+
+		afterEach(() => {
+			umbExtensionsRegistry.clear();
+		});
+
+		it('should return true if a supported paste property value translator is available', () => {
+			const manifests = clipboardContext.getPastePropertyValueTranslatorManifests(TEST_PROPERTY_EDITOR_UI_ALIAS);
+			const values = [{ type: TEST_CLIPBOARD_ENTRY_VALUE_TYPE, value: 'test clipboard value' }];
+			const hasSupported = clipboardContext.hasSupportedPastePropertyValueTranslator(manifests, values);
+			expect(hasSupported).to.be.true;
+		});
+
+		it('should return false if no supported paste property value translator is available', () => {
+			const manifests = clipboardContext.getPastePropertyValueTranslatorManifests(TEST_PROPERTY_EDITOR_UI_ALIAS);
+			const values = [{ type: 'unsupported', value: 'test clipboard value' }];
+			const hasSupported = clipboardContext.hasSupportedPastePropertyValueTranslator(manifests, values);
+			expect(hasSupported).to.be.false;
 		});
 	});
 });
