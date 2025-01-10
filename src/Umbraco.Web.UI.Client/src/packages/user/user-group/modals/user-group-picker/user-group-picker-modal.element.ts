@@ -6,6 +6,7 @@ import type { UMB_USER_GROUP_PICKER_MODAL } from '@umbraco-cms/backoffice/user-g
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbSelectedEvent, UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
+import { UmbUserGroupRefElement } from '../../components/user-group-ref';
 
 @customElement('umb-user-group-picker-modal')
 export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
@@ -59,26 +60,48 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 		this._submitModal();
 	}
 
+	//TODO: This looks good, but uses in-line html, so it should be defined in the umb-user-group-ref it self.
+
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('user_selectUserGroup', false)}>
 				<uui-box>
-					${this._userGroups.map(
-						(item) => html`
-							<uui-menu-item
-								label=${ifDefined(item.name)}
+					${this._userGroups.map((userGroup) => {
+						const isSelected = this.#selectionManager.isSelected(userGroup.unique);
+						return html`
+							<umb-user-group-ref
+								.name=${userGroup.name}
 								selectable
-								@selected=${(event: UUIMenuItemEvent) => this.#onSelected(event, item)}
-								@deselected=${(event: UUIMenuItemEvent) => this.#onDeselected(event, item)}
-								?selected=${this.#selectionManager.isSelected(item.unique)}>
-								<umb-icon .name=${item.icon || undefined} slot="icon"></umb-icon>
-							</uui-menu-item>
-						`,
-					)}
+								@selected=${(event: UUIMenuItemEvent) => this.#onSelected(event, userGroup)}
+								@deselected=${(event: UUIMenuItemEvent) => this.#onDeselected(event, userGroup)}
+								?selected=${isSelected}
+								.icon=${userGroup.icon || ''}
+								.userPermissionAliases=${userGroup.sections}>
+								<uui-icon .name=${userGroup.icon || undefined} slot="icon"></uui-icon>
+								<div slot="detail">
+									<div>
+										<strong>Sections:</strong> ${userGroup.sections.length
+											? userGroup.sections.map((section) => section.split('.').pop()).join(', ')
+											: 'No sections allowed'}
+									</div>
+									<div>
+										<strong>Media Start Node:</strong> ${userGroup.mediaStartNode
+											? userGroup.mediaStartNode.unique
+											: 'No media startnode selected'}
+									</div>
+									<div>
+										<strong>Content Start Node:</strong> ${userGroup.documentStartNode
+											? userGroup.documentStartNode.unique
+											: 'No content startnode selected'}
+									</div>
+								</div>
+							</umb-user-group-ref>
+						`;
+					})}
 				</uui-box>
 				<div slot="actions">
-					<uui-button label="Close" @click=${this._rejectModal}></uui-button>
-					<uui-button label="Submit" look="primary" color="positive" @click=${this.#onSubmit}></uui-button>
+					<uui-button label="Cancel" @click=${this._rejectModal}></uui-button>
+					<uui-button label="Confirm" look="primary" color="positive" @click=${this.#onSubmit}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
