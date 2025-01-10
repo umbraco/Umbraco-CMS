@@ -153,6 +153,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		if (!this._routes || this._routes.length === 0) return nothing;
 		return html`
 			<umb-router-slot
+				inherit-addendum
 				id="router-slot"
 				.routes=${this._routes}
 				@init=${(event: UmbRouterSlotInitEvent) => {

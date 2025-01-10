@@ -1,4 +1,5 @@
 import '@umbraco-cms/backoffice/external/router-slot';
+import { UmbRoutePathAddendumResetContext } from '../../contexts/route-path-addendum-reset.context.js';
 import { UmbRouterSlotInitEvent } from './router-slot-init.event.js';
 import { UmbRouterSlotChangeEvent } from './router-slot-change.event.js';
 import type { UmbRoute } from './route.interface.js';
@@ -19,6 +20,9 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	#router: IRouterSlot = document.createElement('router-slot') as IRouterSlot;
 	#modalRouter: IRouterSlot = document.createElement('router-slot') as IRouterSlot;
 	#listening = false;
+
+	@property({ type: Boolean, attribute: 'inherit-addendum', reflect: false })
+	public inheritAddendum?: boolean;
 
 	@property({ attribute: false })
 	public get routes(): UmbRoute[] | undefined {
@@ -61,6 +65,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 
 	constructor() {
 		super();
+
 		this.#modalRouter.parent = this.#router;
 		this.#modalRouter.style.display = 'none';
 		this.#router.addEventListener('changestate', this._updateRouterPath.bind(this));
@@ -76,6 +81,10 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	}
 
 	override connectedCallback() {
+		if (this.inheritAddendum !== true) {
+			new UmbRoutePathAddendumResetContext(this);
+		}
+
 		super.connectedCallback();
 		// Currently we have to set this every time as RouteSlot looks for its parent every-time it is connected. Aka it has not way to explicitly set the parent.
 		// And we cannot insert the modal router as a slotted-child of the router, as it flushes its children on every route change.
