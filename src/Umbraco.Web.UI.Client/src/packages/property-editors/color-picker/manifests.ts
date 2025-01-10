@@ -1,6 +1,5 @@
 import { UMB_COLOR_PICKER_PROPERTY_EDITOR_UI_ALIAS } from './constants.js';
 import { manifest as schemaManifest } from './Umbraco.ColorPicker.js';
-import { manifests as clipboardManifests } from './clipboard/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -17,5 +16,4 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	schemaManifest,
-	...clipboardManifests,
 ];
