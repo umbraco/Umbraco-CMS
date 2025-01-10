@@ -4,7 +4,7 @@ import type { UmbGridBlockClipboardEntryValueModel } from '../../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbClipboardPastePropertyValueTranslator } from '@umbraco-cms/backoffice/clipboard';
 
-export class UmbGridBlockToBlockGridClipboardPasteTranslator
+export class UmbGridBlockToBlockGridClipboardPastePropertyValueTranslator
 	extends UmbControllerBase
 	implements UmbClipboardPastePropertyValueTranslator<UmbGridBlockClipboardEntryValueModel, UmbBlockGridValueModel>
 {
@@ -28,4 +28,4 @@ export class UmbGridBlockToBlockGridClipboardPasteTranslator
 	}
 }
 
-export { UmbGridBlockToBlockGridClipboardPasteTranslator as api };
+export { UmbGridBlockToBlockGridClipboardPastePropertyValueTranslator as api };

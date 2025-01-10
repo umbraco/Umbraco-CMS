@@ -13,7 +13,7 @@ const TEST_CLIPBOARD_ENTRY_VALUE_TYPE_2 = 'testClipboardEntryValueType2';
 
 type TestValueType = String;
 
-class UmbTestClipboardPasteTranslator1
+class UmbTestClipboardPastePropertyValueTranslator1
 	extends UmbControllerBase
 	implements UmbClipboardPastePropertyValueTranslator<TestValueType, TestValueType>
 {
@@ -22,7 +22,7 @@ class UmbTestClipboardPasteTranslator1
 	}
 }
 
-class UmbTestClipboardPasteTranslator2
+class UmbTestClipboardPastePropertyValueTranslator2
 	extends UmbControllerBase
 	implements UmbClipboardPastePropertyValueTranslator<TestValueType, TestValueType>
 {
@@ -35,7 +35,7 @@ const pasteTranslatorManifest1 = {
 	type: 'clipboardPastePropertyValueTranslator',
 	alias: 'Test.ClipboardPastePropertyValueTranslator1',
 	name: 'Test Clipboard Paste Property Value Translator 1',
-	api: UmbTestClipboardPasteTranslator1,
+	api: UmbTestClipboardPastePropertyValueTranslator1,
 	weight: 1,
 	fromClipboardEntryValueType: TEST_CLIPBOARD_ENTRY_VALUE_TYPE_1,
 	toPropertyEditorUi: TEST_PROPERTY_EDITOR_UI_ALIAS,
@@ -45,7 +45,7 @@ const copyTranslatorManifest2 = {
 	type: 'clipboardPastePropertyValueTranslator',
 	alias: 'Test.ClipboardPastePropertyValueTranslator2',
 	name: 'Test Clipboard Paste Property Value Translator 2',
-	api: UmbTestClipboardPasteTranslator2,
+	api: UmbTestClipboardPastePropertyValueTranslator2,
 	weight: 2,
 	fromClipboardEntryValueType: TEST_CLIPBOARD_ENTRY_VALUE_TYPE_2,
 	toPropertyEditorUi: TEST_PROPERTY_EDITOR_UI_ALIAS,
