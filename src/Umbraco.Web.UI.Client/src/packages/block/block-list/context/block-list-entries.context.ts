@@ -13,6 +13,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_CONTENT_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/content';
 import { UMB_CLIPBOARD_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
+import { Index } from 'src/packages/search/examine-management-dashboard/dashboard-examine-management.stories.js';
 
 export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT,
@@ -123,8 +124,6 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	}
 
 	#insertPropertyValue(values: UmbBlockListValueModel, originData: UmbBlockListWorkspaceOriginData) {
-		console.log('insert property value:', values);
-
 		const layoutEntries = values.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS];
 
 		if (!layoutEntries) {
@@ -133,7 +132,9 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 
 		for (const layoutEntry of layoutEntries) {
 			this.#insertBlockFromPropertyValue(layoutEntry, values, originData);
-			originData.index++;
+			if (originData.index !== -1) {
+				originData = { ...originData, index: originData.index + 1 };
+			}
 		}
 	}
 
@@ -209,6 +210,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 		originData: UmbBlockListWorkspaceOriginData,
 	) {
 		await this._retrieveManager;
+
 		return this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
 	}
 
