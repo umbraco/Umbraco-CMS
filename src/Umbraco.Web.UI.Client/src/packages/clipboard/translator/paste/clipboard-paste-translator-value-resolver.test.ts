@@ -87,7 +87,7 @@ describe('UmbClipboardCopyTranslatorValueResolver', () => {
 	});
 
 	describe('resolve', async () => {
-		let propertyValue: String;
+		let propertyValue: string | undefined;
 
 		beforeEach(async () => {
 			propertyValue = await resolver.resolve(clipboardEntryValues, TEST_PROPERTY_EDITOR_UI_ALIAS);
