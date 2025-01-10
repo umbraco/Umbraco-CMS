@@ -119,15 +119,20 @@ export abstract class UmbBlockEntriesContext<
 
 	// insert/paste from property value methods:
 
-	protected _insertFromPropertyValues(values: Array<UmbBlockValueType>, originData: BlockOriginData) {
-		values.forEach((value) => {
-			originData = this._insertFromPropertyValue(value, originData);
-		});
+	protected async _insertFromPropertyValues(values: Array<UmbBlockValueType>, originData: BlockOriginData) {
+		await Promise.all(
+			values.map(async (value) => {
+				originData = await this._insertFromPropertyValue(value, originData);
+			}),
+		);
 	}
 
-	protected abstract _insertFromPropertyValue(values: UmbBlockValueType, originData: BlockOriginData): BlockOriginData;
+	protected abstract _insertFromPropertyValue(
+		values: UmbBlockValueType,
+		originData: BlockOriginData,
+	): Promise<BlockOriginData>;
 
-	protected _insertBlockFromPropertyValue(
+	protected async _insertBlockFromPropertyValue(
 		layoutEntry: BlockLayoutType,
 		value: UmbBlockValueType,
 		originData: BlockOriginData,
@@ -137,6 +142,6 @@ export abstract class UmbBlockEntriesContext<
 			throw new Error('No content found for layout entry');
 		}
 		const settings = value.settingsData.find((x) => x.key === layoutEntry.settingsKey);
-		this.insert(layoutEntry, content, settings, originData);
+		await this.insert(layoutEntry, content, settings, originData);
 	}
 }

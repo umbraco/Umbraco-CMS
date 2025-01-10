@@ -203,7 +203,7 @@ export class UmbBlockGridEntriesContext
 						data.originData as UmbBlockGridWorkspaceOriginData,
 					);
 					if (created) {
-						this.insert(
+						await this.insert(
 							created.layout,
 							created.content,
 							created.settings,
@@ -454,7 +454,7 @@ export class UmbBlockGridEntriesContext
 			throw new Error(`Cannot delete block, missing layout for ${contentKey}`);
 		}
 		// The following loop will only delete the referenced data of sub Layout Entries, as the Layout entry is part of the main Layout Entry they will go away when that is removed. [NL]
-		forEachBlockLayoutEntryOf(layout, (entry) => {
+		forEachBlockLayoutEntryOf(layout, async (entry) => {
 			if (entry.settingsKey) {
 				this._manager!.removeOneSettings(entry.settingsKey);
 			}
@@ -465,34 +465,36 @@ export class UmbBlockGridEntriesContext
 		await super.delete(contentKey);
 	}
 
-	protected _insertFromPropertyValue(value: UmbBlockGridValueModel, originData: UmbBlockGridWorkspaceOriginData) {
+	protected async _insertFromPropertyValue(value: UmbBlockGridValueModel, originData: UmbBlockGridWorkspaceOriginData) {
 		const layoutEntries = value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS];
 
 		if (!layoutEntries) {
 			throw new Error('No layout entries found');
 		}
 
-		for (const layoutEntry of layoutEntries) {
-			this._insertBlockFromPropertyValue(layoutEntry, value, originData);
-			if (originData.index !== -1) {
-				originData = { ...originData, index: originData.index + 1 };
-			}
-		}
+		await Promise.all(
+			layoutEntries.map(async (layoutEntry) => {
+				await this._insertBlockFromPropertyValue(layoutEntry, value, originData);
+				if (originData.index !== -1) {
+					originData = { ...originData, index: originData.index + 1 };
+				}
+			}),
+		);
 
 		return originData;
 	}
 
-	protected override _insertBlockFromPropertyValue(
+	protected override async _insertBlockFromPropertyValue(
 		layoutEntry: UmbBlockGridLayoutModel,
 		value: UmbBlockGridValueModel,
 		originData: UmbBlockGridWorkspaceOriginData,
 	) {
-		super._insertBlockFromPropertyValue(layoutEntry, value, originData);
+		await super._insertBlockFromPropertyValue(layoutEntry, value, originData);
 
 		// Handle inserting of the inner blocks..
-		forEachBlockLayoutEntryOf(layoutEntry, (entry, areaKey) => {
-			const localOriginData = { index: -1, parentUnique: layoutEntry.contentKey, areaKey };
-			this._insertBlockFromPropertyValue(entry, value, localOriginData);
+		await forEachBlockLayoutEntryOf(layoutEntry, async (entry, parentUnique, areaKey) => {
+			const localOriginData = { index: -1, parentUnique, areaKey };
+			await this._insertBlockFromPropertyValue(entry, value, localOriginData);
 		});
 	}
 

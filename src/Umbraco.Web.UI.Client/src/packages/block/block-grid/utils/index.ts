@@ -34,16 +34,22 @@ export function closestColumnSpanOption(target: number, map: Array<number>, max:
  * @param {UmbBlockGridLayoutModel} entry - The entry to iterate over
  * @param {(entry:UmbBlockGridLayoutModel) => void } callback - The callback to call for each entry
  */
-export function forEachBlockLayoutEntryOf(
+export async function forEachBlockLayoutEntryOf(
 	entry: UmbBlockGridLayoutModel,
-	callback: (entry: UmbBlockGridLayoutModel, areaKey: string) => void,
-): void {
+	callback: (entry: UmbBlockGridLayoutModel, parentUnique: string, areaKey: string) => PromiseLike<void>,
+): Promise<void> {
 	if (entry.areas) {
-		entry.areas.forEach((area) => {
-			area.items.forEach((item) => {
-				forEachBlockLayoutEntryOf(item, callback);
-				callback(item, area.key);
-			});
-		});
+		const parentUnique = entry.contentKey;
+		await Promise.all(
+			entry.areas.map(async (area) => {
+				const areaKey = area.key;
+				await Promise.all(
+					area.items.map(async (item) => {
+						await callback(item, parentUnique, areaKey);
+						await forEachBlockLayoutEntryOf(item, callback);
+					}),
+				);
+			}),
+		);
 	}
 }
