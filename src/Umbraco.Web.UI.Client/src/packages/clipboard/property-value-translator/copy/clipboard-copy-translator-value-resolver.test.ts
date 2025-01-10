@@ -1,7 +1,7 @@
 import { expect } from '@open-wc/testing';
 import { customElement } from 'lit/decorators.js';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import { UmbClipboardCopyTranslatorValueResolver } from './clipboard-copy-translator-value-resolver.js';
+import { UmbClipboardCopyPropertyValueTranslatorValueResolver } from './clipboard-copy-translator-value-resolver.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbClipboardCopyPropertyValueTranslator } from './types.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -13,7 +13,7 @@ const TEST_CLIPBOARD_ENTRY_VALUE_TYPE_2 = 'testClipboardEntryValueType2';
 
 type TestValueType = String;
 
-class UmbTestClipboardCopyTranslator1
+class UmbTestClipboardCopyPropertyValueTranslator1
 	extends UmbControllerBase
 	implements UmbClipboardCopyPropertyValueTranslator<TestValueType, TestValueType>
 {
@@ -22,7 +22,7 @@ class UmbTestClipboardCopyTranslator1
 	}
 }
 
-class UmbTestClipboardCopyTranslator2
+class UmbTestClipboardCopyPropertyValueTranslator2
 	extends UmbControllerBase
 	implements UmbClipboardCopyPropertyValueTranslator<TestValueType, TestValueType>
 {
@@ -35,7 +35,7 @@ const copyTranslatorManifest1 = {
 	type: 'clipboardCopyPropertyValueTranslator',
 	alias: 'Test.ClipboardCopyPropertyValueTranslator1',
 	name: 'Test Clipboard Copy Property Value Translator 1',
-	api: UmbTestClipboardCopyTranslator1,
+	api: UmbTestClipboardCopyPropertyValueTranslator1,
 	fromPropertyEditorUi: TEST_PROPERTY_EDITOR_UI_ALIAS,
 	toClipboardEntryValueType: TEST_CLIPBOARD_ENTRY_VALUE_TYPE_1,
 };
@@ -44,7 +44,7 @@ const copyTranslatorManifest2 = {
 	type: 'clipboardCopyPropertyValueTranslator',
 	alias: 'Test.ClipboardCopyPropertyValueTranslator2',
 	name: 'Test Clipboard Copy Property Value Translator 2',
-	api: UmbTestClipboardCopyTranslator2,
+	api: UmbTestClipboardCopyPropertyValueTranslator2,
 	fromPropertyEditorUi: TEST_PROPERTY_EDITOR_UI_ALIAS,
 	toClipboardEntryValueType: TEST_CLIPBOARD_ENTRY_VALUE_TYPE_2,
 };
@@ -52,9 +52,9 @@ const copyTranslatorManifest2 = {
 @customElement('test-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-describe('UmbClipboardCopyTranslatorValueResolver', () => {
+describe('UmbClipboardCopyPropertyValueTranslatorValueResolver', () => {
 	let hostElement: UmbTestControllerHostElement;
-	let resolver: UmbClipboardCopyTranslatorValueResolver;
+	let resolver: UmbClipboardCopyPropertyValueTranslatorValueResolver;
 
 	const propertyValue = 'testValue';
 
@@ -62,7 +62,7 @@ describe('UmbClipboardCopyTranslatorValueResolver', () => {
 		umbExtensionsRegistry.clear();
 		umbExtensionsRegistry.registerMany([copyTranslatorManifest1, copyTranslatorManifest2]);
 		hostElement = new UmbTestControllerHostElement();
-		resolver = new UmbClipboardCopyTranslatorValueResolver(hostElement);
+		resolver = new UmbClipboardCopyPropertyValueTranslatorValueResolver(hostElement);
 		document.body.innerHTML = '';
 		document.body.appendChild(hostElement);
 	});

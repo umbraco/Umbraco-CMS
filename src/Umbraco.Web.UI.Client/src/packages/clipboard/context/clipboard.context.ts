@@ -1,8 +1,8 @@
 import { UMB_CLIPBOARD_ENTRY_PICKER_MODAL } from '../clipboard-entry/picker-modal/index.js';
 import {
-	UmbClipboardCopyTranslatorValueResolver,
+	UmbClipboardCopyPropertyValueTranslatorValueResolver,
 	UmbClipboardEntryDetailRepository,
-	UmbClipboardPasteTranslatorValueResolver,
+	UmbClipboardPastePropertyValueTranslatorValueResolver,
 	type UmbClipboardEntryDetailModel,
 	type UmbClipboardEntryValuesType,
 } from '../clipboard-entry/index.js';
@@ -116,7 +116,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		propertyValue: any;
 		propertyEditorUiAlias: string;
 	}): Promise<void> {
-		const copyValueResolver = new UmbClipboardCopyTranslatorValueResolver(this);
+		const copyValueResolver = new UmbClipboardCopyPropertyValueTranslatorValueResolver(this);
 		const values = await copyValueResolver.resolve(args.propertyValue, args.propertyEditorUiAlias);
 
 		const entryPreset: Partial<UmbClipboardEntryDetailModel> = {
@@ -209,7 +209,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 			throw new Error(`Could not find clipboard entry with unique id: ${clipboardEntryUnique}`);
 		}
 
-		const valueResolver = new UmbClipboardPasteTranslatorValueResolver<ValueType>(this);
+		const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver<ValueType>(this);
 		const propertyValue = await valueResolver.resolve(entry.values, propertyEditorUiManifest.alias);
 
 		const cloner = new UmbPropertyValueCloneController(this);
