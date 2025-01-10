@@ -1,7 +1,11 @@
 import type { UmbBlockDataModel } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
 import type { UmbBlockListWorkspaceOriginData } from '../index.js';
-import { UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS, UMB_BLOCK_LIST_WORKSPACE_MODAL } from '../index.js';
+import {
+	UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
+	UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
+	UMB_BLOCK_LIST_WORKSPACE_MODAL,
+} from '../index.js';
 import type { UmbBlockListLayoutModel, UmbBlockListTypeModel, UmbBlockListValueModel } from '../types.js';
 import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context-token.js';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
@@ -83,7 +87,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 						UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
 					);
 
-					this.#insertPropertyValues(propertyValues);
+					this.#insertPropertyValues(propertyValues, data.originData as UmbBlockListWorkspaceOriginData);
 				}
 			})
 			.observeRouteBuilder((routeBuilder) => {
@@ -112,8 +116,38 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 		});
 	}
 
-	#insertPropertyValues(values: Array<UmbBlockListValueModel>) {
-		console.log('Property values:', values);
+	#insertPropertyValues(values: Array<UmbBlockListValueModel>, originData: UmbBlockListWorkspaceOriginData) {
+		values.forEach((value) => {
+			this.#insertPropertyValue(value, originData);
+		});
+	}
+
+	#insertPropertyValue(values: UmbBlockListValueModel, originData: UmbBlockListWorkspaceOriginData) {
+		console.log('insert property value:', values);
+
+		const layoutEntries = values.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS];
+
+		if (!layoutEntries) {
+			throw new Error('No layout entries found');
+		}
+
+		for (const layoutEntry of layoutEntries) {
+			this.#insertBlockFromPropertyValue(layoutEntry, values, originData);
+			originData.index++;
+		}
+	}
+
+	#insertBlockFromPropertyValue(
+		layoutEntry: UmbBlockListLayoutModel,
+		value: UmbBlockListValueModel,
+		originData: UmbBlockListWorkspaceOriginData,
+	) {
+		const content = value.contentData.find((x) => x.key === layoutEntry.contentKey);
+		if (!content) {
+			throw new Error('No content found for layout entry');
+		}
+		const settings = value.settingsData.find((x) => x.key === layoutEntry.settingsKey);
+		this.insert(layoutEntry, content, settings, originData);
 	}
 
 	protected _gotBlockManager() {
