@@ -5,7 +5,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi, type ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbClipboardPasteTranslatorValueResolver<PropertyValueType = any> extends UmbControllerBase {
+export class UmbClipboardPasteTranslatorValueResolver<PropertyValueType = unknown> extends UmbControllerBase {
 	async resolve(
 		clipboardEntryValues: UmbClipboardEntryValuesType,
 		propertyEditorUiAlias: string,
