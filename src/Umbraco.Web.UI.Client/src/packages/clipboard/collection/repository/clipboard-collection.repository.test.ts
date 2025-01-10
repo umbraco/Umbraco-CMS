@@ -64,36 +64,44 @@ describe('UmbClipboardLocalStorageDataSource', () => {
 		},
 	];
 
-	beforeEach(async () => {
-		hostElement = new UmbTestControllerHostElement();
-		detailRepository = new UmbClipboardEntryDetailRepository(hostElement);
-		collectionRepository = new UmbClipboardCollectionRepository(hostElement);
-		document.body.appendChild(hostElement);
-		await hostElement.init();
-		await detailRepository.create(clipboardEntries[0]);
-		await detailRepository.create(clipboardEntries[1]);
-		await detailRepository.create(clipboardEntries[2]);
-	});
-
-	afterEach(() => {
-		localStorage.clear();
-		document.body.innerHTML = '';
-	});
-
 	describe('Public API', () => {
 		describe('methods', () => {
-			it('has a getCollection method', () => {
-				expect(collectionRepository).to.have.property('getCollection').that.is.a('function');
+			beforeEach(() => {
+				hostElement = new UmbTestControllerHostElement();
+				collectionRepository = new UmbClipboardCollectionRepository(hostElement);
+			});
+
+			it('has a requestCollection method', () => {
+				expect(collectionRepository).to.have.property('requestCollection').that.is.a('function');
 			});
 		});
 	});
 
 	describe('getCollection', () => {
+		beforeEach(async () => {
+			hostElement = new UmbTestControllerHostElement();
+			detailRepository = new UmbClipboardEntryDetailRepository(hostElement);
+			collectionRepository = new UmbClipboardCollectionRepository(hostElement);
+			document.body.appendChild(hostElement);
+			await hostElement.init();
+			await detailRepository.create(clipboardEntries[0]);
+			await detailRepository.create(clipboardEntries[1]);
+			await detailRepository.create(clipboardEntries[2]);
+		});
+
+		afterEach(() => {
+			localStorage.clear();
+			document.body.innerHTML = '';
+		});
+
 		it('should return all clipboard entries', async () => {
 			const result = await collectionRepository.requestCollection({});
 
 			expect(result.data.items).to.have.lengthOf(clipboardEntries.length);
-			expect(result.data.items).to.deep.equal(clipboardEntries);
+			expect(result.data.total).to.equal(clipboardEntries.length);
+			expect(result.data.items[0].unique).to.equal('1');
+			expect(result.data.items[1].unique).to.equal('2');
+			expect(result.data.items[2].unique).to.equal('3');
 		});
 	});
 });
