@@ -11,7 +11,7 @@ const TEST_PROPERTY_EDITOR_UI_ALIAS = 'testPropertyEditorUiAlias';
 const TEST_CLIPBOARD_ENTRY_VALUE_TYPE_1 = 'testClipboardEntryValueType1';
 const TEST_CLIPBOARD_ENTRY_VALUE_TYPE_2 = 'testClipboardEntryValueType2';
 
-type TestValueType = String;
+type TestValueType = string;
 
 class UmbTestClipboardPasteTranslator1
 	extends UmbControllerBase
@@ -56,7 +56,7 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 
 describe('UmbClipboardCopyTranslatorValueResolver', () => {
 	let hostElement: UmbTestControllerHostElement;
-	let resolver: UmbClipboardPasteTranslatorValueResolver;
+	let resolver: UmbClipboardPasteTranslatorValueResolver<string>;
 
 	const clipboardEntryValues: UmbClipboardEntryValuesType = [
 		{
@@ -73,7 +73,7 @@ describe('UmbClipboardCopyTranslatorValueResolver', () => {
 		umbExtensionsRegistry.clear();
 		umbExtensionsRegistry.registerMany([pasteTranslatorManifest1, copyTranslatorManifest2]);
 		hostElement = new UmbTestControllerHostElement();
-		resolver = new UmbClipboardPasteTranslatorValueResolver<String>(hostElement);
+		resolver = new UmbClipboardPasteTranslatorValueResolver<string>(hostElement);
 		document.body.innerHTML = '';
 		document.body.appendChild(hostElement);
 	});
