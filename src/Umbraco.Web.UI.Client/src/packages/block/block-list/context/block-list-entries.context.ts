@@ -179,19 +179,21 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 		return this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
 	}
 
-	protected _insertFromPropertyValue(value: UmbBlockListValueModel, originData: UmbBlockListWorkspaceOriginData) {
+	protected async _insertFromPropertyValue(value: UmbBlockListValueModel, originData: UmbBlockListWorkspaceOriginData) {
 		const layoutEntries = value.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS];
 
 		if (!layoutEntries) {
 			throw new Error('No layout entries found');
 		}
 
-		for (const layoutEntry of layoutEntries) {
-			this._insertBlockFromPropertyValue(layoutEntry, value, originData);
-			if (originData.index !== -1) {
-				originData = { ...originData, index: originData.index + 1 };
-			}
-		}
+		await Promise.all(
+			layoutEntries.map(async (layoutEntry) => {
+				this._insertBlockFromPropertyValue(layoutEntry, value, originData);
+				if (originData.index !== -1) {
+					originData = { ...originData, index: originData.index + 1 };
+				}
+			}),
+		);
 
 		return originData;
 	}

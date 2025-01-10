@@ -155,17 +155,19 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 		this._manager?.deleteLayoutElement(contentKey);
 	}
 
-	protected _insertFromPropertyValue(value: UmbBlockRteValueModel, originData: UmbBlockRteWorkspaceOriginData) {
+	protected async _insertFromPropertyValue(value: UmbBlockRteValueModel, originData: UmbBlockRteWorkspaceOriginData) {
 		const layoutEntries = value.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS];
 
 		if (!layoutEntries) {
 			throw new Error('No layout entries found');
 		}
 
-		for (const layoutEntry of layoutEntries) {
-			this._insertBlockFromPropertyValue(layoutEntry, value, originData);
-			// TODO: Missing some way to insert a Block HTML Element into the RTE at the current cursor point. (hopefully the responsibilit can be avoided here, but there is some connection missing at this point) [NL]
-		}
+		await Promise.all(
+			layoutEntries.map(async (layoutEntry) => {
+				this._insertBlockFromPropertyValue(layoutEntry, value, originData);
+				// TODO: Missing some way to insert a Block HTML Element into the RTE at the current cursor point. (hopefully the responsibilit can be avoided here, but there is some connection missing at this point) [NL]
+			}),
+		);
 
 		return originData;
 	}
