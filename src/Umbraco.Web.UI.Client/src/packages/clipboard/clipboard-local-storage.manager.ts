@@ -14,9 +14,15 @@ interface UmbClipboardLocalStorageFilterModel {
 // keep internal
 export class UmbClipboardLocalStorageManager extends UmbControllerBase {
 	#currentUserUnique?: string;
+	#fingerprint?: string;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
+
+		// TODO: look into encrypting the data
+		if (!window.isSecureContext && window.crypto) {
+			throw new Error('Clipboard local storage manager can only be used in a secure context');
+		}
 	}
 
 	// Gets all entries from local storage
@@ -72,8 +78,14 @@ export class UmbClipboardLocalStorageManager extends UmbControllerBase {
 	}
 
 	async #requestLocalStorageKey() {
+		if (this.#fingerprint) {
+			return this.#fingerprint;
+		}
+
 		const currentUserUnique = await this.#requestCurrentUserUnique();
-		return `${UMB_CLIPBOARD_LOCAL_STORAGE_KEY_PREFIX}:${currentUserUnique}`;
+		const fingerPrint = await this.#fingerPrint(`${UMB_CLIPBOARD_LOCAL_STORAGE_KEY_PREFIX}:${currentUserUnique}`);
+		this.#fingerprint = fingerPrint;
+		return this.#fingerprint;
 	}
 
 	async #requestCurrentUserUnique() {
@@ -84,5 +96,14 @@ export class UmbClipboardLocalStorageManager extends UmbControllerBase {
 		const context = await this.getContext(UMB_CURRENT_USER_CONTEXT);
 		this.#currentUserUnique = context.getUnique();
 		return this.#currentUserUnique;
+	}
+
+	async #fingerPrint(text: string) {
+		const encoder = new TextEncoder();
+		const data = encoder.encode(text);
+		const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+		const hashArray = Array.from(new Uint8Array(hashBuffer));
+		const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+		return hashHex;
 	}
 }
