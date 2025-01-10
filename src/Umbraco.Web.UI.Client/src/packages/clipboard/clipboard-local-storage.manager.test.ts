@@ -61,13 +61,16 @@ describe('UmbClipboardLocalStorageManager', () => {
 	];
 
 	beforeEach(async () => {
-		localStorage.clear();
 		hostElement = new UmbTestControllerHostElement();
 		manager = new UmbClipboardLocalStorageManager(hostElement);
-		document.body.innerHTML = '';
 		document.body.appendChild(hostElement);
 		await hostElement.init();
 		await manager.setEntries(clipboardEntries);
+	});
+
+	afterEach(() => {
+		localStorage.clear();
+		document.body.innerHTML = '';
 	});
 
 	describe('Public API', () => {
