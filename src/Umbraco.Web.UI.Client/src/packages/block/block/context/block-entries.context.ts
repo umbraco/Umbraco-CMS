@@ -1,5 +1,5 @@
 import type { UmbBlockWorkspaceOriginData } from '../workspace/block-workspace.modal-token.js';
-import type { UmbBlockDataModel, UmbBlockLayoutBaseModel } from '../types.js';
+import type { UmbBlockDataModel, UmbBlockLayoutBaseModel, UmbBlockValueType } from '../types.js';
 import type { UmbBlockDataObjectModel, UmbBlockManagerContext } from './block-manager.context.js';
 import { UMB_BLOCK_ENTRIES_CONTEXT } from './block-entries.context-token.js';
 import { type Observable, UmbArrayState, UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
@@ -116,5 +116,27 @@ export abstract class UmbBlockEntriesContext<
 
 		this._layoutEntries.removeOne(contentKey);
 	}
-	//copy
+
+	// insert/paste from property value methods:
+
+	protected _insertFromPropertyValues(values: Array<UmbBlockValueType>, originData: BlockOriginData) {
+		values.forEach((value) => {
+			originData = this._insertFromPropertyValue(value, originData);
+		});
+	}
+
+	protected abstract _insertFromPropertyValue(values: UmbBlockValueType, originData: BlockOriginData): BlockOriginData;
+
+	protected _insertBlockFromPropertyValue(
+		layoutEntry: BlockLayoutType,
+		value: UmbBlockValueType,
+		originData: BlockOriginData,
+	) {
+		const content = value.contentData.find((x) => x.key === layoutEntry.contentKey);
+		if (!content) {
+			throw new Error('No content found for layout entry');
+		}
+		const settings = value.settingsData.find((x) => x.key === layoutEntry.settingsKey);
+		this.insert(layoutEntry, content, settings, originData);
+	}
 }

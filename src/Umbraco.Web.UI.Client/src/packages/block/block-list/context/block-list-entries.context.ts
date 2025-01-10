@@ -13,7 +13,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_CONTENT_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/content';
 import { UMB_CLIPBOARD_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
-import { Index } from 'src/packages/search/examine-management-dashboard/dashboard-examine-management.stories.js';
 
 export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT,
@@ -88,7 +87,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 						UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
 					);
 
-					this.#insertPropertyValues(propertyValues, data.originData as UmbBlockListWorkspaceOriginData);
+					this._insertFromPropertyValues(propertyValues, data.originData as UmbBlockListWorkspaceOriginData);
 				}
 			})
 			.observeRouteBuilder((routeBuilder) => {
@@ -115,40 +114,6 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 			this.#catalogueModal.setUniquePathValue('variantId', variantId?.toString());
 			this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
 		});
-	}
-
-	#insertPropertyValues(values: Array<UmbBlockListValueModel>, originData: UmbBlockListWorkspaceOriginData) {
-		values.forEach((value) => {
-			this.#insertPropertyValue(value, originData);
-		});
-	}
-
-	#insertPropertyValue(values: UmbBlockListValueModel, originData: UmbBlockListWorkspaceOriginData) {
-		const layoutEntries = values.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS];
-
-		if (!layoutEntries) {
-			throw new Error('No layout entries found');
-		}
-
-		for (const layoutEntry of layoutEntries) {
-			this.#insertBlockFromPropertyValue(layoutEntry, values, originData);
-			if (originData.index !== -1) {
-				originData = { ...originData, index: originData.index + 1 };
-			}
-		}
-	}
-
-	#insertBlockFromPropertyValue(
-		layoutEntry: UmbBlockListLayoutModel,
-		value: UmbBlockListValueModel,
-		originData: UmbBlockListWorkspaceOriginData,
-	) {
-		const content = value.contentData.find((x) => x.key === layoutEntry.contentKey);
-		if (!content) {
-			throw new Error('No content found for layout entry');
-		}
-		const settings = value.settingsData.find((x) => x.key === layoutEntry.settingsKey);
-		this.insert(layoutEntry, content, settings, originData);
 	}
 
 	protected _gotBlockManager() {
@@ -214,9 +179,20 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 		return this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
 	}
 
-	// create Block?
-	override async delete(contentKey: string) {
-		// TODO: Loop through children and delete them as well?
-		await super.delete(contentKey);
+	protected _insertFromPropertyValue(value: UmbBlockListValueModel, originData: UmbBlockListWorkspaceOriginData) {
+		const layoutEntries = value.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS];
+
+		if (!layoutEntries) {
+			throw new Error('No layout entries found');
+		}
+
+		for (const layoutEntry of layoutEntries) {
+			this._insertBlockFromPropertyValue(layoutEntry, value, originData);
+			if (originData.index !== -1) {
+				originData = { ...originData, index: originData.index + 1 };
+			}
+		}
+
+		return originData;
 	}
 }
