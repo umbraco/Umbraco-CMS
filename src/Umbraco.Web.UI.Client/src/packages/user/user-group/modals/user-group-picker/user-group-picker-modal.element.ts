@@ -1,6 +1,6 @@
 import { UmbUserGroupCollectionRepository } from '../../collection/repository/index.js';
 import type { UmbUserGroupDetailModel } from '../../types.js';
-import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UMB_USER_GROUP_PICKER_MODAL } from '@umbraco-cms/backoffice/user-group';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -60,7 +60,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 		this._submitModal();
 	}
 
-	//TODO: This looks good, but uses in-line html, so it should be defined in the umb-user-group-ref it self.
+	//TODO: The details should probably be defined in the umb-user-group-ref it self and subsequently imported instead of being defined here.
 
 	override render() {
 		return html`
@@ -71,6 +71,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 						return html`
 							<umb-user-group-ref
 								.name=${userGroup.name}
+								select-only
 								selectable
 								@selected=${(event: UUIMenuItemEvent) => this.#onSelected(event, userGroup)}
 								@deselected=${(event: UUIMenuItemEvent) => this.#onDeselected(event, userGroup)}
@@ -78,21 +79,21 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 								.icon=${userGroup.icon || ''}
 								.userPermissionAliases=${userGroup.sections}>
 								<uui-icon .name=${userGroup.icon || undefined} slot="icon"></uui-icon>
-								<div slot="detail">
+								<div slot="detail" id="details">
 									<div>
 										<strong>Sections:</strong> ${userGroup.sections.length
 											? userGroup.sections.map((section) => section.split('.').pop()).join(', ')
-											: 'No sections allowed'}
+											: 'No sections selected'}
 									</div>
 									<div>
 										<strong>Media Start Node:</strong> ${userGroup.mediaStartNode
 											? userGroup.mediaStartNode.unique
-											: 'No media startnode selected'}
+											: 'No media start node selected'}
 									</div>
 									<div>
 										<strong>Content Start Node:</strong> ${userGroup.documentStartNode
 											? userGroup.documentStartNode.unique
-											: 'No content startnode selected'}
+											: 'No content start node selected'}
 									</div>
 								</div>
 							</umb-user-group-ref>
@@ -106,6 +107,19 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 			</umb-body-layout>
 		`;
 	}
+
+	static override styles = [
+		css`
+			#details {
+				color: var(--uui-color-text-alt);
+				margin-top: var(--uui-size-space-1);
+			}
+
+			#details > div {
+				margin-bottom: var(--uui-size-space-1);
+			}
+		`,
+	];
 }
 
 export default UmbUserGroupPickerModalElement;
