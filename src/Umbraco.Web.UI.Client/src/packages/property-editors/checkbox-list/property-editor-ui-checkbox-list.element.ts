@@ -39,6 +39,12 @@ export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implem
 							checked: this.#selection.includes(item.value),
 						}));
 		}
+
+
+		this.#selection = this.#selection.filter((selectedItem) =>
+			this._list.some((listItem) => listItem.value === selectedItem),
+		);
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	/**
