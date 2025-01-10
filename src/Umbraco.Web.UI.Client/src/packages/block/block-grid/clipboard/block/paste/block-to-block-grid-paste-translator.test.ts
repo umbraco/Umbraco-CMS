@@ -3,15 +3,15 @@ import { customElement } from 'lit/decorators.js';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../../property-editors/constants.js';
 import type { UmbBlockGridValueModel } from '../../../types.js';
-import { UmbBlockToBlockGridClipboardPasteTranslator } from './block-to-block-grid-paste-translator.js';
+import { UmbBlockToBlockGridClipboardPastePropertyValueTranslator } from './block-to-block-grid-paste-translator.js';
 import type { UmbBlockClipboardEntryValueModel } from '@umbraco-cms/backoffice/block';
 
 @customElement('test-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-describe('UmbBlockToBlockGridClipboardPasteTranslator', () => {
+describe('UmbBlockToBlockGridClipboardPastePropertyValueTranslator', () => {
 	let hostElement: UmbTestControllerHostElement;
-	let copyTranslator: UmbBlockToBlockGridClipboardPasteTranslator;
+	let copyTranslator: UmbBlockToBlockGridClipboardPastePropertyValueTranslator;
 
 	const blockGridPropertyValue: UmbBlockGridValueModel = {
 		contentData: [
@@ -64,7 +64,7 @@ describe('UmbBlockToBlockGridClipboardPasteTranslator', () => {
 
 	beforeEach(async () => {
 		hostElement = new UmbTestControllerHostElement();
-		copyTranslator = new UmbBlockToBlockGridClipboardPasteTranslator(hostElement);
+		copyTranslator = new UmbBlockToBlockGridClipboardPastePropertyValueTranslator(hostElement);
 		document.body.innerHTML = '';
 		document.body.appendChild(hostElement);
 	});

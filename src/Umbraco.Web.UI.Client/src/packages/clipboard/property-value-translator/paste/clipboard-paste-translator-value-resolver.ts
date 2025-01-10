@@ -1,11 +1,13 @@
 import type { UmbClipboardEntryValuesType } from '../../clipboard-entry/types.js';
 import type { UmbClipboardPastePropertyValueTranslator } from './types.js';
-import type { ManifestClipboardPasteTranslator } from './clipboard-paste-translator.extension.js';
+import type { ManifestClipboardPastePropertyValueTranslator } from './clipboard-paste-translator.extension.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi, type ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbClipboardPasteTranslatorValueResolver<PropertyValueType = unknown> extends UmbControllerBase {
+export class UmbClipboardPastePropertyValueTranslatorValueResolver<
+	PropertyValueType = unknown,
+> extends UmbControllerBase {
 	async resolve(
 		clipboardEntryValues: UmbClipboardEntryValuesType,
 		propertyEditorUiAlias: string,
@@ -34,7 +36,7 @@ export class UmbClipboardPasteTranslatorValueResolver<PropertyValueType = unknow
 		}
 
 		// Pick the manifest with the highest priority
-		const manifest: ManifestClipboardPasteTranslator = supportedManifests.sort(
+		const manifest: ManifestClipboardPastePropertyValueTranslator = supportedManifests.sort(
 			(a: ManifestBase, b: ManifestBase): number => (b.weight || 0) - (a.weight || 0),
 		)[0];
 

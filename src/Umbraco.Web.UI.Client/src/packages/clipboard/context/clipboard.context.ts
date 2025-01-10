@@ -1,12 +1,12 @@
 import { UMB_CLIPBOARD_ENTRY_PICKER_MODAL } from '../clipboard-entry/picker-modal/index.js';
 import {
-	UmbClipboardCopyTranslatorValueResolver,
+	UmbClipboardCopyPropertyValueTranslatorValueResolver,
 	UmbClipboardEntryDetailRepository,
-	UmbClipboardPasteTranslatorValueResolver,
+	UmbClipboardPastePropertyValueTranslatorValueResolver,
 	type UmbClipboardEntryDetailModel,
 	type UmbClipboardEntryValuesType,
 } from '../clipboard-entry/index.js';
-import type { ManifestClipboardPasteTranslator } from '../translator/types.js';
+import type { ManifestClipboardPastePropertyValueTranslator } from '../property-value-translator/types.js';
 import { UMB_CLIPBOARD_CONTEXT } from './clipboard.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -116,7 +116,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		propertyValue: any;
 		propertyEditorUiAlias: string;
 	}): Promise<void> {
-		const copyValueResolver = new UmbClipboardCopyTranslatorValueResolver(this);
+		const copyValueResolver = new UmbClipboardCopyPropertyValueTranslatorValueResolver(this);
 		const values = await copyValueResolver.resolve(args.propertyValue, args.propertyEditorUiAlias);
 
 		const entryPreset: Partial<UmbClipboardEntryDetailModel> = {
@@ -138,12 +138,12 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	async pickForProperty(args: { multiple: boolean; propertyEditorUiAlias: string }): Promise<Array<any>> {
 		await this.#init;
 
-		const pasteTranslatorManifests = this.getPasteTranslatorManifestsForPropertyEditorUi(args.propertyEditorUiAlias);
+		const pasteTranslatorManifests = this.getPastePropertyValueTranslatorManifests(args.propertyEditorUiAlias);
 
 		const modal = this.#modalManagerContext?.open(this, UMB_CLIPBOARD_ENTRY_PICKER_MODAL, {
 			data: {
 				filter: (clipboardEntryDetail) =>
-					this.hasSupportedPasteTranslator(pasteTranslatorManifests, clipboardEntryDetail.values),
+					this.hasSupportedPastePropertyValueTranslator(pasteTranslatorManifests, clipboardEntryDetail.values),
 			},
 		});
 
@@ -209,7 +209,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 			throw new Error(`Could not find clipboard entry with unique id: ${clipboardEntryUnique}`);
 		}
 
-		const valueResolver = new UmbClipboardPasteTranslatorValueResolver<ValueType>(this);
+		const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver<ValueType>(this);
 		const propertyValue = await valueResolver.resolve(entry.values, propertyEditorUiManifest.alias);
 
 		const cloner = new UmbPropertyValueCloneController(this);
@@ -225,9 +225,9 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	/**
 	 * Get all clipboard paste translators for a property editor ui
 	 * @param {string} propertyEditorUiAlias - The alias of the property editor to match
-	 * @returns {Array<ManifestClipboardPasteTranslator>} - Returns an array of clipboard paste translators
+	 * @returns {Array<ManifestClipboardPastePropertyValueTranslator>} - Returns an array of clipboard paste translators
 	 */
-	getPasteTranslatorManifestsForPropertyEditorUi(propertyEditorUiAlias: string) {
+	getPastePropertyValueTranslatorManifests(propertyEditorUiAlias: string) {
 		return umbExtensionsRegistry.getByTypeAndFilter(
 			'clipboardPastePropertyValueTranslator',
 			(manifest) => manifest.toPropertyEditorUi === propertyEditorUiAlias,
@@ -236,12 +236,12 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 
 	/**
 	 * Check if the clipboard entry values has supported paste translator
-	 * @param {Array<ManifestClipboardPasteTranslator>} manifests - The paste translator manifests
+	 * @param {Array<ManifestClipboardPastePropertyValueTranslator>} manifests - The paste translator manifests
 	 * @param {UmbClipboardEntryValuesType} clipboardEntryValues - The clipboard entry values
 	 * @returns {boolean} - Returns true if the clipboard entry values has supported paste translator
 	 */
-	hasSupportedPasteTranslator(
-		manifests: Array<ManifestClipboardPasteTranslator>,
+	hasSupportedPastePropertyValueTranslator(
+		manifests: Array<ManifestClipboardPastePropertyValueTranslator>,
 		clipboardEntryValues: UmbClipboardEntryValuesType,
 	): boolean {
 		const entryValueTypes = clipboardEntryValues.map((x) => x.type);

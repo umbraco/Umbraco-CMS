@@ -163,7 +163,7 @@ export class UmbBlockGridEntriesContext
 				// Idea: Maybe on setup should be async, so it can retrieve the values when needed? [NL]
 				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
 				const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
-				const pasteTranslatorManifests = clipboardContext.getPasteTranslatorManifestsForPropertyEditorUi(
+				const pasteTranslatorManifests = clipboardContext.getPastePropertyValueTranslatorManifests(
 					UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
 				);
 				return {
@@ -172,7 +172,7 @@ export class UmbBlockGridEntriesContext
 						blockGroups: this._manager.getBlockGroups() ?? [],
 						openClipboard: routingInfo.view === 'clipboard',
 						clipboardFilter: (clipboardEntryDetailModel) => {
-							const hasSupportedTranslator = clipboardContext.hasSupportedPasteTranslator(
+							const hasSupportedTranslator = clipboardContext.hasSupportedPastePropertyValueTranslator(
 								pasteTranslatorManifests,
 								clipboardEntryDetailModel.values,
 							);
