@@ -112,7 +112,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 		css`
 			#details {
 				color: var(--uui-color-text-alt);
-				margin-top: var(--uui-size-space-1);
+				margin-top: var(--uui-size-space-2);
 			}
 
 			#details > div {
