@@ -1,7 +1,8 @@
-import type { UmbClipboardCopyTranslator } from './types.js';
+import type { UmbClipboardCopyPropertyValueTranslator } from './types.js';
 import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestClipboardCopyTranslator extends ManifestApi<UmbClipboardCopyTranslator<any>> {
+export interface ManifestClipboardCopyPropertyValueTranslator
+	extends ManifestApi<UmbClipboardCopyPropertyValueTranslator<any>> {
 	type: 'clipboardCopyPropertyValueTranslator';
 	fromPropertyEditorUi: string;
 	toClipboardEntryValueType: string;
@@ -9,6 +10,6 @@ export interface ManifestClipboardCopyTranslator extends ManifestApi<UmbClipboar
 
 declare global {
 	interface UmbExtensionManifestMap {
-		umbClipboardCopyTranslator: ManifestClipboardCopyTranslator;
+		umbClipboardCopyPropertyValueTranslator: ManifestClipboardCopyPropertyValueTranslator;
 	}
 }

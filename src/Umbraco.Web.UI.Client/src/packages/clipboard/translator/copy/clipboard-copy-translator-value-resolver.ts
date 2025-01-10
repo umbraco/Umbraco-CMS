@@ -1,5 +1,5 @@
 import type { UmbClipboardEntryValuesType } from '../../clipboard-entry/types.js';
-import type { UmbClipboardCopyTranslator } from './types.js';
+import type { UmbClipboardCopyPropertyValueTranslator } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -28,7 +28,7 @@ export class UmbClipboardCopyTranslatorValueResolver extends UmbControllerBase {
 		const apis = await Promise.all(apiPromises);
 
 		// Translate values
-		const valuePromises = apis.map(async (api: UmbClipboardCopyTranslator | undefined) =>
+		const valuePromises = apis.map(async (api: UmbClipboardCopyPropertyValueTranslator | undefined) =>
 			api?.translate(propertyValue),
 		);
 		const translatedValues = await Promise.all(valuePromises);

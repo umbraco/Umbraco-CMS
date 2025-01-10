@@ -3,7 +3,7 @@ import { customElement } from 'lit/decorators.js';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbClipboardPasteTranslatorValueResolver } from './clipboard-paste-translator-value-resolver.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbClipboardPasteTranslator } from './types.js';
+import type { UmbClipboardPastePropertyValueTranslator } from './types.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { type UmbClipboardEntryValuesType } from '../../clipboard-entry';
 
@@ -15,7 +15,7 @@ type TestValueType = String;
 
 class UmbTestClipboardPasteTranslator1
 	extends UmbControllerBase
-	implements UmbClipboardPasteTranslator<TestValueType, TestValueType>
+	implements UmbClipboardPastePropertyValueTranslator<TestValueType, TestValueType>
 {
 	async translate(value: TestValueType): Promise<TestValueType> {
 		return value + '1';
@@ -24,7 +24,7 @@ class UmbTestClipboardPasteTranslator1
 
 class UmbTestClipboardPasteTranslator2
 	extends UmbControllerBase
-	implements UmbClipboardPasteTranslator<TestValueType, TestValueType>
+	implements UmbClipboardPastePropertyValueTranslator<TestValueType, TestValueType>
 {
 	async translate(value: TestValueType): Promise<TestValueType> {
 		return value + '2';
@@ -33,8 +33,8 @@ class UmbTestClipboardPasteTranslator2
 
 const pasteTranslatorManifest1 = {
 	type: 'clipboardPastePropertyValueTranslator',
-	alias: 'Test.ClipboardPasteTranslator1',
-	name: 'Test Clipboard Paste Translator 1',
+	alias: 'Test.ClipboardPastePropertyValueTranslator1',
+	name: 'Test Clipboard Paste Property Value Translator 1',
 	api: UmbTestClipboardPasteTranslator1,
 	weight: 1,
 	fromClipboardEntryValueType: TEST_CLIPBOARD_ENTRY_VALUE_TYPE_1,
@@ -43,8 +43,8 @@ const pasteTranslatorManifest1 = {
 
 const copyTranslatorManifest2 = {
 	type: 'clipboardPastePropertyValueTranslator',
-	alias: 'Test.ClipboardPasteTranslator2',
-	name: 'Test Clipboard Paste Translator 2',
+	alias: 'Test.ClipboardPastePropertyValueTranslator2',
+	name: 'Test Clipboard Paste Property Value Translator 2',
 	api: UmbTestClipboardPasteTranslator2,
 	weight: 2,
 	fromClipboardEntryValueType: TEST_CLIPBOARD_ENTRY_VALUE_TYPE_2,

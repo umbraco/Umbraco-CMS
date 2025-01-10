@@ -2,11 +2,11 @@ import type { UmbBlockGridValueModel } from '../../../types.js';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../../property-editors/constants.js';
 import type { UmbGridBlockClipboardEntryValueModel } from '../../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbClipboardCopyTranslator } from '@umbraco-cms/backoffice/clipboard';
+import type { UmbClipboardCopyPropertyValueTranslator } from '@umbraco-cms/backoffice/clipboard';
 
-export class UmbBlockGridToGridBlockClipboardCopyTranslator
+export class UmbBlockGridToGridBlockClipboardCopyPropertyValueTranslator
 	extends UmbControllerBase
-	implements UmbClipboardCopyTranslator<UmbBlockGridValueModel, UmbGridBlockClipboardEntryValueModel>
+	implements UmbClipboardCopyPropertyValueTranslator<UmbBlockGridValueModel, UmbGridBlockClipboardEntryValueModel>
 {
 	async translate(propertyValue: UmbBlockGridValueModel) {
 		if (!propertyValue) {
@@ -30,4 +30,4 @@ export class UmbBlockGridToGridBlockClipboardCopyTranslator
 	}
 }
 
-export { UmbBlockGridToGridBlockClipboardCopyTranslator as api };
+export { UmbBlockGridToGridBlockClipboardCopyPropertyValueTranslator as api };

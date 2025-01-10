@@ -2,11 +2,11 @@ import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../../property-e
 import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../../types.js';
 import type { UmbBlockClipboardEntryValueModel } from '@umbraco-cms/backoffice/block';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbClipboardCopyTranslator } from '@umbraco-cms/backoffice/clipboard';
+import type { UmbClipboardCopyPropertyValueTranslator } from '@umbraco-cms/backoffice/clipboard';
 
-export class UmbBlockListToBlockClipboardCopyTranslator
+export class UmbBlockListToBlockClipboardCopyPropertyValueTranslator
 	extends UmbControllerBase
-	implements UmbClipboardCopyTranslator<UmbBlockListValueModel>
+	implements UmbClipboardCopyPropertyValueTranslator<UmbBlockListValueModel>
 {
 	async translate(propertyValue: UmbBlockListValueModel): Promise<UmbBlockClipboardEntryValueModel> {
 		if (!propertyValue) {
@@ -36,4 +36,4 @@ export class UmbBlockListToBlockClipboardCopyTranslator
 	}
 }
 
-export { UmbBlockListToBlockClipboardCopyTranslator as api };
+export { UmbBlockListToBlockClipboardCopyPropertyValueTranslator as api };
