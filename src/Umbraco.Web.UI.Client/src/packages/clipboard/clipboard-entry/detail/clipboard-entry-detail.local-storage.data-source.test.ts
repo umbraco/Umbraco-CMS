@@ -37,12 +37,15 @@ describe('UmbClipboardEntryDetailLocalStorageDataSource', () => {
 	};
 
 	beforeEach(async () => {
-		localStorage.clear();
 		hostElement = new UmbTestControllerHostElement();
 		dataSource = new UmbClipboardEntryDetailLocalStorageDataSource(hostElement);
-		document.body.innerHTML = '';
 		document.body.appendChild(hostElement);
 		await hostElement.init();
+	});
+
+	afterEach(() => {
+		localStorage.clear();
+		document.body.innerHTML = '';
 	});
 
 	describe('Public API', () => {

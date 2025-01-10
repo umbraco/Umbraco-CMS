@@ -39,12 +39,15 @@ describe('UmbClipboardEntryDetailRepository', () => {
 	};
 
 	beforeEach(async () => {
-		localStorage.clear();
 		hostElement = new UmbTestControllerHostElement();
 		repository = new UmbClipboardEntryDetailRepository(hostElement);
-		document.body.innerHTML = '';
 		document.body.appendChild(hostElement);
 		await hostElement.init();
+	});
+
+	afterEach(() => {
+		localStorage.clear();
+		document.body.innerHTML = '';
 	});
 
 	describe('Public API', () => {

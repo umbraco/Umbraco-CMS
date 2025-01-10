@@ -89,12 +89,15 @@ describe('UmbClipboardContext', () => {
 	let clipboardContext: UmbClipboardContext;
 
 	beforeEach(async () => {
-		localStorage.clear();
 		hostElement = new UmbTestControllerHostElement();
 		clipboardContext = new UmbClipboardContext(hostElement);
-		document.body.innerHTML = '';
 		document.body.appendChild(hostElement);
 		await hostElement.init();
+	});
+
+	afterEach(() => {
+		localStorage.clear();
+		document.body.innerHTML = '';
 	});
 
 	describe('write', () => {

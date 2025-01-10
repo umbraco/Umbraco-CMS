@@ -65,16 +65,19 @@ describe('UmbClipboardLocalStorageDataSource', () => {
 	];
 
 	beforeEach(async () => {
-		localStorage.clear();
 		hostElement = new UmbTestControllerHostElement();
 		detailRepository = new UmbClipboardEntryDetailRepository(hostElement);
 		dataSource = new UmbClipboardCollectionLocalStorageDataSource(hostElement);
-		document.body.innerHTML = '';
 		document.body.appendChild(hostElement);
 		await hostElement.init();
 		await detailRepository.create(clipboardEntries[0]);
 		await detailRepository.create(clipboardEntries[1]);
 		await detailRepository.create(clipboardEntries[2]);
+	});
+
+	afterEach(() => {
+		localStorage.clear();
+		document.body.innerHTML = '';
 	});
 
 	describe('Public API', () => {
