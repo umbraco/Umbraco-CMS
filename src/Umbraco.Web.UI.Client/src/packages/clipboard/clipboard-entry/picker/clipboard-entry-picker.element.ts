@@ -55,7 +55,9 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 			types: this.config?.entryTypes ?? [],
 		});
 
-		this._items = data?.items ?? [];
+		const entries = data?.items ?? [];
+		const sortedEntries = entries.sort((a, b) => new Date(b.updateDate!).getTime() - new Date(a.updateDate!).getTime());
+		this._items = sortedEntries;
 	}
 
 	get #filteredItems() {
