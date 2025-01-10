@@ -77,7 +77,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		if (!unique) throw new Error('The Clipboard Entry unique is required');
 		if (!propertyEditorUiAlias) throw new Error('Property Editor UI alias is required');
 		const manifest = await this.#findPropertyEditorUiManifest(propertyEditorUiAlias);
-		return this.#resolveEntry<ReturnType>(unique, manifest);
+		return this.#resolvePropertyValue<ReturnType>(unique, manifest);
 	}
 
 	/**
@@ -176,7 +176,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 				throw new Error('No clipboard entry selected');
 			}
 
-			const propertyValue = await this.#resolveEntry(selected, propertyEditorUiManifest);
+			const propertyValue = await this.#resolvePropertyValue(selected, propertyEditorUiManifest);
 			propertyValues = [propertyValue];
 		}
 
@@ -197,7 +197,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		return manifest;
 	}
 
-	async #resolveEntry<ValueType>(
+	async #resolvePropertyValue<ValueType>(
 		clipboardEntryUnique: string,
 		propertyEditorUiManifest: ManifestPropertyEditorUi,
 	): Promise<ValueType | undefined> {
