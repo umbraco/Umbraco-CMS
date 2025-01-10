@@ -184,7 +184,10 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		return manifest;
 	}
 
-	async #resolveEntry(clipboardEntryUnique: string, propertyEditorUiManifest: ManifestPropertyEditorUi): Promise<any> {
+	async #resolveEntry(
+		clipboardEntryUnique: string,
+		propertyEditorUiManifest: ManifestPropertyEditorUi,
+	): Promise<unknown> {
 		if (!clipboardEntryUnique) {
 			throw new Error('Unique id is required');
 		}
@@ -203,20 +206,17 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 			throw new Error(`Could not find clipboard entry with unique id: ${clipboardEntryUnique}`);
 		}
 
-		let propertyValue = undefined;
-
 		const valueResolver = new UmbClipboardPasteTranslatorValueResolver(this);
-		propertyValue = await valueResolver.resolve(entry.values, propertyEditorUiManifest.alias);
+		const propertyValue = await valueResolver.resolve(entry.values, propertyEditorUiManifest.alias);
 
 		const cloner = new UmbPropertyValueCloneController(this);
 		const clonedValue = await cloner.clone({
 			editorAlias: propertyEditorUiManifest.meta.propertyEditorSchemaAlias,
+			alias: propertyEditorUiManifest.alias,
 			value: propertyValue,
 		});
 
-		propertyValue = clonedValue.value;
-
-		return propertyValue;
+		return clonedValue.value;
 	}
 
 	/**
