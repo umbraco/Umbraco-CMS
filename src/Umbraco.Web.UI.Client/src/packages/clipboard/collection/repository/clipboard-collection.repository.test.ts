@@ -77,7 +77,7 @@ describe('UmbClipboardLocalStorageDataSource', () => {
 		});
 	});
 
-	describe('getCollection', () => {
+	describe('requestCollection', () => {
 		beforeEach(async () => {
 			hostElement = new UmbTestControllerHostElement();
 			detailRepository = new UmbClipboardEntryDetailRepository(hostElement);
