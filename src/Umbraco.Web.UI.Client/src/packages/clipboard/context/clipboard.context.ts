@@ -226,7 +226,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	 */
 	getPasteTranslatorManifestsForPropertyEditorUi(propertyEditorUiAlias: string) {
 		return umbExtensionsRegistry.getByTypeAndFilter(
-			'clipboardPasteTranslator',
+			'clipboardPastePropertyValueTranslator',
 			(manifest) => manifest.toPropertyEditorUi === propertyEditorUiAlias,
 		);
 	}

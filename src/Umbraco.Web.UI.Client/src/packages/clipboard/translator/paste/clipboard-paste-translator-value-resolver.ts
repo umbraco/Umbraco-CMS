@@ -20,11 +20,14 @@ export class UmbClipboardPasteTranslatorValueResolver<PropertyValueType = any> e
 
 		const entryValueTypes = clipboardEntryValues.map((x) => x.type);
 
-		const supportedManifests = umbExtensionsRegistry.getByTypeAndFilter('clipboardPasteTranslator', (manifest) => {
-			const canTranslateValue = entryValueTypes.includes(manifest.fromClipboardEntryValueType);
-			const supportsPropertyEditorUi = manifest.toPropertyEditorUi === propertyEditorUiAlias;
-			return canTranslateValue && supportsPropertyEditorUi;
-		});
+		const supportedManifests = umbExtensionsRegistry.getByTypeAndFilter(
+			'clipboardPastePropertyValueTranslator',
+			(manifest) => {
+				const canTranslateValue = entryValueTypes.includes(manifest.fromClipboardEntryValueType);
+				const supportsPropertyEditorUi = manifest.toPropertyEditorUi === propertyEditorUiAlias;
+				return canTranslateValue && supportsPropertyEditorUi;
+			},
+		);
 
 		if (!supportedManifests.length) {
 			throw new Error('No paste translator found for the given property editor ui and entry value type.');

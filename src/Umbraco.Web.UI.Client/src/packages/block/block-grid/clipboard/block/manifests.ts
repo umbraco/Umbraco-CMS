@@ -3,7 +3,7 @@ import { UMB_BLOCK_CLIPBOARD_ENTRY_VALUE_TYPE } from '@umbraco-cms/backoffice/bl
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
-		type: 'clipboardCopyTranslator',
+		type: 'clipboardCopyPropertyValueTranslator',
 		alias: 'Umb.ClipboardCopyTranslator.BlockGridToBlock',
 		name: 'Block Grid to Block Clipboard Copy Translator',
 		api: () => import('./copy/block-grid-to-block-copy-translator.js'),
@@ -11,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		toClipboardEntryValueType: UMB_BLOCK_CLIPBOARD_ENTRY_VALUE_TYPE,
 	},
 	{
-		type: 'clipboardPasteTranslator',
+		type: 'clipboardPastePropertyValueTranslator',
 		alias: 'Umb.ClipboardPasteTranslator.BlockToBlockGrid',
 		name: 'Block To Block Grid Clipboard Paste Translator',
 		weight: 900,

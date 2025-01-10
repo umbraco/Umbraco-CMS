@@ -15,7 +15,7 @@ export class UmbClipboardCopyTranslatorValueResolver extends UmbControllerBase {
 		}
 
 		const manifests = umbExtensionsRegistry.getByTypeAndFilter(
-			'clipboardCopyTranslator',
+			'clipboardCopyPropertyValueTranslator',
 			(x) => x.fromPropertyEditorUi === propertyEditorUiAlias,
 		);
 

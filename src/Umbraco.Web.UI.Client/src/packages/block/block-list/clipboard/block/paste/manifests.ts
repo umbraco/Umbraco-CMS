@@ -2,7 +2,7 @@ import { UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS } from '../../../property-edito
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
-		type: 'clipboardPasteTranslator',
+		type: 'clipboardPastePropertyValueTranslator',
 		alias: 'Umb.ClipboardPasteTranslator.BlockToBlockList',
 		name: 'Block To Block List Clipboard Paste Translator',
 		api: () => import('./block-to-block-list-paste-translator.js'),

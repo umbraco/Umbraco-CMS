@@ -3,7 +3,7 @@ import { UMB_GRID_BLOCK_CLIPBOARD_ENTRY_VALUE_TYPE } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
-		type: 'clipboardCopyTranslator',
+		type: 'clipboardCopyPropertyValueTranslator',
 		alias: 'Umb.ClipboardCopyTranslator.BlockGridToGridBlock',
 		name: 'Block Grid To Grid Block Clipboard Copy Translator',
 		api: () => import('./copy/block-grid-to-grid-block-copy-translator.js'),
@@ -11,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		toClipboardEntryValueType: UMB_GRID_BLOCK_CLIPBOARD_ENTRY_VALUE_TYPE,
 	},
 	{
-		type: 'clipboardPasteTranslator',
+		type: 'clipboardPastePropertyValueTranslator',
 		alias: 'Umb.ClipboardPasteTranslator.GridBlockToBlockGrid',
 		name: 'Grid Block To Block Grid Clipboard Paste Translator',
 		api: () => import('./paste/grid-block-to-block-grid-paste-translator.js'),

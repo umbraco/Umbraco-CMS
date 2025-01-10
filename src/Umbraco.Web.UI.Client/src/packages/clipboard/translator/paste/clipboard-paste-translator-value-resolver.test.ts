@@ -32,7 +32,7 @@ class UmbTestClipboardPasteTranslator2
 }
 
 const pasteTranslatorManifest1 = {
-	type: 'clipboardPasteTranslator',
+	type: 'clipboardPastePropertyValueTranslator',
 	alias: 'Test.ClipboardPasteTranslator1',
 	name: 'Test Clipboard Paste Translator 1',
 	api: UmbTestClipboardPasteTranslator1,
@@ -42,7 +42,7 @@ const pasteTranslatorManifest1 = {
 };
 
 const copyTranslatorManifest2 = {
-	type: 'clipboardPasteTranslator',
+	type: 'clipboardPastePropertyValueTranslator',
 	alias: 'Test.ClipboardPasteTranslator2',
 	name: 'Test Clipboard Paste Translator 2',
 	api: UmbTestClipboardPasteTranslator2,
