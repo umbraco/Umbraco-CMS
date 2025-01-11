@@ -1,6 +1,8 @@
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type { UmbBlockLayoutBaseModel, UmbBlockValueType } from '@umbraco-cms/backoffice/block';
 
+export type * from './clipboard/types.js';
+
 export interface UmbBlockRteTypeModel extends UmbBlockTypeBaseModel {
 	displayInline: boolean;
 }
