@@ -14,6 +14,7 @@ import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbPropertyValueCloneController } from '@umbraco-cms/backoffice/property';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 /**
  * Clipboard context for managing clipboard entries
@@ -143,9 +144,12 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	 * @param args - Arguments for picking a clipboard entry
 	 * @param {boolean} args.multiple - Allow multiple clipboard entries to be picked
 	 * @param {string} args.propertyEditorUiAlias - The alias of the property editor to match
-	 * @returns { Promise<Array<any>> } - Returns an array of property values matching the property editor alias
+	 * @returns { Promise<{ selection: Array<UmbEntityUnique>; propertyValues: Array<any> }> }
 	 */
-	async pickForProperty(args: { multiple: boolean; propertyEditorUiAlias: string }): Promise<Array<any>> {
+	async pickForProperty(args: {
+		multiple: boolean;
+		propertyEditorUiAlias: string;
+	}): Promise<{ selection: Array<UmbEntityUnique>; propertyValues: Array<any> }> {
 		await this.#init;
 
 		const pasteTranslatorManifests = this.getPastePropertyValueTranslatorManifests(args.propertyEditorUiAlias);
@@ -158,8 +162,9 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		});
 
 		const result = await modal?.onSubmit();
+		const selection = result?.selection || [];
 
-		if (!result?.selection.length) {
+		if (!selection.length) {
 			throw new Error('No clipboard entry selected');
 		}
 
@@ -170,7 +175,7 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 		if (args.multiple) {
 			throw new Error('Multiple clipboard entries not supported');
 		} else {
-			const selected = result?.selection[0];
+			const selected = selection[0];
 
 			if (!selected) {
 				throw new Error('No clipboard entry selected');
@@ -180,7 +185,10 @@ export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 			propertyValues = [propertyValue];
 		}
 
-		return propertyValues;
+		return {
+			selection,
+			propertyValues,
+		};
 	}
 
 	async #findPropertyEditorUiManifest(alias: string): Promise<ManifestPropertyEditorUi> {
