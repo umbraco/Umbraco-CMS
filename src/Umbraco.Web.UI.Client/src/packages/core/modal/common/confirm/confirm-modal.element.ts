@@ -1,4 +1,4 @@
-import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbConfirmModalData, UmbConfirmModalValue, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
@@ -41,7 +41,14 @@ export class UmbConfirmModalElement extends UmbLitElement {
 		`;
 	}
 
-	static override styles = [UmbTextStyles];
+	static override styles = [
+		UmbTextStyles,
+		css`
+			uui-dialog-layout {
+				max-inline-size: 60ch;
+			}
+		`,
+	];
 }
 
 export default UmbConfirmModalElement;
