@@ -1,8 +1,10 @@
 import { UMB_CLIPBOARD_CONTEXT } from '../../context/clipboard.context-token.js';
 import type { MetaPropertyActionPasteFromClipboardKind } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbPropertyActionBase, type UmbPropertyActionArgs } from '@umbraco-cms/backoffice/property-action';
+import { UmbClipboardEntryItemRepository } from '../../clipboard-entry/index.js';
 
 export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<MetaPropertyActionPasteFromClipboardKind> {
 	#init: Promise<unknown>;
@@ -34,12 +36,35 @@ export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<M
 			throw new Error('Property editor manifest not found');
 		}
 
-		const propertyValues = await this.#clipboardContext.pickForProperty({
+		const result = await this.#clipboardContext.pickForProperty({
 			propertyEditorUiAlias: propertyEditorManifest.alias,
 			multiple: false,
 		});
 
-		const propertyValue = propertyValues[0];
+		const selectedUnique = result.selection[0];
+		const propertyValue = result.propertyValues[0];
+
+		if (!selectedUnique) {
+			throw new Error('No clipboard entry selected');
+		}
+
+		const clipboardEntryItemRepository = new UmbClipboardEntryItemRepository(this);
+		const { data } = await clipboardEntryItemRepository.requestItems([selectedUnique]);
+
+		if (!data || data.length === 0) {
+			throw new Error('Clipboard entry not found');
+		}
+
+		const item = data[0];
+
+		// Todo: localize
+		await umbConfirmModal(this, {
+			headline: 'Paste from clipboard',
+			content: `The property already contains a value. Paste from the property action will overwrite the current value. 
+			Do you want to replace the current value with ${item.name}?`,
+			confirmLabel: 'Paste',
+		});
+
 		this.#propertyContext?.setValue(propertyValue);
 	}
 }
