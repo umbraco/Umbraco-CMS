@@ -24,18 +24,28 @@ export class UmbBlockToBlockListClipboardPastePropertyValueTranslator
 					[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: valueClone.layout ?? undefined,
 				},
 			},
-			markup: this.#getMarkup(valueClone),
+			markup: this.#generateMarkup(valueClone),
 		};
 
 		return propertyValue;
 	}
 
-	#getMarkup(value: UmbBlockClipboardEntryValueModel) {
-		const hasContentData = value.contentData && value.contentData.length > 0;
-		const contentAttr = hasContentData ? `data-content-key="${value.contentData[0].key}"` : '';
-		const hasSettingsData = value.settingsData && value.settingsData.length > 0;
-		const settingsAttr = hasSettingsData ? `data-settings-key="${value.settingsData[0].key}"` : '';
-		return `<umb-rte-block ${contentAttr} ${settingsAttr}></umb-rte-block>`;
+	#generateMarkup(value: UmbBlockClipboardEntryValueModel) {
+		const layouts = value.layout ?? [];
+
+		const markup = layouts
+			.map((layout) => {
+				const contentData = value.contentData.find((content) => content.key === layout.contentKey);
+				const settingsData = value.settingsData.find((settings) => settings.key === layout.settingsKey);
+
+				const contentAttr = contentData ? `data-content-key="${contentData.key}"` : '';
+				const settingsAttr = settingsData ? `data-settings-key="${settingsData.key}"` : '';
+
+				return `<umb-rte-block ${contentAttr} ${settingsAttr}></umb-rte-block>`;
+			})
+			.join('');
+
+		return markup;
 	}
 }
 
