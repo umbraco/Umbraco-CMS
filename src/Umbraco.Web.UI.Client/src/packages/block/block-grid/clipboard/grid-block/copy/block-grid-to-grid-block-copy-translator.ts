@@ -23,7 +23,6 @@ export class UmbBlockGridToGridBlockClipboardCopyPropertyValueTranslator
 			contentData: valueClone.contentData,
 			layout: valueClone.layout?.[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? undefined,
 			settingsData: valueClone.settingsData,
-			expose: valueClone.expose,
 		};
 
 		return gridBlockValue;

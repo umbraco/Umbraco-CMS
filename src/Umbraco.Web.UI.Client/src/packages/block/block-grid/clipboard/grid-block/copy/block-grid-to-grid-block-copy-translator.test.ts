@@ -40,20 +40,13 @@ describe('UmbBlockListToBlockClipboardCopyPropertyValueTranslator', () => {
 			],
 		},
 		settingsData: [],
-		expose: [
-			{
-				contentKey: 'contentKey',
-				culture: null,
-				segment: null,
-			},
-		],
+		expose: [],
 	};
 
 	const gridBlockClipboardEntryValue: UmbGridBlockClipboardEntryValueModel = {
 		contentData: blockGridPropertyValue.contentData,
 		layout: blockGridPropertyValue.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS],
 		settingsData: blockGridPropertyValue.settingsData,
-		expose: blockGridPropertyValue.expose,
 	};
 
 	beforeEach(async () => {
