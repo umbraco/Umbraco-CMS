@@ -56,7 +56,6 @@ describe('UmbBlockListToBlockClipboardCopyPropertyValueTranslator', () => {
 			},
 		],
 		settingsData: blockListPropertyValue.settingsData,
-		expose: blockListPropertyValue.expose,
 	};
 
 	beforeEach(async () => {

@@ -44,7 +44,6 @@ export class UmbBlockGridToBlockClipboardCopyPropertyValueTranslator
 			contentData: gridBlockValue.contentData,
 			layout: layout,
 			settingsData: gridBlockValue.settingsData,
-			expose: gridBlockValue.expose,
 		};
 	}
 }
