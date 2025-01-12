@@ -19,7 +19,7 @@ export class UmbBlockToTinyMceClipboardPastePropertyValueTranslator
 			blocks: {
 				contentData: valueClone.contentData,
 				settingsData: valueClone.settingsData,
-				expose: valueClone.expose,
+				expose: [],
 				layout: {
 					[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: valueClone.layout ?? undefined,
 				},
