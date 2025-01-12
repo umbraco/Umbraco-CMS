@@ -1,7 +1,11 @@
 import type { UmbBlockDataModel } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
 import type { UmbBlockListWorkspaceOriginData } from '../index.js';
-import { UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS, UMB_BLOCK_LIST_WORKSPACE_MODAL } from '../index.js';
+import {
+	UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
+	UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
+	UMB_BLOCK_LIST_WORKSPACE_MODAL,
+} from '../index.js';
 import type { UmbBlockListLayoutModel, UmbBlockListTypeModel, UmbBlockListValueModel } from '../types.js';
 import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context-token.js';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
@@ -83,7 +87,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 						UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
 					);
 
-					this.#insertPropertyValues(propertyValues);
+					this._insertFromPropertyValues(propertyValues, data.originData as UmbBlockListWorkspaceOriginData);
 				}
 			})
 			.observeRouteBuilder((routeBuilder) => {
@@ -110,10 +114,6 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 			this.#catalogueModal.setUniquePathValue('variantId', variantId?.toString());
 			this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
 		});
-	}
-
-	#insertPropertyValues(values: Array<UmbBlockListValueModel>) {
-		console.log('Property values:', values);
 	}
 
 	protected _gotBlockManager() {
@@ -175,12 +175,26 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 		originData: UmbBlockListWorkspaceOriginData,
 	) {
 		await this._retrieveManager;
+
 		return this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
 	}
 
-	// create Block?
-	override async delete(contentKey: string) {
-		// TODO: Loop through children and delete them as well?
-		await super.delete(contentKey);
+	protected async _insertFromPropertyValue(value: UmbBlockListValueModel, originData: UmbBlockListWorkspaceOriginData) {
+		const layoutEntries = value.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS];
+
+		if (!layoutEntries) {
+			throw new Error('No layout entries found');
+		}
+
+		await Promise.all(
+			layoutEntries.map(async (layoutEntry) => {
+				this._insertBlockFromPropertyValue(layoutEntry, value, originData);
+				if (originData.index !== -1) {
+					originData = { ...originData, index: originData.index + 1 };
+				}
+			}),
+		);
+
+		return originData;
 	}
 }

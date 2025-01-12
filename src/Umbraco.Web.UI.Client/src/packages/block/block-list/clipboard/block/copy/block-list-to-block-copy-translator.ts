@@ -18,7 +18,6 @@ export class UmbBlockListToBlockClipboardCopyPropertyValueTranslator
 		const contentData = valueClone.contentData;
 		const layout = valueClone.layout?.[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? undefined;
 		const settingsData = valueClone.settingsData;
-		const expose = valueClone.expose;
 
 		layout?.forEach((layoutItem: UmbBlockListLayoutModel) => {
 			// @ts-expect-error - We are removing the $type property from the layout item
@@ -29,7 +28,6 @@ export class UmbBlockListToBlockClipboardCopyPropertyValueTranslator
 			contentData: contentData ?? [],
 			layout: layout,
 			settingsData: settingsData ?? [],
-			expose: expose ?? [],
 		};
 
 		return blockValue;

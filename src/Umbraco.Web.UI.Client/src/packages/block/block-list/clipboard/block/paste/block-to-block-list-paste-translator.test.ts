@@ -38,13 +38,7 @@ describe('UmbBlockToBlockListClipboardPastePropertyValueTranslator', () => {
 			],
 		},
 		settingsData: [],
-		expose: [
-			{
-				contentKey: 'contentKey',
-				culture: null,
-				segment: null,
-			},
-		],
+		expose: [],
 	};
 
 	const blockClipboardEntryValue: UmbBlockClipboardEntryValueModel = {
@@ -56,7 +50,6 @@ describe('UmbBlockToBlockListClipboardPastePropertyValueTranslator', () => {
 			},
 		],
 		settingsData: blockListPropertyValue.settingsData,
-		expose: blockListPropertyValue.expose,
 	};
 
 	beforeEach(async () => {

@@ -128,6 +128,9 @@ export abstract class UmbBlockEntryContext<
 
 	#label = new UmbStringState('');
 	public readonly label = this.#label.asObservable();
+	public getLabel() {
+		return this.#label.getValue();
+	}
 
 	#labelRender = new UmbUfmVirtualRenderController(this);
 

@@ -18,7 +18,7 @@ export class UmbGridBlockToBlockGridClipboardPastePropertyValueTranslator
 		const blockGridPropertyValue: UmbBlockGridValueModel = {
 			contentData: valueClone.contentData,
 			settingsData: valueClone.settingsData,
-			expose: valueClone.expose,
+			expose: [],
 			layout: {
 				[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]: valueClone.layout,
 			},

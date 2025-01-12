@@ -253,6 +253,9 @@ export abstract class UmbBlockManagerContext<
 	getContentOf(contentKey: string) {
 		return this.#contents.value.find((x) => x.key === contentKey);
 	}
+	getSettingsOf(settingsKey: string) {
+		return this.#settings.value.find((x) => x.key === settingsKey);
+	}
 	// originData param is used by some implementations. [NL] should be here, do not remove it.
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	setOneLayout(layoutData: BlockLayoutType, _originData?: BlockOriginDataType) {
