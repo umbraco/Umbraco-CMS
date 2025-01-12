@@ -102,10 +102,33 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         return await method(_dbContext!);
     }
 
+    public T ExecuteWithContext<T>(Func<TDbContext, T> method)
+    {
+        if (_disposed)
+        {
+            throw new InvalidOperationException(
+                "The scope has been disposed, therefore the database is not available.");
+        }
+
+        if (_dbContext is null)
+        {
+            InitializeDatabase();
+        }
+
+        return method(_dbContext!);
+    }
+
     public async Task ExecuteWithContextAsync<T>(Func<TDbContext, Task> method) =>
         await ExecuteWithContextAsync(async db =>
         {
             await method(db);
+            return true; // Do nothing
+        });
+
+    public void ExecuteWithContext<T>(Action<TDbContext> method) =>
+        ExecuteWithContext(db =>
+        {
+            method(db);
             return true; // Do nothing
         });
 

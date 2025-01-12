@@ -13,6 +13,14 @@ public interface IEfCoreScope<TDbContext> : ICoreScope
     /// <returns></returns>
     Task<T> ExecuteWithContextAsync<T>(Func<TDbContext, Task<T>> method);
 
+    /// <summary>
+    /// Executes the given function on the database.
+    /// </summary>
+    /// <param name="method">Function to execute.</param>
+    /// <typeparam name="T">Type to use and return.</typeparam>
+    /// <returns></returns>
+    T ExecuteWithContext<T>(Func<TDbContext, T> method);
+
     public IScopeContext? ScopeContext { get; set; }
 
     /// <summary>
@@ -22,6 +30,14 @@ public interface IEfCoreScope<TDbContext> : ICoreScope
     /// <typeparam name="T">Type to use and return.</typeparam>
     /// <returns></returns>
     Task ExecuteWithContextAsync<T>(Func<TDbContext, Task> method);
+
+    /// <summary>
+    /// Executes the given function on the database.
+    /// </summary>
+    /// <param name="method">Function to execute.</param>
+    /// <typeparam name="T">Type to use and return.</typeparam>
+    /// <returns></returns>
+    void ExecuteWithContext<T>(Action<TDbContext> method);
 
     /// <summary>
     ///     Gets the scope notification publisher
