@@ -296,22 +296,6 @@ export class UmbBlockGridEntryContext
 		const settingsData = settings ? [structuredClone(settings)] : [];
 		const exposes = expose ? [structuredClone(expose)] : [];
 
-		// Find sub Blocks and append their data:
-		forEachBlockLayoutEntryOf(layout, async (entry) => {
-			const content = this._manager!.getContentOf(entry.contentKey);
-			if (!content) {
-				throw new Error('No content found');
-			}
-			contentData.push(structuredClone(content));
-
-			if (entry.settingsKey) {
-				const settings = this._manager!.getSettingsOf(entry.settingsKey);
-				if (settings) {
-					settingsData.push(structuredClone(settings));
-				}
-			}
-		});
-
 		const propertyValue: UmbBlockGridValueModel = {
 			layout: {
 				[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]: layout ? [structuredClone(layout)] : undefined,
