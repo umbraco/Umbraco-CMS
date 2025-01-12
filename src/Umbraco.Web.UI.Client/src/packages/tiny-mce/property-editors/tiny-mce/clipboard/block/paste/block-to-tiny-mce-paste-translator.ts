@@ -3,7 +3,7 @@ import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '@umbraco-cms/backoff
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbClipboardPastePropertyValueTranslator } from '@umbraco-cms/backoffice/clipboard';
 
-export class UmbBlockToBlockListClipboardPastePropertyValueTranslator
+export class UmbBlockToTinyMceClipboardPastePropertyValueTranslator
 	extends UmbControllerBase
 	implements UmbClipboardPastePropertyValueTranslator<UmbBlockClipboardEntryValueModel, any>
 {
@@ -49,4 +49,4 @@ export class UmbBlockToBlockListClipboardPastePropertyValueTranslator
 	}
 }
 
-export { UmbBlockToBlockListClipboardPastePropertyValueTranslator as api };
+export { UmbBlockToTinyMceClipboardPastePropertyValueTranslator as api };
