@@ -310,9 +310,6 @@ export class UmbBlockGridEntryContext
 					settingsData.push(structuredClone(settings));
 				}
 			}
-
-			// Missing getExposesOf method.. but do we need exposes to be part of the clipboard entry?... [NL]
-			//const expose = this._manager!.getExposesOf(entry.contentKey);
 		});
 
 		const propertyValue: UmbBlockGridValueModel = {
