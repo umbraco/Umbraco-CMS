@@ -2,11 +2,18 @@ import type { UmbBlockDataModel } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
 import {
 	UMB_BLOCK_GRID_ENTRY_CONTEXT,
+	UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
 	UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
 	UMB_BLOCK_GRID_WORKSPACE_MODAL,
 	type UmbBlockGridWorkspaceOriginData,
 } from '../index.js';
-import type { UmbBlockGridLayoutModel, UmbBlockGridTypeAreaType, UmbBlockGridTypeModel } from '../types.js';
+import type {
+	UmbBlockGridLayoutModel,
+	UmbBlockGridTypeAreaType,
+	UmbBlockGridTypeModel,
+	UmbBlockGridValueModel,
+} from '../types.js';
+import { forEachBlockLayoutEntryOf } from '../utils/index.js';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context-token.js';
 import type { UmbBlockGridScalableContainerContext } from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
 import {
@@ -196,7 +203,7 @@ export class UmbBlockGridEntriesContext
 						data.originData as UmbBlockGridWorkspaceOriginData,
 					);
 					if (created) {
-						this.insert(
+						await this.insert(
 							created.layout,
 							created.content,
 							created.settings,
@@ -208,12 +215,14 @@ export class UmbBlockGridEntriesContext
 				} else if (value?.pasteFromClipboard && value.pasteFromClipboard.selection?.length && data) {
 					const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
 
-					const propertyValues = await clipboardContext.readMultipleForProperty(
+					const propertyValues = await clipboardContext.readMultipleForProperty<UmbBlockGridValueModel>(
 						value.pasteFromClipboard.selection,
 						UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
 					);
 
-					console.log('Property values:', propertyValues);
+					console.log('propertyValues', propertyValues);
+
+					this._insertFromPropertyValues(propertyValues, data.originData as UmbBlockGridWorkspaceOriginData);
 				}
 			})
 			.observeRouteBuilder((routeBuilder) => {
@@ -433,14 +442,60 @@ export class UmbBlockGridEntriesContext
 		originData: UmbBlockGridWorkspaceOriginData,
 	) {
 		await this._retrieveManager;
-		// TODO: Insert layout entry at the right spot.
 		return this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
 	}
 
 	// create Block?
 	override async delete(contentKey: string) {
 		// TODO: Loop through children and delete them as well?
+		// Find layout entry:
+		const layout = this._layoutEntries.getValue().find((x) => x.contentKey === contentKey);
+		if (!layout) {
+			throw new Error(`Cannot delete block, missing layout for ${contentKey}`);
+		}
+		// The following loop will only delete the referenced data of sub Layout Entries, as the Layout entry is part of the main Layout Entry they will go away when that is removed. [NL]
+		forEachBlockLayoutEntryOf(layout, async (entry) => {
+			if (entry.settingsKey) {
+				this._manager!.removeOneSettings(entry.settingsKey);
+			}
+			this._manager!.removeOneContent(contentKey);
+			this._manager!.removeExposesOf(contentKey);
+		});
+
 		await super.delete(contentKey);
+	}
+
+	protected async _insertFromPropertyValue(value: UmbBlockGridValueModel, originData: UmbBlockGridWorkspaceOriginData) {
+		const layoutEntries = value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS];
+
+		if (!layoutEntries) {
+			throw new Error('No layout entries found');
+		}
+
+		await Promise.all(
+			layoutEntries.map(async (layoutEntry) => {
+				await this._insertBlockFromPropertyValue(layoutEntry, value, originData);
+				if (originData.index !== -1) {
+					originData = { ...originData, index: originData.index + 1 };
+				}
+			}),
+		);
+
+		return originData;
+	}
+
+	protected override async _insertBlockFromPropertyValue(
+		layoutEntry: UmbBlockGridLayoutModel,
+		value: UmbBlockGridValueModel,
+		originData: UmbBlockGridWorkspaceOriginData,
+	) {
+		await super._insertBlockFromPropertyValue(layoutEntry, value, originData);
+
+		// Handle inserting of the inner blocks..
+		await forEachBlockLayoutEntryOf(layoutEntry, async (entry, parentUnique, areaKey) => {
+			const localOriginData = { index: -1, parentUnique, areaKey };
+			await this._insertBlockFromPropertyValue(entry, value, localOriginData);
+		});
 	}
 
 	/**

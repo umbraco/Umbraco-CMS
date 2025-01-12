@@ -1,10 +1,6 @@
 import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context.js';
-import type { UmbBlockGridLayoutModel, UmbBlockGridValueModel } from '../../types.js';
-import {
-	UMB_BLOCK_GRID,
-	UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
-	UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
-} from '../../constants.js';
+import type { UmbBlockGridLayoutModel } from '../../types.js';
+import { UMB_BLOCK_GRID } from '../../constants.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
@@ -22,8 +18,6 @@ import type {
 } from '@umbraco-cms/backoffice/block-custom-view';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UMB_CLIPBOARD_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 /**
  * @element umb-block-grid-entry
  */
@@ -357,41 +351,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.#context.expose();
 	};
 
-	async #copyToClipboard() {
-		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
-		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
-		const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
-
-		const workspaceName = propertyDatasetContext?.getName();
-		const propertyLabel = propertyContext?.getLabel();
-		const blockLabel = this._label;
-
-		const entryName = workspaceName
-			? `${workspaceName} - ${propertyLabel} - ${blockLabel}`
-			: `${propertyLabel} - ${blockLabel}`;
-
-		const content = this.#context.getContent();
-		const layout = this.#context.getLayout();
-		const settings = this.#context.getSettings();
-		const expose = this.#context.getExpose();
-
-		const propertyValue: UmbBlockGridValueModel = {
-			contentData: content ? [structuredClone(content)] : [],
-			layout: {
-				[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]: layout ? [structuredClone(layout)] : undefined,
-			},
-			settingsData: settings ? [structuredClone(settings)] : [],
-			expose: expose ? [structuredClone(expose)] : [],
-		};
-
-		clipboardContext.writeForProperty({
-			icon: this._icon,
-			name: entryName,
-			propertyValue,
-			propertyEditorUiAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
-		});
-	}
-
 	#callUpdateInlineCreateButtons() {
 		clearTimeout(this.#renderTimeout);
 		this.#renderTimeout = setTimeout(this.#updateInlineCreateButtons, 100) as unknown as number;
@@ -586,7 +545,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderCopyToClipboardAction() {
-		return html`<uui-button label="Copy to clipboard" look="secondary" @click=${() => this.#copyToClipboard()}>
+		return html`<uui-button label="Copy to clipboard" look="secondary" @click=${() => this.#context.copyToClipboard()}>
 			<uui-icon name="icon-clipboard-copy"></uui-icon>
 		</uui-button>`;
 	}
