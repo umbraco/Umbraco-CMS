@@ -1,4 +1,5 @@
-import { UMB_CLIPBOARD_CONTEXT } from '../../context/clipboard.context-token.js';
+import type { UMB_CLIPBOARD_CONTEXT } from '../../context/clipboard.context-token.js';
+import { UMB_PROPERTY_CLIPBOARD_CONTEXT } from '../../property/context/constants.js';
 import type { MetaPropertyActionCopyToClipboardKind } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
@@ -9,7 +10,7 @@ export class UmbCopyToClipboardPropertyAction extends UmbPropertyActionBase<Meta
 	#propertyDatasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 	#propertyContext?: typeof UMB_PROPERTY_CONTEXT.TYPE;
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
-	#clipboardContext?: typeof UMB_CLIPBOARD_CONTEXT.TYPE;
+	#clipboardContext?: typeof UMB_PROPERTY_CLIPBOARD_CONTEXT.TYPE;
 	#init?: Promise<unknown>;
 
 	constructor(host: UmbControllerHost, args: UmbPropertyActionArgs<MetaPropertyActionCopyToClipboardKind>) {
@@ -28,7 +29,7 @@ export class UmbCopyToClipboardPropertyAction extends UmbPropertyActionBase<Meta
 				this.#notificationContext = context;
 			}).asPromise(),
 
-			this.consumeContext(UMB_CLIPBOARD_CONTEXT, (context) => {
+			this.consumeContext(UMB_PROPERTY_CLIPBOARD_CONTEXT, (context) => {
 				this.#clipboardContext = context;
 			}).asPromise(),
 		]);

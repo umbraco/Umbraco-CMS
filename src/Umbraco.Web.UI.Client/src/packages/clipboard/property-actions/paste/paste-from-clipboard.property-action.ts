@@ -1,5 +1,5 @@
-import { UMB_CLIPBOARD_CONTEXT } from '../../context/clipboard.context-token.js';
 import { UmbClipboardEntryItemRepository } from '../../clipboard-entry/index.js';
+import { UMB_PROPERTY_CLIPBOARD_CONTEXT } from '../../property/context/property-clipboard.context-token.js';
 import type { MetaPropertyActionPasteFromClipboardKind } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
@@ -9,7 +9,7 @@ import { UmbPropertyActionBase, type UmbPropertyActionArgs } from '@umbraco-cms/
 export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<MetaPropertyActionPasteFromClipboardKind> {
 	#init: Promise<unknown>;
 	#propertyContext?: typeof UMB_PROPERTY_CONTEXT.TYPE;
-	#clipboardContext?: typeof UMB_CLIPBOARD_CONTEXT.TYPE;
+	#clipboardContext?: typeof UMB_PROPERTY_CLIPBOARD_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost, args: UmbPropertyActionArgs<MetaPropertyActionPasteFromClipboardKind>) {
 		super(host, args);
@@ -19,13 +19,15 @@ export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<M
 				this.#propertyContext = context;
 			}).asPromise(),
 
-			this.consumeContext(UMB_CLIPBOARD_CONTEXT, (context) => {
+			this.consumeContext(UMB_PROPERTY_CLIPBOARD_CONTEXT, (context) => {
 				this.#clipboardContext = context;
+				debugger;
 			}).asPromise(),
 		]);
 	}
 
 	override async execute() {
+		debugger;
 		await this.#init;
 		if (!this.#clipboardContext) throw new Error('Clipboard context not found');
 		if (!this.#propertyContext) throw new Error('Property context not found');
@@ -35,7 +37,7 @@ export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<M
 		if (!propertyEditorManifest) {
 			throw new Error('Property editor manifest not found');
 		}
-
+		debugger;
 		const result = await this.#clipboardContext.pickForProperty({
 			propertyEditorUiAlias: propertyEditorManifest.alias,
 			multiple: false,
