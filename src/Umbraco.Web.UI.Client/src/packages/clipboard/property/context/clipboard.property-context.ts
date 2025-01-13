@@ -1,7 +1,6 @@
 import { UMB_CLIPBOARD_CONTEXT } from '../../context/index.js';
 import {
 	UMB_CLIPBOARD_ENTRY_PICKER_MODAL,
-	UmbClipboardEntryDetailRepository,
 	type UmbClipboardEntryDetailModel,
 	type UmbClipboardEntryValuesType,
 } from '../../clipboard-entry/index.js';
@@ -31,7 +30,6 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 
 	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 	#clipboardContext?: typeof UMB_CLIPBOARD_CONTEXT.TYPE;
-	#clipboardDetailRepository = new UmbClipboardEntryDetailRepository(this);
 	#hostElement?: Element;
 	#propertyEditorElement?: UmbPropertyEditorUiElement;
 
@@ -205,6 +203,8 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 		clipboardEntryUnique: string,
 		propertyEditorUiManifest: ManifestPropertyEditorUi,
 	): Promise<ValueType | undefined> {
+		await this.#init;
+
 		if (!clipboardEntryUnique) {
 			throw new Error('Unique id is required');
 		}
@@ -217,7 +217,7 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 			throw new Error('Property Editor UI Schema alias is required');
 		}
 
-		const { data: entry } = await this.#clipboardDetailRepository.requestByUnique(clipboardEntryUnique);
+		const entry = await this.#clipboardContext!.read(clipboardEntryUnique);
 
 		if (!entry) {
 			throw new Error(`Could not find clipboard entry with unique id: ${clipboardEntryUnique}`);
