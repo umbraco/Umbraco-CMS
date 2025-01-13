@@ -141,3 +141,24 @@ test('can add a video in RTE Tiptap property editor', async ({umbracoApi, umbrac
   expect(contentData.values[0].value.markup).toContain('data-embed-url');
   expect(contentData.values[0].value.markup).toContain(videoURL);
 });
+
+// TODO: Remove skip when the front-end ready. Currently it still accept the empty link using spacebar
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17411
+test.skip('cannot submit the empty link in the link picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const iconTitle = 'Link';
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickTipTapToolbarIconWithTitle(iconTitle);
+  await umbracoUi.content.enterLink('Space', true);
+  await umbracoUi.content.enterAnchorOrQuerystring('Space', true);
+  await umbracoUi.content.enterLinkTitle('Space', true);
+
+  // Assert
+  await umbracoUi.content.isSubmitButtonDisabled();
+});
