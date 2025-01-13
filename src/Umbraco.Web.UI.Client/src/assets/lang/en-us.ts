@@ -571,7 +571,7 @@ export default {
 		selectMediaType: 'Select media type',
 		selectIcon: 'Select icon',
 		selectItem: 'Select item',
-		selectLink: 'Select link',
+		selectLink: 'Configure link',
 		selectMacro: 'Select macro',
 		selectContent: 'Select content',
 		selectContentType: 'Select content type',
