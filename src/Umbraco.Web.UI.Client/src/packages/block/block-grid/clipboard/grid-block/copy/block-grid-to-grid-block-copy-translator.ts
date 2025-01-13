@@ -17,34 +17,35 @@ export class UmbBlockGridToGridBlockClipboardCopyPropertyValueTranslator
 			throw new Error('Property value is missing.');
 		}
 
-		debugger;
 		this.#blockGridManager = await this.getContext(UMB_BLOCK_GRID_MANAGER_CONTEXT);
-		debugger;
+
 		return this.#constructGridBlockValue(propertyValue);
 	}
 
 	#constructGridBlockValue(propertyValue: UmbBlockGridValueModel): UmbGridBlockClipboardEntryValueModel {
 		const valueClone = structuredClone(propertyValue);
 
-		const layouts = valueClone.layout?.[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? undefined;
+		const layout = valueClone.layout?.[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? undefined;
+		const contentData = valueClone.contentData;
+		const settingsData = valueClone.settingsData;
 
-		if (!layouts?.length) {
+		if (!layout?.length) {
 			throw new Error('No layouts found.');
 		}
 
-		layouts.forEach((layout) => {
+		layout.forEach((layout) => {
 			// Find sub Blocks and append their data:
 			forEachBlockLayoutEntryOf(layout, async (entry) => {
-				debugger;
 				const content = this.#blockGridManager!.getContentOf(entry.contentKey);
 
 				if (!content) {
 					throw new Error('No content found');
 				}
+
 				contentData.push(structuredClone(content));
 
 				if (entry.settingsKey) {
-					const settings = this._manager!.getSettingsOf(entry.settingsKey);
+					const settings = this.#blockGridManager!.getSettingsOf(entry.settingsKey);
 					if (settings) {
 						settingsData.push(structuredClone(settings));
 					}
@@ -53,9 +54,9 @@ export class UmbBlockGridToGridBlockClipboardCopyPropertyValueTranslator
 		});
 
 		const gridBlockValue: UmbGridBlockClipboardEntryValueModel = {
-			contentData: valueClone.contentData,
-			layout: valueClone.layout?.[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? undefined,
-			settingsData: valueClone.settingsData,
+			contentData,
+			layout,
+			settingsData,
 		};
 
 		return gridBlockValue;

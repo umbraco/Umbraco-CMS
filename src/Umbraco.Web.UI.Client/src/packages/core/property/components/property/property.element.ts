@@ -21,8 +21,6 @@ import type {
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
 import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbContextRequestEvent } from '@umbraco-cms/backoffice/context-api';
 
 /**
  *  @element umb-property
@@ -372,13 +370,6 @@ export class UmbPropertyElement extends UmbLitElement {
 		this.#extensionsController = new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'propertyContext', []);
 	}
 
-	#proxyContextRequests(event: UmbContextRequestEvent) {
-		if (this._element) {
-			event.stopImmediatePropagation();
-			this._element.dispatchEvent(event.clone());
-		}
-	}
-
 	override render() {
 		return html`
 			<umb-property-layout
@@ -404,7 +395,6 @@ export class UmbPropertyElement extends UmbLitElement {
 		if (!this._propertyEditorUiAlias) return nothing;
 		return html`
 			<umb-property-action-menu
-				@umb:context-request=${this.#proxyContextRequests}
 				slot="action-menu"
 				id="action-menu"
 				.propertyEditorUiAlias=${this._propertyEditorUiAlias}>
