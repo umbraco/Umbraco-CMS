@@ -14,6 +14,9 @@ export class UmbEntityNamedDetailWorkspaceContextBase<
 	extends UmbEntityDetailWorkspaceContextBase<NamedDetailModelType, NamedDetailRepositoryType, CreateArgsType>
 	implements UmbNamableWorkspaceContext
 {
+	// Just for context token safety:
+	public readonly IS_ENTITY_NAMED_DETAIL_WORKSPACE_CONTEXT = true;
+
 	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
 
 	getName() {
