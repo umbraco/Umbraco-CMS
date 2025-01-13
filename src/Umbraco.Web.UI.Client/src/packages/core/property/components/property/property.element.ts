@@ -1,6 +1,10 @@
 import { UmbPropertyContext } from './property.context.js';
 import { css, customElement, html, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import {
+	createExtensionElement,
+	UmbExtensionsApiInitializer,
+	UmbExtensionsElementAndApiInitializer,
+} from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -178,6 +182,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	#validationMessageBinder?: UmbBindServerValidationToFormControl;
 	#valueObserver?: UmbObserverController<unknown>;
 	#configObserver?: UmbObserverController<UmbPropertyEditorConfigCollection | undefined>;
+	#extensionsController?: UmbExtensionsApiInitializer<any>;
 
 	constructor() {
 		super();
@@ -274,6 +279,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	}
 
 	private async _gotEditorUI(manifest?: ManifestPropertyEditorUi | null): Promise<void> {
+		this.#createController();
 		this.#propertyContext.setEditor(undefined);
 		this.#propertyContext.setEditorManifest(manifest ?? undefined);
 
@@ -357,6 +363,16 @@ export class UmbPropertyElement extends UmbLitElement {
 
 			this.requestUpdate('element', oldElement);
 		}
+	}
+
+	#createController() {
+		if (this.#extensionsController) {
+			this.#extensionsController.destroy();
+		}
+
+		this.#extensionsController = new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'propertyContext', [
+			this,
+		]);
 	}
 
 	override render() {

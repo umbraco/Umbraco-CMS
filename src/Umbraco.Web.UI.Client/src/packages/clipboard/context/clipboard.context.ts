@@ -1,5 +1,7 @@
 import { UmbClipboardEntryDetailRepository, type UmbClipboardEntryDetailModel } from '../clipboard-entry/index.js';
+import { UMB_CLIPBOARD_CONTEXT } from './clipboard.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * Clipboard context for managing clipboard entries
@@ -9,6 +11,10 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
  */
 export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
 	#clipboardDetailRepository = new UmbClipboardEntryDetailRepository(this);
+
+	constructor(host: UmbControllerHost) {
+		super(host, UMB_CLIPBOARD_CONTEXT);
+	}
 
 	/**
 	 * Write to the clipboard

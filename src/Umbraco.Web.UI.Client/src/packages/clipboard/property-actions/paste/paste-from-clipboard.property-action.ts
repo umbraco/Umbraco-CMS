@@ -21,13 +21,11 @@ export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<M
 
 			this.consumeContext(UMB_PROPERTY_CLIPBOARD_CONTEXT, (context) => {
 				this.#clipboardContext = context;
-				debugger;
 			}).asPromise(),
 		]);
 	}
 
 	override async execute() {
-		debugger;
 		await this.#init;
 		if (!this.#clipboardContext) throw new Error('Clipboard context not found');
 		if (!this.#propertyContext) throw new Error('Property context not found');
@@ -37,7 +35,7 @@ export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<M
 		if (!propertyEditorManifest) {
 			throw new Error('Property editor manifest not found');
 		}
-		debugger;
+
 		const result = await this.#clipboardContext.pickForProperty({
 			propertyEditorUiAlias: propertyEditorManifest.alias,
 			multiple: false,
