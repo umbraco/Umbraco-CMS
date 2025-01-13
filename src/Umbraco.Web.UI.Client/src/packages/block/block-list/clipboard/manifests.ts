@@ -33,9 +33,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'propertyAction',
-		kind: 'pasteFromClipboard',
-		alias: 'Umb.PropertyAction.BlockList.Clipboard.Paste',
-		name: 'Block List Paste From Clipboard Property Action',
+		kind: 'replaceFromClipboard',
+		alias: 'Umb.PropertyAction.BlockList.Clipboard.Replace',
+		name: 'Block List Replace From Clipboard Property Action',
 		forPropertyEditorUis,
 		conditions: [
 			{

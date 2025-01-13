@@ -201,11 +201,11 @@ export class UmbBlockGridEntriesContext
 					} else {
 						throw new Error('Failed to create block');
 					}
-				} else if (value?.pasteFromClipboard && value.pasteFromClipboard.selection?.length && data) {
+				} else if (value?.clipboard && value.clipboard.selection?.length && data) {
 					const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
 
 					const propertyValues = await clipboardContext.readMultiple<UmbBlockGridValueModel>(
-						value.pasteFromClipboard.selection,
+						value.clipboard.selection,
 						UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
 					);
 
