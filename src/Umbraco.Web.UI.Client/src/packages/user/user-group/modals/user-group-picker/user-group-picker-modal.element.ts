@@ -1,17 +1,18 @@
 import { UmbUserGroupCollectionRepository } from '../../collection/repository/index.js';
 import type { UmbUserGroupDetailModel } from '../../types.js';
-import { html, customElement, state, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import type { UMB_USER_GROUP_PICKER_MODAL } from '@umbraco-cms/backoffice/user-group';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import type { UMB_USER_GROUP_PICKER_MODAL } from '@umbraco-cms/backoffice/user-group';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbSelectedEvent, UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
-import { UmbUserGroupRefElement } from '../../components/user-group-ref';
+
+import '../../components/user-group-ref/user-group-ref.element.js';
 
 @customElement('umb-user-group-picker-modal')
 export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
-	(typeof UMB_USER_GROUP_PICKER_MODAL)['DATA'],
-	(typeof UMB_USER_GROUP_PICKER_MODAL)['VALUE']
+	typeof UMB_USER_GROUP_PICKER_MODAL.DATA,
+	typeof UMB_USER_GROUP_PICKER_MODAL.VALUE
 > {
 	@state()
 	private _userGroups: Array<UmbUserGroupDetailModel> = [];
@@ -19,30 +20,35 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 	#selectionManager = new UmbSelectionManager(this);
 	#userGroupCollectionRepository = new UmbUserGroupCollectionRepository(this);
 
-	override connectedCallback(): void {
+	constructor() {
+		super();
+
+		this.#observeUserGroups();
+	}
+
+	override connectedCallback() {
 		super.connectedCallback();
 
-		// TODO: in theory this config could change during the lifetime of the modal, so we could observe it
 		this.#selectionManager.setSelectable(true);
 		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
 		this.#selectionManager.setSelection(this.value?.selection ?? []);
-		this.observe(this.#selectionManager.selection, (selection) => this.updateValue({ selection }), 'selectionObserver');
-	}
 
-	protected override firstUpdated(): void {
-		this.#observeUserGroups();
+		this.observe(this.#selectionManager.selection, (selection) => this.updateValue({ selection }), 'selectionObserver');
 	}
 
 	async #observeUserGroups() {
 		const { error, asObservable } = await this.#userGroupCollectionRepository.requestCollection();
 		if (error) return;
+
 		this.observe(asObservable(), (items) => (this._userGroups = items), 'umbUserGroupsObserver');
 	}
 
 	#onSelected(event: UUIMenuItemEvent, item: UmbUserGroupDetailModel) {
 		if (!item.unique) throw new Error('User group unique is required');
 		event.stopPropagation();
+
 		this.#selectionManager.select(item.unique);
+
 		this.requestUpdate();
 		this.modalContext?.dispatchEvent(new UmbSelectedEvent(item.unique));
 	}
@@ -50,7 +56,9 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 	#onDeselected(event: UUIMenuItemEvent, item: UmbUserGroupDetailModel) {
 		if (!item.unique) throw new Error('User group unique is required');
 		event.stopPropagation();
+
 		this.#selectionManager.deselect(item.unique);
+
 		this.requestUpdate();
 		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(item.unique));
 	}
@@ -60,66 +68,42 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 		this._submitModal();
 	}
 
-	//TODO: The details should probably be defined in the umb-user-group-ref it self and subsequently imported instead of being defined here.
-
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.term('user_selectUserGroup', false)}>
+			<umb-body-layout headline=${this.localize.term('user_selectUserGroup', true)}>
 				<uui-box>
-					${this._userGroups.map((userGroup) => {
-						const isSelected = this.#selectionManager.isSelected(userGroup.unique);
-						return html`
+					${repeat(
+						this._userGroups,
+						(userGroup) => userGroup.alias,
+						(userGroup) => html`
 							<umb-user-group-ref
 								.name=${userGroup.name}
 								select-only
 								selectable
+								?selected=${this.#selectionManager.isSelected(userGroup.unique)}
+								?documentRootAccess=${userGroup.documentRootAccess}
+								.documentStartNode=${!userGroup.documentRootAccess ? userGroup.documentStartNode?.unique : null}
+								?mediaRootAccess=${userGroup.mediaRootAccess}
+								.mediaStartNode=${!userGroup.mediaRootAccess ? userGroup.mediaStartNode?.unique : null}
+								.sections=${userGroup.sections}
 								@selected=${(event: UUIMenuItemEvent) => this.#onSelected(event, userGroup)}
-								@deselected=${(event: UUIMenuItemEvent) => this.#onDeselected(event, userGroup)}
-								?selected=${isSelected}
-								.icon=${userGroup.icon || ''}
-								.userPermissionAliases=${userGroup.sections}>
-								<uui-icon .name=${userGroup.icon || undefined} slot="icon"></uui-icon>
-								<div slot="detail" id="details">
-									<div>
-										<strong>Sections:</strong> ${userGroup.sections.length
-											? userGroup.sections.map((section) => section.split('.').pop()).join(', ')
-											: 'No sections selected'}
-									</div>
-									<div>
-										<strong>Media Start Node:</strong> ${userGroup.mediaStartNode
-											? userGroup.mediaStartNode.unique
-											: 'No media start node selected'}
-									</div>
-									<div>
-										<strong>Content Start Node:</strong> ${userGroup.documentStartNode
-											? userGroup.documentStartNode.unique
-											: 'No content start node selected'}
-									</div>
-								</div>
+								@deselected=${(event: UUIMenuItemEvent) => this.#onDeselected(event, userGroup)}>
+								${when(userGroup.icon, () => html`<umb-icon name=${userGroup.icon!} slot="icon"></umb-icon>`)}
 							</umb-user-group-ref>
-						`;
-					})}
+						`,
+					)}
 				</uui-box>
 				<div slot="actions">
-					<uui-button label="Cancel" @click=${this._rejectModal}></uui-button>
-					<uui-button label="Confirm" look="primary" color="positive" @click=${this.#onSubmit}></uui-button>
+					<uui-button label=${this.localize.term('general_cancel')} @click=${this._rejectModal}></uui-button>
+					<uui-button
+						label=${this.localize.term('buttons_select')}
+						look="primary"
+						color="positive"
+						@click=${this.#onSubmit}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
 	}
-
-	static override styles = [
-		css`
-			#details {
-				color: var(--uui-color-text-alt);
-				margin-top: var(--uui-size-space-2);
-			}
-
-			#details > div {
-				margin-bottom: var(--uui-size-space-1);
-			}
-		`,
-	];
 }
 
 export default UmbUserGroupPickerModalElement;
