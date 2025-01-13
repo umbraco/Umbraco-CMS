@@ -1,5 +1,4 @@
-import type { UMB_CLIPBOARD_CONTEXT } from '../../context/clipboard.context-token.js';
-import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '../../property/context/constants.js';
+import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '../../context/constants.js';
 import type { MetaPropertyActionCopyToClipboardKind } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';

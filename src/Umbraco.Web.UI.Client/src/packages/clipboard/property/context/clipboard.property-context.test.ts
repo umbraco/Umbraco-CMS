@@ -8,7 +8,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import type {
 	UmbClipboardCopyPropertyValueTranslator,
 	UmbClipboardPastePropertyValueTranslator,
-} from '../../property-value-translator/types.js';
+} from '../value-translator/types.js';
 import { UmbClipboardEntryDetailStore, type UmbClipboardEntryDetailModel } from '../../clipboard-entry/index.js';
 import { UmbClipboardPropertyContext } from './clipboard.property-context.js';
 import { UmbClipboardContext } from '../../context/clipboard.context.js';

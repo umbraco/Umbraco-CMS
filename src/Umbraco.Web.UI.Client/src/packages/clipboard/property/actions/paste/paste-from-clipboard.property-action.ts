@@ -1,5 +1,5 @@
-import { UmbClipboardEntryItemRepository } from '../../clipboard-entry/index.js';
-import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '../../property/context/clipboard.property-context-token.js';
+import { UmbClipboardEntryItemRepository } from '../../../clipboard-entry/index.js';
+import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '../../context/clipboard.property-context-token.js';
 import type { MetaPropertyActionPasteFromClipboardKind } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
