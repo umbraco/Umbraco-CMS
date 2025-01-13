@@ -304,7 +304,7 @@ export const foundConsts = [{
 			},
 {
 				path: '@umbraco-cms/backoffice/router',
-				consts: ["UMB_ROUTE_CONTEXT"]
+				consts: ["UMB_ROUTE_CONTEXT","UMB_ROUTE_PATH_ADDENDUM_CONTEXT"]
 			},
 {
 				path: '@umbraco-cms/backoffice/rte',

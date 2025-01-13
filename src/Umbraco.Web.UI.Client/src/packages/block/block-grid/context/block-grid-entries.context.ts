@@ -24,10 +24,8 @@ import {
 	UmbStringState,
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { pathFolderName } from '@umbraco-cms/backoffice/utils';
+import { UmbModalRouteRegistrationController, UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import { UMB_CONTENT_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/content';
 import { UMB_CLIPBOARD_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 
 interface UmbBlockGridAreaTypeInvalidRuleType {
@@ -49,11 +47,7 @@ export class UmbBlockGridEntriesContext
 	implements UmbBlockGridScalableContainerContext
 {
 	//
-	#catalogueModal: UmbModalRouteRegistrationController<
-		typeof UMB_BLOCK_CATALOGUE_MODAL.DATA,
-		typeof UMB_BLOCK_CATALOGUE_MODAL.VALUE
-	>;
-	#workspaceModal;
+	#pathAddendum = new UmbRoutePathAddendumContext(this);
 
 	#parentEntry?: typeof UMB_BLOCK_GRID_ENTRY_CONTEXT.TYPE;
 
@@ -103,9 +97,6 @@ export class UmbBlockGridEntriesContext
 
 	setParentUnique(contentKey: string | null) {
 		this.#parentUnique = contentKey;
-		// Notice pathFolderName can be removed when we have switched to use a proper GUID/ID/KEY. [NL]
-		this.#workspaceModal.setUniquePathValue('parentUnique', pathFolderName(contentKey ?? 'null'));
-		this.#catalogueModal.setUniquePathValue('parentUnique', pathFolderName(contentKey ?? 'null'));
 	}
 
 	getParentUnique(): string | null | undefined {
@@ -114,8 +105,7 @@ export class UmbBlockGridEntriesContext
 
 	setAreaKey(areaKey: string | null) {
 		this.#areaKey = areaKey;
-		this.#workspaceModal.setUniquePathValue('areaKey', areaKey ?? 'null');
-		this.#catalogueModal.setUniquePathValue('areaKey', areaKey ?? 'null');
+		this.#pathAddendum.setAddendum(areaKey ?? '');
 		this.#gotAreaKey();
 
 		// Idea: If we need to parse down a validation data path to target the specific layout object: [NL]
@@ -162,9 +152,8 @@ export class UmbBlockGridEntriesContext
 			this.#gotBlockParentEntry(); // is not used at this point. [NL]
 		});
 
-		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
-			.addUniquePaths(['propertyAlias', 'variantId', 'parentUnique', 'areaKey'])
-			.addAdditionalPath(':view/:index')
+		new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
+			.addAdditionalPath('_catalogue/:view/:index')
 			.onSetup(async (routingInfo) => {
 				if (!this._manager) return false;
 				// Idea: Maybe on setup should be async, so it can retrieve the values when needed? [NL]
@@ -230,8 +219,7 @@ export class UmbBlockGridEntriesContext
 				this._catalogueRouteBuilderState.setValue(routeBuilder);
 			});
 
-		this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_GRID_WORKSPACE_MODAL)
-			.addUniquePaths(['propertyAlias', 'variantId', 'parentUnique', 'areaKey'])
+		new UmbModalRouteRegistrationController(this, UMB_BLOCK_GRID_WORKSPACE_MODAL)
 			.addAdditionalPath('block')
 			.onSetup(() => {
 				return {
@@ -252,12 +240,6 @@ export class UmbBlockGridEntriesContext
 				const newPath = routeBuilder({});
 				this._workspacePath.setValue(newPath);
 			});
-
-		this.consumeContext(UMB_CONTENT_PROPERTY_DATASET_CONTEXT, (dataset) => {
-			const variantId = dataset.getVariantId();
-			this.#catalogueModal.setUniquePathValue('variantId', variantId?.toString());
-			this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
-		});
 	}
 
 	protected _gotBlockManager() {
@@ -265,15 +247,6 @@ export class UmbBlockGridEntriesContext
 
 		this.#setupAllowedBlockTypes();
 		this.#setupRangeLimits();
-
-		this.observe(
-			this._manager.propertyAlias,
-			(alias) => {
-				this.#catalogueModal.setUniquePathValue('propertyAlias', alias ?? 'null');
-				this.#workspaceModal.setUniquePathValue('propertyAlias', alias ?? 'null');
-			},
-			'observePropertyAlias',
-		);
 	}
 
 	#gotAreaKey() {
