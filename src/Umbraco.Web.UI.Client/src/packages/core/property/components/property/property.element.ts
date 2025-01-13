@@ -1,10 +1,6 @@
 import { UmbPropertyContext } from './property.context.js';
 import { css, customElement, html, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import {
-	createExtensionElement,
-	UmbExtensionsApiInitializer,
-	UmbExtensionsElementAndApiInitializer,
-} from '@umbraco-cms/backoffice/extension-api';
+import { createExtensionElement, UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -25,6 +21,8 @@ import type {
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
 import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbContextRequestEvent } from '@umbraco-cms/backoffice/context-api';
 
 /**
  *  @element umb-property
@@ -279,7 +277,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	}
 
 	private async _gotEditorUI(manifest?: ManifestPropertyEditorUi | null): Promise<void> {
-		this.#createController();
+		this.#extensionsController?.destroy();
 		this.#propertyContext.setEditor(undefined);
 		this.#propertyContext.setEditorManifest(manifest ?? undefined);
 
@@ -359,6 +357,7 @@ export class UmbPropertyElement extends UmbLitElement {
 				}
 
 				this._element.toggleAttribute('readonly', this._isReadOnly);
+				this.#createController();
 			}
 
 			this.requestUpdate('element', oldElement);
@@ -370,9 +369,14 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#extensionsController.destroy();
 		}
 
-		this.#extensionsController = new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'propertyContext', [
-			this,
-		]);
+		this.#extensionsController = new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'propertyContext', []);
+	}
+
+	#proxyContextRequests(event: UmbContextRequestEvent) {
+		if (this._element) {
+			event.stopImmediatePropagation();
+			this._element.dispatchEvent(event.clone());
+		}
 	}
 
 	override render() {
@@ -400,6 +404,7 @@ export class UmbPropertyElement extends UmbLitElement {
 		if (!this._propertyEditorUiAlias) return nothing;
 		return html`
 			<umb-property-action-menu
+				@umb:context-request=${this.#proxyContextRequests}
 				slot="action-menu"
 				id="action-menu"
 				.propertyEditorUiAlias=${this._propertyEditorUiAlias}>
