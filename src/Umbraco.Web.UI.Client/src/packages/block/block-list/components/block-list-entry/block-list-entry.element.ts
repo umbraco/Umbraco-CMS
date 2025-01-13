@@ -20,7 +20,7 @@ import type {
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UUIBlinkAnimationValue } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UMB_PROPERTY_CLIPBOARD_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
+import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 
 /**
  * @element umb-block-list-entry
@@ -275,7 +275,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	async #copyToClipboard() {
 		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
 		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
-		const clipboardContext = await this.getContext(UMB_PROPERTY_CLIPBOARD_CONTEXT);
+		const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
 
 		const workspaceName = propertyDatasetContext?.getName();
 		const propertyLabel = propertyContext?.getLabel();
@@ -299,7 +299,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			expose: expose ? [structuredClone(expose)] : [],
 		};
 
-		clipboardContext.writeForProperty({
+		clipboardContext.write({
 			icon: this._icon,
 			name: entryName,
 			propertyValue,

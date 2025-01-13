@@ -19,7 +19,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockGridTypeModel, UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UMB_PROPERTY_CLIPBOARD_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
+import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 
 export class UmbBlockGridEntryContext
 	extends UmbBlockEntryContext<
@@ -274,7 +274,7 @@ export class UmbBlockGridEntryContext
 
 		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
 		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
-		const clipboardContext = await this.getContext(UMB_PROPERTY_CLIPBOARD_CONTEXT);
+		const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
 
 		const workspaceName = propertyDatasetContext?.getName();
 		const propertyLabel = propertyContext?.getLabel();
@@ -305,7 +305,7 @@ export class UmbBlockGridEntryContext
 			expose: exposes,
 		};
 
-		clipboardContext.writeForProperty({
+		clipboardContext.write({
 			icon: this.getContentElementTypeIcon(),
 			name: entryName,
 			propertyValue,

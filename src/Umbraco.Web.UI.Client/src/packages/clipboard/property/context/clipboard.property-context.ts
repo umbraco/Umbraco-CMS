@@ -8,7 +8,7 @@ import {
 	type UmbClipboardEntryValuesType,
 } from '../../clipboard-entry/index.js';
 import type { ManifestClipboardPastePropertyValueTranslator } from '../../property-value-translator/types.js';
-import { UMB_PROPERTY_CLIPBOARD_CONTEXT } from './property-clipboard.context-token.js';
+import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from './clipboard.property-context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -20,10 +20,10 @@ import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 /**
  * Clipboard context for managing clipboard entries for property values
  * @export
- * @class UmbPropertyClipboardContext
- * @augments {UmbContextBase<UmbPropertyClipboardContext>}
+ * @class UmbClipboardPropertyContext
+ * @augments {UmbContextBase<UmbClipboardPropertyContext>}
  */
-export class UmbPropertyClipboardContext extends UmbContextBase<UmbPropertyClipboardContext> {
+export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardPropertyContext> {
 	#init?: Promise<unknown>;
 
 	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
@@ -31,7 +31,7 @@ export class UmbPropertyClipboardContext extends UmbContextBase<UmbPropertyClipb
 	#clipboardDetailRepository = new UmbClipboardEntryDetailRepository(this);
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_PROPERTY_CLIPBOARD_CONTEXT);
+		super(host, UMB_CLIPBOARD_PROPERTY_CONTEXT);
 
 		this.#init = Promise.all([
 			this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
@@ -50,10 +50,7 @@ export class UmbPropertyClipboardContext extends UmbContextBase<UmbPropertyClipb
 	 * @param {string} propertyEditorUiAlias - The alias of the property editor to match
 	 * @returns { Promise<unknown> } - Returns the resolved property value
 	 */
-	async readForProperty<ReturnType = unknown>(
-		unique: string,
-		propertyEditorUiAlias: string,
-	): Promise<ReturnType | undefined> {
+	async read<ReturnType = unknown>(unique: string, propertyEditorUiAlias: string): Promise<ReturnType | undefined> {
 		if (!unique) throw new Error('The Clipboard Entry unique is required');
 		if (!propertyEditorUiAlias) throw new Error('Property Editor UI alias is required');
 		const manifest = await this.#findPropertyEditorUiManifest(propertyEditorUiAlias);
@@ -66,7 +63,7 @@ export class UmbPropertyClipboardContext extends UmbContextBase<UmbPropertyClipb
 	 * @param {string} propertyEditorUiAlias - The alias of the property editor to match
 	 * @returns { Promise<Array<unknown>> } - Returns an array of resolved property values
 	 */
-	async readMultipleForProperty<ReturnType = unknown>(
+	async readMultiple<ReturnType = unknown>(
 		uniques: Array<string>,
 		propertyEditorUiAlias: string,
 	): Promise<Array<ReturnType>> {
@@ -74,7 +71,7 @@ export class UmbPropertyClipboardContext extends UmbContextBase<UmbPropertyClipb
 			throw new Error('Clipboard entry uniques are required');
 		}
 
-		const promises = Promise.allSettled(uniques.map((unique) => this.readForProperty(unique, propertyEditorUiAlias)));
+		const promises = Promise.allSettled(uniques.map((unique) => this.read(unique, propertyEditorUiAlias)));
 
 		const readResult = await promises;
 		// TODO:show message if some entries are not fulfilled
@@ -100,7 +97,7 @@ export class UmbPropertyClipboardContext extends UmbContextBase<UmbPropertyClipb
 	 * @param {string} args.propertyEditorUiAlias - The alias of the property editor to match
 	 * @returns { Promise<void> }
 	 */
-	async writeForProperty(args: {
+	async write(args: {
 		name: string;
 		icon?: string;
 		propertyValue: any;
@@ -129,18 +126,18 @@ export class UmbPropertyClipboardContext extends UmbContextBase<UmbPropertyClipb
 	 * @param {string} args.propertyEditorUiAlias - The alias of the property editor to match
 	 * @returns { Promise<{ selection: Array<UmbEntityUnique>; propertyValues: Array<any> }> }
 	 */
-	async pickForProperty(args: {
+	async pick(args: {
 		multiple: boolean;
 		propertyEditorUiAlias: string;
 	}): Promise<{ selection: Array<UmbEntityUnique>; propertyValues: Array<any> }> {
 		await this.#init;
 
-		const pasteTranslatorManifests = this.getPastePropertyValueTranslatorManifests(args.propertyEditorUiAlias);
+		const pasteTranslatorManifests = this.getPasteTranslatorManifests(args.propertyEditorUiAlias);
 
 		const modal = this.#modalManagerContext?.open(this, UMB_CLIPBOARD_ENTRY_PICKER_MODAL, {
 			data: {
 				filter: (clipboardEntryDetail) =>
-					this.hasSupportedPastePropertyValueTranslator(pasteTranslatorManifests, clipboardEntryDetail.values),
+					this.hasSupportedPasteTranslator(pasteTranslatorManifests, clipboardEntryDetail.values),
 			},
 		});
 
@@ -228,7 +225,7 @@ export class UmbPropertyClipboardContext extends UmbContextBase<UmbPropertyClipb
 	 * @param {string} propertyEditorUiAlias - The alias of the property editor to match
 	 * @returns {Array<ManifestClipboardPastePropertyValueTranslator>} - Returns an array of clipboard paste translators
 	 */
-	getPastePropertyValueTranslatorManifests(propertyEditorUiAlias: string) {
+	getPasteTranslatorManifests(propertyEditorUiAlias: string) {
 		return umbExtensionsRegistry.getByTypeAndFilter(
 			'clipboardPastePropertyValueTranslator',
 			(manifest) => manifest.toPropertyEditorUi === propertyEditorUiAlias,
@@ -241,7 +238,7 @@ export class UmbPropertyClipboardContext extends UmbContextBase<UmbPropertyClipb
 	 * @param {UmbClipboardEntryValuesType} clipboardEntryValues - The clipboard entry values
 	 * @returns {boolean} - Returns true if the clipboard entry values has supported paste translator
 	 */
-	hasSupportedPastePropertyValueTranslator(
+	hasSupportedPasteTranslator(
 		manifests: Array<ManifestClipboardPastePropertyValueTranslator>,
 		clipboardEntryValues: UmbClipboardEntryValuesType,
 	): boolean {
@@ -256,4 +253,4 @@ export class UmbPropertyClipboardContext extends UmbContextBase<UmbPropertyClipb
 	}
 }
 
-export { UmbPropertyClipboardContext as api };
+export { UmbClipboardPropertyContext as api };

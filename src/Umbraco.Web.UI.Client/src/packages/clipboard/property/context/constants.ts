@@ -1,1 +1,1 @@
-export * from './property-clipboard.context-token.js';
+export * from './clipboard.property-context-token.js';

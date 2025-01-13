@@ -26,7 +26,7 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController, UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import { UMB_PROPERTY_CLIPBOARD_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
+import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 
 interface UmbBlockGridAreaTypeInvalidRuleType {
 	groupKey?: string;
@@ -158,8 +158,8 @@ export class UmbBlockGridEntriesContext
 				if (!this._manager) return false;
 				// Idea: Maybe on setup should be async, so it can retrieve the values when needed? [NL]
 				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
-				const clipboardContext = await this.getContext(UMB_PROPERTY_CLIPBOARD_CONTEXT);
-				const pasteTranslatorManifests = clipboardContext.getPastePropertyValueTranslatorManifests(
+				const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
+				const pasteTranslatorManifests = clipboardContext.getPasteTranslatorManifests(
 					UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
 				);
 				return {
@@ -168,7 +168,7 @@ export class UmbBlockGridEntriesContext
 						blockGroups: this._manager.getBlockGroups() ?? [],
 						openClipboard: routingInfo.view === 'clipboard',
 						clipboardFilter: (clipboardEntryDetailModel) => {
-							const hasSupportedTranslator = clipboardContext.hasSupportedPastePropertyValueTranslator(
+							const hasSupportedTranslator = clipboardContext.hasSupportedPasteTranslator(
 								pasteTranslatorManifests,
 								clipboardEntryDetailModel.values,
 							);
@@ -202,9 +202,9 @@ export class UmbBlockGridEntriesContext
 						throw new Error('Failed to create block');
 					}
 				} else if (value?.pasteFromClipboard && value.pasteFromClipboard.selection?.length && data) {
-					const clipboardContext = await this.getContext(UMB_PROPERTY_CLIPBOARD_CONTEXT);
+					const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
 
-					const propertyValues = await clipboardContext.readMultipleForProperty<UmbBlockGridValueModel>(
+					const propertyValues = await clipboardContext.readMultiple<UmbBlockGridValueModel>(
 						value.pasteFromClipboard.selection,
 						UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
 					);
