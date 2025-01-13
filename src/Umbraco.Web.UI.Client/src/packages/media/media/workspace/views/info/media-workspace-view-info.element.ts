@@ -12,6 +12,7 @@ import type { MediaUrlInfoModel } from '@umbraco-cms/backoffice/external/backend
 // import of local components
 import './media-workspace-view-info-history.element.js';
 import './media-workspace-view-info-reference.element.js';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
 @customElement('umb-media-workspace-view-info')
 export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
@@ -43,6 +44,9 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 	@state()
 	private _updateDate?: string | null = null;
 
+	@state()
+	private _hasSettingsAccess: boolean = false;
+
 	constructor() {
 		super();
 
@@ -54,6 +58,17 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 			.observeRouteBuilder((routeBuilder) => {
 				this._editMediaTypePath = routeBuilder({});
 			});
+
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
+			this.observe(
+				context.allowedSections,
+				(allowedSections) => {
+					if (!allowedSections) return;
+					this._hasSettingsAccess = allowedSections.includes("Umb.Section.Settings");
+				},
+				'umbAllowedSectionsObserver',
+			);
+		});
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
@@ -175,7 +190,8 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 				<strong><umb-localize key="content_mediaType">Media Type</umb-localize></strong>
 				<uui-ref-node-document-type
 					standalone
-					href=${this._editMediaTypePath + 'edit/' + this._mediaTypeUnique}
+					href=${this._hasSettingsAccess ? this._editMediaTypePath + 'edit/' + this._mediaTypeUnique : nothing}
+					?readonly=${!this._hasSettingsAccess}
 					name=${ifDefined(this._mediaTypeName)}>
 					${this._mediaTypeIcon ? html`<umb-icon slot="icon" name=${this._mediaTypeIcon}></umb-icon>` : nothing}
 				</uui-ref-node-document-type>
@@ -280,6 +296,11 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 
 			.link-item.with-href:hover {
 				background: var(--uui-color-divider);
+			}
+
+			uui-ref-node-document-type[readonly] {
+				padding-top: 7px;
+				padding-bottom: 7px;
 			}
 		`,
 	];
