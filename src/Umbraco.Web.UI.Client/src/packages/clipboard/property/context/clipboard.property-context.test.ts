@@ -1,5 +1,4 @@
 import { expect } from '@open-wc/testing';
-import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbCurrentUserContext, UmbCurrentUserStore } from '@umbraco-cms/backoffice/current-user';
@@ -12,6 +11,7 @@ import type {
 } from '../../property-value-translator/types.js';
 import { UmbClipboardEntryDetailStore, type UmbClipboardEntryDetailModel } from '../../clipboard-entry/index.js';
 import { UmbClipboardPropertyContext } from './clipboard.property-context.js';
+import { UmbClipboardContext } from '../../context/clipboard.context.js';
 
 const TEST_PROPERTY_EDITOR_UI_ALIAS = 'testPropertyEditorUiAlias';
 const TEST_CLIPBOARD_ENTRY_VALUE_TYPE = 'testClipboardEntryValueType';
@@ -76,6 +76,7 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 		new UmbClipboardEntryDetailStore(this);
 		new UmbNotificationContext(this);
 		new UmbCurrentUserStore(this);
+		new UmbClipboardContext(this);
 	}
 
 	async init() {
