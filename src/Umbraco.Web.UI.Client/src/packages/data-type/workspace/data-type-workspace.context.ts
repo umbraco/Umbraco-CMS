@@ -11,7 +11,7 @@ import type {
 import {
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
-	UmbEntityDetailWorkspaceContextBase,
+	UmbEntityNamedDetailWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -42,10 +42,9 @@ type EntityType = UmbDataTypeDetailModel;
  * - a new property editor ui is picked for a data-type, uses the data-type configuration to set the schema, if such is configured for the Property Editor UI. (The user picks the UI via the UI, the schema comes from the UI that the user picked, we store both on the data-type)
  */
 export class UmbDataTypeWorkspaceContext
-	extends UmbEntityDetailWorkspaceContextBase<EntityType, UmbDataTypeDetailRepository>
+	extends UmbEntityNamedDetailWorkspaceContextBase<EntityType, UmbDataTypeDetailRepository>
 	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
 	readonly propertyEditorUiAlias = this._data.createObservablePartOfCurrent((data) => data?.editorUiAlias);
 	readonly propertyEditorSchemaAlias = this._data.createObservablePartOfCurrent((data) => data?.editorAlias);
 
@@ -247,14 +246,6 @@ export class UmbDataTypeWorkspaceContext
 
 	createPropertyDatasetContext(host: UmbControllerHost): UmbPropertyDatasetContext {
 		return new UmbInvariantWorkspacePropertyDatasetContext(host, this);
-	}
-
-	getName() {
-		return this._data.getCurrent()?.name;
-	}
-
-	setName(name: string | undefined) {
-		this._data.updateCurrent({ name });
 	}
 
 	getPropertyEditorSchemaAlias() {
