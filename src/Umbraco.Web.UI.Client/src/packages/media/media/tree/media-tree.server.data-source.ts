@@ -83,5 +83,6 @@ const mapper = (item: MediaTreeItemResponseModel): UmbMediaTreeItemModel => {
 				culture: variant.culture || null,
 			};
 		}),
+		createDate: item.createDate,
 	};
 };

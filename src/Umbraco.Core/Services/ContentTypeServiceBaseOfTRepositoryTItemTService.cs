@@ -1171,10 +1171,14 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         }
         else
         {
-            TItem[] allowedChildren = GetMany(parent.AllowedContentTypes.Select(x => x.Key)).ToArray();
+            // Get the sorted keys. Whilst we can't guarantee the order that comes back from GetMany, we can use
+            // this to sort the resulting list of allowed children.
+            Guid[] sortedKeys = parent.AllowedContentTypes.OrderBy(x => x.SortOrder).Select(x => x.Key).ToArray();
+
+            TItem[] allowedChildren = GetMany(sortedKeys).ToArray();
             result = new PagedModel<TItem>
             {
-                Items = allowedChildren.Take(take).Skip(skip),
+                Items = allowedChildren.OrderBy(x => sortedKeys.IndexOf(x.Key)).Take(take).Skip(skip),
                 Total = allowedChildren.Length,
             };
         }
