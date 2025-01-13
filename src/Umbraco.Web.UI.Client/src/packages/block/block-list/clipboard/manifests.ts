@@ -8,6 +8,13 @@ import {
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
+		type: 'propertyContext',
+		kind: 'clipboard',
+		alias: 'Umb.PropertyContext.BlockList.Clipboard',
+		name: 'Block List Clipboard Property Context',
+		forPropertyEditorUis: [UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS],
+	},
+	{
 		type: 'propertyAction',
 		kind: 'copyToClipboard',
 		alias: 'Umb.PropertyAction.BlockList.Clipboard.Copy',

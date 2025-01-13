@@ -1,8 +1,16 @@
-export const manifests: Array<UmbExtensionManifest> = [
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
-		type: 'propertyContext',
-		name: 'Clipboard Property Context',
-		alias: 'Umb.PropertyContext.Clipboard',
-		api: () => import('./clipboard.property-context.js'),
+		type: 'kind',
+		alias: 'Umb.Kind.PropertyContext.Clipboard',
+		matchKind: 'clipboard',
+		matchType: 'propertyContext',
+		manifest: {
+			type: 'propertyContext',
+			kind: 'clipboard',
+			api: () => import('./clipboard.property-context.js'),
+			weight: 1200,
+		},
 	},
 ];

@@ -355,19 +355,25 @@ export class UmbPropertyElement extends UmbLitElement {
 				}
 
 				this._element.toggleAttribute('readonly', this._isReadOnly);
-				this.#createController();
+				this.#createController(manifest);
 			}
 
 			this.requestUpdate('element', oldElement);
 		}
 	}
 
-	#createController() {
+	#createController(propertyEditorUiManifest: ManifestPropertyEditorUi): void {
 		if (this.#extensionsController) {
 			this.#extensionsController.destroy();
 		}
 
-		this.#extensionsController = new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'propertyContext', []);
+		this.#extensionsController = new UmbExtensionsApiInitializer(
+			this,
+			umbExtensionsRegistry,
+			'propertyContext',
+			[],
+			(manifest) => manifest.forPropertyEditorUis.includes(propertyEditorUiManifest.alias),
+		);
 	}
 
 	override render() {
