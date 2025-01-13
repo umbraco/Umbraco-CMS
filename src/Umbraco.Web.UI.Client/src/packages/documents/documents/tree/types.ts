@@ -18,6 +18,7 @@ export interface UmbDocumentTreeItemModel extends UmbTreeItemModel {
 		icon: string;
 		collection: UmbReferenceByUnique | null;
 	};
+	createDate: string;
 	variants: Array<UmbDocumentTreeItemVariantModel>;
 }
 

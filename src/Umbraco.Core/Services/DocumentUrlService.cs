@@ -469,7 +469,12 @@ public class DocumentUrlService : IDocumentUrlService
             }
 
             IEnumerable<Domain> domains = _domainCacheService.GetAssigned(idAttempt.Result, false);
-            return domains.FirstOrDefault(x=>x.Culture == cultureOrDefault);
+
+            // If no culture is specified, we assume invariant and return the first domain.
+            // This is also only used to later to specify the node id in the route, so it does not matter what culture it is.
+            return string.IsNullOrEmpty(culture)
+                ? domains.FirstOrDefault()
+                : domains.FirstOrDefault(x => x.Culture?.Equals(culture, StringComparison.InvariantCultureIgnoreCase) ?? false);
         });
 
         var urlSegments = new List<string>();

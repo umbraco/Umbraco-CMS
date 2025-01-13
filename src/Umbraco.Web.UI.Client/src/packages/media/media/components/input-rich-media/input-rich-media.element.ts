@@ -133,19 +133,21 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	#focalPointEnabled: boolean = false;
 
 	@property()
+	/** @deprecated will be removed in v17 */
 	public set alias(value: string | undefined) {
-		this.#modalRouter.setUniquePathValue('propertyAlias', value);
+		//this.#modalRouter.setUniquePathValue('propertyAlias', value);
 	}
 	public get alias(): string | undefined {
-		return this.#modalRouter.getUniquePathValue('propertyAlias');
+		return undefined; //this.#modalRouter.getUniquePathValue('propertyAlias');
 	}
 
 	@property()
+	/** @deprecated will be removed in v17 */
 	public set variantId(value: string | UmbVariantId | undefined) {
-		this.#modalRouter.setUniquePathValue('variantId', value?.toString());
+		//this.#modalRouter.setUniquePathValue('variantId', value?.toString());
 	}
 	public get variantId(): string | undefined {
-		return this.#modalRouter.getUniquePathValue('variantId');
+		return undefined; //this.#modalRouter.getUniquePathValue('variantId');
 	}
 
 	/**
@@ -177,7 +179,6 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 
 	#itemRepository = new UmbMediaItemRepository(this);
 
-	#modalRouter;
 	#modalManager?: UmbModalManagerContext;
 
 	constructor() {
@@ -187,9 +188,8 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 			this.#modalManager = instance;
 		});
 
-		this.#modalRouter = new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
+		new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
 			.addAdditionalPath(':key')
-			.addUniquePaths(['propertyAlias', 'variantId'])
 			.onSetup((params) => {
 				const key = params.key;
 				if (!key) return false;

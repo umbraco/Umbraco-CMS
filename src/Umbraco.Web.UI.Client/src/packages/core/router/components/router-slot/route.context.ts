@@ -1,6 +1,6 @@
+import { umbGenerateRoutePathBuilder } from '../../generate-route-path-builder.function.js';
+import type { UmbModalRouteRegistration } from '../../modal-registration/modal-route-registration.interface.js';
 import type { UmbRoute } from './route.interface.js';
-import { umbGenerateRoutePathBuilder } from './generate-route-path-builder.function.js';
-import type { UmbModalRouteRegistration } from './modal-registration/modal-route-registration.interface.js';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -35,6 +35,13 @@ export class UmbRouteContext extends UmbContextBase<UmbRouteContext> {
 			this.#modalContext = context;
 			this.#generateModalRoutes();
 		});
+	}
+
+	getBasePath() {
+		return this.#basePath.getValue();
+	}
+	getActivePath() {
+		return this.getBasePath() + '/' + this.#activeLocalPath;
 	}
 
 	public registerModal(registration: UmbModalRouteRegistration) {
