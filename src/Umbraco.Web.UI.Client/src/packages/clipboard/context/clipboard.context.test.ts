@@ -5,7 +5,6 @@ import { UmbClipboardContext } from './clipboard.context.js';
 import { UmbClipboardEntryDetailStore, type UmbClipboardEntryDetailModel } from '../clipboard-entry/index.js';
 import { UmbCurrentUserContext, UmbCurrentUserStore } from '@umbraco-cms/backoffice/current-user';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
-const TEST_CLIPBOARD_ENTRY_VALUE_TYPE = 'testClipboardEntryValueType';
 
 @customElement('test-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {
