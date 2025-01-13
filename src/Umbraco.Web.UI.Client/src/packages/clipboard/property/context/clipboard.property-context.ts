@@ -6,6 +6,10 @@ import {
 	type UmbClipboardEntryValuesType,
 } from '../../clipboard-entry/index.js';
 import type { ManifestClipboardPastePropertyValueTranslator } from '../value-translator/types.js';
+import {
+	UmbClipboardCopyPropertyValueTranslatorValueResolver,
+	UmbClipboardPastePropertyValueTranslatorValueResolver,
+} from '../value-translator/index.js';
 import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from './clipboard.property-context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -15,10 +19,6 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import type { ManifestPropertyEditorUi, UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { UMB_CONTEXT_REQUEST_EVENT_TYPE, type UmbContextRequestEvent } from '@umbraco-cms/backoffice/context-api';
-import {
-	UmbClipboardCopyPropertyValueTranslatorValueResolver,
-	UmbClipboardPastePropertyValueTranslatorValueResolver,
-} from '../value-translator/index.js';
 
 /**
  * Clipboard context for managing clipboard entries for property values
