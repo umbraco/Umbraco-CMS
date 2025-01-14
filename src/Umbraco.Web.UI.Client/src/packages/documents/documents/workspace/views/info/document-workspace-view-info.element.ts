@@ -233,7 +233,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 								standalone
 								name=${ifDefined(this._templateName)}
 								href=${this._hasSettingsAccess ? editTemplatePath + 'edit/' + this._templateUnique : nothing}
-								?readonly=${!this._hasSettingsAccess}
+								?readonly=${!this._hasSettingsAccess}>
 								<uui-icon slot="icon" name="icon-document-html"></uui-icon>
 								<uui-action-bar slot="actions">
 									<uui-button
