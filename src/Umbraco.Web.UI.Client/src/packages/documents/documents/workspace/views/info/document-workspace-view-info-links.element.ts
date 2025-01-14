@@ -10,6 +10,7 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { debounce } from '@umbraco-cms/backoffice/utils';
+import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 
 interface UmbDocumentInfoViewLink {
 	culture: string;
@@ -35,6 +36,9 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 
 	@state()
 	private _links: Array<UmbDocumentInfoViewLink> = [];
+
+	@state()
+	private _defaultCulture?: string;
 
 	#urls: Array<UmbDocumentUrlModel> = [];
 
@@ -75,22 +79,36 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 				this.#setLinks();
 			});
 		});
+
+		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
+			this.observe(instance.appDefaultLanguage, (value) => {
+				this._defaultCulture = value?.unique;
+				this.#setLinks();
+			});
+		});
 	}
 
 	#setLinks() {
-		const possibleVariantCultures = this._variantOptions?.map((variantOption) => variantOption.culture) ?? [];
-		const possibleUrlCultures = this.#urls.map((link) => link.culture);
-		const possibleCultures = [...new Set([...possibleVariantCultures, ...possibleUrlCultures])].filter(
-			Boolean,
-		) as string[];
-
-		const links: Array<UmbDocumentInfoViewLink> = possibleCultures.map((culture) => {
-			const url = this.#urls.find((link) => link.culture === culture)?.url;
+		const links: Array<UmbDocumentInfoViewLink> = this.#urls.map((u) => {
+			const culture = u.culture ?? this._defaultCulture ?? "";
+			const url = u.url;
 			const state = this._variantOptions?.find((variantOption) => variantOption.culture === culture)?.variant?.state;
 			return { culture, url, state };
 		});
 
 		this._links = links;
+	}
+
+	#getTargetUrl (url: string | undefined) {
+		if (!url || url.length === 0) {
+			return url;
+		}
+
+		if (url.includes(".") && !url.includes("//")) {
+			return "//" + url;
+		}
+
+		return url;
 	}
 
 	async #requestUrls() {
@@ -181,7 +199,7 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		}
 
 		return html`
-			<a class="link-item" href=${link.url} target="_blank">
+			<a class="link-item" href=${this.#getTargetUrl(link.url)} target="_blank">
 				<span>
 					${this.#renderLinkCulture(link.culture)}
 					<span>${link.url}</span>
