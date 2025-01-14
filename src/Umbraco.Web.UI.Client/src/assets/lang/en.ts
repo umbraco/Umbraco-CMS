@@ -553,7 +553,7 @@ export default {
 		includeDescendants: 'Include descendants',
 		theFriendliestCommunity: 'The friendliest community',
 		linkToPage: 'Link to document',
-		openInNewWindow: 'Opens the linked document in a new window or tab',
+		openInNewWindow: 'Opens the link in a new window or tab',
 		linkToMedia: 'Link to media',
 		selectContentStartNode: 'Select content start node',
 		selectEvent: 'Select event',
