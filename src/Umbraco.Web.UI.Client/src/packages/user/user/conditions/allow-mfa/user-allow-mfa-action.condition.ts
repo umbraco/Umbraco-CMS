@@ -1,7 +1,7 @@
+import { UmbUserConfigRepository } from '../../repository/config/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbConditionBase, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { UmbUserConfigRepository } from '../../repository/config/index.js';
 
 export class UmbUserAllowMfaActionCondition extends UmbConditionBase<never> {
 	#configRepository = new UmbUserConfigRepository(this._host);
