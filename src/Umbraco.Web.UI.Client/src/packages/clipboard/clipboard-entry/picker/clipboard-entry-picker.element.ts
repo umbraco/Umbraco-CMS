@@ -57,15 +57,20 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 
 		const entries = data?.items ?? [];
 		const sortedEntries = entries.sort((a, b) => new Date(b.updateDate!).getTime() - new Date(a.updateDate!).getTime());
-		this._items = sortedEntries;
-	}
 
-	get #filteredItems() {
 		if (this.config?.filter) {
-			return this._items.filter(this.config.filter);
-		} else {
-			return this._items;
+			this._items = sortedEntries.filter(this.config.filter);
+			return;
 		}
+
+		if (this.config?.asyncFilter) {
+			const promises = Promise.all(sortedEntries.map(this.config.asyncFilter));
+			const results = await promises;
+			this._items = sortedEntries.filter((_, index) => results[index]);
+			return;
+		}
+
+		this._items = sortedEntries;
 	}
 
 	async #listenToEntityEvents() {
@@ -112,9 +117,9 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 	};
 
 	override render() {
-		return html`${this.#filteredItems.length > 0
+		return html`${this._items.length > 0
 			? repeat(
-					this.#filteredItems,
+					this._items,
 					(item) => item.unique,
 					(item) => this.#renderItem(item),
 				)
