@@ -1007,6 +1007,10 @@ name: "icon-layers-alt",
 legacy: true,
 path: () => import("./icons/icon-layers-alt.js"),
 },{
+name: "icon-layers",
+
+path: () => import("./icons/icon-layers.js"),
+},{
 name: "icon-layout",
 
 path: () => import("./icons/icon-layout.js"),
@@ -2295,10 +2299,6 @@ name: "icon-google",
 
 path: () => import("./icons/icon-google.js"),
 },{
-name: "icon-linkedin",
-
-path: () => import("./icons/icon-linkedin.js"),
-},{
 name: "icon-mastodon",
 
 path: () => import("./icons/icon-mastodon.js"),
@@ -2526,10 +2526,6 @@ path: () => import("./icons/icon-umbraco.js"),
 name: "icon-azure",
 legacy: true,
 path: () => import("./icons/icon-azure.js"),
-},{
-name: "icon-layers",
-legacy: true,
-path: () => import("./icons/icon-layers.js"),
 },{
 name: "icon-microsoft",
 legacy: true,
