@@ -1,11 +1,12 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
@@ -56,6 +57,30 @@ public class DictionaryItemTests
             .WithRandomTranslations(2)
             .Build();
 
-        Assert.DoesNotThrow(() => JsonConvert.SerializeObject(item));
+        Assert.DoesNotThrow(() => JsonSerializer.Serialize(item));
+    }
+
+    [TestCase("en-AU", "en-AU value")]
+    [TestCase("en-GB", "en-GB value")]
+    [TestCase("en-US", "")]
+    public void Can_Get_Translated_Value_By_IsoCode(string isoCode, string expectedValue)
+    {
+        var item = _builder
+            .AddTranslation()
+            .AddLanguage()
+            .WithCultureInfo("en-AU")
+            .Done()
+            .WithValue("en-AU value")
+            .Done()
+            .AddTranslation()
+            .AddLanguage()
+            .WithCultureInfo("en-GB")
+            .Done()
+            .WithValue("en-GB value")
+            .Done()
+            .Build();
+
+        var value = item.GetTranslatedValue(isoCode);
+        Assert.AreEqual(expectedValue, value);
     }
 }

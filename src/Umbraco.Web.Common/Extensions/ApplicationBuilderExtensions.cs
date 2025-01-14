@@ -1,6 +1,7 @@
 using Dazinator.Extensions.FileProviders.PrependBasePath;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
@@ -16,6 +17,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
+using Umbraco.Cms.Web.Common.Hosting;
 using Umbraco.Cms.Web.Common.Media;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.Plugins;
@@ -181,5 +183,21 @@ public static class ApplicationBuilderExtensions
         }
 
         return app;
+    }
+
+    /// <summary>
+    ///     Configure a virtual path with IApplicationBuilder.UseRewriter for BackOffice assets to allow cache-busting using the url
+    ///     /umbraco/backoffice/!cache-busting-id!/assets/index.js => /umbraco/backoffice/assets/index.js.
+    /// </summary>
+    public static IApplicationBuilder UseUmbracoBackOfficeRewrites(this IApplicationBuilder builder)
+    {
+        IBackOfficePathGenerator backOfficePathGenerator = builder.ApplicationServices.GetRequiredService<IBackOfficePathGenerator>();
+        var backOfficeAssetsPath = backOfficePathGenerator.BackOfficeAssetsPath.TrimStart("/").EnsureEndsWith("/");
+
+        builder.UseRewriter(new RewriteOptions()
+            // The destination needs to be hardcoded to "/umbraco/backoffice" because this is where they are located in the Umbraco.Cms.StaticAssets RCL
+            .AddRewrite(@"^" + backOfficeAssetsPath + "(.+)",  "/umbraco/backoffice/$1", true));
+
+        return builder;
     }
 }

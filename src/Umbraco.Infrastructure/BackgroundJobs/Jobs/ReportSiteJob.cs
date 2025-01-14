@@ -1,13 +1,8 @@
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Telemetry.Models;
@@ -16,37 +11,56 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
 public class ReportSiteJob : IRecurringBackgroundJob
 {
+    public TimeSpan Period => TimeSpan.FromDays(1);
 
-    public TimeSpan Period { get => TimeSpan.FromDays(1); }
-    public TimeSpan Delay { get => TimeSpan.FromMinutes(5); }
-    public ServerRole[] ServerRoles { get => Enum.GetValues<ServerRole>(); }
+    public TimeSpan Delay => TimeSpan.FromMinutes(5);
+
+    public ServerRole[] ServerRoles => Enum.GetValues<ServerRole>();
 
     // No-op event as the period never changes on this job
-    public event EventHandler PeriodChanged { add { } remove { } }
+    public event EventHandler PeriodChanged
+    {
+        add { }
+        remove { }
+    }
 
-
-    private static HttpClient _httpClient = new();
     private readonly ILogger<ReportSiteJob> _logger;
     private readonly ITelemetryService _telemetryService;
-    
+    private readonly IJsonSerializer _jsonSerializer;
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    [Obsolete("Use the constructor with IHttpClientFactory instead.")]
+    public ReportSiteJob(
+        ILogger<ReportSiteJob> logger,
+        ITelemetryService telemetryService,
+        IJsonSerializer jsonSerializer)
+        : this(
+            logger,
+            telemetryService,
+            jsonSerializer,
+            StaticServiceProvider.Instance.GetRequiredService<IHttpClientFactory>())
+    { }
 
     public ReportSiteJob(
         ILogger<ReportSiteJob> logger,
-        ITelemetryService telemetryService)
+        ITelemetryService telemetryService,
+        IJsonSerializer jsonSerializer,
+        IHttpClientFactory httpClientFactory)
     {
         _logger = logger;
         _telemetryService = telemetryService;
-        _httpClient = new HttpClient();
+        _jsonSerializer = jsonSerializer;
+        _httpClientFactory = httpClientFactory;
     }
 
     /// <summary>
     /// Runs the background task to send the anonymous ID
     /// to telemetry service
     /// </summary>
-    public  async Task RunJobAsync()
+    public async Task RunJobAsync()
     {
-
-        if (_telemetryService.TryGetTelemetryReportData(out TelemetryReportData? telemetryReportData) is false)
+        TelemetryReportData? telemetryReportData = await _telemetryService.GetTelemetryReportDataAsync().ConfigureAwait(false);
+        if (telemetryReportData is null)
         {
             _logger.LogWarning("No telemetry marker found");
 
@@ -55,31 +69,28 @@ public class ReportSiteJob : IRecurringBackgroundJob
 
         try
         {
-            if (_httpClient.BaseAddress is null)
+            HttpClient httpClient = _httpClientFactory.CreateClient();
+            if (httpClient.BaseAddress is null)
             {
                 // Send data to LIVE telemetry
-                _httpClient.BaseAddress = new Uri("https://telemetry.umbraco.com/");
+                httpClient.BaseAddress = new Uri("https://telemetry.umbraco.com/");
 
 #if DEBUG
                 // Send data to DEBUG telemetry service
-                _httpClient.BaseAddress = new Uri("https://telemetry.rainbowsrock.net/");
+                httpClient.BaseAddress = new Uri("https://telemetry.rainbowsrock.net/");
 #endif
             }
 
-            _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+            httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-            using (var request = new HttpRequestMessage(HttpMethod.Post, "installs/"))
-            {
-                request.Content = new StringContent(JsonConvert.SerializeObject(telemetryReportData), Encoding.UTF8,
-                    "application/json");
+            using var request = new HttpRequestMessage(HttpMethod.Post, "installs/");
+            request.Content = new StringContent(_jsonSerializer.Serialize(telemetryReportData), Encoding.UTF8, "application/json");
 
-                // Make a HTTP Post to telemetry service
-                // https://telemetry.umbraco.com/installs/
-                // Fire & Forget, do not need to know if its a 200, 500 etc
-                using (await _httpClient.SendAsync(request))
-                {
-                }
-            }
+            // Make a HTTP Post to telemetry service
+            // https://telemetry.umbraco.com/installs/
+            // Fire & Forget, do not need to know if its a 200, 500 etc
+            using (await httpClient.SendAsync(request))
+            { }
         }
         catch
         {

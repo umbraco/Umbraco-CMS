@@ -1,14 +1,11 @@
-import type {UUIButtonState} from '@umbraco-ui/uui';
-import {css, CSSResultGroup, html, LitElement, nothing} from 'lit';
-import {customElement, property, queryAssignedElements, state} from 'lit/decorators.js';
-import {when} from 'lit/directives/when.js';
-import {until} from 'lit/directives/until.js';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { css, type CSSResultGroup, html, nothing, when, customElement, property, queryAssignedElements, state } from '@umbraco-cms/backoffice/external/lit';
 
-import {umbAuthContext} from '../../context/auth.context.js';
-import {umbLocalizationContext} from '../../external/localization/localization-context.js';
+import { UMB_AUTH_CONTEXT } from '../../contexts';
 
 @customElement('umb-login-page')
-export default class UmbLoginPageElement extends LitElement {
+export default class UmbLoginPageElement extends UmbLitElement {
   @property({type: Boolean, attribute: 'username-is-email'})
   usernameIsEmail = false;
 
@@ -19,33 +16,48 @@ export default class UmbLoginPageElement extends LitElement {
   allowPasswordReset = false;
 
   @state()
-  private _loginState: UUIButtonState = undefined;
+  private _loginState?: UUIButtonState;
 
   @state()
   private _loginError = '';
 
   @state()
-  private get disableLocalLogin() {
-    return umbAuthContext.disableLocalLogin;
-  }
+  supportPersistLogin = false;
 
   #formElement?: HTMLFormElement;
+
+  #authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
+
+  constructor() {
+    super();
+
+    this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
+      this.#authContext = authContext;
+      this.supportPersistLogin = authContext.supportsPersistLogin;
+    });
+  }
 
   async #onSlotChanged() {
     this.#formElement = this.slottedElements?.find((el) => el.id === 'umb-login-form');
 
     if (!this.#formElement) return;
 
+    // We need to listen for the enter key to submit the form, because the uui-button does not support the native input fields submit event
+    this.#formElement.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        this.#onSubmitClick();
+      }
+    });
     this.#formElement.onsubmit = this.#handleSubmit;
   }
 
   #handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
 
+    if (!this.#authContext) return;
+
     const form = e.target as HTMLFormElement;
     if (!form) return;
-
-    if (!form.checkValidity()) return;
 
     const formData = new FormData(form);
 
@@ -53,9 +65,15 @@ export default class UmbLoginPageElement extends LitElement {
     const password = formData.get('password') as string;
     const persist = formData.has('persist');
 
+    if (!username || !password) {
+      this._loginError = this.localize.term('auth_userFailedLogin');
+      this._loginState = 'failed';
+      return;
+    }
+
     this._loginState = 'waiting';
 
-    const response = await umbAuthContext.login({
+    const response = await this.#authContext.login({
       username,
       password,
       persist,
@@ -66,9 +84,12 @@ export default class UmbLoginPageElement extends LitElement {
 
     // Check for 402 status code indicating that MFA is required
     if (response.status === 402) {
-      umbAuthContext.isMfaEnabled = true;
+      this.#authContext.isMfaEnabled = true;
       if (response.twoFactorView) {
-        umbAuthContext.twoFactorView = response.twoFactorView;
+        this.#authContext.twoFactorView = response.twoFactorView;
+      }
+      if (response.twoFactorProviders) {
+        this.#authContext.mfaProviders = response.twoFactorProviders;
       }
 
       this.dispatchEvent(new CustomEvent('umb-login-flow', {composed: true, detail: {flow: 'mfa'}}));
@@ -76,28 +97,25 @@ export default class UmbLoginPageElement extends LitElement {
     }
 
     if (response.error) {
-      this.dispatchEvent(new CustomEvent('umb-login-failed', {bubbles: true, composed: true, detail: response}));
       return;
     }
 
-    const returnPath = umbAuthContext.returnPath;
+    const returnPath = this.#authContext.returnPath;
 
     if (returnPath) {
       location.href = returnPath;
     }
-
-    this.dispatchEvent(new CustomEvent('umb-login-success', {bubbles: true, composed: true, detail: response.data}));
   };
 
   get #greetingLocalizationKey() {
     return [
-      'login_greeting0',
-      'login_greeting1',
-      'login_greeting2',
-      'login_greeting3',
-      'login_greeting4',
-      'login_greeting5',
-      'login_greeting6',
+      'auth_greeting0',
+      'auth_greeting1',
+      'auth_greeting2',
+      'auth_greeting3',
+      'auth_greeting4',
+      'auth_greeting5',
+      'auth_greeting6',
     ][new Date().getDay()];
   }
 
@@ -109,49 +127,42 @@ export default class UmbLoginPageElement extends LitElement {
     return html`
       <header id="header">
         <h1 id="greeting">
-          <umb-localize .key=${this.#greetingLocalizationKey}></umb-localize>
+          <umb-localize .key=${this.#greetingLocalizationKey}>Welcome</umb-localize>
         </h1>
         <slot name="subheadline"></slot>
       </header>
-      ${this.disableLocalLogin
-        ? nothing
-        : html`
-          <slot @slotchange=${this.#onSlotChanged}></slot>
-          <div id="secondary-actions">
-            ${when(
-              umbAuthContext.supportsPersistLogin,
-              () => html`
-                <uui-form-layout-item>
-                  <uui-checkbox
-                    name="persist"
-                    .label=${until(umbLocalizationContext.localize('user_rememberMe', undefined, 'Remember me'))}>
-                    <umb-localize key="user_rememberMe">Remember me</umb-localize>
-                  </uui-checkbox>
-                </uui-form-layout-item>`
-            )}
-            ${when(
-              this.allowPasswordReset,
-              () =>
-                html`
-                  <button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
-                    <umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize>
-                  </button>`
-            )}
-          </div>
-          <uui-button
-            type="submit"
-            id="umb-login-button"
-            look="primary"
-            @click=${this.#onSubmitClick}
-            .label=${until(umbLocalizationContext.localize('general_login', undefined, 'Login'), 'Login')}
-            color="default"
-            .state=${this._loginState}></uui-button>
+      <slot @slotchange=${this.#onSlotChanged}></slot>
+      <div id="secondary-actions">
+        ${when(
+          this.supportPersistLogin,
+          () => html`
+            <uui-form-layout-item>
+              <uui-checkbox
+                name="persist"
+                .label=${this.localize.term('auth_rememberMe')}>
+                <umb-localize key="auth_rememberMe">Remember me</umb-localize>
+              </uui-checkbox>
+            </uui-form-layout-item>`
+        )}
+        ${when(
+          this.allowPasswordReset,
+          () =>
+            html`
+              <button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
+                <umb-localize key="auth_forgottenPassword">Forgotten password?</umb-localize>
+              </button>`
+        )}
+      </div>
+      <uui-button
+        type="submit"
+        id="umb-login-button"
+        look="primary"
+        @click=${this.#onSubmitClick}
+        .label=${this.localize.term('auth_login')}
+        color="default"
+        .state=${this._loginState}></uui-button>
 
-          ${this.#renderErrorMessage()}
-        `}
-      <umb-external-login-providers-layout .showDivider=${!this.disableLocalLogin}>
-        <slot name="external"></slot>
-      </umb-external-login-providers-layout>
+      ${this.#renderErrorMessage()}
     `;
   }
 
@@ -210,7 +221,7 @@ export default class UmbLoginPageElement extends LitElement {
         display: inline-flex;
         line-height: 1;
         font-size: 14px;
-        font-family: var(--uui-font-family);
+        font-family: var(--uui-font-family),sans-serif;
         margin-left: auto;
         margin-bottom: var(--uui-size-space-3);
       }

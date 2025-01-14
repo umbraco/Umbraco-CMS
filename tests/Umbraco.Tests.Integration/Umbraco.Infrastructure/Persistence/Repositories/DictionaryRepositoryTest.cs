@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
@@ -17,15 +18,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 public class DictionaryRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
-    public void SetUp() => CreateTestData();
+    public async Task SetUp() => await CreateTestData();
 
     private IDictionaryRepository CreateRepository() => GetRequiredService<IDictionaryRepository>();
 
     [Test]
-    public void Can_Perform_Get_By_Key_On_DictionaryRepository()
+    public async Task Can_Perform_Get_By_Key_On_DictionaryRepository()
     {
         // Arrange
-        var localizationService = GetRequiredService<ILocalizationService>();
+        var languageService = GetRequiredService<ILanguageService>();
         var provider = ScopeProvider;
         using (provider.CreateScope())
         {
@@ -34,7 +35,7 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
             {
                 Translations = new List<IDictionaryTranslation>
                 {
-                    new DictionaryTranslation(localizationService.GetLanguageByIsoCode("en-US"), "Hello world")
+                    new DictionaryTranslation(await languageService.GetAsync("en-US"), "Hello world")
                 }
             };
 
@@ -53,10 +54,10 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Get_By_UniqueId_On_DictionaryRepository()
+    public async Task Can_Perform_Get_By_UniqueId_On_DictionaryRepository()
     {
         // Arrange
-        var localizationService = GetRequiredService<ILocalizationService>();
+        var languageService = GetRequiredService<ILanguageService>();
         var provider = ScopeProvider;
         using (provider.CreateScope())
         {
@@ -65,7 +66,7 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
             {
                 Translations = new List<IDictionaryTranslation>
                 {
-                    new DictionaryTranslation(localizationService.GetLanguageByIsoCode("en-US"), "Hello world")
+                    new DictionaryTranslation(await languageService.GetAsync("en-US"), "Hello world")
                 }
             };
 
@@ -84,10 +85,10 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Get_On_DictionaryRepository()
+    public async Task Can_Perform_Get_On_DictionaryRepository()
     {
         // Arrange
-        var localizationService = GetRequiredService<ILocalizationService>();
+        var languageService = GetRequiredService<ILanguageService>();
         var provider = ScopeProvider;
         using (provider.CreateScope())
         {
@@ -96,7 +97,7 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
             {
                 Translations = new List<IDictionaryTranslation>
                 {
-                    new DictionaryTranslation(localizationService.GetLanguageByIsoCode("en-US"), "Hello world")
+                    new DictionaryTranslation(await languageService.GetAsync("en-US"), "Hello world")
                 }
             };
 
@@ -309,17 +310,17 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Update_WithNewTranslation_On_DictionaryRepository()
+    public async Task Can_Perform_Update_WithNewTranslation_On_DictionaryRepository()
     {
         // Arrange
-        var localizationService = GetRequiredService<ILocalizationService>();
+        var languageService = GetRequiredService<ILanguageService>();
         var provider = ScopeProvider;
         using (provider.CreateScope())
         {
             var repository = CreateRepository();
 
             var languageNo = new Language("nb-NO", "Norwegian Bokmål (Norway)");
-            localizationService.Save(languageNo);
+            await languageService.CreateAsync(languageNo, Constants.Security.SuperUserKey);
 
             // Act
             var item = repository.Get(1);
@@ -334,7 +335,7 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
             // Assert
             Assert.That(dictionaryItem, Is.Not.Null);
             Assert.That(dictionaryItem.Translations.Count(), Is.EqualTo(3));
-            Assert.That(dictionaryItem.Translations.Single(t => t.LanguageId == languageNo.Id).Value, Is.EqualTo("Les mer"));
+            Assert.That(dictionaryItem.Translations.Single(t => t.LanguageIsoCode == languageNo.IsoCode).Value, Is.EqualTo("Les mer"));
         }
     }
 
@@ -395,28 +396,33 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
         }
     }
 
-    public void CreateTestData()
+    public async Task CreateTestData()
     {
-        var localizationService = GetRequiredService<ILocalizationService>();
-        var language = localizationService.GetLanguageByIsoCode("en-US");
+        var languageService = GetRequiredService<ILanguageService>();
+        var dictionaryItemService = GetRequiredService<IDictionaryItemService>();
+        var language = await languageService.GetAsync("en-US");
 
         var languageDK = new Language("da-DK", "Danish (Denmark)");
-        localizationService.Save(languageDK); //Id 2
+        await languageService.CreateAsync(languageDK, Constants.Security.SuperUserKey); //Id 2
 
-        var readMore = new DictionaryItem("Read More");
-        var translations = new List<IDictionaryTranslation>
-        {
-            new DictionaryTranslation(language, "Read More"), new DictionaryTranslation(languageDK, "Læs mere")
-        };
-        readMore.Translations = translations;
-        localizationService.Save(readMore); // Id 1
+        await dictionaryItemService.CreateAsync(
+            new DictionaryItem("Read More")
+            {
+                Translations = new List<IDictionaryTranslation>
+                {
+                    new DictionaryTranslation(language, "Read More"), new DictionaryTranslation(languageDK, "Læs mere")
+                }
+            },
+            Constants.Security.SuperUserKey); // Id 1
 
-        var article = new DictionaryItem("Article");
-        var translations2 = new List<IDictionaryTranslation>
-        {
-            new DictionaryTranslation(language, "Article"), new DictionaryTranslation(languageDK, "Artikel")
-        };
-        article.Translations = translations2;
-        localizationService.Save(article); // Id 2
+        await dictionaryItemService.CreateAsync(
+            new DictionaryItem("Article")
+            {
+                Translations = new List<IDictionaryTranslation>
+                {
+                    new DictionaryTranslation(language, "Article"), new DictionaryTranslation(languageDK, "Artikel")
+                }
+            },
+            Constants.Security.SuperUserKey); // Id 2
     }
 }

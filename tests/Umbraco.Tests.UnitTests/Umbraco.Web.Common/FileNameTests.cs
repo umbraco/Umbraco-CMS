@@ -6,11 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Tests.UnitTests.AutoFixture;
-using Umbraco.Cms.Web.BackOffice.Controllers;
-using Umbraco.Cms.Web.BackOffice.Install;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common;
 
@@ -37,45 +36,7 @@ internal class FileNameTests
 
     [Test]
     [AutoMoqData]
-    public async Task InstallViewExists(
-        [Frozen] IHostingEnvironment hostingEnvironment,
-        InstallController sut)
-    {
-        Mock.Get(hostingEnvironment).Setup(x => x.ToAbsolute(It.IsAny<string>())).Returns("http://localhost/");
-        var viewResult = await sut.Index() as ViewResult;
-        var fileName = GetViewName(viewResult, Path.DirectorySeparatorChar.ToString());
-
-        var views = GetUiFiles(new[] { "umbraco", "UmbracoInstall" });
-        Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
-    }
-
-    [Test]
-    [AutoMoqData]
-    public void PreviewViewExists(PreviewController sut)
-    {
-        var viewResult = sut.Index() as ViewResult;
-        var fileName = GetViewName(viewResult);
-
-        var views = GetUiFiles(new[] { "umbraco", "UmbracoBackOffice" });
-
-        Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
-    }
-
-    [Test]
-    [AutoMoqData]
-    public async Task LoginViewExists(BackOfficeController sut)
-    {
-        var viewResult = await sut.Login() as ViewResult;
-        var fileName = GetViewName(viewResult);
-
-        var views = GetUiFiles(new[] { "umbraco", "UmbracoLogin" });
-
-        Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
-    }
-
-    [Test]
-    [AutoMoqData]
-    public void BackOfficeDefaultExists(BackOfficeController sut)
+    public void BackOfficeDefaultExists(BackOfficeDefaultController sut)
     {
         var viewResult = sut.DefaultView();
         var fileName = GetViewName(viewResult);

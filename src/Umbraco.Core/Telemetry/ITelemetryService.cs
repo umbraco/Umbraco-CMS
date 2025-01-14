@@ -7,8 +7,14 @@ namespace Umbraco.Cms.Core.Telemetry;
 /// </summary>
 public interface ITelemetryService
 {
-    /// <summary>
-    ///     Try and get the <see cref="TelemetryReportData" />
-    /// </summary>
+    [Obsolete("Please use GetTelemetryReportDataAsync. Will be removed in V15.")]
     bool TryGetTelemetryReportData(out TelemetryReportData? telemetryReportData);
+
+    /// <summary>
+    ///     Attempts to get the <see cref="TelemetryReportData" />
+    /// </summary>
+    /// <remarks>
+    ///     May return null if the site is in an unknown state.
+    /// </remarks>
+    Task<TelemetryReportData?> GetTelemetryReportDataAsync();
 }

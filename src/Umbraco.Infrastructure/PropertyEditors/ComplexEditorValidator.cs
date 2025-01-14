@@ -3,6 +3,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors.Validation;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -19,23 +20,16 @@ public abstract class ComplexEditorValidator : IValueValidator
     public ComplexEditorValidator(IPropertyValidationService propertyValidationService) =>
         _propertyValidationService = propertyValidationService;
 
-    /// <summary>
-    ///     Return a single <see cref="ComplexEditorValidationResult" /> for all sub nested validation results in the complex
-    ///     editor
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="valueType"></param>
-    /// <param name="dataTypeConfiguration"></param>
-    /// <returns></returns>
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+    /// <inheritdoc/>
+    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
     {
-        var elementTypeValues = GetElementTypeValidation(value).ToList();
-        var rowResults = GetNestedValidationResults(elementTypeValues).ToList();
+        var elementTypeValues = GetElementTypeValidation(value, validationContext).ToList();
+        var rowResults = GetNestedValidationResults(elementTypeValues, validationContext).ToList();
 
         if (rowResults.Count > 0)
         {
-            var result = new ComplexEditorValidationResult();
-            foreach (ComplexEditorElementTypeValidationResult rowResult in rowResults)
+            var result = new NestedValidationResults();
+            foreach (NestedValidationResults rowResult in rowResults)
             {
                 result.ValidationResults.Add(rowResult);
             }
@@ -46,28 +40,28 @@ public abstract class ComplexEditorValidator : IValueValidator
         return Enumerable.Empty<ValidationResult>();
     }
 
-    protected abstract IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object? value);
+    protected abstract IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object? value, PropertyValidationContext validationContext);
 
     /// <summary>
     ///     Return a nested validation result per row (Element Type)
     /// </summary>
-    protected IEnumerable<ComplexEditorElementTypeValidationResult> GetNestedValidationResults(
-        IEnumerable<ElementTypeValidationModel> elements)
+    protected IEnumerable<NestedValidationResults> GetNestedValidationResults(
+        IEnumerable<ElementTypeValidationModel> elements,
+        PropertyValidationContext validationContext)
     {
         foreach (ElementTypeValidationModel row in elements)
         {
-            var elementTypeValidationResult =
-                new ComplexEditorElementTypeValidationResult(row.ElementTypeAlias, row.Id);
+            var elementTypeValidationResult = new NestedValidationResults();
 
             foreach (PropertyTypeValidationModel prop in row.PropertyTypeValidation)
             {
-                var propValidationResult = new ComplexEditorPropertyTypeValidationResult(prop.PropertyType.Alias);
+                var propValidationResult = new NestedJsonPathValidationResults(prop.JsonPath);
 
                 foreach (ValidationResult validationResult in _propertyValidationService.ValidatePropertyValue(
-                             prop.PropertyType, prop.PostedValue))
+                             prop.PropertyType, prop.PostedValue, validationContext))
                 {
                     // add the result to the property results
-                    propValidationResult.AddValidationResult(validationResult);
+                    propValidationResult.ValidationResults.Add(validationResult);
                 }
 
                 // add the property results to the element type results
@@ -86,15 +80,18 @@ public abstract class ComplexEditorValidator : IValueValidator
 
     public class PropertyTypeValidationModel
     {
-        public PropertyTypeValidationModel(IPropertyType propertyType, object? postedValue)
+        public PropertyTypeValidationModel(IPropertyType propertyType, object? postedValue, string jsonPath)
         {
             PostedValue = postedValue;
             PropertyType = propertyType ?? throw new ArgumentNullException(nameof(propertyType));
+            JsonPath = jsonPath;
         }
 
         public object? PostedValue { get; }
 
         public IPropertyType PropertyType { get; }
+
+        public string JsonPath { get; }
     }
 
     public class ElementTypeValidationModel

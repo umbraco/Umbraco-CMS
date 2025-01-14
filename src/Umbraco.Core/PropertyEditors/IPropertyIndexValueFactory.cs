@@ -12,9 +12,9 @@ public interface IPropertyIndexValueFactory
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Returns key-value pairs, where keys are indexed field names. By default, that would be the property alias,
-    ///         and there would be only one pair, but some implementations (see for instance the grid one) may return more than
-    ///         one pair, with different indexed field names.
+    ///         Returns index values for a given property. By default, a property uses its alias as index field name,
+    ///         and there would be only one index value, but some implementations (see for instance the grid one) may return more than
+    ///         one value, with different indexed field names.
     ///     </para>
     ///     <para>
     ///         And then, values are an enumerable of objects, because each indexed field can in turn have multiple
@@ -22,14 +22,11 @@ public interface IPropertyIndexValueFactory
     ///         more than one value for a given field.
     ///     </para>
     /// </remarks>
-    IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture,
-        string? segment, bool published, IEnumerable<string> availableCultures,
-        IDictionary<Guid, IContentType> contentTypeDictionary) => GetIndexValues(property, culture, segment, published);
-
-    [Obsolete("Use non-obsolete overload, scheduled for removal in v14")]
-    IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published, IEnumerable<string> availableCultures)
-        => GetIndexValues(property, culture, segment, published);
-
-    [Obsolete("Use non-obsolete overload, scheduled for removal in v14")]
-    IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published);
+    IEnumerable<IndexValue> GetIndexValues(
+        IProperty property,
+        string? culture,
+        string? segment,
+        bool published,
+        IEnumerable<string> availableCultures,
+        IDictionary<Guid, IContentType> contentTypeDictionary);
 }

@@ -1,12 +1,10 @@
 using System.Collections;
 using System.Globalization;
-using System.Xml.XPath;
 using Examine;
 using Examine.Search;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Xml;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 
@@ -19,7 +17,8 @@ namespace Umbraco.Cms.Infrastructure;
 public class PublishedContentQuery : IPublishedContentQuery
 {
     private readonly IExamineManager _examineManager;
-    private readonly IPublishedSnapshot _publishedSnapshot;
+    private readonly IPublishedContentCache _publishedContent;
+    private readonly IPublishedMediaCache _publishedMediaCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private static readonly HashSet<string> _returnedQueryFields =
         new() { ExamineFieldNames.ItemIdFieldName, ExamineFieldNames.CategoryFieldName };
@@ -27,13 +26,17 @@ public class PublishedContentQuery : IPublishedContentQuery
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedContentQuery" /> class.
     /// </summary>
-    public PublishedContentQuery(IPublishedSnapshot publishedSnapshot,
-        IVariationContextAccessor variationContextAccessor, IExamineManager examineManager)
+    public PublishedContentQuery(
+        IVariationContextAccessor variationContextAccessor,
+        IExamineManager examineManager,
+        IPublishedContentCache publishedContent,
+        IPublishedMediaCache publishedMediaCache)
     {
-        _publishedSnapshot = publishedSnapshot ?? throw new ArgumentNullException(nameof(publishedSnapshot));
         _variationContextAccessor = variationContextAccessor ??
                                     throw new ArgumentNullException(nameof(variationContextAccessor));
         _examineManager = examineManager ?? throw new ArgumentNullException(nameof(examineManager));
+        _publishedContent = publishedContent;
+        _publishedMediaCache = publishedMediaCache;
     }
 
     #region Convert Helpers
@@ -94,10 +97,10 @@ public class PublishedContentQuery : IPublishedContentQuery
     #region Content
 
     public IPublishedContent? Content(int id)
-        => ItemById(id, _publishedSnapshot.Content);
+        => ItemById(id, _publishedContent);
 
     public IPublishedContent? Content(Guid id)
-        => ItemById(id, _publishedSnapshot.Content);
+        => ItemById(id, _publishedContent);
 
     public IPublishedContent? Content(Udi? id)
     {
@@ -106,7 +109,7 @@ public class PublishedContentQuery : IPublishedContentQuery
             return null;
         }
 
-        return ItemById(udi.Guid, _publishedSnapshot.Content);
+        return ItemById(udi.Guid, _publishedContent);
     }
 
     public IPublishedContent? Content(object id)
@@ -129,39 +132,27 @@ public class PublishedContentQuery : IPublishedContentQuery
         return null;
     }
 
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public IPublishedContent? ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
-        => ItemByXPath(xpath, vars, _publishedSnapshot.Content);
-
     public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids)
-        => ItemsByIds(_publishedSnapshot.Content, ids);
+        => ItemsByIds(_publishedContent, ids);
 
     public IEnumerable<IPublishedContent> Content(IEnumerable<Guid> ids)
-        => ItemsByIds(_publishedSnapshot.Content, ids);
+        => ItemsByIds(_publishedContent, ids);
 
     public IEnumerable<IPublishedContent> Content(IEnumerable<object> ids)
         => ids.Select(Content).WhereNotNull();
 
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public IEnumerable<IPublishedContent> ContentAtXPath(string xpath, params XPathVariable[] vars)
-        => ItemsByXPath(xpath, vars, _publishedSnapshot.Content);
-
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
-        => ItemsByXPath(xpath, vars, _publishedSnapshot.Content);
-
     public IEnumerable<IPublishedContent> ContentAtRoot()
-        => ItemsAtRoot(_publishedSnapshot.Content);
+        => ItemsAtRoot(_publishedContent);
 
     #endregion
 
     #region Media
 
     public IPublishedContent? Media(int id)
-        => ItemById(id, _publishedSnapshot.Media);
+        => ItemById(id, _publishedMediaCache);
 
     public IPublishedContent? Media(Guid id)
-        => ItemById(id, _publishedSnapshot.Media);
+        => ItemById(id, _publishedMediaCache);
 
     public IPublishedContent? Media(Udi? id)
     {
@@ -170,7 +161,7 @@ public class PublishedContentQuery : IPublishedContentQuery
             return null;
         }
 
-        return ItemById(udi.Guid, _publishedSnapshot.Media);
+        return ItemById(udi.Guid, _publishedMediaCache);
     }
 
     public IPublishedContent? Media(object id)
@@ -194,16 +185,16 @@ public class PublishedContentQuery : IPublishedContentQuery
     }
 
     public IEnumerable<IPublishedContent> Media(IEnumerable<int> ids)
-        => ItemsByIds(_publishedSnapshot.Media, ids);
+        => ItemsByIds(_publishedMediaCache, ids);
 
     public IEnumerable<IPublishedContent> Media(IEnumerable<object> ids)
         => ids.Select(Media).WhereNotNull();
 
     public IEnumerable<IPublishedContent> Media(IEnumerable<Guid> ids)
-        => ItemsByIds(_publishedSnapshot.Media, ids);
+        => ItemsByIds(_publishedMediaCache, ids);
 
     public IEnumerable<IPublishedContent> MediaAtRoot()
-        => ItemsAtRoot(_publishedSnapshot.Media);
+        => ItemsAtRoot(_publishedMediaCache);
 
     #endregion
 
@@ -215,22 +206,11 @@ public class PublishedContentQuery : IPublishedContentQuery
     private static IPublishedContent? ItemById(Guid id, IPublishedCache? cache)
         => cache?.GetById(id);
 
-    private static IPublishedContent? ItemByXPath(string xpath, XPathVariable[] vars, IPublishedCache? cache)
-        => cache?.GetSingleByXPath(xpath, vars);
-
     private static IEnumerable<IPublishedContent> ItemsByIds(IPublishedCache? cache, IEnumerable<int> ids)
         => ids.Select(eachId => ItemById(eachId, cache)).WhereNotNull();
 
     private IEnumerable<IPublishedContent> ItemsByIds(IPublishedCache? cache, IEnumerable<Guid> ids)
         => ids.Select(eachId => ItemById(eachId, cache)).WhereNotNull();
-
-    private static IEnumerable<IPublishedContent> ItemsByXPath(string xpath, XPathVariable[] vars,
-        IPublishedCache? cache)
-        => cache?.GetByXPath(xpath, vars) ?? Array.Empty<IPublishedContent>();
-
-    private static IEnumerable<IPublishedContent> ItemsByXPath(XPathExpression xpath, XPathVariable[] vars,
-        IPublishedCache? cache)
-        => cache?.GetByXPath(xpath, vars) ?? Array.Empty<IPublishedContent>();
 
     private static IEnumerable<IPublishedContent> ItemsAtRoot(IPublishedCache? cache)
         => cache?.GetAtRoot() ?? Array.Empty<IPublishedContent>();
@@ -342,8 +322,8 @@ public class PublishedContentQuery : IPublishedContentQuery
         totalRecords = results.TotalItemCount;
 
         return culture.IsNullOrWhiteSpace()
-            ? results.ToPublishedSearchResults(_publishedSnapshot)
-            : new CultureContextualSearchResults(results.ToPublishedSearchResults(_publishedSnapshot.Content), _variationContextAccessor, culture);
+            ? results.ToPublishedSearchResults(_publishedContent)
+            : new CultureContextualSearchResults(results.ToPublishedSearchResults(_publishedContent), _variationContextAccessor, culture);
     }
 
     /// <summary>
@@ -356,8 +336,10 @@ public class PublishedContentQuery : IPublishedContentQuery
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IEnumerable<PublishedSearchResult> _wrapped;
 
-        public CultureContextualSearchResults(IEnumerable<PublishedSearchResult> wrapped,
-            IVariationContextAccessor variationContextAccessor, string culture)
+        public CultureContextualSearchResults(
+            IEnumerable<PublishedSearchResult> wrapped,
+            IVariationContextAccessor variationContextAccessor,
+            string culture)
         {
             _wrapped = wrapped;
             _variationContextAccessor = variationContextAccessor;

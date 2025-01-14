@@ -3,14 +3,14 @@
 
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common;
@@ -29,6 +29,8 @@ public class ImageCropperTest
     [Test]
     public void CanConvertImageCropperDataSetSrcToString()
     {
+        SetupJsonSerializerServiceProvider();
+
         // cropperJson3 - has no crops
         var cropperValue = CropperJson2.DeserializeImageCropperValue();
         var serialized = cropperValue.TryConvertTo<string>();
@@ -37,30 +39,38 @@ public class ImageCropperTest
     }
 
     [Test]
-    public void CanConvertImageCropperDataSetJObject()
+    public void CanConvertJsonStringToImageCropperValue()
     {
-        // cropperJson3 - has no crops
-        var cropperValue = CropperJson2.DeserializeImageCropperValue();
-        var serialized = cropperValue.TryConvertTo<JObject>();
-        Assert.IsTrue(serialized.Success);
-        Assert.AreEqual(cropperValue, serialized.Result.ToObject<ImageCropperValue>());
+        SetupJsonSerializerServiceProvider();
+
+        // cropperJson1 - has crops
+        var cropperValue = CropperJson1.DeserializeImageCropperValue();
+        Assert.AreEqual(MediaPath, cropperValue.Src);
+        Assert.IsNotNull(cropperValue.FocalPoint);
+        Assert.AreEqual(0.96m, cropperValue.FocalPoint.Left);
+        Assert.AreEqual(0.80827067669172936m, cropperValue.FocalPoint.Top);
+        Assert.IsNotNull(cropperValue.Crops);
+        Assert.AreEqual(1, cropperValue.Crops.Count());
+        var crop = cropperValue.Crops.First();
+        Assert.AreEqual("thumb", crop.Alias);
+        Assert.AreEqual(100, crop.Width);
+        Assert.AreEqual(100, crop.Height);
+        Assert.IsNotNull(crop.Coordinates);
+        Assert.AreEqual(0.58729977382575338m, crop.Coordinates.X1);
+        Assert.AreEqual(0.055768992440203169m, crop.Coordinates.Y1);
+        Assert.AreEqual(0m, crop.Coordinates.X2);
+        Assert.AreEqual(0.32457553600198386m, crop.Coordinates.Y2);
     }
 
     [Test]
     public void CanConvertImageCropperDataSetJsonToString()
     {
+        SetupJsonSerializerServiceProvider();
+
         var cropperValue = CropperJson1.DeserializeImageCropperValue();
         var serialized = cropperValue.TryConvertTo<string>();
         Assert.IsTrue(serialized.Success);
-        Assert.IsTrue(serialized.Result.DetectIsJson());
-        var obj = JsonConvert.DeserializeObject<ImageCropperValue>(
-            CropperJson1,
-            new JsonSerializerSettings
-            {
-                Culture = CultureInfo.InvariantCulture,
-                FloatParseHandling = FloatParseHandling.Decimal,
-            });
-        Assert.AreEqual(cropperValue, obj);
+        Assert.AreEqual("/media/1005/img_0671.jpg", serialized.Result);
     }
 
     // [TestCase(CropperJson1, CropperJson1, true)]
@@ -413,6 +423,13 @@ public class ImageCropperTest
             imageCropMode: ImageCropMode.Pad,
             furtherOptions: "bgcolor=fff");
         Assert.AreEqual(MediaPath + "?m=pad&w=400&h=400&bgcolor=fff", urlString);
+    }
+
+    private void SetupJsonSerializerServiceProvider()
+    {
+        var serviceProvider = new Mock<IServiceProvider>();
+        serviceProvider.Setup(s => s.GetService(typeof(IJsonSerializer))).Returns(new SystemTextJsonSerializer());
+        StaticServiceProvider.Instance = serviceProvider.Object;
     }
 
     internal class TestImageUrlGenerator : IImageUrlGenerator

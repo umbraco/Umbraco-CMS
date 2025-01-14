@@ -39,15 +39,6 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
     /// <summary>
     /// Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
     /// </summary>
-    /// <param name="configuration">The ImageSharp configuration.</param>
-    [Obsolete("Use ctor with all params - This will be removed in Umbraco 13.")]
-    public ImageSharpImageUrlGenerator(Configuration configuration)
-        : this(configuration, StaticServiceProvider.Instance.GetService<RequestAuthorizationUtilities>(), StaticServiceProvider.Instance.GetRequiredService<IOptions<ImageSharpMiddlewareOptions>>())
-    { }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
-    /// </summary>
     /// <param name="supportedImageFileTypes">The supported image file types/extensions.</param>
     /// <param name="options">The ImageSharp middleware options.</param>
     /// <param name="requestAuthorizationUtilities">Contains helpers that allow authorization of image requests.</param>

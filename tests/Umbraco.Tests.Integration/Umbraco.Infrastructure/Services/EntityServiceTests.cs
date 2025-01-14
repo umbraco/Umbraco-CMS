@@ -25,23 +25,23 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 public class EntityServiceTests : UmbracoIntegrationTest
 {
     [SetUp]
-    public void SetupTestData()
+    public async Task SetupTestData()
     {
         if (_langFr == null && _langEs == null)
         {
             _langFr = new Language("fr-FR", "French (France)");
             _langEs = new Language("es-ES", "Spanish (Spain)");
-            LocalizationService.Save(_langFr);
-            LocalizationService.Save(_langEs);
+            await LanguageService.CreateAsync(_langFr, Constants.Security.SuperUserKey);
+            await LanguageService.CreateAsync(_langEs, Constants.Security.SuperUserKey);
         }
 
         CreateTestData();
     }
 
-    private Language _langFr;
-    private Language _langEs;
+    private Language? _langFr;
+    private Language? _langEs;
 
-    private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -690,8 +690,6 @@ public class EntityServiceTests : UmbracoIntegrationTest
 
         for (var i = 0; i < entities.Length; i++)
         {
-            Assert.AreEqual(0, entities[i].AdditionalData.Count);
-
             if (i % 2 == 0)
             {
                 var doc = (IDocumentEntitySlim)entities[i];
@@ -701,10 +699,6 @@ public class EntityServiceTests : UmbracoIntegrationTest
                 Assert.AreEqual("Test " + i + " - FR", vals[0]);
                 Assert.AreEqual(_langEs.IsoCode.ToLowerInvariant(), keys[1].ToLowerInvariant());
                 Assert.AreEqual("Test " + i + " - ES", vals[1]);
-            }
-            else
-            {
-                Assert.AreEqual(0, entities[i].AdditionalData.Count);
             }
         }
     }
@@ -842,9 +836,11 @@ public class EntityServiceTests : UmbracoIntegrationTest
     [Test]
     public void EntityService_Cannot_Get_Id_For_Key_With_Incorrect_Object_Type()
     {
-        var result1 = EntityService.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"),
+        var result1 = EntityService.GetId(
+            Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"),
             UmbracoObjectTypes.DocumentType);
-        var result2 = EntityService.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"),
+        var result2 = EntityService.GetId(
+            Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"),
             UmbracoObjectTypes.MediaType);
 
         Assert.IsTrue(result1.Success);
@@ -874,7 +870,7 @@ public class EntityServiceTests : UmbracoIntegrationTest
         Assert.IsFalse(EntityService.GetId(Guid.NewGuid(), UmbracoObjectTypes.DocumentType).Success);
     }
 
-    private static bool s_isSetup;
+    private static bool _isSetup;
 
     private int _folderId;
     private ContentType _contentType;
@@ -891,11 +887,11 @@ public class EntityServiceTests : UmbracoIntegrationTest
 
     public void CreateTestData()
     {
-        if (s_isSetup == false)
+        if (_isSetup == false)
         {
-            s_isSetup = true;
+            _isSetup = true;
 
-            var template = TemplateBuilder.CreateTextPageTemplate();
+            var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
             FileService.SaveTemplate(template); // else, FK violation on contentType!
 
             // Create and Save ContentType "umbTextpage" -> _contentType.Id

@@ -75,8 +75,6 @@ public class SurfaceControllerTests
     [Test]
     public void Can_Lookup_Content()
     {
-        var publishedSnapshot = new Mock<IPublishedSnapshot>();
-        publishedSnapshot.Setup(x => x.Members).Returns(Mock.Of<IPublishedMemberCache>());
         var content = new Mock<IPublishedContent>();
         content.Setup(x => x.Id).Returns(2);
         var backofficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();

@@ -15,7 +15,7 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
 {
     private readonly IMemberTypeRepository _memberTypeRepository;
 
-    [Obsolete("Please use the constructor taking all parameters. This constructor will be removed in V12.")]
+    [Obsolete("Please use the constructor taking all parameters. This constructor will be removed in V16.")]
     public MemberTypeService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -23,6 +23,7 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
         IMemberService memberService,
         IMemberTypeRepository memberTypeRepository,
         IAuditRepository auditRepository,
+        IMemberTypeContainerRepository entityContainerRepository,
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator)
         : this(
@@ -32,9 +33,10 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
             memberService,
             memberTypeRepository,
             auditRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IMemberTypeContainerRepository>(),
+            entityContainerRepository,
             entityRepository,
-            eventAggregator)
+            eventAggregator,
+            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
     {
     }
 
@@ -47,7 +49,8 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
         IAuditRepository auditRepository,
         IMemberTypeContainerRepository entityContainerRepository,
         IEntityRepository entityRepository,
-        IEventAggregator eventAggregator)
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver)
         : base(
             provider,
             loggerFactory,
@@ -56,7 +59,8 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
             auditRepository,
             entityContainerRepository,
             entityRepository,
-            eventAggregator)
+            eventAggregator,
+            userIdKeyResolver)
     {
         MemberService = memberService;
         _memberTypeRepository = memberTypeRepository;

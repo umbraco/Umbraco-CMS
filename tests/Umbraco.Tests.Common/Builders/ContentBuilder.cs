@@ -53,6 +53,7 @@ public class ContentBuilder
     private int? _sortOrder;
     private bool? _trashed;
     private DateTime? _updateDate;
+    private bool? _blueprint;
     private int? _versionId;
 
     DateTime? IWithCreateDateBuilder.CreateDate
@@ -145,6 +146,13 @@ public class ContentBuilder
         set => _updateDate = value;
     }
 
+    public ContentBuilder WithBlueprint(bool blueprint)
+    {
+        _blueprint = blueprint;
+
+        return this;
+    }
+
     public ContentBuilder WithVersionId(int versionId)
     {
         _versionId = versionId;
@@ -217,6 +225,7 @@ public class ContentBuilder
     {
         var id = _id ?? 0;
         var versionId = _versionId ?? 0;
+        var blueprint = _blueprint ?? false;
         var key = _key ?? Guid.NewGuid();
         var parentId = _parentId ?? -1;
         var parent = _parent;
@@ -253,6 +262,7 @@ public class ContentBuilder
 
         content.Id = id;
         content.VersionId = versionId;
+        content.Blueprint = blueprint;
         content.Key = key;
         content.CreateDate = createDate;
         content.UpdateDate = updateDate;
@@ -454,7 +464,6 @@ public class ContentBuilder
         content.SetValue("ddl", "1234");
         content.SetValue("chklist", "randomc");
         content.SetValue("contentPicker", Udi.Create(Constants.UdiEntityType.Document, new Guid("74ECA1D4-934E-436A-A7C7-36CC16D4095C")).ToString());
-        content.SetValue("mediaPicker", Udi.Create(Constants.UdiEntityType.Media, new Guid("44CB39C8-01E5-45EB-9CF8-E70AAF2D1691")).ToString());
         content.SetValue("memberPicker", Udi.Create(Constants.UdiEntityType.Member, new Guid("9A50A448-59C0-4D42-8F93-4F1D55B0F47D")).ToString());
         content.SetValue("multiUrlPicker", "[{\"name\":\"https://test.com\",\"url\":\"https://test.com\"}]");
         content.SetValue("tags", "this,is,tags");

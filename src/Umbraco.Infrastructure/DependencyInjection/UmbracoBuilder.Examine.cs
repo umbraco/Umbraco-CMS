@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
@@ -41,7 +42,9 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IShortStringHelper>(),
                 factory.GetRequiredService<IScopeProvider>(),
                 true,
-                factory.GetRequiredService<ILocalizationService>()));
+                factory.GetRequiredService<ILocalizationService>(),
+                factory.GetRequiredService<IContentTypeService>(),
+                factory.GetRequiredService<ILogger<ContentValueSetBuilder>>()));
         builder.Services.AddUnique<IContentValueSetBuilder>(factory =>
             new ContentValueSetBuilder(
                 factory.GetRequiredService<PropertyEditorCollection>(),
@@ -50,7 +53,9 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IShortStringHelper>(),
                 factory.GetRequiredService<IScopeProvider>(),
                 false,
-                factory.GetRequiredService<ILocalizationService>()));
+                factory.GetRequiredService<ILocalizationService>(),
+                factory.GetRequiredService<IContentTypeService>(),
+                factory.GetRequiredService<ILogger<ContentValueSetBuilder>>()));
         builder.Services.AddUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
         builder.Services.AddUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
         builder.Services.AddUnique<IDeliveryApiContentIndexValueSetBuilder, DeliveryApiContentIndexValueSetBuilder>();

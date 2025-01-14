@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.7");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.3");
 
             modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreApplication", b =>
                 {
@@ -23,11 +23,19 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ApplicationType")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ClientId")
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ClientSecret")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ClientType")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ConcurrencyToken")
@@ -45,6 +53,9 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                     b.Property<string>("DisplayNames")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("JsonWebKeySet")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Permissions")
                         .HasColumnType("TEXT");
 
@@ -60,8 +71,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                     b.Property<string>("Requirements")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Type")
-                        .HasMaxLength(50)
+                    b.Property<string>("Settings")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

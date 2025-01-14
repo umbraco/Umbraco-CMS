@@ -5,9 +5,9 @@ namespace Umbraco.Cms.Core.Models.Membership;
 /// </summary>
 public class EntityPermissionCollection : HashSet<EntityPermission>
 {
-    private Dictionary<int, string[]>? _aggregateNodePermissions;
+    private Dictionary<int, ISet<string>>? _aggregateNodePermissions;
 
-    private string[]? _aggregatePermissions;
+    private ISet<string>? _aggregatePermissions;
 
     public EntityPermissionCollection()
     {
@@ -25,17 +25,17 @@ public class EntityPermissionCollection : HashSet<EntityPermission>
     /// <remarks>
     ///     This value is only calculated once per node
     /// </remarks>
-    public IEnumerable<string> GetAllPermissions(int entityId)
+    public ISet<string> GetAllPermissions(int entityId)
     {
         if (_aggregateNodePermissions == null)
         {
-            _aggregateNodePermissions = new Dictionary<int, string[]>();
+            _aggregateNodePermissions = new Dictionary<int, ISet<string>>();
         }
 
-        if (_aggregateNodePermissions.TryGetValue(entityId, out string[]? entityPermissions) == false)
+        if (_aggregateNodePermissions.TryGetValue(entityId, out ISet<string>? entityPermissions) == false)
         {
             entityPermissions = this.Where(x => x.EntityId == entityId).SelectMany(x => x.AssignedPermissions)
-                .Distinct().ToArray();
+                .ToHashSet();
             _aggregateNodePermissions[entityId] = entityPermissions;
         }
 
@@ -49,7 +49,7 @@ public class EntityPermissionCollection : HashSet<EntityPermission>
     /// <remarks>
     ///     This value is only calculated once
     /// </remarks>
-    public IEnumerable<string> GetAllPermissions() =>
+    public ISet<string> GetAllPermissions() =>
 _aggregatePermissions ??=
-            this.SelectMany(x => x.AssignedPermissions).Distinct().ToArray();
+            this.SelectMany(x => x.AssignedPermissions).Distinct().ToHashSet();
 }

@@ -15,10 +15,10 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
 {
     private ContentPickerValueConverter CreateValueConverter(IApiContentNameProvider? nameProvider = null)
         => new ContentPickerValueConverter(
-            PublishedSnapshotAccessor,
+            PublishedContentCacheMock.Object,
             new ApiContentBuilder(
                 nameProvider ?? new ApiContentNameProvider(),
-                CreateContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings()),
+                CreateContentRouteBuilder(ApiContentPathProvider, CreateGlobalSettings()),
                 CreateOutputExpansionStrategyAccessor()));
 
     [Test]
@@ -72,8 +72,8 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
     {
         var content = new Mock<IPublishedContent>();
 
-        var prop1 = new PublishedElementPropertyBase(DeliveryApiPropertyType, content.Object, false, PropertyCacheLevel.None);
-        var prop2 = new PublishedElementPropertyBase(DefaultPropertyType, content.Object, false, PropertyCacheLevel.None);
+        var prop1 = new PublishedElementPropertyBase(DeliveryApiPropertyType, content.Object, false, PropertyCacheLevel.None, Mock.Of<ICacheManager>());
+        var prop2 = new PublishedElementPropertyBase(DefaultPropertyType, content.Object, false, PropertyCacheLevel.None, Mock.Of<ICacheManager>());
 
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.Alias).Returns("test");

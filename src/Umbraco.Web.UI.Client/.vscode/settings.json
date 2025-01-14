@@ -1,0 +1,41 @@
+{
+	"cssVariables.lookupFiles": ["node_modules/@umbraco-ui/uui-css/dist/custom-properties.css"],
+	"cSpell.words": [
+		"backoffice",
+		"Backoffice",
+		"combobox",
+		"contenteditable",
+		"ctrls",
+		"devs",
+		"Dropcursor",
+		"Elementable",
+		"Gapcursor",
+		"iframes",
+		"invariantable",
+		"lucide",
+		"Niels",
+		"pickable",
+		"popovertarget",
+		"Registrator",
+		"Routable",
+		"stylesheet",
+		"svgs",
+		"templating",
+		"tinymce",
+		"tiptap",
+		"umbraco",
+		"Uncategorized",
+		"uninitialize",
+		"unprovide",
+		"unpublishing",
+		"variantable"
+	],
+	"exportall.config.folderListener": [],
+	"exportall.config.relExclusion": [],
+	"conventionalCommits.scopes": ["partial views"],
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"sonarlint.connectedMode.project": {
+		"connectionId": "umbraco",
+		"projectKey": "umbraco_Umbraco.CMS.Backoffice"
+	}
+}

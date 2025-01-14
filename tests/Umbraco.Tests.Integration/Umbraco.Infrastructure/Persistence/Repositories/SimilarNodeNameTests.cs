@@ -194,7 +194,7 @@ public class SimilarNodeNameTests
             new SimilarNodeName {Id = 22, Name = "Test (1) (1)"}
         };
 
-        // fixme - this will yield "Test (2)" which is already in use
+        // TODO: this will yield "Test (2)" which is already in use
         Assert.AreEqual("Test (3)", SimilarNodeName.GetUniqueName(names, 0, "Test"));
     }
 }

@@ -3,8 +3,8 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -209,7 +209,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         var languageNbNo = new LanguageBuilder()
             .WithCultureInfo("nb-NO")
             .Build();
-        LocalizationService.Save(languageNbNo, -1);
+        LocalizationService.Save(languageNbNo, Constants.Security.SuperUserId);
         Assert.That(languageNbNo.HasIdentity, Is.True);
         var languageId = languageNbNo.Id;
 
@@ -225,9 +225,9 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         var languageDaDk = LocalizationService.GetLanguageByIsoCode("da-DK");
         var languageNbNo = new LanguageBuilder()
             .WithCultureInfo("nb-NO")
-            .WithFallbackLanguageId(languageDaDk.Id)
+            .WithFallbackLanguageIsoCode(languageDaDk.IsoCode)
             .Build();
-        LocalizationService.Save(languageNbNo, -1);
+        LocalizationService.Save(languageNbNo, Constants.Security.SuperUserId);
         var languageId = languageDaDk.Id;
 
         LocalizationService.Delete(languageDaDk);
@@ -275,8 +275,9 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         Assert.Greater(allLangs.Count(), 0);
         foreach (var language in allLangs)
         {
-            Assert.AreEqual("Hellooooo",
-                item.Translations.Single(x => x.Language.CultureName == language.CultureName).Value);
+            Assert.AreEqual(
+                "Hellooooo",
+                item.Translations.Single(x => x.LanguageIsoCode == language.IsoCode).Value);
         }
     }
 
@@ -445,8 +446,8 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
             .WithCultureInfo("en-GB")
             .Build();
 
-        LocalizationService.Save(languageDaDk, -1);
-        LocalizationService.Save(languageEnGb, -1);
+        LocalizationService.Save(languageDaDk, Constants.Security.SuperUserId);
+        LocalizationService.Save(languageEnGb, Constants.Security.SuperUserId);
         _danishLangId = languageDaDk.Id;
         _englishLangId = languageEnGb.Id;
 

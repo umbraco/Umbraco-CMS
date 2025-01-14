@@ -17,8 +17,8 @@ public class ContentBuilderTests : DeliveryApiTests
     {
         var content = new Mock<IPublishedContent>();
 
-        var prop1 = new PublishedElementPropertyBase(DeliveryApiPropertyType, content.Object, false, PropertyCacheLevel.None);
-        var prop2 = new PublishedElementPropertyBase(DefaultPropertyType, content.Object, false, PropertyCacheLevel.None);
+        var prop1 = new PublishedElementPropertyBase(DeliveryApiPropertyType, content.Object, false, PropertyCacheLevel.None, Mock.Of<ICacheManager>());
+        var prop2 = new PublishedElementPropertyBase(DefaultPropertyType, content.Object, false, PropertyCacheLevel.None, Mock.Of<ICacheManager>());
 
         var contentType = new Mock<IPublishedContentType>();
         contentType.SetupGet(c => c.Alias).Returns("thePageType");
@@ -31,12 +31,12 @@ public class ContentBuilderTests : DeliveryApiTests
         content.SetupGet(c => c.CreateDate).Returns(new DateTime(2023, 06, 01));
         content.SetupGet(c => c.UpdateDate).Returns(new DateTime(2023, 07, 12));
 
-        var publishedUrlProvider = new Mock<IPublishedUrlProvider>();
-        publishedUrlProvider
-            .Setup(p => p.GetUrl(It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
-            .Returns((IPublishedContent content, UrlMode mode, string? culture, Uri? current) => $"url:{content.UrlSegment}");
+        var apiContentRouteProvider = new Mock<IApiContentPathProvider>();
+        apiContentRouteProvider
+            .Setup(p => p.GetContentPath(It.IsAny<IPublishedContent>(), It.IsAny<string?>()))
+            .Returns((IPublishedContent c, string? culture) => $"url:{c.UrlSegment}");
 
-        var routeBuilder = CreateContentRouteBuilder(publishedUrlProvider.Object, CreateGlobalSettings());
+        var routeBuilder = CreateContentRouteBuilder(apiContentRouteProvider.Object, CreateGlobalSettings());
 
         var builder = new ApiContentBuilder(new ApiContentNameProvider(), routeBuilder, CreateOutputExpansionStrategyAccessor());
         var result = builder.Build(content.Object);

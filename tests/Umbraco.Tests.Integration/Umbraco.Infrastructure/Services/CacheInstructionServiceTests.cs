@@ -1,20 +1,15 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -28,12 +23,6 @@ public class CacheInstructionServiceTests : UmbracoIntegrationTest
     private CancellationToken CancellationToken => new();
     private CacheRefresherCollection CacheRefreshers => GetRequiredService<CacheRefresherCollection>();
     private IServerRoleAccessor ServerRoleAccessor => GetRequiredService<IServerRoleAccessor>();
-
-    protected override void CustomTestSetup(IUmbracoBuilder builder)
-    {
-        base.CustomTestSetup(builder);
-        builder.AddNuCache();
-    }
 
     [Test]
     public void Confirms_Cold_Boot_Required_When_Instructions_Exist_And_None_Have_Been_Synced()
@@ -226,8 +215,7 @@ public class CacheInstructionServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(3, result.LastId); // 3 records found.
-            Assert.AreEqual(2,
-                result.NumberOfInstructionsProcessed); // 2 records processed (as one is for the same identity).
+            Assert.AreEqual(2, result.NumberOfInstructionsProcessed); // 2 records processed (as one is for the same identity).
             Assert.IsFalse(result.InstructionsWerePruned);
         });
 
@@ -236,11 +224,17 @@ public class CacheInstructionServiceTests : UmbracoIntegrationTest
 
         // The instructions has now been processed and shouldn't be processed on the next call...
         // Run again.
-        var secondResult = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole,
-            CancellationToken, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), lastId);
+        var secondResult = sut.ProcessInstructions(
+            CacheRefreshers,
+            ServerRoleAccessor.CurrentServerRole,
+            CancellationToken,
+            LocalIdentity,
+            DateTime.UtcNow.AddSeconds(-1),
+            lastId);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0,
+            Assert.AreEqual(
+                0,
                 secondResult
                     .LastId); // No instructions was processed so LastId is 0, this is consistent with behavior from V8
             Assert.AreEqual(0, secondResult.NumberOfInstructionsProcessed); // Nothing was processed.

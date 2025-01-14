@@ -3,9 +3,8 @@
     <Title>Umbraco CMS - Imaging - ImageSharp 2</Title>
     <Description>Adds imaging support using ImageSharp/ImageSharp.Web version 2 to Umbraco CMS.</Description>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="SixLabors.ImageSharp" VersionOverride="[2.1.6, 3)" />
+    <PackageReference Include="SixLabors.ImageSharp" VersionOverride="[2.1.9, 3)" />
     <PackageReference Include="SixLabors.ImageSharp.Web" VersionOverride="[2.0.2, 3)" />
   </ItemGroup>
 

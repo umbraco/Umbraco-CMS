@@ -80,7 +80,8 @@ public class ScheduledPublishingJobTests
             mockUmbracoContextFactory.Object,
             _mockLogger.Object,
             mockServerMessenger.Object,
-            mockScopeProvider.Object);
+            mockScopeProvider.Object,
+            TimeProvider.System);
     }
 
     private void VerifyScheduledPublishingNotPerformed() => VerifyScheduledPublishingPerformed(Times.Never());

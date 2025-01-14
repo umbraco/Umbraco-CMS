@@ -1,9 +1,6 @@
 using System.Data;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
@@ -63,29 +60,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             _fileSystems.IsScoped = () => AmbientScope != null && AmbientScope.ScopedFileSystems;
 
             coreDebugSettings.OnChange(x => _coreDebugSettings = x);
-        }
-
-        [Obsolete("Please use an alternative constructor. This constructor is due for removal in v12.")]
-        public ScopeProvider(
-            IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
-            IUmbracoDatabaseFactory databaseFactory,
-            FileSystems fileSystems,
-            IOptionsMonitor<CoreDebugSettings> coreDebugSettings,
-            MediaFileManager mediaFileManager,
-            ILoggerFactory loggerFactory,
-            IRequestCache requestCache,
-            IEventAggregator eventAggregator)
-        : this(
-            StaticServiceProvider.Instance.GetRequiredService<IAmbientScopeStack>(),
-            StaticServiceProvider.Instance.GetRequiredService<IAmbientScopeContextStack>(),
-            distributedLockingMechanismFactory,
-            databaseFactory,
-            fileSystems,
-            coreDebugSettings,
-            mediaFileManager,
-            loggerFactory,
-            eventAggregator)
-        {
         }
 
         public IDistributedLockingMechanismFactory DistributedLockingMechanismFactory { get; }
@@ -185,11 +159,8 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         /// <inheritdoc />
         public IScope DetachScope()
         {
-            Scope? ambientScope = AmbientScope;
-            if (ambientScope == null)
-            {
-                throw new InvalidOperationException("There is no ambient scope.");
-            }
+            Scope? ambientScope = AmbientScope
+                ?? throw new InvalidOperationException("There is no ambient scope.");
 
             if (ambientScope.Detachable == false)
             {
@@ -293,7 +264,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         {
             lock (s_staticScopeInfosLock)
             {
-                return s_staticScopeInfos.TryGetValue(scope, out ScopeInfo scopeInfo) ? scopeInfo : null;
+                return s_staticScopeInfos.TryGetValue(scope, out ScopeInfo? scopeInfo) ? scopeInfo : null!;
             }
         }
 
@@ -328,7 +299,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 
             lock (s_staticScopeInfosLock)
             {
-                if (s_staticScopeInfos.TryGetValue(scope, out ScopeInfo info) == false)
+                if (s_staticScopeInfos.TryGetValue(scope, out ScopeInfo? info) == false)
                 {
                     info = null;
                 }
@@ -353,7 +324,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 
                     sb.Append(s.InstanceId.ToString("N").Substring(0, 8));
                     var ss = s as Scope;
-                    s = ss?.ParentScope;
+                    s = ss?.ParentScope!;
                 }
 
                 _logger.LogTrace("Register " + (context ?? "null") + " context " + sb);
@@ -365,7 +336,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 
                 _logger.LogTrace("At:\r\n" + Head(Environment.StackTrace, 16));
 
-                info.Context = context;
+                info.Context = context!;
             }
         }
 
@@ -415,7 +386,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false) =>
-            (Cms.Core.Scoping.IScope) CreateScope(
+            (Cms.Core.Scoping.IScope)CreateScope(
                 isolationLevel,
                 repositoryCacheMode,
                 eventDispatcher,
@@ -425,9 +396,12 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 autoComplete);
 
         /// <inheritdoc />
-        Core.Scoping.IScope Core.Scoping.IScopeProvider.CreateDetachedScope(IsolationLevel isolationLevel,
-            RepositoryCacheMode repositoryCacheMode, IEventDispatcher? eventDispatcher,
-            IScopedNotificationPublisher? scopedNotificationPublisher, bool? scopeFileSystems) =>
+        Core.Scoping.IScope Core.Scoping.IScopeProvider.CreateDetachedScope(
+            IsolationLevel isolationLevel,
+            RepositoryCacheMode repositoryCacheMode,
+            IEventDispatcher? eventDispatcher,
+            IScopedNotificationPublisher? scopedNotificationPublisher,
+            bool? scopeFileSystems) =>
             (Core.Scoping.IScope)CreateDetachedScope(
                 isolationLevel,
                 repositoryCacheMode,
@@ -457,15 +431,15 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         public IScope Scope { get; } // the scope itself
 
         // the scope's parent identifier
-        public Guid Parent => ((Scope)Scope).ParentScope == null ? Guid.Empty : ((Scope)Scope).ParentScope.InstanceId;
+        public Guid Parent => ((Scope)Scope).ParentScope == null ? Guid.Empty : ((Scope)Scope).ParentScope!.InstanceId;
 
         public DateTime Created { get; } // the date time the scope was created
         public bool Disposed { get; set; } // whether the scope has been disposed already
-        public string Context { get; set; } // the current 'context' that contains the scope (null, "http" or "lcc")
+        public string Context { get; set; }= string.Empty; // the current 'context' that contains the scope (null, "http" or "lcc")
 
         public string CtorStack { get; } // the stacktrace of the scope ctor
         //public string DisposedStack { get; set; } // the stacktrace when disposed
-        public string NullStack { get; set; } // the stacktrace when the 'context' that contains the scope went null
+        public string NullStack { get; set; } = string.Empty; // the stacktrace when the 'context' that contains the scope went null
 
         public override string ToString() => new StringBuilder()
                 .AppendLine("ScopeInfo:")

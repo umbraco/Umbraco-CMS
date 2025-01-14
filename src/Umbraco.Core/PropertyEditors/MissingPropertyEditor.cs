@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -6,17 +7,12 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 ///     Represents a temporary representation of an editor for cases where a data type is created but not editor is
 ///     available.
 /// </summary>
+[HideFromTypeFinder]
 public class MissingPropertyEditor : IDataEditor
 {
     public string Alias => "Umbraco.Missing";
 
-    public EditorType Type => EditorType.Nothing;
-
     public string Name => "Missing property editor";
-
-    public string Icon => string.Empty;
-
-    public string Group => string.Empty;
 
     public bool IsDeprecated => false;
 
@@ -28,5 +24,5 @@ public class MissingPropertyEditor : IDataEditor
 
     public IDataValueEditor GetValueEditor() => throw new NotImplementedException();
 
-    public IDataValueEditor GetValueEditor(object? configuration) => throw new NotImplementedException();
+    public IDataValueEditor GetValueEditor(object? configurationObject) => throw new NotImplementedException();
 }

@@ -20,10 +20,6 @@ public class ConfigureSecurityStampOptions : IConfigureOptions<SecurityStampVali
     public ConfigureSecurityStampOptions(IOptions<SecuritySettings> securitySettings)
         => _securitySettings = securitySettings.Value;
 
-    [Obsolete("Use the overload accepting SecuritySettings instead. Scheduled for removal in v14.")]
-    public static void ConfigureOptions(SecurityStampValidatorOptions options)
-        => ConfigureOptions(options, StaticServiceProvider.Instance.GetRequiredService<SecuritySettings>());
-
     /// <summary>
     ///     Configures security stamp options and ensures any custom claims
     ///     set on the identity are persisted to the new identity when it's refreshed.

@@ -20,7 +20,7 @@ public class InstallationRepository : IInstallationRepository
                 _httpClient = new HttpClient();
             }
 
-            var content = new StringContent(_jsonSerializer.Serialize(installLog), Encoding.UTF8, "application/json");
+            using var content = new StringContent(_jsonSerializer.Serialize(installLog), Encoding.UTF8, "application/json");
 
             await _httpClient.PostAsync(RestApiInstallUrl, content);
         }

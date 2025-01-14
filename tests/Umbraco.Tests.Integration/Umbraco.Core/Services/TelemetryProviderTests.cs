@@ -1,20 +1,13 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Telemetry.Providers;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -46,14 +39,12 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
 
     private UserTelemetryProvider UserTelemetryProvider => GetRequiredService<UserTelemetryProvider>();
 
-    private MacroTelemetryProvider MacroTelemetryProvider => GetRequiredService<MacroTelemetryProvider>();
-
     private MediaTelemetryProvider MediaTelemetryProvider => GetRequiredService<MediaTelemetryProvider>();
 
     private PropertyEditorTelemetryProvider PropertyEditorTelemetryProvider =>
         GetRequiredService<PropertyEditorTelemetryProvider>();
 
-    private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IUserService UserService => GetRequiredService<IUserService>();
 
@@ -75,25 +66,34 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
         builder.Services.AddTransient<ContentTelemetryProvider>();
         builder.Services.AddTransient<LanguagesTelemetryProvider>();
         builder.Services.AddTransient<UserTelemetryProvider>();
-        builder.Services.AddTransient<MacroTelemetryProvider>();
         builder.Services.AddTransient<MediaTelemetryProvider>();
         builder.Services.AddTransient<PropertyEditorTelemetryProvider>();
         base.CustomTestSetup(builder);
     }
 
     [Test]
-    public void Domain_Telemetry_Provider_Can_Get_Domains()
+    public async Task Domain_Telemetry_Provider_Can_Get_Domains()
     {
         // Arrange
-        DomainService.Save(new UmbracoDomain("danish", "da-DK"));
+        var contentType = ContentTypeBuilder.CreateBasicContentType();
+        ContentTypeService.Save(contentType);
 
-        IEnumerable<UsageInformation> result = null;
+        var content = ContentBuilder.CreateBasicContent(contentType);
+        ContentService.Save(content);
+
+        await DomainService.UpdateDomainsAsync(
+            content.Key,
+            new DomainsUpdateModel
+            {
+                Domains = new[] { new DomainModel { DomainName = "english", IsoCode = "en-US" } }
+            });
+
         // Act
-        result = DetailedTelemetryProviders.GetInformation();
-
+        IEnumerable<UsageInformation> result = DetailedTelemetryProviders.GetInformation();
 
         // Assert
         Assert.AreEqual(1, result.First().Data);
+        Assert.AreEqual("DomainCount", result.First().Name);
     }
 
     [Test]
@@ -128,14 +128,16 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Language_Telemetry_Can_Get_Languages()
+    public async Task Language_Telemetry_Can_Get_Languages()
     {
         // Arrange
         var langTwo = _languageBuilder.WithCultureInfo("da-DK").Build();
-        var langThree = _languageBuilder.WithCultureInfo("se-SV").Build();
+        var langThree = _languageBuilder.WithCultureInfo("sv-SE").Build();
 
-        LocalizationService.Save(langTwo);
-        LocalizationService.Save(langThree);
+        var langTwoResult = await LanguageService.CreateAsync(langTwo, Constants.Security.SuperUserKey);
+        Assert.IsTrue(langTwoResult.Success);
+        var langThreeResult = await LanguageService.CreateAsync(langThree, Constants.Security.SuperUserKey);
+        Assert.IsTrue(langThreeResult.Success);
 
         IEnumerable<UsageInformation> result = null;
 
@@ -144,15 +146,6 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
 
         // Assert
         Assert.AreEqual(3, result.First().Data);
-    }
-
-    [Test]
-    public void MacroTelemetry_Can_Get_Macros()
-    {
-        BuildMacros();
-        var result = MacroTelemetryProvider.GetInformation()
-            .FirstOrDefault(x => x.Name == Constants.Telemetry.MacroCount);
-        Assert.AreEqual(3, result.Data);
     }
 
     [Test]
@@ -328,20 +321,6 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
         for (var i = 0; i < count; i++)
         {
             yield return BuildUserGroup(i.ToString());
-        }
-    }
-
-    private void BuildMacros()
-    {
-        var scopeProvider = ScopeProvider;
-        using (var scope = scopeProvider.CreateScope())
-        {
-            var repository = new MacroRepository((IScopeAccessor)scopeProvider, AppCaches.Disabled, Mock.Of<ILogger<MacroRepository>>(), ShortStringHelper);
-
-            repository.Save(new Macro(ShortStringHelper, "test1", "Test1", "~/views/macropartials/test1.cshtml"));
-            repository.Save(new Macro(ShortStringHelper, "test2", "Test2", "~/views/macropartials/test2.cshtml"));
-            repository.Save(new Macro(ShortStringHelper, "test3", "Tet3", "~/views/macropartials/test3.cshtml"));
-            scope.Complete();
         }
     }
 

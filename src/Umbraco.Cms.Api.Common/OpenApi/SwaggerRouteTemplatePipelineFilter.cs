@@ -62,6 +62,11 @@ public class SwaggerRouteTemplatePipelineFilter : UmbracoPipelineFilter
             swaggerUiOptions.SwaggerEndpoint($"{name}/swagger.json", $"{apiInfo.Title}");
         }
 
+        // Add custom configuration from https://swagger.io/docs/open-source-tools/swagger-ui/usage/configuration/
+        swaggerUiOptions.ConfigObject.PersistAuthorization = true; // persists authorization data so it would not be lost on browser close/refresh
+        swaggerUiOptions.ConfigObject.Filter = string.Empty; // Enable the filter with an empty string as default filter.
+
+        swaggerUiOptions.OAuthClientId(Constants.OAuthClientIds.Swagger);
         swaggerUiOptions.OAuthUsePkce();
     }
 

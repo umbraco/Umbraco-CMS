@@ -54,11 +54,4 @@ public class YesNoValueConverter : PropertyValueConverterBase
         // default value is: false
         return false;
     }
-
-    // default ConvertSourceToObject just returns source ie a boolean value
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public override object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview) =>
-
-        // source should come from ConvertSource and be a boolean already
-        (bool?)inter ?? false ? "1" : "0";
 }

@@ -99,7 +99,7 @@ public class MediaTypeBuilderTests
         Assert.AreEqual(testIcon, mediaType.Icon);
         Assert.AreEqual(testThumbnail, mediaType.Thumbnail);
         Assert.AreEqual(testTrashed, mediaType.Trashed);
-        Assert.IsFalse(mediaType.IsContainer);
+        Assert.IsNull(mediaType.ListView);
         Assert.AreEqual(7, mediaType.PropertyTypes.Count()); // 5 from media properties group, 2 custom
 
         var propertyTypeIds = mediaType.PropertyTypes.Select(x => x.Id).OrderBy(x => x).ToArray();

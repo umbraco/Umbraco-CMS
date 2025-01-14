@@ -41,13 +41,21 @@ public static class ObjectExtensions
     public static IEnumerable<T> AsEnumerableOfOne<T>(this T input) => Enumerable.Repeat(input, 1);
 
     /// <summary>
+    /// Disposes the object if it implements <see cref="IDisposable" />.
     /// </summary>
-    /// <param name="input"></param>
+    /// <param name="input">The object.</param>
     public static void DisposeIfDisposable(this object input)
     {
         if (input is IDisposable disposable)
         {
-            disposable.Dispose();
+            try
+            {
+                disposable.Dispose();
+            }
+            catch (ObjectDisposedException)
+            {
+                // ignore if it is already disposed
+            }
         }
     }
 
@@ -217,6 +225,24 @@ public static class ObjectExtensions
                 {
                     return Attempt.Succeed(CustomBooleanTypeConverter.ConvertFrom(input!));
                 }
+            }
+
+            if (target == typeof(DateTime) && input is DateTimeOffset dateTimeOffset)
+            {
+                // IMPORTANT: for compatability with various editors, we must discard any Offset information and assume UTC time here
+                return Attempt.Succeed((object?)new DateTime(
+                    new DateOnly(dateTimeOffset.Year, dateTimeOffset.Month, dateTimeOffset.Day),
+                    new TimeOnly(dateTimeOffset.Hour, dateTimeOffset.Minute, dateTimeOffset.Second, dateTimeOffset.Millisecond, dateTimeOffset.Microsecond),
+                    DateTimeKind.Utc));
+            }
+
+            if (target == typeof(DateTimeOffset) && input is DateTime dateTime)
+            {
+                // IMPORTANT: for compatability with various editors, we must discard any DateTimeKind information and assume UTC time here
+                return Attempt.Succeed((object?)new DateTimeOffset(
+                    new DateOnly(dateTime.Year, dateTime.Month, dateTime.Day),
+                    new TimeOnly(dateTime.Hour, dateTime.Minute, dateTime.Second, dateTime.Millisecond, dateTime.Microsecond),
+                    TimeSpan.Zero));
             }
 
             TypeConverter? inputConverter = GetCachedSourceTypeConverter(inputType, target);

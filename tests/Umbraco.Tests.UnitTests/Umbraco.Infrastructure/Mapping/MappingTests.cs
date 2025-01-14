@@ -116,17 +116,6 @@ public class MappingTests
     }
 
     [Test]
-    public void CollectionsMap()
-    {
-        var definitions = new MapDefinitionCollection(() => new IMapDefinition[] { new MapperDefinition2() });
-        var mapper = new UmbracoMapper(definitions, _scopeProvider, NullLogger<UmbracoMapper>.Instance);
-
-        // can map a PropertyCollection
-        var source = new PropertyCollection();
-        var target = mapper.Map<IEnumerable<ContentPropertyDto>>(source);
-    }
-
-    [Test]
     [Explicit]
     public void ConcurrentMap()
     {
@@ -283,16 +272,6 @@ public class MappingTests
             mapper.Define<Thing1, Thing2>((source, context) => new Thing2(), Map);
 
         private void Map(Thing1 source, Thing2 target, MapperContext context) => target.Value = source.Value;
-    }
-
-    private class MapperDefinition2 : IMapDefinition
-    {
-        public void DefineMaps(IUmbracoMapper mapper) =>
-            mapper.Define<IProperty, ContentPropertyDto>((source, context) => new ContentPropertyDto(), Map);
-
-        private static void Map(IProperty source, ContentPropertyDto target, MapperContext context)
-        {
-        }
     }
 
     private class MapperDefinition3 : IMapDefinition

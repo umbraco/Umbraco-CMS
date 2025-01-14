@@ -10,6 +10,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Update;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.Migrations;
 
@@ -89,6 +90,11 @@ public abstract partial class MigrationBase : IDiscoverable
     /// If this is set to true, the published cache will be rebuild upon successful completion of the migration.
     /// </summary>
     public bool RebuildCache { get; set; }
+
+    /// <summary>
+    /// If this is set to true, all backoffice client tokens will be revoked upon successful completion of the migration.
+    /// </summary>
+    public bool InvalidateBackofficeUserAccess { get; set; }
 
     /// <summary>
     ///     Runs the migration.
