@@ -29,6 +29,7 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 	#init?: Promise<unknown>;
 
 	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
+	#propertyContext?: typeof UMB_PROPERTY_CONTEXT.TYPE;
 	#hostElement?: Element;
 	#propertyEditorElement?: UmbPropertyEditorUiElement;
 
@@ -43,6 +44,7 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 			}).asPromise(),
 
 			this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+				this.#propertyContext = context;
 				this.#propertyEditorElement = context.getEditor();
 			}).asPromise(),
 		]);
@@ -140,11 +142,35 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 		await this.#init;
 
 		const pasteTranslatorManifests = this.getPasteTranslatorManifests(args.propertyEditorUiAlias);
+		const propertyEditorUiManifest = await this.#findPropertyEditorUiManifest(args.propertyEditorUiAlias);
+		const config = this.#propertyContext?.getConfig();
+
+		const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
 		const modal = this.#modalManagerContext?.open(this, UMB_CLIPBOARD_ENTRY_PICKER_MODAL, {
 			data: {
-				filter: (clipboardEntryDetail) =>
-					this.hasSupportedPasteTranslator(pasteTranslatorManifests, clipboardEntryDetail.values),
+				asyncFilter: async (clipboardEntryDetail) => {
+					const hasSupportedPasteTranslator = this.hasSupportedPasteTranslator(
+						pasteTranslatorManifests,
+						clipboardEntryDetail.values,
+					);
+
+					if (!hasSupportedPasteTranslator) {
+						return false;
+					}
+
+					const pasteTranslator = await valueResolver.getPasteTranslator(
+						clipboardEntryDetail.values,
+						propertyEditorUiManifest.alias,
+					);
+
+					if (pasteTranslator.isCompatibleValue) {
+						const value = await valueResolver.resolve(clipboardEntryDetail.values, propertyEditorUiManifest.alias);
+						return pasteTranslator.isCompatibleValue(value, config);
+					}
+
+					return true;
+				},
 			},
 		});
 
@@ -154,8 +180,6 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 		if (!selection.length) {
 			throw new Error('No clipboard entry selected');
 		}
-
-		const propertyEditorUiManifest = await this.#findPropertyEditorUiManifest(args.propertyEditorUiAlias);
 
 		let propertyValues: Array<any> = [];
 

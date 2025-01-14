@@ -4,10 +4,17 @@ import type { ManifestClipboardPastePropertyValueTranslator } from './clipboard-
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi, type ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbClipboardPastePropertyValueTranslatorValueResolver<
 	PropertyValueType = unknown,
 > extends UmbControllerBase {
+	#pasteTranslator: UmbClipboardPastePropertyValueTranslator | undefined;
+
+	constructor(host: UmbControllerHost) {
+		super(host);
+	}
+
 	async resolve(
 		clipboardEntryValues: UmbClipboardEntryValuesType,
 		propertyEditorUiAlias: string,
@@ -20,6 +27,48 @@ export class UmbClipboardPastePropertyValueTranslatorValueResolver<
 			throw new Error('Property editor UI alias is required.');
 		}
 
+		const manifest = this.#getManifestWithBestFit(clipboardEntryValues, propertyEditorUiAlias);
+		const pasteTranslator = await this.getPasteTranslator(clipboardEntryValues, propertyEditorUiAlias);
+
+		const valueToTranslate = clipboardEntryValues.find((x) => x.type === manifest.fromClipboardEntryValueType);
+
+		if (!valueToTranslate) {
+			throw new Error(`Value to translate is missing`);
+		}
+
+		return pasteTranslator.translate(valueToTranslate.value);
+	}
+
+	async getPasteTranslator(clipboardEntryValues: UmbClipboardEntryValuesType, propertyEditorUiAlias: string) {
+		const manifest = this.#getManifestWithBestFit(clipboardEntryValues, propertyEditorUiAlias);
+		const pasteTranslator = await createExtensionApi<UmbClipboardPastePropertyValueTranslator>(this, manifest);
+
+		if (!pasteTranslator) {
+			throw new Error('Failed to create paste translator.');
+		}
+
+		if (!pasteTranslator.translate) {
+			throw new Error('Paste translator does not have a translate method.');
+		}
+
+		return pasteTranslator;
+	}
+
+	#getManifestWithBestFit(
+		clipboardEntryValues: UmbClipboardEntryValuesType,
+		propertyEditorUiAlias: string,
+	): ManifestClipboardPastePropertyValueTranslator {
+		const supportedManifests = this.#getSupportedManifests(clipboardEntryValues, propertyEditorUiAlias);
+
+		if (!supportedManifests.length) {
+			throw new Error('No paste translator found for the given property editor ui and entry value type.');
+		}
+
+		// Pick the manifest with the highest priority
+		return supportedManifests.sort((a: ManifestBase, b: ManifestBase): number => (b.weight || 0) - (a.weight || 0))[0];
+	}
+
+	#getSupportedManifests(clipboardEntryValues: UmbClipboardEntryValuesType, propertyEditorUiAlias: string) {
 		const entryValueTypes = clipboardEntryValues.map((x) => x.type);
 
 		const supportedManifests = umbExtensionsRegistry.getByTypeAndFilter(
@@ -31,31 +80,6 @@ export class UmbClipboardPastePropertyValueTranslatorValueResolver<
 			},
 		);
 
-		if (!supportedManifests.length) {
-			throw new Error('No paste translator found for the given property editor ui and entry value type.');
-		}
-
-		// Pick the manifest with the highest priority
-		const manifest: ManifestClipboardPastePropertyValueTranslator = supportedManifests.sort(
-			(a: ManifestBase, b: ManifestBase): number => (b.weight || 0) - (a.weight || 0),
-		)[0];
-
-		const pasteTranslator = await createExtensionApi<UmbClipboardPastePropertyValueTranslator>(this, manifest);
-
-		if (!pasteTranslator) {
-			throw new Error('Failed to create paste translator.');
-		}
-
-		if (!pasteTranslator.translate) {
-			throw new Error('Paste translator does not have a translate method.');
-		}
-
-		const valueToTranslate = clipboardEntryValues.find((x) => x.type === manifest.fromClipboardEntryValueType);
-
-		if (!valueToTranslate) {
-			throw new Error(`Value to translate is missing`);
-		}
-
-		return pasteTranslator.translate(valueToTranslate.value);
+		return supportedManifests;
 	}
 }
