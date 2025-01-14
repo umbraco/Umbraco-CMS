@@ -2,7 +2,6 @@ import { UMB_UFM_CONTEXT } from '../contexts/ufm.context.js';
 import { nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-// eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name
 export abstract class UmbUfmElementBase extends UmbLitElement {
 	#filterFuncArgs?: Array<{ alias: string; args: Array<string> }>;
 
