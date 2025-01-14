@@ -165,6 +165,7 @@
     <key alias="move">Media moved</key>
     <key alias="copy">Media copied</key>
     <key alias="save">Media saved</key>
+    <key alias="new">Media created</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
@@ -189,6 +190,7 @@
     <key alias="smallPublishVariant">Publish</key>
     <key alias="smallMove">Move</key>
     <key alias="smallSave">Save</key>
+    <key alias="smallNew">New</key>
     <key alias="smallSaveVariant">Save</key>
     <key alias="smallDelete">Delete</key>
     <key alias="smallUnpublish">Unpublish</key>
