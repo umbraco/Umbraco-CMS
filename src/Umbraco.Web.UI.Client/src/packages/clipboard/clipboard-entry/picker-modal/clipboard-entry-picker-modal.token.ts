@@ -2,8 +2,9 @@ import type { UmbClipboardEntryDetailModel } from '../types.js';
 import { UMB_CLIPBOARD_ENTRY_PICKER_MODAL_ALIAS } from './constants.js';
 import { UmbModalToken, type UmbPickerModalData, type UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbClipboardEntryPickerModalData extends UmbPickerModalData<UmbClipboardEntryDetailModel> {}
+export interface UmbClipboardEntryPickerModalData extends UmbPickerModalData<UmbClipboardEntryDetailModel> {
+	asyncFilter?: (item: UmbClipboardEntryDetailModel) => Promise<boolean>;
+}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbClipboardEntryPickerModalValue extends UmbPickerModalValue {}
