@@ -1,8 +1,11 @@
 const { rest } = window.MockServiceWorker;
-import { createProblemDetails } from '../../data/utils.js';
 import { umbRelationTypeMockDb } from '../../data/relation-type/relationType.db.js';
 import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import type {
+	GetRelationTypeByIdResponse,
+	GetRelationTypeResponse,
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 export const detailHandlers = [
 	rest.get(umbracoPath(`${UMB_SLUG}`), (req, res, ctx) => {
@@ -13,27 +16,13 @@ export const detailHandlers = [
 
 		const response = umbRelationTypeMockDb.get({ skip, take });
 
-		return res(ctx.status(200), ctx.json(response));
+		return res(ctx.status(200), ctx.json<GetRelationTypeResponse>(response));
 	}),
 
 	rest.get(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return res(ctx.status(400));
 		const response = umbRelationTypeMockDb.detail.read(id);
-		return res(ctx.status(200), ctx.json(response));
-	}),
-
-	rest.delete(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
-		const id = req.params.id as string;
-		if (!id) return res(ctx.status(400));
-		const relationType = umbRelationTypeMockDb.detail.read(id);
-		if (!relationType) return res(ctx.status(404));
-		if (!relationType.isDeletable)
-			return res(
-				ctx.status(400),
-				ctx.json(createProblemDetails({ title: 'Validation', detail: 'Cannot delete a non-deletable relation type' })),
-			);
-		umbRelationTypeMockDb.detail.delete(id);
-		return res(ctx.status(200));
+		return res(ctx.status(200), ctx.json<GetRelationTypeByIdResponse>(response));
 	}),
 ];
