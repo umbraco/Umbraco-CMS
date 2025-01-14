@@ -8,6 +8,8 @@ import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
+import { UMB_VALIDATION_CONTEXT } from '@umbraco-cms/backoffice/validation';
+import { UmbDataPathBlockElementDataQuery } from '../validation/data-path-element-data-query.function.js';
 
 export abstract class UmbBlockEntriesContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType, BlockManagerContextType>,
@@ -97,24 +99,19 @@ export abstract class UmbBlockEntriesContext<
 		settings: UmbBlockDataModel | undefined,
 		originData: BlockOriginData,
 	): Promise<boolean>;
-	//edit?
-	//editSettings
 
-	// Idea: should we return true if it was successful?
 	public async delete(contentKey: string) {
 		await this._retrieveManager;
 		const layout = this._layoutEntries.value.find((x) => x.contentKey === contentKey);
 		if (!layout) {
 			throw new Error(`Cannot delete block, missing layout for ${contentKey}`);
 		}
+		this._layoutEntries.removeOne(contentKey);
 
+		this._manager!.removeOneContent(contentKey);
 		if (layout.settingsKey) {
 			this._manager!.removeOneSettings(layout.settingsKey);
 		}
-		this._manager!.removeOneContent(contentKey);
 		this._manager!.removeExposesOf(contentKey);
-
-		this._layoutEntries.removeOne(contentKey);
 	}
-	//copy
 }
