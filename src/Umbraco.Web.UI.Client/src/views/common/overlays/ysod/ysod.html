@@ -1,9 +1,8 @@
 ﻿<div ng-controller="Umbraco.Overlays.YsodController">
-
     <h4 class="heading red">{{model.error.errorMsg}}</h4>
     <p>{{model.error.data.ExceptionMessage || model.error.data.Message}}</p>
 
-    <div class="umb-control-group">
+    <div class="umb-control-group" ng-if="model.error.data.ExceptionType || model.error.data.ExceptionMessage">
         <h5>
             <localize key="defaultdialogs_exceptionDetail">Exception Details:</localize>
         </h5>
