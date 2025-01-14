@@ -498,7 +498,7 @@ public class MediaController : ContentControllerBase
         // lastly, if it is not valid, add the model state to the outgoing object and throw a 403
         if (!ModelState.IsValid)
         {
-            return ValidationProblem(display, ModelState, StatusCodes.Status403Forbidden);
+            return ValidationProblem(display, ModelState);
         }
 
         // put the correct msgs in
