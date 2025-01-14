@@ -8,8 +8,6 @@ import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
-import { UMB_VALIDATION_CONTEXT } from '@umbraco-cms/backoffice/validation';
-import { UmbDataPathBlockElementDataQuery } from '../validation/data-path-element-data-query.function.js';
 
 export abstract class UmbBlockEntriesContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType, BlockManagerContextType>,
