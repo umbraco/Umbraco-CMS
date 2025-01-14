@@ -2499,6 +2499,10 @@ name: "icon-keyhole",
 legacy: true,
 path: () => import("./icons/icon-keyhole.js"),
 },{
+name: "icon-linkedin",
+legacy: true,
+path: () => import("./icons/icon-linkedin.js"),
+},{
 name: "icon-linux-tux",
 legacy: true,
 path: () => import("./icons/icon-linux-tux.js"),
