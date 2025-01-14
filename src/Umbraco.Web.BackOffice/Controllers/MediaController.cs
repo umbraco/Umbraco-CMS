@@ -474,8 +474,14 @@ public class MediaController : ContentControllerBase
         // TODO: Allowing media to be saved when it is invalid is odd - media doesn't have a publish phase so suddenly invalid data is allowed to be 'live'
         if (!ModelState.IsValid)
         {
-            MediaItemDisplay? forDisplay = _umbracoMapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
-            return ValidationProblem(forDisplay, ModelState);
+            // check for critical data validation issues, we can't continue saving if this data is invalid
+            if (!RequiredForPersistenceAttribute.HasRequiredValuesForPersistence(contentItem))
+            {
+                // ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
+                // add the model state to the outgoing object and throw validation response
+                MediaItemDisplay? forDisplay = _umbracoMapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
+                return ValidationProblem(forDisplay, ModelState);
+            }
         }
 
         if (contentItem.PersistedContent is null)
@@ -488,6 +494,12 @@ public class MediaController : ContentControllerBase
 
         // return the updated model
         MediaItemDisplay? display = _umbracoMapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
+
+        // lastly, if it is not valid, add the model state to the outgoing object and throw a 403
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(display, ModelState, StatusCodes.Status403Forbidden);
+        }
 
         // put the correct msgs in
         switch (contentItem.Action)
