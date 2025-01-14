@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Delivery.Filters;
 
-public class AddVaryHeaderAttribute : ActionFilterAttribute
+public sealed class AddVaryHeaderAttribute : ActionFilterAttribute
 {
     private const string Vary = "Accept-Language, Preview, Start-Item";
 
