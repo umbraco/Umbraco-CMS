@@ -69,7 +69,7 @@ const treeItemMapper = (model: UmbMockDocumentModel): DocumentTreeItemResponseMo
 		noAccess: model.noAccess,
 		parent: model.parent,
 		variants: model.variants,
-		createDate: model.createDate
+		createDate: model.createDate,
 	};
 };
 

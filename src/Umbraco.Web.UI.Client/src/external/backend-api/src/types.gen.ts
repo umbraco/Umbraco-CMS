@@ -5354,3 +5354,10 @@ export type GetWebhookEventsData = {
 };
 
 export type GetWebhookEventsResponse = ((PagedWebhookEventModel));
+
+export type GetWebhookLogsData = {
+    skip?: number;
+    take?: number;
+};
+
+export type GetWebhookLogsResponse = ((WebhookResponseModel));

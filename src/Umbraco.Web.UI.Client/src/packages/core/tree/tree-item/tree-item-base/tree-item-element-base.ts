@@ -4,7 +4,6 @@ import { UMB_TREE_ITEM_CONTEXT } from './tree-item-context-base.js';
 import { html, nothing, state, ifDefined, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-// eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name
 export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeItemModel> extends UmbLitElement {
 	_item?: TreeItemModelType;
 	@property({ type: Object, attribute: false })
