@@ -20,7 +20,6 @@ import type {
 	PropertyEditorSettingsProperty,
 } from '@umbraco-cms/backoffice/property-editor';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 type EntityType = UmbDataTypeDetailModel;
 
@@ -80,8 +79,6 @@ export class UmbDataTypeWorkspaceContext
 			entityType: UMB_DATA_TYPE_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS,
 		});
-
-		this.addValidationContext(new UmbValidationContext(this));
 
 		this.#observePropertyEditorSchemaAlias();
 		this.#observePropertyEditorUIAlias();
