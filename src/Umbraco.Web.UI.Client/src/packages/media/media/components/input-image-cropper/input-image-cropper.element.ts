@@ -121,6 +121,10 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 			return;
 		}
 
+		if(this.value && this.value.temporaryFileId){
+			value.temporaryFileId = this.value.temporaryFileId
+		}
+
 		this.value = value;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
