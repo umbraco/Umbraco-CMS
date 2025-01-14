@@ -8,7 +8,7 @@ export class UmbBlockToBlockListClipboardPastePropertyValueTranslator
 	extends UmbControllerBase
 	implements UmbClipboardPastePropertyValueTranslator<UmbBlockClipboardEntryValueModel, UmbBlockListValueModel>
 {
-	async isCompatible(
+	async isCompatibleValue(
 		value: UmbBlockClipboardEntryValueModel,
 		config: Array<{ alias: string; value: Array<{ contentElementTypeKey: string }> }>,
 	): Promise<boolean> {
