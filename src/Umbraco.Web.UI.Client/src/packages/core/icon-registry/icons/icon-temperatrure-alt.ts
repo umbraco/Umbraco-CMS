@@ -1,4 +1,4 @@
-export default `<!-- @license lucide-static v0.460.0 - ISC -->
+export default `<!-- @license lucide-static v0.471.0 - ISC -->
 <svg
   class="lucide lucide-thermometer-snowflake"
   xmlns="http://www.w3.org/2000/svg"
@@ -9,11 +9,13 @@ export default `<!-- @license lucide-static v0.460.0 - ISC -->
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="M2 12h10" />
-  <path d="M9 4v16" />
-  <path d="m3 9 3 3-3 3" />
-  <path d="M12 6 9 9 6 6" />
-  <path d="m6 18 3-3 1.5 1.5" />
-  <path d="M20 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z" />
+  <path d="m10 20-1.25-2.5L6 18" />
+  <path d="M10 4 8.75 6.5 6 6" />
+  <path d="M10.585 15H10" />
+  <path d="M2 12h6.5L10 9" />
+  <path d="M20 14.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0z" />
+  <path d="m4 10 1.5 2L4 14" />
+  <path d="m7 21 3-6-1.5-3" />
+  <path d="m7 3 3 6h2" />
 </svg>
 `;
