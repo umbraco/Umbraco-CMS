@@ -11,7 +11,7 @@ export class UmbCollectionWorkspaceViewElement extends UmbLitElement {
 	override render() {
 		if (!this.manifest) return html` <div>No Manifest</div>`;
 		if (!this.manifest.meta.collectionAlias) return html` <div>No Collection Alias in Manifest</div>`;
-		return html`<umb-collection alias=${this.manifest.meta.collectionAlias}></umb-collection>`;
+		return html`<umb-collection data-mark="collection:${this.manifest.meta.collectionAlias}" alias=${this.manifest.meta.collectionAlias}></umb-collection>`;
 	}
 }
 

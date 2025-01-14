@@ -72,6 +72,7 @@ export class UmbCollectionActionButtonElement extends UmbLitElement {
 				id="action-button"
 				color="default"
 				look="outline"
+				data-mark="action:${ifDefined(label)}"
 				label=${ifDefined(label)}
 				href=${ifDefined(this.manifest?.meta.href)}
 				.state=${this._buttonState}

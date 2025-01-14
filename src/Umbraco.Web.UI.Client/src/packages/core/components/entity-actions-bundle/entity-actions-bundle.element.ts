@@ -95,7 +95,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 
 	#renderMore() {
 		if (this._numberOfActions === 1) return nothing;
-		return html`<uui-button @click=${this.#openContextMenu} label="Open actions menu">
+		return html`<uui-button @click=${this.#openContextMenu} label="Open actions menu" data-mark="action:open-actions-menu">
 			<uui-symbol-more></uui-symbol-more>
 		</uui-button>`;
 	}
@@ -104,6 +104,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		if (!this._firstActionApi) return nothing;
 		return html`<uui-button
 			label=${ifDefined(this._firstActionManifest?.meta.label)}
+			data-mark="action:${ifDefined(this._firstActionManifest?.meta.label)}"
 			@click=${this.#onFirstActionClick}>
 			<uui-icon name=${ifDefined(this._firstActionManifest?.meta.icon)}></uui-icon>
 		</uui-button>`;
