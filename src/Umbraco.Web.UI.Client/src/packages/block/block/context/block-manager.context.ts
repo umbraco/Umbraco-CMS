@@ -278,6 +278,14 @@ export abstract class UmbBlockManagerContext<
 	removeOneSettings(settingsKey: string) {
 		this.#settings.removeOne(settingsKey);
 	}
+
+	removeManyContent(contentKeys: Array<string>) {
+		this.#contents.remove(contentKeys);
+	}
+	removeManySettings(settingsKeys: Array<string>) {
+		this.#settings.remove(settingsKeys);
+	}
+
 	removeExposesOf(contentKey: string) {
 		this.#exposes.filter((x) => x.contentKey !== contentKey);
 	}
