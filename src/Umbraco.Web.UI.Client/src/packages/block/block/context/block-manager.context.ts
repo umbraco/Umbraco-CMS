@@ -120,14 +120,18 @@ export abstract class UmbBlockManagerContext<
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_MANAGER_CONTEXT);
 
-		this.observe(this.blockTypes, (blockTypes) => {
-			blockTypes.forEach((x) => {
-				this.#ensureContentType(x.contentElementTypeKey);
-				if (x.settingsElementTypeKey) {
-					this.#ensureContentType(x.settingsElementTypeKey);
-				}
-			});
-		});
+		this.observe(
+			this.blockTypes,
+			(blockTypes) => {
+				blockTypes.forEach((x) => {
+					this.#ensureContentType(x.contentElementTypeKey);
+					if (x.settingsElementTypeKey) {
+						this.#ensureContentType(x.settingsElementTypeKey);
+					}
+				});
+			},
+			null,
+		);
 	}
 
 	async #ensureContentType(unique: string) {
