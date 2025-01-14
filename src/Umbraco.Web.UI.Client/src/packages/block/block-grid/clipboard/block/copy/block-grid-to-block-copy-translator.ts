@@ -9,7 +9,13 @@ export class UmbBlockGridToBlockClipboardCopyPropertyValueTranslator
 	extends UmbControllerBase
 	implements UmbClipboardCopyPropertyValueTranslator<UmbBlockGridValueModel, UmbBlockClipboardEntryValueModel>
 {
-	async translate(propertyValue: UmbBlockGridValueModel) {
+	/**
+	 * Translates a Block Grid property value to a Block clipboard entry value.
+	 * @param {UmbBlockGridValueModel} propertyValue - The Block Grid property value.
+	 * @returns {Promise<UmbBlockClipboardEntryValueModel>} - The Block clipboard entry value.
+	 * @memberof UmbBlockGridToBlockClipboardCopyPropertyValueTranslator
+	 */
+	async translate(propertyValue: UmbBlockGridValueModel): Promise<UmbBlockClipboardEntryValueModel> {
 		if (!propertyValue) {
 			throw new Error('Property value is missing.');
 		}

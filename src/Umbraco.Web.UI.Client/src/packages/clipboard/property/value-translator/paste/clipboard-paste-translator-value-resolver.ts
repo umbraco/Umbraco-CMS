@@ -4,16 +4,11 @@ import type { ManifestClipboardPastePropertyValueTranslator } from './clipboard-
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi, type ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbClipboardPastePropertyValueTranslatorValueResolver<
 	PropertyValueType = unknown,
 > extends UmbControllerBase {
-	#pasteTranslator: UmbClipboardPastePropertyValueTranslator | undefined;
-
-	constructor(host: UmbControllerHost) {
-		super(host);
-	}
+	#apiCache = new Map<string, UmbClipboardPastePropertyValueTranslator>();
 
 	async resolve(
 		clipboardEntryValues: UmbClipboardEntryValuesType,
@@ -39,8 +34,24 @@ export class UmbClipboardPastePropertyValueTranslatorValueResolver<
 		return pasteTranslator.translate(valueToTranslate.value);
 	}
 
-	async getPasteTranslator(clipboardEntryValues: UmbClipboardEntryValuesType, propertyEditorUiAlias: string) {
+	/**
+	 * Get the paste translator for the given clipboard entry values and property editor ui alias
+	 * @param {UmbClipboardEntryValuesType} clipboardEntryValues
+	 * @param {string} propertyEditorUiAlias
+	 * @returns {Promise<UmbClipboardPastePropertyValueTranslator>} - The paste translator
+	 * @memberof UmbClipboardPastePropertyValueTranslatorValueResolver
+	 */
+	async getPasteTranslator(
+		clipboardEntryValues: UmbClipboardEntryValuesType,
+		propertyEditorUiAlias: string,
+	): Promise<UmbClipboardPastePropertyValueTranslator> {
 		const manifest = this.#getManifestWithBestFit(clipboardEntryValues, propertyEditorUiAlias);
+
+		// Check the cache before creating a new instance
+		if (this.#apiCache.has(manifest.alias)) {
+			return this.#apiCache.get(manifest.alias)!;
+		}
+
 		const pasteTranslator = await createExtensionApi<UmbClipboardPastePropertyValueTranslator>(this, manifest);
 
 		if (!pasteTranslator) {
@@ -50,6 +61,9 @@ export class UmbClipboardPastePropertyValueTranslatorValueResolver<
 		if (!pasteTranslator.translate) {
 			throw new Error('Paste translator does not have a translate method.');
 		}
+
+		// Cache the api instance for future use
+		this.#apiCache.set(manifest.alias, pasteTranslator);
 
 		return pasteTranslator;
 	}

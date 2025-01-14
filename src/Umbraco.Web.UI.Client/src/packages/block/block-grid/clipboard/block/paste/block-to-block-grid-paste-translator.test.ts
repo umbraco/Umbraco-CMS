@@ -55,6 +55,28 @@ describe('UmbBlockToBlockGridClipboardPastePropertyValueTranslator', () => {
 		settingsData: blockGridPropertyValue.settingsData,
 	};
 
+	const config1 = [
+		{
+			alias: 'blocks',
+			value: [
+				{
+					contentElementTypeKey: 'contentTypeKey',
+				},
+			],
+		},
+	];
+
+	const config2 = [
+		{
+			alias: 'blocks',
+			value: [
+				{
+					contentElementTypeKey: 'contentTypeKey2',
+				},
+			],
+		},
+	];
+
 	beforeEach(async () => {
 		hostElement = new UmbTestControllerHostElement();
 		copyTranslator = new UmbBlockToBlockGridClipboardPastePropertyValueTranslator(hostElement);
@@ -74,6 +96,18 @@ describe('UmbBlockToBlockGridClipboardPastePropertyValueTranslator', () => {
 		it('returns the block grid property value', async () => {
 			const result = await copyTranslator.translate(blockClipboardEntryValue);
 			expect(result).to.deep.equal(blockGridPropertyValue);
+		});
+	});
+
+	describe('isCompatibleValue', () => {
+		it('returns true if the value is compatible', async () => {
+			const result = await copyTranslator.isCompatibleValue(blockClipboardEntryValue, config1);
+			expect(result).to.be.true;
+		});
+
+		it('returns false if the value is not compatible', async () => {
+			const result = await copyTranslator.isCompatibleValue(blockClipboardEntryValue, config2);
+			expect(result).to.be.false;
 		});
 	});
 });

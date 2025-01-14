@@ -8,6 +8,12 @@ export class UmbBlockToBlockGridClipboardPastePropertyValueTranslator
 	extends UmbControllerBase
 	implements UmbClipboardPastePropertyValueTranslator<UmbBlockClipboardEntryValueModel, UmbBlockGridValueModel>
 {
+	/**
+	 * Translates a block clipboard entry value to a Block Grid property value.
+	 * @param {UmbBlockClipboardEntryValueModel} value The block clipboard entry value.
+	 * @returns {Promise<UmbBlockGridValueModel>} The translated Block Grid property value.
+	 * @memberof UmbBlockToBlockGridClipboardPastePropertyValueTranslator
+	 */
 	async translate(value: UmbBlockClipboardEntryValueModel): Promise<UmbBlockGridValueModel> {
 		if (!value) {
 			throw new Error('Values is missing.');
@@ -34,6 +40,20 @@ export class UmbBlockToBlockGridClipboardPastePropertyValueTranslator
 		};
 
 		return blockGridPropertyValue;
+	}
+
+	/**
+	 * Determines if a block clipboard entry value is compatible with the Block Grid property editor.
+	 * @param {UmbBlockClipboardEntryValueModel} value The block clipboard entry value.
+	 * @param {*} config The Block Grid property editor configuration.
+	 * @returns {Promise<boolean>} A promise that resolves with a boolean indicating if the value is compatible.
+	 * @memberof UmbBlockToBlockGridClipboardPastePropertyValueTranslator
+	 */
+	async isCompatibleValue(value: UmbBlockClipboardEntryValueModel, config: any): Promise<boolean> {
+		const allowedBlockContentTypes =
+			config.find((c) => c.alias === 'blocks')?.value.map((b) => b.contentElementTypeKey) ?? [];
+		const blockContentTypes = value.contentData.map((c) => c.contentTypeKey);
+		return blockContentTypes?.every((b) => allowedBlockContentTypes.includes(b)) ?? false;
 	}
 }
 
