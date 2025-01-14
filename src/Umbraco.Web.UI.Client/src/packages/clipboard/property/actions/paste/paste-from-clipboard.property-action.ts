@@ -1,17 +1,17 @@
 import { UmbClipboardEntryItemRepository } from '../../../clipboard-entry/index.js';
 import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '../../context/clipboard.property-context-token.js';
-import type { MetaPropertyActionReplaceFromClipboardKind } from './types.js';
+import type { MetaPropertyActionPasteFromClipboardKind } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbPropertyActionBase, type UmbPropertyActionArgs } from '@umbraco-cms/backoffice/property-action';
 
-export class UmbReplaceFromClipboardPropertyAction extends UmbPropertyActionBase<MetaPropertyActionReplaceFromClipboardKind> {
+export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<MetaPropertyActionPasteFromClipboardKind> {
 	#init: Promise<unknown>;
 	#propertyContext?: typeof UMB_PROPERTY_CONTEXT.TYPE;
 	#clipboardContext?: typeof UMB_CLIPBOARD_PROPERTY_CONTEXT.TYPE;
 
-	constructor(host: UmbControllerHost, args: UmbPropertyActionArgs<MetaPropertyActionReplaceFromClipboardKind>) {
+	constructor(host: UmbControllerHost, args: UmbPropertyActionArgs<MetaPropertyActionPasteFromClipboardKind>) {
 		super(host, args);
 
 		this.#init = Promise.all([
@@ -66,14 +66,14 @@ export class UmbReplaceFromClipboardPropertyAction extends UmbPropertyActionBase
 
 			// Todo: localize
 			await umbConfirmModal(this, {
-				headline: 'Replace from clipboard',
-				content: `The property already contains a value. Pasting will overwrite the current value. 
+				headline: 'Paste from clipboard',
+				content: `The property already contains a value. Paste from the property action will overwrite the current value. 
 				Do you want to replace the current value with ${item.name}?`,
-				confirmLabel: 'Replace',
+				confirmLabel: 'Paste',
 			});
 		}
 
 		this.#propertyContext?.setValue(propertyValue);
 	}
 }
-export { UmbReplaceFromClipboardPropertyAction as api };
+export { UmbPasteFromClipboardPropertyAction as api };

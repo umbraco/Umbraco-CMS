@@ -17,7 +17,7 @@ export type UmbBlockCatalogueModalValue =
 			create?: {
 				contentElementTypeKey: string;
 			};
-			clipboard?: {
+			pasteFromClipboard?: {
 				selection: Array<string>;
 			};
 	  }

@@ -110,7 +110,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		const target = event.target as any;
 		const selection = target?.selection || [];
 		this.value = {
-			clipboard: {
+			pasteFromClipboard: {
 				selection,
 			},
 		};

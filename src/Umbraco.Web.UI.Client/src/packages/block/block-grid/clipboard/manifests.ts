@@ -33,9 +33,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'propertyAction',
-		kind: 'replaceFromClipboard',
-		alias: 'Umb.PropertyAction.BlockGrid.Clipboard.Replace',
-		name: 'Block Grid Replace From Clipboard Property Action',
+		kind: 'pasteFromClipboard',
+		alias: 'Umb.PropertyAction.BlockGrid.Clipboard.Paste',
+		name: 'Block Grid Paste From Clipboard Property Action',
 		forPropertyEditorUis,
 		conditions: [
 			{
