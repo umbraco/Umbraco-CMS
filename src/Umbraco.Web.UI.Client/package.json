@@ -18,7 +18,7 @@
     "npm": ">=10.1"
   },
   "dependencies": {
-    "@microsoft/signalr": "7.0.12",
+    "@microsoft/signalr": "8.0.7",
     "@umbraco-ui/uui": "1.11.0",
     "@umbraco-ui/uui-css": "1.11.0",
     "ace-builds": "1.31.1",
