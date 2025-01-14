@@ -15,6 +15,7 @@ import {
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
+// eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name
 export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement implements UmbPropertyEditorUiElement {
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
