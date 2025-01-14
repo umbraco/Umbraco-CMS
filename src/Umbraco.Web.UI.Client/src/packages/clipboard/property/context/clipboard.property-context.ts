@@ -29,7 +29,6 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 	#init?: Promise<unknown>;
 
 	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
-	#clipboardContext?: typeof UMB_CLIPBOARD_CONTEXT.TYPE;
 	#hostElement?: Element;
 	#propertyEditorElement?: UmbPropertyEditorUiElement;
 
@@ -41,10 +40,6 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 		this.#init = Promise.all([
 			this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
 				this.#modalManagerContext = context;
-			}).asPromise(),
-
-			this.consumeContext(UMB_CLIPBOARD_CONTEXT, (context) => {
-				this.#clipboardContext = context;
 			}).asPromise(),
 
 			this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
@@ -117,9 +112,7 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 		propertyValue: any;
 		propertyEditorUiAlias: string;
 	}): Promise<UmbClipboardEntryDetailModel | undefined> {
-		if (!this.#clipboardContext) {
-			throw new Error('Clipboard context not found');
-		}
+		const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
 
 		const copyValueResolver = new UmbClipboardCopyPropertyValueTranslatorValueResolver(this);
 		const values = await copyValueResolver.resolve(args.propertyValue, args.propertyEditorUiAlias);
@@ -130,7 +123,7 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 			icon: args.icon,
 		};
 
-		return await this.#clipboardContext.write(entryPreset);
+		return await clipboardContext.write(entryPreset);
 	}
 
 	/**
@@ -203,8 +196,6 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 		clipboardEntryUnique: string,
 		propertyEditorUiManifest: ManifestPropertyEditorUi,
 	): Promise<ValueType | undefined> {
-		await this.#init;
-
 		if (!clipboardEntryUnique) {
 			throw new Error('Unique id is required');
 		}
@@ -217,7 +208,8 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 			throw new Error('Property Editor UI Schema alias is required');
 		}
 
-		const entry = await this.#clipboardContext!.read(clipboardEntryUnique);
+		const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
+		const entry = await clipboardContext.read(clipboardEntryUnique);
 
 		if (!entry) {
 			throw new Error(`Could not find clipboard entry with unique id: ${clipboardEntryUnique}`);
