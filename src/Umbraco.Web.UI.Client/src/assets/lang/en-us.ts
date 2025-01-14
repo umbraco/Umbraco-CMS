@@ -2052,6 +2052,7 @@ export default {
 		fieldIsMandatory: 'Field is mandatory',
 		mandatoryMessage: 'Enter a custom validation error message (optional)',
 		validationRegExp: 'Enter a regular expression',
+		validationRegExpTooLong: 'The pattern you have provided is too long. Please limit to 255 characters.',
 		validationRegExpMessage: 'Enter a custom validation error message (optional)',
 		minCount: 'You need to add at least',
 		maxCount: 'You can only have',

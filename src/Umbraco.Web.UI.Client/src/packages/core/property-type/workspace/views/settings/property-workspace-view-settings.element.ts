@@ -386,13 +386,18 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 			${this._data?.validation?.regEx !== null
 				? html`
-						<uui-input
-							name="pattern"
-							style="margin-bottom: var(--uui-size-space-1); margin-top: var(--uui-size-space-5);"
-							@change=${this.#onValidationRegExChange}
-							placeholder=${this.localize.term('validation_validationRegExp')}
-							label=${this.localize.term('validation_validationRegExp')}
-							.value=${this._data?.validation?.regEx ?? ''}></uui-input>
+						<umb-form-validation-message>
+							<uui-input
+								name="pattern"
+								style="margin-bottom: var(--uui-size-space-1); margin-top: var(--uui-size-space-5);"
+								@change=${this.#onValidationRegExChange}
+								placeholder=${this.localize.term('validation_validationRegExp')}
+								label=${this.localize.term('validation_validationRegExp')}
+								${umbBindToValidation(this, '$.validation.regex')}
+								maxlength=255
+								maxlengthMessage=${this.localize.term('validation_validationRegExpTooLong')}
+								.value=${this._data?.validation?.regEx ?? ''}></uui-input>
+						</umb-form-validation-message>
 						<uui-textarea
 							name="pattern-message"
 							@change=${this.#onValidationMessageChange}
