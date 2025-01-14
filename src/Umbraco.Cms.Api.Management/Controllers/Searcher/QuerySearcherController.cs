@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using Examine;
+using Examine.Lucene.Search;
 using Examine.Search;
 using Lucene.Net.QueryParsers.Classic;
 using Microsoft.AspNetCore.Http;
@@ -57,7 +58,7 @@ public class QuerySearcherController : SearcherControllerBase
             results = searcher
                 .CreateQuery()
                 .NativeQuery(term)
-                .Execute(QueryOptions.SkipTake(skip, take));
+                .Execute(new LuceneQueryOptions(skip, take, skipTakeMaxResults: skip + take));
         }
         catch (ParseException)
         {
