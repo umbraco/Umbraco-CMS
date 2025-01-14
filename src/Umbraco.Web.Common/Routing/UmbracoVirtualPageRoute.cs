@@ -55,10 +55,6 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
         IPublishedRouter publishedRouter)
         : this(endpointDataSource, linkParser, uriUtility, publishedRouter, StaticServiceProvider.Instance.GetRequiredService<IUmbracoContextAccessor>())
     {
-        _endpointDataSource = endpointDataSource;
-        _linkParser = linkParser;
-        _uriUtility = uriUtility;
-        _publishedRouter = publishedRouter;
     }
 
     /// <summary>
