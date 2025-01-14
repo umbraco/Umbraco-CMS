@@ -121,14 +121,6 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 				--uui-color-divider-standalone: transparent;
 			}
 
-			#workspace-header {
-				width: 100%;
-			}
-
-			uui-input {
-				width: 100%;
-			}
-
 			#code-editor-menu-container uui-icon:not([name='icon-delete']) {
 				margin-right: var(--uui-size-space-3);
 			}
