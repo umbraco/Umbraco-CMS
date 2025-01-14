@@ -1,4 +1,4 @@
-import { closestColumnSpanOption, forEachBlockLayoutEntryOf } from '../utils/index.js';
+import { closestColumnSpanOption } from '../utils/index.js';
 import type { UmbBlockGridValueModel } from '../types.js';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS, UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS } from '../constants.js';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context-token.js';
@@ -19,7 +19,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockGridTypeModel, UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UMB_CLIPBOARD_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
+import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 
 export class UmbBlockGridEntryContext
 	extends UmbBlockEntryContext<
@@ -274,7 +274,7 @@ export class UmbBlockGridEntryContext
 
 		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
 		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
-		const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
+		const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
 
 		const workspaceName = propertyDatasetContext?.getName();
 		const propertyLabel = propertyContext?.getLabel();
@@ -296,22 +296,6 @@ export class UmbBlockGridEntryContext
 		const settingsData = settings ? [structuredClone(settings)] : [];
 		const exposes = expose ? [structuredClone(expose)] : [];
 
-		// Find sub Blocks and append their data:
-		forEachBlockLayoutEntryOf(layout, async (entry) => {
-			const content = this._manager!.getContentOf(entry.contentKey);
-			if (!content) {
-				throw new Error('No content found');
-			}
-			contentData.push(structuredClone(content));
-
-			if (entry.settingsKey) {
-				const settings = this._manager!.getSettingsOf(entry.settingsKey);
-				if (settings) {
-					settingsData.push(structuredClone(settings));
-				}
-			}
-		});
-
 		const propertyValue: UmbBlockGridValueModel = {
 			layout: {
 				[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]: layout ? [structuredClone(layout)] : undefined,
@@ -321,7 +305,7 @@ export class UmbBlockGridEntryContext
 			expose: exposes,
 		};
 
-		clipboardContext.writeForProperty({
+		clipboardContext.write({
 			icon: this.getContentElementTypeIcon(),
 			name: entryName,
 			propertyValue,

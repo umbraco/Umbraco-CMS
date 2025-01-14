@@ -1,6 +1,6 @@
 import { UmbPropertyContext } from './property.context.js';
 import { css, customElement, html, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import { createExtensionElement, UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -20,6 +20,7 @@ import type {
 } from '@umbraco-cms/backoffice/content-type';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
+import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 
 /**
  *  @element umb-property
@@ -171,11 +172,13 @@ export class UmbPropertyElement extends UmbLitElement {
 	private _isReadOnly = false;
 
 	#propertyContext = new UmbPropertyContext(this);
+	#pathAddendum = new UmbRoutePathAddendumContext(this);
 
 	#controlValidator?: UmbFormControlValidator;
 	#validationMessageBinder?: UmbBindServerValidationToFormControl;
 	#valueObserver?: UmbObserverController<unknown>;
 	#configObserver?: UmbObserverController<UmbPropertyEditorConfigCollection | undefined>;
+	#extensionsController?: UmbExtensionsApiInitializer<any>;
 
 	constructor() {
 		super();
@@ -184,6 +187,7 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#propertyContext.alias,
 			(alias) => {
 				this._alias = alias;
+				this.#pathAddendum.setAddendum(alias);
 			},
 			null,
 		);
@@ -271,6 +275,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	}
 
 	private async _gotEditorUI(manifest?: ManifestPropertyEditorUi | null): Promise<void> {
+		this.#extensionsController?.destroy();
 		this.#propertyContext.setEditor(undefined);
 		this.#propertyContext.setEditorManifest(manifest ?? undefined);
 
@@ -350,10 +355,25 @@ export class UmbPropertyElement extends UmbLitElement {
 				}
 
 				this._element.toggleAttribute('readonly', this._isReadOnly);
+				this.#createController(manifest);
 			}
 
 			this.requestUpdate('element', oldElement);
 		}
+	}
+
+	#createController(propertyEditorUiManifest: ManifestPropertyEditorUi): void {
+		if (this.#extensionsController) {
+			this.#extensionsController.destroy();
+		}
+
+		this.#extensionsController = new UmbExtensionsApiInitializer(
+			this,
+			umbExtensionsRegistry,
+			'propertyContext',
+			[],
+			(manifest) => manifest.forPropertyEditorUis.includes(propertyEditorUiManifest.alias),
+		);
 	}
 
 	override render() {

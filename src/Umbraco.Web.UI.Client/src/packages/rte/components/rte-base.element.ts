@@ -178,16 +178,18 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 	}
 
 	protected _filterUnusedBlocks(usedContentKeys: (string | null)[]) {
-		const unusedBlockContents = this.#managerContext.getContents().filter((x) => usedContentKeys.indexOf(x.key) === -1);
-		unusedBlockContents.forEach((blockContent) => {
-			this.#managerContext.removeOneContent(blockContent.key);
-		});
-		const unusedBlocks = this.#managerContext.getLayouts().filter((x) => usedContentKeys.indexOf(x.contentKey) === -1);
-		unusedBlocks.forEach((blockLayout) => {
-			this.#managerContext.removeOneLayout(blockLayout.contentKey);
-		});
-	}
+		const unusedLayouts = this.#managerContext.getLayouts().filter((x) => usedContentKeys.indexOf(x.contentKey) === -1);
 
+		const unusedContentKeys = unusedLayouts.map((x) => x.contentKey);
+
+		const unusedSettingsKeys = unusedLayouts
+			.map((x) => x.settingsKey)
+			.filter((x) => typeof x === 'string') as Array<string>;
+
+		this.#managerContext.removeManyContent(unusedContentKeys);
+		this.#managerContext.removeManySettings(unusedSettingsKeys);
+		this.#managerContext.removeManyLayouts(unusedContentKeys);
+	}
 	protected _fireChangeEvent() {
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}

@@ -6,13 +6,22 @@ import {
 	UMB_WRITABLE_PROPERTY_CONDITION_ALIAS,
 } from '@umbraco-cms/backoffice/property';
 
+const forPropertyEditorUis = [UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS];
+
 export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'propertyContext',
+		kind: 'clipboard',
+		alias: 'Umb.PropertyContext.BlockGrid.Clipboard',
+		name: 'Block Grid Clipboard Property Context',
+		forPropertyEditorUis,
+	},
 	{
 		type: 'propertyAction',
 		kind: 'copyToClipboard',
 		alias: 'Umb.PropertyAction.BlockGrid.Clipboard.Copy',
 		name: 'Block Grid Copy To Clipboard Property Action',
-		forPropertyEditorUis: [UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS],
+		forPropertyEditorUis,
 		conditions: [
 			{
 				alias: UMB_WRITABLE_PROPERTY_CONDITION_ALIAS,
@@ -27,7 +36,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'pasteFromClipboard',
 		alias: 'Umb.PropertyAction.BlockGrid.Clipboard.Paste',
 		name: 'Block Grid Paste From Clipboard Property Action',
-		forPropertyEditorUis: [UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS],
+		forPropertyEditorUis,
 		conditions: [
 			{
 				alias: UMB_WRITABLE_PROPERTY_CONDITION_ALIAS,

@@ -5,7 +5,7 @@ import { UmbClipboardCopyPropertyValueTranslatorValueResolver } from './clipboar
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbClipboardCopyPropertyValueTranslator } from './types.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbClipboardEntryValueModel } from '../../clipboard-entry/index.js';
+import type { UmbClipboardEntryValueModel } from '../../../clipboard-entry/index.js';
 
 const TEST_PROPERTY_EDITOR_UI_ALIAS = 'testPropertyEditorUiAlias';
 const TEST_CLIPBOARD_ENTRY_VALUE_TYPE_1 = 'testClipboardEntryValueType1';

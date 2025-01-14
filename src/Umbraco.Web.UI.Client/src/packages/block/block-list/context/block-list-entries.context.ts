@@ -11,8 +11,7 @@ import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context-tok
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UMB_CONTENT_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/content';
-import { UMB_CLIPBOARD_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
+import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 
 export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT,
@@ -22,11 +21,6 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	UmbBlockListWorkspaceOriginData
 > {
 	//
-	#catalogueModal: UmbModalRouteRegistrationController<
-		typeof UMB_BLOCK_CATALOGUE_MODAL.DATA,
-		typeof UMB_BLOCK_CATALOGUE_MODAL.VALUE
-	>;
-	#workspaceModal;
 
 	// We will just say its always allowed for list for now: [NL]
 	public readonly canCreate = new UmbBooleanState(true).asObservable();
@@ -34,15 +28,14 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_LIST_MANAGER_CONTEXT);
 
-		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
-			.addUniquePaths(['propertyAlias', 'variantId'])
-			.addAdditionalPath(':view/:index')
+		new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
+			.addAdditionalPath('_catalogue/:view/:index')
 			.onSetup(async (routingInfo) => {
 				await this._retrieveManager;
 				if (!this._manager) return false;
 				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
-				const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
-				const pasteTranslatorManifests = clipboardContext.getPastePropertyValueTranslatorManifests(
+				const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
+				const pasteTranslatorManifests = clipboardContext.getPasteTranslatorManifests(
 					UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
 				);
 				return {
@@ -51,7 +44,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 						blockGroups: [],
 						openClipboard: routingInfo.view === 'clipboard',
 						clipboardFilter: (clipboardEntryDetailModel) => {
-							const hasSupportedTranslator = clipboardContext.hasSupportedPastePropertyValueTranslator(
+							const hasSupportedTranslator = clipboardContext.hasSupportedPasteTranslator(
 								pasteTranslatorManifests,
 								clipboardEntryDetailModel.values,
 							);
@@ -79,11 +72,11 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 					} else {
 						throw new Error('Failed to create block');
 					}
-				} else if (value?.pasteFromClipboard && value.pasteFromClipboard.selection?.length && data) {
-					const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
+				} else if (value?.clipboard && value.clipboard.selection?.length && data) {
+					const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
 
-					const propertyValues = await clipboardContext.readMultipleForProperty<UmbBlockListValueModel>(
-						value.pasteFromClipboard.selection,
+					const propertyValues = await clipboardContext.readMultiple<UmbBlockListValueModel>(
+						value.clipboard.selection,
 						UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
 					);
 
@@ -94,8 +87,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 				this._catalogueRouteBuilderState.setValue(routeBuilder);
 			});
 
-		this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_LIST_WORKSPACE_MODAL)
-			.addUniquePaths(['propertyAlias', 'variantId'])
+		new UmbModalRouteRegistrationController(this, UMB_BLOCK_LIST_WORKSPACE_MODAL)
 			.addAdditionalPath('block')
 			.onSetup(() => {
 				return {
@@ -107,13 +99,6 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 				const newPath = routeBuilder({});
 				this._workspacePath.setValue(newPath);
 			});
-
-		// TODO: This must later be switched out with a smarter Modal Registration System, cause here is a issue with Block Editors in inline mode in Block Editors, cause the hosting Block is also of type Content. [NL]
-		this.consumeContext(UMB_CONTENT_PROPERTY_DATASET_CONTEXT, (dataset) => {
-			const variantId = dataset.getVariantId();
-			this.#catalogueModal.setUniquePathValue('variantId', variantId?.toString());
-			this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
-		});
 	}
 
 	protected _gotBlockManager() {
@@ -132,15 +117,6 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 				this._manager?.setLayouts(layouts);
 			},
 			'observeThisLayouts',
-		);
-
-		this.observe(
-			this._manager.propertyAlias,
-			(alias) => {
-				this.#catalogueModal.setUniquePathValue('propertyAlias', alias ?? 'null');
-				this.#workspaceModal.setUniquePathValue('propertyAlias', alias ?? 'null');
-			},
-			'observePropertyAlias',
 		);
 	}
 
