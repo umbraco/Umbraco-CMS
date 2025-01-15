@@ -1054,7 +1054,7 @@
 		},
 		{
 			"name": "icon-layers",
-			"file": "layers-3.svg"
+			"file": "layers.svg"
 		},
 		{
 			"name": "icon-layout",
@@ -2437,10 +2437,6 @@
 			"file": "google.svg"
 		},
 		{
-			"name": "icon-linkedin",
-			"file": "linkedin.svg"
-		},
-		{
 			"name": "icon-mastodon",
 			"file": "mastodon.svg"
 		},
@@ -2688,6 +2684,11 @@
 		{
 			"name": "icon-keyhole",
 			"file": "icon-keyhole.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-linkedin",
+			"file": "icon-linkedin.svg",
 			"legacy": true
 		},
 		{

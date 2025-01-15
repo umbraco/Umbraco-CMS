@@ -2299,10 +2299,6 @@ name: "icon-google",
 
 path: () => import("./icons/icon-google.js"),
 },{
-name: "icon-linkedin",
-
-path: () => import("./icons/icon-linkedin.js"),
-},{
 name: "icon-mastodon",
 
 path: () => import("./icons/icon-mastodon.js"),
@@ -2502,6 +2498,10 @@ path: () => import("./icons/icon-keychain.js"),
 name: "icon-keyhole",
 legacy: true,
 path: () => import("./icons/icon-keyhole.js"),
+},{
+name: "icon-linkedin",
+legacy: true,
+path: () => import("./icons/icon-linkedin.js"),
 },{
 name: "icon-linux-tux",
 legacy: true,
