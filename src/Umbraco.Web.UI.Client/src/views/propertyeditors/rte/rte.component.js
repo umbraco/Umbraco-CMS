@@ -256,7 +256,7 @@
                         toolbar: editorConfig.toolbar,
                         model: vm.model,
                         getValue: function () {
-                          return vm.model.value.markup;
+                          return vm.model.value.markup ?? "";
                         },
                         setValue: function (newVal) {
                           vm.model.value.markup = newVal;
