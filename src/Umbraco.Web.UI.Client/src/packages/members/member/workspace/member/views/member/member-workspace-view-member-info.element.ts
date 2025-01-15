@@ -9,7 +9,9 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace'
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbMemberTypeItemRepository } from '@umbraco-cms/backoffice/member-type';
-import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
+import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-member-workspace-view-member-info')
 export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -69,16 +71,16 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 			this._memberTypeIcon = memberType.icon;
 		});
 
-		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
-			this.observe(
-				context.allowedSections,
-				(allowedSections) => {
-					if (!allowedSections) return;
-					this._hasSettingsAccess = allowedSections.includes("Umb.Section.Settings");
+		createExtensionApiByAlias(this, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					match: UMB_SETTINGS_SECTION_ALIAS,
 				},
-				'umbAllowedSectionsObserver',
-			);
-		});
+				onChange: (permitted: boolean) => {
+					this._hasSettingsAccess = permitted;
+				},
+			},
+		]);
 	}
 
 	#setDateFormat(date: string | undefined | null): string {

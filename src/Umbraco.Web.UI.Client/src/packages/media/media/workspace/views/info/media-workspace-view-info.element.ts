@@ -8,11 +8,13 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { MediaUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
+import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 
 // import of local components
 import './media-workspace-view-info-history.element.js';
 import './media-workspace-view-info-reference.element.js';
-import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
 @customElement('umb-media-workspace-view-info')
 export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
@@ -59,16 +61,16 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 				this._editMediaTypePath = routeBuilder({});
 			});
 
-		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
-			this.observe(
-				context.allowedSections,
-				(allowedSections) => {
-					if (!allowedSections) return;
-					this._hasSettingsAccess = allowedSections.includes("Umb.Section.Settings");
+		createExtensionApiByAlias(this, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					match: UMB_SETTINGS_SECTION_ALIAS,
 				},
-				'umbAllowedSectionsObserver',
-			);
-		});
+				onChange: (permitted: boolean) => {
+					this._hasSettingsAccess = permitted;
+				},
+			},
+		]);
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;

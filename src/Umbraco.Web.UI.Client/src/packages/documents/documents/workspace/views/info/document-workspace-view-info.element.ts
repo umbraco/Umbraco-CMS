@@ -12,13 +12,13 @@ import { UMB_TEMPLATE_PICKER_MODAL, UmbTemplateItemRepository } from '@umbraco-c
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
+import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 
 // import of local components
 import './document-workspace-view-info-links.element.js';
 import './document-workspace-view-info-history.element.js';
 import './document-workspace-view-info-reference.element.js';
-import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
-import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 
 @customElement('umb-document-workspace-view-info')
 export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
