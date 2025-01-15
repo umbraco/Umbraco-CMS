@@ -26,7 +26,11 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController, UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
+import {
+	UMB_CLIPBOARD_PROPERTY_CONTEXT,
+	UmbClipboardPastePropertyValueTranslatorValueResolver,
+} from '@umbraco-cms/backoffice/clipboard';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 interface UmbBlockGridAreaTypeInvalidRuleType {
 	groupKey?: string;
@@ -162,17 +166,41 @@ export class UmbBlockGridEntriesContext
 				const pasteTranslatorManifests = clipboardContext.getPasteTranslatorManifests(
 					UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
 				);
+
+				// TODO: consider moving some of this logic to the clipboard property context
+				const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
+				const config = propertyContext.getConfig();
+				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
+
 				return {
 					data: {
 						blocks: this.#allowedBlockTypes.getValue(),
 						blockGroups: this._manager.getBlockGroups() ?? [],
 						openClipboard: routingInfo.view === 'clipboard',
-						clipboardFilter: (clipboardEntryDetailModel) => {
-							const hasSupportedTranslator = clipboardContext.hasSupportedPasteTranslator(
+						clipboardFilter: async (clipboardEntryDetail) => {
+							const hasSupportedPasteTranslator = clipboardContext.hasSupportedPasteTranslator(
 								pasteTranslatorManifests,
-								clipboardEntryDetailModel.values,
+								clipboardEntryDetail.values,
 							);
-							return hasSupportedTranslator;
+
+							if (!hasSupportedPasteTranslator) {
+								return false;
+							}
+
+							const pasteTranslator = await valueResolver.getPasteTranslator(
+								clipboardEntryDetail.values,
+								UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
+							);
+
+							if (pasteTranslator.isCompatibleValue) {
+								const value = await valueResolver.resolve(
+									clipboardEntryDetail.values,
+									UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
+								);
+								return pasteTranslator.isCompatibleValue(value, config);
+							}
+
+							return true;
 						},
 						originData: {
 							index: index,
@@ -208,8 +236,6 @@ export class UmbBlockGridEntriesContext
 						value.clipboard.selection,
 						UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
 					);
-
-					console.log('propertyValues', propertyValues);
 
 					this._insertFromPropertyValues(propertyValues, data.originData as UmbBlockGridWorkspaceOriginData);
 				}

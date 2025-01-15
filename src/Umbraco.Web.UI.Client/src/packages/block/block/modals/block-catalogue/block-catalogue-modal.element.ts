@@ -139,7 +139,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	#renderClipboard() {
 		return html`<uui-box
 			><umb-clipboard-entry-picker
-				.config=${{ multiple: true, filter: this.data?.clipboardFilter }}
+				.config=${{ multiple: true, asyncFilter: this.data?.clipboardFilter }}
 				@selection-change=${this.#onClipboardPickerSelectionChange}></umb-clipboard-entry-picker
 		></uui-box>`;
 	}

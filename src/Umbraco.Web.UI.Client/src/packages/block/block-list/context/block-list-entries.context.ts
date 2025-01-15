@@ -11,7 +11,11 @@ import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context-tok
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
+import {
+	UMB_CLIPBOARD_PROPERTY_CONTEXT,
+	UmbClipboardPastePropertyValueTranslatorValueResolver,
+} from '@umbraco-cms/backoffice/clipboard';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT,
@@ -35,20 +39,45 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 				if (!this._manager) return false;
 				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
 				const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
+
 				const pasteTranslatorManifests = clipboardContext.getPasteTranslatorManifests(
 					UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
 				);
+
+				// TODO: consider moving some of this logic to the clipboard property context
+				const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
+				const config = propertyContext.getConfig();
+				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
+
 				return {
 					data: {
 						blocks: this._manager?.getBlockTypes() ?? [],
 						blockGroups: [],
 						openClipboard: routingInfo.view === 'clipboard',
-						clipboardFilter: (clipboardEntryDetailModel) => {
-							const hasSupportedTranslator = clipboardContext.hasSupportedPasteTranslator(
+						clipboardFilter: async (clipboardEntryDetail) => {
+							const hasSupportedPasteTranslator = clipboardContext.hasSupportedPasteTranslator(
 								pasteTranslatorManifests,
-								clipboardEntryDetailModel.values,
+								clipboardEntryDetail.values,
 							);
-							return hasSupportedTranslator;
+
+							if (!hasSupportedPasteTranslator) {
+								return false;
+							}
+
+							const pasteTranslator = await valueResolver.getPasteTranslator(
+								clipboardEntryDetail.values,
+								UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
+							);
+
+							if (pasteTranslator.isCompatibleValue) {
+								const value = await valueResolver.resolve(
+									clipboardEntryDetail.values,
+									UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
+								);
+								return pasteTranslator.isCompatibleValue(value, config);
+							}
+
+							return true;
 						},
 						originData: { index: index },
 						createBlockInWorkspace: this._manager.getInlineEditingMode() === false,

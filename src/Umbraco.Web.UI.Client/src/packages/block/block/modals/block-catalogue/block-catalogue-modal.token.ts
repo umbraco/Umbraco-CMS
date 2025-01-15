@@ -8,7 +8,7 @@ export interface UmbBlockCatalogueModalData {
 	blockGroups?: Array<UmbBlockTypeGroup>;
 	createBlockInWorkspace?: boolean;
 	openClipboard?: boolean;
-	clipboardFilter?: (clipboardDetailEntryModel: UmbClipboardEntryDetailModel) => boolean;
+	clipboardFilter?: (clipboardDetailEntryModel: UmbClipboardEntryDetailModel) => Promise<boolean>;
 	originData: UmbBlockWorkspaceData['originData'];
 }
 
