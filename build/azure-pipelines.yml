@@ -557,22 +557,21 @@ stages:
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
         strategy:
           matrix:
-            ${{ if eq(parameters.sqlServerLinuxAcceptanceTests, True) }}:
-              LinuxPart1Of3:
-                testCommand: "npm run testSqlite -- --shard=1/3"
-                vmImage: "ubuntu-latest"
-                SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-                CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
-              LinuxPart2Of3:
-                testCommand: "npm run testSqlite -- --shard=2/3"
-                vmImage: "ubuntu-latest"
-                SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-                CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
-              LinuxPart3Of3:
-                testCommand: "npm run testSqlite -- --shard=3/3"
-                vmImage: "ubuntu-latest"
-                SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-                CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+            LinuxPart1Of3:
+              testCommand: "npm run testSqlite -- --shard=1/3"
+              vmImage: "ubuntu-latest"
+              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
+              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+            LinuxPart2Of3:
+              testCommand: "npm run testSqlite -- --shard=2/3"
+              vmImage: "ubuntu-latest"
+              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
+              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+            LinuxPart3Of3:
+              testCommand: "npm run testSqlite -- --shard=3/3"
+              vmImage: "ubuntu-latest"
+              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
+              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
             WindowsPart1Of3:
               vmImage: "windows-latest"
               testCommand: "npm run testSqlite -- --shard=1/3"
