@@ -35,6 +35,7 @@ import type {
 	UUIInputElement,
 	UUIInputEvent,
 } from '@umbraco-cms/backoffice/external/uui';
+import { UmbValidationContext, umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-workspace-package-builder')
 export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
@@ -53,6 +54,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	#notificationContext?: UmbNotificationContext;
 	#packageRepository = new UmbPackageRepository(this);
 	#serverFilePathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
+	#validationContext = new UmbValidationContext(this);
 
 	constructor() {
 		super();
@@ -82,41 +84,43 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		blobDownload(data, filename, mimeType);
 	}
 
-	#isNameDefined() {
-		const valid = this._packageNameInput?.checkValidity() ?? false;
-		if (!valid) this.#notificationContext?.peek('danger', { data: { message: 'Package missing a name' } });
-		return valid;
-	}
-
 	async #save() {
-		if (!this.#isNameDefined()) return;
-		if (!this._package) return;
+		try {
+			await this.#validationContext.validate();
+			if (!this._package) return;
 
-		this._submitState = 'waiting';
+			this._submitState = 'waiting';
 
-		const unique = await this.#packageRepository.saveCreatedPackage(this._package);
-		if (!unique) return;
+			const unique = await this.#packageRepository.saveCreatedPackage(this._package);
+			if (!unique) return;
 
-		this._package.unique = unique;
-		this.requestUpdate('_package');
+			this._package.unique = unique;
+			this.requestUpdate('_package');
 
-		this._submitState = 'success';
+			this._submitState = 'success';
 
-		this.#notificationContext?.peek('positive', { data: { message: 'Package saved' } });
+			this.#notificationContext?.peek('positive', { data: { message: 'Package saved' } });
+		} catch {
+			this._submitState = 'failed';
+		}
 	}
 
 	async #update() {
-		if (!this.#isNameDefined()) return;
-		if (!this._package?.unique) return;
+		try {
+			await this.#validationContext.validate();
+			if (!this._package?.unique) return;
 
-		this._submitState = 'waiting';
+			this._submitState = 'waiting';
 
-		const success = await this.#packageRepository.updateCreatedPackage(this._package);
-		if (!success) return;
+			const success = await this.#packageRepository.updateCreatedPackage(this._package);
+			if (!success) return;
 
-		this._submitState = 'success';
+			this._submitState = 'success';
 
-		this.#notificationContext?.peek('positive', { data: { message: 'Package updated' } });
+			this.#notificationContext?.peek('positive', { data: { message: 'Package updated' } });
+		} catch {
+			this._submitState = 'failed';
+		}
 	}
 
 	override render() {
@@ -133,10 +137,12 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			<div id="header" slot="header">
 				<uui-input
 					id="package-name-input"
+					data-mark="input:workspace-name"
 					required
 					label="Name of the package"
 					placeholder=${this.localize.term('placeholders_entername')}
 					${umbFocus()}
+					${umbBindToValidation(this, '$.name', this._package.name)}
 					.value=${this._package?.name ?? ''}
 					@input=${(e: UUIInputEvent) => (this._package!.name = e.target.value as string)}></uui-input>
 			</div>

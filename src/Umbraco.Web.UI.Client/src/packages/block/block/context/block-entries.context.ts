@@ -97,24 +97,19 @@ export abstract class UmbBlockEntriesContext<
 		settings: UmbBlockDataModel | undefined,
 		originData: BlockOriginData,
 	): Promise<boolean>;
-	//edit?
-	//editSettings
 
-	// Idea: should we return true if it was successful?
 	public async delete(contentKey: string) {
 		await this._retrieveManager;
 		const layout = this._layoutEntries.value.find((x) => x.contentKey === contentKey);
 		if (!layout) {
 			throw new Error(`Cannot delete block, missing layout for ${contentKey}`);
 		}
+		this._layoutEntries.removeOne(contentKey);
 
+		this._manager!.removeOneContent(contentKey);
 		if (layout.settingsKey) {
 			this._manager!.removeOneSettings(layout.settingsKey);
 		}
-		this._manager!.removeOneContent(contentKey);
 		this._manager!.removeExposesOf(contentKey);
-
-		this._layoutEntries.removeOne(contentKey);
 	}
-	//copy
 }
