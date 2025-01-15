@@ -348,7 +348,9 @@
           // But I'm not sure it's needed, as this does not trigger the RTE
           if(modelObject) {
             modelObject.update(vm.model.value.blocks, $scope);
-            vm.tinyMceEditor.fire('updateBlocks');
+            if (vm.tinyMceEditor) {
+              vm.tinyMceEditor.fire('updateBlocks');
+            }
             onLoaded();
           }
       }
