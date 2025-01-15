@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
@@ -15,6 +16,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
     private readonly ILocalizedTextService _localizedTextService;
     private readonly ILogger<PublishedUrlInfoProvider> _logger;
     private readonly UriUtility _uriUtility;
+    private readonly IVariationContextAccessor _variationContextAccessor;
 
     public PublishedUrlInfoProvider(
         IPublishedUrlProvider publishedUrlProvider,
@@ -23,7 +25,8 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
         IUmbracoContextAccessor umbracoContextAccessor,
         ILocalizedTextService localizedTextService,
         ILogger<PublishedUrlInfoProvider> logger,
-        UriUtility uriUtility)
+        UriUtility uriUtility,
+        IVariationContextAccessor variationContextAccessor)
     {
         _publishedUrlProvider = publishedUrlProvider;
         _languageService = languageService;
@@ -32,6 +35,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
         _localizedTextService = localizedTextService;
         _logger = logger;
         _uriUtility = uriUtility;
+        _variationContextAccessor = variationContextAccessor;
     }
 
     /// <inheritdoc />
@@ -44,6 +48,14 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
         foreach (var culture in cultures)
         {
             var url = _publishedUrlProvider.GetUrl(content.Key, culture: culture);
+
+            // Handle "could not get URL"
+            if (url is "#" or "#ex")
+            {
+                urlInfos.Add(UrlInfo.Message(_localizedTextService.Localize("content", "getUrlException"), culture));
+                continue;
+            }
+
             // Check for collision
             Attempt<UrlInfo?> hasCollision = await VerifyCollisionAsync(content, url, culture);
 
@@ -98,7 +110,9 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
 
         if (publishedRequest.PublishedContent?.Id != content.Id)
         {
-            var urlInfo = UrlInfo.Message(_localizedTextService.Localize("content", "routeError"), culture);
+            var collidingContent = publishedRequest.PublishedContent?.Key.ToString();
+
+            var urlInfo = UrlInfo.Message(_localizedTextService.Localize("content", "routeError", [collidingContent]), culture);
             return Attempt.Succeed(urlInfo);
         }
 
