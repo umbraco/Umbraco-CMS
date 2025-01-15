@@ -206,7 +206,9 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 				<strong><umb-localize key="content_documentType">Document Type</umb-localize></strong>
 				<uui-ref-node-document-type
 					standalone
-					href=${this._hasSettingsAccess ? editDocumentTypePath + 'edit/' + this._documentTypeUnique : nothing}
+					href=${ifDefined(
+						this._hasSettingsAccess ? editDocumentTypePath + 'edit/' + this._documentTypeUnique : undefined,
+					)}
 					?readonly=${!this._hasSettingsAccess}
 					name=${ifDefined(this.localize.string(this._documentTypeName ?? ''))}>
 					<umb-icon slot="icon" name=${ifDefined(this._documentTypeIcon)}></umb-icon>
@@ -233,7 +235,9 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 							<uui-ref-node
 								standalone
 								name=${ifDefined(this._templateName)}
-								href=${this._hasSettingsAccess ? editTemplatePath + 'edit/' + this._templateUnique : nothing}
+								href=${ifDefined(
+									this._hasSettingsAccess ? editTemplatePath + 'edit/' + this._templateUnique : undefined,
+								)}
 								?readonly=${!this._hasSettingsAccess}>
 								<uui-icon slot="icon" name="icon-document-html"></uui-icon>
 								<uui-action-bar slot="actions">

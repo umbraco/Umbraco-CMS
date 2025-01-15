@@ -192,7 +192,9 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 				<strong><umb-localize key="content_mediaType">Media Type</umb-localize></strong>
 				<uui-ref-node-document-type
 					standalone
-					href=${this._hasSettingsAccess ? this._editMediaTypePath + 'edit/' + this._mediaTypeUnique : nothing}
+					href=${ifDefined(
+						this._hasSettingsAccess ? this._editMediaTypePath + 'edit/' + this._mediaTypeUnique : undefined,
+					)}
 					?readonly=${!this._hasSettingsAccess}
 					name=${ifDefined(this._mediaTypeName)}>
 					${this._mediaTypeIcon ? html`<umb-icon slot="icon" name=${this._mediaTypeIcon}></umb-icon>` : nothing}

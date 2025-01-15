@@ -3,7 +3,7 @@ import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context-tok
 import { UmbMemberKind, type UmbMemberKindType } from '../../../../utils/index.js';
 import { TimeFormatOptions } from './utils.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
@@ -108,7 +108,9 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 					<uui-ref-node
 						standalone
 						.name=${this._memberTypeName}
-						href=${this._hasSettingsAccess ? this._editMemberTypePath + 'edit/' + this._memberTypeUnique : nothing}
+						href=${ifDefined(
+							this._hasSettingsAccess ? this._editMemberTypePath + 'edit/' + this._memberTypeUnique : undefined,
+						)}
 						?readonly=${!this._hasSettingsAccess}>
 						<umb-icon slot="icon" .name=${this._memberTypeIcon}></umb-icon>
 					</uui-ref-node>
