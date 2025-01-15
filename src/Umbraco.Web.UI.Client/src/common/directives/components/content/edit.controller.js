@@ -924,8 +924,6 @@
                                 formHelper.showNotifications(err.data);
                             }
                             model.submitButtonState = "error";
-                            //re-map the dialog model since we've re-bound the properties
-                            dialog.variants = Utilities.copy($scope.content.variants);
                             handleHttpException(err);
                         });
 
