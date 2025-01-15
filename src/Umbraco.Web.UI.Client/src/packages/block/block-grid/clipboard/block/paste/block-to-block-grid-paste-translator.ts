@@ -49,7 +49,11 @@ export class UmbBlockToBlockGridClipboardPastePropertyValueTranslator
 	 * @returns {Promise<boolean>} A promise that resolves with a boolean indicating if the value is compatible.
 	 * @memberof UmbBlockToBlockGridClipboardPastePropertyValueTranslator
 	 */
-	async isCompatibleValue(value: UmbBlockClipboardEntryValueModel, config: any): Promise<boolean> {
+	async isCompatibleValue(
+		value: UmbBlockClipboardEntryValueModel,
+		// TODO: Replace any with the correct type.
+		config: Array<{ alias: string; value: [{ contentElementTypeKey: string }] }>,
+	): Promise<boolean> {
 		const allowedBlockContentTypes =
 			config.find((c) => c.alias === 'blocks')?.value.map((b) => b.contentElementTypeKey) ?? [];
 		const blockContentTypes = value.contentData.map((c) => c.contentTypeKey);

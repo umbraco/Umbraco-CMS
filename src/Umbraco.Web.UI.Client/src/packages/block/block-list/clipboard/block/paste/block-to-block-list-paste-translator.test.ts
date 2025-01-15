@@ -52,7 +52,7 @@ describe('UmbBlockToBlockListClipboardPastePropertyValueTranslator', () => {
 		settingsData: blockListPropertyValue.settingsData,
 	};
 
-	const config = [
+	const config: Array<{ alias: string; value: [{ contentElementTypeKey: string }] }> = [
 		{
 			alias: 'blocks',
 			value: [
@@ -63,7 +63,7 @@ describe('UmbBlockToBlockListClipboardPastePropertyValueTranslator', () => {
 		},
 	];
 
-	const config2 = [
+	const config2: Array<{ alias: string; value: [{ contentElementTypeKey: string }] }> = [
 		{
 			alias: 'blocks',
 			value: [

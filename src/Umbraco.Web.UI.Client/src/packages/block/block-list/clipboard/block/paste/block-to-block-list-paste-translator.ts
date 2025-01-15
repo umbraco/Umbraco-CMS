@@ -40,7 +40,11 @@ export class UmbBlockToBlockListClipboardPastePropertyValueTranslator
 	 * @returns {Promise<boolean>} - Whether the clipboard entry value is compatible with the config.
 	 * @memberof UmbBlockToBlockListClipboardPastePropertyValueTranslator
 	 */
-	async isCompatibleValue(value: UmbBlockClipboardEntryValueModel, config: any): Promise<boolean> {
+	async isCompatibleValue(
+		value: UmbBlockClipboardEntryValueModel,
+		// TODO: Replace any with the correct type.
+		config: Array<{ alias: string; value: [{ contentElementTypeKey: string }] }>,
+	): Promise<boolean> {
 		const allowedBlockContentTypes =
 			config.find((c) => c.alias === 'blocks')?.value.map((b) => b.contentElementTypeKey) ?? [];
 		const blockContentTypes = value.contentData.map((c) => c.contentTypeKey);

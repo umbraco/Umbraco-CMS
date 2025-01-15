@@ -55,7 +55,7 @@ describe('UmbBlockToBlockGridClipboardPastePropertyValueTranslator', () => {
 		settingsData: blockGridPropertyValue.settingsData,
 	};
 
-	const config1 = [
+	const config1: Array<{ alias: string; value: [{ contentElementTypeKey: string }] }> = [
 		{
 			alias: 'blocks',
 			value: [
@@ -66,7 +66,7 @@ describe('UmbBlockToBlockGridClipboardPastePropertyValueTranslator', () => {
 		},
 	];
 
-	const config2 = [
+	const config2: Array<{ alias: string; value: [{ contentElementTypeKey: string }] }> = [
 		{
 			alias: 'blocks',
 			value: [
