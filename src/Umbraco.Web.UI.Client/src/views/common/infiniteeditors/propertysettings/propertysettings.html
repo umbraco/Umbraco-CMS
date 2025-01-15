@@ -125,6 +125,7 @@
                                       ng-model="model.property.validation.pattern"
                                       ng-change="vm.changeValidationPattern()"
                                       ng-if="vm.showValidationPattern"
+                                      maxlength="255"
                                       umb-auto-resize
                                       focus-when="{{vm.focusOnPatternField}}"
                                       ng-keypress="vm.submitOnEnter($event)">
