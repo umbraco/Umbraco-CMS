@@ -491,9 +491,9 @@ export default {
 		copiedItemOfItems: 'Copied %0% out of %1% items',
 	},
 	defaultdialogs: {
-		nodeNameLinkPicker: 'Link title',
+		nodeNameLinkPicker: 'Title',
 		urlLinkPicker: 'Link',
-		anchorLinkPicker: 'Anchor / querystring',
+		anchorLinkPicker: 'Anchor or querystring',
 		anchorInsert: 'Name',
 		closeThisWindow: 'Close this window',
 		confirmdelete: 'Are you sure you want to delete',
@@ -663,7 +663,7 @@ export default {
 		email: 'Enter your email',
 		enterMessage: 'Enter a message...',
 		usernameHint: 'Your username is usually your email',
-		anchor: '#value or ?key=value',
+		anchor: 'Enter an anchor or querystring, #value or ?key=value',
 		enterAlias: 'Enter alias...',
 		generatingAlias: 'Generating alias...',
 		a11yCreateItem: 'Create item',
@@ -671,6 +671,7 @@ export default {
 		a11yName: 'Name',
 		rteParagraph: 'Write something amazing...',
 		rteHeading: "What's the title?",
+		enterUrl: 'Enter a URL...',
 	},
 	editcontenttype: {
 		createListView: 'Create custom list view',
@@ -798,6 +799,7 @@ export default {
 		dictionary: 'Dictionary',
 		dimensions: 'Dimensions',
 		discard: 'Discard',
+		document: 'Document',
 		down: 'Down',
 		download: 'Download',
 		edit: 'Edit',
@@ -2668,5 +2670,11 @@ export default {
 		toolbar_removeGroup: 'Remove group',
 		toolbar_removeItem: 'Remove action',
 		toolbar_emptyGroup: 'Empty',
+	},
+	linkPicker: {
+		modalSource: 'Source',
+		modalManual: 'Manual',
+		modalAnchorValidationMessage:
+			'Please enter an anchor or querystring, or select a published document or media item, or manually configure the URL.',
 	},
 } as UmbLocalizationDictionary;
