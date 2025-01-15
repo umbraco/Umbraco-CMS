@@ -13,16 +13,28 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
 {
     private readonly IPublishedContentCache _publishedContentCache;
     private readonly IDocumentNavigationQueryService _navigationQueryService;
+    private readonly IRequestPreviewService _requestPreviewService;
     private const string AncestorsSpecifier = "ancestors:";
 
     public AncestorsSelector(
         IPublishedContentCache publishedContentCache,
         IRequestRoutingService requestRoutingService,
-        IDocumentNavigationQueryService navigationQueryService)
+        IDocumentNavigationQueryService navigationQueryService,
+        IRequestPreviewService requestPreviewService)
         : base(publishedContentCache, requestRoutingService)
     {
         _publishedContentCache = publishedContentCache;
         _navigationQueryService = navigationQueryService;
+        _requestPreviewService = requestPreviewService;
+    }
+
+    [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V17.")]
+    public AncestorsSelector(
+        IPublishedContentCache publishedContentCache,
+        IRequestRoutingService requestRoutingService,
+        IDocumentNavigationQueryService navigationQueryService)
+        : this(publishedContentCache, requestRoutingService, navigationQueryService, StaticServiceProvider.Instance.GetRequiredService<IRequestPreviewService>())
+    {
     }
 
     [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V17.")]
@@ -53,8 +65,17 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
             };
         }
 
-        IPublishedContent contentItem = _publishedContentCache.GetById((Guid)id)
-                                        ?? throw new InvalidOperationException("Could not obtain the content cache");
+        IPublishedContent? contentItem = _publishedContentCache.GetById(_requestPreviewService.IsPreview(), id.Value);
+
+        if (contentItem is null)
+        {
+            // no such content item, make sure the selector does not yield any results
+            return new SelectorOption
+            {
+                FieldName = AncestorsSelectorIndexer.FieldName,
+                Values = Array.Empty<string>()
+            };
+        }
 
         var ancestorKeys = contentItem.Ancestors(_publishedContentCache, _navigationQueryService).Select(a => a.Key.ToString("D")).ToArray();
 
