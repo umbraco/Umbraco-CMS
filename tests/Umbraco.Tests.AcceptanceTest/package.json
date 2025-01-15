@@ -6,6 +6,7 @@
     "config": "node config.js",
     "ui": "npx playwright test --headed DefaultConfig",
     "test": "npx playwright test DefaultConfig",
+    "testSqlite": "npx playwright test DefaultConfig --grep-invert \"Users\"",
     "all": "npx playwright test",
     "createTest": "node createTest.js"
   },
