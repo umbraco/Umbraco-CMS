@@ -1,7 +1,6 @@
 import { UmbMediaItemRepository } from '../../repository/index.js';
 import { UMB_IMAGE_CROPPER_EDITOR_MODAL, UMB_MEDIA_PICKER_MODAL } from '../../modals/index.js';
-import type { UmbCropModel, UmbMediaPickerPropertyValue } from '../../types.js';
-import type { UmbMediaItemModel } from '../../repository/index.js';
+import type { UmbMediaItemModel, UmbCropModel, UmbMediaPickerPropertyValue } from '../../types.js';
 import type { UmbUploadableItem } from '../../dropzone/types.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbConfirmModal, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -134,19 +133,21 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	#focalPointEnabled: boolean = false;
 
 	@property()
+	/** @deprecated will be removed in v17 */
 	public set alias(value: string | undefined) {
-		this.#modalRouter.setUniquePathValue('propertyAlias', value);
+		//this.#modalRouter.setUniquePathValue('propertyAlias', value);
 	}
 	public get alias(): string | undefined {
-		return this.#modalRouter.getUniquePathValue('propertyAlias');
+		return undefined; //this.#modalRouter.getUniquePathValue('propertyAlias');
 	}
 
 	@property()
+	/** @deprecated will be removed in v17 */
 	public set variantId(value: string | UmbVariantId | undefined) {
-		this.#modalRouter.setUniquePathValue('variantId', value?.toString());
+		//this.#modalRouter.setUniquePathValue('variantId', value?.toString());
 	}
 	public get variantId(): string | undefined {
-		return this.#modalRouter.getUniquePathValue('variantId');
+		return undefined; //this.#modalRouter.getUniquePathValue('variantId');
 	}
 
 	/**
@@ -178,7 +179,6 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 
 	#itemRepository = new UmbMediaItemRepository(this);
 
-	#modalRouter;
 	#modalManager?: UmbModalManagerContext;
 
 	constructor() {
@@ -188,9 +188,8 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 			this.#modalManager = instance;
 		});
 
-		this.#modalRouter = new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
+		new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
 			.addAdditionalPath(':key')
-			.addUniquePaths(['propertyAlias', 'variantId'])
 			.onSetup((params) => {
 				const key = params.key;
 				if (!key) return false;

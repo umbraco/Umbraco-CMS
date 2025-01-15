@@ -1,4 +1,4 @@
-import { UMB_MEDIA_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_MEDIA_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../../constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

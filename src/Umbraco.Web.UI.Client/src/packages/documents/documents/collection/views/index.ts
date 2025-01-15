@@ -1,12 +1,11 @@
 import type { UmbDocumentCollectionItemModel } from '../types.js';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 
-export { UMB_DOCUMENT_GRID_COLLECTION_VIEW_ALIAS, UMB_DOCUMENT_TABLE_COLLECTION_VIEW_ALIAS } from './manifests.js';
-
 /**
  *
- * @param item
- * @param alias
+ * @param {UmbDocumentCollectionItemModel} item - The item to get the property value for
+ * @param {string} alias - The alias of the property to get the value for
+ * @returns {string} The value of the property
  */
 export function getPropertyValueByAlias(item: UmbDocumentCollectionItemModel, alias: string) {
 	switch (alias) {

@@ -1,5 +1,4 @@
-import { UMB_MEDIA_MENU_ALIAS } from '../../menu/index.js';
-import { UMB_MEDIA_RECYCLE_BIN_TREE_ALIAS } from '../tree/index.js';
+import { UMB_MEDIA_MENU_ALIAS, UMB_MEDIA_RECYCLE_BIN_TREE_ALIAS } from '../../constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

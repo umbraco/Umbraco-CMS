@@ -55,6 +55,9 @@ test('can set an allowed template as default for document type', async ({umbraco
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.allowedTemplates).toHaveLength(2);
   expect(documentTypeData.defaultTemplate.id).toBe(secondTemplateId);
+
+  // Clean
+  await umbracoApi.template.ensureNameNotExists(secondTemplateName);
 });
 
 // TODO: Remove skip when the front-end is ready. Currently the error displays when remove an allowed template

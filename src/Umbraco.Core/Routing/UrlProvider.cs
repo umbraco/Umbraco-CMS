@@ -27,6 +27,28 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="variationContextAccessor">The current variation accessor.</param>
         /// <param name="contentCache">The content cache.</param>
         /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
+        /// <param name="publishStatusQueryService">The publish status query service, to query if a given content is published in a given culture.</param>
+        public UrlProvider(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IOptions<WebRoutingSettings> routingSettings,
+            UrlProviderCollection urlProviders,
+            MediaUrlProviderCollection mediaUrlProviders,
+            IVariationContextAccessor variationContextAccessor,
+            IPublishedContentCache contentCache,
+            IDocumentNavigationQueryService navigationQueryService,
+            IPublishStatusQueryService publishStatusQueryService)
+        {
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            _urlProviders = urlProviders;
+            _mediaUrlProviders = mediaUrlProviders;
+            _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
+            _contentCache = contentCache;
+            _navigationQueryService = navigationQueryService;
+            _publishStatusQueryService = publishStatusQueryService;
+            Mode = routingSettings.Value.UrlProviderMode;
+        }
+
+        [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V17.")]
         public UrlProvider(
             IUmbracoContextAccessor umbracoContextAccessor,
             IOptions<WebRoutingSettings> routingSettings,
@@ -35,14 +57,16 @@ namespace Umbraco.Cms.Core.Routing
             IVariationContextAccessor variationContextAccessor,
             IPublishedContentCache contentCache,
             IDocumentNavigationQueryService navigationQueryService)
+            : this(
+                umbracoContextAccessor,
+                routingSettings,
+                urlProviders,
+                mediaUrlProviders,
+                variationContextAccessor,
+                contentCache,
+                navigationQueryService,
+                StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>())
         {
-            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
-            _urlProviders = urlProviders;
-            _mediaUrlProviders = mediaUrlProviders;
-            _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
-            _contentCache = contentCache;
-            _navigationQueryService = navigationQueryService;
-            Mode = routingSettings.Value.UrlProviderMode;
         }
 
         [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V17.")]
@@ -59,7 +83,8 @@ namespace Umbraco.Cms.Core.Routing
                 mediaUrlProviders,
                 variationContextAccessor,
                 StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
-                StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
+                StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
+                StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>())
         {
         }
 
@@ -69,6 +94,7 @@ namespace Umbraco.Cms.Core.Routing
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IPublishedContentCache _contentCache;
         private readonly IDocumentNavigationQueryService _navigationQueryService;
+        private readonly IPublishStatusQueryService _publishStatusQueryService;
 
         /// <summary>
         /// Gets or sets the provider URL mode.
@@ -147,7 +173,7 @@ namespace Umbraco.Cms.Core.Routing
             // be nice with tests, assume things can be null, ultimately fall back to invariant
             // (but only for variant content of course)
             // We need to check all ancestors because urls are variant even for invariant content, if an ancestor is variant.
-            if (culture == null && content.AncestorsOrSelf(_contentCache, _navigationQueryService).Any(x => x.ContentType.VariesByCulture()))
+            if (culture == null && content.AncestorsOrSelf(_variationContextAccessor, _contentCache, _navigationQueryService, _publishStatusQueryService).Any(x => x.ContentType.VariesByCulture()))
             {
                 culture = _variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
             }

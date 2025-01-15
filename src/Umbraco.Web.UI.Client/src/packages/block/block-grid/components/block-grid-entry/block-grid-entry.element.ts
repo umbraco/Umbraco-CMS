@@ -36,16 +36,16 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	public get contentKey(): string | undefined {
 		return this._contentKey;
 	}
-	public set contentKey(value: string | undefined) {
-		if (!value || value === this._contentKey) return;
-		this._contentKey = value;
-		this._blockViewProps.contentKey = value;
-		this.setAttribute('data-element-key', value);
-		this.#context.setContentKey(value);
+	public set contentKey(key: string | undefined) {
+		if (!key || key === this._contentKey) return;
+		this._contentKey = key;
+		this._blockViewProps.contentKey = key;
+		this.setAttribute('data-element-key', key);
+		this.#context.setContentKey(key);
 
 		new UmbObserveValidationStateController(
 			this,
-			`$.contentData[${UmbDataPathBlockElementDataQuery({ key: value })}]`,
+			`$.contentData[${UmbDataPathBlockElementDataQuery({ key: key })}]`,
 			(hasMessages) => {
 				this._contentInvalid = hasMessages;
 				this._blockViewProps.contentInvalid = hasMessages;
@@ -511,7 +511,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 					look="secondary"
 					color=${this._contentInvalid ? 'danger' : ''}
 					href=${this._workspaceEditContentPath}>
-					<uui-icon name="icon-edit"></uui-icon>
+					<uui-icon name=${this._exposed === false ? 'icon-add' : 'icon-edit'}></uui-icon>
 					${this._contentInvalid
 						? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
 						: nothing}

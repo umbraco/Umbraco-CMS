@@ -19,6 +19,8 @@ import type {
 	UmbPropertyTypeValidationModel,
 } from '@umbraco-cms/backoffice/content-type';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
+import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 
 /**
  *  @element umb-property
@@ -74,6 +76,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 */
 	@property({ type: String })
 	public set alias(alias: string) {
+		this.setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'property:' + alias);
 		this.#propertyContext.setAlias(alias);
 	}
 	public get alias() {
@@ -169,6 +172,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	private _isReadOnly = false;
 
 	#propertyContext = new UmbPropertyContext(this);
+	#pathAddendum = new UmbRoutePathAddendumContext(this);
 
 	#controlValidator?: UmbFormControlValidator;
 	#validationMessageBinder?: UmbBindServerValidationToFormControl;
@@ -182,6 +186,7 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#propertyContext.alias,
 			(alias) => {
 				this._alias = alias;
+				this.#pathAddendum.setAddendum(alias);
 			},
 			null,
 		);

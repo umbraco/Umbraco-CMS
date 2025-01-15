@@ -1,4 +1,5 @@
 @using Microsoft.Extensions.Options
+@using Umbraco.Cms.Api.Management.Controllers.Security
 @using Umbraco.Cms.Api.Management.Extensions
 @using Umbraco.Cms.Core.Configuration.Models
 @using Umbraco.Cms.Core.Logging
@@ -11,13 +12,12 @@
 @inject IJsonSerializer JsonSerializer
 @inject IProfilerHtml ProfilerHtml
 @inject IOptions<GlobalSettings> GlobalSettings
-@inject IOptions<ContentSettings> ContentSettings
 
 @{
     bool.TryParse(Context.Request.Query["umbDebug"], out var isDebug);
     var backOfficePath = BackOfficePathGenerator.BackOfficePath;
     var backOfficeAssetsPath = BackOfficePathGenerator.BackOfficeAssetsPath;
-    var loginLogoImage = ContentSettings.Value.LoginLogoImage;
+    var loginLogoImageAlternative = Url.RouteUrl(BackOfficeGraphicsController.LoginLogoAlternativeRouteName, new {Version= "1"});
 }
 
 <!DOCTYPE html>
@@ -28,7 +28,7 @@
     <base href="@backOfficePath.EnsureEndsWith('/')" />
     <link rel="icon" type="image/svg+xml" href="@backOfficeAssetsPath/assets/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="mobile-web-app-capable" content="yes"/>
     <meta name="robots" content="noindex, nofollow"/>
     <meta name="pinterest" content="nopin"/>
     <title>Umbraco</title>
@@ -54,8 +54,8 @@
         }
     </style>
     <div id="noscript-container">
-        <h1 class="uui-h3" style="display: inline-flex; align-items: center; gap: 10px">
-            <img aria-hidden="true" alt="logo" src="@loginLogoImage" style="width: 100%" />
+        <h1 aria-hidden="true" class="uui-h3" style="display: inline-flex; align-items: center; gap: 10px">
+            <img alt="logo" src="@loginLogoImageAlternative" style="width: 100%" />
         </h1>
         <p>For full functionality of Umbraco CMS it is necessary to enable JavaScript.</p>
         <p>Here are the <a href="https://www.enable-javascript.com/" target="_blank" rel="noopener" style="text-decoration: underline;">instructions how to enable JavaScript in your web browser</a>.</p>

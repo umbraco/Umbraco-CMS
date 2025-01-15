@@ -170,4 +170,15 @@ public abstract class DocumentControllerBase : ContentControllerBase
                 .WithTitle("Unknown content operation status.")
                 .Build()),
         });
+
+    protected IActionResult ContentQueryOperationStatusResult(ContentQueryOperationStatus status)
+        => OperationStatusResult(status, problemDetailsBuilder => status switch
+        {
+            ContentQueryOperationStatus.ContentNotFound => NotFound(problemDetailsBuilder
+                .WithTitle("The document could not be found")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
+                .WithTitle("Unknown content query status.")
+                .Build()),
+        });
 }

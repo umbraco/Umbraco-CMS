@@ -653,6 +653,8 @@ export default {
 			'The process is taking longer than expected, check the Umbraco log to see if there have been any errors during this operation',
 		indexCannotRebuild: 'This index cannot be rebuilt because it has no assigned',
 		iIndexPopulator: 'IIndexPopulator',
+		corruptStatus: 'Possible corrupt index detected',
+		corruptErrorDescription: 'Error received when evaluating the index:',
 	},
 	placeholders: {
 		username: 'Enter your username',
@@ -1724,6 +1726,8 @@ export default {
 			'<strong>NOTE!</strong> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.',
 		changeDataTypeHelpText:
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
+		collection: 'Collection',
+		collectionDescription: 'Configures an overview of child content.',
 		collections: 'Collections',
 		collectionsDescription: 'Configures the content item to show list of its children.',
 		structure: 'Structure',
@@ -2531,6 +2535,8 @@ export default {
 			variantName ? `Create ${name} for ${variantName}` : `Create ${name}`,
 		insertBlock: 'Insert Block',
 		labelInlineMode: 'Display inline with text',
+		notExposedLabel: 'Draft',
+		notExposedDescription: 'This Block is not yet created for this variant',
 	},
 	contentTemplatesDashboard: {
 		whatHeadline: 'What are Document Blueprints?',

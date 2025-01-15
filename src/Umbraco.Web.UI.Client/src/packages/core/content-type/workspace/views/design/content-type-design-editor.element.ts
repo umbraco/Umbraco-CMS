@@ -4,7 +4,7 @@ import {
 	UmbContentTypeContainerStructureHelper,
 	UmbContentTypeMoveRootGroupsIntoFirstTabHelper,
 } from '../../../structure/index.js';
-import { UMB_COMPOSITION_PICKER_MODAL } from '../../../modals/index.js';
+import { UMB_COMPOSITION_PICKER_MODAL } from '../../../modals/constants.js';
 import type { UmbContentTypeDesignEditorTabElement } from './content-type-design-editor-tab.element.js';
 import { UmbContentTypeDesignEditorContext } from './content-type-design-editor.context.js';
 import { css, html, customElement, state, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
@@ -187,21 +187,20 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			});
 		}
 
-		routes.push({
-			path: 'root',
-			component: () => import('./content-type-design-editor-tab.element.js'),
-			setup: (component) => {
-				(component as UmbContentTypeDesignEditorTabElement).containerId = null;
-			},
-		});
-
-		if (this._hasRootGroups) {
+		if (this._hasRootGroups || this._tabs.length === 0) {
+			routes.push({
+				path: 'root',
+				component: () => import('./content-type-design-editor-tab.element.js'),
+				setup: (component) => {
+					(component as UmbContentTypeDesignEditorTabElement).containerId = null;
+				},
+			});
 			routes.push({
 				path: '',
 				redirectTo: 'root',
 				guards: [() => this._activeTabId === undefined],
 			});
-		} else if (routes.length !== 0) {
+		} else {
 			routes.push({
 				path: '',
 				redirectTo: routes[0]?.path,
@@ -269,9 +268,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	#deleteTab(tabId?: string) {
 		if (!tabId) return;
 		this.#workspaceContext?.structure.removeContainer(null, tabId);
-		// TODO: We should only navigate away if it was the last tab and if it was the active one... [NL]
-		if (this.#tabsStructureHelper?.isOwnerChildContainer(tabId)) {
-			window.history.replaceState(null, '', this._routerPath + (this._routes[0]?.path ?? '/root'));
+		if (this._activeTabId === tabId) {
+			this._activeTabId = undefined;
 		}
 	}
 	async #addTab() {

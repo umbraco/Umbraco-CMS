@@ -24,6 +24,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
+import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 
 export abstract class UmbBlockEntryContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType>,
@@ -45,6 +46,8 @@ export abstract class UmbBlockEntryContext<
 	_entries?: BlockEntriesContextType;
 
 	#contentKey?: string;
+
+	#pathAddendum = new UmbRoutePathAddendumContext(this);
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	protected readonly _variantId = this.#variantId.asObservable();
 
@@ -275,6 +278,7 @@ export abstract class UmbBlockEntryContext<
 		this.observe(
 			this.unique,
 			(contentKey) => {
+				this.#pathAddendum.setAddendum(contentKey);
 				if (!contentKey) return;
 				this.#observeContentData();
 			},
@@ -499,15 +503,7 @@ export abstract class UmbBlockEntryContext<
 			]),
 			([variantId, variesByCulture, variesBySegment]) => {
 				if (!variantId || variesByCulture === undefined || variesBySegment === undefined) return;
-				if (!variesBySegment && !variesByCulture) {
-					variantId = UmbVariantId.CreateInvariant();
-				} else if (!variesBySegment) {
-					variantId = variantId.toSegmentInvariant();
-				} else if (!variesByCulture) {
-					variantId = variantId.toCultureInvariant();
-				}
-
-				this.#variantId.setValue(variantId);
+				this.#variantId.setValue(variantId.toVariant(variesByCulture, variesBySegment));
 				this.#gotVariantId();
 			},
 			'observeBlockType',
@@ -633,10 +629,18 @@ export abstract class UmbBlockEntryContext<
 
 	//activate
 	public edit() {
-		window.location.href = this.#generateWorkspaceEditContentPath(this.#workspacePath.value, this.getContentKey());
+		window.history.pushState(
+			{},
+			'',
+			this.#generateWorkspaceEditContentPath(this.#workspacePath.value, this.getContentKey()),
+		);
 	}
 	public editSettings() {
-		window.location.href = this.#generateWorkspaceEditSettingsPath(this.#workspacePath.value, this.getContentKey());
+		window.history.pushState(
+			{},
+			'',
+			this.#generateWorkspaceEditSettingsPath(this.#workspacePath.value, this.getContentKey()),
+		);
 	}
 
 	async requestDelete() {

@@ -1,4 +1,4 @@
-import type { UmbMemberGroupItemModel } from '../../repository/index.js';
+import type { UmbMemberGroupItemModel } from '../../types.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbMemberGroupPickerModalData {
