@@ -367,8 +367,6 @@
                     handler: () => $scope.preview(content, additionalPreviewUrl.url, '_blank')
                 }
             });
-
-            $scope.page.showPreviewButton = true;
         }
 
         /** Syncs the content item to it's tree node - this occurs on first load and after saving */
