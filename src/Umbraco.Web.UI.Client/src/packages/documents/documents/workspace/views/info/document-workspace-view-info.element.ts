@@ -11,12 +11,14 @@ import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UMB_TEMPLATE_PICKER_MODAL, UmbTemplateItemRepository } from '@umbraco-cms/backoffice/template';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 
 // import of local components
 import './document-workspace-view-info-links.element.js';
 import './document-workspace-view-info-history.element.js';
 import './document-workspace-view-info-reference.element.js';
-import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
+import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 
 @customElement('umb-document-workspace-view-info')
 export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
@@ -88,16 +90,16 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			this.#observePendingChanges();
 		});
 
-		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
-			this.observe(
-				context.allowedSections,
-				(allowedSections) => {
-					if (!allowedSections) return;
-					this._hasSettingsAccess = allowedSections.includes("Umb.Section.Settings");
+		createExtensionApiByAlias(this, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					match: UMB_SETTINGS_SECTION_ALIAS,
 				},
-				'umbAllowedSectionsObserver',
-			);
-		});
+				onChange: (permitted: boolean) => {
+					this._hasSettingsAccess = permitted;
+				},
+			},
+		]);
 	}
 
 	#observeContent() {
@@ -200,7 +202,6 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			<div class="general-item"><span>${this.#renderStateTag()}</span></div>
 			${this.#renderCreateDate()}
 
-			<div>${this._hasSettingsAccess}</div>
 			<div class="general-item">
 				<strong><umb-localize key="content_documentType">Document Type</umb-localize></strong>
 				<uui-ref-node-document-type
