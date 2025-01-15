@@ -7,7 +7,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 export class UmbSectionUserPermissionCondition extends UmbControllerBase implements UmbExtensionCondition {
 	config: UmbSectionUserPermissionConditionConfig;
 	permitted = false;
-	#onChange: () => void;
+	#onChange: (permitted: boolean) => void;
 
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<UmbSectionUserPermissionConditionConfig>) {
 		super(host);
@@ -20,7 +20,7 @@ export class UmbSectionUserPermissionCondition extends UmbControllerBase impleme
 				(currentUser) => {
 					const allowedSections = currentUser?.allowedSections || [];
 					this.permitted = allowedSections.includes(this.config.match);
-					this.#onChange();
+					this.#onChange(this.permitted);
 				},
 				'umbSectionUserPermissionConditionObserver',
 			);
