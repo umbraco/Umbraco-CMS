@@ -238,6 +238,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // register published router
             Services.AddUnique<IPublishedRouter, PublishedRouter>();
+            Services.AddUnique<IPublishedUrlInfoProvider, PublishedUrlInfoProvider>();
 
             Services.AddUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
             Services.AddUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
