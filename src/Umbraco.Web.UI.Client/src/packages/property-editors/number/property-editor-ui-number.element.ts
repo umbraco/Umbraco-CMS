@@ -5,6 +5,7 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-property-editor-ui-number')
 export class UmbPropertyEditorUINumberElement extends UmbLitElement implements UmbPropertyEditorUiElement {
@@ -52,16 +53,19 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 
 	override render() {
 		return html`
-			<uui-input
-				type="number"
-				min=${ifDefined(this._min)}
-				max=${ifDefined(this._max)}
-				step=${ifDefined(this._step)}
-				placeholder=${ifDefined(this._placeholder)}
-				.value=${this.value ?? (this._placeholder ? undefined : 0)}
-				@input=${this.#onInput}
-				?readonly=${this.readonly}>
-			</uui-input>
+			<uui-form-validation-message>
+				<uui-input
+					type="number"
+					min=${ifDefined(this._min)}
+					max=${ifDefined(this._max)}
+					step=${ifDefined(this._step)}
+					placeholder=${ifDefined(this._placeholder)}
+					.value=${this.value ?? (this._placeholder ? undefined : 0)}
+					@input=${this.#onInput}
+					?readonly=${this.readonly}
+					${umbBindToValidation(this)}>
+				</uui-input>
+			</uui-form-validation-message>
 		`;
 	}
 
