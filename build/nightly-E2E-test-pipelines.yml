@@ -107,14 +107,30 @@ stages:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.Sqlite
-          # The amount of sharding for our playwright, if the shard Index is increased to [1,2,3,4] this should be updated to 4
+          # The amount of sharding for our playwright, if the shard index is increased to 4 this should be updated to 4 as well
           shardTotal: 3
         strategy:
           matrix:
-            shardIndex: {1,2,3}
-            os: {ubuntu-latest,windows-latest}
+            LinuxPart1Of3:
+              vmImage: "ubuntu-latest"
+              shardIndex: 1
+            LinuxPart2Of3:
+              vmImage: "ubuntu-latest"
+              shardIndex: 2
+            LinuxPart3Of3:
+              vmImage: "ubuntu-latest"
+              shardIndex: 3
+            WindowsPart1Of3:
+              vmImage: "windows-latest"
+              shardIndex: 1
+            WindowsPart2Of3:
+              vmImage: "windows-latest"
+              shardIndex: 2
+            WindowsPart3Of3:
+              vmImage: "windows-latest"
+              shardIndex: 3
         pool:
-          vmImage: ${{matrix.os}}
+          vmImage: $(vmImage)
         steps:
           # Setup test environment
           - task: DownloadPipelineArtifact@2
@@ -200,7 +216,7 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
-          - pwsh: "npm run testSqlite -- --shard=${{ matrix.shardIndex }}/$(shardTotal) --reporter=blob"
+          - pwsh: "npm run testSqlite -- --shard=$(shardIndex)/$(shardTotal) --reporter=blob"
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
@@ -232,10 +248,11 @@ stages:
             condition: succeededOrFailed()
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/AcceptanceTestShards/$(Agent.OS)
-              artifact: blob-report-$(Agent.OS)-${{matrix.shardIndex}}-attempt-$(System.JobAttempt)
+              artifact: blob-report-$(Agent.OS)-$(shardIndex)-attempt-$(System.JobAttempt)
       - job:
         displayName: Merge playwright reports
         steps:
+          # Do we need to think about attempt number?
           - task: DownloadPipelineArtifact@2
             displayName: Download Linux playwright results
             inputs:
@@ -258,6 +275,7 @@ stages:
             inputs:
               patterns: blob-report-windows-latest-*
               path: $(Agent.BuildDirectory)/all-acceptance-test-results/windows
+
           - pwsh: "npx playwright merge-reports --reporter html $(Agent.BuildDirectory)/all-acceptance-test-results/windows"
             displayName: Merge Windows reports
             workingDirectory: $(Agent.BuildDirectory)/merged-acceptance-test-results/windows
@@ -268,7 +286,6 @@ stages:
             inputs:
               targetPath: $(Agent.BuildDirectory)/merged-acceptance-test-results
               artifact: merged-acceptance-test-results-linux-$(System.JobAttempt)
-
 
       - job:
         displayName: E2E Tests (SQL Server)
