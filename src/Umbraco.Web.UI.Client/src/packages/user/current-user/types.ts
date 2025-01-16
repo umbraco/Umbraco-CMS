@@ -30,6 +30,7 @@ export interface UmbCurrentUserModel {
 	permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel>;
 	unique: string;
 	userName: string;
+	userGroupIds: string[];
 }
 
 export type UmbCurrentUserExternalLoginProviderModel = UserExternalLoginProviderModel;
