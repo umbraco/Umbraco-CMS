@@ -99,7 +99,6 @@ stages:
       UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL: https://localhost:44331/
       ASPNETCORE_URLS: https://localhost:44331
     jobs:
-
       # E2E Tests
       - job:
         displayName: E2E Tests (SQLite)
@@ -112,8 +111,8 @@ stages:
           shardTotal: 3
         strategy:
           matrix:
-            shardIndex: [1,2,3]
-            os: [ubuntu-latest, windows-latest]
+            shardIndex: [ 1,2,3 ]
+            os: [ ubuntu-latest, windows-latest ]
         pool:
           vmImage: ${{matrix.os}}
         steps:
@@ -233,15 +232,43 @@ stages:
             condition: succeededOrFailed()
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/AcceptanceTestShards/$(Agent.OS)
-              artifact: blob-report-$(Agent.OS)-${{matrix.shardIndex}}
-
-
+              artifact: blob-report-$(Agent.OS)-${{matrix.shardIndex}}-attempt-$(System.JobAttempt)
       - job:
         displayName: Merge playwright reports
         steps:
           - task: DownloadPipelineArtifact@2
+            displayName: Download Linux playwright results
             inputs:
-              artifact
+              artifact: blob-report-ubuntu-latest-*
+              path: $(Agent.BuildDirectory)/all-acceptance-test-results/linux
+
+          - pwsh: "npx playwright merge-reports --reporter html $(Agent.BuildDirectory)/all-acceptance-test-results/linux"
+            displayName: Merge Linux reports
+            workingDirectory: $(Agent.BuildDirectory)/merged-acceptance-test-results/linux
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish merged test artifacts
+            condition: succeededOrFailed()
+            inputs:
+              targetPath: $(Agent.BuildDirectory)/merged-acceptance-test-results
+              artifact: merged-acceptance-test-results-linux-$(System.JobAttempt)
+
+          - task: DownloadPipelineArtifact@2
+            displayName: Download Windows playwright results
+            inputs:
+              patterns: blob-report-windows-latest-*
+              path: $(Agent.BuildDirectory)/all-acceptance-test-results/windows
+          - pwsh: "npx playwright merge-reports --reporter html $(Agent.BuildDirectory)/all-acceptance-test-results/windows"
+            displayName: Merge Windows reports
+            workingDirectory: $(Agent.BuildDirectory)/merged-acceptance-test-results/windows
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish merged test artifacts
+            condition: succeededOrFailed()
+            inputs:
+              targetPath: $(Agent.BuildDirectory)/merged-acceptance-test-results
+              artifact: merged-acceptance-test-results-linux-$(System.JobAttempt)
+
 
       - job:
         displayName: E2E Tests (SQL Server)
