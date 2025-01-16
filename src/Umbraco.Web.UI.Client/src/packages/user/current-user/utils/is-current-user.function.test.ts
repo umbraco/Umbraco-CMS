@@ -24,10 +24,14 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 describe('isCurrentUser', async () => {
 	let hostElement: UmbTestControllerHostElement;
 
-	beforeEach(async () => {
+	before(async () => {
 		hostElement = new UmbTestControllerHostElement();
 		document.body.appendChild(hostElement);
 		await hostElement.init();
+	});
+
+	after(() => {
+		document.body.innerHTML = '';
 	});
 
 	it('should return true if the current user is the user with the given unique id', async () => {
