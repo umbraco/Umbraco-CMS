@@ -157,7 +157,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 				: nothing}
 			${this._filtered.map(
 				(group) => html`
-					${group.name && group.name !== '' ? html`<h4>${group.name}</h4>` : nothing}
+					${group.name && group.blocks.length !== 0 && group.name !== '' ? html`<h4>${group.name}</h4>` : nothing}
 					<div class="blockGroup">
 						${repeat(
 							group.blocks,
