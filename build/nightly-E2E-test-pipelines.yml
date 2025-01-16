@@ -111,8 +111,8 @@ stages:
           shardTotal: 3
         strategy:
           matrix:
-            shardIndex: [ 1,2,3 ]
-            os: [ ubuntu-latest, windows-latest ]
+            shardIndex: [1,2,3]
+            os: [ubuntu-latest,windows-latest]
         pool:
           vmImage: ${{matrix.os}}
         steps:
