@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_PROPERTY_DATASET_CONTEXT, UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../../constants.js';
 import type { UmbDocumentVariantModel } from '../../../types.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from '../../../publishing/index.js';
-import { TimeOptions } from './utils.js';
+import { TimeOptions } from '../../../utils.js';
 import { css, customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -16,8 +16,6 @@ import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backof
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 
 // import of local components
-import './document-workspace-view-info-links.element.js';
-import './document-workspace-view-info-history.element.js';
 import './document-workspace-view-info-reference.element.js';
 
 @customElement('umb-document-workspace-view-info')
@@ -182,10 +180,9 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	override render() {
 		return html`
 			<div class="container">
-				<umb-document-workspace-view-info-links></umb-document-workspace-view-info-links>
+				<umb-extension-slot id="workspace-info-apps" type="workspaceInfoApp"></umb-extension-slot>
 				<umb-document-workspace-view-info-reference
 					.documentUnique=${this._documentUnique}></umb-document-workspace-view-info-reference>
-				<umb-document-workspace-view-info-history></umb-document-workspace-view-info-history>
 			</div>
 			<div class="container">
 				<uui-box headline=${this.localize.term('general_general')} id="general-section">

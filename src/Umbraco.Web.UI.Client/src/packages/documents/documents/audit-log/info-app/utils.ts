@@ -1,4 +1,4 @@
-import { UmbDocumentAuditLog, type UmbDocumentAuditLogType } from '../../../audit-log/utils/index.js';
+import { UmbDocumentAuditLog, type UmbDocumentAuditLogType } from '../utils/index.js';
 
 interface HistoryStyleMap {
 	look: 'default' | 'primary' | 'secondary' | 'outline' | 'placeholder';
@@ -137,12 +137,3 @@ export function getDocumentHistoryTagStyleAndText(type: UmbDocumentAuditLogType)
 			};
 	}
 }
-
-export const TimeOptions: Intl.DateTimeFormatOptions = {
-	year: 'numeric',
-	month: 'long',
-	day: 'numeric',
-	hour: 'numeric',
-	minute: 'numeric',
-	second: 'numeric',
-};

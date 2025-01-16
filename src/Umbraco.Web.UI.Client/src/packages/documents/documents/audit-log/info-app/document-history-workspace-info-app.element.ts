@@ -1,7 +1,8 @@
-import type { UmbDocumentAuditLogModel } from '../../../audit-log/types.js';
-import { UmbDocumentAuditLogRepository } from '../../../audit-log/index.js';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
-import { getDocumentHistoryTagStyleAndText, TimeOptions } from './utils.js';
+import { UmbDocumentAuditLogRepository } from '../repository/index.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
+import type { UmbDocumentAuditLogModel } from '../types.js';
+import { TimeOptions } from '../../utils.js';
+import { getDocumentHistoryTagStyleAndText } from './utils.js';
 import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
@@ -13,8 +14,8 @@ import type { ManifestEntityAction } from '@umbraco-cms/backoffice/entity-action
 import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
-@customElement('umb-document-workspace-view-info-history')
-export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
+@customElement('umb-document-history-workspace-info-app')
+export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	#allowedActions = new Set(['Umb.EntityAction.Document.Rollback']);
 
 	#auditLogRepository = new UmbDocumentAuditLogRepository(this);
@@ -183,10 +184,10 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	];
 }
 
-export default UmbDocumentWorkspaceViewInfoHistoryElement;
+export default UmbDocumentHistoryWorkspaceInfoAppElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-workspace-view-info-history': UmbDocumentWorkspaceViewInfoHistoryElement;
+		'umb-document-history-workspace-info-app': UmbDocumentHistoryWorkspaceInfoAppElement;
 	}
 }

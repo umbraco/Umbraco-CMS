@@ -1,7 +1,7 @@
-import { UmbDocumentUrlRepository } from '../../../repository/url/document-url.repository.js';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
-import type { UmbDocumentVariantOptionModel } from '../../../types.js';
-import type { UmbDocumentUrlModel } from '../../../repository/url/types.js';
+import { UmbDocumentUrlRepository } from '../repository/index.js';
+import type { UmbDocumentVariantOptionModel } from '../../types.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
+import type { UmbDocumentUrlModel } from '../repository/types.js';
 import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -18,8 +18,8 @@ interface UmbDocumentInfoViewLink {
 	state: DocumentVariantStateModel | null | undefined;
 }
 
-@customElement('umb-document-workspace-view-info-links')
-export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
+@customElement('umb-document-links-workspace-info-app')
+export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 	#documentUrlRepository = new UmbDocumentUrlRepository(this);
 
 	@state()
@@ -284,10 +284,10 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 	];
 }
 
-export default UmbDocumentWorkspaceViewInfoLinksElement;
+export default UmbDocumentLinksWorkspaceInfoAppElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-workspace-view-info-links': UmbDocumentWorkspaceViewInfoLinksElement;
+		'umb-document-links-workspace-info-app': UmbDocumentLinksWorkspaceInfoAppElement;
 	}
 }
