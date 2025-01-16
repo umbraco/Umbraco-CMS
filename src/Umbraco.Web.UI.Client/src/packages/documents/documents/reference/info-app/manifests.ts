@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		element: () => import('./document-references-workspace-view-info.element.js'),
 		weight: 90,
 		meta: {
-			label: 'References',
+			label: '#references_labelUsedByItems',
 		},
 		conditions: [
 			{

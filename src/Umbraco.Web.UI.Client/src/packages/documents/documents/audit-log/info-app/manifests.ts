@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		element: () => import('./document-history-workspace-info-app.element.js'),
 		weight: 80,
 		meta: {
-			label: 'History',
+			label: '#general_history',
 		},
 		conditions: [
 			{

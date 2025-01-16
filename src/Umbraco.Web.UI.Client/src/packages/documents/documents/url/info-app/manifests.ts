@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		element: () => import('./document-links-workspace-info-app.element.js'),
 		weight: 100,
 		meta: {
-			label: 'Links',
+			label: '#general_links',
 		},
 		conditions: [
 			{
