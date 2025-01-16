@@ -217,7 +217,7 @@ stages:
 
           # Test
           # Change testCommand to run different tests
-          - pwsh: "npm run smokeTestSqlite -- --shard=$(shardIndex)/$(shardTotal) --reporter=line,binary"
+          - pwsh: "npm run smokeTestSqlite -- --shard=$(shardIndex)/$(shardTotal) --reporter=line,blob"
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
