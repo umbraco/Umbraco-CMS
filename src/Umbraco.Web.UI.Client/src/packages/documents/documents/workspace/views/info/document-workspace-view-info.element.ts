@@ -15,9 +15,6 @@ import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-reg
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 
-// import of local components
-import './document-workspace-view-info-reference.element.js';
-
 @customElement('umb-document-workspace-view-info')
 export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	@state()
@@ -181,8 +178,6 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		return html`
 			<div class="container">
 				<umb-extension-slot id="workspace-info-apps" type="workspaceInfoApp"></umb-extension-slot>
-				<umb-document-workspace-view-info-reference
-					.documentUnique=${this._documentUnique}></umb-document-workspace-view-info-reference>
 			</div>
 			<div class="container">
 				<uui-box headline=${this.localize.term('general_general')} id="general-section">

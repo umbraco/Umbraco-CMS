@@ -1,4 +1,4 @@
-import { UmbDocumentReferenceRepository } from '../../../reference/index.js';
+import { UmbDocumentReferenceRepository } from '../repository/index.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { isDefaultReference, isDocumentReference, isMediaReference } from '@umbraco-cms/backoffice/relations';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
