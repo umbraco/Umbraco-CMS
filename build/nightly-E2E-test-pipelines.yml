@@ -100,7 +100,7 @@ stages:
       ASPNETCORE_URLS: https://localhost:44331
     jobs:
       # E2E Tests
-      - job:
+      - job: e2ETestsSQLite
         displayName: E2E Tests (SQLite)
         timeoutInMinutes: 180
         variables:
@@ -248,15 +248,16 @@ stages:
             condition: succeededOrFailed()
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/AcceptanceTestShards/$(Agent.OS)
-              artifact: blob-report-$(Agent.OS)-$(shardIndex)-attempt-$(System.JobAttempt)
-      - job:
+              artifact: blob-report-sql-lite-$(Agent.OS)-$(shardIndex)-attempt-$(System.JobAttempt)
+      - job: mergePlaywrightReportsSQLite
+        dependsOn: e2ETestsSQLite
         displayName: Merge playwright reports
         steps:
           # Do we need to think about attempt number?
           - task: DownloadPipelineArtifact@2
             displayName: Download Linux playwright results
             inputs:
-              artifact: blob-report-ubuntu-latest-*
+              patterns: blob-report-sql-lite-ubuntu-latest-*
               path: $(Agent.BuildDirectory)/all-acceptance-test-results/linux
 
           - pwsh: "npx playwright merge-reports --reporter html $(Agent.BuildDirectory)/all-acceptance-test-results/linux"
@@ -273,7 +274,7 @@ stages:
           - task: DownloadPipelineArtifact@2
             displayName: Download Windows playwright results
             inputs:
-              patterns: blob-report-windows-latest-*
+              patterns: blob-report-sql-lite-windows-latest-*
               path: $(Agent.BuildDirectory)/all-acceptance-test-results/windows
 
           - pwsh: "npx playwright merge-reports --reporter html $(Agent.BuildDirectory)/all-acceptance-test-results/windows"
