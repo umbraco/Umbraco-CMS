@@ -1,20 +1,20 @@
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../media-workspace.context-token.js';
-import { TimeOptions } from './utils.js';
+import { TimeOptions } from '../../../audit-log/info-app/utils.js';
 import { css, customElement, html, ifDefined, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbMediaTypeItemModel } from '@umbraco-cms/backoffice/media-type';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE, UmbMediaTypeItemRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_MODAL, type ManifestWorkspaceInfoApp } from '@umbraco-cms/backoffice/workspace';
 import type { MediaUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 
 // import of local components
-import './media-workspace-view-info-history.element.js';
 import './media-workspace-view-info-reference.element.js';
+import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-media-workspace-view-info')
 export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
@@ -130,15 +130,10 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 	override render() {
 		return html`
 			<div class="container">
-				<uui-box headline=${this.localize.term('general_links')} style="--uui-box-default-padding: 0;">
-					<div id="link-section">${this.#renderLinksSection()}</div>
-				</uui-box>
-
-				<umb-media-workspace-view-info-reference
-					.mediaUnique=${this._mediaUnique}></umb-media-workspace-view-info-reference>
-
-				<umb-media-workspace-view-info-history
-					.mediaUnique=${this._mediaUnique}></umb-media-workspace-view-info-history>
+				<umb-extension-slot
+					id="workspace-info-apps"
+					type="workspaceInfoApp"
+					.renderMethod=${this.#renderInfoApp}></umb-extension-slot>
 			</div>
 			<div class="container">
 				<uui-box headline=${this.localize.term('general_general')} id="general-section"
@@ -183,6 +178,17 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 				</a>
 			`;
 		}
+	}
+
+	#renderInfoApp(initializer: UmbExtensionElementInitializer<ManifestWorkspaceInfoApp>) {
+		const headline = initializer.manifest?.meta.label;
+		return html`
+			<uui-box
+				headline=${ifDefined(headline ? this.localize.string(headline) : undefined)}
+				style="--uui-box-default-padding:0">
+				${initializer.component}</uui-box
+			>
+		`;
 	}
 
 	#renderGeneralSection() {

@@ -1,7 +1,7 @@
-import type { UmbMediaAuditLogModel } from '../../../audit-log/types.js';
-import { UmbMediaAuditLogRepository } from '../../../audit-log/index.js';
-import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../media-workspace.context-token.js';
-import { TimeOptions, getMediaHistoryTagStyleAndText } from './utils.js';
+import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
+import type { UmbMediaAuditLogModel } from '../types.js';
+import { UmbMediaAuditLogRepository } from '../repository/index.js';
+import { getMediaHistoryTagStyleAndText, TimeOptions } from './utils.js';
 import { css, html, customElement, state, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -10,8 +10,8 @@ import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 
-@customElement('umb-media-workspace-view-info-history')
-export class UmbMediaWorkspaceViewInfoHistoryElement extends UmbLitElement {
+@customElement('umb-media-history-workspace-info-app')
+export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	@state()
 	_currentPageNumber = 1;
 
@@ -172,10 +172,10 @@ export class UmbMediaWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	];
 }
 
-export default UmbMediaWorkspaceViewInfoHistoryElement;
+export default UmbMediaHistoryWorkspaceInfoAppElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-media-workspace-view-info-history': UmbMediaWorkspaceViewInfoHistoryElement;
+		'umb-media-workspace-view-info-history': UmbMediaHistoryWorkspaceInfoAppElement;
 	}
 }
