@@ -8,8 +8,8 @@ import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbReferenceModel } from '@umbraco-cms/backoffice/relations';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
-@customElement('umb-document-workspace-view-info-reference')
-export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement {
+@customElement('umb-document-references-workspace-info-app')
+export class UmbDocumentReferencesWorkspaceInfoAppElement extends UmbLitElement {
 	#itemsPerPage = 10;
 
 	#referenceRepository = new UmbDocumentReferenceRepository(this);
@@ -194,10 +194,10 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 	];
 }
 
-export default UmbDocumentWorkspaceViewInfoReferenceElement;
+export default UmbDocumentReferencesWorkspaceInfoAppElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-workspace-view-info-reference': UmbDocumentWorkspaceViewInfoReferenceElement;
+		'umb-document-references-workspace-info-app': UmbDocumentReferencesWorkspaceInfoAppElement;
 	}
 }
