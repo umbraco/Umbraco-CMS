@@ -217,7 +217,7 @@ stages:
 
           # Test
           # Change testCommand to run different tests
-          - pwsh: "npm run smokeTestSqlite -- --shard=$(shardIndex)/$(shardTotal) --reporter=blob,html"
+          - pwsh: "npm run smokeTestSqlite -- --shard=$(shardIndex)/$(shardTotal) --reporter=line,binary"
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
@@ -237,10 +237,10 @@ stages:
 
           # Copy artifacts
           - pwsh: |
-              if (Test-Path tests/Umbraco.Tests.AcceptanceTest/results/*) {
-                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results/* $(Build.ArtifactStagingDirectory) -Recurse
+              if (Test-Path tests/Umbraco.Tests.AcceptanceTest/blob-report/*) {
+                Copy-Item tests/Umbraco.Tests.AcceptanceTest/blob-report/* $(Build.ArtifactStagingDirectory) -Recurse
               }
-            displayName: Copy Playwright results
+            displayName: Copy Playwright blob report
             condition: succeededOrFailed()
 
           # Publish
@@ -252,24 +252,39 @@ stages:
               artifact: blob-report-sql-lite-$(Agent.OS)-$(shardIndex)-attempt-$(System.JobAttempt)
       - job: mergePlaywrightReportsSQLite
         dependsOn: e2ETestsSQLite
-        displayName: Merge playwright reports
+        displayName: Merge playwright sqlite reports
         steps:
           # Do we need to think about attempt number?
+          - pwsh: "mkdir all-acceptance-test-results/linux"
+            displayName: Create Linux directory
+            workingDirectory: $(Agent.BuildDirectory)
+
           - task: DownloadPipelineArtifact@2
             displayName: Download Linux playwright results
             inputs:
               patterns: blob-report-sql-lite-ubuntu-latest-*
-              path: $(Build.ArtifactStagingDirectory)
+              path: $(Agent.BuildDirectory)/all-acceptance-test-results/linux
+
+          - pwsh: "mkdir merged-acceptance-test-results/linux"
+            displayName: Create Linux directory
+            workingDirectory: $(Agent.BuildDirectory)
 
           - pwsh: "npx playwright merge-reports --reporter html $(Agent.BuildDirectory)/all-acceptance-test-results/linux"
             displayName: Merge Linux reports
             workingDirectory: $(Agent.BuildDirectory)/merged-acceptance-test-results/linux
 
+          - pwsh: |
+              if (Test-Path $(Agent.BuildDirectory)/merged-acceptance-test-results/linux/*) {
+                Copy-Item $(Agent.BuildDirectory)/merged-acceptance-test-results/linux/* $(Build.ArtifactStagingDirectory) -Recurse
+              }
+            displayName: Copy Playwright blob report
+            condition: succeededOrFailed()
+          # Publish
           - task: PublishPipelineArtifact@1
             displayName: Publish merged test artifacts
             condition: succeededOrFailed()
             inputs:
-              targetPath: $(Agent.BuildDirectory)/merged-acceptance-test-results
+              targetPath: $(Build.ArtifactStagingDirectory)
               artifact: merged-acceptance-test-results-linux-$(System.JobAttempt)
 
           - task: DownloadPipelineArtifact@2
@@ -287,7 +302,7 @@ stages:
             condition: succeededOrFailed()
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
-              artifact: merged-acceptance-test-results-linux-$(System.JobAttempt)
+              artifact: merged-acceptance-test-results-windows-$(System.JobAttempt)
 
       - job:
         displayName: E2E Tests (SQL Server)
