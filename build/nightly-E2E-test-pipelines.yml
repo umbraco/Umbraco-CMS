@@ -216,7 +216,8 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
-          - pwsh: "npm run testSqlite -- --shard=$(shardIndex)/$(shardTotal) --reporter=blob"
+          # Change testCommand to run different tests
+          - pwsh: "npm run smokeTestSqlite -- --shard=$(shardIndex)/$(shardTotal) --reporter=blob,html"
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
@@ -247,7 +248,7 @@ stages:
             displayName: Publish test artifacts
             condition: succeededOrFailed()
             inputs:
-              targetPath: $(Build.ArtifactStagingDirectory)/AcceptanceTestShards/$(Agent.OS)
+              targetPath: $(Build.ArtifactStagingDirectory)
               artifact: blob-report-sql-lite-$(Agent.OS)-$(shardIndex)-attempt-$(System.JobAttempt)
       - job: mergePlaywrightReportsSQLite
         dependsOn: e2ETestsSQLite
@@ -258,7 +259,7 @@ stages:
             displayName: Download Linux playwright results
             inputs:
               patterns: blob-report-sql-lite-ubuntu-latest-*
-              path: $(Agent.BuildDirectory)/all-acceptance-test-results/linux
+              path: $(Build.ArtifactStagingDirectory)
 
           - pwsh: "npx playwright merge-reports --reporter html $(Agent.BuildDirectory)/all-acceptance-test-results/linux"
             displayName: Merge Linux reports
@@ -275,7 +276,7 @@ stages:
             displayName: Download Windows playwright results
             inputs:
               patterns: blob-report-sql-lite-windows-latest-*
-              path: $(Agent.BuildDirectory)/all-acceptance-test-results/windows
+              path: $(Build.ArtifactStagingDirectory)
 
           - pwsh: "npx playwright merge-reports --reporter html $(Agent.BuildDirectory)/all-acceptance-test-results/windows"
             displayName: Merge Windows reports
@@ -285,7 +286,7 @@ stages:
             displayName: Publish merged test artifacts
             condition: succeededOrFailed()
             inputs:
-              targetPath: $(Agent.BuildDirectory)/merged-acceptance-test-results
+              targetPath: $(Build.ArtifactStagingDirectory)
               artifact: merged-acceptance-test-results-linux-$(System.JobAttempt)
 
       - job:
