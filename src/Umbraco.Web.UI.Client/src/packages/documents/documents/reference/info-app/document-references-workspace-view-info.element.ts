@@ -1,5 +1,5 @@
 import { UmbDocumentReferenceRepository } from '../repository/index.js';
-import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { isDefaultReference, isDocumentReference, isMediaReference } from '@umbraco-cms/backoffice/relations';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -7,16 +7,11 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbReferenceModel } from '@umbraco-cms/backoffice/relations';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../constants.js';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 @customElement('umb-document-references-workspace-info-app')
 export class UmbDocumentReferencesWorkspaceInfoAppElement extends UmbLitElement {
-	#itemsPerPage = 10;
-
-	#referenceRepository = new UmbDocumentReferenceRepository(this);
-
-	@property()
-	documentUnique = '';
-
 	@state()
 	private _editDocumentPath = '';
 
@@ -29,6 +24,11 @@ export class UmbDocumentReferencesWorkspaceInfoAppElement extends UmbLitElement 
 	@state()
 	private _items?: Array<UmbReferenceModel> = [];
 
+	#itemsPerPage = 10;
+	#referenceRepository = new UmbDocumentReferenceRepository(this);
+	#documentUnique?: UmbEntityUnique;
+	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
+
 	constructor() {
 		super();
 
@@ -40,15 +40,41 @@ export class UmbDocumentReferencesWorkspaceInfoAppElement extends UmbLitElement 
 			.observeRouteBuilder((routeBuilder) => {
 				this._editDocumentPath = routeBuilder({});
 			});
+
+		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
+			this.#workspaceContext = context;
+			this.#observeDocumentUnique();
+		});
 	}
 
-	protected override firstUpdated(): void {
-		this.#getReferences();
+	#observeDocumentUnique() {
+		this.observe(
+			this.#workspaceContext?.unique,
+			(unique) => {
+				if (!unique) {
+					this.#documentUnique = undefined;
+					this._items = [];
+					return;
+				}
+
+				if (this.#documentUnique === unique) {
+					return;
+				}
+
+				this.#documentUnique = unique;
+				this.#getReferences();
+			},
+			'umbReferencesDocumentUniqueObserver',
+		);
 	}
 
 	async #getReferences() {
+		if (!this.#documentUnique) {
+			throw new Error('Document unique is required');
+		}
+
 		const { data } = await this.#referenceRepository.requestReferencedBy(
-			this.documentUnique,
+			this.#documentUnique,
 			(this._currentPage - 1) * this.#itemsPerPage,
 			this.#itemsPerPage,
 		);
