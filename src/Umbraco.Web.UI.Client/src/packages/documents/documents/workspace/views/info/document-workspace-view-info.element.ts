@@ -194,7 +194,9 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	#renderInfoApp(initializer: UmbExtensionElementInitializer<ManifestWorkspaceInfoApp>) {
 		const headline = initializer.manifest?.meta.label;
 		return html`
-			<uui-box headline=${ifDefined(headline ? this.localize.string(headline) : undefined)}>
+			<uui-box
+				headline=${ifDefined(headline ? this.localize.string(headline) : undefined)}
+				style="--uui-box-default-padding:0">
 				${initializer.component}</uui-box
 			>
 		`;

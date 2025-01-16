@@ -137,48 +137,46 @@ export class UmbDocumentReferencesWorkspaceInfoAppElement extends UmbLitElement 
 	override render() {
 		if (!this._items?.length) return nothing;
 		return html`
-			<uui-box headline=${this.localize.term('references_labelUsedByItems')} style="--uui-box-default-padding:0">
-				<uui-table>
-					<uui-table-head>
-						<uui-table-head-cell></uui-table-head-cell>
-						<uui-table-head-cell><umb-localize key="general_name">Name</umb-localize></uui-table-head-cell>
-						<uui-table-head-cell><umb-localize key="general_status">Status</umb-localize></uui-table-head-cell>
-						<uui-table-head-cell><umb-localize key="general_typeName">Type Name</umb-localize></uui-table-head-cell>
-						<uui-table-head-cell><umb-localize key="general_type">Type</umb-localize></uui-table-head-cell>
-					</uui-table-head>
-					${repeat(
-						this._items,
-						(item) => item.id,
-						(item) => html`
-							<uui-table-row>
-								<uui-table-cell style="text-align:center;">
-									<umb-icon name=${this.#getIcon(item)}></umb-icon>
-								</uui-table-cell>
-								<uui-table-cell class="link-cell">
-									${when(
-										isDocumentReference(item),
-										() => html`
-											<uui-button
-												label="${this.localize.term('general_edit')} ${item.name}"
-												href="${this._editDocumentPath}edit/${item.id}">
-												${item.name}
-											</uui-button>
-										`,
-										() => item.name,
-									)}
-								</uui-table-cell>
-								<uui-table-cell>
-									${this.#getPublishedStatus(item)
-										? this.localize.term('content_published')
-										: this.localize.term('content_unpublished')}
-								</uui-table-cell>
-								<uui-table-cell>${this.#getContentTypeName(item)}</uui-table-cell>
-								<uui-table-cell>${this.#getContentType(item)}</uui-table-cell>
-							</uui-table-row>
-						`,
-					)}
-				</uui-table>
-			</uui-box>
+			<uui-table>
+				<uui-table-head>
+					<uui-table-head-cell></uui-table-head-cell>
+					<uui-table-head-cell><umb-localize key="general_name">Name</umb-localize></uui-table-head-cell>
+					<uui-table-head-cell><umb-localize key="general_status">Status</umb-localize></uui-table-head-cell>
+					<uui-table-head-cell><umb-localize key="general_typeName">Type Name</umb-localize></uui-table-head-cell>
+					<uui-table-head-cell><umb-localize key="general_type">Type</umb-localize></uui-table-head-cell>
+				</uui-table-head>
+				${repeat(
+					this._items,
+					(item) => item.id,
+					(item) => html`
+						<uui-table-row>
+							<uui-table-cell style="text-align:center;">
+								<umb-icon name=${this.#getIcon(item)}></umb-icon>
+							</uui-table-cell>
+							<uui-table-cell class="link-cell">
+								${when(
+									isDocumentReference(item),
+									() => html`
+										<uui-button
+											label="${this.localize.term('general_edit')} ${item.name}"
+											href="${this._editDocumentPath}edit/${item.id}">
+											${item.name}
+										</uui-button>
+									`,
+									() => item.name,
+								)}
+							</uui-table-cell>
+							<uui-table-cell>
+								${this.#getPublishedStatus(item)
+									? this.localize.term('content_published')
+									: this.localize.term('content_unpublished')}
+							</uui-table-cell>
+							<uui-table-cell>${this.#getContentTypeName(item)}</uui-table-cell>
+							<uui-table-cell>${this.#getContentType(item)}</uui-table-cell>
+						</uui-table-row>
+					`,
+				)}
+			</uui-table>
 			${this.#renderReferencePagination()}
 		`;
 	}
@@ -202,6 +200,7 @@ export class UmbDocumentReferencesWorkspaceInfoAppElement extends UmbLitElement 
 			:host {
 				display: contents;
 			}
+
 			uui-table-cell:not(.link-cell) {
 				color: var(--uui-color-text-alt);
 			}

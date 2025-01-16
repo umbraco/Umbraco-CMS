@@ -155,13 +155,11 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<uui-box headline=${this.localize.term('general_links')}>
-				${when(
-					this._loading,
-					() => this.#renderLoading(),
-					() => this.#renderContent(),
-				)}
-			</uui-box>
+			${when(
+				this._loading,
+				() => this.#renderLoading(),
+				() => this.#renderContent(),
+			)}
 		`;
 	}
 
