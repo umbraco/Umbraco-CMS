@@ -460,6 +460,7 @@ export type CurrentUserResponseModel = {
     permissions: Array<(DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
     allowedSections: Array<(string)>;
     isAdmin: boolean;
+    userGroupIds: Array<(ReferenceByIdModel)>;
 };
 
 export type CurrenUserConfigurationResponseModel = {
@@ -867,6 +868,8 @@ export type DocumentVariantResponseModel = {
     updateDate: string;
     state: DocumentVariantStateModel;
     publishDate?: (string) | null;
+    scheduledPublishDate?: (string) | null;
+    scheduledUnpublishDate?: (string) | null;
 };
 
 export enum DocumentVariantStateModel {
