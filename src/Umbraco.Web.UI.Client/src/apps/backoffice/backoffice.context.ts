@@ -78,11 +78,10 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 		this.#activeSectionAlias.setValue(alias);
 	}
 
-	public async serverUpgradeCheck(): Promise<boolean> {
+	public async serverUpgradeCheck() {
 		const version = await this.observe(this.version).asPromise();
 		const repository = new UmbSysinfoRepository(this);
-		const check = await repository.serverUpgradeCheck(version);
-		return !!check;
+		return repository.serverUpgradeCheck(version);
 	}
 }
 
