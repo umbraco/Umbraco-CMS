@@ -22,7 +22,7 @@ export class UmbCurrentUserGroupCondition
 		const { match, oneOf, allOf, noneOf } = this.config;
 
 		if (match) {
-			if (currentUser.userGroupIds.includes(match)) {
+			if (currentUser.userGroupUniques.includes(match)) {
 				this.permitted = true;
 				return;
 			}
@@ -32,7 +32,7 @@ export class UmbCurrentUserGroupCondition
 		}
 
 		if (oneOf) {
-			if (stringOrStringArrayIntersects(oneOf, currentUser.userGroupIds)) {
+			if (stringOrStringArrayIntersects(oneOf, currentUser.userGroupUniques)) {
 				this.permitted = true;
 				return;
 			}
@@ -42,7 +42,7 @@ export class UmbCurrentUserGroupCondition
 		}
 
 		if (allOf) {
-			if (allOf.every((group) => currentUser.userGroupIds.includes(group))) {
+			if (allOf.every((group) => currentUser.userGroupUniques.includes(group))) {
 				this.permitted = true;
 				return;
 			}
@@ -52,7 +52,7 @@ export class UmbCurrentUserGroupCondition
 		}
 
 		if (noneOf) {
-			if (noneOf.some((group) => currentUser.userGroupIds.includes(group))) {
+			if (noneOf.some((group) => currentUser.userGroupUniques.includes(group))) {
 				this.permitted = false;
 				return;
 			}
