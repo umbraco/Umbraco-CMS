@@ -1,16 +1,16 @@
 import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.token.js';
 import type { UmbCurrentUserModel } from '../../types.js';
-import type { UmbCurrentUserGroupConditionConfig } from './types.js';
+import type { UmbCurrentUserGroupIdConditionConfig } from './types.js';
 import { stringOrStringArrayIntersects } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbCurrentUserGroupCondition
-	extends UmbConditionBase<UmbCurrentUserGroupConditionConfig>
+	extends UmbConditionBase<UmbCurrentUserGroupIdConditionConfig>
 	implements UmbExtensionCondition
 {
-	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<UmbCurrentUserGroupConditionConfig>) {
+	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<UmbCurrentUserGroupIdConditionConfig>) {
 		super(host, args);
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
