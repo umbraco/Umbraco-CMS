@@ -11,6 +11,6 @@ public class ApiContentPathProvider : IApiContentPathProvider
     public ApiContentPathProvider(IPublishedUrlProvider publishedUrlProvider)
         => _publishedUrlProvider = publishedUrlProvider;
 
-    public virtual string? GetContentPath(IPublishedContent content, string? culture)
+    public virtual string GetContentPath(IPublishedContent content, string? culture)
         => _publishedUrlProvider.GetUrl(content, UrlMode.Relative, culture);
 }

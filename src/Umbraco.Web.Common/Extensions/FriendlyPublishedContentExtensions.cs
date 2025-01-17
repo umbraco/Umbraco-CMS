@@ -502,7 +502,7 @@ public static class FriendlyPublishedContentExtensions
     /// </param>
     /// <param name="contentTypeAlias">The content type alias.</param>
     /// <returns>The children of the content, of any of the specified types.</returns>
-    public static IEnumerable<IPublishedContent>? ChildrenOfType(this IPublishedContent content, string contentTypeAlias, string? culture = null)
+    public static IEnumerable<IPublishedContent> ChildrenOfType(this IPublishedContent content, string contentTypeAlias, string? culture = null)
         => content.ChildrenOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, contentTypeAlias, culture);
 
     /// <summary>
@@ -557,7 +557,7 @@ public static class FriendlyPublishedContentExtensions
     /// <remarks>
     ///     <para>Note that in V7 this method also return the content node self.</para>
     /// </remarks>
-    public static IEnumerable<IPublishedContent>? Siblings(this IPublishedContent content, string? culture = null)
+    public static IEnumerable<IPublishedContent> Siblings(this IPublishedContent content, string? culture = null)
         => content.Siblings(GetPublishedCache(content), GetNavigationQueryService(content), VariationContextAccessor, PublishStatusQueryService, culture);
 
     /// <summary>
@@ -573,7 +573,7 @@ public static class FriendlyPublishedContentExtensions
     /// <remarks>
     ///     <para>Note that in V7 this method also return the content node self.</para>
     /// </remarks>
-    public static IEnumerable<IPublishedContent>? SiblingsOfType(this IPublishedContent content, string contentTypeAlias, string? culture = null)
+    public static IEnumerable<IPublishedContent> SiblingsOfType(this IPublishedContent content, string contentTypeAlias, string? culture = null)
         => content.SiblingsOfType(VariationContextAccessor, GetPublishedCache(content), GetNavigationQueryService(content), PublishStatusQueryService, contentTypeAlias, culture);
 
     /// <summary>

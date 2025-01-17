@@ -46,11 +46,11 @@ public sealed class DocumentCache : IPublishedContentCache
 
     public IPublishedContent? GetById(Guid contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
 
-    public IPublishedContentType? GetContentType(int id) => _publishedContentTypeCache.Get(PublishedItemType.Content, id);
+    public IPublishedContentType GetContentType(int id) => _publishedContentTypeCache.Get(PublishedItemType.Content, id);
 
-    public IPublishedContentType? GetContentType(string alias) => _publishedContentTypeCache.Get(PublishedItemType.Content, alias);
+    public IPublishedContentType GetContentType(string alias) => _publishedContentTypeCache.Get(PublishedItemType.Content, alias);
 
-    public IPublishedContentType? GetContentType(Guid key) => _publishedContentTypeCache.Get(PublishedItemType.Content, key);
+    public IPublishedContentType GetContentType(Guid key) => _publishedContentTypeCache.Get(PublishedItemType.Content, key);
 
     // TODO: These are all obsolete and should be removed
 
