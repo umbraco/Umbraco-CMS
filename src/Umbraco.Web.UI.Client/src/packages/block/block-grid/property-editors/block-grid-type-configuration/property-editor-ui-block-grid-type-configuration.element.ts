@@ -193,7 +193,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		}
 	}
 
-	#changeGroupName(e: UUIInputEvent, groupKey: string) {
+	#onGroupNameChange(e: UUIInputEvent, groupKey: string) {
 		const groupName = e.target.value as string;
 		// TODO: make one method for updating the blockGroupsDataSetValue: [NL]
 		this.#datasetContext?.setPropertyValue(
@@ -236,7 +236,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 				auto-width
 				label="Group"
 				.value=${groupName ?? ''}
-				@change=${(e: UUIInputEvent) => this.#changeGroupName(e, groupKey)}>
+				@change=${(e: UUIInputEvent) => this.#onGroupNameChange(e, groupKey)}>
 				<uui-button compact slot="append" label="delete" @click=${() => this.#deleteGroup(groupKey)}>
 					<uui-icon name="icon-trash"></uui-icon>
 				</uui-button>
