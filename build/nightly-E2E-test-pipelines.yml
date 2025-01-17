@@ -254,32 +254,33 @@ stages:
         dependsOn: e2ETestsSQLite
         displayName: Merge playwright sqlite reports
         steps:
-          # Do we need to think about attempt number?
-          - pwsh: "mkdir all-acceptance-test-results/linux"
-            displayName: Create Linux directory
-            workingDirectory: $(Agent.BuildDirectory)
+          - pwsh: |
+              mkdir -p "$(Agent.BuildDirectory)/all-acceptance-test-results/linux"
+              mkdir -p "$(Agent.BuildDirectory)/merged-acceptance-test-results/linux"
+            displayName: Create necessary Linux directories
 
+          # Download linux artifacts
           - task: DownloadPipelineArtifact@2
-            displayName: Download Linux playwright results
+            displayName: Download Linux Playwright results
             inputs:
               patterns: blob-report-sql-lite-ubuntu-latest-*
               path: $(Agent.BuildDirectory)/all-acceptance-test-results/linux
 
-          - pwsh: "mkdir merged-acceptance-test-results/linux"
-            displayName: Create Linux directory
-            workingDirectory: $(Agent.BuildDirectory)
-
-          - pwsh: "npx playwright merge-reports --reporter html $(Agent.BuildDirectory)/all-acceptance-test-results/linux"
+          # Merge linux Playwright reports
+          - pwsh: |
+              npx playwright merge-reports --reporter html "$(Agent.BuildDirectory)/all-acceptance-test-results/linux"
             displayName: Merge Linux reports
             workingDirectory: $(Agent.BuildDirectory)/merged-acceptance-test-results/linux
 
+          # Copy merged linux reports if they exist
           - pwsh: |
-              if (Test-Path $(Agent.BuildDirectory)/merged-acceptance-test-results/linux/*) {
-                Copy-Item $(Agent.BuildDirectory)/merged-acceptance-test-results/linux/* $(Build.ArtifactStagingDirectory) -Recurse
+              if (Test-Path "$(Agent.BuildDirectory)/merged-acceptance-test-results/linux/*") {
+                Copy-Item "$(Agent.BuildDirectory)/merged-acceptance-test-results/linux/*" "$(Build.ArtifactStagingDirectory)" -Recurse
               }
             displayName: Copy Playwright blob report
             condition: succeededOrFailed()
-          # Publish
+
+          # Publish merged linux artifacts
           - task: PublishPipelineArtifact@1
             displayName: Publish merged test artifacts
             condition: succeededOrFailed()
