@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			type: 'entityCreateOptionAction',
 			kind: 'folder',
 			api: () => import('./folder-entity-create-option-action.js'),
-			weight: 900,
+			weight: 1,
 			forEntityTypes: [],
 			meta: {
 				icon: 'icon-folder',
