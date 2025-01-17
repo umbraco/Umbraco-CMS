@@ -43,7 +43,6 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-	#moveData?: Array<UmbBlockTypeWithGroupKey>;
 	#sorter = new UmbSorterController<MappedGroupWithBlockTypes, HTMLElement>(this, {
 		getUniqueOfElement: (element) => element.getAttribute('data-umb-group-key'),
 		getUniqueOfModel: (modelEntry) => modelEntry.key!,
