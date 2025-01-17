@@ -32,7 +32,6 @@ export class UmbInputBlockTypeElement<
 			this.dispatchEvent(new CustomEvent('container-change', { detail: { item, model } }));
 		},
 		onChange: ({ model }) => {
-			console.log('change', model);
 			this._value = model;
 			this.dispatchEvent(new UmbChangeEvent());
 		},
