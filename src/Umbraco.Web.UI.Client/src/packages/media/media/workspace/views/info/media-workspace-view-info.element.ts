@@ -11,9 +11,6 @@ import type { MediaUrlInfoModel } from '@umbraco-cms/backoffice/external/backend
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
-
-// import of local components
-import './media-workspace-view-info-reference.element.js';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-media-workspace-view-info')

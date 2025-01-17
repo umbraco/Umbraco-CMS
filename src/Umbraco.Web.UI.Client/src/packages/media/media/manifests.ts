@@ -8,6 +8,7 @@ import { manifests as menuManifests } from './menu/manifests.js';
 import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as propertyEditorsManifests } from './property-editors/manifests.js';
 import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
+import { manifests as referenceManifests } from './reference/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as searchManifests } from './search/manifests.js';
 import { manifests as sectionViewManifests } from './dashboard/manifests.js';
@@ -26,6 +27,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...modalManifests,
 	...propertyEditorsManifests,
 	...recycleBinManifests,
+	...referenceManifests,
 	...repositoryManifests,
 	...searchManifests,
 	...sectionViewManifests,
