@@ -173,7 +173,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	#onCreate(e: CustomEvent, groupKey?: string) {
 		const selectedElementType = e.detail.contentElementTypeKey;
 		if (selectedElementType) {
-			this.#blockTypeWorkspaceModalRegistration?.open({}, 'create/' + selectedElementType + '/' + (groupKey ?? null));
+			this.#blockTypeWorkspaceModalRegistration?.open({}, 'create/' + selectedElementType + '/' + (groupKey ?? 'null'));
 		}
 	}
 

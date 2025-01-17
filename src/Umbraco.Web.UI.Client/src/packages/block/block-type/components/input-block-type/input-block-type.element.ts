@@ -10,6 +10,8 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import {
 	UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT,
 	UMB_DOCUMENT_TYPE_PICKER_MODAL,
+	type UmbDocumentTypePickerModalData,
+	type UmbDocumentTypePickerModalValue,
 } from '@umbraco-cms/backoffice/document-type';
 import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
@@ -40,6 +42,10 @@ export class UmbInputBlockTypeElement<
 			this.dispatchEvent(new UmbChangeEvent());
 		},*/
 	});
+	#elementPickerModal: UmbModalRouteRegistrationController<
+		UmbDocumentTypePickerModalData,
+		UmbDocumentTypePickerModalValue
+	>;
 
 	@property({ type: Array, attribute: false })
 	public set value(items) {
@@ -54,10 +60,9 @@ export class UmbInputBlockTypeElement<
 		return this._value;
 	}
 
-	/** @deprecated will be removed in v17 */
 	@property({ type: String })
 	public set propertyAlias(value: string | undefined) {
-		//this.#elementPickerModal.setUniquePathValue('propertyAlias', value);
+		this.#elementPickerModal.setUniquePathValue('propertyAlias', value);
 	}
 	public get propertyAlias(): string | undefined {
 		return undefined;
@@ -89,7 +94,8 @@ export class UmbInputBlockTypeElement<
 			);
 		});
 
-		new UmbModalRouteRegistrationController(this, UMB_DOCUMENT_TYPE_PICKER_MODAL)
+		this.#elementPickerModal = new UmbModalRouteRegistrationController(this, UMB_DOCUMENT_TYPE_PICKER_MODAL)
+			.addUniquePaths(['propertyAlias'])
 			.onSetup(() => {
 				return {
 					data: {
