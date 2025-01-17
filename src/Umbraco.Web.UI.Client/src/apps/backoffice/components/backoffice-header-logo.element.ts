@@ -76,7 +76,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 						${this._serverUpgradeCheck
 							? html`<uui-button
 									@click=${this.#openNewVersion}
-									color="danger"
+									color="positive"
 									label=${this.localize.term('general_newVersionAvailable')}></uui-button>`
 							: ''}
 
