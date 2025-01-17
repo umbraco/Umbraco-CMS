@@ -156,13 +156,11 @@ export class UmbMediaReferencesWorkspaceInfoAppElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<uui-box headline=${this.localize.term('references_labelUsedByItems')}>
-				${when(
-					this._loading,
-					() => html`<uui-loader></uui-loader>`,
-					() => html`${this.#renderItems()} ${this.#renderPagination()}`,
-				)}
-			</uui-box>
+			${when(
+				this._loading,
+				() => html`<uui-loader></uui-loader>`,
+				() => html`${this.#renderItems()} ${this.#renderPagination()}`,
+			)}
 		`;
 	}
 
