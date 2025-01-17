@@ -10,6 +10,9 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		name: 'Data Type Folder Entity Create Option Action',
 		forEntityTypes: [UMB_DATA_TYPE_ROOT_ENTITY_TYPE, UMB_DATA_TYPE_FOLDER_ENTITY_TYPE],
 		meta: {
+			icon: 'icon-folder',
+			label: '#create_folder',
+			description: '#create_folderDescription',
 			folderRepositoryAlias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
 		},
 	},
