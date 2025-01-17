@@ -806,8 +806,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				// We have both indexes, aka. both elements are in this list.
 				const widthDiff = Math.max(foundElDragRect.width - currentElementRect.width, 0);
 				if (activeIndex < relatedIndex && foundElDragRect.left + widthDiff < this.#dragX) {
+					// If we are located before and we are just enough over to get located after, then lets do it already.
 					placeAfter = true;
 				} else if (activeIndex > relatedIndex && foundElDragRect.right - widthDiff > this.#dragX) {
+					// If we are located after and we are just enough over to get located before, then lets do it already.
 					placeAfter = false;
 				}
 			}
@@ -843,17 +845,21 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			} else {
 				verticalDirection = placementResult ?? false;
 				if (verticalDirection === true) {
-					/*if (activeIndex !== null && relatedIndex !== null) {
+					// Lets check if we should place after or before, based on a vertical algortihm.
+					placeAfter = this.#dragY > foundElDragRect.top + foundElDragRect.height * 0.5;
+
+					// There is room for improvements, if we are in the same model:
+					if (activeIndex !== null && relatedIndex !== null) {
 						// We have both indexes, aka. both elements are in this list.
 						const heightDiff = Math.max(foundElDragRect.height - currentElementRect.height, 0);
-						if (activeIndex < relatedIndex && foundElDragRect.top + heightDiff < this.#dragY) {
+						if (activeIndex < relatedIndex && this.#dragY > foundElDragRect.top + heightDiff) {
+							// If active is located above and we are just enough above to get located after, then lets do it already.
 							placeAfter = true;
-						} else if (activeIndex > relatedIndex && foundElDragRect.bottom - heightDiff > this.#dragY) {
+						} else if (activeIndex > relatedIndex && this.#dragY < foundElDragRect.bottom - heightDiff) {
+							// If active is located below and we are just enough above to get located before, then lets do it already.
 							placeAfter = false;
 						}
-					} else {*/
-					placeAfter = this.#dragY > foundElDragRect.top + foundElDragRect.height * 0.5;
-					//}
+					}
 				}
 			}
 
