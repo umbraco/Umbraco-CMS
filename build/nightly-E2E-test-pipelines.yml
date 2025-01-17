@@ -263,7 +263,7 @@ stages:
           - task: DownloadPipelineArtifact@2
             displayName: Download Linux Playwright results
             inputs:
-              patterns: blob-report-sql-lite-ubuntu-latest-*
+              patterns: blob-report-sql-lite-Linux-*
               path: $(Agent.BuildDirectory)/all-acceptance-test-results/linux
 
           # Merge linux Playwright reports
@@ -291,7 +291,7 @@ stages:
           - task: DownloadPipelineArtifact@2
             displayName: Download Windows playwright results
             inputs:
-              patterns: blob-report-sql-lite-windows-latest-*
+              patterns: blob-report-sql-lite-Windows-*
               path: $(Build.ArtifactStagingDirectory)
 
           - pwsh: "npx playwright merge-reports --reporter html $(Agent.BuildDirectory)/all-acceptance-test-results/windows"
