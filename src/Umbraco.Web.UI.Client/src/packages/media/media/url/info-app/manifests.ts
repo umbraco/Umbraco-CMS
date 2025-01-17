@@ -4,12 +4,12 @@ import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspaceInfoApp',
-		name: 'Media References Workspace Info App',
-		alias: 'Umb.WorkspaceInfoApp.Media.References',
-		element: () => import('./media-references-workspace-info-app.element.js'),
-		weight: 90,
+		name: 'Media Links Workspace Info App',
+		alias: 'Umb.WorkspaceInfoApp.Media.Links',
+		element: () => import('./media-links-workspace-info-app.element.js'),
+		weight: 100,
 		meta: {
-			label: '#references_labelUsedByItems',
+			label: '#general_links',
 		},
 		conditions: [
 			{
