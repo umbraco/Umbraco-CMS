@@ -4,21 +4,28 @@ import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-a
 export interface UmbCurrentUserGroupConditionConfig
 	extends UmbConditionConfigBase<typeof UMB_CURRENT_USER_GROUP_CONDITION_ALIAS> {
 	/**
-	 * The user group(s) that the current user must be a member of to pass the condition.
-	 * If set, the current user must be a member of at least one of the specified groups.
-	 * If both `grant` and `deny` are set, `grant` takes precedence.
-	 * @examples [['guid1', 'guid2'], 'guid3']
-	 * @remark The group is identified by its GUID.
+	 * The user group that the current user must be a member of to pass the condition.
+	 * @examples ['guid1']
 	 */
-	grant?: string | string[];
+	match?: string;
+
+	/**
+	 * The user group(s) that the current user must be a member of to pass the condition.
+	 * @examples [['guid1', 'guid2']]
+	 */
+	oneOf?: Array<string>;
+
+	/**
+	 * The user groups that the current user must be a member of to pass the condition.
+	 * @examples [['guid1', 'guid2']]
+	 */
+	allOf?: Array<string>;
 
 	/**
 	 * The user group(s) that the current user must not be a member of to pass the condition.
-	 * If set, the current user must not be a member of any of the specified groups.
-	 * @examples [['guid1', 'guid2'], 'guid3']
-	 * @remark The group is identified by its GUID.
+	 * @examples [['guid1', 'guid2']]
 	 */
-	deny?: string | string[];
+	noneOf?: Array<string>;
 }
 
 declare global {

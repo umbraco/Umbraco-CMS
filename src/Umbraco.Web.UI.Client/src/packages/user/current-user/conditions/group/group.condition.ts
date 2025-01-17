@@ -19,16 +19,10 @@ export class UmbCurrentUserGroupCondition
 	}
 
 	private observeCurrentUser = async (currentUser: UmbCurrentUserModel) => {
-		const { grant, deny } = this.config;
+		const { match, oneOf, allOf, noneOf } = this.config;
 
-		if (typeof grant === 'undefined' && typeof deny === 'undefined') {
-			console.warn('[UmbCurrentUserGroupCondition] No grant or deny specified');
-			this.permitted = false;
-			return;
-		}
-
-		if (grant) {
-			if (stringOrStringArrayIntersects(grant, currentUser.userGroupIds)) {
+		if (match) {
+			if (currentUser.userGroupIds.includes(match)) {
 				this.permitted = true;
 				return;
 			}
@@ -37,8 +31,28 @@ export class UmbCurrentUserGroupCondition
 			return;
 		}
 
-		if (deny) {
-			if (stringOrStringArrayIntersects(deny, currentUser.userGroupIds)) {
+		if (oneOf) {
+			if (stringOrStringArrayIntersects(oneOf, currentUser.userGroupIds)) {
+				this.permitted = true;
+				return;
+			}
+
+			this.permitted = false;
+			return;
+		}
+
+		if (allOf) {
+			if (allOf.every((group) => currentUser.userGroupIds.includes(group))) {
+				this.permitted = true;
+				return;
+			}
+
+			this.permitted = false;
+			return;
+		}
+
+		if (noneOf) {
+			if (noneOf.some((group) => currentUser.userGroupIds.includes(group))) {
 				this.permitted = false;
 				return;
 			}
