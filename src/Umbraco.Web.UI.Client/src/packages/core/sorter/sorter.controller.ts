@@ -348,7 +348,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	setModel(model: Array<T>): void {
 		if (this.#model) {
-			// TODO: Some updates might need to be done, as the model is about to change? Do make the changes after setting the model?.. [NL]
 			this.#model = model;
 		}
 	}
@@ -798,12 +797,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				throw new Error('Could not find model of found element');
 			}
 
-			// Indication if drop is good:
-			/*if (this.updateAllowIndication(UmbSorterController.activeItem) === false) {
-				console.log('!#€#! does this case ever happen any longer, if not then this should be removed. TODO: ');
-				return;
-			}*/
-
 			let relatedIndex: number | null = this.#model.indexOf(foundModel);
 			if (relatedIndex === -1) {
 				relatedIndex = null;
@@ -1022,32 +1015,11 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 		return false;
 	}
-	/*
-	public async insertItem(item: T, newIndex: number = 0) {
-		if (!item) {
-			return false;
-		}
-
-		if (this.#config.performItemInsert) {
-			const result = await this.#config.performItemInsert({ item, newIndex });
-			if (result === false) {
-				return false;
-			}
-		} else {
-			const newModel = [...this.#model];
-			newModel.splice(newIndex, 0, item);
-			this.#model = newModel;
-			this.#config.onChange?.({ model: newModel, item });
-		}
-		return false;
-	}
-	*/
 
 	public hasOtherItemsThan(item: T) {
 		return this.#model.filter((x) => x !== item).length > 0;
 	}
 
-	// TODO: Could get item via attr.
 	public async moveItemInModel(newIndex: number, fromCtrl: UmbSorterController<T, ElementType>) {
 		if (!UmbSorterController.activeItem) {
 			console.error('There is no active item to move');
