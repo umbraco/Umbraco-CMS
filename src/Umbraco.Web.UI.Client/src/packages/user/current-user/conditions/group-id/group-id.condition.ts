@@ -1,7 +1,6 @@
 import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.token.js';
 import type { UmbCurrentUserModel } from '../../types.js';
 import type { UmbCurrentUserGroupIdConditionConfig } from './types.js';
-import { stringOrStringArrayIntersects } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
@@ -19,40 +18,27 @@ export class UmbCurrentUserGroupCondition
 	}
 
 	private observeCurrentUser = async (currentUser: UmbCurrentUserModel) => {
+		// Idea: This part could be refactored to become a shared util, to align these matching feature across conditions. [NL]
+		// Notice doing so it would be interesting to invistigate if it makes sense to combine some of these properties, to enable more specific matching. (But maybe it is only relevant for the combination of match + oneOf) [NL]
 		const { match, oneOf, allOf, noneOf } = this.config;
 
 		if (match) {
-			if (currentUser.userGroupUniques.includes(match)) {
-				this.permitted = true;
-				return;
-			}
-
-			this.permitted = false;
+			this.permitted = currentUser.userGroupUniques.includes(match);
 			return;
 		}
 
 		if (oneOf) {
-			if (stringOrStringArrayIntersects(oneOf, currentUser.userGroupUniques)) {
-				this.permitted = true;
-				return;
-			}
-
-			this.permitted = false;
+			this.permitted = oneOf.some((v) => currentUser.userGroupUniques.includes(v));
 			return;
 		}
 
 		if (allOf) {
-			if (allOf.every((group) => currentUser.userGroupUniques.includes(group))) {
-				this.permitted = true;
-				return;
-			}
-
-			this.permitted = false;
+			this.permitted = allOf.every((v) => currentUser.userGroupUniques.includes(v));
 			return;
 		}
 
 		if (noneOf) {
-			if (noneOf.some((group) => currentUser.userGroupUniques.includes(group))) {
+			if (noneOf.some((v) => currentUser.userGroupUniques.includes(v))) {
 				this.permitted = false;
 				return;
 			}
