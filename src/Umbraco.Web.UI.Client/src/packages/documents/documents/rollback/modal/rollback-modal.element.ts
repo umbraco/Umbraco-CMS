@@ -1,5 +1,7 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT, UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../constants.js';
+import type { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../constants.js';
+import { UMB_DOCUMENT_ENTITY_TYPE, UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../constants.js';
 import { UmbRollbackRepository } from '../repository/rollback.repository.js';
+import { UmbDocumentItemRepository, type UmbDocumentItemModel } from '../../repository/index.js';
 import type { UmbRollbackModalData, UmbRollbackModalValue } from './types.js';
 import { diffWords, type Change } from '@umbraco-cms/backoffice/external/diff';
 import { css, customElement, html, nothing, repeat, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
@@ -8,6 +10,9 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import { UMB_ENTITY_CONTEXT, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 import '../../modals/shared/document-variant-language-picker.element.js';
 
@@ -42,12 +47,12 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	@state()
 	availableVariants: Option[] = [];
 
+	@state()
+	isInvariant = true;
+
 	#rollbackRepository = new UmbRollbackRepository(this);
 	#userItemRepository = new UmbUserItemRepository(this);
-
 	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
-
-	#propertyDatasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 
 	#localizeDateOptions: Intl.DateTimeFormatOptions = {
 		day: 'numeric',
@@ -56,37 +61,72 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		minute: '2-digit',
 	};
 
+	#documentUnique: UmbEntityUnique | undefined;
+	#documentItem: UmbDocumentItemModel | undefined;
+	#currentAppCulture: string | undefined;
+	#currentDatasetCulture: string | undefined;
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (instance) => {
-			this.#propertyDatasetContext = instance;
-			this.currentCulture = instance.getVariantId().culture ?? undefined;
-			this.#requestVersions();
+			this.#currentDatasetCulture = instance.getVariantId().culture ?? undefined;
+			this.#setCurrentCulture();
 		});
 
-		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance;
+		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
+			this.#currentAppCulture = instance.getAppCulture();
+			this.#setCurrentCulture();
+		});
 
-			this.observe(instance.variantOptions, (options) => {
-				this.availableVariants = options.map((option) => {
+		this.consumeContext(UMB_ENTITY_CONTEXT, async (instance) => {
+			if (instance.getEntityType() !== UMB_DOCUMENT_ENTITY_TYPE) {
+				throw new Error(`Entity type is not ${UMB_DOCUMENT_ENTITY_TYPE}`);
+			}
+
+			this.#documentUnique = instance?.getUnique();
+
+			if (!this.#documentUnique) {
+				throw new Error('Document unique is not set');
+			}
+
+			const { data: documentItems } = await new UmbDocumentItemRepository(this).requestItems([this.#documentUnique]);
+			this.#documentItem = documentItems?.[0];
+			const itemVariants = this.#documentItem?.variants ?? [];
+
+			this.isInvariant = itemVariants.length === 1 && new UmbVariantId(itemVariants[0].culture).isInvariant();
+			this.#setCurrentCulture();
+
+			this.availableVariants = itemVariants
+				.filter((variant) => {
+					return variant.culture !== null;
+				})
+				.map((variant) => {
+					const culture = variant.culture as string;
 					return {
-						name: option.language.name,
-						value: option.language.unique,
-						selected: option.language.unique === this.currentCulture,
+						name: culture,
+						value: culture,
+						selected: variant.culture === this.currentCulture,
 					};
 				});
-			});
+
+			this.#requestVersions();
 		});
 	}
 
+	#setCurrentCulture() {
+		this.currentCulture = this.isInvariant ? undefined : (this.#currentDatasetCulture ?? this.#currentAppCulture);
+	}
+
 	async #requestVersions() {
-		if (!this.#propertyDatasetContext) return;
+		if (!this.#documentUnique) {
+			throw new Error('Document unique is not set');
+		}
 
-		const documentId = this.#propertyDatasetContext.getUnique();
-		if (!documentId) return;
-
-		const { data } = await this.#rollbackRepository.requestVersionsByDocumentId(documentId, this.currentCulture);
+		const { data } = await this.#rollbackRepository.requestVersionsByDocumentId(
+			this.#documentUnique,
+			this.currentCulture,
+		);
 		if (!data) return;
 
 		const tempItems: DocumentVersion[] = [];
@@ -145,6 +185,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		const id = this.currentVersion.id;
 		const culture = this.availableVariants.length > 1 ? this.currentCulture : undefined;
 		this.#rollbackRepository.rollback(id, culture);
+		debugger;
 
 		const docUnique = this.#workspaceContext?.getUnique() ?? '';
 		// TODO Use the load method on the context instead of location.href, when it works.
