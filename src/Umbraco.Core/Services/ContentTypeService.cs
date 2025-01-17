@@ -1,10 +1,15 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Locking;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -22,14 +27,47 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
         IAuditRepository auditRepository,
         IDocumentTypeContainerRepository entityContainerRepository,
         IEntityRepository entityRepository,
-        IEventAggregator eventAggregator)
-        : base(provider, loggerFactory, eventMessagesFactory, repository, auditRepository, entityContainerRepository, entityRepository, eventAggregator) =>
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver)
+        : base(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            repository,
+            auditRepository,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver) =>
         ContentService = contentService;
 
-    // beware! order is important to avoid deadlocks
-    protected override int[] ReadLockIds { get; } = { Constants.Locks.ContentTypes };
+    [Obsolete("Use the ctor specifying all dependencies instead")]
+    public ContentTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IContentService contentService,
+        IContentTypeRepository repository,
+        IAuditRepository auditRepository,
+        IDocumentTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            contentService,
+            repository,
+            auditRepository,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+    { }
 
-    protected override int[] WriteLockIds { get; } = { Constants.Locks.ContentTree, Constants.Locks.ContentTypes };
+    protected override int[] ReadLockIds => ContentTypeLocks.ReadLockIds;
+
+    protected override int[] WriteLockIds => ContentTypeLocks.WriteLockIds;
 
     protected override Guid ContainedObjectType => Constants.ObjectTypes.DocumentType;
 

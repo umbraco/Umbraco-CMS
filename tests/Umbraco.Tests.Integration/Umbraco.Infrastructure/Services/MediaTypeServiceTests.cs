@@ -1,10 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
-using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -172,9 +170,11 @@ public class MediaTypeServiceTests : UmbracoIntegrationTest
         Assert.AreNotEqual(mediaType.Key, sut.Key);
         Assert.AreNotEqual(mediaType.Path, sut.Path);
         Assert.AreNotEqual(mediaType.SortOrder, sut.SortOrder);
-        Assert.AreNotEqual(mediaType.PropertyTypes.First(x => x.Alias.Equals("umbracoFile")).Id,
+        Assert.AreNotEqual(
+            mediaType.PropertyTypes.First(x => x.Alias.Equals("umbracoFile")).Id,
             sut.PropertyTypes.First(x => x.Alias.Equals("umbracoFile")).Id);
-        Assert.AreNotEqual(mediaType.PropertyGroups.First(x => x.Name.Equals("Media")).Id,
+        Assert.AreNotEqual(
+            mediaType.PropertyGroups.First(x => x.Name.Equals("Media")).Id,
             sut.PropertyGroups.First(x => x.Name.Equals("Media")).Id);
     }
 
@@ -216,10 +216,40 @@ public class MediaTypeServiceTests : UmbracoIntegrationTest
         Assert.AreNotEqual(clonedMediaType.Key, originalMediaType.Key);
         Assert.AreNotEqual(clonedMediaType.Path, originalMediaType.Path);
 
-        Assert.AreNotEqual(clonedMediaType.PropertyTypes.First(x => x.Alias.StartsWith("umbracoFile")).Id,
+        Assert.AreNotEqual(
+            clonedMediaType.PropertyTypes.First(x => x.Alias.StartsWith("umbracoFile")).Id,
             originalMediaType.PropertyTypes.First(x => x.Alias.StartsWith("umbracoFile")).Id);
-        Assert.AreNotEqual(clonedMediaType.PropertyGroups.First(x => x.Name.StartsWith("Media")).Id,
+        Assert.AreNotEqual(
+            clonedMediaType.PropertyGroups.First(x => x.Name.StartsWith("Media")).Id,
             originalMediaType.PropertyGroups.First(x => x.Name.StartsWith("Media")).Id);
+    }
+
+    [TestCase(Constants.Conventions.MediaTypes.File)]
+    [TestCase(Constants.Conventions.MediaTypes.Folder)]
+    [TestCase(Constants.Conventions.MediaTypes.Image)]
+    public void Cannot_Delete_System_Media_Type(string mediaTypeAlias)
+    {
+        // Arrange
+        // Act
+        var mediaType = MediaTypeService.Get(mediaTypeAlias);
+        Assert.IsNotNull(mediaType);
+
+        // Assert
+        Assert.Throws<InvalidOperationException>(() => MediaTypeService.Delete(mediaType));
+    }
+
+    [TestCase(Constants.Conventions.MediaTypes.File)]
+    [TestCase(Constants.Conventions.MediaTypes.Folder)]
+    [TestCase(Constants.Conventions.MediaTypes.Image)]
+    public void Cannot_Change_Alias_Of_System_Media_Type(string mediaTypeAlias)
+    {
+        // Arrange
+        // Act
+        var mediaType = MediaTypeService.Get(mediaTypeAlias);
+        Assert.IsNotNull(mediaType);
+
+        // Assert
+        Assert.Throws<InvalidOperationException>(() => mediaType.Alias += "_updated");
     }
 
     public class ContentNotificationHandler :

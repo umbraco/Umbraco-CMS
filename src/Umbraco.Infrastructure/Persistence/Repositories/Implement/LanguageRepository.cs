@@ -18,6 +18,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILanguageRepository
 {
+    // We need to lock this dictionary every time we do an operation on it as the languageRepository is registered as a unique implementation
+    // It is used to quickly get isoCodes by Id, or the reverse by avoiding (deep)cloning dtos
+    // It is rebuild on PerformGetAll
     private readonly Dictionary<string, int> _codeIdMap = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<int, string> _idCodeMap = new();
 
@@ -31,18 +34,12 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
 
     public ILanguage? GetByIsoCode(string isoCode)
     {
-        // ensure cache is populated, in a non-expensive way
-        if (TypedCachePolicy != null)
-        {
-            TypedCachePolicy.GetAllCached(PerformGetAll);
-        }
+        EnsureCacheIsPopulated();
 
         var id = GetIdByIsoCode(isoCode, false);
         return id.HasValue ? Get(id.Value) : null;
     }
 
-    // fast way of getting an id for an isoCode - avoiding cloning
-    // _codeIdMap is rebuilt whenever PerformGetAll runs
     public int? GetIdByIsoCode(string? isoCode, bool throwOnNotFound = true)
     {
         if (isoCode == null)
@@ -50,15 +47,7 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
             return null;
         }
 
-        // ensure cache is populated, in a non-expensive way
-        if (TypedCachePolicy != null)
-        {
-            TypedCachePolicy.GetAllCached(PerformGetAll);
-        }
-        else
-        {
-            PerformGetAll(); // We don't have a typed cache (i.e. unit tests) but need to populate the _codeIdMap
-        }
+        EnsureCacheIsPopulated();
 
         lock (_codeIdMap)
         {
@@ -76,8 +65,6 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
         return null;
     }
 
-    // fast way of getting an isoCode for an id - avoiding cloning
-    // _idCodeMap is rebuilt whenever PerformGetAll runs
     public string? GetIsoCodeById(int? id, bool throwOnNotFound = true)
     {
         if (id == null)
@@ -85,17 +72,8 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
             return null;
         }
 
-        // ensure cache is populated, in a non-expensive way
-        if (TypedCachePolicy != null)
-        {
-            TypedCachePolicy.GetAllCached(PerformGetAll);
-        }
-        else
-        {
-            PerformGetAll();
-        }
+        EnsureCacheIsPopulated();
 
-        // yes, we want to lock _codeIdMap
         lock (_codeIdMap)
         {
             if (_idCodeMap.TryGetValue(id.Value, out var isoCode))
@@ -112,6 +90,38 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
         return null;
     }
 
+    // multi implementation of GetIsoCodeById
+    public string[] GetIsoCodesByIds(ICollection<int> ids, bool throwOnNotFound = true)
+    {
+        var isoCodes = new string[ids.Count];
+
+        if (ids.Any() == false)
+        {
+            return isoCodes;
+        }
+
+        EnsureCacheIsPopulated();
+
+
+        lock (_codeIdMap)
+        {
+            for (var i = 0; i < ids.Count; i++)
+            {
+                var id = ids.ElementAt(i);
+                if (_idCodeMap.TryGetValue(id, out var isoCode))
+                {
+                    isoCodes[i] = isoCode;
+                }
+                else if (throwOnNotFound)
+                {
+                    throw new ArgumentException($"Id {id} does not correspond to an existing language.", nameof(id));
+                }
+            }
+        }
+
+        return isoCodes;
+    }
+
     public string GetDefaultIsoCode() => GetDefault().IsoCode;
 
     public int? GetDefaultId() => GetDefault().Id;
@@ -121,7 +131,6 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
 
     protected ILanguage ConvertFromDto(LanguageDto dto)
     {
-        // yes, we want to lock _codeIdMap
         lock (_codeIdMap)
         {
             string? fallbackIsoCode = null;
@@ -247,6 +256,7 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
             "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE tagId IN (SELECT id FROM " +
             Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id)",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentUrl + " WHERE languageId = @id",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.Language + " WHERE id = @id",
         };
         return list;
@@ -264,6 +274,8 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
             throw new InvalidOperationException("Cannot save a language without an ISO code and a culture name.");
         }
 
+        EnsureCacheIsPopulated();
+
         entity.AddingEntity();
 
         // deal with entity becoming the new default entity
@@ -279,10 +291,17 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
         // fallback cycles are detected at service level
 
         // insert
-        LanguageDto dto = LanguageFactory.BuildDto(entity);
+        LanguageDto dto = LanguageFactory.BuildDto(entity, GetFallbackLanguageId(entity));
         var id = Convert.ToInt32(Database.Insert(dto));
         entity.Id = id;
         entity.ResetDirtyProperties();
+
+        // yes, we want to lock _codeIdMap
+        lock (_codeIdMap)
+        {
+            _codeIdMap[entity.IsoCode] = entity.Id;
+            _idCodeMap[entity.Id] = entity.IsoCode;
+        }
     }
 
     protected override void PersistUpdatedItem(ILanguage entity)
@@ -292,6 +311,8 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
         {
             throw new InvalidOperationException("Cannot save a language without an ISO code and a culture name.");
         }
+
+        EnsureCacheIsPopulated();
 
         entity.UpdatingEntity();
 
@@ -341,9 +362,17 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
         // fallback cycles are detected at service level
 
         // update
-        LanguageDto dto = LanguageFactory.BuildDto(entity);
+        LanguageDto dto = LanguageFactory.BuildDto(entity, GetFallbackLanguageId(entity));
         Database.Update(dto);
         entity.ResetDirtyProperties();
+
+        // yes, we want to lock _codeIdMap
+        lock (_codeIdMap)
+        {
+            _codeIdMap.RemoveAll(kvp => kvp.Value == entity.Id);
+            _codeIdMap[entity.IsoCode] = entity.Id;
+            _idCodeMap[entity.Id] = entity.IsoCode;
+        }
     }
 
     protected override void PersistDeletedItem(ILanguage entity)
@@ -371,6 +400,38 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
 
         // delete
         base.PersistDeletedItem(entity);
+
+        // yes, we want to lock _codeIdMap
+        lock (_codeIdMap)
+        {
+            _codeIdMap.RemoveAll(kvp => kvp.Value == entity.Id);
+            _idCodeMap.Remove(entity.Id);
+        }
+    }
+
+    private void EnsureCacheIsPopulated()
+    {
+        // ensure cache is populated, in a non-expensive way
+        if (TypedCachePolicy != null)
+        {
+            TypedCachePolicy.GetAllCached(PerformGetAll);
+        }
+        else
+        {
+            PerformGetAll(); // We don't have a typed cache (i.e. unit tests) but need to populate the _codeIdMap
+        }
+    }
+
+    private int? GetFallbackLanguageId(ILanguage entity)
+    {
+        int? fallbackLanguageId = null;
+        if (entity.FallbackIsoCode.IsNullOrWhiteSpace() == false &&
+            _codeIdMap.TryGetValue(entity.FallbackIsoCode, out var languageId))
+        {
+            fallbackLanguageId = languageId;
+        }
+
+        return fallbackLanguageId;
     }
 
     #endregion

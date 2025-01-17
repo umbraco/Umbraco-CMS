@@ -54,7 +54,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
         IJsonSerializer jsonSerializer,
         LastSyncedFileManager lastSyncedFileManager,
         IOptionsMonitor<GlobalSettings> globalSettings)
-        : base(distributedEnabled)
+        : base(distributedEnabled, jsonSerializer)
     {
         _cancellationToken = _cancellationTokenSource.Token;
         _mainDom = mainDom;

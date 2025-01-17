@@ -2,11 +2,13 @@ using System.Globalization;
 using System.Net;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -21,12 +23,11 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Packaging
 {
-    public class PackageDataInstallation
+    public class PackageDataInstallation : IPackageDataInstallation
     {
         private readonly IDataValueEditorFactory _dataValueEditorFactory;
         private readonly ILogger<PackageDataInstallation> _logger;
         private readonly IFileService _fileService;
-        private readonly IMacroService _macroService;
         private readonly ILocalizationService _localizationService;
         private readonly IDataTypeService _dataTypeService;
         private readonly PropertyEditorCollection _propertyEditors;
@@ -35,6 +36,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly IConfigurationEditorJsonSerializer _serializer;
         private readonly IMediaService _mediaService;
         private readonly IMediaTypeService _mediaTypeService;
+        private readonly ITemplateContentParserService _templateContentParserService;
+        private readonly ITemplateService _templateService;
         private readonly IEntityService _entityService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
@@ -43,7 +46,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
             IFileService fileService,
-            IMacroService macroService,
             ILocalizationService localizationService,
             IDataTypeService dataTypeService,
             IEntityService entityService,
@@ -54,12 +56,13 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IShortStringHelper shortStringHelper,
             IConfigurationEditorJsonSerializer serializer,
             IMediaService mediaService,
-            IMediaTypeService mediaTypeService)
+            IMediaTypeService mediaTypeService,
+            ITemplateContentParserService templateContentParserService,
+            ITemplateService templateService)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
             _logger = logger;
             _fileService = fileService;
-            _macroService = macroService;
             _localizationService = localizationService;
             _dataTypeService = dataTypeService;
             _entityService = entityService;
@@ -71,6 +74,44 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _serializer = serializer;
             _mediaService = mediaService;
             _mediaTypeService = mediaTypeService;
+            _templateContentParserService = templateContentParserService;
+            _templateService = templateService;
+        }
+
+        [Obsolete("Please use new constructor, scheduled for removal in v15")]
+        public PackageDataInstallation(
+            IDataValueEditorFactory dataValueEditorFactory,
+            ILogger<PackageDataInstallation> logger,
+            IFileService fileService,
+            ILocalizationService localizationService,
+            IDataTypeService dataTypeService,
+            IEntityService entityService,
+            IContentTypeService contentTypeService,
+            IContentService contentService,
+            PropertyEditorCollection propertyEditors,
+            IScopeProvider scopeProvider,
+            IShortStringHelper shortStringHelper,
+            IConfigurationEditorJsonSerializer serializer,
+            IMediaService mediaService,
+            IMediaTypeService mediaTypeService)
+            : this(
+                dataValueEditorFactory,
+                logger,
+                fileService,
+                localizationService,
+                dataTypeService,
+                entityService,
+                contentTypeService,
+                contentService,
+                propertyEditors,
+                scopeProvider,
+                shortStringHelper,
+                serializer,
+                mediaService,
+                mediaTypeService,
+                StaticServiceProvider.Instance.GetRequiredService<ITemplateContentParserService>(),
+                StaticServiceProvider.Instance.GetRequiredService<ITemplateService>())
+        {
         }
 
         // Also remove factory service registration when this constructor is removed
@@ -79,7 +120,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
             IFileService fileService,
-            IMacroService macroService,
             ILocalizationService localizationService,
             IDataTypeService dataTypeService,
             IEntityService entityService,
@@ -97,23 +137,24 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                   dataValueEditorFactory,
                   logger,
                   fileService,
-                  macroService,
                   localizationService,
                   dataTypeService,
                   entityService,
                   contentTypeService,
                   contentService,
                   propertyEditors,
-                  (Umbraco.Cms.Infrastructure.Scoping.IScopeProvider) scopeProvider,
+                  (Umbraco.Cms.Infrastructure.Scoping.IScopeProvider)scopeProvider,
                   shortStringHelper,
                   serializer,
                   mediaService,
-                  mediaTypeService)
+                  mediaTypeService,
+                  StaticServiceProvider.Instance.GetRequiredService<ITemplateContentParserService>(),
+                  StaticServiceProvider.Instance.GetRequiredService<ITemplateService>())
         { }
 
         #region Install/Uninstall
 
-            public InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId)
+        public InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId)
         {
             using (IScope scope = _scopeProvider.CreateScope())
             {
@@ -125,8 +166,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                             out IEnumerable<EntityContainer> dataTypeEntityContainersInstalled),
                     LanguagesInstalled = ImportLanguages(compiledPackage.Languages, userId),
                     DictionaryItemsInstalled = ImportDictionaryItems(compiledPackage.DictionaryItems, userId),
-                    MacrosInstalled = ImportMacros(compiledPackage.Macros, userId),
-                    MacroPartialViewsInstalled = ImportMacroPartialViews(compiledPackage.MacroPartialViews, userId),
                     TemplatesInstalled = ImportTemplates(compiledPackage.Templates.ToList(), userId),
                     DocumentTypesInstalled =
                         ImportDocumentTypes(compiledPackage.DocumentTypes, userId,
@@ -259,12 +298,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
                 if (!importedContentTypes.ContainsKey(contentTypeAlias))
                 {
-                    TContentTypeComposition contentType = FindContentTypeByAlias(contentTypeAlias, typeService);
-                    if (contentType == null)
-                    {
-                        throw new InvalidOperationException(
-                            "Could not find content type with alias " + contentTypeAlias);
-                    }
+                    TContentTypeComposition contentType = FindContentTypeByAlias(contentTypeAlias, typeService)
+                        ?? throw new InvalidOperationException("Could not find content type with alias "
+                        + contentTypeAlias);
 
                     importedContentTypes.Add(contentTypeAlias, contentType);
                 }
@@ -352,8 +388,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             var templateId = element.AttributeValue<int?>("template");
 
             IEnumerable<XElement>? properties = from property in element.Elements()
-                where property.Attribute("isDoc") == null
-                select property;
+                                                where property.Attribute("isDoc") == null
+                                                select property;
 
             //TODO: This will almost never work, we can't reference a template by an INT Id within a package manifest, we need to change the
             // packager to package templates by UDI and resolve by the same, in 98% of cases, this isn't going to work, or it will resolve the wrong template.
@@ -378,12 +414,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 key,
                 int.Parse(level, CultureInfo.InvariantCulture),
                 int.Parse(sortOrder, CultureInfo.InvariantCulture),
-                template?.Id);
-
-            if (content is null)
-            {
-                throw new InvalidOperationException("Cloud not create content");
-            }
+                template?.Id) ?? throw new InvalidOperationException("Cloud not create content");
 
             // Handle culture specific node names
             const string nodeNamePrefix = "nodeName-";
@@ -393,7 +424,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             foreach (XAttribute localizedNodeName in element.Attributes()
                          .Where(a => a.Name.LocalName.InvariantStartsWith(nodeNamePrefix)))
             {
-                var newCulture = localizedNodeName.Name.LocalName.Substring(nodeNamePrefix.Length);
+                var newCulture = localizedNodeName.Name.LocalName[nodeNamePrefix.Length..];
                 // Skip the culture if it does not exist in the current project
                 if (installedLanguages.InvariantContains(newCulture))
                 {
@@ -423,7 +454,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         // set property value
                         // Skip unsupported language variation, otherwise we'll get a "not supported error"
                         // We allow null, because that's invariant
-                        if ( propertyLang is null || installedLanguages.InvariantContains(propertyLang))
+                        if (propertyLang is null || installedLanguages.InvariantContains(propertyLang))
                         {
                             content.SetValue(propertyTypeAlias, propertyValue, propertyLang);
                         }
@@ -456,15 +487,23 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     {
                         return new Content(name, parentId, c)
                         {
-                            Key = key, Level = level, SortOrder = sortOrder, TemplateId = templateId,
-                        } as TContentBase;
+                            Key = key,
+                            Level = level,
+                            SortOrder = sortOrder,
+                            TemplateId = templateId,
+                        }
+                        as TContentBase;
                     }
                     else
                     {
                         return new Content(name, (IContent)parent, c)
                         {
-                            Key = key, Level = level, SortOrder = sortOrder, TemplateId = templateId,
-                        } as TContentBase;
+                            Key = key,
+                            Level = level,
+                            SortOrder = sortOrder,
+                            TemplateId = templateId,
+                        }
+                        as TContentBase;
                     }
 
                 case IMediaType m:
@@ -472,15 +511,21 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     {
                         return new Core.Models.Media(name, parentId, m)
                         {
-                            Key = key, Level = level, SortOrder = sortOrder,
-                        } as TContentBase;
+                            Key = key,
+                            Level = level,
+                            SortOrder = sortOrder,
+                        }
+                        as TContentBase;
                     }
                     else
                     {
                         return new Core.Models.Media(name, (IMedia)parent, m)
                         {
-                            Key = key, Level = level, SortOrder = sortOrder,
-                        } as TContentBase;
+                            Key = key,
+                            Level = level,
+                            SortOrder = sortOrder,
+                        }
+                        as TContentBase;
                     }
 
                 default:
@@ -493,7 +538,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         #region DocumentTypes
 
         public IReadOnlyList<IContentType> ImportDocumentType(XElement docTypeElement, int userId)
-            => ImportDocumentTypes(new[] {docTypeElement}, userId, out _);
+            => ImportDocumentTypes(new[] { docTypeElement }, userId, out _);
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentType"/>
@@ -597,7 +642,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             //Iterate the sorted document types and create them as IContentType objects
             foreach (XElement documentType in documentTypes)
             {
-                var alias = documentType.Element("Info")?.Element("Alias")?.Value;
+                var alias = GetEntityTypeAlias(documentType);
 
                 if (alias is not null && importedContentTypes.ContainsKey(alias) == false)
                 {
@@ -630,7 +675,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 //Update the structure here - we can't do it until all DocTypes have been created
                 foreach (XElement documentType in documentTypes)
                 {
-                    var alias = documentType.Element("Info")?.Element("Alias")?.Value;
+                    var alias = GetEntityTypeAlias(documentType);
                     XElement? structureElement = documentType.Element("Structure");
                     //Ensure that we only update ContentTypes which has actual structure-elements
                     if (structureElement == null || structureElement.Elements().Any() == false || alias is null)
@@ -653,7 +698,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return list;
         }
 
-        private Dictionary<string, int> CreateContentTypeFolderStructure(IEnumerable<XElement> unsortedDocumentTypes,
+        private Dictionary<string, int> CreateContentTypeFolderStructure(
+            IEnumerable<XElement> unsortedDocumentTypes,
             out IEnumerable<EntityContainer> entityContainersInstalled)
         {
             var importedFolders = new Dictionary<string, int>();
@@ -668,7 +714,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                                              // exist which contains it's folders
                                              && ((string?)infoElement.Element("Master")).IsNullOrWhiteSpace())
                 {
-                    var alias = documentType.Element("Info")?.Element("Alias")?.Value;
+                    var alias = GetEntityTypeAlias(documentType);
                     var folders = foldersAttribute.Value.Split(Constants.CharArrays.ForwardSlash);
 
                     XAttribute? folderKeysAttribute = documentType.Attribute("FolderKeys");
@@ -751,13 +797,19 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return _contentTypeService.GetContainer(tryCreateFolder.Result!.Entity!.Id);
         }
 
+        public Guid GetContentTypeKey(XElement contentType)
+            => Guid.Parse(contentType.Element("Info")!.Element("Key")!.Value);
+
+        public string? GetEntityTypeAlias(XElement entityType)
+            => entityType.Element("Info")?.Element("Alias")?.Value;
+
         private T CreateContentTypeFromXml<T>(
             XElement documentType,
             IReadOnlyDictionary<string, T> importedContentTypes,
             IContentTypeBaseService<T> service)
             where T : class, IContentTypeComposition
         {
-            var key = Guid.Parse(documentType.Element("Info")!.Element("Key")!.Value);
+            Guid key = GetContentTypeKey(documentType);
 
             XElement infoElement = documentType.Element("Info")!;
 
@@ -791,11 +843,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             {
                 if (parent is null)
                 {
-                    return new ContentType(_shortStringHelper, parentId) {Alias = alias, Key = key} as T;
+                    return new ContentType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T;
                 }
                 else
                 {
-                    return new ContentType(_shortStringHelper, (IContentType)parent, alias) {Key = key} as T;
+                    return new ContentType(_shortStringHelper, (IContentType)parent, alias) { Key = key } as T;
                 }
             }
 
@@ -803,11 +855,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             {
                 if (parent is null)
                 {
-                    return new MediaType(_shortStringHelper, parentId) {Alias = alias, Key = key} as T;
+                    return new MediaType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T;
                 }
                 else
                 {
-                    return new MediaType(_shortStringHelper, (IMediaType)parent, alias) {Key = key} as T;
+                    return new MediaType(_shortStringHelper, (IMediaType)parent, alias) { Key = key } as T;
                 }
             }
 
@@ -841,17 +893,16 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             contentType.Thumbnail = infoElement.Element("Thumbnail")?.Value;
             contentType.Description = infoElement.Element("Description")?.Value;
 
-            //NOTE AllowAtRoot, IsListView, IsElement and Variations are new properties in the package xml so we need to verify it exists before using it.
+            //NOTE AllowAtRoot, IsElement and Variations are new properties in the package xml so we need to verify it exists before using it.
             XElement? allowAtRoot = infoElement.Element("AllowAtRoot");
             if (allowAtRoot != null)
             {
                 contentType.AllowedAsRoot = allowAtRoot.Value.InvariantEquals("true");
             }
 
-            XElement? isListView = infoElement.Element("IsListView");
-            if (isListView != null)
+            if (Guid.TryParse(infoElement.Element("ListView")?.Value, out Guid listView))
             {
-                contentType.IsContainer = isListView.Value.InvariantEquals("true");
+                contentType.ListView = listView;
             }
 
             XElement? isElement = infoElement.Element("IsElement");
@@ -1049,7 +1100,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var dataTypeDefinitionId =
                     new Guid(property.Element("Definition")!.Value); //Unique Id for a DataTypeDefinition
 
-                IDataType? dataTypeDefinition = _dataTypeService.GetDataType(dataTypeDefinitionId);
+                IDataType? dataTypeDefinition = _dataTypeService.GetAsync(dataTypeDefinitionId).GetAwaiter().GetResult();
 
                 //If no DataTypeDefinition with the guid from the xml wasn't found OR the ControlId on the DataTypeDefinition didn't match the DataType Id
                 //We look up a DataTypeDefinition that matches
@@ -1120,7 +1171,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                             : string.Empty,
                         SortOrder = sortOrder,
                         Variations = property.Element("Variations") != null
-                            ? (ContentVariation)Enum.Parse(typeof(ContentVariation),
+                            ? (ContentVariation)Enum.Parse(
+                                typeof(ContentVariation),
                                 property.Element("Variations")!.Value)
                             : ContentVariation.Nothing,
                         LabelOnTop = property.Element("LabelOnTop") != null && property.Element("LabelOnTop")!.Value.ToLowerInvariant().Equals("true")
@@ -1171,13 +1223,12 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     continue;
                 }
 
-                if (allowedChildren?.Any(x => x.Id.IsValueCreated && x.Id.Value == allowedChild.Id) ?? false)
+                if (allowedChildren?.Any(x => x.Key == allowedChild.Key) ?? false)
                 {
                     continue;
                 }
 
-                allowedChildren?.Add(new ContentTypeSort(new Lazy<int>(() => allowedChild.Id), sortOrder,
-                    allowedChild.Alias));
+                allowedChildren?.Add(new ContentTypeSort(allowedChild.Key, sortOrder, allowedChild.Alias));
                 sortOrder++;
             }
 
@@ -1192,12 +1243,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private T FindContentTypeByAlias<T>(string contentTypeAlias, IContentTypeBaseService<T> typeService)
             where T : IContentTypeComposition
         {
-            T? contentType = typeService.Get(contentTypeAlias);
-
-            if (contentType == null)
-            {
-                throw new Exception($"ContentType matching the passed in Alias: '{contentTypeAlias}' was null");
-            }
+            T? contentType = typeService.Get(contentTypeAlias)
+                ?? throw new Exception($"ContentType matching the passed in Alias: '{contentTypeAlias}' " +
+                $"was null");
 
             return contentType;
         }
@@ -1242,7 +1290,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     parentId = importedFolders[dataTypeDefinitionName];
                 }
 
-                IDataType? definition = _dataTypeService.GetDataType(dataTypeDefinitionId);
+                IDataType? definition = _dataTypeService.GetAsync(dataTypeDefinitionId).GetAwaiter().GetResult();
                 //If the datatype definition doesn't already exist we create a new according to the one in the package xml
                 if (definition == null)
                 {
@@ -1257,22 +1305,24 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     var editorAlias = dataTypeElement.Attribute("Id")?.Value?.Trim();
                     if (!_propertyEditors.TryGet(editorAlias, out IDataEditor? editor))
                     {
-                        editor = new VoidEditor(_dataValueEditorFactory) {Alias = editorAlias ?? string.Empty};
+                        editor = new VoidEditor(_dataValueEditorFactory) { Alias = editorAlias ?? string.Empty };
                     }
+
+                    var editorUiAlias = dataTypeElement.Attribute("EditorUiAlias")?.Value?.Trim() ?? editorAlias;
 
                     var dataType = new DataType(editor, _serializer)
                     {
                         Key = dataTypeDefinitionId,
                         Name = dataTypeDefinitionName,
                         DatabaseType = databaseType,
-                        ParentId = parentId
+                        ParentId = parentId,
+                        EditorUiAlias = editorUiAlias,
                     };
 
                     var configurationAttributeValue = dataTypeElement.Attribute("Configuration")?.Value;
                     if (!string.IsNullOrWhiteSpace(configurationAttributeValue))
                     {
-                        dataType.Configuration = editor.GetConfigurationEditor()
-                            .FromDatabase(configurationAttributeValue, _serializer);
+                        dataType.ConfigurationData = editor.GetConfigurationEditor().FromDatabase(configurationAttributeValue, _serializer);
                     }
 
                     dataTypes.Add(dataType);
@@ -1292,7 +1342,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return dataTypes;
         }
 
-        private Dictionary<string, int> CreateDataTypeFolderStructure(IEnumerable<XElement> datatypeElements,
+        private Dictionary<string, int> CreateDataTypeFolderStructure(
+            IEnumerable<XElement> datatypeElements,
             out IEnumerable<EntityContainer> entityContainersInstalled)
         {
             var importedFolders = new Dictionary<string, int>();
@@ -1380,7 +1431,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="dictionaryItemElementList">Xml to import</param>
         /// <param name="userId"></param>
         /// <returns>An enumerable list of dictionary items</returns>
-        public IReadOnlyList<IDictionaryItem> ImportDictionaryItems(IEnumerable<XElement> dictionaryItemElementList,
+        public IReadOnlyList<IDictionaryItem> ImportDictionaryItems(
+            IEnumerable<XElement> dictionaryItemElementList,
             int userId)
         {
             var languages = _localizationService.GetAllLanguages().ToList();
@@ -1393,8 +1445,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return ImportDictionaryItem(dictionaryItemElement, languages, parentId, userId);
         }
 
-        private IReadOnlyList<IDictionaryItem> ImportDictionaryItems(IEnumerable<XElement> dictionaryItemElementList,
-            List<ILanguage> languages, Guid? parentId, int userId)
+        private IReadOnlyList<IDictionaryItem> ImportDictionaryItems(
+            IEnumerable<XElement> dictionaryItemElementList,
+            List<ILanguage> languages,
+            Guid? parentId,
+            int userId)
         {
             var items = new List<IDictionaryItem>();
             foreach (XElement dictionaryItemElement in dictionaryItemElementList)
@@ -1405,8 +1460,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return items;
         }
 
-        private IEnumerable<IDictionaryItem> ImportDictionaryItem(XElement dictionaryItemElement,
-            List<ILanguage> languages, Guid? parentId, int userId)
+        private IEnumerable<IDictionaryItem> ImportDictionaryItem(
+            XElement dictionaryItemElement,
+            List<ILanguage> languages,
+            Guid? parentId,
+            int userId)
         {
             var items = new List<IDictionaryItem>();
 
@@ -1465,15 +1523,18 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return dictionaryItem;
         }
 
-        private static bool DictionaryValueIsNew(IEnumerable<IDictionaryTranslation> translations,
+        private static bool DictionaryValueIsNew(
+            IEnumerable<IDictionaryTranslation> translations,
             XElement valueElement)
-            => translations.All(t => string.Compare(t.Language?.IsoCode,
-                                         valueElement.Attribute("LanguageCultureAlias")?.Value,
-                                         StringComparison.InvariantCultureIgnoreCase) !=
-                                     0);
+            => translations.All(t => string.Compare(
+                t.LanguageIsoCode,
+                valueElement.Attribute("LanguageCultureAlias")?.Value,
+                StringComparison.InvariantCultureIgnoreCase) != 0);
 
-        private static void AddDictionaryTranslation(ICollection<IDictionaryTranslation> translations,
-            XElement valueElement, IEnumerable<ILanguage> languages)
+        private static void AddDictionaryTranslation(
+            ICollection<IDictionaryTranslation> translations,
+            XElement valueElement,
+            IEnumerable<ILanguage> languages)
         {
             var languageId = valueElement.Attribute("LanguageCultureAlias")?.Value;
             ILanguage? language = languages.SingleOrDefault(l => l.IsoCode == languageId);
@@ -1526,153 +1587,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         #endregion
 
-        #region Macros
-
-        /// <summary>
-        /// Imports and saves the 'Macros' part of a package xml as a list of <see cref="IMacro"/>
-        /// </summary>
-        /// <param name="macroElements">Xml to import</param>
-        /// <param name="userId">Optional id of the User performing the operation</param>
-        /// <returns></returns>
-        public IReadOnlyList<IMacro> ImportMacros(
-            IEnumerable<XElement> macroElements,
-            int userId)
-        {
-            var macros = macroElements.Select(ParseMacroElement).ToList();
-
-            foreach (IMacro macro in macros)
-            {
-                _macroService.Save(macro, userId);
-            }
-
-            return macros;
-        }
-
-        public IReadOnlyList<IPartialView> ImportMacroPartialViews(IEnumerable<XElement> macroPartialViewsElements,
-            int userId)
-        {
-            var result = new List<IPartialView>();
-
-            foreach (XElement macroPartialViewXml in macroPartialViewsElements)
-            {
-                var path = macroPartialViewXml.AttributeValue<string>("path");
-                if (path == null)
-                {
-                    throw new InvalidOperationException("No path attribute found");
-                }
-
-                // Remove prefix to maintain backwards compatibility
-                if (path.StartsWith(Constants.SystemDirectories.MacroPartials))
-                {
-                    path = path.Substring(Constants.SystemDirectories.MacroPartials.Length);
-                }
-                else if (path.StartsWith("~"))
-                {
-                    _logger.LogWarning(
-                        "Importing macro partial views outside of the Views/MacroPartials directory is not supported: {Path}",
-                        path);
-                    continue;
-                }
-
-                IPartialView? macroPartialView = _fileService.GetPartialViewMacro(path);
-
-                // only update if it doesn't exist
-                if (macroPartialView == null)
-                {
-                    var content = macroPartialViewXml.Value ?? string.Empty;
-
-                    macroPartialView = new PartialView(PartialViewType.PartialViewMacro, path) {Content = content};
-                    _fileService.SavePartialViewMacro(macroPartialView, userId);
-                    result.Add(macroPartialView);
-                }
-            }
-
-            return result;
-        }
-
-        private IMacro ParseMacroElement(XElement macroElement)
-        {
-            var macroKey = Guid.Parse(macroElement.Element("key")!.Value);
-            var macroName = macroElement.Element("name")?.Value;
-            var macroAlias = macroElement.Element("alias")!.Value;
-            var macroSource = macroElement.Element("macroSource")!.Value;
-
-            //Following xml elements are treated as nullable properties
-            XElement? useInEditorElement = macroElement.Element("useInEditor");
-            var useInEditor = false;
-            if (useInEditorElement != null && string.IsNullOrEmpty((string)useInEditorElement) == false)
-            {
-                useInEditor = bool.Parse(useInEditorElement.Value);
-            }
-
-            XElement? cacheDurationElement = macroElement.Element("refreshRate");
-            var cacheDuration = 0;
-            if (cacheDurationElement != null && string.IsNullOrEmpty((string)cacheDurationElement) == false)
-            {
-                cacheDuration = int.Parse(cacheDurationElement.Value, CultureInfo.InvariantCulture);
-            }
-
-            XElement? cacheByMemberElement = macroElement.Element("cacheByMember");
-            var cacheByMember = false;
-            if (cacheByMemberElement != null && string.IsNullOrEmpty((string)cacheByMemberElement) == false)
-            {
-                cacheByMember = bool.Parse(cacheByMemberElement.Value);
-            }
-
-            XElement? cacheByPageElement = macroElement.Element("cacheByPage");
-            var cacheByPage = false;
-            if (cacheByPageElement != null && string.IsNullOrEmpty((string)cacheByPageElement) == false)
-            {
-                cacheByPage = bool.Parse(cacheByPageElement.Value);
-            }
-
-            XElement? dontRenderElement = macroElement.Element("dontRender");
-            var dontRender = true;
-            if (dontRenderElement != null && string.IsNullOrEmpty((string)dontRenderElement) == false)
-            {
-                dontRender = bool.Parse(dontRenderElement.Value);
-            }
-
-            var existingMacro = _macroService.GetById(macroKey) as Macro;
-            Macro macro = existingMacro ?? new Macro(_shortStringHelper, macroAlias, macroName, macroSource,
-                cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration) {Key = macroKey};
-
-            XElement? properties = macroElement.Element("properties");
-            if (properties != null)
-            {
-                int sortOrder = 0;
-                foreach (XElement property in properties.Elements())
-                {
-                    Guid propertyKey = property.RequiredAttributeValue<Guid>("key");
-                    var propertyName = property.Attribute("name")?.Value;
-                    var propertyAlias = property.Attribute("alias")!.Value;
-                    var editorAlias = property.Attribute("propertyType")!.Value;
-                    XAttribute? sortOrderAttribute = property.Attribute("sortOrder");
-                    if (sortOrderAttribute != null)
-                    {
-                        sortOrder = int.Parse(sortOrderAttribute.Value, CultureInfo.InvariantCulture);
-                    }
-
-                    if (macro.Properties.Values.Any(x =>
-                            string.Equals(x.Alias, propertyAlias, StringComparison.OrdinalIgnoreCase)))
-                    {
-                        continue;
-                    }
-
-                    macro.Properties.Add(new MacroProperty(propertyAlias, propertyName, sortOrder, editorAlias)
-                    {
-                        Key = propertyKey
-                    });
-
-                    sortOrder++;
-                }
-            }
-
-            return macro;
-        }
-
-        #endregion
-
         public IReadOnlyList<IScript> ImportScripts(IEnumerable<XElement> scriptElements, int userId)
         {
             var result = new List<IScript>();
@@ -1696,7 +1610,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         continue;
                     }
 
-                    script = new Script(path!) {Content = content};
+                    script = new Script(path!) { Content = content };
                     _fileService.SaveScript(script, userId);
                     result.Add(script);
                 }
@@ -1711,12 +1625,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
             foreach (XElement partialViewXml in partialViewElements)
             {
-                var path = partialViewXml.AttributeValue<string>("path");
-
-                if (path == null)
-                {
-                    throw new InvalidOperationException("No path attribute found");
-                }
+                var path = partialViewXml.AttributeValue<string>("path")
+                    ?? throw new InvalidOperationException("No path attribute found");
 
                 IPartialView? partialView = _fileService.GetPartialView(path);
 
@@ -1725,7 +1635,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 {
                     var content = partialViewXml.Value ?? string.Empty;
 
-                    partialView = new PartialView(PartialViewType.PartialView, path) {Content = content};
+                    partialView = new PartialView(path) { Content = content };
                     _fileService.SavePartialView(partialView, userId);
                     result.Add(partialView);
                 }
@@ -1757,7 +1667,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         continue;
                     }
 
-                    s = new Stylesheet(stylesheetPath!) {Content = content};
+                    s = new Stylesheet(stylesheetPath!) { Content = content };
                     _fileService.SaveStylesheet(s, userId);
                 }
 
@@ -1799,8 +1709,17 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         #region Templates
 
+        [Obsolete("Use Async version instead, Scheduled to be removed in v17")]
         public IEnumerable<ITemplate> ImportTemplate(XElement templateElement, int userId)
-            => ImportTemplates(new[] {templateElement}, userId);
+            => ImportTemplates(new[] { templateElement }, userId);
+
+        public async Task<IEnumerable<ITemplate>> ImportTemplateAsync(XElement templateElement, int userId)
+            => ImportTemplatesAsync(new[] {templateElement}, userId).GetAwaiter().GetResult();
+
+
+        [Obsolete("Use Async version instead, Scheduled to be removed in v17")]
+        public IReadOnlyList<ITemplate> ImportTemplates(IReadOnlyCollection<XElement> templateElements, int userId)
+            => ImportTemplatesAsync(templateElements, userId).GetAwaiter().GetResult();
 
         /// <summary>
         /// Imports and saves package xml as <see cref="ITemplate"/>
@@ -1808,7 +1727,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="templateElements">Xml to import</param>
         /// <param name="userId">Optional user id</param>
         /// <returns>An enumerable list of generated Templates</returns>
-        public IReadOnlyList<ITemplate> ImportTemplates(IReadOnlyCollection<XElement> templateElements, int userId)
+        public async Task<IReadOnlyList<ITemplate>> ImportTemplatesAsync(IReadOnlyCollection<XElement> templateElements, int userId)
         {
             var templates = new List<ITemplate>();
 
@@ -1818,20 +1737,19 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             {
                 var dependencies = new List<string>();
                 XElement elementCopy = tempElement;
-                //Ensure that the Master of the current template is part of the import, otherwise we ignore this dependency as part of the dependency sorting.
-                if (string.IsNullOrEmpty((string?)elementCopy.Element("Master")) == false &&
-                    templateElements.Any(x => (string?)x.Element("Alias") == (string?)elementCopy.Element("Master")))
+
+                //Ensure that the Master of the current template is part of the import, otherwise we ignore this dependency as part of the dependency sorting.'
+                var masterTemplate = _templateContentParserService.MasterTemplateAlias(tempElement.Value);
+                if (masterTemplate is not null && templateElements.Any(x => (string?)x.Element("Alias") == masterTemplate))
                 {
-                    dependencies.Add((string)elementCopy.Element("Master")!);
+                    dependencies.Add(masterTemplate);
                 }
-                else if (string.IsNullOrEmpty((string?)elementCopy.Element("Master")) == false &&
-                         templateElements.Any(x =>
-                             (string?)x.Element("Alias") == (string?)elementCopy.Element("Master")) == false)
+                else
                 {
                     _logger.LogInformation(
                         "Template '{TemplateAlias}' has an invalid Master '{TemplateMaster}', so the reference has been ignored.",
                         (string?)elementCopy.Element("Alias"),
-                        (string?)elementCopy.Element("Master"));
+                        masterTemplate);
                 }
 
                 graph.AddItem(TopoGraph.CreateNode((string)elementCopy.Element("Alias")!, elementCopy, dependencies));
@@ -1848,9 +1766,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var design = templateElement.Element("Design")?.Value;
                 XElement? masterElement = templateElement.Element("Master");
 
-                var existingTemplate = _fileService.GetTemplate(alias) as Template;
+                var existingTemplate = await _templateService.GetAsync(alias) as Template;
 
-                Template? template = existingTemplate ?? new Template(_shortStringHelper, templateName, alias);
+                Template template = existingTemplate ?? new Template(_shortStringHelper, templateName, alias);
 
                 // For new templates, use the serialized key if avaialble.
                 if (existingTemplate == null && Guid.TryParse(templateElement.Element("Key")?.Value, out Guid key))
@@ -1873,9 +1791,16 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 templates.Add(template);
             }
 
-            if (templates.Any())
+            foreach (ITemplate template in templates)
             {
-                _fileService.SaveTemplate(templates, userId);
+                if (template.Id > 0)
+                {
+                    await _templateService.UpdateAsync(template, Constants.Security.SuperUserKey);
+                }
+                else
+                {
+                    await _templateService.CreateAsync(template, Constants.Security.SuperUserKey);
+                }
             }
 
             return templates;

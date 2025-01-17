@@ -40,8 +40,6 @@ public class DatabaseSchemaCreator
         typeof(LanguageTextDto),
         typeof(DomainDto),
         typeof(LogDto),
-        typeof(MacroDto),
-        typeof(MacroPropertyDto),
         typeof(MemberPropertyTypeDto),
         typeof(MemberDto),
         typeof(Member2MemberGroupDto),
@@ -55,6 +53,7 @@ public class DatabaseSchemaCreator
         typeof(ContentType2ContentTypeDto),
         typeof(ContentTypeAllowedContentTypeDto),
         typeof(User2NodeNotifyDto),
+        typeof(User2ClientIdDto),
         typeof(ServerRegistrationDto),
         typeof(AccessDto),
         typeof(AccessRuleDto),
@@ -66,11 +65,13 @@ public class DatabaseSchemaCreator
         typeof(LockDto),
         typeof(UserGroupDto),
         typeof(User2UserGroupDto),
-        typeof(UserGroup2NodePermissionDto),
         typeof(UserGroup2AppDto),
+        typeof(UserGroup2PermissionDto),
+        typeof(UserGroup2GranularPermissionDto),
         typeof(UserStartNodeDto),
         typeof(ContentNuDto),
         typeof(DocumentVersionDto),
+        typeof(DocumentUrlDto),
         typeof(KeyValueDto),
         typeof(UserLoginDto),
         typeof(ConsentDto),
@@ -80,7 +81,6 @@ public class DatabaseSchemaCreator
         typeof(ContentScheduleDto),
         typeof(LogViewerQueryDto),
         typeof(ContentVersionCleanupPolicyDto),
-        typeof(UserGroup2NodeDto),
         typeof(CreatedPackageSchemaDto),
         typeof(UserGroup2LanguageDto),
         typeof(WebhookDto),
@@ -89,6 +89,7 @@ public class DatabaseSchemaCreator
         typeof(Webhook2HeadersDto),
         typeof(WebhookLogDto),
         typeof(WebhookRequestDto),
+        typeof(UserDataDto),
     };
 
     private readonly IUmbracoDatabase _database;
@@ -226,8 +227,7 @@ public class DatabaseSchemaCreator
 
         var unknownConstraintsInDatabase = constraintsInDatabase.Where(
             x => x.Item3.InvariantStartsWith("FK_") == false && x.Item3.InvariantStartsWith("PK_") == false &&
-                 x.Item3.InvariantStartsWith("IX_") == false
-        ).Select(x => x.Item3).ToList();
+                 x.Item3.InvariantStartsWith("IX_") == false).Select(x => x.Item3).ToList();
 
         var foreignKeysInSchema = result.TableDefinitions.SelectMany(x => x.ForeignKeys.Select(y => y.Name))
             .Where(x => x is not null).ToList();
@@ -304,7 +304,8 @@ public class DatabaseSchemaCreator
 
         IEnumerable<string> invalidColumnDifferences =
             columnsPerTableInDatabase.Except(columnsPerTableInSchema, StringComparer.InvariantCultureIgnoreCase)
-                .Union(columnsPerTableInSchema.Except(columnsPerTableInDatabase,
+                .Union(columnsPerTableInSchema.Except(
+                    columnsPerTableInDatabase,
                     StringComparer.InvariantCultureIgnoreCase));
         foreach (var column in invalidColumnDifferences)
         {

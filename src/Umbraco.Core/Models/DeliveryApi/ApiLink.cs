@@ -2,23 +2,11 @@ namespace Umbraco.Cms.Core.Models.DeliveryApi;
 
 public sealed class ApiLink
 {
-    [Obsolete("Please use the overload that accepts a query string. Will be removed in V14.")]
-    public static ApiLink Content(string title, string? target, Guid destinationId, string destinationType, IApiContentRoute route)
-        => Content(title, queryString: null, target, destinationId, destinationType, route);
-
     public static ApiLink Content(string title, string? queryString, string? target, Guid destinationId, string destinationType, IApiContentRoute route)
         => new(LinkType.Content, url: null, queryString, title, target, destinationId, destinationType, route);
 
-    [Obsolete("Please use the overload that accepts a query string. Will be removed in V14.")]
-    public static ApiLink Media(string title, string url, string? target, Guid destinationId, string destinationType)
-        => Media(title, url, queryString: null, target, destinationId, destinationType);
-
     public static ApiLink Media(string title, string url, string? queryString, string? target, Guid destinationId, string destinationType)
         => new(LinkType.Media, url, queryString, title, target, destinationId, destinationType, route: null);
-
-    [Obsolete("Please use the overload that accepts a query string. Will be removed in V14.")]
-    public static ApiLink External(string? title, string url, string? target)
-        => External(title, url, queryString: null, target);
 
     public static ApiLink External(string? title, string url, string? queryString, string? target)
         => new(LinkType.External, url, queryString, title, target, null, null, null);

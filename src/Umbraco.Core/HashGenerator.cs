@@ -99,11 +99,7 @@ public class HashGenerator : DisposableObjectSlim
         var hashType = CryptoConfig.AllowOnlyFipsAlgorithms ? "SHA1" : "MD5";
 
         // create an instance of the correct hashing provider based on the type passed in
-        var hasher = HashAlgorithm.Create(hashType);
-        if (hasher == null)
-        {
-            throw new InvalidOperationException("No hashing type found by name " + hashType);
-        }
+        HashAlgorithm hasher = HashAlgorithm.Create(hashType) ?? throw new InvalidOperationException("No hashing type found by name " + hashType);
 
         using (hasher)
         {

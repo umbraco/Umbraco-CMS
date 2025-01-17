@@ -3,6 +3,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -11,15 +12,17 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 /// Validates the min/max number of items of a block based editor
 /// </summary>
-internal abstract class BlockEditorMinMaxValidatorBase : IValueValidator
+internal abstract class BlockEditorMinMaxValidatorBase<TValue, TLayout> : IValueValidator
+    where TValue : BlockValue<TLayout>, new()
+    where TLayout : class, IBlockLayoutItem, new()
 {
     protected BlockEditorMinMaxValidatorBase(ILocalizedTextService textService) => TextService = textService;
 
     protected ILocalizedTextService TextService { get; }
 
-    public abstract IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration);
+    public abstract IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext);
 
-    protected IEnumerable<ValidationResult> ValidateNumberOfBlocks(BlockEditorData? blockEditorData, int? min, int? max)
+    protected IEnumerable<ValidationResult> ValidateNumberOfBlocks(BlockEditorData<TValue, TLayout>? blockEditorData, int? min, int? max)
     {
         var numberOfBlocks = blockEditorData?.Layout?.Count() ?? 0;
 

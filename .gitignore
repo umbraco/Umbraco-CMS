@@ -47,13 +47,6 @@ NDependOut/
 QueryResult.htm
 tools/docfx/
 
-# Ignore rule for clearing out Belle (avoid rebuilding all the time)
-preserve.belle
-
-# Ignore rule for output of generated documentation files from grunt docserve
-/src/Umbraco.Web.UI.Docs/api/
-/src/Umbraco.Web.UI.Docs/package-lock.json
-
 # csharp-docs
 /build/csharp-docs/api/
 /build/csharp-docs/_site/
@@ -68,13 +61,15 @@ preserve.belle
 /build/docs.zip
 /build/ui-docs.zip
 /build/csharp-docs.zip
-/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/
+/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/auth
+/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/backoffice
+/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/assets
+/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/js
+/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/lib
+/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/views
+/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/login
 
 # Environment specific data
-/src/Umbraco.Web.UI.Client/[Bb]uild/
-/src/Umbraco.Web.UI.Client/[Bb]uild/[Bb]elle/
-/src/Umbraco.Web.UI.Client/src/[Ll]ess/*.css
-/src/Umbraco.Web.UI.Client/TESTS-*.xml
 /src/Umbraco.Web.UI/wwwroot/[Mm]edia/
 /src/Umbraco.Web.UI/App_Code/
 /src/Umbraco.Web.UI/App_Plugins/
@@ -91,6 +86,7 @@ preserve.belle
 
 # Tests
 /tests/Umbraco.Tests.AcceptanceTest/.env
+/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth
 /tests/Umbraco.Tests.Integration.SqlCe/DatabaseContextTests.sdf
 /tests/Umbraco.Tests.Integration.SqlCe/[Uu]mbraco/[Dd]ata/TEMP/
 /tests/Umbraco.Tests.Integration/appsettings.Tests.Local.json
@@ -103,10 +99,13 @@ preserve.belle
 # Ignore auto-generated schema
 /src/Umbraco.Cms.Targets/tasks/
 /src/Umbraco.Cms.Targets/appsettings-schema.*.json
+/src/Umbraco.Cms.Targets/umbraco-package-schema.json
 /src/Umbraco.Web.UI/appsettings-schema.json
 /src/Umbraco.Web.UI/appsettings-schema.*.json
+/src/Umbraco.Web.UI/umbraco-package-schema.json
 /tests/Umbraco.Tests.Integration/appsettings-schema.json
 /tests/Umbraco.Tests.Integration/appsettings-schema.*.json
+/tests/Umbraco.Tests.Integration/umbraco-package-schema.json
 /src/Umbraco.Cms/appsettings-schema.json
 playwright-report
 trace.zip

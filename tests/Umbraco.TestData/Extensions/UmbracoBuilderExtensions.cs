@@ -1,9 +1,7 @@
-using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.TestData.Configuration;
 
@@ -28,10 +26,6 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.Configure<TestDataSettings>(testDataSection);
 
-        if (config.IgnoreLocalDb)
-        {
-            builder.Services.AddSingleton(factory => new PublishedSnapshotServiceOptions { IgnoreLocalDb = true });
-        }
 
         builder.Services.Configure<UmbracoPipelineOptions>(options =>
             options.AddFilter(new UmbracoPipelineFilter(nameof(LoadTestController))

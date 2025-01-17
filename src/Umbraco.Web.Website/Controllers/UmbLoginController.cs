@@ -3,12 +3,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Cms.Web.Common.Models;
 using Umbraco.Cms.Web.Common.Security;
@@ -22,6 +23,8 @@ public class UmbLoginController : SurfaceController
     private readonly IMemberManager _memberManager;
     private readonly IMemberSignInManager _signInManager;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
+    private readonly IPublishedContentCache _contentCache;
+    private readonly IDocumentNavigationQueryService _navigationQueryService;
 
     [ActivatorUtilitiesConstructor]
     public UmbLoginController(
@@ -33,12 +36,42 @@ public class UmbLoginController : SurfaceController
         IPublishedUrlProvider publishedUrlProvider,
         IMemberSignInManager signInManager,
         IMemberManager memberManager,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService)
         : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
     {
         _signInManager = signInManager;
         _memberManager = memberManager;
         _twoFactorLoginService = twoFactorLoginService;
+        _contentCache = contentCache;
+        _navigationQueryService = navigationQueryService;
+    }
+
+    [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V17.")]
+    public UmbLoginController(
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IUmbracoDatabaseFactory databaseFactory,
+        ServiceContext services,
+        AppCaches appCaches,
+        IProfilingLogger profilingLogger,
+        IPublishedUrlProvider publishedUrlProvider,
+        IMemberSignInManager signInManager,
+        IMemberManager memberManager,
+        ITwoFactorLoginService twoFactorLoginService)
+        : this(
+            umbracoContextAccessor,
+            databaseFactory,
+            services,
+            appCaches,
+            profilingLogger,
+            publishedUrlProvider,
+            signInManager,
+            memberManager,
+            twoFactorLoginService,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
+    {
     }
 
     [HttpPost]
@@ -69,7 +102,7 @@ public class UmbLoginController : SurfaceController
                 // If it's not a local URL we'll redirect to the root of the current site.
                 return Redirect(Url.IsLocalUrl(model.RedirectUrl)
                     ? model.RedirectUrl
-                    : CurrentPage!.AncestorOrSelf(1)!.Url(PublishedUrlProvider));
+                    : CurrentPage!.AncestorOrSelf(_contentCache, _navigationQueryService, 1)!.Url(PublishedUrlProvider));
             }
 
             // Redirect to current URL by default.
@@ -84,8 +117,7 @@ public class UmbLoginController : SurfaceController
             MemberIdentityUser? attemptedUser = await _memberManager.FindByNameAsync(model.Username);
             if (attemptedUser == null!)
             {
-                return new ValidationErrorResult(
-                    $"No local member found for username {model.Username}");
+                return BadRequest($"No local member found for username {model.Username}");
             }
 
             IEnumerable<string> providerNames =

@@ -117,7 +117,7 @@ public class MediaTypeBuilder
         mediaType.Thumbnail = GetThumbnail();
         mediaType.CreatorId = GetCreatorId();
         mediaType.Trashed = GetTrashed();
-        mediaType.IsContainer = GetIsContainer();
+        mediaType.ListView = GetListView();
 
         BuildPropertyGroups(mediaType, _propertyGroupBuilders.Select(x => x.Build()));
         BuildPropertyTypeIds(mediaType, _propertyTypeIdsIncrementingFrom);
@@ -150,7 +150,7 @@ public class MediaTypeBuilder
             .WithSortOrder(1)
             .Done()
             .AddPropertyType()
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TinyMce)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.RichText)
             .WithValueStorageType(ValueStorageType.Ntext)
             .WithAlias(RandomAlias("bodyText", randomizeAliases))
             .WithName("Body text")

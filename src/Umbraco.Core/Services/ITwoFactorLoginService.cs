@@ -29,6 +29,7 @@ public interface ITwoFactorLoginService : IService
     ///     The returned type can be anything depending on the setup providers. You will need to cast it to the type handled by
     ///     the provider.
     /// </remarks>
+    [Obsolete("Use IUserTwoFactorLoginService.GetSetupInfoWithStatusAsync. This will be removed in Umbraco 15.")]
     Task<object?> GetSetupInfoAsync(Guid userOrMemberKey, string providerName);
 
     /// <summary>
@@ -59,10 +60,13 @@ public interface ITwoFactorLoginService : IService
     /// <summary>
     /// Disables 2FA with Code.
     /// </summary>
+    [Obsolete("Use IUserTwoFactorLoginService.DisableByCodeWithStatusAsync. This will be removed in Umbraco 15.")]
     Task<bool> DisableWithCodeAsync(string providerName, Guid userOrMemberKey, string code);
 
     /// <summary>
     /// Validates and Saves.
     /// </summary>
+    [Obsolete("Use IUserTwoFactorLoginService.ValidateAndSaveWithStatusAsync. This will be removed in Umbraco 15.")]
     Task<bool> ValidateAndSaveAsync(string providerName, Guid userKey, string secret, string code);
+
 }

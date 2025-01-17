@@ -1,23 +1,16 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Sync;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
@@ -26,8 +19,6 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 /// </summary>
 public class HealthCheckNotifierJob : IRecurringBackgroundJob
 {
-
-
     public TimeSpan Period { get; private set; }
     public TimeSpan Delay { get; private set; }
 
@@ -46,26 +37,6 @@ public class HealthCheckNotifierJob : IRecurringBackgroundJob
     private readonly ICoreScopeProvider _scopeProvider;
     private HealthChecksSettings _healthChecksSettings;
 
-    [Obsolete("Use constructor that accepts IEventAggregator as a parameter, scheduled for removal in V14")]
-    public HealthCheckNotifierJob(
-        IOptionsMonitor<HealthChecksSettings> healthChecksSettings,
-        HealthCheckCollection healthChecks,
-        HealthCheckNotificationMethodCollection notifications,
-        ICoreScopeProvider scopeProvider,
-        ILogger<HealthCheckNotifierJob> logger,
-        IProfilingLogger profilingLogger,
-        ICronTabParser cronTabParser)
-        : this(
-            healthChecksSettings,
-            healthChecks,
-            notifications,
-            scopeProvider,
-            logger,
-            profilingLogger,
-            cronTabParser,
-            StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>())
-    { }
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="HealthCheckNotifierJob" /> class.
     /// </summary>
@@ -76,6 +47,7 @@ public class HealthCheckNotifierJob : IRecurringBackgroundJob
     /// <param name="logger">The typed logger.</param>
     /// <param name="profilingLogger">The profiling logger.</param>
     /// <param name="cronTabParser">Parser of crontab expressions.</param>
+    /// <param name="eventAggregator"></param>
     public HealthCheckNotifierJob(
         IOptionsMonitor<HealthChecksSettings> healthChecksSettings,
         HealthCheckCollection healthChecks,

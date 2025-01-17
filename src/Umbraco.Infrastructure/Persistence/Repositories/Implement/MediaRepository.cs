@@ -57,16 +57,23 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
         _mediaUrlGenerators = mediaUrlGenerators;
         _serializer = serializer;
-        _mediaByGuidReadRepository = new MediaByGuidReadRepository(this, scopeAccessor, cache,
+        _mediaByGuidReadRepository = new MediaByGuidReadRepository(
+            this,
+            scopeAccessor,
+            cache,
             loggerFactory.CreateLogger<MediaByGuidReadRepository>());
     }
 
     protected override MediaRepository This => this;
 
     /// <inheritdoc />
-    public override IEnumerable<IMedia> GetPage(IQuery<IMedia>? query,
-        long pageIndex, int pageSize, out long totalRecords,
-        IQuery<IMedia>? filter, Ordering? ordering)
+    public override IEnumerable<IMedia> GetPage(
+        IQuery<IMedia>? query,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        IQuery<IMedia>? filter,
+        Ordering? ordering)
     {
         Sql<ISqlContext>? filterSql = null;
 
@@ -260,8 +267,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         var list = new List<string>
         {
             "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2Node + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2GranularPermission + " WHERE uniqueId IN (SELECT uniqueId FROM umbracoNode WHERE id = @id)",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
             "UPDATE " + Constants.DatabaseSchema.Tables.UserGroup +
             " SET startContentId = NULL WHERE startContentId = @id",
@@ -314,7 +320,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         {
             var underscoreIndex = mediaPath.LastIndexOf('_');
             var dotIndex = mediaPath.LastIndexOf('.');
-            umbracoFileValue = string.Concat(mediaPath.Substring(0, underscoreIndex), mediaPath.Substring(dotIndex));
+            umbracoFileValue = string.Concat(mediaPath[..underscoreIndex], mediaPath[dotIndex..]);
         }
 
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Single, joinMediaVersion: true)

@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Models;
 /// <summary>
 ///     Represents a member type
 /// </summary>
-public interface IMemberGroup : IEntity, IRememberBeingDirty, IHaveAdditionalData
+public interface IMemberGroup : IEntity, IRememberBeingDirty
 {
     /// <summary>
     ///     The name of the member group

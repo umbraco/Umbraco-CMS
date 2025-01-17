@@ -27,10 +27,16 @@ public interface IValueConnector
     /// <param name="propertyType">The value property type</param>
     /// <param name="dependencies">The content dependencies.</param>
     /// <param name="contextCache">The context cache.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
-    /// The deploy property value.
+    /// A task that represents the asynchronous operation. The task result contains the deploy property value.
     /// </returns>
-    string? ToArtifact(object? value, IPropertyType propertyType, ICollection<ArtifactDependency> dependencies, IContextCache contextCache);
+    Task<string?> ToArtifactAsync(
+        object? value,
+        IPropertyType propertyType,
+        ICollection<ArtifactDependency> dependencies,
+        IContextCache contextCache,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the content property value corresponding to a deploy property value.
@@ -39,8 +45,14 @@ public interface IValueConnector
     /// <param name="propertyType">The value property type</param>
     /// <param name="currentValue">The current content property value.</param>
     /// <param name="contextCache">The context cache.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
-    /// The content property value.
+    /// A task that represents the asynchronous operation. The task result contains the content property value.
     /// </returns>
-    object? FromArtifact(string? value, IPropertyType propertyType, object? currentValue, IContextCache contextCache);
+    Task<object?> FromArtifactAsync(
+        string? value,
+        IPropertyType propertyType,
+        object? currentValue,
+        IContextCache contextCache,
+        CancellationToken cancellationToken = default);
 }

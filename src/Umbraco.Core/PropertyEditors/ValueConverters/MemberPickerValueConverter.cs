@@ -12,17 +12,14 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 public class MemberPickerValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private readonly IMemberService _memberService;
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
-    private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+    private readonly IPublishedMemberCache _memberCache;
 
     public MemberPickerValueConverter(
         IMemberService memberService,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IUmbracoContextAccessor umbracoContextAccessor)
+        IPublishedMemberCache memberCache)
     {
         _memberService = memberService;
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
-        _umbracoContextAccessor = umbracoContextAccessor;
+        _memberCache = memberCache;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType)
@@ -64,7 +61,6 @@ public class MemberPickerValueConverter : PropertyValueConverterBase, IDeliveryA
         }
 
         IPublishedContent? member;
-        IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
         if (source is int id)
         {
             IMember? m = _memberService.GetById(id);
@@ -73,7 +69,7 @@ public class MemberPickerValueConverter : PropertyValueConverterBase, IDeliveryA
                 return null;
             }
 
-            member = publishedSnapshot?.Members?.Get(m);
+            member = _memberCache.Get(m);
             if (member != null)
             {
                 return member;
@@ -92,7 +88,7 @@ public class MemberPickerValueConverter : PropertyValueConverterBase, IDeliveryA
                 return null;
             }
 
-            member = publishedSnapshot?.Members?.Get(m);
+            member = _memberCache.Get(m);
 
             if (member != null)
             {

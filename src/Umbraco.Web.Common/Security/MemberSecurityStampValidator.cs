@@ -14,8 +14,8 @@ public class MemberSecurityStampValidator : SecurityStampValidator<MemberIdentit
 {
     public MemberSecurityStampValidator(
         IOptions<MemberSecurityStampValidatorOptions> options,
-        MemberSignInManager signInManager, ISystemClock clock, ILoggerFactory logger)
-        : base(options, signInManager, clock, logger)
+        MemberSignInManager signInManager, ILoggerFactory logger)
+        : base(options, signInManager, logger)
     {
     }
 

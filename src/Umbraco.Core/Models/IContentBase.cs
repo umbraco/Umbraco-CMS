@@ -138,4 +138,11 @@ public interface IContentBase : IUmbracoEntity, IRememberBeingDirty
     /// </summary>
     /// <remarks>Values 'null' and 'empty' are equivalent for culture and segment.</remarks>
     void SetValue(string propertyTypeAlias, object? value, string? culture = null, string? segment = null);
+
+    /// <summary>
+    ///     Removes a Property value.
+    /// </summary>
+    /// <param name="propertyTypeAlias">The alias of the property value to remove.</param>
+    /// <remarks>This removes the value for all cultures and segments.</remarks>
+    void RemoveValue(string propertyTypeAlias);
 }

@@ -18,27 +18,11 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IUmbracoMapper, UmbracoMapper>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
-            .Add<AuditMapDefinition>()
-            .Add<CodeFileMapDefinition>()
-            .Add<ContentPropertyMapDefinition>()
-            .Add<ContentTypeMapDefinition>()
-            .Add<DataTypeMapDefinition>()
-            .Add<EntityMapDefinition>()
             .Add<RelationModelMapDefinition>()
-            .Add<DictionaryMapDefinition>()
-            .Add<MacroMapDefinition>()
-            .Add<RedirectUrlMapDefinition>()
-            .Add<RelationMapDefinition>()
-            .Add<SectionMapDefinition>()
             .Add<TagMapDefinition>()
-            .Add<TemplateMapDefinition>()
-            .Add<UserMapDefinition>()
-            .Add<MemberMapDefinition>()
-            .Add<LanguageMapDefinition>()
             .Add<IdentityMapDefinition>();
 
         builder.Services.AddTransient<CommonMapper>();
-        builder.Services.AddTransient<MemberTabsAndPropertiesMapper>();
 
         return builder;
     }

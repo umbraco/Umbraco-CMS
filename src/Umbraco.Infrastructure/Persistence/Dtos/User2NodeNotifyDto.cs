@@ -19,7 +19,6 @@ internal class User2NodeNotifyDto
     public int NodeId { get; set; }
 
     [Column("action")]
-    [SpecialDbType(SpecialDbTypes.NCHAR)]
-    [Length(1)]
+    [Length(255)]
     public string? Action { get; set; }
 }

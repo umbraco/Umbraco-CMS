@@ -9,9 +9,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Asp.Versioning.Mvc "/>
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
     <PackageReference Include="OpenIddict.Abstractions" />
     <PackageReference Include="OpenIddict.AspNetCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Take top-level depedendency on OpenIddict.AspNetCore depends on a vulnerable version -->
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
   </ItemGroup>
 
   <ItemGroup>

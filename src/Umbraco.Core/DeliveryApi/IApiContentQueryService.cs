@@ -9,9 +9,6 @@ namespace Umbraco.Cms.Core.DeliveryApi;
 /// </summary>
 public interface IApiContentQueryService
 {
-    [Obsolete($"Use the {nameof(ExecuteQuery)} method that accepts {nameof(ProtectedAccess)}. Will be removed in V14.")]
-    Attempt<PagedModel<Guid>, ApiContentQueryOperationStatus> ExecuteQuery(string? fetch, IEnumerable<string> filters, IEnumerable<string> sorts, int skip, int take);
-
     /// <summary>
     ///     Returns an attempt with a collection of item ids that passed the search criteria as a paged model.
     /// </summary>

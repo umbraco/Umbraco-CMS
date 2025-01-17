@@ -12,6 +12,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+[Obsolete($"This service has been superseded by {nameof(IMediaImportService)}. Will be removed in V16.")]
 public class TemporaryMediaService : ITemporaryMediaService
 {
     private readonly IShortStringHelper _shortStringHelper;

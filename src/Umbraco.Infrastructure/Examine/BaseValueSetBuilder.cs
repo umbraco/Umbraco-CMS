@@ -1,9 +1,6 @@
 using Examine;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
@@ -25,27 +22,6 @@ public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
     /// <inheritdoc />
     public abstract IEnumerable<ValueSet> GetValueSets(params TContent[] content);
 
-    [Obsolete("Use the overload that specifies availableCultures, scheduled for removal in v14")]
-    protected void AddPropertyValue(IProperty property, string? culture, string? segment, IDictionary<string, IEnumerable<object?>>? values)
-        => AddPropertyValue(
-            property,
-            culture,
-            segment,
-            values,
-            Enumerable.Empty<string>(),
-            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>().GetAll().ToDictionary(x=>x.Key));
-
-    [Obsolete("Use the overload that specifies availableCultures, scheduled for removal in v14")]
-    protected void AddPropertyValue(IProperty property, string? culture, string? segment,
-        IDictionary<string, IEnumerable<object?>>? values, IEnumerable<string> availableCultures)
-        => AddPropertyValue(
-            property,
-            culture,
-            segment,
-            values,
-            Enumerable.Empty<string>(),
-            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>().GetAll().ToDictionary(x=>x.Key));
-
     protected void AddPropertyValue(IProperty property, string? culture, string? segment, IDictionary<string, IEnumerable<object?>>? values, IEnumerable<string> availableCultures, IDictionary<Guid, IContentType> contentTypeDictionary)
     {
         IDataEditor? editor = _propertyEditors[property.PropertyType.PropertyEditorAlias];
@@ -54,18 +30,19 @@ public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
             return;
         }
 
-        IEnumerable<KeyValuePair<string, IEnumerable<object?>>> indexVals =
+        IEnumerable<IndexValue> indexVals =
             editor.PropertyIndexValueFactory.GetIndexValues(property, culture, segment, PublishedValuesOnly, availableCultures, contentTypeDictionary);
-        foreach (KeyValuePair<string, IEnumerable<object?>> keyVal in indexVals)
+        foreach (IndexValue indexValue in indexVals)
         {
-            if (keyVal.Key.IsNullOrWhiteSpace())
+            if (indexValue.FieldName.IsNullOrWhiteSpace())
             {
                 continue;
             }
 
-            var cultureSuffix = culture == null ? string.Empty : "_" + culture;
+            var indexValueCulture = indexValue.Culture ?? culture;
+            var cultureSuffix = indexValueCulture == null ? string.Empty : "_" + indexValueCulture.ToLowerInvariant();
 
-            foreach (var val in keyVal.Value)
+            foreach (var val in indexValue.Values)
             {
                 switch (val)
                 {
@@ -79,28 +56,28 @@ public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
                             continue;
                         }
 
-                        var key = $"{keyVal.Key}{cultureSuffix}";
+                        var key = $"{indexValue.FieldName}{cultureSuffix}";
                         if (values?.TryGetValue(key, out IEnumerable<object?>? v) ?? false)
                         {
                             values[key] = new List<object?>(v) { val }.ToArray();
                         }
                         else
                         {
-                            values?.Add($"{keyVal.Key}{cultureSuffix}", val.Yield());
+                            values?.Add($"{indexValue.FieldName}{cultureSuffix}", val.Yield());
                         }
                     }
 
                         break;
                     default:
                         {
-                        var key = $"{keyVal.Key}{cultureSuffix}";
+                        var key = $"{indexValue.FieldName}{cultureSuffix}";
                         if (values?.TryGetValue(key, out IEnumerable<object?>? v) ?? false)
                         {
                             values[key] = new List<object?>(v) { val }.ToArray();
                         }
                         else
                         {
-                            values?.Add($"{keyVal.Key}{cultureSuffix}", val.Yield());
+                            values?.Add($"{indexValue.FieldName}{cultureSuffix}", val.Yield());
                         }
                     }
 

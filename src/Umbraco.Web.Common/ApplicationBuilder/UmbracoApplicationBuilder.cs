@@ -73,6 +73,8 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
 
         AppBuilder.UseUmbracoMediaFileProvider();
 
+        AppBuilder.UseUmbracoBackOfficeRewrites();
+
         AppBuilder.UseStaticFiles();
 
         AppBuilder.UseUmbracoPluginsStaticFiles();

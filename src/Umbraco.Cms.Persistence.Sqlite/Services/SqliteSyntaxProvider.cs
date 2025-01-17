@@ -79,6 +79,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         switch (indexTypes)
         {
             case IndexTypes.UniqueNonClustered:
+            case IndexTypes.UniqueClustered:
                 return "UNIQUE";
             default:
                 return string.Empty;
@@ -159,6 +160,8 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     public override string ConvertDecimalToOrderableString => "substr('0000000000'||'{0}', -10, 10)";
 
     public override string ConvertDateToOrderableString => "{0}";
+
+    public override string RenameTable => "ALTER TABLE {0} RENAME TO {1}";
 
     /// <inheritdoc />
     public override string GetSpecialDbType(SpecialDbType dbType) => "TEXT COLLATE NOCASE";

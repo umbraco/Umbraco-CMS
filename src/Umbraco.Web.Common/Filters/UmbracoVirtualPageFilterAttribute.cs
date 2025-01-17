@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Routing;
 
@@ -40,6 +42,12 @@ public class UmbracoVirtualPageFilterAttribute : Attribute, IAsyncActionFilter
             if (endpoint != null)
             {
                 IUmbracoVirtualPageRoute umbracoVirtualPageRoute = context.HttpContext.RequestServices.GetRequiredService<IUmbracoVirtualPageRoute>();
+                IPublishedRouter publishedRouter = context.HttpContext.RequestServices.GetRequiredService<IPublishedRouter>();
+                UriUtility uriUtility = context.HttpContext.RequestServices.GetRequiredService<UriUtility>();
+
+                var originalRequestUrl = new Uri(context.HttpContext.Request.GetEncodedUrl());
+                Uri cleanedUri = uriUtility.UriToUmbraco(originalRequestUrl);
+                publishedRouter.UpdateVariationContext(cleanedUri);
 
                 IPublishedContent? publishedContent = umbracoVirtualPageRoute.FindContent(endpoint, context);
 

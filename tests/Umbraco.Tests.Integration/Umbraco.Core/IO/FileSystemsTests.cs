@@ -69,7 +69,7 @@ public class FileSystemsTests : UmbracoIntegrationTest
         Assert.IsTrue(Directory.Exists(physPath));
     }
 
-    // FIXME: don't make sense anymore
+    // TODO: don't make sense anymore
     /*
     [Test]
     public void Cannot_Get_InvalidFileSystem()

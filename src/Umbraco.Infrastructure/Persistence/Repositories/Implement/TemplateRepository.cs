@@ -383,8 +383,6 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
         var list = new List<string>
         {
             "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2Node + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
             "UPDATE " + Constants.DatabaseSchema.Tables.DocumentVersion +
             " SET templateId = NULL WHERE templateId = @id",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentType + " WHERE templateNodeId = @id",

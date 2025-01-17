@@ -24,32 +24,26 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 public class ExamineExternalIndexSearcherTest : IExamineExternalIndexSearcherTest
 {
     private readonly AppCaches _appCaches;
+    private readonly ILanguageService _languageService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IEntityService _entityService;
     private readonly IExamineManager _examineManager;
-    private readonly ILocalizationService _languageService;
-    private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IUmbracoTreeSearcherFields _treeSearcherFields;
-    private readonly IUmbracoMapper _umbracoMapper;
 
     public ExamineExternalIndexSearcherTest(
         IExamineManager examineManager,
-        ILocalizationService languageService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IEntityService entityService,
         IUmbracoTreeSearcherFields treeSearcherFields,
         AppCaches appCaches,
-        IUmbracoMapper umbracoMapper,
-        IPublishedUrlProvider publishedUrlProvider)
+        ILanguageService languageService)
     {
         _examineManager = examineManager;
-        _languageService = languageService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _entityService = entityService;
         _treeSearcherFields = treeSearcherFields;
         _appCaches = appCaches;
-        _umbracoMapper = umbracoMapper;
-        _publishedUrlProvider = publishedUrlProvider;
+        _languageService = languageService;
     }
 
     public IEnumerable<ISearchResult> Search(
@@ -141,7 +135,7 @@ public class ExamineExternalIndexSearcherTest : IExamineExternalIndexSearcherTes
             throw new InvalidOperationException("No index found by name " + indexName);
         }
 
-        if (!BuildQuery(sb, query, searchFrom, fields, type))
+        if (!BuildQueryAsync(sb, query, searchFrom, fields, type).GetAwaiter().GetResult())
         {
             totalFound = 0;
             return Enumerable.Empty<ISearchResult>();
@@ -159,14 +153,14 @@ public class ExamineExternalIndexSearcherTest : IExamineExternalIndexSearcherTes
         return result;
     }
 
-    private bool BuildQuery(StringBuilder sb, string query, string? searchFrom, List<string> fields, string type)
+    private async Task<bool> BuildQueryAsync(StringBuilder sb, string query, string? searchFrom, List<string> fields, string type)
     {
         //build a lucene query:
         // the nodeName will be boosted 10x without wildcards
         // then nodeName will be matched normally with wildcards
         // the rest will be normal without wildcards
 
-        var allLangs = _languageService.GetAllLanguages().Select(x => x.IsoCode.ToLowerInvariant()).ToList();
+        var allLanguages = (await _languageService.GetAllAsync()).Select(x => x.IsoCode.ToLowerInvariant()).ToList();
 
         // the chars [*-_] in the query will mess everything up so let's remove those
         // However we cannot just remove - and _  since these signify a space, so we instead replace them with that.
@@ -199,7 +193,7 @@ public class ExamineExternalIndexSearcherTest : IExamineExternalIndexSearcherTes
 
                 sb.Append("+(");
 
-                AppendNodeNamePhraseWithBoost(sb, query, allLangs);
+                AppendNodeNamePhraseWithBoost(sb, query, allLanguages);
 
                 foreach (var f in fields)
                 {
@@ -232,9 +226,9 @@ public class ExamineExternalIndexSearcherTest : IExamineExternalIndexSearcherTes
 
                 sb.Append("+(");
 
-                AppendNodeNameExactWithBoost(sb, query, allLangs);
+                AppendNodeNameExactWithBoost(sb, query, allLanguages);
 
-                AppendNodeNameWithWildcards(sb, querywords, allLangs);
+                AppendNodeNameWithWildcards(sb, querywords, allLanguages);
 
                 foreach (var f in fields)
                 {

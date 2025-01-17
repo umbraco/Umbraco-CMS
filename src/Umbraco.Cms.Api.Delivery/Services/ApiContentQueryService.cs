@@ -37,15 +37,6 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
         _requestPreviewService = requestPreviewService;
     }
 
-    [Obsolete($"Use the {nameof(ExecuteQuery)} method that accepts {nameof(ProtectedAccess)}. Will be removed in V14.")]
-    public Attempt<PagedModel<Guid>, ApiContentQueryOperationStatus> ExecuteQuery(
-        string? fetch,
-        IEnumerable<string> filters,
-        IEnumerable<string> sorts,
-        int skip,
-        int take)
-        => ExecuteQuery(fetch, filters, sorts, ProtectedAccess.None, skip, take);
-
     /// <inheritdoc/>
     public Attempt<PagedModel<Guid>, ApiContentQueryOperationStatus> ExecuteQuery(
         string? fetch,

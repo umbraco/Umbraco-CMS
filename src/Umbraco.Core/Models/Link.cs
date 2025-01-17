@@ -12,7 +12,5 @@ public class Link
 
     public Udi? Udi { get; set; }
 
-    public IPublishedContent? Content { get; set; }
-
     public string? Url { get; set; }
 }
