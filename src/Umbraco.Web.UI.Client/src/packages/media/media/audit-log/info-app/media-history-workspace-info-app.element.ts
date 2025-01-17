@@ -83,13 +83,10 @@ export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<uui-box>
-			<div id="rollback" slot="header">
-				<h2><umb-localize key="general_history">History</umb-localize></h2>
-			</div>
+		return html`
 			${this._items ? this.#renderHistory() : html`<uui-loader-circle></uui-loader-circle> `}
 			${this.#renderPagination()}
-		</uui-box> `;
+		`;
 	}
 
 	#renderHistory() {
@@ -145,6 +142,11 @@ export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				display: block;
+				padding: var(--uui-size-space-4) var(--uui-size-space-5);
+			}
+
 			uui-loader-circle {
 				font-size: 2rem;
 			}
