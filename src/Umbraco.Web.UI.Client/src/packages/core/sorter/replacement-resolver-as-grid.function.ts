@@ -1,4 +1,4 @@
-import type { UmbSorterResolvePlacementArgs } from './sorter.controller';
+import type { UmbSorterResolvePlacementArgs } from './sorter.controller.js';
 
 /**
  * This function is used to resolve the placement of an item in a simple grid layout.
