@@ -3,7 +3,7 @@ import type { MediaUrlInfoModel } from '@umbraco-cms/backoffice/external/backend
 import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-@customElement('umb-document-links-workspace-info-app')
+@customElement('umb-media-links-workspace-info-app')
 export class UmbMediaLinksWorkspaceInfoAppElement extends UmbLitElement {
 	@state()
 	private _urls?: Array<MediaUrlInfoModel>;
