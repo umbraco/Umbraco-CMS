@@ -7,7 +7,10 @@ import {
 } from '@umbraco-cms/backoffice/tree';
 import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
 
-export type UmbDocumentPickerModalData = UmbTreePickerModalData<UmbDocumentItemModel>;
+export interface UmbDocumentPickerModalData extends UmbTreePickerModalData<UmbDocumentItemModel> {
+	allowedContentTypes: Array<{ unique: string; entityType: string }>;
+}
+
 export type UmbDocumentPickerModalValue = UmbTreePickerModalValue;
 
 export const UMB_DOCUMENT_PICKER_MODAL = new UmbModalToken<UmbDocumentPickerModalData, UmbDocumentPickerModalValue>(
