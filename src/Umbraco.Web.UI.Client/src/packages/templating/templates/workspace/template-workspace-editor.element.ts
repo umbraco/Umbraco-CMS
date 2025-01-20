@@ -13,6 +13,7 @@ import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 
 import '@umbraco-cms/backoffice/code-editor';
 import '../../local-components/insert-menu/index.js';
+import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-template-workspace-editor')
 export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
@@ -170,6 +171,8 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 					.alias=${this._alias}
 					?auto-generate-alias=${this.#isNew}
 					@change=${this.#onNameAndAliasChange}
+					required
+					${umbBindToValidation(this)}
 					${umbFocus()}>
 				</umb-input-with-alias>
 

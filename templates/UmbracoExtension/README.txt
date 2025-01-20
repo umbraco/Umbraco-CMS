@@ -35,4 +35,4 @@
 * Use VSCode as the editor of choice as it has good tooling support for TypeScript and it will recommend a VSCode Extension for good Lit WebComponent completions
 
 == Other Resources ==
-* Umbraco Docs - https://docs.umbraco.com/umbraco-cms/customizing/extend-and-customize-editing-experience
+* Umbraco Docs - https://docs.umbraco.com/umbraco-cms/customizing/overview

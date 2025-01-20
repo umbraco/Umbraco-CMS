@@ -216,7 +216,8 @@ public class UserPresentationFactory : IUserPresentationFactory
             HasAccessToAllLanguages = hasAccessToAllLanguages,
             HasAccessToSensitiveData = user.HasAccessToSensitiveData(),
             AllowedSections = allowedSections,
-            IsAdmin = user.IsAdmin()
+            IsAdmin = user.IsAdmin(),
+            UserGroupIds = presentationUser.UserGroupIds,
         });
     }
 

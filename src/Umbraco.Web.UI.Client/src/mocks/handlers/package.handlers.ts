@@ -7,9 +7,20 @@ import type {
 	PagedPackageDefinitionResponseModel,
 	PagedPackageMigrationStatusResponseModel,
 	CreatePackageRequestModel,
+	GetPackageConfigurationResponse,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const handlers = [
+	rest.get(umbracoPath('/package/configuration'), (_req, res, ctx) => {
+		return res(
+			// Respond with a 200 status code
+			ctx.status(200),
+			ctx.json<GetPackageConfigurationResponse>({
+				marketplaceUrl: 'https://marketplace.umbraco.com',
+			}),
+		);
+	}),
+
 	rest.get(umbracoPath('/package/migration-status'), (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code

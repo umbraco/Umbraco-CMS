@@ -90,7 +90,7 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 
 	#setLinks() {
 		const links: Array<UmbDocumentInfoViewLink> = this.#urls.map((u) => {
-			const culture = u.culture ?? this._defaultCulture ?? "";
+			const culture = u.culture ?? this._defaultCulture ?? '';
 			const url = u.url;
 			const state = this._variantOptions?.find((variantOption) => variantOption.culture === culture)?.variant?.state;
 			return { culture, url, state };
@@ -99,13 +99,13 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		this._links = links;
 	}
 
-	#getTargetUrl (url: string | undefined) {
+	#getTargetUrl(url: string | undefined) {
 		if (!url || url.length === 0) {
 			return url;
 		}
 
-		if (url.includes(".") && !url.includes("//")) {
-			return "//" + url;
+		if (url.includes('.') && !url.includes('//')) {
+			return '//' + url;
 		}
 
 		return url;

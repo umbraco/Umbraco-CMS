@@ -35,7 +35,6 @@ import {
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 	UmbDataPathVariantQuery,
 	UmbServerModelValidatorContext,
-	UmbValidationContext,
 	UmbVariantsValidationPathTranslator,
 	UmbVariantValuesValidationPathTranslator,
 } from '@umbraco-cms/backoffice/validation';
@@ -201,7 +200,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			},
 		);
 
-		this.addValidationContext(new UmbValidationContext(this));
 		new UmbVariantValuesValidationPathTranslator(this);
 		new UmbVariantsValidationPathTranslator(this);
 

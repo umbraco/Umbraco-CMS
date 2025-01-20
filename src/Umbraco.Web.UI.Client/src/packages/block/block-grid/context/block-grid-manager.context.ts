@@ -181,7 +181,6 @@ export class UmbBlockGridManagerContext<
 		return undefined;
 	}
 
-	// TODO: Remove dependency on modalData object here. [NL] Maybe change it into requiring the originData object instead.
 	insert(
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataModel,

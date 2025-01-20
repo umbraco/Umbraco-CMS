@@ -1,3 +1,4 @@
+import { UmbRefItemElement } from '@umbraco-cms/backoffice/components';
 import type {
 	UmbEntityCreateOptionActionListModalData,
 	UmbEntityCreateOptionActionListModalValue,
@@ -60,16 +61,29 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 		);
 	}
 
-	async #onClick(event: Event, controller: UmbExtensionApiInitializer<ManifestType>, href?: string) {
+	async #onOpen(event: Event, controller: UmbExtensionApiInitializer<ManifestType>) {
 		event.stopPropagation();
 
-		// skip if href is defined
-		if (href) {
+		if (!controller.api) {
+			throw new Error('No API found');
+		}
+
+		await controller.api.execute();
+
+		this._submitModal();
+	}
+
+	async #onNavigate(event: Event, href: string | undefined) {
+		const refItemElement = event.composedPath().find((x) => x instanceof UmbRefItemElement) as UmbRefItemElement;
+
+		// ignore click events if they are not on a ref item
+		if (!refItemElement) {
 			return;
 		}
 
-		if (!controller.api) throw new Error('No API found');
-		await controller.api.execute();
+		if (!href) {
+			throw new Error('No href found');
+		}
 
 		this._submitModal();
 	}
@@ -121,7 +135,8 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 				icon=${manifest.meta.icon}
 				href=${ifDefined(href)}
 				target=${this.#getTarget(href)}
-				@open=${(event: Event) => this.#onClick(event, controller, href)}>
+				@open=${(event: Event) => this.#onOpen(event, controller)}
+				@click=${(event: Event) => this.#onNavigate(event, href)}>
 			</umb-ref-item>
 		`;
 	}
