@@ -129,6 +129,7 @@ export default {
 	buttons: {
 		clearSelection: 'Clear selection',
 		select: 'Select',
+		choose: 'Choose',
 		somethingElse: 'Do something else',
 		bold: 'Bold',
 		deindent: 'Cancel Paragraph Indent',
@@ -1970,6 +1971,9 @@ export default {
 		sectionsHelp: 'Add sections to give users access',
 		selectUserGroup: (multiple: boolean) => {
 			return multiple ? 'Select User Groups' : 'Select User Group';
+		},
+		chooseUserGroup: (multiple: boolean) => {
+			return multiple ? 'Choose User Groups' : 'Choose User Group';
 		},
 		noStartNode: 'No start node selected',
 		noStartNodes: 'No start nodes selected',

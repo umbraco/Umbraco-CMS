@@ -123,6 +123,7 @@ export default {
 	buttons: {
 		clearSelection: 'Ryd valg',
 		select: 'Vælg',
+		choose: 'Vælg',
 		somethingElse: 'Gør noget andet',
 		bold: 'Fed',
 		deindent: 'Fortryd indryk afsnit',
@@ -1917,6 +1918,9 @@ export default {
 		allowAccessToAllDocuments: 'Tillad adgang til alle dokumenter',
 		allowAccessToAllMedia: 'Tillad adgang til alle medier',
 		selectUserGroup: (multiple: boolean) => {
+			return multiple ? 'Vælg brugergrupper' : 'Vælg brugergruppe';
+		},
+		chooseUserGroup: (multiple: boolean) => {
 			return multiple ? 'Vælg brugergrupper' : 'Vælg brugergruppe';
 		},
 		noStartNode: 'Ingen startnode valgt',
