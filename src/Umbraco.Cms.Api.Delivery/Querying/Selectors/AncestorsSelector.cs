@@ -31,11 +31,13 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
     public AncestorsSelector(
         IPublishedContentCache publishedContentCache,
         IRequestRoutingService requestRoutingService,
-        IRequestPreviewService requestPreviewService,
-        IRequestCultureService requestCultureService,
-        IApiDocumentUrlService apiDocumentUrlService,
         IDocumentNavigationQueryService navigationQueryService)
-        : this(requestRoutingService, requestPreviewService, requestCultureService, apiDocumentUrlService, navigationQueryService)
+        : this(
+            requestRoutingService,
+            StaticServiceProvider.Instance.GetRequiredService<IRequestPreviewService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IRequestCultureService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IApiDocumentUrlService>(),
+            navigationQueryService)
     {
     }
 
