@@ -257,54 +257,32 @@ stages:
         displayName: Merge Playwright SQLite reports
         steps:
           - pwsh: |
-              mkdir -p "$(Agent.BuildDirectory)/all-acceptance-test-results/linux"
-              mkdir -p "$(Agent.BuildDirectory)/merged-acceptance-test-results/linux"
+              mkdir -p "$(Agent.BuildDirectory)/linuxResults/all-acceptance-test-results"
+              mkdir -p "$(Agent.BuildDirectory)/linuxResults/merged-acceptance-test-results"
             displayName: Create necessary Linux directories
-
-          # Test Download
-          - task: DownloadPipelineArtifact@2
-            displayName: Download Linux Playwright results 1
-            inputs:
-              itemPattern: '*.zip'
-              targetPath: $(Agent.BuildDirectory)/all-acceptance-test-results/linux
-
-          # Test Download 2
-          - task: DownloadPipelineArtifact@2
-            displayName: Download Linux Playwright results 2
-            inputs:
-              itemPattern: '**/*.zip'
-              targetPath: $(Agent.BuildDirectory)/all-acceptance-test-results/linux
-
-          # Test Download 2
-          - task: DownloadPipelineArtifact@2
-            displayName: Download Linux Playwright results 2
-            inputs:
-              itemPattern: '**/*ubuntu*zip'
-              targetPath: $(Agent.BuildDirectory)/all-acceptance-test-results/linux
-          # Test Download 3
-          - task: DownloadPipelineArtifact@2
-            displayName: Download Linux Playwright results 3
-            inputs:
-              itemPattern: '*ubuntu*.zip'
-              targetPath: $(Agent.BuildDirectory)/all-acceptance-test-results/linux
 
           # Download Linux reports
           - task: DownloadPipelineArtifact@2
             displayName: Download Linux Playwright results
             inputs:
-              itemPattern: 'report-ubuntu-latest-*.zip'
-              targetPath : $(Agent.BuildDirectory)/all-acceptance-test-results/linux
+              itemPattern: '**/report-ubuntu*zip'
+              targetPath : $(Agent.BuildDirectory)/linuxResults/all-acceptance-test-results
+
+          # Install Playwright and dependencies
+          - pwsh: npx playwright install --with-deps
+            displayName: Install Playwright
+            workingDirectory: $(Agent.BuildDirectory)/linuxResults/
 
           # Merge linux Playwright reports
           - pwsh: |
-              npx playwright merge-reports --reporter html "$(Agent.BuildDirectory)/all-acceptance-test-results/linux"
+              npx playwright merge-reports --reporter html $(Agent.BuildDirectory)/all-acceptance-test-results/linux
             displayName: Merge Linux reports
-            workingDirectory: $(Agent.BuildDirectory)/merged-acceptance-test-results/linux
+            workingDirectory: $(Agent.BuildDirectory)/linuxResults/merged-acceptance-test-results
 
           # Copy merged linux reports if they exist
           - pwsh: |
-              if (Test-Path "$(Agent.BuildDirectory)/merged-acceptance-test-results/linux/*") {
-                Copy-Item "$(Agent.BuildDirectory)/merged-acceptance-test-results/linux/*" "$(Build.ArtifactStagingDirectory)" -Recurse
+              if (Test-Path "$(Agent.BuildDirectory)/linuxResults/merged-acceptance-test-results/*") {
+                Copy-Item "$(Agent.BuildDirectory)/linuxResults/merged-acceptance-test-results/*" "$(Build.ArtifactStagingDirectory)" -Recurse
               }
             displayName: Copy merged Linux reports
 
@@ -316,22 +294,22 @@ stages:
               targetPath: $(Build.ArtifactStagingDirectory)
               artifact: merged-acceptance-test-results-linux-$(System.JobAttempt)
 
-          - task: DownloadPipelineArtifact@2
-            displayName: Download Windows playwright results
-            inputs:
-              patterns: blob-report-sql-lite-Windows-*
-              path: $(Build.ArtifactStagingDirectory)
-
-          - pwsh: "npx playwright merge-reports --reporter html $(Agent.BuildDirectory)/all-acceptance-test-results/windows"
-            displayName: Merge Windows reports
-            workingDirectory: $(Agent.BuildDirectory)/merged-acceptance-test-results/windows
-
-          - task: PublishPipelineArtifact@1
-            displayName: Publish merged test artifacts
-            condition: succeededOrFailed()
-            inputs:
-              targetPath: $(Build.ArtifactStagingDirectory)
-              artifact: merged-acceptance-test-results-windows-$(System.JobAttempt)
+#          - task: DownloadPipelineArtifact@2
+#            displayName: Download Windows playwright results
+#            inputs:
+#              patterns: blob-report-sql-lite-Windows-*
+#              path: $(Build.ArtifactStagingDirectory)
+#
+#          - pwsh: "npx playwright merge-reports --reporter html $(Agent.BuildDirectory)/all-acceptance-test-results/windows"
+#            displayName: Merge Windows reports
+#            workingDirectory: $(Agent.BuildDirectory)/merged-acceptance-test-results/windows
+#
+#          - task: PublishPipelineArtifact@1
+#            displayName: Publish merged test artifacts
+#            condition: succeededOrFailed()
+#            inputs:
+#              targetPath: $(Build.ArtifactStagingDirectory)
+#              artifact: merged-acceptance-test-results-windows-$(System.JobAttempt)
 
 #      - job:
 #        displayName: E2E Tests (SQL Server)
