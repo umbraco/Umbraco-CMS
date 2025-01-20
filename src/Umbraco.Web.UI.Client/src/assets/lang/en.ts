@@ -1730,6 +1730,8 @@ export default {
 			'<strong>NOTE!</strong> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.',
 		changeDataTypeHelpText:
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
+		collection: 'Collection',
+		collectionDescription: 'Configures an overview of child content.',
 		collections: 'Collections',
 		collectionsDescription: 'Configures the content item to show list of its children.',
 		structure: 'Structure',
@@ -2482,8 +2484,8 @@ export default {
 		confirmDeleteBlockTypeMessage: 'Are you sure you want to delete the block configuration <strong>%0%</strong>?',
 		confirmDeleteBlockTypeNotice:
 			'The content of this block will still be present, editing of this content\n      will no longer be available and will be shown as unsupported content.\n    ',
-		confirmDeleteBlockGroupMessage:
-			'Are you sure you want to delete group <strong>%0%</strong> and all the Block configurations of this?',
+		confirmDeleteBlockGroupTitle: 'Delete group?',
+		confirmDeleteBlockGroupMessage: 'Are you sure you want to delete group <strong>%0%</strong>?',
 		confirmDeleteBlockGroupNotice:
 			'The content of these Blocks will still be present, editing of this content\n      will no longer be available and will be shown as unsupported content.\n    ',
 		blockConfigurationOverlayTitle: "Configuration of '%0%'",

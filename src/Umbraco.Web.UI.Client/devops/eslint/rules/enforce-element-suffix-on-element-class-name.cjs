@@ -12,11 +12,16 @@ module.exports = {
 	create: function (context) {
 		return {
 			ClassDeclaration(node) {
+				// check if class is abstract
+				const isAbstract = node.abstract;
+
 				// check if the class extends HTMLElement, LitElement, or UmbLitElement
 				const isExtendingElement =
 					node.superClass && ['HTMLElement', 'LitElement', 'UmbLitElement'].includes(node.superClass.name);
-				// check if the class name ends with 'Element'
-				const isClassNameValid = node.id.name.endsWith('Element');
+
+				// check if the class name ends with 'Element' or 'ElementBase'
+				const isClassNameValid = node.id.name.endsWith('Element') || isAbstract && node.id.name.endsWith('ElementBase');
+
 
 				if (isExtendingElement && !isClassNameValid) {
 					context.report({

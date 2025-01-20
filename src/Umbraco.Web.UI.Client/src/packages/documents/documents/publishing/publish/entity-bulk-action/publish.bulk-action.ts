@@ -67,7 +67,7 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 					data: {
 						headline: localizationController.term('content_readyToPublish'),
 						content: localizationController.term('prompt_confirmListViewPublish'),
-						color: 'danger',
+						color: 'positive',
 						confirmLabel: localizationController.term('actions_publish'),
 					},
 				})
@@ -77,7 +77,11 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 			if (confirm !== false) {
 				const variantId = new UmbVariantId(options[0].language.unique, null);
 				const publishingRepository = new UmbDocumentPublishingRepository(this._host);
-				await publishingRepository.unpublish(this.selection[0], [variantId]);
+				for (let i = 0; i < this.selection.length; i++) {
+					const id = this.selection[i];
+					await publishingRepository.publish(id, [{ variantId }]);
+				}
+
 				eventContext.dispatchEvent(event);
 			}
 			return;

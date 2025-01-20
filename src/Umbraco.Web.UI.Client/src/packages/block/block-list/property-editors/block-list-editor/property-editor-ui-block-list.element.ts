@@ -22,7 +22,7 @@ import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 
 import '../../components/block-list-entry/index.js';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import { ExtractJsonQueryProps, UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -184,6 +184,27 @@ export class UmbPropertyEditorUIBlockListElement
 				'observePropertyAlias',
 			);
 
+			// Observe Blocks and clean up validation messages for content/settings that are not in the block list anymore:
+			this.observe(this.#managerContext.layouts, (layouts) => {
+				const contentKeys = layouts.map((x) => x.contentKey);
+				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.contentData').forEach((message) => {
+					// get the KEY from this string: $.contentData[?(@.key == 'KEY')]
+					const key = ExtractJsonQueryProps(message.path).key;
+					if (key && contentKeys.indexOf(key) === -1) {
+						this.#validationContext.messages.removeMessageByKey(message.key);
+					}
+				});
+
+				const settingsKeys = layouts.map((x) => x.settingsKey).filter((x) => x !== undefined) as string[];
+				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.settingsData').forEach((message) => {
+					// get the key from this string: $.settingsData[?(@.key == 'KEY')]
+					const key = ExtractJsonQueryProps(message.path).key;
+					if (key && settingsKeys.indexOf(key) === -1) {
+						this.#validationContext.messages.removeMessageByKey(message.key);
+					}
+				});
+			});
+
 			this.observe(
 				observeMultiple([
 					this.#managerContext.layouts,
@@ -244,13 +265,18 @@ export class UmbPropertyEditorUIBlockListElement
 
 		this.addValidator(
 			'rangeUnderflow',
-			() => '#validation_entriesShort',
+			() =>
+				this.localize.term(
+					'validation_entriesShort',
+					this._limitMin,
+					(this._limitMin ?? 0) - this.#entriesContext.getLength(),
+				),
 			() => !!this._limitMin && this.#entriesContext.getLength() < this._limitMin,
 		);
 
 		this.addValidator(
 			'rangeOverflow',
-			() => '#validation_entriesExceed',
+			() => this.localize.term('validation_entriesExceed', this._limitMax, this.#entriesContext.getLength()),
 			() => !!this._limitMax && this.#entriesContext.getLength() > this._limitMax,
 		);
 
@@ -333,7 +359,7 @@ export class UmbPropertyEditorUIBlockListElement
 				look="placeholder"
 				href=${this._catalogueRouteBuilder?.({ view: 'clipboard', index: -1 }) ?? ''}
 				?disabled=${this.readonly}>
-				<uui-icon name="icon-paste-in"></uui-icon>
+				<uui-icon name="icon-clipboard-paste"></uui-icon>
 			</uui-button>
 		`;
 	}

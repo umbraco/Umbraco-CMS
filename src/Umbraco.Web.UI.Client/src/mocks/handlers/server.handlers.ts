@@ -49,6 +49,7 @@ export const serverInformationHandlers = [
 			ctx.json<GetServerConfigurationResponse>({
 				allowPasswordReset: true,
 				versionCheckPeriod: 7, // days
+				allowLocalLogin: true,
 			}),
 		);
 	}),
@@ -58,8 +59,8 @@ export const serverInformationHandlers = [
 			ctx.status(200),
 			ctx.json<GetServerUpgradeCheckResponse>({
 				type: 'Minor',
-				comment: "14.2.0.0 is released. Upgrade today - it's free!",
-				url: 'https://our.umbraco.com/download/releases/1420',
+				comment: "15.2.0 is released. Upgrade today - it's free!",
+				url: 'https://our.umbraco.com/download/releases/1520',
 			}),
 		);
 	}),
