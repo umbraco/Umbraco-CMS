@@ -1,11 +1,7 @@
 import { UmbDocumentSearchRepository } from './document-search.repository.js';
-import type { UmbDocumentSearchItemModel } from './types.js';
-import type { UmbSearchProvider, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type { UmbDocumentSearchItemModel, UmbDocumentSearchRequestArgs } from './types.js';
+import type { UmbSearchProvider } from '@umbraco-cms/backoffice/search';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-
-export interface UmbDocumentSearchRequestArgs extends UmbSearchRequestArgs {
-	allowedContentTypes: Array<{ unique: string }>;
-}
 
 export class UmbDocumentSearchProvider
 	extends UmbControllerBase
@@ -13,7 +9,7 @@ export class UmbDocumentSearchProvider
 {
 	#repository = new UmbDocumentSearchRepository(this);
 
-	search(args: UmbSearchRequestArgs) {
+	search(args: UmbDocumentSearchRequestArgs) {
 		return this.#repository.search(args);
 	}
 
