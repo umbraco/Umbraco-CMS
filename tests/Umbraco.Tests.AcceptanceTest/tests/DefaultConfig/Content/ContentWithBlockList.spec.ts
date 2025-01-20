@@ -81,7 +81,6 @@ test('can add a block element in the content', async ({umbracoApi, umbracoUi}) =
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
   await umbracoUi.content.enterTextstring(inputText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButton();
@@ -103,7 +102,7 @@ test('can edit block element in the content', async ({umbracoApi, umbracoUi}) =>
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickEditBlockListBlockBtn();
+  await umbracoUi.content.clickEditBlockListBlockButton();
   await umbracoUi.content.enterTextstring(updatedText);
   await umbracoUi.content.clickUpdateButton();
   await umbracoUi.content.clickSaveButton();
@@ -121,7 +120,7 @@ test('can delete block element in the content', async ({umbracoApi, umbracoUi}) 
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickDeleteBlockListBlockBtn();
+  await umbracoUi.content.clickDeleteBlockListBlockButton();
   await umbracoUi.content.clickConfirmToDeleteButton();
   await umbracoUi.content.clickSaveButton();
 
@@ -134,7 +133,7 @@ test('can delete block element in the content', async ({umbracoApi, umbracoUi}) 
 
 test('cannot add number of block element greater than the maxiumm amount', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const customDataTypeId = await umbracoApi.dataType.createBlockListWithABlockAndMinAndMaxAmount(customDataTypeName, elementTypeId, 0, 0);
+  const customDataTypeId = await umbracoApi.dataType.createBlockListWithABlockAndMinAndMaxAmount(customDataTypeName, elementTypeId, 0, 1);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
@@ -143,7 +142,8 @@ test('cannot add number of block element greater than the maxiumm amount', async
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
+  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickAddBlockElementButton();
   await umbracoUi.content.clickCreateModalButton();
 
   // Assert
@@ -163,13 +163,12 @@ test('can set the label of block element in the content', async ({umbracoApi, um
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.doesBlockHaveName(blockLabel);
+  await umbracoUi.content.doesBlockElementHaveName(blockLabel);
 });
 
 test('can add settings model for the block in the content', async ({umbracoApi, umbracoUi}) => {
@@ -189,7 +188,6 @@ test('can add settings model for the block in the content', async ({umbracoApi, 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
   await umbracoUi.content.enterTextstring(contentBlockInputText);
   await umbracoUi.content.clickAddBlockSettingsTabButton();
   await umbracoUi.content.enterTextArea(settingBlockInputText);

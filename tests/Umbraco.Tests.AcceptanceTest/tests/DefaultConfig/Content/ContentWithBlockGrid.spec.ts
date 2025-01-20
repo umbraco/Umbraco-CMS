@@ -103,7 +103,7 @@ test('can edit block element in the content', async ({umbracoApi, umbracoUi}) =>
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickEditBlockGridBlockBtn();
+  await umbracoUi.content.clickEditBlockGridBlockButton();
   await umbracoUi.content.enterTextstring(updatedText);
   await umbracoUi.content.clickUpdateButton();
   await umbracoUi.content.clickSaveButton();
@@ -121,7 +121,7 @@ test('can delete block element in the content', async ({umbracoApi, umbracoUi}) 
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickDeleteBlockGridBlockBtn();
+  await umbracoUi.content.clickDeleteBlockGridBlockButton();
   await umbracoUi.content.clickConfirmToDeleteButton();
   await umbracoUi.content.clickSaveButton();
 
@@ -200,7 +200,7 @@ test('can set the label of block element in the content', async ({umbracoApi, um
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.doesBlockHaveName(blockLabel);
+  await umbracoUi.content.doesBlockElementHaveName(blockLabel);
 });
 
 test('can set the number of columns for the layout in the content', async ({umbracoApi, umbracoUi}) => {
