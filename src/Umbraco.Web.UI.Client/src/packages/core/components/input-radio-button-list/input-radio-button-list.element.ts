@@ -1,10 +1,10 @@
-import { css, html, nothing, repeat, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, repeat, customElement, property, classMap } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlMixin, UUIRadioElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIRadioEvent } from '@umbraco-cms/backoffice/external/uui';
 
-type UmbRadioButtonItem = { label: string; value: string };
+export type UmbRadioButtonItem = { label: string; value: string; invalid?: boolean };
 
 @customElement('umb-input-radio-button-list')
 export class UmbInputRadioButtonListElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -56,13 +56,23 @@ export class UmbInputRadioButtonListElement extends UUIFormControlMixin(UmbLitEl
 	}
 
 	#renderRadioButton(item: (typeof this.list)[0]) {
-		return html`<uui-radio value=${item.value} label=${item.label}></uui-radio>`;
+		return html`<uui-radio
+			value=${item.value}
+			class=${classMap({ invalid: !!item.invalid })}
+			label=${item.label + (item.invalid ? ` (${this.localize.term('validation_legacyOption')})` : '')}
+			title=${item.invalid ? this.localize.term('validation_legacyOptionDescription') : ''}></uui-radio>`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				display: block;
+			}
+
+			uui-radio {
+				&.invalid {
+					text-decoration: line-through;
+				}
 			}
 		`,
 	];

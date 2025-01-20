@@ -367,6 +367,22 @@ name: "icon-client",
 legacy: true,
 path: () => import("./icons/icon-client.js"),
 },{
+name: "icon-clipboard",
+
+path: () => import("./icons/icon-clipboard.js"),
+},{
+name: "icon-clipboard-copy",
+
+path: () => import("./icons/icon-clipboard-copy.js"),
+},{
+name: "icon-clipboard-entry",
+
+path: () => import("./icons/icon-clipboard-entry.js"),
+},{
+name: "icon-clipboard-paste",
+
+path: () => import("./icons/icon-clipboard-paste.js"),
+},{
 name: "icon-cloud-drive",
 
 path: () => import("./icons/icon-cloud-drive.js"),
@@ -2299,10 +2315,6 @@ name: "icon-google",
 
 path: () => import("./icons/icon-google.js"),
 },{
-name: "icon-linkedin",
-
-path: () => import("./icons/icon-linkedin.js"),
-},{
 name: "icon-mastodon",
 
 path: () => import("./icons/icon-mastodon.js"),
@@ -2502,6 +2514,10 @@ path: () => import("./icons/icon-keychain.js"),
 name: "icon-keyhole",
 legacy: true,
 path: () => import("./icons/icon-keyhole.js"),
+},{
+name: "icon-linkedin",
+legacy: true,
+path: () => import("./icons/icon-linkedin.js"),
 },{
 name: "icon-linux-tux",
 legacy: true,

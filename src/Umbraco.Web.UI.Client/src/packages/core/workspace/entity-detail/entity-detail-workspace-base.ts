@@ -14,6 +14,7 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 const LOADING_STATE_UNIQUE = 'umbLoadingEntityDetail';
 
@@ -50,6 +51,23 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		parent ? parent.entityType : undefined,
 	);
 
+	/**
+	 * The base validation context for the workspace. This ensures that at least one validation context is always present.
+	 * @example You can manually validate all properties on the context:
+	 * ```ts
+	 * try {
+	 *   await this.validationContext.validate();
+	 * } catch (error) {
+	 *   console.error(error);
+	 * }
+	 * ```
+	 * @example You can set the data path on the context to map to a specific part of the server validation:
+	 * ```ts
+	 * this.validationContext.setDataPath('path.to.data');
+	 * ```
+	 */
+	protected validationContext = new UmbValidationContext(this);
+
 	#initResolver?: () => void;
 	#initialized = false;
 
@@ -66,6 +84,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.#entityContext.setEntityType(args.entityType);
 		window.addEventListener('willchangestate', this.#onWillNavigate);
 		this.#observeRepository(args.detailRepositoryAlias);
+		this.addValidationContext(this.validationContext);
 	}
 
 	/**

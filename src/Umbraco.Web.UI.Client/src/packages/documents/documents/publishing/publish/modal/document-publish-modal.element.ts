@@ -33,7 +33,8 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
 		this._options =
 			this.data?.options.filter(
-				(option) => (option.variant && option.variant.state === null) ||
+				(option) =>
+					(option.variant && option.variant.state === null) ||
 					isNotPublishedMandatory(option) ||
 					option.variant?.state !== UmbDocumentVariantState.NOT_CREATED,
 			) ?? [];

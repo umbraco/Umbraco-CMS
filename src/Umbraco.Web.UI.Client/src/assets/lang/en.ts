@@ -491,9 +491,9 @@ export default {
 		copiedItemOfItems: 'Copied %0% out of %1% items',
 	},
 	defaultdialogs: {
-		nodeNameLinkPicker: 'Link title',
+		nodeNameLinkPicker: 'Title',
 		urlLinkPicker: 'Link',
-		anchorLinkPicker: 'Anchor / querystring',
+		anchorLinkPicker: 'Anchor or querystring',
 		anchorInsert: 'Name',
 		closeThisWindow: 'Close this window',
 		confirmdelete: 'Are you sure you want to delete',
@@ -553,7 +553,7 @@ export default {
 		includeDescendants: 'Include descendants',
 		theFriendliestCommunity: 'The friendliest community',
 		linkToPage: 'Link to document',
-		openInNewWindow: 'Opens the linked document in a new window or tab',
+		openInNewWindow: 'Opens the link in a new window or tab',
 		linkToMedia: 'Link to media',
 		selectContentStartNode: 'Select content start node',
 		selectEvent: 'Select event',
@@ -561,7 +561,7 @@ export default {
 		selectMediaType: 'Select media type',
 		selectIcon: 'Select icon',
 		selectItem: 'Select item',
-		selectLink: 'Select link',
+		selectLink: 'Configure link',
 		selectMacro: 'Select macro',
 		selectContent: 'Select content',
 		selectContentType: 'Select content type',
@@ -663,7 +663,7 @@ export default {
 		email: 'Enter your email',
 		enterMessage: 'Enter a message...',
 		usernameHint: 'Your username is usually your email',
-		anchor: '#value or ?key=value',
+		anchor: 'Enter an anchor or querystring, #value or ?key=value',
 		enterAlias: 'Enter alias...',
 		generatingAlias: 'Generating alias...',
 		a11yCreateItem: 'Create item',
@@ -671,6 +671,7 @@ export default {
 		a11yName: 'Name',
 		rteParagraph: 'Write something amazing...',
 		rteHeading: "What's the title?",
+		enterUrl: 'Enter a URL...',
 	},
 	editcontenttype: {
 		createListView: 'Create custom list view',
@@ -798,6 +799,7 @@ export default {
 		dictionary: 'Dictionary',
 		dimensions: 'Dimensions',
 		discard: 'Discard',
+		document: 'Document',
 		down: 'Down',
 		download: 'Download',
 		edit: 'Edit',
@@ -2116,6 +2118,8 @@ export default {
 		duplicateUserGroupName: "User group name '%0%' is already taken",
 		duplicateMemberGroupName: "Member group name '%0%' is already taken",
 		duplicateUsername: "Username '%0%' is already taken",
+		legacyOption: 'Legacy option',
+		legacyOptionDescription: 'This option is no longer supported, please select something else',
 	},
 	healthcheck: {
 		checkSuccessMessage: "Value is set to the recommended value: '%0%'.",
@@ -2484,8 +2488,8 @@ export default {
 		confirmDeleteBlockTypeMessage: 'Are you sure you want to delete the block configuration <strong>%0%</strong>?',
 		confirmDeleteBlockTypeNotice:
 			'The content of this block will still be present, editing of this content\n      will no longer be available and will be shown as unsupported content.\n    ',
-		confirmDeleteBlockGroupMessage:
-			'Are you sure you want to delete group <strong>%0%</strong> and all the Block configurations of this?',
+		confirmDeleteBlockGroupTitle: 'Delete group?',
+		confirmDeleteBlockGroupMessage: 'Are you sure you want to delete group <strong>%0%</strong>?',
 		confirmDeleteBlockGroupNotice:
 			'The content of these Blocks will still be present, editing of this content\n      will no longer be available and will be shown as unsupported content.\n    ',
 		blockConfigurationOverlayTitle: "Configuration of '%0%'",
@@ -2668,5 +2672,14 @@ export default {
 		toolbar_removeGroup: 'Remove group',
 		toolbar_removeItem: 'Remove action',
 		toolbar_emptyGroup: 'Empty',
+	},
+	linkPicker: {
+		modalSource: 'Source',
+		modalManual: 'Manual',
+		modalAnchorValidationMessage:
+			'Please enter an anchor or querystring, or select a published document or media item, or manually configure the URL.',
+		resetUrlHeadline: 'Reset URL?',
+		resetUrlMessage: 'Are you sure you want to reset this URL?',
+		resetUrlLabel: 'Reset',
 	},
 } as UmbLocalizationDictionary;
