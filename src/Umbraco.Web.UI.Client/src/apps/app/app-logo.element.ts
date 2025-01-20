@@ -1,4 +1,4 @@
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import { UMB_APP_CONTEXT } from './app.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 

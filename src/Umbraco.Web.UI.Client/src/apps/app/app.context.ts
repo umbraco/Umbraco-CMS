@@ -6,11 +6,13 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 export class UmbAppContext extends UmbContextBase<UmbAppContext> {
 	#serverUrl: string;
 	#backofficePath: string;
+	#serverConnection;
 
 	constructor(host: UmbControllerHost, config: UmbAppContextConfig) {
 		super(host, UMB_APP_CONTEXT);
 		this.#serverUrl = config.serverUrl;
 		this.#backofficePath = config.backofficePath;
+		this.#serverConnection = config.serverConnection;
 	}
 
 	getBackofficePath() {
@@ -19,6 +21,10 @@ export class UmbAppContext extends UmbContextBase<UmbAppContext> {
 
 	getServerUrl() {
 		return this.#serverUrl;
+	}
+
+	getServerConnection() {
+		return this.#serverConnection;
 	}
 }
 

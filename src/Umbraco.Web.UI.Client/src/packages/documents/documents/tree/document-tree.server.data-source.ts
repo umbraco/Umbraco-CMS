@@ -91,5 +91,6 @@ const mapper = (item: DocumentTreeItemResponseModel): UmbDocumentTreeItemModel =
 		}),
 		name: item.variants[0]?.name, // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
 		isFolder: false,
+		createDate: item.createDate,
 	};
 };

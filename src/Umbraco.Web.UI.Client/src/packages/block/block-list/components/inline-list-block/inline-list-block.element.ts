@@ -115,10 +115,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 						'observeVariant',
 					);
 
-					new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [
-						this,
-						this.#workspaceContext,
-					]);
+					new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [this.#workspaceContext]);
 				}
 			},
 		);

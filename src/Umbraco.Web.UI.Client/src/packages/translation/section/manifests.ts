@@ -1,4 +1,5 @@
 import { UMB_TRANSLATION_SECTION_ALIAS } from './constants.js';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -12,7 +13,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.SectionUserPermission',
+				alias: UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS,
 				match: UMB_TRANSLATION_SECTION_ALIAS,
 			},
 		],

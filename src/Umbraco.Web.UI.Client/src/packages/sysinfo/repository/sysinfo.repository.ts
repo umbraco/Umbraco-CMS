@@ -1,12 +1,11 @@
-import type { UmbServerConfiguration, UmbServerUpgradeCheck } from '../types.js';
+import type { UmbServerUpgradeCheck } from '../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import { tryExecute, tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { ServerService } from '@umbraco-cms/backoffice/external/backend-api';
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 
 export class UmbSysinfoRepository extends UmbRepositoryBase {
-	#serverConfiguration?: UmbServerConfiguration;
-
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Repository.Sysinfo');
 	}
@@ -21,14 +20,10 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 		return data;
 	}
 
-	async requestServerConfiguration() {
-		const { data } = await tryExecute(ServerService.getServerConfiguration());
-		return data;
-	}
-
 	async serverUpgradeCheck(): Promise<UmbServerUpgradeCheck | null> {
 		// Check if we are allowed to check again
-		const versionCheckPeriod = await this.#getVersionCheckPeriod();
+		const appContext = await this.getContext(UMB_APP_CONTEXT);
+		const versionCheckPeriod = await this.observe(appContext.getServerConnection().versionCheckPeriod).asPromise();
 
 		if (versionCheckPeriod <= 0) {
 			return null;
@@ -75,14 +70,6 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 		}
 
 		return null;
-	}
-
-	async #getVersionCheckPeriod(): Promise<number> {
-		if (!this.#serverConfiguration) {
-			this.#serverConfiguration = await this.requestServerConfiguration();
-		}
-
-		return this.#serverConfiguration?.versionCheckPeriod ?? 7;
 	}
 
 	#getStoredServerUpgradeCheck(lastCheck: Date): UmbServerUpgradeCheck | null {

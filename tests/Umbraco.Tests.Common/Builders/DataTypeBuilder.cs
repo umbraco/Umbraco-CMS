@@ -137,7 +137,7 @@ public class DataTypeBuilder
         var sortOrder = _sortOrder ?? 0;
         var serializer = new SystemTextConfigurationEditorJsonSerializer();
 
-        return new DataType(editor, serializer, parentId)
+        var dataType = new DataType(editor, serializer, parentId)
         {
             Id = id,
             Key = key,
@@ -152,5 +152,7 @@ public class DataTypeBuilder
             DatabaseType = databaseType,
             SortOrder = sortOrder
         };
+
+        return dataType;
     }
 }

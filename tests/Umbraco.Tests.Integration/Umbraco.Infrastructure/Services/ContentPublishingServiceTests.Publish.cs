@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentPublishing;
@@ -626,6 +626,28 @@ public partial class ContentPublishingServiceTests
 
         var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { cultureCode }), Constants.Security.SuperUserKey);
 
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, result.Status);
+    }
+
+    [Test]
+    public async Task Can_Publish_Invariant_Content_With_Cultures_Provided_If_The_Default_Culture_Is_Exclusively_Provided()
+    {
+        var result = await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(new HashSet<string>() { "en-US" }), Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+    }
+
+    [Test]
+    public async Task Can_Publish_Invariant_Content_With_Cultures_Provided_If_The_Default_Culture_Is_Provided_With_Other_Cultures()
+    {
+        var result = await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(new HashSet<string>() { "en-US", "da-DK" }), Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+    }
+
+    [Test]
+    public async Task Cannot_Publish_Invariant_Content_With_Cultures_Provided_That_Do_Not_Include_The_Default_Culture()
+    {
+        var result = await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(new HashSet<string>() { "da-DK" }), Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, result.Status);
     }
