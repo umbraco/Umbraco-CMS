@@ -24,6 +24,7 @@ import { UmbBlockElementDataValidationPathTranslator } from '@umbraco-cms/backof
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
 import '../../components/block-grid-entries/index.js';
+import { data } from 'src/mocks/data/data-type/data-type.data.js';
 
 /**
  * @element umb-property-editor-ui-block-grid
@@ -90,6 +91,8 @@ export class UmbPropertyEditorUIBlockGridElement
 
 	constructor() {
 		super();
+
+		this.#validationContext.messages.debug('block');
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(
