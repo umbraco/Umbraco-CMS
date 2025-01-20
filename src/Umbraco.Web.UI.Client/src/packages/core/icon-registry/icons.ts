@@ -367,6 +367,22 @@ name: "icon-client",
 legacy: true,
 path: () => import("./icons/icon-client.js"),
 },{
+name: "icon-clipboard",
+
+path: () => import("./icons/icon-clipboard.js"),
+},{
+name: "icon-clipboard-copy",
+
+path: () => import("./icons/icon-clipboard-copy.js"),
+},{
+name: "icon-clipboard-entry",
+
+path: () => import("./icons/icon-clipboard-entry.js"),
+},{
+name: "icon-clipboard-paste",
+
+path: () => import("./icons/icon-clipboard-paste.js"),
+},{
 name: "icon-cloud-drive",
 
 path: () => import("./icons/icon-cloud-drive.js"),

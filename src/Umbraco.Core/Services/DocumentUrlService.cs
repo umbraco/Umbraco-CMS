@@ -736,8 +736,6 @@ public class DocumentUrlService : IDocumentUrlService
 
         if (considerFirstLevelAsRoot)
         {
-            yield return rootKeys.First();
-
             foreach (Guid rootKey in rootKeys)
             {
                 if (isDraft is false && IsContentPublished(rootKey, culture) is false)

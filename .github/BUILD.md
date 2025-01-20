@@ -36,7 +36,7 @@ In order to build the Umbraco source code locally with Visual Studio Code, first
 
 Open the root folder of the repository in Visual Studio Code.
 
-To build the front end you'll need to open the command pallet (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>) and run `>Tasks: Run Task` followed by `Client Build`.
+To build the front-end you'll need to open the command pallet (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>) and run `>Tasks: Run Task` followed by `Client Build`.
 
 You can also run the tasks manually on the command line:
 
@@ -46,9 +46,7 @@ npm i
 npm run build:for:cms
 ```
 
-If you just want to watch the UI Client to `Umbraco.Web.UI` then instead of running `build:for:cms`, you can do: `npm run dev:mock`. This will launch the Vite dev server on http://localhost:5173 and watch for changes with mocked API responses.
-
-You can also run `npm run dev:server` to run the Vite server against a local Umbraco instance. In this case, you need to have the .NET project running and accept connections from the Vite server. Please see the Umbraco.Web.UI.Client README.md [Run against a local Umbraco instance](../src/Umbraco.Web.UI.Client/.github/README.md#run-against-a-local-umbraco-instance) for more information.
+If you want to make changes to the UI, you can choose to run a front-end development server. To learn more please read the Umbraco.Web.UI.Client README.md [Run against a local Umbraco instance](../src/Umbraco.Web.UI.Client/.github/README.md#run-against-a-local-umbraco-instance) for more information.
 
 The login screen is a different frontend build, for that one you can run it as follows:
 

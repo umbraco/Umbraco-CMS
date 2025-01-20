@@ -1,6 +1,6 @@
 import type { UmbBlockDataModel } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
-import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '../types.js';
+import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel, UmbBlockRteValueModel } from '../types.js';
 import {
 	UMB_BLOCK_RTE_WORKSPACE_MODAL,
 	type UmbBlockRteWorkspaceOriginData,
@@ -9,6 +9,7 @@ import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from './block-rte-manager.context-token
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '@umbraco-cms/backoffice/rte';
 
 export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 	typeof UMB_BLOCK_RTE_MANAGER_CONTEXT,
@@ -127,8 +128,24 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 
 	// create Block?
 	override async delete(contentKey: string) {
-		// TODO: Loop through children and delete them as well?
 		await super.delete(contentKey);
 		this._manager?.deleteLayoutElement(contentKey);
+	}
+
+	protected async _insertFromPropertyValue(value: UmbBlockRteValueModel, originData: UmbBlockRteWorkspaceOriginData) {
+		const layoutEntries = value.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS];
+
+		if (!layoutEntries) {
+			throw new Error('No layout entries found');
+		}
+
+		await Promise.all(
+			layoutEntries.map(async (layoutEntry) => {
+				this._insertBlockFromPropertyValue(layoutEntry, value, originData);
+				// TODO: Missing some way to insert a Block HTML Element into the RTE at the current cursor point. (hopefully the responsibilit can be avoided here, but there is some connection missing at this point) [NL]
+			}),
+		);
+
+		return originData;
 	}
 }
