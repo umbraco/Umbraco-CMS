@@ -261,12 +261,39 @@ stages:
               mkdir -p "$(Agent.BuildDirectory)/merged-acceptance-test-results/linux"
             displayName: Create necessary Linux directories
 
+          # Test Download
+          - task: DownloadPipelineArtifact@2
+            displayName: Download Linux Playwright results 1
+            inputs:
+              itemPattern: '*.zip'
+              targetPath: $(Agent.BuildDirectory)/all-acceptance-test-results/linux
+
+          # Test Download 2
+          - task: DownloadPipelineArtifact@2
+            displayName: Download Linux Playwright results 2
+            inputs:
+              itemPattern: '**'
+              targetPath: $(Agent.BuildDirectory)/all-acceptance-test-results/linux
+
+          # Test Download 2
+          - task: DownloadPipelineArtifact@2
+            displayName: Download Linux Playwright results 2
+            inputs:
+              itemPattern: '**'
+              targetPath: $(Agent.BuildDirectory)/all-acceptance-test-results/linux
+          # Test Download 3
+          - task: DownloadPipelineArtifact@2
+            displayName: Download Linux Playwright results 3
+            inputs:
+              itemPattern: '*Linux*.zip'
+              targetPath: $(Agent.BuildDirectory)/all-acceptance-test-results/linux
+
           # Download Linux reports
           - task: DownloadPipelineArtifact@2
             displayName: Download Linux Playwright results
             inputs:
-              patterns: 'report-ubuntu-latest-*.zip'
-              path: $(Agent.BuildDirectory)/all-acceptance-test-results/linux
+              itemPattern: 'report-ubuntu-latest-*.zip'
+              targetPath : $(Agent.BuildDirectory)/all-acceptance-test-results/linux
 
           # Merge linux Playwright reports
           - pwsh: |
