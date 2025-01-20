@@ -11,6 +11,8 @@ import type {
 } from '@umbraco-cms/backoffice/property-editor';
 
 import '../../components/input-rich-media/input-rich-media.element.js';
+import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
+import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 
 const elementName = 'umb-property-editor-ui-media-picker';
 
@@ -29,7 +31,9 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 		this._focalPointEnabled = Boolean(config.getValueByAlias('enableLocalFocalPoint'));
 		this._multiple = Boolean(config.getValueByAlias('multiple'));
 		this._preselectedCrops = config?.getValueByAlias<Array<UmbCropModel>>('crops') ?? [];
-		this._startNode = config.getValueByAlias<string>('startNodeId') ?? '';
+
+		const startNodeId = config.getValueByAlias<string>('startNodeId') ?? '';
+		this._startNode = startNodeId ? { unique: startNodeId, entityType: UMB_MEDIA_ENTITY_TYPE } : undefined;
 
 		const minMax = config.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
 		this._min = minMax?.min ?? 0;
@@ -46,7 +50,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	readonly = false;
 
 	@state()
-	private _startNode: string = '';
+	private _startNode?: UmbTreeStartNode;
 
 	@state()
 	private _focalPointEnabled: boolean = false;

@@ -15,6 +15,7 @@ import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 import '@umbraco-cms/backoffice/imaging';
+import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 type UmbRichMediaCardModel = {
 	unique: string;
@@ -106,8 +107,8 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	@property({ type: Array })
 	allowedContentTypeIds?: string[] | undefined;
 
-	@property({ type: String })
-	startNode = '';
+	@property({ type: Object, attribute: false })
+	startNode?: UmbTreeStartNode;
 
 	@property({ type: Boolean })
 	multiple = false;
@@ -307,7 +308,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 		const data = await modalHandler?.onSubmit().catch(() => null);
 		if (!data) return;
 
-		const selection = data.selection;
+		const selection = data.selection.filter((x) => x !== null) as string[];
 		this.#addItems(selection);
 	}
 
