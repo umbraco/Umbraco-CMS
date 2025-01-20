@@ -265,7 +265,7 @@ stages:
           - task: DownloadPipelineArtifact@2
             displayName: Download Linux Playwright results
             inputs:
-              patterns: 'report-Linux-'
+              patterns: 'report-ubuntu-latest-'
               path: $(Agent.BuildDirectory)/all-acceptance-test-results/linux
 
           # Merge linux Playwright reports
