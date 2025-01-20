@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -26,7 +27,7 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
         IUserIdKeyResolver userIdKeyResolver,
-        IContentTypeFilterService contentTypeFilterService)
+        ContentTypeFilterCollection contentTypeFilters)
         : base(
             provider,
             loggerFactory,
@@ -37,7 +38,7 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
             entityRepository,
             eventAggregator,
             userIdKeyResolver,
-            contentTypeFilterService)
+            contentTypeFilters)
     {
         MemberService = memberService;
         _memberTypeRepository = memberTypeRepository;
@@ -91,7 +92,7 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
             entityRepository,
             eventAggregator,
             userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<IContentTypeFilterService>())
+            StaticServiceProvider.Instance.GetRequiredService<ContentTypeFilterCollection>())
     {
     }
 

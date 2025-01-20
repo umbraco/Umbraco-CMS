@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.Locking;
 
 namespace Umbraco.Cms.Core.Services;
@@ -27,7 +28,7 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
         IUserIdKeyResolver userIdKeyResolver,
-        IContentTypeFilterService contentTypeFilterService)
+        ContentTypeFilterCollection contentTypeFilters)
         : base(
             provider,
             loggerFactory,
@@ -38,7 +39,7 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
             entityRepository,
             eventAggregator,
             userIdKeyResolver,
-            contentTypeFilterService) =>
+            contentTypeFilters) =>
         ContentService = contentService;
 
     [Obsolete("Use the ctor specifying all dependencies instead")]
@@ -88,7 +89,7 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
             entityRepository,
             eventAggregator,
             userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<IContentTypeFilterService>())
+            StaticServiceProvider.Instance.GetRequiredService<ContentTypeFilterCollection>())
     { }
 
     protected override int[] ReadLockIds => ContentTypeLocks.ReadLockIds;

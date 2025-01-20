@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.Locking;
 using Umbraco.Extensions;
 
@@ -25,7 +26,7 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
         IUserIdKeyResolver userIdKeyResolver,
-        IContentTypeFilterService contentTypeFilterService)
+        ContentTypeFilterCollection contentTypeFilters)
         : base(
             provider,
             loggerFactory,
@@ -36,7 +37,7 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
             entityRepository,
             eventAggregator,
             userIdKeyResolver,
-            contentTypeFilterService) => MediaService = mediaService;
+            contentTypeFilters) => MediaService = mediaService;
 
     [Obsolete("Use the constructor with all dependencies instead")]
     public MediaTypeService(
@@ -86,7 +87,7 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
             entityRepository,
             eventAggregator,
             userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<IContentTypeFilterService>())
+            StaticServiceProvider.Instance.GetRequiredService<ContentTypeFilterCollection>())
     {
     }
 

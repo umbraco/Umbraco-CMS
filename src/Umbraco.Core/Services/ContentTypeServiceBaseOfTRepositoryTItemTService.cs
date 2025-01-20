@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
@@ -25,7 +26,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     private readonly IEntityRepository _entityRepository;
     private readonly IEventAggregator _eventAggregator;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
-    private readonly IContentTypeFilterService _contentTypeFilterService;
+    private readonly ContentTypeFilterCollection _contentTypeFilters;
 
     protected ContentTypeServiceBase(
         ICoreScopeProvider provider,
@@ -37,7 +38,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
         IUserIdKeyResolver userIdKeyResolver,
-        IContentTypeFilterService contentTypeFilterService)
+        ContentTypeFilterCollection contentTypeFilters)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         Repository = repository;
@@ -46,7 +47,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         _entityRepository = entityRepository;
         _eventAggregator = eventAggregator;
         _userIdKeyResolver = userIdKeyResolver;
-        _contentTypeFilterService = contentTypeFilterService;
+        _contentTypeFilters = contentTypeFilters;
     }
 
     [Obsolete("Use the ctor specifying all dependencies instead")]
@@ -93,7 +94,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             entityRepository,
             eventAggregator,
             userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<IContentTypeFilterService>())
+            StaticServiceProvider.Instance.GetRequiredService<ContentTypeFilterCollection>())
     {
     }
 
@@ -1167,7 +1168,10 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         IQuery<TItem> query = ScopeProvider.CreateQuery<TItem>().Where(x => x.AllowedAsRoot);
         IEnumerable<TItem> contentTypes = Repository.Get(query).ToArray();
 
-        contentTypes = (IEnumerable<TItem>)await _contentTypeFilterService.FilterAllowedAtRootAsync(contentTypes);
+        foreach (IContentTypeFilter filter in _contentTypeFilters)
+        {
+            contentTypes = await filter.FilterAllowedAtRootAsync(contentTypes);
+        }
 
         var pagedModel = new PagedModel<TItem>
         {
@@ -1189,7 +1193,11 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             return Attempt.FailWithStatus<PagedModel<TItem>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.NotFound, null);
         }
 
-        IEnumerable<ContentTypeSort> allowedContentTypes = await _contentTypeFilterService.FilterAllowedChildrenAsync(parent.AllowedContentTypes, key);
+        IEnumerable<ContentTypeSort> allowedContentTypes = parent.AllowedContentTypes;
+        foreach (IContentTypeFilter filter in _contentTypeFilters)
+        {
+            allowedContentTypes = await filter.FilterAllowedChildrenAsync(allowedContentTypes, key);
+        }
 
         PagedModel<TItem> result;
         if (allowedContentTypes.Any() is false)
