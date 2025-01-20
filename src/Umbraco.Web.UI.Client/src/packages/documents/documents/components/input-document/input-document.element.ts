@@ -176,25 +176,19 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 		return item.variants[0]?.state === 'Draft';
 	}
 
-	// TODO: move this implementation to the UmbDocumentPickerInputContext
-	// so it will be based on the pass in allowedContentTypes
-	#pickableFilter = (item: UmbDocumentItemModel): boolean => {
-		if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
-			return this.allowedContentTypeIds.includes(item.documentType.unique);
-		}
-		return true;
-	};
-
 	#openPicker() {
-		this.#pickerContext.openPicker({
-			hideTreeRoot: true,
-			pickableFilter: this.#pickableFilter,
-			startNode: this.startNode,
-			allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({
-				unique: id,
-				entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
-			})),
-		});
+		this.#pickerContext.openPicker(
+			{
+				hideTreeRoot: true,
+				startNode: this.startNode,
+			},
+			{
+				allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({
+					unique: id,
+					entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+				})),
+			},
+		);
 	}
 
 	#onRemove(item: UmbDocumentItemModel) {
