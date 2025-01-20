@@ -31,13 +31,12 @@ export class UmbDocumentSearchServerDataSource
 	 * @memberof UmbDocumentSearchServerDataSource
 	 */
 	async search(args: UmbDocumentSearchRequestArgs) {
-		debugger;
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			DocumentService.getItemDocumentSearch({
 				query: args.query,
 				parentId: args.searchFrom?.unique ?? undefined,
-				allowedDocumentTypes: args.allowedContentTypes,
+				allowedDocumentTypes: args.allowedContentTypes.map((contentType) => contentType.unique),
 			}),
 		);
 
