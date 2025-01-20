@@ -162,7 +162,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
         public Assembly? CurrentModelsAssembly { get; private set; }
 
         /// <inheritdoc />
-        public object SyncRoot { get; } = new object();
+        public object SyncRoot { get; } = new();
 
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
 
