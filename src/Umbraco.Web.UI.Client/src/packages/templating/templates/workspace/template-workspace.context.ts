@@ -6,7 +6,7 @@ import { UMB_TEMPLATE_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbTemplateWorkspaceEditorElement } from './template-workspace-editor.element.js';
 import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbEntityDetailWorkspaceContextBase,
+	UmbEntityNamedDetailWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
@@ -15,7 +15,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
 export class UmbTemplateWorkspaceContext
-	extends UmbEntityDetailWorkspaceContextBase<UmbTemplateDetailModel, UmbTemplateDetailRepository>
+	extends UmbEntityNamedDetailWorkspaceContextBase<UmbTemplateDetailModel, UmbTemplateDetailRepository>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	public readonly itemRepository = new UmbTemplateItemRepository(this);
@@ -23,7 +23,6 @@ export class UmbTemplateWorkspaceContext
 	#masterTemplate = new UmbObjectState<UmbTemplateItemModel | null>(null);
 	masterTemplate = this.#masterTemplate.asObservable();
 
-	public readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
 	public readonly alias = this._data.createObservablePartOfCurrent((data) => data?.alias);
 	public readonly content = this._data.createObservablePartOfCurrent((data) => data?.content);
 	public readonly masterTemplateUnique = this._data.createObservablePartOfCurrent(
@@ -81,10 +80,6 @@ export class UmbTemplateWorkspaceContext
 			await this.setMasterTemplate(parent.unique);
 		}
 		return data;
-	}
-
-	setName(value: string) {
-		this._data.updateCurrent({ name: value });
 	}
 
 	setAlias(value: string) {

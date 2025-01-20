@@ -38,16 +38,19 @@ export class UmbRelationTypeWorkspaceEditorElement extends UmbLitElement {
 	override render() {
 		return html`
 			<umb-workspace-editor back-path="${UMB_RELATIONS_ROOT_WORKSPACE_PATH}">
-				<div id="header" slot="header">
-					<uui-input id="name" .value=${this._name ?? ''} readonly>
-						<div id="alias" slot="append">${this._alias}</div>
-					</uui-input>
-				</div>
+				<umb-input-with-alias
+					id="name"
+					slot="header"
+					label=${this.localize.term('placeholders_entername')}
+					.value=${this._name ?? ''}
+					.alias=${this._alias ?? ''}
+					readonly>
+				</umb-input-with-alias>
 			</umb-workspace-editor>
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				display: block;
@@ -55,20 +58,8 @@ export class UmbRelationTypeWorkspaceEditorElement extends UmbLitElement {
 				height: 100%;
 			}
 
-			#header {
-				display: flex;
-				flex: 1 1 auto;
-			}
-
 			#name {
 				width: 100%;
-				flex: 1 1 auto;
-				align-items: center;
-			}
-
-			#alias {
-				padding: 0 var(--uui-size-space-3);
-				opacity: 0.5;
 			}
 		`,
 	];

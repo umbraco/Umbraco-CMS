@@ -32,3 +32,21 @@ export const queryFilter = (filterBy: string, value?: string) => {
 	const query = filterBy.toLowerCase();
 	return value.toLowerCase().includes(query);
 };
+
+/**
+ * Creates a problem details object.
+ * @param {object} problemDetails The problem details object.
+ * @param {string} problemDetails.title The title of the problem, which will be shown to the user.
+ * @param {string} problemDetails.detail A human-readable explanation specific to this occurrence of the problem, which will be shown to the user.
+ * @param {number} problemDetails.status The HTTP status code for this occurrence of the problem.
+ * @param {string} problemDetails.type A URI reference that identifies the problem type.
+ * @returns {object} The problem details object.
+ */
+export function createProblemDetails(problemDetails: {
+	title: string;
+	detail?: string;
+	type?: string;
+	status?: number;
+}): object {
+	return problemDetails;
+}

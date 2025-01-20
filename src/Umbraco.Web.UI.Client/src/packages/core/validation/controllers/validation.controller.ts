@@ -76,7 +76,8 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 * @param translator
 	 */
 	async removeTranslator(translator: UmbValidationMessageTranslator) {
-		this.messages.removeTranslator(translator);
+		// Because this may have been destroyed at this point. and because we do not know if a context has been destroyed, then we allow this call, but let it soft-fail if messages does not exists. [NL]
+		this.messages?.removeTranslator(translator);
 	}
 
 	#currentProvideHost?: UmbClassInterface;
