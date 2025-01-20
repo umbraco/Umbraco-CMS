@@ -272,20 +272,20 @@ stages:
           - task: DownloadPipelineArtifact@2
             displayName: Download Linux Playwright results 2
             inputs:
-              itemPattern: '**'
+              itemPattern: '**/*.zip'
               targetPath: $(Agent.BuildDirectory)/all-acceptance-test-results/linux
 
           # Test Download 2
           - task: DownloadPipelineArtifact@2
             displayName: Download Linux Playwright results 2
             inputs:
-              itemPattern: '**'
+              itemPattern: '**/*ubuntu*zip'
               targetPath: $(Agent.BuildDirectory)/all-acceptance-test-results/linux
           # Test Download 3
           - task: DownloadPipelineArtifact@2
             displayName: Download Linux Playwright results 3
             inputs:
-              itemPattern: '*Linux*.zip'
+              itemPattern: '*ubuntu*.zip'
               targetPath: $(Agent.BuildDirectory)/all-acceptance-test-results/linux
 
           # Download Linux reports
