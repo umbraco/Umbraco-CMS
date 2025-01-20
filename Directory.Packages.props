@@ -91,6 +91,8 @@
     <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
     <!-- Both OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer bring in a vulnerable version of Microsoft.IdentityModel.JsonWebTokens -->
     <PackageVersion Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.7.1" />
+    <!-- Examine.Lucene bring in a vulnerable version of Lucene.Net.Replicator -->
+    <PackageVersion Include="Lucene.Net.Replicator" Version="4.8.0-beta00017" />
     <!-- Both OpenIddict.AspNetCore, Microsoft.EntityFrameworkCore.* bring in a vulnerable version of Microsoft.Extensions.Caching.Memory -->
     <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
     <!-- Both Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer,NPoco.SqlServer, and more bring in a vulnerable version of System.Text.Json -->
