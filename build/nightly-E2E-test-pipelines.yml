@@ -275,7 +275,7 @@ stages:
 
           # Merge linux Playwright reports
           - pwsh: |
-              npx playwright merge-reports --reporter html $(Agent.BuildDirectory)/all-acceptance-test-results/linux
+              npx playwright merge-reports --reporter html ../all-acceptance-test-results
             displayName: Merge Linux reports
             workingDirectory: $(Agent.BuildDirectory)/linuxResults/merged-acceptance-test-results
 
