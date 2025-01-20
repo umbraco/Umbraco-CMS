@@ -208,7 +208,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 			return html`<div id="inside">
 				<umb-property-type-based-property
 					.property=${this._inlineProperty}
-					data-path=${this._inlinePropertyDataPath}
+					.data-path=${this._inlinePropertyDataPath}
 					slot="areas"></umb-property-type-based-property>
 				<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
 			</div>`;
