@@ -26,8 +26,6 @@ export const UmbControllerHostElementMixin = <T extends HTMLElementConstructor>(
 			super.disconnectedCallback?.();
 			this.hostDisconnected();
 		}
-
-		override destroy(): void {}
 	}
 
 	return UmbControllerHostElementClass as unknown as HTMLElementConstructor<UmbControllerHostElement> & T;

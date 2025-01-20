@@ -81,7 +81,7 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 				const publishingRepository = new UmbDocumentPublishingRepository(this._host);
 				for (let i = 0; i < this.selection.length; i++) {
 					const id = this.selection[i];
-					await publishingRepository.publish(id, [ { variantId }]);
+					await publishingRepository.publish(id, [{ variantId }]);
 				}
 
 				eventContext.dispatchEvent(event);

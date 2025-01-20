@@ -1,6 +1,8 @@
 import type { UmbBlockLayoutBaseModel, UmbBlockValueType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block-type';
 
+export type * from './clipboard/types.js';
+
 // Configuration models:
 export interface UmbBlockGridTypeModel extends UmbBlockTypeWithGroupKey {
 	columnSpanOptions: Array<UmbBlockGridTypeColumnSpanOption>;

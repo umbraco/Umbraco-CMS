@@ -443,10 +443,11 @@ export type CultureReponseModel = {
 };
 
 export type CurrentUserResponseModel = {
-    id: string;
     email: string;
     userName: string;
     name: string;
+    userGroupIds: Array<(ReferenceByIdModel)>;
+    id: string;
     languageIsoCode: (string) | null;
     documentStartNodeIds: Array<(ReferenceByIdModel)>;
     hasDocumentRootAccess: boolean;
