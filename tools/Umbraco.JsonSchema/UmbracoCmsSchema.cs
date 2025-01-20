@@ -76,7 +76,20 @@ internal class UmbracoCmsSchema
         public required DataTypesSettings DataTypes { get; set; }
 
         public required MarketplaceSettings Marketplace { get; set; }
+        
+        public InstallDefaultDataNamedOptions InstallDefaultData { get; set; } = null!;
 
         public required WebhookSettings Webhook { get; set; }
+    }
+
+    public class InstallDefaultDataNamedOptions
+    {
+        public InstallDefaultDataSettings Languages { get; set; } = null!;
+
+        public InstallDefaultDataSettings DataTypes { get; set; } = null!;
+
+        public InstallDefaultDataSettings MediaTypes { get; set; } = null!;
+
+        public InstallDefaultDataSettings MemberTypes { get; set; } = null!;
     }
 }
