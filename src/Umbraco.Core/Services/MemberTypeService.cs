@@ -15,6 +15,34 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
 {
     private readonly IMemberTypeRepository _memberTypeRepository;
 
+    public MemberTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IMemberService memberService,
+        IMemberTypeRepository memberTypeRepository,
+        IAuditRepository auditRepository,
+        IMemberTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver,
+        IContentTypeFilterService contentTypeFilterService)
+        : base(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            memberTypeRepository,
+            auditRepository,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            contentTypeFilterService)
+    {
+        MemberService = memberService;
+        _memberTypeRepository = memberTypeRepository;
+    }
+
     [Obsolete("Please use the constructor taking all parameters. This constructor will be removed in V16.")]
     public MemberTypeService(
         ICoreScopeProvider provider,
@@ -40,6 +68,7 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
     {
     }
 
+    [Obsolete("Please use the constructor taking all parameters. This constructor will be removed in V16.")]
     public MemberTypeService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -51,19 +80,19 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
         IUserIdKeyResolver userIdKeyResolver)
-        : base(
+        : this(
             provider,
             loggerFactory,
             eventMessagesFactory,
+            memberService,
             memberTypeRepository,
             auditRepository,
             entityContainerRepository,
             entityRepository,
             eventAggregator,
-            userIdKeyResolver)
+            userIdKeyResolver,
+            StaticServiceProvider.Instance.GetRequiredService<IContentTypeFilterService>())
     {
-        MemberService = memberService;
-        _memberTypeRepository = memberTypeRepository;
     }
 
     // beware! order is important to avoid deadlocks

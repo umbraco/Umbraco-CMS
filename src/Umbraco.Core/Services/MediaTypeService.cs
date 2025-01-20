@@ -24,7 +24,8 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
         IMediaTypeContainerRepository entityContainerRepository,
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        IContentTypeFilterService contentTypeFilterService)
         : base(
             provider,
             loggerFactory,
@@ -34,7 +35,8 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
             entityContainerRepository,
             entityRepository,
             eventAggregator,
-            userIdKeyResolver) => MediaService = mediaService;
+            userIdKeyResolver,
+            contentTypeFilterService) => MediaService = mediaService;
 
     [Obsolete("Use the constructor with all dependencies instead")]
     public MediaTypeService(
@@ -61,6 +63,32 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
     {
     }
 
+    [Obsolete("Use the constructor with all dependencies instead")]
+    public MediaTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IMediaService mediaService,
+        IMediaTypeRepository mediaTypeRepository,
+        IAuditRepository auditRepository,
+        IMediaTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            mediaService,
+            mediaTypeRepository,
+            auditRepository,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            StaticServiceProvider.Instance.GetRequiredService<IContentTypeFilterService>())
+    {
+    }
 
     protected override int[] ReadLockIds => MediaTypeLocks.ReadLockIds;
 

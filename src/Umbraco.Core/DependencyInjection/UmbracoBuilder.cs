@@ -445,6 +445,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IDocumentUrlService, DocumentUrlService>();
             Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlServiceInitializerNotificationHandler>();
 
+            // Content type filters
+            Services.AddUnique<IContentTypeFilterService, NoopContentTypeFilterService>();
         }
     }
 }

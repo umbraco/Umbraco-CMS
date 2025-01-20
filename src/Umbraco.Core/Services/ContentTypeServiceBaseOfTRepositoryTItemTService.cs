@@ -25,6 +25,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     private readonly IEntityRepository _entityRepository;
     private readonly IEventAggregator _eventAggregator;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
+    private readonly IContentTypeFilterService _contentTypeFilterService;
 
     protected ContentTypeServiceBase(
         ICoreScopeProvider provider,
@@ -35,7 +36,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         IEntityContainerRepository containerRepository,
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        IContentTypeFilterService contentTypeFilterService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         Repository = repository;
@@ -44,6 +46,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         _entityRepository = entityRepository;
         _eventAggregator = eventAggregator;
         _userIdKeyResolver = userIdKeyResolver;
+        _contentTypeFilterService = contentTypeFilterService;
     }
 
     [Obsolete("Use the ctor specifying all dependencies instead")]
@@ -66,6 +69,31 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             entityRepository,
             eventAggregator,
             StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+    {
+    }
+
+    [Obsolete("Use the ctor specifying all dependencies instead")]
+    protected ContentTypeServiceBase(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        TRepository repository,
+        IAuditRepository auditRepository,
+        IEntityContainerRepository containerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            repository,
+            auditRepository,
+            containerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            StaticServiceProvider.Instance.GetRequiredService<IContentTypeFilterService>())
     {
     }
 
@@ -1129,7 +1157,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     #region Allowed types
 
     /// <inheritdoc />
-    public Task<PagedModel<TItem>> GetAllAllowedAsRootAsync(int skip, int take)
+    public async Task<PagedModel<TItem>> GetAllAllowedAsRootAsync(int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
@@ -1139,28 +1167,32 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         IQuery<TItem> query = ScopeProvider.CreateQuery<TItem>().Where(x => x.AllowedAsRoot);
         IEnumerable<TItem> contentTypes = Repository.Get(query).ToArray();
 
+        contentTypes = (IEnumerable<TItem>)await _contentTypeFilterService.FilterAllowedAtRootAsync(contentTypes);
+
         var pagedModel = new PagedModel<TItem>
         {
             Total = contentTypes.Count(),
             Items = contentTypes.Skip(skip).Take(take)
         };
 
-        return Task.FromResult(pagedModel);
+        return pagedModel;
     }
 
     /// <inheritdoc />
-    public Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, int skip, int take)
+    public async Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         TItem? parent = Get(key);
 
         if (parent?.AllowedContentTypes is null)
         {
-            return Task.FromResult(Attempt.FailWithStatus<PagedModel<TItem>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.NotFound, null));
+            return Attempt.FailWithStatus<PagedModel<TItem>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.NotFound, null);
         }
 
+        IEnumerable<ContentTypeSort> allowedContentTypes = await _contentTypeFilterService.FilterAllowedChildrenAsync(parent.AllowedContentTypes, key);
+
         PagedModel<TItem> result;
-        if (parent.AllowedContentTypes.Any() is false)
+        if (allowedContentTypes.Any() is false)
         {
             // no content types allowed under parent
             result = new PagedModel<TItem>
@@ -1173,7 +1205,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         {
             // Get the sorted keys. Whilst we can't guarantee the order that comes back from GetMany, we can use
             // this to sort the resulting list of allowed children.
-            Guid[] sortedKeys = parent.AllowedContentTypes.OrderBy(x => x.SortOrder).Select(x => x.Key).ToArray();
+            Guid[] sortedKeys = allowedContentTypes.OrderBy(x => x.SortOrder).Select(x => x.Key).ToArray();
 
             TItem[] allowedChildren = GetMany(sortedKeys).ToArray();
             result = new PagedModel<TItem>
@@ -1183,7 +1215,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             };
         }
 
-        return Task.FromResult(Attempt.SucceedWithStatus<PagedModel<TItem>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, result));
+        return Attempt.SucceedWithStatus<PagedModel<TItem>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, result);
     }
 
     #endregion
