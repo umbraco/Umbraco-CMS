@@ -569,6 +569,7 @@ export default {
 		selectMember: 'Choose member',
 		selectMembers: 'Choose members',
 		selectMemberGroup: 'Select member group',
+		chooseMemberGroup: 'Choose member group',
 		selectMemberType: 'Select member type',
 		selectNode: 'Select node',
 		selectLanguages: 'Select languages',
