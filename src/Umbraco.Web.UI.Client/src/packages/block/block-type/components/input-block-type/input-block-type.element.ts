@@ -6,12 +6,14 @@ import { css, html, customElement, property, state, repeat } from '@umbraco-cms/
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import {
 	UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT,
 	UMB_DOCUMENT_TYPE_PICKER_MODAL,
+	type UmbDocumentTypePickerModalData,
+	type UmbDocumentTypePickerModalValue,
 } from '@umbraco-cms/backoffice/document-type';
-import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 
 import '../block-type-card/index.js';
@@ -27,32 +29,40 @@ export class UmbInputBlockTypeElement<
 		itemSelector: 'umb-block-type-card',
 		identifier: 'umb-block-type-sorter',
 		containerSelector: '#blocks',
+		resolvePlacement: UmbSorterResolvePlacementAsGrid,
+		onContainerChange: ({ item, model }) => {
+			this.dispatchEvent(new CustomEvent('container-change', { detail: { item, model } }));
+		},
 		onChange: ({ model }) => {
-			this._items = model;
+			this._value = model;
+			this.dispatchEvent(new UmbChangeEvent());
 		},
-		onContainerChange: ({ model, item }) => {
-			this._items = model;
-			this.dispatchEvent(new CustomEvent('change', { detail: { item } }));
-		},
-		onEnd: () => {
+		/*onEnd: () => {
 			// TODO: Investigate if onEnd is called when a container move has been performed, if not then I would say it should be. [NL]
-			this.dispatchEvent(new CustomEvent('change', { detail: { moveComplete: true } }));
-		},
+			this.dispatchEvent(new UmbChangeEvent());
+		},*/
 	});
+	#elementPickerModal: UmbModalRouteRegistrationController<
+		UmbDocumentTypePickerModalData,
+		UmbDocumentTypePickerModalValue
+	>;
 
 	@property({ type: Array, attribute: false })
 	public set value(items) {
-		this._items = items ?? [];
-		this.#sorter.setModel(this._items);
+		this._value = items ?? [];
+		// Make sure the block types are unique on contentTypeElementKey:
+		this._value = this._value.filter(
+			(value, index, self) => self.findIndex((x) => x.contentElementTypeKey === value.contentElementTypeKey) === index,
+		);
+		this.#sorter.setModel(this._value);
 	}
 	public get value() {
-		return this._items;
+		return this._value;
 	}
 
-	/** @deprecated will be removed in v17 */
 	@property({ type: String })
 	public set propertyAlias(value: string | undefined) {
-		//this.#elementPickerModal.setUniquePathValue('propertyAlias', value);
+		this.#elementPickerModal.setUniquePathValue('propertyAlias', value);
 	}
 	public get propertyAlias(): string | undefined {
 		return undefined;
@@ -65,7 +75,7 @@ export class UmbInputBlockTypeElement<
 	private _pickerPath?: string;
 
 	@state()
-	private _items: Array<BlockType> = [];
+	private _value: Array<BlockType> = [];
 
 	// TODO: Seems no need to have these initially, then can be retrieved inside the `create` method. [NL]
 	#datasetContext?: UmbPropertyDatasetContext;
@@ -84,7 +94,8 @@ export class UmbInputBlockTypeElement<
 			);
 		});
 
-		new UmbModalRouteRegistrationController(this, UMB_DOCUMENT_TYPE_PICKER_MODAL)
+		this.#elementPickerModal = new UmbModalRouteRegistrationController(this, UMB_DOCUMENT_TYPE_PICKER_MODAL)
+			.addUniquePaths(['propertyAlias'])
 			.onSetup(() => {
 				return {
 					data: {
@@ -123,8 +134,8 @@ export class UmbInputBlockTypeElement<
 	}
 
 	deleteItem(contentElementTypeKey: string) {
-		this.value = this.value.filter((x) => x.contentElementTypeKey !== contentElementTypeKey);
-		this.dispatchEvent(new UmbDeleteEvent());
+		this._value = this.value.filter((x) => x.contentElementTypeKey !== contentElementTypeKey);
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	async #onRequestDelete(item: BlockType) {
