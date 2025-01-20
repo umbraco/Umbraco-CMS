@@ -10,7 +10,7 @@ import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeEntityType } from '@umbraco-cms/backoffice/document-type';
 
-interface UmbOpenDocumentPickerArgs {
+interface UmbInputDocumentOpenPickerArgs {
 	allowedContentTypes?: Array<{ unique: string; entityType: UmbDocumentTypeEntityType }>;
 }
 
@@ -24,26 +24,29 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 		super(host, UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS, UMB_DOCUMENT_PICKER_MODAL, (entry) => entry.unique);
 	}
 
-	override async openPicker(pickerData?: Partial<UmbDocumentPickerModalData>, args?: UmbOpenDocumentPickerArgs) {
-		const pickerConfig = {
+	override async openPicker(pickerData?: Partial<UmbDocumentPickerModalData>, args?: UmbInputDocumentOpenPickerArgs) {
+		const combinedPickerData = {
 			...pickerData,
 		};
 
-		pickerConfig.pickableFilter = (item) => this.#pickableFilter(item, args?.allowedContentTypes);
+		// transform allowedContentTypes to a pickable filter
+		combinedPickerData.pickableFilter = (item) => this.#pickableFilter(item, args?.allowedContentTypes);
 
+		// set default search data
 		if (!pickerData?.search) {
-			pickerConfig.search = {
+			combinedPickerData.search = {
 				providerAlias: UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS,
 				...pickerData?.search,
 			};
 		}
 
-		pickerConfig.search!.requestArgs = {
+		// pass allowedContentTypes to the search request args
+		combinedPickerData.search!.requestArgs = {
 			allowedContentTypes: args?.allowedContentTypes,
 			...pickerData?.search?.requestArgs,
 		};
 
-		super.openPicker(pickerConfig);
+		super.openPicker(combinedPickerData);
 	}
 
 	#pickableFilter = (
