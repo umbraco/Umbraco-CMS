@@ -40,7 +40,7 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 
 	#sorter = new UmbSorterController(this, {
 		getUniqueOfElement: (element: HTMLElement) => {
-			const unique = element.dataset["alias"];
+			const unique = element.dataset['alias'];
 			return unique;
 		},
 		getUniqueOfModel: (modelEntry: UmbCrop) => {
@@ -53,7 +53,7 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 			const oldValue = this._value;
 			this._value = model;
 			this.requestUpdate('_value', oldValue);
-		  this.dispatchEvent(new UmbPropertyValueChangeEvent());
+			this.dispatchEvent(new UmbPropertyValueChangeEvent());
 		},
 	});
 

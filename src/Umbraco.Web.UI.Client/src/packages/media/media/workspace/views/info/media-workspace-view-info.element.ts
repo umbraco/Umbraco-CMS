@@ -8,6 +8,9 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { MediaUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
+import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 
 // import of local components
 import './media-workspace-view-info-history.element.js';
@@ -43,6 +46,9 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 	@state()
 	private _updateDate?: string | null = null;
 
+	@state()
+	private _hasSettingsAccess: boolean = false;
+
 	constructor() {
 		super();
 
@@ -54,6 +60,17 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 			.observeRouteBuilder((routeBuilder) => {
 				this._editMediaTypePath = routeBuilder({});
 			});
+
+		createExtensionApiByAlias(this, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					match: UMB_SETTINGS_SECTION_ALIAS,
+				},
+				onChange: (permitted: boolean) => {
+					this._hasSettingsAccess = permitted;
+				},
+			},
+		]);
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
@@ -175,7 +192,10 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 				<strong><umb-localize key="content_mediaType">Media Type</umb-localize></strong>
 				<uui-ref-node-document-type
 					standalone
-					href=${this._editMediaTypePath + 'edit/' + this._mediaTypeUnique}
+					href=${ifDefined(
+						this._hasSettingsAccess ? this._editMediaTypePath + 'edit/' + this._mediaTypeUnique : undefined,
+					)}
+					?readonly=${!this._hasSettingsAccess}
 					name=${ifDefined(this._mediaTypeName)}>
 					${this._mediaTypeIcon ? html`<umb-icon slot="icon" name=${this._mediaTypeIcon}></umb-icon>` : nothing}
 				</uui-ref-node-document-type>
@@ -280,6 +300,11 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 
 			.link-item.with-href:hover {
 				background: var(--uui-color-divider);
+			}
+
+			uui-ref-node-document-type[readonly] {
+				padding-top: 7px;
+				padding-bottom: 7px;
 			}
 		`,
 	];
