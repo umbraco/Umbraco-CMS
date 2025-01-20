@@ -164,7 +164,8 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		};
 
 		this.#partialUpdateLink(link);
-		this.#validationContext.validate();
+
+		await this.#validationContext.validate();
 	}
 
 	async #onResetUrl() {
