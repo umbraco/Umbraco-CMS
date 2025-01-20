@@ -1,34 +1,18 @@
 import type { ActiveVariant } from '../../controllers/index.js';
 import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT } from './workspace-split-view.context.js';
-import {
-	type UUIInputElement,
-	UUIInputEvent,
-	type UUIPopoverContainerElement,
-} from '@umbraco-cms/backoffice/external/uui';
-import {
-	css,
-	html,
-	nothing,
-	customElement,
-	state,
-	query,
-	ifDefined,
-	type TemplateResult,
-} from '@umbraco-cms/backoffice/external/lit';
-import {
-	UmbVariantId,
-	type UmbEntityVariantModel,
-	type UmbEntityVariantOptionModel,
-} from '@umbraco-cms/backoffice/variant';
-import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
-import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { css, customElement, html, ifDefined, nothing, query, ref, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbVariantState } from '@umbraco-cms/backoffice/utils';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbDataPathVariantQuery, umbBindToValidation } from '@umbraco-cms/backoffice/validation';
+import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
+import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantState } from '@umbraco-cms/backoffice/utils';
+import type { UUIInputElement, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 
-const elementName = 'umb-workspace-split-view-variant-selector';
-@customElement(elementName)
+@customElement('umb-workspace-split-view-variant-selector')
 export class UmbWorkspaceSplitViewVariantSelectorElement<
 	VariantOptionModelType extends
 		UmbEntityVariantOptionModel<UmbEntityVariantModel> = UmbEntityVariantOptionModel<UmbEntityVariantModel>,
@@ -220,66 +204,74 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		this._popoverElement.style.width = `${host.width}px`;
 	}
 
+	/**
+	 * Focuses the input element after a short delay to ensure it is rendered.
+	 * This works better than the {umbFocus()} directive, which does not work in this context.
+	 */
+	#focusInput(element?: Element) {
+		if (!element) return;
+
+		setTimeout(async () => {
+			await this.updateComplete;
+			(element as UUIInputElement)?.focus();
+		}, 200);
+	}
+
 	override render() {
-		return this._variantId
-			? html`
+		if (!this._variantId) return nothing;
+
+		return html`
 			<uui-input
 				id="name-input"
 				data-mark="input:entity-name"
+				placeholder=${this.localize.term('placeholders_entername')}
 				label=${this.localize.term('placeholders_entername')}
 				.value=${this._name ?? ''}
 				@input=${this.#handleInput}
 				required
 				?readonly=${this.#isReadOnly(this._activeVariant?.culture ?? null)}
 				${umbBindToValidation(this, `$.variants[${UmbDataPathVariantQuery(this._variantId)}].name`, this._name ?? '')}
-				${umbFocus()}
-			>
-				${
-					this.#hasVariants()
-						? html`
-								<uui-button
-									id="variant-selector-toggle"
-									compact
-									slot="append"
-									popovertarget="variant-selector-popover"
-									title=${ifDefined(this._activeVariant?.language.name)}
-									label="Select a variant">
-									${this._activeVariant?.language.name} ${this.#renderReadOnlyTag(this._activeVariant?.culture)}
-									<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
-								</uui-button>
-								${this._activeVariants.length > 1
-									? html`
-											<uui-button slot="append" compact id="variant-close" @click=${this.#closeSplitView}>
-												<uui-icon name="remove"></uui-icon>
-											</uui-button>
-										`
-									: ''}
-							`
-						: nothing
-				}
+				${ref(this.#focusInput)}>
+				${this.#hasVariants()
+					? html`
+							<uui-button
+								id="variant-selector-toggle"
+								compact
+								slot="append"
+								popovertarget="variant-selector-popover"
+								title=${ifDefined(this._activeVariant?.language.name)}
+								label="Select a variant">
+								${this._activeVariant?.language.name} ${this.#renderReadOnlyTag(this._activeVariant?.culture)}
+								<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
+							</uui-button>
+							${this._activeVariants.length > 1
+								? html`
+										<uui-button slot="append" compact id="variant-close" @click=${this.#closeSplitView}>
+											<uui-icon name="remove"></uui-icon>
+										</uui-button>
+									`
+								: ''}
+						`
+					: nothing}
 			</uui-input>
 
-			${
-				this.#hasVariants()
-					? html`
-							<uui-popover-container
-								id="variant-selector-popover"
-								@beforetoggle=${this.#onPopoverToggle}
-								placement="bottom-end">
-								<div id="variant-selector-dropdown">
-									<uui-scroll-container>
-										<ul>
-											${this._variantOptions.map((variant) => this.#renderListItem(variant))}
-										</ul>
-									</uui-scroll-container>
-								</div>
-							</uui-popover-container>
-						`
-					: nothing
-			}
-		</div>
-		`
-			: nothing;
+			${this.#hasVariants()
+				? html`
+						<uui-popover-container
+							id="variant-selector-popover"
+							@beforetoggle=${this.#onPopoverToggle}
+							placement="bottom-end">
+							<div id="variant-selector-dropdown">
+								<uui-scroll-container>
+									<ul>
+										${this._variantOptions.map((variant) => this.#renderListItem(variant))}
+									</ul>
+								</uui-scroll-container>
+							</div>
+						</uui-popover-container>
+					`
+				: nothing}
+		`;
 	}
 
 	#renderListItem(variantOption: VariantOptionModelType) {
@@ -313,7 +305,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	protected _renderVariantDetails(variantOption: VariantOptionModelType): TemplateResult {
+	protected _renderVariantDetails(variantOption: VariantOptionModelType) {
 		return html``;
 	}
 
@@ -502,6 +494,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbWorkspaceSplitViewVariantSelectorElement;
+		'umb-workspace-split-view-variant-selector': UmbWorkspaceSplitViewVariantSelectorElement;
 	}
 }
