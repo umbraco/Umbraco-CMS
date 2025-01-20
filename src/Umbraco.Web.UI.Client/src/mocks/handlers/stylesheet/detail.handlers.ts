@@ -1,4 +1,5 @@
 const { rest } = window.MockServiceWorker;
+import { createProblemDetails } from '../../data/utils.js';
 import { umbStylesheetMockDb } from '../../data/stylesheet/stylesheet.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
@@ -13,6 +14,14 @@ export const detailHandlers = [
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 		const path = umbStylesheetMockDb.file.create(requestBody);
 		const encodedPath = encodeURIComponent(path);
+
+		// Validate name
+		if (!requestBody.name) {
+			return res(
+				ctx.status(400, 'name is required'),
+				ctx.json(createProblemDetails({ title: 'Validation', detail: 'name is required' })),
+			);
+		}
 
 		return res(
 			ctx.status(201),

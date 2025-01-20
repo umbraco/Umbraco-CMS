@@ -70,6 +70,8 @@ public abstract class UmbracoIntegrationTestWithMediaEditing : UmbracoIntegratio
         var mediaTypes = MediaTypeService.GetAll();
         var mediaTypesList = mediaTypes.ToList();
         var imageMediaType = mediaTypesList.FirstOrDefault(x => x.Alias == "Image");
+        imageMediaType.PropertyTypes.First().Mandatory = false;
+        MediaTypeService.Save(imageMediaType);
 
         // Add CustomMediaType to FolderMediaType AllowedContentTypes
         var mediaTypeUpdateHelper = new MediaTypeUpdateHelper();

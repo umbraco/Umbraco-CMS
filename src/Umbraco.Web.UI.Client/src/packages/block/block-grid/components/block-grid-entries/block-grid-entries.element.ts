@@ -404,7 +404,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				look="placeholder"
 				href=${this.#context.getPathForClipboard(-1) ?? ''}
 				?disabled=${this._isReadOnly}>
-				<uui-icon name="icon-paste-in"></uui-icon>
+				<uui-icon name="icon-clipboard-paste"></uui-icon>
 			</uui-button>
 		`;
 	}

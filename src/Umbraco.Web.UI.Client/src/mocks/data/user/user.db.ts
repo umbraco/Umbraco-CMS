@@ -86,6 +86,7 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 			permissions,
 			allowedSections,
 			isAdmin: firstUser.isAdmin,
+			userGroupIds: firstUser.userGroupIds,
 		};
 	}
 

@@ -98,36 +98,85 @@ export abstract class UmbBlockManagerContext<
 		return this.#blockTypes.value;
 	}
 
+	/**
+	 * Set all layouts.
+	 * @param {Array<BlockLayoutType>} layouts - All layouts.
+	 */
 	setLayouts(layouts: Array<BlockLayoutType>) {
 		this._layouts.setValue(layouts);
 	}
-	getLayouts() {
+
+	/**
+	 * Get all layouts.
+	 * @returns {Array<BlockLayoutType>} - All layouts.
+	 */
+	getLayouts(): Array<BlockLayoutType> {
 		return this._layouts.getValue();
 	}
+
+	/**
+	 * Set all contents.
+	 * @param {Array<UmbBlockDataModel>} contents - All contents.
+	 */
 	setContents(contents: Array<UmbBlockDataModel>) {
 		this.#contents.setValue(contents);
 	}
-	getContents() {
+
+	/**
+	 * Get all contents.
+	 * @returns {Array<UmbBlockDataModel>} - All contents.
+	 */
+	getContents(): Array<UmbBlockDataModel> {
 		return this.#contents.value;
 	}
+
+	/**
+	 * Set all settings.
+	 * @param {Array<UmbBlockDataModel>} settings - All settings.
+	 */
 	setSettings(settings: Array<UmbBlockDataModel>) {
 		this.#settings.setValue(settings);
 	}
+
+	/**
+	 * Get all settings.
+	 * @returns {Array<UmbBlockDataModel>} - All settings.
+	 */
+	getSettings(): Array<UmbBlockDataModel> {
+		return this.#settings.value;
+	}
+
+	/**
+	 * Set all exposes.
+	 * @param {Array<UmbBlockExposeModel>} exposes - All exposes.
+	 */
 	setExposes(exposes: Array<UmbBlockExposeModel>) {
 		this.#exposes.setValue(exposes);
+	}
+
+	/**
+	 * Get all exposes.
+	 * @returns {Array<UmbBlockExposeModel>} - All exposes.
+	 */
+	getExposes(): Array<UmbBlockExposeModel> {
+		return this.#exposes.value;
 	}
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_MANAGER_CONTEXT);
 
-		this.observe(this.blockTypes, (blockTypes) => {
-			blockTypes.forEach((x) => {
-				this.#ensureContentType(x.contentElementTypeKey);
-				if (x.settingsElementTypeKey) {
-					this.#ensureContentType(x.settingsElementTypeKey);
-				}
-			});
-		});
+		this.observe(
+			this.blockTypes,
+			(blockTypes) => {
+				blockTypes.forEach((x) => {
+					this.#ensureContentType(x.contentElementTypeKey);
+					if (x.settingsElementTypeKey) {
+						this.#ensureContentType(x.settingsElementTypeKey);
+					}
+				});
+			},
+			null,
+		);
 	}
 
 	async #ensureContentType(unique: string) {
@@ -208,6 +257,9 @@ export abstract class UmbBlockManagerContext<
 	getContentOf(contentKey: string) {
 		return this.#contents.value.find((x) => x.key === contentKey);
 	}
+	getSettingsOf(settingsKey: string) {
+		return this.#settings.value.find((x) => x.key === settingsKey);
+	}
 	// originData param is used by some implementations. [NL] should be here, do not remove it.
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	setOneLayout(layoutData: BlockLayoutType, _originData?: BlockOriginDataType) {
@@ -230,6 +282,14 @@ export abstract class UmbBlockManagerContext<
 	removeOneSettings(settingsKey: string) {
 		this.#settings.removeOne(settingsKey);
 	}
+
+	removeManyContent(contentKeys: Array<string>) {
+		this.#contents.remove(contentKeys);
+	}
+	removeManySettings(settingsKeys: Array<string>) {
+		this.#settings.remove(settingsKeys);
+	}
+
 	removeExposesOf(contentKey: string) {
 		this.#exposes.filter((x) => x.contentKey !== contentKey);
 	}

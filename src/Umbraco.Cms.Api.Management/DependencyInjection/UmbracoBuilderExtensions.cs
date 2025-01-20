@@ -66,6 +66,7 @@ public static partial class UmbracoBuilderExtensions
                 .AddCorsPolicy()
                 .AddWebhooks()
                 .AddPreview()
+                .AddServerEvents()
                 .AddPasswordConfiguration()
                 .AddSupplemenataryLocalizedTextFileSources()
                 .AddUserData()

@@ -1,5 +1,5 @@
 import { RuntimeLevelModel, ServerService } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 export class UmbServerConnection {
@@ -8,6 +8,15 @@ export class UmbServerConnection {
 
 	#isConnected = new UmbBooleanState(false);
 	isConnected = this.#isConnected.asObservable();
+
+	#versionCheckPeriod = new UmbNumberState(undefined);
+	versionCheckPeriod = this.#versionCheckPeriod.asObservable();
+
+	#allowLocalLogin = new UmbBooleanState(false);
+	allowLocalLogin = this.#allowLocalLogin.asObservable();
+
+	#allowPasswordReset = new UmbBooleanState(false);
+	allowPasswordReset = this.#allowPasswordReset.asObservable();
 
 	constructor(serverUrl: string) {
 		this.#url = serverUrl;
@@ -19,6 +28,7 @@ export class UmbServerConnection {
 	 */
 	async connect() {
 		await this.#setStatus();
+		await this.#setServerConfiguration();
 		return this;
 	}
 
@@ -58,5 +68,16 @@ export class UmbServerConnection {
 
 		this.#isConnected.setValue(true);
 		this.#status = data?.serverStatus ?? RuntimeLevelModel.UNKNOWN;
+	}
+
+	async #setServerConfiguration() {
+		const { data, error } = await tryExecute(ServerService.getServerConfiguration());
+		if (error) {
+			throw error;
+		}
+
+		this.#versionCheckPeriod.setValue(data?.versionCheckPeriod);
+		this.#allowLocalLogin.setValue(data?.allowLocalLogin ?? false);
+		this.#allowPasswordReset.setValue(data?.allowPasswordReset ?? false);
 	}
 }
