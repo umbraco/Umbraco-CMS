@@ -154,8 +154,8 @@ stages:
               "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
               UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               URL=$(ASPNETCORE_URLS)
-              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json" | Out-File .env
-              PLAYWRIGHT_BLOB_OUTPUT_NAME=report-$(vmImage)-attempt-$(System.JobAttempt)-shard-$(shardIndex)
+              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json
+              PLAYWRIGHT_BLOB_OUTPUT_NAME=report-$(vmImage)-attempt-$(System.JobAttempt)-shard-$(shardIndex)" | Out-File .env
             displayName: Generate .env
             workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
 
