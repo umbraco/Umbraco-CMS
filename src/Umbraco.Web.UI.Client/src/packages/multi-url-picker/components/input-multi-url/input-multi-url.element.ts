@@ -160,9 +160,6 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	@state()
 	private _modalRoute?: UmbModalRouteBuilder;
 
-	@state()
-	private _configIsValid: boolean = !this.min || !this.max || this.min <= this.max;
-
 	#linkPickerModal;
 
 	constructor() {
@@ -231,10 +228,6 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 			});
 	}
 
-	#configIsValid() {
-		return this.min === undefined || this.max === undefined || this.min <= this.max;
-	}
-
 	async #requestRemoveItem(index: number) {
 		const item = this.#urls[index];
 		if (!item) throw new Error('Could not find item at index: ' + index);
@@ -278,8 +271,7 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	override render() {
-		if (!this.#configIsValid()) return html`<div id="invalid-config-warning">Data type configuration is not valid: minimum number must be less than or equal to the maximum.</div>`;
-		return html`<div>${this.min}</div>${this.#renderItems()} ${this.#renderAddButton()}`;
+		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 
 	#renderAddButton() {
@@ -340,15 +332,6 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 		css`
 			#btn-add {
 				width: 100%;
-			}
-
-			#invalid-config-warning {
-				background-color: var(--uui-color-warning);
-				color: var(--uui-color-warning-contrast);
-				padding: var(--uui-size-space-4) var(--uui-size-space-5);
-				border: 1px solid var(--uui-color-warning-standalone);
-				margin-top: var(--uui-size-space-4);
-				border-radius: var(--uui-border-radius);
 			}
 		`,
 	];
