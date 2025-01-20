@@ -255,38 +255,52 @@ stages:
       - job: mergePlaywrightReportsSQLite
         dependsOn: e2ETestsSQLite
         displayName: Merge Playwright SQLite reports
+        variables:
+          linuxResultsPath: "$(Agent.BuildDirectory)/linuxResults"
+          allLinuxArtifactsPath: "$(Agent.BuildDirectory)/linuxResults/all-artifacts-with-pattern"
+          allLinuxBlobReportsPath: "$(Agent.BuildDirectory)/linuxResults/all-blob-reports-with-pattern"
+          linuxMergedResultsPath: "$(Agent.BuildDirectory)/linuxResults/merged-acceptance-test-results"
+          linuxArtifactPattern: "*/report-ubuntu-latest-attempt--$(System.JobAttempt)*.zip"
+          linuxArtifactName: "merged-acceptance-test-results-linux-$(System.JobAttempt)"
         steps:
           # Create necessary Linux directories
           - pwsh: |
-              mkdir -p "$(Agent.BuildDirectory)/linuxResults/all-acceptance-test-results"
-              mkdir -p "$(Agent.BuildDirectory)/linuxResults/merged-acceptance-test-results"
+              mkdir -p "$(allLinuxArtifactsPath)"
+              mkdir -p "$(allLinuxBlobReportsPath)"
+              mkdir -p "$(linuxMergedResultsPath)"
             displayName: Create necessary Linux directories
 
           - task: DownloadPipelineArtifact@2
             displayName: Download Linux Playwright results
             inputs:
-              patterns: |
-                */report-ubuntu*.zip
-              path: $(Agent.BuildDirectory)/linuxResults/all-acceptance-test-results
+              patterns: "$(linuxArtifactPattern)"
+              path: "$(allLinuxArtifactsPath)"
 
           - pwsh: ls
-            displayName: Checks if anything was downloaded
-            workingDirectory: $(Agent.BuildDirectory)/linuxResults/all-acceptance-test-results
+            displayName: Check downloaded artifacts
+            workingDirectory: "$(allLinuxArtifactsPath)"
+
+          - pwsh: |
+              Get-ChildItem "$(allLinuxArtifactsPath)" -Recurse -Filter "$(linuxArtifactPattern)" -File |
+              ForEach-Object {
+                Move-Item -Path $_.FullName -Destination "$(allLinuxBlobReportsPath)" -Force
+              }
+            displayName: Move linux blob reports to specific folder
 
           # Install Playwright and dependencies
           - pwsh: npx playwright install --with-deps
             displayName: Install Playwright
-            workingDirectory: $(Agent.BuildDirectory)/linuxResults/
+            workingDirectory: "$(linuxResultsPath)"
 
           # Merge Linux Playwright reports
-          - pwsh: npx playwright merge-reports --reporter html "$(Agent.BuildDirectory)/linuxResults/all-acceptance-test-results"
+          - pwsh: npx playwright merge-reports --reporter html "$(allLinuxBlobReportsPath)"
             displayName: Merge Linux reports
-            workingDirectory: $(Agent.BuildDirectory)/linuxResults/merged-acceptance-test-results
+            workingDirectory: "$(linuxMergedResultsPath)"
 
           # Copy merged Linux reports if they exist
           - pwsh: |
-              if (Test-Path "$(Agent.BuildDirectory)/linuxResults/merged-acceptance-test-results/*") {
-                Copy-Item "$(Agent.BuildDirectory)/linuxResults/merged-acceptance-test-results/*" "$(Build.ArtifactStagingDirectory)" -Recurse
+              if (Test-Path "$(linuxMergedResultsPath)/*") {
+                Copy-Item "$(linuxMergedResultsPath)/*" "$(Build.ArtifactStagingDirectory)" -Recurse
               }
             displayName: Copy merged Linux reports
 
@@ -295,8 +309,10 @@ stages:
             displayName: Publish merged test artifacts
             condition: succeededOrFailed()
             inputs:
-              targetPath: $(Build.ArtifactStagingDirectory)
-              artifact: merged-acceptance-test-results-linux-$(System.JobAttempt)
+              targetPath: "$(Build.ArtifactStagingDirectory)"
+              artifact: "$(linuxArtifactName)"
+
+
 
 #          - task: DownloadPipelineArtifact@2
 #            displayName: Download Windows playwright results
