@@ -1,7 +1,6 @@
 import { UMB_MEMBER_ENTITY_TYPE } from '../entity.js';
-import type { UmbMemberSearchItemModel } from './member.search-provider.js';
-import type { UmbMemberSearchRequestArgs } from './types.js';
-import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type { UmbMemberSearchItemModel, UmbMemberSearchRequestArgs } from './types.js';
+import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { MemberService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
