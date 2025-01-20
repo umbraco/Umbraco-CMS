@@ -127,7 +127,6 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 							this.#generatePropertyDataPath();
 							if (variantId) {
 								context.content.setup(this, variantId);
-								// TODO: Support segment name?
 								const culture = variantId.culture;
 								if (culture) {
 									const languageRepository = new UmbLanguageItemRepository(this);
@@ -208,7 +207,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 			return html`<div id="inside">
 				<umb-property-type-based-property
 					.property=${this._inlineProperty}
-					.data-path=${this._inlinePropertyDataPath}
+					.dataPath=${this._inlinePropertyDataPath ?? ''}
 					slot="areas"></umb-property-type-based-property>
 				<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
 			</div>`;

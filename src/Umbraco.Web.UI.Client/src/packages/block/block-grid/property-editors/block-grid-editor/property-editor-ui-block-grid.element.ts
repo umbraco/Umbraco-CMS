@@ -91,8 +91,6 @@ export class UmbPropertyEditorUIBlockGridElement
 	constructor() {
 		super();
 
-		this.#validationContext.messages.debug('block');
-
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(
 				context.dataPath,
