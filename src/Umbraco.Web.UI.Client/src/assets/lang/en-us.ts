@@ -445,10 +445,9 @@ export default {
 		compositionDescription:
 			"Defines a re-usable set of properties that can be included in the definition of\n      multiple other Document Types. For example, a set of 'Common Page Settings'.\n    ",
 		folder: 'Folder',
-		folderDescription:
-			'Used to organise the Document Types, Compositions and Element Types created in this\n      Document Type tree.\n    ',
-		newFolder: 'New folder',
-		newDataType: 'New Data Type',
+		folderDescription: 'Used to organize items and other folders. Keep items structured and easy to access.',
+		newFolder: 'Folder',
+		newDataType: 'Data Type',
 		newJavascriptFile: 'New JavaScript file',
 		newEmptyPartialView: 'New empty partial view',
 		newPartialViewMacro: 'New partial view macro',
