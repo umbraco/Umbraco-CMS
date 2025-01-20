@@ -52,7 +52,7 @@ test('can rename a media file', async ({umbracoApi, umbracoUi}) => {
 
 const mediaFileTypes = [
   {fileName: 'Article', filePath: 'Article.pdf', thumbnail: 'icon-article'},
-  {fileName: 'Audio', filePath: 'Audio.mp3', thumbnail: 'icon-sound-waves'},
+  {fileName: 'Audio', filePath: 'Audio.mp3', thumbnail: 'icon-audio-lines'},
   {fileName: 'File', filePath: 'File.txt', thumbnail: 'icon-document'},
   {fileName: 'Image', filePath: 'Umbraco.png', thumbnail: 'image'},
   {fileName: 'Vector Graphics (SVG)', filePath: 'VectorGraphics.svg', thumbnail: 'image'},
