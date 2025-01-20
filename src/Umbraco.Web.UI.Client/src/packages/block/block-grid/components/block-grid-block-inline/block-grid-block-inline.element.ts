@@ -20,6 +20,8 @@ import {
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
@@ -53,10 +55,14 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	_inlineProperty?: UmbPropertyTypeModel;
 
 	@state()
+	_inlinePropertyDataPath?: string;
+
+	@state()
 	private _ownerContentTypeName?: string;
 
 	@state()
 	private _variantName?: string;
+	#variantId: UmbVariantId | undefined;
 
 	constructor() {
 		super();
@@ -101,6 +107,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 						this.#workspaceContext.content.structure.contentTypeProperties,
 						(contentTypeProperties) => {
 							this._inlineProperty = contentTypeProperties[0];
+							this.#generatePropertyDataPath();
 						},
 						'observeProperties',
 					);
@@ -116,6 +123,8 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 					this.observe(
 						context.variantId,
 						async (variantId) => {
+							this.#variantId = variantId;
+							this.#generatePropertyDataPath();
 							if (variantId) {
 								context.content.setup(this, variantId);
 								// TODO: Support segment name?
@@ -140,6 +149,16 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	#load() {
 		if (!this.#workspaceContext || !this.#contentKey) return;
 		this.#workspaceContext.load(this.#contentKey);
+	}
+
+	#generatePropertyDataPath() {
+		if (!this.#variantId || !this._inlineProperty) return;
+		const property = this._inlineProperty;
+		this._inlinePropertyDataPath = `$.values[${UmbDataPathPropertyValueQuery({
+			alias: property.alias,
+			culture: property.variesByCulture ? this.#variantId!.culture : null,
+			segment: property.variesBySegment ? this.#variantId!.segment : null,
+		})}].value`;
 	}
 
 	#expose = () => {
@@ -189,6 +208,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 			return html`<div id="inside">
 				<umb-property-type-based-property
 					.property=${this._inlineProperty}
+					data-path=${this._inlinePropertyDataPath}
 					slot="areas"></umb-property-type-based-property>
 				<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
 			</div>`;
