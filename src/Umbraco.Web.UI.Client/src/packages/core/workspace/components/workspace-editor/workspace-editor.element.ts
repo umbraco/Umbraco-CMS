@@ -3,7 +3,7 @@ import { createExtensionElement, UmbExtensionsManifestInitializer } from '@umbra
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { ManifestWorkspaceView } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_VIEW_PATH_PATTERN, type ManifestWorkspaceView } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 
 /**
@@ -62,7 +62,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		if (this._workspaceViews.length > 0) {
 			newRoutes = this._workspaceViews.map((manifest) => {
 				return {
-					path: `view/${manifest.meta.pathname}`,
+					path: UMB_WORKSPACE_VIEW_PATH_PATTERN.generateLocal({ viewPathname: manifest.meta.pathname }),
 					component: () => createExtensionElement(manifest),
 					setup: (component) => {
 						if (component) {
@@ -153,6 +153,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		if (!this._routes || this._routes.length === 0) return nothing;
 		return html`
 			<umb-router-slot
+				inherit-addendum
 				id="router-slot"
 				.routes=${this._routes}
 				@init=${(event: UmbRouterSlotInitEvent) => {

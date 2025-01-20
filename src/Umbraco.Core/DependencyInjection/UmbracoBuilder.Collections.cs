@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Media.EmbedProviders;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.ServerEvents;
 using Umbraco.Cms.Core.Snippets;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Webhooks;
@@ -106,6 +107,9 @@ public static partial class UmbracoBuilderExtensions
     /// <param name="builder">The builder.</param>
     public static ContentFinderCollectionBuilder ContentFinders(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<ContentFinderCollectionBuilder>();
+
+    public static EventSourceAuthorizerCollectionBuilder EventSourceAuthorizers(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<EventSourceAuthorizerCollectionBuilder>();
 
     /// <summary>
     /// Gets the editor validators collection builder.

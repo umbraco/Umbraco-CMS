@@ -24,6 +24,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
+import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 
 export abstract class UmbBlockEntryContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType>,
@@ -45,6 +46,8 @@ export abstract class UmbBlockEntryContext<
 	_entries?: BlockEntriesContextType;
 
 	#contentKey?: string;
+
+	#pathAddendum = new UmbRoutePathAddendumContext(this);
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	protected readonly _variantId = this.#variantId.asObservable();
 
@@ -275,6 +278,7 @@ export abstract class UmbBlockEntryContext<
 		this.observe(
 			this.unique,
 			(contentKey) => {
+				this.#pathAddendum.setAddendum(contentKey);
 				if (!contentKey) return;
 				this.#observeContentData();
 			},

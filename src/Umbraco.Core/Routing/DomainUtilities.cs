@@ -1,6 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
@@ -27,7 +31,49 @@ namespace Umbraco.Cms.Core.Routing
         /// one document per culture), and domains, withing the context of a current Uri, assign
         /// a culture to that document.</para>
         /// </remarks>
-        public static string? GetCultureFromDomains(int contentId, string contentPath, Uri? current, IUmbracoContext umbracoContext, ISiteDomainMapper siteDomainMapper)
+        [Obsolete("Please use the method taking all parameters. This overload will be removed in V17.")]
+        public static string? GetCultureFromDomains(
+            int contentId,
+            string contentPath,
+            Uri? current,
+            IUmbracoContext umbracoContext,
+            ISiteDomainMapper siteDomainMapper)
+            => GetCultureFromDomains(
+                contentId,
+                contentPath,
+                current,
+                umbracoContext,
+                siteDomainMapper,
+                StaticServiceProvider.Instance.GetRequiredService<IDomainCache>(),
+                StaticServiceProvider.Instance.GetRequiredService<IPublishedCache>(),
+                StaticServiceProvider.Instance.GetRequiredService<INavigationQueryService>());
+
+        /// <summary>
+        /// Gets the culture assigned to a document by domains, in the context of a current Uri.
+        /// </summary>
+        /// <param name="contentId">The document identifier.</param>
+        /// <param name="contentPath">The document path.</param>
+        /// <param name="current">An optional current Uri.</param>
+        /// <param name="umbracoContext">An Umbraco context.</param>
+        /// <param name="siteDomainMapper">The site domain helper.</param>
+        /// <param name="domainCache">The domain cache.</param>
+        /// <param name="publishedCache">The published content cache.</param>
+        /// <param name="navigationQueryService">The navigation query service.</param>
+        /// <returns>The culture assigned to the document by domains.</returns>
+        /// <remarks>
+        /// <para>In 1:1 multilingual setup, a document contains several cultures (there is not
+        /// one document per culture), and domains, withing the context of a current Uri, assign
+        /// a culture to that document.</para>
+        /// </remarks>
+        public static string? GetCultureFromDomains(
+            int contentId,
+            string contentPath,
+            Uri? current,
+            IUmbracoContext umbracoContext,
+            ISiteDomainMapper siteDomainMapper,
+            IDomainCache domainCache,
+            IPublishedCache publishedCache,
+            INavigationQueryService navigationQueryService)
         {
             if (umbracoContext == null)
             {
@@ -39,20 +85,11 @@ namespace Umbraco.Cms.Core.Routing
                 current = umbracoContext.CleanedUmbracoUrl;
             }
 
-            // get the published route, else the preview route
-            // if both are null then the content does not exist
-            var route = umbracoContext.Content?.GetRouteById(contentId) ??
-                        umbracoContext.Content?.GetRouteById(true, contentId);
+            var domainNodeId = GetAncestorNodeWithDomainsAssigned(contentId, umbracoContext, domainCache, publishedCache, navigationQueryService);
 
-            if (route == null)
-            {
-                return null;
-            }
-
-            var pos = route.IndexOf('/');
-            DomainAndUri? domain = pos == 0
-                ? null
-                : DomainForNode(umbracoContext.Domains, siteDomainMapper, int.Parse(route.Substring(0, pos), CultureInfo.InvariantCulture), current);
+            DomainAndUri? domain = domainNodeId.HasValue
+                ? DomainForNode(umbracoContext.Domains, siteDomainMapper, domainNodeId.Value, current)
+                : null;
 
             var rootContentId = domain?.ContentId ?? -1;
             Domain? wcDomain = FindWildcardDomainInPath(umbracoContext.Domains?.GetAll(true), contentPath, rootContentId);
@@ -69,6 +106,22 @@ namespace Umbraco.Cms.Core.Routing
 
             return umbracoContext.Domains?.DefaultCulture;
         }
+
+        private static int? GetAncestorNodeWithDomainsAssigned(int contentId, IUmbracoContext umbracoContext, IDomainCache domainCache, IPublishedCache publishedCache, INavigationQueryService navigationQueryService)
+        {
+            IPublishedContent? content = umbracoContext.Content.GetById(contentId);
+            var hasDomains = ContentHasAssignedDomains(content, domainCache);
+            while (content is not null && !hasDomains)
+            {
+                content = content.Parent<IPublishedContent>(publishedCache, navigationQueryService);
+                hasDomains = content is not null && domainCache.HasAssigned(content.Id, true);
+            }
+
+            return content?.Id;
+        }
+
+        private static bool ContentHasAssignedDomains(IPublishedContent? content, IDomainCache domainCache)
+            => content is not null && domainCache.HasAssigned(content.Id, true);
 
         #endregion
 
