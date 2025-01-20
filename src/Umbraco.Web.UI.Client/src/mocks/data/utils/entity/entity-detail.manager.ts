@@ -22,7 +22,7 @@ export class UmbMockEntityDetailManager<MockType extends { id: string }> {
 		return mockItem.id;
 	}
 
-	read(id: string) {
+	read(id: string): MockType {
 		const item = this.#db.read(id);
 		if (!item) throw new Error('Item not found');
 		const mappedItem = this.#readResponseMapper(item);

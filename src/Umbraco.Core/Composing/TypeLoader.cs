@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Composing;
 /// </remarks>
 public sealed class TypeLoader
 {
-    private readonly object _locko = new();
+    private readonly Lock _locko = new();
     private readonly ILogger<TypeLoader> _logger;
 
     private readonly Dictionary<CompositeTypeTypeKey, TypeList> _types = new();

@@ -2118,6 +2118,8 @@ export default {
 		duplicateUserGroupName: "User group name '%0%' is already taken",
 		duplicateMemberGroupName: "Member group name '%0%' is already taken",
 		duplicateUsername: "Username '%0%' is already taken",
+		legacyOption: 'Legacy option',
+		legacyOptionDescription: 'This option is no longer supported, please select something else',
 	},
 	healthcheck: {
 		checkSuccessMessage: "Value is set to the recommended value: '%0%'.",
