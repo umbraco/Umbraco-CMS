@@ -20,6 +20,7 @@ import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 
 const elementName = 'umb-input-document';
 
@@ -175,6 +176,8 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 		return item.variants[0]?.state === 'Draft';
 	}
 
+	// TODO: move this implementation to the UmbDocumentPickerInputContext
+	// so it will be based on the pass in allowedContentTypes
 	#pickableFilter = (item: UmbDocumentItemModel): boolean => {
 		if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
 			return this.allowedContentTypeIds.includes(item.documentType.unique);
@@ -187,6 +190,10 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 			hideTreeRoot: true,
 			pickableFilter: this.#pickableFilter,
 			startNode: this.startNode,
+			allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({
+				unique: id,
+				entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+			})),
 		});
 	}
 
