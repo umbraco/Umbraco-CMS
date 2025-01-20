@@ -171,9 +171,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		if (this.value.link.url) {
 			await umbConfirmModal(this, {
 				color: 'danger',
-				headline: `Reset URL?`,
-				content: 'Are you sure you want to reset this URL?',
-				confirmLabel: 'Reset',
+				headline: this.localize.term('linkPicker_resetUrlHeadline'),
+				content: this.localize.term('linkPicker_resetUrlMessage'),
+				confirmLabel: this.localize.term('linkPicker_resetUrlLabel'),
 			});
 		}
 

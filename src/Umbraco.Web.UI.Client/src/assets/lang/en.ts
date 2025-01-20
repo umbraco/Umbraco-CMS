@@ -2676,5 +2676,8 @@ export default {
 		modalManual: 'Manual',
 		modalAnchorValidationMessage:
 			'Please enter an anchor or querystring, or select a published document or media item, or manually configure the URL.',
+		resetUrlHeadline: 'Reset URL?',
+		resetUrlMessage: 'Are you sure you want to reset this URL?',
+		resetUrlLabel: 'Reset',
 	},
 } as UmbLocalizationDictionary;
