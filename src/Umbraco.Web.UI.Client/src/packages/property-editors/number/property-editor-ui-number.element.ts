@@ -1,6 +1,7 @@
 import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -21,6 +22,9 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 	readonly = false;
 
 	@state()
+	private _label?: string;
+
+	@state()
 	private _max?: number;
 
 	@state()
@@ -34,16 +38,24 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
-		this._min = this.#parseInt(config.getValueByAlias('min'));
-		this._max = this.#parseInt(config.getValueByAlias('max'));
+		this._min = this.#parseInt(config.getValueByAlias('min')) || 0;
+		this._max = this.#parseInt(config.getValueByAlias('max')) || Infinity;
 		this._step = this.#parseInt(config.getValueByAlias('step'));
 		this._placeholder = config.getValueByAlias('placeholder');
+	}
 
+	constructor() {
+		super();
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			this._label = context.getLabel();
+		});
+	}
+
+	protected override firstUpdated() {
 		if (this._min && this._max && this._min > this._max) {
-			this._max = this._min;
-			//TODO Maybe we want to show some kind of error element rather than trying to fix the mistake made by the user...?
-			throw new Error(
-				`Property Editor Number: max is greater than min and set to be equal. Please change your data type configuration.`,
+			console.warn(
+				`Property '${this._label}' (Numeric) has been misconfigured, 'min' is greater than 'max'. Please correct your data type configuration.`,
+				this,
 			);
 		}
 	}
@@ -62,11 +74,12 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 		return html`
 			<uui-input
 				type="number"
+				label=${ifDefined(this._label)}
 				min=${ifDefined(this._min)}
 				max=${ifDefined(this._max)}
 				step=${ifDefined(this._step)}
 				placeholder=${ifDefined(this._placeholder)}
-				.value=${this.value ?? (this._placeholder ? undefined : 0)}
+				.value=${this.value?.toString() ?? (this._placeholder ? '' : '0')}
 				@input=${this.#onInput}
 				?readonly=${this.readonly}>
 			</uui-input>

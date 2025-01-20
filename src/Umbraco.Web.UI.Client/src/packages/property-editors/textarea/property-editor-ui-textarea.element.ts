@@ -8,10 +8,11 @@ import type {
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 @customElement('umb-property-editor-ui-textarea')
 export class UmbPropertyEditorUITextareaElement
-	extends UmbFormControlMixin<string>(UmbLitElement, undefined)
+	extends UmbFormControlMixin<string, typeof UmbLitElement>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
 	/**
@@ -22,6 +23,9 @@ export class UmbPropertyEditorUITextareaElement
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
+
+	@state()
+	private _label?: string;
 
 	@state()
 	private _maxChars?: number;
@@ -44,22 +48,28 @@ export class UmbPropertyEditorUITextareaElement
 		this._minHeight = Number(config?.getValueByAlias('minHeight')) || undefined;
 		this._maxHeight = Number(config?.getValueByAlias('maxHeight')) || undefined;
 
-		if (this._minHeight && this._maxHeight && this._minHeight > this._maxHeight) {
-			this._maxHeight = this._minHeight;
-			//TODO Maybe we want to show some kind of error element rather than trying to fix the mistake made by the user...?
-			throw new Error(
-				`Property Editor Text Area: max is greater than min and set to be equal. Please change your data type configuration.`,
-			);
-		}
-
 		this._css = {
 			'--uui-textarea-min-height': this._minHeight ? `${this._minHeight}px` : 'reset',
 			'--uui-textarea-max-height': this._maxHeight ? `${this._maxHeight}px` : 'reset',
 		};
 	}
 
+	constructor() {
+		super();
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			this._label = context.getLabel();
+		});
+	}
+
 	protected override firstUpdated(): void {
 		this.addFormControlElement(this.shadowRoot!.querySelector('uui-textarea')!);
+
+		if (this._minHeight && this._maxHeight && this._minHeight > this._maxHeight) {
+			console.warn(
+				`Property '${this._label}' (Textarea) has been misconfigured, 'minHeight' is greater than 'maxHeight'. Please correct your data type configuration.`,
+				this,
+			);
+		}
 	}
 
 	#onInput(event: InputEvent) {
@@ -72,7 +82,7 @@ export class UmbPropertyEditorUITextareaElement
 	override render() {
 		return html`
 			<uui-textarea
-				label="Textarea"
+				label=${ifDefined(this._label)}
 				style=${styleMap(this._css)}
 				.autoHeight=${this._rows ? false : true}
 				maxlength=${ifDefined(this._maxChars)}
@@ -83,7 +93,7 @@ export class UmbPropertyEditorUITextareaElement
 		`;
 	}
 
-	static styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			uui-textarea {
