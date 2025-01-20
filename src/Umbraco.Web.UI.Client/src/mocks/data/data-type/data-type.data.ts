@@ -407,6 +407,27 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
+		name: 'Dropdown (Multiple)',
+		id: 'dt-dropdown-multiple',
+		parent: null,
+		editorAlias: 'Umbraco.DropDown.Flexible',
+		editorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		values: [
+			{
+				alias: 'multiple',
+				value: true,
+			},
+			{
+				alias: 'items',
+				value: ['First Option', 'Second Option', 'I Am the third Option'],
+			},
+		],
+	},
+	{
 		name: 'Dropdown Alignment Options',
 		id: 'dt-dropdown-align',
 		parent: null,
