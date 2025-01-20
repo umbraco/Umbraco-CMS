@@ -552,6 +552,7 @@ export default {
 		selectSections: 'Vælg sektioner',
 		selectUser: 'Vælg bruger',
 		selectUsers: 'Vælg brugere',
+		chooseUsers: 'Vælg brugere',
 		noIconsFound: 'Ingen ikoner blev fundet',
 		noMacroParams: 'Der er ingen parametre for denne makro',
 		noMacros: 'Der er ikke tilføjet nogen makroer',
