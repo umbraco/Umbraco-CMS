@@ -20,6 +20,7 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
         IRequestPreviewService requestPreviewService)
         : this(
             requestRoutingService,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
             StaticServiceProvider.Instance.GetRequiredService<IRequestPreviewService>(),
             StaticServiceProvider.Instance.GetRequiredService<IRequestCultureService>(),
             StaticServiceProvider.Instance.GetRequiredService<IApiDocumentUrlService>(),
@@ -34,6 +35,7 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
         IDocumentNavigationQueryService navigationQueryService)
         : this(
             requestRoutingService,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
             StaticServiceProvider.Instance.GetRequiredService<IRequestPreviewService>(),
             StaticServiceProvider.Instance.GetRequiredService<IRequestCultureService>(),
             StaticServiceProvider.Instance.GetRequiredService<IApiDocumentUrlService>(),
@@ -45,6 +47,7 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
     public AncestorsSelector(IPublishedContentCache publishedContentCache, IRequestRoutingService requestRoutingService)
         : this(
             requestRoutingService,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
             StaticServiceProvider.Instance.GetRequiredService<IRequestPreviewService>(),
             StaticServiceProvider.Instance.GetRequiredService<IRequestCultureService>(),
             StaticServiceProvider.Instance.GetRequiredService<IApiDocumentUrlService>(),
@@ -60,6 +63,18 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
         IDocumentNavigationQueryService navigationQueryService)
         : base(requestRoutingService, requestPreviewService, requestCultureService, apiDocumentUrlService)
         => _navigationQueryService = navigationQueryService;
+
+    [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V17.")]
+    public AncestorsSelector(
+        IRequestRoutingService requestRoutingService,
+        IPublishedContentCache publishedContentCache,
+        IRequestPreviewService requestPreviewService,
+        IRequestCultureService requestCultureService,
+        IApiDocumentUrlService apiDocumentUrlService,
+        IDocumentNavigationQueryService navigationQueryService)
+        : this(requestRoutingService, requestPreviewService, requestCultureService, apiDocumentUrlService, navigationQueryService)
+    {
+    }
 
     /// <inheritdoc />
     public bool CanHandle(string query)
