@@ -40,7 +40,7 @@ public class TypeFinder : ITypeFinder
     private static readonly ConcurrentDictionary<string, Type?> TypeNamesCache = new();
 
     private readonly IAssemblyProvider _assemblyProvider;
-    private readonly object _localFilteredAssemblyCacheLocker = new();
+    private readonly Lock _localFilteredAssemblyCacheLocker = new();
     private readonly ILogger<TypeFinder> _logger;
     private readonly List<string> _notifiedLoadExceptionAssemblies = new();
 
