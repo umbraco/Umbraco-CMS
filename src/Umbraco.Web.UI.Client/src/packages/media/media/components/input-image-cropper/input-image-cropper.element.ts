@@ -13,18 +13,21 @@ import './image-cropper-focus-setter.element.js';
 import './image-cropper-preview.element.js';
 import './image-cropper-field.element.js';
 
+const DefaultFocalPoint = { left: 0.5, top: 0.5 };
+const DefaultValue = {
+	temporaryFileId: null,
+	src: '',
+	crops: [],
+	focalPoint: DefaultFocalPoint,
+};
+
 @customElement('umb-input-image-cropper')
 export class UmbInputImageCropperElement extends UmbLitElement {
 	@query('#dropzone')
 	private _dropzone?: UUIFileDropzoneElement;
 
 	@property({ attribute: false })
-	value: UmbImageCropperPropertyEditorValue = {
-		temporaryFileId: null,
-		src: '',
-		crops: [],
-		focalPoint: { left: 0.5, top: 0.5 },
-	};
+	value: UmbImageCropperPropertyEditorValue = DefaultValue;
 
 	@property({ attribute: false })
 	crops: UmbImageCropperPropertyEditorValue['crops'] = [];
@@ -68,7 +71,7 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 	}
 
 	#onRemove = () => {
-		this.value = assignToFrozenObject(this.value, { src: '', temporaryFileId: null });
+		this.value = assignToFrozenObject(this.value, DefaultValue);
 		if (this.fileUnique) {
 			this.#manager?.removeOne(this.fileUnique);
 		}
@@ -116,13 +119,13 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 		const value = (e.target as UmbInputImageCropperFieldElement).value;
 
 		if (!value) {
-			this.value = { src: '', crops: [], focalPoint: { left: 0.5, top: 0.5 }, temporaryFileId: null };
+			this.value = DefaultValue;
 			this.dispatchEvent(new UmbChangeEvent());
 			return;
 		}
 
-		if(this.value && this.value.temporaryFileId){
-			value.temporaryFileId = this.value.temporaryFileId
+		if (this.value && this.value.temporaryFileId) {
+			value.temporaryFileId = this.value.temporaryFileId;
 		}
 
 		this.value = value;
