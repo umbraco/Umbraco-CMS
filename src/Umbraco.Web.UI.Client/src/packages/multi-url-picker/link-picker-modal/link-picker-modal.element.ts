@@ -237,14 +237,17 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		return html`
 			<uui-button-group>
 				<uui-button
+					data-mark="action:document"
 					look="placeholder"
 					label=${this.localize.term('general_document')}
 					@click=${this.#triggerDocumentPicker}></uui-button>
 				<uui-button
+					data-mark="action:media"
 					look="placeholder"
 					label=${this.localize.term('general_media')}
 					@click=${this.#triggerMediaPicker}></uui-button>
 				<uui-button
+					data-mark="action:external"
 					look="placeholder"
 					label=${this.localize.term('linkPicker_modalManual')}
 					@click=${this.#triggerExternalUrl}></uui-button>
@@ -279,6 +282,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		if (this.value.link.type !== 'external') return nothing;
 		return html`
 			<uui-input
+				data-mark="input:url"
 				label=${this.localize.term('placeholders_enterUrl')}
 				placeholder=${this.localize.term('placeholders_enterUrl')}
 				.value=${this.value.link.url ?? ''}
@@ -316,6 +320,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				orientation=${this.#propertyLayoutOrientation}
 				label=${this.localize.term('defaultdialogs_anchorLinkPicker')}>
 				<uui-input
+					data-mark="input:anchor"
 					slot="editor"
 					id="link-anchor"
 					label=${this.localize.term('placeholders_anchor')}
@@ -333,6 +338,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				orientation=${this.#propertyLayoutOrientation}
 				label=${this.localize.term('defaultdialogs_nodeNameLinkPicker')}>
 				<uui-input
+					data-mark="input:title"
 					slot="editor"
 					label=${this.localize.term('defaultdialogs_nodeNameLinkPicker')}
 					placeholder=${this.localize.term('defaultdialogs_nodeNameLinkPicker')}
