@@ -84,7 +84,7 @@ test('can delete a group in a document type', {tag: '@smoke'}, async ({umbracoAp
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.documentType.deleteGroup(groupName, true);
+  await umbracoUi.documentType.deleteGroup(groupName);
   await umbracoUi.documentType.clickConfirmToDeleteButton();
   await umbracoUi.documentType.clickSaveButton();
 

@@ -6,6 +6,8 @@ export * from './entity-actions/index.js';
 export * from './constants.js';
 export * from './global-contexts/index.js';
 export * from './modals/index.js';
+export * from './paths.js';
+export * from './publishing/index.js';
 export * from './recycle-bin/index.js';
 export * from './reference/index.js';
 export * from './repository/index.js';

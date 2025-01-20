@@ -235,6 +235,11 @@ public class HtmlLocalLinkParserTests
             mediaCache.Setup(x => x.GetById(It.IsAny<int>())).Returns(media.Object);
             mediaCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(media.Object);
 
+            var publishStatusQueryService = new Mock<IPublishStatusQueryService>();
+            publishStatusQueryService
+                .Setup(x => x.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()))
+                .Returns(true);
+
             var publishedUrlProvider = new UrlProvider(
                 umbracoContextAccessor,
                 Options.Create(webRoutingSettings),
@@ -242,7 +247,8 @@ public class HtmlLocalLinkParserTests
                 new MediaUrlProviderCollection(() => new[] { mediaUrlProvider.Object }),
                 Mock.Of<IVariationContextAccessor>(),
                 contentCache.Object,
-                navigationQueryService.Object);
+                navigationQueryService.Object,
+                publishStatusQueryService.Object);
 
             var linkParser = new HtmlLocalLinkParser(publishedUrlProvider);
 
