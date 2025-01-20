@@ -6,9 +6,10 @@ import {
 	UMB_TREE_PICKER_MODAL_ALIAS,
 } from '@umbraco-cms/backoffice/tree';
 import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
+import type { UmbDocumentTypeEntityType } from '@umbraco-cms/backoffice/document-type';
 
 export interface UmbDocumentPickerModalData extends UmbTreePickerModalData<UmbDocumentItemModel> {
-	allowedContentTypes: Array<{ unique: string; entityType: string }>;
+	allowedContentTypes: Array<{ unique: string; entityType: UmbDocumentTypeEntityType }>;
 }
 
 export type UmbDocumentPickerModalValue = UmbTreePickerModalValue;
