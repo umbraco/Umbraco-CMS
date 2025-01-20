@@ -14,6 +14,7 @@ import {
 	query,
 	ifDefined,
 	type TemplateResult,
+	ref,
 } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbVariantId,
@@ -21,7 +22,7 @@ import {
 	type UmbEntityVariantOptionModel,
 } from '@umbraco-cms/backoffice/variant';
 import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
-import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbVariantState } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathVariantQuery, umbBindToValidation } from '@umbraco-cms/backoffice/validation';
@@ -220,9 +221,23 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		this._popoverElement.style.width = `${host.width}px`;
 	}
 
+	/**
+	 * Focuses the input element after a short delay to ensure it is rendered.
+	 * This works better than the {umbFocus()} directive, which does not work in this context.
+	 */
+	#focusInput(element?: Element) {
+		if (!element) return;
+
+		setTimeout(async () => {
+			await this.updateComplete;
+			(element as UUIInputElement)?.focus();
+		}, 200);
+	}
+
 	override render() {
-		return this._variantId
-			? html`
+		if (!this._variantId) return nothing;
+
+		return html`
 			<uui-input
 				id="name-input"
 				data-mark="input:entity-name"
@@ -233,7 +248,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				required
 				?readonly=${this.#isReadOnly(this._activeVariant?.culture ?? null)}
 				${umbBindToValidation(this, `$.variants[${UmbDataPathVariantQuery(this._variantId)}].name`, this._name ?? '')}
-				${umbFocus()}
+				${ref(this.#focusInput)}
 			>
 				${
 					this.#hasVariants()
@@ -278,9 +293,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 						`
 					: nothing
 			}
-		</div>
-		`
-			: nothing;
+		</div>`;
 	}
 
 	#renderListItem(variantOption: VariantOptionModelType) {
