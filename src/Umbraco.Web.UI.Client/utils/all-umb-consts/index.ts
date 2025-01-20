@@ -52,7 +52,7 @@ export const foundConsts = [{
 			},
 {
 				path: '@umbraco-cms/backoffice/auth',
-				consts: ["UMB_AUTH_CONTEXT","UMB_STORAGE_TOKEN_RESPONSE_NAME","UMB_STORAGE_REDIRECT_URL","UMB_MODAL_APP_AUTH"]
+				consts: ["UMB_AUTH_CONTEXT","UMB_STORAGE_TOKEN_RESPONSE_NAME","UMB_MODAL_APP_AUTH"]
 			},
 {
 				path: '@umbraco-cms/backoffice/block-custom-view',
@@ -400,7 +400,7 @@ export const foundConsts = [{
 			},
 {
 				path: '@umbraco-cms/backoffice/utils',
-				consts: []
+				consts: ["UMB_STORAGE_REDIRECT_URL"]
 			},
 {
 				path: '@umbraco-cms/backoffice/validation',
