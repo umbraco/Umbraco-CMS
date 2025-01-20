@@ -155,6 +155,7 @@ stages:
               UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               URL=$(ASPNETCORE_URLS)
               STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json" | Out-File .env
+              PLAYWRIGHT_BLOB_OUTPUT_NAME=report-$(vmImage)-attempt-$(System.JobAttempt)-shard-$(shardIndex)
             displayName: Generate .env
             workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
 
@@ -249,21 +250,22 @@ stages:
             condition: succeededOrFailed()
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
-              artifact: blob-report-sql-lite-$(Agent.OS)-$(shardIndex)-attempt-$(System.JobAttempt)
+              artifact: blob-report-sql-lite-$(Agent.OS)-shard-$(shardIndex)-attempt-$(System.JobAttempt)
+
       - job: mergePlaywrightReportsSQLite
         dependsOn: e2ETestsSQLite
-        displayName: Merge playwright sqlite reports
+        displayName: Merge Playwright SQLite reports
         steps:
           - pwsh: |
               mkdir -p "$(Agent.BuildDirectory)/all-acceptance-test-results/linux"
               mkdir -p "$(Agent.BuildDirectory)/merged-acceptance-test-results/linux"
             displayName: Create necessary Linux directories
 
-          # Download linux artifacts
+          # Download Linux reports
           - task: DownloadPipelineArtifact@2
             displayName: Download Linux Playwright results
             inputs:
-              patterns: blob-report-sql-lite-Linux-*
+              patterns: 'report-Linux-'
               path: $(Agent.BuildDirectory)/all-acceptance-test-results/linux
 
           # Merge linux Playwright reports
@@ -277,10 +279,9 @@ stages:
               if (Test-Path "$(Agent.BuildDirectory)/merged-acceptance-test-results/linux/*") {
                 Copy-Item "$(Agent.BuildDirectory)/merged-acceptance-test-results/linux/*" "$(Build.ArtifactStagingDirectory)" -Recurse
               }
-            displayName: Copy Playwright blob report
-            condition: succeededOrFailed()
+            displayName: Copy merged Linux reports
 
-          # Publish merged linux artifacts
+          # Publish merged linux reports
           - task: PublishPipelineArtifact@1
             displayName: Publish merged test artifacts
             condition: succeededOrFailed()
