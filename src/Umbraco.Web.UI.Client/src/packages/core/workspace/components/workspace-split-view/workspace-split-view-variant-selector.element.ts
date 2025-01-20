@@ -226,6 +226,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			<uui-input
 				id="name-input"
 				data-mark="input:entity-name"
+				placeholder=${this.localize.term('placeholders_entername')}
 				label=${this.localize.term('placeholders_entername')}
 				.value=${this._name ?? ''}
 				@input=${this.#handleInput}
