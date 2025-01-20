@@ -256,7 +256,7 @@
                         toolbar: editorConfig.toolbar,
                         model: vm.model,
                         getValue: function () {
-                          return vm.model.value.markup;
+                          return vm.model.value.markup ?? "";
                         },
                         setValue: function (newVal) {
                           vm.model.value.markup = newVal;
@@ -276,7 +276,7 @@
 
                 // Readonly mode
                 baseLineConfigObj.toolbar = vm.readonly ? false : baseLineConfigObj.toolbar;
-                baseLineConfigObj.readonly = vm.readonly ? 1 : baseLineConfigObj.readonly;
+                baseLineConfigObj.readonly = vm.readonly ? true : baseLineConfigObj.readonly;
 
                 // We need to wait for DOM to have rendered before we can find the element by ID.
                 $timeout(function () {
@@ -348,9 +348,11 @@
           // But I'm not sure it's needed, as this does not trigger the RTE
           if(modelObject) {
             modelObject.update(vm.model.value.blocks, $scope);
-            vm.tinyMceEditor.fire('updateBlocks');
+            if (vm.tinyMceEditor) {
+              vm.tinyMceEditor.fire('updateBlocks');
+            }
+            onLoaded();
           }
-          onLoaded();
       }
 
       function ensurePropertyValue(newVal) {

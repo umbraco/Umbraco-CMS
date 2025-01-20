@@ -165,6 +165,7 @@
     <key alias="move">Media moved</key>
     <key alias="copy">Media copied</key>
     <key alias="save">Media saved</key>
+    <key alias="new">Media created</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
@@ -189,6 +190,7 @@
     <key alias="smallPublishVariant">Publish</key>
     <key alias="smallMove">Move</key>
     <key alias="smallSave">Save</key>
+    <key alias="smallNew">New</key>
     <key alias="smallSaveVariant">Save</key>
     <key alias="smallDelete">Delete</key>
     <key alias="smallUnpublish">Unpublish</key>
@@ -1732,6 +1734,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="publishWithMissingDomain">There is no domain configured for %0%, please contact an administrator, see
       log for more information
     </key>
+    <key alias="publishWithNoUrl">The document does not have a URL, possibly due to a naming collision with another document. More details can be found under Info.</key>
     <key alias="preventCleanupEnableError">An error occurred while enabling version cleanup for %0%</key>
     <key alias="preventCleanupDisableError">An error occurred while disabling version cleanup for %0%</key>
     <key alias="copySuccessMessage">Your system information has successfully been copied to the clipboard</key>

@@ -311,10 +311,12 @@
             // create the save button
             if (_.contains($scope.content.allowedActions, "A")) {
                 $scope.page.showSaveButton = true;
+                $scope.page.showPreviewButton = true;
                 // add ellipsis to the save button if it opens the variant overlay
                 $scope.page.saveButtonEllipsis = content.variants && content.variants.length > 1 ? "true" : "false";
             } else {
                 $scope.page.showSaveButton = false;
+                $scope.page.showPreviewButton = false;
             }
 
             // create the pubish combo button
@@ -365,8 +367,6 @@
                     handler: () => $scope.preview(content, additionalPreviewUrl.url, '_blank')
                 }
             });
-
-            $scope.page.showPreviewButton = true;
         }
 
         /** Syncs the content item to it's tree node - this occurs on first load and after saving */
@@ -924,8 +924,6 @@
                                 formHelper.showNotifications(err.data);
                             }
                             model.submitButtonState = "error";
-                            //re-map the dialog model since we've re-bound the properties
-                            dialog.variants = Utilities.copy($scope.content.variants);
                             handleHttpException(err);
                         });
 
