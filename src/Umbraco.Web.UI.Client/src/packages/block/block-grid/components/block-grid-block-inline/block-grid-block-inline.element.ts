@@ -32,6 +32,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	//
 	#blockContext?: typeof UMB_BLOCK_GRID_ENTRY_CONTEXT.TYPE;
 	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
+	#variantId: UmbVariantId | undefined;
 	#contentKey?: string;
 	#parentUnique?: string | null;
 	#areaKey?: string | null;
@@ -62,7 +63,6 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 
 	@state()
 	private _variantName?: string;
-	#variantId: UmbVariantId | undefined;
 
 	constructor() {
 		super();
