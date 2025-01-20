@@ -12,6 +12,7 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 
 // TODO: This is across packages, how should we go about getting just a single element from another package? like here we just need the umb-block-type-card element
 import '@umbraco-cms/backoffice/block-type';
+import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-block-catalogue-modal')
 export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
@@ -105,6 +106,16 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		this.modalContext?.submit();
 	}
 
+	async #onClipboardPickerSelectionChange(event: UmbSelectionChangeEvent) {
+		const target = event.target as any;
+		const selection = target?.selection || [];
+		this.value = {
+			clipboard: {
+				selection,
+			},
+		};
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('blockEditor_addBlock')}">
@@ -126,7 +137,11 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	}
 
 	#renderClipboard() {
-		return html`Clipboard`;
+		return html`<uui-box
+			><umb-clipboard-entry-picker
+				.config=${{ multiple: true, asyncFilter: this.data?.clipboardFilter }}
+				@selection-change=${this.#onClipboardPickerSelectionChange}></umb-clipboard-entry-picker
+		></uui-box>`;
 	}
 
 	#renderCreateEmpty() {
@@ -142,7 +157,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 				: nothing}
 			${this._filtered.map(
 				(group) => html`
-					${group.name && group.name !== '' ? html`<h4>${group.name}</h4>` : nothing}
+					${group.name && group.blocks.length !== 0 && group.name !== '' ? html`<h4>${group.name}</h4>` : nothing}
 					<div class="blockGroup">
 						${repeat(
 							group.blocks,
@@ -181,7 +196,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 					?active=${this._openClipboard}
 					@click=${() => (this._openClipboard = true)}>
 					<umb-localize key=${this.localize.term('blockEditor_tabClipboard')}>Clipboard</umb-localize>
-					<uui-icon slot="icon" name="icon-paste-in"></uui-icon>
+					<uui-icon slot="icon" name="icon-clipboard"></uui-icon>
 				</uui-tab>
 			</uui-tab-group>
 		`;

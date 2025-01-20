@@ -1,4 +1,5 @@
 import { UMB_MEDIA_ROOT_ENTITY_TYPE, UMB_MEDIA_MENU_ALIAS } from '../media/index.js';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 
 const sectionAlias = 'Umb.Section.Media';
 
@@ -14,7 +15,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.SectionUserPermission',
+				alias: UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS,
 				match: sectionAlias,
 			},
 		],

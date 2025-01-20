@@ -1,5 +1,4 @@
 import { manifests as authManifests } from './auth/manifests.js';
-import { manifests as clipboardManifests } from './clipboard/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as contentManifests } from './content/manifests.js';
 import { manifests as contentTypeManifests } from './content-type/manifests.js';
@@ -28,7 +27,6 @@ import type { UmbExtensionManifestKind } from './extension-registry/index.js';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	...authManifests,
-	...clipboardManifests,
 	...collectionManifests,
 	...contentManifests,
 	...contentTypeManifests,
