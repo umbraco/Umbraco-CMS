@@ -3,9 +3,10 @@ import { isCurrentUserAnAdmin } from '@umbraco-cms/backoffice/current-user';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_NEWVERSION_MODAL, UMB_SYSINFO_MODAL, type UmbServerUpgradeCheck } from '@umbraco-cms/backoffice/sysinfo';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_NEWVERSION_MODAL, UMB_SYSINFO_MODAL } from '@umbraco-cms/backoffice/sysinfo';
+import type { UmbServerUpgradeCheck } from '@umbraco-cms/backoffice/sysinfo';
 
 @customElement('umb-backoffice-header-logo')
 export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
