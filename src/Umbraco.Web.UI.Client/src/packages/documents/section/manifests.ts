@@ -1,5 +1,6 @@
 import { UMB_CONTENT_SECTION_ALIAS } from '@umbraco-cms/backoffice/content';
 import { UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_CONTENT_MENU_ALIAS } from '@umbraco-cms/backoffice/document';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -13,7 +14,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.SectionUserPermission',
+				alias: UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS,
 				match: UMB_CONTENT_SECTION_ALIAS,
 			},
 		],

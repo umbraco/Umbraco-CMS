@@ -46,7 +46,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		},
 	},
-	blockListSchemaManifest,
 	{
 		type: 'propertyValueResolver',
 		alias: 'Umb.PropertyValueResolver.BlockList',
@@ -56,4 +55,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 			editorAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
 		},
 	},
+	blockListSchemaManifest,
 ];
