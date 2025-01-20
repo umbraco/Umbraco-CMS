@@ -53,6 +53,7 @@ public class QuerySearcherController : SearcherControllerBase
         ISearchResults results;
 
         // NativeQuery will work for a single word/phrase too (but depends on the implementation) the lucene one will work.
+        // Due to examine changes we need to supply the skipTakeMaxResults, see https://github.com/umbraco/Umbraco-CMS/issues/17920 for more info
         try
         {
             results = searcher
