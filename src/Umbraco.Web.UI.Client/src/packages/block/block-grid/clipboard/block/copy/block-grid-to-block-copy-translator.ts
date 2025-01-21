@@ -51,13 +51,15 @@ export class UmbBlockGridToBlockClipboardCopyPropertyValueTranslator
 			}
 			contentData.push(contentDataEntry);
 
-			const settingsDataEntry = gridBlockValue.settingsData.find(
-				(settingsData) => settingsData.key === gridLayout.settingsKey,
-			);
-			if (!settingsDataEntry) {
-				throw new Error('No settings data found for layout entry');
+			if (gridLayout.settingsKey) {
+				const settingsDataEntry = gridBlockValue.settingsData.find(
+					(settingsData) => settingsData.key === gridLayout.settingsKey,
+				);
+				if (!settingsDataEntry) {
+					throw new Error('No settings data found for layout entry');
+				}
+				settingsData.push(settingsDataEntry);
 			}
-			settingsData.push(settingsDataEntry);
 
 			return {
 				contentKey: gridLayout.contentKey,
