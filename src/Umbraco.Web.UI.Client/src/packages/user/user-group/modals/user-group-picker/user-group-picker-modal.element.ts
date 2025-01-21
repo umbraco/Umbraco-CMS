@@ -70,7 +70,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.term('user_selectUserGroup', true)}>
+			<umb-body-layout headline=${this.localize.term('user_chooseUserGroup', true)}>
 				<uui-box>
 					${repeat(
 						this._userGroups,
@@ -96,7 +96,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_cancel')} @click=${this._rejectModal}></uui-button>
 					<uui-button
-						label=${this.localize.term('buttons_select')}
+						label=${this.localize.term('buttons_choose')}
 						look="primary"
 						color="positive"
 						@click=${this.#onSubmit}></uui-button>
