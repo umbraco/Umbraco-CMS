@@ -10,7 +10,7 @@ import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeEntityType } from '@umbraco-cms/backoffice/document-type';
 
-interface UmbInputDocumentOpenPickerArgs {
+interface UmbDocumentPickerInputContextOpenArgs {
 	allowedContentTypes?: Array<{ unique: string; entityType: UmbDocumentTypeEntityType }>;
 }
 
@@ -24,7 +24,10 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 		super(host, UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS, UMB_DOCUMENT_PICKER_MODAL, (entry) => entry.unique);
 	}
 
-	override async openPicker(pickerData?: Partial<UmbDocumentPickerModalData>, args?: UmbInputDocumentOpenPickerArgs) {
+	override async openPicker(
+		pickerData?: Partial<UmbDocumentPickerModalData>,
+		args?: UmbDocumentPickerInputContextOpenArgs,
+	) {
 		const combinedPickerData = {
 			...pickerData,
 		};
