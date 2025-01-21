@@ -54,7 +54,8 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
         .AddNotificationHandler<ContentPublishingNotification, ContentNotificationHandler>()
         .AddNotificationHandler<ContentPublishedNotification, ContentNotificationHandler>()
         .AddNotificationHandler<ContentUnpublishingNotification, ContentNotificationHandler>()
-        .AddNotificationHandler<ContentUnpublishedNotification, ContentNotificationHandler>();
+        .AddNotificationHandler<ContentUnpublishedNotification, ContentNotificationHandler>()
+        .AddNotificationHandler<ContentTreeChangeNotification, ContentNotificationHandler>();
 
     private void CreateTestData()
     {
@@ -177,6 +178,69 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Publishing_Invariant()
+    {
+        IContent document = new Content("content", -1, _contentType);
+        ContentService.Save(document);
+
+        var treeChangeWasCalled = false;
+
+        ContentNotificationHandler.TreeChange += notification =>
+        {
+            var change = notification.Changes.FirstOrDefault();
+            var publishedCultures = change?.PublishedCultures?.ToArray();
+            Assert.IsNotNull(publishedCultures);
+            Assert.AreEqual(1, publishedCultures.Length);
+            Assert.IsTrue(publishedCultures.InvariantContains("*"));
+            Assert.IsNull(change.UnpublishedCultures);
+
+            treeChangeWasCalled = true;
+        };
+
+        try
+        {
+            ContentService.Publish(document, ["*"]);
+            Assert.IsTrue(treeChangeWasCalled);
+        }
+        finally
+        {
+            ContentNotificationHandler.TreeChange = null;
+        }
+    }
+
+    [Test]
+    public void Unpublishing_Invariant()
+    {
+        IContent document = new Content("content", -1, _contentType);
+        ContentService.Save(document);
+        ContentService.Publish(document, ["*"]);
+
+        var treeChangeWasCalled = false;
+
+        ContentNotificationHandler.TreeChange += notification =>
+        {
+            var change = notification.Changes.FirstOrDefault();
+            Assert.IsNull(change?.PublishedCultures);
+            var unpublishedCultures = change?.UnpublishedCultures?.ToArray();
+            Assert.IsNotNull(unpublishedCultures);
+            Assert.AreEqual(1, unpublishedCultures.Length);
+            Assert.IsTrue(unpublishedCultures.InvariantContains("*"));
+
+            treeChangeWasCalled = true;
+        };
+
+        try
+        {
+            ContentService.Unpublish(document);
+            Assert.IsTrue(treeChangeWasCalled);
+        }
+        finally
+        {
+            ContentNotificationHandler.TreeChange = null;
+        }
+    }
+
+    [Test]
     public async Task Publishing_Culture()
     {
         await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"), Constants.Security.SuperUserKey);
@@ -202,6 +266,7 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         var publishingWasCalled = false;
         var publishedWasCalled = false;
+        var treeChangeWasCalled = false;
 
         ContentNotificationHandler.PublishingContent += notification =>
         {
@@ -227,16 +292,30 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
             publishedWasCalled = true;
         };
 
+        ContentNotificationHandler.TreeChange += notification =>
+        {
+            var change = notification.Changes.FirstOrDefault();
+            var publishedCultures = change?.PublishedCultures?.ToArray();
+            Assert.IsNotNull(publishedCultures);
+            Assert.AreEqual(1, publishedCultures.Length);
+            Assert.IsTrue(publishedCultures.InvariantContains("fr-FR"));
+            Assert.IsNull(change.UnpublishedCultures);
+
+            treeChangeWasCalled = true;
+        };
+
         try
         {
             ContentService.Publish(document, new[] { "fr-FR" });
             Assert.IsTrue(publishingWasCalled);
             Assert.IsTrue(publishedWasCalled);
+            Assert.IsTrue(treeChangeWasCalled);
         }
         finally
         {
             ContentNotificationHandler.PublishingContent = null;
             ContentNotificationHandler.PublishedContent = null;
+            ContentNotificationHandler.TreeChange = null;
         }
 
         document = ContentService.GetById(document.Id);
@@ -399,6 +478,7 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         var publishingWasCalled = false;
         var publishedWasCalled = false;
+        var treeChangeWasCalled = false;
 
         // TODO: revisit this - it was migrated when removing static events, but the expected result seems illogic - why does this test bind to Published and not Unpublished?
 
@@ -432,16 +512,30 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
             publishedWasCalled = true;
         };
 
+        ContentNotificationHandler.TreeChange += notification =>
+        {
+            var change = notification.Changes.FirstOrDefault();
+            var unpublishedCultures = change?.UnpublishedCultures?.ToArray();
+            Assert.IsNotNull(unpublishedCultures);
+            Assert.AreEqual(1, unpublishedCultures.Length);
+            Assert.IsTrue(unpublishedCultures.InvariantContains("fr-FR"));
+            Assert.IsNull(change.PublishedCultures);
+
+            treeChangeWasCalled = true;
+        };
+
         try
         {
             ContentService.CommitDocumentChanges(document);
             Assert.IsTrue(publishingWasCalled);
             Assert.IsTrue(publishedWasCalled);
+            Assert.IsTrue(treeChangeWasCalled);
         }
         finally
         {
             ContentNotificationHandler.PublishingContent = null;
             ContentNotificationHandler.PublishedContent = null;
+            ContentNotificationHandler.TreeChange = null;
         }
 
         document = ContentService.GetById(document.Id);
@@ -456,7 +550,8 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
         INotificationHandler<ContentPublishingNotification>,
         INotificationHandler<ContentPublishedNotification>,
         INotificationHandler<ContentUnpublishingNotification>,
-        INotificationHandler<ContentUnpublishedNotification>
+        INotificationHandler<ContentUnpublishedNotification>,
+        INotificationHandler<ContentTreeChangeNotification>
     {
         public static Action<ContentSavingNotification> SavingContent { get; set; }
 
@@ -470,6 +565,8 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         public static Action<ContentUnpublishedNotification> UnpublishedContent { get; set; }
 
+        public static Action<ContentTreeChangeNotification> TreeChange { get; set; }
+
         public void Handle(ContentPublishedNotification notification) => PublishedContent?.Invoke(notification);
 
         public void Handle(ContentPublishingNotification notification) => PublishingContent?.Invoke(notification);
@@ -480,5 +577,7 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
         public void Handle(ContentUnpublishedNotification notification) => UnpublishedContent?.Invoke(notification);
 
         public void Handle(ContentUnpublishingNotification notification) => UnpublishingContent?.Invoke(notification);
+
+        public void Handle(ContentTreeChangeNotification notification) => TreeChange?.Invoke(notification);
     }
 }
