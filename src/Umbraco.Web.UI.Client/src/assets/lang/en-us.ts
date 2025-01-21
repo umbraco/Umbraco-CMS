@@ -585,6 +585,7 @@ export default {
 		selectSections: 'Select sections',
 		selectUser: 'Select user',
 		selectUsers: 'Select users',
+		chooseUsers: 'Choose users',
 		noIconsFound: 'No icons were found',
 		noMacroParams: 'There are no parameters for this macro',
 		noMacros: 'There are no macros available to insert',
