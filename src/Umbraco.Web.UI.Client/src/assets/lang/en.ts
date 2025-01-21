@@ -2116,6 +2116,9 @@ export default {
 		duplicateUserGroupName: "User group name '%0%' is already taken",
 		duplicateMemberGroupName: "Member group name '%0%' is already taken",
 		duplicateUsername: "Username '%0%' is already taken",
+		numberMinimum: "Value must be greater than or equal to '%0%'.",
+		numberMaximum: "Value must be less than or equal to '%0%'.",
+		numberMisconfigured: "Minimum value '%1%' must be less than the maximum value '%0%'.",
 	},
 	healthcheck: {
 		checkSuccessMessage: "Value is set to the recommended value: '%0%'.",
