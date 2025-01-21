@@ -1156,7 +1156,6 @@ export default {
 	treeHeaders: {
 		cacheBrowser: 'Cache przeglądarki',
 		contentRecycleBin: 'Kosz',
-		mediaRecycleBin: 'Kosz',
 		createdPackages: 'Utworzone pakiety',
 		dataTypes: 'Typy danych',
 		dictionary: 'Słownik',
@@ -1166,6 +1165,7 @@ export default {
 		languages: 'Języki',
 		localPackage: 'Zainstaluj pakiet lokalny',
 		macros: 'Makra',
+		mediaRecycleBin: 'Kosz',
 		mediaTypes: 'Typy mediów',
 		member: 'Członkowie',
 		memberGroups: 'Grupy członków',

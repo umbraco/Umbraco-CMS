@@ -931,7 +931,6 @@ export default {
 	treeHeaders: {
 		cacheBrowser: 'キャッシュの参照',
 		contentRecycleBin: 'ごみ箱',
-		mediaRecycleBin: 'ごみ箱',
 		createdPackages: 'パッケージの作成',
 		dataTypes: 'データ型',
 		dictionary: 'ディクショナリ',
@@ -941,6 +940,7 @@ export default {
 		languages: '言語',
 		localPackage: 'ローカルパッケージのインストール',
 		macros: 'マクロ',
+		mediaRecycleBin: 'ごみ箱',
 		mediaTypes: 'メディアタイプ',
 		member: 'メンバー',
 		memberGroups: 'メンバーのグループ',

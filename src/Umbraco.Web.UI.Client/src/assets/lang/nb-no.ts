@@ -1028,7 +1028,6 @@ export default {
 	treeHeaders: {
 		cacheBrowser: 'Hurtigbufferleser',
 		contentRecycleBin: 'Papirkurv',
-		mediaRecycleBin: 'Papirkurv',
 		createdPackages: 'Opprettede pakker',
 		datatype: 'Datatyper',
 		dictionary: 'Ordbok',
@@ -1038,6 +1037,7 @@ export default {
 		languages: 'Språk',
 		localPackage: 'Installer lokal pakke',
 		macros: 'Makroer',
+		mediaRecycleBin: 'Papirkurv',
 		mediaTypes: 'Mediatyper',
 		member: 'Medlemmer',
 		memberGroup: 'Medlemsgrupper',

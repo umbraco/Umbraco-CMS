@@ -728,7 +728,6 @@ export default {
 	treeHeaders: {
 		cacheBrowser: 'זיכרון מטמון בדפדפן',
 		contentRecycleBin: 'סל מיחזור',
-		mediaRecycleBin: 'סל מיחזור',
 		createdPackages: 'יצירת חבילות',
 		dataTypes: 'סוגי מידע',
 		dictionary: 'מילון',
@@ -738,6 +737,7 @@ export default {
 		languages: 'שפות',
 		localPackage: 'התקן חבילה מקומית',
 		macros: 'מקרו',
+		mediaRecycleBin: 'סל מיחזור',
 		mediaTypes: 'סוגי מדיה',
 		member: 'משתמשים',
 		memberGroups: 'קבוצות משתמשים',

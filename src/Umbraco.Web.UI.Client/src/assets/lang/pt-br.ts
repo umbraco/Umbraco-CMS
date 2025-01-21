@@ -738,7 +738,6 @@ export default {
 	treeHeaders: {
 		cacheBrowser: 'Navegador de Cache',
 		contentRecycleBin: 'Lixeira',
-		mediaRecycleBin: 'Lixeira',
 		createdPackages: 'Pacotes criados',
 		dataTypes: 'Tipo de Dado',
 		dictionary: 'Dicionário',
@@ -748,6 +747,7 @@ export default {
 		languages: 'Linguagens',
 		localPackage: 'Instalar pacote local',
 		macros: 'Macros',
+		mediaRecycleBin: 'Lixeira',
 		mediaTypes: 'Tipos de Mídia',
 		member: 'Membros',
 		memberGroups: 'Grupos de Membros',
