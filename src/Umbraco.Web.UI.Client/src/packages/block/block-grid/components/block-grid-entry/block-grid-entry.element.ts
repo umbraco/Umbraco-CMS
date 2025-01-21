@@ -499,7 +499,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	#renderActionBar() {
 		return html`
 			<uui-action-bar>
-				${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderDeleteAction()}</uui-action-bar
+				${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
+				${this.#renderDeleteAction()}</uui-action-bar
 			>
 		`;
 	}
@@ -541,6 +542,12 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 					</uui-button>`
 				: nothing}
 		`;
+	}
+
+	#renderCopyToClipboardAction() {
+		return html`<uui-button label="Copy to clipboard" look="secondary" @click=${() => this.#context.copyToClipboard()}>
+			<uui-icon name="icon-clipboard-copy"></uui-icon>
+		</uui-button>`;
 	}
 
 	#renderDeleteAction() {

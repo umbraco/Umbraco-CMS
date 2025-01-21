@@ -14,7 +14,7 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
     // means faster execution, but uses memory - not sure if we want it
     // so making it configurable.
     private const bool FullCacheWhenPreviewing = true;
-    private readonly object _locko = new();
+    private readonly Lock _locko = new();
     private readonly object? _sourceValue;
     protected readonly bool IsMember;
     protected readonly bool IsPreviewing;

@@ -1,4 +1,4 @@
-import { UmbPropertyActionBase } from '../../components/property-action/property-action-base.controller.js';
+import { UmbPropertyActionBase } from '../../property-action-base.js';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 export class UmbClearPropertyAction extends UmbPropertyActionBase {

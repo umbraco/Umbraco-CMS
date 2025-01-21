@@ -1641,7 +1641,12 @@ public class ContentService : RepositoryService, IContentService
                 // events and audit
                 scope.Notifications.Publish(
                     new ContentUnpublishedNotification(content, eventMessages).WithState(notificationState));
-                scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
+                scope.Notifications.Publish(new ContentTreeChangeNotification(
+                    content,
+                    TreeChangeTypes.RefreshBranch,
+                    variesByCulture ? culturesPublishing.IsCollectionEmpty() ? null : culturesPublishing : null,
+                    variesByCulture ? culturesUnpublishing.IsCollectionEmpty() ? null : culturesUnpublishing : ["*"],
+                    eventMessages));
 
                 if (culturesUnpublishing != null)
                 {
@@ -1700,7 +1705,12 @@ public class ContentService : RepositoryService, IContentService
                 if (!branchOne)
                 {
                     scope.Notifications.Publish(
-                        new ContentTreeChangeNotification(content, changeType, eventMessages));
+                        new ContentTreeChangeNotification(
+                            content,
+                            changeType,
+                            variesByCulture ? culturesPublishing.IsCollectionEmpty() ? null : culturesPublishing : ["*"],
+                            variesByCulture ? culturesUnpublishing.IsCollectionEmpty() ? null : culturesUnpublishing : null,
+                            eventMessages));
                     scope.Notifications.Publish(
                         new ContentPublishedNotification(content, eventMessages).WithState(notificationState));
                 }
@@ -2149,7 +2159,6 @@ public class ContentService : RepositoryService, IContentService
         var results = new List<PublishResult>();
         var publishedDocuments = new List<IContent>();
 
-        IDictionary<string, object?>? initialNotificationState = null;
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.WriteLock(Constants.Locks.ContentTree);
@@ -2168,7 +2177,8 @@ public class ContentService : RepositoryService, IContentService
             }
 
             // deal with the branch root - if it fails, abort
-            PublishResult? result = PublishBranchItem(scope, document, shouldPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, out initialNotificationState);
+            HashSet<string>? culturesToPublish = shouldPublish(document);
+            PublishResult? result = PublishBranchItem(scope, document, culturesToPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, out IDictionary<string, object?>? notificationState);
             if (result != null)
             {
                 results.Add(result);
@@ -2177,6 +2187,8 @@ public class ContentService : RepositoryService, IContentService
                     return results;
                 }
             }
+
+            HashSet<string> culturesPublished = culturesToPublish ?? [];
 
             // deal with descendants
             // if one fails, abort its branch
@@ -2203,12 +2215,14 @@ public class ContentService : RepositoryService, IContentService
                     }
 
                     // no need to check path here, parent has to be published here
-                    result = PublishBranchItem(scope, d, shouldPublish, publishCultures, false, publishedDocuments, eventMessages, userId, allLangs, out _);
+                    culturesToPublish = shouldPublish(d);
+                    result = PublishBranchItem(scope, d, culturesToPublish, publishCultures, false, publishedDocuments, eventMessages, userId, allLangs, out _);
                     if (result != null)
                     {
                         results.Add(result);
                         if (result.Success)
                         {
+                            culturesPublished.UnionWith(culturesToPublish ?? []);
                             continue;
                         }
                     }
@@ -2225,9 +2239,15 @@ public class ContentService : RepositoryService, IContentService
 
             // trigger events for the entire branch
             // (SaveAndPublishBranchOne does *not* do it)
+            var variesByCulture = document.ContentType.VariesByCulture();
             scope.Notifications.Publish(
-                new ContentTreeChangeNotification(document, TreeChangeTypes.RefreshBranch, eventMessages));
-            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages, true).WithState(initialNotificationState));
+                new ContentTreeChangeNotification(
+                    document,
+                    TreeChangeTypes.RefreshBranch,
+                    variesByCulture ? culturesPublished.IsCollectionEmpty() ? null : culturesPublished : ["*"],
+                    null,
+                    eventMessages));
+            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages).WithState(notificationState));
 
             scope.Complete();
         }
@@ -2241,7 +2261,7 @@ public class ContentService : RepositoryService, IContentService
     private PublishResult? PublishBranchItem(
         ICoreScope scope,
         IContent document,
-        Func<IContent, HashSet<string>?> shouldPublish,
+        HashSet<string>? culturesToPublish,
         Func<IContent, HashSet<string>, IReadOnlyCollection<ILanguage>,
             bool> publishCultures,
         bool isRoot,
@@ -2251,9 +2271,7 @@ public class ContentService : RepositoryService, IContentService
         IReadOnlyCollection<ILanguage> allLangs,
         out IDictionary<string, object?>? initialNotificationState)
     {
-        HashSet<string>? culturesToPublish = shouldPublish(document);
-
-        initialNotificationState = null;
+        initialNotificationState = new Dictionary<string, object?>();
 
         // we need to guard against unsaved changes before proceeding; the document will be saved, but we're not firing any saved notifications
         if (HasUnsavedChanges(document))
@@ -2796,6 +2814,13 @@ public class ContentService : RepositoryService, IContentService
                         GetPagedDescendants(content.Id, page++, pageSize, out total);
                     foreach (IContent descendant in descendants)
                     {
+                        // when copying a branch into itself, the copy of a root would be seen as a descendant
+                        // and would be copied again => filter it out.
+                        if (descendant.Id == copy.Id)
+                        {
+                            continue;
+                        }
+
                         // if parent has not been copied, skip, else gets its copy id
                         if (idmap.TryGetValue(descendant.ParentId, out parentId) == false)
                         {

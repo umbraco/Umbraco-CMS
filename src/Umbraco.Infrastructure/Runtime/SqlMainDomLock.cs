@@ -23,7 +23,7 @@ public class SqlMainDomLock : IMainDomLock
     private readonly IUmbracoDatabase? _db;
     private readonly UmbracoDatabaseFactory _dbFactory;
     private readonly IOptions<GlobalSettings> _globalSettings;
-    private readonly object _locker = new();
+    private readonly Lock _locker = new();
     private readonly string _lockId;
     private readonly ILogger<SqlMainDomLock> _logger;
     private bool _acquireWhenTablesNotAvailable;
