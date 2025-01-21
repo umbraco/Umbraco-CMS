@@ -1,4 +1,5 @@
 ﻿using OpenIddict.Abstractions;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Api.Delivery.Services;
