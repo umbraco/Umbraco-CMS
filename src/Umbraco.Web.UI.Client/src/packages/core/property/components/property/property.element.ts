@@ -20,8 +20,7 @@ import type {
 } from '@umbraco-cms/backoffice/content-type';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
-import { UMB_ROUTE_PATH_ADDENDUM_CONTEXT, UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
-import type { UmbContextRequestEvent } from '@umbraco-cms/backoffice/context-api';
+import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 
 /**
  *  @element umb-property
@@ -377,17 +376,6 @@ export class UmbPropertyElement extends UmbLitElement {
 		);
 	}
 
-	#proxyContextRequests(event: UmbContextRequestEvent) {
-		if (this._element) {
-			// TODO: We would need to secure that we have checked for al other context-apis hosted here is not a match. [NL]
-			// Ideally this is done by writting an actual Context APi Proxy Controller. [NL]
-			if (event.contextAlias === 'UmbPropertyContext') return;
-			if (event.contextAlias === UMB_ROUTE_PATH_ADDENDUM_CONTEXT.contextAlias) return;
-			event.stopImmediatePropagation();
-			this._element.dispatchEvent(event.clone());
-		}
-	}
-
 	override render() {
 		return html`
 			<umb-property-layout
@@ -413,7 +401,6 @@ export class UmbPropertyElement extends UmbLitElement {
 		if (!this._propertyEditorUiAlias) return nothing;
 		return html`
 			<umb-property-action-menu
-				@umb:context-request=${this.#proxyContextRequests}
 				slot="action-menu"
 				id="action-menu"
 				.propertyEditorUiAlias=${this._propertyEditorUiAlias}>
