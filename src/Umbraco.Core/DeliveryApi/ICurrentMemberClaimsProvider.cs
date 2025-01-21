@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Api.Delivery.Services;
+﻿namespace Umbraco.Cms.Core.DeliveryApi;
 
 public interface ICurrentMemberClaimsProvider
 {
