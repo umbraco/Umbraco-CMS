@@ -781,7 +781,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
       $scope.options.allowBulkDelete;
 
     if ($scope.isTrashed === false) {
-      getContentTypesCallback(id).then(function (listViewAllowedTypes) {
+      getContentTypesCallback($scope.contentId).then(function (listViewAllowedTypes) {
         $scope.listViewAllowedTypes = listViewAllowedTypes;
 
         var blueprints = false;
