@@ -546,6 +546,7 @@ export default {
 		selectMember: 'Vælg medlem',
 		selectMembers: 'Vælg medlemmer',
 		selectMemberGroup: 'Vælg medlemsgruppe',
+		chooseMemberGroup: 'Vælg medlemsgruppe',
 		selectMemberType: 'Vælg medlemstype',
 		selectNode: 'Vælg node',
 		selectLanguages: 'Vælg sprog',
