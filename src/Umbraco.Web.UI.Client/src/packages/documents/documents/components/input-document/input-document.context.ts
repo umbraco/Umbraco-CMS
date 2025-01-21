@@ -44,9 +44,9 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 		}
 
 		// pass allowedContentTypes to the search request args
-		combinedPickerData.search!.requestArgs = {
-			allowedContentTypes: args?.allowedContentTypes,
-			...pickerData?.search?.requestArgs,
+		combinedPickerData.search!.queryParams = {
+			contentTypes: args?.allowedContentTypes,
+			...pickerData?.search?.queryParams,
 		};
 
 		super.openPicker(combinedPickerData);

@@ -126,7 +126,6 @@ export class UmbPickerSearchManager<
 	 * @memberof UmbPickerSearchManager
 	 */
 	public setQuery(query: SearchRequestArgsType) {
-		if (this.getSearchable() === false) throw new Error('Search is not enabled');
 		if (!this.query) {
 			this.clear();
 			return;
@@ -186,7 +185,6 @@ export class UmbPickerSearchManager<
 
 		const args = {
 			searchFrom: this.#config?.searchFrom,
-			...this.#config?.requestArgs,
 			...query,
 		};
 
