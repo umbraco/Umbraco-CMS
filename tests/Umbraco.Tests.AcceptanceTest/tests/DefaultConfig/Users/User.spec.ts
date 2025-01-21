@@ -28,7 +28,7 @@ test('can create a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.enterUserEmail(userEmail);
   await umbracoUi.user.clickChooseButton();
   await umbracoUi.user.clickButtonWithName(defaultUserGroupName);
-  await umbracoUi.user.clickSubmitButton();
+  await umbracoUi.user.clickChooseModalButton();
   await umbracoUi.user.clickCreateUserButton();
 
   // Assert
@@ -86,7 +86,7 @@ test('can add multiple user groups to a user', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
   await umbracoUi.user.clickChooseUserGroupsButton();
   await umbracoUi.user.clickButtonWithName(secondUserGroupName);
-  await umbracoUi.user.clickSubmitButton();
+  await umbracoUi.user.clickChooseModalButton();
   await umbracoUi.user.clickSaveButton();
 
   // Assert

@@ -214,6 +214,7 @@ test('can create a document type with a composition', {tag: '@smoke'}, async ({u
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickCompositionsButton();
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.documentType.clickButtonWithName(compositionDocumentTypeName);
   await umbracoUi.documentType.clickSubmitButton();
   await umbracoUi.documentType.clickSaveButton();
@@ -241,6 +242,7 @@ test('can remove a composition from a document type', async ({umbracoApi, umbrac
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickCompositionsButton();
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.documentType.clickButtonWithName(compositionDocumentTypeName);
   await umbracoUi.documentType.clickSubmitButton();
   await umbracoUi.documentType.clickConfirmToSubmitButton();
