@@ -148,7 +148,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	override render() {
 		return html`
-			<umb-body-layout headline="Select">
+			<umb-body-layout  headline=${this.localize.term('general_choose')}>
 				<uui-box> ${this.#renderSearch()} ${this.#renderTree()}</uui-box>
 				${this.#renderActions()}
 			</umb-body-layout>
