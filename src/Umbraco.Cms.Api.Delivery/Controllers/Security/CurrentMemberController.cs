@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Server.AspNetCore;
 using Umbraco.Cms.Api.Delivery.Routing;
-using Umbraco.Cms.Api.Delivery.Services;
+using Umbraco.Cms.Core.DeliveryApi;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers.Security;
 
