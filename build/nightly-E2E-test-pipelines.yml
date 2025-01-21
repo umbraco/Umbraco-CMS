@@ -260,7 +260,7 @@ stages:
           allLinuxArtifactsPath: "$(Agent.BuildDirectory)/linuxResults/all-artifacts-with-pattern"
           allLinuxBlobReportsPath: "$(Agent.BuildDirectory)/linuxResults/all-blob-reports-with-pattern"
           linuxMergedResultsPath: "$(Agent.BuildDirectory)/linuxResults/merged-acceptance-test-results"
-          linuxArtifactPattern: "*/report-ubuntu-latest-attempt--$(System.JobAttempt)*.zip"
+          linuxArtifactPattern: "*/report-ubuntu-latest-attempt-$(System.JobAttempt)*.zip"
           linuxArtifactName: "merged-acceptance-test-results-linux-$(System.JobAttempt)"
         steps:
           # Create necessary Linux directories
