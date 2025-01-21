@@ -16,7 +16,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockGridEditorName);
 });
 
-test('can create a block grid editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can create a block grid editor', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
   //  Arrange
   const blockGridLocatorName = 'Block Grid';
   const blockGridEditorAlias = 'Umbraco.BlockGrid';
@@ -24,8 +24,8 @@ test('can create a block grid editor', {tag: '@smoke'}, async ({umbracoApi, umbr
 
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
-  await umbracoUi.dataType.clickCreateButton();
-  await umbracoUi.dataType.clickNewDataTypeThreeDotsButton();
+  await umbracoUi.dataType.clickActionsMenuCreateButton();
+  await umbracoUi.dataType.clickNewDataTypeButton();
   await umbracoUi.dataType.enterDataTypeName(blockGridEditorName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor(blockGridLocatorName);

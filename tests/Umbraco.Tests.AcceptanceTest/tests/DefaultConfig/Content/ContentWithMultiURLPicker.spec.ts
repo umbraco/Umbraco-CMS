@@ -37,7 +37,7 @@ test('can create content with the document link', {tag: '@smoke'}, async ({umbra
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
-  await umbracoUi.content.clickLinkToDocumentButton();
+  await umbracoUi.content.clickDocumentLinkButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
   await umbracoUi.content.clickButtonWithName('Choose');
   await umbracoUi.content.clickSubmitButton();
@@ -80,7 +80,7 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
-  await umbracoUi.content.clickLinkToDocumentButton();
+  await umbracoUi.content.clickDocumentLinkButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
   await umbracoUi.content.clickButtonWithName('Choose');
   await umbracoUi.content.clickSubmitButton();
@@ -115,6 +115,7 @@ test('can create content with the external link', async ({umbracoApi, umbracoUi}
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickManualLinkButton();
   await umbracoUi.content.enterLink(link);
   await umbracoUi.content.enterLinkTitle(linkTitle);
   await umbracoUi.content.clickSubmitButton();
@@ -147,7 +148,7 @@ test('can create content with the media link', async ({umbracoApi, umbracoUi}) =
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
-  await umbracoUi.content.clickLinkToMediaButton();
+  await umbracoUi.content.clickMediaLinkButton();
   await umbracoUi.content.selectMediaWithName(mediaFileName);
   await umbracoUi.content.clickMediaPickerModalSubmitButton();
   await umbracoUi.waitForTimeout(500);
@@ -185,13 +186,14 @@ test('can add multiple links in the content', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.content.goToContentWithName(contentName);
   // Add media link
   await umbracoUi.content.clickAddMultiURLPickerButton();
-  await umbracoUi.content.clickLinkToMediaButton();
+  await umbracoUi.content.clickMediaLinkButton();
   await umbracoUi.content.selectMediaWithName(mediaFileName);
   await umbracoUi.content.clickMediaPickerModalSubmitButton();
   await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.clickSubmitButton();
   // Add external link
   await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickManualLinkButton();
   await umbracoUi.content.enterLink(link);
   await umbracoUi.content.enterLinkTitle(linkTitle);
   await umbracoUi.content.clickSubmitButton();
