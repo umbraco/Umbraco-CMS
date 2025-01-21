@@ -32,4 +32,14 @@ public class ContentTreeChangeNotification : TreeChangeNotification<IContent>
         : base(new TreeChange<IContent>(target, changeTypes), messages)
     {
     }
+
+    public ContentTreeChangeNotification(
+        IContent target,
+        TreeChangeTypes changeTypes,
+        IEnumerable<string>? publishedCultures,
+        IEnumerable<string>? unpublishedCultures,
+        EventMessages messages)
+        : base(new TreeChange<IContent>(target, changeTypes, publishedCultures, unpublishedCultures), messages)
+    {
+    }
 }
