@@ -562,6 +562,8 @@ export default {
 		selectIcon: 'Select icon',
 		selectItem: 'Select item',
 		selectLink: 'Configure link',
+		addLink: 'Add Link',
+		editLink: 'Edit Link',
 		selectMacro: 'Select macro',
 		selectContent: 'Select content',
 		selectContentType: 'Select content type',
