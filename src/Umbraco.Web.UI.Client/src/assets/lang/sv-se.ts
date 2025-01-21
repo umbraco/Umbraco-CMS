@@ -1028,6 +1028,7 @@ export default {
 		cacheBrowser: 'Cacha webbläsare',
 		content: 'Innehåll',
 		contentRecycleBin: 'Papperskorg',
+		mediaRecycleBin: 'Papperskorg',
 		createdPackages: 'Skapade paket',
 		dataTypes: 'Datatyper',
 		dictionary: 'Ordbok',

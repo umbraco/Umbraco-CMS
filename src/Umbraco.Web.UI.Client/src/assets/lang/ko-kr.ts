@@ -726,6 +726,7 @@ export default {
 	treeHeaders: {
 		cacheBrowser: '캐시 브라우저',
 		contentRecycleBin: '휴지통',
+		mediaRecycleBin: '휴지통',
 		createdPackages: '생성된 패키지',
 		dataTypes: '데이터 타입',
 		dictionary: '사전',

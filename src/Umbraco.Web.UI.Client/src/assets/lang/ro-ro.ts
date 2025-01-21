@@ -27,6 +27,7 @@ export default {
 		media: 'Media',
 		cacheBrowser: 'Cache Browser',
 		contentRecycleBin: 'Cos de gunoi',
+		mediaRecycleBin: 'Cos de gunoi',
 		createdPackages: 'Pachete create',
 		dataTypes: 'Tipuri de date',
 		dictionary: 'Dicţionar',

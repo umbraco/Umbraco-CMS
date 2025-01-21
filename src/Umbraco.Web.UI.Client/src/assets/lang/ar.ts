@@ -1735,6 +1735,7 @@ export default {
 		media: 'الوسائط',
 		cacheBrowser: 'متصفح الذاكرة المؤقتة',
 		contentRecycleBin: 'سلة المحذوفات',
+		mediaRecycleBin: 'سلة المحذوفات',
 		createdPackages: 'الحزم التي تم إنشاؤها',
 		dataTypes: 'أنواع البيانات',
 		dictionary: 'القاموس',

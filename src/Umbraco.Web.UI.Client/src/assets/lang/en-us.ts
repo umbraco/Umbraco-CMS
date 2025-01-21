@@ -1825,6 +1825,7 @@ export default {
 		media: 'Media',
 		cacheBrowser: 'Cache Browser',
 		contentRecycleBin: 'Recycle Bin',
+		mediaRecycleBin: 'Recycle Bin',
 		createdPackages: 'Created packages',
 		dataTypes: 'Data Types',
 		dictionary: 'Dictionary',

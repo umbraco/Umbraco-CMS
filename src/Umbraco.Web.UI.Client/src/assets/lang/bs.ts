@@ -1658,6 +1658,7 @@ export default {
 		media: 'Mediji',
 		cacheBrowser: 'Pretraživač keša',
 		contentRecycleBin: 'Kanta za smeće',
+		mediaRecycleBin: 'Kanta za smeće',
 		createdPackages: 'Kreirani paketi',
 		dataTypes: 'Tipovi podataka',
 		dictionary: 'Riječnik',

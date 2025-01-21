@@ -1657,6 +1657,7 @@ export default {
 		media: 'Medien',
 		cacheBrowser: 'Zwischenspeicher',
 		contentRecycleBin: 'Papierkorb',
+		mediaRecycleBin: 'Papierkorb',
 		createdPackages: 'Erstellte Pakete',
 		dataTypes: 'Datentypen',
 		dictionary: 'Wörterbuch',

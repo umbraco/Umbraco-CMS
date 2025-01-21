@@ -1156,6 +1156,7 @@ export default {
 	treeHeaders: {
 		cacheBrowser: 'Cache przeglądarki',
 		contentRecycleBin: 'Kosz',
+		mediaRecycleBin: 'Kosz',
 		createdPackages: 'Utworzone pakiety',
 		dataTypes: 'Typy danych',
 		dictionary: 'Słownik',

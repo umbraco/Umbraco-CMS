@@ -1299,6 +1299,7 @@ export default {
 		content: 'Матеріали',
 		contentBlueprints: 'Шаблони вмісту',
 		contentRecycleBin: 'Корзина',
+		mediaRecycleBin: 'Корзина',
 		createdPackages: 'Створені пакети',
 		dataTypes: 'Типи даних',
 		dictionary: 'Словник',

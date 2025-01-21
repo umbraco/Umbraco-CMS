@@ -1300,6 +1300,7 @@ export default {
 		content: 'Содержимое',
 		contentBlueprints: 'Шаблоны содержимого',
 		contentRecycleBin: 'Корзина',
+		mediaRecycleBin: 'Корзина',
 		createdPackages: 'Созданные пакеты',
 		dataTypes: 'Типы данных',
 		dictionary: 'Словарь',

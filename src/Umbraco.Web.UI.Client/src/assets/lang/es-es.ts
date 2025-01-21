@@ -1231,6 +1231,7 @@ export default {
 		media: 'Media',
 		cacheBrowser: 'Caché del navegador',
 		contentRecycleBin: 'Papelera de reciclaje',
+		mediaRecycleBin: 'Papelera de reciclaje',
 		createdPackages: 'Paquetes creados',
 		dataTypes: 'Tipos de datos',
 		dictionary: 'Diccionario',

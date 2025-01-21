@@ -1792,6 +1792,7 @@ export default {
 		media: 'Mediearkiv',
 		cacheBrowser: 'Cacheviser',
 		contentRecycleBin: 'Papirkurv',
+		mediaRecycleBin: 'Papirkurv',
 		createdPackages: 'Oprettede pakker',
 		dataTypes: 'Datatyper',
 		dictionary: 'Ordbog',

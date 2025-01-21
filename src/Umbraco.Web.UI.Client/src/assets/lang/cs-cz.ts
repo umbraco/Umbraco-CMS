@@ -1520,6 +1520,7 @@ export default {
 		media: 'Média',
 		cacheBrowser: 'Prohlížeč mezipaměti',
 		contentRecycleBin: 'Koš',
+		mediaRecycleBin: 'Koš',
 		createdPackages: 'Vytvořené balíčky',
 		dataTypes: 'Datové typy',
 		dictionary: 'Slovník',

@@ -1522,6 +1522,7 @@ export default {
 		media: 'Medya',
 		cacheBrowser: 'Önbellek Tarayıcısı',
 		contentRecycleBin: 'Geri Dönüşüm Kutusu',
+		mediaRecycleBin: 'Geri Dönüşüm Kutusu',
 		createdPackages: 'Oluşturulan paketler',
 		dataTypes: 'Veri Türleri',
 		dictionary: 'Sözlük',

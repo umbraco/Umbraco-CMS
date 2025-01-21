@@ -936,6 +936,7 @@ export default {
 	treeHeaders: {
 		cacheBrowser: '缓存浏览',
 		contentRecycleBin: '回收站',
+		mediaRecycleBin: '回收站',
 		createdPackages: '创建扩展包',
 		dataTypes: '数据类型',
 		dictionary: '字典',

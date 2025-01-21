@@ -1817,6 +1817,7 @@ export default {
 		media: 'Cyfrwng',
 		cacheBrowser: 'Porwr Storfa',
 		contentRecycleBin: 'Bin Ailgylchu',
+		mediaRecycleBin: 'Bin Ailgylchu',
 		createdPackages: "Pecynnau wedi'u creu",
 		dataTypes: 'Mathau o Ddata',
 		dictionary: 'Geiriadur',

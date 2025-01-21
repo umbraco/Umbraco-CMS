@@ -1678,6 +1678,7 @@ export default {
 		media: 'Media',
 		cacheBrowser: 'Cache Browser',
 		contentRecycleBin: 'Cestino',
+		mediaRecycleBin: 'Cestino',
 		createdPackages: 'Pacchetti creati',
 		dataTypes: 'Tipi di dato',
 		dictionary: 'Dizionario',

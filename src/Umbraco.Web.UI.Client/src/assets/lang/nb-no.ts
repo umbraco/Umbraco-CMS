@@ -1028,6 +1028,7 @@ export default {
 	treeHeaders: {
 		cacheBrowser: 'Hurtigbufferleser',
 		contentRecycleBin: 'Papirkurv',
+		mediaRecycleBin: 'Papirkurv',
 		createdPackages: 'Opprettede pakker',
 		datatype: 'Datatyper',
 		dictionary: 'Ordbok',

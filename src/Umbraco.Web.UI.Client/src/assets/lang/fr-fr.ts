@@ -1559,6 +1559,7 @@ export default {
 		media: 'Media',
 		cacheBrowser: 'Navigateur de cache',
 		contentRecycleBin: 'Corbeille',
+		mediaRecycleBin: 'Corbeille',
 		createdPackages: 'Packages créés',
 		dataTypes: 'Types de données',
 		dictionary: 'Dictionnaire',

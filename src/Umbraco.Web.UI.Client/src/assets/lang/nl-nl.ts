@@ -1623,6 +1623,7 @@ export default {
 		media: 'Media',
 		cacheBrowser: 'Cachebrowser',
 		contentRecycleBin: 'Prullenbak',
+		mediaRecycleBin: 'Prullenbak',
 		createdPackages: 'Gemaakte packages',
 		dataTypes: 'Datatypes',
 		dictionary: 'Woordenboek',
