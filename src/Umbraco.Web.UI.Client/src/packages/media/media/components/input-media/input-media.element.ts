@@ -17,9 +17,10 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
+import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
 
 import '@umbraco-cms/backoffice/imaging';
-import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 const elementName = 'umb-input-media';
 @customElement(elementName)
@@ -194,6 +195,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 			{
 				allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({
 					unique: id,
+					entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
 				})),
 			},
 		);
