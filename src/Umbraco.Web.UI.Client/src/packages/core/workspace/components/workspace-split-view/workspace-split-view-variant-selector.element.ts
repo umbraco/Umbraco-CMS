@@ -368,6 +368,10 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				white-space: nowrap;
 			}
 
+			uui-scroll-container {
+				max-height: 50dvh;
+			}
+
 			ul {
 				list-style-type: none;
 				padding: 0;
