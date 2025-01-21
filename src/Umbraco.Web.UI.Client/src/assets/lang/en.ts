@@ -129,6 +129,7 @@ export default {
 	buttons: {
 		clearSelection: 'Clear selection',
 		select: 'Select',
+		choose: 'Choose',
 		somethingElse: 'Do something else',
 		bold: 'Bold',
 		deindent: 'Cancel Paragraph Indent',
@@ -569,12 +570,14 @@ export default {
 		selectMember: 'Choose member',
 		selectMembers: 'Choose members',
 		selectMemberGroup: 'Select member group',
+		chooseMemberGroup: 'Choose member group',
 		selectMemberType: 'Select member type',
 		selectNode: 'Select node',
 		selectLanguages: 'Select languages',
 		selectSections: 'Select sections',
 		selectUser: 'Select user',
 		selectUsers: 'Select users',
+		chooseUsers: 'Choose users',
 		noIconsFound: 'No icons were found',
 		noMacroParams: 'There are no parameters for this macro',
 		noMacros: 'There are no macros available to insert',
@@ -2009,6 +2012,9 @@ export default {
 		sectionsHelp: 'Add sections to give users access',
 		selectUserGroup: (multiple: boolean) => {
 			return multiple ? 'Select User Groups' : 'Select User Group';
+		},
+		chooseUserGroup: (multiple: boolean) => {
+			return multiple ? 'Choose User Groups' : 'Choose User Group';
 		},
 		noStartNode: 'No start node selected',
 		noStartNodes: 'No start nodes selected',
