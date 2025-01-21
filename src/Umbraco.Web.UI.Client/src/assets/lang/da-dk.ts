@@ -539,6 +539,8 @@ export default {
 		selectIcon: 'Vælg ikon',
 		selectItem: 'Vælg item',
 		selectLink: 'Vælg link',
+		addLink: 'Tilføj Link',
+		editLink: 'Rediger Link',
 		selectMacro: 'Vælg makro',
 		selectContent: 'Vælg indhold',
 		selectContentType: 'Vælg indholdstype',
