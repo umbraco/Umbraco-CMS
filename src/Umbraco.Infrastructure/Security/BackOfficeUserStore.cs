@@ -282,8 +282,8 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         ThrowIfDisposed();
 
         // In the external login flow - see BackOfficeController.ExternalSignInAsync - we can have a situation where an
-        // error has occured but the user is signed in. For that reason, at the end of the process, when the errors are
-        // found the user is signed out.
+        // error has occured but the user is signed in. For that reason, at the end of the process, if errors are
+        // recorded, the user is signed out.
         // Before signing out, we request the user in order to update the security stamp - see UmbracoSignInManager.SignOutAsync.
         // But we can have a situation where the signed in principal has the ID from the external provider, which may not be something
         // we can parse to an integer.
