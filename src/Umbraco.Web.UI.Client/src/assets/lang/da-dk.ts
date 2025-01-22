@@ -540,7 +540,7 @@ export default {
 		selectItem: 'Vælg item',
 		selectLink: 'Vælg link',
 		addLink: 'Tilføj Link',
-		editLink: 'Rediger Link',
+		UpdateLink: 'Opdater Link',
 		selectMacro: 'Vælg makro',
 		selectContent: 'Vælg indhold',
 		selectContentType: 'Vælg indholdstype',
