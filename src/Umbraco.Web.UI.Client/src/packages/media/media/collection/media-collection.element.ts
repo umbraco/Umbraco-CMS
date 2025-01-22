@@ -1,6 +1,7 @@
 import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../workspace/media-workspace.context-token.js';
-import { UmbFileDropzoneItemStatus, type UmbUploadableItem } from '../dropzone/types.js';
+import { UmbFileDropzoneItemStatus } from '../dropzone/types.js';
+import type { UmbDropzoneSubmittedEvent } from '../dropzone/dropzone-submitted.event.js';
 import type { UmbDropzoneElement } from '../dropzone/dropzone.element.js';
 import { UMB_MEDIA_COLLECTION_CONTEXT } from './media-collection.context-token.js';
 import { customElement, html, query, state, when } from '@umbraco-cms/backoffice/external/lit';
@@ -50,10 +51,9 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		);
 	}
 
-	async #setupPlaceholders(event: CustomEvent) {
+	async #setupPlaceholders(event: UmbDropzoneSubmittedEvent) {
 		event.preventDefault();
-		const uploadable = event.detail as Array<UmbUploadableItem>;
-		const placeholders = uploadable
+		const placeholders = event.items
 			.filter((p) => p.parentUnique === this._unique)
 			.map((p) => ({ unique: p.unique, status: p.status, name: p.temporaryFile?.file.name ?? p.folder?.name }));
 
