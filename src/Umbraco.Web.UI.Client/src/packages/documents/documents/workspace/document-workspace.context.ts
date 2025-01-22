@@ -110,7 +110,7 @@ export class UmbDocumentWorkspaceContext
 		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
 			{
 				config: {
-					oneOf: [[UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_UPDATE]],
+					oneOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_UPDATE],
 				},
 				onChange: (permitted: boolean) => {
 					this.#userCanSave = permitted;
