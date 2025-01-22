@@ -9,14 +9,22 @@ import {
 	UMB_DOCUMENT_COLLECTION_ALIAS,
 	UMB_DOCUMENT_ENTITY_TYPE,
 	UMB_DOCUMENT_SAVE_MODAL,
+	UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
 	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
+	UMB_USER_PERMISSION_DOCUMENT_CREATE,
+	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 } from '../constants.js';
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, UmbDocumentPublishingRepository } from '../publishing/index.js';
 import { UmbDocumentValidationRepository } from '../repository/validation/index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import {
+	UMB_INVARIANT_CULTURE,
+	UmbVariantId,
+	type UmbEntityVariantModel,
+	type UmbEntityVariantOptionModel,
+} from '@umbraco-cms/backoffice/variant';
 import {
 	type UmbPublishableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
@@ -33,6 +41,8 @@ import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/documen
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
@@ -66,6 +76,8 @@ export class UmbDocumentWorkspaceContext
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#publishingContext?: typeof UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.TYPE;
+	#variantOptions?: UmbEntityVariantOptionModel<UmbEntityVariantModel>[];
+	#userCanSave = false;
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -85,6 +97,27 @@ export class UmbDocumentWorkspaceContext
 		this.consumeContext(UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, (context) => {
 			this.#publishingContext = context;
 		});
+
+		this.observe(this.variantOptions, (variantOptions) => {
+			const previousValue = this.#variantOptions;
+			this.#variantOptions = variantOptions;
+
+			if (previousValue?.length !== variantOptions.length) {
+				this.#checkForUserAccess();
+			}
+		});
+
+		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					oneOf: [[UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_UPDATE]],
+				},
+				onChange: (permitted: boolean) => {
+					this.#userCanSave = permitted;
+					this.#checkForUserAccess();
+				},
+			},
+		]);
 
 		this.routes.setRoutes([
 			{
@@ -135,6 +168,34 @@ export class UmbDocumentWorkspaceContext
 				},
 			},
 		]);
+	}
+
+	async #checkForUserAccess() {
+		// create a list of variantIds for the disallowed languages
+		const identifier = 'UMB_SAVE_USER_PERMISSION_';
+		const uniques = this.#variantOptions?.map((variant) => identifier + variant.culture) || [];
+
+		if (this.#userCanSave) {
+			this.readOnlyState?.removeStates(uniques);
+			return;
+		}
+
+		const variantIds = this.#variantOptions?.map((variant) => new UmbVariantId(variant.culture, variant.segment)) || [];
+
+		// create a list of states for the disallowed languages
+		const readOnlyStates = variantIds.map((variantId) => {
+			return {
+				unique: identifier + variantId.culture,
+				variantId,
+				message: 'You do not have permission to edit to this document',
+			};
+		});
+
+		// remove all previous states before adding new ones
+		this.readOnlyState?.removeStates(uniques);
+
+		// add new states
+		this.readOnlyState?.addStates(readOnlyStates);
 	}
 
 	override async load(unique: string) {
