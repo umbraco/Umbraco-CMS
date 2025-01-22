@@ -13,7 +13,7 @@ export default {
 	actions: {
 		assigndomain: 'Culture and Hostnames',
 		auditTrail: 'Audit Trail',
-		browse: 'Browse Node',
+		browse: 'Browse',
 		changeDataType: 'Change Data Type',
 		changeDocType: 'Change Document Type',
 		chooseWhereToCopy: 'Choose where to copy',
