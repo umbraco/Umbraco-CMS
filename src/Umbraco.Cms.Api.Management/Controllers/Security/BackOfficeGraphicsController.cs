@@ -56,7 +56,7 @@ public class BackOfficeGraphicsController : Controller
 
     private IActionResult HandleFileRequest(string virtualPath)
     {
-        var filePath = Path.Combine(Constants.SystemDirectories.Umbraco, virtualPath).TrimStart(Constants.CharArrays.Tilde).Replace(Path.DirectorySeparatorChar, '/');
+        var filePath = $"{Constants.SystemDirectories.Umbraco}/{virtualPath}".TrimStart(Constants.CharArrays.Tilde);
         IFileInfo fileInfo = _webHostEnvironment.WebRootFileProvider.GetFileInfo(filePath);
 
         if (fileInfo.PhysicalPath is null)
