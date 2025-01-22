@@ -26,10 +26,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 				match: UMB_DOCUMENT_WORKSPACE_ALIAS,
 			},
 			{
-				alias: UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
-				oneOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_UPDATE],
-			},
-			{
 				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 		],
@@ -48,10 +44,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_DOCUMENT_WORKSPACE_ALIAS,
-			},
-			{
-				alias: UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
-				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE],
 			},
 			{
 				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
