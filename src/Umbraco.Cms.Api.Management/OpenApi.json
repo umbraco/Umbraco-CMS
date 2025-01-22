@@ -10086,6 +10086,17 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "allowedMediaTypes",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
           }
         ],
         "responses": {
@@ -15764,6 +15775,17 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "allowedMediaTypes",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
           }
         ],
         "responses": {
@@ -19637,6 +19659,17 @@
               "type": "integer",
               "format": "int32",
               "default": 100
+            }
+          },
+          {
+            "name": "allowedMemberTypes",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
             }
           }
         ],
