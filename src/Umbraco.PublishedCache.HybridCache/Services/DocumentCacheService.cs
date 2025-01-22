@@ -74,23 +74,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     {
         bool calculatedPreview = preview ?? GetPreview();
 
-        ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
-            GetCacheKey(key, calculatedPreview), // Unique key to the cache entry
-            async cancel =>
-            {
-                using ICoreScope scope = _scopeProvider.CreateCoreScope();
-                ContentCacheNode? contentCacheNode = await _databaseCacheRepository.GetContentSourceAsync(key, calculatedPreview);
-                scope.Complete();
-                return contentCacheNode;
-            },
-            GetEntryOptions(key));
-
-        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, calculatedPreview).CreateModel(_publishedModelFactory);
-    }
-
-    private bool GetPreview()
-    {
-        return _previewService.IsInPreview();
+        return await GetNodeAsync(key, calculatedPreview);
     }
 
     public async Task<IPublishedContent?> GetByIdAsync(int id, bool? preview = null)
@@ -104,17 +88,37 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         bool calculatedPreview = preview ?? GetPreview();
         Guid key = keyAttempt.Result;
 
-        ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
-            GetCacheKey(keyAttempt.Result, calculatedPreview), // Unique key to the cache entry
-        async cancel =>
-        {
-            using ICoreScope scope = _scopeProvider.CreateCoreScope();
-            ContentCacheNode? contentCacheNode = await _databaseCacheRepository.GetContentSourceAsync(id, calculatedPreview);
-            scope.Complete();
-            return contentCacheNode;
-        }, GetEntryOptions(key));
+        return await GetNodeAsync(key, calculatedPreview);
+    }
 
-        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, calculatedPreview).CreateModel(_publishedModelFactory);;
+    private async Task<IPublishedContent?> GetNodeAsync(Guid key, bool preview)
+    {
+        var cacheKey = GetCacheKey(key, preview);
+
+        ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
+            cacheKey,
+            async cancel =>
+            {
+                using ICoreScope scope = _scopeProvider.CreateCoreScope();
+                ContentCacheNode? contentCacheNode = await _databaseCacheRepository.GetContentSourceAsync(key, preview);
+                scope.Complete();
+                return contentCacheNode;
+            },
+            GetEntryOptions(key));
+
+        // We don't want to cache removed items, this may cause issues if the L2 serializer changes.
+        if (contentCacheNode is null)
+        {
+            await _hybridCache.RemoveAsync(cacheKey);
+            return null;
+        }
+
+        return _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview).CreateModel(_publishedModelFactory);
+    }
+
+    private bool GetPreview()
+    {
+        return _previewService.IsInPreview();
     }
 
     public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)

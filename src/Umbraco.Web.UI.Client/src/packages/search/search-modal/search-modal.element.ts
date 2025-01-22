@@ -16,7 +16,7 @@ import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-c
 
 import '../search-result/search-result-item.element.js';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
-import type { ManifestSearchResultItem } from '../extensions/index.js';
+import type { ManifestSearchResultItem } from '../extensions/types.js';
 
 type SearchProvider = {
 	name: string;

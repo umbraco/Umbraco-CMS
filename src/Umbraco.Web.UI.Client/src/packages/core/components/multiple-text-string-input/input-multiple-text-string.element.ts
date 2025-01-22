@@ -21,13 +21,14 @@ export class UmbInputMultipleTextStringElement extends UmbFormControlMixin<undef
 		getUniqueOfModel: (modelEntry: string) => {
 			return modelEntry;
 		},
-		identifier: 'Umb.SorterIdentifier.ColorEditor',
+		identifier: 'Umb.SorterIdentifier.MultipleTextString',
 		itemSelector: 'umb-input-multiple-text-string-item',
 		containerSelector: '#sorter-wrapper',
 		onChange: ({ model }) => {
 			const oldValue = this._items;
 			this._items = model;
 			this.requestUpdate('_items', oldValue);
+			this.dispatchEvent(new UmbChangeEvent());
 		},
 	});
 

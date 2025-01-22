@@ -13,7 +13,6 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
-using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -36,6 +35,7 @@ public class ContentService : RepositoryService, IContentService
     private readonly ICultureImpactFactory _cultureImpactFactory;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly PropertyEditorCollection _propertyEditorCollection;
+    private readonly IIdKeyMap _idKeyMap;
     private IQuery<IContent>? _queryNotTrashed;
 
     #region Constructors
@@ -54,7 +54,8 @@ public class ContentService : RepositoryService, IContentService
         IShortStringHelper shortStringHelper,
         ICultureImpactFactory cultureImpactFactory,
         IUserIdKeyResolver userIdKeyResolver,
-        PropertyEditorCollection propertyEditorCollection)
+        PropertyEditorCollection propertyEditorCollection,
+        IIdKeyMap idKeyMap)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
@@ -68,7 +69,43 @@ public class ContentService : RepositoryService, IContentService
         _cultureImpactFactory = cultureImpactFactory;
         _userIdKeyResolver = userIdKeyResolver;
         _propertyEditorCollection = propertyEditorCollection;
+        _idKeyMap = idKeyMap;
         _logger = loggerFactory.CreateLogger<ContentService>();
+    }
+
+    [Obsolete("Use non-obsolete constructor. Scheduled for removal in V17.")]
+    public ContentService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IDocumentRepository documentRepository,
+        IEntityRepository entityRepository,
+        IAuditRepository auditRepository,
+        IContentTypeRepository contentTypeRepository,
+        IDocumentBlueprintRepository documentBlueprintRepository,
+        ILanguageRepository languageRepository,
+        Lazy<IPropertyValidationService> propertyValidationService,
+        IShortStringHelper shortStringHelper,
+        ICultureImpactFactory cultureImpactFactory,
+        IUserIdKeyResolver userIdKeyResolver,
+        PropertyEditorCollection propertyEditorCollection)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            documentRepository,
+            entityRepository,
+            auditRepository,
+            contentTypeRepository,
+            documentBlueprintRepository,
+            languageRepository,
+            propertyValidationService,
+            shortStringHelper,
+            cultureImpactFactory,
+            userIdKeyResolver,
+            propertyEditorCollection,
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
+    {
     }
 
     [Obsolete("Use non-obsolete constructor. Scheduled for removal in V16.")]
@@ -100,7 +137,8 @@ public class ContentService : RepositoryService, IContentService
             shortStringHelper,
             cultureImpactFactory,
             userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<PropertyEditorCollection>())
+            StaticServiceProvider.Instance.GetRequiredService<PropertyEditorCollection>()
+            )
     {
     }
 
@@ -548,6 +586,17 @@ public class ContentService : RepositoryService, IContentService
             scope.ReadLock(Constants.Locks.ContentTree);
             return _documentRepository.GetContentSchedule(contentId);
         }
+    }
+
+    public ContentScheduleCollection GetContentScheduleByContentId(Guid contentId)
+    {
+        Attempt<int> idAttempt = _idKeyMap.GetIdForKey(contentId, UmbracoObjectTypes.Document);
+        if (idAttempt.Success is false)
+        {
+            return new ContentScheduleCollection();
+        }
+
+        return GetContentScheduleByContentId(idAttempt.Result);
     }
 
     /// <inheritdoc />
@@ -1592,7 +1641,12 @@ public class ContentService : RepositoryService, IContentService
                 // events and audit
                 scope.Notifications.Publish(
                     new ContentUnpublishedNotification(content, eventMessages).WithState(notificationState));
-                scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
+                scope.Notifications.Publish(new ContentTreeChangeNotification(
+                    content,
+                    TreeChangeTypes.RefreshBranch,
+                    variesByCulture ? culturesPublishing.IsCollectionEmpty() ? null : culturesPublishing : null,
+                    variesByCulture ? culturesUnpublishing.IsCollectionEmpty() ? null : culturesUnpublishing : ["*"],
+                    eventMessages));
 
                 if (culturesUnpublishing != null)
                 {
@@ -1651,7 +1705,12 @@ public class ContentService : RepositoryService, IContentService
                 if (!branchOne)
                 {
                     scope.Notifications.Publish(
-                        new ContentTreeChangeNotification(content, changeType, eventMessages));
+                        new ContentTreeChangeNotification(
+                            content,
+                            changeType,
+                            variesByCulture ? culturesPublishing.IsCollectionEmpty() ? null : culturesPublishing : ["*"],
+                            variesByCulture ? culturesUnpublishing.IsCollectionEmpty() ? null : culturesUnpublishing : null,
+                            eventMessages));
                     scope.Notifications.Publish(
                         new ContentPublishedNotification(content, eventMessages).WithState(notificationState));
                 }
@@ -2100,7 +2159,6 @@ public class ContentService : RepositoryService, IContentService
         var results = new List<PublishResult>();
         var publishedDocuments = new List<IContent>();
 
-        IDictionary<string, object?>? initialNotificationState = null;
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.WriteLock(Constants.Locks.ContentTree);
@@ -2119,7 +2177,8 @@ public class ContentService : RepositoryService, IContentService
             }
 
             // deal with the branch root - if it fails, abort
-            PublishResult? result = PublishBranchItem(scope, document, shouldPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, out initialNotificationState);
+            HashSet<string>? culturesToPublish = shouldPublish(document);
+            PublishResult? result = PublishBranchItem(scope, document, culturesToPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, out IDictionary<string, object?>? notificationState);
             if (result != null)
             {
                 results.Add(result);
@@ -2128,6 +2187,8 @@ public class ContentService : RepositoryService, IContentService
                     return results;
                 }
             }
+
+            HashSet<string> culturesPublished = culturesToPublish ?? [];
 
             // deal with descendants
             // if one fails, abort its branch
@@ -2154,12 +2215,14 @@ public class ContentService : RepositoryService, IContentService
                     }
 
                     // no need to check path here, parent has to be published here
-                    result = PublishBranchItem(scope, d, shouldPublish, publishCultures, false, publishedDocuments, eventMessages, userId, allLangs, out _);
+                    culturesToPublish = shouldPublish(d);
+                    result = PublishBranchItem(scope, d, culturesToPublish, publishCultures, false, publishedDocuments, eventMessages, userId, allLangs, out _);
                     if (result != null)
                     {
                         results.Add(result);
                         if (result.Success)
                         {
+                            culturesPublished.UnionWith(culturesToPublish ?? []);
                             continue;
                         }
                     }
@@ -2176,9 +2239,15 @@ public class ContentService : RepositoryService, IContentService
 
             // trigger events for the entire branch
             // (SaveAndPublishBranchOne does *not* do it)
+            var variesByCulture = document.ContentType.VariesByCulture();
             scope.Notifications.Publish(
-                new ContentTreeChangeNotification(document, TreeChangeTypes.RefreshBranch, eventMessages));
-            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages, true).WithState(initialNotificationState));
+                new ContentTreeChangeNotification(
+                    document,
+                    TreeChangeTypes.RefreshBranch,
+                    variesByCulture ? culturesPublished.IsCollectionEmpty() ? null : culturesPublished : ["*"],
+                    null,
+                    eventMessages));
+            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages).WithState(notificationState));
 
             scope.Complete();
         }
@@ -2192,7 +2261,7 @@ public class ContentService : RepositoryService, IContentService
     private PublishResult? PublishBranchItem(
         ICoreScope scope,
         IContent document,
-        Func<IContent, HashSet<string>?> shouldPublish,
+        HashSet<string>? culturesToPublish,
         Func<IContent, HashSet<string>, IReadOnlyCollection<ILanguage>,
             bool> publishCultures,
         bool isRoot,
@@ -2202,9 +2271,7 @@ public class ContentService : RepositoryService, IContentService
         IReadOnlyCollection<ILanguage> allLangs,
         out IDictionary<string, object?>? initialNotificationState)
     {
-        HashSet<string>? culturesToPublish = shouldPublish(document);
-
-        initialNotificationState = null;
+        initialNotificationState = new Dictionary<string, object?>();
 
         // we need to guard against unsaved changes before proceeding; the document will be saved, but we're not firing any saved notifications
         if (HasUnsavedChanges(document))
@@ -2747,6 +2814,13 @@ public class ContentService : RepositoryService, IContentService
                         GetPagedDescendants(content.Id, page++, pageSize, out total);
                     foreach (IContent descendant in descendants)
                     {
+                        // when copying a branch into itself, the copy of a root would be seen as a descendant
+                        // and would be copied again => filter it out.
+                        if (descendant.Id == copy.Id)
+                        {
+                            continue;
+                        }
+
                         // if parent has not been copied, skip, else gets its copy id
                         if (idmap.TryGetValue(descendant.ParentId, out parentId) == false)
                         {
@@ -3176,8 +3250,8 @@ public class ContentService : RepositoryService, IContentService
 
         ContentScheduleCollection contentSchedule = _documentRepository.GetContentSchedule(content.Id);
 
-        // loop over each culture publishing - or string.Empty for invariant
-        foreach (var culture in culturesPublishing ?? new[] { string.Empty })
+        // loop over each culture publishing - or InvariantCulture for invariant
+        foreach (var culture in culturesPublishing ?? new[] { Constants.System.InvariantCulture })
         {
             // ensure that the document status is correct
             // note: culture will be string.Empty for invariant

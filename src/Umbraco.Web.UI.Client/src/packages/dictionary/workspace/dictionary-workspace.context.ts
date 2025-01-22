@@ -2,20 +2,19 @@ import type { UmbDictionaryDetailModel } from '../types.js';
 import { UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS, type UmbDictionaryDetailRepository } from '../repository/index.js';
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
 import { UmbDictionaryWorkspaceEditorElement } from './dictionary-workspace-editor.element.js';
-import { UMB_DICTIONARY_WORKSPACE_ALIAS } from './manifests.js';
+import { UMB_DICTIONARY_WORKSPACE_ALIAS } from './constants.js';
 import {
 	type UmbSubmittableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
-	UmbEntityDetailWorkspaceContextBase,
+	UmbEntityNamedDetailWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDictionaryWorkspaceContext
-	extends UmbEntityDetailWorkspaceContextBase<UmbDictionaryDetailModel, UmbDictionaryDetailRepository>
+	extends UmbEntityNamedDetailWorkspaceContextBase<UmbDictionaryDetailModel, UmbDictionaryDetailRepository>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
 	readonly dictionary = this._data.createObservablePartOfCurrent((data) => data);
 
 	constructor(host: UmbControllerHost) {
@@ -50,14 +49,6 @@ export class UmbDictionaryWorkspaceContext
 				},
 			},
 		]);
-	}
-
-	setName(name: string) {
-		this._data.updateCurrent({ name });
-	}
-
-	getName() {
-		return this._data.getCurrent()?.name;
 	}
 
 	setPropertyValue(isoCode: string, translation: string) {

@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
@@ -25,6 +26,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     private readonly IEntityRepository _entityRepository;
     private readonly IEventAggregator _eventAggregator;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
+    private readonly ContentTypeFilterCollection _contentTypeFilters;
 
     protected ContentTypeServiceBase(
         ICoreScopeProvider provider,
@@ -35,7 +37,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         IEntityContainerRepository containerRepository,
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         Repository = repository;
@@ -44,6 +47,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         _entityRepository = entityRepository;
         _eventAggregator = eventAggregator;
         _userIdKeyResolver = userIdKeyResolver;
+        _contentTypeFilters = contentTypeFilters;
     }
 
     [Obsolete("Use the ctor specifying all dependencies instead")]
@@ -66,6 +70,31 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             entityRepository,
             eventAggregator,
             StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+    {
+    }
+
+    [Obsolete("Use the ctor specifying all dependencies instead")]
+    protected ContentTypeServiceBase(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        TRepository repository,
+        IAuditRepository auditRepository,
+        IEntityContainerRepository containerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            repository,
+            auditRepository,
+            containerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            StaticServiceProvider.Instance.GetRequiredService<ContentTypeFilterCollection>())
     {
     }
 
@@ -1129,7 +1158,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     #region Allowed types
 
     /// <inheritdoc />
-    public Task<PagedModel<TItem>> GetAllAllowedAsRootAsync(int skip, int take)
+    public async Task<PagedModel<TItem>> GetAllAllowedAsRootAsync(int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
@@ -1139,28 +1168,39 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         IQuery<TItem> query = ScopeProvider.CreateQuery<TItem>().Where(x => x.AllowedAsRoot);
         IEnumerable<TItem> contentTypes = Repository.Get(query).ToArray();
 
+        foreach (IContentTypeFilter filter in _contentTypeFilters)
+        {
+            contentTypes = await filter.FilterAllowedAtRootAsync(contentTypes);
+        }
+
         var pagedModel = new PagedModel<TItem>
         {
             Total = contentTypes.Count(),
             Items = contentTypes.Skip(skip).Take(take)
         };
 
-        return Task.FromResult(pagedModel);
+        return pagedModel;
     }
 
     /// <inheritdoc />
-    public Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, int skip, int take)
+    public async Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         TItem? parent = Get(key);
 
         if (parent?.AllowedContentTypes is null)
         {
-            return Task.FromResult(Attempt.FailWithStatus<PagedModel<TItem>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.NotFound, null));
+            return Attempt.FailWithStatus<PagedModel<TItem>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.NotFound, null);
+        }
+
+        IEnumerable<ContentTypeSort> allowedContentTypes = parent.AllowedContentTypes;
+        foreach (IContentTypeFilter filter in _contentTypeFilters)
+        {
+            allowedContentTypes = await filter.FilterAllowedChildrenAsync(allowedContentTypes, key);
         }
 
         PagedModel<TItem> result;
-        if (parent.AllowedContentTypes.Any() is false)
+        if (allowedContentTypes.Any() is false)
         {
             // no content types allowed under parent
             result = new PagedModel<TItem>
@@ -1171,15 +1211,19 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         }
         else
         {
-            TItem[] allowedChildren = GetMany(parent.AllowedContentTypes.Select(x => x.Key)).ToArray();
+            // Get the sorted keys. Whilst we can't guarantee the order that comes back from GetMany, we can use
+            // this to sort the resulting list of allowed children.
+            Guid[] sortedKeys = allowedContentTypes.OrderBy(x => x.SortOrder).Select(x => x.Key).ToArray();
+
+            TItem[] allowedChildren = GetMany(sortedKeys).ToArray();
             result = new PagedModel<TItem>
             {
-                Items = allowedChildren.Take(take).Skip(skip),
+                Items = allowedChildren.OrderBy(x => sortedKeys.IndexOf(x.Key)).Take(take).Skip(skip),
                 Total = allowedChildren.Length,
             };
         }
 
-        return Task.FromResult(Attempt.SucceedWithStatus<PagedModel<TItem>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, result));
+        return Attempt.SucceedWithStatus<PagedModel<TItem>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, result);
     }
 
     #endregion

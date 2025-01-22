@@ -1,4 +1,4 @@
-import { UMB_MEDIA_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../entity.js';
+import { UMB_MEDIA_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../constants.js';
 import { UmbMediaRecycleBinTreeServerDataSource } from './media-recycle-bin-tree.server.data-source.js';
 import type { UmbMediaRecycleBinTreeItemModel, UmbMediaRecycleBinTreeRootModel } from './types.js';
 import { UMB_MEDIA_RECYCLE_BIN_TREE_STORE_CONTEXT } from './media-recycle-bin-tree.store.context-token.js';
@@ -21,7 +21,7 @@ export class UmbMediaRecycleBinTreeRepository
 		const data = {
 			unique: null,
 			entityType: UMB_MEDIA_RECYCLE_BIN_ROOT_ENTITY_TYPE,
-			name: 'Recycle Bin',
+			name: '#treeHeaders_contentRecycleBin',
 			icon: 'icon-trash',
 			hasChildren,
 			isContainer: false,

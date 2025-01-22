@@ -338,7 +338,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         }
         if(payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
         {
-            _documentUrlService.RebuildAllUrlsAsync().GetAwaiter().GetResult(); //TODO make async
+            _documentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult(); //TODO make async
         }
 
         if(payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
@@ -380,6 +380,10 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         public TreeChangeTypes ChangeTypes { get; init; }
 
         public bool Blueprint { get; init; }
+
+        public string[]? PublishedCultures { get; init; }
+
+        public string[]? UnpublishedCultures { get; init; }
     }
 
     #endregion

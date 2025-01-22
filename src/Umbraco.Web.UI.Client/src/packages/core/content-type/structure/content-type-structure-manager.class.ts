@@ -192,8 +192,9 @@ export class UmbContentTypeStructureManager<
 
 	async #loadContentTypeCompositions(ownerContentTypeCompositions: T['compositions'] | undefined) {
 		if (!ownerContentTypeCompositions) {
-			// Owner content type was undefined, so we can not load compositions. But at this point we neither offload existing compositions, this is most likely not a case that needs to be handled.
-			return;
+			// Owner content type was undefined, so we cannot load compositions.
+			// But to clean up existing compositions, we set the array to empty to still be able to execute the clean-up code.
+			ownerContentTypeCompositions = [];
 		}
 
 		const ownerUnique = this.getOwnerContentTypeUnique();
@@ -266,6 +267,15 @@ export class UmbContentTypeStructureManager<
 
 	getOwnerContentTypeUnique() {
 		return this.#ownerContentTypeUnique;
+	}
+
+	getVariesByCulture() {
+		const ownerContentType = this.getOwnerContentType();
+		return ownerContentType?.variesByCulture;
+	}
+	getVariesBySegment() {
+		const ownerContentType = this.getOwnerContentType();
+		return ownerContentType?.variesBySegment;
 	}
 
 	/**

@@ -2,10 +2,18 @@ import type { UmbBlockDataModel } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
 import {
 	UMB_BLOCK_GRID_ENTRY_CONTEXT,
+	UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
+	UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
 	UMB_BLOCK_GRID_WORKSPACE_MODAL,
 	type UmbBlockGridWorkspaceOriginData,
 } from '../index.js';
-import type { UmbBlockGridLayoutModel, UmbBlockGridTypeAreaType, UmbBlockGridTypeModel } from '../types.js';
+import type {
+	UmbBlockGridLayoutModel,
+	UmbBlockGridTypeAreaType,
+	UmbBlockGridTypeModel,
+	UmbBlockGridValueModel,
+} from '../types.js';
+import { forEachBlockLayoutEntryOf } from '../utils/index.js';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context-token.js';
 import type { UmbBlockGridScalableContainerContext } from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
 import {
@@ -16,10 +24,13 @@ import {
 	UmbStringState,
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { pathFolderName } from '@umbraco-cms/backoffice/utils';
+import { UmbModalRouteRegistrationController, UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import {
+	UMB_CLIPBOARD_PROPERTY_CONTEXT,
+	UmbClipboardPastePropertyValueTranslatorValueResolver,
+} from '@umbraco-cms/backoffice/clipboard';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 interface UmbBlockGridAreaTypeInvalidRuleType {
 	groupKey?: string;
@@ -40,11 +51,7 @@ export class UmbBlockGridEntriesContext
 	implements UmbBlockGridScalableContainerContext
 {
 	//
-	#catalogueModal: UmbModalRouteRegistrationController<
-		typeof UMB_BLOCK_CATALOGUE_MODAL.DATA,
-		typeof UMB_BLOCK_CATALOGUE_MODAL.VALUE
-	>;
-	#workspaceModal;
+	#pathAddendum = new UmbRoutePathAddendumContext(this);
 
 	#parentEntry?: typeof UMB_BLOCK_GRID_ENTRY_CONTEXT.TYPE;
 
@@ -94,9 +101,6 @@ export class UmbBlockGridEntriesContext
 
 	setParentUnique(contentKey: string | null) {
 		this.#parentUnique = contentKey;
-		// Notice pathFolderName can be removed when we have switched to use a proper GUID/ID/KEY. [NL]
-		this.#workspaceModal.setUniquePathValue('parentUnique', pathFolderName(contentKey ?? 'null'));
-		this.#catalogueModal.setUniquePathValue('parentUnique', pathFolderName(contentKey ?? 'null'));
 	}
 
 	getParentUnique(): string | null | undefined {
@@ -105,8 +109,7 @@ export class UmbBlockGridEntriesContext
 
 	setAreaKey(areaKey: string | null) {
 		this.#areaKey = areaKey;
-		this.#workspaceModal.setUniquePathValue('areaKey', areaKey ?? 'null');
-		this.#catalogueModal.setUniquePathValue('areaKey', areaKey ?? 'null');
+		this.#pathAddendum.setAddendum(areaKey ?? '');
 		this.#gotAreaKey();
 
 		// Idea: If we need to parse down a validation data path to target the specific layout object: [NL]
@@ -153,18 +156,52 @@ export class UmbBlockGridEntriesContext
 			this.#gotBlockParentEntry(); // is not used at this point. [NL]
 		});
 
-		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
-			.addUniquePaths(['propertyAlias', 'variantId', 'parentUnique', 'areaKey'])
-			.addAdditionalPath(':view/:index')
-			.onSetup((routingInfo) => {
+		new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
+			.addAdditionalPath('_catalogue/:view/:index')
+			.onSetup(async (routingInfo) => {
 				if (!this._manager) return false;
 				// Idea: Maybe on setup should be async, so it can retrieve the values when needed? [NL]
 				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
+				const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
+				const pasteTranslatorManifests = clipboardContext.getPasteTranslatorManifests(
+					UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
+				);
+
+				// TODO: consider moving some of this logic to the clipboard property context
+				const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
+				const config = propertyContext.getConfig();
+				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
+
 				return {
 					data: {
 						blocks: this.#allowedBlockTypes.getValue(),
 						blockGroups: this._manager.getBlockGroups() ?? [],
 						openClipboard: routingInfo.view === 'clipboard',
+						clipboardFilter: async (clipboardEntryDetail) => {
+							const hasSupportedPasteTranslator = clipboardContext.hasSupportedPasteTranslator(
+								pasteTranslatorManifests,
+								clipboardEntryDetail.values,
+							);
+
+							if (!hasSupportedPasteTranslator) {
+								return false;
+							}
+
+							const pasteTranslator = await valueResolver.getPasteTranslator(
+								clipboardEntryDetail.values,
+								UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
+							);
+
+							if (pasteTranslator.isCompatibleValue) {
+								const value = await valueResolver.resolve(
+									clipboardEntryDetail.values,
+									UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
+								);
+								return pasteTranslator.isCompatibleValue(value, config);
+							}
+
+							return true;
+						},
 						originData: {
 							index: index,
 							areaKey: this.#areaKey,
@@ -183,7 +220,7 @@ export class UmbBlockGridEntriesContext
 						data.originData as UmbBlockGridWorkspaceOriginData,
 					);
 					if (created) {
-						this.insert(
+						await this.insert(
 							created.layout,
 							created.content,
 							created.settings,
@@ -192,6 +229,15 @@ export class UmbBlockGridEntriesContext
 					} else {
 						throw new Error('Failed to create block');
 					}
+				} else if (value?.clipboard && value.clipboard.selection?.length && data) {
+					const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
+
+					const propertyValues = await clipboardContext.readMultiple<UmbBlockGridValueModel>(
+						value.clipboard.selection,
+						UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
+					);
+
+					this._insertFromPropertyValues(propertyValues, data.originData as UmbBlockGridWorkspaceOriginData);
 				}
 			})
 			.observeRouteBuilder((routeBuilder) => {
@@ -199,8 +245,7 @@ export class UmbBlockGridEntriesContext
 				this._catalogueRouteBuilderState.setValue(routeBuilder);
 			});
 
-		this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_GRID_WORKSPACE_MODAL)
-			.addUniquePaths(['propertyAlias', 'variantId', 'parentUnique', 'areaKey'])
+		new UmbModalRouteRegistrationController(this, UMB_BLOCK_GRID_WORKSPACE_MODAL)
 			.addAdditionalPath('block')
 			.onSetup(() => {
 				return {
@@ -221,12 +266,6 @@ export class UmbBlockGridEntriesContext
 				const newPath = routeBuilder({});
 				this._workspacePath.setValue(newPath);
 			});
-
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (dataset) => {
-			const variantId = dataset.getVariantId();
-			this.#catalogueModal.setUniquePathValue('variantId', variantId?.toString());
-			this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
-		});
 	}
 
 	protected _gotBlockManager() {
@@ -234,15 +273,6 @@ export class UmbBlockGridEntriesContext
 
 		this.#setupAllowedBlockTypes();
 		this.#setupRangeLimits();
-
-		this.observe(
-			this._manager.propertyAlias,
-			(alias) => {
-				this.#catalogueModal.setUniquePathValue('propertyAlias', alias ?? 'null');
-				this.#workspaceModal.setUniquePathValue('propertyAlias', alias ?? 'null');
-			},
-			'observePropertyAlias',
-		);
 	}
 
 	#gotAreaKey() {
@@ -411,14 +441,60 @@ export class UmbBlockGridEntriesContext
 		originData: UmbBlockGridWorkspaceOriginData,
 	) {
 		await this._retrieveManager;
-		// TODO: Insert layout entry at the right spot.
 		return this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
 	}
 
 	// create Block?
 	override async delete(contentKey: string) {
 		// TODO: Loop through children and delete them as well?
+		// Find layout entry:
+		const layout = this._layoutEntries.getValue().find((x) => x.contentKey === contentKey);
+		if (!layout) {
+			throw new Error(`Cannot delete block, missing layout for ${contentKey}`);
+		}
+		// The following loop will only delete the referenced data of sub Layout Entries, as the Layout entry is part of the main Layout Entry they will go away when that is removed. [NL]
+		forEachBlockLayoutEntryOf(layout, async (entry) => {
+			if (entry.settingsKey) {
+				this._manager!.removeOneSettings(entry.settingsKey);
+			}
+			this._manager!.removeOneContent(contentKey);
+			this._manager!.removeExposesOf(contentKey);
+		});
+
 		await super.delete(contentKey);
+	}
+
+	protected async _insertFromPropertyValue(value: UmbBlockGridValueModel, originData: UmbBlockGridWorkspaceOriginData) {
+		const layoutEntries = value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS];
+
+		if (!layoutEntries) {
+			throw new Error('No layout entries found');
+		}
+
+		await Promise.all(
+			layoutEntries.map(async (layoutEntry) => {
+				await this._insertBlockFromPropertyValue(layoutEntry, value, originData);
+				if (originData.index !== -1) {
+					originData = { ...originData, index: originData.index + 1 };
+				}
+			}),
+		);
+
+		return originData;
+	}
+
+	protected override async _insertBlockFromPropertyValue(
+		layoutEntry: UmbBlockGridLayoutModel,
+		value: UmbBlockGridValueModel,
+		originData: UmbBlockGridWorkspaceOriginData,
+	) {
+		await super._insertBlockFromPropertyValue(layoutEntry, value, originData);
+
+		// Handle inserting of the inner blocks..
+		await forEachBlockLayoutEntryOf(layoutEntry, async (entry, parentUnique, areaKey) => {
+			const localOriginData = { index: -1, parentUnique, areaKey };
+			await this._insertBlockFromPropertyValue(entry, value, localOriginData);
+		});
 	}
 
 	/**

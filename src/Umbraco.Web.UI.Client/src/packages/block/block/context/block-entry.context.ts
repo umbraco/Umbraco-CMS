@@ -1,5 +1,11 @@
 import type { UmbBlockManagerContext, UmbBlockWorkspaceOriginData } from '../index.js';
-import type { UmbBlockLayoutBaseModel, UmbBlockDataModel, UmbBlockDataType } from '../types.js';
+import type {
+	UmbBlockLayoutBaseModel,
+	UmbBlockDataModel,
+	UmbBlockDataType,
+	UmbBlockExposeModel,
+	UmbBlockDataValueModel,
+} from '../types.js';
 import type { UmbBlockEntriesContext } from './block-entries.context.js';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -24,6 +30,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
+import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 
 export abstract class UmbBlockEntryContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType>,
@@ -45,6 +52,8 @@ export abstract class UmbBlockEntryContext<
 	_entries?: BlockEntriesContextType;
 
 	#contentKey?: string;
+
+	#pathAddendum = new UmbRoutePathAddendumContext(this);
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	protected readonly _variantId = this.#variantId.asObservable();
 
@@ -81,6 +90,30 @@ export abstract class UmbBlockEntryContext<
 	public readonly contentElementTypeAlias = this.#contentElementType.asObservablePart((x) => x?.alias);
 	public readonly contentElementTypeIcon = this.#contentElementType.asObservablePart((x) => x?.icon);
 
+	/**
+	 * Get the name of the content element type.
+	 * @returns {string | undefined} - the name of the content element type.
+	 */
+	public getContentElementTypeName(): string | undefined {
+		return this.#contentElementType.getValue()?.name;
+	}
+
+	/**
+	 * Get the alias of the content element type.
+	 * @returns {string | undefined} - the alias of the content element type.
+	 */
+	public getContentElementTypeAlias(): string | undefined {
+		return this.#contentElementType.getValue()?.alias;
+	}
+
+	/**
+	 * Get the icon of the content element type.
+	 * @returns {string | undefined} - the icon of the content element type.
+	 */
+	public getContentElementTypeIcon(): string | undefined {
+		return this.#contentElementType.getValue()?.icon;
+	}
+
 	_blockType = new UmbObjectState<BlockType | undefined>(undefined);
 	public readonly blockType = this._blockType.asObservable();
 	public readonly contentElementTypeKey = this._blockType.asObservablePart((x) => x?.contentElementTypeKey);
@@ -94,8 +127,19 @@ export abstract class UmbBlockEntryContext<
 	public readonly settingsKey = this._layout.asObservablePart((x) => (x ? (x.settingsKey ?? null) : undefined));
 	public readonly unique = this._layout.asObservablePart((x) => x?.contentKey);
 
+	/**
+	 * Get the layout of the block.
+	 * @returns {BlockLayoutType | undefined} - the layout of the block.
+	 */
+	public getLayout(): BlockLayoutType | undefined {
+		return this._layout.getValue();
+	}
+
 	#label = new UmbStringState('');
 	public readonly label = this.#label.asObservable();
+	public getLabel() {
+		return this.#label.getValue();
+	}
 
 	#labelRender = new UmbUfmVirtualRenderController(this);
 
@@ -200,20 +244,18 @@ export abstract class UmbBlockEntryContext<
 		if (!this.#contentValuesObservable) {
 			this.#contentValuesObservable = mergeObservables(
 				[this._contentValueArray, this.#contentStructure!.contentTypeProperties, this._variantId],
-				([propertyValues, properties, variantId]) => {
-					if (!propertyValues || !properties || !variantId) return;
-
-					return properties.reduce((acc, property) => {
-						const propertyVariantId = this.#createPropertyVariantId(property, variantId);
-						acc[property.alias] = propertyValues.find(
-							(x) => x.alias === property.alias && propertyVariantId.compare(x),
-						)?.value;
-						return acc;
-					}, {} as UmbBlockDataType);
-				},
+				this.#propertyValuesToObjectCallback,
 			);
 		}
 		return this.#contentValuesObservable;
+	}
+
+	/**
+	 * Get the content of the block.
+	 * @returns {UmbBlockDataModel | undefined} - the content of the block.
+	 */
+	public getContent(): UmbBlockDataModel | undefined {
+		return this.#content.getValue();
 	}
 
 	#settings = new UmbObjectState<UmbBlockDataModel | undefined>(undefined);
@@ -228,19 +270,34 @@ export abstract class UmbBlockEntryContext<
 		if (!this.#settingsValuesObservable) {
 			this.#settingsValuesObservable = mergeObservables(
 				[this._settingsValueArray, this.#settingsStructure!.contentTypeProperties, this._variantId],
-				([propertyValues, properties, variantId]) => {
-					if (!propertyValues || !properties || !variantId) return;
-
-					return properties.reduce((acc, property) => {
-						acc[property.alias] = propertyValues.find((x) =>
-							this.#createPropertyVariantId(property, variantId).compare(x),
-						)?.value;
-						return acc;
-					}, {} as UmbBlockDataType);
-				},
+				this.#propertyValuesToObjectCallback,
 			);
 		}
 		return this.#settingsValuesObservable;
+	}
+
+	#propertyValuesToObjectCallback = ([propertyValues, properties, variantId]: [
+		UmbBlockDataValueModel<unknown>[] | undefined,
+		UmbPropertyTypeModel[],
+		UmbVariantId | undefined,
+	]) => {
+		if (!propertyValues || !properties || !variantId) return;
+
+		return properties.reduce((acc, property) => {
+			const propertyVariantId = this.#createPropertyVariantId(property, variantId);
+			acc[property.alias] = propertyValues.find(
+				(x) => x.alias === property.alias && propertyVariantId.compare(x),
+			)?.value;
+			return acc;
+		}, {} as UmbBlockDataType);
+	};
+
+	/**
+	 * Get the settings of the block.
+	 * @returns {UmbBlockDataModel | undefined} - the settings of the block.
+	 */
+	public getSettings(): UmbBlockDataModel | undefined {
+		return this.#settings.getValue();
 	}
 
 	abstract readonly showContentEdit: Observable<boolean>;
@@ -275,6 +332,7 @@ export abstract class UmbBlockEntryContext<
 		this.observe(
 			this.unique,
 			(contentKey) => {
+				this.#pathAddendum.setAddendum(contentKey);
 				if (!contentKey) return;
 				this.#observeContentData();
 			},
@@ -499,15 +557,7 @@ export abstract class UmbBlockEntryContext<
 			]),
 			([variantId, variesByCulture, variesBySegment]) => {
 				if (!variantId || variesByCulture === undefined || variesBySegment === undefined) return;
-				if (!variesBySegment && !variesByCulture) {
-					variantId = UmbVariantId.CreateInvariant();
-				} else if (!variesBySegment) {
-					variantId = variantId.toSegmentInvariant();
-				} else if (!variesByCulture) {
-					variantId = variantId.toCultureInvariant();
-				}
-
-				this.#variantId.setValue(variantId);
+				this.#variantId.setValue(variantId.toVariant(variesByCulture, variesBySegment));
 				this.#gotVariantId();
 			},
 			'observeBlockType',
@@ -633,10 +683,18 @@ export abstract class UmbBlockEntryContext<
 
 	//activate
 	public edit() {
-		window.location.href = this.#generateWorkspaceEditContentPath(this.#workspacePath.value, this.getContentKey());
+		window.history.pushState(
+			{},
+			'',
+			this.#generateWorkspaceEditContentPath(this.#workspacePath.value, this.getContentKey()),
+		);
 	}
 	public editSettings() {
-		window.location.href = this.#generateWorkspaceEditSettingsPath(this.#workspacePath.value, this.getContentKey());
+		window.history.pushState(
+			{},
+			'',
+			this.#generateWorkspaceEditSettingsPath(this.#workspacePath.value, this.getContentKey()),
+		);
 	}
 
 	async requestDelete() {
@@ -664,5 +722,12 @@ export abstract class UmbBlockEntryContext<
 		this._manager?.setOneExpose(this.#contentKey, variantId);
 	}
 
-	//copy
+	/**
+	 * Get the expose of the block.
+	 * @returns {UmbBlockExposeModel | undefined} - the expose of the block.
+	 */
+	public getExpose(): UmbBlockExposeModel | undefined {
+		const exposes = this._manager?.getExposes();
+		return exposes?.find((x) => x.contentKey === this.#contentKey);
+	}
 }

@@ -1,5 +1,7 @@
 import type { ManifestEntityAction, MetaEntityActionDefaultKind } from '@umbraco-cms/backoffice/entity-action';
 
+export type { UmbMoveDataSource } from './move-data-source.interface.js';
+export type { UmbMoveRepository } from './move-repository.interface.js';
 export interface UmbMoveToRequestArgs {
 	unique: string;
 	destination: {

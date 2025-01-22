@@ -1,6 +1,6 @@
 import type { UmbDataTypeDetailModel, UmbDataTypePropertyValueModel } from '../types.js';
-import { type UmbDataTypeDetailRepository, UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
-import { UMB_DATA_TYPE_ENTITY_TYPE } from '../entity.js';
+import { UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS, UMB_DATA_TYPE_ENTITY_TYPE } from '../constants.js';
+import type { UmbDataTypeDetailRepository } from '../repository/index.js';
 import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
 import { UMB_DATA_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
@@ -11,7 +11,7 @@ import type {
 import {
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
-	UmbEntityDetailWorkspaceContextBase,
+	UmbEntityNamedDetailWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -20,7 +20,6 @@ import type {
 	PropertyEditorSettingsProperty,
 } from '@umbraco-cms/backoffice/property-editor';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 type EntityType = UmbDataTypeDetailModel;
 
@@ -42,10 +41,9 @@ type EntityType = UmbDataTypeDetailModel;
  * - a new property editor ui is picked for a data-type, uses the data-type configuration to set the schema, if such is configured for the Property Editor UI. (The user picks the UI via the UI, the schema comes from the UI that the user picked, we store both on the data-type)
  */
 export class UmbDataTypeWorkspaceContext
-	extends UmbEntityDetailWorkspaceContextBase<EntityType, UmbDataTypeDetailRepository>
+	extends UmbEntityNamedDetailWorkspaceContextBase<EntityType, UmbDataTypeDetailRepository>
 	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
 	readonly propertyEditorUiAlias = this._data.createObservablePartOfCurrent((data) => data?.editorUiAlias);
 	readonly propertyEditorSchemaAlias = this._data.createObservablePartOfCurrent((data) => data?.editorAlias);
 
@@ -81,8 +79,6 @@ export class UmbDataTypeWorkspaceContext
 			entityType: UMB_DATA_TYPE_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS,
 		});
-
-		this.addValidationContext(new UmbValidationContext(this));
 
 		this.#observePropertyEditorSchemaAlias();
 		this.#observePropertyEditorUIAlias();
@@ -247,14 +243,6 @@ export class UmbDataTypeWorkspaceContext
 
 	createPropertyDatasetContext(host: UmbControllerHost): UmbPropertyDatasetContext {
 		return new UmbInvariantWorkspacePropertyDatasetContext(host, this);
-	}
-
-	getName() {
-		return this._data.getCurrent()?.name;
-	}
-
-	setName(name: string | undefined) {
-		this._data.updateCurrent({ name });
 	}
 
 	getPropertyEditorSchemaAlias() {

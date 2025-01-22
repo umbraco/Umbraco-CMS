@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../../collection/index.js';
+import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../../collection/constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_USER_PERMISSION_DOCUMENT_DELETE } from '../../user-permissions/constants.js';
 import { UMB_BULK_TRASH_DOCUMENT_REPOSITORY_ALIAS } from './repository/constants.js';

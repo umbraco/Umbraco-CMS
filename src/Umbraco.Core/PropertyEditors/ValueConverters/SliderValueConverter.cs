@@ -123,6 +123,7 @@ public class SliderValueConverter : PropertyValueConverterBase
     private static bool TryParseDecimal(string? representation, out decimal value)
         => decimal.TryParse(representation, NumberStyles.Number, CultureInfo.InvariantCulture, out value);
 
+
     private static bool IsRange(IPublishedPropertyType propertyType)
         => propertyType.DataType.ConfigurationAs<SliderConfiguration>()?.EnableRange == true;
 }
