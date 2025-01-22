@@ -23,7 +23,6 @@ public class ContentSettings
     internal const string StaticLoginLogoImage = "assets/logo_light.svg";
     internal const string StaticLoginLogoImageAlternative = "assets/logo_dark.svg";
     internal const string StaticBackOfficeLogo = "assets/logo.svg";
-    internal const bool StaticHideBackOfficeLogo = false;
     internal const bool StaticDisableDeleteWhenReferenced = false;
     internal const bool StaticDisableUnpublishWhenReferenced = false;
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
@@ -90,13 +89,6 @@ public class ContentSettings
     /// </summary>
     [DefaultValue(StaticBackOfficeLogo)]
     public string BackOfficeLogo { get; set; } = StaticBackOfficeLogo;
-
-    /// <summary>
-    ///     Gets or sets a value indicating whether to hide the backoffice umbraco logo or not.
-    /// </summary>
-    [DefaultValue(StaticHideBackOfficeLogo)]
-    [Obsolete("This setting is no longer used and will be removed in future versions. An alternative BackOffice logo can be set using the BackOfficeLogo setting.")]
-    public bool HideBackOfficeLogo { get; set; } = StaticHideBackOfficeLogo;
 
     /// <summary>
     ///     Gets or sets a value indicating whether to disable the deletion of items referenced by other items.
