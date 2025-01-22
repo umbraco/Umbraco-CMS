@@ -331,7 +331,7 @@
     <key alias="schedulePublishHelp">Select the date and time to publish and/or unpublish the content item.</key>
     <key alias="createEmpty">Create new</key>
     <key alias="createFromClipboard">Paste from clipboard</key>
-    <key alias="removeItem">Remove Item</key>
+    <key alias="removeItem">Remove item</key>
     <key alias="nodeIsInTrash">This item is in the Recycle Bin</key>
     <key alias="variantSaveNotAllowed">Save is not allowed</key>
     <key alias="variantPublishNotAllowed">Publish is not allowed</key>
