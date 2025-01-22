@@ -229,7 +229,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.term('defaultdialogs_chooseMedia')}>
+			<umb-body-layout headline=${this.localize.term('defaultdialogs_chooseMediaStartNode')}>
 				${this.#renderBody()} ${this.#renderBreadcrumb()}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
