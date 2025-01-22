@@ -559,7 +559,7 @@ export default {
 		selectContentStartNode: 'Select content start node',
 		selectEvent: 'Select event',
 		selectMedia: 'Select media',
-		chooseMedia: 'Choose Media Start nodes',
+		chooseMediaStartNode: 'Choose Media Start nodes',
 		selectMediaType: 'Select media type',
 		selectIcon: 'Select icon',
 		selectItem: 'Select item',
