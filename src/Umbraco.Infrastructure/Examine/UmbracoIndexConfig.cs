@@ -17,7 +17,7 @@ public class UmbracoIndexConfig : IUmbracoIndexConfig
     protected IScopeProvider ScopeProvider { get; }
 
     public IContentValueSetValidator GetContentValueSetValidator() =>
-        new ContentValueSetValidator(false, true, PublicAccessService, ScopeProvider, null, null,null);
+        new ContentValueSetValidator(false, true, PublicAccessService, ScopeProvider, null, null, null);
 
     public IContentValueSetValidator GetPublishedContentValueSetValidator() =>
         new ContentValueSetValidator(true, false, PublicAccessService, ScopeProvider, null, null, null);
