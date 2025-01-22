@@ -18,7 +18,7 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
     private readonly Scoping.IScopeProvider? _scopeProvider;
 
     // used for tests
-    public ContentValueSetValidator(bool publishedValuesOnly, int? parentId = null, IEnumerable<string>? includeItemTypes = null, IEnumerable<string>? excludeItemTypes = null)
+    internal ContentValueSetValidator(bool publishedValuesOnly, int? parentId = null, IEnumerable<string>? includeItemTypes = null, IEnumerable<string>? excludeItemTypes = null)
         : this(publishedValuesOnly, true, null, null, parentId, includeItemTypes, excludeItemTypes)
     {
     }
