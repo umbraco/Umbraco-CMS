@@ -49,7 +49,6 @@ describe('UmbBlockGridPropertyValueCloner', () => {
 															{
 																contentKey: 'content-3',
 																settingsKey: 'settings-3',
-																areas: [],
 															},
 														],
 													},
