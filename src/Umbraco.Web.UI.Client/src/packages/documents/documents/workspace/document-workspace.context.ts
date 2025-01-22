@@ -19,12 +19,7 @@ import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, UmbDocumentPublishingReposit
 import { UmbDocumentValidationRepository } from '../repository/validation/index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import {
-	UMB_INVARIANT_CULTURE,
-	UmbVariantId,
-	type UmbEntityVariantModel,
-	type UmbEntityVariantOptionModel,
-} from '@umbraco-cms/backoffice/variant';
+import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
 	type UmbPublishableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
@@ -75,8 +70,8 @@ export class UmbDocumentWorkspaceContext
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#publishingContext?: typeof UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.TYPE;
-	#variantOptions?: UmbEntityVariantOptionModel<UmbEntityVariantModel>[];
-	#userCanSave = false;
+	#userCanCreate = false;
+	#userCanUpdate = false;
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -97,23 +92,24 @@ export class UmbDocumentWorkspaceContext
 			this.#publishingContext = context;
 		});
 
-		this.observe(this.variantOptions, (variantOptions) => {
-			const previousValue = this.#variantOptions;
-			this.#variantOptions = variantOptions;
-
-			if (previousValue?.length !== variantOptions.length) {
-				this.#setReadOnlyStateForUserSavePermission();
-			}
-		});
+		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					allOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE],
+				},
+				onChange: (permitted: boolean) => {
+					this.#userCanCreate = permitted;
+				},
+			},
+		]);
 
 		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
 			{
 				config: {
-					oneOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_UPDATE],
+					allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE],
 				},
 				onChange: (permitted: boolean) => {
-					this.#userCanSave = permitted;
-					this.#setReadOnlyStateForUserSavePermission();
+					this.#userCanUpdate = permitted;
 				},
 			},
 		]);
@@ -134,6 +130,7 @@ export class UmbDocumentWorkspaceContext
 						documentTypeUnique,
 						blueprintUnique,
 					);
+
 					new UmbWorkspaceIsNewRedirectController(
 						this,
 						this,
@@ -150,6 +147,12 @@ export class UmbDocumentWorkspaceContext
 					const documentTypeUnique = info.match.params.documentTypeUnique;
 					await this.create({ entityType: parentEntityType, unique: parentUnique }, documentTypeUnique);
 
+					this.#setReadOnlyStateForUserPermission(
+						UMB_USER_PERMISSION_DOCUMENT_CREATE,
+						this.#userCanCreate,
+						'You do not have permission to create documents.',
+					);
+
 					new UmbWorkspaceIsNewRedirectController(
 						this,
 						this,
@@ -160,10 +163,15 @@ export class UmbDocumentWorkspaceContext
 			{
 				path: UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.toString(),
 				component: () => import('./document-workspace-editor.element.js'),
-				setup: (_component, info) => {
+				setup: async (_component, info) => {
 					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
-					this.load(unique);
+					await this.load(unique);
+					this.#setReadOnlyStateForUserPermission(
+						UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+						this.#userCanUpdate,
+						'You do not have permission to update documents.',
+					);
 				},
 			},
 		]);
@@ -359,22 +367,22 @@ export class UmbDocumentWorkspaceContext
 		return new UmbDocumentPropertyDatasetContext(host, this, variantId);
 	}
 
-	async #setReadOnlyStateForUserSavePermission() {
-		const identifier = 'UMB_SAVE_USER_PERMISSION_';
-		const uniques = this.#variantOptions?.map((variant) => identifier + variant.culture) || [];
+	async #setReadOnlyStateForUserPermission(identifier: string, permitted: boolean, message: string) {
+		const variants = this.getVariants();
+		const uniques = variants?.map((variant) => identifier + variant.culture) || [];
 
-		if (this.#userCanSave) {
+		if (permitted) {
 			this.readOnlyState?.removeStates(uniques);
 			return;
 		}
 
-		const variantIds = this.#variantOptions?.map((variant) => new UmbVariantId(variant.culture, variant.segment)) || [];
+		const variantIds = variants?.map((variant) => new UmbVariantId(variant.culture, variant.segment)) || [];
 
 		const readOnlyStates = variantIds.map((variantId) => {
 			return {
 				unique: identifier + variantId.culture,
 				variantId,
-				message: 'You do not have permission to edit to this document',
+				message,
 			};
 		});
 
