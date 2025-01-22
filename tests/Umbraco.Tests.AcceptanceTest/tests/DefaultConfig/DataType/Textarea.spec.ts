@@ -8,6 +8,7 @@ let dataTypeData = null;
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();
   await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.dataType.goToDataType(dataTypeName);
   dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
 });

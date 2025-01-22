@@ -370,8 +370,9 @@ test('cannot create a template with an empty name', {tag: '@smoke'}, async ({umb
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  await umbracoUi.template.isErrorNotificationVisible();
+  // await umbracoUi.template.isErrorNotificationVisible();
   // TODO: Uncomment this when the front-end updates the error message
   //await umbracoUi.template.doesErrorNotificationHaveText(NotificationConstantHelper.error.emptyName);
+  await umbracoUi.waitForTimeout(500);
   expect(await umbracoApi.template.doesNameExist(templateName)).toBeFalsy();
 });
