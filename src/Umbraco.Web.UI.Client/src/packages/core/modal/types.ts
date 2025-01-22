@@ -12,7 +12,7 @@ export interface UmbPickerModalData<ItemType> {
 
 export interface UmbPickerModalSearchConfig {
 	providerAlias: string;
-	requestArgs?: object;
+	queryParams?: object;
 }
 
 export interface UmbPickerModalValue {

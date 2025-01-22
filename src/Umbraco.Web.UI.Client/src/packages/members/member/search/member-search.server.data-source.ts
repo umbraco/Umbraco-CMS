@@ -35,7 +35,7 @@ export class UmbMemberSearchServerDataSource
 			this.#host,
 			MemberService.getItemMemberSearch({
 				query: args.query,
-				allowedMemberTypes: args.allowedContentTypes?.map((memberReference) => memberReference.unique),
+				allowedMemberTypes: args.contentTypes?.map((memberReference) => memberReference.unique),
 			}),
 		);
 

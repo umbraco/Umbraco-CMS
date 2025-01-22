@@ -7,5 +7,5 @@ export interface UmbMediaSearchItemModel extends UmbMediaItemModel {
 }
 
 export interface UmbMediaSearchRequestArgs extends UmbSearchRequestArgs {
-	allowedContentTypes?: Array<{ unique: string; entityType: UmbMediaTypeEntityType }>;
+	contentTypes?: Array<{ unique: string; entityType: UmbMediaTypeEntityType }>;
 }

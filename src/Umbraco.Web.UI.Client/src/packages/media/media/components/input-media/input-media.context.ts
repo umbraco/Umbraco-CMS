@@ -8,7 +8,7 @@ import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbMediaTypeEntityType } from '@umbraco-cms/backoffice/media-type';
 
-interface UmbInputMediaOpenPickerArgs {
+interface UmbMediaPickerInputContextOpenArgs {
 	allowedContentTypes?: Array<{ unique: string; entityType: UmbMediaTypeEntityType }>;
 }
 
@@ -22,7 +22,7 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 		super(host, UMB_MEDIA_ITEM_REPOSITORY_ALIAS, UMB_MEDIA_PICKER_MODAL);
 	}
 
-	override async openPicker(pickerData?: Partial<UmbMediaPickerModalData>, args?: UmbInputMediaOpenPickerArgs) {
+	override async openPicker(pickerData?: Partial<UmbMediaPickerModalData>, args?: UmbMediaPickerInputContextOpenArgs) {
 		const combinedPickerData = {
 			...pickerData,
 		};
@@ -39,9 +39,9 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 		}
 
 		// pass allowedContentTypes to the search request args
-		combinedPickerData.search!.requestArgs = {
-			allowedContentTypes: args?.allowedContentTypes,
-			...pickerData?.search?.requestArgs,
+		combinedPickerData.search!.queryParams = {
+			contentTypes: args?.allowedContentTypes,
+			...pickerData?.search?.queryParams,
 		};
 
 		super.openPicker(combinedPickerData);

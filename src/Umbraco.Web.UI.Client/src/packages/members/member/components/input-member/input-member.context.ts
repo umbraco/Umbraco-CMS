@@ -9,7 +9,7 @@ import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbMemberTypeEntityType } from '@umbraco-cms/backoffice/member-type';
 
-interface UmbInputMemberOpenPickerArgs {
+interface UmbMemberPickerInputContextOpenArgs {
 	allowedContentTypes?: Array<{ unique: string; entityType: UmbMemberTypeEntityType }>;
 }
 
@@ -23,7 +23,10 @@ export class UmbMemberPickerInputContext extends UmbPickerInputContext<
 		super(host, UMB_MEMBER_ITEM_REPOSITORY_ALIAS, UMB_MEMBER_PICKER_MODAL);
 	}
 
-	override async openPicker(pickerData?: Partial<UmbMemberPickerModalData>, args?: UmbInputMemberOpenPickerArgs) {
+	override async openPicker(
+		pickerData?: Partial<UmbMemberPickerModalData>,
+		args?: UmbMemberPickerInputContextOpenArgs,
+	) {
 		const combinedPickerData = {
 			...pickerData,
 		};
@@ -40,9 +43,9 @@ export class UmbMemberPickerInputContext extends UmbPickerInputContext<
 		}
 
 		// pass allowedContentTypes to the search request args
-		combinedPickerData.search!.requestArgs = {
-			allowedContentTypes: args?.allowedContentTypes,
-			...pickerData?.search?.requestArgs,
+		combinedPickerData.search!.queryParams = {
+			contentTypes: args?.allowedContentTypes,
+			...pickerData?.search?.queryParams,
 		};
 
 		super.openPicker(combinedPickerData);

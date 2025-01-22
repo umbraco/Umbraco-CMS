@@ -220,6 +220,13 @@ export const data: Array<UmbMockDocumentModel> = [
 				value: null,
 			},
 			{
+				editorAlias: 'Umbraco.DropDown.Flexible',
+				alias: 'dropdownMultiple',
+				culture: null,
+				segment: null,
+				value: null,
+			},
+			{
 				editorAlias: 'Umbraco.TextArea',
 				alias: 'textArea',
 				culture: null,
