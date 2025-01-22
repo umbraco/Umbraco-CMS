@@ -2128,7 +2128,7 @@ export default {
 		legacyOptionDescription: 'This option is no longer supported, please select something else',
 		numberMinimum: "Value must be greater than or equal to '%0%'.",
 		numberMaximum: "Value must be less than or equal to '%0%'.",
-		numberMisconfigured: "Minimum value '%1%' must be less than the maximum value '%0%'.",
+		numberMisconfigured: "Minimum value '%0%' must be less than the maximum value '%1%'.",
 	},
 	healthcheck: {
 		checkSuccessMessage: "Value is set to the recommended value: '%0%'.",
