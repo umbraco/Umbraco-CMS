@@ -31,13 +31,12 @@ export class UmbMediaSearchServerDataSource
 	 * @memberof UmbMediaSearchServerDataSource
 	 */
 	async search(args: UmbMediaSearchRequestArgs) {
-		debugger;
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			MediaService.getItemMediaSearch({
 				query: args.query,
 				parentId: args.searchFrom?.unique || undefined,
-				allowedMediaTypes: args.contentTypes?.map((mediaReference) => mediaReference.unique),
+				allowedMediaTypes: args.allowedContentTypes?.map((mediaReference) => mediaReference.unique),
 			}),
 		);
 

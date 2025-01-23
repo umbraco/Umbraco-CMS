@@ -7,5 +7,5 @@ export interface UmbDocumentSearchItemModel extends UmbDocumentItemModel {
 }
 
 export interface UmbDocumentSearchRequestArgs extends UmbSearchRequestArgs {
-	contentTypes?: Array<{ unique: string; entityType: UmbDocumentTypeEntityType }>;
+	allowedContentTypes?: Array<{ unique: string; entityType: UmbDocumentTypeEntityType }>;
 }

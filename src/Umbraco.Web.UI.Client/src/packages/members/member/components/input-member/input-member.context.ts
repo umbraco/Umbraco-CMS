@@ -44,7 +44,7 @@ export class UmbMemberPickerInputContext extends UmbPickerInputContext<
 
 		// pass allowedContentTypes to the search request args
 		combinedPickerData.search!.queryParams = {
-			contentTypes: args?.allowedContentTypes,
+			allowedContentTypes: args?.allowedContentTypes,
 			...pickerData?.search?.queryParams,
 		};
 

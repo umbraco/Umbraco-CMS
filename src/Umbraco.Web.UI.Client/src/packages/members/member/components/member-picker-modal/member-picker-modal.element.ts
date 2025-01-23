@@ -46,8 +46,20 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 		super.updated(_changedProperties);
 
 		if (_changedProperties.has('data')) {
-			this.#pickerContext.search.updateConfig({ ...this.data?.search });
 			this.#pickerContext.selection.setMultiple(this.data?.multiple ?? false);
+
+			if (this.data?.search) {
+				this.#pickerContext.search.updateConfig({
+					...this.data.search,
+				});
+
+				const searchQueryParams = this.data.search.queryParams;
+				if (searchQueryParams) {
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					//@ts-ignore - TODO wire up types
+					this.#pickerContext.search.setQuery(searchQueryParams);
+				}
+			}
 		}
 
 		if (_changedProperties.has('value')) {
