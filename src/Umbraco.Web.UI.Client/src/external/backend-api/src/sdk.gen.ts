@@ -1494,7 +1494,7 @@ export class DocumentService {
      * @param data.skip
      * @param data.take
      * @param data.parentId
-     * @param data.allowedMediaTypes
+     * @param data.allowedDocumentTypes
      * @returns unknown OK
      * @throws ApiError
      */
@@ -1507,7 +1507,7 @@ export class DocumentService {
                 skip: data.skip,
                 take: data.take,
                 parentId: data.parentId,
-                allowedMediaTypes: data.allowedMediaTypes
+                allowedDocumentTypes: data.allowedDocumentTypes
             },
             errors: {
                 401: 'The resource is protected and requires an authentication token'

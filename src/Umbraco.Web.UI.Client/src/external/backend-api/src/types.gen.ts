@@ -3314,7 +3314,7 @@ export type GetItemDocumentData = {
 export type GetItemDocumentResponse = (Array<(DocumentItemResponseModel)>);
 
 export type GetItemDocumentSearchData = {
-    allowedMediaTypes?: Array<(string)>;
+    allowedDocumentTypes?: Array<(string)>;
     parentId?: string;
     query?: string;
     skip?: number;
