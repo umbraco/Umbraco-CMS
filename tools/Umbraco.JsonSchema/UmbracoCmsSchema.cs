@@ -73,26 +73,25 @@ internal class UmbracoCmsSchema
 
         public required HelpPageSettings HelpPage { get; set; }
 
-        public required InstallDefaultDataSettings DefaultDataCreation { get; set; }
+        public required InstallDefaultDataNamedOptions InstallDefaultData { get; set; }
 
         public required DataTypesSettings DataTypes { get; set; }
 
         public required MarketplaceSettings Marketplace { get; set; }
-        
-        public InstallDefaultDataNamedOptions InstallDefaultData { get; set; } = null!;
 
         public required WebhookSettings Webhook { get; set; }
+
         public required CacheSettings Cache { get; set; }
     }
 
     public class InstallDefaultDataNamedOptions
     {
-        public InstallDefaultDataSettings Languages { get; set; } = null!;
+        public required InstallDefaultDataSettings Languages { get; set; }
 
-        public InstallDefaultDataSettings DataTypes { get; set; } = null!;
+        public required InstallDefaultDataSettings DataTypes { get; set; }
 
-        public InstallDefaultDataSettings MediaTypes { get; set; } = null!;
+        public required InstallDefaultDataSettings MediaTypes { get; set; }
 
-        public InstallDefaultDataSettings MemberTypes { get; set; } = null!;
+        public required InstallDefaultDataSettings MemberTypes { get; set; }
     }
 }

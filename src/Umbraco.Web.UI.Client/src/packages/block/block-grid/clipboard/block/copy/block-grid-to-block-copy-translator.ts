@@ -24,6 +24,7 @@ export class UmbBlockGridToBlockClipboardCopyPropertyValueTranslator
 	}
 
 	#constructGridBlockValue(propertyValue: UmbBlockGridValueModel): UmbGridBlockClipboardEntryValueModel {
+		// TODO: investigate if structured can be remove here.
 		const valueClone = structuredClone(propertyValue);
 
 		const gridBlockValue: UmbGridBlockClipboardEntryValueModel = {
@@ -38,7 +39,28 @@ export class UmbBlockGridToBlockClipboardCopyPropertyValueTranslator
 	#constructBlockValue(propertyValue: UmbBlockGridValueModel): UmbBlockClipboardEntryValueModel {
 		const gridBlockValue = this.#constructGridBlockValue(propertyValue);
 
+		const contentData: typeof gridBlockValue.contentData = [];
+		const settingsData: typeof gridBlockValue.settingsData = [];
+
 		const layout: UmbBlockClipboardEntryValueModel['layout'] = gridBlockValue.layout?.map((gridLayout) => {
+			const contentDataEntry = gridBlockValue.contentData.find(
+				(contentData) => contentData.key === gridLayout.contentKey,
+			);
+			if (!contentDataEntry) {
+				throw new Error('No content data found for layout entry');
+			}
+			contentData.push(contentDataEntry);
+
+			if (gridLayout.settingsKey) {
+				const settingsDataEntry = gridBlockValue.settingsData.find(
+					(settingsData) => settingsData.key === gridLayout.settingsKey,
+				);
+				if (!settingsDataEntry) {
+					throw new Error('No settings data found for layout entry');
+				}
+				settingsData.push(settingsDataEntry);
+			}
+
 			return {
 				contentKey: gridLayout.contentKey,
 				settingsKey: gridLayout.settingsKey,
@@ -46,9 +68,9 @@ export class UmbBlockGridToBlockClipboardCopyPropertyValueTranslator
 		});
 
 		return {
-			contentData: gridBlockValue.contentData,
 			layout: layout,
-			settingsData: gridBlockValue.settingsData,
+			contentData,
+			settingsData,
 		};
 	}
 }
