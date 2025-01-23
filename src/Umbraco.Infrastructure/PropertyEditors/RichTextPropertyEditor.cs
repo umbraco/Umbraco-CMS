@@ -92,7 +92,6 @@ public class RichTextPropertyEditor : DataEditor
         private readonly HtmlLocalLinkParser _localLinkParser;
         private readonly RichTextEditorPastedImages _pastedImages;
         private readonly IJsonSerializer _jsonSerializer;
-        private readonly IBlockEditorElementTypeCache _elementTypeCache;
         private readonly IRichTextRequiredValidator _richTextRequiredValidator;
         private readonly ILogger<RichTextPropertyValueEditor> _logger;
 
@@ -122,12 +121,12 @@ public class RichTextPropertyEditor : DataEditor
             _localLinkParser = localLinkParser;
             _pastedImages = pastedImages;
             _htmlSanitizer = htmlSanitizer;
-            _elementTypeCache = elementTypeCache;
             _richTextRequiredValidator = richTextRequiredValidator;
             _jsonSerializer = jsonSerializer;
             _logger = logger;
 
-            Validators.Add(new RichTextEditorBlockValidator(propertyValidationService, CreateBlockEditorValues(), elementTypeCache, jsonSerializer, logger));
+            BlockEditorValues = new(new RichTextEditorBlockDataConverter(_jsonSerializer), elementTypeCache, logger);
+            Validators.Add(new RichTextEditorBlockValidator(propertyValidationService, BlockEditorValues, elementTypeCache, jsonSerializer, logger));
         }
 
         public override IValueRequiredValidator RequiredValidator => _richTextRequiredValidator;
@@ -340,12 +339,6 @@ public class RichTextPropertyEditor : DataEditor
         }
 
         private BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? ConvertAndClean(RichTextBlockValue blockValue)
-        {
-            BlockEditorValues<RichTextBlockValue, RichTextBlockLayoutItem> blockEditorValues = CreateBlockEditorValues();
-            return blockEditorValues.ConvertAndClean(blockValue);
-        }
-
-        private BlockEditorValues<RichTextBlockValue, RichTextBlockLayoutItem> CreateBlockEditorValues()
-            => new(new RichTextEditorBlockDataConverter(_jsonSerializer), _elementTypeCache, _logger);
+            => BlockEditorValues.ConvertAndClean(blockValue);
     }
 }
