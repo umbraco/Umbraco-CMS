@@ -42,7 +42,7 @@ test('can create content with a rich text editor that has a stylesheet', async (
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(documentName);
   // Is needed to make sure that the rich text editor is loaded
-  await umbracoUi.waitForTimeout(500);
+  // await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource, false);
   await umbracoUi.content.clickSaveButton();
 

@@ -103,7 +103,7 @@ test('can delete a tab in a document type', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.waitForTimeout(200);
+  // await umbracoUi.waitForTimeout(200);
   await umbracoUi.documentType.clickRemoveTabWithName(tabName);
   await umbracoUi.documentType.clickConfirmToDeleteButton();
   await umbracoUi.documentType.clickSaveButton();
@@ -214,7 +214,7 @@ test('can create a document type with a composition', {tag: '@smoke'}, async ({u
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.waitForTimeout(500);
+  // await umbracoUi.waitForTimeout(500);
   await umbracoUi.documentType.clickCompositionsButton();
   await umbracoUi.documentType.clickButtonWithName(compositionDocumentTypeName);
   await umbracoUi.documentType.clickSubmitButton();
@@ -242,9 +242,9 @@ test('can remove a composition from a document type', async ({umbracoApi, umbrac
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.waitForTimeout(500);
+  // await umbracoUi.waitForTimeout(500);
   await umbracoUi.documentType.clickCompositionsButton();
-  await umbracoUi.waitForTimeout(1000);
+  // await umbracoUi.waitForTimeout(1000);
   await umbracoUi.documentType.clickButtonWithName(compositionDocumentTypeName);
   await umbracoUi.documentType.clickSubmitButton();
   await umbracoUi.documentType.clickConfirmToSubmitButton();
@@ -295,7 +295,7 @@ test.skip('can reorder properties in a document type', async ({umbracoApi, umbra
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickReorderButton();
   // Drag and Drop
-  await umbracoUi.waitForTimeout(5000);
+  // await umbracoUi.waitForTimeout(5000);
   const dragFromLocator = umbracoUi.documentType.getTextLocatorWithName(dataTypeNameTwo);
   const dragToLocator = umbracoUi.documentType.getTextLocatorWithName(dataTypeName);
   await umbracoUi.documentType.dragAndDrop(dragFromLocator, dragToLocator, 0, 0, 5);

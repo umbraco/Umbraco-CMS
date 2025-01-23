@@ -62,7 +62,7 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
 
   // Assert
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
-  await umbracoUi.waitForTimeout(500);
+  // await umbracoUi.waitForTimeout(500);
   await umbracoUi.media.goToMediaWithName(rootFolderName);
   await umbracoUi.media.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource);
   await umbracoUi.media.clickCaretButtonForMediaName(rootFolderName);

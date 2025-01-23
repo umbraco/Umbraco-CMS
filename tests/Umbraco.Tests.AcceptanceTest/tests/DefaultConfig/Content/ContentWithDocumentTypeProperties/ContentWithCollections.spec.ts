@@ -54,7 +54,7 @@ test('can create child content in a collection', async ({umbracoApi, umbracoUi})
   await umbracoUi.content.clickCreateButton();
   await umbracoUi.content.chooseDocumentType(childDocumentTypeName);
   // This wait is needed
-  await umbracoUi.waitForTimeout(500);
+  // await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.enterContentName(firstChildContentName);
   await umbracoUi.content.clickSaveButton();
 
@@ -63,11 +63,11 @@ test('can create child content in a collection', async ({umbracoApi, umbracoUi})
   expect(childData.length).toBe(expectedNames.length);
   expect(childData[0].variants[0].name).toBe(firstChildContentName);
   // verify that the child content displays in collection list after reloading tree
-  await umbracoUi.waitForTimeout(1000);
+  // await umbracoUi.waitForTimeout(1000);
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickReloadButton();
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.waitForTimeout(500);
+  // await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.doesDocumentTableColumnNameValuesMatch(expectedNames);
 
   // Clean
@@ -90,7 +90,7 @@ test('can create multiple child nodes in a collection', async ({umbracoApi, umbr
   await umbracoUi.content.clickCreateButton();
   await umbracoUi.content.chooseDocumentType(childDocumentTypeName);
   // This wait is needed
-  await umbracoUi.waitForTimeout(500);
+  // await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.enterContentName(secondChildContentName);
   await umbracoUi.content.clickSaveButton();
 
@@ -100,11 +100,11 @@ test('can create multiple child nodes in a collection', async ({umbracoApi, umbr
   expect(childData[0].variants[0].name).toBe(firstChildContentName);
   expect(childData[1].variants[0].name).toBe(secondChildContentName);
   // verify that the child content displays in collection list after reloading tree
-  await umbracoUi.waitForTimeout(1000);
+  // await umbracoUi.waitForTimeout(1000);
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickReloadButton();
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.waitForTimeout(500);
+  // await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.doesDocumentTableColumnNameValuesMatch(expectedNames);
 
   // Clean
@@ -130,6 +130,7 @@ test('can search in a collection of content', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.content.searchByKeywordInCollection(searchKeyword);
 
   // Assert
+  // await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.doesDocumentTableColumnNameValuesMatch(expectedSearchResult);
 
   // Clean

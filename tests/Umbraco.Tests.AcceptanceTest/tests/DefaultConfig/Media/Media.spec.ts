@@ -39,7 +39,7 @@ test('can rename a media file', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
   // Arrange
-  await umbracoUi.waitForTimeout(1000);
+  // await umbracoUi.waitForTimeout(1000);
   await umbracoUi.media.clickLabelWithName(wrongMediaFileName, true);
   await umbracoUi.media.enterMediaItemName(mediaFileName);
   await umbracoUi.media.clickSaveButton();
@@ -240,6 +240,7 @@ test('can empty the recycle bin', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickConfirmEmptyRecycleBinButton();
 
   // Assert
+  // await umbracoUi.waitForTimeout(500);
   await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false);
   await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.emptiedRecycleBin);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();

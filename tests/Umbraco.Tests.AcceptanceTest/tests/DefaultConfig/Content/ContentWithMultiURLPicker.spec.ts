@@ -72,7 +72,7 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   const documentTypeForLinkedDocumentId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeForLinkedDocumentName);
   const linkedDocumentName = 'ContentToPick';
   const linkedDocumentId = await umbracoApi.document.createDefaultDocument(linkedDocumentName, documentTypeForLinkedDocumentId);
-  await umbracoUi.waitForTimeout(2000);
+  // await umbracoUi.waitForTimeout(2000);
   await umbracoApi.document.publish(linkedDocumentId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
