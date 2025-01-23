@@ -115,6 +115,8 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#renderMemberItem(item: UmbMemberItemModel | UmbMemberDetailModel) {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore - TODO: MemberDetailModel does not have a name. It should have so we ignore this for now.
 		const selectable = this._selectableFilter(item);
 
 		return html`
