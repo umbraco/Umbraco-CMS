@@ -10088,7 +10088,7 @@
             }
           },
           {
-            "name": "allowedMediaTypes",
+            "name": "allowedDocumentTypes",
             "in": "query",
             "schema": {
               "type": "array",
