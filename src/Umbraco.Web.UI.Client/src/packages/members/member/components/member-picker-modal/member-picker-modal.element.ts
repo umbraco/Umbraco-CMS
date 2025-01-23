@@ -14,10 +14,13 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	UmbMemberPickerModalValue
 > {
 	@state()
-	private _members: Array<UmbMemberDetailModel> = [];
+	private _members: Array<UmbMemberItemModel | UmbMemberDetailModel> = [];
 
 	@state()
 	private _searchQuery?: string;
+
+	@state()
+	private _selectableFilter: (item: UmbMemberItemModel) => boolean = () => true;
 
 	#collectionRepository = new UmbMemberCollectionRepository(this);
 	#pickerContext = new UmbCollectionItemPickerContext(this);
@@ -47,6 +50,10 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 
 		if (_changedProperties.has('data')) {
 			this.#pickerContext.selection.setMultiple(this.data?.multiple ?? false);
+
+			if (this.data?.pickableFilter) {
+				this._selectableFilter = this.data?.pickableFilter;
+			}
 
 			if (this.data?.search) {
 				this.#pickerContext.search.updateConfig({
@@ -108,10 +115,13 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#renderMemberItem(item: UmbMemberItemModel | UmbMemberDetailModel) {
+		const selectable = this._selectableFilter(item);
+
 		return html`
 			<uui-menu-item
 				label=${item.variants[0].name ?? ''}
-				selectable
+				?selectable=${selectable}
+				?disabled=${!selectable}
 				@selected=${() => this.#pickerContext.selection.select(item.unique)}
 				@deselected=${() => this.#pickerContext.selection.deselect(item.unique)}
 				?selected=${this.#pickerContext.selection.isSelected(item.unique)}>
