@@ -1,10 +1,10 @@
-import { UmbUserConfigRepository } from '../../repository/config/index.js';
+import { UmbCurrentUserConfigRepository } from '../../repository/config/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbConditionBase, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbUserAllowMfaActionCondition extends UmbConditionBase<never> {
-	#configRepository = new UmbUserConfigRepository(this._host);
+export class UmbCurrentUserAllowMfaActionCondition extends UmbConditionBase<never> {
+	#configRepository = new UmbCurrentUserConfigRepository(this._host);
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	constructor(host: UmbControllerHost, args: any) {
@@ -27,4 +27,4 @@ export class UmbUserAllowMfaActionCondition extends UmbConditionBase<never> {
 	}
 }
 
-export { UmbUserAllowMfaActionCondition as api };
+export { UmbCurrentUserAllowMfaActionCondition as api };
