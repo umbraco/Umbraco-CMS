@@ -18,11 +18,8 @@ export class UmbCurrentUserConfigRepository extends UmbRepositoryBase implements
 
 	constructor(host: UmbControllerHost) {
 		super(host);
-		console.log("a");
 		this.initialized = new Promise<void>((resolve) => {
-			console.log("b");
 			this.consumeContext(UMB_CURRENT_USER_CONFIG_STORE_CONTEXT, async (store) => {
-				console.log("c");
 				this.#dataStore = store;
 				await this.#init();
 				resolve();
