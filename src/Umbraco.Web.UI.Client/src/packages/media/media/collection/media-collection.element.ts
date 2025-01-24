@@ -1,6 +1,5 @@
 import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../workspace/media-workspace.context-token.js';
-import { UmbFileDropzoneItemStatus } from '../dropzone/types.js';
 import type { UmbDropzoneSubmittedEvent } from '../dropzone/dropzone-submitted.event.js';
 import type { UmbDropzoneElement } from '../dropzone/dropzone.element.js';
 import { UMB_MEDIA_COLLECTION_CONTEXT } from './media-collection.context-token.js';
@@ -41,10 +40,10 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 			this._dropzone.progressItems(),
 			(progressItems) => {
 				progressItems.forEach((item) => {
-					if (item.status === UmbFileDropzoneItemStatus.COMPLETE && !item.folder?.name) {
-						// We do not update folders as it may have children still being uploaded.
-						this.#collectionContext?.updatePlaceholderStatus(item.unique, UmbFileDropzoneItemStatus.COMPLETE);
-					}
+					// We do not update folders as it may have children still being uploaded.
+					if (item.folder?.name) return;
+
+					this.#collectionContext?.updatePlaceholderStatus(item.unique, item.status);
 				});
 			},
 			'_observeProgressItems',
@@ -61,19 +60,21 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		this.#observeProgressItems();
 	}
 
-	async #onComplete() {
+	async #onComplete(event: Event) {
+		event.preventDefault();
 		this._progress = -1;
 		this.#collectionContext?.requestCollection();
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		const event = new UmbRequestReloadChildrenOfEntityEvent({
+		const reloadEvent = new UmbRequestReloadChildrenOfEntityEvent({
 			entityType: this._unique ? UMB_MEDIA_ENTITY_TYPE : UMB_MEDIA_ROOT_ENTITY_TYPE,
 			unique: this._unique,
 		});
-		eventContext.dispatchEvent(event);
+		eventContext.dispatchEvent(reloadEvent);
 	}
 
 	#onProgress(event: ProgressEvent) {
+		event.preventDefault();
 		this._progress = (event.loaded / event.total) * 100;
 		if (this._progress >= 100) {
 			this._progress = -1;
