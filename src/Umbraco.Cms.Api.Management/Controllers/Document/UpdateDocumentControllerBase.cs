@@ -25,7 +25,7 @@ public abstract class UpdateDocumentControllerBase : DocumentControllerBase
             ContentPermissionResource.WithKeys(ActionUpdate.ActionLetter, id),
             AuthorizationPolicies.ContentPermissionByResource);
 
-        if (!authorizationResult.Succeeded)
+        if (authorizationResult.Succeeded is false)
         {
             return Forbidden();
         }
