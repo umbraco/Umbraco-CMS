@@ -119,6 +119,10 @@ export class UmbPropertyEditorUIContentPickerElement
 		this.#setPickerRootUnique();
 	}
 
+	override focus() {
+		return this.shadowRoot?.querySelector<UmbInputContentElement>('umb-input-content')?.focus();
+	}
+
 	async #setPickerRootUnique() {
 		// If we have a root unique value, we don't need to fetch it from the dynamic root
 		if (this._rootUnique) return;
