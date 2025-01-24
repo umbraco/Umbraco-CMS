@@ -162,9 +162,9 @@ export class UmbDropzoneManager extends UmbControllerBase {
 
 			// Handle files and folders differently: a file is uploaded as temp then created as a media item, and a folder is created as a media item directly
 			if (item.temporaryFile) {
-				await this.#handleFile(item as UmbUploadableFile, mediaTypeUnique);
+				this.#handleFile(item as UmbUploadableFile, mediaTypeUnique);
 			} else if (item.folder) {
-				await this.#handleFolder(item as UmbUploadableFolder, mediaTypeUnique);
+				this.#handleFolder(item as UmbUploadableFolder, mediaTypeUnique);
 			}
 		}
 	}
@@ -198,8 +198,8 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		}
 	}
 
-	async #uploadAsTemporaryFile(item: UmbUploadableFile) {
-		return await this.#tempFileManager.uploadOne({
+	#uploadAsTemporaryFile(item: UmbUploadableFile) {
+		return this.#tempFileManager.uploadOne({
 			temporaryUnique: item.temporaryFile.temporaryUnique,
 			file: item.temporaryFile.file,
 		});
@@ -258,7 +258,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		// TODO: Use a scaffolding feature to ensure consistency. [NL]
 		const name = item.temporaryFile ? item.temporaryFile.file.name : (item.folder?.name ?? '');
 		const umbracoFile: UmbMediaValueModel = {
-			editorAlias: null as any,
+			editorAlias: '',
 			alias: 'umbracoFile',
 			value: { temporaryFileId: item.temporaryFile?.temporaryUnique },
 			culture: null,
