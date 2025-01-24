@@ -2,7 +2,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
-export class UmbUserConfigServerDataSource {
+export class UmbCurrentUserConfigServerDataSource {
 	#host;
 
 	constructor(host: UmbControllerHost) {
@@ -10,16 +10,8 @@ export class UmbUserConfigServerDataSource {
 	}
 
 	/**
-	 * Get the user configuration.
-	 * @memberof UmbUserConfigServerDataSource
-	 */
-	getUserConfig() {
-		return tryExecuteAndNotify(this.#host, UserService.getUserConfiguration());
-	}
-
-	/**
 	 * Get the current user configuration.
-	 * @memberof UmbUserConfigServerDataSource
+	 * @memberof UmbCurrentUserConfigServerDataSource
 	 */
 	getCurrentUserConfig() {
 		return tryExecuteAndNotify(this.#host, UserService.getUserCurrentConfiguration());
