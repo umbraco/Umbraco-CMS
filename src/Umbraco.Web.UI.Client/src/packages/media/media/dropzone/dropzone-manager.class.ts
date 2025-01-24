@@ -73,6 +73,9 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	 */
 	public createMediaItems(items: UmbFileDropzoneDroppedItems, parentUnique: string | null = null) {
 		const uploadableItems = this.#setupProgress(items, parentUnique);
+
+		if (!uploadableItems.length) return [];
+
 		if (uploadableItems.length === 1) {
 			// When there is only one item being uploaded, allow the user to pick the media type, if more than one is allowed.
 			this.#createOneMediaItem(uploadableItems[0]);
@@ -80,6 +83,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 			// When there are multiple items being uploaded, automatically pick the media types for each item. We probably want to allow the user to pick the media type in the future.
 			this.#createMediaItems(uploadableItems);
 		}
+
 		return uploadableItems;
 	}
 
@@ -301,21 +305,18 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		const items: Array<UmbUploadableItem> = [];
 
 		for (const file of files) {
-			const unique = UmbId.new();
-			if (file.type) {
-				items.push({
-					unique,
-					parentUnique,
-					status: UmbFileDropzoneItemStatus.WAITING,
-					temporaryFile: { file, temporaryUnique: UmbId.new() },
-				});
-			}
+			items.push({
+				unique: UmbId.new(),
+				parentUnique,
+				status: UmbFileDropzoneItemStatus.WAITING,
+				temporaryFile: { file, temporaryUnique: UmbId.new() },
+			});
 		}
 
 		for (const subfolder of folders) {
 			const unique = UmbId.new();
 			items.push({
-				unique,
+				unique: UmbId.new(),
 				parentUnique,
 				status: UmbFileDropzoneItemStatus.WAITING,
 				folder: { name: subfolder.folderName },
