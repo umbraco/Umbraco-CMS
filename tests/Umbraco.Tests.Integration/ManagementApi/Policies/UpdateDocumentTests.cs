@@ -3,6 +3,7 @@ using System.Net;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Document;
+using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
@@ -42,13 +43,15 @@ public class UpdateDocumentTests : ManagementApiTest<UpdateDocumentController>
     [Test]
     public async Task UserWithoutPermissionCannotUpdate()
     {
-        var userGroup = new UserGroup(ShortStringHelper);
-        userGroup.Name = "Test";
-        userGroup.Alias = "test";
-        userGroup.Permissions = new HashSet<string> { ActionBrowse.ActionLetter };
-        userGroup.HasAccessToAllLanguages = true;
-        userGroup.StartContentId = -1;
-        userGroup.StartMediaId = -1;
+        var userGroup = new UserGroup(ShortStringHelper)
+        {
+            Name = "Test",
+            Alias = "test",
+            Permissions = new HashSet<string> { ActionBrowse.ActionLetter },
+            HasAccessToAllLanguages = true,
+            StartContentId = -1,
+            StartMediaId = -1
+        };
         userGroup.AddAllowedSection("content");
         userGroup.AddAllowedSection("media");
 
@@ -74,40 +77,30 @@ public class UpdateDocumentTests : ManagementApiTest<UpdateDocumentController>
             return (userCreationResult.Result.CreatedUser, "1234567890");
         });
 
+        const string UpdatedName = "NewName";
+
         var model = await CreateContent();
-        var updateRequestModel = DocumentUpdateHelper.CreateInvariantDocumentUpdateRequestModel(model);
-        var updatedName = "NewName";
-        updateRequestModel.Variants.First().Name = updatedName;
+        var updateRequestModel = CreateRequestModel(model, UpdatedName);
 
-        var url = GetManagementApiUrl<UpdateDocumentController>(x => x.Update(CancellationToken.None, model.Key!.Value, null));
-        var requestBody = new StringContent(JsonSerializer.Serialize(updateRequestModel), Encoding.UTF8, "application/json");
-        var response = await Client.PutAsync(url, requestBody);
+        var response = await GetManagementApiResponse(model, updateRequestModel);
 
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
-        var content = ContentService.GetById(model.Key!.Value);
-        Assert.IsNotNull(content);
-        Assert.That(content.Name, Is.Not.EqualTo(updatedName));
+        AssertResponse(response, model, HttpStatusCode.Forbidden, model.InvariantName);
     }
 
     [Test]
-    public async Task EditorCanUpdate()
+    public async Task UserWithPermissionCanUpdate()
     {
-        // "Default" version creates an editor
+        // "Default" version creates an editor that has permission to update content.
         await AuthenticateClientAsync(Client, "editor@editor.com", "1234567890", false);
 
+        const string UpdatedName = "NewName";
+
         var model = await CreateContent();
-        var updateRequestModel = DocumentUpdateHelper.CreateInvariantDocumentUpdateRequestModel(model);
-        var updatedName = "NewName";
-        updateRequestModel.Variants.First().Name = updatedName;
+        var updateRequestModel = CreateRequestModel(model, UpdatedName);
 
-        var url = GetManagementApiUrl<UpdateDocumentController>(x => x.Update(CancellationToken.None, model.Key!.Value, null));
-        var requestBody = new StringContent(JsonSerializer.Serialize(updateRequestModel), Encoding.UTF8, "application/json");
-        var response = await Client.PutAsync(url, requestBody);
+        var response = await GetManagementApiResponse(model, updateRequestModel);
 
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-        var content = ContentService.GetById(model.Key!.Value);
-        Assert.IsNotNull(content);
-        Assert.That(content.Name, Is.EqualTo(updatedName));
+        AssertResponse(response, model, HttpStatusCode.OK, UpdatedName);
     }
 
     private async Task<ContentCreateModel> CreateContent()
@@ -129,10 +122,32 @@ public class UpdateDocumentTests : ManagementApiTest<UpdateDocumentController>
 
         var publishResult = await ContentPublishingService.PublishAsync(
             createContentResult.Result.Content!.Key,
-            new List<CulturePublishScheduleModel> { new() { Culture = "*" } },
+            [new() { Culture = "*" }],
             userKey);
 
         Assert.IsTrue(publishResult.Success);
         return textPage;
+    }
+
+    private static UpdateDocumentRequestModel CreateRequestModel(ContentCreateModel model, string name)
+    {
+        var updateRequestModel = DocumentUpdateHelper.CreateInvariantDocumentUpdateRequestModel(model);
+        updateRequestModel.Variants.First().Name = name;
+        return updateRequestModel;
+    }
+
+    private async Task<HttpResponseMessage> GetManagementApiResponse(ContentCreateModel model, UpdateDocumentRequestModel updateRequestModel)
+    {
+        var url = GetManagementApiUrl<UpdateDocumentController>(x => x.Update(CancellationToken.None, model.Key!.Value, null));
+        var requestBody = new StringContent(JsonSerializer.Serialize(updateRequestModel), Encoding.UTF8, "application/json");
+        return await Client.PutAsync(url, requestBody);
+    }
+
+    private void AssertResponse(HttpResponseMessage response, ContentCreateModel model, HttpStatusCode expectedStatusCode, string expectedContentName)
+    {
+        Assert.That(response.StatusCode, Is.EqualTo(expectedStatusCode));
+        var content = ContentService.GetById(model.Key!.Value);
+        Assert.IsNotNull(content);
+        Assert.That(content.Name, Is.EqualTo(expectedContentName));
     }
 }
