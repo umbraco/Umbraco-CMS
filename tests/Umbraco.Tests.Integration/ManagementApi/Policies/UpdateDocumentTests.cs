@@ -1,15 +1,20 @@
 using System.Linq.Expressions;
-using System.Net.Http.Json;
+using System.Net;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Document;
-using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.TestHelpers;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Policies;
 
@@ -21,6 +26,16 @@ public class UpdateDocumentTests : ManagementApiTest<UpdateDocumentController>
 
     private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
 
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+
+    private IContentTypeEditingService ContentTypeEditingService => GetRequiredService<IContentTypeEditingService>();
+
+    private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
+
+    private IContentPublishingService ContentPublishingService => GetRequiredService<IContentPublishingService>();
+
+    private IContentService ContentService => GetRequiredService<IContentService>();
+
     protected override Expression<Func<UpdateDocumentController, object>> MethodSelector =>
         x => x.Update(CancellationToken.None, Guid.Empty, null!);
 
@@ -30,7 +45,7 @@ public class UpdateDocumentTests : ManagementApiTest<UpdateDocumentController>
         var userGroup = new UserGroup(ShortStringHelper);
         userGroup.Name = "Test";
         userGroup.Alias = "test";
-        userGroup.Permissions = new HashSet<string> { "Umb.Document.Read" };
+        userGroup.Permissions = new HashSet<string> { ActionBrowse.ActionLetter };
         userGroup.HasAccessToAllLanguages = true;
         userGroup.StartContentId = -1;
         userGroup.StartMediaId = -1;
@@ -59,8 +74,65 @@ public class UpdateDocumentTests : ManagementApiTest<UpdateDocumentController>
             return (userCreationResult.Result.CreatedUser, "1234567890");
         });
 
-        var updateModel = new UpdateDocumentRequestModel();
-        var content = new StringContent(JsonSerializer.Serialize(updateModel), Encoding.UTF8, "application/json");
-        var response = await Client.PutAsync(Url, content);
+        var model = await CreateContent();
+        var updateRequestModel = DocumentUpdateHelper.CreateInvariantDocumentUpdateRequestModel(model);
+        var updatedName = "NewName";
+        updateRequestModel.Variants.First().Name = updatedName;
+
+        var url = GetManagementApiUrl<UpdateDocumentController>(x => x.Update(CancellationToken.None, model.Key!.Value, null));
+        var requestBody = new StringContent(JsonSerializer.Serialize(updateRequestModel), Encoding.UTF8, "application/json");
+        var response = await Client.PutAsync(url, requestBody);
+
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
+        var content = ContentService.GetById(model.Key!.Value);
+        Assert.IsNotNull(content);
+        Assert.That(content.Name, Is.Not.EqualTo(updatedName));
+    }
+
+    [Test]
+    public async Task EditorCanUpdate()
+    {
+        // "Default" version creates an editor
+        await AuthenticateClientAsync(Client, "editor@editor.com", "1234567890", false);
+
+        var model = await CreateContent();
+        var updateRequestModel = DocumentUpdateHelper.CreateInvariantDocumentUpdateRequestModel(model);
+        var updatedName = "NewName";
+        updateRequestModel.Variants.First().Name = updatedName;
+
+        var url = GetManagementApiUrl<UpdateDocumentController>(x => x.Update(CancellationToken.None, model.Key!.Value, null));
+        var requestBody = new StringContent(JsonSerializer.Serialize(updateRequestModel), Encoding.UTF8, "application/json");
+        var response = await Client.PutAsync(url, requestBody);
+
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        var content = ContentService.GetById(model.Key!.Value);
+        Assert.IsNotNull(content);
+        Assert.That(content.Name, Is.EqualTo(updatedName));
+    }
+
+    private async Task<ContentCreateModel> CreateContent()
+    {
+        var userKey = Constants.Security.SuperUserKey;
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        var templateAttempt = await TemplateService.CreateAsync(template, userKey);
+        Assert.IsTrue(templateAttempt.Success);
+
+        var contentTypeCreateModel = ContentTypeEditingBuilder.CreateSimpleContentType(defaultTemplateKey: template.Key);
+        var contentTypeAttempt = await ContentTypeEditingService.CreateAsync(contentTypeCreateModel, userKey);
+        Assert.IsTrue(contentTypeAttempt.Success);
+
+        var textPage = ContentEditingBuilder.CreateSimpleContent(contentTypeAttempt.Result.Key);
+        textPage.TemplateKey = templateAttempt.Result.Key;
+        textPage.Key = Guid.NewGuid();
+        var createContentResult = await ContentEditingService.CreateAsync(textPage, userKey);
+        Assert.IsTrue(createContentResult.Success);
+
+        var publishResult = await ContentPublishingService.PublishAsync(
+            createContentResult.Result.Content!.Key,
+            new List<CulturePublishScheduleModel> { new() { Culture = "*" } },
+            userKey);
+
+        Assert.IsTrue(publishResult.Success);
+        return textPage;
     }
 }
