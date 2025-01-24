@@ -322,7 +322,7 @@ public class UsersController : BackOfficeNotificationsController
     /// <returns></returns>
     [OutgoingEditorModelEvent]
     [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
-    public ActionResult<IEnumerable<UserDisplay?>> GetByIds([FromJsonPath] int[] ids)
+    public ActionResult<IEnumerable<UserDisplay?>> GetByIds([FromQuery] int[] ids)
     {
         if (ids == null)
         {

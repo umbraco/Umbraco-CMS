@@ -318,12 +318,14 @@
           */
         function getUsers(userIds) {
 
+            var idQuery = "";
+            userIds.forEach(id => idQuery += `ids=${id}&`);
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "userApiBaseUrl",
                         "GetByIds",
-                        { ids: userIds })),
+                        idQuery)),
                 "Failed to retrieve data for users " + userIds);
         }
 
