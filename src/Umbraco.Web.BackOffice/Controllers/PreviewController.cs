@@ -1,9 +1,12 @@
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Hosting;
@@ -27,7 +30,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
 [DisableBrowserCache]
 [Area(Constants.Web.Mvc.BackOfficeArea)]
-public class PreviewController : Controller
+public partial class PreviewController : Controller
 {
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
     private readonly ICookieManager _cookieManager;
@@ -39,7 +42,9 @@ public class PreviewController : Controller
     private readonly IRuntimeMinifier _runtimeMinifier;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly ICompositeViewEngine _viewEngines;
+    private readonly WebRoutingSettings _webRoutingSettings;
 
+    [Obsolete("Please use the non-obsolete constructor.")]
     public PreviewController(
         UmbracoFeatures features,
         IOptionsSnapshot<GlobalSettings> globalSettings,
@@ -51,9 +56,38 @@ public class PreviewController : Controller
         IRuntimeMinifier runtimeMinifier,
         ICompositeViewEngine viewEngines,
         IUmbracoContextAccessor umbracoContextAccessor)
+        : this(
+            features,
+            globalSettings,
+            StaticServiceProvider.Instance.GetRequiredService<IOptionsSnapshot<WebRoutingSettings>>(),
+            publishedSnapshotService,
+            backofficeSecurityAccessor,
+            localizationService,
+            hostingEnvironment,
+            cookieManager,
+            runtimeMinifier,
+            viewEngines,
+            umbracoContextAccessor)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public PreviewController(
+        UmbracoFeatures features,
+        IOptionsSnapshot<GlobalSettings> globalSettings,
+        IOptionsSnapshot<WebRoutingSettings> webRoutingSettings,
+        IPublishedSnapshotService publishedSnapshotService,
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        ILocalizationService localizationService,
+        IHostingEnvironment hostingEnvironment,
+        ICookieManager cookieManager,
+        IRuntimeMinifier runtimeMinifier,
+        ICompositeViewEngine viewEngines,
+        IUmbracoContextAccessor umbracoContextAccessor)
     {
         _features = features;
         _globalSettings = globalSettings.Value;
+        _webRoutingSettings = webRoutingSettings.Value;
         _publishedSnapshotService = publishedSnapshotService;
         _backofficeSecurityAccessor = backofficeSecurityAccessor;
         _localizationService = localizationService;
@@ -153,6 +187,43 @@ public class PreviewController : Controller
         // Expire Client-side cookie that determines whether the user has accepted to be in Preview Mode when visiting the website.
         _cookieManager.ExpireCookie(Constants.Web.AcceptPreviewCookieName);
 
+        // are we attempting a redirect to the default route (by ID with optional culture)?
+        Match match = DefaultPreviewRedirectRegex().Match(redir ?? string.Empty);
+        if (match.Success)
+        {
+            var id = int.Parse(match.Groups["id"].Value);
+
+            // first try to resolve the published URL
+            if (_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext) &&
+                umbracoContext.Content is not null)
+            {
+                IPublishedContent? publishedContent = umbracoContext.Content.GetById(id);
+                if (publishedContent is null)
+                {
+                    // content is not published, redirect to root
+                    return Redirect("/");
+                }
+
+                var culture = publishedContent.ContentType.VariesByCulture()
+                              && match.Groups.TryGetValue("culture", out Group? group)
+                    ? group.Value
+                    : null;
+
+                var publishedUrl = publishedContent.Url(culture);
+                if (WebPath.IsWellFormedWebPath(publishedUrl, UriKind.RelativeOrAbsolute))
+                {
+                    return Redirect(publishedUrl);
+                }
+            }
+
+            // could not resolve the published URL - are we allowed to route content by ID?
+            if (_webRoutingSettings.DisableFindContentByIdPath)
+            {
+                // no we are not - redirect to root instead
+                return Redirect("/");
+            }
+        }
+
         if (WebPath.IsWellFormedWebPath(redir, UriKind.Relative)
             && Uri.TryCreate(redir, UriKind.Relative, out Uri? url))
         {
@@ -161,4 +232,7 @@ public class PreviewController : Controller
 
         return Redirect("/");
     }
+
+    [GeneratedRegex("^\\/(?<id>\\d*)(\\?culture=(?<culture>[\\w-]*))?$")]
+    private static partial Regex DefaultPreviewRedirectRegex();
 }
