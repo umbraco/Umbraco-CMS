@@ -1491,6 +1491,8 @@ export default {
 		scheduleErrExpireDate2: 'The expire date cannot be before the release date',
 		preventCleanupEnableError: 'An error occurred while enabling version cleanup for %0%',
 		preventCleanupDisableError: 'An error occurred while disabling version cleanup for %0%',
+		offlineHeadline: 'Offline',
+		offlineMessage: 'You are currently offline. Please check your internet connection.',
 	},
 	stylesheet: {
 		addRule: 'Add style',
