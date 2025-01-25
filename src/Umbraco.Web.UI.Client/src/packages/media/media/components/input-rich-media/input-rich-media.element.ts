@@ -1,6 +1,6 @@
 import { UmbMediaItemRepository } from '../../repository/index.js';
 import { UMB_IMAGE_CROPPER_EDITOR_MODAL, UMB_MEDIA_PICKER_MODAL } from '../../modals/index.js';
-import type { UmbMediaItemModel, UmbCropModel, UmbMediaPickerPropertyValue } from '../../types.js';
+import type { UmbMediaItemModel, UmbCropModel, UmbMediaPickerPropertyValueEntry } from '../../types.js';
 import type { UmbUploadableItem } from '../../dropzone/types.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbConfirmModal, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -8,7 +8,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
@@ -25,11 +25,9 @@ type UmbRichMediaCardModel = {
 	isTrashed?: boolean;
 };
 
-const elementName = 'umb-input-rich-media';
-
-@customElement(elementName)
+@customElement('umb-input-rich-media')
 export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement, '') {
-	#sorter = new UmbSorterController<UmbMediaPickerPropertyValue>(this, {
+	#sorter = new UmbSorterController<UmbMediaPickerPropertyValueEntry>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
 		},
@@ -39,9 +37,8 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 		identifier: 'Umb.SorterIdentifier.InputRichMedia',
 		itemSelector: 'uui-card-media',
 		containerSelector: '.container',
-		// TODO: This component probably needs some grid-like logic for resolve placement... [LI]
-		// TODO: You can also use verticalDirection? [NL]
-		resolvePlacement: () => false,
+		//resolvePlacement: (args) => args.pointerX < args.relatedRect.left + args.relatedRect.width * 0.5,
+		resolvePlacement: UmbSorterResolvePlacementAsGrid,
 		onChange: ({ model }) => {
 			this.#items = model;
 			this.#sortCards(model);
@@ -49,7 +46,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 		},
 	});
 
-	#sortCards(model: Array<UmbMediaPickerPropertyValue>) {
+	#sortCards(model: Array<UmbMediaPickerPropertyValueEntry>) {
 		const idToIndexMap: { [unique: string]: number } = {};
 		model.forEach((item, index) => {
 			idToIndexMap[item.key] = index;
@@ -96,15 +93,15 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Array })
-	public set items(value: Array<UmbMediaPickerPropertyValue>) {
+	public set items(value: Array<UmbMediaPickerPropertyValueEntry>) {
 		this.#sorter.setModel(value);
 		this.#items = value;
 		this.#populateCards();
 	}
-	public get items(): Array<UmbMediaPickerPropertyValue> {
+	public get items(): Array<UmbMediaPickerPropertyValueEntry> {
 		return this.#items;
 	}
-	#items: Array<UmbMediaPickerPropertyValue> = [];
+	#items: Array<UmbMediaPickerPropertyValueEntry> = [];
 
 	@property({ type: Array })
 	allowedContentTypeIds?: string[] | undefined;
@@ -285,7 +282,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	#addItems(uniques: string[]) {
 		if (!uniques.length) return;
 
-		const additions: Array<UmbMediaPickerPropertyValue> = uniques.map((unique) => ({
+		const additions: Array<UmbMediaPickerPropertyValueEntry> = uniques.map((unique) => ({
 			key: UmbId.new(),
 			mediaKey: unique,
 			mediaTypeAlias: '',
@@ -454,6 +451,6 @@ export default UmbInputRichMediaElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbInputRichMediaElement;
+		'umb-input-rich-media': UmbInputRichMediaElement;
 	}
 }

@@ -443,10 +443,11 @@ export type CultureReponseModel = {
 };
 
 export type CurrentUserResponseModel = {
-    id: string;
     email: string;
     userName: string;
     name: string;
+    userGroupIds: Array<(ReferenceByIdModel)>;
+    id: string;
     languageIsoCode: (string) | null;
     documentStartNodeIds: Array<(ReferenceByIdModel)>;
     hasDocumentRootAccess: boolean;
@@ -469,6 +470,8 @@ export type CurrenUserConfigurationResponseModel = {
      */
     usernameIsEmail: boolean;
     passwordConfiguration: (PasswordConfigurationResponseModel);
+    allowChangePassword: boolean;
+    allowTwoFactor: boolean;
 };
 
 export type DatabaseInstallRequestModel = {
@@ -867,6 +870,8 @@ export type DocumentVariantResponseModel = {
     updateDate: string;
     state: DocumentVariantStateModel;
     publishDate?: (string) | null;
+    scheduledPublishDate?: (string) | null;
+    scheduledUnpublishDate?: (string) | null;
 };
 
 export enum DocumentVariantStateModel {

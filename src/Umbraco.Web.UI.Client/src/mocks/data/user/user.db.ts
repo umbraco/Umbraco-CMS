@@ -64,6 +64,9 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 	getCurrentUser(): CurrentUserResponseModel {
 		const firstUser = this.data[0];
 		const permissions = firstUser.userGroupIds?.length ? umbUserGroupMockDb.getPermissions(firstUser.userGroupIds) : [];
+		const fallbackPermissions = firstUser.userGroupIds?.length
+			? umbUserGroupMockDb.getFallbackPermissions(firstUser.userGroupIds)
+			: [];
 		const allowedSections = firstUser.userGroupIds?.length
 			? umbUserGroupMockDb.getAllowedSections(firstUser.userGroupIds)
 			: [];
@@ -82,10 +85,11 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 			mediaStartNodeIds: firstUser.mediaStartNodeIds,
 			hasDocumentRootAccess: firstUser.hasDocumentRootAccess,
 			hasMediaRootAccess: firstUser.hasMediaRootAccess,
-			fallbackPermissions: [],
+			fallbackPermissions,
 			permissions,
 			allowedSections,
 			isAdmin: firstUser.isAdmin,
+			userGroupIds: firstUser.userGroupIds,
 		};
 	}
 
