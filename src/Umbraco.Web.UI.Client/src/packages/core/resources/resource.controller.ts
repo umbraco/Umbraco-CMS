@@ -6,7 +6,8 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
-import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
+import { CancelablePromise, type ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
+import type { XhrRequestOptions } from './types.js';
 
 export class UmbResourceController extends UmbControllerBase {
 	#promise: Promise<any>;
@@ -165,6 +166,91 @@ export class UmbResourceController extends UmbControllerBase {
 		}
 
 		return { data, error };
+	}
+
+	/**
+	 * Make an XHR request.
+	 * @param host The controller host for this controller to be appended to.
+	 * @param options The options for the XHR request.
+	 */
+	static xhrRequest<T>(options: XhrRequestOptions): CancelablePromise<T> {
+		const baseUrl = options.baseUrl || '/umbraco';
+
+		const promise = new CancelablePromise<T>(async (resolve, reject, onCancel) => {
+			const xhr = new XMLHttpRequest();
+			xhr.open(options.method, `${baseUrl}${options.url}`, true);
+
+			// Set default headers
+			if (options.token) {
+				const token = typeof options.token === 'function' ? await options.token() : options.token;
+				if (token) {
+					xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+				}
+			}
+
+			// Infer Content-Type header based on body type
+			if (options.body instanceof FormData) {
+				// Note: 'multipart/form-data' is automatically set by the browser for FormData
+			} else {
+				xhr.setRequestHeader('Content-Type', 'application/json');
+			}
+
+			// Set custom headers
+			if (options.headers) {
+				for (const [key, value] of Object.entries(options.headers)) {
+					xhr.setRequestHeader(key, value);
+				}
+			}
+
+			xhr.upload.onprogress = (event) => {
+				if (options.onProgress) {
+					options.onProgress(event);
+				}
+			};
+
+			xhr.onload = () => {
+				try {
+					if (xhr.status >= 200 && xhr.status < 300) {
+						if (options.responseHeader) {
+							const response = xhr.getResponseHeader(options.responseHeader);
+							resolve(response as T);
+						} else {
+							resolve(JSON.parse(xhr.responseText));
+						}
+					} else {
+						const problemDetails: ProblemDetails = JSON.parse(xhr.responseText);
+						reject(problemDetails);
+					}
+				} catch {
+					reject(new Error(`Failed to make request: ${xhr.statusText}`));
+				}
+			};
+
+			xhr.onerror = () => {
+				try {
+					const problemDetails: ProblemDetails = JSON.parse(xhr.responseText);
+					reject(problemDetails);
+				} catch (e) {
+					reject(e);
+				}
+			};
+
+			if (!onCancel.isCancelled) {
+				// Handle body based on Content-Type
+				if (options.body instanceof FormData) {
+					xhr.send(options.body);
+				} else {
+					xhr.send(JSON.stringify(options.body));
+				}
+			}
+
+			onCancel(() => {
+				xhr.abort();
+				reject(new Error('Request was cancelled.'));
+			});
+		});
+
+		return promise;
 	}
 
 	/**
