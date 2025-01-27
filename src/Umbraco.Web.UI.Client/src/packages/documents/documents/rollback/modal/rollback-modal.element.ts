@@ -11,7 +11,7 @@ import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
-import { UMB_ENTITY_CONTEXT, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 import '../../modals/shared/document-variant-language-picker.element.js';
@@ -229,8 +229,6 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	}
 
 	#renderCultureSelect() {
-		if (!this._availableVariants.length) return nothing;
-
 		return html`
 			<uui-select
 				id="language-select"
@@ -356,9 +354,13 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			<umb-body-layout headline="Rollback">
 				<div id="main">
 					<div id="box-left">
-						<uui-box id="language-box" headline=${this.localize.term('general_language')}>
-							${this.#renderCultureSelect()}
-						</uui-box>
+						${this._availableVariants.length
+							? html`
+									<uui-box id="language-box" headline=${this.localize.term('general_language')}>
+										${this.#renderCultureSelect()}
+									</uui-box>
+								`
+							: nothing}
 						<uui-box id="versions-box" headline=${this.localize.term('rollback_versions')}>
 							${this.#renderVersions()}
 						</uui-box>
