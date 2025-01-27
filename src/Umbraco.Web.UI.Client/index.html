@@ -12,6 +12,7 @@
 					"@umbraco-cms/backoffice/block-rte": "/src/packages/block/block-rte/index.ts"
 				}
 			}
+
 		</script>
 		<script src="node_modules/msw/lib/iife/index.js"></script>
 		<link rel="stylesheet" href="node_modules/@umbraco-ui/uui-css/dist/uui-css.css" />
@@ -21,3 +22,33 @@
 
 	<body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden"></body>
 </html>
+
+<script>
+
+	const updatePageTitle = () => {
+		const windowUrl = window.location.href;
+		const text = windowUrl.split("/");
+		const Names = [];
+	
+
+		for ( let i = 0; i < text.length; i++) {
+
+			text[i].charAt(0).toUpperCase() + text[i].slice(1);
+			if(text[i] != "") {
+				const capatalized = text[i].charAt(0).toUpperCase()+ text[i].slice(1);
+				Names.push(capatalized);
+			}
+			
+		}
+
+		console.log(Names);
+
+		document.title = Names[3] + " - " + Names[1];
+	}
+
+	navigation.addEventListener("navigate", e => {
+		updatePageTitle();
+	});
+	
+	
+</script>
