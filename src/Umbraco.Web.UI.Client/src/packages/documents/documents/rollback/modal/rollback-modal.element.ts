@@ -169,10 +169,20 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 	async #selectVersion(id: string) {
 		const version = this._versions.find((item) => item.id === id);
-		if (!version) return;
+
+		if (!version) {
+			this._selectedVersion = undefined;
+			this._diffs = [];
+			return;
+		}
 
 		const { data } = await this.#rollbackRepository.requestVersionById(id);
-		if (!data) return;
+
+		if (!data) {
+			this._selectedVersion = undefined;
+			this._diffs = [];
+			return;
+		}
 
 		this._selectedVersion = {
 			date: version.date,
@@ -259,32 +269,38 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	}
 
 	#renderVersions() {
-		return html` ${repeat(
-			this._versions,
-			(item) => item.id,
-			(item) => {
-				return html`
-					<div
-						@click=${() => this.#onVersionClicked(item.id)}
-						@keydown=${() => {}}
-						class="rollback-item ${this._selectedVersion?.id === item.id ? 'active' : ''}">
-						<div>
-							<p class="rollback-item-date">
-								<umb-localize-date date="${item.date}" .options=${this.#localizeDateOptions}></umb-localize-date>
-							</p>
-							<p>${item.user}</p>
-							<p>${item.isCurrentlyPublishedVersion ? this.localize.term('rollback_currentPublishedVersion') : ''}</p>
+		if (!this._versions.length) {
+			return html`<uui-box headline=${this.localize.term('rollback_versions')}>No versions available</uui-box>`;
+		}
+
+		return html` <uui-box id="versions-box" headline=${this.localize.term('rollback_versions')}>
+			${repeat(
+				this._versions,
+				(item) => item.id,
+				(item) => {
+					return html`
+						<div
+							@click=${() => this.#onVersionClicked(item.id)}
+							@keydown=${() => {}}
+							class="rollback-item ${this._selectedVersion?.id === item.id ? 'active' : ''}">
+							<div>
+								<p class="rollback-item-date">
+									<umb-localize-date date="${item.date}" .options=${this.#localizeDateOptions}></umb-localize-date>
+								</p>
+								<p>${item.user}</p>
+								<p>${item.isCurrentlyPublishedVersion ? this.localize.term('rollback_currentPublishedVersion') : ''}</p>
+							</div>
+							<uui-button
+								look="secondary"
+								@click=${(event: Event) => this.#onPreventCleanup(event, item.id, !item.preventCleanup)}
+								label=${item.preventCleanup
+									? this.localize.term('contentTypeEditor_historyCleanupEnableCleanup')
+									: this.localize.term('contentTypeEditor_historyCleanupPreventCleanup')}></uui-button>
 						</div>
-						<uui-button
-							look="secondary"
-							@click=${(event: Event) => this.#onPreventCleanup(event, item.id, !item.preventCleanup)}
-							label=${item.preventCleanup
-								? this.localize.term('contentTypeEditor_historyCleanupEnableCleanup')
-								: this.localize.term('contentTypeEditor_historyCleanupPreventCleanup')}></uui-button>
-					</div>
-				`;
-			},
-		)}`;
+					`;
+				},
+			)}</uui-box
+		>`;
 	}
 
 	async #setDiffs() {
@@ -324,41 +340,50 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		this._diffs = [...diffs];
 	}
 
-	#renderCurrentVersion() {
-		return html`
-			${unsafeHTML(this.localize.term('rollback_diffHelp'))}
-			<uui-table>
-				<uui-table-column style="width: 0"></uui-table-column>
-				<uui-table-column></uui-table-column>
+	#renderSelectedVersion() {
+		if (!this._selectedVersion)
+			return html`
+				<uui-box id="box-right" style="display: flex; align-items: center; justify-content: center;"
+					>No selected version</uui-box
+				>
+			`;
 
-				<uui-table-head>
-					<uui-table-head-cell>${this.localize.term('general_alias')}</uui-table-head-cell>
-					<uui-table-head-cell>${this.localize.term('general_value')}</uui-table-head-cell>
-				</uui-table-head>
-				${repeat(
-					this._diffs,
-					(item) => item.alias,
-					(item) => {
-						const diff = this._diffs.find((x) => x?.alias === item.alias);
-						return html`
-							<uui-table-row>
-								<uui-table-cell>${item.alias}</uui-table-cell>
-								<uui-table-cell>
-									${diff
-										? diff.diff.map((part) =>
-												part.added
-													? html`<span class="diff-added">${part.value}</span>`
-													: part.removed
-														? html`<span class="diff-removed">${part.value}</span>`
-														: part.value,
-											)
-										: nothing}
-								</uui-table-cell>
-							</uui-table-row>
-						`;
-					},
-				)}
-			</uui-table>
+		return html`
+			<uui-box headline=${this.currentVersionHeader} id="box-right">
+				${unsafeHTML(this.localize.term('rollback_diffHelp'))}
+				<uui-table>
+					<uui-table-column style="width: 0"></uui-table-column>
+					<uui-table-column></uui-table-column>
+
+					<uui-table-head>
+						<uui-table-head-cell>${this.localize.term('general_alias')}</uui-table-head-cell>
+						<uui-table-head-cell>${this.localize.term('general_value')}</uui-table-head-cell>
+					</uui-table-head>
+					${repeat(
+						this._diffs,
+						(item) => item.alias,
+						(item) => {
+							const diff = this._diffs.find((x) => x?.alias === item.alias);
+							return html`
+								<uui-table-row>
+									<uui-table-cell>${item.alias}</uui-table-cell>
+									<uui-table-cell>
+										${diff
+											? diff.diff.map((part) =>
+													part.added
+														? html`<span class="diff-added">${part.value}</span>`
+														: part.removed
+															? html`<span class="diff-removed">${part.value}</span>`
+															: part.value,
+												)
+											: nothing}
+									</uui-table-cell>
+								</uui-table-row>
+							`;
+						},
+					)}
+				</uui-table>
+			</uui-box>
 		`;
 	}
 
@@ -382,11 +407,9 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 									</uui-box>
 								`
 							: nothing}
-						<uui-box id="versions-box" headline=${this.localize.term('rollback_versions')}>
-							${this.#renderVersions()}
-						</uui-box>
+						${this.#renderVersions()}
 					</div>
-					<uui-box headline=${this.currentVersionHeader} id="box-right"> ${this.#renderCurrentVersion()} </uui-box>
+					${this.#renderSelectedVersion()}
 				</div>
 				<umb-footer-layout slot="footer">
 					<uui-button
