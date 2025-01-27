@@ -1,6 +1,6 @@
 export interface XhrRequestOptions {
 	baseUrl?: string;
-	method: string;
+	method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
 	url: string;
 	body?: unknown;
 	token?: string | (() => string | Promise<string>);

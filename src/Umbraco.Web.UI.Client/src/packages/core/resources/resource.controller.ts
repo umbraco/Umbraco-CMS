@@ -1,13 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { UMB_AUTH_CONTEXT } from '../auth/index.js';
 import { isApiError, isCancelError, isCancelablePromise } from './apiTypeValidators.function.js';
+import type { XhrRequestOptions } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
-import { CancelablePromise, type ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
-import type { XhrRequestOptions } from './types.js';
+import {
+	ApiError,
+	CancelablePromise,
+	CancelError,
+	type ProblemDetails,
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbResourceController extends UmbControllerBase {
 	#promise: Promise<any>;
@@ -73,7 +78,7 @@ export class UmbResourceController extends UmbControllerBase {
 				// Cancelled - do nothing
 				return {};
 			} else {
-				console.group('ApiError caught in UmbResourceController');
+				console.groupCollapsed('ApiError caught in UmbResourceController');
 				console.error('Request failed', error.request);
 				console.error('Request body', error.body);
 				console.error('Error', error);
@@ -218,21 +223,46 @@ export class UmbResourceController extends UmbControllerBase {
 							resolve(JSON.parse(xhr.responseText));
 						}
 					} else {
-						const problemDetails: ProblemDetails = JSON.parse(xhr.responseText);
-						reject(problemDetails);
+						// TODO: [JOV] This has to be changed into our own error type, when we have a chance to introduce a breaking change in the future.
+						const error = new ApiError(
+							{
+								method: options.method,
+								url: `${baseUrl}${options.url}`,
+							},
+							{
+								body: xhr.responseText,
+								ok: false,
+								status: xhr.status,
+								statusText: xhr.statusText,
+								url: xhr.responseURL,
+							},
+							xhr.statusText,
+						);
+						reject(error);
 					}
 				} catch {
+					// This most likely happens when the response is not JSON
 					reject(new Error(`Failed to make request: ${xhr.statusText}`));
 				}
 			};
 
 			xhr.onerror = () => {
-				try {
-					const problemDetails: ProblemDetails = JSON.parse(xhr.responseText);
-					reject(problemDetails);
-				} catch (e) {
-					reject(e);
-				}
+				// TODO: [JOV] This has to be changed into our own error type, when we have a chance to introduce a breaking change in the future.
+				const error = new ApiError(
+					{
+						method: options.method,
+						url: `${baseUrl}${options.url}`,
+					},
+					{
+						body: xhr.responseText,
+						ok: false,
+						status: xhr.status,
+						statusText: xhr.statusText,
+						url: xhr.responseURL,
+					},
+					xhr.statusText,
+				);
+				reject(error);
 			};
 
 			if (!onCancel.isCancelled) {
@@ -246,7 +276,8 @@ export class UmbResourceController extends UmbControllerBase {
 
 			onCancel(() => {
 				xhr.abort();
-				reject(new Error('Request was cancelled.'));
+				// TODO: [JOV] This has to be changed into our own error type, when we have a chance to introduce a breaking change in the future.
+				reject(new CancelError('Request was cancelled.'));
 			});
 		});
 
