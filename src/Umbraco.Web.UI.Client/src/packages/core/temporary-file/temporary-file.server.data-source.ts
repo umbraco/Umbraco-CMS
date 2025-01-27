@@ -1,4 +1,5 @@
-import { OpenAPI, TemporaryFileService } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbDataSourceResponse } from '../repository/index.js';
+import { TemporaryFileService, type PostTemporaryFileResponse } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify, tryXhrRequest } from '@umbraco-cms/backoffice/resources';
 
@@ -26,21 +27,15 @@ export class UmbTemporaryFileServerDataSource {
 	 * @returns {*}
 	 * @memberof UmbTemporaryFileServerDataSource
 	 */
-	async create(id: string, file: File, onProgress?: (progress: ProgressEvent) => void) {
-		/*return tryExecuteAndNotify(
-			this.#host,
-			TemporaryFileService.postTemporaryFile({
-				formData: {
-					Id: id,
-					File: file,
-				},
-			}),
-		);*/
+	async create(
+		id: string,
+		file: File,
+		onProgress?: (progress: ProgressEvent) => void,
+	): Promise<UmbDataSourceResponse<PostTemporaryFileResponse>> {
 		const body = new FormData();
 		body.append('Id', id);
 		body.append('File', file);
-		const xhrRequest = tryXhrRequest(this.#host, {
-			baseUrl: OpenAPI.BASE,
+		const xhrRequest = tryXhrRequest<PostTemporaryFileResponse>(this.#host, {
 			url: '/umbraco/management/api/v1/temporary-file',
 			method: 'POST',
 			responseHeader: 'Umb-Generated-Resource',

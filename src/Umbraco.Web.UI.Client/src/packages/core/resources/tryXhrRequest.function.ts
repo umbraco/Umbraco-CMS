@@ -3,7 +3,7 @@ import type { XhrRequestOptions } from './types.js';
 import { UmbResourceController } from './resource.controller.js';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { CancelablePromise } from '@umbraco-cms/backoffice/external/backend-api';
+import { OpenAPI, type CancelablePromise } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  * Make an XHR request.
@@ -13,6 +13,7 @@ import type { CancelablePromise } from '@umbraco-cms/backoffice/external/backend
 export function tryXhrRequest<T>(host: UmbControllerHost, options: XhrRequestOptions): CancelablePromise<T> {
 	return UmbResourceController.xhrRequest<T>({
 		...options,
+		baseUrl: OpenAPI.BASE,
 		async token() {
 			const contextConsumer = new UmbContextConsumerController(host, UMB_AUTH_CONTEXT).asPromise();
 			const authContext = await contextConsumer;
