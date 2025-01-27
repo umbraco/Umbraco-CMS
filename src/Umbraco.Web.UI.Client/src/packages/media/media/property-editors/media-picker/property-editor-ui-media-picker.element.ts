@@ -1,5 +1,6 @@
 import type { UmbInputRichMediaElement } from '../../components/input-rich-media/input-rich-media.element.js';
-import type { UmbCropModel, UmbMediaPickerPropertyValue } from '../types.js';
+import type { UmbCropModel, UmbMediaPickerValueModel } from '../types.js';
+import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
@@ -9,10 +10,10 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 import '../../components/input-rich-media/input-rich-media.element.js';
-import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
-import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 
 const elementName = 'umb-property-editor-ui-media-picker';
 
@@ -20,10 +21,10 @@ const elementName = 'umb-property-editor-ui-media-picker';
  * @element umb-property-editor-ui-media-picker
  */
 @customElement(elementName)
-export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property({ attribute: false })
-	value?: Array<UmbMediaPickerPropertyValue>;
-
+export class UmbPropertyEditorUIMediaPickerElement
+	extends UmbFormControlMixin<UmbMediaPickerValueModel | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
+	implements UmbPropertyEditorUiElement
+{
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
