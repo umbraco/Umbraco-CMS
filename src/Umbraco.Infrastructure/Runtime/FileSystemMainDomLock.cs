@@ -108,7 +108,7 @@ internal class FileSystemMainDomLock : IMainDomLock
     public void DeleteLockReleaseSignalFile() =>
         File.Delete(_releaseSignalFilePath);
 
-    private void ListeningLoop()
+    private async Task ListeningLoop()
     {
         while (true)
         {
@@ -132,7 +132,7 @@ internal class FileSystemMainDomLock : IMainDomLock
                 break;
             }
 
-            Thread.Sleep(_globalSettings.CurrentValue.MainDomReleaseSignalPollingInterval);
+            await Task.Delay(_globalSettings.CurrentValue.MainDomReleaseSignalPollingInterval);
         }
     }
 }
