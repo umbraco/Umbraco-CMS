@@ -1,7 +1,11 @@
-import type { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../constants.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../constants.js';
 import { UmbRollbackRepository } from '../repository/rollback.repository.js';
-import { UmbDocumentItemRepository, type UmbDocumentItemModel } from '../../repository/index.js';
+import {
+	UmbDocumentDetailRepository,
+	UmbDocumentItemRepository,
+	type UmbDocumentItemModel,
+} from '../../repository/index.js';
 import type { UmbRollbackModalData, UmbRollbackModalValue } from './types.js';
 import { diffWords, type Change } from '@umbraco-cms/backoffice/external/diff';
 import { css, customElement, html, nothing, repeat, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
@@ -50,6 +54,9 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	@state()
 	isInvariant = true;
 
+	@state()
+	_diffs: Array<{ alias: string; diff: Change[] }> = [];
+
 	#rollbackRepository = new UmbRollbackRepository(this);
 	#userItemRepository = new UmbUserItemRepository(this);
 	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
@@ -68,6 +75,10 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (instance) => {
+			this.#workspaceContext = instance;
+		});
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (instance) => {
 			this.#currentDatasetCulture = instance.getVariantId().culture ?? undefined;
@@ -179,6 +190,8 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 					};
 				}),
 		};
+
+		await this.#setDiffs();
 	}
 
 	#onRollback() {
@@ -222,6 +235,10 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		this.#requestVersions();
 	}
 
+	#trimQuotes(str: string): string {
+		return str.replace(/^['"]|['"]$/g, '');
+	}
+
 	#renderCultureSelect() {
 		return html`
 			<div id="language-select">
@@ -261,12 +278,26 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		)}`;
 	}
 
-	#renderCurrentVersion() {
+	async #setDiffs() {
 		if (!this.selectedVersion) return;
 
-		let currentPropertyValues = this.#workspaceContext?.getData()?.values ?? [];
+		let newestPropertyValues = [];
 
-		currentPropertyValues = currentPropertyValues.filter((x) => x.culture === this.selectedCulture || !x.culture); // When invariant, culture is undefined or null.
+		if (this.#workspaceContext) {
+			newestPropertyValues = this.#workspaceContext?.getData()?.values ?? [];
+		} else {
+			if (!this.#documentUnique) {
+				throw new Error('Document unique is not set');
+			}
+
+			const repo = new UmbDocumentDetailRepository(this);
+			const { data } = await repo.requestByUnique(this.#documentUnique);
+			if (!data) return;
+
+			newestPropertyValues = data.values;
+		}
+
+		newestPropertyValues = newestPropertyValues.filter((x) => x.culture === this.selectedCulture || !x.culture); // When invariant, culture is undefined or null.
 
 		const diffs: Array<{ alias: string; diff: Change[] }> = [];
 
@@ -274,25 +305,21 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		diffs.push({ alias: 'name', diff: nameDiff });
 
 		this.selectedVersion.properties.forEach((item) => {
-			const draftValue = currentPropertyValues.find((x) => x.alias === item.alias);
+			const draftValue = newestPropertyValues.find((x) => x.alias === item.alias);
 
 			if (!draftValue) return;
 
-			const draftValueString = trimQuotes(JSON.stringify(draftValue.value));
-			const versionValueString = trimQuotes(JSON.stringify(item.value));
+			const draftValueString = this.#trimQuotes(JSON.stringify(draftValue.value));
+			const versionValueString = this.#trimQuotes(JSON.stringify(item.value));
 
 			const diff = diffWords(draftValueString, versionValueString);
 			diffs.push({ alias: item.alias, diff });
 		});
 
-		/**
-		 *
-		 * @param str
-		 */
-		function trimQuotes(str: string): string {
-			return str.replace(/^['"]|['"]$/g, '');
-		}
+		this._diffs = [...diffs];
+	}
 
+	#renderCurrentVersion() {
 		return html`
 			${unsafeHTML(this.localize.term('rollback_diffHelp'))}
 			<uui-table>
@@ -304,10 +331,10 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 					<uui-table-head-cell>${this.localize.term('general_value')}</uui-table-head-cell>
 				</uui-table-head>
 				${repeat(
-					diffs,
+					this._diffs,
 					(item) => item.alias,
 					(item) => {
-						const diff = diffs.find((x) => x?.alias === item.alias);
+						const diff = this._diffs.find((x) => x?.alias === item.alias);
 						return html`
 							<uui-table-row>
 								<uui-table-cell>${item.alias}</uui-table-cell>
