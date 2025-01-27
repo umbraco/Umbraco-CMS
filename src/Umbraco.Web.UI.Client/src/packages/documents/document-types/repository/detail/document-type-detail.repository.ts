@@ -5,7 +5,29 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDetailRepositoryBase } from '@umbraco-cms/backoffice/repository';
 export class UmbDocumentTypeDetailRepository extends UmbDetailRepositoryBase<UmbDocumentTypeDetailModel> {
 	constructor(host: UmbControllerHost) {
-		super(host, UmbDocumentTypeDetailServerDataSource, UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT);
+		super(host, UmbDocumentTypeDetailServerDataSource, UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT, {
+			create: {
+				success: {
+					message: () => {
+						return `Document Type created`;
+					},
+				},
+			},
+			save: {
+				success: {
+					message: () => {
+						return `Document Type saved`;
+					},
+				},
+			},
+			delete: {
+				success: {
+					message: () => {
+						return `Document Type deleted`;
+					},
+				},
+			},
+		});
 	}
 }
 

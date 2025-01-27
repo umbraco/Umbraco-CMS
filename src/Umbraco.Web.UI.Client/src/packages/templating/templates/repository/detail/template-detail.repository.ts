@@ -6,7 +6,15 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbTemplateDetailRepository extends UmbDetailRepositoryBase<UmbTemplateDetailModel> {
 	constructor(host: UmbControllerHost) {
-		super(host, UmbTemplateServerDataSource, UMB_TEMPLATE_DETAIL_STORE_CONTEXT);
+		super(host, UmbTemplateServerDataSource, UMB_TEMPLATE_DETAIL_STORE_CONTEXT, {
+			create: {
+				success: {
+					message: () => {
+						return `Template created`;
+					},
+				},
+			},
+		});
 	}
 }
 

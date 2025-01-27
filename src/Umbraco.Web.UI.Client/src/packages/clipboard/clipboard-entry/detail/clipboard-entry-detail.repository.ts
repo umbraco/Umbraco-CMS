@@ -6,7 +6,15 @@ import { UmbDetailRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 export class UmbClipboardEntryDetailRepository extends UmbDetailRepositoryBase<UmbClipboardEntryDetailModel> {
 	constructor(host: UmbControllerHost) {
-		super(host, UmbClipboardEntryDetailLocalStorageDataSource, UMB_CLIPBOARD_ENTRY_DETAIL_STORE_CONTEXT);
+		super(host, UmbClipboardEntryDetailLocalStorageDataSource, UMB_CLIPBOARD_ENTRY_DETAIL_STORE_CONTEXT, {
+			create: {
+				success: {
+					message: (model) => {
+						return `${model.name} copied to clipboard`;
+					},
+				},
+			},
+		});
 	}
 
 	override async create(model: UmbClipboardEntryDetailModel) {

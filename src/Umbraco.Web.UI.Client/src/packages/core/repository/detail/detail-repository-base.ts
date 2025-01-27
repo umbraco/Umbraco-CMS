@@ -10,6 +10,24 @@ import type { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
+interface UmbDetailRepositoryBaseNotification<DetailModelType extends UmbEntityModel> {
+	create?: {
+		success?: {
+			message?: (model: DetailModelType) => string;
+		};
+	};
+	save?: {
+		success?: {
+			message?: (model: DetailModelType) => string;
+		};
+	};
+	delete?: {
+		success: {
+			message?: (unique: string) => string;
+		};
+	};
+}
+
 export abstract class UmbDetailRepositoryBase<
 		DetailModelType extends UmbEntityModel,
 		UmbDetailDataSourceType extends UmbDetailDataSource<DetailModelType> = UmbDetailDataSource<DetailModelType>,
@@ -22,11 +40,13 @@ export abstract class UmbDetailRepositoryBase<
 	#detailStore?: UmbDetailStore<DetailModelType>;
 	protected detailDataSource: UmbDetailDataSourceType;
 	#notificationContext?: UmbNotificationContext;
+	#notification?: UmbDetailRepositoryBaseNotification<DetailModelType>;
 
 	constructor(
 		host: UmbControllerHost,
 		detailSource: UmbDetailDataSourceConstructor<DetailModelType>,
 		detailStoreContextAlias: string | UmbContextToken<any, any>,
+		notification?: UmbDetailRepositoryBaseNotification<DetailModelType>,
 	) {
 		super(host);
 
@@ -34,6 +54,7 @@ export abstract class UmbDetailRepositoryBase<
 		if (!detailStoreContextAlias) throw new Error('Detail store context alias is missing');
 
 		this.detailDataSource = new detailSource(host) as UmbDetailDataSourceType;
+		this.#notification = notification;
 
 		this.#init = Promise.all([
 			this.consumeContext(detailStoreContextAlias, (instance) => {
@@ -95,8 +116,9 @@ export abstract class UmbDetailRepositoryBase<
 		if (createdData) {
 			this.#detailStore?.append(createdData);
 
-			// TODO: how do we handle generic notifications? Is this the correct place to do it?
-			const notification = { data: { message: `Created` } };
+			// TODO: Is this the correct place to do it?
+			const message = this.#notification?.create?.success?.message?.(createdData) ?? `Created`;
+			const notification = { data: { message } };
 			this.#notificationContext!.peek('positive', notification);
 		}
 
@@ -119,8 +141,9 @@ export abstract class UmbDetailRepositoryBase<
 		if (updatedData) {
 			this.#detailStore!.updateItem(model.unique, updatedData);
 
-			// TODO: how do we handle generic notifications? Is this the correct place to do it?
-			const notification = { data: { message: `Saved` } };
+			// TODO: Is this the correct place to do it?
+			const message = this.#notification?.save?.success?.message?.(updatedData) ?? `Saved`;
+			const notification = { data: { message } };
 			this.#notificationContext!.peek('positive', notification);
 		}
 
@@ -142,8 +165,9 @@ export abstract class UmbDetailRepositoryBase<
 		if (!error) {
 			this.#detailStore!.removeItem(unique);
 
-			// TODO: how do we handle generic notifications? Is this the correct place to do it?
-			const notification = { data: { message: `Deleted` } };
+			// TODO: Is this the correct place to do it?
+			const message = this.#notification?.delete?.success.message?.(unique) ?? `Deleted`;
+			const notification = { data: { message } };
 			this.#notificationContext!.peek('positive', notification);
 		}
 
