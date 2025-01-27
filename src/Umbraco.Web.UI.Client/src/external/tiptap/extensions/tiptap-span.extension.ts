@@ -1,4 +1,4 @@
-import { Mark, mergeAttributes } from '@tiptap/core';
+import { Node, mergeAttributes } from '@tiptap/core';
 
 export interface SpanOptions {
 	/**
@@ -9,12 +9,14 @@ export interface SpanOptions {
 	HTMLAttributes: Record<string, any>;
 }
 
-export const Span = Mark.create<SpanOptions>({
+export const Span = Node.create<SpanOptions>({
 	name: 'span',
 
 	group: 'inline',
 
-	content: 'inline',
+	inline: true,
+
+	content: 'inline*',
 
 	addOptions() {
 		return { HTMLAttributes: {} };
