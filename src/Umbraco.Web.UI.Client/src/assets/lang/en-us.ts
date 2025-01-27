@@ -572,7 +572,7 @@ export default {
 		selectItem: 'Select item',
 		selectLink: 'Configure link',
 		addLink: 'Add Link',
-		UpdateLink: 'Update Link',
+		updateLink: 'Update Link',
 		selectMacro: 'Select macro',
 		selectContent: 'Select content',
 		selectContentType: 'Select content type',

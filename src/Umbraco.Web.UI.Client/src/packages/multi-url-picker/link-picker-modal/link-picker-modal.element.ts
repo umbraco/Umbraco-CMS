@@ -200,8 +200,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.term(
-					this.modalContext?.data.isNew ? 'defaultdialogs_addLink' : 'defaultdialogs_UpdateLink',
+			<umb-body-layout
+				headline=${this.localize.term(
+					this.modalContext?.data.isNew ? 'defaultdialogs_addLink' : 'defaultdialogs_updateLink',
 				)}>
 				<uui-box>
 					${this.#renderLinkType()} ${this.#renderLinkAnchorInput()} ${this.#renderLinkTitleInput()}
