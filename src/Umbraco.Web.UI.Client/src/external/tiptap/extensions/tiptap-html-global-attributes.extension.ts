@@ -44,6 +44,7 @@ export const HtmlGlobalAttributes = Extension.create<HtmlGlobalAttributesOptions
 						},
 					},
 					id: {},
+					style: {},
 				},
 			},
 		];
