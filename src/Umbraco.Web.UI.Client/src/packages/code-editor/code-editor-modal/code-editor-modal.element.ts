@@ -3,9 +3,7 @@ import type { UmbCodeEditorModalData, UmbCodeEditorModalValue } from './code-edi
 import { css, html, ifDefined, customElement, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
-const elementName = 'umb-code-editor-modal';
-
-@customElement(elementName)
+@customElement('umb-code-editor-modal')
 export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditorModalData, UmbCodeEditorModalValue> {
 	@query('umb-code-editor')
 	_codeEditor?: UmbCodeEditorElement;
@@ -63,6 +61,6 @@ export default UmbCodeEditorModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbCodeEditorModalElement;
+		'umb-code-editor-modal': UmbCodeEditorModalElement;
 	}
 }
