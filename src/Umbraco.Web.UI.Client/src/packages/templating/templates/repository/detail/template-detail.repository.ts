@@ -10,7 +10,21 @@ export class UmbTemplateDetailRepository extends UmbDetailRepositoryBase<UmbTemp
 			create: {
 				success: {
 					message: () => {
-						return `Template created`;
+						return `#template_created`;
+					},
+				},
+			},
+			save: {
+				success: {
+					message: () => {
+						return `#template_updated`;
+					},
+				},
+			},
+			delete: {
+				success: {
+					message: () => {
+						return `#template_deleted`;
 					},
 				},
 			},

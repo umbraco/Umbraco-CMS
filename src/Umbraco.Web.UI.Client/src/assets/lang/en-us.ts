@@ -403,6 +403,11 @@ export default {
 		copyFailed: 'Failed to copy content type',
 		moveFailed: 'Failed to move content type',
 	},
+	documentType: {
+		created: 'Document Type created',
+		updated: 'Document Type saved',
+		deleted: 'Document Type deleted',
+	},
 	mediaType: {
 		copyFailed: 'Failed to copy media type',
 		moveFailed: 'Failed to move media type',
@@ -1384,6 +1389,9 @@ export default {
 		validationFailedMessage: 'Validation errors must be fixed before the item can be saved',
 		operationFailedHeader: 'Failed',
 		operationSavedHeader: 'Saved',
+		created: 'Created',
+		updated: 'Saved',
+		deleted: 'Deleted',
 		operationSavedHeaderReloadUser: 'Saved. To view the changes please reload your browser',
 		invalidUserPermissionsText: 'Insufficient user permissions, could not complete the operation',
 		operationCancelledHeader: 'Cancelled',
@@ -1508,8 +1516,10 @@ export default {
 		tabRules: 'Rich Text Editor',
 	},
 	template: {
+		created: 'Template created',
 		runtimeModeProduction: 'Content is not editable when using runtime mode <code>Production</code>.',
 		deleteByIdFailed: 'Failed to delete template with ID %0%',
+		deleted: 'Template deleted',
 		edittemplate: 'Edit template',
 		insertSections: 'Sections',
 		insertContentArea: 'Insert content area',
@@ -1573,6 +1583,7 @@ export default {
 		ascending: 'ascending',
 		descending: 'descending',
 		template: 'Template',
+		updated: 'Template saved',
 	},
 	grid: {
 		media: 'Image',

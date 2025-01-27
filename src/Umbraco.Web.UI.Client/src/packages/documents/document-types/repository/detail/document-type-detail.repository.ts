@@ -9,21 +9,21 @@ export class UmbDocumentTypeDetailRepository extends UmbDetailRepositoryBase<Umb
 			create: {
 				success: {
 					message: () => {
-						return `Document Type created`;
+						return `#documentType_created`;
 					},
 				},
 			},
 			save: {
 				success: {
 					message: () => {
-						return `Document Type saved`;
+						return `#documentType_updated`;
 					},
 				},
 			},
 			delete: {
 				success: {
 					message: () => {
-						return `Document Type deleted`;
+						return `#documentType_deleted`;
 					},
 				},
 			},

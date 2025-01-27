@@ -9,6 +9,7 @@ import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 interface UmbDetailRepositoryBaseNotification<DetailModelType extends UmbEntityModel> {
 	create?: {
@@ -41,6 +42,7 @@ export abstract class UmbDetailRepositoryBase<
 	protected detailDataSource: UmbDetailDataSourceType;
 	#notificationContext?: UmbNotificationContext;
 	#notification?: UmbDetailRepositoryBaseNotification<DetailModelType>;
+	protected readonly _localize = new UmbLocalizationController(this);
 
 	constructor(
 		host: UmbControllerHost,
@@ -116,8 +118,11 @@ export abstract class UmbDetailRepositoryBase<
 		if (createdData) {
 			this.#detailStore?.append(createdData);
 
+			debugger;
 			// TODO: Is this the correct place to do it?
-			const message = this.#notification?.create?.success?.message?.(createdData) ?? `Created`;
+			const message =
+				this._localize.string(this.#notification?.create?.success?.message?.(createdData)) ??
+				this._localize.term('speechBubbles_created');
 			const notification = { data: { message } };
 			this.#notificationContext!.peek('positive', notification);
 		}
@@ -140,9 +145,10 @@ export abstract class UmbDetailRepositoryBase<
 
 		if (updatedData) {
 			this.#detailStore!.updateItem(model.unique, updatedData);
-
 			// TODO: Is this the correct place to do it?
-			const message = this.#notification?.save?.success?.message?.(updatedData) ?? `Saved`;
+			const message =
+				this._localize.string(this.#notification?.save?.success?.message?.(updatedData)) ??
+				this._localize.term('speechBubbles_updated');
 			const notification = { data: { message } };
 			this.#notificationContext!.peek('positive', notification);
 		}
@@ -166,7 +172,9 @@ export abstract class UmbDetailRepositoryBase<
 			this.#detailStore!.removeItem(unique);
 
 			// TODO: Is this the correct place to do it?
-			const message = this.#notification?.delete?.success.message?.(unique) ?? `Deleted`;
+			const message =
+				this._localize.string(this.#notification?.delete?.success.message?.(unique)) ??
+				this._localize.term('speechBubbles_deleted');
 			const notification = { data: { message } };
 			this.#notificationContext!.peek('positive', notification);
 		}
