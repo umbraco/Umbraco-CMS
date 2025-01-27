@@ -23,7 +23,7 @@ interface UmbDetailRepositoryBaseNotification<DetailModelType extends UmbEntityM
 		};
 	};
 	delete?: {
-		success: {
+		success?: {
 			message?: (unique: string) => string;
 		};
 	};
@@ -118,11 +118,10 @@ export abstract class UmbDetailRepositoryBase<
 		if (createdData) {
 			this.#detailStore?.append(createdData);
 
-			debugger;
 			// TODO: Is this the correct place to do it?
-			const message =
-				this._localize.string(this.#notification?.create?.success?.message?.(createdData)) ??
-				this._localize.term('speechBubbles_created');
+			const message = this.#notification?.create?.success?.message
+				? this._localize.string(this.#notification.create.success.message?.(createdData))
+				: this._localize.term('speechBubbles_created');
 			const notification = { data: { message } };
 			this.#notificationContext!.peek('positive', notification);
 		}
@@ -146,9 +145,9 @@ export abstract class UmbDetailRepositoryBase<
 		if (updatedData) {
 			this.#detailStore!.updateItem(model.unique, updatedData);
 			// TODO: Is this the correct place to do it?
-			const message =
-				this._localize.string(this.#notification?.save?.success?.message?.(updatedData)) ??
-				this._localize.term('speechBubbles_updated');
+			const message = this.#notification?.save?.success?.message
+				? this._localize.string(this.#notification.save.success.message?.(updatedData))
+				: this._localize.term('speechBubbles_updated');
 			const notification = { data: { message } };
 			this.#notificationContext!.peek('positive', notification);
 		}
@@ -172,9 +171,9 @@ export abstract class UmbDetailRepositoryBase<
 			this.#detailStore!.removeItem(unique);
 
 			// TODO: Is this the correct place to do it?
-			const message =
-				this._localize.string(this.#notification?.delete?.success.message?.(unique)) ??
-				this._localize.term('speechBubbles_deleted');
+			const message = this.#notification?.delete?.success?.message
+				? this._localize.string(this.#notification.delete.success.message?.(unique))
+				: this._localize.term('speechBubbles_deleted');
 			const notification = { data: { message } };
 			this.#notificationContext!.peek('positive', notification);
 		}
