@@ -421,7 +421,8 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 						slot="actions"
 						look="primary"
 						@click=${this.#onRollback}
-						label=${this.localize.term('actions_rollback')}></uui-button>
+						label=${this.localize.term('actions_rollback')}
+						?disabled=${!this._selectedVersion}></uui-button>
 				</umb-footer-layout>
 			</umb-body-layout>
 		`;
