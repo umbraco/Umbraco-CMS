@@ -316,7 +316,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		for (const subfolder of folders) {
 			const unique = UmbId.new();
 			items.push({
-				unique: UmbId.new(),
+				unique,
 				parentUnique,
 				status: UmbFileDropzoneItemStatus.WAITING,
 				folder: { name: subfolder.folderName },
