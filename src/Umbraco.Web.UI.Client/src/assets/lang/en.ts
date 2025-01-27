@@ -2675,6 +2675,8 @@ export default {
 		config_overlaySize: 'Overlay size',
 	},
 	tiptap: {
+		config_extensions: 'Capabilities',
+		config_toolbar: 'Toolbar',
 		extGroup_formatting: 'Text formatting',
 		extGroup_interactive: 'Interactive elements',
 		extGroup_media: 'Embeds and media',
