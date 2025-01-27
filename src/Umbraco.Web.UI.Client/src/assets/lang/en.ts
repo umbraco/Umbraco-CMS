@@ -129,6 +129,7 @@ export default {
 	buttons: {
 		clearSelection: 'Clear selection',
 		select: 'Select',
+		choose: 'Choose',
 		somethingElse: 'Do something else',
 		bold: 'Bold',
 		deindent: 'Cancel Paragraph Indent',
@@ -558,10 +559,14 @@ export default {
 		selectContentStartNode: 'Select content start node',
 		selectEvent: 'Select event',
 		selectMedia: 'Select media',
+		chooseMedia: 'Choose media',
+		chooseMediaStartNode: 'Choose Media Start nodes',
 		selectMediaType: 'Select media type',
 		selectIcon: 'Select icon',
 		selectItem: 'Select item',
 		selectLink: 'Configure link',
+		addLink: 'Add Link',
+		updateLink: 'Update Link',
 		selectMacro: 'Select macro',
 		selectContent: 'Select content',
 		selectContentType: 'Select content type',
@@ -569,12 +574,14 @@ export default {
 		selectMember: 'Choose member',
 		selectMembers: 'Choose members',
 		selectMemberGroup: 'Select member group',
+		chooseMemberGroup: 'Choose member group',
 		selectMemberType: 'Select member type',
 		selectNode: 'Select node',
 		selectLanguages: 'Select languages',
 		selectSections: 'Select sections',
 		selectUser: 'Select user',
 		selectUsers: 'Select users',
+		chooseUsers: 'Choose users',
 		noIconsFound: 'No icons were found',
 		noMacroParams: 'There are no parameters for this macro',
 		noMacros: 'There are no macros available to insert',
@@ -2010,6 +2017,9 @@ export default {
 		selectUserGroup: (multiple: boolean) => {
 			return multiple ? 'Select User Groups' : 'Select User Group';
 		},
+		chooseUserGroup: (multiple: boolean) => {
+			return multiple ? 'Choose User Groups' : 'Choose User Group';
+		},
 		noStartNode: 'No start node selected',
 		noStartNodes: 'No start nodes selected',
 		startnode: 'Content start node',
@@ -2120,6 +2130,9 @@ export default {
 		duplicateUsername: "Username '%0%' is already taken",
 		legacyOption: 'Legacy option',
 		legacyOptionDescription: 'This option is no longer supported, please select something else',
+		numberMinimum: "Value must be greater than or equal to '%0%'.",
+		numberMaximum: "Value must be less than or equal to '%0%'.",
+		numberMisconfigured: "Minimum value '%0%' must be less than the maximum value '%1%'.",
 	},
 	healthcheck: {
 		checkSuccessMessage: "Value is set to the recommended value: '%0%'.",

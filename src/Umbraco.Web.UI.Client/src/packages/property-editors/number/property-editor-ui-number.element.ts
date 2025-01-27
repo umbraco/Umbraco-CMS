@@ -1,4 +1,5 @@
 import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
@@ -8,10 +9,10 @@ import type {
 } from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-property-editor-ui-number')
-export class UmbPropertyEditorUINumberElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property({ type: Number })
-	value?: number;
-
+export class UmbPropertyEditorUINumberElement
+	extends UmbFormControlMixin<number | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
+	implements UmbPropertyEditorUiElement
+{
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 * @type {boolean}
@@ -46,9 +47,28 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 
 	constructor() {
 		super();
+
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this._label = context.getLabel();
 		});
+
+		this.addValidator(
+			'rangeUnderflow',
+			() => this.localize.term('validation_numberMinimum', this._min),
+			() => !!this._min && this.value! < this._min,
+		);
+
+		this.addValidator(
+			'rangeOverflow',
+			() => this.localize.term('validation_numberMaximum', this._max),
+			() => !!this._max && this.value! > this._max,
+		);
+
+		this.addValidator(
+			'customError',
+			() => this.localize.term('validation_numberMisconfigured', this._min, this._max),
+			() => !!this._min && !!this._max && this._min > this._max,
+		);
 	}
 
 	protected override firstUpdated() {
@@ -79,7 +99,7 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 				max=${ifDefined(this._max)}
 				step=${ifDefined(this._step)}
 				placeholder=${ifDefined(this._placeholder)}
-				.value=${this.value?.toString() ?? (this._placeholder ? '' : '0')}
+				value=${this.value?.toString() ?? (this._placeholder ? '' : '0')}
 				@input=${this.#onInput}
 				?readonly=${this.readonly}>
 			</uui-input>

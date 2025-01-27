@@ -123,6 +123,7 @@ export default {
 	buttons: {
 		clearSelection: 'Ryd valg',
 		select: 'Vælg',
+		choose: 'Vælg',
 		somethingElse: 'Gør noget andet',
 		bold: 'Fed',
 		deindent: 'Fortryd indryk afsnit',
@@ -535,10 +536,14 @@ export default {
 		linkToMedia: 'Link til medie',
 		selectContentStartNode: 'Vælg startnode for indhold',
 		selectMedia: 'Vælg medie',
+		chooseMedia: 'Vælg medie',
+		chooseMediaStartNode: 'Vælg startnode for medie',
 		selectMediaType: 'Vælg medietype',
 		selectIcon: 'Vælg ikon',
 		selectItem: 'Vælg item',
 		selectLink: 'Vælg link',
+		addLink: 'Tilføj Link',
+		updateLink: 'Opdater Link',
 		selectMacro: 'Vælg makro',
 		selectContent: 'Vælg indhold',
 		selectContentType: 'Vælg indholdstype',
@@ -546,12 +551,14 @@ export default {
 		selectMember: 'Vælg medlem',
 		selectMembers: 'Vælg medlemmer',
 		selectMemberGroup: 'Vælg medlemsgruppe',
+		chooseMemberGroup: 'Vælg medlemsgruppe',
 		selectMemberType: 'Vælg medlemstype',
 		selectNode: 'Vælg node',
 		selectLanguages: 'Vælg sprog',
 		selectSections: 'Vælg sektioner',
 		selectUser: 'Vælg bruger',
 		selectUsers: 'Vælg brugere',
+		chooseUsers: 'Vælg brugere',
 		noIconsFound: 'Ingen ikoner blev fundet',
 		noMacroParams: 'Der er ingen parametre for denne makro',
 		noMacros: 'Der er ikke tilføjet nogen makroer',
@@ -1917,6 +1924,9 @@ export default {
 		allowAccessToAllDocuments: 'Tillad adgang til alle dokumenter',
 		allowAccessToAllMedia: 'Tillad adgang til alle medier',
 		selectUserGroup: (multiple: boolean) => {
+			return multiple ? 'Vælg brugergrupper' : 'Vælg brugergruppe';
+		},
+		chooseUserGroup: (multiple: boolean) => {
 			return multiple ? 'Vælg brugergrupper' : 'Vælg brugergruppe';
 		},
 		noStartNode: 'Ingen startnode valgt',
