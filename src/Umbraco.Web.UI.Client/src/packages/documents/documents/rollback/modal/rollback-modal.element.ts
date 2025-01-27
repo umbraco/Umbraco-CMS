@@ -10,7 +10,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
 import { UMB_ENTITY_CONTEXT, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
@@ -97,18 +97,20 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			this.isInvariant = itemVariants.length === 1 && new UmbVariantId(itemVariants[0].culture).isInvariant();
 			this.#setCurrentCulture();
 
-			this.availableVariants = itemVariants
-				.filter((variant) => {
-					return variant.culture !== null;
-				})
-				.map((variant) => {
-					const culture = variant.culture as string;
+			const cultures = itemVariants.map((x) => x.culture).filter((x) => x !== null) as string[];
+			const { data: languageItems } = await new UmbLanguageItemRepository(this).requestItems(cultures);
+
+			if (languageItems) {
+				this.availableVariants = languageItems.map((language) => {
 					return {
-						name: culture,
-						value: culture,
-						selected: variant.culture === this.currentCulture,
+						name: language.name,
+						value: language.unique,
+						selected: language.unique === this.currentCulture,
 					};
 				});
+			} else {
+				this.availableVariants = [];
+			}
 
 			this.#requestVersions();
 		});
@@ -185,7 +187,6 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		const id = this.currentVersion.id;
 		const culture = this.availableVariants.length > 1 ? this.currentCulture : undefined;
 		this.#rollbackRepository.rollback(id, culture);
-		debugger;
 
 		const docUnique = this.#workspaceContext?.getUnique() ?? '';
 		// TODO Use the load method on the context instead of location.href, when it works.
@@ -222,7 +223,6 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	}
 
 	#renderCultureSelect() {
-		if (this.availableVariants.length < 2) return nothing;
 		return html`
 			<div id="language-select">
 				<b>${this.localize.term('general_language')}</b>
