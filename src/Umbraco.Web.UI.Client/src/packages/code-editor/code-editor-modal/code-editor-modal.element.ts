@@ -16,21 +16,30 @@ export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditor
 	#handleCancel() {
 		this.modalContext?.reject();
 	}
+
+	#onLoaded() {
+		if (this.data?.formatOnLoad) {
+			setTimeout(() => {
+				this._codeEditor?.editor?.monacoEditor?.getAction('editor.action.formatDocument')?.run();
+			}, 100);
+		}
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout .headline=${this.data?.headline ?? 'Code Editor'}>
 				<div id="editor-box">${this.#renderCodeEditor()}</div>
 				<div slot="actions">
-					<uui-button
+				<uui-button
 						id="cancel"
-						label=${this.localize.term('general_cancel')}
-						@click=${this.#handleCancel}></uui-button>
-					<uui-button
+					label=${this.localize.term('general_cancel')}
+					@click=${this.#handleCancel}></uui-button>
+				<uui-button
 						id="confirm"
 						color="${this.data?.color || 'positive'}"
-						look="primary"
+					look="primary"
 						label="${this.data?.confirmLabel || this.localize.term('general_submit')}"
-						@click=${this.#handleConfirm}></uui-button>
+					@click=${this.#handleConfirm}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
@@ -38,7 +47,10 @@ export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditor
 
 	#renderCodeEditor() {
 		return html`
-			<umb-code-editor language=${ifDefined(this.data?.language)} .code=${this.data?.content ?? ''}></umb-code-editor>
+			<umb-code-editor
+				language=${ifDefined(this.data?.language)}
+				.code=${this.data?.content ?? ''}
+				@loaded=${this.#onLoaded}></umb-code-editor>
 		`;
 	}
 
