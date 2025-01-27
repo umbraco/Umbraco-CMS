@@ -14,17 +14,17 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
 interface UmbDetailRepositoryBaseNotification<DetailModelType extends UmbEntityModel> {
 	create?: {
 		success?: {
-			message?: (model: DetailModelType) => string;
+			message?: (model: DetailModelType) => Promise<string>;
 		};
 	};
 	save?: {
 		success?: {
-			message?: (model: DetailModelType) => string;
+			message?: (model: DetailModelType) => Promise<string>;
 		};
 	};
 	delete?: {
 		success?: {
-			message?: (unique: string) => string;
+			message?: (unique: string) => Promise<string>;
 		};
 	};
 }
@@ -120,7 +120,7 @@ export abstract class UmbDetailRepositoryBase<
 
 			// TODO: Is this the correct place to do it?
 			const message = this.#notification?.create?.success?.message
-				? this._localize.string(this.#notification.create.success.message?.(createdData))
+				? this._localize.string(await this.#notification.create.success.message?.(createdData))
 				: this._localize.term('speechBubbles_created');
 			const notification = { data: { message } };
 			this.#notificationContext!.peek('positive', notification);
@@ -146,7 +146,7 @@ export abstract class UmbDetailRepositoryBase<
 			this.#detailStore!.updateItem(model.unique, updatedData);
 			// TODO: Is this the correct place to do it?
 			const message = this.#notification?.save?.success?.message
-				? this._localize.string(this.#notification.save.success.message?.(updatedData))
+				? this._localize.string(await this.#notification.save.success.message?.(updatedData))
 				: this._localize.term('speechBubbles_updated');
 			const notification = { data: { message } };
 			this.#notificationContext!.peek('positive', notification);
@@ -172,7 +172,7 @@ export abstract class UmbDetailRepositoryBase<
 
 			// TODO: Is this the correct place to do it?
 			const message = this.#notification?.delete?.success?.message
-				? this._localize.string(this.#notification.delete.success.message?.(unique))
+				? this._localize.string(await this.#notification.delete.success.message?.(unique))
 				: this._localize.term('speechBubbles_deleted');
 			const notification = { data: { message } };
 			this.#notificationContext!.peek('positive', notification);

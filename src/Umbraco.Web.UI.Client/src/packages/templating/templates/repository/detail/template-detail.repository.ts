@@ -9,21 +9,21 @@ export class UmbTemplateDetailRepository extends UmbDetailRepositoryBase<UmbTemp
 		super(host, UmbTemplateServerDataSource, UMB_TEMPLATE_DETAIL_STORE_CONTEXT, {
 			create: {
 				success: {
-					message: () => {
+					message: async () => {
 						return `#template_created`;
 					},
 				},
 			},
 			save: {
 				success: {
-					message: () => {
+					message: async () => {
 						return `#template_updated`;
 					},
 				},
 			},
 			delete: {
 				success: {
-					message: () => {
+					message: async () => {
 						return `#template_deleted`;
 					},
 				},

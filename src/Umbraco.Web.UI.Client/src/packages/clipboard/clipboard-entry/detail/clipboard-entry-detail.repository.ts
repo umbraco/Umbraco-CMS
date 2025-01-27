@@ -9,7 +9,7 @@ export class UmbClipboardEntryDetailRepository extends UmbDetailRepositoryBase<U
 		super(host, UmbClipboardEntryDetailLocalStorageDataSource, UMB_CLIPBOARD_ENTRY_DETAIL_STORE_CONTEXT, {
 			create: {
 				success: {
-					message: (model) => {
+					message: async (model) => {
 						return `${model.name} copied to clipboard`;
 					},
 				},

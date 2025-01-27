@@ -8,21 +8,21 @@ export class UmbDocumentTypeDetailRepository extends UmbDetailRepositoryBase<Umb
 		super(host, UmbDocumentTypeDetailServerDataSource, UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT, {
 			create: {
 				success: {
-					message: () => {
+					message: async () => {
 						return `#documentType_created`;
 					},
 				},
 			},
 			save: {
 				success: {
-					message: () => {
+					message: async () => {
 						return `#documentType_updated`;
 					},
 				},
 			},
 			delete: {
 				success: {
-					message: () => {
+					message: async () => {
 						return `#documentType_deleted`;
 					},
 				},
