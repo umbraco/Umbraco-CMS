@@ -215,7 +215,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		const entityDetailUpdatedEvent = new UmbEntityDetailUpdatedEvent({ unique, entityType });
 		actionEventContext.dispatchEvent(entityDetailUpdatedEvent);
 
-		this.modalContext?.reject();
+		this.modalContext?.submit();
 	}
 
 	#onCancel() {
