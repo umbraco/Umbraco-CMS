@@ -20,8 +20,8 @@ export class UmbTemporaryFileManager<
 		this.#queue.setValue([]);
 
 		const item: UploadableItem = {
-			status: TemporaryFileStatus.WAITING,
 			...uploadableItem,
+			status: TemporaryFileStatus.WAITING,
 		};
 
 		this.#queue.appendOne(item);
