@@ -15,6 +15,11 @@ import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 import '../../modals/shared/document-variant-language-picker.element.js';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import {
+	UmbEntityDetailUpdatedEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
 
 type DocumentVersion = {
 	id: string;
@@ -187,12 +192,28 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		await this.#setDiffs();
 	}
 
-	#onRollback() {
+	async #onRollback() {
 		if (!this._selectedVersion) return;
 
 		const id = this._selectedVersion.id;
 		const culture = this._selectedCulture ?? undefined;
-		this.#rollbackRepository.rollback(id, culture);
+
+		const { error } = await this.#rollbackRepository.rollback(id, culture);
+		if (error) return;
+
+		const unique = this.#currentDocument?.unique;
+		const entityType = this.#currentDocument?.entityType;
+
+		if (!unique || !entityType) {
+			throw new Error('Document unique or entity type is not set');
+		}
+
+		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		const reloadStructureEvent = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
+		actionEventContext.dispatchEvent(reloadStructureEvent);
+
+		const entityDetailUpdatedEvent = new UmbEntityDetailUpdatedEvent({ unique, entityType });
+		actionEventContext.dispatchEvent(entityDetailUpdatedEvent);
 
 		this.modalContext?.reject();
 	}
