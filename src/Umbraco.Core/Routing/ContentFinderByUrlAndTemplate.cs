@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
@@ -24,10 +25,10 @@ namespace Umbraco.Cms.Core.Routing;
 ///     </para>
 ///     <para>If successful, then the template of the document request is also assigned.</para>
 /// </remarks>
-public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
+public class ContentFinderByUrlAndTemplate : ContentFinderByUrlNew
 {
     private readonly IContentTypeService _contentTypeService;
-    private readonly IFileService _fileService;
+    private readonly ITemplateService _templateService;
     private readonly ILogger<ContentFinderByUrlAndTemplate> _logger;
     private WebRoutingSettings _webRoutingSettings;
 
@@ -36,14 +37,16 @@ public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
     /// </summary>
     public ContentFinderByUrlAndTemplate(
         ILogger<ContentFinderByUrlAndTemplate> logger,
-        IFileService fileService,
+        ITemplateService templateService,
         IContentTypeService contentTypeService,
         IUmbracoContextAccessor umbracoContextAccessor,
-        IOptionsMonitor<WebRoutingSettings> webRoutingSettings)
-        : base(logger, umbracoContextAccessor)
+        IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
+        IDocumentUrlService documentUrlService,
+        IPublishedContentCache publishedContentCache)
+        : base(logger, umbracoContextAccessor, documentUrlService, publishedContentCache)
     {
         _logger = logger;
-        _fileService = fileService;
+        _templateService = templateService;
         _contentTypeService = contentTypeService;
         _webRoutingSettings = webRoutingSettings.CurrentValue;
         webRoutingSettings.OnChange(x => _webRoutingSettings = x);
@@ -55,7 +58,7 @@ public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
     /// <param name="frequest">The <c>PublishedRequest</c>.</param>
     /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
     /// <remarks>If successful, also assigns the template.</remarks>
-    public override Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
+    public override async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
     {
         var path = frequest.AbsolutePathDecoded;
 
@@ -72,7 +75,7 @@ public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
                 _logger.LogDebug("No template in path '/'");
             }
 
-            return Task.FromResult(false);
+            return false;
         }
 
         // look for template in last position
@@ -80,7 +83,9 @@ public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
         var templateAlias = path[(pos + 1)..];
         path = pos == 0 ? "/" : path[..pos];
 
-        ITemplate? template = _fileService.GetTemplate(templateAlias);
+
+
+        ITemplate? template = await _templateService.GetAsync(templateAlias);
 
         if (template == null)
         {
@@ -88,14 +93,14 @@ public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
             {
                 _logger.LogDebug("Not a valid template: '{TemplateAlias}'", templateAlias);
             }
-
-            return Task.FromResult(false);
+            return false;
         }
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
             _logger.LogDebug("Valid template: '{TemplateAlias}'", templateAlias);
         }
+
 
         // look for node corresponding to the rest of the route
         var route = frequest.Domain != null ? frequest.Domain.ContentId + path : path;
@@ -108,20 +113,19 @@ public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
                 _logger.LogDebug("Not a valid route to node: '{Route}'", route);
             }
 
-            return Task.FromResult(false);
+            return false;
         }
-
         // IsAllowedTemplate deals both with DisableAlternativeTemplates and ValidateAlternativeTemplates settings
         if (!node.IsAllowedTemplate(_contentTypeService, _webRoutingSettings, template.Id))
         {
             _logger.LogWarning(
                 "Alternative template '{TemplateAlias}' is not allowed on node {NodeId}.", template.Alias, node.Id);
             frequest.SetPublishedContent(null); // clear
-            return Task.FromResult(false);
+            return false;
         }
 
         // got it
         frequest.SetTemplate(template);
-        return Task.FromResult(true);
+        return true;
     }
 }
