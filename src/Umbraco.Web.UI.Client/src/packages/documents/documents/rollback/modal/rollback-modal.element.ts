@@ -1,11 +1,7 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../constants.js';
-import { UMB_DOCUMENT_ENTITY_TYPE, UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../constants.js';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../../constants.js';
 import { UmbRollbackRepository } from '../repository/rollback.repository.js';
-import {
-	UmbDocumentDetailRepository,
-	UmbDocumentItemRepository,
-	type UmbDocumentItemModel,
-} from '../../repository/index.js';
+import { UmbDocumentDetailRepository } from '../../repository/index.js';
+import type { UmbDocumentDetailModel } from '../../types.js';
 import type { UmbRollbackModalData, UmbRollbackModalValue } from './types.js';
 import { diffWords, type Change } from '@umbraco-cms/backoffice/external/diff';
 import { css, customElement, html, nothing, repeat, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
@@ -31,10 +27,10 @@ type DocumentVersion = {
 @customElement('umb-rollback-modal')
 export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModalData, UmbRollbackModalValue> {
 	@state()
-	versions: DocumentVersion[] = [];
+	_versions: DocumentVersion[] = [];
 
 	@state()
-	selectedVersion?: {
+	_selectedVersion?: {
 		date: string;
 		name: string;
 		user: string;
@@ -46,20 +42,19 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	};
 
 	@state()
-	selectedCulture?: string;
+	_selectedCulture: string | null = null;
 
 	@state()
-	availableVariants: Option[] = [];
+	_isInvariant = true;
 
 	@state()
-	isInvariant = true;
+	_availableVariants: Option[] = [];
 
 	@state()
 	_diffs: Array<{ alias: string; diff: Change[] }> = [];
 
 	#rollbackRepository = new UmbRollbackRepository(this);
 	#userItemRepository = new UmbUserItemRepository(this);
-	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 
 	#localizeDateOptions: Intl.DateTimeFormatOptions = {
 		day: 'numeric',
@@ -68,17 +63,12 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		minute: '2-digit',
 	};
 
-	#documentUnique: UmbEntityUnique | undefined;
-	#documentItem: UmbDocumentItemModel | undefined;
+	#currentDocument: UmbDocumentDetailModel | undefined;
 	#currentAppCulture: string | undefined;
 	#currentDatasetCulture: string | undefined;
 
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance;
-		});
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (instance) => {
 			this.#currentDatasetCulture = instance.getVariantId().culture ?? undefined;
@@ -95,32 +85,34 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 				throw new Error(`Entity type is not ${UMB_DOCUMENT_ENTITY_TYPE}`);
 			}
 
-			this.#documentUnique = instance?.getUnique();
+			const unique = instance?.getUnique();
 
-			if (!this.#documentUnique) {
+			if (!unique) {
 				throw new Error('Document unique is not set');
 			}
 
-			const { data: documentItems } = await new UmbDocumentItemRepository(this).requestItems([this.#documentUnique]);
-			this.#documentItem = documentItems?.[0];
-			const itemVariants = this.#documentItem?.variants ?? [];
+			const { data } = await new UmbDocumentDetailRepository(this).requestByUnique(unique);
+			if (!data) return;
 
-			this.isInvariant = itemVariants.length === 1 && new UmbVariantId(itemVariants[0].culture).isInvariant();
+			this.#currentDocument = data;
+			const itemVariants = this.#currentDocument?.variants ?? [];
+
+			this._isInvariant = itemVariants.length === 1 && new UmbVariantId(itemVariants[0].culture).isInvariant();
 			this.#selectCulture();
 
 			const cultures = itemVariants.map((x) => x.culture).filter((x) => x !== null) as string[];
 			const { data: languageItems } = await new UmbLanguageItemRepository(this).requestItems(cultures);
 
 			if (languageItems) {
-				this.availableVariants = languageItems.map((language) => {
+				this._availableVariants = languageItems.map((language) => {
 					return {
 						name: language.name,
 						value: language.unique,
-						selected: language.unique === this.selectedCulture,
+						selected: language.unique === this._selectedCulture,
 					};
 				});
 			} else {
-				this.availableVariants = [];
+				this._availableVariants = [];
 			}
 
 			this.#requestVersions();
@@ -128,17 +120,18 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	}
 
 	#selectCulture() {
-		this.selectedCulture = this.isInvariant ? undefined : (this.#currentDatasetCulture ?? this.#currentAppCulture);
+		const contextCulture = this.#currentDatasetCulture ?? this.#currentAppCulture ?? null;
+		this._selectedCulture = this._isInvariant ? null : contextCulture;
 	}
 
 	async #requestVersions() {
-		if (!this.#documentUnique) {
+		if (!this.#currentDocument?.unique) {
 			throw new Error('Document unique is not set');
 		}
 
 		const { data } = await this.#rollbackRepository.requestVersionsByDocumentId(
-			this.#documentUnique,
-			this.selectedCulture,
+			this.#currentDocument?.unique,
+			this._selectedCulture ?? undefined,
 		);
 		if (!data) return;
 
@@ -161,7 +154,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			});
 		});
 
-		this.versions = tempItems;
+		this._versions = tempItems;
 		const id = tempItems.find((item) => item.isCurrentlyPublishedVersion)?.id;
 
 		if (id) {
@@ -170,19 +163,19 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	}
 
 	async #selectVersion(id: string) {
-		const version = this.versions.find((item) => item.id === id);
+		const version = this._versions.find((item) => item.id === id);
 		if (!version) return;
 
 		const { data } = await this.#rollbackRepository.requestVersionById(id);
 		if (!data) return;
 
-		this.selectedVersion = {
+		this._selectedVersion = {
 			date: version.date,
 			user: version.user,
-			name: data.variants.find((x) => x.culture === this.selectedCulture)?.name || data.variants[0].name,
+			name: data.variants.find((x) => x.culture === this._selectedCulture)?.name || data.variants[0].name,
 			id: data.id,
 			properties: data.values
-				.filter((x) => x.culture === this.selectedCulture || !x.culture) // When invariant, culture is undefined or null.
+				.filter((x) => x.culture === this._selectedCulture || !x.culture) // When invariant, culture is undefined or null.
 				.map((value: any) => {
 					return {
 						alias: value.alias,
@@ -195,16 +188,12 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	}
 
 	#onRollback() {
-		if (!this.selectedVersion) return;
+		if (!this._selectedVersion) return;
 
-		const id = this.selectedVersion.id;
-		const culture = this.availableVariants.length > 1 ? this.selectedCulture : undefined;
+		const id = this._selectedVersion.id;
+		const culture = this._selectedCulture ?? undefined;
 		this.#rollbackRepository.rollback(id, culture);
 
-		const docUnique = this.#workspaceContext?.getUnique() ?? '';
-		// TODO Use the load method on the context instead of location.href, when it works.
-		// this.#workspaceContext?.load(docUnique);
-		location.href = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: docUnique });
 		this.modalContext?.reject();
 	}
 
@@ -221,7 +210,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		event.stopImmediatePropagation();
 		this.#rollbackRepository.setPreventCleanup(id, preventCleanup);
 
-		const version = this.versions.find((item) => item.id === id);
+		const version = this._versions.find((item) => item.id === id);
 		if (!version) return;
 
 		version.preventCleanup = preventCleanup;
@@ -231,7 +220,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	#onChangeCulture(event: UUISelectEvent) {
 		const value = event.target.value;
 
-		this.selectedCulture = value.toString();
+		this._selectedCulture = value.toString();
 		this.#requestVersions();
 	}
 
@@ -243,7 +232,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		return html`
 			<div id="language-select">
 				<b>${this.localize.term('general_language')}</b>
-				<uui-select @change=${this.#onChangeCulture} .options=${this.availableVariants}></uui-select>
+				<uui-select @change=${this.#onChangeCulture} .options=${this._availableVariants}></uui-select>
 			</div>
 		`;
 	}
@@ -251,14 +240,14 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	#renderVersions() {
 		return html` ${this.#renderCultureSelect()}
 		${repeat(
-			this.versions,
+			this._versions,
 			(item) => item.id,
 			(item) => {
 				return html`
 					<div
 						@click=${() => this.#onVersionClicked(item.id)}
 						@keydown=${() => {}}
-						class="rollback-item ${this.selectedVersion?.id === item.id ? 'active' : ''}">
+						class="rollback-item ${this._selectedVersion?.id === item.id ? 'active' : ''}">
 						<div>
 							<p class="rollback-item-date">
 								<umb-localize-date date="${item.date}" .options=${this.#localizeDateOptions}></umb-localize-date>
@@ -279,33 +268,29 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	}
 
 	async #setDiffs() {
-		if (!this.selectedVersion) return;
+		if (!this._selectedVersion) return;
 
-		let newestPropertyValues = [];
+		const currentPropertyValues = this.#currentDocument?.values.filter(
+			(x) => x.culture === this._selectedCulture || !x.culture,
+		); // When invariant, culture is undefined or null.
 
-		if (this.#workspaceContext) {
-			newestPropertyValues = this.#workspaceContext?.getData()?.values ?? [];
-		} else {
-			if (!this.#documentUnique) {
-				throw new Error('Document unique is not set');
-			}
-
-			const repo = new UmbDocumentDetailRepository(this);
-			const { data } = await repo.requestByUnique(this.#documentUnique);
-			if (!data) return;
-
-			newestPropertyValues = data.values;
+		if (!currentPropertyValues) {
+			throw new Error('Current property values are not set');
 		}
 
-		newestPropertyValues = newestPropertyValues.filter((x) => x.culture === this.selectedCulture || !x.culture); // When invariant, culture is undefined or null.
+		const currentName = this.#currentDocument?.variants.find((x) => x.culture === this._selectedCulture)?.name;
+
+		if (!currentName) {
+			throw new Error('Current name is not set');
+		}
 
 		const diffs: Array<{ alias: string; diff: Change[] }> = [];
 
-		const nameDiff = diffWords(this.#workspaceContext?.getName() ?? '', this.selectedVersion.name);
+		const nameDiff = diffWords(currentName, this._selectedVersion.name);
 		diffs.push({ alias: 'name', diff: nameDiff });
 
-		this.selectedVersion.properties.forEach((item) => {
-			const draftValue = newestPropertyValues.find((x) => x.alias === item.alias);
+		this._selectedVersion.properties.forEach((item) => {
+			const draftValue = currentPropertyValues.find((x) => x.alias === item.alias);
 
 			if (!draftValue) return;
 
@@ -359,9 +344,9 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 	get currentVersionHeader() {
 		return (
-			this.localize.date(this.selectedVersion?.date ?? new Date(), this.#localizeDateOptions) +
+			this.localize.date(this._selectedVersion?.date ?? new Date(), this.#localizeDateOptions) +
 			' - ' +
-			this.selectedVersion?.user
+			this._selectedVersion?.user
 		);
 	}
 
