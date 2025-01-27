@@ -39,9 +39,7 @@ type UmbTiptapExtensionGroup = {
 const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
 const TIPTAP_BLOCK_EXTENSION_ALIAS = 'Umb.Tiptap.Block';
 
-const elementName = 'umb-property-editor-ui-tiptap-extensions-configuration';
-
-@customElement(elementName)
+@customElement('umb-property-editor-ui-tiptap-extensions-configuration')
 export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
@@ -223,6 +221,6 @@ export { UmbPropertyEditorUiTiptapExtensionsConfigurationElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbPropertyEditorUiTiptapExtensionsConfigurationElement;
+		'umb-property-editor-ui-tiptap-extensions-configuration': UmbPropertyEditorUiTiptapExtensionsConfigurationElement;
 	}
 }
