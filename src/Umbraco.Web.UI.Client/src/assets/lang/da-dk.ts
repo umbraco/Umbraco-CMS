@@ -536,6 +536,8 @@ export default {
 		linkToMedia: 'Link til medie',
 		selectContentStartNode: 'Vælg startnode for indhold',
 		selectMedia: 'Vælg medie',
+		chooseMedia: 'Vælg medie',
+		chooseMediaStartNode: 'Vælg startnode for medie',
 		selectMediaType: 'Vælg medietype',
 		selectIcon: 'Vælg ikon',
 		selectItem: 'Vælg item',

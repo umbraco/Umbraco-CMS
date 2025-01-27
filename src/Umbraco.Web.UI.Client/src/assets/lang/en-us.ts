@@ -568,6 +568,7 @@ export default {
 		linkToMedia: 'Link to media',
 		selectContentStartNode: 'Select content start node',
 		selectMedia: 'Select media',
+		chooseMediaStartNode: 'Choose Media Start nodes',
 		selectMediaType: 'Select media type',
 		selectIcon: 'Select icon',
 		selectItem: 'Select item',
