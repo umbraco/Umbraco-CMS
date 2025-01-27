@@ -2692,6 +2692,7 @@ export default {
 		toolbar_removeGroup: 'Remove group',
 		toolbar_removeItem: 'Remove action',
 		toolbar_emptyGroup: 'Empty',
+		sourceCodeEdit: 'Edit source code',
 	},
 	linkPicker: {
 		modalSource: 'Source',
