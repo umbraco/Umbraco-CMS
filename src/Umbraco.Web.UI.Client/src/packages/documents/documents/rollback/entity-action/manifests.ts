@@ -7,7 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'default',
 		alias: 'Umb.EntityAction.Document.Rollback',
 		name: 'Rollback Document Entity Action',
-		weight: 500,
+		weight: 450,
 		api: () => import('./rollback.action.js'),
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
