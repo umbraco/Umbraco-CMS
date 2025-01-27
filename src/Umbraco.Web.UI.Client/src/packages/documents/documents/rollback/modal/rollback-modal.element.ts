@@ -229,17 +229,18 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	}
 
 	#renderCultureSelect() {
+		if (!this._availableVariants.length) return nothing;
+
 		return html`
-			<div id="language-select">
-				<b>${this.localize.term('general_language')}</b>
-				<uui-select @change=${this.#onChangeCulture} .options=${this._availableVariants}></uui-select>
-			</div>
+			<uui-select
+				id="language-select"
+				@change=${this.#onChangeCulture}
+				.options=${this._availableVariants}></uui-select>
 		`;
 	}
 
 	#renderVersions() {
-		return html` ${this.#renderCultureSelect()}
-		${repeat(
+		return html` ${repeat(
 			this._versions,
 			(item) => item.id,
 			(item) => {
@@ -354,9 +355,14 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		return html`
 			<umb-body-layout headline="Rollback">
 				<div id="main">
-					<uui-box headline=${this.localize.term('rollback_versions')} id="box-left">
-						<div>${this.#renderVersions()}</div>
-					</uui-box>
+					<div id="box-left">
+						<uui-box id="language-box" headline=${this.localize.term('general_language')}>
+							${this.#renderCultureSelect()}
+						</uui-box>
+						<uui-box id="versions-box" headline=${this.localize.term('rollback_versions')}>
+							${this.#renderVersions()}
+						</uui-box>
+					</div>
 					<uui-box headline=${this.currentVersionHeader} id="box-right"> ${this.#renderCurrentVersion()} </uui-box>
 				</div>
 				<umb-footer-layout slot="footer">
@@ -381,14 +387,15 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			:host {
 				color: var(--uui-color-text);
 			}
-			#language-select {
-				display: flex;
-				flex-direction: column;
-				padding: var(--uui-size-space-5);
-				padding-bottom: 0;
-				gap: var(--uui-size-space-2);
-				font-size: 15px;
+
+			#language-box {
+				margin-bottom: var(--uui-size-space-2);
 			}
+
+			#language-select {
+				width: 100%;
+			}
+
 			uui-table {
 				--uui-table-cell-padding: var(--uui-size-space-1) var(--uui-size-space-4);
 				margin-top: var(--uui-size-space-5);
@@ -462,15 +469,19 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			.rollback-item uui-button {
 				white-space: nowrap;
 			}
+
 			#main {
 				display: flex;
-				gap: var(--uui-size-space-4);
+				gap: var(--uui-size-space-5);
 				width: 100%;
 				height: 100%;
 			}
 
-			#box-left {
+			#versions-box {
 				--uui-box-default-padding: 0;
+			}
+
+			#box-left {
 				max-width: 500px;
 				flex: 1;
 				overflow: auto;
