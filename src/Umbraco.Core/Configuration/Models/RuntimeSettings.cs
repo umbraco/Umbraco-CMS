@@ -19,11 +19,6 @@ public class RuntimeSettings
     public RuntimeMode Mode { get; set; } = RuntimeMode.BackofficeDevelopment;
 
     /// <summary>
-    /// Gets or sets a value for the maximum query string length.
-    /// </summary>
-    public int? MaxQueryStringLength { get; set; }
-
-    /// <summary>
     ///     Gets or sets a value for the maximum request length in kb.
     /// </summary>
     public long? MaxRequestLength { get; set; }
