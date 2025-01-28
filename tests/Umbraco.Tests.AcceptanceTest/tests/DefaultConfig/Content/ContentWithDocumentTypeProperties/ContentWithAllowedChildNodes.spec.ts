@@ -71,8 +71,6 @@ test('can create multiple child nodes with different document types', async ({um
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickCreateButton();
   await umbracoUi.content.chooseDocumentType(secondChildDocumentTypeName);
-  // This wait is needed
-  // await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.enterContentName(secondChildContentName);
   await umbracoUi.content.clickSaveButton();
 

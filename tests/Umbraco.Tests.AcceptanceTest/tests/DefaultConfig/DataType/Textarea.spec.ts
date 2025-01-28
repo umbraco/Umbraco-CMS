@@ -8,7 +8,6 @@ let dataTypeData = null;
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();
   await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
-  // await umbracoUi.waitForTimeout(500);
   await umbracoUi.dataType.goToDataType(dataTypeName);
   dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
 });
@@ -82,9 +81,7 @@ test('can update max height (pixels) value', async ({umbracoApi, umbracoUi}) => 
   };
 
   // Act
-  // await umbracoUi.waitForTimeout(500);
   await umbracoUi.dataType.enterMaxHeightValue(maxHeightValue.toString());
-  // await umbracoUi.waitForTimeout(500);
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert

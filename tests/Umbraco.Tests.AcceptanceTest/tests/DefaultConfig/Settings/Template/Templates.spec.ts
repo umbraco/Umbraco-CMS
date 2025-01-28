@@ -203,7 +203,6 @@ test('can use query builder with Where statement for a template', async ({umbrac
 
   // Act
   await umbracoUi.template.goToTemplate(templateName);
-  // await umbracoUi.waitForTimeout(500);
   await umbracoUi.template.addQueryBuilderWithWhereStatement(propertyAliasValue, operatorValue, constrainValue);
   // Verify that the code is shown
   await umbracoUi.template.isQueryBuilderCodeShown(expectedCode);
@@ -225,7 +224,6 @@ test('can insert sections - render child template into a template', async ({umbr
 
   // Act
   await umbracoUi.template.goToTemplate(templateName);
-  // await umbracoUi.waitForTimeout(1000);
   await umbracoUi.template.insertSection(sectionType);
   await umbracoUi.template.clickSaveButton();
 
@@ -373,6 +371,5 @@ test('cannot create a template with an empty name', {tag: '@smoke'}, async ({umb
   // await umbracoUi.template.isErrorNotificationVisible();
   // TODO: Uncomment this when the front-end updates the error message
   //await umbracoUi.template.doesErrorNotificationHaveText(NotificationConstantHelper.error.emptyName);
-  // await umbracoUi.waitForTimeout(500);
   expect(await umbracoApi.template.doesNameExist(templateName)).toBeFalsy();
 });

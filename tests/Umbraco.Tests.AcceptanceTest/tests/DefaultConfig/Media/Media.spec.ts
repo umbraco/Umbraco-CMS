@@ -240,7 +240,6 @@ test('can empty the recycle bin', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickConfirmEmptyRecycleBinButton();
 
   // Assert
-  // await umbracoUi.waitForTimeout(500);
   await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false);
   await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.emptiedRecycleBin);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
