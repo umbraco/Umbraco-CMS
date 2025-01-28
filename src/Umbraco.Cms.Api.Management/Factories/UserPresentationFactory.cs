@@ -143,6 +143,10 @@ public class UserPresentationFactory : IUserPresentationFactory
             KeepUserLoggedIn = _securitySettings.KeepUserLoggedIn,
             UsernameIsEmail = _securitySettings.UsernameIsEmail,
             PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
+
+            // You should not be able to change any password or set 2fa if any providers has deny local login set.
+            AllowChangePassword = _externalLoginProviders.HasDenyLocalLogin() is false,
+            AllowTwoFactor = _externalLoginProviders.HasDenyLocalLogin() is false,
         };
 
         return await Task.FromResult(model);

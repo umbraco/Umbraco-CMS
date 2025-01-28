@@ -3,7 +3,7 @@ import type { UmbTiptapToolbarValue } from '../types.js';
 import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { Editor, Placeholder, StarterKit, TextStyle } from '@umbraco-cms/backoffice/external/tiptap';
+import { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -12,28 +12,13 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import './tiptap-hover-menu.element.js';
 import './tiptap-toolbar.element.js';
 
+const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
+
 @customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
-	readonly #requiredExtensions = [
-		StarterKit,
-		Placeholder.configure({
-			placeholder: ({ node }) => {
-				if (node.type.name === 'heading') {
-					return this.localize.term('placeholders_rteHeading');
-				}
-
-				return this.localize.term('placeholders_rteParagraph');
-			},
-		}),
-		TextStyle,
-	];
-
-	@state()
-	private readonly _extensions: Array<UmbTiptapExtensionApi> = [];
-
 	@property({ type: String })
 	override set value(value: string) {
-		this.#markup = value;
+		this.#value = value;
 
 		// Try to set the value to the editor if it is ready.
 		if (this._editor) {
@@ -41,10 +26,9 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		}
 	}
 	override get value() {
-		return this.#markup;
+		return this.#value;
 	}
-
-	#markup = '';
+	#value = '';
 
 	@property({ attribute: false })
 	configuration?: UmbPropertyEditorConfigCollection;
@@ -57,6 +41,9 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 	@state()
 	private _editor?: Editor;
+
+	@state()
+	private readonly _extensions: Array<UmbTiptapExtensionApi> = [];
 
 	@state()
 	_toolbar: UmbTiptapToolbarValue = [[[]]];
@@ -76,7 +63,13 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	async #loadExtensions() {
 		await new Promise<void>((resolve) => {
 			this.observe(umbExtensionsRegistry.byType('tiptapExtension'), async (manifests) => {
-				const enabledExtensions = this.configuration?.getValueByAlias<string[]>('extensions') ?? [];
+				let enabledExtensions = this.configuration?.getValueByAlias<string[]>('extensions') ?? [];
+
+				// Ensures that the "Rich Text Essentials" extension is always enabled. [LK]
+				if (!enabledExtensions.includes(TIPTAP_CORE_EXTENSION_ALIAS)) {
+					enabledExtensions = [TIPTAP_CORE_EXTENSION_ALIAS, ...enabledExtensions];
+				}
+
 				for (const manifest of manifests) {
 					if (manifest.api) {
 						const extension = await loadManifestApi(manifest.api);
@@ -114,13 +107,13 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		this._editor = new Editor({
 			element: element,
 			editable: !this.readonly,
-			extensions: [...this.#requiredExtensions, ...extensions],
-			content: this.#markup,
+			extensions: extensions,
+			content: this.#value,
 			onBeforeCreate: ({ editor }) => {
 				this._extensions.forEach((ext) => ext.setEditor(editor));
 			},
 			onUpdate: ({ editor }) => {
-				this.#markup = editor.getHTML();
+				this.#value = editor.getHTML();
 				this.dispatchEvent(new UmbChangeEvent());
 			},
 		});

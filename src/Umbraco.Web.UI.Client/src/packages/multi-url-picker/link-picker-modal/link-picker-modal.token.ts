@@ -5,6 +5,7 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 export interface UmbLinkPickerModalData {
 	config: UmbLinkPickerConfig;
 	index: number | null;
+	isNew: boolean;
 }
 
 export type UmbLinkPickerModalValue = { link: UmbLinkPickerLink };
