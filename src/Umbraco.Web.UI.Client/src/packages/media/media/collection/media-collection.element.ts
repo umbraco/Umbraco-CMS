@@ -3,7 +3,7 @@ import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../workspace/media-workspace.contex
 import type { UmbDropzoneSubmittedEvent } from '../dropzone/dropzone-submitted.event.js';
 import type { UmbDropzoneElement } from '../dropzone/dropzone.element.js';
 import { UMB_MEDIA_COLLECTION_CONTEXT } from './media-collection.context-token.js';
-import { customElement, html, query, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, ref, state, when, type Ref } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
 import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
@@ -17,9 +17,6 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 
 	@state()
 	private _unique: string | null = null;
-
-	@query('#dropzone')
-	private _dropzone!: UmbDropzoneElement;
 
 	constructor() {
 		super();
@@ -35,9 +32,10 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		});
 	}
 
-	#observeProgressItems() {
+	#observeProgressItems(dropzone?: Element) {
+		if (!dropzone) return;
 		this.observe(
-			this._dropzone.progressItems(),
+			(dropzone as UmbDropzoneElement).progressItems(),
 			(progressItems) => {
 				progressItems.forEach((item) => {
 					// We do not update folders as it may have children still being uploaded.
@@ -57,7 +55,6 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 			.map((p) => ({ unique: p.unique, status: p.status, name: p.temporaryFile?.file.name ?? p.folder?.name }));
 
 		this.#collectionContext?.setPlaceholders(placeholders);
-		this.#observeProgressItems();
 	}
 
 	async #onComplete(event: Event) {
@@ -89,6 +86,7 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 			${when(this._progress >= 0, () => html`<uui-loader-bar progress=${this._progress}></uui-loader-bar>`)}
 			<umb-dropzone
 				id="dropzone"
+				${ref(this.#observeProgressItems)}
 				multiple
 				.parentUnique=${this._unique}
 				@submitted=${this.#setupPlaceholders}
