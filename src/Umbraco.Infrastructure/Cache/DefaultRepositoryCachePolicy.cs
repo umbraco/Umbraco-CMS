@@ -139,9 +139,13 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
 
         TEntity? entity = performGet(id);
 
-        if ((entity != null && entity.HasIdentity) || _options.CacheNullValues)
+        if (entity != null && entity.HasIdentity)
         {
             InsertEntity(cacheKey, entity);
+        }
+        else if (entity is null && _options.CacheNullValues)
+        {
+            InsertNull(cacheKey);
         }
 
         return entity;
@@ -248,6 +252,12 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     }
 
     protected virtual void InsertEntity(string cacheKey, TEntity entity)
+        => InsertNullableEntity(cacheKey, entity);
+
+    protected virtual void InsertNull(string cacheKey)
+        => InsertNullableEntity(cacheKey, null);
+
+    private void InsertNullableEntity(string cacheKey, TEntity? entity)
         => Cache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
 
     protected virtual void InsertEntities(TId[]? ids, TEntity[]? entities)
