@@ -722,7 +722,70 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'fileExtensions',
-				value: ['jpg', 'jpeg', 'png', 'pdf', 'mov', 'iso'],
+				value: ['jpg', 'jpeg', 'png', 'svg'],
+			},
+			{
+				alias: 'multiple',
+				value: true,
+			},
+		],
+	},
+	{
+		name: 'Upload Field (Files)',
+		id: 'dt-uploadFieldFiles',
+		parent: null,
+		editorAlias: 'Umbraco.UploadField',
+		editorUiAlias: 'Umb.PropertyEditorUi.UploadField',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		values: [
+			{
+				alias: 'fileExtensions',
+				value: ['pdf', 'iso'],
+			},
+			{
+				alias: 'multiple',
+				value: true,
+			},
+		],
+	},
+	{
+		name: 'Upload Field (Movies)',
+		id: 'dt-uploadFieldMovies',
+		parent: null,
+		editorAlias: 'Umbraco.UploadField',
+		editorUiAlias: 'Umb.PropertyEditorUi.UploadField',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		values: [
+			{
+				alias: 'fileExtensions',
+				value: ['mp4', 'mov'],
+			},
+			{
+				alias: 'multiple',
+				value: true,
+			},
+		],
+	},
+	{
+		name: 'Upload Field (Vector)',
+		id: 'dt-uploadFieldVector',
+		parent: null,
+		editorAlias: 'Umbraco.UploadField',
+		editorUiAlias: 'Umb.PropertyEditorUi.UploadField',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		values: [
+			{
+				alias: 'fileExtensions',
+				value: ['svg'],
 			},
 			{
 				alias: 'multiple',
