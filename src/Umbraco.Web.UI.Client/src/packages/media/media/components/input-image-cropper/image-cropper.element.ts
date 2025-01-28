@@ -335,7 +335,7 @@ export class UmbImageCropperElement extends UmbLitElement {
 				step="0.001">
 			</uui-slider>
 			<div id="actions">
-				<uui-button @click=${this.#onReset} label="${this.localize.term('general_reset')}"></uui-button>
+				<uui-button @click=${this.#onReset} label="${this.localize.term('imagecropper_reset')}"></uui-button>
 				<uui-button
 					look="secondary"
 					@click=${this.#onCancel}

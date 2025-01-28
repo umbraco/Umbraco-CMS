@@ -10,7 +10,7 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 	override async execute(editor?: Editor) {
 		const attrs = editor?.getAttributes(UmbLink.name) ?? {};
 		const link = this.#getLinkData(attrs);
-		const data = { config: {}, index: null };
+		const data = { config: {}, index: null, isNew: link?.url === undefined };
 		const value = { link };
 
 		const overlaySize = this.configuration?.getValueByAlias<UUIModalSidebarSize>('overlaySize') ?? 'small';

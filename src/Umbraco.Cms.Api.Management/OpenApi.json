@@ -35929,6 +35929,8 @@
       },
       "CurrenUserConfigurationResponseModel": {
         "required": [
+          "allowChangePassword",
+          "allowTwoFactor",
           "keepUserLoggedIn",
           "passwordConfiguration",
           "usernameIsEmail"
@@ -35948,6 +35950,12 @@
                 "$ref": "#/components/schemas/PasswordConfigurationResponseModel"
               }
             ]
+          },
+          "allowChangePassword": {
+            "type": "boolean"
+          },
+          "allowTwoFactor": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
