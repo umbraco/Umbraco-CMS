@@ -74,7 +74,10 @@ export class UmbTemporaryFileManager<
 	async #handleUpload(item: UploadableItem) {
 		if (!item.temporaryUnique) throw new Error(`Unique is missing for item ${item}`);
 
-		const { error } = await this.#temporaryFileRepository.upload(item.temporaryUnique, item.file);
+		const { error } = await this.#temporaryFileRepository.upload(item.temporaryUnique, item.file, (evt) => {
+			// Update progress in percent if a callback is provided
+			if (item.onProgress) item.onProgress((evt.loaded / evt.total) * 100);
+		});
 		const status = error ? TemporaryFileStatus.ERROR : TemporaryFileStatus.SUCCESS;
 
 		this.#queue.updateOne(item.temporaryUnique, { ...item, status });
