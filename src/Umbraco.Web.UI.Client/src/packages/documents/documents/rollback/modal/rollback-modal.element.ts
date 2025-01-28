@@ -16,10 +16,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 import '../../modals/shared/document-variant-language-picker.element.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import {
-	UmbEntityDetailUpdatedEvent,
-	UmbRequestReloadStructureForEntityEvent,
-} from '@umbraco-cms/backoffice/entity-action';
+import { UmbEntityUpdatedEvent, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 type DocumentVersion = {
 	id: string;
@@ -222,7 +219,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		const reloadStructureEvent = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 		actionEventContext.dispatchEvent(reloadStructureEvent);
 
-		const entityDetailUpdatedEvent = new UmbEntityDetailUpdatedEvent({ unique, entityType });
+		const entityDetailUpdatedEvent = new UmbEntityUpdatedEvent({ unique, entityType });
 		actionEventContext.dispatchEvent(entityDetailUpdatedEvent);
 
 		this.modalContext?.submit();

@@ -7,7 +7,7 @@ import { UmbEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@um
 import { UMB_DISCARD_CHANGES_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import {
-	UmbEntityDetailUpdatedEvent,
+	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
@@ -94,11 +94,11 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			this.#eventContext = context;
 
 			this.#eventContext.removeEventListener(
-				UmbEntityDetailUpdatedEvent.TYPE,
+				UmbEntityUpdatedEvent.TYPE,
 				this.#onEntityDetailUpdatedEvent as unknown as EventListener,
 			);
 			this.#eventContext.addEventListener(
-				UmbEntityDetailUpdatedEvent.TYPE,
+				UmbEntityUpdatedEvent.TYPE,
 				this.#onEntityDetailUpdatedEvent as unknown as EventListener,
 			);
 		});
@@ -416,7 +416,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	// Discriminator to identify events from this workspace context
 	protected readonly _workspaceEventDiscriminator = UmbId.new();
 
-	#onEntityDetailUpdatedEvent = (event: UmbEntityDetailUpdatedEvent) => {
+	#onEntityDetailUpdatedEvent = (event: UmbEntityUpdatedEvent) => {
 		const eventEntityUnique = event.getUnique();
 		const eventEntityType = event.getEntityType();
 		const eventDiscriminator = event.getDiscriminator();
@@ -434,7 +434,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	public override destroy(): void {
 		window.removeEventListener('willchangestate', this.#onWillNavigate);
 		this.#eventContext?.removeEventListener(
-			UmbEntityDetailUpdatedEvent.TYPE,
+			UmbEntityUpdatedEvent.TYPE,
 			this.#onEntityDetailUpdatedEvent as unknown as EventListener,
 		);
 		this._detailRepository?.destroy();

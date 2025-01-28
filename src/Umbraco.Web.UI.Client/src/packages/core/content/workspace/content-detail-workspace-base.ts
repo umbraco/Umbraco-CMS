@@ -42,7 +42,7 @@ import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
-	UmbEntityDetailUpdatedEvent,
+	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
@@ -719,7 +719,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const structureEvent = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 		eventContext.dispatchEvent(structureEvent);
 
-		const updatedEvent = new UmbEntityDetailUpdatedEvent({
+		const updatedEvent = new UmbEntityUpdatedEvent({
 			unique,
 			entityType,
 			discriminator: this._workspaceEventDiscriminator,
