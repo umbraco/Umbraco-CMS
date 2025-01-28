@@ -26,7 +26,7 @@ public class RuntimeSettings
     /// <summary>
     ///     Gets or sets a value for the maximum request length in kb.
     /// </summary>
-    public int? MaxRequestLength { get; set; }
+    public long? MaxRequestLength { get; set; }
 
     /// <summary>
     /// Gets or sets the timespan temporary files are kept, before they are removed by a background task.
