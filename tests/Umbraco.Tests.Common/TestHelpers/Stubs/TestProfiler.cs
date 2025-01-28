@@ -39,6 +39,9 @@ public class TestProfiler : IProfiler
         }
     }
 
+    /// <inheritdoc/>
+    public bool IsEnabled => _enabled;
+
     public static void Enable() => _enabled = true;
 
     public static void Disable() => _enabled = false;

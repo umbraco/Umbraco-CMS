@@ -21,9 +21,9 @@
             <div class="flex items-center">
               <div class="flx-g0 flx-s0" style="flex-basis: 40px;">
                 <umb-checkmark checked="true" size="m" style="cursor: default"
-                               ng-if="model.log.statusCode === 'OK (200)'"></umb-checkmark>
+                               ng-if="model.log.isSuccessStatusCode"></umb-checkmark>
                 <umb-icon icon="icon-wrong" class="umb-checkmark umb-checkmark--m" style="cursor: default;"
-                          ng-if="model.log.statusCode !== 'OK (200)'"></umb-icon>
+                          ng-if="!model.log.isSuccessStatusCode"></umb-icon>
               </div>
               <div class="flx-g1 flx-s1 flx-b2">{{model.log.statusCode}}</div>
             </div>
@@ -45,6 +45,10 @@
             <div>{{model.log.retryCount}}</div>
           </umb-control-group>
 
+          <umb-control-group label="Webhook key">
+            <div>{{model.log.webhookKey}}</div>
+          </umb-control-group>
+
         </umb-box-content>
 
       </umb-box>
@@ -53,16 +57,14 @@
         <umb-box-header title="Request"></umb-box-header>
         <umb-box-content class="block-form">
           <pre class="code">{{model.log.requestHeaders}}</pre>
-          <umb-code-snippet language="'JSON'" wrap="true">{{vm.formatData(model.log.requestBody) | json}}
-          </umb-code-snippet>
+          <umb-code-snippet language="vm.detectLanguage(model.log.requestHeaders, 'JSON')" wrap="true">{{vm.formatData(model.log.requestBody)}}</umb-code-snippet>
         </umb-box-content>
       </umb-box>
         <umb-box>
           <umb-box-header title="Response"></umb-box-header>
           <umb-box-content class="block-form">
             <pre class="code">{{model.log.responseHeaders}}</pre>
-            <umb-code-snippet language="'TEXT'" wrap="true">{{vm.formatData(model.log.responseBody) | json}}
-            </umb-code-snippet>
+            <umb-code-snippet language="vm.detectLanguage(model.log.responseHeaders)" wrap="true">{{vm.formatData(model.log.responseBody)}}</umb-code-snippet>
           </umb-box-content>
         </umb-box>
       <div ng-if="model.log.exceptionOccured">

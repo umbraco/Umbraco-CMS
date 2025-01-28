@@ -6,8 +6,10 @@
         var vm = this;
         vm.loading = true;
         vm.isNew = true;
+        vm.publishAll = false;
 
         vm.changeSelection = changeSelection;
+        vm.changePublishAllSelection = changePublishAllSelection;
 
         function allowPublish (variant) {
             return variant.allowedActions.includes("U");
@@ -38,6 +40,20 @@
             $scope.model.disableSubmitButton = !canPublish();
             //need to set the Save state to same as publish.
             variant.save = variant.publish;
+            //update publishAll checkbox value
+            updatePublishAllSelectionStatus();
+        }
+
+        function changePublishAllSelection(){
+            vm.availableVariants.forEach(variant => {
+                variant.publish = vm.publishAll;
+                variant.save = variant.publish;
+            });
+            $scope.model.disableSubmitButton = !canPublish();
+        }
+
+        function updatePublishAllSelectionStatus(){
+            vm.publishAll = vm.availableVariants.every(x => x.publish);
         }
 
         function hasAnyDataFilter(variant) {
@@ -138,7 +154,7 @@
 
             vm.availableVariants = vm.variants.filter(publishableVariantFilter);
             vm.missingMandatoryVariants = vm.variants.filter(notPublishableButMandatoryFilter);
-
+            
             // if any active varaiant that is available for publish, we set it to be published:
             vm.availableVariants.forEach(v => {
                 if(v.active && allowPublish(v)) {
@@ -151,6 +167,9 @@
             }
 
             $scope.model.disableSubmitButton = !canPublish();
+
+            //update publishAll checkbox value
+            updatePublishAllSelectionStatus();
 
             const localizeKey = vm.missingMandatoryVariants.length > 0 ? 'content_notReadyToPublish' : 
                 !$scope.model.title ? 'content_readyToPublish' : '';

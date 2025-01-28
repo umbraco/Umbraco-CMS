@@ -1,4 +1,4 @@
-import type { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui';
+import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-ui/uui';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
@@ -73,7 +73,7 @@ export class UmbExternalLoginProviderElement extends LitElement {
   @property({attribute: 'external-login-url'})
   set externalLoginUrl(value: string) {
     const tempUrl = new URL(value, window.location.origin);
-    const searchParams = new URLSearchParams(tempUrl.search);
+    const searchParams = new URLSearchParams(window.location.search);
     tempUrl.searchParams.append('redirectUrl', decodeURIComponent(searchParams.get('returnPath') ?? ''));
     this.#externalLoginUrl = tempUrl.pathname + tempUrl.search;
   }
@@ -102,7 +102,7 @@ export class UmbExternalLoginProviderElement extends LitElement {
    * @see https://uui.umbraco.com/?path=/story/uui-button--looks-and-colors
    */
   @property({attribute: 'button-look'})
-  buttonLook: InterfaceLook = 'outline';
+  buttonLook: UUIInterfaceLook = 'outline';
 
   /**
    * Gets or sets the color of the underlying uui-button.
@@ -113,7 +113,7 @@ export class UmbExternalLoginProviderElement extends LitElement {
    * @see https://uui.umbraco.com/?path=/story/uui-button--looks-and-colors
    */
   @property({attribute: 'button-color'})
-  buttonColor: InterfaceColor = 'default';
+  buttonColor: UUIInterfaceColor = 'default';
 
   #externalLoginUrl = '';
 

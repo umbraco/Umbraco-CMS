@@ -367,7 +367,6 @@
              * @name load
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Load the scaffolding models for the given configuration, these are needed to provide useful models for each block.
-             * @param {Object} blockObject BlockObject to receive data values from.
              * @returns {Promise} A Promise object which resolves when all scaffold models are loaded.
              */
             load: function () {
@@ -398,9 +397,16 @@
                 scaffoldKeys = scaffoldKeys.filter((value, index, self) => self.indexOf(value) === index);
 
                 if(scaffoldKeys.length > 0) {
-                  var currentPage = editorState.getCurrent();
-                  var currentPageId = currentPage ? (currentPage.id > 0 ? currentPage.id : currentPage.parentId) : null || -20;
+                  // We need to know if we are in the document type editor or content editor.
+                  // If we are in the document type editor, we need to use -20 as the current page id.
+                  // If we are in the content editor, we need to use the current page id or parent id if the current page is new.
+                  // We can recognize a content editor context by checking if the current editor state has a contentTypeKey.
+                  // If no current is represented, we will use null.
+                  const currentEditorState = editorState.getCurrent();
+                  const currentPageId = currentEditorState ? currentEditorState.contentTypeKey ? currentEditorState.id || currentEditorState.parentId || -20 : -20 : null;
 
+                  // Load all scaffolds for the block types.
+                  // The currentPageId is used to determine the access level for the current user.
                   tasks.push(contentResource.getScaffoldByKeys(currentPageId, scaffoldKeys).then(scaffolds => {
                       Object.values(scaffolds).forEach(scaffold => {
                           // self.scaffolds might not exists anymore, this happens if this instance has been destroyed before the load is complete.
@@ -631,21 +637,26 @@
                 }
 
                 blockObject.retrieveValuesFrom = function (content, settings) {
-                    if (this.content !== null) {
+                    if (this.content) {
                         mapElementValues(content, this.content);
+                        if (this.config.settingsElementTypeKey !== null) {
+                          mapElementValues(settings, this.settings);
+                      }
+                    } else {
+                      console.error("This data cannot be edited at the given movement. Maybe due to publishing while editing.");
                     }
-                    if (this.config.settingsElementTypeKey !== null) {
-                        mapElementValues(settings, this.settings);
-                    }
+
 
                 };
 
                 blockObject.sync = function () {
-                    if (this.content !== null) {
+                    if (this.content) {
                         mapToPropertyModel(this.content, this.data);
-                    }
-                    if (this.config.settingsElementTypeKey !== null) {
-                        mapToPropertyModel(this.settings, this.settingsData);
+                        if (this.config.settingsElementTypeKey !== null) {
+                            mapToPropertyModel(this.settings, this.settingsData);
+                        }
+                    } else {
+                      console.error("This data cannot be edited at the given movement. Maybe due to publishing while editing.");
                     }
                 };
                 // first time instant update of label.

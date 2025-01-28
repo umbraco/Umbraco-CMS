@@ -116,7 +116,7 @@ angular.module("umbraco.directives")
               if (scope.totalMessages === 0) {
                 if (scope.filesUploaded) {
                   //queue is empty, trigger the done action
-                  scope.filesUploaded(scope.done);
+                  scope.filesUploaded(scope.processed);
                 }
 
                 //auto-clear the done queue after 3 secs

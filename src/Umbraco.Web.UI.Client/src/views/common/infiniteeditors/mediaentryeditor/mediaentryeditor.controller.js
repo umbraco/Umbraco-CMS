@@ -3,15 +3,15 @@ angular.module("umbraco")
         function ($scope, localizationService, entityResource, editorService, overlayService, eventsService, mediaHelper) {
 
             var unsubscribe = [];
-            
+
             const vm = this;
-            
+
             vm.loading = true;
             vm.model = $scope.model;
             vm.mediaEntry = vm.model.mediaEntry;
             vm.currentCrop = null;
             vm.title = "";
-            
+
             vm.focalPointChanged = focalPointChanged;
             vm.onImageLoaded = onImageLoaded;
             vm.openMedia = openMedia;
@@ -20,7 +20,7 @@ angular.module("umbraco")
             vm.deselectCrop = deselectCrop;
             vm.resetCrop = resetCrop;
             vm.submitAndClose = submitAndClose;
-            vm.close = close;   
+            vm.close = close;
 
             function init() {
 
@@ -58,11 +58,17 @@ angular.module("umbraco")
                     return;
                 }
 
+                // the focal point can be null in some cases - most often right after a save. this throws the crop
+                // thumbnails (previews) off, so let's enforce the default focal point.
+                if (!vm.mediaEntry.focalPoint){
+                  vm.mediaEntry.focalPoint = {left: 0.5, top: 0.5};
+                }
+
                 vm.loading = true;
 
                 entityResource.getById(vm.mediaEntry.mediaKey, "Media").then(function (mediaEntity) {
                     vm.media = mediaEntity;
-                    vm.imageSrc = mediaHelper.resolveFileFromEntity(mediaEntity, true);
+                    vm.imageSrc = mediaHelper.resolveFileFromEntity(mediaEntity, false);
                     vm.fileSrc = mediaHelper.resolveFileFromEntity(mediaEntity, false);
                     vm.fileExtension = mediaHelper.getFileExtension(vm.fileSrc);
                     vm.loading = false;
@@ -85,12 +91,12 @@ angular.module("umbraco")
                     });
                 });
             }
-            
+
             function onImageLoaded(isCroppable, hasDimensions) {
                 vm.isCroppable = isCroppable;
                 vm.hasDimensions = hasDimensions;
             }
-            
+
             function repickMedia() {
                 vm.model.propertyEditor.changeMediaFor(vm.model.mediaEntry, onMediaReplaced);
             }
@@ -103,10 +109,9 @@ angular.module("umbraco")
                 // un-select crop:
                 vm.currentCrop = null;
 
-                //
                 updateMedia();
             }
-            
+
             function openMedia() {
 
                 const mediaEditor = {
@@ -118,37 +123,38 @@ angular.module("umbraco")
                         editorService.close();
                     }
                 };
-                
+
                 editorService.mediaEditor(mediaEditor);
             }
 
             function focalPointChanged(left, top) {
-                //update the model focalpoint value
+                // update the model focalpoint value
                 vm.mediaEntry.focalPoint = {
                     left: left,
                     top: top
                 };
 
-                //set form to dirty to track changes
+                // set form to dirty to track changes
                 setDirty();
             }
-            
+
             function selectCrop(targetCrop) {
                 vm.currentCrop = targetCrop;
                 setDirty();
                 // TODO: start watchin values of crop, first when changed set to dirty.
             }
-            
+
             function deselectCrop() {
                 vm.currentCrop = null;
             }
-            
+
             function resetCrop() {
                 if (vm.currentCrop) {
-                    $scope.$evalAsync( () => {
-                        vm.model.propertyEditor.resetCrop(vm.currentCrop);
-                        vm.forceUpdateCrop = Math.random();
-                    });
+                  vm.model.propertyEditor.resetCrop(vm.currentCrop);
+                  // deselecting the crop here has a dual purpose:
+                  // 1. it replicates the behaviour of the image cropper (e.g. on media items).
+                  // 2. it ensures that the newly reset crop does not get overwritten by a new crop with default values.
+                  deselectCrop();
                 }
             }
 
@@ -161,7 +167,7 @@ angular.module("umbraco")
                     vm.model.submit(vm.model);
                 }
             }
-            
+
             function close() {
                 if (vm.model && vm.model.close)
                 {
@@ -170,7 +176,7 @@ angular.module("umbraco")
                       const labelKeys = vm.model.createFlow === true
                           ? ["mediaPicker_confirmCancelMediaEntryCreationHeadline", "mediaPicker_confirmCancelMediaEntryCreationMessage"]
                           : ["prompt_discardChanges", "mediaPicker_confirmCancelMediaEntryHasChanges"];
-                        
+
                         localizationService.localizeMany(labelKeys).then(localizations => {
                             const confirm = {
                                 title: localizations[0],
@@ -197,7 +203,7 @@ angular.module("umbraco")
             }
 
             init();
-            
+
             $scope.$on("$destroy", function () {
                 unsubscribe.forEach(x => x());
             });

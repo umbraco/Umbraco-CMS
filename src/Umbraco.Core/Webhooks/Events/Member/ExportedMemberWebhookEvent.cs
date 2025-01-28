@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
@@ -18,7 +18,7 @@ public class ExportedMemberWebhookEvent : WebhookEventBase<ExportedMemberNotific
     {
     }
 
-    public override string Alias => "exportedMember";
+    public override string Alias => Constants.WebhookEvents.Aliases.ExportedMember;
 
     public override object? ConvertNotificationToRequestPayload(ExportedMemberNotification notification)
     {

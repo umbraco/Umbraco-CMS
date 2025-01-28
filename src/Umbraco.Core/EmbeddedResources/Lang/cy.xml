@@ -459,9 +459,10 @@
     <key alias="confirmlogout">Ydych chi'n sicr?</key>
     <key alias="confirmSure">Ydych chi'n sicr?</key>
     <key alias="cut">Torri</key>
-    <key alias="editdictionary">Golygu Eitem Geiriadur</key>
-    <key alias="editlanguage">Golygu Iaith</key>
+    <key alias="editDictionary">Golygu Eitem Geiriadur</key>
+    <key alias="editLanguage">Golygu Iaith</key>
     <key alias="editSelectedMedia">Golygu cyfrwng a dewiswyd</key>
+    <key alias="editWebhook">Golygu bachyn gwe</key>
     <key alias="insertAnchor">Mewnosod dolen leol</key>
     <key alias="insertCharacter">Mewnosod nod</key>
     <key alias="insertgraphicheadline">Mewnosod pennawd graffig</key>
@@ -504,6 +505,7 @@
     <key alias="openInNewWindow">Agor y ddolen ddogfen mewn ffenestr neu tab newydd</key>
     <key alias="linkToMedia">Dolen i gyfrwng</key>
     <key alias="selectContentStartNode">Dewis nod cychwyn cynnwys</key>
+    <key alias="selectEvent">Dewis digwyddiad</key>
     <key alias="selectMedia">Dewis cyfrwng</key>
     <key alias="selectMediaType">Dewis y math o gyfrwng</key>
     <key alias="selectIcon">Dewis eicon</key>
@@ -857,6 +859,7 @@
     <key alias="umbracoInfo">Gwybodaeth Umbraco</key>
     <key alias="skipToMenu">Neidio i'r dewislen</key>
     <key alias="skipToContent">Neidio i'r cynnwys</key>
+    <key alias="primary">Prif</key>
   </area>
   <area alias="colors">
     <key alias="blue">Glas</key>
@@ -1061,6 +1064,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="instruction">Mewngofnodwch isod</key>
     <key alias="signInWith">Mewngofnodwch gyda</key>
     <key alias="timeout">Sesiwn wedi cyrraedd terfyn amser</key>
+    <key alias="userFailedLogin">Wps! Mae mewngofnodi wedi methu. Gwiriwch eich manylion a thrio eto.</key>
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">Wedi anghofio eich cyfrinair?</key>
     <key alias="forgottenPasswordInstruction">Bydd ebost yn cael ei anfon i'r cyfeiriad darparwyd gyda dolen i ailosod eich cyfrinair</key>
@@ -1424,6 +1428,44 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="allowedItemTypes">Gallwch ond ddewis eitemau o'r math(au): %0%</key>
     <key alias="pickedTrashedItem">Rydych wedi dewis eitem gynnwys sydd naill ai wedi'i ddileu neu yn y bin ailgylchu</key>
     <key alias="pickedTrashedItems">Rydych wedi dewis eitemau gynnwys sydd naill ai wedi'u dileu neu yn y bin ailgylchu</key>
+    <key alias="specifyPickerRootTitle">Nodi gwraidd</key>
+    <key alias="defineRootNode">Dewiswch nod gwraidd</key>
+    <key alias="defineXPathOrigin">Nodi gwraidd efo XPath</key>
+    <key alias="defineDynamicRoot">Nodi Gwraidd Dynamig</key>
+    <key alias="configurationStartNodeTitle">Nod cychwyn</key>
+    <key alias="configurationXPathTitle">Ymholiad XPath</key>
+  </area>
+  <area alias="dynamicRoot">
+    <key alias="configurationTitle">Ymholiad Gwraidd Dynamig</key>
+    <key alias="pickDynamicRootOriginTitle">Dewiswch darddiad</key>
+    <key alias="pickDynamicRootOriginDesc">Diffiniwch darddiad eich Ymholiad Gwraidd Dynamig</key>
+    <key alias="originRootTitle">Gwraidd</key>
+    <key alias="originRootDesc">Nod gwraidd y sesiwn olygu hon</key>
+    <key alias="originParentTitle">Rhiant</key>
+    <key alias="originParentDesc">Nod rhiant y ffynhonnell yn y sesiwn olygu hon</key>
+    <key alias="originCurrentTitle">Cyfredol</key>
+    <key alias="originCurrentDesc">Y nod cynnwys sy'n ffynhonnell ar gyfer y sesiwn olygu hon</key>
+    <key alias="originSiteTitle">Gwefan</key>
+    <key alias="originSiteDesc">Canfod nod agosaf gydag enw gwesteiwr</key>
+    <key alias="originByKeyTitle">Nod penodol</key>
+    <key alias="originByKeyDesc">Dewiswch Nod penodol fel tarddiad yr ymholiad hwn</key>
+    <key alias="pickDynamicRootQueryStepTitle">Atodwch y cam i'r ymholiad</key>
+    <key alias="pickDynamicRootQueryStepDesc">Diffiniwch y cam nesaf yn eich Ymholiad Gwraidd Dynamig</key>
+    <key alias="queryStepNearestAncestorOrSelfTitle">Hynafiad Agosaf Neu Hunan</key>
+    <key alias="queryStepNearestAncestorOrSelfDesc">Holwch yr hynafiad agosaf neu hunan sy'n cyd-fynd ag un o'r mathau sydd wedi'u ffurfweddu</key>
+    <key alias="queryStepFurthestAncestorOrSelfTitle">Hynafiad Pellaf Neu Hunan</key>
+    <key alias="queryStepFurthestAncestorOrSelfDesc">Holwch yr hynafiad pellaf neu'r hunan sy'n cyd-fynd ag un o'r mathau sydd wedi'u ffurfweddu</key>
+    <key alias="queryStepNearestDescendantOrSelfTitle">Disgynnydd Agosaf Neu Hunan</key>
+    <key alias="queryStepNearestDescendantOrSelfDesc">Holwch y disgynnydd agosaf neu'r hunan sy'n cyd-fynd ag un o'r mathau sydd wedi'u ffurfweddu</key>
+    <key alias="queryStepFurthestDescendantOrSelfTitle">Disgynnydd Pellaf Neu Hunan</key>
+    <key alias="queryStepFurthestDescendantOrSelfDesc">Holwch y disgynnydd pellaf neu'r hunan sy'n cyd-fynd ag un o'r mathau sydd wedi'u ffurfweddu</key>
+    <key alias="queryStepCustomTitle">Arferiad</key>
+    <key alias="queryStepCustomDesc">Ymholiad gan ddefnyddio Cam Ymholiad arferiad</key>
+    <key alias="addQueryStep">Ychwanegu cam ymholiad</key>
+    <key alias="queryStepTypes">Sy'n cyfateb i'r mathau: </key>
+    <key alias="noValidStartNodeTitle">Dim cynnwys cyfatebol</key>
+    <key alias="noValidStartNodeDesc">Nid yw ffurfweddiad yr eiddo hwn yn cyfateb i unrhyw gynnwys. Creu'r cynnwys coll neu cysylltwch â'ch gweinyddwr i addasu gosodiadau Gwraidd Dynamig ar gyfer yr eiddo hwn.</key>
+    <key alias="cancelAndClearQuery">Canslo a chlirio ymholiad</key>
   </area>
   <area alias="mediaPicker">
     <key alias="pickedTrashedItem">Rydych wedi dewis eitem gyfrwng sydd naill ai wedi'i ddileu neu yn y bin ailgylchu</key>
@@ -1629,6 +1671,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="preventCleanupDisableError">Digwyddodd gwall wrth analluogi glanhau fersiwn ar gyfer %0%</key>
     <key alias="copySuccessMessage">Mae gwybodaeth eich system wedi'i chopïo'n llwyddiannus i'r clipfwrdd</key>
     <key alias="cannotCopyInformation">Methu â chopïo gwybodaeth eich system i'r clipfwrdd</key>
+    <key alias="webhookSaved">Bachyn gwe wedi arbed</key>
   </area>
   <area alias="stylesheet">
     <key alias="addRule">Ychwanegu ardull</key>
@@ -1873,6 +1916,33 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="historyCleanupGloballyDisabled"><strong>NODYN!</strong> Mae glanhau fersiynau cynnwys hanesyddol wedi'u hanalluogi'n fyd-eang. Ni fydd y gosodiadau hyn yn dod i rym cyn iddo gael ei alluogi.</key>
     <key alias="changeDataTypeHelpText">Mae newid math o ddata gyda gwerthoedd storio wedi'i analluogi. I ganiatáu hyn gallwch newid y gosodiad Umbraco:CMS:DataTypes:CanBeChanged yn appssettings.json.</key>
   </area>
+  <area alias="webhooks">
+    <key alias="addWebhook">Creu bachyn gwe</key>
+    <key alias="addWebhookHeader">Ychwanegu pennyn bachyn gwe</key>
+    <key alias="addDocumentType">Ychwanegu Math o Ddogfen</key>
+    <key alias="addMediaType">Ychwanegu Math o Gyfrwng</key>
+    <key alias="createHeader">Creu pennawd</key>
+    <key alias="deliveries">Danfoniadau</key>
+    <key alias="noHeaders">Nid oes penawdau bachyn gwe wedi'u hychwanegu</key>
+    <key alias="noEventsFound">Ni chanfuwyd unrhyw ddigwyddiadau.</key>
+    <key alias="enabled">Wedi'i alluogi</key>
+    <key alias="events">Digwyddiadau</key>D
+    <key alias="event">Digwyddiad</key>
+    <key alias="url">Url</key>
+    <key alias="types">Mathau</key>
+    <key alias="webhookKey">Allwedd bachyn gwe</key>
+    <key alias="retryCount">Cyfrif o Ailgeision</key>
+    <key alias="toggleDebug">Togl modd dadfygio am ragor o wybodaeth.</key>
+    <key alias="statusNotOk">Cod statws ddim yn OK</key>
+    <key alias="urlDescription">Yr url i'w alw pan fydd y bachyn gwe yn cael ei sbarduno.</key>
+    <key alias="eventDescription">Y digwyddiadau y dylid sbarduno'r bachyn gwe.</key>
+    <key alias="contentTypeDescription">Sbardunwch y bachyn gwe am fath penodol o gynnwys yn unig.</key>
+    <key alias="enabledDescription">A yw'r bachyn gwe wedi'i alluogi?</key>
+    <key alias="headersDescription">Penawdau arferu i'w cynnwys yn y cais bachyn gwe.</key>
+    <key alias="contentType">Math o Gynnwys</key>
+    <key alias="headers">Penawdau</key>
+    <key alias="selectEventFirst">Dewiswch ddigwyddiad yn gyntaf.</key>
+  </area>
   <area alias="languages">
     <key alias="addLanguage">Ychwanegu iaith</key>
     <key alias="mandatoryLanguage">Iath gorfodol</key>
@@ -2011,6 +2081,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="settingsGroup">Gosodiadau</key>
     <key alias="templatingGroup">Templedi</key>
     <key alias="thirdPartyGroup">Trydydd parti</key>
+    <key alias="webhooks">Bachau gwe</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Diweddariad newydd yn barod</key>
@@ -2769,6 +2840,8 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="configureArea">Ffurfweddu ardal</key>
     <key alias="deleteArea">Dileu ardal</key>
     <key alias="addColumnSpanOption">Ychwanegu opsiwn rhychwantu %0% colofn</key>
+    <key alias="insertBlock">Mewnosod Bloc</key>
+    <key alias="labelInlineMode">Arddangos yn fewnol â'r testun</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Beth yw Templedi Gynnwys</key>

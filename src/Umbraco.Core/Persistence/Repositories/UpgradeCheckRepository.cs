@@ -21,10 +21,10 @@ public class UpgradeCheckRepository : IUpgradeCheckRepository
                 _httpClient = new HttpClient();
             }
 
-            var content = new StringContent(_jsonSerializer.Serialize(new CheckUpgradeDto(version)), Encoding.UTF8, "application/json");
+            using var content = new StringContent(_jsonSerializer.Serialize(new CheckUpgradeDto(version)), Encoding.UTF8, "application/json");
 
             _httpClient.Timeout = TimeSpan.FromSeconds(1);
-            HttpResponseMessage task = await _httpClient.PostAsync(RestApiUpgradeChecklUrl, content);
+            using HttpResponseMessage task = await _httpClient.PostAsync(RestApiUpgradeChecklUrl, content);
             var json = await task.Content.ReadAsStringAsync();
             UpgradeResult? result = _jsonSerializer.Deserialize<UpgradeResult>(json);
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
@@ -18,7 +18,7 @@ public class MemberTypeSavedWebhookEvent : WebhookEventBase<MemberTypeSavedNotif
     {
     }
 
-    public override string Alias => "memberTypeSaved";
+    public override string Alias => Constants.WebhookEvents.Aliases.MemberTypeSaved;
 
     public override object? ConvertNotificationToRequestPayload(MemberTypeSavedNotification notification) =>
         notification.SavedEntities;

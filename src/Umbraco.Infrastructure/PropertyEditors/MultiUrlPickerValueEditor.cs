@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -146,38 +147,41 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 
             foreach (LinkDto dto in links)
             {
-                GuidUdi? udi = dto.Udi;
                 var icon = "icon-link";
+                string? nodeName = null;
                 var published = true;
                 var trashed = false;
                 var url = dto.Url;
 
-                if (dto.Udi != null)
+                if (dto.Udi is not null)
                 {
                     if (dto.Udi.EntityType == Constants.UdiEntityType.Document)
                     {
-                        url =  _publishedUrlProvider.GetUrl(dto.Udi.Guid, UrlMode.Relative, culture);
-                        IContent? c = _contentService.GetById(dto.Udi.Guid);
-
-                        if (c is not null)
+                        IContent? content = _contentService.GetById(dto.Udi.Guid);
+                        if (content is not null)
                         {
+                            icon = content.ContentType.Icon;
+                            nodeName = content.Name;
                             published = culture == null
-                                ? c.Published
-                                : c.PublishedCultures.Contains(culture);
-                            icon = c.ContentType.Icon;
-                            trashed = c.Trashed;
+                                ? content.Published
+                                : content.IsCulturePublished(culture);
+                            trashed = content.Trashed;
                         }
+
+                        url = _publishedUrlProvider.GetUrl(dto.Udi.Guid, UrlMode.Relative, culture);
                     }
                     else if (dto.Udi.EntityType == Constants.UdiEntityType.Media)
                     {
-                        url = _publishedUrlProvider.GetMediaUrl(dto.Udi.Guid, UrlMode.Relative, culture);
-                        IMedia? m = _mediaService.GetById(dto.Udi.Guid);
-                        if (m is not null)
+                        IMedia? media = _mediaService.GetById(dto.Udi.Guid);
+                        if (media is not null)
                         {
-                            published = m.Trashed is false;
-                            icon = m.ContentType.Icon;
-                            trashed = m.Trashed;
+                            icon = media.ContentType.Icon;
+                            nodeName = media.Name;
+                            published = media.Trashed is false;
+                            trashed = media.Trashed;
                         }
+
+                        url = _publishedUrlProvider.GetMediaUrl(dto.Udi.Guid, UrlMode.Relative, culture);
                     }
                 }
 
@@ -185,12 +189,13 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                 {
                     Icon = icon,
                     Name = dto.Name,
-                    Target = dto.Target,
-                    Trashed = trashed,
+                    NodeName = nodeName,
                     Published = published,
                     QueryString = dto.QueryString,
-                    Udi = udi,
-                    Url = url ?? string.Empty,
+                    Target = dto.Target,
+                    Trashed = trashed,
+                    Udi = dto.Udi,
+                    Url = url,
                 });
             }
 
@@ -229,7 +234,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                     QueryString = link.QueryString,
                     Target = link.Target,
                     Udi = link.Udi,
-                    Url = link.Udi == null ? link.Url : null, // only save the URL for external links
+                    Url = link.Udi is null ? link.Url : null, // only save the URL for external links
                 },
                 _linkDisplayJsonSerializerSettings);
         }

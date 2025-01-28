@@ -9,7 +9,6 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Infrastructure.DeliveryApi;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
@@ -359,6 +358,48 @@ public class RichTextParserTests : PropertyValueConverterTests
     }
 
     [Test]
+    public void ParseElement_CanHandleWhitespaceAroundInlineElemements()
+    {
+        var parser = CreateRichTextElementParser();
+
+        var element = parser.Parse("<p>What follows from <strong>here</strong> <em>is</em> <a href=\"#\">just</a> a bunch of text.</p>") as RichTextRootElement;
+        Assert.IsNotNull(element);
+        var paragraphElement = element.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(paragraphElement);
+
+        var childElements = paragraphElement.Elements.ToArray();
+        Assert.AreEqual(7, childElements.Length);
+
+        var childElementCounter = 0;
+
+        void AssertNextChildElementIsText(string expectedText)
+        {
+            var textElement = childElements[childElementCounter++] as RichTextTextElement;
+            Assert.IsNotNull(textElement);
+            Assert.AreEqual(expectedText, textElement.Text);
+        }
+
+        void AssertNextChildElementIsGeneric(string expectedTag, string expectedInnerText)
+        {
+            var genericElement = childElements[childElementCounter++] as RichTextGenericElement;
+            Assert.IsNotNull(genericElement);
+            Assert.AreEqual(expectedTag, genericElement.Tag);
+            Assert.AreEqual(1, genericElement.Elements.Count());
+            var textElement = genericElement.Elements.First() as RichTextTextElement;
+            Assert.IsNotNull(textElement);
+            Assert.AreEqual(expectedInnerText, textElement.Text);
+        }
+
+        AssertNextChildElementIsText("What follows from ");
+        AssertNextChildElementIsGeneric("strong", "here");
+        AssertNextChildElementIsText(" ");
+        AssertNextChildElementIsGeneric("em", "is");
+        AssertNextChildElementIsText(" ");
+        AssertNextChildElementIsGeneric("a", "just");
+        AssertNextChildElementIsText(" a bunch of text.");
+    }
+
+    [Test]
     public void ParseMarkup_CanParseContentLink()
     {
         var parser = CreateRichTextMarkupParser();
@@ -474,7 +515,7 @@ public class RichTextParserTests : PropertyValueConverterTests
             Mock.Of<ILogger<ApiRichTextMarkupParser>>());
     }
 
-    private void SetupTestContent(out IApiContentRouteBuilder routeBuilder, out IPublishedSnapshotAccessor snapshotAccessor, out IPublishedUrlProvider urlProvider)
+    private void SetupTestContent(out IApiContentRouteBuilder routeBuilder, out IPublishedSnapshotAccessor snapshotAccessor, out IApiMediaUrlProvider apiMediaUrlProvider)
     {
         var contentMock = new Mock<IPublishedContent>();
         contentMock.SetupGet(m => m.Key).Returns(_contentKey);
@@ -502,14 +543,14 @@ public class RichTextParserTests : PropertyValueConverterTests
             .Setup(m => m.Build(contentMock.Object, null))
             .Returns(new ApiContentRoute("/some-content-path", new ApiContentStartItem(_contentRootKey, "the-root-path")));
 
-        var urlProviderMock = new Mock<IPublishedUrlProvider>();
-        urlProviderMock
-            .Setup(m => m.GetMediaUrl(mediaMock.Object, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<string>(), It.IsAny<Uri?>()))
+        var apiMediaUrlProviderMock = new Mock<IApiMediaUrlProvider>();
+        apiMediaUrlProviderMock
+            .Setup(m => m.GetUrl(mediaMock.Object))
             .Returns("/some-media-url");
 
         routeBuilder = routeBuilderMock.Object;
         snapshotAccessor = snapshotAccessorMock.Object;
-        urlProvider = urlProviderMock.Object;
+        apiMediaUrlProvider = apiMediaUrlProviderMock.Object;
     }
 
     private IPublishedElement CreateElement(Guid id, int propertyValue)

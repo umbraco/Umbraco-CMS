@@ -1,7 +1,8 @@
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -16,6 +17,7 @@ public class DataValueEditorReuseTests
 {
     private Mock<IDataValueEditorFactory> _dataValueEditorFactoryMock;
     private PropertyEditorCollection _propertyEditorCollection;
+    private DataValueReferenceFactoryCollection _dataValueReferenceFactories;
 
     [SetUp]
     public void SetUp()
@@ -32,6 +34,7 @@ public class DataValueEditorReuseTests
                 Mock.Of<IIOHelper>()));
 
         _propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>));
+        _dataValueReferenceFactories = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>);
 
         _dataValueEditorFactoryMock
             .Setup(m =>
@@ -40,8 +43,9 @@ public class DataValueEditorReuseTests
                 new DataEditorAttribute("a", "b", "c"),
                 new BlockListEditorDataConverter(),
                 _propertyEditorCollection,
-                Mock.Of<IDataTypeService>(),
-                Mock.Of<IContentTypeService>(),
+                _dataValueReferenceFactories,
+                Mock.Of<IDataTypeConfigurationCache>(),
+                Mock.Of<IBlockEditorElementTypeCache>(),
                 Mock.Of<ILocalizedTextService>(),
                 Mock.Of<ILogger<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>>(),
                 Mock.Of<IShortStringHelper>(),
@@ -95,7 +99,7 @@ public class DataValueEditorReuseTests
     {
         var blockListPropertyEditor = new BlockListPropertyEditor(
             _dataValueEditorFactoryMock.Object,
-            new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>)),
+            _propertyEditorCollection,
             Mock.Of<IIOHelper>(),
             Mock.Of<IEditorConfigurationParser>(),
             Mock.Of<IBlockValuePropertyIndexValueFactory>());
@@ -116,7 +120,7 @@ public class DataValueEditorReuseTests
     {
         var blockListPropertyEditor = new BlockListPropertyEditor(
             _dataValueEditorFactoryMock.Object,
-            new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>)),
+            _propertyEditorCollection,
             Mock.Of<IIOHelper>(),
             Mock.Of<IEditorConfigurationParser>(),
             Mock.Of<IBlockValuePropertyIndexValueFactory>());

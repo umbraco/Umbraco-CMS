@@ -112,7 +112,8 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
                 published,
                 propertyTypeDictionary,
                 nestedContentRowValue,
-                availableCultures));
+                availableCultures,
+                contentTypeDictionary));
 
             index++;
         }
@@ -213,7 +214,8 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
         bool published,
         IDictionary<string, IPropertyType> propertyTypeDictionary,
         TItem nestedContentRowValue,
-        IEnumerable<string> availableCultures)
+        IEnumerable<string> availableCultures,
+        IDictionary<Guid,IContentType> contentTypeDictionary)
     {
         foreach ((var propertyAlias, var propertyValue) in GetRawProperty(nestedContentRowValue))
         {
@@ -238,7 +240,7 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
                             subProperty.PublishValues(availableCulture, segment ?? "*");
                         }
                         indexValues =
-                            editor.PropertyIndexValueFactory.GetIndexValues(subProperty, availableCulture, segment, published, availableCultures);
+                            editor.PropertyIndexValueFactory.GetIndexValues(subProperty, availableCulture, segment, published, availableCultures, contentTypeDictionary);
                     }
                 }
                 else
@@ -248,7 +250,7 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
                     {
                         subProperty.PublishValues(culture ?? "*", segment ?? "*");
                     }
-                    indexValues = editor.PropertyIndexValueFactory.GetIndexValues(subProperty, culture, segment, published, availableCultures);
+                    indexValues = editor.PropertyIndexValueFactory.GetIndexValues(subProperty, culture, segment, published, availableCultures, contentTypeDictionary);
                 }
 
                 foreach ((var nestedAlias, IEnumerable<object?> nestedValue) in indexValues)

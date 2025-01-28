@@ -3,23 +3,29 @@
 
     function PickDynamicRootQueryStepController($scope, localizationService, editorService, udiParser) {
 
-        var vm = this;
+        const vm = this;
+
+        vm.choose = choose;
+        vm.chooseCustom = chooseCustom;
+
+        vm.submit = submit;
+        vm.close = close;
 
         function onInit() {
-            if(!$scope.model.title) {
-                localizationService.localize("dynamicRoot_pickDynamicRootQueryStepTitle").then(function(value){
+            if (!$scope.model.title) {
+                localizationService.localize("dynamicRoot_pickDynamicRootQueryStepTitle").then(value => {
                     $scope.model.title = value;
                 });
             }
-            if(!$scope.model.subtitle) {
-                localizationService.localize("dynamicRoot_pickDynamicRootQueryStepDesc").then(function(value){
+            if (!$scope.model.subtitle) {
+                localizationService.localize("dynamicRoot_pickDynamicRootQueryStepDesc").then(value => {
                     $scope.model.subtitle = value;
                 });
             }
         }
 
-        vm.choose = function(queryStepAlias) {
-          var editor = {
+        function choose(queryStepAlias) {
+          const editor = {
             multiPicker: true,
             filterCssClass: "not-allowed not-published",
             filter: function (item) {
@@ -42,16 +48,18 @@
 
           switch ($scope.model.contentType) {
             case "content":
-              editorService.contentTypePicker(editor);
+              editor.entityType = "documentType";
               break;
             case "media":
-              editorService.mediaTypePicker(editor);
+              editor.entityType = "mediaType";
               break;
           }
+
+          editorService.contentTypePicker(editor);
         }
 
-        vm.chooseCustom = function() {
-          var customStepPicker = {
+        function chooseCustom() {
+          const customStepPicker = {
             view: "views/common/infiniteeditors/pickdynamicrootcustomstep/pickdynamicrootcustomstep.html",
             size: "small",
             value: "",
@@ -68,17 +76,15 @@
           };
           editorService.open(customStepPicker);
         }
-
-        vm.submit = submit;
+        
         function submit(model) {
           if ($scope.model.submit) {
               $scope.model.submit(model);
           }
         }
 
-        vm.close = close;
         function close() {
-            if($scope.model.close) {
+            if ($scope.model.close) {
                 $scope.model.close();
             }
         }

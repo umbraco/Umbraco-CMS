@@ -3,6 +3,7 @@ using Examine.Lucene;
 using Examine.Lucene.Directories;
 using Examine.Lucene.Providers;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -41,37 +42,27 @@ public class PublishedContentQueryTests : ExamineBaseTest
         public IEnumerable<string> GetFields() => _fieldNames;
     }
 
-    private TestIndex CreateTestIndex(Directory luceneDirectory, string[] fieldNames)
+    private TestIndex CreateTestIndex(Directory luceneDirectory, (string Name, string Culture)[] fields)
     {
-        var index = new TestIndex(LoggerFactory, "TestIndex", luceneDirectory, fieldNames);
+        var index = new TestIndex(LoggerFactory, "TestIndex", luceneDirectory, fields.Select(f => f.Name).ToArray());
 
         using (index.WithThreadingMode(IndexThreadingMode.Synchronous))
         {
-            //populate with some test data
-            index.IndexItem(new ValueSet(
-                "1",
-                "content",
-                new Dictionary<string, object>
-                {
-                    [fieldNames[0]] = "Hello world, there are products here",
-                    [UmbracoExamineFieldNames.VariesByCultureFieldName] = "n"
-                }));
-            index.IndexItem(new ValueSet(
-                "2",
-                "content",
-                new Dictionary<string, object>
-                {
-                    [fieldNames[1]] = "Hello world, there are products here",
-                    [UmbracoExamineFieldNames.VariesByCultureFieldName] = "y"
-                }));
-            index.IndexItem(new ValueSet(
-                "3",
-                "content",
-                new Dictionary<string, object>
-                {
-                    [fieldNames[2]] = "Hello world, there are products here",
-                    [UmbracoExamineFieldNames.VariesByCultureFieldName] = "y"
-                }));
+            // populate with some test data
+            for (var i = 0; i < fields.Length; i++)
+            {
+                var (name, culture) = fields[i];
+
+                index.IndexItem(new ValueSet(
+                    $"{i + 1}",
+                    "content",
+                    new Dictionary<string, object>
+                    {
+                        [name] = "Hello world, there are products here",
+                        [UmbracoExamineFieldNames.VariesByCultureFieldName] = culture.IsNullOrEmpty() ? "n" : "y",
+                        [culture.IsNullOrEmpty() ? UmbracoExamineFieldNames.PublishedFieldName : $"{UmbracoExamineFieldNames.PublishedFieldName}_{culture}"] = "y"
+                    }));
+            }
         }
 
         return index;
@@ -102,8 +93,8 @@ public class PublishedContentQueryTests : ExamineBaseTest
     {
         using (var luceneDir = new RandomIdRAMDirectory())
         {
-            var fieldNames = new[] { "title", "title_en-us", "title_fr-fr" };
-            using (var indexer = CreateTestIndex(luceneDir, fieldNames))
+            var fields = new[] { (Name: "title", Culture: null), (Name: "title_en-us", Culture: "en-us"), (Name: "title_fr-fr", Culture: "fr-fr") };
+            using (var indexer = CreateTestIndex(luceneDir, fields))
             {
                 var pcq = CreatePublishedContentQuery(indexer);
 

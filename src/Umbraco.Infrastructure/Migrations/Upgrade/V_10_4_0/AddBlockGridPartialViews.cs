@@ -2,6 +2,7 @@
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_4_0;
 
+[Obsolete("This is no longer used and will be removed in V14.")]
 public class AddBlockGridPartialViews : MigrationBase
 {
     private readonly IPartialViewPopulator _partialViewPopulator;

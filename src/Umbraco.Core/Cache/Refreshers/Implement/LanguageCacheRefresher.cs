@@ -134,8 +134,14 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
             ContentCacheRefresher.RefreshContentTypes(AppCaches); // we need to evict all IContent items
 
             // now refresh all nucache
-            ContentCacheRefresher.JsonPayload[] clearContentPayload =
-                new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) };
+            ContentCacheRefresher.JsonPayload[] clearContentPayload = new[]
+            {
+                new ContentCacheRefresher.JsonPayload()
+                {
+                    ChangeTypes = TreeChangeTypes.RefreshAll
+                }
+            };
+
             ContentCacheRefresher.NotifyPublishedSnapshotService(_publishedSnapshotService, AppCaches, clearContentPayload);
         }
 

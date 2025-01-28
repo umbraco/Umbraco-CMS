@@ -176,14 +176,11 @@ public class DataValueReferenceFactoryCollectionTests
     {
         var collection = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>);
         var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>));
-        var properties = new PropertyCollection();
 
-        var resultA = collection.GetAutomaticRelationTypesAliases(propertyEditors).ToArray();
-        var resultB = collection.GetAutomaticRelationTypesAliases(properties, propertyEditors).ToArray();
+        var result = collection.GetAllAutomaticRelationTypesAliases(propertyEditors).ToArray();
 
         var expected = Constants.Conventions.RelationTypes.AutomaticRelationTypes;
-        CollectionAssert.AreEquivalent(expected, resultA, "Result A does not contain the expected relation type aliases.");
-        CollectionAssert.AreEquivalent(expected, resultB, "Result B does not contain the expected relation type aliases.");
+        CollectionAssert.AreEquivalent(expected, result, "Result does not contain the expected relation type aliases.");
     }
 
     [Test]
@@ -194,15 +191,11 @@ public class DataValueReferenceFactoryCollectionTests
         var labelPropertyEditor = new LabelPropertyEditor(DataValueEditorFactory, IOHelper, EditorConfigurationParser);
         var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => labelPropertyEditor.Yield()));
         var serializer = new ConfigurationEditorJsonSerializer();
-        var property = new Property(new PropertyType(ShortStringHelper, new DataType(labelPropertyEditor, serializer)));
-        var properties = new PropertyCollection { property, property }; // Duplicate on purpose to test distinct aliases
 
-        var resultA = collection.GetAutomaticRelationTypesAliases(propertyEditors).ToArray();
-        var resultB = collection.GetAutomaticRelationTypesAliases(properties, propertyEditors).ToArray();
+        var result = collection.GetAllAutomaticRelationTypesAliases(propertyEditors).ToArray();
 
         var expected = Constants.Conventions.RelationTypes.AutomaticRelationTypes.Append("umbTest");
-        CollectionAssert.AreEquivalent(expected, resultA, "Result A does not contain the expected relation type aliases.");
-        CollectionAssert.AreEquivalent(expected, resultB, "Result B does not contain the expected relation type aliases.");
+        CollectionAssert.AreEquivalent(expected, result, "Result does not contain the expected relation type aliases.");
     }
 
     private class TestDataValueReferenceFactory : IDataValueReferenceFactory

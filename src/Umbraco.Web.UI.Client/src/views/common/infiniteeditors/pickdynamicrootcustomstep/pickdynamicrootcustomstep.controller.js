@@ -3,31 +3,32 @@
 
     function PickDynamicRootCustomStepController($scope, localizationService) {
 
-        var vm = this;
+        const vm = this;
+
+        vm.submit = submit;
+        vm.close = close;
 
         function onInit() {
-            if(!$scope.model.title) {
-                localizationService.localize("dynamicRoot_pickDynamicRootQueryStepTitle").then(function(value){
+            if (!$scope.model.title) {
+                localizationService.localize("dynamicRoot_pickDynamicRootQueryStepTitle").then(value => {
                     $scope.model.title = value;
                 });
             }
-            if(!$scope.model.subtitle) {
-                localizationService.localize("dynamicRoot_pickDynamicRootQueryStepDesc").then(function(value){
+            if (!$scope.model.subtitle) {
+                localizationService.localize("dynamicRoot_pickDynamicRootQueryStepDesc").then(value => {
                     $scope.model.subtitle = value;
                 });
             }
         }
-
-        vm.submit = submit;
+        
         function submit() {
           if ($scope.model.submit) {
               $scope.model.submit($scope.model);
           }
         }
 
-        vm.close = close;
         function close() {
-            if($scope.model.close) {
+            if ($scope.model.close) {
                 $scope.model.close();
             }
         }

@@ -1,3 +1,5 @@
+using Umbraco.Cms.Core.Models.PublishedContent;
+
 namespace Umbraco.Cms.Core.Models;
 
 public class Link
@@ -9,6 +11,8 @@ public class Link
     public LinkType Type { get; set; }
 
     public Udi? Udi { get; set; }
+
+    public IPublishedContent? Content { get; set; }
 
     public string? Url { get; set; }
 }

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core;
@@ -6,6 +7,7 @@ using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Macros;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Templates;
@@ -15,12 +17,23 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
     private readonly ILogger<HtmlMacroParameterParser> _logger;
     private readonly IMacroService _macroService;
     private readonly ParameterEditorCollection _parameterEditors;
+    private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactories;
 
+    [Obsolete("Use the non-obsolete overload instead, scheduled for removal in v14")]
     public HtmlMacroParameterParser(IMacroService macroService, ILogger<HtmlMacroParameterParser> logger, ParameterEditorCollection parameterEditors)
+        : this(
+            macroService,
+            logger,
+            parameterEditors,
+            StaticServiceProvider.Instance.GetRequiredService<DataValueReferenceFactoryCollection>())
+    { }
+
+    public HtmlMacroParameterParser(IMacroService macroService, ILogger<HtmlMacroParameterParser> logger, ParameterEditorCollection parameterEditors, DataValueReferenceFactoryCollection dataValueReferenceFactories)
     {
         _macroService = macroService;
         _logger = logger;
         _parameterEditors = parameterEditors;
+        _dataValueReferenceFactories = dataValueReferenceFactories;
     }
 
     /// <summary>
@@ -41,10 +54,10 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
             (macroAlias, macroAttributes) => foundMacros.Add(new Tuple<string?, Dictionary<string, string>>(
                 macroAlias,
                 new Dictionary<string, string>(macroAttributes, StringComparer.OrdinalIgnoreCase))));
-        foreach (UmbracoEntityReference umbracoEntityReference in GetUmbracoEntityReferencesFromMacros(foundMacros))
-        {
-            yield return umbracoEntityReference;
-        }
+
+        return foundMacros.Count > 0
+            ? GetUmbracoEntityReferencesFromMacros(foundMacros)
+            : Enumerable.Empty<UmbracoEntityReference>();
     }
 
     /// <summary>
@@ -52,8 +65,7 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
     /// </summary>
     /// <param name="macroGridControls"></param>
     /// <returns></returns>
-    public IEnumerable<UmbracoEntityReference> FindUmbracoEntityReferencesFromGridControlMacros(
-        IEnumerable<GridValue.GridControl> macroGridControls)
+    public IEnumerable<UmbracoEntityReference> FindUmbracoEntityReferencesFromGridControlMacros(IEnumerable<GridValue.GridControl> macroGridControls)
     {
         var foundMacros = new List<Tuple<string?, Dictionary<string, string>>>();
 
@@ -65,15 +77,13 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
             // Collect any macro parameters that contain the media udi format
             if (gridMacro is not null && gridMacro.MacroParameters is not null && gridMacro.MacroParameters.Any())
             {
-                foundMacros.Add(
-                    new Tuple<string?, Dictionary<string, string>>(gridMacro.MacroAlias, gridMacro.MacroParameters));
+                foundMacros.Add(new Tuple<string?, Dictionary<string, string>>(gridMacro.MacroAlias, gridMacro.MacroParameters));
             }
         }
 
-        foreach (UmbracoEntityReference umbracoEntityReference in GetUmbracoEntityReferencesFromMacros(foundMacros))
-        {
-            yield return umbracoEntityReference;
-        }
+        return foundMacros.Count > 0
+            ? GetUmbracoEntityReferencesFromMacros(foundMacros)
+            : Enumerable.Empty<UmbracoEntityReference>();
     }
 
     private IEnumerable<UmbracoEntityReference> GetUmbracoEntityReferencesFromMacros(
@@ -84,6 +94,7 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
             yield break;
         }
 
+
         IEnumerable<string?> uniqueMacroAliases = macros.Select(f => f.Item1).Distinct();
 
         // TODO: Tracking Macro references
@@ -91,7 +102,9 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
         var foundMacroUmbracoEntityReferences = new List<UmbracoEntityReference>();
 
         // Get all the macro configs in one hit for these unique macro aliases - this is now cached with a custom cache policy
-        IEnumerable<IMacro> macroConfigs = macroWithAliasService.GetAll(uniqueMacroAliases.WhereNotNull().ToArray());
+        IEnumerable<IMacro> macroConfigs = uniqueMacroAliases.Any()
+            ? macroWithAliasService.GetAll(uniqueMacroAliases.WhereNotNull().ToArray())
+            : Enumerable.Empty<IMacro>();
 
         foreach (Tuple<string?, Dictionary<string, string>> macro in macros)
         {
@@ -101,14 +114,12 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
                 continue;
             }
 
-            foundMacroUmbracoEntityReferences.Add(
-                new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Macro, macroConfig.Key)));
+            foundMacroUmbracoEntityReferences.Add(new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Macro, macroConfig.Key)));
 
             // Only do this if the macros actually have parameters
             if (macroConfig.Properties.Keys.Any(f => f != "macroAlias"))
             {
-                foreach (UmbracoEntityReference umbracoEntityReference in GetUmbracoEntityReferencesFromMacroParameters(
-                             macro.Item2, macroConfig, _parameterEditors))
+                foreach (UmbracoEntityReference umbracoEntityReference in GetUmbracoEntityReferencesFromMacroParameters(macro.Item2, macroConfig, _parameterEditors))
                 {
                     yield return umbracoEntityReference;
                 }
@@ -130,41 +141,23 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
     ///     look up the corresponding property editor for a macro parameter
     /// </param>
     /// <returns></returns>
-    private IEnumerable<UmbracoEntityReference> GetUmbracoEntityReferencesFromMacroParameters(
-        Dictionary<string, string> macroParameters, IMacro macroConfig, ParameterEditorCollection parameterEditors)
+    private IEnumerable<UmbracoEntityReference> GetUmbracoEntityReferencesFromMacroParameters(Dictionary<string, string> macroParameters, IMacro macroConfig, ParameterEditorCollection parameterEditors)
     {
-        var foundUmbracoEntityReferences = new List<UmbracoEntityReference>();
         foreach (IMacroProperty parameter in macroConfig.Properties)
         {
             if (macroParameters.TryGetValue(parameter.Alias, out var parameterValue))
             {
                 var parameterEditorAlias = parameter.EditorAlias;
-
-                // Lookup propertyEditor from the registered ParameterEditors with the implmementation to avoid looking up for each parameter
-                IDataEditor? parameterEditor = parameterEditors.FirstOrDefault(f =>
-                    string.Equals(f.Alias, parameterEditorAlias, StringComparison.OrdinalIgnoreCase));
+                IDataEditor? parameterEditor = parameterEditors.FirstOrDefault(f => string.Equals(f.Alias, parameterEditorAlias, StringComparison.OrdinalIgnoreCase));
                 if (parameterEditor is not null)
                 {
-                    // Get the ParameterValueEditor for this PropertyEditor (where the GetReferences method is implemented) - cast as IDataValueReference to determine if 'it is' implemented for the editor
-                    if (parameterEditor.GetValueEditor() is IDataValueReference parameterValueEditor)
+                    foreach (UmbracoEntityReference entityReference in _dataValueReferenceFactories.GetReferences(parameterEditor, parameterValue))
                     {
-                        foreach (UmbracoEntityReference entityReference in parameterValueEditor.GetReferences(
-                                     parameterValue))
-                        {
-                            foundUmbracoEntityReferences.Add(entityReference);
-                        }
-                    }
-                    else
-                    {
-                        _logger.LogInformation(
-                            "{0} doesn't have a ValueEditor that implements IDataValueReference",
-                            parameterEditor.Alias);
+                        yield return entityReference;
                     }
                 }
             }
         }
-
-        return foundUmbracoEntityReferences;
     }
 
     // Poco class to deserialise the Json for a Macro Control

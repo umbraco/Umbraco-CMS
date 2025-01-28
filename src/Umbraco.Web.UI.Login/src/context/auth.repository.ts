@@ -25,26 +25,20 @@ export class UmbAuthRepository {
       });
       const response = await fetch(request);
 
-      const responseData: LoginResponse = {
-        status: response.status,
-      };
-
-      if (!response.ok) {
-        responseData.error = await this.#getErrorText(response);
-        return responseData;
-      }
+      let responseData: any = undefined;
 
       try {
         const text = await response.text();
         if (text) {
-          responseData.data = JSON.parse(this.#removeAngularJSResponseData(text));
+          responseData = JSON.parse(this.#removeAngularJSResponseData(text));
         }
       } catch {
       }
 
       return {
         status: response.status,
-        data: responseData?.data,
+        error: response.ok ? undefined : await this.#getErrorText(response),
+        data: responseData,
         twoFactorView: responseData?.twoFactorView,
       };
     } catch (error) {

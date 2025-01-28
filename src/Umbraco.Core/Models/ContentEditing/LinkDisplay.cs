@@ -11,6 +11,9 @@ public class LinkDisplay
     [DataMember(Name = "name")]
     public string? Name { get; set; }
 
+    [DataMember(Name = "nodeName")]
+    public string? NodeName { get; set; }
+
     [DataMember(Name = "published")]
     public bool Published { get; set; }
 

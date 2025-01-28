@@ -650,8 +650,17 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
   };
 
   function performCopy(target, relateToOriginal, includeDescendants) {
+    var newPath = null;
+    var newTarget = null;
     applySelected(
-      function (selected, index) { return contentResource.copy({ parentId: target.id, id: getIdCallback(selected[index]), relateToOriginal: relateToOriginal, recursive: includeDescendants }); },
+      function (selected, index) {
+        return contentResource.copy({ parentId: target.id, id: getIdCallback(selected[index]), relateToOriginal: relateToOriginal, recursive: includeDescendants })
+          .then(function (path) {
+            newPath = path;
+            newTarget = parseInt(target.id);
+            return path;
+          });
+      },
       function (count, total) {
         var key = (total === 1 ? "bulk_copiedItemOfItem" : "bulk_copiedItemOfItems");
         return localizationService.localize(key, [count, total]);
@@ -659,6 +668,18 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
       function (total) {
         var key = (total === 1 ? "bulk_copiedItem" : "bulk_copiedItems");
         return localizationService.localize(key, [total]);
+      })
+      .then(function () {
+        //executes if all is successful
+        if (newPath) {
+          if (newTarget === $scope.contentId) {
+            // if we copied this to the same parent, reload the current view completely
+            $scope.reloadView($scope.contentId);
+          } else {
+            // Otherwise just clear the current selection but don't reload
+            $scope.clearSelection();
+          }
+        }
       });
   }
 
@@ -760,7 +781,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
       $scope.options.allowBulkDelete;
 
     if ($scope.isTrashed === false) {
-      getContentTypesCallback(id).then(function (listViewAllowedTypes) {
+      getContentTypesCallback($scope.contentId).then(function (listViewAllowedTypes) {
         $scope.listViewAllowedTypes = listViewAllowedTypes;
 
         var blueprints = false;

@@ -2,7 +2,7 @@
     'use strict';
 
     /** This directive is used to render out the current variant tabs and properties and exposes an API for other directives to consume  */
-    function tabbedContentDirective($timeout, $filter, contentEditingHelper, contentTypeHelper) {
+    function tabbedContentDirective($timeout, $filter, contentEditingHelper, contentTypeHelper, eventsService) {
 
         function link($scope, $element) {
 
@@ -15,7 +15,8 @@
 
             $scope.activeTabAlias = null;
             $scope.tabs = [];
-            $scope.allowUpdate = $scope.content.allowedActions.includes('A');
+            //$scope.allowUpdate = $scope.content.allowedActions.includes('A');
+            setAllowUpdate()
             $scope.allowEditInvariantFromNonDefault = Umbraco.Sys.ServerVariables.umbracoSettings.allowEditInvariantFromNonDefault;
 
             $scope.$watchCollection('content.tabs', (newValue) => {
@@ -43,6 +44,10 @@
                     scrollableNode.addEventListener("mousewheel", cancelScrollTween);
                 }
             });
+
+            function setAllowUpdate() {
+              $scope.allowUpdate = $scope.content.allowedActions.includes('A');
+            }
 
             function onScroll(event) {
 
@@ -149,6 +154,16 @@
                     setActiveAnchor($args.anchor);
                     scrollTo($args.anchor.id);
                 }
+            });
+
+            eventsService.on("form.lock", function() {
+              $scope.$evalAsync(() => {
+                $scope.allowUpdate = false;
+              });
+            });
+
+            eventsService.on("form.unlock", function() {
+                setAllowUpdate();
             });
 
             //ensure to unregister from all dom-events

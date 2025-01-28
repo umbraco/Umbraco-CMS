@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
@@ -122,7 +123,7 @@ public class ImagesController : UmbracoAuthorizedApiController
 
     private bool IsAllowed(string encodedImagePath)
     {
-        if(Uri.IsWellFormedUriString(encodedImagePath, UriKind.Relative))
+        if(WebPath.IsWellFormedWebPath(encodedImagePath, UriKind.Relative))
         {
             return true;
         }

@@ -10,7 +10,7 @@
     vm.page.name = "";
     vm.page.navigation = [];
 
-    let webhookUri = $routeParams.method;
+    let webhookUri = $routeParams.id;
 
     onInit();
 
@@ -33,8 +33,8 @@
           {
             "name": vm.page.labels.webhooks,
             "icon": "icon-webhook",
-            "view": "views/webhooks/webhooks.html",
-            "active": webhookUri === 'overview',
+            "view": !webhookUri ? "views/webhooks/webhooks.html" : null,
+            "active": !webhookUri,
             "alias": "umbWebhooks",
             "action": function () {
               $location.path("/settings/webhooks/overview");
@@ -43,11 +43,11 @@
           {
             "name": vm.page.labels.logs,
             "icon": "icon-box-alt",
-            "view": "views/webhooks/logs.html",
+            "view": webhookUri === 'logs' ? "views/webhooks/logs.html" : null,
             "active": webhookUri === 'logs',
             "alias": "umbWebhookLogs",
             "action": function () {
-              $location.path("/settings/webhooks/overview");
+              $location.path("/settings/webhooks/overview/logs");
             }
           }
         ];

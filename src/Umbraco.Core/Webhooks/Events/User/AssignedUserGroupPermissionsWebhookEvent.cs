@@ -18,7 +18,7 @@ public class AssignedUserGroupPermissionsWebhookEvent : WebhookEventBase<Assigne
     {
     }
 
-    public override string Alias => "assignedUserGroupPermissions";
+    public override string Alias => Constants.WebhookEvents.Aliases.AssignedUserGroupPermissions;
 
     public override object? ConvertNotificationToRequestPayload(AssignedUserGroupPermissionsNotification notification)
         => notification.EntityPermissions;

@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
@@ -358,7 +356,16 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
         // notify
         SnapshotService.Notify(
-            new[] { new ContentCacheRefresher.JsonPayload(10, Guid.Empty, TreeChangeTypes.RefreshBranch) }, out _, out _);
+            new[]
+            {
+                new ContentCacheRefresher.JsonPayload()
+                {
+                    Id = 10,
+                    ChangeTypes = TreeChangeTypes.RefreshBranch
+                }
+            },
+            out _,
+            out _);
 
         // changes that *I* make are immediately visible on the current snapshot
         var documents = snapshot.Content.GetAtRoot().ToArray();
@@ -392,7 +399,16 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
         // notify
         SnapshotService.Notify(
-            new[] { new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshBranch) }, out _, out _);
+            new[]
+            {
+                new ContentCacheRefresher.JsonPayload()
+                {
+                    Id = 1,
+                    ChangeTypes = TreeChangeTypes.RefreshBranch
+                }
+            },
+            out _,
+            out _);
 
         // changes that *I* make are immediately visible on the current snapshot
         var documents = snapshot.Content.GetAtRoot().ToArray();
@@ -450,7 +466,11 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         SnapshotService.Notify(
             new[]
             {
-                new ContentCacheRefresher.JsonPayload(kit.Node.ParentContentId, Guid.Empty, TreeChangeTypes.RefreshBranch),
+                new ContentCacheRefresher.JsonPayload()
+                {
+                    Id = kit.Node.ParentContentId,
+                    ChangeTypes = TreeChangeTypes.RefreshBranch
+                }
             },
             out _,
             out _);
@@ -516,11 +536,19 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         // notify
         SnapshotService.Notify(
             new[]
-        {
-            // removal must come first
-            new ContentCacheRefresher.JsonPayload(2, Guid.Empty, TreeChangeTypes.RefreshBranch),
-            new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshBranch),
-        },
+            {
+                // removal must come first
+                new ContentCacheRefresher.JsonPayload()
+                {
+                    Id = 2,
+                    ChangeTypes = TreeChangeTypes.RefreshBranch
+                },
+                new ContentCacheRefresher.JsonPayload()
+                {
+                    Id = 1,
+                    ChangeTypes = TreeChangeTypes.RefreshBranch
+                }
+            },
             out _,
             out _);
 
@@ -571,7 +599,16 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
         // notify - which ensures there are 2 generations in the cache meaning each LinkedNode has a Next value.
         SnapshotService.Notify(
-            new[] { new ContentCacheRefresher.JsonPayload(4, Guid.Empty, TreeChangeTypes.RefreshBranch) }, out _, out _);
+            new[]
+            {
+                new ContentCacheRefresher.JsonPayload()
+                {
+                    Id = 4,
+                    ChangeTypes = TreeChangeTypes.RefreshBranch
+                }
+            },
+            out _,
+            out _);
 
         // refresh the branch again, this used to show the issue where a null ref exception would occur
         // because in the ClearBranchLocked logic, when SetValueLocked was called within a recursive call
@@ -579,7 +616,16 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         // this value before recursing.
         Assert.DoesNotThrow(() =>
             SnapshotService.Notify(
-                new[] { new ContentCacheRefresher.JsonPayload(4, Guid.Empty, TreeChangeTypes.RefreshBranch) }, out _, out _));
+                new[]
+                {
+                    new ContentCacheRefresher.JsonPayload()
+                    {
+                        Id = 4,
+                        ChangeTypes = TreeChangeTypes.RefreshBranch
+                    }
+                },
+                out _,
+                out _));
     }
 
     [Test]
@@ -759,11 +805,23 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         // notify
         SnapshotService.Notify(
             new[]
-        {
-            new ContentCacheRefresher.JsonPayload(3, Guid.Empty, TreeChangeTypes.Remove), // remove last
-            new ContentCacheRefresher.JsonPayload(5, Guid.Empty, TreeChangeTypes.Remove), // remove middle
-            new ContentCacheRefresher.JsonPayload(9, Guid.Empty, TreeChangeTypes.Remove), // remove first
-        },
+            {
+                new ContentCacheRefresher.JsonPayload() // remove last
+                {
+                    Id = 3,
+                    ChangeTypes = TreeChangeTypes.Remove
+                },
+                new ContentCacheRefresher.JsonPayload() // remove middle
+                {
+                    Id = 5,
+                    ChangeTypes = TreeChangeTypes.Remove
+                },
+                new ContentCacheRefresher.JsonPayload() // remove first
+                {
+                    Id = 9,
+                    ChangeTypes = TreeChangeTypes.Remove
+                }
+            },
             out _,
             out _);
 
@@ -779,11 +837,23 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         // notify
         SnapshotService.Notify(
             new[]
-        {
-            new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.Remove), // remove first
-            new ContentCacheRefresher.JsonPayload(8, Guid.Empty, TreeChangeTypes.Remove), // remove
-            new ContentCacheRefresher.JsonPayload(7, Guid.Empty, TreeChangeTypes.Remove), // remove
-        },
+            {
+                new ContentCacheRefresher.JsonPayload() // remove first
+                {
+                    Id = 1,
+                    ChangeTypes = TreeChangeTypes.Remove
+                },
+                new ContentCacheRefresher.JsonPayload() // remove
+                {
+                    Id = 8,
+                    ChangeTypes = TreeChangeTypes.Remove
+                },
+                new ContentCacheRefresher.JsonPayload() // remove
+                {
+                    Id = 7,
+                    ChangeTypes = TreeChangeTypes.Remove
+                }
+            },
             out _,
             out _);
 
@@ -823,8 +893,16 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         SnapshotService.Notify(
             new[]
             {
-                new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshBranch),
-                new ContentCacheRefresher.JsonPayload(2, Guid.Empty, TreeChangeTypes.RefreshNode),
+                new ContentCacheRefresher.JsonPayload()
+                {
+                    Id = 1,
+                    ChangeTypes = TreeChangeTypes.RefreshBranch
+                },
+                new ContentCacheRefresher.JsonPayload()
+                {
+                    Id = 2,
+                    ChangeTypes = TreeChangeTypes.RefreshNode
+                }
             },
             out _,
             out _);
@@ -887,7 +965,17 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         var parentNode = parentNodes[0];
         AssertLinkedNode(parentNode.contentNode, -1, -1, -1, 2, 2);
 
-        SnapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(2, Guid.Empty, TreeChangeTypes.Remove) }, out _, out _);
+        SnapshotService.Notify(
+            new[]
+            {
+                new ContentCacheRefresher.JsonPayload()
+                {
+                    Id = 2,
+                    ChangeTypes = TreeChangeTypes.Remove
+                }
+            },
+            out _,
+            out _);
 
         parentNodes = contentStore.Test.GetValues(1);
         parentNode = parentNodes[0];
@@ -944,9 +1032,13 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
         SnapshotService.Notify(
             new[]
-        {
-            new ContentCacheRefresher.JsonPayload(3, Guid.Empty, TreeChangeTypes.Remove), // remove middle child
-        },
+            {
+                new ContentCacheRefresher.JsonPayload() // remove middle child
+                {
+                    Id = 3,
+                    ChangeTypes = TreeChangeTypes.Remove
+                }
+            },
             out _,
             out _);
 
@@ -1013,7 +1105,16 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         Assert.IsFalse(contentStore.Test.NextGen);
 
         SnapshotService.Notify(
-            new[] { new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshNode) }, out _, out _);
+            new[]
+            {
+                new ContentCacheRefresher.JsonPayload()
+                {
+                    Id = 1,
+                    ChangeTypes = TreeChangeTypes.RefreshNode
+                }
+            },
+            out _,
+            out _);
 
         Assert.AreEqual(2, contentStore.Test.LiveGen);
         Assert.IsTrue(contentStore.Test.NextGen);
@@ -1084,7 +1185,17 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
                 published ? rootKit.PublishedData : null);
             NuCacheContentService.ContentKits[1] = kit;
 
-            SnapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(1, Guid.Empty, changeType) }, out _, out _);
+            SnapshotService.Notify(
+                new[]
+                {
+                    new ContentCacheRefresher.JsonPayload()
+                    {
+                        Id = 1,
+                        ChangeTypes = changeType
+                    }
+                },
+                out _,
+                out _);
 
             Assert.AreEqual(assertGen, contentStore.Test.LiveGen);
             Assert.IsTrue(contentStore.Test.NextGen);
@@ -1162,9 +1273,13 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
         SnapshotService.Notify(
             new[]
-        {
-            new ContentCacheRefresher.JsonPayload(3, Guid.Empty, TreeChangeTypes.RefreshBranch), // remove middle child
-        },
+            {
+                new ContentCacheRefresher.JsonPayload() // remove middle child
+                {
+                    Id = 3,
+                    ChangeTypes = TreeChangeTypes.RefreshBranch
+                }
+            },
             out _,
             out _);
 

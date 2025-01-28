@@ -156,7 +156,7 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
 
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
     {
-        if (inter is not RichTextEditorIntermediateValue richTextEditorIntermediateValue
+        if (inter is not IRichTextEditorIntermediateValue richTextEditorIntermediateValue
             || richTextEditorIntermediateValue.Markup.IsNullOrWhiteSpace())
         {
             // different return types for the JSON configuration forces us to have different return values for empty properties
@@ -201,7 +201,7 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
 
     private string? Convert(object? source, bool preview)
     {
-        if (source is not RichTextEditorIntermediateValue intermediateValue)
+        if (source is not IRichTextEditorIntermediateValue intermediateValue)
         {
             return null;
         }
@@ -291,7 +291,7 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         return RichTextParsingRegexes.BlockRegex().Replace(source, RenderBlock);
     }
 
-    private RichTextModel CreateRichTextModel(RichTextEditorIntermediateValue richTextEditorIntermediateValue)
+    private RichTextModel CreateRichTextModel(IRichTextEditorIntermediateValue richTextEditorIntermediateValue)
     {
         var markup = _apiRichTextMarkupParser.Parse(richTextEditorIntermediateValue.Markup);
 
@@ -308,7 +308,7 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         };
     }
 
-    private class RichTextEditorIntermediateValue
+    private class RichTextEditorIntermediateValue : IRichTextEditorIntermediateValue
     {
         public required string Markup { get; set; }
 
