@@ -216,11 +216,12 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		}
 
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+
 		const reloadStructureEvent = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 		actionEventContext.dispatchEvent(reloadStructureEvent);
 
-		const entityDetailUpdatedEvent = new UmbEntityUpdatedEvent({ unique, entityType });
-		actionEventContext.dispatchEvent(entityDetailUpdatedEvent);
+		const entityUpdatedEvent = new UmbEntityUpdatedEvent({ unique, entityType });
+		actionEventContext.dispatchEvent(entityUpdatedEvent);
 
 		this.modalContext?.submit();
 	}
