@@ -722,7 +722,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'fileExtensions',
-				value: ['jpg', 'jpeg', 'png', 'pdf'],
+				value: ['jpg', 'jpeg', 'png', 'pdf', 'mov', 'iso'],
 			},
 			{
 				alias: 'multiple',
