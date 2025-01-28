@@ -146,7 +146,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	#validationRepository?: UmbContentValidationRepository<DetailModelType>;
 
 	#saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
-	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	constructor(
 		host: UmbControllerHost,
