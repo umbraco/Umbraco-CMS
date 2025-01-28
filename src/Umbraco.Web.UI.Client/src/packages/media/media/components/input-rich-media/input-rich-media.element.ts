@@ -235,14 +235,21 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 			'valueMissing',
 			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 			() => {
-				return !this.readonly && (!this.value || this.value.length === 0);
+				return !this.readonly && !!this.required && (!this.value || this.value.length === 0);
 			},
 		);
 
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !this.readonly && !!this.min && (this.value?.length ?? 0) < this.min,
+			() =>
+				!this.readonly &&
+				// Only if min is set:
+				!!this.min &&
+				// if the value is empty and not required, we should not validate the min:
+				!(this.value?.length === 0 && this.required == false) &&
+				// Validate the min:
+				(this.value?.length ?? 0) < this.min,
 		);
 		this.addValidator(
 			'rangeOverflow',
@@ -257,15 +264,16 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	async #populateCards() {
 		const mediaItems = this.#itemManager.getItems();
-		// Check if all media items is loaded.
-		// But notice, it would be nicer UX if we could show a loading state on the cards that are missing(loading) their items.
-		const missingCards = mediaItems.filter((item) => !this._cards.find((card) => card.unique === item.unique));
-		if (!missingCards.length) return;
 
 		if (!mediaItems.length) {
 			this._cards = [];
 			return;
 		}
+		// Check if all media items is loaded.
+		// But notice, it would be nicer UX if we could show a loading state on the cards that are missing(loading) their items.
+		const missingCards = mediaItems.filter((item) => !this._cards.find((card) => card.unique === item.unique));
+		const removedCards = this._cards.filter((card) => !mediaItems.find((item) => card.unique === item.unique));
+		if (missingCards.length === 0 && removedCards.length === 0) return;
 
 		this._cards =
 			this.value?.map((item) => {
