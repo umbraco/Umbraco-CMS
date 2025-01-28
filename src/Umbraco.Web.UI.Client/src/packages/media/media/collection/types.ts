@@ -23,7 +23,10 @@ export interface UmbMediaCollectionItemModel {
 	values?: Array<{ alias: string; value: string }>;
 	url?: string;
 	status?: UmbFileDropzoneItemStatus;
-	progress: number;
+	/**
+	 * The progress of the item in percentage.
+	 */
+	progress?: number;
 }
 
 export interface UmbEditableMediaCollectionItemModel {

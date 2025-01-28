@@ -116,7 +116,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 		const error = item.status !== UmbFileDropzoneItemStatus.WAITING && !complete;
 		return html`<uui-card-media disabled class="media-placeholder-item" name=${ifDefined(item.name)}>
 			<umb-temporary-file-badge
-				.progress=${item.progress}
+				.progress=${item.progress ?? 0}
 				?complete=${complete}
 				?error=${error}></umb-temporary-file-badge>
 		</uui-card-media>`;
