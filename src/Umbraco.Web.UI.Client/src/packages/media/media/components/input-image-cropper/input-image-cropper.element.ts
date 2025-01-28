@@ -60,7 +60,7 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 			'valueMissing',
 			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 			() => {
-				return !this.value || (this.value.src === '' && this.value.temporaryFileId == null);
+				return !!this.required && (!this.value || (this.value.src === '' && this.value.temporaryFileId == null));
 			},
 		);
 	}
