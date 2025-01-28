@@ -8,5 +8,5 @@ public class TemporaryFileConfigurationResponseModel
 
     public string[] AllowedUploadedFileExtensions { get; set; } = Array.Empty<string>();
 
-    public long? MaxFileSize { get; set; }
+    public int? MaxFileSize { get; set; }
 }
