@@ -470,6 +470,8 @@ export type CurrenUserConfigurationResponseModel = {
      */
     usernameIsEmail: boolean;
     passwordConfiguration: (PasswordConfigurationResponseModel);
+    allowChangePassword: boolean;
+    allowTwoFactor: boolean;
 };
 
 export type DatabaseInstallRequestModel = {

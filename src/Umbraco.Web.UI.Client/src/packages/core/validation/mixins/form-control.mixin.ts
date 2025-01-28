@@ -168,7 +168,6 @@ export function UmbFormControlMixin<
 				/*if (e.composedPath().some((x) => x === this)) {
 					return;
 				}*/
-				this.pristine = false;
 				this.checkValidity();
 			});
 		}
