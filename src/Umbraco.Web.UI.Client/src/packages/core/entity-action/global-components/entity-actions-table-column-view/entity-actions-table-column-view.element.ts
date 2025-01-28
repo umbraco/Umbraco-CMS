@@ -11,25 +11,12 @@ export class UmbEntityActionsTableColumnViewElement extends UmbLitElement {
 	@state()
 	_isOpen = false;
 
-	#onActionExecuted() {
-		this._isOpen = false;
-	}
-
-	#onClick(event: Event) {
-		event.stopPropagation();
-	}
-
 	override render() {
 		if (!this.value) return nothing;
 
 		return html`
-			<umb-dropdown .open=${this._isOpen} @click=${this.#onClick} compact hide-expand>
-				<uui-symbol-more slot="label"></uui-symbol-more>
-				<umb-entity-action-list
-					@action-executed=${this.#onActionExecuted}
-					entity-type=${this.value.entityType}
-					.unique=${this.value.unique}></umb-entity-action-list>
-			</umb-dropdown>
+			<umb-entity-actions-bundle .entityType=${this.value.entityType} .unique=${this.value.unique}>
+			</umb-entity-actions-bundle>
 		`;
 	}
 }

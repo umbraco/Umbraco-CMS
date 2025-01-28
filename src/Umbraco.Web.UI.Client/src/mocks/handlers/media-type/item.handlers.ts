@@ -10,4 +10,13 @@ export const itemHandlers = [
 		const items = umbMediaTypeMockDb.item.getItems(ids);
 		return res(ctx.status(200), ctx.json(items));
 	}),
+
+	rest.get(umbracoPath(`/item${UMB_SLUG}/allowed`), (req, res, ctx) => {
+		const fileExtension = req.url.searchParams.get('fileExtension');
+		if (!fileExtension) return;
+
+		const response = umbMediaTypeMockDb.getAllowedByFileExtension(fileExtension);
+
+		return res(ctx.status(200), ctx.json(response));
+	}),
 ];
