@@ -4,6 +4,8 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { type ManifestRepository, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
 
 const ObserveRepositoryAlias = Symbol();
 
@@ -14,6 +16,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 
 	#init: Promise<unknown>;
 	#currentRequest?: Promise<unknown>;
+	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	// the init promise is used externally for recognizing when the manager is ready.
 	public get init() {
@@ -70,6 +73,20 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 			},
 			null,
 		);
+
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
+			this.#eventContext = context;
+
+			this.#eventContext.removeEventListener(
+				UmbEntityUpdatedEvent.TYPE,
+				this.#onEntityDetailUpdatedEvent as unknown as EventListener,
+			);
+
+			this.#eventContext.addEventListener(
+				UmbEntityUpdatedEvent.TYPE,
+				this.#onEntityDetailUpdatedEvent as unknown as EventListener,
+			);
+		});
 	}
 
 	getUniques(): Array<string> {
@@ -122,6 +139,25 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		}
 	}
 
+	async #reloadItem(unique: string): Promise<void> {
+		await this.#init;
+		if (!this.repository) throw new Error('Repository is not initialized');
+
+		const { data } = await this.repository.requestItems([unique]);
+
+		if (data) {
+			const items = this.getItems();
+			const item = items.find((item) => this.#getUnique(item) === unique);
+
+			if (item) {
+				const index = items.indexOf(item);
+				const newItems = [...items];
+				newItems[index] = data[0];
+				this.#items.setValue(this.#sortByUniques(newItems));
+			}
+		}
+	}
+
 	#sortByUniques(data: Array<ItemType>): Array<ItemType> {
 		const uniques = this.getUniques();
 		return [...data].sort((a, b) => {
@@ -129,5 +165,26 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 			const bIndex = uniques.indexOf(this.#getUnique(b) ?? '');
 			return aIndex - bIndex;
 		});
+	}
+
+	#onEntityDetailUpdatedEvent = (event: UmbEntityUpdatedEvent) => {
+		const eventUnique = event.getUnique();
+
+		const items = this.getItems();
+		if (items.length === 0) return;
+
+		// Ignore events if the entity is not in the list of items.
+		const item = items.find((item) => this.#getUnique(item) === eventUnique);
+		if (!item) return;
+
+		this.#reloadItem(item.unique);
+	};
+
+	override destroy(): void {
+		this.#eventContext?.removeEventListener(
+			UmbEntityUpdatedEvent.TYPE,
+			this.#onEntityDetailUpdatedEvent as unknown as EventListener,
+		);
+		super.destroy();
 	}
 }
