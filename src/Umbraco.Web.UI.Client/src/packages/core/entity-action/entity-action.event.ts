@@ -2,7 +2,9 @@ import { UmbControllerEvent } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbEntityActionEventArgs extends UmbEntityModel {}
+export interface UmbEntityActionEventArgs extends UmbEntityModel {
+	discriminator?: string;
+}
 
 export class UmbEntityActionEvent<
 	ArgsType extends UmbEntityActionEventArgs = UmbEntityActionEventArgs,
@@ -20,5 +22,9 @@ export class UmbEntityActionEvent<
 
 	getUnique(): string | null {
 		return this._args.unique;
+	}
+
+	getDiscriminator(): string | undefined {
+		return this._args.discriminator;
 	}
 }
