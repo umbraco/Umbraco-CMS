@@ -34,7 +34,7 @@ export class UmbTemporaryFileManager<
 	): Promise<Array<UploadableItem>> {
 		this.#queue.setValue([]);
 
-		const items = queueItems.map((item): UploadableItem => ({ status: TemporaryFileStatus.WAITING, ...item }));
+		const items = queueItems.map((item): UploadableItem => ({ ...item, status: TemporaryFileStatus.WAITING }));
 		this.#queue.append(items);
 		return this.#handleQueue({ ...options });
 	}
