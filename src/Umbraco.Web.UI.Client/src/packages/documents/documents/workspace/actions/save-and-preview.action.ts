@@ -1,9 +1,6 @@
 import { UmbDocumentUserPermissionCondition } from '../../user-permissions/conditions/document-user-permission.condition.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../document-workspace.context-token.js';
-import {
-	UMB_USER_PERMISSION_DOCUMENT_CREATE,
-	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-} from '../../user-permissions/index.js';
+import { UMB_USER_PERMISSION_DOCUMENT_UPDATE } from '../../user-permissions/index.js';
 import { UmbWorkspaceActionBase } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -23,7 +20,7 @@ export class UmbDocumentSaveAndPreviewWorkspaceAction extends UmbWorkspaceAction
 			host,
 			config: {
 				alias: 'Umb.Condition.UserPermission.Document',
-				oneOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_UPDATE],
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE],
 			},
 			onChange: () => {
 				if (condition.permitted) {
