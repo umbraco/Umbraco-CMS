@@ -16,4 +16,12 @@ export class UmbUserConfigServerDataSource {
 	getUserConfig() {
 		return tryExecuteAndNotify(this.#host, UserService.getUserConfiguration());
 	}
+
+	/**
+	 * Get the current user configuration.
+	 * @memberof UmbUserConfigServerDataSource
+	 */
+	getCurrentUserConfig() {
+		return tryExecuteAndNotify(this.#host, UserService.getUserCurrentConfiguration());
+	}
 }

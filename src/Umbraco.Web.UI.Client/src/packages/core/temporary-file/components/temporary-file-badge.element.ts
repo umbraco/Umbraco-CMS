@@ -22,18 +22,31 @@ export class UmbTemporaryFileBadgeElement extends UmbLitElement {
 	@property({ type: Boolean, reflect: true })
 	public complete = false;
 
+	@property({ type: Boolean, reflect: true })
+	public error = false;
+
 	override render() {
 		return html`<uui-badge>
 			<div id="wrapper">
-				<uui-loader-circle .progress=${this.complete ? 100 : this.progress}></uui-loader-circle>
-				${this.complete
-					? html`<uui-icon name="icon-check"></uui-icon>`
-					: html`<uui-icon name="icon-arrow-up"></uui-icon>`}
+				<uui-loader-circle .progress=${this.complete || this.error ? 100 : this.progress}></uui-loader-circle>
+				${this.#renderIcon()}
 			</div>
 		</uui-badge>`;
 	}
 
-	static override styles = css`
+	#renderIcon() {
+		if (this.error) {
+			return html`<uui-icon name="icon-alert"></uui-icon>`;
+		}
+
+		if (this.complete) {
+			return html`<uui-icon name="icon-check"></uui-icon>`;
+		}
+
+		return html`<uui-icon name="icon-arrow-up"></uui-icon>`;
+	}
+
+	static override readonly styles = css`
 		:host {
 			display: block;
 		}
@@ -52,6 +65,12 @@ export class UmbTemporaryFileBadgeElement extends UmbLitElement {
 		}
 		:host([complete]) uui-loader-circle {
 			color: var(--uui-color-positive);
+		}
+		:host([error]) #wrapper {
+			background-color: var(--uui-color-danger);
+		}
+		:host([error]) uui-loader-circle {
+			color: var(--uui-color-danger);
 		}
 
 		uui-loader-circle {

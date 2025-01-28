@@ -1,3 +1,5 @@
+import { UMB_CURRENT_USER_ALLOW_MFA_CONDITION_ALIAS } from '@umbraco-cms/backoffice/user';
+
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'currentUserAction',
@@ -13,7 +15,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.User.AllowMfaAction',
+				alias: UMB_CURRENT_USER_ALLOW_MFA_CONDITION_ALIAS,
 			},
 		],
 	},

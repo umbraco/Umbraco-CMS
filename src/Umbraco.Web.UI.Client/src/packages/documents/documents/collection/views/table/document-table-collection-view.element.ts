@@ -125,7 +125,11 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				};
 			});
 
-			this._tableColumns = [...this.#systemColumns, ...userColumns, { name: '', alias: 'entityActions' }];
+			this._tableColumns = [
+				...this.#systemColumns,
+				...userColumns,
+				{ name: '', alias: 'entityActions', align: 'right' },
+			];
 		}
 	}
 
