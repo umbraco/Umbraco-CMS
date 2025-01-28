@@ -20,6 +20,7 @@ import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 /**
  * Manages the dropzone and uploads folders and files to the server.
@@ -50,6 +51,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	public readonly progressItems = this.#progressItems.asObservable();
 
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+	#localization = new UmbLocalizationController(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -143,7 +145,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		if (!options.length) {
 			this.#notificationContext?.peek('warning', {
 				data: {
-					message: `No media types are allowed for ${item.temporaryFile?.file.name}.`,
+					message: `${this.#localization.term('media_disallowedFileType')}: ${item.temporaryFile?.file.name}.`,
 				},
 			});
 			return this.#updateStatus(item, UmbFileDropzoneItemStatus.NOT_ALLOWED);
