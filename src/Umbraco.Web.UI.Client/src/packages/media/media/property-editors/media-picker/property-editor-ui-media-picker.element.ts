@@ -11,7 +11,7 @@ import type {
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 import '../../components/input-rich-media/input-rich-media.element.js';
 
@@ -40,6 +40,16 @@ export class UmbPropertyEditorUIMediaPickerElement
 		this._min = minMax?.min ?? 0;
 		this._max = minMax?.max ?? Infinity;
 	}
+
+	/**
+	 * Sets the input to mandatory, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	mandatory?: boolean;
+
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -86,8 +96,17 @@ export class UmbPropertyEditorUIMediaPickerElement
 		});
 	}
 
+	override firstUpdated() {
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-rich-media')!);
+	}
+
+	override focus() {
+		return this.shadowRoot?.querySelector<UmbInputRichMediaElement>('umb-input-rich-media')?.focus();
+	}
+
 	#onChange(event: CustomEvent & { target: UmbInputRichMediaElement }) {
-		this.value = event.target.items;
+		const isEmpty = event.target.value?.length === 0;
+		this.value = isEmpty ? undefined : event.target.value;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
@@ -97,12 +116,14 @@ export class UmbPropertyEditorUIMediaPickerElement
 				.alias=${this._alias}
 				.allowedContentTypeIds=${this._allowedMediaTypes}
 				.focalPointEnabled=${this._focalPointEnabled}
-				.items=${this.value ?? []}
+				.value=${this.value ?? []}
 				.max=${this._max}
 				.min=${this._min}
 				.preselectedCrops=${this._preselectedCrops}
 				.startNode=${this._startNode}
 				.variantId=${this._variantId}
+				.required=${this.mandatory}
+				.requiredMessage=${this.mandatoryMessage}
 				?multiple=${this._multiple}
 				@change=${this.#onChange}
 				?readonly=${this.readonly}>

@@ -36011,14 +36011,11 @@
           "mediaStartNodeIds",
           "name",
           "permissions",
+          "userGroupIds",
           "userName"
         ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "email": {
             "type": "string"
           },
@@ -36027,6 +36024,21 @@
           },
           "name": {
             "type": "string"
+          },
+          "userGroupIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
+            }
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
           },
           "languageIsoCode": {
             "type": "string",
@@ -37824,6 +37836,16 @@
             "$ref": "#/components/schemas/DocumentVariantStateModel"
           },
           "publishDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "scheduledPublishDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "scheduledUnpublishDate": {
             "type": "string",
             "format": "date-time",
             "nullable": true

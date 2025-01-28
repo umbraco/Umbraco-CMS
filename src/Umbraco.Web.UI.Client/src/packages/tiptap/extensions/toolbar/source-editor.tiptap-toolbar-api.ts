@@ -13,6 +13,7 @@ export default class UmbTiptapToolbarSourceEditorExtensionApi extends UmbTiptapT
 				headline: 'Edit source code',
 				content: editor?.getHTML() ?? '',
 				language: 'html',
+				formatOnLoad: true,
 			},
 		});
 

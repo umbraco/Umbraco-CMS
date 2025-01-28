@@ -39,9 +39,7 @@ type UmbTiptapExtensionGroup = {
 const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
 const TIPTAP_BLOCK_EXTENSION_ALIAS = 'Umb.Tiptap.Block';
 
-const elementName = 'umb-property-editor-ui-tiptap-extensions-configuration';
-
-@customElement(elementName)
+@customElement('umb-property-editor-ui-tiptap-extensions-configuration')
 export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
@@ -101,16 +99,13 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 		this.observe(umbExtensionsRegistry.byType('tiptapExtension'), (extensions) => {
 			this._extensions = extensions
 				.sort((a, b) => a.alias.localeCompare(b.alias))
-				.map((ext) => ({ alias: ext.alias, label: ext.meta.label, icon: ext.meta.icon, group: ext.meta.group }));
-
-			// Hardcoded core extension
-			this._extensions.unshift({
-				alias: TIPTAP_CORE_EXTENSION_ALIAS,
-				label: 'Rich Text Essentials',
-				icon: 'icon-browser-window',
-				group: '#tiptap_extGroup_formatting',
-				description: 'This is a core extension, it is always enabled by default.',
-			});
+				.map((ext) => ({
+					alias: ext.alias,
+					label: ext.meta.label,
+					icon: ext.meta.icon,
+					group: ext.meta.group,
+					description: ext.meta.description,
+				}));
 
 			if (!this.value) {
 				// The default value is all extensions enabled
@@ -226,6 +221,6 @@ export { UmbPropertyEditorUiTiptapExtensionsConfigurationElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbPropertyEditorUiTiptapExtensionsConfigurationElement;
+		'umb-property-editor-ui-tiptap-extensions-configuration': UmbPropertyEditorUiTiptapExtensionsConfigurationElement;
 	}
 }
