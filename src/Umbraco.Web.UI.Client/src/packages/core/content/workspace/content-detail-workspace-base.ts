@@ -42,10 +42,12 @@ import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
+	UmbEntityDetailUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -144,6 +146,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	#validationRepository?: UmbContentValidationRepository<DetailModelType>;
 
 	#saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
+	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	constructor(
 		host: UmbControllerHost,
@@ -709,13 +712,21 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 		this._data.setCurrent(newCurrentData);
 
+		const unique = this.getUnique()!;
+		const entityType = this.getEntityType();
+
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		const event = new UmbRequestReloadStructureForEntityEvent({
-			entityType: this.getEntityType(),
-			unique: this.getUnique()!,
+		const structureEvent = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
+		eventContext.dispatchEvent(structureEvent);
+
+		const updatedEvent = new UmbEntityDetailUpdatedEvent({
+			unique,
+			entityType,
+			discriminator: this._workspaceEventDiscriminator,
 		});
 
-		eventContext.dispatchEvent(event);
+		eventContext.dispatchEvent(updatedEvent);
+
 		this._closeModal();
 	}
 
