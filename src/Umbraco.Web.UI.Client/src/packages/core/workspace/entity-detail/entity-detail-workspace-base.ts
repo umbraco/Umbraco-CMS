@@ -428,7 +428,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		// Ignore events from this workspace so we don't reload the data twice. Ex saving this workspace
 		if (eventDiscriminator === this._workspaceEventDiscriminator) return;
 
-		this.load(this.getUnique()!);
+		this.reload();
 	};
 
 	public override destroy(): void {
