@@ -33,8 +33,6 @@ import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/documen
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbEntityDetailUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
@@ -68,7 +66,6 @@ export class UmbDocumentWorkspaceContext
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#publishingContext?: typeof UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.TYPE;
-	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -138,20 +135,6 @@ export class UmbDocumentWorkspaceContext
 				},
 			},
 		]);
-
-		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
-			this.#eventContext = context;
-
-			this.#eventContext.removeEventListener(
-				UmbEntityDetailUpdatedEvent.TYPE,
-				this.#onEntityDetailUpdatedEvent as unknown as EventListener,
-			);
-
-			this.#eventContext.addEventListener(
-				UmbEntityDetailUpdatedEvent.TYPE,
-				this.#onEntityDetailUpdatedEvent as unknown as EventListener,
-			);
-		});
 	}
 
 	override async load(unique: string) {
@@ -343,18 +326,6 @@ export class UmbDocumentWorkspaceContext
 	): UmbDocumentPropertyDatasetContext {
 		return new UmbDocumentPropertyDatasetContext(host, this, variantId);
 	}
-
-	// TODO: This is currently only a local implementation. Looks into a solution for all detail workspaces
-	#onEntityDetailUpdatedEvent = (event: UmbEntityDetailUpdatedEvent) => {
-		const eventUnique = event.getUnique();
-		const eventEntityType = event.getEntityType();
-
-		// Ignore events for other entities
-		if (eventEntityType !== this.getEntityType()) return;
-		if (eventUnique !== this.getUnique()) return;
-
-		this.load(this.getUnique()!);
-	};
 }
 
 export default UmbDocumentWorkspaceContext;
