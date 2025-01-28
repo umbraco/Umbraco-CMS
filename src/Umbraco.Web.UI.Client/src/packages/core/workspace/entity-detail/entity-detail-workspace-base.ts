@@ -7,6 +7,7 @@ import { UmbEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@um
 import { UMB_DISCARD_CHANGES_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import {
+	UmbEntityDetailUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
@@ -15,6 +16,7 @@ import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/bac
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 const LOADING_STATE_UNIQUE = 'umbLoadingEntityDetail';
 
@@ -44,6 +46,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	protected _getDataPromise?: Promise<any>;
 	protected _detailRepository?: DetailRepositoryType;
+
+	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	#parent = new UmbObjectState<{ entityType: string; unique: UmbEntityUnique } | undefined>(undefined);
 	public readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
@@ -85,6 +89,19 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		window.addEventListener('willchangestate', this.#onWillNavigate);
 		this.#observeRepository(args.detailRepositoryAlias);
 		this.addValidationContext(this.validationContext);
+
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
+			this.#eventContext = context;
+
+			this.#eventContext.removeEventListener(
+				UmbEntityDetailUpdatedEvent.TYPE,
+				this.#onEntityDetailUpdatedEvent as unknown as EventListener,
+			);
+			this.#eventContext.addEventListener(
+				UmbEntityDetailUpdatedEvent.TYPE,
+				this.#onEntityDetailUpdatedEvent as unknown as EventListener,
+			);
+		});
 	}
 
 	/**
@@ -396,8 +413,30 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		}
 	}
 
+	// Discriminator to identify events from this workspace context
+	protected readonly _workspaceEventDiscriminator = UmbId.new();
+
+	#onEntityDetailUpdatedEvent = (event: UmbEntityDetailUpdatedEvent) => {
+		const eventEntityUnique = event.getUnique();
+		const eventEntityType = event.getEntityType();
+		const eventDiscriminator = event.getDiscriminator();
+
+		// Ignore events for other entities
+		if (eventEntityType !== this.getEntityType()) return;
+		if (eventEntityUnique !== this.getUnique()) return;
+
+		// Ignore events from this workspace so we don't reload the data twice. Ex saving this workspace
+		if (eventDiscriminator === this._workspaceEventDiscriminator) return;
+
+		this.load(this.getUnique()!);
+	};
+
 	public override destroy(): void {
 		window.removeEventListener('willchangestate', this.#onWillNavigate);
+		this.#eventContext?.removeEventListener(
+			UmbEntityDetailUpdatedEvent.TYPE,
+			this.#onEntityDetailUpdatedEvent as unknown as EventListener,
+		);
 		this._detailRepository?.destroy();
 		this.#entityContext.destroy();
 		super.destroy();
