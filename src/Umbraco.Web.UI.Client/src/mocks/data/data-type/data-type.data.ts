@@ -975,8 +975,16 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{
 				alias: 'layouts',
 				value: [
-					{ icon: 'icon-grid', isSystem: true, name: 'Grid', path: '', selected: true },
-					{ icon: 'icon-list', isSystem: true, name: 'Table', path: '', selected: true },
+					{
+						icon: 'icon-grid',
+						name: 'Media Grid Collection View',
+						collectionView: 'Umb.CollectionView.Media.Grid',
+					},
+					{
+						icon: 'icon-list',
+						name: 'Media Table Collection View',
+						collectionView: 'Umb.CollectionView.Media.Table',
+					},
 				],
 			},
 			{ alias: 'icon', value: 'icon-layers' },
