@@ -19,6 +19,7 @@ import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-t
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 /**
  * Manages the dropzone and uploads folders and files to the server.
@@ -48,9 +49,15 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	readonly #progressItems = new UmbArrayState<UmbUploadableItem>([], (x) => x.unique);
 	public readonly progressItems = this.#progressItems.asObservable();
 
+	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+
 	constructor(host: UmbControllerHost) {
 		super(host);
 		this.#host = host;
+
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
+			this.#notificationContext = context;
+		});
 	}
 
 	public setIsFoldersAllowed(isAllowed: boolean) {
@@ -134,6 +141,11 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	async #createOneMediaItem(item: UmbUploadableItem) {
 		const options = await this.#getMediaTypeOptions(item);
 		if (!options.length) {
+			this.#notificationContext?.peek('warning', {
+				data: {
+					message: `No media types are allowed for ${item.temporaryFile?.file.name}.`,
+				},
+			});
 			return this.#updateProgress(item, UmbFileDropzoneItemStatus.NOT_ALLOWED);
 		}
 
