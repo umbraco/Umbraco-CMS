@@ -21,7 +21,10 @@ export const data: Array<UmbMockMediaModel> = [
 		values: [
 			{
 				editorAlias: 'Umbraco.UploadField',
-				alias: 'dt-uploadField',
+				alias: 'mediaPicker',
+				value: {
+					src: '/umbraco/backoffice/assets/installer-illustration.svg',
+				},
 			},
 			{
 				editorAlias: 'Umbraco.TextBox',
