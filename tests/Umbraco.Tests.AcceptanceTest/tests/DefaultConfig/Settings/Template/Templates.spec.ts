@@ -163,7 +163,6 @@ test.skip('can use query builder with Order By statement for a template', async 
 
   // Act
   await umbracoUi.template.goToTemplate(templateName);
-  // await umbracoUi.waitForTimeout(1000);
   await umbracoUi.template.addQueryBuilderWithOrderByStatement(propertyAliasValue, isAscending);
   // Verify that the code is shown
   await umbracoUi.template.isQueryBuilderCodeShown(expectedCode);

@@ -103,7 +103,6 @@ test('can delete a tab in a document type', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  // await umbracoUi.waitForTimeout(200);
   await umbracoUi.documentType.clickRemoveTabWithName(tabName);
   await umbracoUi.documentType.clickConfirmToDeleteButton();
   await umbracoUi.documentType.clickSaveButton();
@@ -294,7 +293,6 @@ test.skip('can reorder properties in a document type', async ({umbracoApi, umbra
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickReorderButton();
   // Drag and Drop
-  // await umbracoUi.waitForTimeout(5000);
   const dragFromLocator = umbracoUi.documentType.getTextLocatorWithName(dataTypeNameTwo);
   const dragToLocator = umbracoUi.documentType.getTextLocatorWithName(dataTypeName);
   await umbracoUi.documentType.dragAndDrop(dragFromLocator, dragToLocator, 0, 0, 5);
