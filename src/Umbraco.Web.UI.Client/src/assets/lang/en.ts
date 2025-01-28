@@ -1493,6 +1493,8 @@ export default {
 		preventCleanupDisableError: 'An error occurred while disabling version cleanup for %0%',
 		offlineHeadline: 'Offline',
 		offlineMessage: 'You are currently offline. Please check your internet connection.',
+		onlineHeadline: 'Online',
+		onlineMessage: 'You are now online. You can continue working.',
 	},
 	stylesheet: {
 		addRule: 'Add style',

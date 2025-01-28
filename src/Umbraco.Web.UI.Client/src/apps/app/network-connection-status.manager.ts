@@ -26,6 +26,12 @@ export class UmbNetworkConnectionStatusManager extends UmbControllerBase {
 
 	#onOnline() {
 		this.#offlineNotification?.close();
+		this.#notificationContext?.peek('positive', {
+			data: {
+				headline: this.#localize.term('speechBubbles_onlineHeadline'),
+				message: this.#localize.term('speechBubbles_onlineMessage'),
+			},
+		});
 	}
 
 	#onOffline() {
