@@ -239,7 +239,7 @@ test('can add media start nodes for a user', {tag: '@smoke'}, async ({umbracoApi
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
   await umbracoUi.user.clickChooseMediaStartNodeButton();
   await umbracoUi.user.selectMediaWithName(mediaName);
-  await umbracoUi.user.clickSubmitButton();
+  await umbracoUi.user.clickChooseModalButton();
   await umbracoUi.user.clickSaveButton();
 
   // Assert
@@ -271,7 +271,7 @@ test('can add multiple media start nodes for a user', async ({umbracoApi, umbrac
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
   await umbracoUi.user.clickChooseMediaStartNodeButton();
   await umbracoUi.user.selectMediaWithName(secondMediaName);
-  await umbracoUi.user.clickSubmitButton();
+  await umbracoUi.user.clickChooseModalButton();
   await umbracoUi.user.clickSaveButton();
 
   // Assert

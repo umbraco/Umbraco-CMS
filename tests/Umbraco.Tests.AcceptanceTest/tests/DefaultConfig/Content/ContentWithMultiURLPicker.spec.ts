@@ -40,7 +40,7 @@ test('can create content with the document link', {tag: '@smoke'}, async ({umbra
   await umbracoUi.content.clickDocumentLinkButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
   await umbracoUi.content.clickButtonWithName('Choose');
-  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickAddButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
@@ -83,7 +83,7 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   await umbracoUi.content.clickDocumentLinkButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
   await umbracoUi.content.clickButtonWithName('Choose');
-  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickAddButton();
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
@@ -118,7 +118,7 @@ test('can create content with the external link', async ({umbracoApi, umbracoUi}
   await umbracoUi.content.clickManualLinkButton();
   await umbracoUi.content.enterLink(link);
   await umbracoUi.content.enterLinkTitle(linkTitle);
-  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickAddButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
@@ -150,9 +150,8 @@ test('can create content with the media link', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickMediaLinkButton();
   await umbracoUi.content.selectMediaWithName(mediaFileName);
-  await umbracoUi.content.clickMediaPickerModalSubmitButton();
-  await umbracoUi.waitForTimeout(500);
-  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickAddButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
@@ -188,15 +187,14 @@ test('can add multiple links in the content', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickMediaLinkButton();
   await umbracoUi.content.selectMediaWithName(mediaFileName);
-  await umbracoUi.content.clickMediaPickerModalSubmitButton();
-  await umbracoUi.waitForTimeout(500);
-  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickAddButton();
   // Add external link
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickManualLinkButton();
   await umbracoUi.content.enterLink(link);
   await umbracoUi.content.enterLinkTitle(linkTitle);
-  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickAddButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
@@ -253,7 +251,7 @@ test('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickLinkWithName(linkTitle);
   await umbracoUi.content.enterLinkTitle(updatedLinkTitle);
-  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickUpdateButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
