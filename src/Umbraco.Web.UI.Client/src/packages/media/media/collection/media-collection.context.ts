@@ -33,6 +33,7 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 				updateDate: date,
 				createDate: date,
 				entityType: UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE,
+				progress: 0,
 				...placeholder,
 			}))
 			.reverse();
@@ -46,6 +47,11 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 	updatePlaceholderStatus(unique: string, status?: UmbFileDropzoneItemStatus) {
 		this._items.updateOne(unique, { status });
 		this.#placeholders.updateOne(unique, { status });
+	}
+
+	updatePlaceholderProgress(unique: string, progress: number) {
+		this._items.updateOne(unique, { progress });
+		this.#placeholders.updateOne(unique, { progress });
 	}
 
 	/**

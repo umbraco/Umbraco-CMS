@@ -42,6 +42,7 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 					if (item.folder?.name) return;
 
 					this.#collectionContext?.updatePlaceholderStatus(item.unique, item.status);
+					this.#collectionContext?.updatePlaceholderProgress(item.unique, item.progress);
 				});
 			},
 			'_observeProgressItems',
