@@ -1,5 +1,5 @@
 import type { UmbImageCropperPropertyEditorValue, UmbInputImageCropperElement } from '../../components/index.js';
-import { html, customElement, property, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import {
 	type UmbPropertyEditorUiElement,
 	UmbPropertyValueChangeEvent,
