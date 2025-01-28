@@ -93,8 +93,8 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		return this.#uniques.getValue();
 	}
 
-	setUniques(uniques: string[]): void {
-		this.#uniques.setValue(uniques);
+	setUniques(uniques: string[] | undefined): void {
+		this.#uniques.setValue(uniques ?? []);
 	}
 
 	getItems(): Array<ItemType> {
