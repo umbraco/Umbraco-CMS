@@ -136,10 +136,6 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				align-items: center;
 			}
 
-			.media-placeholder-item {
-				font-style: italic;
-			}
-
 			/** TODO: Remove this fix when UUI gets upgrade to 1.3 */
 			umb-imaging-thumbnail {
 				pointer-events: none;
