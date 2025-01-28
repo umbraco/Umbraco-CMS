@@ -19,7 +19,6 @@ import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-t
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
 
 /**
  * Manages the dropzone and uploads folders and files to the server.
@@ -70,10 +69,13 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	 * Allows the user to pick a media type option if multiple types are allowed.
 	 * @param {UmbFileDropzoneDroppedItems} items - The files and folders to upload.
 	 * @param {string | null} parentUnique - Where the items should be uploaded.
-	 * @returns {Promise<Array<UmbUploadableItem>>} - The items about to be uploaded.
+	 * @returns {Array<UmbUploadableItem>} - The items about to be uploaded.
 	 */
-	public async createMediaItems(items: UmbFileDropzoneDroppedItems, parentUnique: string | null = null) {
-		const uploadableItems = await this.#setupProgress(items, parentUnique);
+	public createMediaItems(items: UmbFileDropzoneDroppedItems, parentUnique: string | null = null) {
+		const uploadableItems = this.#setupProgress(items, parentUnique);
+
+		if (!uploadableItems.length) return [];
+
 		if (uploadableItems.length === 1) {
 			// When there is only one item being uploaded, allow the user to pick the media type, if more than one is allowed.
 			this.#createOneMediaItem(uploadableItems[0]);
@@ -81,6 +83,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 			// When there are multiple items being uploaded, automatically pick the media types for each item. We probably want to allow the user to pick the media type in the future.
 			this.#createMediaItems(uploadableItems);
 		}
+
 		return uploadableItems;
 	}
 
@@ -90,12 +93,12 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	/**
 	 * Uploads the files as temporary files and returns the data.
 	 * @param { File[] } files - The files to upload.
-	 * @returns {Promise<Array<UmbUploadableFileModel>>} - Files as temporary files.
+	 * @returns {Promise<Array<UmbUploadableItem>>} - Files as temporary files.
 	 */
-	public async createTemporaryFiles(files: Array<File>) {
-		const uploadableItems = (await this.#setupProgress({ files, folders: [] }, null)) as Array<UmbUploadableFile>;
+	public async createTemporaryFiles(files: Array<File>): Promise<Array<UmbUploadableItem>> {
+		const uploadableItems = this.#setupProgress({ files, folders: [] }, null) as Array<UmbUploadableFile>;
 
-		const uploadedItems: Array<UmbTemporaryFileModel> = [];
+		const uploadedItems: Array<UmbUploadableItem> = [];
 
 		for (const item of uploadableItems) {
 			// Upload as temp file
@@ -115,7 +118,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 			}
 
 			// Add to return value
-			uploadedItems.push(uploaded);
+			uploadedItems.push(item);
 		}
 
 		return uploadedItems;
@@ -163,9 +166,9 @@ export class UmbDropzoneManager extends UmbControllerBase {
 
 			// Handle files and folders differently: a file is uploaded as temp then created as a media item, and a folder is created as a media item directly
 			if (item.temporaryFile) {
-				await this.#handleFile(item as UmbUploadableFile, mediaTypeUnique);
+				this.#handleFile(item as UmbUploadableFile, mediaTypeUnique);
 			} else if (item.folder) {
-				await this.#handleFolder(item as UmbUploadableFolder, mediaTypeUnique);
+				this.#handleFolder(item as UmbUploadableFolder, mediaTypeUnique);
 			}
 		}
 	}
@@ -199,8 +202,8 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		}
 	}
 
-	async #uploadAsTemporaryFile(item: UmbUploadableFile) {
-		return await this.#tempFileManager.uploadOne({
+	#uploadAsTemporaryFile(item: UmbUploadableFile) {
+		return this.#tempFileManager.uploadOne({
 			temporaryUnique: item.temporaryFile.temporaryUnique,
 			file: item.temporaryFile.file,
 		});
@@ -259,7 +262,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		// TODO: Use a scaffolding feature to ensure consistency. [NL]
 		const name = item.temporaryFile ? item.temporaryFile.file.name : (item.folder?.name ?? '');
 		const umbracoFile: UmbMediaValueModel = {
-			editorAlias: null as any,
+			editorAlias: '',
 			alias: 'umbracoFile',
 			value: { temporaryFileId: item.temporaryFile?.temporaryUnique },
 			culture: null,
@@ -277,7 +280,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	}
 
 	// Progress handling
-	async #setupProgress(items: UmbFileDropzoneDroppedItems, parent: string | null) {
+	#setupProgress(items: UmbFileDropzoneDroppedItems, parent: string | null) {
 		const current = this.#progress.getValue();
 		const currentItems = this.#progressItems.getValue();
 
@@ -302,15 +305,12 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		const items: Array<UmbUploadableItem> = [];
 
 		for (const file of files) {
-			const unique = UmbId.new();
-			if (file.type) {
-				items.push({
-					unique,
-					parentUnique,
-					status: UmbFileDropzoneItemStatus.WAITING,
-					temporaryFile: { file, temporaryUnique: UmbId.new() },
-				});
-			}
+			items.push({
+				unique: UmbId.new(),
+				parentUnique,
+				status: UmbFileDropzoneItemStatus.WAITING,
+				temporaryFile: { file, temporaryUnique: UmbId.new() },
+			});
 		}
 
 		for (const subfolder of folders) {

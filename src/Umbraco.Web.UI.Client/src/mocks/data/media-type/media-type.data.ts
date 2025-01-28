@@ -8,6 +8,11 @@ export type UmbMockMediaTypeModel = MediaTypeResponseModel &
 	MediaTypeTreeItemResponseModel &
 	MediaTypeItemResponseModel;
 
+export type UmbMockMediaTypeUnionModel =
+	| MediaTypeResponseModel
+	| MediaTypeTreeItemResponseModel
+	| MediaTypeItemResponseModel;
+
 export const data: Array<UmbMockMediaTypeModel> = [
 	{
 		name: 'Media Type 1',
