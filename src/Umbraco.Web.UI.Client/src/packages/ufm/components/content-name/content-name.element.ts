@@ -6,9 +6,8 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbMediaItemRepository, UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
 import { UmbMemberItemRepository, UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
 
-const elementName = 'ufm-content-name';
-
-@customElement(elementName)
+// eslint-disable-next-line local-rules/enforce-umb-prefix-on-element-name
+@customElement('ufm-content-name')
 export class UmbUfmContentNameElement extends UmbUfmElementBase {
 	@property()
 	alias?: string;
@@ -95,6 +94,6 @@ export { UmbUfmContentNameElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbUfmContentNameElement;
+		'ufm-content-name': UmbUfmContentNameElement;
 	}
 }

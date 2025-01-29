@@ -2,9 +2,8 @@ import { UMB_UFM_RENDER_CONTEXT } from '../ufm-render/ufm-render.context.js';
 import { UmbUfmElementBase } from '../ufm-element-base.js';
 import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
-const elementName = 'ufm-label-value';
-
-@customElement(elementName)
+// eslint-disable-next-line local-rules/enforce-umb-prefix-on-element-name
+@customElement('ufm-label-value')
 export class UmbUfmLabelValueElement extends UmbUfmElementBase {
 	@property()
 	alias?: string;
@@ -32,6 +31,6 @@ export { UmbUfmLabelValueElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbUfmLabelValueElement;
+		'ufm-label-value': UmbUfmLabelValueElement;
 	}
 }

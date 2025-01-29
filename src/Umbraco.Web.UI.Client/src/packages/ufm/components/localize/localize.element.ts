@@ -1,9 +1,8 @@
 import { UmbUfmElementBase } from '../ufm-element-base.js';
 import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
-const elementName = 'ufm-localize';
-
-@customElement(elementName)
+// eslint-disable-next-line local-rules/enforce-umb-prefix-on-element-name
+@customElement('ufm-localize')
 export class UmbUfmLocalizeElement extends UmbUfmElementBase {
 	@property()
 	public set alias(value: string | undefined) {
@@ -21,6 +20,6 @@ export { UmbUfmLocalizeElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbUfmLocalizeElement;
+		'ufm-localize': UmbUfmLocalizeElement;
 	}
 }
