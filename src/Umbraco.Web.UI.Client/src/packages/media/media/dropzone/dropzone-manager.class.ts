@@ -114,16 +114,14 @@ export class UmbDropzoneManager extends UmbControllerBase {
 			const uploaded = await this.#tempFileManager.uploadOne({
 				temporaryUnique: item.temporaryFile.temporaryUnique,
 				file: item.temporaryFile.file,
+				onProgress: (progress) => this.#updateProgress(item, progress),
 			});
 
 			// Update progress
-			const progress = this.#progress.getValue();
-			this.#progress.update({ completed: progress.completed + 1 });
-
 			if (uploaded.status === TemporaryFileStatus.SUCCESS) {
-				this.#progressItems.updateOne(item.unique, { status: UmbFileDropzoneItemStatus.COMPLETE });
+				this.#updateStatus(item, UmbFileDropzoneItemStatus.COMPLETE);
 			} else {
-				this.#progressItems.updateOne(item.unique, { status: UmbFileDropzoneItemStatus.ERROR });
+				this.#updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
 			}
 
 			// Add to return value
