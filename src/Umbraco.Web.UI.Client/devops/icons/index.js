@@ -46,7 +46,7 @@ const collectDictionaryIcons = async () => {
 
 				const icon = {
 					name: iconDef.name,
-					legacy: iconDef.legacy,
+					legacy: iconDef.legacy, // TODO: Deprecated, remove in v.17.
 					hidden: iconDef.legacy ?? iconDef.internal,
 					fileName: iconFileName,
 					svg,
