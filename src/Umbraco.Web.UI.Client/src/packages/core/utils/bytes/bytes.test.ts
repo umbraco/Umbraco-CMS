@@ -1,5 +1,5 @@
 import { expect } from '@open-wc/testing';
-import { formatBytes } from './bytes.js';
+import { formatBytes } from './bytes.function.js';
 
 describe('bytes', () => {
 	it('should format bytes as human-readable text', () => {
