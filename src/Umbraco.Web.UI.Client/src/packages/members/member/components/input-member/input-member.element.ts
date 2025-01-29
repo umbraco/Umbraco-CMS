@@ -8,6 +8,7 @@ import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/member-type';
 
 const elementName = 'umb-input-member';
 
@@ -159,18 +160,18 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observeItems');
 	}
 
-	#pickableFilter = (item: UmbMemberItemModel): boolean => {
-		if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
-			return this.allowedContentTypeIds.includes(item.memberType.unique);
-		}
-		return true;
-	};
-
 	#openPicker() {
-		this.#pickerContext.openPicker({
-			filter: this.filter,
-			pickableFilter: this.#pickableFilter,
-		});
+		this.#pickerContext.openPicker(
+			{
+				filter: this.filter,
+			},
+			{
+				allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({
+					unique: id,
+					entityType: UMB_MEMBER_TYPE_ENTITY_TYPE,
+				})),
+			},
+		);
 	}
 
 	#onRemove(item: UmbMemberItemModel) {
