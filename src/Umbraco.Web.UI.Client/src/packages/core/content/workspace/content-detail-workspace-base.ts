@@ -728,6 +728,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this._closeModal();
 	}
 
+	override resetState() {
+		super.resetState();
+		this.readOnlyState.clear();
+	}
+
 	abstract getContentTypeUnique(): string | undefined;
 
 	abstract createPropertyDatasetContext(

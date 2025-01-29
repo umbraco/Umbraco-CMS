@@ -1,4 +1,4 @@
-import type { UmbMediaCardItemModel, UmbMediaItemModel } from '../../types.js';
+import type { UmbMediaCardItemModel } from '../../types.js';
 import { UmbMediaPickerInputContext } from './input-media.context.js';
 import {
 	css,
@@ -17,6 +17,8 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
+import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
 
 import '@umbraco-cms/backoffice/imaging';
 
@@ -111,8 +113,8 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	@property({ type: Boolean })
 	showOpenButton?: boolean;
 
-	@property({ type: String })
-	startNode = '';
+	@property({ type: Object, attribute: false })
+	startNode?: UmbTreeStartNode;
 
 	@property({ type: String })
 	public override set value(selectionString: string | undefined) {
@@ -184,19 +186,19 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		);
 	}
 
-	#pickableFilter = (item: UmbMediaItemModel): boolean => {
-		if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
-			return this.allowedContentTypeIds.includes(item.mediaType.unique);
-		}
-		return true;
-	};
-
 	#openPicker() {
-		this.#pickerContext.openPicker({
-			multiple: this.max > 1,
-			startNode: this.startNode,
-			pickableFilter: this.#pickableFilter,
-		});
+		this.#pickerContext.openPicker(
+			{
+				multiple: this.max > 1,
+				startNode: this.startNode,
+			},
+			{
+				allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({
+					unique: id,
+					entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
+				})),
+			},
+		);
 	}
 
 	async #onRemove(item: UmbMediaCardItemModel) {
