@@ -16,6 +16,7 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 export class UmbDefaultTreeContext<
 		TreeItemType extends UmbTreeItemModel,
@@ -33,6 +34,9 @@ export class UmbDefaultTreeContext<
 
 	#rootItems = new UmbArrayState<TreeItemType>([], (x) => x.unique);
 	rootItems = this.#rootItems.asObservable();
+
+	#location = new UmbArrayState<UmbEntityUnique>([], (x) => x);
+	location = this.#location.asObservable();
 
 	public selectableFilter?: (item: TreeItemType) => boolean = () => true;
 	public filter?: (item: TreeItemType) => boolean = () => true;
@@ -290,6 +294,14 @@ export class UmbDefaultTreeContext<
 
 	public getAdditionalRequestArgs() {
 		return this.#additionalRequestArgs.getValue();
+	}
+
+	setLocation(path: Array<UmbEntityUnique>): void {
+		this.#location.setValue(path);
+	}
+
+	getLocation(): Array<UmbEntityUnique> {
+		return this.#location.getValue();
 	}
 
 	#resetTree() {

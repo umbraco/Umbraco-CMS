@@ -3,6 +3,7 @@ import type { UmbTreeItemModel } from '../../types.js';
 import { UMB_TREE_ITEM_CONTEXT } from './tree-item-context-base.js';
 import { html, nothing, state, ifDefined, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 
 export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeItemModel> extends UmbLitElement {
 	_item?: TreeItemModelType;
@@ -43,6 +44,9 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 	private _hasChildren = false;
 
 	@state()
+	private _isOpen = false;
+
+	@state()
 	private _iconSlotHasChildren = false;
 
 	@state()
@@ -67,6 +71,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 			this.observe(this.#treeItemContext.treeItem, (value) => (this._item = value));
 			this.observe(this.#treeItemContext.childItems, (value) => (this._childItems = value));
 			this.observe(this.#treeItemContext.hasChildren, (value) => (this._hasChildren = value));
+			this.observe(this.#treeItemContext.isOpen, (value) => (this._isOpen = value));
 			this.observe(this.#treeItemContext.isActive, (value) => (this._isActive = value));
 			this.observe(this.#treeItemContext.isLoading, (value) => (this._isLoading = value));
 			this.observe(this.#treeItemContext.isSelectableContext, (value) => (this._isSelectableContext = value));
@@ -94,9 +99,15 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 		this.#treeItemContext?.deselect();
 	}
 
-	// TODO: do we want to catch and emit a backoffice event here?
-	private _onShowChildren() {
+	private _onShowChildren(event: UUIMenuItemEvent) {
+		event.stopPropagation();
 		this.#treeItemContext?.loadChildren();
+		this.#treeItemContext?.showChildren();
+	}
+
+	private _onHideChildren(event: UUIMenuItemEvent) {
+		event.stopPropagation();
+		this.#treeItemContext?.hideChildren();
 	}
 
 	#onLoadMoreClick = (event: any) => {
@@ -112,6 +123,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 		return html`
 			<uui-menu-item
 				@show-children=${this._onShowChildren}
+				@hide-children=${this._onHideChildren}
 				@selected=${this._handleSelectedItem}
 				@deselected=${this._handleDeselectedItem}
 				?active=${this._isActive}
@@ -120,6 +132,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 				?selected=${this._isSelected}
 				.loading=${this._isLoading}
 				.hasChildren=${this._hasChildren}
+				.showChildren=${this._isOpen}
 				.caretLabel=${this.localize.term('visuallyHiddenTexts_expandChildItems') + ' ' + label}
 				label=${label}
 				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">

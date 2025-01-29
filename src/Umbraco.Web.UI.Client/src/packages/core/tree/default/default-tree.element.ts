@@ -10,6 +10,7 @@ import { UMB_TREE_CONTEXT } from './default-tree.context-token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 @customElement('umb-default-tree')
 export class UmbDefaultTreeElement extends UmbLitElement {
@@ -39,6 +40,9 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 	@property({ attribute: false })
 	filter: (item: UmbTreeItemModelBase) => boolean = () => true;
+
+	@property({ attribute: false })
+	location: Array<UmbEntityUnique> = [];
 
 	@state()
 	private _rootItems: UmbTreeItemModel[] = [];
@@ -102,6 +106,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 		if (_changedProperties.has('filter')) {
 			this.#treeContext!.filter = this.filter;
+		}
+
+		if (_changedProperties.has('location')) {
+			this.#treeContext!.setLocation(this.location);
 		}
 	}
 

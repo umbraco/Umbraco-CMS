@@ -18,6 +18,7 @@ import {
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 export abstract class UmbTreeItemContextBase<
 		TreeItemType extends UmbTreeItemModel,
@@ -26,7 +27,7 @@ export abstract class UmbTreeItemContextBase<
 	extends UmbContextBase<UmbTreeItemContext<TreeItemType>>
 	implements UmbTreeItemContext<TreeItemType>
 {
-	public unique?: string | null;
+	public unique?: UmbEntityUnique;
 	public entityType?: string;
 	public readonly pagination = new UmbPaginationManager();
 
@@ -63,6 +64,9 @@ export abstract class UmbTreeItemContextBase<
 
 	#path = new UmbStringState('');
 	readonly path = this.#path.asObservable();
+
+	#isOpen = new UmbBooleanState(false);
+	isOpen = this.#isOpen.asObservable();
 
 	#foldersOnly = new UmbBooleanState(false);
 	readonly foldersOnly = this.#foldersOnly.asObservable();
@@ -151,6 +155,7 @@ export abstract class UmbTreeItemContextBase<
 		this.#observeIsSelectable();
 		this.#observeIsSelected();
 		this.#observeSectionPath();
+		this.#observeLocation();
 	}
 
 	/**
@@ -228,6 +233,14 @@ export abstract class UmbTreeItemContextBase<
 		this.treeContext?.selection.deselect(this.unique);
 	}
 
+	public showChildren() {
+		this.#isOpen.setValue(true);
+	}
+
+	public hideChildren() {
+		this.#isOpen.setValue(false);
+	}
+
 	async #consumeContexts() {
 		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
 			this.#sectionContext = instance;
@@ -245,6 +258,7 @@ export abstract class UmbTreeItemContextBase<
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
 			this.#observeFoldersOnly();
+			this.#observeLocation();
 		});
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
@@ -352,6 +366,24 @@ export abstract class UmbTreeItemContextBase<
 				this.#hasActions.setValue(actions.length > 0);
 			},
 			'observeActions',
+		);
+	}
+
+	#observeLocation() {
+		if (!this.treeContext) return;
+
+		this.observe(
+			this.treeContext.location,
+			(location) => {
+				if (this.unique === undefined) return;
+				if (location.includes(this.unique)) {
+					if (this.#hasChildren.getValue()) {
+						this.loadChildren();
+						this.showChildren();
+					}
+				}
+			},
+			'observeLocation',
 		);
 	}
 
