@@ -47,6 +47,7 @@ const collectDictionaryIcons = async () => {
 				const icon = {
 					name: iconDef.name,
 					legacy: iconDef.legacy,
+					hidden: iconDef.legacy ?? iconDef.internal,
 					fileName: iconFileName,
 					svg,
 					output: `${iconsOutputDirectory}/${iconFileName}.ts`,
