@@ -95,11 +95,11 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 			this.#eventContext.removeEventListener(
 				UmbEntityUpdatedEvent.TYPE,
-				this.#onEntityDetailUpdatedEvent as unknown as EventListener,
+				this.#onEntityUpdatedEvent as unknown as EventListener,
 			);
 			this.#eventContext.addEventListener(
 				UmbEntityUpdatedEvent.TYPE,
-				this.#onEntityDetailUpdatedEvent as unknown as EventListener,
+				this.#onEntityUpdatedEvent as unknown as EventListener,
 			);
 		});
 	}
@@ -324,13 +324,21 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this._data.setPersisted(data);
 		this._data.setCurrent(data);
 
-		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		const event = new UmbRequestReloadStructureForEntityEvent({
-			unique: this.getUnique()!,
-			entityType: this.getEntityType(),
+		const unique = this.getUnique()!;
+		const entityType = this.getEntityType();
+
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
+
+		eventContext.dispatchEvent(event);
+
+		const updatedEvent = new UmbEntityUpdatedEvent({
+			unique,
+			entityType,
+			discriminator: this._workspaceEventDiscriminator,
 		});
 
-		actionEventContext.dispatchEvent(event);
+		eventContext.dispatchEvent(updatedEvent);
 	}
 
 	#allowNavigateAway = false;
@@ -416,7 +424,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	// Discriminator to identify events from this workspace context
 	protected readonly _workspaceEventDiscriminator = UmbId.new();
 
-	#onEntityDetailUpdatedEvent = (event: UmbEntityUpdatedEvent) => {
+	#onEntityUpdatedEvent = (event: UmbEntityUpdatedEvent) => {
 		const eventEntityUnique = event.getUnique();
 		const eventEntityType = event.getEntityType();
 		const eventDiscriminator = event.getDiscriminator();
@@ -435,7 +443,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		window.removeEventListener('willchangestate', this.#onWillNavigate);
 		this.#eventContext?.removeEventListener(
 			UmbEntityUpdatedEvent.TYPE,
-			this.#onEntityDetailUpdatedEvent as unknown as EventListener,
+			this.#onEntityUpdatedEvent as unknown as EventListener,
 		);
 		this._detailRepository?.destroy();
 		this.#entityContext.destroy();
