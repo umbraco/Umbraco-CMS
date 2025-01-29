@@ -361,6 +361,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 					<umb-localize key="validation_fieldIsMandatory">Field is mandatory</umb-localize>
 				</label>
 				<uui-toggle
+					label="validationToggle"
 					@change=${this.#onMandatoryChange}
 					id="mandatory"
 					.checked=${this._data?.validation?.mandatory ?? false}
@@ -379,7 +380,8 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 	}
 
 	#renderCustomValidation() {
-		return html`<uui-select
+		return html`<uui-select 
+				label="customValidationOptions"
 				style="margin-top: var(--uui-size-space-1)"
 				@change=${this.#onCustomValidationChange}
 				.options=${this._customValidationOptions}></uui-select>
