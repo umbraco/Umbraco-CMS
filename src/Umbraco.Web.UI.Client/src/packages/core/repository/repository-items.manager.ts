@@ -79,12 +79,12 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 
 			this.#eventContext.removeEventListener(
 				UmbEntityUpdatedEvent.TYPE,
-				this.#onEntityDetailUpdatedEvent as unknown as EventListener,
+				this.#onEntityUpdatedEvent as unknown as EventListener,
 			);
 
 			this.#eventContext.addEventListener(
 				UmbEntityUpdatedEvent.TYPE,
-				this.#onEntityDetailUpdatedEvent as unknown as EventListener,
+				this.#onEntityUpdatedEvent as unknown as EventListener,
 			);
 		});
 	}
@@ -167,7 +167,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		});
 	}
 
-	#onEntityDetailUpdatedEvent = (event: UmbEntityUpdatedEvent) => {
+	#onEntityUpdatedEvent = (event: UmbEntityUpdatedEvent) => {
 		const eventUnique = event.getUnique();
 
 		const items = this.getItems();
@@ -183,7 +183,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 	override destroy(): void {
 		this.#eventContext?.removeEventListener(
 			UmbEntityUpdatedEvent.TYPE,
-			this.#onEntityDetailUpdatedEvent as unknown as EventListener,
+			this.#onEntityUpdatedEvent as unknown as EventListener,
 		);
 		super.destroy();
 	}
