@@ -364,6 +364,7 @@ test('can see if the user has the correct access based on content start nodes', 
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
+  await umbracoUi.waitForTimeout(500);
 
   // Assert
   await umbracoUi.user.doesUserHaveAccessToContentNode(documentName);
