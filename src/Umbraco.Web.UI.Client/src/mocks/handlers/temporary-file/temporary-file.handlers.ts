@@ -7,6 +7,12 @@ const UMB_SLUG = 'temporary-file';
 
 export const handlers = [
 	rest.post(umbracoPath(`/${UMB_SLUG}`), async (_req, res, ctx) => {
-		return res(ctx.delay(), ctx.status(201), ctx.text<PostTemporaryFileResponse>(UmbId.new()));
+		const guid = UmbId.new();
+		return res(
+			ctx.delay(),
+			ctx.status(201),
+			ctx.set('Umb-Generated-Resource', guid),
+			ctx.text<PostTemporaryFileResponse>(guid),
+		);
 	}),
 ];
