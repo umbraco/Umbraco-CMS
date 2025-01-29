@@ -55,11 +55,6 @@ public static partial class Constants
         public const string ListView = "icon-thumbnail-list";
 
         /// <summary>
-        ///     System macro icon.
-        /// </summary>
-        public const string Macro = "icon-settings-alt";
-
-        /// <summary>
         ///     System media file icon.
         /// </summary>
         public const string MediaFile = "icon-document";
@@ -72,7 +67,7 @@ public static partial class Constants
         /// <summary>
         ///     System media audio icon.
         /// </summary>
-        public const string MediaAudio = "icon-sound-waves";
+        public const string MediaAudio = "icon-audio-lines";
 
         /// <summary>
         ///     System media article icon
@@ -82,7 +77,7 @@ public static partial class Constants
         /// <summary>
         ///     System media vector icon.
         /// </summary>
-        public const string MediaVectorGraphics = "icon-picture";
+        public const string MediaVectorGraphics = "icon-origami";
 
         /// <summary>
         ///     System media folder icon.

@@ -1,7 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!--
+      TODO: Fix and remove overrides:
+      [CS0618] handle member obsolete appropriately
+      [IDE1006] fix naming rule violation
+      [IDE0057] simplify substring
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),CS0618,IDE1006,IDE0057</WarningsNotAsErrors>
+  </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="Bogus" />
   </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\..\src\Umbraco.Cms\Umbraco.Cms.csproj" />
   </ItemGroup>

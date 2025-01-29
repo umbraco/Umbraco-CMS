@@ -294,17 +294,17 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
 
     private MultiUrlPickerValueConverter MultiUrlPickerValueConverter()
     {
-        var routeBuilder = CreateContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings());
+        var routeBuilder = CreateContentRouteBuilder(ApiContentPathProvider, CreateGlobalSettings());
         return new MultiUrlPickerValueConverter(
-            PublishedSnapshotAccessor,
             Mock.Of<IProfilingLogger>(),
             Serializer(),
-            Mock.Of<IUmbracoContextAccessor>(),
             PublishedUrlProvider,
             new ApiContentNameProvider(),
             ApiMediaUrlProvider(),
-            routeBuilder);
+            routeBuilder,
+            CacheManager.Content,
+            CacheManager.Media);
     }
 
-    private IJsonSerializer Serializer() => new JsonNetSerializer();
+    private IJsonSerializer Serializer() => new SystemTextJsonSerializer();
 }

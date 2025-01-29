@@ -381,4 +381,6 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <param name="filepath">The filesystem path to the media.</param>
     /// <returns>The size of the media.</returns>
     long GetMediaFileSize(string filepath);
+
+    Task<OperationResult> EmptyRecycleBinAsync(Guid userId);
 }

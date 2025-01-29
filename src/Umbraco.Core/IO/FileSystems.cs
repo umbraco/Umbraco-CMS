@@ -19,7 +19,6 @@ namespace Umbraco.Cms.Core.IO
 
 
         // wrappers for shadow support
-        private ShadowWrapper? _macroPartialFileSystem;
         private ShadowWrapper? _partialViewsFileSystem;
         private ShadowWrapper? _stylesheetsFileSystem;
         private ShadowWrapper? _scriptsFileSystem;
@@ -32,7 +31,7 @@ namespace Umbraco.Cms.Core.IO
 
         // shadow support
         private readonly List<ShadowWrapper> _shadowWrappers = new();
-        private readonly object _shadowLocker = new();
+        private readonly Lock _shadowLocker = new();
         private static string? _shadowCurrentId; // static - unique!!
         #region Constructor
 
@@ -56,13 +55,11 @@ namespace Umbraco.Cms.Core.IO
             IIOHelper ioHelper,
             IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
-            IFileSystem macroPartialFileSystem,
             IFileSystem partialViewsFileSystem,
             IFileSystem stylesheetFileSystem,
             IFileSystem scriptsFileSystem,
             IFileSystem mvcViewFileSystem) : this(loggerFactory, ioHelper, globalSettings, hostingEnvironment)
         {
-            _macroPartialFileSystem = CreateShadowWrapperInternal(macroPartialFileSystem, "macro-partials");
             _partialViewsFileSystem = CreateShadowWrapperInternal(partialViewsFileSystem, "partials");
             _stylesheetsFileSystem = CreateShadowWrapperInternal(stylesheetFileSystem, "css");
             _scriptsFileSystem = CreateShadowWrapperInternal(scriptsFileSystem, "scripts");
@@ -81,22 +78,6 @@ namespace Umbraco.Cms.Core.IO
         #endregion
 
         #region Well-Known FileSystems
-
-        /// <summary>
-        /// Gets the macro partials filesystem.
-        /// </summary>
-        public IFileSystem? MacroPartialsFileSystem
-        {
-            get
-            {
-                if (Volatile.Read(ref _wkfsInitialized) == false)
-                {
-                    EnsureWellKnownFileSystems();
-                }
-
-                return _macroPartialFileSystem;
-            }
-        }
 
         /// <summary>
         /// Gets the partial views filesystem.
@@ -214,12 +195,10 @@ namespace Umbraco.Cms.Core.IO
             ILogger<PhysicalFileSystem> logger = _loggerFactory.CreateLogger<PhysicalFileSystem>();
 
             //TODO this is fucked, why do PhysicalFileSystem has a root url? Mvc views cannot be accessed by url!
-            var macroPartialFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.MacroPartials), _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.MacroPartials));
             var partialViewsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.PartialViews), _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.PartialViews));
             var scriptsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger,  _hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoScriptsPath), _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoScriptsPath));
             var mvcViewsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.MvcViews), _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.MvcViews));
 
-            _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "macro-partials", IsScoped);
             _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "partials", IsScoped);
             _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "scripts", IsScoped);
             _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "views", IsScoped);
@@ -239,7 +218,6 @@ namespace Umbraco.Cms.Core.IO
             }
 
             // TODO: do we need a lock here?
-            _shadowWrappers.Add(_macroPartialFileSystem);
             _shadowWrappers.Add(_partialViewsFileSystem);
             _shadowWrappers.Add(_scriptsFileSystem);
             _shadowWrappers.Add(_mvcViewsFileSystem);

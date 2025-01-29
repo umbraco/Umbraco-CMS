@@ -1,12 +1,10 @@
+using System.Diagnostics;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers.Content;
 
@@ -16,32 +14,6 @@ public class ByIdContentApiController : ContentApiItemControllerBase
 {
     private readonly IRequestMemberAccessService _requestMemberAccessService;
 
-    [Obsolete($"Please use the constructor that does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
-    public ByIdContentApiController(
-        IApiPublishedContentCache apiPublishedContentCache,
-        IApiContentResponseBuilder apiContentResponseBuilder,
-        IPublicAccessService publicAccessService)
-        : this(
-            apiPublishedContentCache,
-            apiContentResponseBuilder,
-            StaticServiceProvider.Instance.GetRequiredService<IRequestMemberAccessService>())
-    {
-    }
-
-    [Obsolete($"Please use the constructor that does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
-    public ByIdContentApiController(
-        IApiPublishedContentCache apiPublishedContentCache,
-        IApiContentResponseBuilder apiContentResponseBuilder,
-        IPublicAccessService publicAccessService,
-        IRequestMemberAccessService requestMemberAccessService)
-        : this(
-            apiPublishedContentCache,
-            apiContentResponseBuilder,
-            requestMemberAccessService)
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
     public ByIdContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilder,
@@ -75,19 +47,17 @@ public class ByIdContentApiController : ContentApiItemControllerBase
 
     private async Task<IActionResult> HandleRequest(Guid id)
     {
-        IPublishedContent? contentItem = ApiPublishedContentCache.GetById(id);
+        IPublishedContent? contentItem = await ApiPublishedContentCache.GetByIdAsync(id).ConfigureAwait(false);
 
         if (contentItem is null)
         {
             return NotFound();
         }
-
-        IActionResult? deniedAccessResult = await HandleMemberAccessAsync(contentItem, _requestMemberAccessService);
+        IActionResult? deniedAccessResult = await HandleMemberAccessAsync(contentItem, _requestMemberAccessService).ConfigureAwait(false);
         if (deniedAccessResult is not null)
         {
             return deniedAccessResult;
         }
-
         IApiContentResponse? apiContentResponse = ApiContentResponseBuilder.Build(contentItem);
         if (apiContentResponse is null)
         {

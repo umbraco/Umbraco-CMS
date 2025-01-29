@@ -5,21 +5,27 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 
 [TestFixture]
 public abstract class ExamineBaseTest : UmbracoIntegrationTest
 {
+    private const int IndexingTimoutInMilliseconds = 3000;
+
     protected IndexInitializer IndexInitializer => Services.GetRequiredService<IndexInitializer>();
 
     protected IHostingEnvironment HostingEnvironment => Services.GetRequiredService<IHostingEnvironment>();
@@ -30,6 +36,15 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
 
     protected override void ConfigureTestServices(IServiceCollection services)
         => services.AddSingleton<IndexInitializer>();
+
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        base.CustomTestSetup(builder);
+        builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
+        builder
+            .AddNotificationHandler<ContentTreeChangeNotification,
+                ContentTreeChangeDistributedCacheNotificationHandler>();
+    }
 
     /// <summary>
     ///     Used to create and manage a testable index
@@ -124,7 +139,8 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
             {
                 indexUpdatingAction();
                 return null;
-            }, indexName);
+            },
+            indexName);
 
     /// <summary>
     /// Performs and action and waits for the specified index to be done indexing.
@@ -148,8 +164,7 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
 
         // Perform the action, and wait for the handle to be freed, meaning the index is done populating.
         var result = indexUpdatingAction();
-        await indexingHandle.WaitOneAsync();
-
+        await indexingHandle.WaitOneAsync(millisecondsTimeout: IndexingTimoutInMilliseconds);
         return result;
     }
 

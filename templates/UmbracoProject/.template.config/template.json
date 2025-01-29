@@ -18,6 +18,7 @@
   "sourceName": "UmbracoProject",
   "defaultName": "UmbracoProject1",
   "preferNameDirectory": true,
+  "additionalConfigFiles": [ "starterkits.template.json"],
   "sources": [
     {
       "modifiers": [
@@ -25,6 +26,13 @@
           "condition": "(ExcludeGitignore)",
           "exclude": [
             ".gitignore"
+          ]
+        },
+        {
+          "condition": "(!Docker)",
+          "exclude": [
+            "Dockerfile",
+            ".dockerignore"
           ]
         }
       ]
@@ -38,25 +46,102 @@
       "datatype": "choice",
       "choices": [
         {
-          "displayName": ".NET 8.0",
-          "description": "Target net8.0",
-          "choice": "net8.0"
+          "displayName": ".NET 9.0",
+          "description": "Target net9.0",
+          "choice": "net9.0"
         }
       ],
-      "defaultValue": "net8.0",
-      "replaces": "net8.0"
+      "defaultValue": "net9.0",
+      "replaces": "net9.0"
+    },
+    "UmbracoRelease": {
+      "displayName": "Umbraco Version",
+      "description": "The Umbraco release to use, either latest or latest long term supported",
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "Latest",
+      "choices": [
+        {
+          "choice": "Latest",
+          "description": "The latest umbraco release"
+        },
+        {
+          "choice": "LTS",
+          "description": "The most recent long term supported version",
+          "displayName": "Long Term Supported"
+        }
+      ],
+      "isRequired": false
     },
     "UmbracoVersion": {
-      "displayName": "Umbraco version",
-      "description": "The version of Umbraco.Cms to add as PackageReference.",
+      "displayName": "Custom Version",
+      "description": "The selected custom version of Umbraco, this is obsoleted, and will be removed in a future version of the template.",
       "type": "parameter",
       "datatype": "string",
-      "defaultValue": "*",
-      "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
+      "defaultValue": "null",
+      "replaces": "CUSTOM_VERSION",
+      "isRequired": false
+    },
+    "FinalVersion" : {
+      "type": "generated",
+      "generator": "switch",
+      "datatype": "text",
+      "description": "The calculated version of Umbraco to use",
+      "replaces": "UMBRACO_VERSION_FROM_TEMPLATE",
+      "parameters": {
+        "evaluator": "C++",
+        "datatype": "text",
+        "cases": [
+          {
+            "condition": "(UmbracoRelease == 'Latest')",
+            "value": "*"
+          },
+          {
+            "condition": "(UmbracoRelease == 'LTS')",
+            "value": "13.5.0"
+          }
+        ]
+      }
+    },
+    "DotnetVersion":
+    {
+      "type": "generated",
+      "generator": "switch",
+      "datatype": "text",
+      "description": "Used to calculate the dotnet version to use, for latest we want to use dotnet 9 and for LTS we want to use dotnet 8",
+      "replaces": "DOTNET_VERSION_FROM_TEMPLATE",
+      "parameters": {
+        "evaluator": "C++",
+        "datatype": "text",
+        "cases": [
+          {
+            "condition": "(UmbracoRelease == 'Latest')",
+            "value": "net9.0"
+          },
+          {
+            "condition": "(UmbracoRelease == 'LTS')",
+            "value": "net8.0"
+          }
+        ]
+      }
     },
     "UseHttpsRedirect": {
       "displayName": "Use HTTPS redirect",
       "description": "Adds code to Startup.cs to redirect HTTP to HTTPS and enables the UseHttps setting.",
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false"
+    },
+    "UseDeliveryApi": {
+      "displayName": "Use Delivery API",
+      "description": "Enables the Delivery API",
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false"
+    },
+    "Docker": {
+      "displayName": "Add Docker file",
+      "description": "Adds a docker file to the project.",
       "type": "parameter",
       "datatype": "bool",
       "defaultValue": "false"
@@ -243,6 +328,58 @@
       "datatype": "string",
       "defaultValue": "",
       "replaces": "PACKAGE_PROJECT_NAME_FROM_TEMPLATE"
+    },
+    "DevelopmentMode": {
+      "type": "parameter",
+      "displayName": "Development mode",
+      "datatype": "choice",
+      "description": "Choose the development mode to use for the project.",
+      "defaultValue": "BackofficeDevelopment",
+      "choices": [
+        {
+          "choice": "BackofficeDevelopment",
+          "description": "Enables backoffice development, allowing you to develop from within the backoffice, this is the default behaviour.",
+          "displayName": "Backoffice Development"
+        },
+        {
+          "choice": "IDEDevelopment",
+          "description": "Configures appsettings.Development.json to Development runtime mode and SourceCodeAuto models builder mode, and configures appsettings.json to Production runtime mode, Nothing models builder mode, and enables UseHttps",
+          "displayName": "IDE Development"
+        }
+      ]
+    },
+    "ModelsBuilderMode": {
+      "type": "parameter",
+      "displayName": "Models builder mode",
+      "datatype": "choice",
+      "description": "Choose the models builder mode to use for the project. When development mode is set to IDEDevelopment this only changes the models builder mode appsetttings.development.json",
+      "defaultValue": "Default",
+      "replaces": "MODELS_MODE",
+      "choices": [
+        {
+          "choice": "Default",
+          "description": "Let DevelopmentMode determine the models builder mode."
+        },
+        {
+          "choice": "InMemoryAuto",
+          "description": "Generate models in memory, automatically updating when a content type change, this means no need for app rebuild, however models are only available in views.",
+          "displayName": "In Memory Auto"
+        },
+        {
+          "choice": "SourceCodeManual",
+          "description": "Generate models as source code, only updating when requested manually, this means a interaction and rebuild is required when content type(s) change, however models are available in code.",
+          "displayName": "Source Code Manual"
+        },
+        {
+          "choice": "SourceCodeAuto",
+          "description": "Generate models as source code, automatically updating when a content type change, this means a rebuild is required when content type(s) change, however models are available in code.",
+          "displayName": "Source Code Auto"
+        },
+        {
+          "choice": "Nothing",
+          "description": "No models are generated, this is recommended for production assuming generated models are used for development."
+        }
+      ]
     },
     "Namespace": {
       "type": "derived",

@@ -40,7 +40,7 @@ public class TypeFinder : ITypeFinder
     private static readonly ConcurrentDictionary<string, Type?> TypeNamesCache = new();
 
     private readonly IAssemblyProvider _assemblyProvider;
-    private readonly object _localFilteredAssemblyCacheLocker = new();
+    private readonly Lock _localFilteredAssemblyCacheLocker = new();
     private readonly ILogger<TypeFinder> _logger;
     private readonly List<string> _notifiedLoadExceptionAssemblies = new();
 
@@ -48,11 +48,6 @@ public class TypeFinder : ITypeFinder
 
     private string[]? _assembliesAcceptingLoadExceptions;
     private volatile HashSet<Assembly>? _localFilteredAssemblyCache;
-
-    [Obsolete("Please use the constructor taking all parameters. This constructor will be removed in V14.")]
-    public TypeFinder(ILogger<TypeFinder> logger, IAssemblyProvider assemblyProvider, ITypeFinderConfig? typeFinderConfig = null)
-        : this(logger, assemblyProvider, null, typeFinderConfig)
-    { }
 
     public TypeFinder(ILogger<TypeFinder> logger, IAssemblyProvider assemblyProvider, string[]? additionalExlusionAssemblies, ITypeFinderConfig? typeFinderConfig = null)
     {

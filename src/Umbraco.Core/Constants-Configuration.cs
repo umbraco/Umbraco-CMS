@@ -22,7 +22,6 @@ public static partial class Constants
         public const string ConfigModelsBuilderPrefix = ConfigPrefix + "ModelsBuilder:";
         public const string ConfigSecurityPrefix = ConfigPrefix + "Security:";
         public const string ConfigContentNotificationsEmail = ConfigContentNotificationsPrefix + "Email";
-        public const string ConfigContentMacroErrors = ConfigContentPrefix + "MacroErrors";
         public const string ConfigGlobalUseHttps = ConfigGlobalPrefix + "UseHttps";
         public const string ConfigHostingDebug = ConfigHostingPrefix + "Debug";
         public const string ConfigCustomErrorsMode = ConfigCustomErrorsPrefix + "Mode";
@@ -40,7 +39,6 @@ public static partial class Constants
         public const string ConfigImaging = ConfigPrefix + "Imaging";
         public const string ConfigExamine = ConfigPrefix + "Examine";
         public const string ConfigIndexing = ConfigPrefix + "Indexing";
-        public const string ConfigKeepAlive = ConfigPrefix + "KeepAlive";
         public const string ConfigLogging = ConfigPrefix + "Logging";
         public const string ConfigMemberPassword = ConfigPrefix + "Security:MemberPassword";
         public const string ConfigModelsBuilder = ConfigPrefix + "ModelsBuilder";
@@ -50,11 +48,12 @@ public static partial class Constants
         public const string ConfigRequestHandler = ConfigPrefix + "RequestHandler";
         public const string ConfigRuntime = ConfigPrefix + "Runtime";
         public const string ConfigRuntimeMode = ConfigRuntime + ":Mode";
+        [Obsolete("Runtime minification is no longer supported. Will be removed entirely in V16.")]
         public const string ConfigRuntimeMinification = ConfigPrefix + "RuntimeMinification";
+        [Obsolete("Runtime minification is no longer supported. Will be removed entirely in V16.")]
         public const string ConfigRuntimeMinificationVersion = ConfigRuntimeMinification + ":Version";
         public const string ConfigSecurity = ConfigPrefix + "Security";
         public const string ConfigBasicAuth = ConfigPrefix + "BasicAuth";
-        public const string ConfigTours = ConfigPrefix + "Tours";
         public const string ConfigTypeFinder = ConfigPrefix + "TypeFinder";
         public const string ConfigWebRouting = ConfigPrefix + "WebRouting";
         public const string ConfigUserPassword = ConfigPrefix + "Security:UserPassword";
@@ -64,7 +63,9 @@ public static partial class Constants
         public const string ConfigHelpPage = ConfigPrefix + "HelpPage";
         public const string ConfigInstallDefaultData = ConfigPrefix + "InstallDefaultData";
         public const string ConfigDataTypes = ConfigPrefix + "DataTypes";
+        public const string ConfigPackageManifests = ConfigPrefix + "PackageManifests";
         public const string ConfigWebhook = ConfigPrefix + "Webhook";
+        public const string ConfigCache = ConfigPrefix + "Cache";
 
         public static class NamedOptions
         {

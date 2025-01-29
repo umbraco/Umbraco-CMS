@@ -170,11 +170,13 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
         var list = new[]
         {
             "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
-            "DELETE FROM umbracoUserGroup2Node WHERE nodeId = @id",
-            "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @id",
-            "DELETE FROM umbracoRelation WHERE parentId = @id", "DELETE FROM umbracoRelation WHERE childId = @id",
+            "DELETE FROM umbracoUserGroup2Permission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
+            "DELETE FROM umbracoUserGroup2GranularPermission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
+            "DELETE FROM umbracoRelation WHERE parentId = @id",
+            "DELETE FROM umbracoRelation WHERE childId = @id",
             "DELETE FROM cmsTagRelationship WHERE nodeId = @id",
-            "DELETE FROM cmsMember2MemberGroup WHERE MemberGroup = @id", "DELETE FROM umbracoNode WHERE id = @id",
+            "DELETE FROM cmsMember2MemberGroup WHERE MemberGroup = @id",
+            "DELETE FROM umbracoNode WHERE id = @id",
         };
         return list;
     }

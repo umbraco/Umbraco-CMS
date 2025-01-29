@@ -1,9 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -12,34 +12,39 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.BlockGrid,
-    "Block Grid",
-    "blockgrid",
-    ValueType = ValueTypes.Json,
-    Group = Constants.PropertyEditors.Groups.RichContent,
-    Icon = "icon-layout")]
+    ValueType = ValueTypes.Json)]
 public class BlockGridPropertyEditor : BlockGridPropertyEditorBase
 {
     private readonly IIOHelper _ioHelper;
-
-    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 13.")]
-    public BlockGridPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper)
-        : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IBlockValuePropertyIndexValueFactory>())
-    {
-
-    }
-
 
     public BlockGridPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
         IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
         : base(dataValueEditorFactory, blockValuePropertyIndexValueFactory)
+        => _ioHelper = ioHelper;
+
+    public override bool SupportsConfigurableElements => true;
+
+    /// <inheritdoc />
+    public override bool CanMergePartialPropertyValues(IPropertyType propertyType) => propertyType.VariesByCulture() is false;
+
+    /// <inheritdoc />
+    public override object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture)
     {
-        _ioHelper = ioHelper;
+        var valueEditor = (BlockGridEditorPropertyValueEditor)GetValueEditor();
+        return valueEditor.MergePartialPropertyValueForCulture(sourceValue, targetValue, culture);
     }
 
+    public override object? MergeVariantInvariantPropertyValue(
+        object? sourceValue,
+        object? targetValue,
+        bool canUpdateInvariantData,
+        HashSet<string> allowedCultures)
+    {
+        var valueEditor = (BlockGridEditorPropertyValueEditor)GetValueEditor();
+        return valueEditor.MergeVariantInvariantPropertyValue(sourceValue, targetValue, canUpdateInvariantData,allowedCultures);
+    }
 
     #region Pre Value Editor
 

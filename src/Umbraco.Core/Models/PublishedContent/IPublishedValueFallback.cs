@@ -5,12 +5,6 @@ namespace Umbraco.Cms.Core.Models.PublishedContent;
 /// </summary>
 public interface IPublishedValueFallback
 {
-    [Obsolete("Scheduled for removal in v14")]
-    /// <summary>
-    /// VariationContextAccessor that is not required to be implemented, therefore throws NotImplementedException as default.
-    /// </summary>
-    IVariationContextAccessor VariationContextAccessor { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
-
     /// <summary>
     ///     Tries to get a fallback value for a property.
     /// </summary>

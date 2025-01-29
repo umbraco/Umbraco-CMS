@@ -17,9 +17,9 @@ namespace Umbraco.Cms.Persistence.EFCore;
 /// and insure the 'src/Umbraco.Web.UI/appsettings.json' have a connection string set with the right provider.
 ///
 /// Create a migration for each provider.
-/// <code>dotnet ef migrations add %Name% -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.SqlServer -- --provider SqlServer</code>
+/// <code>dotnet ef migrations add %Name% -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.SqlServer -c UmbracoDbContext -- --provider SqlServer</code>
 ///
-/// <code>dotnet ef migrations add %Name% -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.Sqlite -- --provider Sqlite</code>
+/// <code>dotnet ef migrations add %Name% -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.Sqlite -c UmbracoDbContext  -- --provider Sqlite</code>
 ///
 /// Remove the last migration for each provider.
 /// <code>dotnet ef migrations remove -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.SqlServer -- --provider SqlServer</code>
@@ -36,19 +36,14 @@ public class UmbracoDbContext : DbContext
     /// </summary>
     /// <param name="options"></param>
     public UmbracoDbContext(DbContextOptions<UmbracoDbContext> options)
-        : base(ConfigureOptions(options, out IOptionsMonitor<ConnectionStrings>? connectionStringsOptionsMonitor))
+        : base(ConfigureOptions(options))
     {
-        connectionStringsOptionsMonitor.OnChange(c =>
-        {
-            ILogger<UmbracoDbContext> logger = StaticServiceProvider.Instance.GetRequiredService<ILogger<UmbracoDbContext>>();
-            logger.LogWarning("Connection string changed, disposing context");
-            Dispose();
-        });
+
     }
 
-    private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options, out IOptionsMonitor<ConnectionStrings> connectionStringsOptionsMonitor)
+    private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
-        connectionStringsOptionsMonitor = StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
+        IOptionsMonitor<ConnectionStrings> connectionStringsOptionsMonitor = StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
 
         ConnectionStrings connectionStrings = connectionStringsOptionsMonitor.CurrentValue;
 
@@ -59,7 +54,7 @@ public class UmbracoDbContext : DbContext
 
             // we're throwing an exception here to make it abundantly clear that one should never utilize (or have a
             // dependency on) the DbContext before the connection string has been initialized by the installer.
-            throw new ConfigurationErrorsException("No connection string was found, cannot setup Umbraco EF Core context");
+            throw new InvalidOperationException("No connection string was found, cannot setup Umbraco EF Core context");
         }
 
         IEnumerable<IMigrationProviderSetup> migrationProviders = StaticServiceProvider.Instance.GetServices<IMigrationProviderSetup>();

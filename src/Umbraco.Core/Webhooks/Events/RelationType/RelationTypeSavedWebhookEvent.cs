@@ -18,7 +18,7 @@ public class RelationTypeSavedWebhookEvent : WebhookEventBase<RelationTypeSavedN
     {
     }
 
-    public override string Alias => "relationTypeSaved";
+    public override string Alias => Constants.WebhookEvents.Aliases.RelationTypeSaved;
 
     public override object? ConvertNotificationToRequestPayload(RelationTypeSavedNotification notification)
         => notification.SavedEntities;

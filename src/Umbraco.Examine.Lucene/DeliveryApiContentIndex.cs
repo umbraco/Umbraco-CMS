@@ -1,9 +1,9 @@
+using System.Globalization;
 using Examine;
 using Examine.Lucene;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
@@ -16,6 +16,9 @@ public class DeliveryApiContentIndex : UmbracoExamineIndex
 {
     private readonly IDeliveryApiCompositeIdHandler _deliveryApiCompositeIdHandler;
     private readonly ILogger<DeliveryApiContentIndex> _logger;
+
+    // The special path and icon value transformations are not needed in this case
+    protected override bool ApplySpecialValueTransformations => false;
 
     [Obsolete("Use the constructor that takes an IDeliveryApiCompositeIdHandler instead, scheduled for removal in v15")]
     public DeliveryApiContentIndex(
@@ -125,13 +128,13 @@ public class DeliveryApiContentIndex : UmbracoExamineIndex
 
     private (string? ContentId, string? Culture) ParseItemId(string id)
     {
-        DeliveryApiIndexCompositeIdModel compositeIdModel = _deliveryApiCompositeIdHandler.Decompose(id);
-        return (compositeIdModel.Id.ToString() ?? id, compositeIdModel.Culture);
-    }
+        if (int.TryParse(id, out _))
+        {
+            return (id, null);
+        }
 
-    protected override void OnTransformingIndexValues(IndexingItemEventArgs e)
-    {
-        // UmbracoExamineIndex (base class down the hierarchy) performs some magic transformations here for paths and icons;
-        // we don't want that for the Delivery API, so we'll have to override this method and simply do nothing.
+        DeliveryApiIndexCompositeIdModel compositeIdModel = _deliveryApiCompositeIdHandler.Decompose(id);
+
+        return (compositeIdModel.Id?.ToString(CultureInfo.InvariantCulture), compositeIdModel.Culture);
     }
 }

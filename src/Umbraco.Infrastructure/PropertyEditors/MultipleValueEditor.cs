@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -20,34 +18,16 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </remarks>
 public class MultipleValueEditor : DataValueEditor
 {
+    private readonly IJsonSerializer _jsonSerializer;
+
     public MultipleValueEditor(
         ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper,
         DataEditorAttribute attribute)
-        : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
-    {
-    }
-
-    /// <summary>
-    ///     Override so that we can return an array to the editor for multi-select values
-    /// </summary>
-    /// <param name="property"></param>
-    /// <param name="culture"></param>
-    /// <param name="segment"></param>
-    /// <returns></returns>
-    public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
-    {
-        var json = base.ToEditor(property, culture, segment)?.ToString();
-        string[]? result = null;
-        if (json is not null)
-        {
-            result = JsonConvert.DeserializeObject<string[]>(json);
-        }
-
-        return result ?? Array.Empty<string>();
-    }
+        : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute) =>
+        _jsonSerializer = jsonSerializer;
 
     /// <summary>
     ///     When multiple values are selected a json array will be posted back so we need to format for storage in
@@ -58,17 +38,12 @@ public class MultipleValueEditor : DataValueEditor
     /// <returns></returns>
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
-        if (editorValue.Value is not JArray json || json.HasValues == false)
+        if (editorValue.Value is not IEnumerable<string> stringValues || stringValues.Any() == false)
         {
             return null;
         }
 
-        var values = json.Select(item => item.Value<string>()).ToArray();
-        if (values.Length == 0)
-        {
-            return null;
-        }
-
-        return JsonConvert.SerializeObject(values, Formatting.None);
+        var result = _jsonSerializer.Serialize(stringValues);
+        return result;
     }
 }

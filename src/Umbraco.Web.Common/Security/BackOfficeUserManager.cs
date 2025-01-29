@@ -1,23 +1,31 @@
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Security.Claims;
 using System.Security.Principal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Security;
 
 public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, UserPasswordConfigurationSettings>,
-    IBackOfficeUserManager
+    IBackOfficeUserManager,
+    ICoreBackOfficeUserManager
 {
     private readonly IBackOfficeUserPasswordChecker _backOfficeUserPasswordChecker;
+    private readonly GlobalSettings _globalSettings;
     private readonly IEventAggregator _eventAggregator;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -34,7 +42,8 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         ILogger<UserManager<BackOfficeIdentityUser>> logger,
         IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
         IEventAggregator eventAggregator,
-        IBackOfficeUserPasswordChecker backOfficeUserPasswordChecker)
+        IBackOfficeUserPasswordChecker backOfficeUserPasswordChecker,
+        IOptions<GlobalSettings> globalSettings)
         : base(
             ipResolver,
             store,
@@ -50,31 +59,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         _httpContextAccessor = httpContextAccessor;
         _eventAggregator = eventAggregator;
         _backOfficeUserPasswordChecker = backOfficeUserPasswordChecker;
-    }
-
-    /// <summary>
-    ///     Override to check the user approval value as well as the user lock out date, by default this only checks the user's
-    ///     locked out date
-    /// </summary>
-    /// <param name="user">The user</param>
-    /// <returns>True if the user is locked out, else false</returns>
-    /// <remarks>
-    ///     In the ASP.NET Identity world, there is only one value for being locked out, in Umbraco we have 2 so when checking
-    ///     this for Umbraco we need to check both values
-    /// </remarks>
-    public override async Task<bool> IsLockedOutAsync(BackOfficeIdentityUser user)
-    {
-        if (user == null)
-        {
-            throw new ArgumentNullException(nameof(user));
-        }
-
-        if (user.IsApproved == false)
-        {
-            return true;
-        }
-
-        return await base.IsLockedOutAsync(user);
+        _globalSettings = globalSettings.Value;
     }
 
     public override async Task<IdentityResult> AccessFailedAsync(BackOfficeIdentityUser user)
@@ -137,6 +122,22 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         }
 
         return result;
+    }
+
+    public async Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockUser(IUser user)
+    {
+        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString());
+
+        if (identityUser is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, new UserUnlockResult());
+        }
+
+        IdentityResult result = await SetLockoutEndDateAsync(identityUser, DateTimeOffset.Now.AddMinutes(-1));
+
+        return result.Succeeded
+            ? Attempt.SucceedWithStatus(UserOperationStatus.Success, new UserUnlockResult())
+            : Attempt.FailWithStatus(UserOperationStatus.UnknownFailure, new UserUnlockResult { Error = new ValidationResult(result.Errors.ToErrorMessage()) });
     }
 
     public override async Task<IdentityResult> ResetAccessFailedCountAsync(BackOfficeIdentityUser user)
@@ -245,5 +246,113 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         T notification = createNotification(currentUserId, ip);
         _eventAggregator.Publish(notification);
         return notification;
+    }
+
+    public async Task<IdentityCreationResult> CreateForInvite(UserCreateModel createModel)
+    {
+        var identityUser = BackOfficeIdentityUser.CreateNew(
+            _globalSettings,
+            createModel.UserName,
+            createModel.Email,
+            _globalSettings.DefaultUILanguage);
+
+        identityUser.Name = createModel.Name;
+
+        IdentityResult created = await CreateAsync(identityUser);
+
+        return created.Succeeded
+            ? new IdentityCreationResult { Succeded = true }
+            : IdentityCreationResult.Fail(created.Errors.ToErrorMessage());
+    }
+
+    public async Task<IdentityCreationResult> CreateAsync(UserCreateModel createModel)
+    {
+        var identityUser = BackOfficeIdentityUser.CreateNew(
+            _globalSettings,
+            createModel.UserName,
+            createModel.Email,
+            _globalSettings.DefaultUILanguage,
+            createModel.Name,
+            createModel.Id,
+            createModel.Kind);
+
+        IdentityResult created = await CreateAsync(identityUser);
+
+        if (created.Succeeded is false)
+        {
+            return IdentityCreationResult.Fail(created.Errors.ToErrorMessage());
+        }
+
+        var password = GeneratePassword();
+
+        IdentityResult passwordAdded = await AddPasswordAsync(identityUser, password);
+        if (passwordAdded.Succeeded is false)
+        {
+            return IdentityCreationResult.Fail(passwordAdded.Errors.ToErrorMessage());
+        }
+
+        return new IdentityCreationResult { Succeded = true, InitialPassword = password };
+    }
+
+    public async Task<Attempt<string, UserOperationStatus>> GeneratePasswordResetTokenAsync(IUser user)
+    {
+        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString());
+
+        if (identityUser is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, string.Empty);
+        }
+
+        var token = await GeneratePasswordResetTokenAsync(identityUser);
+
+        return Attempt.SucceedWithStatus(UserOperationStatus.Success, token);
+    }
+    public async Task<Attempt<string, UserOperationStatus>> GenerateEmailConfirmationTokenAsync(IUser user)
+    {
+        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString());
+
+        if (identityUser is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, string.Empty);
+        }
+
+        var token = await GenerateEmailConfirmationTokenAsync(identityUser);
+
+        return Attempt.SucceedWithStatus(UserOperationStatus.Success, token);
+    }
+
+    public async Task<Attempt<ICollection<IIdentityUserLogin>, UserOperationStatus>> GetLoginsAsync(IUser user)
+    {
+        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString());
+        if (identityUser is null)
+        {
+            return Attempt.FailWithStatus<ICollection<IIdentityUserLogin>, UserOperationStatus>(UserOperationStatus.UserNotFound, Array.Empty<IIdentityUserLogin>());
+        }
+
+        return Attempt.SucceedWithStatus(UserOperationStatus.Success, identityUser.Logins);
+    }
+
+    public async Task<bool> IsEmailConfirmationTokenValidAsync(IUser user, string token)
+    {
+        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString(CultureInfo.InvariantCulture));
+
+        if (identityUser != null && await VerifyUserTokenAsync(identityUser, Options.Tokens.EmailConfirmationTokenProvider, ConfirmEmailTokenPurpose, token).ConfigureAwait(false))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public async Task<bool> IsResetPasswordTokenValidAsync(IUser user, string token)
+    {
+        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString(CultureInfo.InvariantCulture));
+
+        if (identityUser != null && await VerifyUserTokenAsync(identityUser, Options.Tokens.PasswordResetTokenProvider, ResetPasswordTokenPurpose, token).ConfigureAwait(false))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

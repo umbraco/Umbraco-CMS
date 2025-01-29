@@ -1,16 +1,19 @@
+@using Umbraco.Cms.Core.PublishedCache
 @using Umbraco.Cms.Core.Routing
-@using Umbraco.Extensions
-@inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage
+@using Umbraco.Cms.Core.Services.Navigation
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@inject IPublishedContentCache PublishedContentCache
+@inject IDocumentNavigationQueryService DocumentNavigationQueryService
 @inject IPublishedUrlProvider PublishedUrlProvider
 @*
     This snippet makes a list of links to the of parents of the current page using an unordered HTML list.
 
     How it works:
-    - It uses the Ancestors() method to get all parents and then generates links so the visitor can go back
+    - It uses the Ancestors method to get all parents and then generates links so the visitor can go back
     - Finally it outputs the name of the current page (without a link)
 *@
 
-@{ var selection = Model?.Content.Ancestors().ToArray(); }
+@{ var selection = Model?.Content.Ancestors(PublishedContentCache, DocumentNavigationQueryService).ToArray(); }
 
 @if (selection?.Length > 0)
 {

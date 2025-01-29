@@ -16,12 +16,13 @@ public class ContentTypeBuilder
         IWithPropertyTypeIdsIncrementingFrom,
         IBuildPropertyTypes
 {
-    private readonly List<ContentTypeSortBuilder> _allowedContentTypeBuilders = new();
+    private readonly List<ContentTypeSortBuilder<ContentTypeBuilder>> _allowedContentTypeBuilders = new();
     private readonly List<PropertyTypeBuilder<ContentTypeBuilder>> _noGroupPropertyTypeBuilders = new();
     private readonly List<PropertyGroupBuilder<ContentTypeBuilder>> _propertyGroupBuilders = new();
     private readonly List<TemplateBuilder> _templateBuilders = new();
     private ContentVariation? _contentVariation;
     private int? _defaultTemplateId;
+    private bool? _isElement;
     private PropertyTypeCollection _propertyTypeCollection;
 
     private int? _propertyTypeIdsIncrementingFrom;
@@ -45,6 +46,12 @@ public class ContentTypeBuilder
     public ContentTypeBuilder WithDefaultTemplateId(int templateId)
     {
         _defaultTemplateId = templateId;
+        return this;
+    }
+
+    public ContentTypeBuilder WithIsElement(bool isElement)
+    {
+        _isElement = isElement;
         return this;
     }
 
@@ -81,9 +88,9 @@ public class ContentTypeBuilder
         return builder;
     }
 
-    public ContentTypeSortBuilder AddAllowedContentType()
+    public ContentTypeSortBuilder<ContentTypeBuilder> AddAllowedContentType()
     {
-        var builder = new ContentTypeSortBuilder(this);
+        var builder = new ContentTypeSortBuilder<ContentTypeBuilder>(this);
         _allowedContentTypeBuilders.Add(builder);
         return builder;
     }
@@ -116,7 +123,8 @@ public class ContentTypeBuilder
         contentType.Thumbnail = GetThumbnail();
         contentType.CreatorId = GetCreatorId();
         contentType.Trashed = GetTrashed();
-        contentType.IsContainer = GetIsContainer();
+        contentType.ListView = GetListView();
+        contentType.IsElement = _isElement ?? false;
         contentType.HistoryCleanup = new HistoryCleanup();
 
         contentType.Variations = contentVariation;
@@ -228,7 +236,7 @@ public class ContentTypeBuilder
                 .WithLabelOnTop(true)
                 .Done()
                 .AddPropertyType()
-                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TinyMce)
+                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.RichText)
                 .WithValueStorageType(ValueStorageType.Ntext)
                 .WithAlias(RandomAlias("bodyText", randomizeAliases))
                 .WithName("Body text")
@@ -292,7 +300,7 @@ public class ContentTypeBuilder
             .WithSortOrder(1)
             .Done()
             .AddPropertyType()
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TinyMce)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.RichText)
             .WithValueStorageType(ValueStorageType.Ntext)
             .WithAlias("bodyText")
             .WithName("Body text")
@@ -400,7 +408,7 @@ public class ContentTypeBuilder
             .WithAlias("bodyText")
             .WithName("Body Text")
             .WithDataTypeId(Constants.DataTypes.RichtextEditor)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TinyMce)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.RichText)
             .WithValueStorageType(ValueStorageType.Ntext)
             .WithSortOrder(3)
             .Done()
@@ -499,14 +507,6 @@ public class ContentTypeBuilder
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.ContentPicker)
             .WithValueStorageType(ValueStorageType.Integer)
             .WithSortOrder(16)
-            .Done()
-            .AddPropertyType()
-            .WithAlias("mediaPicker")
-            .WithName("Media Picker")
-            .WithDataTypeId(1048)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.MediaPicker)
-            .WithValueStorageType(ValueStorageType.Integer)
-            .WithSortOrder(17)
             .Done()
             .AddPropertyType()
             .WithAlias("memberPicker")

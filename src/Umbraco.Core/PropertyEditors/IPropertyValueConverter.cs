@@ -97,37 +97,4 @@ public interface IPropertyValueConverter : IDiscoverable
     ///     </para>
     /// </remarks>
     object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
-
-    /// <summary>
-    ///     Converts a property intermediate value to an XPath value.
-    /// </summary>
-    /// <param name="owner">The property set owning the property.</param>
-    /// <param name="propertyType">The property type.</param>
-    /// <param name="referenceCacheLevel">The reference cache level.</param>
-    /// <param name="inter">The intermediate value.</param>
-    /// <param name="preview">A value indicating whether conversion should take place in preview mode.</param>
-    /// <returns>The result of the conversion.</returns>
-    /// <remarks>
-    ///     <para>
-    ///         The converter should know how to convert a <c>null</c> intermediate value, or any intermediate value
-    ///         indicating that no value has been assigned to the property. It is up to the converter to determine
-    ///         what to return in that case: either <c>null</c>, or the default value...
-    ///     </para>
-    ///     <para>
-    ///         If successful, the result should be either <c>null</c>, a string, or an <c>XPathNavigator</c>
-    ///         instance. Whether an xml-whitespace string should be returned as <c>null</c> or literally, is
-    ///         up to the converter.
-    ///     </para>
-    ///     <para>
-    ///         The converter may want to return an XML fragment that represent a part of the content tree,
-    ///         but should pay attention not to create infinite loops that would kill XPath and XSLT.
-    ///     </para>
-    ///     <para>
-    ///         The <paramref name="referenceCacheLevel" /> is passed to the converter so that it can be, in turn,
-    ///         passed to eg a PublishedFragment constructor. It is used by the fragment and the properties to manage
-    ///         the cache levels of property values. It is not meant to be used by the converter.
-    ///     </para>
-    /// </remarks>
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
 }

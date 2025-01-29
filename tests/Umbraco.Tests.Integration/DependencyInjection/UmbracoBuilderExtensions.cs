@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -18,10 +19,8 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HostedServices;
-using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Persistence.EFCore.Locking;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
@@ -47,10 +46,6 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddUnique(testHelper.MainDom);
 
         builder.Services.AddUnique<IIndexRebuilder, TestBackgroundIndexRebuilder>();
-        builder.Services.AddUnique(factory => Mock.Of<IRuntimeMinifier>());
-
-        // we don't want persisted nucache files in tests
-        builder.Services.AddTransient(factory => new PublishedSnapshotServiceOptions { IgnoreLocalDb = true });
 
 #if IS_WINDOWS
         // ensure all lucene indexes are using RAM directory (no file system)
@@ -123,13 +118,24 @@ public static class UmbracoBuilderExtensions
 
                 var currFolder = new DirectoryInfo(srcFolder);
 
-                var uiProject = currFolder.GetDirectories("Umbraco.Web.UI", SearchOption.TopDirectoryOnly).First();
-                var mainLangFolder = new DirectoryInfo(Path.Combine(uiProject.FullName, globalSettings.Value.UmbracoPath.TrimStart("~/"), "config", "lang"));
+                if (!currFolder.Exists)
+                {
+                    currFolder = new DirectoryInfo(Path.GetTempPath());
+                }
+
+                var uiProject = currFolder.GetDirectories("Umbraco.Web.UI", SearchOption.TopDirectoryOnly).FirstOrDefault();
+                if (uiProject == null)
+                {
+                    uiProject = new DirectoryInfo(Path.Combine(Path.GetTempPath(), "Umbraco.Web.UI"));
+                    uiProject.Create();
+                }
+
+                var mainLangFolder = new DirectoryInfo(Path.Combine(uiProject.FullName, Constants.System.DefaultUmbracoPath.TrimStart("~/"), "config", "lang"));
 
                 return new LocalizedTextServiceFileSources(
                     loggerFactory.CreateLogger<LocalizedTextServiceFileSources>(),
                     appCaches,
-                    mainLangFolder,
+                    currFolder,
                     Array.Empty<LocalizedTextServiceSupplementaryFileSource>(),
                     new EmbeddedFileProvider(typeof(IAssemblyProvider).Assembly, "Umbraco.Cms.Core.EmbeddedResources.Lang").GetDirectoryContents(string.Empty));
             }),

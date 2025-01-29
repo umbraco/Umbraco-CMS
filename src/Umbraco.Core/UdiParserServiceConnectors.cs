@@ -4,9 +4,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core;
 
+[Obsolete("This class will be removed in a future version.")]
 public static class UdiParserServiceConnectors
 {
-    private static readonly object ScanLocker = new();
+    private static readonly Lock ScanLocker = new();
 
     // notes - see U4-10409
     // if this class is used during application pre-start it cannot scans the assemblies,
@@ -19,6 +20,7 @@ public static class UdiParserServiceConnectors
     ///     Scan for deploy <see cref="IServiceConnector" /> in assemblies for known UDI types.
     /// </summary>
     /// <param name="typeLoader"></param>
+    [Obsolete("Use UdiParser.RegisterUdiType() instead. This method will be removed in a future version.")]
     public static void ScanDeployServiceConnectorsForUdiTypes(TypeLoader typeLoader)
     {
         if (typeLoader is null)
@@ -72,6 +74,7 @@ public static class UdiParserServiceConnectors
     ///     Registers a single <see cref="IServiceConnector" /> to add it's UDI type.
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    [Obsolete("Use UdiParser.RegisterUdiType() instead. This method will be removed in a future version.")]
     public static void RegisterServiceConnector<T>()
         where T : IServiceConnector
     {

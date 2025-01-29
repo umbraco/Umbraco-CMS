@@ -8,13 +8,9 @@ namespace Umbraco.Cms.Core.Packaging;
 public class ConflictingPackageData
 {
     private readonly IFileService _fileService;
-    private readonly IMacroService _macroService;
 
-    public ConflictingPackageData(IMacroService macroService, IFileService fileService)
-    {
-        _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
-        _macroService = macroService ?? throw new ArgumentNullException(nameof(macroService));
-    }
+    public ConflictingPackageData(IFileService fileService)
+        => _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
 
     public IEnumerable<IFile?>? FindConflictingStylesheets(IEnumerable<XElement>? stylesheetNodes) =>
         stylesheetNodes?
@@ -43,18 +39,4 @@ public class ConflictingPackageData
                 return _fileService.GetTemplate(xElement.Value);
             })
             .WhereNotNull();
-
-    public IEnumerable<IMacro?>? FindConflictingMacros(IEnumerable<XElement>? macroNodes) =>
-        macroNodes?
-            .Select(n =>
-            {
-                XElement? xElement = n.Element("alias") ?? n.Element("Alias");
-                if (xElement == null)
-                {
-                    throw new FormatException("missing a \"alias\" element in alias element");
-                }
-
-                return _macroService.GetByAlias(xElement.Value);
-            })
-            .Where(v => v != null);
 }

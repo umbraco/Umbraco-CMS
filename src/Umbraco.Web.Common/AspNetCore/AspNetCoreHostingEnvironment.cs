@@ -25,16 +25,6 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
     private string? _applicationId;
     private string? _localTempPath;
 
-    [Obsolete("Please use an alternative constructor.")]
-    public AspNetCoreHostingEnvironment(
-        IServiceProvider serviceProvider,
-        IOptionsMonitor<HostingSettings> hostingSettings,
-        IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
-        IWebHostEnvironment webHostEnvironment)
-        : this(hostingSettings, webRoutingSettings, webHostEnvironment, serviceProvider.GetService<IApplicationDiscriminator>()!)
-    {
-    }
-
     public AspNetCoreHostingEnvironment(
         IOptionsMonitor<HostingSettings> hostingSettings,
         IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
@@ -53,14 +43,14 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
         _webHostEnvironment = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
         _urlProviderMode = _webRoutingSettings.CurrentValue.UrlProviderMode;
 
-        SetSiteName(hostingSettings.CurrentValue.SiteName);
+        SetSiteNameAndDebugMode(hostingSettings.CurrentValue);
 
         // We have to ensure that the OptionsMonitor is an actual options monitor since we have a hack
         // where we initially use an OptionsMonitorAdapter, which doesn't implement OnChange.
         // See summery of OptionsMonitorAdapter for more information.
         if (hostingSettings is OptionsMonitor<HostingSettings>)
         {
-            hostingSettings.OnChange(settings => SetSiteName(settings.SiteName));
+            hostingSettings.OnChange(settings => SetSiteNameAndDebugMode(settings));
         }
 
         ApplicationPhysicalPath = webHostEnvironment.ContentRootPath;
@@ -70,10 +60,6 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
             ApplicationMainUrl = new Uri(_webRoutingSettings.CurrentValue.UmbracoApplicationUrl);
         }
     }
-
-    // Scheduled for removal in v12
-    [Obsolete("This will never have a value")]
-    public Version? IISVersion { get; }
 
     /// <inheritdoc />
     public bool IsHosted { get; } = true;
@@ -109,7 +95,7 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
         _hostingSettings.CurrentValue.ApplicationVirtualPath?.EnsureStartsWith('/') ?? "/";
 
     /// <inheritdoc />
-    public bool IsDebugMode => _hostingSettings.CurrentValue.Debug;
+    public bool IsDebugMode { get; private set; }
 
     public string LocalTempPath
     {
@@ -175,7 +161,7 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
 
     public void EnsureApplicationMainUrl(Uri? currentApplicationUrl)
     {
-        // Fixme: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
+        // TODO: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
         // it changes the URL to `localhost:80` which actually doesn't work for pinging itself, it only works internally in Azure. The ironic part
         // about this is that this is here specifically for the slot swap scenario https://issues.umbraco.org/issue/U4-10626
 
@@ -202,8 +188,12 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
         }
     }
 
-    private void SetSiteName(string? siteName) =>
-        SiteName = string.IsNullOrWhiteSpace(siteName)
+    private void SetSiteNameAndDebugMode(HostingSettings hostingSettings)
+    {
+        SiteName = string.IsNullOrWhiteSpace(hostingSettings.SiteName)
             ? _webHostEnvironment.ApplicationName
-            : siteName;
+            : hostingSettings.SiteName;
+
+        IsDebugMode = hostingSettings.Debug;
+    }
 }

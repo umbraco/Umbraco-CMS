@@ -14,15 +14,6 @@ public interface IFileType
     bool CanSetPhysical { get; }
 
     /// <summary>
-    /// Gets the stream.
-    /// </summary>
-    /// <param name="udi">The UDI.</param>
-    /// <returns>
-    /// The stream.
-    /// </returns>
-    Stream GetStream(StringUdi udi);
-
-    /// <summary>
     /// Gets the stream as an asynchronous operation.
     /// </summary>
     /// <param name="udi">The UDI.</param>
@@ -49,13 +40,6 @@ public interface IFileType
     /// The file length in bytes or <c>-1</c> if not found.
     /// </returns>
     long GetLength(StringUdi udi);
-
-    /// <summary>
-    /// Sets the stream.
-    /// </summary>
-    /// <param name="udi">The UDI.</param>
-    /// <param name="stream">The stream.</param>
-    void SetStream(StringUdi udi, Stream stream);
 
     /// <summary>
     /// Sets the stream as an asynchronous operation.

@@ -1,10 +1,9 @@
-import type {UUIButtonState, UUIInputElement} from '@umbraco-ui/uui';
-import {LitElement, css, html, nothing} from 'lit';
-import {customElement, state} from 'lit/decorators.js';
-import {until} from 'lit/directives/until.js';
-import {umbAuthContext} from '../../context/auth.context.js';
-import {umbLocalizationContext} from '../../external/localization/localization-context.js';
-import {loadCustomView, renderCustomView} from '../../utils/load-custom-view.function.js';
+import type {UUIButtonState, UUIInputElement} from '@umbraco-cms/backoffice/external/uui';
+import {css, html, nothing, customElement, state, until} from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
+
+import { loadCustomView, renderCustomView } from '../../utils/load-custom-view.function.js';
+import { UMB_AUTH_CONTEXT } from "../../contexts";
 
 type MfaCustomViewElement = HTMLElement & {
   providers?: string[];
@@ -12,12 +11,9 @@ type MfaCustomViewElement = HTMLElement & {
 };
 
 @customElement('umb-mfa-page')
-export default class UmbMfaPageElement extends LitElement {
+export default class UmbMfaPageElement extends UmbLitElement {
   @state()
   protected providers: Array<{ name: string; value: string; selected: boolean }> = [];
-
-  @state()
-  private loading = true;
 
   @state()
   private buttonState?: UUIButtonState;
@@ -25,47 +21,42 @@ export default class UmbMfaPageElement extends LitElement {
   @state()
   private error: string | null = null;
 
+  #authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
+
   constructor() {
     super();
-    this.#loadProviders();
+    this.consumeContext(UMB_AUTH_CONTEXT, authContext => {
+      this.#authContext = authContext;
+      this.#loadProviders();
+    });
   }
 
-  async #loadProviders() {
-    try {
-      const response = await umbAuthContext.getMfaProviders();
-      this.providers = response.providers.map((provider) => ({name: provider, value: provider, selected: false}));
+  #loadProviders() {
+    this.providers = this.#authContext?.mfaProviders.map((provider) => ({name: provider, value: provider, selected: false})) ?? [];
 
-      if (this.providers.length) {
-        this.providers[0].selected = true;
-      }
-
-      if (response.error) {
-        this.error = response.error;
-      }
-    } catch (e) {
-      if (e instanceof Error) {
-        this.error = e.message ?? 'Unknown error';
-      } else {
-        this.error = 'Unknown error';
-      }
-      this.providers = [];
+    if (this.providers.length) {
+      this.providers[0].selected = true;
+    } else {
+      this.error = 'Error: No providers available';
     }
-    this.loading = false;
   }
 
-  private async handleSubmit(e: SubmitEvent) {
+  async #handleSubmit(e: SubmitEvent) {
     e.preventDefault();
+
+    if (!this.#authContext) return;
 
     this.error = null;
 
     const form = e.target as HTMLFormElement;
     if (!form) return;
 
-    const codeInput = form.elements.namedItem('2facode') as UUIInputElement;
+    const codeInput = form.elements.namedItem('mfacode') as UUIInputElement;
 
     if (codeInput) {
       codeInput.error = false;
       codeInput.errorMessage = '';
+      codeInput.setCustomValidity('');
     }
 
     if (!form.checkValidity()) return;
@@ -76,6 +67,12 @@ export default class UmbMfaPageElement extends LitElement {
 
     // If no provider given, use the first one (there probably is only one anyway)
     if (!provider) {
+      // If there are no providers, we can't continue
+      if (!this.providers.length) {
+        this.error = 'No providers available';
+        return;
+      }
+
       provider = this.providers[0].value;
     }
 
@@ -88,51 +85,37 @@ export default class UmbMfaPageElement extends LitElement {
 
     this.buttonState = 'waiting';
 
-    try {
-      const response = await umbAuthContext.validateMfaCode(code, provider);
-      if (response.error) {
-        if (codeInput) {
-          codeInput.error = true;
-          codeInput.errorMessage = response.error;
-        } else {
-          this.error = response.error;
-        }
-        this.buttonState = 'failed';
-        return;
-      }
-
-      this.buttonState = 'success';
-
-      const returnPath = umbAuthContext.returnPath;
-      if (returnPath) {
-        location.href = returnPath;
-      }
-
-      this.dispatchEvent(
-        new CustomEvent('umb-login-success', {bubbles: true, composed: true, detail: response.data})
-      );
-    } catch (e) {
-      if (e instanceof Error) {
-        this.error = e.message ?? 'Unknown error';
+    const response = await this.#authContext.validateMfaCode(code, provider);
+    if (response.error) {
+      if (codeInput) {
+        codeInput.error = true;
+        codeInput.errorMessage = response.error;
       } else {
-        this.error = 'Unknown error';
+        this.error = response.error;
       }
       this.buttonState = 'failed';
-      this.dispatchEvent(new CustomEvent('umb-login-failed', {bubbles: true, composed: true, detail: e}));
+      return;
+    }
+
+    this.buttonState = 'success';
+
+    const returnPath = this.#authContext.returnPath;
+    if (returnPath) {
+      location.href = returnPath;
     }
   }
 
   protected renderDefaultView() {
     return html`
       <uui-form>
-        <form id="LoginForm" @submit=${this.handleSubmit}>
+        <form id="LoginForm" @submit=${this.#handleSubmit} novalidate>
           <header id="header">
             <h1>
-              <umb-localize key="login_2faTitle">One last step</umb-localize>
+              <umb-localize key="auth_mfaTitle">One last step</umb-localize>
             </h1>
 
             <p>
-              <umb-localize key="login_2faText">
+              <umb-localize key="auth_mfaText">
                 You have enabled 2-factor authentication and must verify your identity.
               </umb-localize>
             </p>
@@ -141,40 +124,32 @@ export default class UmbMfaPageElement extends LitElement {
           <!-- if there's only one provider active, it will skip this step! -->
           ${this.providers.length > 1
             ? html`
-              <uui-form-layout-item label="@login_2faMultipleText">
+              <uui-form-layout-item>
                 <uui-label id="providerLabel" for="provider" slot="label" required>
-                  <umb-localize key="login_2faMultipleText">Please choose a 2-factor provider</umb-localize>
+                  <umb-localize key="auth_mfaMultipleText">Please choose a 2-factor provider</umb-localize>
                 </uui-label>
-                <div class="uui-input-wrapper">
-                  <uui-select id="provider" name="provider" .options=${this.providers} aria-required="true" required>
-                  </uui-select>
-                </div>
+                <uui-select label=${this.localize.term('auth_mfaMultipleText')} id="provider" name="provider" .options=${this.providers} aria-required="true" required></uui-select>
               </uui-form-layout-item>
             `
             : nothing}
 
           <uui-form-layout-item>
-            <uui-label id="2facodeLabel" for="2facode" slot="label" required>
-              <umb-localize key="login_2faCodeInput">Verification code</umb-localize>
+            <uui-label id="mfacodeLabel" for="mfacode" slot="label" required>
+              <umb-localize key="auth_mfaCodeInput">Verification code</umb-localize>
             </uui-label>
 
             <uui-input
               autofocus
-              id="2facode"
+              id="mfacode"
               type="text"
               name="token"
               inputmode="numeric"
               autocomplete="one-time-code"
-              placeholder=${until(
-                umbLocalizationContext.localize('login_2faCodeInputHelp'),
-                'Please enter the verification code'
-              )}
+              placeholder=${this.localize.term('auth_mfaCodeInputHelp')}
               aria-required="true"
               required
-              required-message=${until(
-                umbLocalizationContext.localize('login_2faCodeInputHelp'),
-                'Please enter the verification code'
-              )}
+              required-message=${this.localize.term('auth_mfaCodeInputHelp')}
+              label=${this.localize.term('auth_mfaCodeInput')}
               style="width:100%;">
             </uui-input>
           </uui-form-layout-item>
@@ -186,7 +161,7 @@ export default class UmbMfaPageElement extends LitElement {
             button-style="success"
             look="primary"
             color="default"
-            label=${until(umbLocalizationContext.localize('general_validate'), 'Validate')}
+            label=${this.localize.term('auth_validate')}
             type="submit"></uui-button>
         </form>
       </uui-form>
@@ -196,14 +171,14 @@ export default class UmbMfaPageElement extends LitElement {
   }
 
   protected async renderCustomView() {
-    const view = umbAuthContext.twoFactorView;
+    const view = this.#authContext?.twoFactorView;
     if (!view) return nothing;
 
     try {
       const customView = await loadCustomView<MfaCustomViewElement>(view);
       if (typeof customView === 'object') {
         customView.providers = this.providers.map((provider) => provider.value);
-        customView.returnPath = umbAuthContext.returnPath;
+        customView.returnPath = this.#authContext?.returnPath ?? '';
       }
       return renderCustomView(customView);
     } catch (e) {
@@ -218,10 +193,7 @@ export default class UmbMfaPageElement extends LitElement {
   }
 
   protected render() {
-    return this.loading
-      ? html`
-        <uui-loader-bar></uui-loader-bar>`
-      : umbAuthContext.twoFactorView
+    return this.#authContext?.twoFactorView
         ? until(this.renderCustomView(), html`
           <uui-loader-bar></uui-loader-bar>`)
         : this.renderDefaultView();
@@ -246,8 +218,8 @@ export default class UmbMfaPageElement extends LitElement {
         gap: var(--uui-size-layout-2);
       }
 
-      .uui-input-wrapper {
-        background-color: var(--uui-color-surface);
+      #provider {
+        width: 100%;
       }
 
       uui-form-layout-item {

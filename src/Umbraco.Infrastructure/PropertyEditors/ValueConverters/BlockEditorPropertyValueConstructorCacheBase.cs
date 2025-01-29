@@ -9,13 +9,13 @@ public abstract class BlockEditorPropertyValueConstructorCacheBase<T>
     where T : IBlockReference<IPublishedElement, IPublishedElement>
 {
     private readonly
-        ConcurrentDictionary<(Guid, Guid?), Func<Udi, IPublishedElement, Udi?, IPublishedElement?, T>>
+        ConcurrentDictionary<(Guid, Guid?), Func<Guid, IPublishedElement, Guid?, IPublishedElement?, T>>
         _constructorCache = new();
 
-    public bool TryGetValue((Guid ContentTypeKey, Guid? SettingsTypeKey) key, [MaybeNullWhen(false)] out Func<Udi, IPublishedElement, Udi?, IPublishedElement?, T> value)
+    public bool TryGetValue((Guid ContentTypeKey, Guid? SettingsTypeKey) key, [MaybeNullWhen(false)] out Func<Guid, IPublishedElement, Guid?, IPublishedElement?, T> value)
         => _constructorCache.TryGetValue(key, out value);
 
-    public void SetValue((Guid ContentTypeKey, Guid? SettingsTypeKey) key, Func<Udi, IPublishedElement, Udi?, IPublishedElement?, T> value)
+    public void SetValue((Guid ContentTypeKey, Guid? SettingsTypeKey) key, Func<Guid, IPublishedElement, Guid?, IPublishedElement?, T> value)
         => _constructorCache[key] = value;
 
     public void Clear()

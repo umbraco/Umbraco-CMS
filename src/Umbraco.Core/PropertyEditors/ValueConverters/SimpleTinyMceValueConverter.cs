@@ -10,12 +10,12 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 public class SimpleTinyMceValueConverter : PropertyValueConverterBase
 {
     public override bool IsConverter(IPublishedPropertyType propertyType)
-        => propertyType.EditorAlias == Constants.PropertyEditors.Aliases.TinyMce;
+        => propertyType.EditorAlias == Constants.PropertyEditors.Aliases.RichText;
 
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         => typeof(IHtmlEncodedString);
 
-    // PropertyCacheLevel.Content is ok here because that converter does not parse {locallink} nor executes macros
+    // PropertyCacheLevel.Content is ok here because that converter does not parse {locallink}
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
@@ -30,10 +30,4 @@ public class SimpleTinyMceValueConverter : PropertyValueConverterBase
 
         // source should come from ConvertSource and be a string (or null) already
         new HtmlEncodedString(inter == null ? string.Empty : (string)inter);
-
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview) =>
-
-        // source should come from ConvertSource and be a string (or null) already
-        inter;
 }

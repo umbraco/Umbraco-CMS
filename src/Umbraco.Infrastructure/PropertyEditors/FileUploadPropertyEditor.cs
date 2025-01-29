@@ -2,10 +2,8 @@
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
@@ -18,10 +16,6 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 
 [DataEditor(
     Constants.PropertyEditors.Aliases.UploadField,
-    "File upload",
-    "fileupload",
-    Group = Constants.PropertyEditors.Groups.Media,
-    Icon = "icon-download-alt",
     ValueEditorIsReusable = true)]
 public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     INotificationHandler<ContentCopiedNotification>, INotificationHandler<ContentDeletedNotification>,
@@ -30,52 +24,24 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
 {
     private readonly IContentService _contentService;
     private readonly IOptionsMonitor<ContentSettings> _contentSettings;
-    private readonly IEditorConfigurationParser _editorConfigurationParser;
     private readonly IIOHelper _ioHelper;
-    private readonly ILocalizedTextService _localizedTextService;
     private readonly MediaFileManager _mediaFileManager;
     private readonly UploadAutoFillProperties _uploadAutoFillProperties;
 
-    // Scheduled for removal in v12
-    [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
     public FileUploadPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         MediaFileManager mediaFileManager,
         IOptionsMonitor<ContentSettings> contentSettings,
-        ILocalizedTextService localizedTextService,
         UploadAutoFillProperties uploadAutoFillProperties,
         IContentService contentService,
         IIOHelper ioHelper)
-        : this(
-            dataValueEditorFactory,
-            mediaFileManager,
-            contentSettings,
-            localizedTextService,
-            uploadAutoFillProperties,
-            contentService,
-            ioHelper,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-    {
-    }
-
-    public FileUploadPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        MediaFileManager mediaFileManager,
-        IOptionsMonitor<ContentSettings> contentSettings,
-        ILocalizedTextService localizedTextService,
-        UploadAutoFillProperties uploadAutoFillProperties,
-        IContentService contentService,
-        IIOHelper ioHelper,
-        IEditorConfigurationParser editorConfigurationParser)
         : base(dataValueEditorFactory)
     {
         _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
         _contentSettings = contentSettings;
-        _localizedTextService = localizedTextService;
         _uploadAutoFillProperties = uploadAutoFillProperties;
         _contentService = contentService;
         _ioHelper = ioHelper;
-        _editorConfigurationParser = editorConfigurationParser;
         SupportsReadOnly = true;
     }
 
@@ -142,18 +108,14 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
 
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new FileUploadConfigurationEditor(_ioHelper, _editorConfigurationParser);
+        new FileUploadConfigurationEditor(_ioHelper);
 
     /// <summary>
     ///     Creates the corresponding property value editor.
     /// </summary>
     /// <returns>The corresponding property value editor.</returns>
     protected override IDataValueEditor CreateValueEditor()
-    {
-        FileUploadPropertyValueEditor editor = DataValueEditorFactory.Create<FileUploadPropertyValueEditor>(Attribute!);
-        editor.Validators.Add(new UploadFileTypeValidator(_localizedTextService, _contentSettings));
-        return editor;
-    }
+        => DataValueEditorFactory.Create<FileUploadPropertyValueEditor>(Attribute!);
 
     /// <summary>
     ///     Gets a value indicating whether a property is an upload field.

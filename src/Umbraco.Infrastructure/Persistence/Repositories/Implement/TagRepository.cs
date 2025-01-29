@@ -175,7 +175,8 @@ WHERE r.tagId IS NULL";
 
     /// <inheritdoc />
     public void RemoveAll(int contentId) =>
-        Database.Execute("DELETE FROM cmsTagRelationship WHERE nodeId = @nodeId",
+        Database.Execute(
+            "DELETE FROM cmsTagRelationship WHERE nodeId = @nodeId",
             new {nodeId = contentId});
 
     // this is a clever way to produce an SQL statement like this:
@@ -336,7 +337,8 @@ WHERE r.tagId IS NULL";
     {
         Sql<ISqlContext> sql = Sql()
             .Select<TagRelationshipDto>(x => Alias(x.NodeId, "NodeId"))
-            .AndSelect<PropertyTypeDto>(x => Alias(x.Alias, "PropertyTypeAlias"),
+            .AndSelect<PropertyTypeDto>(
+            x => Alias(x.Alias, "PropertyTypeAlias"),
                 x => Alias(x.Id, "PropertyTypeId"))
             .AndSelect<TagDto>(x => Alias(x.Id, "TagId"), x => Alias(x.Text, "TagText"),
                 x => Alias(x.Group, "TagGroup"), x => Alias(x.LanguageId, "TagLanguage"))

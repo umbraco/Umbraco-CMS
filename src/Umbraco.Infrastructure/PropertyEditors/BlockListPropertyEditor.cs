@@ -1,10 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -13,59 +13,57 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.BlockList,
-    "Block List",
-    "blocklist",
     ValueType = ValueTypes.Json,
-    Group = Constants.PropertyEditors.Groups.Lists,
-    Icon = "icon-thumbnail-list",
     ValueEditorIsReusable = false)]
-public class BlockListPropertyEditor : BlockEditorPropertyEditor
+public class BlockListPropertyEditor : BlockListPropertyEditorBase
 {
-    private readonly IEditorConfigurationParser _editorConfigurationParser;
     private readonly IIOHelper _ioHelper;
 
-    // Scheduled for removal in v12
-    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 13.")]
     public BlockListPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
-        PropertyEditorCollection propertyEditors,
-        IIOHelper ioHelper)
-        : this(dataValueEditorFactory, propertyEditors, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-    {
-    }
+        IIOHelper ioHelper,
+        IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory,
+        IJsonSerializer jsonSerializer)
+        : base(dataValueEditorFactory, blockValuePropertyIndexValueFactory, jsonSerializer)
+        => _ioHelper = ioHelper;
 
-    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 13.")]
+    [Obsolete("Use constructor that doesn't take PropertyEditorCollection, scheduled for removal in V15")]
     public BlockListPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         PropertyEditorCollection propertyEditors,
         IIOHelper ioHelper,
-        IEditorConfigurationParser editorConfigurationParser)
-        : this(
-            dataValueEditorFactory,
-            propertyEditors,
-            ioHelper,
-            editorConfigurationParser,
-            StaticServiceProvider.Instance.GetRequiredService<IBlockValuePropertyIndexValueFactory>())
+        IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory,
+        IJsonSerializer jsonSerializer)
+        : this(dataValueEditorFactory, ioHelper, blockValuePropertyIndexValueFactory, jsonSerializer)
     {
-
     }
 
-    public BlockListPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        PropertyEditorCollection propertyEditors,
-        IIOHelper ioHelper,
-        IEditorConfigurationParser editorConfigurationParser,
-        IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
-        : base(dataValueEditorFactory, propertyEditors, blockValuePropertyIndexValueFactory)
+    public override bool SupportsConfigurableElements => true;
+
+    /// <inheritdoc />
+    public override bool CanMergePartialPropertyValues(IPropertyType propertyType) => propertyType.VariesByCulture() is false;
+
+    /// <inheritdoc />
+    public override object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture)
     {
-        _ioHelper = ioHelper;
-        _editorConfigurationParser = editorConfigurationParser;
+        var valueEditor = (BlockListEditorPropertyValueEditor)GetValueEditor();
+        return valueEditor.MergePartialPropertyValueForCulture(sourceValue, targetValue, culture);
+    }
+
+    public override object? MergeVariantInvariantPropertyValue(
+        object? sourceValue,
+        object? targetValue,
+        bool canUpdateInvariantData,
+        HashSet<string> allowedCultures)
+    {
+        var valueEditor = (BlockListEditorPropertyValueEditor)GetValueEditor();
+        return valueEditor.MergeVariantInvariantPropertyValue(sourceValue, targetValue, canUpdateInvariantData, allowedCultures);
     }
 
     #region Pre Value Editor
 
     protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new BlockListConfigurationEditor(_ioHelper, _editorConfigurationParser);
+        new BlockListConfigurationEditor(_ioHelper);
 
     #endregion
 }

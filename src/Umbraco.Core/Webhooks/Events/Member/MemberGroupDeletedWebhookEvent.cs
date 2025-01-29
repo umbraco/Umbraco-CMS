@@ -18,7 +18,7 @@ public class MemberGroupDeletedWebhookEvent : WebhookEventBase<MemberGroupDelete
     {
     }
 
-    public override string Alias => "memberGroupDeleted";
+    public override string Alias => Constants.WebhookEvents.Aliases.MemberGroupDeleted;
 
     public override object? ConvertNotificationToRequestPayload(MemberGroupDeletedNotification notification)
         => notification.DeletedEntities;

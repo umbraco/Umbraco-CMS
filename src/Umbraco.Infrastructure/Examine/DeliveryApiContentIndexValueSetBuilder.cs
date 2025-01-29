@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -21,6 +22,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
     private readonly IDeliveryApiContentIndexFieldDefinitionBuilder _deliveryApiContentIndexFieldDefinitionBuilder;
     private readonly IMemberService _memberService;
     private readonly IDeliveryApiCompositeIdHandler _deliveryApiCompositeIdHandler;
+    private readonly ICoreScopeProvider _coreScopeProvider;
     private DeliveryApiSettings _deliveryApiSettings;
 
     [Obsolete("Please use ctor that takes an IDeliveryApiCompositeIdHandler. Scheduled for removal in v15")]
@@ -40,8 +42,33 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
         deliveryApiContentIndexFieldDefinitionBuilder,
         deliveryApiSettings,
         memberService,
-        StaticServiceProvider.Instance.GetRequiredService<IDeliveryApiCompositeIdHandler>())
+        StaticServiceProvider.Instance.GetRequiredService<IDeliveryApiCompositeIdHandler>(),
+        StaticServiceProvider.Instance.GetRequiredService<ICoreScopeProvider>()
+        )
     {
+    }
+    [Obsolete("Please use ctor that takes an IDeliveryApiCompositeIdHandler. Scheduled for removal in v15")]
+    public DeliveryApiContentIndexValueSetBuilder(
+        ContentIndexHandlerCollection contentIndexHandlerCollection,
+        IContentService contentService,
+        IPublicAccessService publicAccessService,
+        ILogger<DeliveryApiContentIndexValueSetBuilder> logger,
+        IDeliveryApiContentIndexFieldDefinitionBuilder deliveryApiContentIndexFieldDefinitionBuilder,
+        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings,
+        IMemberService memberService,
+        IDeliveryApiCompositeIdHandler deliveryApiCompositeIdHandle)
+     :this(
+         contentIndexHandlerCollection,
+         contentService,
+         publicAccessService,
+         logger,
+         deliveryApiContentIndexFieldDefinitionBuilder,
+         deliveryApiSettings,
+         memberService,
+         deliveryApiCompositeIdHandle,
+         StaticServiceProvider.Instance.GetRequiredService<ICoreScopeProvider>())
+    {
+
     }
 
     public DeliveryApiContentIndexValueSetBuilder(
@@ -52,7 +79,8 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
         IDeliveryApiContentIndexFieldDefinitionBuilder deliveryApiContentIndexFieldDefinitionBuilder,
         IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings,
         IMemberService memberService,
-        IDeliveryApiCompositeIdHandler deliveryApiCompositeIdHandler)
+        IDeliveryApiCompositeIdHandler deliveryApiCompositeIdHandler,
+        ICoreScopeProvider coreScopeProvider)
     {
         _contentIndexHandlerCollection = contentIndexHandlerCollection;
         _publicAccessService = publicAccessService;
@@ -60,6 +88,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
         _deliveryApiContentIndexFieldDefinitionBuilder = deliveryApiContentIndexFieldDefinitionBuilder;
         _memberService = memberService;
         _deliveryApiCompositeIdHandler = deliveryApiCompositeIdHandler;
+        _coreScopeProvider = coreScopeProvider;
         _contentService = contentService;
         _deliveryApiSettings = deliveryApiSettings.CurrentValue;
         deliveryApiSettings.OnChange(settings => _deliveryApiSettings = settings);
@@ -68,6 +97,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
     /// <inheritdoc />
     public IEnumerable<ValueSet> GetValueSets(params IContent[] contents)
     {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         FieldDefinitionCollection fieldDefinitions = _deliveryApiContentIndexFieldDefinitionBuilder.Build();
         foreach (IContent content in contents.Where(CanIndex))
         {
@@ -76,7 +106,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
 
             foreach (var culture in availableCultures)
             {
-                var indexCulture = culture ?? "none";
+                var indexCulture = culture?.ToLowerInvariant() ?? "none";
                 var isPublished = publishedCultures.Contains(culture);
 
                 // required index values go here
@@ -101,6 +131,8 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
 
                 yield return new ValueSet(_deliveryApiCompositeIdHandler.IndexId(content.Id, indexCulture), IndexTypes.Content, content.ContentType.Alias, indexValues);
             }
+
+            scope.Complete();
         }
     }
 

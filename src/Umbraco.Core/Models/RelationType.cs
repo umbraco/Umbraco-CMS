@@ -22,7 +22,8 @@ public class RelationType : EntityBase, IRelationTypeWithIsDependency
     {
     }
 
-        public RelationType(string? name, string? alias, bool isBidrectional, Guid? parentObjectType, Guid? childObjectType, bool isDependency){
+    public RelationType(string? name, string? alias, bool isBidrectional, Guid? parentObjectType, Guid? childObjectType, bool isDependency, Guid? key = null)
+    {
         if (name == null)
         {
             throw new ArgumentNullException(nameof(name));
@@ -45,6 +46,11 @@ public class RelationType : EntityBase, IRelationTypeWithIsDependency
             throw new ArgumentException(
                 "Value can't be empty or consist only of white-space characters.",
                 nameof(alias));
+        }
+
+        if (key.HasValue)
+        {
+            Key = key.Value;
         }
 
         _name = name;

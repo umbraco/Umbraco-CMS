@@ -40,9 +40,9 @@ public interface IUser : IMembershipUser, IRememberBeingDirty
     string? Avatar { get; set; }
 
     /// <summary>
-    ///     A Json blob stored for recording tour data for a user
+    ///     The type of user.
     /// </summary>
-    string? TourData { get; set; }
+    UserKind Kind { get; set; }
 
     void RemoveGroup(string group);
 

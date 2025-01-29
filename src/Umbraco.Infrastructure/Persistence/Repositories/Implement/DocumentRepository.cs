@@ -97,13 +97,11 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     protected virtual bool EnsureUniqueNaming { get; } = true;
 
     // note: is ok to 'new' the repo here as it's a sub-repo really
-    private PermissionRepository<IContent> PermissionRepository => _permissionRepository
-                                                                   ?? (_permissionRepository =
+    private PermissionRepository<IContent> PermissionRepository => _permissionRepository ??=
                                                                        new PermissionRepository<IContent>(
-                                                                           _scopeAccessor, _appCaches,
-                                                                           _loggerFactory
-                                                                               .CreateLogger<
-                                                                                   PermissionRepository<IContent>>()));
+                                                                           _scopeAccessor,
+                                                                           _appCaches,
+                                                                           _loggerFactory.CreateLogger<PermissionRepository<IContent>>());
 
     /// <inheritdoc />
     public ContentScheduleCollection GetContentSchedule(int contentId)
@@ -117,8 +115,9 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
         foreach (ContentScheduleDto? scheduleDto in scheduleDtos)
         {
-            result.Add(new ContentSchedule(scheduleDto.Id,
-                LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? string.Empty,
+            result.Add(new ContentSchedule(
+                scheduleDto.Id,
+                LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? Constants.System.InvariantCulture,
                 scheduleDto.Date,
                 scheduleDto.Action == ContentScheduleAction.Release.ToString()
                     ? ContentScheduleAction.Release
@@ -136,7 +135,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         {
             Sql<ISqlContext> joins = Sql()
                 .InnerJoin<UserDto>("updaterUser")
-                .On<ContentVersionDto, UserDto>((version, user) => version.UserId == user.Id,
+                .On<ContentVersionDto, UserDto>(
+                (version, user) => version.UserId == user.Id,
                     aliasRight: "updaterUser");
 
             // see notes in ApplyOrdering: the field MUST be selected + aliased
@@ -166,13 +166,17 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                     (content, contentType) => content.ContentTypeId == contentType.NodeId, aliasRight: "ctype")
                 // left join on optional culture variation
                 //the magic "[[[ISOCODE]]]" parameter value will be replaced in ContentRepositoryBase.GetPage() by the actual ISO code
-                .LeftJoin<ContentVersionCultureVariationDto>(nested =>
-                        nested.InnerJoin<LanguageDto>("langp").On<ContentVersionCultureVariationDto, LanguageDto>(
-                            (ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == "[[[ISOCODE]]]", "ccvp",
+                .LeftJoin<ContentVersionCultureVariationDto>(
+                    nested => nested.InnerJoin<LanguageDto>("langp")
+                    .On<ContentVersionCultureVariationDto, LanguageDto>(
+                            (ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == "[[[ISOCODE]]]",
+                            "ccvp",
                             "langp"),
                     "ccvp")
-                .On<ContentVersionDto, ContentVersionCultureVariationDto>((version, ccv) => version.Id == ccv.VersionId,
-                    "pcv", "ccvp");
+                .On<ContentVersionDto, ContentVersionCultureVariationDto>(
+                (version, ccv) => version.Id == ccv.VersionId,
+                    "pcv",
+                    "ccvp");
 
             sql = InsertJoins(sql, joins);
 
@@ -192,7 +196,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         return base.ApplySystemOrdering(ref sql, ordering);
     }
 
-    private IEnumerable<IContent> MapDtosToContent(List<DocumentDto> dtos,
+    private IEnumerable<IContent> MapDtosToContent(
+        List<DocumentDto> dtos,
         bool withCache = false,
         bool loadProperties = true,
         bool loadTemplates = true,
@@ -361,7 +366,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             var publishedVersionId = dto.PublishedVersionDto?.Id ?? 0;
 
             var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType);
-            var ltemp = new List<TempContent<Content>> {temp};
+            var ltemp = new List<TempContent<Content>> { temp };
             IDictionary<int, PropertyCollection> properties = GetPropertyCollections(ltemp);
             content.Properties = properties[dto.DocumentVersionDto.Id];
 
@@ -399,8 +404,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             }
         }
 
-        if (content.PublishedVersionId > 0 &&
-            contentVariations.TryGetValue(content.PublishedVersionId, out contentVariation))
+        if (content.PublishedState is PublishedState.Published && content.PublishedVersionId > 0 && contentVariations.TryGetValue(content.PublishedVersionId, out contentVariation))
         {
             foreach (ContentVariation v in contentVariation)
             {
@@ -451,7 +455,9 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
             variation.Add(new ContentVariation
             {
-                Culture = LanguageRepository.GetIsoCodeById(dto.LanguageId), Name = dto.Name, Date = dto.UpdateDate
+                Culture = LanguageRepository.GetIsoCodeById(dto.LanguageId),
+                Name = dto.Name,
+                Date = dto.UpdateDate
             });
         }
 
@@ -463,12 +469,13 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     {
         IEnumerable<int> ids = temps.Select(x => x.Id);
 
-        IEnumerable<DocumentCultureVariationDto> dtos = Database.FetchByGroups<DocumentCultureVariationDto, int>(ids,
-            Constants.Sql.MaxParameterCount, batch =>
-                Sql()
-                    .Select<DocumentCultureVariationDto>()
-                    .From<DocumentCultureVariationDto>()
-                    .WhereIn<DocumentCultureVariationDto>(x => x.NodeId, batch));
+        IEnumerable<DocumentCultureVariationDto> dtos = Database.FetchByGroups<DocumentCultureVariationDto, int>(
+            ids,
+            Constants.Sql.MaxParameterCount,
+            batch => Sql()
+                        .Select<DocumentCultureVariationDto>()
+                        .From<DocumentCultureVariationDto>()
+                        .WhereIn<DocumentCultureVariationDto>(x => x.NodeId, batch));
 
         var variations = new Dictionary<int, List<DocumentVariation>>();
 
@@ -481,7 +488,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
             variation.Add(new DocumentVariation
             {
-                Culture = LanguageRepository.GetIsoCodeById(dto.LanguageId), Edited = dto.Edited
+                Culture = LanguageRepository.GetIsoCodeById(dto.LanguageId),
+                Edited = dto.Edited
             });
         }
 
@@ -538,7 +546,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         }
     }
 
-    private IEnumerable<DocumentCultureVariationDto> GetDocumentVariationDtos(IContent content,
+    private IEnumerable<DocumentCultureVariationDto> GetDocumentVariationDtos(
+        IContent content,
         HashSet<string> editedCultures)
     {
         IEnumerable<string>
@@ -670,20 +679,27 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
 
             // left join on optional published version
-            .LeftJoin<ContentVersionDto>(nested =>
-                nested.InnerJoin<DocumentVersionDto>("pdv")
-                    .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published,
-                        "pcv", "pdv"), "pcv")
-            .On<DocumentDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcv")
+            .LeftJoin<ContentVersionDto>(
+                nested => nested.InnerJoin<DocumentVersionDto>("pdv")
+                    .On<ContentVersionDto, DocumentVersionDto>(
+                        (left, right) => left.Id == right.Id && right.Published,
+                            "pcv",
+                            "pdv"),
+                        "pcv")
+            .On<DocumentDto, ContentVersionDto>(
+                (left, right) => left.NodeId == right.NodeId,
+                aliasRight: "pcv")
 
             // TODO: should we be joining this when the query type is not single/many?
             // left join on optional culture variation
             //the magic "[[[ISOCODE]]]" parameter value will be replaced in ContentRepositoryBase.GetPage() by the actual ISO code
-            .LeftJoin<ContentVersionCultureVariationDto>(nested =>
-                nested.InnerJoin<LanguageDto>("lang").On<ContentVersionCultureVariationDto, LanguageDto>(
-                    (ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == "[[[ISOCODE]]]", "ccv", "lang"), "ccv")
-            .On<ContentVersionDto, ContentVersionCultureVariationDto>((version, ccv) => version.Id == ccv.VersionId,
-                aliasRight: "ccv");
+            .LeftJoin<ContentVersionCultureVariationDto>(
+                nested => nested.InnerJoin<LanguageDto>("lang")
+                .On<ContentVersionCultureVariationDto, LanguageDto>(
+                        (ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == "[[[ISOCODE]]]", "ccv", "lang"), "ccv")
+                .On<ContentVersionDto, ContentVersionCultureVariationDto>(
+                        (version, ccv) => version.Id == ccv.VersionId,
+                    aliasRight: "ccv");
 
         sql
             .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
@@ -718,8 +734,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             " WHERE contentKey IN (SELECT uniqueId FROM " + Constants.DatabaseSchema.Tables.Node +
             " WHERE id = @id)",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2Node + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2GranularPermission + " WHERE uniqueId IN (SELECT uniqueId FROM umbracoNode WHERE id = @id)",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
             "UPDATE " + Constants.DatabaseSchema.Tables.UserGroup +
             " SET startContentId = NULL WHERE startContentId = @id",
@@ -744,7 +759,10 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             "DELETE FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE nodeId = @id",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE loginNodeId = @id",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE noAccessNodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id"
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentUrl + " WHERE uniqueId IN (SELECT uniqueId FROM " + Constants.DatabaseSchema.Tables.Node +
+            " WHERE id = @id)",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id",
+
         };
         return list;
     }
@@ -813,10 +831,9 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 .From<ContentVersionDto>()
                 .InnerJoin<DocumentVersionDto>()
                 .On<ContentVersionDto, DocumentVersionDto>((c, d) => c.Id == d.Id)
-                .Where<ContentVersionDto>(x => x.Id == SqlTemplate.Arg<int>("versionId"))
-        );
+                .Where<ContentVersionDto>(x => x.Id == SqlTemplate.Arg<int>("versionId")));
         DocumentVersionDto? versionDto =
-            Database.Fetch<DocumentVersionDto>(template.Sql(new {versionId})).FirstOrDefault();
+            Database.Fetch<DocumentVersionDto>(template.Sql(new { versionId })).FirstOrDefault();
 
         // nothing to delete
         if (versionDto == null)
@@ -852,10 +869,9 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 .Where<ContentVersionDto>(x =>
                     x.NodeId == SqlTemplate.Arg<int>("nodeId") && !x.Current &&
                     x.VersionDate < SqlTemplate.Arg<DateTime>("versionDate"))
-                .Where<DocumentVersionDto>(x => !x.Published)
-        );
+                .Where<DocumentVersionDto>(x => !x.Published));
         List<ContentVersionDto>? versionDtos =
-            Database.Fetch<ContentVersionDto>(template.Sql(new {nodeId, versionDate}));
+            Database.Fetch<ContentVersionDto>(template.Sql(new { nodeId, versionDate }));
         foreach (ContentVersionDto? versionDto in versionDtos)
         {
             PerformDeleteVersion(versionDto.NodeId, versionDto.Id);
@@ -864,10 +880,10 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
     protected override void PerformDeleteVersion(int id, int versionId)
     {
-        Database.Delete<PropertyDataDto>("WHERE versionId = @versionId", new {versionId});
-        Database.Delete<ContentVersionCultureVariationDto>("WHERE versionId = @versionId", new {versionId});
-        Database.Delete<DocumentVersionDto>("WHERE id = @versionId", new {versionId});
-        Database.Delete<ContentVersionDto>("WHERE id = @versionId", new {versionId});
+        Database.Delete<PropertyDataDto>("WHERE versionId = @versionId", new { versionId });
+        Database.Delete<ContentVersionCultureVariationDto>("WHERE versionId = @versionId", new { versionId });
+        Database.Delete<DocumentVersionDto>("WHERE id = @versionId", new { versionId });
+        Database.Delete<ContentVersionDto>("WHERE id = @versionId", new { versionId });
     }
 
     #endregion
@@ -900,9 +916,10 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         NodeDto parent = GetParentNodeDto(entity.ParentId);
         var level = parent.Level + 1;
 
-        var sortOrderExists = SortorderExists(entity.ParentId, entity.SortOrder);
+        var calculateSortOrder = (entity is { HasIdentity: false, SortOrder: 0 } && entity.IsPropertyDirty(nameof(entity.SortOrder)) is false) // SortOrder was not updated from it's default value
+                                 || SortorderExists(entity.ParentId, entity.SortOrder);
         // if the sortorder of the entity already exists get a new one, else use the sortOrder of the entity
-        var sortOrder = sortOrderExists ? GetNewChildSortOrder(entity.ParentId, 0) : entity.SortOrder;
+        var sortOrder = calculateSortOrder ? GetNewChildSortOrder(entity.ParentId, 0) : entity.SortOrder;
 
         // persist the node dto
         NodeDto nodeDto = dto.ContentDto.NodeDto;
@@ -970,8 +987,13 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         }
 
         // persist the property data
-        IEnumerable<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations,
-            entity.VersionId, entity.PublishedVersionId, entity.Properties, LanguageRepository, out var edited,
+        IEnumerable<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildDtos(
+            entity.ContentType.Variations,
+            entity.VersionId,
+            entity.PublishedVersionId,
+            entity.Properties,
+            LanguageRepository,
+            out var edited,
             out HashSet<string>? editedCultures);
         foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
         {
@@ -1344,16 +1366,16 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             .WhereNotIn<ContentScheduleDto>(x => x.Id, ids));
 
         //add/update the rest
-        foreach ((ContentSchedule Model, ContentScheduleDto Dto) schedule in schedules)
+        foreach ((ContentSchedule model, ContentScheduleDto dto) in schedules)
         {
-            if (schedule.Model.Id == Guid.Empty)
+            if (model.Id == Guid.Empty)
             {
-                schedule.Model.Id = schedule.Dto.Id = Guid.NewGuid();
-                Database.Insert(schedule.Dto);
+                model.Id = dto.Id = Guid.NewGuid();
+                Database.Insert(dto);
             }
             else
             {
-                Database.Update(schedule.Dto);
+                Database.Update(dto);
             }
         }
     }
@@ -1420,7 +1442,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     /// <param name="entity"></param>
     /// <param name="permission"></param>
     /// <param name="groupIds"></param>
-    public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> groupIds) =>
+    public void AssignEntityPermission(IContent entity, string permission, IEnumerable<int> groupIds) =>
         PermissionRepository.AssignEntityPermission(entity, permission, groupIds);
 
     public EntityPermissionCollection GetPermissionsForEntity(int entityId) =>
@@ -1433,9 +1455,13 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     public void AddOrUpdatePermissions(ContentPermissionSet permission) => PermissionRepository.Save(permission);
 
     /// <inheritdoc />
-    public override IEnumerable<IContent> GetPage(IQuery<IContent>? query,
-        long pageIndex, int pageSize, out long totalRecords,
-        IQuery<IContent>? filter, Ordering? ordering)
+    public override IEnumerable<IContent> GetPage(
+        IQuery<IContent>? query,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        IQuery<IContent>? filter,
+        Ordering? ordering)
     {
         Sql<ISqlContext>? filterSql = null;
 
@@ -1603,7 +1629,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
     private Sql GetSqlForHasScheduling(ContentScheduleAction action, DateTime date)
     {
-        SqlTemplate template = SqlContext.Templates.Get("Umbraco.Core.DocumentRepository.GetSqlForHasScheduling",
+        SqlTemplate template = SqlContext.Templates.Get(
+            "Umbraco.Core.DocumentRepository.GetSqlForHasScheduling",
             tsql => tsql
                 .SelectCount()
                 .From<ContentScheduleDto>()
@@ -1773,7 +1800,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
             // get a unique name
             IEnumerable<SimilarNodeName> otherNames =
-                cultureNames.Select(x => new SimilarNodeName {Id = x.Id, Name = x.Name});
+                cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name });
             var uniqueName = SimilarNodeName.GetUniqueName(otherNames, 0, cultureInfo.Name);
 
             if (uniqueName == content.GetCultureName(cultureInfo.Culture))

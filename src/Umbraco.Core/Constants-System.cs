@@ -19,9 +19,19 @@ public static partial class Constants
         public const string RootString = "-1";
 
         /// <summary>
+        ///     The GUID identifier for global system root node.
+        /// </summary>
+        public static readonly Guid? RootKey = null;
+
+        /// <summary>
         ///     The integer identifier for content's recycle bin.
         /// </summary>
         public const int RecycleBinContent = -20;
+
+        /// <summary>
+        ///     The GUId identifier for content's recycle bin.
+        /// </summary>
+        public static readonly Guid RecycleBinContentKey = new("0F582A79-1E41-4CF0-BFA0-76340651891A");
 
         /// <summary>
         ///     The string identifier for content's recycle bin.
@@ -42,6 +52,11 @@ public static partial class Constants
         ///     The integer identifier for media's recycle bin.
         /// </summary>
         public const int RecycleBinMedia = -21;
+
+        /// <summary>
+        /// The GUID identifier for media's recycle bin.
+        /// </summary>
+        public static readonly Guid RecycleBinMediaKey = new("BF7C7CBC-952F-4518-97A2-69E9C7B33842");
 
         /// <summary>
         ///     The string identifier for media's recycle bin.
@@ -74,5 +89,7 @@ public static partial class Constants
         /// The DataDirectory placeholder.
         /// </summary>
         public const string DataDirectoryPlaceholder = "|DataDirectory|";
+
+        public const string InvariantCulture = "*";
     }
 }

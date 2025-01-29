@@ -1,12 +1,8 @@
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
-using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Media;
-using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Sections;
 using Umbraco.Cms.Core.Webhooks;
 
 namespace Umbraco.Cms.Core.DependencyInjection;
@@ -25,25 +21,9 @@ public static partial class UmbracoBuilderExtensions
     /// The builder.
     /// </returns>
     public static IUmbracoBuilder AddComponent<T>(this IUmbracoBuilder builder)
-        where T : IComponent
+        where T : IAsyncComponent
     {
         builder.Components().Append<T>();
-
-        return builder;
-    }
-
-    /// <summary>
-    /// Register a content app.
-    /// </summary>
-    /// <typeparam name="T">The type of the content app.</typeparam>
-    /// <param name="builder">The builder.</param>
-    /// <returns>
-    /// The builder.
-    /// </returns>
-    public static IUmbracoBuilder AddContentApp<T>(this IUmbracoBuilder builder)
-        where T : IContentAppFactory
-    {
-        builder.ContentApps().Append<T>();
 
         return builder;
     }
@@ -60,38 +40,6 @@ public static partial class UmbracoBuilderExtensions
         where T : IContentFinder
     {
         builder.ContentFinders().Append<T>();
-
-        return builder;
-    }
-
-    /// <summary>
-    /// Register a dashboard.
-    /// </summary>
-    /// <typeparam name="T">The type of the dashboard.</typeparam>
-    /// <param name="builder">The builder.</param>
-    /// <returns>
-    /// The builder.
-    /// </returns>
-    public static IUmbracoBuilder AddDashboard<T>(this IUmbracoBuilder builder)
-        where T : IDashboard
-    {
-        builder.Dashboards().Add<T>();
-
-        return builder;
-    }
-
-    /// <summary>
-    /// Register a manifest filter.
-    /// </summary>
-    /// <typeparam name="T">The type of the manifest filter.</typeparam>
-    /// <param name="builder">The Builder.</param>
-    /// <returns>
-    /// The builder.
-    /// </returns>
-    public static IUmbracoBuilder AddManifestFilter<T>(this IUmbracoBuilder builder)
-        where T : IManifestFilter
-    {
-        builder.ManifestFilters().Append<T>();
 
         return builder;
     }
@@ -128,21 +76,6 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
-    /// <summary>
-    /// Register a section.
-    /// </summary>
-    /// <typeparam name="T">The type of the section.</typeparam>
-    /// <param name="builder">The builder.</param>
-    /// <returns>
-    /// The builder.
-    /// </returns>
-    public static IUmbracoBuilder AddSection<T>(this IUmbracoBuilder builder)
-        where T : ISection
-    {
-        builder.Sections().Append<T>();
-
-        return builder;
-    }
 
     /// <summary>
     /// Register a URL provider.

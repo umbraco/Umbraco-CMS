@@ -18,6 +18,7 @@ public class WebRoutingSettings
     internal const bool StaticDisableAlternativeTemplates = false;
     internal const bool StaticValidateAlternativeTemplates = false;
     internal const bool StaticDisableFindContentByIdPath = false;
+    internal const bool StaticDisableFindContentByIdentifierPath = false;
     internal const bool StaticDisableRedirectUrlTracking = false;
     internal const string StaticUrlProviderMode = "Auto";
 
@@ -59,12 +60,8 @@ public class WebRoutingSettings
     [DefaultValue(StaticValidateAlternativeTemplates)]
     public bool ValidateAlternativeTemplates { get; set; } = StaticValidateAlternativeTemplates;
 
-    /// <summary>
-    ///     Gets or sets a value indicating whether find content ID by path is disabled.
-    /// </summary>
-    [DefaultValue(StaticDisableFindContentByIdPath)]
-    public bool DisableFindContentByIdPath { get; set; } = StaticDisableFindContentByIdPath;
-
+    [DefaultValue(StaticDisableFindContentByIdentifierPath)]
+    public bool DisableFindContentByIdentifierPath { get; set; } = StaticDisableFindContentByIdentifierPath;
     /// <summary>
     ///     Gets or sets a value indicating whether redirect URL tracking is disabled.
     /// </summary>

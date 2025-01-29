@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
@@ -11,8 +10,6 @@ using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -22,49 +19,31 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IProfilingLogger _proflog;
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IApiContentNameProvider _apiContentNameProvider;
     private readonly IApiMediaUrlProvider _apiMediaUrlProvider;
     private readonly IApiContentRouteBuilder _apiContentRouteBuilder;
-
-    [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
-    public MultiUrlPickerValueConverter(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IProfilingLogger proflog,
-        IJsonSerializer jsonSerializer,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IPublishedUrlProvider publishedUrlProvider)
-        : this(
-            publishedSnapshotAccessor,
-            proflog,
-            jsonSerializer,
-            umbracoContextAccessor,
-            publishedUrlProvider,
-            StaticServiceProvider.Instance.GetRequiredService<IApiContentNameProvider>(),
-            StaticServiceProvider.Instance.GetRequiredService<IApiMediaUrlProvider>(),
-            StaticServiceProvider.Instance.GetRequiredService<IApiContentRouteBuilder>())
-    {
-    }
+    private readonly IPublishedContentCache _contentCache;
+    private readonly IPublishedMediaCache _mediaCache;
 
     public MultiUrlPickerValueConverter(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IProfilingLogger proflog,
         IJsonSerializer jsonSerializer,
-        IUmbracoContextAccessor umbracoContextAccessor,
         IPublishedUrlProvider publishedUrlProvider,
         IApiContentNameProvider apiContentNameProvider,
         IApiMediaUrlProvider apiMediaUrlProvider,
-        IApiContentRouteBuilder apiContentRouteBuilder)
+        IApiContentRouteBuilder apiContentRouteBuilder,
+        IPublishedContentCache contentCache,
+        IPublishedMediaCache mediaCache)
     {
-        _publishedSnapshotAccessor = publishedSnapshotAccessor ??
-                                     throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
         _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
         _jsonSerializer = jsonSerializer;
         _publishedUrlProvider = publishedUrlProvider;
         _apiContentNameProvider = apiContentNameProvider;
         _apiMediaUrlProvider = apiMediaUrlProvider;
         _apiContentRouteBuilder = apiContentRouteBuilder;
+        _contentCache = contentCache;
+        _mediaCache = mediaCache;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
@@ -97,7 +76,6 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
 
             var links = new List<Link>();
             IEnumerable<MultiUrlPickerValueEditor.LinkDto>? dtos = ParseLinkDtos(inter.ToString()!);
-            IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             if (dtos is null)
             {
                 return links;
@@ -115,8 +93,8 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
                         : LinkType.Content;
 
                     IPublishedContent? content = type == LinkType.Media
-                        ? publishedSnapshot.Media?.GetById(preview, dto.Udi.Guid)
-                        : publishedSnapshot.Content?.GetById(preview, dto.Udi.Guid);
+                        ? _mediaCache.GetById(preview, dto.Udi.Guid)
+                        : _contentCache.GetById(preview, dto.Udi.Guid);
 
                     if (content == null || content.ContentType.ItemType == PublishedItemType.Element)
                     {
@@ -170,14 +148,12 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
             return DefaultValue();
         }
 
-        IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-
         ApiLink? ToLink(MultiUrlPickerValueEditor.LinkDto item)
         {
             switch (item.Udi?.EntityType)
             {
                 case Constants.UdiEntityType.Document:
-                    IPublishedContent? content = publishedSnapshot.Content?.GetById(item.Udi.Guid);
+                    IPublishedContent? content = _contentCache.GetById(item.Udi.Guid);
                     IApiContentRoute? route = content != null
                         ? _apiContentRouteBuilder.Build(content)
                         : null;
@@ -191,7 +167,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
                             content.ContentType.Alias,
                             route);
                 case Constants.UdiEntityType.Media:
-                    IPublishedContent? media = publishedSnapshot.Media?.GetById(item.Udi.Guid);
+                    IPublishedContent? media = _mediaCache.GetById(item.Udi.Guid);
                     return media == null
                         ? null
                         : ApiLink.Media(

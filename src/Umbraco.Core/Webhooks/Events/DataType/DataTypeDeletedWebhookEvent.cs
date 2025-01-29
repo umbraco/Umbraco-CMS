@@ -18,7 +18,7 @@ public class DataTypeDeletedWebhookEvent : WebhookEventBase<DataTypeSavedNotific
     {
     }
 
-    public override string Alias => "dataTypeDeleted";
+    public override string Alias => Constants.WebhookEvents.Aliases.DataTypeDeleted;
 
     public override object? ConvertNotificationToRequestPayload(DataTypeSavedNotification notification)
         => notification.SavedEntities;

@@ -311,7 +311,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     continue; // not implementing IDataValueTags, continue
                 }
 
-                object? configuration = DataTypeService.GetDataType(property.PropertyType.DataTypeId)?.Configuration;
+                object? configurationObject = DataTypeService.GetDataType(property.PropertyType.DataTypeId)?.ConfigurationObject;
 
                 if (property.PropertyType.VariesByCulture())
                 {
@@ -319,14 +319,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     foreach (IPropertyValue pvalue in property.Values)
                     {
                         var languageId = LanguageRepository.GetIdByIsoCode(pvalue.Culture);
-                        tags.AddRange(tagsProvider.GetTags(pvalue.EditedValue, configuration, languageId));
+                        tags.AddRange(tagsProvider.GetTags(pvalue.EditedValue, configurationObject, languageId));
                     }
 
                     tagRepo.Assign(entity.Id, property.PropertyTypeId, tags);
                 }
                 else
                 {
-                    IEnumerable<ITag> tags = tagsProvider.GetTags(property.GetValue(), configuration, null);
+                    IEnumerable<ITag> tags = tagsProvider.GetTags(property.GetValue(), configurationObject, null);
                     tagRepo.Assign(entity.Id, property.PropertyTypeId, tags);
                 }
             }
@@ -1082,19 +1082,23 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected void PersistRelations(TEntity entity)
         {
-            // Get all references from our core built in DataEditors/Property Editors
-            // Along with seeing if developers want to collect additional references from the DataValueReferenceFactories collection
+            // Get all references and automatic relation type aliases
             ISet<UmbracoEntityReference> references = _dataValueReferenceFactories.GetAllReferences(entity.Properties, PropertyEditors);
-
-            // First delete all auto-relations for this entity
-            ISet<string> automaticRelationTypeAliases = _dataValueReferenceFactories.GetAutomaticRelationTypesAliases(entity.Properties, PropertyEditors);
-            RelationRepository.DeleteByParent(entity.Id, automaticRelationTypeAliases.ToArray());
+            ISet<string> automaticRelationTypeAliases = _dataValueReferenceFactories.GetAllAutomaticRelationTypesAliases(PropertyEditors);
 
             if (references.Count == 0)
             {
+                // Delete all relations using the automatic relation type aliases
+                 RelationRepository.DeleteByParent(entity.Id, automaticRelationTypeAliases.ToArray());
+
                 // No need to add new references/relations
                 return;
             }
+
+            // Lookup all relation type IDs
+            var relationTypeLookup = RelationTypeRepository.GetMany(Array.Empty<int>())
+                .Where(x => automaticRelationTypeAliases.Contains(x.Alias))
+                .ToDictionary(x => x.Alias, x => x.Id);
 
             // Lookup node IDs for all GUID based UDIs
             IEnumerable<Guid> keys = references.Select(x => x.Udi).OfType<GuidUdi>().Select(x => x.Guid);
@@ -1106,15 +1110,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     .WhereIn<NodeDto>(x => x.UniqueId, guids);
             }).ToDictionary(x => x.UniqueId, x => x.NodeId);
 
-            // Lookup all relation type IDs
-            var relationTypeLookup = RelationTypeRepository.GetMany(Array.Empty<int>()).ToDictionary(x => x.Alias, x => x.Id);
-
             // Get all valid relations
-            var relations = new List<ReadOnlyRelation>(references.Count);
+            var relations = new List<(int ChildId, int RelationTypeId)>(references.Count);
             foreach (UmbracoEntityReference reference in references)
             {
-                if (!automaticRelationTypeAliases.Contains(reference.RelationTypeAlias))
+                if (string.IsNullOrEmpty(reference.RelationTypeAlias))
                 {
+                    // Reference does not specify a relation type alias, so skip adding a relation
+                    Logger.LogDebug("The reference to {Udi} does not specify a relation type alias, so it will not be saved as relation.", reference.Udi);
+                }
+                else if (!automaticRelationTypeAliases.Contains(reference.RelationTypeAlias))
+            {
                     // Returning a reference that doesn't use an automatic relation type is an issue that should be fixed in code
                     Logger.LogError("The reference to {Udi} uses a relation type {RelationTypeAlias} that is not an automatic relation type.", reference.Udi, reference.RelationTypeAlias);
                 }
@@ -1130,12 +1136,24 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 }
                 else
                 {
-                    relations.Add(new ReadOnlyRelation(entity.Id, id, relationTypeId));
+                    relations.Add((id, relationTypeId));
                 }
             }
 
-            // Save bulk relations
-            RelationRepository.SaveBulk(relations);
+            // Get all existing relations (optimize for adding new and keeping existing relations)
+            var query = Query<IRelation>().Where(x => x.ParentId == entity.Id).WhereIn(x => x.RelationTypeId, relationTypeLookup.Values);
+            var existingRelations = RelationRepository.GetPagedRelationsByQuery(query, 0, int.MaxValue, out _, null)
+                .ToDictionary(x => (x.ChildId, x.RelationTypeId)); // Relations are unique by parent ID, child ID and relation type ID
+
+            // Add relations that don't exist yet
+            var relationsToAdd = relations.Except(existingRelations.Keys).Select(x => new ReadOnlyRelation(entity.Id, x.ChildId, x.RelationTypeId));
+            RelationRepository.SaveBulk(relationsToAdd);
+
+            // Delete relations that don't exist anymore
+            foreach (IRelation relation in existingRelations.Where(x => !relations.Contains(x.Key)).Select(x => x.Value))
+            {
+                RelationRepository.Delete(relation);
+            }
         }
 
         /// <summary>
