@@ -29,11 +29,19 @@
             }
         });
 
-    
+
 
     function UmbPropertyController($scope, userService, serverValidationManager, udiService, angularHelper) {
 
         const vm = this;
+
+        const propertyLockedListener = $scope.$on("umb-property-editor-locked", function(event, value) {
+          vm.preview = value;
+        });
+
+        $scope.$on("$destroy", function () {
+          propertyLockedListener();
+        });
 
         vm.$onInit = onInit;
 
@@ -55,7 +63,7 @@
         // returns the validation path for the property to be used as the validation key for server side validation logic
         vm.getValidationPath = function () {
 
-            var parentValidationPath = vm.parentUmbProperty ? vm.parentUmbProperty.getValidationPath() : null;            
+            var parentValidationPath = vm.parentUmbProperty ? vm.parentUmbProperty.getValidationPath() : null;
             var propAlias = vm.propertyAlias ? vm.propertyAlias : vm.property.alias;
             // the elementKey will be empty when this is not a nested property
             var valPath = vm.elementKey ? vm.elementKey + "/" + propAlias : propAlias;
