@@ -69,7 +69,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         int pageSize,
         long pageIndex,
         out long totalFound,
-        string[]? contentTypeAliases = null,
+        string[]? contentTypeAliases,
         string? searchFrom = null,
         bool ignoreUserStartNodes = false)
     {

@@ -25,7 +25,7 @@ public interface IBackOfficeExamineSearcher
         int pageSize,
         long pageIndex,
         out long totalFound,
-        string[]? contentTypeAliases = null,
+        string[]? contentTypeAliases,
         string? searchFrom = null,
         bool ignoreUserStartNodes = false)
         => Search(query, entityType, pageSize, pageIndex, out totalFound, null, searchFrom, ignoreUserStartNodes);
