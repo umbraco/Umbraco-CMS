@@ -52,12 +52,24 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         _publishedUrlProvider = publishedUrlProvider;
     }
 
+    [Obsolete("Please use the method that accepts all parameters. Will be removed in V17.")]
     public IEnumerable<ISearchResult> Search(
         string query,
         UmbracoEntityTypes entityType,
         int pageSize,
         long pageIndex,
         out long totalFound,
+        string? searchFrom = null,
+        bool ignoreUserStartNodes = false)
+        => Search(query, entityType, pageSize, pageIndex, out totalFound, null, searchFrom, ignoreUserStartNodes);
+
+    public IEnumerable<ISearchResult> Search(
+        string query,
+        UmbracoEntityTypes entityType,
+        int pageSize,
+        long pageIndex,
+        out long totalFound,
+        string[]? contentTypeAliases,
         string? searchFrom = null,
         bool ignoreUserStartNodes = false)
     {
@@ -139,6 +151,11 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                 throw new NotSupportedException("The " + typeof(BackOfficeExamineSearcher) +
                                                 " currently does not support searching against object type " +
                                                 entityType);
+        }
+
+        if (contentTypeAliases?.Any() is true)
+        {
+            sb.Append($"+({string.Join(" ", contentTypeAliases.Select(alias => $"{ExamineFieldNames.ItemTypeFieldName}:{alias}"))}) ");
         }
 
         if (!_examineManager.TryGetIndex(indexName, out IIndex? index))

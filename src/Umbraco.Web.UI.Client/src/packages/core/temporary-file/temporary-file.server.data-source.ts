@@ -35,7 +35,7 @@ export class UmbTemporaryFileServerDataSource {
 		const body = new FormData();
 		body.append('Id', id);
 		body.append('File', file);
-		const xhrRequest = tryXhrRequest<PostTemporaryFileResponse>(this.#host, {
+		const xhrRequest = tryXhrRequest<PostTemporaryFileResponse>({
 			url: '/umbraco/management/api/v1/temporary-file',
 			method: 'POST',
 			responseHeader: 'Umb-Generated-Resource',
