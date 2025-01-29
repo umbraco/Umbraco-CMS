@@ -620,7 +620,7 @@ name: "icon-dock-connector",
 path: () => import("./icons/icon-dock-connector.js"),
 },{
 name: "icon-document-dashed-line",
-
+legacy: true,
 path: () => import("./icons/icon-document-dashed-line.js"),
 },{
 name: "icon-document",
@@ -2226,6 +2226,10 @@ path: () => import("./icons/icon-database.js"),
 name: "icon-umb-manifest",
 
 path: () => import("./icons/icon-umb-manifest.js"),
+},{
+name: "icon-puzzle-piece",
+
+path: () => import("./icons/icon-puzzle-piece.js"),
 },{
 name: "icon-document-3d",
 
