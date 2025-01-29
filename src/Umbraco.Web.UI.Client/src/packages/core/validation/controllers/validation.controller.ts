@@ -192,6 +192,9 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 */
 	addValidator(validator: UmbValidator): void {
 		if (this.#validators.includes(validator)) return;
+		if (validator === this) {
+			throw new Error('Cannot add it self as validator');
+		}
 		this.#validators.push(validator);
 		//validator.addEventListener('change', this.#onValidatorChange);
 		if (this.#validationMode) {
@@ -231,7 +234,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 
 		if (!this.messages) {
 			// This Context has been destroyed while is was validating, so we should not continue.
-			return;
+			return Promise.reject();
 		}
 
 		// If we have any messages then we are not valid, otherwise lets check the validation results: [NL]
@@ -264,6 +267,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 */
 	reset(): void {
 		this.#validationMode = false;
+		this.messages.clear();
 		this.#validators.forEach((v) => v.reset());
 	}
 
