@@ -1494,6 +1494,7 @@ export class DocumentService {
      * @param data.skip
      * @param data.take
      * @param data.parentId
+     * @param data.allowedDocumentTypes
      * @returns unknown OK
      * @throws ApiError
      */
@@ -1505,7 +1506,8 @@ export class DocumentService {
                 query: data.query,
                 skip: data.skip,
                 take: data.take,
-                parentId: data.parentId
+                parentId: data.parentId,
+                allowedDocumentTypes: data.allowedDocumentTypes
             },
             errors: {
                 401: 'The resource is protected and requires an authentication token'
@@ -3497,6 +3499,7 @@ export class MediaService {
      * @param data.skip
      * @param data.take
      * @param data.parentId
+     * @param data.allowedMediaTypes
      * @returns unknown OK
      * @throws ApiError
      */
@@ -3508,7 +3511,8 @@ export class MediaService {
                 query: data.query,
                 skip: data.skip,
                 take: data.take,
-                parentId: data.parentId
+                parentId: data.parentId,
+                allowedMediaTypes: data.allowedMediaTypes
             },
             errors: {
                 401: 'The resource is protected and requires an authentication token'
@@ -4703,6 +4707,7 @@ export class MemberService {
      * @param data.query
      * @param data.skip
      * @param data.take
+     * @param data.allowedMemberTypes
      * @returns unknown OK
      * @throws ApiError
      */
@@ -4713,7 +4718,8 @@ export class MemberService {
             query: {
                 query: data.query,
                 skip: data.skip,
-                take: data.take
+                take: data.take,
+                allowedMemberTypes: data.allowedMemberTypes
             },
             errors: {
                 401: 'The resource is protected and requires an authentication token'

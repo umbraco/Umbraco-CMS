@@ -31,10 +31,7 @@ const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_M
 
 // TODO: investigate how we can reuse the picker-search-field element, picker context etc.
 @customElement('umb-media-picker-modal')
-export class UmbMediaPickerModalElement extends UmbModalBaseElement<
-	UmbMediaPickerModalData<unknown>,
-	UmbMediaPickerModalValue
-> {
+export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPickerModalData, UmbMediaPickerModalValue> {
 	#mediaTreeRepository = new UmbMediaTreeRepository(this);
 	#mediaItemRepository = new UmbMediaItemRepository(this);
 	#mediaSearchProvider = new UmbMediaSearchProvider(this);
@@ -91,8 +88,10 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	protected override async firstUpdated(_changedProperties: PropertyValues): Promise<void> {
 		super.firstUpdated(_changedProperties);
 
-		if (this.data?.startNode) {
-			const { data } = await this.#mediaItemRepository.requestItems([this.data.startNode]);
+		const startNode = this.data?.startNode;
+
+		if (startNode) {
+			const { data } = await this.#mediaItemRepository.requestItems([startNode.unique]);
 			this._startNode = data?.[0];
 
 			if (this._startNode) {
@@ -165,7 +164,11 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 		}
 
 		const query = this._searchQuery;
-		const { data } = await this.#mediaSearchProvider.search({ query, searchFrom: this._searchFrom });
+		const { data } = await this.#mediaSearchProvider.search({
+			query,
+			searchFrom: this._searchFrom,
+			...this.data?.search?.queryParams,
+		});
 
 		if (!data) {
 			// No search results.
