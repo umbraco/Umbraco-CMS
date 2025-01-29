@@ -26,7 +26,7 @@
                 showInherit: "<",
                 inheritsFrom: "<",
                 hideLabel: "<?",
-                preview: "<?",
+                preview: "<?"
             }
         });
 
