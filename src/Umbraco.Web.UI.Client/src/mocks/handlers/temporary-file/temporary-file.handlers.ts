@@ -25,7 +25,7 @@ export const handlers = [
 			ctx.json<GetTemporaryFileConfigurationResponse>({
 				allowedUploadedFileExtensions: [],
 				disallowedUploadedFilesExtensions: ['exe', 'dll', 'bat', 'msi'],
-				maxFileSize: 51200,
+				maxFileSize: 1468007,
 				imageFileTypes: ['jpg', 'png', 'gif', 'jpeg', 'svg'],
 			}),
 		);
