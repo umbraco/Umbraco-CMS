@@ -1,6 +1,6 @@
 import { UMB_MEMBER_ENTITY_TYPE } from '../entity.js';
-import type { UmbMemberSearchItemModel } from './member.search-provider.js';
-import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type { UmbMemberSearchItemModel, UmbMemberSearchRequestArgs } from './types.js';
+import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { MemberService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -10,7 +10,9 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbMemberSearchServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbMemberSearchServerDataSource implements UmbSearchDataSource<UmbMemberSearchItemModel> {
+export class UmbMemberSearchServerDataSource
+	implements UmbSearchDataSource<UmbMemberSearchItemModel, UmbMemberSearchRequestArgs>
+{
 	#host: UmbControllerHost;
 
 	/**
@@ -28,11 +30,12 @@ export class UmbMemberSearchServerDataSource implements UmbSearchDataSource<UmbM
 	 * @returns {*}
 	 * @memberof UmbMemberSearchServerDataSource
 	 */
-	async search(args: UmbSearchRequestArgs) {
+	async search(args: UmbMemberSearchRequestArgs) {
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			MemberService.getItemMemberSearch({
 				query: args.query,
+				allowedMemberTypes: args.allowedContentTypes?.map((memberReference) => memberReference.unique),
 			}),
 		);
 
