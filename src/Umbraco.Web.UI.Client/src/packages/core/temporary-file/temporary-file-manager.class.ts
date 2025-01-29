@@ -1,17 +1,22 @@
 import { UmbTemporaryFileRepository } from './temporary-file.repository.js';
+import { UmbTemporaryFileConfigRepository } from './config/index.js';
 import {
 	TemporaryFileStatus,
 	type UmbQueueHandlerCallback,
 	type UmbTemporaryFileModel,
 	type UmbUploadOptions,
 } from './types.js';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { observeMultiple, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 export class UmbTemporaryFileManager<
 	UploadableItem extends UmbTemporaryFileModel = UmbTemporaryFileModel,
 > extends UmbControllerBase {
 	readonly #temporaryFileRepository = new UmbTemporaryFileRepository(this._host);
+	readonly #temporaryFileConfigRepository = new UmbTemporaryFileConfigRepository(this._host);
+	readonly #localization = new UmbLocalizationController(this._host);
 
 	readonly #queue = new UmbArrayState<UploadableItem>([], (item) => item.temporaryUnique);
 	public readonly queue = this.#queue.asObservable();
@@ -71,8 +76,57 @@ export class UmbTemporaryFileManager<
 		return filesCompleted;
 	}
 
+	async #validateItem(item: UploadableItem): Promise<boolean> {
+		const maxFileSize = await this.observe(this.#temporaryFileConfigRepository.part('maxFileSize')).asPromise();
+		if (maxFileSize && item.file.size > maxFileSize) {
+			const notification = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+			notification.peek('warning', {
+				data: {
+					headline: 'Upload',
+					message: `
+${this.#localization.term('media_invalidFileSize')}: ${item.file.name} (${item.file.size} bytes)
+
+${this.#localization.term('media_maxFileSize')} ${maxFileSize} bytes
+					`,
+					whitespace: 'pre-line',
+				},
+			});
+			return false;
+		}
+
+		const fileExtension = item.file.name.split('.').pop() ?? '';
+
+		const [allowedExtensions, disallowedExtensions] = await this.observe(
+			observeMultiple([
+				this.#temporaryFileConfigRepository.part('allowedUploadedFileExtensions'),
+				this.#temporaryFileConfigRepository.part('disallowedUploadedFilesExtensions'),
+			]),
+		).asPromise();
+
+		if (
+			(allowedExtensions && !allowedExtensions.includes(fileExtension)) ||
+			(disallowedExtensions && disallowedExtensions.includes(fileExtension))
+		) {
+			const notification = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+			notification.peek('warning', {
+				data: {
+					message: `${this.#localization.term('media_disallowedFileType')}: ${fileExtension}`,
+				},
+			});
+			return false;
+		}
+
+		return true;
+	}
+
 	async #handleUpload(item: UploadableItem) {
 		if (!item.temporaryUnique) throw new Error(`Unique is missing for item ${item}`);
+
+		const isValid = await this.#validateItem(item);
+		if (!isValid) {
+			this.#queue.updateOne(item.temporaryUnique, { ...item, status: TemporaryFileStatus.ERROR });
+			return { ...item, status: TemporaryFileStatus.ERROR };
+		}
 
 		const { error } = await this.#temporaryFileRepository.upload(item.temporaryUnique, item.file, (evt) => {
 			// Update progress in percent if a callback is provided
