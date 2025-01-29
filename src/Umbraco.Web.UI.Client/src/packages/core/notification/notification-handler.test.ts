@@ -1,5 +1,5 @@
 import { UmbNotificationHandler } from './notification-handler.js';
-import type { UmbNotificationOptions } from './notification.context.js';
+import type { UmbNotificationOptions } from './types.js';
 import { assert, expect } from '@open-wc/testing';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
