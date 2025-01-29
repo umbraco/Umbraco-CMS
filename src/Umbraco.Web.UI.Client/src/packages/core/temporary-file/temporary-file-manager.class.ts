@@ -10,6 +10,7 @@ import { observeMultiple, UmbArrayState } from '@umbraco-cms/backoffice/observab
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { formatBytes } from '@umbraco-cms/backoffice/utils';
 
 export class UmbTemporaryFileManager<
 	UploadableItem extends UmbTemporaryFileModel = UmbTemporaryFileModel,
@@ -84,9 +85,9 @@ export class UmbTemporaryFileManager<
 				data: {
 					headline: 'Upload',
 					message: `
-${this.#localization.term('media_invalidFileSize')}: ${item.file.name} (${item.file.size} bytes)
+${this.#localization.term('media_invalidFileSize')}: ${item.file.name} (${formatBytes(item.file.size)}).
 
-${this.#localization.term('media_maxFileSize')} ${maxFileSize} bytes
+${this.#localization.term('media_maxFileSize')} ${formatBytes(maxFileSize)}.
 					`,
 					whitespace: 'pre-line',
 				},
