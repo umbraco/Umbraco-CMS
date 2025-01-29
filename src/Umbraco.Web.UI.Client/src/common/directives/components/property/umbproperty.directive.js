@@ -25,7 +25,8 @@
                 propertyAlias: "@",
                 showInherit: "<",
                 inheritsFrom: "<",
-                hideLabel: "<?"
+                hideLabel: "<?",
+                preview: "<?",
             }
         });
 
@@ -34,14 +35,6 @@
     function UmbPropertyController($scope, userService, serverValidationManager, udiService, angularHelper) {
 
         const vm = this;
-
-        const propertyLockedListener = $scope.$on("umb-property-editor-locked", function(event, value) {
-          vm.preview = value;
-        });
-
-        $scope.$on("$destroy", function () {
-          propertyLockedListener();
-        });
 
         vm.$onInit = onInit;
 

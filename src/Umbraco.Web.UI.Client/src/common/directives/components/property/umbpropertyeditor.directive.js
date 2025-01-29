@@ -1,7 +1,7 @@
 /**
 * @ngdoc directive
 * @function
-* @name umbraco.directives.directive:umbPropertyEditor
+* @name umbraco.directives.directive:umbPropertyEditor 
 * @requires formController
 * @restrict E
 **/
@@ -18,10 +18,10 @@ function umbPropEditor(umbPropEditorHelper, localizationService) {
                 allowUnlock: "<?",
                 onUnlock: "&?"
             },
-
+            
             require: ["^^form", "?^umbProperty"],
             restrict: 'E',
-            replace: true,
+            replace: true,      
             templateUrl: 'views/components/property/umb-property-editor.html',
             link: function (scope, element, attrs, ctrl) {
 
@@ -40,8 +40,6 @@ function umbPropEditor(umbPropEditorHelper, localizationService) {
                    scope.model.alias = Math.random().toString(36).slice(2);
                 }
 
-                emitPropertyLocked(scope.preview);
-
                 localizationService.localize('languages_invariantPropertyUnlockHelp',  [scope.model.label])
                     .then(function(value) {
                         scope.labels.invariantPropertyUnlockHelp = value;
@@ -51,7 +49,7 @@ function umbPropEditor(umbPropEditorHelper, localizationService) {
                     .then(function(value) {
                         scope.labels.invariantCulturePropertyUnlockHelp = value;
                     });
-
+                
                 localizationService.localize('languages_invariantSegmentPropertyUnlockHelp',  [scope.model.label])
                     .then(function(value) {
                         scope.labels.invariantSegmentPropertyUnlockHelp = value;
@@ -66,7 +64,6 @@ function umbPropEditor(umbPropEditorHelper, localizationService) {
                 scope.unlock = function () {
                     if (scope.onUnlock) {
                         scope.onUnlock();
-                        emitPropertyLocked(false);
                     }
                 };
 
@@ -77,10 +74,6 @@ function umbPropEditor(umbPropEditorHelper, localizationService) {
                 scope.$on("$destroy", function () {
                     unbindWatcher();
                 });
-
-                function emitPropertyLocked(locked) {
-                    scope.$emit("umb-property-editor-locked", locked);
-                }
             }
         };
     };
