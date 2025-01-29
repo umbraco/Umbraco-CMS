@@ -11,8 +11,8 @@ describe('bytes', () => {
 	});
 
 	it('should format bytes as human-readable text with decimal places', () => {
-		expect(formatBytes(1024, { decimals: 0 })).to.equal('1 KB');
-		expect(formatBytes(1587.2, { decimals: 2 })).to.equal('1.55 KB');
+		expect(formatBytes(1587.2, { decimals: 0 })).to.equal('2 KB');
+		expect(formatBytes(1587.2, { decimals: 1 })).to.equal('1.6 KB');
 	});
 
 	it('should format bytes as human-readable text with different kilobytes', () => {

@@ -13,7 +13,7 @@ export interface IFormatBytesOptions {
 	kilo?: number;
 
 	/**
-	 * Number of decimal places, default is 0.
+	 * Number of decimal places, default is 2.
 	 * @example 0, 1, 2, 3, etc.
 	 */
 	decimals?: number;
@@ -35,7 +35,7 @@ export function formatBytes(bytes: number, opts?: IFormatBytesOptions): string {
 	if (bytes === 0) return '0 Bytes';
 
 	const k = opts?.kilo ?? 1024;
-	const dm = opts?.decimals ?? 0;
+	const dm = opts?.decimals ?? 2;
 	const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
 	const i = Math.floor(Math.log(bytes) / Math.log(k));
