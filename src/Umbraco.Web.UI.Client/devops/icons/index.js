@@ -138,9 +138,11 @@ const collectDiskIcons = async (icons) => {
 
 		// Only append not already defined icons:
 		if (!icons.find((x) => x.name === iconName)) {
+			// remove legacy for v.17 (Deprecated)
 			const icon = {
 				name: iconName,
 				legacy: true,
+				hidden: true,
 				fileName: iconFileName,
 				svg,
 				output: `${iconsOutputDirectory}/${iconFileName}.ts`,
@@ -173,11 +175,13 @@ const generateJS = (icons) => {
 	const JSPath = `${moduleDirectory}/icons.ts`;
 
 	const iconDescriptors = icons.map((icon) => {
+		// remove legacy for v.17 (Deprecated)
 		return `{
 			name: "${icon.name}",
 			${icon.legacy ? 'legacy: true,' : ''}
+			${icon.hidden ? 'hidden: true,' : ''}
 			path: () => import("./icons/${icon.fileName}.js"),
-		}`.replace(/\t/g, ''); // Regex removes white space [NL]
+		}`.replace(/\t/g, '').replace(/^\s*[\r\n]/gm, ''); // Regex removes white space [NL] // + regex that removes empty lines. [NL]
 	});
 
 	const content = `export default [${iconDescriptors.join(',')}];`;
