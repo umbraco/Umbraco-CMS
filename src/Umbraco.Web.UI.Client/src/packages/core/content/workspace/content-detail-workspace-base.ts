@@ -47,7 +47,6 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
