@@ -48,7 +48,7 @@ export default {
 		protect: 'Public Access',
 		publish: 'Publish',
 		readOnly: 'Read-only',
-		refreshNode: 'Reload',
+		refreshNode: 'Reload children',
 		remove: 'Remove',
 		rename: 'Rename',
 		republish: 'Republish entire site',
