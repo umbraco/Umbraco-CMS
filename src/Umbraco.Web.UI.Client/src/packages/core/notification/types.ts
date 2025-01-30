@@ -9,6 +9,7 @@ export interface UmbNotificationDefaultData {
 	 * @deprecated, do not use this. It will be removed in v.16 — Use UmbPeekError instead
 	 */
 	structuredList?: Record<string, Array<unknown>>;
+	whitespace?: 'normal' | 'pre-line' | 'pre-wrap' | 'nowrap' | 'pre';
 }
 
 /**
