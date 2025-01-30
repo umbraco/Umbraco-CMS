@@ -257,8 +257,7 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 				justify-content: space-between;
 				align-items: center;
 				gap: var(--uui-size-6);
-
-				padding: var(--uui-size-space-4) var(--uui-size-space-6);
+				padding: var(--uui-size-space-4) var(--uui-size-space-5);
 
 				&:is(a) {
 					cursor: pointer;

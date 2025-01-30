@@ -102,27 +102,13 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 	override render() {
 		return html`
 			<div class="container">
-				<umb-extension-slot
-					id="workspace-info-apps"
-					type="workspaceInfoApp"
-					.renderMethod=${this.#renderInfoApp}></umb-extension-slot>
+				<umb-extension-slot id="workspace-info-apps" type="workspaceInfoApp"></umb-extension-slot>
 			</div>
 			<div class="container">
 				<uui-box headline=${this.localize.term('general_general')} id="general-section"
 					>${this.#renderGeneralSection()}</uui-box
 				>
 			</div>
-		`;
-	}
-
-	#renderInfoApp(initializer: UmbExtensionElementInitializer<ManifestWorkspaceInfoApp>) {
-		const headline = initializer.manifest?.meta.label;
-		return html`
-			<uui-box
-				headline=${ifDefined(headline ? this.localize.string(headline) : undefined)}
-				style="--uui-box-default-padding:0">
-				${initializer.component}</uui-box
-			>
 		`;
 	}
 

@@ -8,9 +8,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.WorkspaceInfoApp.Media.Links',
 		element: () => import('./media-links-workspace-info-app.element.js'),
 		weight: 100,
-		meta: {
-			label: '#general_links',
-		},
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,

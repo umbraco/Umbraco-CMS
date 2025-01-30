@@ -155,20 +155,20 @@ export class UmbMediaReferencesWorkspaceInfoAppElement extends UmbLitElement {
 	}
 
 	override render() {
+		if (!this._items?.length) return nothing;
 		return html`
-			${when(
-				this._loading,
-				() => html`<uui-loader></uui-loader>`,
-				() => html`${this.#renderItems()} ${this.#renderPagination()}`,
-			)}
+			<umb-workspace-info-app-layout headline="#references_labelUsedByItems">
+				${when(
+					this._loading,
+					() => html`<uui-loader></uui-loader>`,
+					() => html`${this.#renderItems()} ${this.#renderPagination()}`,
+				)}
+			</umb-workspace-info-app-layout>
 		`;
 	}
 
 	#renderItems() {
-		if (!this._items?.length)
-			return html`<p>
-				<umb-localize key="references_itemHasNoReferences">This item has no references.</umb-localize>
-			</p>`;
+		if (!this._items?.length) return nothing;
 		return html`
 			<uui-table>
 				<uui-table-head>

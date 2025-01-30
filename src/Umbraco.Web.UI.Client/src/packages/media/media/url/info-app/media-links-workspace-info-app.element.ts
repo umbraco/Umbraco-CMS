@@ -32,7 +32,9 @@ export class UmbMediaLinksWorkspaceInfoAppElement extends UmbLitElement {
 	}
 
 	protected override render() {
-		return html` ${this.#renderLinksSection()} `;
+		return html`<umb-workspace-info-app-layout headline="#general_links">
+			${this.#renderLinksSection()}
+		</umb-workspace-info-app-layout> `;
 	}
 
 	#openSvg(imagePath: string) {
@@ -100,7 +102,7 @@ export class UmbMediaLinksWorkspaceInfoAppElement extends UmbLitElement {
 			}
 
 			.link-item {
-				padding: var(--uui-size-space-4) var(--uui-size-space-6);
+				padding: var(--uui-size-space-4) var(--uui-size-space-5);
 				display: grid;
 				grid-template-columns: 1fr auto;
 				gap: var(--uui-size-6);

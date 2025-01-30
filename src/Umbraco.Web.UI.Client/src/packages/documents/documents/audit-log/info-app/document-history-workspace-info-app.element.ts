@@ -182,6 +182,12 @@ export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 				gap: var(--uui-size-layout-1);
 			}
 
+			.log-type uui-tag {
+				height: fit-content;
+				margin-top: auto;
+				margin-bottom: auto;
+			}
+
 			uui-pagination {
 				flex: 1;
 				display: flex;
