@@ -40,6 +40,17 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 							href="https://our.umbraco.com/?utm_source=core&amp;utm_medium=dashboard&amp;utm_content=image&amp;utm_campaign=our"
 							label=${this.localize.term('welcomeDashboard_ourUmbracoButton')}></uui-button>
 					</div>
+
+					<umb-tree
+						alias="Umb.Tree.DataType"
+						.props=${{
+							location: [
+								null,
+								'5f485f78-19f2-4841-89b3-2bb668f103eb',
+								'950174a0-c84f-444b-bd66-a25a0ee4c848',
+								'20df0d05-186c-4ec5-bbe0-8df08abc257e',
+							],
+						}}></umb-tree>
 				</uui-box>
 				${this.#infoLinks.map(
 					(link) => html`
