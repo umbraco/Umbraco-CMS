@@ -311,6 +311,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 			#loadMoreButton {
 				width: 100%;
 			}
+
 			uui-table-cell {
 				padding: var(--uui-size-space-2);
 			}
@@ -334,11 +335,6 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 
 			uui-table-row.hidden {
 				visibility: hidden;
-			}
-
-			uui-table-cell uui-icon {
-				display: flex;
-				
 			}
 
 			uui-table-row[id='content-node']:hover {
