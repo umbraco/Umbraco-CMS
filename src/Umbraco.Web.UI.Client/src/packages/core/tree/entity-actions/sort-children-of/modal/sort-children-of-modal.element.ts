@@ -286,18 +286,11 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		</uui-table-head-cell>`;
 	}
 
-	#renderChild(item: UmbTreeItemModel) {
-
-		let iconColor = {};
-		const iconInfo = item.documentType.icon.split(" ");
-		if(iconInfo[1]) {
-			iconColor = iconInfo[1].split("-");
-		}
-		
-		
+	#renderChild(item: UmbTreeItemModel) {	
 		return html`
+		
 		<uui-table-row id="content-node" data-unique=${item.unique} class="${this._isSorting ? 'hidden' : ''}">
-			<uui-table-cell><uui-icon  name="${iconInfo[0]}" style="color: ${iconColor[1]}"; aria-hidden="true"></uui-icon></uui-table-cell>
+			<uui-table-cell><umb-icon name="${item.documentType.icon}"></umb-icon></uui-table-cell>
 			<uui-table-cell>${item.name}</uui-table-cell>
 			<uui-table-cell>${this.#renderCreateDate(item)}</uui-table-cell>
 		</uui-table-row>`;
@@ -319,7 +312,10 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 				width: 100%;
 			}
 			uui-table-cell {
-				padding: var(--uui-size-space-2); var(--uui-size-space-0);
+				padding: var(--uui-size-space-2);
+			}
+			uui-table-head-cell {
+				padding: 0;
 			}
 
 			uui-table-head-cell button {
@@ -346,11 +342,15 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 			}
 
 			uui-table-row[id='content-node']:hover {
-			cursor: grab;
+				cursor: grab;
 			}
 
 			uui-icon[name='icon-navigation'] {
 				cursor: hand;
+			}
+			
+			uui-box {
+				--uui-box-default-padding: 0;
 			}
 		`,
 	];
