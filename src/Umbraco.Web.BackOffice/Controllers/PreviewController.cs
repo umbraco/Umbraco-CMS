@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -164,12 +165,39 @@ public partial class PreviewController : Controller
     [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
     public ActionResult Frame(int id, string culture)
     {
+        if (ValidateProvidedCulture(culture) is false)
+        {
+            throw new InvalidOperationException($"Could not recognise the provided culture: {culture}");
+        }
+
         EnterPreview(id);
 
         // use a numeric URL because content may not be in cache and so .Url would fail
         var query = culture.IsNullOrWhiteSpace() ? string.Empty : $"?culture={culture}";
 
         return RedirectPermanent($"../../{id}{query}");
+    }
+
+    private static bool ValidateProvidedCulture(string culture)
+    {
+        if (string.IsNullOrEmpty(culture))
+        {
+            return true;
+        }
+
+        // We can be confident the backoffice will have provided a valid culture in linking to the
+        // preview, so we don't need to check that the culture matches an Umbraco language.
+        // We are only concerned here with protecting against XSS attacks from a fiddled preview
+        // URL, so we can just confirm we have a valid culture.
+        try
+        {
+            CultureInfo.GetCultureInfo(culture, true);
+            return true;
+        }
+        catch (CultureNotFoundException)
+        {
+            return false;
+        }
     }
 
     public ActionResult? EnterPreview(int id)
