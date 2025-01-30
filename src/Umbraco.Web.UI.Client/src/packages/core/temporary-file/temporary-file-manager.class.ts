@@ -20,8 +20,8 @@ export class UmbTemporaryFileManager<
 		this.#queue.setValue([]);
 
 		const item: UploadableItem = {
-			status: TemporaryFileStatus.WAITING,
 			...uploadableItem,
+			status: TemporaryFileStatus.WAITING,
 		};
 
 		this.#queue.appendOne(item);
@@ -34,7 +34,7 @@ export class UmbTemporaryFileManager<
 	): Promise<Array<UploadableItem>> {
 		this.#queue.setValue([]);
 
-		const items = queueItems.map((item): UploadableItem => ({ status: TemporaryFileStatus.WAITING, ...item }));
+		const items = queueItems.map((item): UploadableItem => ({ ...item, status: TemporaryFileStatus.WAITING }));
 		this.#queue.append(items);
 		return this.#handleQueue({ ...options });
 	}
@@ -74,19 +74,13 @@ export class UmbTemporaryFileManager<
 	async #handleUpload(item: UploadableItem) {
 		if (!item.temporaryUnique) throw new Error(`Unique is missing for item ${item}`);
 
-		const { error } = await this.#temporaryFileRepository
-			.upload(item.temporaryUnique, item.file)
-			.catch(() => ({ error: true }));
+		const { error } = await this.#temporaryFileRepository.upload(item.temporaryUnique, item.file, (evt) => {
+			// Update progress in percent if a callback is provided
+			if (item.onProgress) item.onProgress((evt.loaded / evt.total) * 100);
+		});
+		const status = error ? TemporaryFileStatus.ERROR : TemporaryFileStatus.SUCCESS;
 
-		let status: TemporaryFileStatus;
-		if (error) {
-			status = TemporaryFileStatus.ERROR;
-			this.#queue.updateOne(item.temporaryUnique, { ...item, status });
-		} else {
-			status = TemporaryFileStatus.SUCCESS;
-			this.#queue.updateOne(item.temporaryUnique, { ...item, status });
-		}
-
+		this.#queue.updateOne(item.temporaryUnique, { ...item, status });
 		return { ...item, status };
 	}
 }
