@@ -287,17 +287,16 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 	}
 
 	#renderChild(item: UmbTreeItemModel) {
-
 		let iconColor = {};
-		const iconInfo = item.documentType.icon.split(" ");
-		if(iconInfo[1]) {
-			iconColor = iconInfo[1].split("-");
+		const iconInfo = item.documentType.icon.split(' ');
+		if (iconInfo[1]) {
+			iconColor = iconInfo[1].split('-');
 		}
-		
-		
-		return html`
-		<uui-table-row id="content-node" data-unique=${item.unique} class="${this._isSorting ? 'hidden' : ''}">
-			<uui-table-cell><uui-icon  name="${iconInfo[0]}" style="color: ${iconColor[1]}"; aria-hidden="true"></uui-icon></uui-table-cell>
+
+		return html` <uui-table-row id="content-node" data-unique=${item.unique} class="${this._isSorting ? 'hidden' : ''}">
+			<uui-table-cell id="icon-cell"
+				><uui-icon name="${iconInfo[0]}" style="color: ${iconColor[1]}" ; aria-hidden="true"></uui-icon
+			></uui-table-cell>
 			<uui-table-cell>${item.name}</uui-table-cell>
 			<uui-table-cell>${this.#renderCreateDate(item)}</uui-table-cell>
 		</uui-table-row>`;
@@ -318,8 +317,19 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 			#loadMoreButton {
 				width: 100%;
 			}
+
 			uui-table-cell {
-				padding: var(--uui-size-space-2); var(--uui-size-space-0);
+				padding: var(--uui-size-space-2);
+			}
+
+			uui-table-head-cell {
+				padding: 0;
+			}
+
+			#icon-cell {
+				display: flex;
+				align-items: center;
+				justify-content: center;
 			}
 
 			uui-table-head-cell button {
@@ -340,17 +350,16 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 				visibility: hidden;
 			}
 
-			uui-table-cell uui-icon {
-				display: flex;
-				
-			}
-
 			uui-table-row[id='content-node']:hover {
-			cursor: grab;
+				cursor: grab;
 			}
 
 			uui-icon[name='icon-navigation'] {
 				cursor: hand;
+			}
+
+			uui-box {
+				--uui-box-default-padding: 0;
 			}
 		`,
 	];
