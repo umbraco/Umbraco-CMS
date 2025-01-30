@@ -1,3 +1,5 @@
+import type { TemporaryFileConfigurationResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+
 export enum TemporaryFileStatus {
 	SUCCESS = 'success',
 	WAITING = 'waiting',
@@ -17,3 +19,5 @@ export type UmbUploadOptions<TItem extends UmbTemporaryFileModel> = {
 	chunkSize?: number;
 	callback?: UmbQueueHandlerCallback<TItem>;
 };
+
+export type UmbTemporaryFileConfigurationModel = TemporaryFileConfigurationResponseModel;
