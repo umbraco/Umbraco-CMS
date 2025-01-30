@@ -38,7 +38,7 @@ export class UmbDeleteEntityAction extends UmbEntityActionBase<MetaEntityActionD
 			headline: this.#localize.string(headline),
 			content: this.#localize.string(content, argsMap),
 			color: 'danger',
-			confirmLabel: 'Delete',
+			confirmLabel: '#general_delete',
 		});
 
 		const detailRepository = await createExtensionApiByAlias<UmbDetailRepository<any>>(
