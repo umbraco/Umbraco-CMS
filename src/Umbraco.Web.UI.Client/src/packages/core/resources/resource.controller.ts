@@ -4,12 +4,7 @@ import { isApiError, isCancelError, isCancelablePromise } from './apiTypeValidat
 import type { XhrRequestOptions } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import {
-	UMB_NOTIFICATION_CONTEXT,
-	umbPeekError,
-	type UmbNotificationOptions,
-} from '@umbraco-cms/backoffice/notification';
+import { umbPeekError, type UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import {
 	ApiError,
@@ -122,13 +117,10 @@ export class UmbResourceController extends UmbControllerBase {
 									'The Umbraco object cache is corrupt, but your action may still have been executed. Please restart the server to reset the cache. This is a work in progress.';
 							}
 
-							const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-							notificationContext.peek('danger', {
-								data: {
-									headline,
-									message,
-								},
-								...options,
+							umbPeekError(this, {
+								headline: headline,
+								message: message,
+								details: problemDetails?.errors ?? problemDetails?.detail,
 							});
 						}
 						break;
@@ -136,7 +128,6 @@ export class UmbResourceController extends UmbControllerBase {
 						// Other errors
 						if (!isCancelledByNotification) {
 							/*
-
 							const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 							notificationContext.peek('danger', {
 								data: {
@@ -151,9 +142,8 @@ export class UmbResourceController extends UmbControllerBase {
 							*/
 							const headline = problemDetails?.title ?? error.name ?? 'Server Error';
 							umbPeekError(this, {
-								headline: problemDetails?.detail ? headline : undefined,
-								message: problemDetails?.detail ?? headline,
-								details: problemDetails?.errors,
+								message: headline,
+								details: problemDetails?.errors ?? problemDetails?.detail,
 							});
 						}
 				}

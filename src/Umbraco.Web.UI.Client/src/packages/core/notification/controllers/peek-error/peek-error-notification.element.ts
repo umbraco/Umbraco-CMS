@@ -15,7 +15,7 @@ export class UmbPeekErrorNotificationElement extends UmbLitElement {
 	async #onClick() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 
-		modalManager.open(this, UMB_ERROR_VIEWER_MODAL, { data: this.data });
+		modalManager.open(this, UMB_ERROR_VIEWER_MODAL, { data: this.data?.details });
 
 		this.notificationHandler.close();
 	}
@@ -24,7 +24,12 @@ export class UmbPeekErrorNotificationElement extends UmbLitElement {
 		return this.data
 			? html`<uui-toast-notification-layout headline=${ifDefined(this.data.headline)}
 					>${this.data.message}${this.data.details
-						? html`<uui-button slot="action" look="primary" color="danger" @click=${this.#onClick}></uui-button>`
+						? html`<uui-button
+								slot="actions"
+								look="primary"
+								color="danger"
+								label=${this.localize.term('defaultdialogs_seeErrorAction')}
+								@click=${this.#onClick}></uui-button>`
 						: nothing}</uui-toast-notification-layout
 				>`
 			: nothing;

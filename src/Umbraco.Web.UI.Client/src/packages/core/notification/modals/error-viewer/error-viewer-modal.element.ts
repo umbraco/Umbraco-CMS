@@ -1,9 +1,15 @@
 import type { UmbErrorViewerModalData, UmbErrorViewerModalValue } from './error-viewer-modal.token.js';
-import { css, customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-error-viewer-modal')
 export class UmbErrorViewerModalElement extends UmbModalBaseElement<UmbErrorViewerModalData, UmbErrorViewerModalValue> {
+	@state()
+	_displayError?: string;
+
+	@state()
+	_displayLang?: string;
+
 	// Code adapted from https://stackoverflow.com/a/57668208/12787
 	// Licensed under the permissions of the CC BY-SA 4.0 DEED
 	#stringify(obj: any): string {
@@ -24,12 +30,26 @@ export class UmbErrorViewerModalElement extends UmbModalBaseElement<UmbErrorView
 		return output + '\n}';
 	}
 
+	public override set data(value: UmbErrorViewerModalData | undefined) {
+		super.data = value;
+		console.log(value, typeof value);
+		// is JSON:
+		if (typeof value === 'string') {
+			this._displayLang = 'String';
+			this._displayError = value;
+		} else {
+			this._displayLang = 'JSON';
+			this._displayError = this.#stringify(value);
+		}
+	}
+	public override get data(): UmbErrorViewerModalData | undefined {
+		return super.data;
+	}
+
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.term('general_manifest')} main-no-padding>
-				${this.data
-					? html`<umb-code-block language="JSON" copy>${this.#stringify(this.data)}</umb-code-block>`
-					: nothing}
+			<umb-body-layout headline=${this.localize.term('defaultdialogs_seeErrorDialogHeadline')} main-no-padding>
+				${this.data ? html`<umb-code-block language=${this._displayLang} copy>${this.data}</umb-code-block>` : nothing}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 				</div>
