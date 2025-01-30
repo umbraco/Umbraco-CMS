@@ -247,5 +247,11 @@
     <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Update.cs">
       <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Services\PublishedUrlInfoProvider_hidetoplevel_false.cs">
+      <DependentUpon>PublishedUrlInfoProviderTestsBase.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\PublishedUrlInfoProviderTests.cs">
+      <DependentUpon>PublishedUrlInfoProviderTestsBase.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

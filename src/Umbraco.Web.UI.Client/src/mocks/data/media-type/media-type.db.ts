@@ -52,7 +52,7 @@ class UmbMediaTypeMockDB extends UmbEntityMockDbBase<UmbMockMediaTypeModel> {
 		const allowedTypes = this.data.filter((field) => {
 			const allProperties = field.properties.flat();
 
-			const fileUploadType = allProperties.find((prop) => prop.alias === 'umbracoFile');
+			const fileUploadType = allProperties.find((prop) => prop.alias === 'umbracoFile' || prop.alias === 'mediaPicker');
 			if (!fileUploadType) return false;
 
 			const dataType = umbDataTypeMockDb.read(fileUploadType.dataType.id);

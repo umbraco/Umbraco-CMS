@@ -108,7 +108,14 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		const data = await modal?.onSubmit().catch(() => null);
 		if (!data) return;
 
-		this._unique = data.selection[0];
+		const selected = data.selection[0];
+
+		if (!selected) {
+			throw new Error('No media selected');
+		}
+
+		this._unique = selected;
+
 		this.value = { ...this.value, unique: this._unique };
 		this.#getSrc();
 	}

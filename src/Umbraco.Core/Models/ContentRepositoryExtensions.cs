@@ -237,7 +237,7 @@ public static class ContentRepositoryExtensions
         {
             foreach (ContentCultureInfos cultureInfo in other.CultureInfos)
             {
-                if (culture == "*" || culture == cultureInfo.Culture)
+                if (culture == "*" || culture.InvariantEquals(cultureInfo.Culture))
                 {
                     content.SetCultureName(cultureInfo.Name, cultureInfo.Culture);
                 }
