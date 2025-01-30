@@ -1,3 +1,4 @@
+import { UMB_WEBHOOK_DELIVERY_COLLECTION_ALIAS } from '../../collection/deliveries/constants.js';
 import { UMB_WEBHOOK_ENTITY_TYPE, UMB_WEBHOOK_WORKSPACE_ALIAS } from '../../entity.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS, UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
@@ -22,6 +23,24 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Overview',
 			pathname: 'overview',
 			icon: 'icon-webhook',
+		},
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_WEBHOOK_WORKSPACE_ALIAS,
+			},
+		],
+	},
+	{
+		type: 'workspaceView',
+		kind: 'collection',
+		alias: 'Umb.WorkspaceView.WebhookDeliveries.Collection',
+		name: 'Webhook Root Workspace Deliveries View',
+		meta: {
+			label: 'Deliveries',
+			pathname: 'deliveries',
+			icon: 'icon-box-alt',
+			collectionAlias: UMB_WEBHOOK_DELIVERY_COLLECTION_ALIAS,
 		},
 		conditions: [
 			{

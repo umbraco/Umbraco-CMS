@@ -1,0 +1,1 @@
+export { UMB_WEBHOOK_DELIVERIES_TABLE_COLLECTION_VIEW_ALIAS } from './manifests.js';

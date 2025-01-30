@@ -1771,6 +1771,7 @@ export default {
 		headers: 'Headers',
 		selectEventFirst: 'Please select an event first.',
 		selectEvents: 'Select events',
+		statusCode: 'Status code'
 	},
 	languages: {
 		addLanguage: 'Add language',

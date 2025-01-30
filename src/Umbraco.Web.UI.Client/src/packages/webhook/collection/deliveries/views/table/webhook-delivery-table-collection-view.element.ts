@@ -1,0 +1,134 @@
+import type { UmbWebhookDeliveryDetailModel } from '../../../../types.js';
+import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
+import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
+
+import './column-layouts/status-code/webhook-delivery-table-status-code-column-layout.element.js';
+import type { UUIPaginationEvent } from '@umbraco-ui/uui';
+
+@customElement('umb-webhook-delivery-table-collection-view')
+export class UmbWebhookDeliveryTableCollectionViewElement extends UmbLitElement {
+	#itemsPerPage = 50;
+	#currentPage = 1;
+
+	@state()
+	private _total = 0;
+
+	@state()
+	private _tableConfig: UmbTableConfig = {
+		allowSelection: false,
+		hideIcon: true
+	};
+
+	@state()
+	private _tableColumns: Array<UmbTableColumn> = [
+		{
+			name: this.localize.term('general_date'),
+			alias: 'date',
+		},
+		{
+			name: this.localize.term('webhooks_url'),
+			alias: 'url',
+		},
+		{
+			name: this.localize.term('webhooks_event'),
+			alias: 'eventAlias',
+		},
+		{
+			name: this.localize.term('webhooks_statusCode'),
+			alias: 'statusCode',
+			elementName: 'umb-webhook-delivery-table-status-code-column-layout',
+		},
+		{
+			name: this.localize.term('webhooks_retryCount'),
+			alias: 'retryCount',
+		},
+	];
+
+	@state()
+	private _tableItems: Array<UmbTableItem> = [];
+
+	#collectionContext?: UmbDefaultCollectionContext<UmbWebhookDeliveryDetailModel>;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
+			this.#collectionContext = instance;
+			this.#observeCollectionItems();
+		});
+	}
+
+	#observeCollectionItems() {
+		if (!this.#collectionContext) return;
+		this.observe(this.#collectionContext.items, (items) => this.#createTableItems(items), 'umbCollectionItemsObserver');
+		this.observe(this.#collectionContext.totalItems, (totalItems) => this._total = totalItems, 'umbCollectionTotalItemsObserver');
+	}
+
+	#createTableItems(deliveries: Array<UmbWebhookDeliveryDetailModel>) {
+		this._tableItems = deliveries.map((delivery, index) => {
+			return {
+				id: delivery.unique,
+				icon: 'icon-box-alt',
+				data: [
+					{
+						columnAlias: 'date',
+						value: html`<umb-date-table-column-view .value=${delivery.date}></umb-date-table-column-view>`,
+					},
+					{
+						columnAlias: 'url',
+						value: delivery.url,
+					},
+					{
+						columnAlias: 'eventAlias',
+						value: delivery.eventAlias,
+					},
+					{
+						columnAlias: 'statusCode',
+						value: delivery.statusCode,
+					},
+					{
+						columnAlias: 'retryCount',
+						value: delivery.retryCount,
+					},
+				],
+			};
+		});
+	}
+
+	#onChangePage(event: UUIPaginationEvent) {
+		this.#currentPage = event.target.current;
+		this.#collectionContext?.setFilter({skip: this.#itemsPerPage * (this.#currentPage - 1), take: this.#itemsPerPage})
+	}
+
+	override render() {
+		return html`
+			<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
+			${this._total > this.#itemsPerPage
+				? html`<uui-pagination
+						.current=${this.#currentPage}
+						.total=${Math.ceil(this._total / this.#itemsPerPage)}
+						@change=${this.#onChangePage}></uui-pagination>`
+				: nothing}
+		`;
+	}
+
+	static override styles = [
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+			}
+		`,
+	];
+}
+
+export default UmbWebhookDeliveryTableCollectionViewElement;
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'umb-webhook-delivery-table-collection-view': UmbWebhookDeliveryTableCollectionViewElement;
+	}
+}

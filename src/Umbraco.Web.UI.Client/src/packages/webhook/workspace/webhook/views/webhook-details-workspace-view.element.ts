@@ -17,13 +17,13 @@ import '../../../components/input-webhook-events.element.js';
 @customElement('umb-webhook-details-workspace-view')
 export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
-	_webhook?: UmbWebhookDetailModel;
+	private _webhook?: UmbWebhookDetailModel;
 
 	@state()
-	_isNew?: boolean;
+	private _isNew?: boolean;
 
 	@state()
-	contentType?: string;
+	private _contentType?: string;
 
 	#webhookWorkspaceContext?: typeof UMB_WEBHOOK_WORKSPACE_CONTEXT.TYPE;
 
@@ -34,7 +34,7 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 			this.#webhookWorkspaceContext = instance;
 			this.observe(this.#webhookWorkspaceContext.data, (webhook) => {
 				this._webhook = webhook;
-				this.contentType = this._webhook?.events[0]?.eventType ?? undefined;
+				this._contentType = this._webhook?.events[0]?.eventType ?? undefined;
 			});
 			this.observe(this.#webhookWorkspaceContext.isNew, (isNew) => {
 				this._isNew = isNew;
@@ -44,7 +44,7 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 
 	#onEventsChange(event: UmbChangeEvent & { target: UmbInputWebhookEventsElement }) {
 		const events = event.target.events ?? [];
-		if (events.length && events[0].eventType !== this.contentType) {
+		if (events.length && events[0].eventType !== this._contentType) {
 			this.#webhookWorkspaceContext?.setTypes([]);
 		}
 		this.#webhookWorkspaceContext?.setEvents(events);
@@ -71,7 +71,7 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 		this.#webhookWorkspaceContext?.setEnabled(event.target.checked);
 	}
 	#renderContentTypePicker() {
-		if (this.contentType !== 'Content' && this.contentType !== 'Media') return nothing;
+		if (this._contentType !== 'Content' && this._contentType !== 'Media') return nothing;
 
 		return html`
 			<umb-property-layout
@@ -83,7 +83,7 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 	}
 
 	#renderContentTypePickerEditor() {
-		switch (this.contentType) {
+		switch (this._contentType) {
 			case 'Content':
 				return html`
 					<umb-input-document-type
