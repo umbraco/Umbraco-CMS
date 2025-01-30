@@ -45,6 +45,8 @@ export class UmbInputToggleElement extends UUIFormControlMixin(UmbLitElement, ''
 		return undefined;
 	}
 
+	// test
+
 	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#updateLabel();
