@@ -99,18 +99,22 @@ export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<umb-extension-with-api-slot
-				slot="header-actions"
-				type="entityAction"
-				.filter=${(manifest: ManifestEntityAction) =>
-					this.#allowedActions.has(manifest.alias)}></umb-extension-with-api-slot>
+			<umb-workspace-info-app-layout headline="#general_history">
+				<umb-extension-with-api-slot
+					slot="header-actions"
+					type="entityAction"
+					.filter=${(manifest: ManifestEntityAction) =>
+						this.#allowedActions.has(manifest.alias)}></umb-extension-with-api-slot>
 
-			${when(
-				this._items,
-				() => this.#renderHistory(),
-				() => html`<div id="loader"><uui-loader></uui-loader></div>`,
-			)}
-			${this.#renderPagination()}
+				<div id="content">
+					${when(
+						this._items,
+						() => this.#renderHistory(),
+						() => html`<div id="loader"><uui-loader></uui-loader></div>`,
+					)}
+					${this.#renderPagination()}
+				</div>
+			</umb-workspace-info-app-layout>
 		`;
 	}
 
@@ -162,7 +166,7 @@ export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
-			:host {
+			#content {
 				display: block;
 				padding: var(--uui-size-space-4) var(--uui-size-space-5);
 			}

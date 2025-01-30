@@ -1,4 +1,5 @@
 import { UmbDocumentReferenceRepository } from '../repository/index.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../constants.js';
 import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { isDefaultReference, isDocumentReference, isMediaReference } from '@umbraco-cms/backoffice/relations';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -7,7 +8,6 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbReferenceModel } from '@umbraco-cms/backoffice/relations';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../constants.js';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 @customElement('umb-document-references-workspace-info-app')
@@ -137,47 +137,49 @@ export class UmbDocumentReferencesWorkspaceInfoAppElement extends UmbLitElement 
 	override render() {
 		if (!this._items?.length) return nothing;
 		return html`
-			<uui-table>
-				<uui-table-head>
-					<uui-table-head-cell></uui-table-head-cell>
-					<uui-table-head-cell><umb-localize key="general_name">Name</umb-localize></uui-table-head-cell>
-					<uui-table-head-cell><umb-localize key="general_status">Status</umb-localize></uui-table-head-cell>
-					<uui-table-head-cell><umb-localize key="general_typeName">Type Name</umb-localize></uui-table-head-cell>
-					<uui-table-head-cell><umb-localize key="general_type">Type</umb-localize></uui-table-head-cell>
-				</uui-table-head>
-				${repeat(
-					this._items,
-					(item) => item.id,
-					(item) => html`
-						<uui-table-row>
-							<uui-table-cell style="text-align:center;">
-								<umb-icon name=${this.#getIcon(item)}></umb-icon>
-							</uui-table-cell>
-							<uui-table-cell class="link-cell">
-								${when(
-									isDocumentReference(item),
-									() => html`
-										<uui-button
-											label="${this.localize.term('general_edit')} ${item.name}"
-											href="${this._editDocumentPath}edit/${item.id}">
-											${item.name}
-										</uui-button>
-									`,
-									() => item.name,
-								)}
-							</uui-table-cell>
-							<uui-table-cell>
-								${this.#getPublishedStatus(item)
-									? this.localize.term('content_published')
-									: this.localize.term('content_unpublished')}
-							</uui-table-cell>
-							<uui-table-cell>${this.#getContentTypeName(item)}</uui-table-cell>
-							<uui-table-cell>${this.#getContentType(item)}</uui-table-cell>
-						</uui-table-row>
-					`,
-				)}
-			</uui-table>
-			${this.#renderReferencePagination()}
+			<umb-workspace-info-app-layout headline="#references_labelUsedByItems">
+				<uui-table>
+					<uui-table-head>
+						<uui-table-head-cell></uui-table-head-cell>
+						<uui-table-head-cell><umb-localize key="general_name">Name</umb-localize></uui-table-head-cell>
+						<uui-table-head-cell><umb-localize key="general_status">Status</umb-localize></uui-table-head-cell>
+						<uui-table-head-cell><umb-localize key="general_typeName">Type Name</umb-localize></uui-table-head-cell>
+						<uui-table-head-cell><umb-localize key="general_type">Type</umb-localize></uui-table-head-cell>
+					</uui-table-head>
+					${repeat(
+						this._items,
+						(item) => item.id,
+						(item) => html`
+							<uui-table-row>
+								<uui-table-cell style="text-align:center;">
+									<umb-icon name=${this.#getIcon(item)}></umb-icon>
+								</uui-table-cell>
+								<uui-table-cell class="link-cell">
+									${when(
+										isDocumentReference(item),
+										() => html`
+											<uui-button
+												label="${this.localize.term('general_edit')} ${item.name}"
+												href="${this._editDocumentPath}edit/${item.id}">
+												${item.name}
+											</uui-button>
+										`,
+										() => item.name,
+									)}
+								</uui-table-cell>
+								<uui-table-cell>
+									${this.#getPublishedStatus(item)
+										? this.localize.term('content_published')
+										: this.localize.term('content_unpublished')}
+								</uui-table-cell>
+								<uui-table-cell>${this.#getContentTypeName(item)}</uui-table-cell>
+								<uui-table-cell>${this.#getContentType(item)}</uui-table-cell>
+							</uui-table-row>
+						`,
+					)}
+				</uui-table>
+				${this.#renderReferencePagination()}
+			</umb-workspace-info-app-layout>
 		`;
 	}
 

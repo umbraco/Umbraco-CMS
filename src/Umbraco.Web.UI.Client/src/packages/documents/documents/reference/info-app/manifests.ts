@@ -8,9 +8,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.WorkspaceInfoApp.Document.References',
 		element: () => import('./document-references-workspace-view-info.element.js'),
 		weight: 90,
-		meta: {
-			label: '#references_labelUsedByItems',
-		},
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,

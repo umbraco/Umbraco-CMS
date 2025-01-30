@@ -155,11 +155,13 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			${when(
-				this._loading,
-				() => this.#renderLoading(),
-				() => this.#renderContent(),
-			)}
+			<umb-workspace-info-app-layout headline="#general_links">
+				${when(
+					this._loading,
+					() => this.#renderLoading(),
+					() => this.#renderContent(),
+				)}
+			</umb-workspace-info-app-layout>
 		`;
 	}
 

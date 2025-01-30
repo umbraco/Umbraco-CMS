@@ -8,9 +8,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.WorkspaceInfoApp.Document.History',
 		element: () => import('./document-history-workspace-info-app.element.js'),
 		weight: 80,
-		meta: {
-			label: '#general_history',
-		},
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
