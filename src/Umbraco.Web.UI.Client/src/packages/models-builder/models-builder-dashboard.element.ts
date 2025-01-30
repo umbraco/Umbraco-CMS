@@ -95,7 +95,7 @@ export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 				</p>
 				${this._modelsBuilder?.lastError
 					? html`<p class="error">Last generation failed with the following error:</p>
-							<umb-code-block>${this._modelsBuilder.lastError}</umb-code-block>`
+							<umb-code-block style="max-height:500px;">${this._modelsBuilder.lastError}</umb-code-block>`
 					: nothing}
 			</uui-box>
 		`;
