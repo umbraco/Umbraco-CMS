@@ -1,17 +1,15 @@
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../media-workspace.context-token.js';
 import { TimeOptions } from '../../../audit-log/info-app/utils.js';
-import { css, customElement, html, ifDefined, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbMediaTypeItemModel } from '@umbraco-cms/backoffice/media-type';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE, UmbMediaTypeItemRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_WORKSPACE_MODAL, type ManifestWorkspaceInfoApp } from '@umbraco-cms/backoffice/workspace';
-import type { MediaUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
-import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-media-workspace-view-info')
 export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
