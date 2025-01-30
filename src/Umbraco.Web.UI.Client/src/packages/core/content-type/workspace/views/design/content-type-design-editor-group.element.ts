@@ -167,6 +167,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 					<uui-input
 						id="group-name"
 						label=${this.localize.term('contentTypeEditor_group')}
+						data-mark="input:${this.localize.term('contentTypeEditor_group')}"
 						placeholder=${this.localize.term('placeholders_entername')}
 						.value=${this._group!.name}
 						?disabled=${!this._hasOwnerContainer}
@@ -209,6 +210,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 						<uui-input
 							type="number"
 							label=${this.localize.term('sort_sortOrder')}
+							data-mark="input:${this.localize.term('sort_sortOrder')}"
 							.value=${this.group!.sortOrder.toString()}
 							?disabled=${!this._hasOwnerContainer}
 							@change=${(e: UUIInputEvent) =>
