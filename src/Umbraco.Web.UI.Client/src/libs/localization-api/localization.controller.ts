@@ -222,6 +222,10 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * @returns {Array<string>} An array of keys.
 	 */
 	getKeysFromString(text: string): Array<string> {
+		if (typeof text !== 'string') {
+			return [];
+		}
+
 		const regex = /#\w+/g;
 		const keys = text.match(regex) || [];
 		return keys.map((key) => key.slice(1));
