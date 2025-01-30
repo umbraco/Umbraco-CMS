@@ -302,6 +302,42 @@ describe('UmbLocalizeController', () => {
 			expect(controller.string({})).to.equal('');
 			expect(controller.string(undefined)).to.equal('');
 		});
+
+		it('should return an empty string if the input is an empty string', async () => {
+			expect(controller.string('')).to.equal('');
+		});
+
+		it('should return the input string if the input is not prefixed with a #', async () => {
+			const str = 'close';
+			expect(controller.string(str)).to.equal('close');
+		});
+
+		it('should replace tokens in each key with the provided values', async () => {
+			const str = '#withInlineToken #withInlineTokenLegacy';
+			expect(
+				controller.string(str, { withInlineToken: ['value1', 'value2'], withInlineTokenLegacy: ['value3', 'value4'] }),
+			).to.equal('value1 value2 value3 value4');
+		});
+	});
+
+	describe('getKeysFromString', () => {
+		it('should return an empty array if the input is not a string', async () => {
+			// @ts-expect-error
+			expect(controller.getKeysFromString(123)).to.deep.equal([]);
+			// @ts-expect-error
+			expect(controller.getKeysFromString({})).to.deep.equal([]);
+			// @ts-expect-error
+			expect(controller.getKeysFromString(undefined)).to.deep.equal([]);
+		});
+
+		it('should return an empty array if the input is an empty string', async () => {
+			expect(controller.getKeysFromString('')).to.deep.equal([]);
+		});
+
+		it('should return an array of keys', async () => {
+			const str = '#close #logout';
+			expect(controller.getKeysFromString(str)).to.deep.equal(['close', 'logout']);
+		});
 	});
 
 	describe('host element', () => {
