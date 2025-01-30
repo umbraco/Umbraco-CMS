@@ -338,7 +338,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 			}
 
 			uui-table-row[id='content-node']:hover {
-				cursor: grab;
+				cursor: grab; 
 			}
 
 			uui-icon[name='icon-navigation'] {
