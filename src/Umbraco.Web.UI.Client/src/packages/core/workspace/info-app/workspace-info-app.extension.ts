@@ -11,9 +11,8 @@ export interface ManifestWorkspaceInfoApp
 	meta: MetaWorkspaceInfoApp;
 }
 
-export interface MetaWorkspaceInfoApp {
-	label: string;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface MetaWorkspaceInfoApp {}
 
 declare global {
 	interface UmbExtensionManifestMap {
