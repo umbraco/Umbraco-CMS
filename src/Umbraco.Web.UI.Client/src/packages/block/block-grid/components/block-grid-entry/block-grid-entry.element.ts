@@ -467,7 +467,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			return this.#renderUnsupportedBlock();
 		}
 		if (this._inlineEditingMode) {
-			return this.#renderInlineEditBlock();
+			return this.renderInlineBlock();
 		}
 		return this.#renderRefBlock();
 	}
@@ -481,7 +481,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		//TODO: investigate if we should have ${umbDestroyOnDisconnect()} here. Note how it works for drag n' drop in grid between areas and areas-root
 	}
 
-	#renderInlineEditBlock() {
+	renderInlineBlock() {
 		return html`<umb-block-grid-block-inline
 			class="umb-block-grid__block--view"
 			.label=${this._label}

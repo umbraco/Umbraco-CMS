@@ -1,15 +1,12 @@
+import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
-
-import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
-import { type UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-import '../block-grid-areas-container/index.js';
-import '../ref-grid-block/index.js';
-
-@customElement('umb-block-grid-block-unsupported')
-export class UmbBlockGridBlockUnsupportedElement extends UmbLitElement {
+/**
+ * @element umb-unsupported-list-block
+ */
+@customElement('umb-unsupported-list-block')
+export class UmbUnsupportedListBlockElement extends UmbLitElement {
 	override render() {
 		return html`
 			<div id="host">
@@ -18,7 +15,7 @@ export class UmbBlockGridBlockUnsupportedElement extends UmbLitElement {
 					<slot></slot>
 					<slot name="tag"></slot>
 				</div>
-				${this.#renderInside()}
+				<div id="inside">${this.localize.term('blockEditor_unsupportedBlockDescription')}</div>
 			</div>
 		`;
 	}
@@ -36,28 +33,9 @@ export class UmbBlockGridBlockUnsupportedElement extends UmbLitElement {
 		`;
 	}
 
-	#renderInside() {
-		return html`<div id="inside">
-			${this.localize.term('blockEditor_unsupportedBlockDescription')}
-			<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
-		</div>`;
-	}
-
 	static override styles = [
 		UmbTextStyles,
 		css`
-			umb-block-grid-areas-container {
-				margin-top: calc(var(--uui-size-2) + 1px);
-			}
-			umb-block-grid-areas-container::part(area) {
-				margin: var(--uui-size-2);
-			}
-
-			#exposeButton {
-				width: 100%;
-				min-height: var(--uui-size-16);
-			}
-
 			#host {
 				position: relative;
 				display: block;
@@ -72,14 +50,15 @@ export class UmbBlockGridBlockUnsupportedElement extends UmbLitElement {
 
 				min-width: 250px;
 			}
+
 			#open-part + * {
 				border-top: 1px solid var(--uui-color-border);
 			}
-			#open-part {
+			:host([disabled]) #open-part {
 				cursor: default;
 				transition: border-color 80ms;
 			}
-			#host {
+			:host([disabled]) #host {
 				border-color: var(--uui-color-disabled-standalone);
 			}
 
@@ -93,6 +72,16 @@ export class UmbBlockGridBlockUnsupportedElement extends UmbLitElement {
 				display: flex;
 				justify-content: flex-end;
 				align-items: center;
+			}
+
+			button {
+				font-size: inherit;
+				font-family: inherit;
+				border: 0;
+				padding: 0;
+				background-color: transparent;
+				text-align: left;
+				color: var(--uui-color-text);
 			}
 
 			#content {
@@ -145,6 +134,13 @@ export class UmbBlockGridBlockUnsupportedElement extends UmbLitElement {
 				vertical-align: text-top;
 			}
 
+			:host([disabled]) #icon {
+				color: var(--uui-color-disabled-contrast);
+			}
+			:host([disabled]) #name {
+				color: var(--uui-color-disabled-contrast);
+			}
+
 			#inside {
 				position: relative;
 				display: block;
@@ -154,10 +150,10 @@ export class UmbBlockGridBlockUnsupportedElement extends UmbLitElement {
 	];
 }
 
-export default UmbBlockGridBlockUnsupportedElement;
+export default UmbUnsupportedListBlockElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-block-grid-block-unsupported': UmbBlockGridBlockUnsupportedElement;
+		'umb-unsupported-list-block': UmbUnsupportedListBlockElement;
 	}
 }
