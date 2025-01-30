@@ -112,9 +112,13 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 				};
 			});
 
-			this._tableColumns = [...this.#systemColumns, ...userColumns, { name: '', alias: 'entityActions' }];
+			this._tableColumns = [
+				...this.#systemColumns,
+				...userColumns,
+				{ name: '', alias: 'entityActions', align: 'right' },
+			];
 		} else {
-			this._tableColumns = [...this.#systemColumns, { name: '', alias: 'entityActions' }];
+			this._tableColumns = [...this.#systemColumns, { name: '', alias: 'entityActions', align: 'right' }];
 		}
 	}
 

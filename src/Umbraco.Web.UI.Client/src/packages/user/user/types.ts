@@ -2,6 +2,7 @@ import type { UmbUserEntityType } from './entity.js';
 import type { UmbUserKindType } from './utils/index.js';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import {
+	type CurrenUserConfigurationResponseModel,
 	type UserConfigurationResponseModel,
 	UserStateModel,
 	type UserTwoFactorProviderModel,
@@ -42,3 +43,5 @@ export interface UmbUserStartNodesModel {
 export type UmbUserMfaProviderModel = UserTwoFactorProviderModel;
 
 export type UmbUserConfigurationModel = UserConfigurationResponseModel;
+
+export type UmbCurrentUserConfigurationModel = CurrenUserConfigurationResponseModel;

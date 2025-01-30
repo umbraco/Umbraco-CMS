@@ -78,6 +78,8 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             pageSize,
             pageIndex,
             out _,
+            null,
+            null,
             ignoreUserStartNodes: true);
 
     private async Task SetupUserIdentity(string userId)
