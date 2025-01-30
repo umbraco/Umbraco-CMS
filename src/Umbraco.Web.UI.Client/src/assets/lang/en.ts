@@ -2388,6 +2388,8 @@ export default {
 		labelForRemoveAllEntries: 'Remove all items',
 		labelForClearClipboard: 'Clear clipboard',
 		labelForCopyToClipboard: 'Copy to clipboard',
+		confirmDeleteHeadline: 'Delete from clipboard',
+		confirmDeleteDescription: 'Are you sure you want to delete {0} from the clipboard?',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Open Property Actions',
