@@ -78,21 +78,25 @@ export class UmbTemporaryFileManager<
 	}
 
 	async #validateItem(item: UploadableItem): Promise<boolean> {
-		const maxFileSize = await this.observe(this.#temporaryFileConfigRepository.part('maxFileSize')).asPromise();
-		if (maxFileSize && item.file.size > maxFileSize) {
-			const notification = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-			notification.peek('warning', {
-				data: {
-					headline: 'Upload',
-					message: `
-${this.#localization.term('media_invalidFileSize')}: ${item.file.name} (${formatBytes(item.file.size)}).
-
-${this.#localization.term('media_maxFileSize')} ${formatBytes(maxFileSize)}.
-					`,
-					whitespace: 'pre-line',
-				},
-			});
-			return false;
+		let maxFileSize = await this.observe(this.#temporaryFileConfigRepository.part('maxFileSize')).asPromise();
+		if (maxFileSize) {
+			// Convert from kilobytes to bytes
+			maxFileSize *= 1024;
+			if (item.file.size > maxFileSize) {
+				const notification = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+				notification.peek('warning', {
+					data: {
+						headline: 'Upload',
+						message: `
+	${this.#localization.term('media_invalidFileSize')}: ${item.file.name} (${formatBytes(item.file.size)}).
+	
+	${this.#localization.term('media_maxFileSize')} ${formatBytes(maxFileSize)}.
+						`,
+						whitespace: 'pre-line',
+					},
+				});
+				return false;
+			}
 		}
 
 		const fileExtension = item.file.name.split('.').pop() ?? '';
@@ -105,8 +109,8 @@ ${this.#localization.term('media_maxFileSize')} ${formatBytes(maxFileSize)}.
 		).asPromise();
 
 		if (
-			(allowedExtensions && !allowedExtensions.includes(fileExtension)) ||
-			(disallowedExtensions && disallowedExtensions.includes(fileExtension))
+			(allowedExtensions?.length && !allowedExtensions.includes(fileExtension)) ||
+			(disallowedExtensions?.length && disallowedExtensions.includes(fileExtension))
 		) {
 			const notification = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 			notification.peek('warning', {
