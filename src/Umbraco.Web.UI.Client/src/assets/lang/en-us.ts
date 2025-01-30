@@ -2548,6 +2548,9 @@ export default {
 		labelInlineMode: 'Display inline with text',
 		notExposedLabel: 'Draft',
 		notExposedDescription: 'This Block is not yet created for this variant',
+		unsupportedBlockName: 'Unsupported',
+		unsupportedBlockDescription:
+			'This content is no longer supported in this Editor. If you are missing this content, please contact your administrator. Otherwise delete it.',
 	},
 	contentTemplatesDashboard: {
 		whatHeadline: 'What are Document Blueprints?',

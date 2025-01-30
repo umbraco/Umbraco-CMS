@@ -2385,6 +2385,9 @@ export default {
 		labelInlineMode: 'Indsæt på linje med tekst',
 		notExposedLabel: 'ikke oprettet',
 		notExposedDescription: 'Denne Block er endnu ikke oprettet for denne variant',
+		unsupportedBlockName: 'Ugyldigt indhold',
+		unsupportedBlockDescription:
+			'Dette indhold er ikke længere understøttet. Hvis du mangler dette indhold bør du kontakte din administrator. Ellers bør du slette dette indhold.',
 	},
 	contentTemplatesDashboard: {
 		whatHeadline: 'Hvad er Indholdsskabeloner?',

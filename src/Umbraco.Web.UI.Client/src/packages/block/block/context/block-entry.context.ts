@@ -52,6 +52,8 @@ export abstract class UmbBlockEntryContext<
 	_entries?: BlockEntriesContextType;
 
 	#contentKey?: string;
+	#unsupported = new UmbBooleanState(undefined);
+	readonly unsupported = this.#unsupported.asObservable();
 
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
@@ -515,6 +517,7 @@ export abstract class UmbBlockEntryContext<
 		this.observe(
 			this._manager.contentOf(this.#contentKey),
 			(content) => {
+				this.#unsupported.setValue(!content);
 				this.#content.setValue(content);
 			},
 			'observeContent',
