@@ -77,6 +77,7 @@ export class UmbPropertyEditorUINumberElement
 		return html`
 			<uui-input
 				type="number"
+				label="number"
 				min=${ifDefined(this._min)}
 				max=${ifDefined(this._max)}
 				step=${ifDefined(this._step)}

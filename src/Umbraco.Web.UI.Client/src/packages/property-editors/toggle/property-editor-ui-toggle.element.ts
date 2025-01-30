@@ -25,6 +25,9 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 	readonly = false;
 
 	@state()
+	_ariaLabel?: string;
+
+	@state()
 	_labelOff?: string;
 
 	@state()
@@ -33,12 +36,14 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 	@state()
 	_showLabels = false;
 
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 		this.value ??= config.getValueByAlias('default') ?? false;
 		this._labelOff = config.getValueByAlias('labelOff');
 		this._labelOn = config.getValueByAlias('labelOn');
 		this._showLabels = Boolean(config.getValueByAlias('showLabels'));
+		this._ariaLabel = config.getValueByAlias('ariaLabel');
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputToggleElement }) {
@@ -49,6 +54,7 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 	override render() {
 		return html`
 			<umb-input-toggle
+				.ariaLabel=${this._ariaLabel}
 				.labelOn=${this._labelOn}
 				.labelOff=${this._labelOff}
 				?checked=${this.value}
