@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MPL-2.0
  * Copyright © 2019 Lee Kelleher.
  * Modifications are licensed under the MIT License.
+ */
 
 export interface IFormatBytesOptions {
 	/**
