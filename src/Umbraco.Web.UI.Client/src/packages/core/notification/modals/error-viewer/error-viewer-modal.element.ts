@@ -32,7 +32,6 @@ export class UmbErrorViewerModalElement extends UmbModalBaseElement<UmbErrorView
 
 	public override set data(value: UmbErrorViewerModalData | undefined) {
 		super.data = value;
-		console.log(value, typeof value);
 		// is JSON:
 		if (typeof value === 'string') {
 			this._displayLang = 'String';
@@ -49,7 +48,9 @@ export class UmbErrorViewerModalElement extends UmbModalBaseElement<UmbErrorView
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_seeErrorDialogHeadline')} main-no-padding>
-				${this.data ? html`<umb-code-block language=${this._displayLang} copy>${this.data}</umb-code-block>` : nothing}
+				${this.data
+					? html`<umb-code-block language=${this._displayLang ?? ''} copy>${this._displayError}</umb-code-block>`
+					: nothing}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 				</div>
