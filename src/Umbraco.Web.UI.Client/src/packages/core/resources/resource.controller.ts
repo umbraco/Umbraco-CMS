@@ -32,6 +32,7 @@ export class UmbResourceController extends UmbControllerBase {
 	 * @param promise
 	 */
 	static async tryExecute<T>(promise: Promise<T>): Promise<UmbDataSourceResponse<T>> {
+		// TODO: tryExecute should not take a promise as argument, but should utilize the class property `#promise` instead. (In this way the promise can be cancelled when disconnected)
 		try {
 			return { data: await promise };
 		} catch (error) {
