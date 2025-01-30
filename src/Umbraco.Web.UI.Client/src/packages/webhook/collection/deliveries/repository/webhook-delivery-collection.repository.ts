@@ -5,7 +5,7 @@ import type { UmbWebhookDeliveryCollectionDataSource } from './types.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_WEBHOOK_WORKSPACE_CONTEXT } from 'src/packages/webhook/constants.js';
+import { UMB_WEBHOOK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/webhook';
 
 export class UmbWebhookDeliveryCollectionRepository extends UmbRepositoryBase implements UmbCollectionRepository {
 	#collectionSource: UmbWebhookDeliveryCollectionDataSource;

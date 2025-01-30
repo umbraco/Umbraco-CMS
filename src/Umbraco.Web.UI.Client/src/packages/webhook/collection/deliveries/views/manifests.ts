@@ -7,7 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'collectionView',
 		alias: UMB_WEBHOOK_DELIVERIES_TABLE_COLLECTION_VIEW_ALIAS,
 		name: 'Webhook Deliveries Table Collection View',
-		js: () => import('./table/webhook-delivery-table-collection-view.element'),
+		js: () => import('./table/webhook-delivery-table-collection-view.element.js'),
 		meta: {
 			label: 'Table',
 			icon: 'icon-list',

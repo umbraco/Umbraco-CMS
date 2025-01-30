@@ -6,7 +6,7 @@ import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
 
 import './column-layouts/status-code/webhook-delivery-table-status-code-column-layout.element.js';
-import type { UUIPaginationEvent } from '@umbraco-ui/uui';
+import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-webhook-delivery-table-collection-view')
 export class UmbWebhookDeliveryTableCollectionViewElement extends UmbLitElement {
@@ -68,7 +68,7 @@ export class UmbWebhookDeliveryTableCollectionViewElement extends UmbLitElement 
 	}
 
 	#createTableItems(deliveries: Array<UmbWebhookDeliveryDetailModel>) {
-		this._tableItems = deliveries.map((delivery, index) => {
+		this._tableItems = deliveries.map((delivery) => {
 			return {
 				id: delivery.unique,
 				icon: 'icon-box-alt',
