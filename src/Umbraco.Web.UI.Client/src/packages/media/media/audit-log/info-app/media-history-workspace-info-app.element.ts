@@ -1,8 +1,8 @@
-import type { UmbMediaAuditLogModel } from '../../../audit-log/types.js';
-import { UmbMediaAuditLogRepository } from '../../../audit-log/index.js';
-import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../media-workspace.context-token.js';
-import { TimeOptions, getMediaHistoryTagStyleAndText } from './utils.js';
-import { css, html, customElement, state, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
+import type { UmbMediaAuditLogModel } from '../types.js';
+import { UmbMediaAuditLogRepository } from '../repository/index.js';
+import { getMediaHistoryTagStyleAndText, TimeOptions } from './utils.js';
+import { css, html, customElement, state, nothing, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
@@ -10,8 +10,8 @@ import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 
-@customElement('umb-media-workspace-view-info-history')
-export class UmbMediaWorkspaceViewInfoHistoryElement extends UmbLitElement {
+@customElement('umb-media-history-workspace-info-app')
+export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	@state()
 	_currentPageNumber = 1;
 
@@ -83,13 +83,18 @@ export class UmbMediaWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<uui-box>
-			<div id="rollback" slot="header">
-				<h2><umb-localize key="general_history">History</umb-localize></h2>
-			</div>
-			${this._items ? this.#renderHistory() : html`<uui-loader-circle></uui-loader-circle> `}
-			${this.#renderPagination()}
-		</uui-box> `;
+		return html`
+			<umb-workspace-info-app-layout headline="#general_history">
+				<div id="content">
+					${when(
+						this._items,
+						() => this.#renderHistory(),
+						() => html`<div id="loader"><uui-loader></uui-loader></div>`,
+					)}
+					${this.#renderPagination()}
+				</div>
+			</umb-workspace-info-app-layout>
+		`;
 	}
 
 	#renderHistory() {
@@ -145,25 +150,30 @@ export class UmbMediaWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
-			uui-loader-circle {
-				font-size: 2rem;
+			#content {
+				display: block;
+				padding: var(--uui-size-space-4) var(--uui-size-space-5);
 			}
 
-			uui-tag uui-icon {
-				margin-right: var(--uui-size-space-1);
+			#loader {
+				display: flex;
+				justify-content: center;
 			}
 
 			.log-type {
-				flex-grow: 1;
-				gap: var(--uui-size-space-2);
+				display: grid;
+				grid-template-columns: var(--uui-size-40) auto;
+				gap: var(--uui-size-layout-1);
+			}
+
+			.log-type uui-tag {
+				height: fit-content;
+				margin-top: auto;
+				margin-bottom: auto;
 			}
 
 			uui-pagination {
 				flex: 1;
-				display: inline-block;
-			}
-
-			.pagination {
 				display: flex;
 				justify-content: center;
 				margin-top: var(--uui-size-layout-1);
@@ -172,10 +182,10 @@ export class UmbMediaWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	];
 }
 
-export default UmbMediaWorkspaceViewInfoHistoryElement;
+export default UmbMediaHistoryWorkspaceInfoAppElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-media-workspace-view-info-history': UmbMediaWorkspaceViewInfoHistoryElement;
+		'umb-media-workspace-view-info-history': UmbMediaHistoryWorkspaceInfoAppElement;
 	}
 }
