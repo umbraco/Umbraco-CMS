@@ -218,6 +218,10 @@
 
                 return !canEditCulture || !canEditSegment;
             }
+
+            $scope.isPreview = function(property) {
+              return ((property.readonly || !$scope.allowUpdate) && !property.supportsReadOnly) || ($scope.propertyEditorDisabled(property) && $scope.allowUpdate);
+            }
         }
 
         var directive = {

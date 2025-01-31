@@ -86,7 +86,7 @@ function contentCreateController($scope,
         });
         $scope.docType = docType;
         if (blueprints.length) {
-            if (blueprintConfig.skipSelect) {
+            if (blueprintConfig.skipSelect && blueprints.length === 1) {
                 createFromBlueprint(blueprints[0].id);
             } else {
                 $scope.selectContentType = false;

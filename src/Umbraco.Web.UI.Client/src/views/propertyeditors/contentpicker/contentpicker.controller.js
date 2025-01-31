@@ -15,7 +15,7 @@
  * @param {any} editorService
  * @param {any} userService
  */
-function contentPickerController($scope, $q, $routeParams, $location, entityResource, editorState, iconHelper, navigationService, localizationService, editorService, userService, overlayService) {
+function contentPickerController($scope, $q, $routeParams, $location, entityResource, editorState, iconHelper, navigationService, localizationService, editorService, userService, overlayService, eventsService) {
 
     var vm = {
         labels: {
@@ -25,6 +25,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
     };
 
     var unsubscribe;
+    var savedEventUnsubscribe;
 
     function subscribe() {
         unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
@@ -32,6 +33,13 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
                 return $scope.model.config.idType === "udi" ? i.udi : i.id;
             });
             $scope.model.value = trim(currIds.join(), ",");
+        });
+
+        const initialEditorStateId = editorState?.current ? editorState.current.id : 0;
+        savedEventUnsubscribe = eventsService.on("content.saved", function () {
+          if($scope.invalidStartNode === true && editorState?.current && editorState.current.id !== initialEditorStateId) {
+            initDialogOptions();
+          }
         });
     }
 
@@ -214,69 +222,73 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         });
     }
 
-    //We need to manually handle the filter for members here since the tree displayed is different and only contains
-    // searchable list views
-    if (entityType === "Member") {
-        //first change the not allowed filter css class
-        dialogOptions.filterCssClass = "not-allowed";
-        var currFilter = dialogOptions.filter;
-        //now change the filter to be a method
-        dialogOptions.filter = function (i) {
-            //filter out the list view nodes
-            if (i.metaData.isContainer) {
-                return true;
-            }
-            if (!currFilter) {
-                return false;
-            }
-            //now we need to filter based on what is stored in the pre-vals, this logic duplicates what is in the treepicker.controller,
-            // but not much we can do about that since members require special filtering.
-            var filterItem = currFilter.toLowerCase().split(',');
-            // NOTE: when used in a mini list view, the item content type alias is metaData.ContentTypeAlias (in regular views it's metaData.contentType)
-            var itemContentType = i.metaData.contentType || i.metaData.ContentTypeAlias;
-            var found = filterItem.indexOf(itemContentType.toLowerCase()) >= 0;
-            if (!currFilter.startsWith("!") && !found || currFilter.startsWith("!") && found) {
-                return true;
-            }
+    function initDialogOptions() {
+      //We need to manually handle the filter for members here since the tree displayed is different and only contains
+      // searchable list views
+      if (entityType === "Member") {
+          //first change the not allowed filter css class
+          dialogOptions.filterCssClass = "not-allowed";
+          var currFilter = dialogOptions.filter;
+          //now change the filter to be a method
+          dialogOptions.filter = function (i) {
+              //filter out the list view nodes
+              if (i.metaData.isContainer) {
+                  return true;
+              }
+              if (!currFilter) {
+                  return false;
+              }
+              //now we need to filter based on what is stored in the pre-vals, this logic duplicates what is in the treepicker.controller,
+              // but not much we can do about that since members require special filtering.
+              var filterItem = currFilter.toLowerCase().split(',');
+              // NOTE: when used in a mini list view, the item content type alias is metaData.ContentTypeAlias (in regular views it's metaData.contentType)
+              var itemContentType = i.metaData.contentType || i.metaData.ContentTypeAlias;
+              var found = filterItem.indexOf(itemContentType.toLowerCase()) >= 0;
+              if (!currFilter.startsWith("!") && !found || currFilter.startsWith("!") && found) {
+                  return true;
+              }
 
-            return false;
-        }
-    }
-    if ($routeParams.section === "settings" && $routeParams.tree === "documentTypes") {
-        //if the content-picker is being rendered inside the document-type editor, we don't need to process the startnode query
-        dialogOptions.startNodeId = -1;
-    }
-    else if ($scope.model.config.startNode.query) {
-        entityResource.getByXPath(
-            $scope.model.config.startNode.query,
-            editorState.current.id,
-            editorState.current.parentId,
-            "Document"
-        ).then(function (ent) {
-            dialogOptions.startNodeId = ($scope.model.config.idType === "udi" ? ent.udi : ent.id).toString();
-        });
-    }
-    else if ($scope.model.config.startNode.dynamicRoot) {
-
-        entityResource.getDynamicRoot(
-          JSON.stringify($scope.model.config.startNode.dynamicRoot),
-            editorState.current.id,
-            editorState.current.parentId,
-            $scope.model.culture,
-            $scope.model.segment
-        ).then(function (ent) {
-          if(ent) {
-            dialogOptions.startNodeId = ($scope.model.config.idType === "udi" ? ent.udi : ent.id).toString();
-          } else {
-            console.error("The Dynamic Root query did not find any valid results");
-            $scope.invalidStartNode = true;
+              return false;
           }
-        });
+      }
+      if ($routeParams.section === "settings" && $routeParams.tree === "documentTypes") {
+          //if the content-picker is being rendered inside the document-type editor, we don't need to process the startnode query
+          dialogOptions.startNodeId = -1;
+      }
+      else if ($scope.model.config.startNode.query) {
+          entityResource.getByXPath(
+              $scope.model.config.startNode.query,
+              editorState.current.id,
+              editorState.current.parentId,
+              "Document"
+          ).then(function (ent) {
+              dialogOptions.startNodeId = ($scope.model.config.idType === "udi" ? ent.udi : ent.id).toString();
+          });
+      }
+      else if ($scope.model.config.startNode.dynamicRoot) {
+          $scope.invalidStartNode = false;
+          entityResource.getDynamicRoot(
+            JSON.stringify($scope.model.config.startNode.dynamicRoot),
+              editorState.current.id,
+              editorState.current.parentId,
+              $scope.model.culture,
+              $scope.model.segment
+          ).then(function (ent) {
+            if(ent) {
+              dialogOptions.startNodeId = ($scope.model.config.idType === "udi" ? ent.udi : ent.id).toString();
+            } else {
+              console.error("The Dynamic Root query did not find any valid results");
+              $scope.invalidStartNode = true;
+            }
+          });
+      }
+
+      else {
+          dialogOptions.startNodeId = $scope.model.config.startNode.id;
+      }
     }
 
-    else {
-        dialogOptions.startNodeId = $scope.model.config.startNode.id;
-    }
+    initDialogOptions();
 
     //dialog
     $scope.openCurrentPicker = function () {
@@ -425,6 +437,9 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
     $scope.$on('$destroy', function () {
         if (unsubscribe) {
             unsubscribe();
+        }
+        if (savedEventUnsubscribe) {
+          savedEventUnsubscribe();
         }
     });
 

@@ -36,6 +36,13 @@ export default class UmbLoginPageElement extends LitElement {
 
     if (!this.#formElement) return;
 
+    // We need to listen for the enter key to submit the form, because the uui-button does not support the native input fields submit event
+    this.#formElement.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        this.#onSubmitClick();
+      }
+    });
+
     this.#formElement.onsubmit = this.#handleSubmit;
   }
 
@@ -52,6 +59,12 @@ export default class UmbLoginPageElement extends LitElement {
     const username = formData.get('username') as string;
     const password = formData.get('password') as string;
     const persist = formData.has('persist');
+
+    if (!username || !password) {
+      this._loginError = await umbLocalizationContext.localize('auth_userFailedLogin');
+      this._loginState = 'failed';
+      return;
+    }
 
     this._loginState = 'waiting';
 

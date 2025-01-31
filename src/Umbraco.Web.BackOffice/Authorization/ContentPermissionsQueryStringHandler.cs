@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
@@ -60,9 +61,15 @@ public class
             nodeId = requirement.NodeId.Value;
         }
 
+        IUser? currentUser = BackOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+        if (currentUser is null)
+        {
+            return Task.FromResult(false);
+        }
+
         ContentPermissions.ContentAccess permissionResult = _contentPermissions.CheckPermissions(
             nodeId,
-            BackOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser,
+            currentUser,
             out IContent? contentItem,
             new[] { requirement.PermissionToCheck });
 

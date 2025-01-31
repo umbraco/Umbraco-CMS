@@ -102,9 +102,15 @@ public class UmbracoRequestPathsTests
     [TestCase("http://www.domain.com/install/test/test", true)]
     [TestCase("http://www.domain.com/Install/test/test.aspx", true)]
     [TestCase("http://www.domain.com/install/test/test.js", true)]
+    [TestCase("http://www.domain.com/install?param=value", true)]
     [TestCase("http://www.domain.com/instal", false)]
     [TestCase("http://www.domain.com/umbraco", false)]
     [TestCase("http://www.domain.com/umbraco/umbraco", false)]
+    [TestCase("http://www.domain.com/installation", false)]
+    [TestCase("http://www.domain.com/installation/", false)]
+    [TestCase("http://www.domain.com/installation/test", false)]
+    [TestCase("http://www.domain.com/installation/test.js", false)]
+    [TestCase("http://www.domain.com/installation?param=value", false)]
     public void Is_Installer_Request(string input, bool expected)
     {
         var source = new Uri(input);

@@ -129,6 +129,7 @@ public class GlobalSettings
     /// <summary>
     ///     Gets or sets a value indicating whether to install the database when it is missing.
     /// </summary>
+    [Obsolete("This option will be removed in V16.")]
     [DefaultValue(StaticInstallMissingDatabase)]
     public bool InstallMissingDatabase { get; set; } = StaticInstallMissingDatabase;
 

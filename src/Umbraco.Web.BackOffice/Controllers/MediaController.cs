@@ -471,7 +471,8 @@ public class MediaController : ContentControllerBase
             null); // media are all invariant
 
         // we will continue to save if model state is invalid, however we cannot save if critical data is missing.
-        // TODO: Allowing media to be saved when it is invalid is odd - media doesn't have a publish phase so suddenly invalid data is allowed to be 'live'
+        // this is a design decision, to continue to be able to save invalid content
+        //  as you can do the same with documents. This will be removed in a future version.
         if (!ModelState.IsValid)
         {
             // check for critical data validation issues, we can't continue saving if this data is invalid
@@ -495,10 +496,10 @@ public class MediaController : ContentControllerBase
         // return the updated model
         MediaItemDisplay? display = _umbracoMapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
 
-        // lastly, if it is not valid, add the model state to the outgoing object and throw a 403
+        // lastly, if it is not valid, add the model state to the outgoing object.
         if (!ModelState.IsValid)
         {
-            return ValidationProblem(display, ModelState, StatusCodes.Status403Forbidden);
+            return ValidationProblem(display, ModelState);
         }
 
         // put the correct msgs in

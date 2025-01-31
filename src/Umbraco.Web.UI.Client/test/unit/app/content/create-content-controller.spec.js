@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
 
     describe("create content dialog",
         function () {
@@ -89,12 +89,15 @@
                     expect(searcher.search).toHaveBeenCalledWith("blueprintId", "1");
                 });
 
-            it("skips selection and creates first blueprint when configured to",
+            it("skips selection and creates first blueprint when configured to and only one blueprint exists",
                 function () {
                     initialize({
                         allowBlank: true,
                         skipSelect: true
                     });
+
+                    // Ensure only one blueprint is available.
+                    allowedTypes[1].blueprints = { "1": "a" };
 
                     scope.createOrSelectBlueprintIfAny(allowedTypes[1]);
 
