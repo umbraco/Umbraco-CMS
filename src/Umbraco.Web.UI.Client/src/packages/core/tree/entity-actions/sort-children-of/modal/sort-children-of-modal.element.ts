@@ -286,10 +286,8 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		</uui-table-head-cell>`;
 	}
 
-	#renderChild(item: UmbTreeItemModel) {	
-		return html`
-		
-		<uui-table-row id="content-node" data-unique=${item.unique} class="${this._isSorting ? 'hidden' : ''}">
+	#renderChild(item: UmbTreeItemModel) {
+		return html` <uui-table-row id="content-node" data-unique=${item.unique} class="${this._isSorting ? 'hidden' : ''}">
 			<uui-table-cell><umb-icon name="${item.documentType.icon}"></umb-icon></uui-table-cell>
 			<uui-table-cell>${item.name}</uui-table-cell>
 			<uui-table-cell>${this.#renderCreateDate(item)}</uui-table-cell>
@@ -313,10 +311,11 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 			}
 
 			uui-table-cell {
-				padding: var(--uui-size-space-2);
+				padding: var(--uui-size-space-2) var(--uui-size-space-5);
 			}
+
 			uui-table-head-cell {
-				padding: 0;
+				padding: 0 var(--uui-size-space-5);
 			}
 
 			uui-table-head-cell button {
@@ -338,13 +337,13 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 			}
 
 			uui-table-row[id='content-node']:hover {
-				cursor: grab; 
+				cursor: grab;
 			}
 
 			uui-icon[name='icon-navigation'] {
 				cursor: hand;
 			}
-			
+
 			uui-box {
 				--uui-box-default-padding: 0;
 			}
