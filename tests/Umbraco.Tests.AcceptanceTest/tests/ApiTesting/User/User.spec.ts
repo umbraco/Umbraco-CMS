@@ -19,7 +19,7 @@ test.describe('User Tests', () => {
 
   test('can create a user', async ({umbracoApi}) => {
     // Act
-    userId = await umbracoApi.user.createDefaultUser(userName, userEmail, userGroupId);
+    userId = await umbracoApi.user.createDefaultUser(userName, userEmail, [userGroupId]);
 
     // Assert
     expect(await umbracoApi.user.doesExist(userId)).toBeTruthy();
@@ -28,7 +28,7 @@ test.describe('User Tests', () => {
   test('can update a user', async ({umbracoApi}) => {
     // Arrange
     const anotherUserGroup = await umbracoApi.userGroup.getByName("Translators");
-    userId = await umbracoApi.user.createDefaultUser(userName, userEmail, userGroupId);
+    userId = await umbracoApi.user.createDefaultUser(userName, userEmail, [userGroupId]);
     const userData = await umbracoApi.user.get(userId);
     const newUserGroupData = [
       userGroupId,
@@ -48,7 +48,7 @@ test.describe('User Tests', () => {
 
   test('can delete a user', async ({umbracoApi}) => {
     // Arrange
-    userId = await umbracoApi.user.createDefaultUser(userName, userEmail, userGroupId);
+    userId = await umbracoApi.user.createDefaultUser(userName, userEmail, [userGroupId]);
     expect(await umbracoApi.user.doesExist(userId)).toBeTruthy();
 
     // Act
