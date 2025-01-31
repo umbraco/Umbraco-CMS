@@ -46,12 +46,12 @@ export class UmbPropertyEditorUIAcceptedTypesElement
 		this._inputElement?.addValidator(
 			'badInput',
 			() => {
-				let message = 'One of the extensions is not valid.';
+				let message = this.localize.term('validation_invalidExtensions');
 				if (config.allowedUploadedFileExtensions.length) {
-					message += ` The extension must be one of the following: ${config.allowedUploadedFileExtensions.join(', ')}.`;
+					message += ` ${this.localize.term('validation_allowedExtensions')} ${config.allowedUploadedFileExtensions.join(', ')}`;
 				}
 				if (config.disallowedUploadedFilesExtensions.length) {
-					message += ` The extension must not be one of the following: ${config.disallowedUploadedFilesExtensions.join(', ')}.`;
+					message += ` ${this.localize.term('validation_disallowedExtensions')} ${config.disallowedUploadedFilesExtensions.join(', ')}`;
 				}
 				return message;
 			},
@@ -77,25 +77,23 @@ export class UmbPropertyEditorUIAcceptedTypesElement
 			return nothing;
 		}
 		return html`
-			<uui-box id="notice" headline="Notice">
-				<p>
-					Regardless of the accepted extensions below, the following limitations apply system-wide due to the server
-					configuration:
-				</p>
+			<uui-box id="notice" headline=${this.localize.term('general_serverConfiguration')}>
+				<p>${this.localize.term('media_noticeExtensionsServerOverride')}</p>
 				${this._acceptedTypes.length
 					? html`<p>
-							You can only upload files of the following types: <strong>${this._acceptedTypes.join(', ')}</strong>.
+							${this.localize.term('validation_allowedExtensions')} <strong>${this._acceptedTypes.join(', ')}</strong>
 						</p>`
 					: nothing}
 				${this._disallowedTypes.length
 					? html`<p>
-							Files of the following types are not allowed: <strong>${this._disallowedTypes.join(', ')}</strong>.
+							${this.localize.term('validation_disallowedExtensions')}
+							<strong>${this._disallowedTypes.join(', ')}</strong>
 						</p>`
 					: nothing}
 				${this._maxFileSize
 					? html`
 							<p>
-								The maximum file size is
+								${this.localize.term('media_maxFileSize')}
 								<strong title="${this.localize.number(this._maxFileSize)} bytes">
 									${formatBytes(this._maxFileSize, { decimals: 2 })} </strong
 								>.
