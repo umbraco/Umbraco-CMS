@@ -132,6 +132,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 			<uui-box id="toolbox" headline=${this.localize.term('tiptap_toobar_availableItems')}>
 				<div slot="header-actions">
 					<uui-input
+						label="search input"
 						type="search"
 						autocomplete="off"
 						placeholder=${this.localize.term('placeholders_filter')}
@@ -162,6 +163,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 			? nothing
 			: html`
 					<uui-button
+						.label="Choose action: ${this.localize.string(item.label)}"
 						compact
 						class=${forbidden ? 'forbidden' : ''}
 						draggable="true"
@@ -277,6 +279,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		return html`
 			<uui-button
 				compact
+				label="selected action: ${this.localize.string(item.label)}"
 				class=${forbidden ? 'forbidden' : ''}
 				draggable="true"
 				look=${forbidden ? 'placeholder' : 'outline'}

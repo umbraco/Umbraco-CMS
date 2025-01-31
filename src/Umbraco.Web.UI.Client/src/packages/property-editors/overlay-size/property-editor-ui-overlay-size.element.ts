@@ -25,6 +25,9 @@ export class UmbPropertyEditorUIOverlaySizeElement extends UmbLitElement impleme
 		{ value: 'full', name: 'Full' },
 	];
 
+	@property({ type: String })
+	name?: string;
+
 	@property({ attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
@@ -42,7 +45,7 @@ export class UmbPropertyEditorUIOverlaySizeElement extends UmbLitElement impleme
 	}
 
 	override render() {
-		return html`<uui-select .options=${this._list} @change=${this.#onChange}></uui-select>`;
+		return html`<uui-select label="Choose ${this.name}" .options=${this._list} @change=${this.#onChange}></uui-select>`;
 	}
 }
 

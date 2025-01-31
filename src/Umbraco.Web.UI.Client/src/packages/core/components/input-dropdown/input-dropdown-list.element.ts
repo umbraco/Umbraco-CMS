@@ -39,7 +39,7 @@ export class UmbInputDropdownListElement extends UUIFormControlMixin(UmbLitEleme
 	}
 
 	override render() {
-		return html`<uui-select
+		return html`<uui-select 
 			label=${this.localize.term('formProviderFieldTypes_dropdownName')}
 			.placeholder=${this.placeholder ?? ''}
 			.options=${this.options ?? []}
