@@ -131,6 +131,11 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 					this.#parentMessages = msgs;
 					msgs.forEach((msg) => {
 						const path = ReplaceStartOfPath(msg.path, this.#baseDataPath!, '$');
+						if (path === undefined) {
+							throw new Error(
+								'Path was not transformed correctly and can therefor not be transfered to the local validation context messages.',
+							);
+						}
 						// Notice, the local message uses the same key. [NL]
 						this.messages.addMessage(msg.type, path, msg.body, msg.key);
 					});
@@ -152,6 +157,11 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 					msgs.forEach((msg) => {
 						// replace this.#baseDataPath (if it starts with it) with $ in the path, so it becomes relative to the parent context
 						const path = ReplaceStartOfPath(msg.path, '$', this.#baseDataPath!);
+						if (path === undefined) {
+							throw new Error(
+								'Path was not transformed correctly and can therefor not be synced with parent messages.',
+							);
+						}
 						// Notice, the parent message uses the same key. [NL]
 						this.#parent!.messages.addMessage(msg.type, path, msg.body, msg.key);
 					});
