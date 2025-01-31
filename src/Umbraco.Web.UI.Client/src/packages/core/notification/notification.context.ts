@@ -12,7 +12,6 @@ export interface UmbNotificationDefaultData {
 	message: string;
 	headline?: string;
 	structuredList?: Record<string, Array<unknown>>;
-	whitespace?: 'normal' | 'pre-line' | 'pre-wrap' | 'nowrap' | 'pre';
 }
 
 /**
