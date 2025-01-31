@@ -26,9 +26,16 @@ export class UmbDeleteEntityAction extends UmbEntityActionBase<MetaEntityActionD
 		if (!item) throw new Error('Item not found.');
 
 		const headline = this.args.meta.confirm?.headline ?? '#actions_delete';
-		const content = this.args.meta.confirm?.message ?? '#defaultdialogs_confirmdelete';
-		const keysFromString = this.#localize.getKeysFromString(content);
-		const argsMap: UmbLocalizeStringArgsMap = keysFromString.reduce((acc: UmbLocalizeStringArgsMap, key) => {
+		const message = this.args.meta.confirm?.message ?? '#defaultdialogs_confirmdelete';
+
+		/* We need to replace the token in a translation with the item name.
+		 A string can potentially consist of multiple translation keys.
+		 First we find all the translation keys in message. */
+		const keysFromMessageString = this.#localize.getKeysFromString(message);
+
+		// Second we create a map of the translation keys found in the message and the arguments that should replace the tokens.
+		// This will enable the localize service to pass and replace the tokens in the all the translations with the item name.
+		const argsMap: UmbLocalizeStringArgsMap = keysFromMessageString.reduce((acc: UmbLocalizeStringArgsMap, key) => {
 			acc[key] = [item.name];
 			return acc;
 		}, {});
@@ -36,7 +43,7 @@ export class UmbDeleteEntityAction extends UmbEntityActionBase<MetaEntityActionD
 		// TODO: handle items with variants
 		await umbConfirmModal(this._host, {
 			headline: this.#localize.string(headline),
-			content: this.#localize.string(content, argsMap),
+			content: this.#localize.string(message, argsMap),
 			color: 'danger',
 			confirmLabel: '#general_delete',
 		});
