@@ -1,1 +1,1 @@
-export const UMB_WEBHOOK_DELIVERIES_COLLECTION_REPOSITORY_ALIAS = 'Umb.Repository.WebhookDeliveriesCollection';
+export const UMB_WEBHOOK_DELIVERY_COLLECTION_REPOSITORY_ALIAS = 'Umb.Repository.WebhookDelivery.Collection';
