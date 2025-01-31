@@ -18,7 +18,7 @@ public class PublishedElement : IPublishedElement
 
     // initializes a new instance of the PublishedElement class
     // within the context of a published snapshot service (eg a published content property value)
-    public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object?>? values, bool previewing, PropertyCacheLevel referenceCacheLevel, IPublishedSnapshotAccessor? publishedSnapshotAccessor)
+    public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object?>? values, bool previewing, PropertyCacheLevel referenceCacheLevel, ICacheManager? cacheManager)
     {
         if (key == Guid.Empty)
         {
@@ -28,13 +28,6 @@ public class PublishedElement : IPublishedElement
         if (values == null)
         {
             throw new ArgumentNullException(nameof(values));
-        }
-
-        if (referenceCacheLevel != PropertyCacheLevel.None && publishedSnapshotAccessor == null)
-        {
-            throw new ArgumentNullException(
-                "A published snapshot accessor is required when referenceCacheLevel != None.",
-                nameof(publishedSnapshotAccessor));
         }
 
         ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
@@ -47,10 +40,10 @@ public class PublishedElement : IPublishedElement
                                .Select(propertyType =>
                                {
                                    values.TryGetValue(propertyType.Alias, out var value);
-                                   return (IPublishedProperty)new PublishedElementPropertyBase(propertyType, this, previewing, referenceCacheLevel, value, publishedSnapshotAccessor);
+                                   return (IPublishedProperty)new PublishedElementPropertyBase(propertyType, this, previewing, referenceCacheLevel,cacheManager, value);
                                })
                                .ToArray()
-                           ?? new IPublishedProperty[0];
+                           ?? [];
     }
 
     // initializes a new instance of the PublishedElement class

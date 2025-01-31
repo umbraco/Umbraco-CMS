@@ -32,7 +32,9 @@ public class FilePermissionHelper : IFilePermissionHelper
     /// <summary>
     ///     Initializes a new instance of the <see cref="FilePermissionHelper" /> class.
     /// </summary>
-    public FilePermissionHelper(IOptions<GlobalSettings> globalSettings, IIOHelper ioHelper,
+    public FilePermissionHelper(
+        IOptions<GlobalSettings> globalSettings,
+        IIOHelper ioHelper,
         IHostingEnvironment hostingEnvironment)
     {
         _globalSettings = globalSettings.Value;
@@ -51,7 +53,6 @@ public class FilePermissionHelper : IFilePermissionHelper
         {
             hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Bin),
             hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Umbraco),
-            hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoPath),
             hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Packages),
         };
     }

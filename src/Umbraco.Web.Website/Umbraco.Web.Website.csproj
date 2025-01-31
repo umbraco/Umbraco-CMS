@@ -5,13 +5,19 @@
     <Description>Contains the website assembly needed to run the frontend of Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Web.Website</RootNamespace>
   </PropertyGroup>
+  
   <PropertyGroup>
-    <!--  TODO: [ASP0019] use IHeaderDictionary.Append or the indexer to append or set headers,
-    [CS0618] handle member obsolete appropriately, [SA1401] make fields private,
-    [SA1649] update file name, and remove this override, [IDE1006] fix namin rule violation,
-    and remove override -->
-    <WarningsNotAsErrors>ASP0019,CS0618,SA1401,SA1649,IDE0270,IDE1006</WarningsNotAsErrors>
+    <!--
+      TODO: Fix and remove overrides:
+      [ASP0019] use IHeaderDictionary.Append or the indexer to append or set headers
+      [CS0618] handle member obsolete appropriately
+      [SA1401] make fields private
+      [SA1649] update file name, and remove this override
+      [IDE1006] fix naming rule violation
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),ASP0019,CS0618,SA1401,SA1649,IDE1006</WarningsNotAsErrors>
   </PropertyGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
   </ItemGroup>

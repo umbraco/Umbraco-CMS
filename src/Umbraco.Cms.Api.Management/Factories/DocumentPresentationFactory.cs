@@ -22,21 +22,25 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
     private readonly ITemplateService _templateService;
     private readonly IPublicAccessService _publicAccessService;
     private readonly TimeProvider _timeProvider;
+    private readonly IIdKeyMap _idKeyMap;
 
     public DocumentPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IDocumentUrlFactory documentUrlFactory,
         ITemplateService templateService,
         IPublicAccessService publicAccessService,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IIdKeyMap idKeyMap)
     {
         _umbracoMapper = umbracoMapper;
         _documentUrlFactory = documentUrlFactory;
         _templateService = templateService;
         _publicAccessService = publicAccessService;
         _timeProvider = timeProvider;
+        _idKeyMap = idKeyMap;
     }
 
+    [Obsolete("Schedule for removal in v17")]
     public async Task<DocumentResponseModel> CreateResponseModelAsync(IContent content)
     {
         DocumentResponseModel responseModel = _umbracoMapper.Map<DocumentResponseModel>(content)!;
@@ -54,12 +58,51 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         return responseModel;
     }
 
+    public async Task<PublishedDocumentResponseModel> CreatePublishedResponseModelAsync(IContent content)
+    {
+        PublishedDocumentResponseModel responseModel = _umbracoMapper.Map<PublishedDocumentResponseModel>(content)!;
+
+        responseModel.Urls = await _documentUrlFactory.CreateUrlsAsync(content);
+
+        Guid? templateKey = content.PublishTemplateId.HasValue
+            ? _templateService.GetAsync(content.PublishTemplateId.Value).Result?.Key
+            : null;
+
+        responseModel.Template = templateKey.HasValue
+            ? new ReferenceByIdModel { Id = templateKey.Value }
+            : null;
+
+        return responseModel;
+    }
+
+    public async Task<DocumentResponseModel> CreateResponseModelAsync(IContent content, ContentScheduleCollection schedule)
+    {
+        DocumentResponseModel responseModel = _umbracoMapper.Map<DocumentResponseModel>(content)!;
+        _umbracoMapper.Map(schedule, responseModel);
+
+        responseModel.Urls = await _documentUrlFactory.CreateUrlsAsync(content);
+
+        Guid? templateKey = content.TemplateId.HasValue
+            ? _templateService.GetAsync(content.TemplateId.Value).Result?.Key
+            : null;
+
+        responseModel.Template = templateKey.HasValue
+            ? new ReferenceByIdModel { Id = templateKey.Value }
+            : null;
+
+        return responseModel;
+    }
+
     public DocumentItemResponseModel CreateItemResponseModel(IDocumentEntitySlim entity)
     {
+        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(entity.ParentId, UmbracoObjectTypes.Document);
+
         var responseModel = new DocumentItemResponseModel
         {
             Id = entity.Key,
-            IsTrashed = entity.Trashed
+            IsTrashed = entity.Trashed,
+            Parent = parentKeyAttempt.Success ? new ReferenceByIdModel { Id = parentKeyAttempt.Result } : null,
+            HasChildren = entity.HasChildren,
         };
 
         responseModel.IsProtected = _publicAccessService.IsProtected(entity.Path);
@@ -111,6 +154,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
     public DocumentTypeReferenceResponseModel CreateDocumentTypeReferenceResponseModel(IDocumentEntitySlim entity)
         => _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(entity)!;
 
+    [Obsolete("Use CreateCulturePublishScheduleModels instead. Scheduled for removal in v17")]
     public Attempt<CultureAndScheduleModel, ContentPublishingOperationStatus> CreateCultureAndScheduleModel(PublishDocumentRequestModel requestModel)
     {
         var contentScheduleCollection = new ContentScheduleCollection();
@@ -119,7 +163,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         {
             if (cultureAndScheduleRequestModel.Schedule is null || (cultureAndScheduleRequestModel.Schedule.PublishTime is null && cultureAndScheduleRequestModel.Schedule.UnpublishTime is null))
             {
-                culturesToPublishImmediately.Add(cultureAndScheduleRequestModel.Culture ?? "*"); // API have `null` for invariant, but service layer has "*".
+                culturesToPublishImmediately.Add(cultureAndScheduleRequestModel.Culture ?? Constants.System.InvariantCulture); // API have `null` for invariant, but service layer has "*".
                 continue;
             }
 
@@ -135,7 +179,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
                 }
 
                 contentScheduleCollection.Add(new ContentSchedule(
-                    cultureAndScheduleRequestModel.Culture ?? "*",
+                    cultureAndScheduleRequestModel.Culture ?? Constants.System.InvariantCulture,
                     cultureAndScheduleRequestModel.Schedule.PublishTime.Value.UtcDateTime,
                     ContentScheduleAction.Release));
             }
@@ -160,7 +204,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
                 }
 
                 contentScheduleCollection.Add(new ContentSchedule(
-                    cultureAndScheduleRequestModel.Culture ?? "*",
+                    cultureAndScheduleRequestModel.Culture ?? Constants.System.InvariantCulture,
                     cultureAndScheduleRequestModel.Schedule.UnpublishTime.Value.UtcDateTime,
                     ContentScheduleAction.Expire));
             }
@@ -170,5 +214,52 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
             Schedules = contentScheduleCollection,
             CulturesToPublishImmediately = culturesToPublishImmediately,
         });
+    }
+
+    public Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> CreateCulturePublishScheduleModels(PublishDocumentRequestModel requestModel)
+    {
+        var model = new List<CulturePublishScheduleModel>();
+
+        foreach (CultureAndScheduleRequestModel cultureAndScheduleRequestModel in requestModel.PublishSchedules)
+        {
+            if (cultureAndScheduleRequestModel.Schedule is null)
+            {
+                model.Add(new CulturePublishScheduleModel
+                {
+                    Culture = cultureAndScheduleRequestModel.Culture
+                              ?? Constants.System.InvariantCulture // API have `null` for invariant, but service layer has "*".
+                });
+                continue;
+            }
+
+            if (cultureAndScheduleRequestModel.Schedule.PublishTime is not null
+                && cultureAndScheduleRequestModel.Schedule.PublishTime <= _timeProvider.GetUtcNow())
+            {
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.PublishTimeNeedsToBeInFuture, model);
+            }
+
+            if (cultureAndScheduleRequestModel.Schedule.UnpublishTime is not null
+                && cultureAndScheduleRequestModel.Schedule.UnpublishTime <= _timeProvider.GetUtcNow())
+            {
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.UpublishTimeNeedsToBeInFuture, model);
+            }
+
+            if (cultureAndScheduleRequestModel.Schedule.UnpublishTime <= cultureAndScheduleRequestModel.Schedule.PublishTime)
+            {
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.UnpublishTimeNeedsToBeAfterPublishTime, model);
+            }
+
+            model.Add(new CulturePublishScheduleModel
+            {
+                Culture = cultureAndScheduleRequestModel.Culture,
+                Schedule = new ContentScheduleModel
+                {
+                    PublishDate = cultureAndScheduleRequestModel.Schedule.PublishTime,
+                    UnpublishDate = cultureAndScheduleRequestModel.Schedule.UnpublishTime,
+                },
+            });
+        }
+
+        return Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, model);
     }
 }

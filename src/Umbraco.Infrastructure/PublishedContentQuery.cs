@@ -17,7 +17,8 @@ namespace Umbraco.Cms.Infrastructure;
 public class PublishedContentQuery : IPublishedContentQuery
 {
     private readonly IExamineManager _examineManager;
-    private readonly IPublishedSnapshot _publishedSnapshot;
+    private readonly IPublishedContentCache _publishedContent;
+    private readonly IPublishedMediaCache _publishedMediaCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private static readonly HashSet<string> _returnedQueryFields =
         new() { ExamineFieldNames.ItemIdFieldName, ExamineFieldNames.CategoryFieldName };
@@ -25,13 +26,17 @@ public class PublishedContentQuery : IPublishedContentQuery
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedContentQuery" /> class.
     /// </summary>
-    public PublishedContentQuery(IPublishedSnapshot publishedSnapshot,
-        IVariationContextAccessor variationContextAccessor, IExamineManager examineManager)
+    public PublishedContentQuery(
+        IVariationContextAccessor variationContextAccessor,
+        IExamineManager examineManager,
+        IPublishedContentCache publishedContent,
+        IPublishedMediaCache publishedMediaCache)
     {
-        _publishedSnapshot = publishedSnapshot ?? throw new ArgumentNullException(nameof(publishedSnapshot));
         _variationContextAccessor = variationContextAccessor ??
                                     throw new ArgumentNullException(nameof(variationContextAccessor));
         _examineManager = examineManager ?? throw new ArgumentNullException(nameof(examineManager));
+        _publishedContent = publishedContent;
+        _publishedMediaCache = publishedMediaCache;
     }
 
     #region Convert Helpers
@@ -92,10 +97,10 @@ public class PublishedContentQuery : IPublishedContentQuery
     #region Content
 
     public IPublishedContent? Content(int id)
-        => ItemById(id, _publishedSnapshot.Content);
+        => ItemById(id, _publishedContent);
 
     public IPublishedContent? Content(Guid id)
-        => ItemById(id, _publishedSnapshot.Content);
+        => ItemById(id, _publishedContent);
 
     public IPublishedContent? Content(Udi? id)
     {
@@ -104,7 +109,7 @@ public class PublishedContentQuery : IPublishedContentQuery
             return null;
         }
 
-        return ItemById(udi.Guid, _publishedSnapshot.Content);
+        return ItemById(udi.Guid, _publishedContent);
     }
 
     public IPublishedContent? Content(object id)
@@ -128,26 +133,26 @@ public class PublishedContentQuery : IPublishedContentQuery
     }
 
     public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids)
-        => ItemsByIds(_publishedSnapshot.Content, ids);
+        => ItemsByIds(_publishedContent, ids);
 
     public IEnumerable<IPublishedContent> Content(IEnumerable<Guid> ids)
-        => ItemsByIds(_publishedSnapshot.Content, ids);
+        => ItemsByIds(_publishedContent, ids);
 
     public IEnumerable<IPublishedContent> Content(IEnumerable<object> ids)
         => ids.Select(Content).WhereNotNull();
 
     public IEnumerable<IPublishedContent> ContentAtRoot()
-        => ItemsAtRoot(_publishedSnapshot.Content);
+        => ItemsAtRoot(_publishedContent);
 
     #endregion
 
     #region Media
 
     public IPublishedContent? Media(int id)
-        => ItemById(id, _publishedSnapshot.Media);
+        => ItemById(id, _publishedMediaCache);
 
     public IPublishedContent? Media(Guid id)
-        => ItemById(id, _publishedSnapshot.Media);
+        => ItemById(id, _publishedMediaCache);
 
     public IPublishedContent? Media(Udi? id)
     {
@@ -156,7 +161,7 @@ public class PublishedContentQuery : IPublishedContentQuery
             return null;
         }
 
-        return ItemById(udi.Guid, _publishedSnapshot.Media);
+        return ItemById(udi.Guid, _publishedMediaCache);
     }
 
     public IPublishedContent? Media(object id)
@@ -180,16 +185,16 @@ public class PublishedContentQuery : IPublishedContentQuery
     }
 
     public IEnumerable<IPublishedContent> Media(IEnumerable<int> ids)
-        => ItemsByIds(_publishedSnapshot.Media, ids);
+        => ItemsByIds(_publishedMediaCache, ids);
 
     public IEnumerable<IPublishedContent> Media(IEnumerable<object> ids)
         => ids.Select(Media).WhereNotNull();
 
     public IEnumerable<IPublishedContent> Media(IEnumerable<Guid> ids)
-        => ItemsByIds(_publishedSnapshot.Media, ids);
+        => ItemsByIds(_publishedMediaCache, ids);
 
     public IEnumerable<IPublishedContent> MediaAtRoot()
-        => ItemsAtRoot(_publishedSnapshot.Media);
+        => ItemsAtRoot(_publishedMediaCache);
 
     #endregion
 
@@ -317,8 +322,8 @@ public class PublishedContentQuery : IPublishedContentQuery
         totalRecords = results.TotalItemCount;
 
         return culture.IsNullOrWhiteSpace()
-            ? results.ToPublishedSearchResults(_publishedSnapshot)
-            : new CultureContextualSearchResults(results.ToPublishedSearchResults(_publishedSnapshot.Content), _variationContextAccessor, culture);
+            ? results.ToPublishedSearchResults(_publishedContent)
+            : new CultureContextualSearchResults(results.ToPublishedSearchResults(_publishedContent), _variationContextAccessor, culture);
     }
 
     /// <summary>
@@ -331,8 +336,10 @@ public class PublishedContentQuery : IPublishedContentQuery
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IEnumerable<PublishedSearchResult> _wrapped;
 
-        public CultureContextualSearchResults(IEnumerable<PublishedSearchResult> wrapped,
-            IVariationContextAccessor variationContextAccessor, string culture)
+        public CultureContextualSearchResults(
+            IEnumerable<PublishedSearchResult> wrapped,
+            IVariationContextAccessor variationContextAccessor,
+            string culture)
         {
             _wrapped = wrapped;
             _variationContextAccessor = variationContextAccessor;

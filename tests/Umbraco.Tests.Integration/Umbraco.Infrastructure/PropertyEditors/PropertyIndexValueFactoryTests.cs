@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
+internal class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
 {
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -46,20 +46,22 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
         var propertyValue = RichTextPropertyEditorHelper.SerializeRichTextEditorValue(
             new RichTextEditorValue
             {
-                Markup = @$"<p>This is some markup</p><umb-rte-block data-content-udi=""umb://element/{elementId:N}""><!--Umbraco-Block--></umb-rte-block>",
+                Markup = @$"<p>This is some markup</p><umb-rte-block data-content-key=""{elementId:D}""><!--Umbraco-Block--></umb-rte-block>",
                 Blocks = JsonSerializer.Deserialize<RichTextBlockValue>($$"""
                                                                   {
                                                                   	"layout": {
                                                                   		"Umbraco.TinyMCE": [{
-                                                                  				"contentUdi": "umb://element/{{elementId:N}}"
+                                                                  				"contentKey": "{{elementId:D}}"
                                                                   			}
                                                                   		]
                                                                   	},
                                                                   	"contentData": [{
                                                                   			"contentTypeKey": "{{elementType.Key:D}}",
-                                                                  			"udi": "umb://element/{{elementId:N}}",
-                                                                  			"singleLineText": "The single line of text in the block",
-                                                                  			"bodyText": "<p>The body text in the block</p>"
+                                                                  			"key": "{{elementId:D}}",
+                                                                  			"values": [
+                                                                  			    { "alias": "singleLineText", "value": "The single line of text in the block" },
+                                                                                { "alias": "bodyText", "value": "<p>The body text in the block</p>" }
+                                                                  			]
                                                                   		}
                                                                   	],
                                                                   	"settingsData": []
@@ -81,12 +83,13 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
             contentTypeDictionary: new Dictionary<Guid, IContentType>
             {
                 { elementType.Key, elementType }, { contentType.Key, contentType }
-            }).ToDictionary();
+            });
 
-        Assert.IsTrue(indexValues.TryGetValue("bodyText", out var bodyTextIndexValues));
+        var indexValue = indexValues.FirstOrDefault(v => v.FieldName == "bodyText");
+        Assert.IsNotNull(indexValue);
 
-        Assert.AreEqual(1, bodyTextIndexValues.Count());
-        var bodyTextIndexValue = bodyTextIndexValues.First() as string;
+        Assert.AreEqual(1, indexValue.Values.Count());
+        var bodyTextIndexValue = indexValue.Values.First() as string;
         Assert.IsNotNull(bodyTextIndexValue);
 
         Assert.Multiple(() =>
@@ -120,12 +123,13 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
             contentTypeDictionary: new Dictionary<Guid, IContentType>
             {
                 { contentType.Key, contentType }
-            }).ToDictionary();
+            });
 
-        Assert.IsTrue(indexValues.TryGetValue("bodyText", out var bodyTextIndexValues));
+        var indexValue = indexValues.FirstOrDefault(v => v.FieldName == "bodyText");
+        Assert.IsNotNull(indexValue);
 
-        Assert.AreEqual(1, bodyTextIndexValues.Count());
-        var bodyTextIndexValue = bodyTextIndexValues.First() as string;
+        Assert.AreEqual(1, indexValue.Values.Count());
+        var bodyTextIndexValue = indexValue.Values.First() as string;
         Assert.IsNotNull(bodyTextIndexValue);
         Assert.IsTrue(bodyTextIndexValue.Contains("This is some markup"));
     }
@@ -170,24 +174,23 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
 
         var editor = dataType.Editor!;
 
-        var contentElementUdi = new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid());
+        var contentElementKey = Guid.NewGuid();
         var blockListValue = new BlockListValue(
         [
-            new BlockListLayoutItem(contentElementUdi)
+            new BlockListLayoutItem(contentElementKey)
         ])
         {
             ContentData =
             [
-                new(contentElementUdi, elementType.Key, elementType.Alias)
+                new(contentElementKey, elementType.Key, elementType.Alias)
                 {
-                    RawPropertyValues = new Dictionary<string, object?>
+                    Values = new List<BlockPropertyValue>
                     {
-                        {"singleLineText", "The single line of text in the block"},
-                        {"bodyText", "<p>The body text in the block</p>"}
+                        new() { Alias = "singleLineText", Value = "The single line of text in the block" },
+                        new() { Alias = "bodyText", Value = "<p>The body text in the block</p>" },
                     }
                 }
             ],
-            SettingsData = []
         };
         var propertyValue = JsonSerializer.Serialize(blockListValue);
 
@@ -204,12 +207,13 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
             contentTypeDictionary: new Dictionary<Guid, IContentType>
             {
                 { elementType.Key, elementType }, { contentType.Key, contentType }
-            }).ToDictionary();
+            });
 
-        Assert.IsTrue(indexValues.TryGetValue("blocks", out var blocksIndexValues));
+        var indexValue = indexValues.FirstOrDefault(v => v.FieldName == "blocks");
+        Assert.IsNotNull(indexValue);
 
-        Assert.AreEqual(1, blocksIndexValues.Count());
-        var blockIndexValue = blocksIndexValues.First() as string;
+        Assert.AreEqual(1, indexValue.Values.Count());
+        var blockIndexValue = indexValue.Values.First() as string;
         Assert.IsNotNull(blockIndexValue);
 
         Assert.Multiple(() =>
@@ -272,11 +276,11 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
 
         var editor = dataType.Editor!;
 
-        var contentElementUdi = new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid());
-        var contentAreaElementUdi = new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid());
+        var contentElementKey = Guid.NewGuid();
+        var contentAreaElementKey = Guid.NewGuid();
         var blockGridValue = new BlockGridValue(
         [
-            new BlockGridLayoutItem(contentElementUdi)
+            new BlockGridLayoutItem(contentElementKey)
             {
                 ColumnSpan = 12,
                 RowSpan = 1,
@@ -286,7 +290,7 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
                     {
                         Items =
                         [
-                            new BlockGridLayoutItem(contentAreaElementUdi)
+                            new BlockGridLayoutItem(contentAreaElementKey)
                             {
                                 ColumnSpan = 12,
                                 RowSpan = 1,
@@ -299,22 +303,22 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
         {
             ContentData =
             [
-                new(contentElementUdi, elementType.Key, elementType.Alias)
+                new(contentElementKey, elementType.Key, elementType.Alias)
                 {
-                    RawPropertyValues = new()
+                    Values = new List<BlockPropertyValue>
                     {
-                        { "singleLineText", "The single line of text in the grid root" },
-                        { "bodyText", "<p>The body text in the grid root</p>" },
-                    },
+                        new() { Alias = "singleLineText", Value = "The single line of text in the grid root" },
+                        new() { Alias = "bodyText", Value = "<p>The body text in the grid root</p>" },
+                    }
                 },
-                new(contentAreaElementUdi, elementType.Key, elementType.Alias)
+                new(contentAreaElementKey, elementType.Key, elementType.Alias)
                 {
-                    RawPropertyValues = new()
+                    Values = new List<BlockPropertyValue>
                     {
-                        { "singleLineText", "The single line of text in the grid area" },
-                        { "bodyText", "<p>The body text in the grid area</p>" },
-                    },
-                },
+                        new() { Alias = "singleLineText", Value = "The single line of text in the grid area" },
+                        new() { Alias = "bodyText", Value = "<p>The body text in the grid area</p>" },
+                    }
+                }
             ],
         };
         var propertyValue = JsonSerializer.Serialize(blockGridValue);
@@ -332,12 +336,13 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
             contentTypeDictionary: new Dictionary<Guid, IContentType>
             {
                 { elementType.Key, elementType }, { contentType.Key, contentType }
-            }).ToDictionary();
+            });
 
-        Assert.IsTrue(indexValues.TryGetValue("blocks", out var blocksIndexValues));
+        var indexValue = indexValues.FirstOrDefault(v => v.FieldName == "blocks");
+        Assert.IsNotNull(indexValue);
 
-        Assert.AreEqual(1, blocksIndexValues.Count());
-        var blockIndexValue = blocksIndexValues.First() as string;
+        Assert.AreEqual(1, indexValue.Values.Count());
+        var blockIndexValue = indexValue.Values.First() as string;
         Assert.IsNotNull(blockIndexValue);
 
         Assert.Multiple(() =>

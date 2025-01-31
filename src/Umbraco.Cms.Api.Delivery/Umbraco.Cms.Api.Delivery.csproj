@@ -3,10 +3,16 @@
     <Title>Umbraco CMS - Delivery API</Title>
     <Description>Contains the presentation layer for the Umbraco CMS Delivery API.</Description>
   </PropertyGroup>
+  
   <PropertyGroup>
-    <!--  TODO: [ASP0019] use IHeaderDictionary.Append or the indexer to append or set headers and remove this override -->
-    <WarningsNotAsErrors>ASP0019</WarningsNotAsErrors>
+    <!--
+      TODO: Fix and remove overrides:
+      [ASP0019] use IHeaderDictionary.Append or the indexer to append or set headers
+      [CS0618/CS0612] update obsolete references
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),ASP0019,CS0618,CS0612</WarningsNotAsErrors>
   </PropertyGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj" />
     <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />

@@ -1,6 +1,7 @@
 ﻿import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
+// Skip all tests as this feature is removed
 const relationTypeName = 'Test Relation Type';
 const objectTypeName = 'Document';
 let relationTypeId = '';
@@ -88,7 +89,7 @@ test.skip('can delete a relation type', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.relationType.clickRootFolderCaretButton();
   await umbracoUi.relationType.clickActionsMenuForRelationType(relationTypeName);
-  await umbracoUi.relationType.clickDeleteExactLabel();
+  await umbracoUi.relationType.clickDeleteButton();
   await umbracoUi.relationType.clickConfirmToDeleteButton();
 
   // Assert

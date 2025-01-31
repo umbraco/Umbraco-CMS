@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
 internal class CollectibleRuntimeViewCompiler : IViewCompiler
 {
-    private readonly object _cacheLock = new object();
+    private readonly Lock _cacheLock = new();
     private readonly Dictionary<string, CompiledViewDescriptor> _precompiledViews;
     private readonly ConcurrentDictionary<string, string> _normalizedPathCache;
     private readonly IFileProvider _fileProvider;
@@ -40,29 +40,14 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         CompilationOptionsProvider compilationOptionsProvider,
         InMemoryAssemblyLoadContextManager loadContextManager)
     {
-        if (fileProvider == null)
-        {
-            throw new ArgumentNullException(nameof(fileProvider));
-        }
-
-        if (projectEngine == null)
-        {
-            throw new ArgumentNullException(nameof(projectEngine));
-        }
-
         if (precompiledViews == null)
         {
             throw new ArgumentNullException(nameof(precompiledViews));
         }
 
-        if (logger == null)
-        {
-            throw new ArgumentNullException(nameof(logger));
-        }
-
-        _fileProvider = fileProvider;
-        _projectEngine = projectEngine;
-        _logger = logger;
+        _fileProvider = fileProvider ?? throw new ArgumentNullException(nameof(fileProvider));
+        _projectEngine = projectEngine ?? throw new ArgumentNullException(nameof(projectEngine));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _referenceManager = referenceManager;
         _compilationOptionsProvider = compilationOptionsProvider;
         _loadContextManager = loadContextManager;
@@ -81,15 +66,12 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
             precompiledViews.Count,
             StringComparer.OrdinalIgnoreCase);
 
-        foreach (var precompiledView in precompiledViews)
+        foreach (CompiledViewDescriptor precompiledView in precompiledViews)
         {
             _logger.LogDebug("Initializing Razor view compiler with compiled view: '{ViewName}'", precompiledView.RelativePath);
-            if (!_precompiledViews.ContainsKey(precompiledView.RelativePath))
-            {
-                // View ordering has precedence semantics, a view with a higher precedence was
-                // already added to the list.
-                _precompiledViews.Add(precompiledView.RelativePath, precompiledView);
-            }
+            // View ordering has precedence semantics, a view with a higher precedence was
+            // already added to the list.
+            _precompiledViews.TryAdd(precompiledView.RelativePath, precompiledView);
         }
 
         if (_precompiledViews.Count == 0)
@@ -117,7 +99,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
 
         // Attempt to lookup the cache entry using the passed in path. This will succeed if the path is already
         // normalized and a cache entry exists.
-        if (_cache.TryGetValue<Task<CompiledViewDescriptor>>(relativePath, out var cachedResult) && cachedResult is not null)
+        if (_cache.TryGetValue<Task<CompiledViewDescriptor>>(relativePath, out Task<CompiledViewDescriptor>? cachedResult) && cachedResult is not null)
         {
             return cachedResult;
         }
@@ -145,12 +127,12 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         lock (_cacheLock)
         {
             // Double-checked locking to handle a possible race.
-            if (_cache.TryGetValue<Task<CompiledViewDescriptor>>(normalizedPath, out var result) && result is not null)
+            if (_cache.TryGetValue<Task<CompiledViewDescriptor>>(normalizedPath, out Task<CompiledViewDescriptor>? result) && result is not null)
             {
                 return result;
             }
 
-            if (_precompiledViews.TryGetValue(normalizedPath, out var precompiledView))
+            if (_precompiledViews.TryGetValue(normalizedPath, out CompiledViewDescriptor? precompiledView))
             {
                 _logger.LogTrace("Located compiled view for view at path '{Path}'", normalizedPath);
                 item = CreatePrecompiledWorkItem(normalizedPath, precompiledView);
@@ -191,7 +173,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
             Debug.Assert(taskSource != null);
 
             if (item.Descriptor?.Item != null &&
-                ChecksumValidator.IsItemValid(_projectEngine.FileSystem, item.Descriptor.Item) )
+                ChecksumValidator.IsItemValid(_projectEngine.FileSystem, item.Descriptor.Item))
             {
                 // If the item has checksums to validate, we should also have a precompiled view.
                 Debug.Assert(item.Descriptor != null);
@@ -203,7 +185,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
             _logger.LogTrace("Invalidating compiled view at path '{Path}' with a file since the checksum did not match", item.NormalizedPath);
             try
             {
-                var descriptor = CompileAndEmit(normalizedPath);
+                CompiledViewDescriptor descriptor = CompileAndEmit(normalizedPath);
                 descriptor.ExpirationTokens = cacheEntryOptions.ExpirationTokens;
                 taskSource.SetResult(descriptor);
             }
@@ -269,7 +251,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
                 _fileProvider.Watch(normalizedPath),
             };
 
-        var projectItem = _projectEngine.FileSystem.GetItem(normalizedPath, fileKind: null);
+        RazorProjectItem projectItem = _projectEngine.FileSystem.GetItem(normalizedPath, fileKind: null);
         if (!projectItem.Exists)
         {
             _logger.LogTrace("Could not find a file for view at path '{Path}'", normalizedPath);
@@ -307,7 +289,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
 
     private IList<IChangeToken> GetExpirationTokens(CompiledViewDescriptor precompiledView)
     {
-        var checksums = precompiledView.Item.GetChecksumMetadata();
+        IReadOnlyList<IRazorSourceChecksumMetadata> checksums = precompiledView.Item.GetChecksumMetadata();
         var expirationTokens = new List<IChangeToken>(checksums.Count);
 
         for (var i = 0; i < checksums.Count; i++)
@@ -324,10 +306,10 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
     {
         // OK this means we can do compilation. For now let's just identify the other files we need to watch
         // so we can create the cache entry. Compilation will happen after we release the lock.
-        var importFeature = _projectEngine.ProjectFeatures.OfType<IImportProjectFeature>().ToArray();
-        foreach (var feature in importFeature)
+        IImportProjectFeature[] importFeature = _projectEngine.ProjectFeatures.OfType<IImportProjectFeature>().ToArray();
+        foreach (IImportProjectFeature feature in importFeature)
         {
-            foreach (var file in feature.GetImports(projectItem))
+            foreach (RazorProjectItem? file in feature.GetImports(projectItem))
             {
                 if (file.FilePath != null)
                 {
@@ -339,9 +321,9 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
 
     protected virtual CompiledViewDescriptor CompileAndEmit(string relativePath)
     {
-        var projectItem = _projectEngine.FileSystem.GetItem(relativePath, fileKind: null);
-        var codeDocument = _projectEngine.Process(projectItem);
-        var cSharpDocument = codeDocument.GetCSharpDocument();
+        RazorProjectItem projectItem = _projectEngine.FileSystem.GetItem(relativePath, fileKind: null);
+        RazorCodeDocument codeDocument = _projectEngine.Process(projectItem);
+        RazorCSharpDocument cSharpDocument = codeDocument.GetCSharpDocument();
 
         if (cSharpDocument.Diagnostics.Count > 0)
         {
@@ -350,11 +332,11 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
                 cSharpDocument.Diagnostics);
         }
 
-        var assembly = CompileAndEmit(codeDocument, cSharpDocument.GeneratedCode);
+        Assembly assembly = CompileAndEmit(codeDocument, cSharpDocument.GeneratedCode);
 
         // Anything we compile from source will use Razor 2.1 and so should have the new metadata.
         var loader = new RazorCompiledItemLoader();
-        var item = loader.LoadItems(assembly).Single();
+        RazorCompiledItem item = loader.LoadItems(assembly).Single();
         return new CompiledViewDescriptor(item);
     }
 
@@ -372,7 +354,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         using (var assemblyStream = new MemoryStream())
         using (MemoryStream? pdbStream = emitPdbFile ? new MemoryStream() : null)
         {
-            var result = compilation.Emit(
+            EmitResult result = compilation.Emit(
                 assemblyStream,
                 pdbStream,
                 options: _compilationOptionsProvider.EmitOptions);
@@ -480,7 +462,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
 
         return string.Create(length, (path, addLeadingSlash), (span, tuple) =>
         {
-            var (pathValue, addLeadingSlashValue) = tuple;
+            (string pathValue, bool addLeadingSlashValue) = tuple;
             var spanIndex = 0;
 
             if (addLeadingSlashValue)

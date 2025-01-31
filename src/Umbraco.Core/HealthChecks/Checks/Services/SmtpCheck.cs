@@ -55,7 +55,8 @@ public class SmtpCheck : HealthCheck
                     using (var writer = new StreamWriter(stream))
                     using (var reader = new StreamReader(stream))
                     {
-                        writer.WriteLine("EHLO " + host);
+                        writer.Write("EHLO ");
+                        writer.WriteLine(host);
                         writer.Flush();
                         reader.ReadLine();
                         return true;

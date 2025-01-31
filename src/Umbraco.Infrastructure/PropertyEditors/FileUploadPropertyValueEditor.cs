@@ -87,7 +87,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         FileUploadValue? editorModelValue = ParseFileUploadValue(editorValue.Value);
 
         // no change?
-        if (editorModelValue?.TemporaryFileId.HasValue is not true)
+        if (editorModelValue?.TemporaryFileId.HasValue is not true && string.IsNullOrEmpty(editorModelValue?.Src) is false)
         {
             return currentValue;
         }
@@ -99,7 +99,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
             : null;
 
         // resetting the current value?
-        if (editorModelValue?.Src is null && currentPath.IsNullOrWhiteSpace() is false)
+        if (string.IsNullOrEmpty(editorModelValue?.Src) && currentPath.IsNullOrWhiteSpace() is false)
         {
             // delete the current file and clear the value of this property
             _mediaFileManager.FileSystem.DeleteFile(currentPath);

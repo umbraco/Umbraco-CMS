@@ -19,6 +19,7 @@ public class NuCacheSettings
     /// <summary>
     ///     Gets or sets a value defining the BTree block size.
     /// </summary>
+    [Obsolete("This property is no longer used. Scheduled for removal in v16")]
     public int? BTreeBlockSize { get; set; }
 
     /// <summary>
@@ -37,8 +38,10 @@ public class NuCacheSettings
     ///     The size to use for nucache Kit batches.  Higher value means more content loaded into memory at a time.
     /// </summary>
     [DefaultValue(StaticKitBatchSize)]
+    [Obsolete("This property is no longer used")]
     public int KitBatchSize { get; set; } = StaticKitBatchSize;
 
+    [Obsolete("This property is no longer used")]
     public bool UnPublishedContentCompression { get; set; } = false;
 
     [DefaultValue(StaticUsePagedSqlQuery)]

@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -10,6 +11,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Strings;
@@ -33,25 +35,29 @@ public class ContentService : RepositoryService, IContentService
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ICultureImpactFactory _cultureImpactFactory;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
+    private readonly PropertyEditorCollection _propertyEditorCollection;
+    private readonly IIdKeyMap _idKeyMap;
     private IQuery<IContent>? _queryNotTrashed;
 
     #region Constructors
 
     public ContentService(
-    ICoreScopeProvider provider,
-    ILoggerFactory loggerFactory,
-    IEventMessagesFactory eventMessagesFactory,
-    IDocumentRepository documentRepository,
-    IEntityRepository entityRepository,
-    IAuditRepository auditRepository,
-    IContentTypeRepository contentTypeRepository,
-    IDocumentBlueprintRepository documentBlueprintRepository,
-    ILanguageRepository languageRepository,
-    Lazy<IPropertyValidationService> propertyValidationService,
-    IShortStringHelper shortStringHelper,
-    ICultureImpactFactory cultureImpactFactory,
-    IUserIdKeyResolver userIdKeyResolver)
-    : base(provider, loggerFactory, eventMessagesFactory)
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IDocumentRepository documentRepository,
+        IEntityRepository entityRepository,
+        IAuditRepository auditRepository,
+        IContentTypeRepository contentTypeRepository,
+        IDocumentBlueprintRepository documentBlueprintRepository,
+        ILanguageRepository languageRepository,
+        Lazy<IPropertyValidationService> propertyValidationService,
+        IShortStringHelper shortStringHelper,
+        ICultureImpactFactory cultureImpactFactory,
+        IUserIdKeyResolver userIdKeyResolver,
+        PropertyEditorCollection propertyEditorCollection,
+        IIdKeyMap idKeyMap)
+        : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
         _entityRepository = entityRepository;
@@ -63,10 +69,81 @@ public class ContentService : RepositoryService, IContentService
         _shortStringHelper = shortStringHelper;
         _cultureImpactFactory = cultureImpactFactory;
         _userIdKeyResolver = userIdKeyResolver;
+        _propertyEditorCollection = propertyEditorCollection;
+        _idKeyMap = idKeyMap;
         _logger = loggerFactory.CreateLogger<ContentService>();
     }
 
-    [Obsolete("Use constructor that takes IUserIdKeyResolver as a parameter, scheduled for removal in V15")]
+    [Obsolete("Use non-obsolete constructor. Scheduled for removal in V17.")]
+    public ContentService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IDocumentRepository documentRepository,
+        IEntityRepository entityRepository,
+        IAuditRepository auditRepository,
+        IContentTypeRepository contentTypeRepository,
+        IDocumentBlueprintRepository documentBlueprintRepository,
+        ILanguageRepository languageRepository,
+        Lazy<IPropertyValidationService> propertyValidationService,
+        IShortStringHelper shortStringHelper,
+        ICultureImpactFactory cultureImpactFactory,
+        IUserIdKeyResolver userIdKeyResolver,
+        PropertyEditorCollection propertyEditorCollection)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            documentRepository,
+            entityRepository,
+            auditRepository,
+            contentTypeRepository,
+            documentBlueprintRepository,
+            languageRepository,
+            propertyValidationService,
+            shortStringHelper,
+            cultureImpactFactory,
+            userIdKeyResolver,
+            propertyEditorCollection,
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
+    {
+    }
+
+    [Obsolete("Use non-obsolete constructor. Scheduled for removal in V16.")]
+    public ContentService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IDocumentRepository documentRepository,
+        IEntityRepository entityRepository,
+        IAuditRepository auditRepository,
+        IContentTypeRepository contentTypeRepository,
+        IDocumentBlueprintRepository documentBlueprintRepository,
+        ILanguageRepository languageRepository,
+        Lazy<IPropertyValidationService> propertyValidationService,
+        IShortStringHelper shortStringHelper,
+        ICultureImpactFactory cultureImpactFactory,
+        IUserIdKeyResolver userIdKeyResolver)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            documentRepository,
+            entityRepository,
+            auditRepository,
+            contentTypeRepository,
+            documentBlueprintRepository,
+            languageRepository,
+            propertyValidationService,
+            shortStringHelper,
+            cultureImpactFactory,
+            userIdKeyResolver,
+            StaticServiceProvider.Instance.GetRequiredService<PropertyEditorCollection>()
+            )
+    {
+    }
+
+    [Obsolete("Use non-obsolete constructor. Scheduled for removal in V16.")]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -93,7 +170,8 @@ public class ContentService : RepositoryService, IContentService
             propertyValidationService,
             shortStringHelper,
             cultureImpactFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>(),
+            StaticServiceProvider.Instance.GetRequiredService<PropertyEditorCollection>())
     {
     }
 
@@ -354,11 +432,9 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentNullException(nameof(parent));
         }
 
-        IContentType contentType = GetContentType(contentTypeAlias);
-        if (contentType == null)
-        {
-            throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias)); // causes rollback
-        }
+        IContentType contentType = GetContentType(contentTypeAlias)
+            // causes rollback
+            ?? throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
 
         var content = new Content(name, parent, contentType, userId);
 
@@ -382,11 +458,11 @@ public class ContentService : RepositoryService, IContentService
             // locking the content tree secures content types too
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            IContentType contentType = GetContentType(contentTypeAlias); // + locks
-            if (contentType == null)
-            {
-                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias)); // causes rollback
-            }
+            IContentType contentType = GetContentType(contentTypeAlias)
+                // + locks
+                ??
+                // causes rollback
+                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
 
             IContent? parent = parentId > 0 ? GetById(parentId) : null; // + locks
             if (parentId > 0 && parent == null)
@@ -428,11 +504,11 @@ public class ContentService : RepositoryService, IContentService
             // locking the content tree secures content types too
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            IContentType contentType = GetContentType(contentTypeAlias); // + locks
-            if (contentType == null)
-            {
-                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias)); // causes rollback
-            }
+            IContentType contentType = GetContentType(contentTypeAlias)
+            // + locks
+                ??
+                // causes rollback
+                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
 
             var content = new Content(name, parent, contentType, userId);
 
@@ -483,7 +559,7 @@ public class ContentService : RepositoryService, IContentService
             scope.ReadLock(Constants.Locks.ContentTree);
             IEnumerable<IContent> items = _documentRepository.GetMany(idsA);
             var index = items.ToDictionary(x => x.Id, x => x);
-            return idsA.Select(x => index.TryGetValue(x, out IContent? c) ? c : null).WhereNotNull();
+            return idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
         }
     }
 
@@ -511,6 +587,17 @@ public class ContentService : RepositoryService, IContentService
             scope.ReadLock(Constants.Locks.ContentTree);
             return _documentRepository.GetContentSchedule(contentId);
         }
+    }
+
+    public ContentScheduleCollection GetContentScheduleByContentId(Guid contentId)
+    {
+        Attempt<int> idAttempt = _idKeyMap.GetIdForKey(contentId, UmbracoObjectTypes.Document);
+        if (idAttempt.Success is false)
+        {
+            return new ContentScheduleCollection();
+        }
+
+        return GetContentScheduleByContentId(idAttempt.Result);
     }
 
     /// <inheritdoc />
@@ -556,7 +643,7 @@ public class ContentService : RepositoryService, IContentService
             {
                 var index = items.ToDictionary(x => x.Key, x => x);
 
-                return idsA.Select(x => index.TryGetValue(x, out IContent? c) ? c : null).WhereNotNull();
+                return idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
             }
 
             return Enumerable.Empty<IContent>();
@@ -1179,9 +1266,10 @@ public class ContentService : RepositoryService, IContentService
 
             // publish the culture(s)
             // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
+            var publishTime = DateTime.Now;
             foreach (CultureImpact? impact in impacts)
             {
-                content.PublishCulture(impact);
+                content.PublishCulture(impact, publishTime, _propertyEditorCollection);
             }
 
             // Change state to publishing
@@ -1818,7 +1906,7 @@ public class ContentService : RepositoryService, IContentService
                         // publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                         IProperty[]? invalidProperties = null;
                         CultureImpact impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(allLangs.Value, culture));
-                        var tryPublish = d.PublishCulture(impact) &&
+                        var tryPublish = d.PublishCulture(impact, date, _propertyEditorCollection) &&
                                          _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
                         if (invalidProperties != null && invalidProperties.Length > 0)
                         {
@@ -1895,22 +1983,24 @@ public class ContentService : RepositoryService, IContentService
     {
         // variant content type - publish specified cultures
         // invariant content type - publish only the invariant culture
+
+        var publishTime = DateTime.Now;
         if (content.ContentType.VariesByCulture())
         {
             return culturesToPublish.All(culture =>
             {
                 CultureImpact? impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
-                return content.PublishCulture(impact) &&
+                return content.PublishCulture(impact, publishTime, _propertyEditorCollection) &&
                        _propertyValidationService.Value.IsPropertyDataValid(content, out _, impact);
             });
         }
 
-        return content.PublishCulture(_cultureImpactFactory.ImpactInvariant())
+        return content.PublishCulture(_cultureImpactFactory.ImpactInvariant(), publishTime, _propertyEditorCollection)
                && _propertyValidationService.Value.IsPropertyDataValid(content, out _, _cultureImpactFactory.ImpactInvariant());
     }
 
     // utility 'ShouldPublish' func used by SaveAndPublishBranch
-    private HashSet<string>? PublishBranch_ShouldPublish(ref HashSet<string>? cultures, string c, bool published, bool edited, bool isRoot, bool force)
+    private static HashSet<string>? PublishBranch_ShouldPublish(ref HashSet<string>? cultures, string c, bool published, bool edited, bool isRoot, bool force)
     {
         // if published, republish
         if (published)
@@ -1997,7 +2087,7 @@ public class ContentService : RepositoryService, IContentService
     {
         // note: EditedValue and PublishedValue are objects here, so it is important to .Equals()
         // and not to == them, else we would be comparing references, and that is a bad thing
-        cultures = cultures ?? Array.Empty<string>();
+        cultures ??= Array.Empty<string>();
 
         if (content.ContentType.VariesByCulture() is false && cultures.Length == 0)
         {
@@ -2642,6 +2732,9 @@ public class ContentService : RepositoryService, IContentService
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
 
+        // keep track of updates (copied item key and parent key) for the in-memory navigation structure
+        var navigationUpdates = new List<Tuple<Guid, Guid?>>();
+
         IContent copy = content.DeepCloneWithResetIdentities();
         copy.ParentId = parentId;
 
@@ -2677,6 +2770,9 @@ public class ContentService : RepositoryService, IContentService
 
             // save and flush because we need the ID for the recursive Copying events
             _documentRepository.Save(copy);
+
+            // store navigation update information for copied item
+            navigationUpdates.Add(Tuple.Create(copy.Key, GetParent(copy)?.Key));
 
             // add permissions
             if (currentPermissions.Count > 0)
@@ -2726,8 +2822,14 @@ public class ContentService : RepositoryService, IContentService
                         descendantCopy.CreatorId = userId;
                         descendantCopy.WriterId = userId;
 
+                        // since the repository relies on the dirty state to figure out whether it needs to update the sort order, we mark it dirty here
+                        descendantCopy.SortOrder = descendantCopy.SortOrder;
+
                         // save and flush (see above)
                         _documentRepository.Save(descendantCopy);
+
+                        // store navigation update information for descendants
+                        navigationUpdates.Add(Tuple.Create(descendantCopy.Key, GetParent(descendantCopy)?.Key));
 
                         copies.Add(Tuple.Create(descendant, descendantCopy));
                         idmap[descendant.Id] = descendantCopy.Id;
@@ -2740,7 +2842,7 @@ public class ContentService : RepositoryService, IContentService
             // - a copy is unpublished and therefore has no impact on tags in DB
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(copy, TreeChangeTypes.RefreshBranch, eventMessages));
-            foreach (Tuple<IContent, IContent> x in copies)
+            foreach (Tuple<IContent, IContent> x in CollectionsMarshal.AsSpan(copies))
             {
                 // FIXME: Pass parent key in constructor too when proper Copy method is implemented
                 scope.Notifications.Publish(new ContentCopiedNotification(x.Item1, x.Item2, parentId, relateToOriginal, eventMessages));
@@ -2944,7 +3046,7 @@ public class ContentService : RepositoryService, IContentService
         return OperationResult.Succeed(eventMessages);
     }
 
-    private bool HasUnsavedChanges(IContent content) => content.HasIdentity is false || content.IsDirty();
+    private static bool HasUnsavedChanges(IContent content) => content.HasIdentity is false || content.IsDirty();
 
     public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
     {
@@ -3016,7 +3118,7 @@ public class ContentService : RepositoryService, IContentService
     private void Audit(AuditType type, int userId, int objectId, string? message = null, string? parameters = null) =>
         _auditRepository.Save(new AuditItem(objectId, type, userId, UmbracoObjectTypes.Document.GetName(), message, parameters));
 
-    private bool IsDefaultCulture(IReadOnlyCollection<ILanguage>? langs, string culture) =>
+    private static bool IsDefaultCulture(IReadOnlyCollection<ILanguage>? langs, string culture) =>
         langs?.Any(x => x.IsDefault && x.IsoCode.InvariantEquals(culture)) ?? false;
 
     private bool IsMandatoryCulture(IReadOnlyCollection<ILanguage> langs, string culture) =>
@@ -3036,6 +3138,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="evtMsgs"></param>
     /// <param name="culturesPublishing"></param>
     /// <param name="allLangs"></param>
+    /// <param name="notificationState"></param>
     /// <returns></returns>
     private PublishResult StrategyCanPublish(
         ICoreScope scope,
@@ -3059,7 +3162,8 @@ public class ContentService : RepositoryService, IContentService
                     .ToArray();
 
         // publish the culture(s)
-        if (!impactsToPublish.All(content.PublishCulture))
+        var publishTime = DateTime.Now;
+        if (!impactsToPublish.All(impact => content.PublishCulture(impact, publishTime, _propertyEditorCollection)))
         {
             return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
         }
@@ -3122,8 +3226,8 @@ public class ContentService : RepositoryService, IContentService
 
         ContentScheduleCollection contentSchedule = _documentRepository.GetContentSchedule(content.Id);
 
-        // loop over each culture publishing - or string.Empty for invariant
-        foreach (var culture in culturesPublishing ?? new[] { string.Empty })
+        // loop over each culture publishing - or InvariantCulture for invariant
+        foreach (var culture in culturesPublishing ?? new[] { Constants.System.InvariantCulture })
         {
             // ensure that the document status is correct
             // note: culture will be string.Empty for invariant
@@ -3466,13 +3570,11 @@ public class ContentService : RepositoryService, IContentService
         scope.ReadLock(Constants.Locks.ContentTypes);
 
         IQuery<IContentType> query = Query<IContentType>().Where(x => x.Alias == contentTypeAlias);
-        IContentType? contentType = _contentTypeRepository.Get(query).FirstOrDefault();
-
-        if (contentType == null)
-        {
-            throw new Exception(
-                $"No ContentType matching the passed in Alias: '{contentTypeAlias}' was found"); // causes rollback
-        }
+        IContentType? contentType = _contentTypeRepository.Get(query).FirstOrDefault()
+            ??
+        // causes rollback
+            throw new Exception($"No ContentType matching the passed in Alias: '{contentTypeAlias}'" +
+            $" was found");
 
         return contentType;
     }
@@ -3677,4 +3779,5 @@ public class ContentService : RepositoryService, IContentService
         DeleteBlueprintsOfTypes(new[] { contentTypeId }, userId);
 
     #endregion
+
 }

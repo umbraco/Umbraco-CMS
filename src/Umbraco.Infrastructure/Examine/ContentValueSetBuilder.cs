@@ -1,5 +1,7 @@
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -27,7 +29,10 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
     private readonly ILocalizationService _localizationService;
     private readonly IContentTypeService _contentTypeService;
     private readonly ILogger<ContentValueSetBuilder> _logger;
+    private readonly IDocumentUrlService _documentUrlService;
+    private readonly ILanguageService _languageService;
 
+    [Obsolete("Use the non-obsolete constructor. This will be removed in Umbraco 16.")]
     public ContentValueSetBuilder(
         PropertyEditorCollection propertyEditors,
         UrlSegmentProviderCollection urlSegmentProviders,
@@ -38,6 +43,36 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         ILocalizationService localizationService,
         IContentTypeService contentTypeService,
         ILogger<ContentValueSetBuilder> logger)
+        : this(
+            propertyEditors,
+            urlSegmentProviders,
+            userService,
+            shortStringHelper,
+            scopeProvider,
+            publishedValuesOnly,
+            localizationService,
+            contentTypeService,
+            logger,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>()
+            )
+    {
+
+    }
+
+    [Obsolete("Use the non-obsolete constructor. This will be removed in Umbraco 16.")]
+    public ContentValueSetBuilder(
+        PropertyEditorCollection propertyEditors,
+        UrlSegmentProviderCollection urlSegmentProviders,
+        IUserService userService,
+        IShortStringHelper shortStringHelper,
+        ICoreScopeProvider scopeProvider,
+        bool publishedValuesOnly,
+        ILocalizationService localizationService,
+        IContentTypeService contentTypeService,
+        ILogger<ContentValueSetBuilder> logger,
+        IDocumentUrlService documentUrlService,
+        ILanguageService languageService)
         : base(propertyEditors, publishedValuesOnly)
     {
         _urlSegmentProviders = urlSegmentProviders;
@@ -47,8 +82,9 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         _localizationService = localizationService;
         _contentTypeService = contentTypeService;
         _logger = logger;
+        _documentUrlService = documentUrlService;
+        _languageService = languageService;
     }
-
     /// <inheritdoc />
     public override IEnumerable<ValueSet> GetValueSets(params IContent[] content)
     {
@@ -73,6 +109,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
     {
         IDictionary<Guid, IContentType> contentTypeDictionary = _contentTypeService.GetAll().ToDictionary(x => x.Key);
 
+        var defaultCulture = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
         // TODO: There is a lot of boxing going on here and ultimately all values will be boxed by Lucene anyways
         // but I wonder if there's a way to reduce the boxing that we have to do or if it will matter in the end since
         // Lucene will do it no matter what? One idea was to create a `FieldValue` struct which would contain `object`, `object[]`, `ValueType` and `ValueType[]`
@@ -81,7 +118,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         {
             var isVariant = c.ContentType.VariesByCulture();
 
-            var urlValue = c.GetUrlSegment(_shortStringHelper, _urlSegmentProviders); // Always add invariant urlName
+            var urlValue = _documentUrlService.GetUrlSegment(c.Key, defaultCulture, false); // Always add invariant urlName
             var values = new Dictionary<string, IEnumerable<object?>>
             {
                 { "icon", c.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>() },

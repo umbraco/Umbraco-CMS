@@ -55,6 +55,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
     private IUserService UserService => GetRequiredService<IUserService>();
 
+    private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
+
     private IRelationService RelationService => GetRequiredService<IRelationService>();
 
     private ILocalizedTextService TextService => GetRequiredService<ILocalizedTextService>();
@@ -326,7 +328,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         contentSchedule = ContentService.GetContentScheduleByContentId(content.Id);
         var sched = contentSchedule.FullSchedule;
         Assert.AreEqual(1, sched.Count);
-        Assert.AreEqual(1, sched.Count(x => x.Culture == string.Empty));
+        Assert.AreEqual(1, sched.Count(x => x.Culture == Constants.System.InvariantCulture));
         contentSchedule.Clear(ContentScheduleAction.Expire);
         ContentService.Save(content, Constants.Security.SuperUserId, contentSchedule);
 
@@ -640,7 +642,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         // and proper values
         // first, the current (edited) version, with edited and published versions
         Assert.AreEqual("John Farr", versions[0].GetValue("author")); // current version has the edited value
-        Assert.AreEqual("Bob Hope",
+        Assert.AreEqual(
+            "Bob Hope",
             versions[0].GetValue("author", published: true)); // and the published published value
 
         // then, the current (published) version, with edited == published
@@ -1148,7 +1151,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             Assert.AreEqual("foo", entity.Name);
 
             var e = ContentService.GetById(entity.Id);
-            Assert.AreEqual("Home", e.Name);
+            Assert.AreEqual("Textpage", e.Name);
 
             savingWasCalled = true;
         };
@@ -1165,7 +1168,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         try
         {
             var content = ContentService.GetById(Textpage.Id);
-            Assert.AreEqual("Home", content.Name);
+            Assert.AreEqual("Textpage", content.Name);
 
             content.Name = "foo";
             ContentService.Save(content);
@@ -1290,7 +1293,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         content.SetCultureName("name-fr", langFr.IsoCode);
         content.SetCultureName("name-da", langDa.IsoCode);
 
-        content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault));
+        content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault), DateTime.Now, PropertyEditorCollection);
         var result = ContentService.CommitDocumentChanges(content);
         Assert.IsTrue(result.Success);
         content = ContentService.GetById(content.Id);
@@ -1298,7 +1301,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsFalse(content.IsCulturePublished(langDa.IsoCode));
 
         content.UnpublishCulture(langFr.IsoCode);
-        content.PublishCulture(CultureImpact.Explicit(langDa.IsoCode, langDa.IsDefault));
+        content.PublishCulture(CultureImpact.Explicit(langDa.IsoCode, langDa.IsDefault), DateTime.Now, PropertyEditorCollection);
 
         result = ContentService.CommitDocumentChanges(content);
         Assert.IsTrue(result.Success);
@@ -2055,11 +2058,11 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         ContentService.Save(content2);
         Assert.IsTrue(ContentService.Publish(content2, content2.AvailableCultures.ToArray(), userId: -1).Success);
 
-        var editorGroup = UserService.GetUserGroupByAlias(Constants.Security.EditorGroupAlias);
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
         editorGroup.StartContentId = content1.Id;
         UserService.Save(editorGroup);
 
-        var admin = UserService.GetUserById(Constants.Security.SuperUserId);
+        var admin = await UserService.GetAsync(Constants.Security.SuperUserKey);
         admin.StartContentIds = new[] { content1.Id };
         UserService.Save(admin);
 
@@ -2071,7 +2074,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             new List<PublicAccessRule> { new() { RuleType = "test", RuleValue = "test" } }));
         Assert.IsTrue(PublicAccessService.AddRule(content1, "test2", "test2").Success);
 
-        var user = UserService.GetUserById(Constants.Security.SuperUserId);
+        var user = await UserService.GetAsync(Constants.Security.SuperUserKey);
         var userGroup = UserService.GetUserGroupByAlias(user.Groups.First().Alias);
         Assert.IsNotNull(NotificationService.CreateNotification(user, content1, "X"));
 
@@ -2186,7 +2189,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         var temp = ContentService.GetById(Textpage.Id);
-        Assert.AreEqual("Home", temp.Name);
+        Assert.AreEqual("Textpage", temp.Name);
         Assert.AreEqual(3, ContentService.CountChildren(temp.Id));
 
         // Act
@@ -2211,7 +2214,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         var temp = ContentService.GetById(Textpage.Id);
-        Assert.AreEqual("Home", temp.Name);
+        Assert.AreEqual("Textpage", temp.Name);
         Assert.AreEqual(3, ContentService.CountChildren(temp.Id));
 
         // Act

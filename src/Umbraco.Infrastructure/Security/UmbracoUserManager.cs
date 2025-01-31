@@ -160,11 +160,8 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
     /// </remarks>
     public virtual async Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string newPassword)
     {
-        TUser? user = await FindByIdAsync(userId);
-        if (user is null)
-        {
-            throw new InvalidOperationException("Could not find user");
-        }
+        TUser? user = await FindByIdAsync(userId)
+            ?? throw new InvalidOperationException("Could not find user");
 
         IdentityResult result = await ResetPasswordAsync(user, token, newPassword);
         return result;
@@ -249,6 +246,31 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
         return result;
     }
 
+    /// <summary>
+    ///     Override to check the user approval value as well as the user lock out date, by default this only checks the user's
+    ///     locked out date
+    /// </summary>
+    /// <param name="user">The user</param>
+    /// <returns>True if the user is locked out, else false</returns>
+    /// <remarks>
+    ///     In the ASP.NET Identity world, there is only one value for being locked out, in Umbraco we have 2 so when checking
+    ///     this for Umbraco we need to check both values
+    /// </remarks>
+    public override async Task<bool> IsLockedOutAsync(TUser user)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException(nameof(user));
+        }
+
+        if (user.IsApproved == false)
+        {
+            return true;
+        }
+
+        return await base.IsLockedOutAsync(user);
+    }
+
     public async Task<bool> ValidateCredentialsAsync(string username, string password)
     {
         TUser? user = await FindByNameAsync(username);
@@ -265,7 +287,7 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
                                             typeof(IUserPasswordStore<>));
         }
 
-        var result = await VerifyPasswordAsync(userPasswordStore, user, password);
+        PasswordVerificationResult result = await VerifyPasswordAsync(userPasswordStore, user, password);
 
         return result == PasswordVerificationResult.Success || result == PasswordVerificationResult.SuccessRehashNeeded;
     }

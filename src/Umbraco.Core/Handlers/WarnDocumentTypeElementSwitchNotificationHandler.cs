@@ -35,7 +35,7 @@ public class WarnDocumentTypeElementSwitchNotificationHandler :
             .Where(e => e.HasIdentity)
             .Select(e => e.Key);
 
-        IEnumerable<IContentType> persistedItems = _contentTypeService.GetAll(updatedKeys);
+        IEnumerable<IContentType> persistedItems = _contentTypeService.GetMany(updatedKeys);
 
         var stateInformation = persistedItems
             .ToDictionary(
@@ -56,12 +56,11 @@ public class WarnDocumentTypeElementSwitchNotificationHandler :
 
         foreach (IContentType savedDocumentType in notification.SavedEntities)
         {
-            if (stateInformation.ContainsKey(savedDocumentType.Key) is false)
+            if (stateInformation.TryGetValue(savedDocumentType.Key, out DocumentTypeElementSwitchInformation? state) is false)
             {
                 continue;
             }
 
-            DocumentTypeElementSwitchInformation state = stateInformation[savedDocumentType.Key];
             if (state.WasElement == savedDocumentType.IsElement)
             {
                 // no change
