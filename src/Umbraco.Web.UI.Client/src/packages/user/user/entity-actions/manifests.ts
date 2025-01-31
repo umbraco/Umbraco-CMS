@@ -1,4 +1,8 @@
-import { UMB_USER_ALLOW_MFA_CONDITION_ALIAS, UMB_USER_DETAIL_REPOSITORY_ALIAS, UMB_USER_ITEM_REPOSITORY_ALIAS } from '../constants.js';
+import {
+	UMB_USER_ALLOW_MFA_CONDITION_ALIAS,
+	UMB_USER_DETAIL_REPOSITORY_ALIAS,
+	UMB_USER_ITEM_REPOSITORY_ALIAS,
+} from '../constants.js';
 import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 
 import { manifests as createManifests } from './create/manifests.js';

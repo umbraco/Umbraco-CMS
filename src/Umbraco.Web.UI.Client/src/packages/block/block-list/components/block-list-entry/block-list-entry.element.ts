@@ -116,7 +116,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	constructor() {
 		super();
-
+		this.#init();
+	}
+	#init() {
 		this.observe(
 			this.#context.showContentEdit,
 			(showContentEdit) => {

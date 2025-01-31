@@ -1,8 +1,5 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
-
-import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
-import { type UmbBlockDataType } from '@umbraco-cms/backoffice/block';
+import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import '../block-grid-areas-container/index.js';
