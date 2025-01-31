@@ -27,8 +27,8 @@ export class UmbTemporaryFileRepository extends UmbRepositoryBase {
 	 * @returns {*}
 	 * @memberof UmbTemporaryFileRepository
 	 */
-	upload(id: string, file: File, onProgress?: (progress: ProgressEvent) => void) {
-		return this.#source.create(id, file, onProgress);
+	upload(id: string, file: File, onProgress?: (progress: ProgressEvent) => void, abortSignal?: AbortSignal) {
+		return this.#source.create(id, file, onProgress, abortSignal);
 	}
 
 	/**

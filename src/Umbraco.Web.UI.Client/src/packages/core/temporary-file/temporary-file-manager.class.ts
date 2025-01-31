@@ -89,7 +89,7 @@ export class UmbTemporaryFileManager<
 						headline: 'Upload',
 						message: `
 	${this.#localization.term('media_invalidFileSize')}: ${item.file.name} (${formatBytes(item.file.size)}).
-	
+
 	${this.#localization.term('media_maxFileSize')} ${formatBytes(maxFileSize)}.
 						`,
 						whitespace: 'pre-line',
@@ -129,14 +129,22 @@ export class UmbTemporaryFileManager<
 
 		const isValid = await this.#validateItem(item);
 		if (!isValid) {
-			this.#queue.updateOne(item.temporaryUnique, { ...item, status: TemporaryFileStatus.ERROR });
+			this.#queue.updateOne(item.temporaryUnique, {
+				...item,
+				status: TemporaryFileStatus.ERROR,
+			});
 			return { ...item, status: TemporaryFileStatus.ERROR };
 		}
 
-		const { error } = await this.#temporaryFileRepository.upload(item.temporaryUnique, item.file, (evt) => {
-			// Update progress in percent if a callback is provided
-			if (item.onProgress) item.onProgress((evt.loaded / evt.total) * 100);
-		});
+		const { error } = await this.#temporaryFileRepository.upload(
+			item.temporaryUnique,
+			item.file,
+			(evt) => {
+				// Update progress in percent if a callback is provided
+				if (item.onProgress) item.onProgress((evt.loaded / evt.total) * 100);
+			},
+			item.abortSignal,
+		);
 		const status = error ? TemporaryFileStatus.ERROR : TemporaryFileStatus.SUCCESS;
 
 		this.#queue.updateOne(item.temporaryUnique, { ...item, status });
