@@ -78,7 +78,7 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   await umbracoUi.stylesheet.clickActionsMenuForStylesheet(childFolderName);
   await umbracoUi.stylesheet.createFolder(childOfChildFolderName);
 
-  //Assert
+  // Assert
   await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   expect(await umbracoApi.stylesheet.doesNameExist(childOfChildFolderName)).toBeTruthy();
   const styleChildren = await umbracoApi.stylesheet.getChildren('/' + stylesheetFolderName + '/' + childFolderName);

@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services;
 ///     this
 ///     reader.
 /// </remarks>
-internal class PocoDataDataReader<T, TSyntax> : BulkDataReader
+internal sealed class PocoDataDataReader<T, TSyntax> : BulkDataReader
     where TSyntax : ISqlSyntaxProvider
 {
     private readonly ColumnDefinition[] _columnDefinitions;

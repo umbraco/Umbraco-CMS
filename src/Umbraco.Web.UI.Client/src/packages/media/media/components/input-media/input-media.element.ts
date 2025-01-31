@@ -1,5 +1,4 @@
-import type { UmbMediaCardItemModel } from '../../modals/index.js';
-import type { UmbMediaItemModel } from '../../repository/index.js';
+import type { UmbMediaCardItemModel, UmbMediaItemModel } from '../../types.js';
 import { UmbMediaPickerInputContext } from './input-media.context.js';
 import {
 	css,
@@ -15,7 +14,7 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
@@ -34,8 +33,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		identifier: 'Umb.SorterIdentifier.InputMedia',
 		itemSelector: 'uui-card-media',
 		containerSelector: '.container',
-		/** TODO: This component probably needs some grid-like logic for resolve placement... [LI] */
-		resolvePlacement: () => false,
+		resolvePlacement: UmbSorterResolvePlacementAsGrid,
 		onChange: ({ model }) => {
 			this.selection = model;
 			this.#sortCards(model);
@@ -246,7 +244,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		return html`
 			<uui-card-media
 				name=${ifDefined(item.name === null ? undefined : item.name)}
-				detail=${ifDefined(item.unique)}
+				data-mark="${item.entityType}:${item.unique}"
 				href="${ifDefined(href)}"
 				?readonly=${this.readonly}>
 				<umb-imaging-thumbnail

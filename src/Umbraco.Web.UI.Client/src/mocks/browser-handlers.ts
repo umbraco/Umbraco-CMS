@@ -1,3 +1,4 @@
+import { handlers as backofficeHandlers } from './handlers/backoffice/backoffice.handlers.js';
 import { handlers as configHandlers } from './handlers/config.handlers.js';
 import { handlers as cultureHandlers } from './handlers/culture.handlers.js';
 import { handlers as dataTypeHandlers } from './handlers/data-type/index.js';
@@ -22,6 +23,8 @@ import { handlers as partialViewHandlers } from './handlers/partial-view/index.j
 import { handlers as profilingHandlers } from './handlers/performance-profiling.handlers.js';
 import { handlers as publishedStatusHandlers } from './handlers/published-status.handlers.js';
 import { handlers as redirectManagementHandlers } from './handlers/redirect-management.handlers.js';
+import { handlers as relationTypeHandlers } from './handlers/relation-type/index.js';
+import { handlers as relationHandlers } from './handlers/relation/index.js';
 import { handlers as rteEmbedHandlers } from './handlers/rte-embed.handlers.js';
 import { handlers as scriptHandlers } from './handlers/script/index.js';
 import { handlers as staticFileHandlers } from './handlers/static-file/index.js';
@@ -38,6 +41,7 @@ import { handlers as documentBlueprintHandlers } from './handlers/document-bluep
 import { handlers as temporaryFileHandlers } from './handlers/temporary-file/index.js';
 
 const handlers = [
+	...backofficeHandlers,
 	...configHandlers,
 	...cultureHandlers,
 	...dataTypeHandlers,
@@ -62,6 +66,8 @@ const handlers = [
 	...profilingHandlers,
 	...publishedStatusHandlers,
 	...redirectManagementHandlers,
+	...relationTypeHandlers,
+	...relationHandlers,
 	...rteEmbedHandlers,
 	...scriptHandlers,
 	...staticFileHandlers,
@@ -75,8 +81,11 @@ const handlers = [
 	...documentBlueprintHandlers,
 	...temporaryFileHandlers,
 	...serverHandlers.serverInformationHandlers,
+	serverHandlers.serverRunningHandler,
+	...manifestsHandlers.manifestEmptyHandlers,
 ];
 
+/* TODO: find solution to run with different handlers across vite mocks and web-test-runner mocks
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {
 	case 'must-install':
 		handlers.push(serverHandlers.serverMustInstallHandler);
@@ -96,5 +105,6 @@ switch (import.meta.env.VITE_UMBRACO_EXTENSION_MOCKS) {
 	default:
 		handlers.push(...manifestsHandlers.manifestEmptyHandlers);
 }
+*/
 
 export { handlers };

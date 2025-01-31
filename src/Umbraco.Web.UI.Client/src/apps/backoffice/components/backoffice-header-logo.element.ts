@@ -3,8 +3,10 @@ import { isCurrentUserAnAdmin } from '@umbraco-cms/backoffice/current-user';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_NEWVERSION_MODAL, UMB_SYSINFO_MODAL } from '@umbraco-cms/backoffice/sysinfo';
+import type { UmbServerUpgradeCheck } from '@umbraco-cms/backoffice/sysinfo';
 
 @customElement('umb-backoffice-header-logo')
 export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
@@ -15,7 +17,10 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 	private _isUserAdmin = false;
 
 	@state()
-	private _serverUpgradeCheck = false;
+	private _serverUpgradeCheck: UmbServerUpgradeCheck | null = null;
+
+	@state()
+	private _serverUrl = '';
 
 	#backofficeContext?: typeof UMB_BACKOFFICE_CONTEXT.TYPE;
 
@@ -34,6 +39,10 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 
 			this.#backofficeContext = context;
 		});
+
+		this.consumeContext(UMB_APP_CONTEXT, (context) => {
+			this._serverUrl = context.getServerUrl();
+		});
 	}
 
 	protected override async firstUpdated() {
@@ -44,21 +53,22 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 		this._isUserAdmin = await isCurrentUserAnAdmin(this);
 
 		if (this._isUserAdmin) {
-			this._serverUpgradeCheck = this.#backofficeContext ? await this.#backofficeContext.serverUpgradeCheck() : false;
+			this._serverUpgradeCheck = this.#backofficeContext ? await this.#backofficeContext.serverUpgradeCheck() : null;
 		}
 	}
 
 	override render() {
 		return html`
-			<uui-button id="logo" look="primary" label="Umbraco" compact popovertarget="logo-popover">
-				<img src="/umbraco/backoffice/assets/umbraco_logomark_white.svg" alt="Umbraco" />
+			<uui-button id="logo" look="primary" label="Logo" compact popovertarget="logo-popover">
+				<umb-app-logo id="logo-img"></umb-app-logo>
 			</uui-button>
 			<uui-popover-container id="logo-popover" placement="bottom-start">
 				<umb-popover-layout>
 					<div id="modal">
 						<img
-							src="/umbraco/backoffice/assets/umbraco_logo_blue.svg"
-							alt="Umbraco"
+							aria-hidden="true"
+							src="${this._serverUrl}/umbraco/management/api/v1/security/back-office/graphics/login-logo-alternative"
+							alt="logo"
 							width="300"
 							height="82"
 							loading="lazy" />
@@ -67,7 +77,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 						${this._serverUpgradeCheck
 							? html`<uui-button
 									@click=${this.#openNewVersion}
-									color="danger"
+									color="positive"
 									label=${this.localize.term('general_newVersionAvailable')}></uui-button>`
 							: ''}
 
@@ -89,9 +99,15 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 	}
 
 	async #openNewVersion() {
+		if (!this._serverUpgradeCheck) return;
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		modalManager
-			.open(this, UMB_NEWVERSION_MODAL)
+			.open(this, UMB_NEWVERSION_MODAL, {
+				data: {
+					comment: this._serverUpgradeCheck.comment,
+					downloadUrl: this._serverUpgradeCheck.url,
+				},
+			})
 			.onSubmit()
 			.catch(() => {});
 	}
@@ -107,9 +123,9 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 				--uui-button-background-color: transparent;
 			}
 
-			#logo > img {
+			#logo-img {
+				display: block;
 				height: var(--uui-size-10);
-				width: var(--uui-size-10);
 			}
 
 			#modal {

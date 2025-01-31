@@ -1,7 +1,8 @@
 import { UmbLanguageCollectionRepository } from '../collection/index.js';
 import type { UmbLanguageDetailModel } from '../types.js';
-import { type UmbAppLanguageContext, UMB_APP_LANGUAGE_CONTEXT } from '../global-contexts/index.js';
-import type { UUIMenuItemEvent, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbAppLanguageContext } from '../global-contexts/index.js';
+import { UMB_APP_LANGUAGE_CONTEXT } from '../constants.js';
+import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
 	html,
@@ -111,16 +112,9 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		}
 	}
 
-	#onLabelClick(event: UUIMenuItemEvent) {
-		const menuItem = event.target;
-		const unique = menuItem.dataset.unique;
-		if (!unique) throw new Error('Missing unique on menu item');
-
+	#chooseLanguage(unique: string) {
 		this.#appLanguageContext?.setLanguage(unique);
 		this._isOpen = false;
-
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
 		this._popoverElement?.hidePopover();
 	}
 
@@ -129,7 +123,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	}
 
 	#renderTrigger() {
-		return html`<button id="toggle" popovertarget="dropdown-popover">
+		return html`<button id="toggle" data-mark="action:open" popovertarget="dropdown-popover">
 			<span
 				>${this._appLanguage?.name}
 				${this._appLanguageIsReadOnly ? this.#renderReadOnlyTag(this._appLanguage?.unique) : nothing}</span
@@ -139,7 +133,10 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	}
 
 	#renderContent() {
-		return html` <uui-popover-container id="dropdown-popover" @beforetoggle=${this.#onPopoverToggle}>
+		return html` <uui-popover-container
+			id="dropdown-popover"
+			data-mark="app-language-menu"
+			@beforetoggle=${this.#onPopoverToggle}>
 			<umb-popover-layout>
 				${repeat(
 					this._languages,
@@ -147,9 +144,9 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 					(language) => html`
 						<uui-menu-item
 							label=${ifDefined(language.name)}
-							@click-label=${this.#onLabelClick}
-							data-unique=${ifDefined(language.unique)}
-							?active=${language.unique === this._appLanguage?.unique}>
+							data-mark="${language.entityType}:${language.unique}"
+							?active=${language.unique === this._appLanguage?.unique}
+							@click-label=${() => this.#chooseLanguage(language.unique)}>
 							${this.#isLanguageReadOnly(language.unique) ? this.#renderReadOnlyTag(language.unique) : nothing}
 						</uui-menu-item>
 					`,

@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS } from '../../../tree/index.js';
-import type { UmbDocumentTypeCreateOptionsModalData } from './index.js';
+import type { UmbDocumentTypeCreateOptionsModalData } from './constants.js';
 import {
 	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN,
 	type UmbCreateDocumentTypeWorkspacePresetType,
@@ -12,6 +12,7 @@ import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 // Include the types from the DocumentTypeWorkspacePresetType + folder.
 type OptionsPresetType = UmbCreateDocumentTypeWorkspacePresetType | 'folder' | null;
 
+/** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
 @customElement('umb-document-type-create-options-modal')
 export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<UmbDocumentTypeCreateOptionsModalData> {
 	#createFolderAction?: UmbCreateFolderEntityAction;
@@ -110,7 +111,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 									name=${item.label}
 									detail=${item.description}
 									icon=${item.icon}
-									@click=${() => this.#onClick(item.preset)}></umb-ref-item>
+									@open=${() => this.#onClick(item.preset)}></umb-ref-item>
 							`,
 						)}
 					</uui-ref-list>

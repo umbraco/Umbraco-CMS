@@ -1,4 +1,4 @@
-import { UMB_MEDIA_TYPE_CREATE_OPTIONS_MODAL } from './modal/index.js';
+import { UMB_MEDIA_TYPE_CREATE_OPTIONS_MODAL } from './modal/constants.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';

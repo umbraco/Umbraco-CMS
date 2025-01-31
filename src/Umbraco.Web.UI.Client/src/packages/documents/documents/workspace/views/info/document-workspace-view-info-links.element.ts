@@ -1,12 +1,22 @@
 import { UmbDocumentUrlRepository } from '../../../repository/url/document-url.repository.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
-import { css, customElement, html, map, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbDocumentUrlModel } from '../../../repository/url/types.js';
+import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { debounce } from '@umbraco-cms/backoffice/utils';
+import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+
+interface UmbDocumentInfoViewLink {
+	culture: string;
+	url: string | undefined;
+	state: DocumentVariantStateModel | null | undefined;
+}
 
 @customElement('umb-document-workspace-view-info-links')
 export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
@@ -22,49 +32,105 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 	private _variantOptions?: Array<UmbDocumentVariantOptionModel>;
 
 	@state()
-	private _lookup: Record<string, string> = {};
+	private _loading = false;
+
+	@state()
+	private _links: Array<UmbDocumentInfoViewLink> = [];
+
+	@state()
+	private _defaultCulture?: string;
+
+	#urls: Array<UmbDocumentUrlModel> = [];
+
+	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
+	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
-			context.addEventListener(UmbRequestReloadStructureForEntityEvent.TYPE, () => {
-				this.#requestUrls();
-			});
+			this.#eventContext = context;
+
+			this.#eventContext.removeEventListener(
+				UmbRequestReloadStructureForEntityEvent.TYPE,
+				this.#onReloadRequest as unknown as EventListener,
+			);
+
+			this.#eventContext.addEventListener(
+				UmbRequestReloadStructureForEntityEvent.TYPE,
+				this.#onReloadRequest as unknown as EventListener,
+			);
 		});
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
-			this.observe(
-				observeMultiple([context.isNew, context.unique, context.variantOptions]),
-				([isNew, unique, variantOptions]) => {
-					if (!unique) return;
-					this._isNew = isNew === true;
+			this.#documentWorkspaceContext = context;
+			this.observe(observeMultiple([context.isNew, context.unique]), ([isNew, unique]) => {
+				if (!unique) return;
+				this._isNew = isNew === true;
+
+				if (unique !== this._unique) {
 					this._unique = unique;
-					this._variantOptions = variantOptions;
 					this.#requestUrls();
-				},
-			);
+				}
+			});
+
+			this.observe(context.variantOptions, (variantOptions) => {
+				this._variantOptions = variantOptions;
+				this.#setLinks();
+			});
 		});
+
+		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
+			this.observe(instance.appDefaultLanguage, (value) => {
+				this._defaultCulture = value?.unique;
+				this.#setLinks();
+			});
+		});
+	}
+
+	#setLinks() {
+		const links: Array<UmbDocumentInfoViewLink> = this.#urls.map((u) => {
+			const culture = u.culture ?? this._defaultCulture ?? '';
+			const url = u.url;
+			const state = this._variantOptions?.find((variantOption) => variantOption.culture === culture)?.variant?.state;
+			return { culture, url, state };
+		});
+
+		this._links = links;
+	}
+
+	#getTargetUrl(url: string | undefined) {
+		if (!url || url.length === 0) {
+			return url;
+		}
+
+		if (url.includes('.') && !url.includes('//')) {
+			return '//' + url;
+		}
+
+		return url;
 	}
 
 	async #requestUrls() {
 		if (this._isNew) return;
 		if (!this._unique) return;
 
+		this._loading = true;
+		this.#urls = [];
+
 		const { data } = await this.#documentUrlRepository.requestItems([this._unique]);
 
 		if (data?.length) {
-			data[0].urls.forEach((item) => {
-				if (item.culture && item.url) {
-					this._lookup[item.culture] = item.url;
-				}
-			});
-			this.requestUpdate('_lookup');
+			const item = data[0];
+			this.#urls = item.urls;
+			this.#setLinks();
 		}
+
+		this._loading = false;
 	}
 
-	#getStateLocalizationKey(variantOption: UmbDocumentVariantOptionModel) {
-		switch (variantOption.variant?.state) {
+	#getStateLocalizationKey(state: DocumentVariantStateModel | null | undefined): string {
+		switch (state) {
 			case null:
 			case undefined:
 			case DocumentVariantStateModel.NOT_CREATED:
@@ -78,56 +144,98 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		}
 	}
 
+	#debounceRequestUrls = debounce(() => this.#requestUrls(), 50);
+
+	#onReloadRequest = (event: UmbEntityActionEvent) => {
+		// TODO: Introduce "Published Event". We only need to update the url when the document is published.
+		if (event.getUnique() !== this.#documentWorkspaceContext?.getUnique()) return;
+		if (event.getEntityType() !== this.#documentWorkspaceContext.getEntityType()) return;
+		this.#debounceRequestUrls();
+	};
+
 	override render() {
 		return html`
 			<uui-box headline=${this.localize.term('general_links')}>
 				${when(
-					this._isNew,
-					() => this.#renderNotCreated(),
-					() => this.#renderUrls(),
+					this._loading,
+					() => this.#renderLoading(),
+					() => this.#renderContent(),
 				)}
 			</uui-box>
 		`;
 	}
 
-	#renderNotCreated() {
+	#renderLoading() {
+		return html`<div id="loader-container"><uui-loader></uui-loader></div>`;
+	}
+
+	#renderContent() {
 		return html`
-			<div class="link-item">
-				<span>
-					<em><umb-localize key="content_notCreated"></umb-localize></em>
-				</span>
-			</div>
+			${when(
+				this._isNew,
+				() => this.#renderNotCreated(),
+				() => (this._links.length === 0 ? this.#renderNoLinks() : this.#renderLinks()),
+			)}
 		`;
 	}
 
-	#renderUrls() {
-		if (!this._variantOptions?.length) return nothing;
-		return map(this._variantOptions, (variantOption) => this.#renderUrl(variantOption));
+	#renderNotCreated() {
+		return html`${this.#renderEmptyLink(null, null)}`;
 	}
 
-	#renderUrl(variantOption: UmbDocumentVariantOptionModel) {
-		const varies = !!variantOption.culture;
-		const culture = varies ? variantOption.culture! : variantOption.language.unique;
-		const url = this._lookup[culture];
-		return when(
-			url,
-			() => html`
-				<a class="link-item" href=${url} target="_blank">
-					<span>
-						<span class="culture">${varies ? culture : nothing}</span>
-						<span>${url}</span>
-					</span>
-					<uui-icon name="icon-out"></uui-icon>
-				</a>
-			`,
-			() => html`
-				<div class="link-item">
-					<span>
-						${when(varies, () => html`<span class="culture">${culture}</span>`)}
-						<em><umb-localize key=${this.#getStateLocalizationKey(variantOption)}></umb-localize></em>
-					</span>
-				</div>
-			`,
+	#renderLinks() {
+		return html`
+			${repeat(
+				this._links,
+				(link) => link.url,
+				(link) => this.#renderLink(link),
+			)}
+		`;
+	}
+
+	#renderLink(link: UmbDocumentInfoViewLink) {
+		if (!link.url) {
+			return this.#renderEmptyLink(link.culture, link.state);
+		}
+
+		return html`
+			<a class="link-item" href=${this.#getTargetUrl(link.url)} target="_blank">
+				<span>
+					${this.#renderLinkCulture(link.culture)}
+					<span>${link.url}</span>
+				</span>
+				<uui-icon name="icon-out"></uui-icon>
+			</a>
+		`;
+	}
+
+	#renderNoLinks() {
+		return html` ${this._variantOptions?.map((variantOption) =>
+			this.#renderEmptyLink(variantOption.culture, variantOption.variant?.state),
+		)}`;
+	}
+
+	#renderEmptyLink(culture: string | null, state: DocumentVariantStateModel | null | undefined) {
+		return html`<div class="link-item">
+			<span>
+				${this.#renderLinkCulture(culture)}
+				<em><umb-localize key=${this.#getStateLocalizationKey(state)}></umb-localize></em>
+			</span>
+		</div>`;
+	}
+
+	#renderLinkCulture(culture: string | null) {
+		if (!culture) return nothing;
+		if (this._links.length === 1) return nothing;
+		return html`<span class="culture">${culture}</span>`;
+	}
+
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+
+		this.#eventContext?.removeEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadRequest as unknown as EventListener,
 		);
 	}
 
@@ -135,6 +243,13 @@ export class UmbDocumentWorkspaceViewInfoLinksElement extends UmbLitElement {
 		css`
 			uui-box {
 				--uui-box-default-padding: 0;
+			}
+
+			#loader-container {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: var(--uui-size-space-2);
 			}
 
 			.link-item {

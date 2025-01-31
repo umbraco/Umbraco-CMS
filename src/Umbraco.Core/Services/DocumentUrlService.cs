@@ -393,7 +393,19 @@ public class DocumentUrlService : IDocumentUrlService
             return GetTopMostRootKey(isDraft, culture);
         }
 
-        // Otherwise we have to find the root items (or child of the first root when hideTopLevelNodeFromPath is true) and follow the url segments in them to get to correct document key
+        // Special case for all top level nodes except the first (that will have /)
+        if (runnerKey is null && urlSegments.Length == 1 && hideTopLevelNodeFromPath is true)
+        {
+            IEnumerable<Guid> rootKeys = GetKeysInRoot(false, isDraft, culture);
+            Guid? rootKeyWithUrlSegment = GetChildWithUrlSegment(rootKeys, urlSegments.First(), culture, isDraft);
+
+            if (rootKeyWithUrlSegment is not null)
+            {
+                return rootKeyWithUrlSegment;
+            }
+        }
+
+        // Otherwise we have to find the root items (or child of the roots when hideTopLevelNodeFromPath is true) and follow the url segments in them to get to correct document key
         for (var index = 0; index < urlSegments.Length; index++)
         {
             var urlSegment = urlSegments[index];
@@ -447,7 +459,7 @@ public class DocumentUrlService : IDocumentUrlService
         var cultureOrDefault = string.IsNullOrWhiteSpace(culture) is false ? culture : _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
 
         Guid[] ancestorsOrSelfKeysArray = ancestorsOrSelfKeys as Guid[] ?? ancestorsOrSelfKeys.ToArray();
-        IDictionary<Guid, Domain?> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToDictionary(x => x, ancestorKey =>
+        ILookup<Guid, Domain?> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToLookup(x => x, ancestorKey =>
         {
             Attempt<int> idAttempt = _idKeyMap.GetIdForKey(ancestorKey, UmbracoObjectTypes.Document);
 
@@ -457,7 +469,12 @@ public class DocumentUrlService : IDocumentUrlService
             }
 
             IEnumerable<Domain> domains = _domainCacheService.GetAssigned(idAttempt.Result, false);
-            return domains.FirstOrDefault(x=>x.Culture == cultureOrDefault);
+
+            // If no culture is specified, we assume invariant and return the first domain.
+            // This is also only used to later to specify the node id in the route, so it does not matter what culture it is.
+            return string.IsNullOrEmpty(culture)
+                ? domains.FirstOrDefault()
+                : domains.FirstOrDefault(x => x.Culture?.Equals(culture, StringComparison.InvariantCultureIgnoreCase) ?? false);
         });
 
         var urlSegments = new List<string>();
@@ -466,13 +483,11 @@ public class DocumentUrlService : IDocumentUrlService
 
         foreach (Guid ancestorOrSelfKey in ancestorsOrSelfKeysArray)
         {
-            if (ancestorOrSelfKeyToDomains.TryGetValue(ancestorOrSelfKey, out Domain? domain))
+            var domains = ancestorOrSelfKeyToDomains[ancestorOrSelfKey].WhereNotNull();
+            if (domains.Any())
             {
-                if (domain is not null)
-                {
-                    foundDomain = domain;
-                    break;
-                }
+                foundDomain = domains.First();// What todo here that is better?
+                break;
             }
 
             if (_cache.TryGetValue(CreateCacheKey(ancestorOrSelfKey, cultureOrDefault, isDraft), out PublishedDocumentUrlSegment? publishedDocumentUrlSegment))
@@ -528,7 +543,7 @@ public class DocumentUrlService : IDocumentUrlService
         var cultures = languages.ToDictionary(x=>x.IsoCode);
 
         Guid[] ancestorsOrSelfKeysArray = ancestorsOrSelfKeys as Guid[] ?? ancestorsOrSelfKeys.ToArray();
-        Dictionary<Guid, Task<Dictionary<string, Domain>>> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToDictionary(x => x, async ancestorKey =>
+        Dictionary<Guid, Task<ILookup<string, Domain>>> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToDictionary(x => x, async ancestorKey =>
         {
             Attempt<int> idAttempt = _idKeyMap.GetIdForKey(ancestorKey, UmbracoObjectTypes.Document);
 
@@ -537,35 +552,43 @@ public class DocumentUrlService : IDocumentUrlService
                 return null;
             }
             IEnumerable<Domain> domains = _domainCacheService.GetAssigned(idAttempt.Result, false);
-            return domains.ToDictionary(x => x.Culture!);
+            return domains.ToLookup(x => x.Culture!);
         })!;
 
         foreach ((string culture, ILanguage language) in cultures)
         {
-           var urlSegments = new List<string>();
-           Domain? foundDomain = null;
+            var urlSegments = new List<string>();
+            List<Domain?> foundDomains = new List<Domain?>();
 
-           var hasUrlInCulture = true;
-           foreach (Guid ancestorOrSelfKey in ancestorsOrSelfKeysArray)
-           {
-                if (ancestorOrSelfKeyToDomains.TryGetValue(ancestorOrSelfKey, out Task<Dictionary<string, Domain>>? domainDictionaryTask))
+            var hasUrlInCulture = true;
+            foreach (Guid ancestorOrSelfKey in ancestorsOrSelfKeysArray)
+            {
+                var domainLookup = await ancestorOrSelfKeyToDomains[ancestorOrSelfKey];
+                if (domainLookup.Any())
                 {
-                    Dictionary<string, Domain> domainDictionary = await domainDictionaryTask;
-                    if (domainDictionary.TryGetValue(culture, out Domain? domain))
+                    var domains = domainLookup[culture];
+                    foreach (Domain domain in domains)
                     {
-                        Attempt<Guid> domainKeyAttempt = _idKeyMap.GetKeyForId(domain.ContentId, UmbracoObjectTypes.Document);
+                        Attempt<Guid> domainKeyAttempt =
+                            _idKeyMap.GetKeyForId(domain.ContentId, UmbracoObjectTypes.Document);
                         if (domainKeyAttempt.Success)
                         {
                             if (_publishStatusQueryService.IsDocumentPublished(domainKeyAttempt.Result, culture))
                             {
-                                foundDomain = domain;
-                                break;
+                                foundDomains.Add(domain);
                             }
                         }
                     }
+
+                    if (foundDomains.Any())
+                    {
+                        break;
+                    }
                 }
 
-                if (_cache.TryGetValue(CreateCacheKey(ancestorOrSelfKey, culture, false), out PublishedDocumentUrlSegment? publishedDocumentUrlSegment))
+                if (_cache.TryGetValue(
+                        CreateCacheKey(ancestorOrSelfKey, culture, false),
+                        out PublishedDocumentUrlSegment? publishedDocumentUrlSegment))
                 {
                     urlSegments.Add(publishedDocumentUrlSegment.UrlSegment);
                 }
@@ -573,33 +596,74 @@ public class DocumentUrlService : IDocumentUrlService
                 {
                     hasUrlInCulture = false;
                 }
-           }
+            }
 
-           //If we did not find a domain and this is not the default language, then the content is not routable
-           if (foundDomain is null && language.IsDefault is false)
-           {
-               continue;
-           }
+            //If we did not find a domain and this is not the default language, then the content is not routable
+            if (foundDomains.Any() is false && language.IsDefault is false)
+            {
+                continue;
+            }
 
-           var isRootFirstItem = GetTopMostRootKey(false, culture) == ancestorsOrSelfKeysArray.Last();
 
-           var leftToRight = _globalSettings.ForceCombineUrlPathLeftToRight
-                             || CultureInfo.GetCultureInfo(culture).TextInfo.IsRightToLeft is false;
-           if (leftToRight)
-           {
-               urlSegments.Reverse();
-           }
+            var isRootFirstItem = GetTopMostRootKey(false, culture) == ancestorsOrSelfKeysArray.Last();
 
-           result.Add(new UrlInfo(
-               text: GetFullUrl(isRootFirstItem, urlSegments, foundDomain, leftToRight),
-               isUrl: hasUrlInCulture,
-               culture: culture
-           ));
+            var leftToRight = _globalSettings.ForceCombineUrlPathLeftToRight
+                              || CultureInfo.GetCultureInfo(culture).TextInfo.IsRightToLeft is false;
+            if (leftToRight)
+            {
+                urlSegments.Reverse();
+            }
 
+            // If no domain was found, we need to add a null domain to the list to make sure we check for no domains.
+            if (foundDomains.Any() is false)
+            {
+                foundDomains.Add(null);
+            }
+
+            foreach (Domain? foundDomain in foundDomains)
+            {
+                var foundUrl = GetFullUrl(isRootFirstItem, urlSegments, foundDomain, leftToRight);
+
+                if (foundDomain is not null)
+                {
+                    // if we found a domain, it should be safe to show url
+                    result.Add(new UrlInfo(
+                        text: foundUrl,
+                        isUrl: hasUrlInCulture,
+                        culture: culture
+                    ));
+                }
+                else
+                {
+                    // otherwise we need to ensure that no other page has the same url
+                    // e.g. a site with two roots that both have a child with the same name
+                    Guid? documentKeyByRoute = GetDocumentKeyByRoute(foundUrl, culture, foundDomain?.ContentId, false);
+                    if (contentKey.Equals(documentKeyByRoute))
+                    {
+                        result.Add(new UrlInfo(
+                            text: foundUrl,
+                            isUrl: hasUrlInCulture,
+                            culture: culture
+                        ));
+                    }
+                    else
+                    {
+                        result.Add(new UrlInfo(
+                            text: "Conflict: Other page has the same url",
+                            isUrl: false,
+                            culture: culture
+                        ));
+                    }
+                }
+
+
+
+            }
         }
 
         return result;
     }
+
 
     private string GetFullUrl(bool isRootFirstItem, List<string> segments, Domain? foundDomain, bool leftToRight)
     {
@@ -610,7 +674,7 @@ public class DocumentUrlService : IDocumentUrlService
             return foundDomain.Name.EnsureEndsWith("/") + string.Join('/', urlSegments);
         }
 
-        var hideTopLevel = _globalSettings.HideTopLevelNodeFromPath && isRootFirstItem;
+        var hideTopLevel = HideTopLevel(_globalSettings.HideTopLevelNodeFromPath, isRootFirstItem, urlSegments);
         if (leftToRight)
         {
             return '/' + string.Join('/', urlSegments.Skip(hideTopLevel ? 1 : 0));
@@ -622,6 +686,21 @@ public class DocumentUrlService : IDocumentUrlService
         }
 
         return '/' + string.Join('/', urlSegments);
+    }
+
+    private bool HideTopLevel(bool hideTopLevelNodeFromPath, bool isRootFirstItem, List<string> urlSegments)
+    {
+        if (hideTopLevelNodeFromPath is false)
+        {
+            return false;
+        }
+
+        if(isRootFirstItem is false && urlSegments.Count == 1)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     public async Task CreateOrUpdateUrlSegmentsWithDescendantsAsync(Guid key)
@@ -646,7 +725,7 @@ public class DocumentUrlService : IDocumentUrlService
         }
     }
 
-    private IEnumerable<Guid> GetKeysInRoot(bool addFirstLevelChildren, bool isDraft, string culture)
+    private IEnumerable<Guid> GetKeysInRoot(bool considerFirstLevelAsRoot, bool isDraft, string culture)
     {
         if (_documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeysEnumerable) is false)
         {
@@ -655,12 +734,7 @@ public class DocumentUrlService : IDocumentUrlService
 
         IEnumerable<Guid> rootKeys = rootKeysEnumerable as Guid[] ?? rootKeysEnumerable.ToArray();
 
-        foreach (Guid rootKey in rootKeys)
-        {
-            yield return rootKey;
-        }
-
-        if (addFirstLevelChildren)
+        if (considerFirstLevelAsRoot)
         {
             foreach (Guid rootKey in rootKeys)
             {
@@ -675,6 +749,13 @@ public class DocumentUrlService : IDocumentUrlService
                 {
                     yield return childKey;
                 }
+            }
+        }
+        else
+        {
+            foreach (Guid rootKey in rootKeys)
+            {
+                yield return rootKey;
             }
         }
 
@@ -710,11 +791,7 @@ public class DocumentUrlService : IDocumentUrlService
         return Enumerable.Empty<Guid>();
     }
 
-    /// <summary>
-    /// Gets the top most root key.
-    /// </summary>
-    /// <returns>The top most root key.</returns>
-    private Guid? GetTopMostRootKey(bool isDraft, string culture)
+    private IEnumerable<Guid> GetRootKeys(bool isDraft, string culture)
     {
         if (_documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys))
         {
@@ -722,11 +799,20 @@ public class DocumentUrlService : IDocumentUrlService
             {
                 if (isDraft || IsContentPublished(rootKey, culture))
                 {
-                    return rootKey;
+                    yield return rootKey;
                 }
             }
         }
-        return null;
+    }
+
+
+    /// <summary>
+    /// Gets the top most root key.
+    /// </summary>
+    /// <returns>The top most root key.</returns>
+    private Guid? GetTopMostRootKey(bool isDraft, string culture)
+    {
+        return GetRootKeys(isDraft, culture).Cast<Guid?>().FirstOrDefault();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Cms.Core.Configuration.Models;
 
@@ -25,6 +26,8 @@ public class SecuritySettings
 
     internal const int StaticMemberDefaultLockoutTimeInMinutes = 30 * 24 * 60;
     internal const int StaticUserDefaultLockoutTimeInMinutes = 30 * 24 * 60;
+    private const long StaticUserDefaultFailedLoginDurationInMilliseconds = 1000;
+    private const long StaticUserMinimumFailedLoginDurationInMilliseconds = 250;
     internal const string StaticAuthorizeCallbackPathName = "/umbraco/oauth_complete";
     internal const string StaticAuthorizeCallbackLogoutPathName = "/umbraco/logout";
     internal const string StaticAuthorizeCallbackErrorPathName = "/umbraco/error";
@@ -100,6 +103,30 @@ public class SecuritySettings
     /// </summary>
     [DefaultValue(StaticAllowConcurrentLogins)]
     public bool AllowConcurrentLogins { get; set; } = StaticAllowConcurrentLogins;
+
+    /// <summary>
+    /// Gets or sets the default duration (in milliseconds) of failed login attempts.
+    /// </summary>
+    /// <value>
+    /// The default duration (in milliseconds) of failed login attempts.
+    /// </value>
+    /// <remarks>
+    /// The user login endpoint ensures that failed login attempts take at least as long as the average successful login.
+    /// However, if no successful logins have occurred, this value is used as the default duration.
+    /// </remarks>
+    [Range(0, long.MaxValue)]
+    [DefaultValue(StaticUserDefaultFailedLoginDurationInMilliseconds)]
+    public long UserDefaultFailedLoginDurationInMilliseconds { get; set; } = StaticUserDefaultFailedLoginDurationInMilliseconds;
+
+    /// <summary>
+    /// Gets or sets the minimum duration (in milliseconds) of failed login attempts.
+    /// </summary>
+    /// <value>
+    /// The minimum duration (in milliseconds) of failed login attempts.
+    /// </value>
+    [Range(0, long.MaxValue)]
+    [DefaultValue(StaticUserMinimumFailedLoginDurationInMilliseconds)]
+    public long UserMinimumFailedLoginDurationInMilliseconds { get; set; } = StaticUserMinimumFailedLoginDurationInMilliseconds;
 
     /// <summary>
     ///     Gets or sets a value of the back-office host URI. Use this when running the back-office client and the Management API on different hosts. Leave empty when running both on the same host.

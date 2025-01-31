@@ -1,4 +1,4 @@
-export const UMB_DOCUMENT_NOTIFICATIONS_REPOSITORY_ALIAS = 'Umb.Repository.Document.Notifications';
+import { UMB_DOCUMENT_NOTIFICATIONS_REPOSITORY_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

@@ -69,6 +69,7 @@ const treeItemMapper = (model: UmbMockDocumentModel): DocumentTreeItemResponseMo
 		noAccess: model.noAccess,
 		parent: model.parent,
 		variants: model.variants,
+		createDate: model.createDate,
 	};
 };
 
@@ -86,6 +87,7 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 		},
 		hasChildren: false,
 		id: request.id ? request.id : UmbId.new(),
+		createDate: now,
 		isProtected: false,
 		isTrashed: false,
 		noAccess: false,
@@ -126,9 +128,11 @@ const itemMapper = (model: UmbMockDocumentModel): DocumentItemResponseModel => {
 			icon: model.documentType.icon,
 			id: model.documentType.id,
 		},
+		hasChildren: model.hasChildren,
 		id: model.id,
 		isProtected: model.isProtected,
 		isTrashed: model.isTrashed,
+		parent: model.parent,
 		variants: model.variants,
 	};
 };

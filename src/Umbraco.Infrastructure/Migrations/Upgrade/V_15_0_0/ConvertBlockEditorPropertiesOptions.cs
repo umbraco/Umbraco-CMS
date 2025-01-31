@@ -26,4 +26,12 @@ public class ConvertBlockEditorPropertiesOptions
     /// If you choose to skip the migration, you're responsible for performing the content migration for Rich Texts after the V15 upgrade has completed.
     /// </remarks>
     public bool SkipRichTextEditors { get; set; } = false;
+
+    /// <summary>
+    /// Setting this property to true will cause all block editor migrations to run as parallel operations.
+    /// </summary>
+    /// <remarks>
+    /// While this greatly improves the speed of the migration, some content setups may experience issues and failing migrations as a result.
+    /// </remarks>
+    public bool ParallelizeMigration { get; set; } = false;
 }

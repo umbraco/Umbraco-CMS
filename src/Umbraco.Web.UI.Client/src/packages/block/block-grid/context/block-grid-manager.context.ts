@@ -1,5 +1,6 @@
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
 import type { UmbBlockGridWorkspaceOriginData } from '../index.js';
+import { UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET } from './constants.js';
 import {
 	appendToFrozenArray,
 	pushAtToUniqueArray,
@@ -14,8 +15,6 @@ import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-
-export const UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET = '/umbraco/backoffice/css/umbraco-blockgridlayout.css';
 
 /**
  * A implementation of the Block Manager specifically for the Block Grid Editor.
@@ -182,7 +181,6 @@ export class UmbBlockGridManagerContext<
 		return undefined;
 	}
 
-	// TODO: Remove dependency on modalData object here. [NL] Maybe change it into requiring the originData object instead.
 	insert(
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataModel,

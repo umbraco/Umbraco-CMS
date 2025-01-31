@@ -2,7 +2,7 @@ import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
 import { UMB_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/index.js';
 import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
 import { UmbRequestReloadTreeItemChildrenEvent } from '../../entity-actions/reload-tree-item-children/index.js';
-import type { ManifestTreeItem } from '../../extensions/index.js';
+import type { ManifestTreeItem } from '../../extensions/types.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbArrayState, UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

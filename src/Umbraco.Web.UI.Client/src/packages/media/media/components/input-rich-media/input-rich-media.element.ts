@@ -1,7 +1,6 @@
 import { UmbMediaItemRepository } from '../../repository/index.js';
 import { UMB_IMAGE_CROPPER_EDITOR_MODAL, UMB_MEDIA_PICKER_MODAL } from '../../modals/index.js';
-import type { UmbCropModel, UmbMediaPickerPropertyValue } from '../../types.js';
-import type { UmbMediaItemModel } from '../../repository/index.js';
+import type { UmbMediaItemModel, UmbCropModel, UmbMediaPickerPropertyValue } from '../../types.js';
 import type { UmbUploadableItem } from '../../dropzone/types.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbConfirmModal, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -9,7 +8,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
@@ -26,9 +25,7 @@ type UmbRichMediaCardModel = {
 	isTrashed?: boolean;
 };
 
-const elementName = 'umb-input-rich-media';
-
-@customElement(elementName)
+@customElement('umb-input-rich-media')
 export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController<UmbMediaPickerPropertyValue>(this, {
 		getUniqueOfElement: (element) => {
@@ -40,9 +37,8 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 		identifier: 'Umb.SorterIdentifier.InputRichMedia',
 		itemSelector: 'uui-card-media',
 		containerSelector: '.container',
-		// TODO: This component probably needs some grid-like logic for resolve placement... [LI]
-		// TODO: You can also use verticalDirection? [NL]
-		resolvePlacement: () => false,
+		//resolvePlacement: (args) => args.pointerX < args.relatedRect.left + args.relatedRect.width * 0.5,
+		resolvePlacement: UmbSorterResolvePlacementAsGrid,
 		onChange: ({ model }) => {
 			this.#items = model;
 			this.#sortCards(model);
@@ -134,19 +130,21 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	#focalPointEnabled: boolean = false;
 
 	@property()
+	/** @deprecated will be removed in v17 */
 	public set alias(value: string | undefined) {
-		this.#modalRouter.setUniquePathValue('propertyAlias', value);
+		//this.#modalRouter.setUniquePathValue('propertyAlias', value);
 	}
 	public get alias(): string | undefined {
-		return this.#modalRouter.getUniquePathValue('propertyAlias');
+		return undefined; //this.#modalRouter.getUniquePathValue('propertyAlias');
 	}
 
 	@property()
+	/** @deprecated will be removed in v17 */
 	public set variantId(value: string | UmbVariantId | undefined) {
-		this.#modalRouter.setUniquePathValue('variantId', value?.toString());
+		//this.#modalRouter.setUniquePathValue('variantId', value?.toString());
 	}
 	public get variantId(): string | undefined {
-		return this.#modalRouter.getUniquePathValue('variantId');
+		return undefined; //this.#modalRouter.getUniquePathValue('variantId');
 	}
 
 	/**
@@ -178,7 +176,6 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 
 	#itemRepository = new UmbMediaItemRepository(this);
 
-	#modalRouter;
 	#modalManager?: UmbModalManagerContext;
 
 	constructor() {
@@ -188,9 +185,8 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 			this.#modalManager = instance;
 		});
 
-		this.#modalRouter = new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
+		new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
 			.addAdditionalPath(':key')
-			.addUniquePaths(['propertyAlias', 'variantId'])
 			.onSetup((params) => {
 				const key = params.key;
 				if (!key) return false;
@@ -455,6 +451,6 @@ export default UmbInputRichMediaElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbInputRichMediaElement;
+		'umb-input-rich-media': UmbInputRichMediaElement;
 	}
 }
