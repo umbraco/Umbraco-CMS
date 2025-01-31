@@ -478,7 +478,7 @@ export default {
 		anchorLinkPicker: 'Lokalt link / querystreng',
 		anchorInsert: 'Navn på lokalt link',
 		closeThisWindow: 'Luk denne dialog',
-		confirmdelete: 'Er du sikker på at du vil slette {0}?',
+		confirmdelete: (name: string) => `Er du sikker på at du vil slette${name ? ` <strong>${name}</strong>` : ''}?`,
 		confirmdisable: 'Er du sikker på du vil deaktivere',
 		confirmremove: 'Er du sikker på at du vil fjerne',
 		confirmremoveusageof: 'Er du sikker på du vil fjerne brugen af <strong>%0%</strong>',
@@ -2250,7 +2250,7 @@ export default {
 		labelForClearClipboard: 'Ryd udklipsholder',
 		labelForCopyToClipboard: 'Kopier til udklipsholder',
 		confirmDeleteHeadline: 'Slet fra udklipsholderen',
-		confirmDeleteDescription: 'Er du sikker på at du vil slette {0} fra udklipsholderen?',
+		confirmDeleteDescription: 'Er du sikker på at du vil slette <strong>{0}</strong> fra udklipsholderen?',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Åben egenskabshandlinger',
