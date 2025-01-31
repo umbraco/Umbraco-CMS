@@ -69,12 +69,9 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         foreach (CompiledViewDescriptor precompiledView in precompiledViews)
         {
             _logger.LogDebug("Initializing Razor view compiler with compiled view: '{ViewName}'", precompiledView.RelativePath);
-            if (!_precompiledViews.ContainsKey(precompiledView.RelativePath))
-            {
-                // View ordering has precedence semantics, a view with a higher precedence was
-                // already added to the list.
-                _precompiledViews.Add(precompiledView.RelativePath, precompiledView);
-            }
+            // View ordering has precedence semantics, a view with a higher precedence was
+            // already added to the list.
+            _precompiledViews.TryAdd(precompiledView.RelativePath, precompiledView);
         }
 
         if (_precompiledViews.Count == 0)
