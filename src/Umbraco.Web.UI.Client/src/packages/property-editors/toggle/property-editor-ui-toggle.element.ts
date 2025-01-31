@@ -33,6 +33,9 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 	@state()
 	_labelOn?: string;
 
+	@property({ type: String })
+	name?: string;
+
 	@state()
 	_showLabels = false;
 
@@ -40,6 +43,7 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 		this.value ??= config.getValueByAlias('default') ?? false;
+
 		this._labelOff = config.getValueByAlias('labelOff');
 		this._labelOn = config.getValueByAlias('labelOn');
 		this._showLabels = Boolean(config.getValueByAlias('showLabels'));
@@ -54,8 +58,8 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 	override render() {
 		return html`
 			<umb-input-toggle
-				.ariaLabel=${this._ariaLabel}
-				.labelOn=${this._labelOn}
+
+				.ariaLabel=${this._ariaLabel ? this.localize.string(this._ariaLabel) : this.localize.term('general_toggleFor', [this.name])}
 				.labelOff=${this._labelOff}
 				?checked=${this.value}
 				?showLabels=${this._showLabels}

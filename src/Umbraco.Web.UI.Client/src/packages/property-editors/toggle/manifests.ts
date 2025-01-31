@@ -22,7 +22,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	
 							{
 								alias: "ariaLabel",
-								value: 'Toggle the initial state of this data type'
+								value: 'toggle for the initial state of this data type'
 							}
 						]
 					},
@@ -34,7 +34,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	
 							{
 								alias: "ariaLabel",
-								value: 'Toggle weather if label should be displayed'
+								value: 'toggle for weather if label should be displayed'
 							}
 						]
 					},
