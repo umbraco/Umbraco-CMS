@@ -226,12 +226,12 @@ public static class PropertyTagsExtensions
         switch (storageType)
         {
             case TagsStorageType.Csv:
-                return value.Split(new[] { delimiter }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());
+                return value.Split([delimiter], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
             case TagsStorageType.Json:
                 try
                 {
-                    return serializer.Deserialize<string[]>(value)?.Select(x => x.Trim()) ?? Enumerable.Empty<string>();
+                    return serializer.Deserialize<string[]>(value)?.Select(x => x.Trim()) ?? [];
                 }
                 catch (Exception)
                 {

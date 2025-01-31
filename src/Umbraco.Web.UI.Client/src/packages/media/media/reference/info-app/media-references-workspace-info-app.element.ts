@@ -1,5 +1,6 @@
-import { UmbMediaReferenceRepository } from '../../../reference/index.js';
-import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbMediaReferenceRepository } from '../repository/index.js';
+import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
+import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { isDefaultReference, isDocumentReference, isMediaReference } from '@umbraco-cms/backoffice/relations';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
@@ -8,17 +9,15 @@ import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbReferenceModel } from '@umbraco-cms/backoffice/relations';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
-@customElement('umb-media-workspace-view-info-reference')
-export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
+@customElement('umb-media-references-workspace-info-app')
+export class UmbMediaReferencesWorkspaceInfoAppElement extends UmbLitElement {
 	#itemsPerPage = 10;
 
 	#referenceRepository;
 
 	#routeBuilder?: UmbModalRouteBuilder;
-
-	@property()
-	mediaUnique = '';
 
 	@state()
 	private _currentPage = 1;
@@ -32,6 +31,9 @@ export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 	@state()
 	private _loading = true;
 
+	#workspaceContext?: typeof UMB_MEDIA_WORKSPACE_CONTEXT.TYPE;
+	#mediaUnique?: UmbEntityUnique;
+
 	constructor() {
 		super();
 		this.#referenceRepository = new UmbMediaReferenceRepository(this);
@@ -44,6 +46,32 @@ export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 			.observeRouteBuilder((routeBuilder) => {
 				this.#routeBuilder = routeBuilder;
 			});
+
+		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (context) => {
+			this.#workspaceContext = context;
+			this.#observeMediaUnique();
+		});
+	}
+
+	#observeMediaUnique() {
+		this.observe(
+			this.#workspaceContext?.unique,
+			(unique) => {
+				if (!unique) {
+					this.#mediaUnique = undefined;
+					this._items = [];
+					return;
+				}
+
+				if (this.#mediaUnique === unique) {
+					return;
+				}
+
+				this.#mediaUnique = unique;
+				this.#getReferences();
+			},
+			'umbReferencesDocumentUniqueObserver',
+		);
 	}
 
 	protected override firstUpdated(): void {
@@ -51,10 +79,14 @@ export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 	}
 
 	async #getReferences() {
+		if (!this.#mediaUnique) {
+			throw new Error('Media unique is required');
+		}
+
 		this._loading = true;
 
 		const { data } = await this.#referenceRepository.requestReferencedBy(
-			this.mediaUnique,
+			this.#mediaUnique,
 			(this._currentPage - 1) * this.#itemsPerPage,
 			this.#itemsPerPage,
 		);
@@ -123,22 +155,20 @@ export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 	}
 
 	override render() {
+		if (!this._items?.length) return nothing;
 		return html`
-			<uui-box headline=${this.localize.term('references_labelUsedByItems')}>
+			<umb-workspace-info-app-layout headline="#references_labelUsedByItems">
 				${when(
 					this._loading,
 					() => html`<uui-loader></uui-loader>`,
 					() => html`${this.#renderItems()} ${this.#renderPagination()}`,
 				)}
-			</uui-box>
+			</umb-workspace-info-app-layout>
 		`;
 	}
 
 	#renderItems() {
-		if (!this._items?.length)
-			return html`<p>
-				<umb-localize key="references_itemHasNoReferences">This item has no references.</umb-localize>
-			</p>`;
+		if (!this._items?.length) return nothing;
 		return html`
 			<uui-table>
 				<uui-table-head>
@@ -218,10 +248,10 @@ export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 	];
 }
 
-export default UmbMediaWorkspaceViewInfoReferenceElement;
+export default UmbMediaReferencesWorkspaceInfoAppElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-media-workspace-view-info-reference': UmbMediaWorkspaceViewInfoReferenceElement;
+		'umb-media-references-workspace-info-app': UmbMediaReferencesWorkspaceInfoAppElement;
 	}
 }

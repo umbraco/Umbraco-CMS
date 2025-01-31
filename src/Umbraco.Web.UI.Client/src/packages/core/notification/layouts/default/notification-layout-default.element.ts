@@ -6,7 +6,6 @@ import {
 	ifDefined,
 	nothing,
 	css,
-	styleMap,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbNotificationDefaultData, UmbNotificationHandler } from '@umbraco-cms/backoffice/notification';
@@ -24,7 +23,7 @@ export class UmbNotificationLayoutDefaultElement extends LitElement {
 	override render() {
 		return html`
 			<uui-toast-notification-layout id="layout" headline="${ifDefined(this.data.headline)}" class="uui-text">
-				<div id="message" style=${styleMap({ whiteSpace: this.data.whitespace })}>${this.data.message}</div>
+				<div id="message">${this.data.message}</div>
 				${this.#renderStructuredList(this.data.structuredList)}
 			</uui-toast-notification-layout>
 		`;
@@ -56,6 +55,9 @@ export class UmbNotificationLayoutDefaultElement extends LitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
+			#message {
+				white-space: pre-line;
+			}
 			.structured-list ul {
 				margin: 0;
 			}

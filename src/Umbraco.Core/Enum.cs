@@ -45,7 +45,7 @@ public static class Enum<T>
 
     public static string[] GetNames() => ValueToName.Values.ToArray();
 
-    public static string? GetName(T value) => ValueToName.TryGetValue(value, out var name) ? name : null;
+    public static string? GetName(T value) => ValueToName.GetValueOrDefault(value);
 
     public static T Parse(string value, bool ignoreCase = false)
     {
