@@ -13,6 +13,7 @@ import {
 	property,
 	query,
 	state,
+	when,
 	type PropertyValueMap,
 } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -21,7 +22,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
+import { formatBytes, stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends UmbLitElement {
@@ -55,6 +56,9 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	public temporaryFile?: UmbTemporaryFileModel;
 
 	@state()
+	private _progress = 0;
+
+	@state()
 	private _extensions?: string[];
 
 	@state()
@@ -62,9 +66,6 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 	@query('#dropzone')
 	private _dropzone?: UUIFileDropzoneElement;
-
-	@state()
-	private _progress = 0;
 
 	#manager = new UmbTemporaryFileManager(this);
 
@@ -161,21 +162,25 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 			temporaryUnique: UmbId.new(),
 			status: TemporaryFileStatus.WAITING,
 			file: e.detail.files[0],
-			onProgress: (p) => {
-				this._progress = p;
-			},
 		};
 
-		const blobUrl = URL.createObjectURL(this.temporaryFile.file);
-		this.value = { src: blobUrl };
-
-		const uploaded = await this.#manager.uploadOne(this.temporaryFile);
+		const uploaded = await this.#manager.uploadOne({
+			...this.temporaryFile,
+			onProgress: (p) => {
+				this._progress = Math.ceil(p);
+			},
+		});
 
 		if (uploaded.status === TemporaryFileStatus.SUCCESS) {
 			this.temporaryFile.status = TemporaryFileStatus.SUCCESS;
+
+			const blobUrl = URL.createObjectURL(this.temporaryFile.file);
+			this.value = { src: blobUrl };
+
 			this.dispatchEvent(new UmbChangeEvent());
 		} else {
 			this.temporaryFile.status = TemporaryFileStatus.ERROR;
+			this.requestUpdate('temporaryFile');
 		}
 	}
 
@@ -186,11 +191,14 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	}
 
 	override render() {
-		if (this.value.src && this._previewAlias) {
-			return this.#renderFile(this.value.src, this._previewAlias, this.temporaryFile?.file);
-		} else {
+		if (!this.temporaryFile && !this.value.src) {
 			return this.#renderDropzone();
 		}
+
+		return html`
+			${this.temporaryFile ? this.#renderUploader() : nothing}
+			${this.value.src && this._previewAlias ? this.#renderFile(this.value.src) : nothing}
+		`;
 	}
 
 	#renderDropzone() {
@@ -207,22 +215,47 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		`;
 	}
 
-	#renderFile(src: string, previewAlias: string, file?: File) {
-		if (!previewAlias) return 'An error occurred. No previewer found for the file type.';
+	#renderUploader() {
+		if (!this.temporaryFile) return nothing;
+
+		return html`
+			<div id="temporaryFile">
+				<div id="fileIcon">
+					${when(
+						this.temporaryFile.status === TemporaryFileStatus.SUCCESS,
+						() => html`<umb-icon name="check" color="green"></umb-icon>`,
+					)}
+					${when(
+						this.temporaryFile.status === TemporaryFileStatus.ERROR,
+						() => html`<umb-icon name="wrong" color="red"></umb-icon>`,
+					)}
+				</div>
+				<div id="fileDetails">
+					<div id="fileName">${this.temporaryFile.file.name}</div>
+					<div id="fileSize">${formatBytes(this.temporaryFile.file.size, { decimals: 2 })}: ${this._progress}%</div>
+					${when(
+						this.temporaryFile.status === TemporaryFileStatus.WAITING,
+						() => html`<div id="progress"></div><uui-loader-bar progress=${this._progress}></uui-loader-bar></div>`,
+					)}
+					${when(
+						this.temporaryFile.status === TemporaryFileStatus.ERROR,
+						() => html`<div id="error">An error occured</div>`,
+					)}
+				</div>
+				<div id="fileActions">${this.#renderButtonRemove()}</div>
+			</div>
+		`;
+	}
+
+	#renderFile(src: string) {
 		return html`
 			<div id="wrapper">
 				<div id="wrapperInner">
 					<umb-extension-slot
 						type="fileUploadPreview"
-						.props=${{ path: src, file: file }}
-						.filter=${(manifest: ManifestFileUploadPreview) => manifest.alias === previewAlias}>
+						.props=${{ path: src, file: this.temporaryFile?.file }}
+						.filter=${(manifest: ManifestFileUploadPreview) => manifest.alias === this._previewAlias}>
 					</umb-extension-slot>
-					${this.temporaryFile && this.temporaryFile.status !== TemporaryFileStatus.SUCCESS
-						? html`<umb-temporary-file-badge
-								id="badge"
-								.progress=${this._progress}
-								?error=${this.temporaryFile.status === TemporaryFileStatus.ERROR}></umb-temporary-file-badge>`
-						: nothing}
 				</div>
 			</div>
 			${this.#renderButtonRemove()}
@@ -238,6 +271,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	#handleRemove() {
 		this.value = { src: undefined };
 		this.temporaryFile = undefined;
+		this._progress = 0;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -271,15 +305,36 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 				max-width: 100%;
 			}
 
-			#badge {
-				position: absolute;
-				top: 50%;
-				left: 50%;
-				transform: translate(-50%, -50%);
-				width: 100px;
+			#temporaryFile {
+				display: grid;
+				grid-template-columns: auto auto auto;
+				width: fit-content;
+				max-width: 100%;
+				margin: var(--uui-size-layout-1) 0;
+				padding: var(--uui-size-space-3);
+				border: 1px dashed var(--uui-color-divider-emphasis);
+			}
 
-				background: rgba(255, 255, 255, 0.75);
-				border-radius: 50%;
+			#fileIcon,
+			#fileActions {
+				place-self: center center;
+				padding: 0 var(--uui-size-layout-1);
+			}
+
+			#fileName {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				font-size: var(--uui-size-5);
+			}
+
+			#fileSize {
+				font-size: var(--uui-font-size-small);
+				color: var(--uui-color-text-alt);
+			}
+
+			#error {
+				color: var(--uui-color-danger);
 			}
 
 			uui-file-dropzone {
