@@ -71,9 +71,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 	#manifests: Array<ManifestFileUploadPreview> = [];
 
-	constructor() {
-		super();
-	}
+	#uploadAbort?: AbortController;
 
 	override updated(changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
 		super.updated(changedProperties);
@@ -164,23 +162,37 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 			file: e.detail.files[0],
 		};
 
-		const uploaded = await this.#manager.uploadOne({
-			...this.temporaryFile,
-			onProgress: (p) => {
-				this._progress = Math.ceil(p);
-			},
-		});
+		try {
+			this.#uploadAbort = new AbortController();
+			const uploaded = await this.#manager.uploadOne({
+				...this.temporaryFile,
+				onProgress: (p) => {
+					this._progress = Math.ceil(p);
+				},
+				abortSignal: this.#uploadAbort.signal,
+			});
 
-		if (uploaded.status === TemporaryFileStatus.SUCCESS) {
-			this.temporaryFile.status = TemporaryFileStatus.SUCCESS;
+			if (uploaded.status === TemporaryFileStatus.SUCCESS) {
+				this.temporaryFile.status = TemporaryFileStatus.SUCCESS;
 
-			const blobUrl = URL.createObjectURL(this.temporaryFile.file);
-			this.value = { src: blobUrl };
+				const blobUrl = URL.createObjectURL(this.temporaryFile.file);
+				this.value = { src: blobUrl };
 
-			this.dispatchEvent(new UmbChangeEvent());
-		} else {
-			this.temporaryFile.status = TemporaryFileStatus.ERROR;
-			this.requestUpdate('temporaryFile');
+				this.dispatchEvent(new UmbChangeEvent());
+			} else {
+				this.temporaryFile.status = TemporaryFileStatus.ERROR;
+				this.requestUpdate('temporaryFile');
+			}
+		} catch {
+			// If we still have a temporary file, set it to error.
+			if (this.temporaryFile) {
+				this.temporaryFile.status = TemporaryFileStatus.ERROR;
+				this.requestUpdate('temporaryFile');
+			}
+
+			// If the error was caused by the upload being aborted, do not show an error message.
+		} finally {
+			this.#uploadAbort = undefined;
 		}
 	}
 
@@ -273,6 +285,9 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		this.temporaryFile = undefined;
 		this._progress = 0;
 		this.dispatchEvent(new UmbChangeEvent());
+
+		// If the upload promise happens to be in progress, cancel it.
+		this.#uploadAbort?.abort();
 	}
 
 	static override readonly styles = [
