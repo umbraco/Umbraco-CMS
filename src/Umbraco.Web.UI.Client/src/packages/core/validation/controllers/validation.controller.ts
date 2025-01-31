@@ -7,20 +7,7 @@ import type { UmbContextProviderController } from '@umbraco-cms/backoffice/conte
 import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-
-/**
- * Helper method to replace the start of a string with another string.
- * @param path {string}
- * @param startFrom {string}
- * @param startTo {string}
- * @returns {string}
- */
-function ReplaceStartOfString(path: string, startFrom: string, startTo: string): string {
-	if (path.startsWith(startFrom + '.')) {
-		return startTo + path.slice(startFrom.length);
-	}
-	return path;
-}
+import { ReplaceStartOfPath } from '../utils/replace-start-of-path.function.js';
 
 /**
  * Validation Context is the core of Validation.
@@ -143,7 +130,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 					}
 					this.#parentMessages = msgs;
 					msgs.forEach((msg) => {
-						const path = ReplaceStartOfString(msg.path, this.#baseDataPath!, '$');
+						const path = ReplaceStartOfPath(msg.path, this.#baseDataPath!, '$');
 						// Notice, the local message uses the same key. [NL]
 						this.messages.addMessage(msg.type, path, msg.body, msg.key);
 					});
@@ -164,7 +151,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 					this.#localMessages = msgs;
 					msgs.forEach((msg) => {
 						// replace this.#baseDataPath (if it starts with it) with $ in the path, so it becomes relative to the parent context
-						const path = ReplaceStartOfString(msg.path, '$', this.#baseDataPath!);
+						const path = ReplaceStartOfPath(msg.path, '$', this.#baseDataPath!);
 						// Notice, the parent message uses the same key. [NL]
 						this.#parent!.messages.addMessage(msg.type, path, msg.body, msg.key);
 					});
