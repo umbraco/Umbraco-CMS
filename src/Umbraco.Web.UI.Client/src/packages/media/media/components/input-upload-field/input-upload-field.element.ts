@@ -1,7 +1,7 @@
 import type { MediaValueType } from '../../property-editors/upload-field/types.js';
 import { getMimeTypeFromExtension } from './utils.js';
 import type { ManifestFileUploadPreview } from './file-upload-preview.extension.js';
-import { TemporaryFileStatus, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
+import { UmbTemporaryFileManager, TemporaryFileStatus } from '@umbraco-cms/backoffice/temporary-file';
 import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import {
@@ -63,6 +63,9 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	@query('#dropzone')
 	private _dropzone?: UUIFileDropzoneElement;
 
+	@state()
+	private _progress = 0;
+
 	#manager = new UmbTemporaryFileManager(this);
 
 	#manifests: Array<ManifestFileUploadPreview> = [];
@@ -108,7 +111,13 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 			stringOrStringArrayContains(manifest.forMimeTypes, '*/*'),
 		)?.alias;
 
-		const mimeType = this.#getMimeTypeFromPath(this.value.src);
+		let mimeType: string | null = null;
+		if (this.temporaryFile?.file) {
+			mimeType = this.temporaryFile.file.type;
+		} else {
+			mimeType = this.#getMimeTypeFromPath(this.value.src);
+		}
+
 		if (!mimeType) return fallbackAlias;
 
 		// Check for an exact match
@@ -148,23 +157,24 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 	async #onUpload(e: UUIFileDropzoneEvent) {
 		//Property Editor for Upload field will always only have one file.
-		const item: UmbTemporaryFileModel = {
+		this.temporaryFile = {
 			temporaryUnique: UmbId.new(),
+			status: TemporaryFileStatus.WAITING,
 			file: e.detail.files[0],
+			onProgress: (p) => {
+				this._progress = p;
+			},
 		};
+		const blobUrl = URL.createObjectURL(this.temporaryFile.file);
+		this.value = { src: blobUrl };
 
-		const upload = this.#manager.uploadOne(item);
+		const uploaded = await this.#manager.uploadOne(this.temporaryFile);
 
-		const reader = new FileReader();
-		reader.onload = () => {
-			this.value = { src: reader.result as string };
-		};
-		reader.readAsDataURL(item.file);
-
-		const uploaded = await upload;
 		if (uploaded.status === TemporaryFileStatus.SUCCESS) {
-			this.temporaryFile = { temporaryUnique: item.temporaryUnique, file: item.file };
+			this.temporaryFile.status = TemporaryFileStatus.SUCCESS;
 			this.dispatchEvent(new UmbChangeEvent());
+		} else {
+			this.temporaryFile.status = TemporaryFileStatus.ERROR;
 		}
 	}
 
@@ -189,6 +199,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 				id="dropzone"
 				label="dropzone"
 				@change="${this.#onUpload}"
+				disallowFolderUpload
 				accept="${ifDefined(this._extensions?.join(', '))}">
 				<uui-button label=${this.localize.term('media_clickToUpload')} @click="${this.#handleBrowse}"></uui-button>
 			</uui-file-dropzone>
@@ -206,7 +217,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 						.filter=${(manifest: ManifestFileUploadPreview) => manifest.alias === previewAlias}>
 					</umb-extension-slot>
 					${this.temporaryFile?.status === TemporaryFileStatus.WAITING
-						? html`<umb-temporary-file-badge></umb-temporary-file-badge>`
+						? html`<umb-temporary-file-badge .progress=${this._progress}></umb-temporary-file-badge>`
 						: nothing}
 				</div>
 			</div>
