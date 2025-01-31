@@ -25,9 +25,6 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 	readonly = false;
 
 	@state()
-	_ariaLabel?: string;
-
-	@state()
 	_labelOff?: string;
 
 	@state()
@@ -43,7 +40,6 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 		this._labelOff = config.getValueByAlias('labelOff');
 		this._labelOn = config.getValueByAlias('labelOn');
 		this._showLabels = Boolean(config.getValueByAlias('showLabels'));
-		this._ariaLabel = config.getValueByAlias('ariaLabel');
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputToggleElement }) {
