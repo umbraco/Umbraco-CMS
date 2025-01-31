@@ -720,7 +720,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const updatedEvent = new UmbEntityUpdatedEvent({
 			unique,
 			entityType,
-			discriminator: this._workspaceEventDiscriminator,
+			eventUnique: this._workspaceEventUnique,
 		});
 
 		eventContext.dispatchEvent(updatedEvent);

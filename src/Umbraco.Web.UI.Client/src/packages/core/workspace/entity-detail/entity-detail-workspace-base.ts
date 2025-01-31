@@ -335,7 +335,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		const updatedEvent = new UmbEntityUpdatedEvent({
 			unique,
 			entityType,
-			discriminator: this._workspaceEventDiscriminator,
+			eventUnique: this._workspaceEventUnique,
 		});
 
 		eventContext.dispatchEvent(updatedEvent);
@@ -422,19 +422,19 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	// Discriminator to identify events from this workspace context
-	protected readonly _workspaceEventDiscriminator = UmbId.new();
+	protected readonly _workspaceEventUnique = UmbId.new();
 
 	#onEntityUpdatedEvent = (event: UmbEntityUpdatedEvent) => {
 		const eventEntityUnique = event.getUnique();
 		const eventEntityType = event.getEntityType();
-		const eventDiscriminator = event.getDiscriminator();
+		const eventDiscriminator = event.getEventUnique();
 
 		// Ignore events for other entities
 		if (eventEntityType !== this.getEntityType()) return;
 		if (eventEntityUnique !== this.getUnique()) return;
 
 		// Ignore events from this workspace so we don't reload the data twice. Ex saving this workspace
-		if (eventDiscriminator === this._workspaceEventDiscriminator) return;
+		if (eventDiscriminator === this._workspaceEventUnique) return;
 
 		this.reload();
 	};
