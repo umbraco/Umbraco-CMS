@@ -10,7 +10,7 @@ export interface MetaEntityActionDeleteKind extends MetaEntityActionDefaultKind 
 	itemRepositoryAlias: string;
 	confirm?: {
 		headline?: string;
-		content?: string;
+		message?: string;
 	};
 }
 

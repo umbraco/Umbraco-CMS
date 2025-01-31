@@ -26,7 +26,7 @@ export class UmbDeleteEntityAction extends UmbEntityActionBase<MetaEntityActionD
 		if (!item) throw new Error('Item not found.');
 
 		const headline = this.args.meta.confirm?.headline ?? '#actions_delete';
-		const content = this.args.meta.confirm?.content ?? '#defaultdialogs_confirmdelete';
+		const content = this.args.meta.confirm?.message ?? '#defaultdialogs_confirmdelete';
 		const keysFromString = this.#localize.getKeysFromString(content);
 		const argsMap: UmbLocalizeStringArgsMap = keysFromString.reduce((acc: UmbLocalizeStringArgsMap, key) => {
 			acc[key] = [item.name];

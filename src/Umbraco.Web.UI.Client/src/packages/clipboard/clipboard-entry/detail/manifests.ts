@@ -26,7 +26,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			detailRepositoryAlias: UMB_CLIPBOARD_ENTRY_DETAIL_REPOSITORY_ALIAS,
 			confirm: {
 				headline: '#clipboard_confirmDeleteHeadline',
-				content: '#clipboard_confirmDeleteDescription',
+				message: '#clipboard_confirmDeleteDescription',
 			},
 		},
 	},
