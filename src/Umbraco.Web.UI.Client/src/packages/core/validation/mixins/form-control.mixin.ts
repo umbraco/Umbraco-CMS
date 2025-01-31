@@ -124,7 +124,7 @@ export function UmbFormControlMixin<
 		 * @default
 		 */
 		@property({ reflect: false }) // Do not 'reflect' as the attribute value is used as fallback. [NL]
-		value: ValueType | DefaultValueType;
+		value: ValueType | DefaultValueType = defaultValue as unknown as DefaultValueType;
 
 		// Validation
 		//private _validityState = new UmbValidityState();
@@ -148,7 +148,6 @@ export function UmbFormControlMixin<
 		}
 		private _pristine: boolean = true;
 
-		#value: ValueType | DefaultValueType = defaultValue as unknown as DefaultValueType;
 		protected _internals: ElementInternals;
 		#form: HTMLFormElement | null = null;
 		#validators: UmbFormControlValidatorConfig[] = [];
