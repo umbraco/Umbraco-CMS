@@ -1,2 +1,2 @@
 export * from './webhooks/constants.js';
-export * from './deliveries/constants.js';
+export * from '../delivery/collection/constants.js';
