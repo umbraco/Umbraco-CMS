@@ -1,5 +1,5 @@
-import type { UmbMediaAuditLogType } from '../../../audit-log/utils/index.js';
-import { UmbMediaAuditLog } from '../../../audit-log/utils/index.js';
+import type { UmbMediaAuditLogType } from '../utils/index.js';
+import { UmbMediaAuditLog } from '../utils/index.js';
 
 interface HistoryStyleMap {
 	look: 'default' | 'primary' | 'secondary' | 'outline' | 'placeholder';

@@ -1,5 +1,6 @@
-import { UmbDocumentReferenceRepository } from '../../../reference/index.js';
-import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbDocumentReferenceRepository } from '../repository/index.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../constants.js';
+import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { isDefaultReference, isDocumentReference, isMediaReference } from '@umbraco-cms/backoffice/relations';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -7,16 +8,10 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbReferenceModel } from '@umbraco-cms/backoffice/relations';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
-@customElement('umb-document-workspace-view-info-reference')
-export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement {
-	#itemsPerPage = 10;
-
-	#referenceRepository = new UmbDocumentReferenceRepository(this);
-
-	@property()
-	documentUnique = '';
-
+@customElement('umb-document-references-workspace-info-app')
+export class UmbDocumentReferencesWorkspaceInfoAppElement extends UmbLitElement {
 	@state()
 	private _editDocumentPath = '';
 
@@ -29,6 +24,11 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 	@state()
 	private _items?: Array<UmbReferenceModel> = [];
 
+	#itemsPerPage = 10;
+	#referenceRepository = new UmbDocumentReferenceRepository(this);
+	#documentUnique?: UmbEntityUnique;
+	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
+
 	constructor() {
 		super();
 
@@ -40,15 +40,41 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 			.observeRouteBuilder((routeBuilder) => {
 				this._editDocumentPath = routeBuilder({});
 			});
+
+		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
+			this.#workspaceContext = context;
+			this.#observeDocumentUnique();
+		});
 	}
 
-	protected override firstUpdated(): void {
-		this.#getReferences();
+	#observeDocumentUnique() {
+		this.observe(
+			this.#workspaceContext?.unique,
+			(unique) => {
+				if (!unique) {
+					this.#documentUnique = undefined;
+					this._items = [];
+					return;
+				}
+
+				if (this.#documentUnique === unique) {
+					return;
+				}
+
+				this.#documentUnique = unique;
+				this.#getReferences();
+			},
+			'umbReferencesDocumentUniqueObserver',
+		);
 	}
 
 	async #getReferences() {
+		if (!this.#documentUnique) {
+			throw new Error('Document unique is required');
+		}
+
 		const { data } = await this.#referenceRepository.requestReferencedBy(
-			this.documentUnique,
+			this.#documentUnique,
 			(this._currentPage - 1) * this.#itemsPerPage,
 			this.#itemsPerPage,
 		);
@@ -111,7 +137,7 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 	override render() {
 		if (!this._items?.length) return nothing;
 		return html`
-			<uui-box headline=${this.localize.term('references_labelUsedByItems')} style="--uui-box-default-padding:0">
+			<umb-workspace-info-app-layout headline="#references_labelUsedByItems">
 				<uui-table>
 					<uui-table-head>
 						<uui-table-head-cell></uui-table-head-cell>
@@ -152,8 +178,8 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 						`,
 					)}
 				</uui-table>
-			</uui-box>
-			${this.#renderReferencePagination()}
+				${this.#renderReferencePagination()}
+			</umb-workspace-info-app-layout>
 		`;
 	}
 
@@ -176,6 +202,7 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 			:host {
 				display: contents;
 			}
+
 			uui-table-cell:not(.link-cell) {
 				color: var(--uui-color-text-alt);
 			}
@@ -194,10 +221,10 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 	];
 }
 
-export default UmbDocumentWorkspaceViewInfoReferenceElement;
+export default UmbDocumentReferencesWorkspaceInfoAppElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-workspace-view-info-reference': UmbDocumentWorkspaceViewInfoReferenceElement;
+		'umb-document-references-workspace-info-app': UmbDocumentReferencesWorkspaceInfoAppElement;
 	}
 }
