@@ -191,10 +191,10 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * If the term is found in the localization set, it will be replaced with the localized term.
 	 * If the term is not found, the original term will be returned.
 	 * @param {string} text The text to translate.
-	 * @param {Record<string, Array<string>>} argsMap An object where the keys are the terms to translate and the values are arrays of arguments to pass to the term function.
+	 * @param {...any} args The arguments to parse for this localization entry.
 	 * @returns {string} The translated text.
 	 */
-	string(text: unknown, argsMap?: Record<string, Array<string>>): string {
+	string(text: unknown, ...args: any): string {
 		if (typeof text !== 'string') {
 			return '';
 		}
@@ -204,7 +204,6 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 
 		const localizedText = text.replace(regex, (match: string) => {
 			const key = match.slice(1);
-			const args = argsMap?.[key] || [];
 
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
@@ -214,20 +213,5 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 		});
 
 		return localizedText;
-	}
-
-	/**
-	 * Extracts all keys from a string that start with a `#` character.
-	 * @param {string} text The text to parse.
-	 * @returns {Array<string>} An array of keys.
-	 */
-	getKeysFromString(text: string): Array<string> {
-		if (typeof text !== 'string') {
-			return [];
-		}
-
-		const regex = /#\w+/g;
-		const keys = text.match(regex) || [];
-		return keys.map((key) => key.slice(1));
 	}
 }
