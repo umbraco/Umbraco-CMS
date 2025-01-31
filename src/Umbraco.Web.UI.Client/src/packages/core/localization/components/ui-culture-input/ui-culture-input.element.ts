@@ -67,6 +67,7 @@ export class UmbUiCultureInputElement extends UUIFormControlMixin(UmbLitElement,
 	override render() {
 		return html`
 			<uui-select
+				label="${this.name} selector"
 				style="margin-top: var(--uui-size-space-1)"
 				@change=${this.#onCustomValidationChange}
 				.options=${this._options.map((e) => ({
