@@ -165,6 +165,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 				this._progress = p;
 			},
 		};
+
 		const blobUrl = URL.createObjectURL(this.temporaryFile.file);
 		this.value = { src: blobUrl };
 
@@ -210,14 +211,17 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		if (!previewAlias) return 'An error occurred. No previewer found for the file type.';
 		return html`
 			<div id="wrapper">
-				<div style="position:relative; display: flex; width: fit-content; max-width: 100%">
+				<div id="wrapperInner">
 					<umb-extension-slot
 						type="fileUploadPreview"
 						.props=${{ path: src, file: file }}
 						.filter=${(manifest: ManifestFileUploadPreview) => manifest.alias === previewAlias}>
 					</umb-extension-slot>
-					${this.temporaryFile?.status === TemporaryFileStatus.WAITING
-						? html`<umb-temporary-file-badge .progress=${this._progress}></umb-temporary-file-badge>`
+					${this.temporaryFile && this.temporaryFile.status !== TemporaryFileStatus.SUCCESS
+						? html`<umb-temporary-file-badge
+								id="badge"
+								.progress=${this._progress}
+								?error=${this.temporaryFile.status === TemporaryFileStatus.ERROR}></umb-temporary-file-badge>`
 						: nothing}
 				</div>
 			</div>
@@ -258,6 +262,24 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 				padding: var(--uui-size-space-4);
 				border: 1px solid var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
+			}
+
+			#wrapperInner {
+				position: relative;
+				display: flex;
+				width: fit-content;
+				max-width: 100%;
+			}
+
+			#badge {
+				position: absolute;
+				top: 50%;
+				left: 50;
+				transform: translate(-50%, -50%);
+				width: 100px;
+
+				background: rgba(255, 255, 255, 0.75);
+				border-radius: 50%;
 			}
 
 			uui-file-dropzone {
