@@ -1,25 +1,18 @@
 import type { UmbWebhookDeliveryDetailModel } from '../../../../types.js';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
-import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
 
 import './column-layouts/status-code/webhook-delivery-table-status-code-column-layout.element.js';
-import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-webhook-delivery-table-collection-view')
 export class UmbWebhookDeliveryTableCollectionViewElement extends UmbLitElement {
-	#itemsPerPage = 50;
-	#currentPage = 1;
-
-	@state()
-	private _total = 0;
-
 	@state()
 	private _tableConfig: UmbTableConfig = {
 		allowSelection: false,
-		hideIcon: true
+		hideIcon: true,
 	};
 
 	@state()
@@ -64,7 +57,6 @@ export class UmbWebhookDeliveryTableCollectionViewElement extends UmbLitElement 
 	#observeCollectionItems() {
 		if (!this.#collectionContext) return;
 		this.observe(this.#collectionContext.items, (items) => this.#createTableItems(items), 'umbCollectionItemsObserver');
-		this.observe(this.#collectionContext.totalItems, (totalItems) => this._total = totalItems, 'umbCollectionTotalItemsObserver');
 	}
 
 	#createTableItems(deliveries: Array<UmbWebhookDeliveryDetailModel>) {
@@ -98,20 +90,9 @@ export class UmbWebhookDeliveryTableCollectionViewElement extends UmbLitElement 
 		});
 	}
 
-	#onChangePage(event: UUIPaginationEvent) {
-		this.#currentPage = event.target.current;
-		this.#collectionContext?.setFilter({skip: this.#itemsPerPage * (this.#currentPage - 1), take: this.#itemsPerPage})
-	}
-
 	override render() {
 		return html`
 			<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
-			${this._total > this.#itemsPerPage
-				? html`<uui-pagination
-						.current=${this.#currentPage}
-						.total=${Math.ceil(this._total / this.#itemsPerPage)}
-						@change=${this.#onChangePage}></uui-pagination>`
-				: nothing}
 		`;
 	}
 
