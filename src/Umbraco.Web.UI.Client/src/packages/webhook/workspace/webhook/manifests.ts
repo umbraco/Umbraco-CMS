@@ -20,8 +20,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 		js: () => import('./views/webhook-details-workspace-view.element.js'),
 		weight: 300,
 		meta: {
-			label: 'Overview',
-			pathname: 'overview',
+			label: 'Details',
+			pathname: 'details',
 			icon: 'icon-webhook',
 		},
 		conditions: [
