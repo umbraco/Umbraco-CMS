@@ -14,12 +14,12 @@ public partial class TemplateContentParserService : ITemplateContentParserServic
 
         Match match = LayoutRegex().Match(viewContent);
 
-        if (match.Success == false || match.Groups.ContainsKey("layout") == false)
+        if (match.Success == false || match.Groups.TryGetValue("layout", out Group? layoutGroup) == false)
         {
             return null;
         }
 
-        var layout = match.Groups["layout"].Value;
+        var layout = layoutGroup.Value;
         return layout != "null"
             ? layout.Replace(".cshtml", string.Empty, StringComparison.OrdinalIgnoreCase)
             : null;
