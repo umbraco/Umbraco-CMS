@@ -7,10 +7,10 @@ public interface IHealthCheckGroupPresentationFactory
 {
     IEnumerable<IGrouping<string?, HealthCheck>> CreateGroupingFromHealthCheckCollection();
 
-    [Obsolete("Use CreateHealthCheckGroupWithResultViewModelAsync instead. Will be removed in v16")]
+    [Obsolete("Use CreateHealthCheckGroupWithResultViewModelAsync instead. Will be removed in v17.")]
     HealthCheckGroupWithResultResponseModel CreateHealthCheckGroupWithResultViewModel(IGrouping<string?, HealthCheck> healthCheckGroup);
 
-    [Obsolete("Use CreateHealthCheckGroupWithResultViewModelAsync instead. Will be removed in v16")]
+    [Obsolete("Use CreateHealthCheckGroupWithResultViewModelAsync instead. Will be removed in v17.")]
     HealthCheckWithResultPresentationModel CreateHealthCheckWithResultViewModel(HealthCheck healthCheck);
 
     Task<HealthCheckGroupWithResultResponseModel> CreateHealthCheckGroupWithResultViewModelAsync(IGrouping<string?, HealthCheck> healthCheckGroup)

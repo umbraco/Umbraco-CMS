@@ -46,7 +46,7 @@ public abstract class HealthCheck : IDiscoverable
     ///     If there are possible actions to take to rectify this check, this method must be overridden by a sub class
     ///     in order to explicitly provide those actions.
     /// </remarks>
-    [Obsolete("Use GetStatusAsync instead. Will be removed in v16")]
+    [Obsolete("Use GetStatusAsync instead. Will be removed in v17")]
     public virtual Task<IEnumerable<HealthCheckStatus>> GetStatus() => Task.FromResult(Enumerable.Empty<HealthCheckStatus>());
 
     /// <summary>

@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Mapping;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
+// TODO (V16): Make internal sealed.
 public class HealthCheckGroupPresentationFactory : IHealthCheckGroupPresentationFactory
 {
     private readonly HealthChecksSettings _healthChecksSettings;
@@ -40,13 +41,13 @@ public class HealthCheckGroupPresentationFactory : IHealthCheckGroupPresentation
         return groups;
     }
 
-    [Obsolete("Use CreateHealthCheckGroupWithResultViewModelAsync instead. Will be removed in v16")]
-    public HealthCheckGroupWithResultResponseModel CreateHealthCheckGroupWithResultViewModel(IGrouping<string?, HealthCheck> healthCheckGroup) =>
-        throw new NotImplementedException("Use CreateHealthCheckGroupWithResultViewModelAsync instead");
+    [Obsolete("Use CreateHealthCheckGroupWithResultViewModelAsync instead. Will be removed in v17.")]
+    public HealthCheckGroupWithResultResponseModel CreateHealthCheckGroupWithResultViewModel(IGrouping<string?, HealthCheck> healthCheckGroup)
+        => CreateHealthCheckGroupWithResultViewModelAsync(healthCheckGroup).GetAwaiter().GetResult();
 
-    [Obsolete("Use CreateHealthCheckGroupWithResultViewModelAsync instead. Will be removed in v16")]
+    [Obsolete("Use CreateHealthCheckGroupWithResultViewModelAsync instead. Will be removed in v17.")]
     public HealthCheckWithResultPresentationModel CreateHealthCheckWithResultViewModel(HealthCheck healthCheck) =>
-        throw new NotImplementedException("Use CreateHealthCheckGroupWithResultViewModelAsync instead");
+        CreateHealthCheckWithResultViewModelAsync(healthCheck).GetAwaiter().GetResult();
 
     public async Task<HealthCheckGroupWithResultResponseModel> CreateHealthCheckGroupWithResultViewModelAsync(IGrouping<string?, HealthCheck> healthCheckGroup)
     {
