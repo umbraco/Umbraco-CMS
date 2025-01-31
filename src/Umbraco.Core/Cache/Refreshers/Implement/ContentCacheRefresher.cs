@@ -380,6 +380,10 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         public TreeChangeTypes ChangeTypes { get; init; }
 
         public bool Blueprint { get; init; }
+
+        public string[]? PublishedCultures { get; init; }
+
+        public string[]? UnpublishedCultures { get; init; }
     }
 
     #endregion

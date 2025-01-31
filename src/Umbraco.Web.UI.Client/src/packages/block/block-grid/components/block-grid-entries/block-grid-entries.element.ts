@@ -31,7 +31,11 @@ function resolvePlacementAsBlockGrid(
 	args: UmbSorterResolvePlacementArgs<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>,
 ) {
 	// If this has areas, we do not want to move, unless we are at the edge
-	if (args.relatedModel.areas?.length > 0 && isWithinRect(args.pointerX, args.pointerY, args.relatedRect, -10)) {
+	if (
+		args.relatedModel.areas &&
+		args.relatedModel.areas.length > 0 &&
+		isWithinRect(args.pointerX, args.pointerY, args.relatedRect, -10)
+	) {
 		return null;
 	}
 

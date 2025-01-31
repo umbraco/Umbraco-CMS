@@ -54,7 +54,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 
 	private async _buttonHandler() {
 		this._buttonState = 'waiting';
-		this._api?.checkGroup(this.groupName);
+		await this._api?.checkGroup(this.groupName);
 		this._buttonState = 'success';
 	}
 

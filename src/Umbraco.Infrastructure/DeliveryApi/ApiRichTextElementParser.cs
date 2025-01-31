@@ -101,8 +101,9 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         // - non-#comment nodes
         // - non-#text nodes
         // - non-empty #text nodes
+        // - empty #text between inline elements (see #17037)
         HtmlNode[] childNodes = element.ChildNodes
-            .Where(c => c.Name != CommentNodeName && (c.Name != TextNodeName || string.IsNullOrWhiteSpace(c.InnerText) is false))
+            .Where(c => c.Name != CommentNodeName && (c.Name != TextNodeName || c.NextSibling is not null || string.IsNullOrWhiteSpace(c.InnerText) is false))
             .ToArray();
 
         var tag = TagName(element);

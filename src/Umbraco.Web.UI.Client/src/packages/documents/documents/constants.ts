@@ -12,5 +12,6 @@ export * from './reference/constants.js';
 export * from './repository/constants.js';
 export * from './rollback/constants.js';
 export * from './search/constants.js';
+export * from './url/constants.js';
 export * from './user-permissions/constants.js';
 export * from './workspace/constants.js';
