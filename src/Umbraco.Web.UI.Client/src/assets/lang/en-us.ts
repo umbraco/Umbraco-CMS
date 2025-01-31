@@ -1492,6 +1492,8 @@ export default {
 		preventCleanupDisableError: 'An error occurred while disabling version cleanup for %0%',
 		copySuccessMessage: 'Your system information has successfully been copied to the clipboard',
 		cannotCopyInformation: 'Could not copy your system information to the clipboard',
+		offlineHeadline: 'Offline',
+		offlineMessage: 'You are currently offline. Please check your internet connection.',
 	},
 	stylesheet: {
 		addRule: 'Add style',

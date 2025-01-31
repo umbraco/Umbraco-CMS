@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/prope
 
 export const manifest: ManifestPropertyEditorSchema = {
 	type: 'propertyEditorSchema',
-	name: 'Date/Time',
+	name: 'True/False',
 	alias: 'Umbraco.TrueFalse',
 	meta: {
 		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
