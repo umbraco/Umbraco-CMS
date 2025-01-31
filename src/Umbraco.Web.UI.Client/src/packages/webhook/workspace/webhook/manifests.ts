@@ -1,4 +1,3 @@
-import { UMB_WEBHOOK_DELIVERY_COLLECTION_ALIAS } from '../../delivery/collection/constants.js';
 import { UMB_WEBHOOK_ENTITY_TYPE, UMB_WEBHOOK_WORKSPACE_ALIAS } from '../../entity.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS, UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
