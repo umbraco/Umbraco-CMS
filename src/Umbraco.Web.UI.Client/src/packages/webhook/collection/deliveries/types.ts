@@ -1,5 +1,5 @@
 export interface UmbWebhookDeliveryCollectionFilterModel {
-  id: string;
+	webhook: { unique: string };
 	skip?: number;
 	take?: number;
 }

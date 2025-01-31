@@ -10,7 +10,7 @@ import { UMB_WEBHOOK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/webhook';
 export class UmbWebhookDeliveryCollectionRepository extends UmbRepositoryBase implements UmbCollectionRepository {
 	#collectionSource: UmbWebhookDeliveryCollectionDataSource;
 
-	#webhookId: string = "";
+	#webhookId: string = '';
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -19,7 +19,7 @@ export class UmbWebhookDeliveryCollectionRepository extends UmbRepositoryBase im
 
 		this.consumeContext(UMB_WEBHOOK_WORKSPACE_CONTEXT, (instance) => {
 			this.observe(instance.data, (webhook) => {
-				this.#webhookId = webhook?.unique ?? "";
+				this.#webhookId = webhook?.unique ?? '';
 			});
 		});
 	}

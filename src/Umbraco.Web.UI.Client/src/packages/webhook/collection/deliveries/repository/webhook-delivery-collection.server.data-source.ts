@@ -26,12 +26,19 @@ export class UmbWebhookDeliveryCollectionServerDataSource implements UmbWebhookD
 	/**
 	 * Gets the Webhook delivery collection filtered by the given filter.
 	 * @param {UmbWebhookDeliveryCollectionFilterModel} filter
-	 * @param _filter
+	 * @param filter
 	 * @returns {*}
 	 * @memberof UmbWebhookDeliveryCollectionServerDataSource
 	 */
-	async getCollection(_filter: UmbWebhookDeliveryCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(this.#host, WebhookService.getWebhookByIdLogs(_filter));
+	async getCollection(filter: UmbWebhookDeliveryCollectionFilterModel) {
+		const { data, error } = await tryExecuteAndNotify(
+			this.#host,
+			WebhookService.getWebhookByIdLogs({
+				id: filter.webhook.unique,
+				skip: filter.skip,
+				take: filter.take,
+			}),
+		);
 
 		if (error || !data) {
 			return { error };
@@ -45,7 +52,7 @@ export class UmbWebhookDeliveryCollectionServerDataSource implements UmbWebhookD
 				url: item.url,
 				eventAlias: item.eventAlias,
 				retryCount: item.retryCount,
-				statusCode: item.statusCode
+				statusCode: item.statusCode,
 			};
 
 			return model;
