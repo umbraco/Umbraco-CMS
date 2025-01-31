@@ -89,10 +89,9 @@ export class UmbTemporaryFileManager<
 						headline: 'Upload',
 						message: `
 	${this.#localization.term('media_invalidFileSize')}: ${item.file.name} (${formatBytes(item.file.size)}).
-	
+
 	${this.#localization.term('media_maxFileSize')} ${formatBytes(maxFileSize)}.
 						`,
-						whitespace: 'pre-line',
 					},
 				});
 				return false;
