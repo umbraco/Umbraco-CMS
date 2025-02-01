@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -57,17 +58,25 @@ public static class StringExtensions
     /// <returns></returns>
     public static int[] GetIdsFromPathReversed(this string path)
     {
-        string[] pathSegments = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
-        List<int> nodeIds = new(pathSegments.Length);
-        for (int i = pathSegments.Length - 1; i >= 0; i--)
+        ReadOnlySpan<char> pathSpan = path.AsSpan();
+        List<int> nodeIds = [];
+        foreach (Range rangeOfPathSegment in pathSpan.Split(Constants.CharArrays.Comma))
         {
-            if (int.TryParse(pathSegments[i], NumberStyles.Integer, CultureInfo.InvariantCulture, out int pathSegment))
+            if (int.TryParse(pathSpan[rangeOfPathSegment], NumberStyles.Integer, CultureInfo.InvariantCulture, out int pathSegment))
             {
                 nodeIds.Add(pathSegment);
             }
         }
 
-        return nodeIds.ToArray();
+        Span<int> nodeIdsSpan = CollectionsMarshal.AsSpan(nodeIds);
+        var result = new int[nodeIdsSpan.Length];
+        var resultIndex = 0;
+        for (int i = nodeIdsSpan.Length - 1; i >= 0; i--)
+        {
+            result[resultIndex++] = nodeIdsSpan[i];
+        }
+
+        return result;
     }
 
     /// <summary>
