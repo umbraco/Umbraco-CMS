@@ -8,8 +8,9 @@ import { manifests as moveManifests } from './move-to/manifests.js';
 import { manifests as duplicateManifests } from './duplicate/manifests.js';
 import { manifests as exportManifests } from './export/manifests.js';
 import { manifests as importManifests } from './import/manifests.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<UmbExtensionManifest> = [
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
 		type: 'entityAction',
 		kind: 'delete',
