@@ -15,10 +15,12 @@
 	},
 
 	"features": {
-		// Workaround until the image is updated to include the latest version of .NET Core - .NET7
-		// https://github.com/devcontainers/templates/issues/38#issuecomment-1310803259		
-		"ghcr.io/devcontainers/features/dotnet:1": {
-			"version": "7"
+		// Install .NET SDKs for build container
+		// Latest (aka .NET9 & LTS .NET8)
+		// https://github.com/devcontainers/features/tree/main/src/dotnet
+		"ghcr.io/devcontainers/features/dotnet:2": {
+			"version": "latest",
+        		"additionalVersions": "lts"
 		},
 
 		// Adds SSH support to the container
@@ -34,6 +36,7 @@
 
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
+		"ms-dotnettools.csdevkit",
 		"ms-dotnettools.csharp"
 	],
 	
