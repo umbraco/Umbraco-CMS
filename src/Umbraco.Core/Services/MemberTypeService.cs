@@ -111,7 +111,7 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
         {
             scope.ReadLock(ReadLockIds);
 
-            using (IEnumerator<IMemberType> e = _memberTypeRepository.GetMany(new int[0]).GetEnumerator())
+            using (IEnumerator<IMemberType> e = _memberTypeRepository.GetMany(Array.Empty<int>()).GetEnumerator())
             {
                 if (e.MoveNext() == false)
                 {

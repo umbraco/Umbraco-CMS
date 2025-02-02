@@ -16,26 +16,38 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'media-type-1-id',
-			icon: 'icon-bug',
+			icon: 'icon-picture',
 		},
 		values: [
 			{
+				editorAlias: 'Umbraco.UploadField',
+				alias: 'mediaPicker',
+				value: {
+					src: '/umbraco/backoffice/assets/installer-illustration.svg',
+				},
+			},
+			{
 				editorAlias: 'Umbraco.TextBox',
-				alias: 'myMediaHeadline',
+				alias: 'mediaType1Property1',
 				value: 'The daily life at Umbraco HQ',
 			},
 		],
 		variants: [
 			{
 				publishDate: '2023-02-06T15:31:51.354764',
-				culture: 'en-us',
+				culture: null,
 				segment: null,
 				name: 'Flipped Car',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
-		urls: [],
+		urls: [
+			{
+				culture: null,
+				url: '/umbraco/backoffice/assets/installer-illustration.svg',
+			},
+		],
 	},
 	{
 		hasChildren: false,
@@ -51,14 +63,14 @@ export const data: Array<UmbMockMediaModel> = [
 		values: [
 			{
 				editorAlias: 'Umbraco.TextBox',
-				alias: 'myMediaDescription',
+				alias: 'mediaType1Property1',
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
 		variants: [
 			{
 				publishDate: '2023-02-06T15:31:51.354764',
-				culture: 'en-us',
+				culture: null,
 				segment: null,
 				name: 'Umbracoffee',
 				createDate: '2023-02-06T15:31:46.876902',
@@ -83,7 +95,7 @@ export const data: Array<UmbMockMediaModel> = [
 		variants: [
 			{
 				publishDate: '2023-02-06T15:31:51.354764',
-				culture: 'en-us',
+				culture: null,
 				segment: null,
 				name: 'People',
 				createDate: '2023-02-06T15:31:46.876902',
@@ -108,7 +120,7 @@ export const data: Array<UmbMockMediaModel> = [
 		variants: [
 			{
 				publishDate: '2023-02-06T15:31:51.354764',
-				culture: 'en-us',
+				culture: null,
 				segment: null,
 				name: 'John Smith',
 				createDate: '2023-02-06T15:31:46.876902',
@@ -131,14 +143,14 @@ export const data: Array<UmbMockMediaModel> = [
 		values: [
 			{
 				editorAlias: 'Umbraco.TextBox',
-				alias: 'myMediaDescription',
+				alias: 'mediaType1Property1',
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
 		variants: [
 			{
 				publishDate: '2023-02-06T15:31:51.354764',
-				culture: 'en-us',
+				culture: null,
 				segment: null,
 				name: 'Jane Doe',
 				createDate: '2023-02-06T15:31:46.876902',
@@ -161,14 +173,14 @@ export const data: Array<UmbMockMediaModel> = [
 		values: [
 			{
 				editorAlias: 'Umbraco.TextBox',
-				alias: 'myMediaDescription',
+				alias: 'mediaType1Property1',
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
 		variants: [
 			{
 				publishDate: '2023-02-06T15:31:51.354764',
-				culture: 'en-us',
+				culture: null,
 				segment: null,
 				name: 'John Doe',
 				createDate: '2023-02-06T15:31:46.876902',
@@ -191,14 +203,14 @@ export const data: Array<UmbMockMediaModel> = [
 		values: [
 			{
 				editorAlias: 'Umbraco.TextBox',
-				alias: 'myMediaDescription',
+				alias: 'mediaType1Property1',
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
 		variants: [
 			{
 				publishDate: '2023-02-06T15:31:51.354764',
-				culture: 'en-us',
+				culture: null,
 				segment: null,
 				name: 'A very nice hat',
 				createDate: '2023-02-06T15:31:46.876902',
@@ -221,14 +233,14 @@ export const data: Array<UmbMockMediaModel> = [
 		values: [
 			{
 				editorAlias: 'Umbraco.TextBox',
-				alias: 'myMediaDescription',
+				alias: 'mediaType1Property1',
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
 		variants: [
 			{
 				publishDate: '2023-02-06T15:31:51.354764',
-				culture: 'en-us',
+				culture: null,
 				segment: null,
 				name: 'Fancy old chair',
 				createDate: '2023-02-06T15:31:46.876902',

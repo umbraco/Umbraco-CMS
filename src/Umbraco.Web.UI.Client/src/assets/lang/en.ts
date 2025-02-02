@@ -13,7 +13,7 @@ export default {
 	actions: {
 		assigndomain: 'Culture and Hostnames',
 		auditTrail: 'Audit Trail',
-		browse: 'Browse Node',
+		browse: 'Browse',
 		changeDataType: 'Change Data Type',
 		changeDocType: 'Change Document Type',
 		chooseWhereToCopy: 'Choose where to copy',
@@ -363,6 +363,7 @@ export default {
 		disallowedFileType: 'Cannot upload this file, it does not have an approved file type',
 		disallowedMediaType: "Cannot upload this file, the media type with alias '%0%' is not allowed here",
 		invalidFileName: 'Cannot upload this file, it does not have a valid file name',
+		invalidFileSize: 'Cannot upload this file, it is too large',
 		maxFileSize: 'Max file size is',
 		mediaRoot: 'Media root',
 		createFolderFailed: 'Failed to create a folder under parent id %0%',
@@ -1495,6 +1496,10 @@ export default {
 		scheduleErrExpireDate2: 'The expire date cannot be before the release date',
 		preventCleanupEnableError: 'An error occurred while enabling version cleanup for %0%',
 		preventCleanupDisableError: 'An error occurred while disabling version cleanup for %0%',
+		offlineHeadline: 'Offline',
+		offlineMessage: 'You are currently offline. Please check your internet connection.',
+		onlineHeadline: 'Online',
+		onlineMessage: 'You are now online. You can continue working.',
 	},
 	stylesheet: {
 		addRule: 'Add style',

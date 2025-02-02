@@ -85,7 +85,7 @@ public class UserEditorAuthorizationHelper
         {
             var savingGroupAliases = userGroupAliases.ToArray();
             var existingGroupAliases = savingUser == null
-                ? new string[0]
+                ? []
                 : savingUser.Groups.Select(x => x.Alias).ToArray();
 
             IEnumerable<string> addedGroupAliases = savingGroupAliases.Except(existingGroupAliases);

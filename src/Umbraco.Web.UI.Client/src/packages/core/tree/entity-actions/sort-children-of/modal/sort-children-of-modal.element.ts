@@ -287,8 +287,9 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 	}
 
 	#renderChild(item: UmbTreeItemModel) {
-		return html` <uui-table-row data-unique=${item.unique} class="${this._isSorting ? 'hidden' : ''}">
-			<uui-table-cell><uui-icon name="icon-navigation" aria-hidden="true"></uui-icon></uui-table-cell>
+		// TODO: find a way to get the icon for the item. We do not have the icon in the tree item model.
+		return html` <uui-table-row id="content-node" data-unique=${item.unique} class="${this._isSorting ? 'hidden' : ''}">
+			<uui-table-cell><umb-icon name="icon-navigation"></umb-icon></uui-table-cell>
 			<uui-table-cell>${item.name}</uui-table-cell>
 			<uui-table-cell>${this.#renderCreateDate(item)}</uui-table-cell>
 		</uui-table-row>`;
@@ -310,6 +311,14 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 				width: 100%;
 			}
 
+			uui-table-cell {
+				padding: var(--uui-size-space-2) var(--uui-size-space-5);
+			}
+
+			uui-table-head-cell {
+				padding: 0 var(--uui-size-space-5);
+			}
+
 			uui-table-head-cell button {
 				background-color: transparent;
 				color: inherit;
@@ -328,8 +337,16 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 				visibility: hidden;
 			}
 
+			uui-table-row[id='content-node']:hover {
+				cursor: grab;
+			}
+
 			uui-icon[name='icon-navigation'] {
 				cursor: hand;
+			}
+
+			uui-box {
+				--uui-box-default-padding: 0;
 			}
 		`,
 	];

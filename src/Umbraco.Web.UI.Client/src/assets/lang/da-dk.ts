@@ -345,6 +345,9 @@ export default {
 		clickToUpload: 'Klik for at uploade',
 		orClickHereToUpload: 'eller klik her for at vælge filer',
 		disallowedFileType: 'Kan ikke uploade denne fil, den har ikke en godkendt filtype',
+		disallowedMediaType: "Kan ikke uploade denne fil, mediatypen med alias '%0%' er ikke tilladt her",
+		invalidFileName: 'Kan ikke uploade denne fil, den har et ugyldigt filnavn',
+		invalidFileSize: 'Kan ikke uploade denne fil, den er for stor',
 		maxFileSize: 'Maks filstørrelse er',
 		mediaRoot: 'Medie rod',
 		moveToSameFolderFailed: 'Overordnet og destinations mappe kan ikke være den samme',
@@ -353,8 +356,6 @@ export default {
 		dragAndDropYourFilesIntoTheArea:
 			'Træk dine filer ind i dropzonen for, at uploade dem til\n      mediebiblioteket.\n    ',
 		uploadNotAllowed: 'Upload er ikke tiladt på denne lokation',
-		disallowedMediaType: "Cannot upload this file, the media type with alias '%0%' is not allowed here",
-		invalidFileName: 'Cannot upload this file, it does not have a valid file name',
 	},
 	member: {
 		createNewMember: 'Opret et nyt medlem',
