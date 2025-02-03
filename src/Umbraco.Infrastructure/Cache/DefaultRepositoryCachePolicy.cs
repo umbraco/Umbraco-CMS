@@ -24,7 +24,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     private static readonly TEntity[] _emptyEntities = new TEntity[0]; // const
     private readonly RepositoryCachePolicyOptions _options;
 
-    private const string NullRepresentationInCache = "*NULL*";
+    private const string NullRepresentationInCache = "Umbraco.Cms.Core.Cache.DefaultRepositoryCachePolicy.NullRepresentationInCache";
 
     public DefaultRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
         : base(cache, scopeAccessor) =>
