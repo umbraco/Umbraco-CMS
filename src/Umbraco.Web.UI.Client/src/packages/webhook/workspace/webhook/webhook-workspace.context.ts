@@ -16,6 +16,13 @@ export class UmbWebhookWorkspaceContext
 	extends UmbEntityDetailWorkspaceContextBase<UmbWebhookDetailModel, UmbWebhookDetailRepository>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
+	// Observable states
+	readonly headers = this._data.createObservablePartOfCurrent((data) => data?.headers);
+	readonly enabled = this._data.createObservablePartOfCurrent((data) => data?.enabled);
+	readonly url = this._data.createObservablePartOfCurrent((data) => data?.url);
+	readonly events = this._data.createObservablePartOfCurrent((data) => data?.events);
+	readonly contentTypes = this._data.createObservablePartOfCurrent((data) => data?.contentTypes);
+
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			workspaceAlias: UMB_WEBHOOK_WORKSPACE_ALIAS,
@@ -48,24 +55,94 @@ export class UmbWebhookWorkspaceContext
 		]);
 	}
 
+	/**
+	 * Sets the events
+	 * @param {Array<UmbWebhookEventModel>} events - The events
+	 * @memberof UmbWebhookWorkspaceContext
+	 */
 	setEvents(events: Array<UmbWebhookEventModel>) {
 		this._data.updateCurrent({ events });
 	}
 
+	/**
+	 * Gets the events
+	 * @returns {Array<UmbWebhookEventModel>}
+	 * @memberof UmbWebhookWorkspaceContext
+	 */
+	getEvents(): Array<UmbWebhookEventModel> | undefined {
+		return this._data.getCurrent()?.events;
+	}
+
+	/**
+	 * Sets the headers
+	 * @param {{ [key: string]: string }} headers - The headers
+	 * @memberof UmbWebhookWorkspaceContext
+	 */
 	setHeaders(headers: { [key: string]: string }) {
 		this._data.updateCurrent({ headers });
 	}
 
+	/**
+	 * Gets the headers
+	 * @returns {UmbWebhookDetailModel['headers']} - The headers
+	 * @memberof UmbWebhookWorkspaceContext
+	 */
+	getHeaders(): UmbWebhookDetailModel['headers'] | undefined {
+		return this._data.getCurrent()?.headers;
+	}
+
+	/**
+	 * Sets the content types
+	 * @param {string[]} types - The content types
+	 * @memberof UmbWebhookWorkspaceContext
+	 */
 	setTypes(types: string[]) {
 		this._data.updateCurrent({ contentTypes: types });
 	}
 
+	/**
+	 * Gets the content types
+	 * @returns {string[]} - The content types
+	 * @memberof UmbWebhookWorkspaceContext
+	 */
+	getTypes(): string[] | undefined {
+		return this._data.getCurrent()?.contentTypes;
+	}
+
+	/**
+	 * Sets the URL
+	 * @param {string} url - The URL
+	 * @memberof UmbWebhookWorkspaceContext
+	 */
 	setUrl(url: string) {
 		this._data.updateCurrent({ url });
 	}
 
+	/**
+	 * Gets the URL
+	 * @returns {string} - The URL
+	 * @memberof UmbWebhookWorkspaceContext
+	 */
+	getUrl(): string | undefined {
+		return this._data.getCurrent()?.url;
+	}
+
+	/**
+	 * Sets the enabled state
+	 * @param {boolean} enabled - The enabled state
+	 * @memberof UmbWebhookWorkspaceContext
+	 */
 	setEnabled(enabled: boolean) {
 		this._data.updateCurrent({ enabled });
+	}
+
+	/**
+	 * Gets the enabled state
+	 * @returns {boolean} - The enabled state
+	 * @memberof UmbWebhookWorkspaceContext
+	 */
+	getEnabled(): boolean | undefined {
+		return this._data.getCurrent()?.enabled;
 	}
 }
 
