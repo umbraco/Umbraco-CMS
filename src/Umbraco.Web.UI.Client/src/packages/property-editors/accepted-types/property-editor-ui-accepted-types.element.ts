@@ -1,12 +1,9 @@
 import { UmbPropertyEditorUIMultipleTextStringElement } from '../multiple-text-string/property-editor-ui-multiple-text-string.element.js';
-import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	UmbTemporaryFileConfigRepository,
-	type UmbTemporaryFileConfigurationModel,
-} from '@umbraco-cms/backoffice/temporary-file';
+import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { formatBytes } from '@umbraco-cms/backoffice/utils';
+import { UmbTemporaryFileConfigRepository } from '@umbraco-cms/backoffice/temporary-file';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbTemporaryFileConfigurationModel } from '@umbraco-cms/backoffice/temporary-file';
 
 /**
  * @element umb-property-editor-ui-accepted-types
@@ -16,6 +13,8 @@ export class UmbPropertyEditorUIAcceptedTypesElement
 	extends UmbPropertyEditorUIMultipleTextStringElement
 	implements UmbPropertyEditorUiElement
 {
+	#temporaryFileConfigRepository = new UmbTemporaryFileConfigRepository(this);
+
 	@state()
 	protected _acceptedTypes: string[] = [];
 
@@ -24,8 +23,6 @@ export class UmbPropertyEditorUIAcceptedTypesElement
 
 	@state()
 	protected _maxFileSize?: number | null;
-
-	#temporaryFileConfigRepository = new UmbTemporaryFileConfigRepository(this);
 
 	override async connectedCallback() {
 		super.connectedCallback();
@@ -48,10 +45,10 @@ export class UmbPropertyEditorUIAcceptedTypesElement
 			() => {
 				let message = this.localize.term('validation_invalidExtensions');
 				if (config.allowedUploadedFileExtensions.length) {
-					message += ` ${this.localize.term('validation_allowedExtensions')} ${config.allowedUploadedFileExtensions.join(', ')}`;
+					message += `<br>${this.localize.term('validation_allowedExtensions')} ${config.allowedUploadedFileExtensions.join(', ')}`;
 				}
 				if (config.disallowedUploadedFilesExtensions.length) {
-					message += ` ${this.localize.term('validation_disallowedExtensions')} ${config.disallowedUploadedFilesExtensions.join(', ')}`;
+					message += `<br>${this.localize.term('validation_disallowedExtensions')} ${config.disallowedUploadedFilesExtensions.join(', ')}`;
 				}
 				return message;
 			},
@@ -76,47 +73,63 @@ export class UmbPropertyEditorUIAcceptedTypesElement
 		if (!this._acceptedTypes.length && !this._disallowedTypes.length && !this._maxFileSize) {
 			return nothing;
 		}
+
 		return html`
 			<uui-box id="notice" headline=${this.localize.term('general_serverConfiguration')}>
-				<p>${this.localize.term('media_noticeExtensionsServerOverride')}</p>
-				${this._acceptedTypes.length
-					? html`<p>
-							${this.localize.term('validation_allowedExtensions')} <strong>${this._acceptedTypes.join(', ')}</strong>
-						</p>`
-					: nothing}
-				${this._disallowedTypes.length
-					? html`<p>
-							${this.localize.term('validation_disallowedExtensions')}
+				<p><umb-localize key="media_noticeExtensionsServerOverride"></umb-localize></p>
+				${when(
+					this._acceptedTypes.length,
+					() => html`
+						<p>
+							<umb-localize key="validation_allowedExtensions"></umb-localize>
+							<strong>${this._acceptedTypes.join(', ')}</strong>
+						</p>
+					`,
+				)}
+				${when(
+					this._disallowedTypes.length,
+					() => html`
+						<p>
+							<umb-localize key="validation_disallowedExtensions"></umb-localize>
 							<strong>${this._disallowedTypes.join(', ')}</strong>
-						</p>`
-					: nothing}
-				${this._maxFileSize
-					? html`
-							<p>
-								${this.localize.term('media_maxFileSize')}
-								<strong title="${this.localize.number(this._maxFileSize)} bytes">
-									${formatBytes(this._maxFileSize, { decimals: 2 })} </strong
-								>.
-							</p>
-						`
-					: nothing}
+						</p>
+					`,
+				)}
+				${when(
+					this._maxFileSize,
+					() => html`
+						<p>
+							${this.localize.term('media_maxFileSize')}
+							<strong title="${this.localize.number(this._maxFileSize!)} bytes"
+								>${formatBytes(this._maxFileSize!, { decimals: 2 })}</strong
+							>.
+						</p>
+					`,
+				)}
 			</uui-box>
 		`;
 	}
 
 	override render() {
-		return html` ${this.#renderAcceptedTypes()} ${super.render()} `;
+		return html`${this.#renderAcceptedTypes()} ${super.render()}`;
 	}
 
 	static override readonly styles = [
-		UmbTextStyles,
 		css`
 			#notice {
+				--uui-box-default-padding: var(--uui-size-space-4);
+				--uui-box-header-padding: var(--uui-size-space-4);
 				--uui-color-divider-standalone: var(--uui-color-warning-standalone);
+
 				border: 1px solid var(--uui-color-divider-standalone);
 				background-color: var(--uui-color-warning);
 				color: var(--uui-color-warning-contrast);
 				margin-bottom: var(--uui-size-layout-1);
+
+				p {
+					margin: 0.5rem 0;
+				}
+			}
 		`,
 	];
 }
