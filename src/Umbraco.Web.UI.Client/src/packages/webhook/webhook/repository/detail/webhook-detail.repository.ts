@@ -1,6 +1,7 @@
 import type { UmbWebhookDetailModel } from '../../../types.js';
 import { UmbWebhookDetailServerDataSource } from './webhook-detail.server.data-source.js';
 import { UMB_WEBHOOK_DETAIL_STORE_CONTEXT } from './webhook-detail.store.js';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDetailRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
@@ -13,8 +14,17 @@ export class UmbWebhookDetailRepository extends UmbDetailRepositoryBase<UmbWebho
 		return super.create(model, null);
 	}
 
+	/**
+	 * @deprecated - Use the event UmbWebhookEventRepository instead.
+	 * Gets a list of hardcoded events
+	 * @returns {Promise<{ data: { items: string[]; total: number }; error: any }>} - Hardcoded events
+	 */
 	async requestEvents(): Promise<{ data: { items: string[]; total: number }; error: any }> {
-		//TODO Use service when available
+		new UmbDeprecation({
+			deprecated: 'The requestEvents method on the UmbWebhookDetailRepository is deprecated.',
+			removeInVersion: '17',
+			solution: 'Use the requestEvents method on UmbWebhookEventRepository instead.',
+		}).warn();
 
 		const items = ['Content Deleted', 'Content Published', 'Content Unpublished', 'Media Deleted', 'Media Saved'];
 
