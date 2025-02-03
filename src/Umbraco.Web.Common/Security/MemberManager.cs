@@ -204,8 +204,8 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
 
     public virtual IPublishedContent? AsPublishedMember(MemberIdentityUser user) => _store.GetPublishedMember(user);
 
-    /// This will check if the member has access to this path
     /// <summary>
+    /// This will check if the member has access to this path.
     /// </summary>
     /// <param name="path"></param>
     /// <returns></returns>
