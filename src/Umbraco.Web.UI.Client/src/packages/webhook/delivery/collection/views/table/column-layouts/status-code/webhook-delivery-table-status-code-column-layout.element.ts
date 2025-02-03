@@ -4,18 +4,26 @@ import { html, LitElement, nothing, customElement, property, css } from '@umbrac
 @customElement('umb-webhook-delivery-table-status-code-column-layout')
 export class UmbWebhookDeliveryTableStatusCodeColumnLayoutElement extends LitElement {
 	@property({ attribute: false })
-	value: string = "";
+	value: string = '';
+
+	#getTagColor() {
+		console.log(this.value);
+		if (this.value.includes('(2')) {
+			return 'positive';
+		}
+		if (this.value.includes('(4')) {
+			return 'warning';
+		}
+		if (this.value.includes('(5')) {
+			return 'danger';
+		}
+
+		return 'default';
+	}
 
 	override render() {
 		if (this.value.length === 0) return nothing;
-
-		const className = this.value.includes("(2") || this.value.includes("(3")
-			? "success"
-			: this.value.includes("(4")
-				? "warning"
-				: "error";
-
-		return html`<span class="${className}">${this.value}</span>`;
+		return html`<uui-tag color=${this.#getTagColor()} look="secondary">${this.value}</uui-tag>`;
 	}
 
 	static override styles = [
@@ -24,10 +32,6 @@ export class UmbWebhookDeliveryTableStatusCodeColumnLayoutElement extends LitEle
 			:host {
 				white-space: nowrap;
 			}
-
-			.success { color: var(--uui-palette-jungle-green); }
-			.warning { color: var(--uui-palette-chamoisee); }
-			.error { color: var(--uui-palette-maroon-flush); }
 		`,
 	];
 }
