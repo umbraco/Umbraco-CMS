@@ -18,17 +18,12 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableColumns: Array<UmbTableColumn> = [
 		{
-			name: this.localize.term('general_name'),
-			alias: 'name',
-			elementName: 'umb-webhook-table-name-column-layout',
+			name: this.localize.term('webhooks_url'),
+			alias: 'url',
 		},
 		{
 			name: this.localize.term('webhooks_enabled'),
 			alias: 'enabled',
-		},
-		{
-			name: this.localize.term('webhooks_url'),
-			alias: 'url',
 		},
 		{
 			name: this.localize.term('webhooks_events'),
@@ -66,19 +61,14 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 	}
 
 	#createTableItems(webhooks: Array<UmbWebhookDetailModel>) {
-		this._tableItems = webhooks.map((webhook, index) => {
+		this._tableItems = webhooks.map((webhook) => {
 			return {
 				id: webhook.unique,
 				icon: 'icon-webhook',
 				data: [
 					{
-						columnAlias: 'name',
-						value: { name: `Webhook ${index + 1}`, unique: webhook.unique },
-					},
-					{
 						columnAlias: 'url',
-						value: webhook.url,
-						path: webhook.url,
+						value: html`<a href=${'section/settings/workspace/webhook/edit/' + webhook.unique}>${webhook.url}</a>`,
 					},
 					{
 						columnAlias: 'enabled',
