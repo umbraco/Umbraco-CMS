@@ -736,7 +736,9 @@ namespace Umbraco.Cms.Core.Services
         public void SetLastLogin(string username, DateTime date) => throw new NotImplementedException();
 
         /// <inheritdoc />
-        public void Save(IMember member)
+        public void Save(IMember member) => Save(member, true);
+
+        public void Save(IMember member, bool publishNotifications)
         {
             // trimming username and email to make sure we have no trailing space
             member.Username = member.Username.Trim();
@@ -761,7 +763,10 @@ namespace Umbraco.Cms.Core.Services
 
             _memberRepository.Save(member);
 
-            scope.Notifications.Publish(new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
+            if (publishNotifications)
+            {
+                scope.Notifications.Publish(new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
+            }
 
             Audit(AuditType.Save, 0, member.Id);
 

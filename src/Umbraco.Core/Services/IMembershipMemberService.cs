@@ -136,6 +136,14 @@ public interface IMembershipMemberService<T> : IService
     void Save(T entity);
 
     /// <summary>
+    ///     Saves an <see cref="IMembershipUser" />
+    /// </summary>
+    /// <remarks>An <see cref="IMembershipUser" /> can be of type <see cref="IMember" /> or <see cref="IUser" /></remarks>
+    /// <param name="entity"><see cref="IMember" /> or <see cref="IUser" /> to Save</param>
+    /// <param name="publishNotifications"> Whether notifications should be published or not</param>
+    void Save(T entity, bool publishNotifications) => Save(entity);
+
+    /// <summary>
     ///     Saves a list of <see cref="IMembershipUser" /> objects
     /// </summary>
     /// <remarks>An <see cref="IMembershipUser" /> can be of type <see cref="IMember" /> or <see cref="IUser" /></remarks>
