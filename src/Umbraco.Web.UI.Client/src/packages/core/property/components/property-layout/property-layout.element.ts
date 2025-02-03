@@ -90,14 +90,8 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 
 	#renderDescription() {
 		if (!this.description) return;
-
-		let description = this.description;
-		if (description.startsWith('#')) {
-			description = this.localize.string(description);
-		}
-
-		const ufmValue = { alias: this.alias, label: this.label, description };
-		return html`<umb-ufm-render id="description" .markdown=${description} .value=${ufmValue}></umb-ufm-render>`;
+		const ufmValue = { alias: this.alias, label: this.label, description: this.description };
+		return html`<umb-ufm-render id="description" .markdown=${this.description} .value=${ufmValue}></umb-ufm-render>`;
 	}
 
 	static override styles = [
