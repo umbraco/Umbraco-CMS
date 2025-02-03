@@ -1,4 +1,4 @@
-import { UmbWebhookEventRepository } from '../../webhook-event/repository/webhook-event.repository.js';
+import { UmbWebhookEventRepository } from '../repository/webhook-event.repository.js';
 import type { UmbWebhookEventModel } from '../../types.js';
 import type { UmbWebhookPickerModalData, UmbWebhookPickerModalValue } from './webhook-events-modal.token.js';
 import { customElement, html, state, repeat } from '@umbraco-cms/backoffice/external/lit';

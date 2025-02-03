@@ -1,6 +1,6 @@
 import { UMB_WEBHOOK_WORKSPACE_CONTEXT } from '../webhook-workspace.context-token.js';
 import type { UmbInputWebhookHeadersElement } from '../../../components/input-webhook-headers.element.js';
-import type { UmbInputWebhookEventsElement } from '../../../components/input-webhook-events.element.js';
+import type { UmbInputWebhookEventsElement } from '../../../webhook-event/input-webhook-events.element.js';
 import { css, customElement, html, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -12,7 +12,7 @@ import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffic
 
 import '@umbraco-cms/backoffice/culture';
 import '../../../components/input-webhook-headers.element.js';
-import '../../../components/input-webhook-events.element.js';
+import '../../../webhook-event/input-webhook-events.element.js';
 
 @customElement('umb-webhook-details-workspace-view')
 export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
