@@ -5,7 +5,7 @@
 @using Umbraco.Extensions
 
 @{
-    var isLoggedIn = Context.User?.Identity?.IsAuthenticated ?? false;
+    var isLoggedIn = Context.User.GetMemberIdentity()?.IsAuthenticated ?? false;
     var logoutModel = new PostRedirectModel();
     // You can modify this to redirect to a different URL instead of the current one
     logoutModel.RedirectUrl = null;
@@ -15,7 +15,7 @@
 {
     <div class="login-status">
 
-        <p>Welcome back <strong>@Context?.User?.Identity?.Name</strong>!</p>
+        <p>Welcome back <strong>@Context.User?.GetMemberIdentity()?.Name</strong>!</p>
 
         @using (Html.BeginUmbracoForm<UmbLoginStatusController>("HandleLogout", new { RedirectUrl = logoutModel.RedirectUrl }))
         {
