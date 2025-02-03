@@ -1,5 +1,5 @@
-import type { UmbWebhookDetailModel } from '../../types.js';
-import { UMB_WEBHOOK_ENTITY_TYPE } from '../../entity.js';
+import type { UmbWebhookDetailModel } from '../../../types.js';
+import { UMB_WEBHOOK_ENTITY_TYPE } from '../../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {

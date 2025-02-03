@@ -21,7 +21,7 @@ export interface UmbWebhookDeliveryDetailModel {
 	unique: string;
 	date: string;
 	url: string;
-	eventAlias: string,
-	retryCount: number,
-	statusCode: string
+	eventAlias: string;
+	retryCount: number;
+	statusCode: string;
 }

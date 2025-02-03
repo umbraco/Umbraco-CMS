@@ -1,5 +1,5 @@
 import { UMB_WEBHOOK_ENTITY_TYPE } from '../../entity.js';
-import { UMB_WEBHOOK_DETAIL_REPOSITORY_ALIAS, UMB_WEBHOOK_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
+import { UMB_WEBHOOK_DETAIL_REPOSITORY_ALIAS, UMB_WEBHOOK_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
