@@ -50,6 +50,6 @@ export class UmbWebhookCollectionServerDataSource implements UmbWebhookCollectio
 			return model;
 		});
 
-		return { data: { items, total: data.items.length } };
+		return { data: { items, total: data.total } };
 	}
 }
