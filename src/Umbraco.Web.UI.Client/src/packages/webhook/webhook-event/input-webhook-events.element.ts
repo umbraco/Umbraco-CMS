@@ -1,5 +1,5 @@
-import type { UmbWebhookEventModel } from '../types.js';
 import { UMB_WEBHOOK_EVENTS_MODAL } from './modal/webhook-events-modal.token.js';
+import type { UmbWebhookEventModel } from './types.js';
 import { css, html, customElement, property, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

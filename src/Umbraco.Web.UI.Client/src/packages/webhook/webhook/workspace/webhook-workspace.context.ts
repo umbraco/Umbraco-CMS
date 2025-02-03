@@ -1,7 +1,8 @@
-import type { UmbWebhookDetailModel, UmbWebhookEventModel } from '../../types.js';
 import type { UmbWebhookDetailRepository } from '../repository/index.js';
 import { UMB_WEBHOOK_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_WEBHOOK_ENTITY_TYPE, UMB_WEBHOOK_ROOT_ENTITY_TYPE, UMB_WEBHOOK_WORKSPACE_ALIAS } from '../../entity.js';
+import type { UmbWebhookDetailModel } from '../types.js';
+import type { UmbWebhookEventModel } from '../../webhook-event/types.js';
 import { UmbWebhookWorkspaceEditorElement } from './webhook-workspace-editor.element.js';
 import {
 	type UmbSubmittableWorkspaceContext,

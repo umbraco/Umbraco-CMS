@@ -1,5 +1,5 @@
 import type { UmbWebhookDeliveryCollectionFilterModel } from '../types.js';
-import type { UmbWebhookDeliveryDetailModel } from '../../../types.js';
+import type { UmbWebhookDeliveryDetailModel } from '../../types.js';
 import { UmbWebhookDeliveryCollectionServerDataSource } from './webhook-delivery-collection.server.data-source.js';
 import type { UmbWebhookDeliveryCollectionDataSource } from './types.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';

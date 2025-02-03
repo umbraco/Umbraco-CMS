@@ -1,4 +1,4 @@
-import type { UmbWebhookEventModel } from '../../types.js';
+import type { UmbWebhookEventModel } from '../types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

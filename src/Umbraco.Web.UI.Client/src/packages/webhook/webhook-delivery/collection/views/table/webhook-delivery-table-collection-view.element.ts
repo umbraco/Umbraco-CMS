@@ -1,4 +1,4 @@
-import type { UmbWebhookDeliveryDetailModel } from '../../../../types.js';
+import type { UmbWebhookDeliveryDetailModel } from '../../../types.js';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

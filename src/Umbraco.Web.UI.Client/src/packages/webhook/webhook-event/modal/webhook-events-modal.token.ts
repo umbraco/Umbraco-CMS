@@ -1,4 +1,4 @@
-import type { UmbWebhookEventModel } from '../../types.js';
+import type { UmbWebhookEventModel } from '../types.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbWebhookPickerModalData {
