@@ -1,4 +1,4 @@
-export * from './webhook-event/modal/constants.js';
+export * from './webhook-event/constants.js';
 export * from './webhook-delivery/constants.js';
 export * from './repository/constants.js';
 export * from './webhook-root/constants.js';
