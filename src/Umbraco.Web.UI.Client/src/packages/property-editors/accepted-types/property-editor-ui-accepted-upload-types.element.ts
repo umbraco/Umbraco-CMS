@@ -6,10 +6,10 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/propert
 import type { UmbTemporaryFileConfigurationModel } from '@umbraco-cms/backoffice/temporary-file';
 
 /**
- * @element umb-property-editor-ui-accepted-types
+ * @element umb-property-editor-ui-accepted-upload-types
  */
-@customElement('umb-property-editor-ui-accepted-types')
-export class UmbPropertyEditorUIAcceptedTypesElement
+@customElement('umb-property-editor-ui-accepted-upload-types')
+export class UmbPropertyEditorUIAcceptedUploadTypesElement
 	extends UmbPropertyEditorUIMultipleTextStringElement
 	implements UmbPropertyEditorUiElement
 {
@@ -134,10 +134,10 @@ export class UmbPropertyEditorUIAcceptedTypesElement
 	];
 }
 
-export default UmbPropertyEditorUIAcceptedTypesElement;
+export default UmbPropertyEditorUIAcceptedUploadTypesElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-accepted-types': UmbPropertyEditorUIAcceptedTypesElement;
+		'umb-property-editor-ui-accepted-upload-types': UmbPropertyEditorUIAcceptedUploadTypesElement;
 	}
 }

@@ -11,7 +11,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 				{
 					alias: 'fileExtensions',
 					label: 'Accepted file extensions',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.AcceptedTypes',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.AcceptedUploadTypes',
 				},
 			],
 		},

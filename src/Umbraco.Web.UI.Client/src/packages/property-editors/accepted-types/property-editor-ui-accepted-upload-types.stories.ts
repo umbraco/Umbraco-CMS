@@ -1,4 +1,4 @@
-import type { UmbPropertyEditorUIAcceptedTypesElement } from './property-editor-ui-accepted-types.element.js';
+import type { UmbPropertyEditorUIAcceptedUploadTypesElement } from './property-editor-ui-accepted-upload-types.element.js';
 import type { Meta, StoryFn } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
@@ -10,6 +10,6 @@ export default {
 	id: 'umb-property-editor-ui-accepted-types',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIAcceptedTypesElement> = () =>
-	html`<umb-property-editor-ui-accepted-types></umb-property-editor-ui-accepted-types>`;
+export const AAAOverview: StoryFn<UmbPropertyEditorUIAcceptedUploadTypesElement> = () =>
+	html`<umb-property-editor-ui-accepted-upload-types></umb-property-editor-ui-accepted-upload-types>`;
 AAAOverview.storyName = 'Overview';

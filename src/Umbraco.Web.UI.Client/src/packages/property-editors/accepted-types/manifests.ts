@@ -2,9 +2,9 @@ import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-
 
 export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
-	alias: 'Umb.PropertyEditorUi.AcceptedTypes',
-	name: 'Accepted Types Property Editor UI',
-	element: () => import('./property-editor-ui-accepted-types.element.js'),
+	alias: 'Umb.PropertyEditorUi.AcceptedUploadTypes',
+	name: 'Accepted Upload Types Property Editor UI',
+	element: () => import('./property-editor-ui-accepted-upload-types.element.js'),
 	meta: {
 		label: 'Accepted Upload Types',
 		propertyEditorSchemaAlias: 'Umbraco.MultipleTextstring',

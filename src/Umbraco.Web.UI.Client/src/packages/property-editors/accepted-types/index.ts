@@ -1,1 +1,1 @@
-export * from './property-editor-ui-accepted-types.element.js';
+export * from './property-editor-ui-accepted-upload-types.element.js';
