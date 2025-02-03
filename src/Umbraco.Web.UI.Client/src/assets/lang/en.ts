@@ -2509,7 +2509,8 @@ export default {
 		labelEditorSize: 'Overlay editor size',
 		addCustomView: 'Add custom view',
 		addSettingsElementType: 'Add settings',
-		confirmDeleteBlockMessage: 'Are you sure you want to delete the content <strong>%0%</strong>?',
+		confirmDeleteBlockTitle: 'Delete %0%?',
+		confirmDeleteBlockMessage: 'Are you sure you want to delete this %0%?',
 		confirmDeleteBlockTypeMessage: 'Are you sure you want to delete the block configuration <strong>%0%</strong>?',
 		confirmDeleteBlockTypeNotice:
 			'The content of this block will still be present, editing of this content\n      will no longer be available and will be shown as unsupported content.\n    ',
