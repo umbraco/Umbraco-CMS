@@ -49,7 +49,6 @@ describe('UmbBlockGridPropertyValueCloner', () => {
 															{
 																contentKey: 'content-3',
 																settingsKey: 'settings-3',
-																areas: [],
 															},
 														],
 													},
@@ -162,7 +161,7 @@ describe('UmbBlockGridPropertyValueCloner', () => {
 
 			testLayoutEntryNewKeyIsReflected(
 				'fictive-content-type-2',
-				result.value?.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]?.[0].areas[0]?.items[0],
+				result.value?.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]?.[0].areas?.[0]?.items[0],
 				result.value?.contentData,
 				result.value?.settingsData,
 				result.value?.expose,
@@ -175,7 +174,8 @@ describe('UmbBlockGridPropertyValueCloner', () => {
 
 			testLayoutEntryNewKeyIsReflected(
 				'fictive-content-type-3',
-				result.value?.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]?.[0].areas[0]?.items[0].areas[0]?.items[0],
+				result.value?.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]?.[0].areas?.[0]?.items[0].areas?.[0]
+					?.items[0],
 				result.value?.contentData,
 				result.value?.settingsData,
 				result.value?.expose,

@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -20,36 +18,16 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueEditorIsReusable = true)]
 public class TrueFalsePropertyEditor : DataEditor
 {
-    private readonly IIOHelper _ioHelper;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="TrueFalsePropertyEditor" /> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. This constructor will be removed in V17.")]
     public TrueFalsePropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
-        : this(
-              dataValueEditorFactory,
-              StaticServiceProvider.Instance.GetRequiredService<IIOHelper>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="TrueFalsePropertyEditor" /> class.
-    /// </summary>
-    public TrueFalsePropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
         : base(dataValueEditorFactory)
-    {
-        _ioHelper = ioHelper;
-        SupportsReadOnly = true;
-    }
+        => SupportsReadOnly = true;
 
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor()
         => DataValueEditorFactory.Create<TrueFalsePropertyValueEditor>(Attribute!);
-
-    /// <inheritdoc />
-    protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new TrueFalseConfigurationEditor(_ioHelper);
 
     internal class TrueFalsePropertyValueEditor : DataValueEditor
     {

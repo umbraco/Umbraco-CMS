@@ -7,6 +7,7 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 /**
  * @element umb-property-editor-ui-multiple-text-string
@@ -51,10 +52,29 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement 
 	required = false;
 
 	@state()
+	private _label?: string;
+
+	@state()
 	private _min = 0;
 
 	@state()
 	private _max = Infinity;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			this._label = context.getLabel();
+		});
+	}
+
+	protected override firstUpdated() {
+		if (this._min && this._max && this._min > this._max) {
+			console.warn(
+				`Property '${this._label}' (Multiple Text String) has been misconfigured, 'min' is greater than 'max'. Please correct your data type configuration.`,
+				this,
+			);
+		}
+	}
 
 	#onChange(event: UmbChangeEvent) {
 		event.stopPropagation();

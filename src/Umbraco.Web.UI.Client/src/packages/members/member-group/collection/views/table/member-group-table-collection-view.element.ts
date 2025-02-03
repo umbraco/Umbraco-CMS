@@ -22,6 +22,7 @@ export class UmbMemberGroupTableCollectionViewElement extends UmbLitElement {
 		{
 			name: '',
 			alias: 'entityActions',
+			align: 'right',
 		},
 	];
 
