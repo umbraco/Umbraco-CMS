@@ -1,3 +1,4 @@
 import { manifests as collectionManifests } from './collection/manifests.js';
+import { manifests as workspaceManifests } from './workspace/manifests.js';
 
-export const manifests: Array<UmbExtensionManifest> = [...collectionManifests];
+export const manifests: Array<UmbExtensionManifest> = [...collectionManifests, ...workspaceManifests];

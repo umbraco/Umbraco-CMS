@@ -3,7 +3,6 @@ import { manifests as entityActions } from './entity-actions/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as webhookManifests } from './webhook/manifests.js';
 import { manifests as webhookRootManifests } from './webhook-root/manifests.js';
-import { manifests as workspaceManifests } from './workspace/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	...deliveryManifests,
@@ -11,7 +10,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...repositoryManifests,
 	...webhookManifests,
 	...webhookRootManifests,
-	...workspaceManifests,
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.Webhook.Events',
