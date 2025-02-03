@@ -1,9 +1,6 @@
 import type { MediaValueType } from '../../property-editors/upload-field/types.js';
-import { getMimeTypeFromExtension } from './utils.js';
 import type { ManifestFileUploadPreview } from './file-upload-preview.extension.js';
-import { UmbTemporaryFileManager, TemporaryFileStatus } from '@umbraco-cms/backoffice/temporary-file';
-import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
-import { UmbId } from '@umbraco-cms/backoffice/id';
+import { getMimeTypeFromExtension } from './utils.js';
 import {
 	css,
 	html,
@@ -14,15 +11,17 @@ import {
 	query,
 	state,
 	when,
-	type PropertyValueMap,
 } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-
-import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { formatBytes, stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { UmbId } from '@umbraco-cms/backoffice/id';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTemporaryFileManager, TemporaryFileStatus } from '@umbraco-cms/backoffice/temporary-file';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
+import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends UmbLitElement {
@@ -36,7 +35,6 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 			temporaryFileId: this.temporaryFile?.temporaryUnique,
 		};
 	}
-
 	#src = '';
 
 	/**
@@ -75,6 +73,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 	override updated(changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
 		super.updated(changedProperties);
+
 		if (changedProperties.has('value') && changedProperties.get('value')?.src !== this.value.src) {
 			this.#setPreviewAlias();
 		}
@@ -216,13 +215,13 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	#renderDropzone() {
 		return html`
 			<uui-file-dropzone
-				@click=${this.#handleBrowse}
 				id="dropzone"
 				label="dropzone"
-				@change="${this.#onUpload}"
 				disallowFolderUpload
-				accept="${ifDefined(this._extensions?.join(', '))}">
-				<uui-button label=${this.localize.term('media_clickToUpload')} @click="${this.#handleBrowse}"></uui-button>
+				accept=${ifDefined(this._extensions?.join(', '))}
+				@change=${this.#onUpload}
+				@click=${this.#handleBrowse}>
+				<uui-button label=${this.localize.term('media_clickToUpload')} @click=${this.#handleBrowse}></uui-button>
 			</uui-file-dropzone>
 		`;
 	}
@@ -247,14 +246,24 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 					<div id="fileSize">${formatBytes(this.temporaryFile.file.size, { decimals: 2 })}: ${this._progress}%</div>
 					${when(
 						this.temporaryFile.status === TemporaryFileStatus.WAITING,
-						() => html`<div id="progress"></div><uui-loader-bar progress=${this._progress}></uui-loader-bar></div>`,
+						() => html`<div id="progress"><uui-loader-bar progress=${this._progress}></uui-loader-bar></div>`,
 					)}
 					${when(
 						this.temporaryFile.status === TemporaryFileStatus.ERROR,
 						() => html`<div id="error">An error occured</div>`,
 					)}
 				</div>
-				<div id="fileActions">${this.#renderButtonRemove()}</div>
+				<div id="fileActions">
+					${when(
+						this.temporaryFile.status === TemporaryFileStatus.WAITING,
+						() => html`
+							<uui-button compact @click=${this.#handleRemove} label=${this.localize.term('general_cancel')}>
+								<uui-icon name="remove"></uui-icon>${this.localize.term('general_cancel')}
+							</uui-button>
+						`,
+						() => this.#renderButtonRemove(),
+					)}
+				</div>
 			</div>
 		`;
 	}
@@ -275,9 +284,11 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	}
 
 	#renderButtonRemove() {
-		return html`<uui-button compact @click=${this.#handleRemove} label=${this.localize.term('content_uploadClear')}>
-			<uui-icon name="icon-trash"></uui-icon>${this.localize.term('content_uploadClear')}
-		</uui-button>`;
+		return html`
+			<uui-button compact @click=${this.#handleRemove} label=${this.localize.term('content_uploadClear')}>
+				<uui-icon name="icon-trash"></uui-icon>${this.localize.term('content_uploadClear')}
+			</uui-button>
+		`;
 	}
 
 	#handleRemove() {
