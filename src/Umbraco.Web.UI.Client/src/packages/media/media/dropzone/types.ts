@@ -11,6 +11,7 @@ export interface UmbUploadableItem {
 	unique: string;
 	parentUnique: string | null;
 	status: UmbFileDropzoneItemStatus;
+	progress: number;
 	folder?: { name: string };
 	temporaryFile?: UmbTemporaryFileModel;
 }

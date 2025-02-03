@@ -1,7 +1,8 @@
-import type { UmbDocumentAuditLogModel } from '../../../audit-log/types.js';
-import { UmbDocumentAuditLogRepository } from '../../../audit-log/index.js';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
-import { getDocumentHistoryTagStyleAndText, TimeOptions } from './utils.js';
+import { UmbDocumentAuditLogRepository } from '../repository/index.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
+import type { UmbDocumentAuditLogModel } from '../types.js';
+import { TimeOptions } from '../../utils.js';
+import { getDocumentHistoryTagStyleAndText } from './utils.js';
 import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
@@ -13,8 +14,8 @@ import type { ManifestEntityAction } from '@umbraco-cms/backoffice/entity-action
 import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
-@customElement('umb-document-workspace-view-info-history')
-export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
+@customElement('umb-document-history-workspace-info-app')
+export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	#allowedActions = new Set(['Umb.EntityAction.Document.Rollback']);
 
 	#auditLogRepository = new UmbDocumentAuditLogRepository(this);
@@ -98,19 +99,22 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<uui-box headline=${this.localize.term('general_history')}>
+			<umb-workspace-info-app-layout headline="#general_history">
 				<umb-extension-with-api-slot
-				slot="header-actions"
-				type="entityAction"
-				.filter=${(manifest: ManifestEntityAction) => this.#allowedActions.has(manifest.alias)}></umb-extension-with-api-slot>
-			</uui-button>
-			${when(
-				this._items,
-				() => this.#renderHistory(),
-				() => html`<div id="loader"><uui-loader></uui-loader></div>`,
-			)}
-			${this.#renderPagination()}
-		</uui-box>
+					slot="header-actions"
+					type="entityAction"
+					.filter=${(manifest: ManifestEntityAction) =>
+						this.#allowedActions.has(manifest.alias)}></umb-extension-with-api-slot>
+
+				<div id="content">
+					${when(
+						this._items,
+						() => this.#renderHistory(),
+						() => html`<div id="loader"><uui-loader></uui-loader></div>`,
+					)}
+					${this.#renderPagination()}
+				</div>
+			</umb-workspace-info-app-layout>
 		`;
 	}
 
@@ -162,6 +166,11 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
+			#content {
+				display: block;
+				padding: var(--uui-size-space-4) var(--uui-size-space-5);
+			}
+
 			#loader {
 				display: flex;
 				justify-content: center;
@@ -171,6 +180,12 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 				display: grid;
 				grid-template-columns: var(--uui-size-40) auto;
 				gap: var(--uui-size-layout-1);
+			}
+
+			.log-type uui-tag {
+				height: fit-content;
+				margin-top: auto;
+				margin-bottom: auto;
 			}
 
 			uui-pagination {
@@ -183,10 +198,10 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	];
 }
 
-export default UmbDocumentWorkspaceViewInfoHistoryElement;
+export default UmbDocumentHistoryWorkspaceInfoAppElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-workspace-view-info-history': UmbDocumentWorkspaceViewInfoHistoryElement;
+		'umb-document-history-workspace-info-app': UmbDocumentHistoryWorkspaceInfoAppElement;
 	}
 }

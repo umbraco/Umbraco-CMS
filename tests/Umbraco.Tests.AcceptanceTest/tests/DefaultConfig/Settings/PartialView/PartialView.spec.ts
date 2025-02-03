@@ -43,7 +43,6 @@ test('can create a partial view from snippet', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.partialView.clickNewPartialViewFromSnippetButton();
   await umbracoUi.partialView.clickBreadcrumbButton();
   await umbracoUi.partialView.enterPartialViewName(partialViewName);
-  await umbracoUi.waitForTimeout(500);
   await umbracoUi.partialView.clickSaveButton();
 
   // Assert

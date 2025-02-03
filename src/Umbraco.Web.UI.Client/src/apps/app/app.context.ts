@@ -1,4 +1,5 @@
 import type { UmbAppContextConfig } from './app-context-config.interface.js';
+import { UmbNetworkConnectionStatusManager } from './network-connection-status.manager.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -13,6 +14,8 @@ export class UmbAppContext extends UmbContextBase<UmbAppContext> {
 		this.#serverUrl = config.serverUrl;
 		this.#backofficePath = config.backofficePath;
 		this.#serverConnection = config.serverConnection;
+
+		new UmbNetworkConnectionStatusManager(this);
 	}
 
 	getBackofficePath() {

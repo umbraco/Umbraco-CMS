@@ -3337,6 +3337,7 @@ export type GetItemDocumentData = {
 export type GetItemDocumentResponse = (Array<(DocumentItemResponseModel)>);
 
 export type GetItemDocumentSearchData = {
+    allowedDocumentTypes?: Array<(string)>;
     parentId?: string;
     query?: string;
     skip?: number;
@@ -3905,6 +3906,7 @@ export type GetItemMediaData = {
 export type GetItemMediaResponse = (Array<(MediaItemResponseModel)>);
 
 export type GetItemMediaSearchData = {
+    allowedMediaTypes?: Array<(string)>;
     parentId?: string;
     query?: string;
     skip?: number;
@@ -4256,6 +4258,7 @@ export type GetItemMemberData = {
 export type GetItemMemberResponse = (Array<(MemberItemResponseModel)>);
 
 export type GetItemMemberSearchData = {
+    allowedMemberTypes?: Array<(string)>;
     query?: string;
     skip?: number;
     take?: number;
