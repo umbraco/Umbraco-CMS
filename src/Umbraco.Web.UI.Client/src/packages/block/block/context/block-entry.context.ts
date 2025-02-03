@@ -21,6 +21,7 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import { encodeFilePath, UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import type {
 	UmbContentTypeModel,
 	UmbContentTypeStructureManager,
@@ -52,6 +53,8 @@ export abstract class UmbBlockEntryContext<
 	_entries?: BlockEntriesContextType;
 
 	#contentKey?: string;
+
+	readonly #localize = new UmbLocalizationController(this);
 
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
@@ -660,7 +663,7 @@ export abstract class UmbBlockEntryContext<
 			this.observe(
 				this.contentElementTypeName,
 				(contentTypeName) => {
-					this.#label.setValue(contentTypeName ?? 'no name');
+					this.#label.setValue(this.#localize.string(contentTypeName) || 'no name');
 				},
 				'observeContentTypeName',
 			);
