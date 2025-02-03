@@ -1,7 +1,9 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -20,11 +22,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>, IDictionaryRepository
 {
     private readonly ILoggerFactory _loggerFactory;
+    private readonly INullValueCachePolicyResolver<DictionaryRepository> _nullValueCachePolicyResolver;
 
-    public DictionaryRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<DictionaryRepository> logger,
-        ILoggerFactory loggerFactory)
-        : base(scopeAccessor, cache, logger) =>
+    public DictionaryRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<DictionaryRepository> logger,
+        ILoggerFactory loggerFactory,
+        INullValueCachePolicyResolver<DictionaryRepository> nullValueCachePolicyResolver)
+        : base(scopeAccessor, cache, logger)
+    {
         _loggerFactory = loggerFactory;
+        _nullValueCachePolicyResolver = nullValueCachePolicyResolver;
+    }
 
     public IDictionaryItem? Get(Guid uniqueId)
     {
@@ -42,15 +52,23 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
 
     public IDictionaryItem? Get(string key)
     {
-        var keyRepo = new DictionaryByKeyRepository(this, ScopeAccessor, AppCaches,
-            _loggerFactory.CreateLogger<DictionaryByKeyRepository>());
+        var keyRepo = new DictionaryByKeyRepository(
+            this,
+            ScopeAccessor,
+            AppCaches,
+            _loggerFactory.CreateLogger<DictionaryByKeyRepository>(),
+            _nullValueCachePolicyResolver);
         return keyRepo.Get(key);
     }
 
     public IEnumerable<IDictionaryItem> GetManyByKeys(string[] keys)
     {
-        var keyRepo = new DictionaryByKeyRepository(this, ScopeAccessor, AppCaches,
-            _loggerFactory.CreateLogger<DictionaryByKeyRepository>());
+        var keyRepo = new DictionaryByKeyRepository(
+            this,
+            ScopeAccessor,
+            AppCaches,
+            _loggerFactory.CreateLogger<DictionaryByKeyRepository>(),
+            _nullValueCachePolicyResolver);
         return keyRepo.GetMany(keys);
     }
 
@@ -199,11 +217,19 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
     private class DictionaryByKeyRepository : SimpleGetRepository<string, IDictionaryItem, DictionaryDto>
     {
         private readonly DictionaryRepository _dictionaryRepository;
+        private readonly INullValueCachePolicyResolver<DictionaryRepository> _nullValueCachePolicyResolver;
 
-        public DictionaryByKeyRepository(DictionaryRepository dictionaryRepository, IScopeAccessor scopeAccessor,
-            AppCaches cache, ILogger<DictionaryByKeyRepository> logger)
-            : base(scopeAccessor, cache, logger) =>
+        public DictionaryByKeyRepository(
+            DictionaryRepository dictionaryRepository,
+            IScopeAccessor scopeAccessor,
+            AppCaches cache,
+            ILogger<DictionaryByKeyRepository> logger,
+            INullValueCachePolicyResolver<DictionaryRepository> nullValueCachePolicyResolver)
+            : base(scopeAccessor, cache, logger)
+        {
             _dictionaryRepository = dictionaryRepository;
+            _nullValueCachePolicyResolver = nullValueCachePolicyResolver;
+        }
 
         protected override IEnumerable<DictionaryDto> PerformFetch(Sql sql) =>
             Database
@@ -227,7 +253,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
             var options = new RepositoryCachePolicyOptions
             {
                 // allow null to be cached
-                CacheNullValues = true,
+                NullValueRepresentation = _nullValueCachePolicyResolver.GetNullValue(),
                 // allow zero to be cached
                 GetAllCacheAllowZeroCount = true
             };

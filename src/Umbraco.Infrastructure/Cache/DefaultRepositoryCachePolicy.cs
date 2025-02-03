@@ -1,6 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Diagnostics;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -23,8 +25,6 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
 {
     private static readonly TEntity[] _emptyEntities = new TEntity[0]; // const
     private readonly RepositoryCachePolicyOptions _options;
-
-    private const string NullRepresentationInCache = "Umbraco.Cms.Core.Cache.DefaultRepositoryCachePolicy.NullRepresentationInCache";
 
     public DefaultRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
         : base(cache, scopeAccessor) =>
@@ -140,7 +140,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
         }
 
         // If we've cached a "null" value, return null.
-        if (_options.CacheNullValues && Cache.GetCacheItem<string>(cacheKey) == NullRepresentationInCache)
+        if (_options.NullValueRepresentation is not null && Cache.GetCacheItem<string>(cacheKey) == _options.NullValueRepresentation)
         {
             return null;
         }
@@ -153,7 +153,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
             // If we've found an identified entity, cache it for subsequent retrieval.
             InsertEntity(cacheKey, entity);
         }
-        else if (entity is null && _options.CacheNullValues)
+        else if (entity is null && _options.NullValueRepresentation is not null)
         {
             // If we've not found an entity, and we're caching null values, cache a "null" value.
             InsertNull(cacheKey);
@@ -271,7 +271,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
         // a value that does exist but isn't yet cached, or a value that has been explicitly cached with a null value.
         // Both would return null when we retrieve from the cache and we couldn't distinguish between the two.
         // So we cache a special value that represents null, and then we can check for that value when we retrieve from the cache.
-        Cache.Insert(cacheKey, () => NullRepresentationInCache, TimeSpan.FromMinutes(5), true);
+        Cache.Insert(cacheKey, () => _options.NullValueRepresentation, TimeSpan.FromMinutes(5), true);
     }
 
     protected virtual void InsertEntities(TId[]? ids, TEntity[]? entities)
