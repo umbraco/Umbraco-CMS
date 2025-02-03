@@ -79,7 +79,7 @@ public class SmidgeRuntimeMinifier : IRuntimeMinifier
             RuntimeMinificationCacheBuster.AppDomain => typeof(AppDomainLifetimeCacheBuster),
             RuntimeMinificationCacheBuster.Version => typeof(UmbracoSmidgeConfigCacheBuster),
             RuntimeMinificationCacheBuster.Timestamp => typeof(TimestampCacheBuster),
-            _ => throw new NotImplementedException(),
+            _ => throw new ArgumentOutOfRangeException("CacheBuster", "RuntimeMinification.CacheBuster is not a valid value")
         };
 
         _cacheBusterType = cacheBusterType;
