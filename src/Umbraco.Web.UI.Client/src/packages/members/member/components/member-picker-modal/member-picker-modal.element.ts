@@ -118,6 +118,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore - TODO: MemberDetailModel does not have a name. It should have so we ignore this for now.
 		const selectable = this._selectableFilter(item);
+		console.log(item);
 
 		return html`
 			<uui-menu-item
@@ -127,7 +128,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 				@selected=${() => this.#pickerContext.selection.select(item.unique)}
 				@deselected=${() => this.#pickerContext.selection.deselect(item.unique)}
 				?selected=${this.#pickerContext.selection.isSelected(item.unique)}>
-				<uui-icon slot="icon" name="icon-user"></uui-icon>
+				<umb-icon slot="icon" name=${item.memberType.icon}></umb-icon>
 			</uui-menu-item>
 		`;
 	}
