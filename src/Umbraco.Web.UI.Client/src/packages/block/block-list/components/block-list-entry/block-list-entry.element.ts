@@ -333,9 +333,17 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		}
 	};
 
+	#getLabelToRender() {
+		if (this._label.startsWith('#')) {
+			return this.localize.string(this._label);
+		}
+
+		return this._label;
+	}
+
 	#renderRefBlock() {
 		return html`<umb-ref-list-block
-			.label=${this._label}
+			.label=${this.#getLabelToRender()}
 			.icon=${this._icon}
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
@@ -346,7 +354,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	#renderInlineBlock() {
 		return html`<umb-inline-list-block
-			.label=${this._label}
+			.label=${this.#getLabelToRender()}
 			.icon=${this._icon}
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
