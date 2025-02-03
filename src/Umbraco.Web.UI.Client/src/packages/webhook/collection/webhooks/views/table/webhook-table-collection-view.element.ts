@@ -27,7 +27,7 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 		},
 		{
 			name: this.localize.term('webhooks_types'),
-			alias: 'types',
+			alias: 'contentTypes',
 			elementName: 'umb-webhook-table-content-type-column-layout',
 		},
 		{
@@ -80,7 +80,7 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 						value: webhook.events.map((event) => event.eventName).join(', ') || 'None',
 					},
 					{
-						columnAlias: 'types',
+						columnAlias: 'contentTypes',
 						value: { contentTypeName: webhook.events[0].eventType, contentTypes: webhook.contentTypes },
 					},
 					{

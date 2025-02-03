@@ -390,6 +390,7 @@ export default {
 	contentType: {
 		copyFailed: 'Failed to copy content type',
 		moveFailed: 'Failed to move content type',
+		contentTypes: 'Content Types',
 	},
 	mediaType: {
 		copyFailed: 'Failed to copy media type',
@@ -1765,7 +1766,7 @@ export default {
 		events: 'Events',
 		event: 'Event',
 		url: 'URL',
-		types: 'Types',
+		types: 'Content Types',
 		webhookKey: 'Webhook key',
 		retryCount: 'Retry count',
 		urlDescription: 'The URL to call when the webhook is triggered.',
