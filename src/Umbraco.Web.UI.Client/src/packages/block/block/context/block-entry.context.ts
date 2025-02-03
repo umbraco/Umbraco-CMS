@@ -53,6 +53,8 @@ export abstract class UmbBlockEntryContext<
 	_entries?: BlockEntriesContextType;
 
 	#contentKey?: string;
+	#unsupported = new UmbBooleanState(undefined);
+	readonly unsupported = this.#unsupported.asObservable();
 
 	readonly #localize = new UmbLocalizationController(this);
 
@@ -518,6 +520,9 @@ export abstract class UmbBlockEntryContext<
 		this.observe(
 			this._manager.contentOf(this.#contentKey),
 			(content) => {
+				if (this.#unsupported.getValue() !== true) {
+					this.#unsupported.setValue(!content);
+				}
 				this.#content.setValue(content);
 			},
 			'observeContent',
@@ -601,6 +606,8 @@ export abstract class UmbBlockEntryContext<
 		// observe blockType:
 		this.#contentStructure = this._manager.getStructure(contentTypeKey);
 		this.#contentStructurePromiseResolve?.();
+
+		this.#unsupported.setValue(!this.#contentStructure);
 
 		this.observe(
 			this.#contentStructure?.ownerContentType,
