@@ -15,9 +15,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_PROPERTY_CONTEXT, UmbPropertyValueCloneController } from '@umbraco-cms/backoffice/property';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { ManifestPropertyEditorUi, UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
-import { UMB_CONTEXT_REQUEST_EVENT_TYPE, type UmbContextRequestEvent } from '@umbraco-cms/backoffice/context-api';
 
 /**
  * Clipboard context for managing clipboard entries for property values
@@ -29,30 +28,15 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 	#init?: Promise<unknown>;
 
 	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
-	#propertyContext?: typeof UMB_PROPERTY_CONTEXT.TYPE;
-	#hostElement?: Element;
-	#propertyEditorElement?: UmbPropertyEditorUiElement;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_CLIPBOARD_PROPERTY_CONTEXT);
-
-		this.#hostElement = host.getHostElement();
 
 		this.#init = Promise.all([
 			this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
 				this.#modalManagerContext = context;
 			}).asPromise(),
-
-			this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-				this.#propertyContext = context;
-				this.#propertyEditorElement = context.getEditor();
-			}).asPromise(),
 		]);
-
-		this.#hostElement.addEventListener(
-			UMB_CONTEXT_REQUEST_EVENT_TYPE,
-			this.#proxyContextRequest.bind(this) as EventListener,
-		);
 	}
 
 	/**
@@ -143,7 +127,7 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 
 		const pasteTranslatorManifests = this.getPasteTranslatorManifests(args.propertyEditorUiAlias);
 		const propertyEditorUiManifest = await this.#findPropertyEditorUiManifest(args.propertyEditorUiAlias);
-		const config = this.#propertyContext?.getConfig();
+		const config = (await this.getContext(UMB_PROPERTY_CONTEXT)).getConfig();
 
 		const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
@@ -282,30 +266,6 @@ export class UmbClipboardPropertyContext extends UmbContextBase<UmbClipboardProp
 		});
 
 		return supportedManifests.length > 0;
-	}
-
-	#proxyContextRequest(event: UmbContextRequestEvent) {
-		const path = event.composedPath();
-
-		// Ignore events from the property editor element so we don't end up in a loop when proxying the requests.
-		if (path.includes(this.#propertyEditorElement as EventTarget)) {
-			return;
-		}
-
-		// Proxy all context requests to the property editor element so the clipboard actions, translators and filters
-		// can consume contexts from property editor root element.
-		if (this.#propertyEditorElement) {
-			event.stopImmediatePropagation();
-			this.#propertyEditorElement.dispatchEvent(event.clone());
-		}
-	}
-
-	override destroy(): void {
-		super.destroy();
-		this.#hostElement?.removeEventListener(
-			UMB_CONTEXT_REQUEST_EVENT_TYPE,
-			this.#proxyContextRequest.bind(this) as EventListener,
-		);
 	}
 }
 

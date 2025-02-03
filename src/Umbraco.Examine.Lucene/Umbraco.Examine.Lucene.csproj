@@ -22,6 +22,7 @@
     <!-- Take top-level depedendency on System.Security.Cryptography.Xml, because Examine depends on a vulnerable version -->
     <PackageReference Include="System.Security.Cryptography.Xml" />
     <!-- Take top-level depedendency on Lucene.Net.Replicator, because Examine depends on a vulnerable version -->
+    <!-- Take top-level depedendency on Lucene.Net.Replicator-->
     <PackageReference Include="Lucene.Net.Replicator" />
   </ItemGroup>
 

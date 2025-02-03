@@ -42,6 +42,7 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 		{
 			name: '',
 			alias: 'entityActions',
+			align: 'right',
 		},
 	];
 

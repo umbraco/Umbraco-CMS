@@ -1,5 +1,11 @@
 import type { UmbBlockManagerContext, UmbBlockWorkspaceOriginData } from '../index.js';
-import type { UmbBlockLayoutBaseModel, UmbBlockDataModel, UmbBlockDataType, UmbBlockExposeModel } from '../types.js';
+import type {
+	UmbBlockLayoutBaseModel,
+	UmbBlockDataModel,
+	UmbBlockDataType,
+	UmbBlockExposeModel,
+	UmbBlockDataValueModel,
+} from '../types.js';
 import type { UmbBlockEntriesContext } from './block-entries.context.js';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -238,17 +244,7 @@ export abstract class UmbBlockEntryContext<
 		if (!this.#contentValuesObservable) {
 			this.#contentValuesObservable = mergeObservables(
 				[this._contentValueArray, this.#contentStructure!.contentTypeProperties, this._variantId],
-				([propertyValues, properties, variantId]) => {
-					if (!propertyValues || !properties || !variantId) return;
-
-					return properties.reduce((acc, property) => {
-						const propertyVariantId = this.#createPropertyVariantId(property, variantId);
-						acc[property.alias] = propertyValues.find(
-							(x) => x.alias === property.alias && propertyVariantId.compare(x),
-						)?.value;
-						return acc;
-					}, {} as UmbBlockDataType);
-				},
+				this.#propertyValuesToObjectCallback,
 			);
 		}
 		return this.#contentValuesObservable;
@@ -274,20 +270,27 @@ export abstract class UmbBlockEntryContext<
 		if (!this.#settingsValuesObservable) {
 			this.#settingsValuesObservable = mergeObservables(
 				[this._settingsValueArray, this.#settingsStructure!.contentTypeProperties, this._variantId],
-				([propertyValues, properties, variantId]) => {
-					if (!propertyValues || !properties || !variantId) return;
-
-					return properties.reduce((acc, property) => {
-						acc[property.alias] = propertyValues.find((x) =>
-							this.#createPropertyVariantId(property, variantId).compare(x),
-						)?.value;
-						return acc;
-					}, {} as UmbBlockDataType);
-				},
+				this.#propertyValuesToObjectCallback,
 			);
 		}
 		return this.#settingsValuesObservable;
 	}
+
+	#propertyValuesToObjectCallback = ([propertyValues, properties, variantId]: [
+		UmbBlockDataValueModel<unknown>[] | undefined,
+		UmbPropertyTypeModel[],
+		UmbVariantId | undefined,
+	]) => {
+		if (!propertyValues || !properties || !variantId) return;
+
+		return properties.reduce((acc, property) => {
+			const propertyVariantId = this.#createPropertyVariantId(property, variantId);
+			acc[property.alias] = propertyValues.find(
+				(x) => x.alias === property.alias && propertyVariantId.compare(x),
+			)?.value;
+			return acc;
+		}, {} as UmbBlockDataType);
+	};
 
 	/**
 	 * Get the settings of the block.

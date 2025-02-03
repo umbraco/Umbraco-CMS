@@ -10086,6 +10086,17 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "allowedDocumentTypes",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
           }
         ],
         "responses": {
@@ -15764,6 +15775,17 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "allowedMediaTypes",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
           }
         ],
         "responses": {
@@ -19637,6 +19659,17 @@
               "type": "integer",
               "format": "int32",
               "default": 100
+            }
+          },
+          {
+            "name": "allowedMemberTypes",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
             }
           }
         ],
@@ -35929,6 +35962,8 @@
       },
       "CurrenUserConfigurationResponseModel": {
         "required": [
+          "allowChangePassword",
+          "allowTwoFactor",
           "keepUserLoggedIn",
           "passwordConfiguration",
           "usernameIsEmail"
@@ -35948,6 +35983,12 @@
                 "$ref": "#/components/schemas/PasswordConfigurationResponseModel"
               }
             ]
+          },
+          "allowChangePassword": {
+            "type": "boolean"
+          },
+          "allowTwoFactor": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -35970,14 +36011,11 @@
           "mediaStartNodeIds",
           "name",
           "permissions",
+          "userGroupIds",
           "userName"
         ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "email": {
             "type": "string"
           },
@@ -35986,6 +36024,21 @@
           },
           "name": {
             "type": "string"
+          },
+          "userGroupIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
+            }
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
           },
           "languageIsoCode": {
             "type": "string",
@@ -37783,6 +37836,16 @@
             "$ref": "#/components/schemas/DocumentVariantStateModel"
           },
           "publishDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "scheduledPublishDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "scheduledUnpublishDate": {
             "type": "string",
             "format": "date-time",
             "nullable": true

@@ -20,7 +20,6 @@ test('can create a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   // Act
   await umbracoUi.script.clickActionsMenuAtRoot();
   await umbracoUi.script.createFolder(scriptFolderName);
-  await umbracoUi.waitForTimeout(1000);
 
   // Assert
   await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
