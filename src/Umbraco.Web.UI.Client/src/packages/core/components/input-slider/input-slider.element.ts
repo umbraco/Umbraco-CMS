@@ -6,6 +6,9 @@ import type { UUISliderEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-slider')
 export class UmbInputSliderElement extends UUIFormControlMixin(UmbLitElement, '') {
+	@property()
+	label: string = '';
+
 	@property({ type: Number })
 	min = 0;
 
@@ -50,6 +53,7 @@ export class UmbInputSliderElement extends UUIFormControlMixin(UmbLitElement, ''
 	#renderSlider() {
 		return html`
 			<uui-slider
+				.label=${this.label}
 				.min=${this.min}
 				.max=${this.max}
 				.step=${this.step}
@@ -63,6 +67,7 @@ export class UmbInputSliderElement extends UUIFormControlMixin(UmbLitElement, ''
 	#renderRangeSlider() {
 		return html`
 			<uui-range-slider
+				.label=${this.label}
 				.min=${this.min}
 				.max=${this.max}
 				.step=${this.step}

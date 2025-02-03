@@ -117,6 +117,13 @@ export class UmbPropertyEditorUIContentPickerElement
 	override firstUpdated() {
 		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-content')!);
 		this.#setPickerRootUnique();
+
+		if (this._min && this._max && this._min > this._max) {
+			console.warn(
+				`Property (Content Picker) has been misconfigured, 'minNumber' is greater than 'maxNumber'. Please correct your data type configuration.`,
+				this,
+			);
+		}
 	}
 
 	override focus() {

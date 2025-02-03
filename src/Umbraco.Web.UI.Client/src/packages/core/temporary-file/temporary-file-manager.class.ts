@@ -92,7 +92,6 @@ export class UmbTemporaryFileManager<
 
 	${this.#localization.term('media_maxFileSize')} ${formatBytes(maxFileSize)}.
 						`,
-						whitespace: 'pre-line',
 					},
 				});
 				return false;
