@@ -1,4 +1,4 @@
-import { UMB_WEBHOOK_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
+import { UMB_WEBHOOK_WORKSPACE_CONTEXT } from '../../webhook/constants.js';
 import { UmbCollectionWorkspaceViewElement } from '@umbraco-cms/backoffice/collection';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
