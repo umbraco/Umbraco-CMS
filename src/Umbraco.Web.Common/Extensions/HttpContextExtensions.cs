@@ -62,9 +62,16 @@ public static class HttpContextExtensions
         // Update the HttpContext's user with the authenticated user's principal to ensure
         // that subsequent requests within the same context will recognize the user
         // as authenticated.
-        if (result.Succeeded)
+        if (result is { Succeeded: true, Principal.Identity: not null })
         {
-            httpContext.User = result.Principal;
+            // We need to get existing identities that are not the backoffice kind and flow them to the new identity
+            // Otherwise we can't log in as both a member and a backoffice user
+            // For instance if you've enabled basic auth.
+            ClaimsPrincipal? authenticatedPrincipal = result.Principal;
+            IEnumerable<ClaimsIdentity> existingIdentities = httpContext.User.Identities.Where(x => x.IsAuthenticated && x.AuthenticationType != authenticatedPrincipal.Identity.AuthenticationType);
+            authenticatedPrincipal.AddIdentities(existingIdentities);
+
+            httpContext.User = authenticatedPrincipal;
         }
 
         return result;
