@@ -6,8 +6,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspaceView',
 		kind: 'collection',
-		alias: 'Umb.WorkspaceView.WebhookDeliveries.Collection',
-		name: 'Webhook Root Workspace Deliveries View',
+		alias: 'Umb.WorkspaceView.WebhookDelivery.Collection',
+		name: 'Webhook Delivery Workspace View',
+		element: () => import('./webhook-delivery-collection-workspace-view.element.js'),
 		meta: {
 			label: 'Deliveries',
 			pathname: 'deliveries',

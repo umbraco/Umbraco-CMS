@@ -7,7 +7,6 @@ export class UmbWebhookDeliveryTableStatusCodeColumnLayoutElement extends LitEle
 	value: string = '';
 
 	#getTagColor() {
-		console.log(this.value);
 		if (this.value.includes('(2')) {
 			return 'positive';
 		}
