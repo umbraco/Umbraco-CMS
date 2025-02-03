@@ -48,7 +48,7 @@ export default class UmbInputUploadFieldFileElement extends UmbLitElement {
 				if (this.file) return;
 
 				this.extension = this.path.split('.').pop() ?? '';
-				this.label = this.#serverUrl ? this.path.substring(this.#serverUrl.length) : this.#loadingText;
+				this.label = this.path.split('/').pop() ?? this.#loadingText;
 			}
 		}
 	}
