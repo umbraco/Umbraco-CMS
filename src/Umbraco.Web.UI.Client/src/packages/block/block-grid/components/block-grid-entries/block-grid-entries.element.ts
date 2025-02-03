@@ -338,6 +338,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			this.#typeLimitValidator = undefined;
 		}
 		if (hasTypeLimits) {
+			// If we have specific block type limits, we should use those for validation (not the Block Type Configurations)
 			this.#typeLimitValidator = this.addValidator(
 				'customError',
 				() => {
