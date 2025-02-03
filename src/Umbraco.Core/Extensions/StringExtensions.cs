@@ -68,12 +68,11 @@ public static class StringExtensions
             }
         }
 
-        Span<int> nodeIdsSpan = CollectionsMarshal.AsSpan(nodeIds);
-        var result = new int[nodeIdsSpan.Length];
+        var result = new int[nodeIds.Count];
         var resultIndex = 0;
-        for (int i = nodeIdsSpan.Length - 1; i >= 0; i--)
+        for (int i = nodeIds.Count - 1; i >= 0; i--)
         {
-            result[resultIndex++] = nodeIdsSpan[i];
+            result[resultIndex++] = nodeIds[i];
         }
 
         return result;
