@@ -59,7 +59,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html` <a href="/section/settings/dashboard/health-check"> &larr; Back to overview </a>
+		return html` <a href="section/settings/dashboard/health-check"> &larr; Back to overview </a>
 			${this._group ? this.#renderGroup() : nothing}`;
 	}
 

@@ -34,7 +34,6 @@ test('can see correct information when published', async ({umbracoApi, umbracoUi
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.waitForTimeout(2000);
   const contentData = await umbracoApi.document.getByName(contentName);
   await umbracoUi.content.doesIdHaveText(contentData.id);
   const expectedCreatedDate = new Date(contentData.variants[0].createDate).toLocaleString("en-US", {
@@ -134,8 +133,6 @@ test('cannot change to a template that is not allowed in the document type', asy
   await umbracoUi.content.clickEditTemplateByName(firstTemplateName);
 
   // Assert
-  // This wait is needed to make sure the template name is visible when the modal is opened
-  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.content.isTemplateNameDisabled(secondTemplateName);
 
   // Clean
