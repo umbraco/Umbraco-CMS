@@ -819,6 +819,7 @@ export default {
 		error: 'Error',
 		field: 'Field',
 		fieldFor: 'Field for %0%',
+		toggleFor: 'Toggle for %0%',
 		findDocument: 'Find',
 		first: 'First',
 		focalPoint: 'Focal point',
