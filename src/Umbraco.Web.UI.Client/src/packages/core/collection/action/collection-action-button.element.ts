@@ -51,17 +51,7 @@ export class UmbCollectionActionButtonElement extends UmbLitElement {
 
 	private async _onClick() {
 		if (!this.#api) return;
-
-		this._buttonState = 'waiting';
-
-		try {
-			if (!this.#api) throw new Error('No api defined');
-			await this.#api.execute();
-			this._buttonState = 'success';
-		} catch {
-			this._buttonState = 'failed';
-		}
-
+		await this.#api.execute();
 		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 
