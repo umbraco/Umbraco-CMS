@@ -21,6 +21,10 @@ export class UmbWebhookDeliveryTableCollectionViewElement extends UmbLitElement 
 			alias: 'date',
 		},
 		{
+			name: this.localize.term('webhooks_url'),
+			alias: 'eventUrl',
+		},
+		{
 			name: this.localize.term('webhooks_event'),
 			alias: 'eventAlias',
 		},
@@ -63,6 +67,10 @@ export class UmbWebhookDeliveryTableCollectionViewElement extends UmbLitElement 
 					{
 						columnAlias: 'date',
 						value: html`<umb-date-table-column-view .value=${delivery.date}></umb-date-table-column-view>`,
+					},
+					{
+						columnAlias: 'eventUrl',
+						value: delivery.url,
 					},
 					{
 						columnAlias: 'eventAlias',
