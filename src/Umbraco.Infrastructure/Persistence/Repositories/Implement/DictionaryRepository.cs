@@ -22,14 +22,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>, IDictionaryRepository
 {
     private readonly ILoggerFactory _loggerFactory;
-    private readonly INullValueCachePolicyResolver<DictionaryRepository> _nullValueCachePolicyResolver;
+    private readonly INullValueCachePolicyResolver<IDictionaryRepository> _nullValueCachePolicyResolver;
 
     public DictionaryRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<DictionaryRepository> logger,
         ILoggerFactory loggerFactory,
-        INullValueCachePolicyResolver<DictionaryRepository> nullValueCachePolicyResolver)
+        INullValueCachePolicyResolver<IDictionaryRepository> nullValueCachePolicyResolver)
         : base(scopeAccessor, cache, logger)
     {
         _loggerFactory = loggerFactory;
@@ -217,14 +217,14 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
     private class DictionaryByKeyRepository : SimpleGetRepository<string, IDictionaryItem, DictionaryDto>
     {
         private readonly DictionaryRepository _dictionaryRepository;
-        private readonly INullValueCachePolicyResolver<DictionaryRepository> _nullValueCachePolicyResolver;
+        private readonly INullValueCachePolicyResolver<IDictionaryRepository> _nullValueCachePolicyResolver;
 
         public DictionaryByKeyRepository(
             DictionaryRepository dictionaryRepository,
             IScopeAccessor scopeAccessor,
             AppCaches cache,
             ILogger<DictionaryByKeyRepository> logger,
-            INullValueCachePolicyResolver<DictionaryRepository> nullValueCachePolicyResolver)
+            INullValueCachePolicyResolver<IDictionaryRepository> nullValueCachePolicyResolver)
             : base(scopeAccessor, cache, logger)
         {
             _dictionaryRepository = dictionaryRepository;
