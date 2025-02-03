@@ -1761,6 +1761,7 @@ export default {
 		noHeaders: 'No webhook headers have been added',
 		noEventsFound: 'No events were found.',
 		enabled: 'Enabled',
+		disabled: 'Disabled',
 		events: 'Events',
 		event: 'Event',
 		url: 'URL',
@@ -1776,7 +1777,7 @@ export default {
 		headers: 'Headers',
 		selectEventFirst: 'Please select an event first.',
 		selectEvents: 'Select events',
-		statusCode: 'Status code'
+		statusCode: 'Status code',
 	},
 	languages: {
 		addLanguage: 'Add language',

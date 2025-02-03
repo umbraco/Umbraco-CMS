@@ -22,10 +22,6 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 			alias: 'url',
 		},
 		{
-			name: this.localize.term('webhooks_enabled'),
-			alias: 'enabled',
-		},
-		{
 			name: this.localize.term('webhooks_events'),
 			alias: 'events',
 		},
@@ -33,6 +29,10 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 			name: this.localize.term('webhooks_types'),
 			alias: 'types',
 			elementName: 'umb-webhook-table-content-type-column-layout',
+		},
+		{
+			name: this.localize.term('general_status'),
+			alias: 'status',
 		},
 		{
 			name: '',
@@ -45,9 +45,14 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 	private _tableItems: Array<UmbTableItem> = [];
 
 	#collectionContext?: UmbDefaultCollectionContext<UmbWebhookDetailModel>;
+	#enabledLabel: string;
+	#disabledLabel: string;
 
 	constructor() {
 		super();
+
+		this.#enabledLabel = this.localize.term('webhooks_enabled');
+		this.#disabledLabel = this.localize.term('webhooks_disabled');
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
@@ -71,16 +76,18 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 						value: html`<a href=${'section/settings/workspace/webhook/edit/' + webhook.unique}>${webhook.url}</a>`,
 					},
 					{
-						columnAlias: 'enabled',
-						value: html`<umb-boolean-table-column-view .value=${webhook.enabled}></umb-boolean-table-column-view>`,
-					},
-					{
 						columnAlias: 'events',
 						value: webhook.events.map((event) => event.eventName).join(', ') || 'None',
 					},
 					{
 						columnAlias: 'types',
 						value: { contentTypeName: webhook.events[0].eventType, contentTypes: webhook.contentTypes },
+					},
+					{
+						columnAlias: 'status',
+						value: html`<uui-tag color=${webhook.enabled ? 'positive' : 'danger'}
+							>${webhook.enabled ? this.#enabledLabel : this.#disabledLabel}</uui-tag
+						>`,
 					},
 					{
 						columnAlias: 'entityActions',
