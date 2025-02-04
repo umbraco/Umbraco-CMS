@@ -13,9 +13,10 @@ public class SmidgeOptionsSetup : IConfigureOptions<SmidgeOptions>
         => _runtimeMinificationSettings = runtimeMinificatinoSettings;
 
     /// <summary>
-    ///     Configures Smidge to use in-memory caching if configured that way or if certain cache busters are used. As well as the cache buster type.
+    /// Configures Smidge to use in-memory caching if configured that way or if certain cache busters are used.
+    /// Also sets the cache buster type such that public facing bundles will use the configured method.
     /// </summary>
-    /// <param name="options"></param>
+    /// <param name="options">Instance of <see cref="SmidgeOptions"></see> to configure.</param>
     public void Configure(SmidgeOptions options)
     {
         options.CacheOptions.UseInMemoryCache = _runtimeMinificationSettings.Value.UseInMemoryCache ||
@@ -27,7 +28,7 @@ public class SmidgeOptionsSetup : IConfigureOptions<SmidgeOptions>
             RuntimeMinificationCacheBuster.AppDomain => typeof(AppDomainLifetimeCacheBuster),
             RuntimeMinificationCacheBuster.Version => typeof(UmbracoSmidgeConfigCacheBuster),
             RuntimeMinificationCacheBuster.Timestamp => typeof(TimestampCacheBuster),
-            _ => throw new ArgumentOutOfRangeException("CacheBuster", "RuntimeMinification.CacheBuster is not a valid value")
+            _ => throw new ArgumentOutOfRangeException("CacheBuster", $"{_runtimeMinificationSettings.Value.CacheBuster} is not a valid value for RuntimeMinificationCacheBuster."),
         };
 
         options.DefaultBundleOptions.DebugOptions.SetCacheBusterType(cacheBusterType);
