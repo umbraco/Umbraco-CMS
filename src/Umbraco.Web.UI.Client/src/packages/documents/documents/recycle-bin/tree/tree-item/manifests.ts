@@ -6,7 +6,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'default',
 		alias: 'Umb.TreeItem.Document.RecycleBin',
 		name: 'Document Recycle Bin Tree Item',
-		api: () => import('./document-recycle-bin-root-tree-item.context.js'),
 		forEntityTypes: [UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE],
 	},
 ];

@@ -2,7 +2,7 @@ import { UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../constants.js';
 import { UMB_DOCUMENT_RECYCLE_BIN_TREE_ALIAS, UMB_DOCUMENT_RECYCLE_BIN_TREE_REPOSITORY_ALIAS } from './constants.js';
 import { manifests as dataManifests } from './data/manifests.js';
 import { manifests as reloadTreeItemChildrenManifests } from './reload-tree-item-children/manifests.js';
-import { manifests as rootTreeItemManifests } from './root-tree-item/manifests.js';
+import { manifests as rootTreeItemManifests } from './tree-item/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -10,7 +10,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'default',
 		alias: UMB_DOCUMENT_RECYCLE_BIN_TREE_ALIAS,
 		name: 'Document Recycle Bin Tree',
-		api: () => import('./document-recycle-bin-tree.context.js'),
 		meta: {
 			repositoryAlias: UMB_DOCUMENT_RECYCLE_BIN_TREE_REPOSITORY_ALIAS,
 		},
