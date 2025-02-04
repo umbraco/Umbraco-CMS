@@ -23,8 +23,8 @@ public class AddNameAndDescriptionToWebhooks : MigrationBase
         {
             var columns = Context.SqlContext.SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
 
-            AddColumn(columns, nameof(WebhookDto.Name));
-            AddColumn(columns, nameof(WebhookDto.Description));
+            AddColumn(columns, "name");
+            AddColumn(columns, "description");
         }
         else
         {
@@ -35,7 +35,7 @@ public class AddNameAndDescriptionToWebhooks : MigrationBase
     private void AddColumn(List<Persistence.SqlSyntax.ColumnInfo> columns, string column)
     {
         if (columns
-            .SingleOrDefault(x => x.TableName == Constants.DatabaseSchema.Tables.Webhook && x.ColumnName.InvariantEquals(column)) is null)
+            .SingleOrDefault(x => x.TableName == Constants.DatabaseSchema.Tables.Webhook && x.ColumnName == column) is null)
         {
             AddColumn<WebhookDto>(Constants.DatabaseSchema.Tables.Webhook, column);
         }
