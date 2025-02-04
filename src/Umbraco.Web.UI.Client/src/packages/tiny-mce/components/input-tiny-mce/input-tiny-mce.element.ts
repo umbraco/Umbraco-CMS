@@ -367,6 +367,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	}
 
 	#onChange(value: string) {
+		if (this.value === value) return;
 		this.value = value;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
