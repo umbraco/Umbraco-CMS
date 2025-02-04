@@ -249,21 +249,7 @@ export abstract class UmbTreeItemContextBase<
 		});
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
-			this.#actionEventContext?.removeEventListener(
-				UmbRequestReloadTreeItemChildrenEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-
-			this.#actionEventContext?.removeEventListener(
-				UmbRequestReloadChildrenOfEntityEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-
-			this.#actionEventContext?.removeEventListener(
-				UmbRequestReloadStructureForEntityEvent.TYPE,
-				this.#onReloadStructureRequest as unknown as EventListener,
-			);
-
+			this.#removeEventListeners();
 			this.#actionEventContext = instance;
 
 			this.#actionEventContext.addEventListener(
@@ -411,7 +397,7 @@ export abstract class UmbTreeItemContextBase<
 		return `section/${pathname}/workspace/${entityType}/edit/${unique}`;
 	}
 
-	override destroy(): void {
+	#removeEventListeners = () => {
 		this.#actionEventContext?.removeEventListener(
 			UmbRequestReloadTreeItemChildrenEvent.TYPE,
 			this.#onReloadRequest as EventListener,
@@ -426,6 +412,10 @@ export abstract class UmbTreeItemContextBase<
 			UmbRequestReloadStructureForEntityEvent.TYPE,
 			this.#onReloadStructureRequest as unknown as EventListener,
 		);
+	};
+
+	override destroy(): void {
+		this.#removeEventListeners();
 		window.removeEventListener('navigationend', this.#debouncedCheckIsActive);
 		super.destroy();
 	}
