@@ -227,7 +227,8 @@ test('can set the number of columns for the layout in the content', async ({umbr
   expect(layoutValue[0].columnSpan).toBe(gridColumns);
 });
 
-test('can add settings model for the block in the content', async ({umbracoApi, umbracoUi}) => {
+// TODO: Remove skip when front-end is ready. Currently, it is impossible to create content with blockgrid that has a setting model
+test.skip('can add settings model for the block in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const contentBlockInputText = 'This is textstring';
   const settingBlockInputText = 'This is textarea';

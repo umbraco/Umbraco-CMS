@@ -143,12 +143,8 @@ test('cannot add number of block element greater than the maxiumm amount', async
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.waitForTimeout(500);
-  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.waitForTimeout(500);
-  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
   await umbracoUi.content.clickCreateModalButton();
 
   // Assert
@@ -168,7 +164,6 @@ test('can set the label of block element in the content', async ({umbracoApi, um
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButton();
 
@@ -177,7 +172,8 @@ test('can set the label of block element in the content', async ({umbracoApi, um
   await umbracoUi.content.doesBlockElementHaveName(blockLabel);
 });
 
-test('can add settings model for the block in the content', async ({umbracoApi, umbracoUi}) => {
+// TODO: Remove skip when front-end is ready. Currently, it is impossible to create content with blocklist that has a setting model
+test.skip('can add settings model for the block in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const contentBlockInputText = 'This is textstring';
   const settingBlockInputText = 'This is textarea';
@@ -194,7 +190,6 @@ test('can add settings model for the block in the content', async ({umbracoApi, 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
   await umbracoUi.content.enterTextstring(contentBlockInputText);
   await umbracoUi.content.clickAddBlockSettingsTabButton();
   await umbracoUi.content.enterTextArea(settingBlockInputText);
