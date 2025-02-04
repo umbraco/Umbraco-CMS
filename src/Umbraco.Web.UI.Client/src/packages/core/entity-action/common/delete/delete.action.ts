@@ -24,7 +24,7 @@ export class UmbDeleteEntityAction extends UmbEntityActionBase<MetaEntityActionD
 		// TODO: handle items with variants
 		await umbConfirmModal(this._host, {
 			headline: `Delete`,
-			content: `Are you sure you want to delete ${item.name}?`,
+			content: `Are you sure you want to delete ${(item.name && item.name.length > 0 ? item.name : "this item")}?`,
 			color: 'danger',
 			confirmLabel: 'Delete',
 		});
