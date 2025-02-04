@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -14,15 +14,20 @@ public class WebhookServiceTests : UmbracoIntegrationTest
     private IWebhookService WebhookService => GetRequiredService<IWebhookService>();
 
     [Test]
-    [TestCase("https://example.com", Constants.WebhookEvents.Aliases.ContentPublish, "00000000-0000-0000-0000-010000000000")]
-    [TestCase("https://example.com", Constants.WebhookEvents.Aliases.ContentDelete, "00000000-0000-0000-0000-000200000000")]
-    [TestCase("https://example.com", Constants.WebhookEvents.Aliases.ContentUnpublish, "00000000-0000-0000-0000-300000000000")]
-    [TestCase("https://example.com", Constants.WebhookEvents.Aliases.MediaDelete, "00000000-0000-0000-0000-000004000000")]
-    [TestCase("https://example.com", Constants.WebhookEvents.Aliases.MediaSave, "00000000-0000-0000-0000-000000500000")]
-    public async Task Can_Create_And_Get(string url, string webhookEvent, Guid key)
+    [TestCase("https://example.com", Constants.WebhookEvents.Aliases.ContentPublish, "00000000-0000-0000-0000-010000000000", "Example", "Example description")]
+    [TestCase("https://example.com", Constants.WebhookEvents.Aliases.ContentDelete, "00000000-0000-0000-0000-000200000000", "Example", "Example description")]
+    [TestCase("https://example.com", Constants.WebhookEvents.Aliases.ContentUnpublish, "00000000-0000-0000-0000-300000000000", "Example", "Example description")]
+    [TestCase("https://example.com", Constants.WebhookEvents.Aliases.MediaDelete, "00000000-0000-0000-0000-000004000000", "Example", "Example description")]
+    [TestCase("https://example.com", Constants.WebhookEvents.Aliases.MediaSave, "00000000-0000-0000-0000-000000500000", "Example", "Example description")]
+    public async Task Can_Create_And_Get(string url, string webhookEvent, Guid key, string name, string description)
     {
-        var createdWebhook = await WebhookService.CreateAsync(new Webhook(url, true, new[] { key }, new[] { webhookEvent }));
-        var webhook = await WebhookService.GetAsync(createdWebhook.Result.Key);
+        IWebhook webhook = new Webhook(url, true, [key], [webhookEvent])
+        {
+            Name = name,
+            Description = description
+        };
+        var createdWebhook = await WebhookService.CreateAsync(webhook);
+        webhook = await WebhookService.GetAsync(createdWebhook.Result.Key);
 
         Assert.Multiple(() =>
         {
@@ -30,6 +35,8 @@ public class WebhookServiceTests : UmbracoIntegrationTest
             Assert.AreEqual(1, webhook.Events.Length);
             Assert.IsTrue(webhook.Events.Contains(webhookEvent));
             Assert.AreEqual(url, webhook.Url);
+            Assert.AreEqual(name, webhook.Name);
+            Assert.AreEqual(description, webhook.Description);
             Assert.IsTrue(webhook.ContentTypeKeys.Contains(key));
         });
     }
@@ -37,9 +44,9 @@ public class WebhookServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Get_All()
     {
-        var createdWebhookOne = await WebhookService.CreateAsync(new Webhook("https://example.com", true, new[] { Guid.NewGuid() }, new[] { Constants.WebhookEvents.Aliases.ContentPublish }));
-        var createdWebhookTwo = await WebhookService.CreateAsync(new Webhook("https://example.com", true, new[] { Guid.NewGuid() }, new[] { Constants.WebhookEvents.Aliases.ContentDelete }));
-        var createdWebhookThree = await WebhookService.CreateAsync(new Webhook("https://example.com", true, new[] { Guid.NewGuid() }, new[] { Constants.WebhookEvents.Aliases.ContentUnpublish }));
+        var createdWebhookOne = await WebhookService.CreateAsync(new Webhook("https://example.com", true, [Guid.NewGuid()], [Constants.WebhookEvents.Aliases.ContentPublish]));
+        var createdWebhookTwo = await WebhookService.CreateAsync(new Webhook("https://example.com", true, [Guid.NewGuid()], [Constants.WebhookEvents.Aliases.ContentDelete]));
+        var createdWebhookThree = await WebhookService.CreateAsync(new Webhook("https://example.com", true, [Guid.NewGuid()], [Constants.WebhookEvents.Aliases.ContentUnpublish]));
         var webhooks = await WebhookService.GetAllAsync(0, int.MaxValue);
 
         Assert.Multiple(() =>
@@ -59,7 +66,7 @@ public class WebhookServiceTests : UmbracoIntegrationTest
     [TestCase("https://example.com", Constants.WebhookEvents.Aliases.MediaSave, "00000000-0000-0000-0000-000000500000")]
     public async Task Can_Delete(string url, string webhookEvent, Guid key)
     {
-        var createdWebhook = await WebhookService.CreateAsync(new Webhook(url, true, new[] { key }, new[] { webhookEvent }));
+        var createdWebhook = await WebhookService.CreateAsync(new Webhook(url, true, [key], [webhookEvent]));
         var webhook = await WebhookService.GetAsync(createdWebhook.Result.Key);
 
         Assert.IsNotNull(webhook);
@@ -71,7 +78,7 @@ public class WebhookServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Create_With_No_EntityKeys()
     {
-        var createdWebhook = await WebhookService.CreateAsync(new Webhook("https://example.com", events: new[] { Constants.WebhookEvents.Aliases.ContentPublish }));
+        var createdWebhook = await WebhookService.CreateAsync(new Webhook("https://example.com", events: [Constants.WebhookEvents.Aliases.ContentPublish]));
         var webhook = await WebhookService.GetAsync(createdWebhook.Result.Key);
 
         Assert.IsNotNull(webhook);
@@ -81,8 +88,8 @@ public class WebhookServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Update()
     {
-        var createdWebhook = await WebhookService.CreateAsync(new Webhook("https://example.com", events: new[] { Constants.WebhookEvents.Aliases.ContentPublish }));
-        createdWebhook.Result.Events = new[] { Constants.WebhookEvents.Aliases.ContentDelete };
+        var createdWebhook = await WebhookService.CreateAsync(new Webhook("https://example.com", events: [Constants.WebhookEvents.Aliases.ContentPublish]));
+        createdWebhook.Result.Events = [Constants.WebhookEvents.Aliases.ContentDelete];
         await WebhookService.UpdateAsync(createdWebhook.Result);
 
         var updatedWebhook = await WebhookService.GetAsync(createdWebhook.Result.Key);
@@ -94,9 +101,9 @@ public class WebhookServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Get_By_EventName()
     {
-        var webhook1 = await WebhookService.CreateAsync(new Webhook("https://example.com", events: new[] { Constants.WebhookEvents.Aliases.ContentPublish }));
-        var webhook2 = await WebhookService.CreateAsync(new Webhook("https://example.com", events: new[] { Constants.WebhookEvents.Aliases.ContentUnpublish }));
-        var webhook3 = await WebhookService.CreateAsync(new Webhook("https://example.com", events: new[] { Constants.WebhookEvents.Aliases.ContentUnpublish }));
+        var webhook1 = await WebhookService.CreateAsync(new Webhook("https://example.com", events: [Constants.WebhookEvents.Aliases.ContentPublish]));
+        var webhook2 = await WebhookService.CreateAsync(new Webhook("https://example.com", events: [Constants.WebhookEvents.Aliases.ContentUnpublish]));
+        var webhook3 = await WebhookService.CreateAsync(new Webhook("https://example.com", events: [Constants.WebhookEvents.Aliases.ContentUnpublish]));
 
         var result = await WebhookService.GetByAliasAsync(Constants.WebhookEvents.Aliases.ContentUnpublish);
 

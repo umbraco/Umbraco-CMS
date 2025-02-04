@@ -29,6 +29,8 @@ internal class WebhookPresentationFactory : IWebhookPresentationFactory
         var target = new WebhookResponseModel
         {
             Events = webhook.Events.Select(Create).ToArray(),
+            Name = webhook.Name,
+            Description = webhook.Description,
             Url = webhook.Url,
             Enabled = webhook.Enabled,
             Id = webhook.Key,
@@ -44,6 +46,8 @@ internal class WebhookPresentationFactory : IWebhookPresentationFactory
         var target = new Webhook(webhookRequestModel.Url, webhookRequestModel.Enabled, webhookRequestModel.ContentTypeKeys, webhookRequestModel.Events, webhookRequestModel.Headers)
         {
             Key = webhookRequestModel.Id ?? Guid.NewGuid(),
+            Name = webhookRequestModel.Name,
+            Description = webhookRequestModel.Description,
         };
         return target;
     }
@@ -53,6 +57,8 @@ internal class WebhookPresentationFactory : IWebhookPresentationFactory
         var target = new Webhook(webhookRequestModel.Url, webhookRequestModel.Enabled, webhookRequestModel.ContentTypeKeys, webhookRequestModel.Events, webhookRequestModel.Headers)
         {
             Key = existingWebhookkey,
+            Name = webhookRequestModel.Name,
+            Description = webhookRequestModel.Description,
         };
         return target;
     }
