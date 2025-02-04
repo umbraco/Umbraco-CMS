@@ -1,3 +1,4 @@
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -6,7 +7,6 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbDeprecation } from '../utils';
 
 const ObserveRepositoryAlias = Symbol();
 
