@@ -29,6 +29,11 @@ export class UmbDocumentRecycleBinTreeContext extends UmbDefaultTreeContext<
 			this.loadTree();
 		}
 	};
+
+	override destroy(): void {
+		this.#actionEventContext?.removeEventListener(UmbEntityTrashedEvent.TYPE, this.#onEntityTrashed as EventListener);
+		super.destroy();
+	}
 }
 
 export { UmbDocumentRecycleBinTreeContext as api };
