@@ -69,6 +69,9 @@ export abstract class UmbBlockEntriesContext<
 
 	// Public methods:
 
+	blockTypeOf(contentTypeKey: string) {
+		return this._manager!.blockTypeOf(contentTypeKey);
+	}
 	layoutOf(contentKey: string) {
 		return this._layoutEntries.asObservablePart((source) => source.find((x) => x.contentKey === contentKey));
 	}

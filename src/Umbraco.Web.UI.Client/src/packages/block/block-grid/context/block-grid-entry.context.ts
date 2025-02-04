@@ -65,9 +65,6 @@ export class UmbBlockGridEntryContext
 	#areaGridColumns = new UmbNumberState(undefined);
 	readonly areaGridColumns = this.#areaGridColumns.asObservable();
 
-	#isValidBlockType = new UmbBooleanState(true);
-	public readonly isValidBlockType = this.#isValidBlockType.asObservable();
-
 	readonly showContentEdit = mergeObservables(
 		[this._contentStructureHasProperties, this.forceHideContentEditorInOverlay],
 		([a, b]) => a === true && b === false,
@@ -160,19 +157,6 @@ export class UmbBlockGridEntryContext
 		if (!this._entries) return;
 
 		this.#gotEntriesAndManager();
-
-		this.observe(
-			this.contentTypeKey,
-			(contentTypeKey) => {
-				if (contentTypeKey) {
-					const valid = this._entries?.isAllowedBlockType(contentTypeKey);
-					if (valid !== undefined) {
-						this.#isValidBlockType.setValue(valid);
-					}
-				}
-			},
-			'observeBlockTypeValidity',
-		);
 
 		// Retrieve scale options:
 		this.observe(

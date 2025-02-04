@@ -143,14 +143,6 @@ export class UmbBlockGridEntriesContext
 		return this._manager?.getMaxAllowed() ?? Infinity;
 	}
 
-	getAllowedBlockTypes() {
-		return this.#allowedBlockTypes.getValue();
-	}
-
-	isAllowedBlockType(contentTypeKey: string) {
-		return this.#allowedBlockTypes.getValue().find((x) => x.contentElementTypeKey === contentTypeKey) !== undefined;
-	}
-
 	getLayoutContainerElement() {
 		return this.getHostElement().shadowRoot?.querySelector('.umb-block-grid__layout-container') as
 			| HTMLElement
@@ -418,6 +410,10 @@ export class UmbBlockGridEntriesContext
 		return this._catalogueRouteBuilderState.getValue()?.({ view: 'clipboard', index: index });
 	}
 
+	blockTypeOf(contentTypeKey: string) {
+		return this.#allowedBlockTypes.getValue().find((x) => x.contentElementTypeKey === contentTypeKey);
+	}
+
 	/*
 	async setLayouts(layouts: Array<UmbBlockGridLayoutModel>) {
 		await this._retrieveManager;
@@ -654,7 +650,7 @@ export class UmbBlockGridEntriesContext
 		if (layoutEntries.length === 0) return true;
 
 		// Check all layout entries if they are allowed.
-		const allowedBlocks = this.getAllowedBlockTypes();
+		const allowedBlocks = this.#allowedBlockTypes.getValue();
 		if (allowedBlocks.length === 0) return false;
 
 		const allowedKeys = allowedBlocks.map((x) => x.contentElementTypeKey);
