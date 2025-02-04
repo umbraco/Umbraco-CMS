@@ -4497,9 +4497,13 @@ public static class PublishedContentExtensions
             yield break;
         }
 
+        // Only documents can be published. For any other cached types we should by-pass the check for being published
+        // in the LINQ statement below.
+        var canBePublished = publishedCache is IPublishedContentCache;
+
         culture ??= variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
         IEnumerable<IPublishedContent> descendants = descendantsKeys
-            .Where(x => publishStatusQueryService.IsDocumentPublished(x, culture))
+            .Where(x => canBePublished is false || publishStatusQueryService.IsDocumentPublished(x, culture))
             .Select(publishedCache.GetById)
             .WhereNotNull()
             .FilterByCulture(culture, variationContextAccessor);
