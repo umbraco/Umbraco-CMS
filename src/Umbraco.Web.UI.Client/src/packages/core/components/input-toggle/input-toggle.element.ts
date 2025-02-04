@@ -26,6 +26,9 @@ export class UmbInputToggleElement extends UUIFormControlMixin(UmbLitElement, ''
 	@property({ type: String })
 	labelOff?: string;
 
+	@property({ type: String, attribute: 'aria-label' })
+	override ariaLabel: string | null = null;
+
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 * @type {boolean}
@@ -42,6 +45,8 @@ export class UmbInputToggleElement extends UUIFormControlMixin(UmbLitElement, ''
 		return undefined;
 	}
 
+	// test
+
 	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#updateLabel();
@@ -54,15 +59,15 @@ export class UmbInputToggleElement extends UUIFormControlMixin(UmbLitElement, ''
 	}
 
 	#updateLabel() {
-		this._currentLabel = this.showLabels ? (this.checked ? this.labelOn : this.labelOff) : '';
+		this._currentLabel = this.showLabels ? (this.checked ? this.labelOn : this.labelOff) : ''; 
 	}
 
 	override render() {
 		return html`<uui-toggle
 			.checked=${this.#checked}
-			.label=${this._currentLabel}
+			.label="${this.ariaLabel}"
 			@change=${this.#onChange}
-			?readonly=${this.readonly}></uui-toggle>`;
+			?readonly=${this.readonly}><span>${this._currentLabel}</span> </uui-toggle>`;
 	}
 
 	static override styles = [

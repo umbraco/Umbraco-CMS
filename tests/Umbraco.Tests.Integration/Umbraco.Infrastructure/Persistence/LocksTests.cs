@@ -191,7 +191,7 @@ public class LocksTests : UmbracoIntegrationTest
         const int threadCount = 8;
         var threads = new Thread[threadCount];
         var exceptions = new Exception[threadCount];
-        var locker = new object();
+        Lock locker = new();
         var acquired = 0;
         var entered = 0;
         var ms = new AutoResetEvent[threadCount];

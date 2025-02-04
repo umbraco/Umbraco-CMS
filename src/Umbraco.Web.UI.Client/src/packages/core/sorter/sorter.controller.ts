@@ -80,20 +80,38 @@ function destroyPreventEvent(element: Element) {
 	//element.removeAttribute('draggable');
 }
 
-export type resolvePlacementArgs<T, ElementType extends HTMLElement> = {
+export type UmbSorterResolvePlacementReturn =
+	| boolean
+	| null
+	| {
+			placeAfter: boolean;
+			verticalDirection?: boolean;
+	  };
+
+export type UmbSorterResolvePlacementArgs<T, ElementType extends HTMLElement = HTMLElement> = {
 	containerElement: Element;
 	containerRect: DOMRect;
 	item: T;
+	itemIndex: number | null;
 	element: ElementType;
 	elementRect: DOMRect;
 	relatedElement: ElementType;
 	relatedModel: T;
 	relatedRect: DOMRect;
+	relatedIndex: number | null;
 	placeholderIsInThisRow: boolean;
 	horizontalPlaceAfter: boolean;
 	pointerX: number;
 	pointerY: number;
 };
+
+/**
+ * @deprecated will be removed in v.17, use `UmbSorterResolvePlacementArgs`
+ */
+export type resolvePlacementArgs<T, ElementType extends HTMLElement = HTMLElement> = UmbSorterResolvePlacementArgs<
+	T,
+	ElementType
+>;
 
 type UniqueType = string | symbol | number;
 
@@ -180,7 +198,7 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	 * 	}
 	 * }
 	 */
-	resolvePlacement?: (argument: resolvePlacementArgs<T, ElementType>) => boolean | null;
+	resolvePlacement?: (argument: UmbSorterResolvePlacementArgs<T, ElementType>) => UmbSorterResolvePlacementReturn;
 	/**
 	 * This callback is executed when an item is moved within this container.
 	 */
@@ -248,7 +266,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	#observer;
 
 	#model: Array<T> = [];
-	#rqaId?: number;
+	static rqaId?: number;
 
 	#containerElement!: HTMLElement;
 	#useContainerShadowRoot?: boolean;
@@ -260,7 +278,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	#dragX = 0;
 	#dragY = 0;
 
-	#items = Array<ElementType>();
+	#elements = Array<ElementType>();
 
 	public get identifier() {
 		return this.#config.identifier;
@@ -328,11 +346,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 	}
 
-	setModel(model: Array<T>): void {
-		if (this.#model) {
-			// TODO: Some updates might need to be done, as the model is about to change? Do make the changes after setting the model?.. [NL]
-			this.#model = model;
-		}
+	setModel(model: Array<T> | undefined): void {
+		this.#model = model ?? [];
 	}
 
 	/**
@@ -409,7 +424,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			(this.#containerElement as unknown) = undefined;
 		}
 
-		this.#items.forEach((item) => this.destroyItem(item));
+		this.#elements.forEach((item) => this.destroyItem(item));
 	}
 
 	#itemDraggedOver = (e: DragEvent) => {
@@ -433,7 +448,11 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 			return;
 		} else {
-			// TODO: Check if dropping here is okay..
+			// Indication if drop is good:
+			if (this.updateAllowIndication(UmbSorterController.activeItem) === false) {
+				console.log('Dropping here was not allowed');
+				return;
+			}
 
 			// If so lets set the approaching sorter:
 			UmbSorterController.dropSorter = this as unknown as UmbSorterController<unknown>;
@@ -476,8 +495,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			}
 		}
 
-		this.#items.push(element);
-		this.#items = Array.from(new Set(this.#items));
+		this.#elements.push(element);
+		this.#elements = Array.from(new Set(this.#elements));
 	}
 
 	destroyItem(element: HTMLElement) {
@@ -491,7 +510,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		(draggableElement as HTMLElement).draggable = false;
 
-		this.#items = this.#items.filter((x) => x !== element);
+		this.#elements = this.#elements.filter((x) => x !== element);
 	}
 
 	#setupPlaceholderStyle() {
@@ -586,9 +605,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		UmbSorterController.dropSorter = this as unknown as UmbSorterController<unknown>;
 
 		// We must wait one frame before changing the look of the block.
-		this.#rqaId = requestAnimationFrame(() => {
+		UmbSorterController.rqaId = requestAnimationFrame(() => {
 			// It should be okay to use the same rqaId, as the move does not, or is okay not, to happen on first frame/drag-move.
-			this.#rqaId = undefined;
+			UmbSorterController.rqaId = undefined;
 			if (UmbSorterController.activeElement) {
 				UmbSorterController.activeElement.style.transform = '';
 			}
@@ -650,9 +669,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			});
 		}
 
-		if (this.#rqaId) {
-			cancelAnimationFrame(this.#rqaId);
-			this.#rqaId = undefined;
+		if (UmbSorterController.rqaId) {
+			cancelAnimationFrame(UmbSorterController.rqaId);
+			UmbSorterController.rqaId = undefined;
 		}
 
 		UmbSorterController.activeItem = undefined;
@@ -689,17 +708,21 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			const activeDragRect = UmbSorterController.activeDragElement!.getBoundingClientRect();
 			const insideCurrentRect = isWithinRect(this.#dragX, this.#dragY, activeDragRect);
 			if (!insideCurrentRect) {
-				if (this.#rqaId === undefined) {
-					this.#rqaId = requestAnimationFrame(this.#updateDragMove);
+				if (UmbSorterController.rqaId === undefined) {
+					UmbSorterController.rqaId = requestAnimationFrame(this.#updateDragMove);
 				}
 			}
 		}
 	}
 
 	#updateDragMove = () => {
-		this.#rqaId = undefined;
+		UmbSorterController.rqaId = undefined;
 		if (!UmbSorterController.activeElement || !UmbSorterController.activeItem) {
 			return;
+		}
+
+		if ((UmbSorterController.dropSorter as any) !== this) {
+			throw new Error('Drop sorter is not this sorter');
 		}
 
 		// Maybe no need to check this twice, like we do it before the RAF an inside it, I think its fine to choose one of them.
@@ -744,6 +767,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		elementsInSameRow.forEach((sameRow) => {
 			const centerX = sameRow.dragRect.left + sameRow.dragRect.width * 0.5;
 			const distance = Math.abs(this.#dragX - centerX);
+			/*const distance = Math.min(
+				Math.abs(this.#dragX - sameRow.dragRect.left),
+				Math.abs(this.#dragX - sameRow.dragRect.right),
+			);*/
 			if (distance < lastDistance) {
 				foundEl = sameRow.el as HTMLElement;
 				foundElDragRect = sameRow.dragRect;
@@ -751,6 +778,11 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				placeAfter = this.#dragX > centerX;
 			}
 		});
+
+		let activeIndex: number | null = this.#model.indexOf(UmbSorterController.activeItem);
+		if (activeIndex === -1) {
+			activeIndex = null;
+		}
 
 		if (foundEl) {
 			// If we are on top or closest to our self, we should not do anything.
@@ -763,21 +795,35 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				throw new Error('Could not find model of found element');
 			}
 
-			// Indication if drop is good:
-			if (this.updateAllowIndication(UmbSorterController.activeItem) === false) {
-				return;
+			let relatedIndex: number | null = this.#model.indexOf(foundModel);
+			if (relatedIndex === -1) {
+				relatedIndex = null;
 			}
 
-			const verticalDirection: boolean | null = this.#config.resolvePlacement
+			if (activeIndex !== null && relatedIndex !== null) {
+				// We have both indexes, aka. both elements are in this list.
+				const widthDiff = Math.max(foundElDragRect.width - currentElementRect.width, 0);
+				if (activeIndex < relatedIndex && foundElDragRect.left + widthDiff < this.#dragX) {
+					// If we are located before and we are just enough over to get located after, then lets do it already.
+					placeAfter = true;
+				} else if (activeIndex > relatedIndex && foundElDragRect.right - widthDiff > this.#dragX) {
+					// If we are located after and we are just enough over to get located before, then lets do it already.
+					placeAfter = false;
+				}
+			}
+
+			const placementResult: UmbSorterResolvePlacementReturn = this.#config.resolvePlacement
 				? this.#config.resolvePlacement({
 						containerElement: this.#containerElement,
 						containerRect: currentContainerRect,
 						item: UmbSorterController.activeItem,
+						itemIndex: activeIndex,
 						element: UmbSorterController.activeElement as ElementType,
 						elementRect: currentElementRect,
 						relatedElement: foundEl,
 						relatedModel: foundModel,
 						relatedRect: foundElDragRect,
+						relatedIndex: relatedIndex,
 						placeholderIsInThisRow: placeholderIsInThisRow,
 						horizontalPlaceAfter: placeAfter,
 						pointerX: this.#dragX,
@@ -785,20 +831,41 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 					})
 				: true;
 
-			if (verticalDirection === null) {
-				// The resolvePlacement has chosen to back out of this move.
+			if (placementResult === null) {
+				// The resolvePlacement method has chosen to back out of this move.
 				return;
 			}
 
-			if (verticalDirection) {
-				placeAfter = this.#dragY > foundElDragRect.top + foundElDragRect.height * 0.5;
+			let verticalDirection = true;
+			if (typeof placementResult === 'object') {
+				verticalDirection = placementResult.verticalDirection ?? false;
+				placeAfter = placementResult.placeAfter;
+			} else {
+				verticalDirection = placementResult ?? false;
+				if (verticalDirection === true) {
+					// Lets check if we should place after or before, based on a vertical algortihm.
+					placeAfter = this.#dragY > foundElDragRect.top + foundElDragRect.height * 0.5;
+
+					// There is room for improvements, if we are in the same model:
+					if (activeIndex !== null && relatedIndex !== null) {
+						// We have both indexes, aka. both elements are in this list.
+						const heightDiff = Math.max(foundElDragRect.height - currentElementRect.height, 0);
+						if (activeIndex < relatedIndex && this.#dragY > foundElDragRect.top + heightDiff) {
+							// If active is located above and we are just enough above to get located after, then lets do it already.
+							placeAfter = true;
+						} else if (activeIndex > relatedIndex && this.#dragY < foundElDragRect.bottom - heightDiff) {
+							// If active is located below and we are just enough above to get located before, then lets do it already.
+							placeAfter = false;
+						}
+					}
+				}
 			}
 
-			if (verticalDirection) {
+			if (verticalDirection === true) {
 				let el;
 				if (placeAfter === false) {
 					let lastLeft = foundElDragRect.left;
-					elementsInSameRow.findIndex((x) => {
+					elementsInSameRow.map((x) => {
 						if (x.dragRect.left < lastLeft) {
 							lastLeft = x.dragRect.left;
 							el = x.el;
@@ -806,7 +873,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 					});
 				} else {
 					let lastRight = foundElDragRect.right;
-					elementsInSameRow.findIndex((x) => {
+					elementsInSameRow.map((x) => {
 						if (x.dragRect.right > lastRight) {
 							lastRight = x.dragRect.right;
 							el = x.el;
@@ -824,7 +891,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 			return;
 		}
-		// We skipped the above part cause we are above or below container, or within an empty container:
+		// We skipped the above part cause we are above or below container, or within an empty container, or in a blank space:
 
 		// Indication if drop is good:
 		if (this.updateAllowIndication(UmbSorterController.activeItem) === false) {
@@ -838,8 +905,56 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			this.#moveElementTo(0);
 		} else if (this.#dragY > currentContainerRect.bottom) {
 			this.#moveElementTo(-1);
+		} else {
+			// There was no target, but we are still inside. aka. in a vertical gap/gutter/blankspace.
+			if (this.#model.length > 1 && activeIndex !== null) {
+				const belowActive = this.#dragY > currentElementRect.bottom;
+
+				const foundTarget =
+					belowActive === false
+						? this.#findIndexToMoveTo(0, activeIndex)
+						: this.#findIndexToMoveTo(activeIndex, this.#model.length);
+
+				if (foundTarget) {
+					this.#moveElementTo(foundTarget);
+				}
+			}
 		}
 	};
+
+	#findIndexToMoveTo(a: number, b: number): number | undefined {
+		if (a === b) {
+			return a;
+		}
+		const halfWay = a + Math.round((b - a) * 0.5);
+
+		// if we hit one of the points, then lets just move to the other point.
+		if (halfWay === a || halfWay === b) {
+			return b;
+		}
+
+		const belowHalf = this.#isPointerBelowTargetElement(halfWay);
+		if (belowHalf === null) {
+			throw new Error('Could not determine if below target');
+		}
+
+		if (belowHalf) {
+			return this.#findIndexToMoveTo(halfWay, b);
+		} else {
+			return this.#findIndexToMoveTo(a, halfWay);
+		}
+	}
+
+	#isPointerBelowTargetElement(targetIndex: number) {
+		if (targetIndex > 0 && targetIndex < this.#model.length) {
+			const element = this.getElementOfItem(this.#model[targetIndex]);
+			if (element) {
+				// Below this one == true, otherwise false.
+				return this.#dragY > element?.getBoundingClientRect().bottom;
+			}
+		}
+		return null;
+	}
 
 	//
 	async #moveElementTo(newIndex: number) {
@@ -850,6 +965,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		const requestingSorter = UmbSorterController.dropSorter;
 		if (!requestingSorter) {
 			throw new Error('Could not find requestingSorter');
+		}
+		if ((requestingSorter as any) !== this) {
+			throw new Error('Requesting sorter is not this sorter');
 		}
 
 		// If same container and same index, do nothing:
@@ -872,6 +990,16 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		return this.#model.find((entry: T) => elementUnique === this.#config.getUniqueOfModel(entry));
 	}
 
+	public getElementOfItem(item: T) {
+		const unique = this.#config.getUniqueOfModel(item);
+		if (unique === undefined) {
+			console.error('Sorter could not find unique of item', item);
+			//throw new Error('Sorter could not find unique of item');
+			return;
+		}
+		return this.#elements.find((element) => unique === this.#config.getUniqueOfElement(element));
+	}
+
 	public async removeItem(item: T) {
 		if (!item) {
 			return false;
@@ -891,32 +1019,11 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 		return false;
 	}
-	/*
-	public async insertItem(item: T, newIndex: number = 0) {
-		if (!item) {
-			return false;
-		}
-
-		if (this.#config.performItemInsert) {
-			const result = await this.#config.performItemInsert({ item, newIndex });
-			if (result === false) {
-				return false;
-			}
-		} else {
-			const newModel = [...this.#model];
-			newModel.splice(newIndex, 0, item);
-			this.#model = newModel;
-			this.#config.onChange?.({ model: newModel, item });
-		}
-		return false;
-	}
-	*/
 
 	public hasOtherItemsThan(item: T) {
 		return this.#model.filter((x) => x !== item).length > 0;
 	}
 
-	// TODO: Could get item via attr.
 	public async moveItemInModel(newIndex: number, fromCtrl: UmbSorterController<T, ElementType>) {
 		if (!UmbSorterController.activeItem) {
 			console.error('There is no active item to move');
@@ -940,34 +1047,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		const localMove = fromCtrl === (this as any);
 
-		if (localMove) {
-			// Local move:
-
-			const oldIndex = this.#model.indexOf(item);
-			if (oldIndex === -1) {
-				console.error('Could not find item in model when performing internal move', this.getHostElement(), this.#model);
-				return false;
-			}
-
-			if (this.#config.performItemMove) {
-				const result = await this.#config.performItemMove({ item, newIndex, oldIndex });
-				if (result === false) {
-					return false;
-				}
-			} else {
-				const newModel = [...this.#model];
-				newModel.splice(oldIndex, 1);
-				if (oldIndex <= newIndex) {
-					newIndex--;
-				}
-				newModel.splice(newIndex, 0, item);
-				this.#model = newModel;
-				this.#config.onChange?.({ model: newModel, item });
-			}
-
-			UmbSorterController.activeIndex = newIndex;
-		} else {
-			// Not a local move:
+		if (!localMove) {
+			// Not a local move, so we have to switch container to continue:
 
 			if ((await fromCtrl.removeItem(item)) !== true) {
 				console.error('Sync could not remove item when moving to a new container');
@@ -997,6 +1078,35 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				UmbSorterController.dropSorter = this as unknown as UmbSorterController<unknown>;
 				UmbSorterController.activeIndex = newIndex;
 			}
+			return true;
+		}
+
+		if (localMove) {
+			// Local move:
+
+			const oldIndex = this.#model.indexOf(item);
+			if (oldIndex === -1) {
+				console.error('Could not find item in model when performing internal move', this.getHostElement(), this.#model);
+				return false;
+			}
+
+			if (this.#config.performItemMove) {
+				const result = await this.#config.performItemMove({ item, newIndex, oldIndex });
+				if (result === false) {
+					return false;
+				}
+			} else {
+				const newModel = [...this.#model];
+				newModel.splice(oldIndex, 1);
+				if (oldIndex <= newIndex) {
+					newIndex--;
+				}
+				newModel.splice(newIndex, 0, item);
+				this.#model = newModel;
+				this.#config.onChange?.({ model: newModel, item });
+			}
+
+			UmbSorterController.activeIndex = newIndex;
 		}
 
 		return true;

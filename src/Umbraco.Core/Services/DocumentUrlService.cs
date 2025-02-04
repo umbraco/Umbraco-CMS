@@ -525,6 +525,7 @@ public class DocumentUrlService : IDocumentUrlService
     }
 
 
+    [Obsolete("This method is obsolete and will be removed in future versions. Use IPublishedUrlInfoProvider.GetAllAsync instead.")]
     public async Task<IEnumerable<UrlInfo>> ListUrlsAsync(Guid contentKey)
     {
         var result = new List<UrlInfo>();
@@ -736,8 +737,6 @@ public class DocumentUrlService : IDocumentUrlService
 
         if (considerFirstLevelAsRoot)
         {
-            yield return rootKeys.First();
-
             foreach (Guid rootKey in rootKeys)
             {
                 if (isDraft is false && IsContentPublished(rootKey, culture) is false)

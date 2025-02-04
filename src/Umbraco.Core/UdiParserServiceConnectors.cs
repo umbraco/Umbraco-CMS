@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core;
 [Obsolete("This class will be removed in a future version.")]
 public static class UdiParserServiceConnectors
 {
-    private static readonly object ScanLocker = new();
+    private static readonly Lock ScanLocker = new();
 
     // notes - see U4-10409
     // if this class is used during application pre-start it cannot scans the assemblies,

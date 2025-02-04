@@ -13,7 +13,7 @@ public abstract class CollectionBuilderBase<TBuilder, TCollection, TItem> : ICol
     where TBuilder : CollectionBuilderBase<TBuilder, TCollection, TItem>
     where TCollection : class, IBuilderCollection<TItem>
 {
-    private readonly object _locker = new();
+    private readonly Lock _locker = new();
     private readonly List<Type> _types = new();
     private Type[]? _registeredTypes;
 

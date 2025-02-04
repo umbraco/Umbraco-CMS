@@ -43,7 +43,7 @@ public class PublishedElement : IPublishedElement
                                    return (IPublishedProperty)new PublishedElementPropertyBase(propertyType, this, previewing, referenceCacheLevel,cacheManager, value);
                                })
                                .ToArray()
-                           ?? new IPublishedProperty[0];
+                           ?? [];
     }
 
     // initializes a new instance of the PublishedElement class

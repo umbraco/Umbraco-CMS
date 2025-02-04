@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-import { UMB_STORAGE_TOKEN_RESPONSE_NAME } from './auth.context.token.js';
+import { UMB_STORAGE_TOKEN_RESPONSE_NAME } from './constants.js';
 import type { LocationLike, StringMap } from '@umbraco-cms/backoffice/external/openid';
 import {
 	BaseTokenRequestHandler,
