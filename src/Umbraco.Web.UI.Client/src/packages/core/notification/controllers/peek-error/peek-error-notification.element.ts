@@ -1,6 +1,6 @@
 import { customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbNotificationHandler } from '../../notification-handler';
+import type { UmbNotificationHandler } from '../../notification-handler.js';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbPeekErrorArgs } from '../../types.js';
 import { UMB_ERROR_VIEWER_MODAL } from '../../index.js';
