@@ -101,13 +101,12 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		);
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
-			this.#eventContext = context;
-
-			this.#eventContext.removeEventListener(
+			this.#eventContext?.removeEventListener(
 				UmbEntityUpdatedEvent.TYPE,
 				this.#onEntityUpdatedEvent as unknown as EventListener,
 			);
 
+			this.#eventContext = context;
 			this.#eventContext.addEventListener(
 				UmbEntityUpdatedEvent.TYPE,
 				this.#onEntityUpdatedEvent as unknown as EventListener,
@@ -225,7 +224,17 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		await this.#init;
 		if (!this.repository) throw new Error('Repository is not initialized');
 
-		const { data } = await this.repository.requestItems([unique]);
+		const { data, error } = await this.repository.requestItems([unique]);
+
+		if (error) {
+			this.#statuses.appendOne({
+				state: {
+					type: 'error',
+					error: '#general_notFound',
+				},
+				unique,
+			} as UmbRepositoryItemsStatus);
+		}
 
 		if (data) {
 			const items = this.getItems();
