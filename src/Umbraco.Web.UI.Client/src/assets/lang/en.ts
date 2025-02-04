@@ -392,6 +392,7 @@ export default {
 	contentType: {
 		copyFailed: 'Failed to copy content type',
 		moveFailed: 'Failed to move content type',
+		contentTypes: 'Content Types',
 	},
 	mediaType: {
 		copyFailed: 'Failed to copy media type',
@@ -1765,10 +1766,11 @@ export default {
 		noHeaders: 'No webhook headers have been added',
 		noEventsFound: 'No events were found.',
 		enabled: 'Enabled',
+		disabled: 'Disabled',
 		events: 'Events',
 		event: 'Event',
 		url: 'URL',
-		types: 'Types',
+		types: 'Content Types',
 		webhookKey: 'Webhook key',
 		retryCount: 'Retry count',
 		urlDescription: 'The URL to call when the webhook is triggered.',
@@ -1780,6 +1782,7 @@ export default {
 		headers: 'Headers',
 		selectEventFirst: 'Please select an event first.',
 		selectEvents: 'Select events',
+		statusCode: 'Status code',
 	},
 	languages: {
 		addLanguage: 'Add language',
