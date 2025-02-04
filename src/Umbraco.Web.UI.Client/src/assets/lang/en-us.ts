@@ -822,6 +822,7 @@ export default {
 		error: 'Error',
 		field: 'Field',
 		fieldFor: 'Field for %0%',
+		toggleFor: 'Toggle for %0%',
 		findDocument: 'Find',
 		first: 'First',
 		focalPoint: 'Focal point',
@@ -2445,7 +2446,8 @@ export default {
 		labelEditorSize: 'Overlay editor size',
 		addCustomView: 'Add custom view',
 		addSettingsElementType: 'Add settings',
-		confirmDeleteBlockMessage: 'Are you sure you want to delete the content <strong>%0%</strong>?',
+		confirmDeleteBlockTitle: 'Delete %0%?',
+		confirmDeleteBlockMessage: 'Are you sure you want to delete this %0%?',
 		confirmDeleteBlockTypeMessage: 'Are you sure you want to delete the block configuration <strong>%0%</strong>?',
 		confirmDeleteBlockTypeNotice:
 			'The content of this block will still be present, editing of this content\n      will no longer be available and will be shown as unsupported content.\n    ',
@@ -2548,6 +2550,9 @@ export default {
 		labelInlineMode: 'Display inline with text',
 		notExposedLabel: 'Draft',
 		notExposedDescription: 'This Block is not yet created for this variant',
+		unsupportedBlockName: 'Unsupported',
+		unsupportedBlockDescription:
+			'This content is no longer supported in this Editor. If you are missing this content, please contact your administrator. Otherwise delete it.',
 	},
 	contentTemplatesDashboard: {
 		whatHeadline: 'What are Document Blueprints?',
