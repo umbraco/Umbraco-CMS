@@ -554,7 +554,7 @@ export default {
 		relateToOriginalLabel: 'Relate to original',
 		includeDescendants: 'Include descendants',
 		theFriendliestCommunity: 'The friendliest community',
-		linkToPage: 'Link to document',
+		linkToPage: 'Link to content',
 		openInNewWindow: 'Opens the link in a new window or tab',
 		linkToMedia: 'Link to media',
 		selectContentStartNode: 'Select content start node',
