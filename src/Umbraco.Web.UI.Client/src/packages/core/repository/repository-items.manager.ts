@@ -38,7 +38,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 	#items = new UmbArrayState<ItemType>([], (x) => this.#getUnique(x));
 	items = this.#items.asObservable();
 
-	#statuses = new UmbArrayState<UmbRepositoryItemsStatus>([], (x) => x);
+	#statuses = new UmbArrayState<UmbRepositoryItemsStatus>([], (x) => x.unique);
 	statuses = this.#statuses.asObservable();
 
 	/**
@@ -145,6 +145,15 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 
 		const requestedUniques = this.getUniques();
 
+		this.#statuses.setValue(
+			requestedUniques.map((unique) => ({
+				state: {
+					type: 'loading',
+				},
+				unique,
+			})),
+		);
+
 		// TODO: Test if its just some items that is gone now, if so then just filter them out. (maybe use code from #removeItem)
 		// This is where this.#getUnique comes in play. Unless that can come from the repository, but that collides with the idea of having a multi-type repository. If that happens.
 		const request = this.repository.requestItems(requestedUniques);
@@ -175,17 +184,30 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 			const rejectedUniques = requestedUniques.filter(
 				(unique) => !data.find((item) => this.#getUnique(item) === unique),
 			);
+			const resolvedUniques = requestedUniques.filter((unique) => !rejectedUniques.includes(unique));
 			this.#items.remove(rejectedUniques);
 
-			this.#statuses.append(
-				rejectedUniques.map((unique) => ({
-					state: {
-						type: 'error',
-						error: '#general_notFound',
-					},
-					unique,
-				})),
-			);
+			this.#statuses.append([
+				...rejectedUniques.map(
+					(unique) =>
+						({
+							state: {
+								type: 'error',
+								error: '#general_notFound',
+							},
+							unique,
+						}) as UmbRepositoryItemsStatus,
+				),
+				...resolvedUniques.map(
+					(unique) =>
+						({
+							state: {
+								type: 'success',
+							},
+							unique,
+						}) as UmbRepositoryItemsStatus,
+				),
+			]);
 		}
 
 		if (asObservable) {
