@@ -23,9 +23,6 @@ umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-collection-action-button')
 export class UmbCollectionActionButtonElement extends UmbLitElement {
-	@state()
-	private _buttonState?: UUIButtonState;
-
 	private _manifest?: ManifestCollectionAction;
 	@property({ type: Object, attribute: false })
 	public get manifest() {
@@ -64,7 +61,6 @@ export class UmbCollectionActionButtonElement extends UmbLitElement {
 				look="outline"
 				label=${ifDefined(label)}
 				href=${ifDefined(this.manifest?.meta.href)}
-				.state=${this._buttonState}
 				@click=${this._onClick}></uui-button>
 		`;
 	}
