@@ -73,6 +73,10 @@ stages:
         pool:
           vmImage: 'ubuntu-latest'
         steps:
+          - checkout: self
+            submodules: false
+            lfs: false,
+            fetchDepth: 500
           - task: NodeTool@0
             displayName: Use Node.js $(nodeVersion)
             retryCountOnTaskFailure: 3
@@ -198,6 +202,11 @@ stages:
         pool:
           vmImage: 'ubuntu-latest'
         steps:
+          - checkout: self
+            submodules: false
+            lfs: false,
+            fetchDepth: 1
+            fetchFilter: tree:0
           - task: NodeTool@0
             displayName: Use Node.js 10.15.x
             retryCountOnTaskFailure: 3
@@ -249,6 +258,11 @@ stages:
         pool:
           vmImage: $(vmImage)
         steps:
+          - checkout: self
+            submodules: false
+            lfs: false,
+            fetchDepth: 1
+            fetchFilter: tree:0
           - task: DownloadPipelineArtifact@2
             displayName: Download build artifacts
             inputs:
@@ -288,6 +302,11 @@ stages:
         variables:
           Tests__Database__DatabaseType: 'Sqlite'
         steps:
+          - checkout: self
+            submodules: false
+            lfs: false,
+            fetchDepth: 1
+            fetchFilter: tree:0
           # Setup test environment
           - task: DownloadPipelineArtifact@2
             displayName: Download build artifacts

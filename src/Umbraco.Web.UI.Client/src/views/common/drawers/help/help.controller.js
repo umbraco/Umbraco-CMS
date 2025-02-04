@@ -67,7 +67,7 @@
               if(browserInfo != null){
                 vm.systemInfo.push({name :"Browser", data: browserInfo.name + " " + browserInfo.version});
               }
-              vm.systemInfo.push({name :"Browser OS", data: getPlatform()});
+              vm.systemInfo.push({name :"Browser (user agent)", data: getPlatform()});
             } );
             tourService.getGroupedTours().then(function(groupedTours) {
                 vm.tours = groupedTours;
@@ -257,7 +257,7 @@
         }
 
         function getPlatform() {
-          return window.navigator.platform;
+          return navigator.userAgent;
         }
 
         evts.push(eventsService.on("appState.tour.complete", function (event, tour) {
