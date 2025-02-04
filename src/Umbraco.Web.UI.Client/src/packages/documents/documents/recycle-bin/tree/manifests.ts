@@ -24,6 +24,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'default',
 		alias: UMB_DOCUMENT_RECYCLE_BIN_TREE_ALIAS,
 		name: 'Document Recycle Bin Tree',
+		api: () => import('./document-recycle-bin-tree.context.js'),
 		meta: {
 			repositoryAlias: UMB_DOCUMENT_RECYCLE_BIN_TREE_REPOSITORY_ALIAS,
 		},
