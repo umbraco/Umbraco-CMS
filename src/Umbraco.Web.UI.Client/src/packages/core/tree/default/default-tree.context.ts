@@ -307,16 +307,6 @@ export class UmbDefaultTreeContext<
 				this.#onReloadRequest as EventListener,
 			);
 
-			this.#actionEventContext.removeEventListener(
-				UmbRequestReloadChildrenOfEntityEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-
-			this.#actionEventContext.addEventListener(
-				UmbRequestReloadChildrenOfEntityEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-
 			this.#actionEventContext.addEventListener(
 				UmbRequestReloadChildrenOfEntityEvent.TYPE,
 				this.#onReloadRequest as EventListener,
@@ -355,11 +345,6 @@ export class UmbDefaultTreeContext<
 	};
 
 	override destroy(): void {
-		this.#actionEventContext?.removeEventListener(
-			UmbRequestReloadChildrenOfEntityEvent.TYPE,
-			this.#onReloadRequest as EventListener,
-		);
-
 		this.#actionEventContext?.removeEventListener(
 			UmbRequestReloadChildrenOfEntityEvent.TYPE,
 			this.#onReloadRequest as EventListener,
