@@ -13,14 +13,14 @@ test.beforeEach(async ({umbracoApi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can create content with empty RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const expectedState = 'Draft'; 
+  const expectedState = 'Draft';
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -42,7 +42,7 @@ test('can create content with empty RTE Tiptap property editor', async ({umbraco
 
 test('can create content with non-empty RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const expectedState = 'Draft'; 
+  const expectedState = 'Draft';
   const inputText = 'Test Tiptap here';
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoUi.goToBackOffice();
@@ -101,7 +101,7 @@ test('can add a media in RTE Tiptap property editor', async ({umbracoApi, umbrac
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickTipTapToolbarIconWithTitle(iconTitle);
   await umbracoUi.content.selectMediaWithName(imageName);
-  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickMediaCaptionAltTextModalSubmitButton();
   await umbracoUi.content.clickSaveButton();
 

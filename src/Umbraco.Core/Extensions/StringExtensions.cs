@@ -57,16 +57,17 @@ public static class StringExtensions
     /// <returns></returns>
     public static int[] GetIdsFromPathReversed(this string path)
     {
-        var nodeIds = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
-            .Select(x =>
-                int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var output)
-                    ? Attempt<int>.Succeed(output)
-                    : Attempt<int>.Fail())
-            .Where(x => x.Success)
-            .Select(x => x.Result)
-            .Reverse()
-            .ToArray();
-        return nodeIds;
+        string[] pathSegments = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
+        List<int> nodeIds = new(pathSegments.Length);
+        for (int i = pathSegments.Length - 1; i >= 0; i--)
+        {
+            if (int.TryParse(pathSegments[i], NumberStyles.Integer, CultureInfo.InvariantCulture, out int pathSegment))
+            {
+                nodeIds.Add(pathSegment);
+            }
+        }
+
+        return nodeIds.ToArray();
     }
 
     /// <summary>
@@ -79,7 +80,7 @@ public static class StringExtensions
     public static string StripFileExtension(this string fileName)
     {
         // filenames cannot contain line breaks
-        if (fileName.Contains(Environment.NewLine) || fileName.Contains("\r") || fileName.Contains("\n"))
+        if (fileName.Contains('\n') || fileName.Contains('\r'))
         {
             return fileName;
         }
@@ -434,8 +435,7 @@ public static class StringExtensions
     {
         var delimiters = new[] { delimiter };
         return !list.IsNullOrWhiteSpace()
-            ? list.Split(delimiters, StringSplitOptions.RemoveEmptyEntries)
-                .Select(i => i.Trim())
+            ? list.Split(delimiters, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .ToList()
             : new List<string>();
     }
@@ -617,7 +617,7 @@ public static class StringExtensions
         compare.EndsWith(compareTo, StringComparison.InvariantCultureIgnoreCase);
 
     public static bool InvariantContains(this string compare, string compareTo) =>
-        compare.IndexOf(compareTo, StringComparison.OrdinalIgnoreCase) >= 0;
+        compare.Contains(compareTo, StringComparison.OrdinalIgnoreCase);
 
     public static bool InvariantContains(this IEnumerable<string> compare, string compareTo) =>
         compare.Contains(compareTo, StringComparer.InvariantCultureIgnoreCase);

@@ -20,7 +20,6 @@ test('can create a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.stylesheet.clickActionsMenuAtRoot();
   await umbracoUi.stylesheet.createFolder(stylesheetFolderName);
-  await umbracoUi.waitForTimeout(1000);
 
   // Assert
   await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);

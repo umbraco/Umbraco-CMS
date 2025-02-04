@@ -116,6 +116,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryE
 	resolvePlacement: resolvePlacementAsBlockGrid,
 	identifier: 'block-grid-editor',
 	itemSelector: 'umb-block-grid-entry',
+	disabledItemSelector: 'umb-block-grid-entry[unsupported]',
 	containerSelector: '.umb-block-grid__layout-container',
 };
 
