@@ -7,25 +7,23 @@ using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
+// TODO (V16): Make this test class internal (along with any others in this project). We should just expose the base classes and helpers.
+// Could also consider moving the base classes to a different assembly, and shipping that, but not our tests.
+
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class WebhookServiceTests : UmbracoIntegrationTest
 {
     private IWebhookService WebhookService => GetRequiredService<IWebhookService>();
 
-    [Test]
-    [TestCase("https://example.com", Constants.WebhookEvents.Aliases.ContentPublish, "00000000-0000-0000-0000-010000000000", "Example", "Example description")]
-    [TestCase("https://example.com", Constants.WebhookEvents.Aliases.ContentDelete, "00000000-0000-0000-0000-000200000000", "Example", "Example description")]
-    [TestCase("https://example.com", Constants.WebhookEvents.Aliases.ContentUnpublish, "00000000-0000-0000-0000-300000000000", "Example", "Example description")]
-    [TestCase("https://example.com", Constants.WebhookEvents.Aliases.MediaDelete, "00000000-0000-0000-0000-000004000000", "Example", "Example description")]
-    [TestCase("https://example.com", Constants.WebhookEvents.Aliases.MediaSave, "00000000-0000-0000-0000-000000500000", "Example", "Example description")]
-    public async Task Can_Create_And_Get(string url, string webhookEvent, Guid key, string name, string description)
+    [TestCase("https://example.com", Constants.WebhookEvents.Aliases.ContentPublish, "00000000-0000-0000-0000-010000000000")]
+    [TestCase("https://example.com", Constants.WebhookEvents.Aliases.ContentDelete, "00000000-0000-0000-0000-000200000000")]
+    [TestCase("https://example.com", Constants.WebhookEvents.Aliases.ContentUnpublish, "00000000-0000-0000-0000-300000000000")]
+    [TestCase("https://example.com", Constants.WebhookEvents.Aliases.MediaDelete, "00000000-0000-0000-0000-000004000000")]
+    [TestCase("https://example.com", Constants.WebhookEvents.Aliases.MediaSave, "00000000-0000-0000-0000-000000500000")]
+    public async Task Can_Create_And_Get(string url, string webhookEvent, Guid key)
     {
-        IWebhook webhook = new Webhook(url, true, [key], [webhookEvent])
-        {
-            Name = name,
-            Description = description
-        };
+        IWebhook webhook = new Webhook(url, true, [key], [webhookEvent]);
         var createdWebhook = await WebhookService.CreateAsync(webhook);
         webhook = await WebhookService.GetAsync(createdWebhook.Result.Key);
 
@@ -35,9 +33,52 @@ public class WebhookServiceTests : UmbracoIntegrationTest
             Assert.AreEqual(1, webhook.Events.Length);
             Assert.IsTrue(webhook.Events.Contains(webhookEvent));
             Assert.AreEqual(url, webhook.Url);
-            Assert.AreEqual(name, webhook.Name);
-            Assert.AreEqual(description, webhook.Description);
             Assert.IsTrue(webhook.ContentTypeKeys.Contains(key));
+        });
+    }
+
+    [Test]
+    public async Task Can_Create_And_Update_And_Get_With_Name_And_Description()
+    {
+        var contentTypeKey = Guid.NewGuid();
+        const string Url = "https://example.com";
+        const string Event = Constants.WebhookEvents.Aliases.ContentPublish;
+        const string Name = "Example name";
+        const string Description = "Example description";
+        IWebhook webhook = new Webhook(Url, true, [contentTypeKey], [Event])
+        {
+            Name = Name,
+            Description = Description
+        };
+        var createdWebhook = await WebhookService.CreateAsync(webhook);
+        webhook = await WebhookService.GetAsync(createdWebhook.Result.Key);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsNotNull(webhook);
+            Assert.AreEqual(1, webhook.Events.Length);
+            Assert.IsTrue(webhook.Events.Contains(Event));
+            Assert.AreEqual(Url, webhook.Url);
+            Assert.AreEqual(Name, webhook.Name);
+            Assert.AreEqual(Description, webhook.Description);
+            Assert.IsTrue(webhook.ContentTypeKeys.Contains(contentTypeKey));
+        });
+
+        const string UpdatedName = "Updated name";
+        const string UpdatedDescription = "Updated description";
+
+        webhook.Name = UpdatedName;
+        webhook.Description = UpdatedDescription;
+
+        await WebhookService.UpdateAsync(webhook);
+
+        var updatedWebhook = await WebhookService.GetAsync(webhook.Key);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsNotNull(updatedWebhook);
+            Assert.AreEqual(UpdatedName, updatedWebhook.Name);
+            Assert.AreEqual(UpdatedDescription, updatedWebhook.Description);
         });
     }
 
