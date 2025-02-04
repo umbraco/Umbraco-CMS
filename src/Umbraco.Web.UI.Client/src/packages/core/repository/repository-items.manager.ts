@@ -49,7 +49,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 			? (entry: ItemType) => {
 					new UmbDeprecation({
 						deprecated: 'The getUniqueMethod parameter.',
-						removeInVersion: '17',
+						removeInVersion: '17.0.0',
 						solution: 'The required unique property on the item will be used instead.',
 					}).warn();
 					return getUniqueMethod(entry);
