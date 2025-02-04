@@ -22,7 +22,7 @@ export class UmbWebhookDetailRepository extends UmbDetailRepositoryBase<UmbWebho
 	async requestEvents(): Promise<{ data: { items: string[]; total: number }; error: any }> {
 		new UmbDeprecation({
 			deprecated: 'The requestEvents method on the UmbWebhookDetailRepository is deprecated.',
-			removeInVersion: '17',
+			removeInVersion: '17.0.0',
 			solution: 'Use the requestEvents method on UmbWebhookEventRepository instead.',
 		}).warn();
 
