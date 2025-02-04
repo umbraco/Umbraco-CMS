@@ -302,14 +302,10 @@ export class UmbDefaultTreeContext<
 
 	#consumeContexts() {
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
+			this.#removeEventListeners();
 			this.#actionEventContext = instance;
 
-			this.#actionEventContext.removeEventListener(
-				UmbRequestReloadChildrenOfEntityEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-
-			this.#actionEventContext.addEventListener(
+			this.#actionEventContext?.addEventListener(
 				UmbRequestReloadChildrenOfEntityEvent.TYPE,
 				this.#onReloadRequest as EventListener,
 			);
@@ -346,12 +342,15 @@ export class UmbDefaultTreeContext<
 		this.loadTree();
 	};
 
-	override destroy(): void {
+	#removeEventListeners() {
 		this.#actionEventContext?.removeEventListener(
 			UmbRequestReloadChildrenOfEntityEvent.TYPE,
 			this.#onReloadRequest as EventListener,
 		);
+	}
 
+	override destroy(): void {
+		this.#removeEventListeners();
 		super.destroy();
 	}
 }
