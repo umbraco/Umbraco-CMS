@@ -487,6 +487,7 @@ export abstract class UmbBlockEntryContext<
 
 	#gotManager() {
 		this.#observeVariantId();
+		this.#observeBlockType();
 		this.#observeContentData();
 		this.#observeSettingsData();
 		this.#observeReadOnlyState();
@@ -497,7 +498,6 @@ export abstract class UmbBlockEntryContext<
 	#gotEntries() {
 		this.#updateCreatePaths();
 		this.#observeLayout();
-		this.#observeBlockType();
 
 		this.observe(
 			this._entries?.workspacePath,
