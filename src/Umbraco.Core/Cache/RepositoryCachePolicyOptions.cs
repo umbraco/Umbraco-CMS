@@ -11,6 +11,7 @@ public class RepositoryCachePolicyOptions
     public RepositoryCachePolicyOptions(Func<int> performCount)
     {
         PerformCount = performCount;
+        CacheNullValues = false;
         GetAllCacheValidateCount = true;
         GetAllCacheAllowZeroCount = false;
     }
@@ -21,6 +22,7 @@ public class RepositoryCachePolicyOptions
     public RepositoryCachePolicyOptions()
     {
         PerformCount = null;
+        CacheNullValues = false;
         GetAllCacheValidateCount = false;
         GetAllCacheAllowZeroCount = false;
     }
@@ -31,10 +33,9 @@ public class RepositoryCachePolicyOptions
     public Func<int>? PerformCount { get; set; }
 
     /// <summary>
-    ///     If not null, the Get method will cache null results so that the db is not hit for repeated lookups
-    ///     The value of this property will be used as the proxy value for the given key to populate the cache, but the return value will be null
+    ///     True if the Get method will cache null results so that the db is not hit for repeated lookups
     /// </summary>
-    public string? NullValueRepresentation { get; set; }
+    public bool CacheNullValues { get; set; }
 
     /// <summary>
     ///     True/false as to validate the total item count when all items are returned from cache, the default is true but this
