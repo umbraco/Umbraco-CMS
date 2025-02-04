@@ -99,6 +99,10 @@ export default {
 		createblueprint: 'Allow access to create a Document Blueprint',
 		notify: 'Allow access to setup notifications for content nodes',
 	},
+	userRights: {
+		permissionLabel: 'Permissions',
+		permissionsDescription: 'Assign permissions for an action type',
+	},
 	apps: {
 		umbContent: 'Content',
 		umbInfo: 'Info',
