@@ -62,6 +62,9 @@ export class UmbBlockGridEntryContext
 	#canScale = new UmbBooleanState(false);
 	readonly canScale = this.#canScale.asObservable();
 
+	#isAllowed = new UmbBooleanState(false);
+	readonly isAllowed = this.#isAllowed.asObservable();
+
 	#areaGridColumns = new UmbNumberState(undefined);
 	readonly areaGridColumns = this.#areaGridColumns.asObservable();
 
@@ -157,6 +160,21 @@ export class UmbBlockGridEntryContext
 		if (!this._entries) return;
 
 		this.#gotEntriesAndManager();
+
+		this.observe(
+			this.contentElementTypeKey,
+			(key) => {
+				this.observe(
+					key ? this._entries?.isBlockTypeAllowed(key) : undefined,
+					(isAllowed) => {
+						if (isAllowed === undefined) return;
+						this.#isAllowed.setValue(isAllowed);
+					},
+					'observeIsAllowed',
+				);
+			},
+			'observeContentElementTypeKey',
+		);
 
 		// Retrieve scale options:
 		this.observe(

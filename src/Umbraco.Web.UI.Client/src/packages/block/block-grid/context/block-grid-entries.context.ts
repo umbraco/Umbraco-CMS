@@ -410,9 +410,9 @@ export class UmbBlockGridEntriesContext
 		return this._catalogueRouteBuilderState.getValue()?.({ view: 'clipboard', index: index });
 	}
 
-	override blockTypeOf(contentTypeKey: string) {
+	isBlockTypeAllowed(contentTypeKey: string) {
 		return this.#allowedBlockTypes.asObservablePart((types) =>
-			types.find((x) => x.contentElementTypeKey === contentTypeKey),
+			types.some((x) => x.contentElementTypeKey === contentTypeKey),
 		);
 	}
 
