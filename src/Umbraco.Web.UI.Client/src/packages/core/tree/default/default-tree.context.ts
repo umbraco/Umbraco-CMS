@@ -161,6 +161,8 @@ export class UmbDefaultTreeContext<
 			this.#loadRootItems(reload);
 			return;
 		}
+
+		this.#loadTreeRoot();
 	}
 
 	async #loadTreeRoot() {
