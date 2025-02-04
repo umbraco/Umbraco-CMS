@@ -22,6 +22,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 export abstract class UmbTreeItemContextBase<
 		TreeItemType extends UmbTreeItemModel,
 		TreeRootType extends UmbTreeRootModel,
+		ManifestType extends ManifestTreeItem = ManifestTreeItem,
 	>
 	extends UmbContextBase<UmbTreeItemContext<TreeItemType>>
 	implements UmbTreeItemContext<TreeItemType>
@@ -30,7 +31,7 @@ export abstract class UmbTreeItemContextBase<
 	public entityType?: string;
 	public readonly pagination = new UmbPaginationManager();
 
-	#manifest?: ManifestTreeItem;
+	#manifest?: ManifestType;
 
 	protected readonly _treeItem = new UmbObjectState<TreeItemType | undefined>(undefined);
 	readonly treeItem = this._treeItem.asObservable();
@@ -112,7 +113,7 @@ export abstract class UmbTreeItemContextBase<
 	 * @param {ManifestCollection} manifest
 	 * @memberof UmbCollectionContext
 	 */
-	public set manifest(manifest: ManifestTreeItem | undefined) {
+	public set manifest(manifest: ManifestType | undefined) {
 		if (this.#manifest === manifest) return;
 		this.#manifest = manifest;
 	}

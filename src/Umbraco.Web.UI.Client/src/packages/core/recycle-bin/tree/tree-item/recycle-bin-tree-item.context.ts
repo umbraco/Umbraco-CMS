@@ -1,3 +1,4 @@
+import type { ManifestTreeItemRecycleBinKind } from './types.js';
 import { UmbDefaultTreeItemContext, type UmbTreeItemModel, type UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
@@ -7,9 +8,12 @@ import { UmbEntityTrashedEvent } from '@umbraco-cms/backoffice/recycle-bin';
 export class UmbRecycleBinTreeItemContext<
 	RecycleBinTreeItemModelType extends UmbTreeItemModel,
 	RecycleBinTreeRootModelType extends UmbTreeRootModel,
-> extends UmbDefaultTreeItemContext<RecycleBinTreeItemModelType, RecycleBinTreeRootModelType> {
+> extends UmbDefaultTreeItemContext<
+	RecycleBinTreeItemModelType,
+	RecycleBinTreeRootModelType,
+	ManifestTreeItemRecycleBinKind
+> {
 	#actionEventContext?: UmbActionEventContext;
-	#entityTypes: Array<string> = [];
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -25,7 +29,13 @@ export class UmbRecycleBinTreeItemContext<
 		const entityType = event.getEntityType();
 		if (!entityType) throw new Error('Entity type is required');
 
-		if (this.#entityTypes.includes(entityType)) {
+		const entityTypes = this.getManifest()?.meta.entityTypes;
+
+		if (!entityTypes) {
+			throw new Error('Entity types are missing from the manifest.');
+		}
+
+		if (entityTypes.includes(entityType)) {
 			this.loadChildren();
 		}
 	};
