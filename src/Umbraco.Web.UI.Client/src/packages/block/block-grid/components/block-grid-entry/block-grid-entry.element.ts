@@ -102,16 +102,15 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	_canScale?: boolean;
-
-	@state()
-	_invalidBlockType?: boolean;
-
 	@state()
 	_showInlineCreateBefore?: boolean;
 	@state()
 	_showInlineCreateAfter?: boolean;
 	@state()
 	_inlineCreateAboveWidth?: string;
+
+	@state()
+	_invalidBlockType?: boolean;
 
 	// 'content-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
