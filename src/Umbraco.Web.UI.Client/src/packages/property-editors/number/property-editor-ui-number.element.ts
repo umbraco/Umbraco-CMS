@@ -85,7 +85,7 @@ export class UmbPropertyEditorUINumberElement
 		return Number.isNaN(num) ? undefined : num;
 	}
 
-	#onInput(e: InputEvent & { target: HTMLInputElement }) {
+	#onChange(event: InputEvent & { target: HTMLInputElement }) {
 		const newValue = event.target.value === '' ? undefined : this.#parseNumber(event.target.value);
 		if (newValue === this.value) return;
 		this.value = newValue;
@@ -101,8 +101,8 @@ export class UmbPropertyEditorUINumberElement
 				max=${ifDefined(this._max)}
 				step=${ifDefined(this._step)}
 				placeholder=${ifDefined(this._placeholder)}
-				value=${this.value?.toString() ?? (this._placeholder ? '' : '0')}
-				@input=${this.#onInput}
+				value=${this.value?.toString() ?? ''}
+				@change=${this.#onChange}
 				?readonly=${this.readonly}>
 			</uui-input>
 		`;
