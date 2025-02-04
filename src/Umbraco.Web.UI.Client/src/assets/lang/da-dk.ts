@@ -93,6 +93,10 @@ export default {
 		createblueprint: 'Tillad adgang til at oprette en indholdsskabelon',
 		notify: 'Tillad adgang til at oprette notificeringer for noder',
 	},
+	userRights: {
+		permissionLabel: 'Handlingsrettigheder',
+		permissionsDescription: 'Tildel tilladelser til en handlingstype',
+	},
 	apps: {
 		umbContent: 'Indhold',
 		umbInfo: 'Info',
