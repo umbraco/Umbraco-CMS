@@ -410,8 +410,10 @@ export class UmbBlockGridEntriesContext
 		return this._catalogueRouteBuilderState.getValue()?.({ view: 'clipboard', index: index });
 	}
 
-	blockTypeOf(contentTypeKey: string) {
-		return this.#allowedBlockTypes.getValue().find((x) => x.contentElementTypeKey === contentTypeKey);
+	override blockTypeOf(contentTypeKey: string) {
+		return this.#allowedBlockTypes.asObservablePart((types) =>
+			types.find((x) => x.contentElementTypeKey === contentTypeKey),
+		);
 	}
 
 	/*

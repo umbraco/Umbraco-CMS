@@ -175,13 +175,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
-		this.observe(
-			this.#context.isValidBlockType,
-			(valid) => {
-				this._invalidBlockType = valid;
-			},
-			null,
-		);
 		// TODO: Implement index.
 		this.observe(
 			this.#context.label,
