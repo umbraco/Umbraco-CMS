@@ -3,23 +3,20 @@ import { defaultFallbackConfig } from './input-tiny-mce.defaults.js';
 import { pastePreProcessHandler } from './input-tiny-mce.handlers.js';
 import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
 import type { UmbTinyMcePluginBase } from './tiny-mce-plugin.js';
-import { type ClassConstructor, loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { css, customElement, html, property, query } from '@umbraco-cms/backoffice/external/lit';
+import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { getProcessedImageUrl, umbDeepMerge } from '@umbraco-cms/backoffice/utils';
+import { renderEditor } from '@umbraco-cms/backoffice/external/tinymce';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbStylesheetDetailRepository, UmbStylesheetRuleManager } from '@umbraco-cms/backoffice/stylesheet';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import {
-	type EditorEvent,
-	type Editor,
-	type RawEditorOptions,
-	renderEditor,
-} from '@umbraco-cms/backoffice/external/tinymce';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
+import type { EditorEvent, Editor, RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
 import type { ManifestTinyMcePlugin } from '@umbraco-cms/backoffice/tiny-mce';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * Handles the resize event
@@ -367,6 +364,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	}
 
 	#onChange(value: string) {
+		if (this.value === value) return;
 		this.value = value;
 		this.dispatchEvent(new UmbChangeEvent());
 	}

@@ -55,7 +55,9 @@ export class UmbCurrentUserConfigRepository extends UmbRepositoryBase implements
 	 * Subscribe to a part of the user configuration.
 	 * @param part
 	 */
-	part<Part extends keyof UmbCurrentUserConfigurationModel>(part: Part): Observable<UmbCurrentUserConfigurationModel[Part]> {
+	part<Part extends keyof UmbCurrentUserConfigurationModel>(
+		part: Part,
+	): Observable<UmbCurrentUserConfigurationModel[Part]> {
 		if (!this.#dataStore) {
 			throw new Error('Data store not initialized');
 		}

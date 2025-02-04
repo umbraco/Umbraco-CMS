@@ -372,6 +372,8 @@ export default {
 		fileSecurityValidationFailure: 'One or more file security validations have failed',
 		moveToSameFolderFailed: 'Parent and destination folders cannot be the same',
 		uploadNotAllowed: 'Upload is not allowed in this location.',
+		noticeExtensionsServerOverride:
+			'Regardless of the allowed file types, the following limitations apply system-wide due to the server configuration:',
 	},
 	member: {
 		'2fa': 'Two-Factor Authentication',
@@ -390,6 +392,7 @@ export default {
 	contentType: {
 		copyFailed: 'Failed to copy content type',
 		moveFailed: 'Failed to move content type',
+		contentTypes: 'Content Types',
 	},
 	mediaType: {
 		copyFailed: 'Failed to copy media type',
@@ -817,6 +820,7 @@ export default {
 		error: 'Error',
 		field: 'Field',
 		fieldFor: 'Field for %0%',
+		toggleFor: 'Toggle for %0%',
 		findDocument: 'Find',
 		first: 'First',
 		focalPoint: 'Focal point',
@@ -885,6 +889,7 @@ export default {
 		retrieve: 'Retrieve',
 		retry: 'Retry',
 		rights: 'Permissions',
+		serverConfiguration: 'Server Configuration',
 		scheduledPublishing: 'Scheduled Publishing',
 		umbracoInfo: 'Umbraco info',
 		search: 'Search',
@@ -1761,10 +1766,11 @@ export default {
 		noHeaders: 'No webhook headers have been added',
 		noEventsFound: 'No events were found.',
 		enabled: 'Enabled',
+		disabled: 'Disabled',
 		events: 'Events',
 		event: 'Event',
 		url: 'URL',
-		types: 'Types',
+		types: 'Content Types',
 		webhookKey: 'Webhook key',
 		retryCount: 'Retry count',
 		urlDescription: 'The URL to call when the webhook is triggered.',
@@ -1776,6 +1782,7 @@ export default {
 		headers: 'Headers',
 		selectEventFirst: 'Please select an event first.',
 		selectEvents: 'Select events',
+		statusCode: 'Status code',
 	},
 	languages: {
 		addLanguage: 'Add language',
@@ -2138,6 +2145,9 @@ export default {
 		numberMinimum: "Value must be greater than or equal to '%0%'.",
 		numberMaximum: "Value must be less than or equal to '%0%'.",
 		numberMisconfigured: "Minimum value '%0%' must be less than the maximum value '%1%'.",
+		invalidExtensions: 'One or more of the extensions are invalid.',
+		allowedExtensions: 'Allowed extensions are:',
+		disallowedExtensions: 'Disallowed extensions are:',
 	},
 	healthcheck: {
 		checkSuccessMessage: "Value is set to the recommended value: '%0%'.",
@@ -2502,7 +2512,8 @@ export default {
 		labelEditorSize: 'Overlay editor size',
 		addCustomView: 'Add custom view',
 		addSettingsElementType: 'Add settings',
-		confirmDeleteBlockMessage: 'Are you sure you want to delete the content <strong>%0%</strong>?',
+		confirmDeleteBlockTitle: 'Delete %0%?',
+		confirmDeleteBlockMessage: 'Are you sure you want to delete this %0%?',
 		confirmDeleteBlockTypeMessage: 'Are you sure you want to delete the block configuration <strong>%0%</strong>?',
 		confirmDeleteBlockTypeNotice:
 			'The content of this block will still be present, editing of this content\n      will no longer be available and will be shown as unsupported content.\n    ',
@@ -2607,6 +2618,9 @@ export default {
 		notExposedDescription: 'This Block is not yet created for this variant',
 		areaValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in this area.',
 		rootValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in the root of this property.',
+		unsupportedBlockName: 'Unsupported',
+		unsupportedBlockDescription:
+			'This content is no longer supported in this Editor. If you are missing this content, please contact your administrator. Otherwise delete it.',
 	},
 	contentTemplatesDashboard: {
 		whatHeadline: 'What are Document Blueprints?',
