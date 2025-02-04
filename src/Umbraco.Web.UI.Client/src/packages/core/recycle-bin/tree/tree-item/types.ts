@@ -7,7 +7,7 @@ export interface ManifestTreeItemRecycleBinKind extends ManifestTreeItem {
 }
 
 export interface MetaTreeItemRecycleBinKind {
-	entityTypes: Array<string>;
+	supportedEntityTypes: Array<string>;
 }
 
 declare global {

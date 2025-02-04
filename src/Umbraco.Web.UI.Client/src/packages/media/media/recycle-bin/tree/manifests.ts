@@ -36,7 +36,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Media Recycle Bin Tree Item',
 		forEntityTypes: [UMB_MEDIA_RECYCLE_BIN_ROOT_ENTITY_TYPE],
 		meta: {
-			entityTypes: [UMB_MEDIA_ENTITY_TYPE],
+			supportedEntityTypes: [UMB_MEDIA_ENTITY_TYPE],
 		},
 	},
 	{

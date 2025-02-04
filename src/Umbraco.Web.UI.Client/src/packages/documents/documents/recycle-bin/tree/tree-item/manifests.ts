@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Document Recycle Bin Tree Item',
 		forEntityTypes: [UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE],
 		meta: {
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+			supportedEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
 ];
