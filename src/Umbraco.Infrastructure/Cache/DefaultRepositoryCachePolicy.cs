@@ -139,8 +139,8 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
             return fromCache;
         }
 
-        // Because TEntity can never be a string, we will never be in a position where the proxy value collides withs a real value
-        // There for this point can only be reached if there is a proxy null value => becomes null when cast to TEntity above OR the item simply does not exist.
+        // Because TEntity can never be a string, we will never be in a position where the proxy value collides withs a real value.
+        // Therefore this point can only be reached if there is a proxy null value => becomes null when cast to TEntity above OR the item simply does not exist.
         // If we've cached a "null" value, return null.
         if (_options.CacheNullValues && Cache.GetCacheItem<string>(cacheKey) == NullRepresentationInCache)
         {
