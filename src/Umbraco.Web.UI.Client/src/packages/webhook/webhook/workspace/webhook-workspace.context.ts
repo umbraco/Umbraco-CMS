@@ -21,6 +21,8 @@ export class UmbWebhookWorkspaceContext
 	readonly headers = this._data.createObservablePartOfCurrent((data) => data?.headers);
 	readonly enabled = this._data.createObservablePartOfCurrent((data) => data?.enabled);
 	readonly url = this._data.createObservablePartOfCurrent((data) => data?.url);
+	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
+	readonly description = this._data.createObservablePartOfCurrent((data) => data?.description);
 	readonly events = this._data.createObservablePartOfCurrent((data) => data?.events);
 	readonly contentTypes = this._data.createObservablePartOfCurrent((data) => data?.contentTypes);
 
@@ -117,6 +119,24 @@ export class UmbWebhookWorkspaceContext
 	 */
 	setUrl(url: string) {
 		this._data.updateCurrent({ url });
+	}
+
+	/**
+	 * Sets the name
+	 * @param {string} name - The name
+	 * @memberof UmbWebhookWorkspaceContext
+	 */
+	setName(name: string) {
+		this._data.updateCurrent({ name });
+	}
+
+	/**
+	 * Sets the description
+	 * @param {string} description - The description
+	 * @memberof UmbWebhookWorkspaceContext
+	 */
+	setDescription(description: string) {
+		this._data.updateCurrent({ description });
 	}
 
 	/**

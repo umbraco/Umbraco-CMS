@@ -22,6 +22,10 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 			alias: 'url',
 		},
 		{
+			name: this.localize.term('general_name'),
+			alias: 'name',
+		},
+		{
 			name: this.localize.term('webhooks_events'),
 			alias: 'events',
 		},
@@ -74,6 +78,10 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 					{
 						columnAlias: 'url',
 						value: html`<a href=${'section/settings/workspace/webhook/edit/' + webhook.unique}>${webhook.url}</a>`,
+					},
+					{
+						columnAlias: 'name',
+						value: html`${webhook.name}`,
 					},
 					{
 						columnAlias: 'events',
