@@ -464,7 +464,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 							? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
 							: nothing}
 						${this._invalidLocation
-							? html`<uui-tag id="invalidLocation" color="danger">Not allowed here</uui-tag>`
+							? html`<uui-tag id="invalidLocation" color="danger"
+									><umb-localize key="blockEditor_invalidDropPosition" .args=${[this._label]}></umb-localize
+								></uui-tag>`
 							: nothing}
 						${this._canScale
 							? html` <umb-block-scale-handler
@@ -646,8 +648,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 			#invalidLocation {
 				position: absolute;
-				top: 0;
-				right: 0;
+				top: -1em;
+				left: var(--uui-size-space-2);
 				z-index: 2;
 			}
 
