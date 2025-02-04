@@ -104,6 +104,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	_canScale?: boolean;
 
 	@state()
+	_invalidBlockType?: boolean;
+
+	@state()
 	_showInlineCreateBefore?: boolean;
 	@state()
 	_showInlineCreateAfter?: boolean;
@@ -163,6 +166,13 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.#context.blockType,
 			(blockType) => {
 				this.#updateBlockViewProps({ blockType });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.isValidBlockType,
+			(valid) => {
+				this._invalidBlockType = valid;
 			},
 			null,
 		);

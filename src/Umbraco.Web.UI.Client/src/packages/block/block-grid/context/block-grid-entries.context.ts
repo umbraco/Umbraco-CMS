@@ -147,6 +147,10 @@ export class UmbBlockGridEntriesContext
 		return this.#allowedBlockTypes.getValue();
 	}
 
+	isAllowedBlockType(contentTypeKey: string) {
+		return this.#allowedBlockTypes.getValue().find((x) => x.contentElementTypeKey === contentTypeKey) !== undefined;
+	}
+
 	getLayoutContainerElement() {
 		return this.getHostElement().shadowRoot?.querySelector('.umb-block-grid__layout-container') as
 			| HTMLElement
