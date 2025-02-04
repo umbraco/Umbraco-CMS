@@ -15,7 +15,7 @@ const secondBlockPropertyValue = 'Yet Another test';
 // ElementType
 const elementGroupName = 'ElementGroup';
 const elementTypeName = 'TestElement';
-const elementDataTypeName = 'Richtext editor';
+const richTextDataTypeUiAlias = 'Richtext editor';
 const elementDataTypeUiAlias = 'Umbraco.RichText';
 const elementPropertyName = 'TipTapProperty'
 let elementTypeId = '';
@@ -29,7 +29,7 @@ test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.dataType.ensureNameNotExists(blockListDataTypeName);
-  const tipTapDataType = await umbracoApi.dataType.getByName(elementDataTypeName);
+  const tipTapDataType = await umbracoApi.dataType.getByName(richTextDataTypeUiAlias);
   tipTapDataTypeId = tipTapDataType.id;
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, elementGroupName, elementPropertyName, tipTapDataTypeId);
 });
@@ -41,7 +41,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockListDataTypeName);
 });
 
-test('can copy a single block', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
+test('can copy a single block', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDefaultDocumentWithABlockListEditorAndBlockWithValue(contentName, documentTypeName, blockListDataTypeName, elementTypeId, AliasHelper.toAlias(elementPropertyName), blockPropertyValue, elementDataTypeUiAlias, groupName);
   await umbracoUi.goToBackOffice();
@@ -56,7 +56,7 @@ test('can copy a single block', {tag: '@smoke'}, async ({page, umbracoApi, umbra
   await umbracoUi.content.doesClipboardHaveCopiedBlockWithName(contentName, blockListDataTypeName, elementTypeName);
 });
 
-test('can copy and paste a single block into the same document and group', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
+test('can copy and paste a single block into the same document and group', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDefaultDocumentWithABlockListEditorAndBlockWithValue(contentName, documentTypeName, blockListDataTypeName, elementTypeId, AliasHelper.toAlias(elementPropertyName), blockPropertyValue, elementDataTypeUiAlias, groupName);
   await umbracoUi.goToBackOffice();
@@ -81,7 +81,7 @@ test('can copy and paste a single block into the same document and group', {tag:
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
 });
 
-test('can copy and paste a single block into the same document but different group', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
+test('can copy and paste a single block into the same document but different group', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDefaultDocumentWithABlockListEditorAndBlockWithValueAndTwoGroups(contentName, documentTypeName, blockListDataTypeName, elementTypeId, AliasHelper.toAlias(elementPropertyName), blockPropertyValue, elementDataTypeUiAlias, groupName, secondBlockListPropertyName, secondGroupName);
   await umbracoUi.goToBackOffice();
@@ -106,7 +106,7 @@ test('can copy and paste a single block into the same document but different gro
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
 });
 
-test('can copy and paste a single block into another document', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
+test('can copy and paste a single block into another document', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.ensureNameNotExists(secondContentName);
   await umbracoApi.document.createDefaultDocumentWithABlockListEditorAndBlockWithValue(contentName, documentTypeName, blockListDataTypeName, elementTypeId, AliasHelper.toAlias(elementPropertyName), blockPropertyValue, elementDataTypeUiAlias, groupName);
@@ -163,7 +163,7 @@ test('can copy and paste multiple blocks into the same document and group', {tag
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, secondBlockPropertyValue);
 });
 
-test('can copy and paste multiple blocks into the same document but different group', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
+test('can copy and paste multiple blocks into the same document but different group', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDefaultDocumentWithABlockListEditorAndBlockWithTwoValuesAndTwoGroups(contentName, documentTypeName, blockListDataTypeName, elementTypeId, AliasHelper.toAlias(elementPropertyName), blockPropertyValue, elementDataTypeUiAlias, groupName, secondBlockPropertyValue, secondBlockListPropertyName, secondGroupName);
   await umbracoUi.goToBackOffice();
@@ -193,7 +193,7 @@ test('can copy and paste multiple blocks into the same document but different gr
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, secondBlockPropertyValue);
 });
 
-test('can copy and paste multiple blocks into another document', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
+test('can copy and paste multiple blocks into another document', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.ensureNameNotExists(secondContentName);
   await umbracoApi.document.createDefaultDocumentWithABlockListEditorAndBlockWithTwoValues(contentName, documentTypeName, blockListDataTypeName, elementTypeId, AliasHelper.toAlias(elementPropertyName), blockPropertyValue, elementDataTypeUiAlias, groupName, secondBlockPropertyValue);
@@ -234,7 +234,7 @@ test('can copy and paste multiple blocks into another document', {tag: '@smoke'}
   await umbracoApi.document.ensureNameNotExists(secondContentName);
 });
 
-test('can replace multiple blocks', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
+test('can replace multiple blocks', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDefaultDocumentWithABlockListEditorAndBlockWithTwoValues(contentName, documentTypeName, blockListDataTypeName, elementTypeId, AliasHelper.toAlias(elementPropertyName), blockPropertyValue, elementDataTypeUiAlias, groupName, secondBlockPropertyValue);
   await umbracoUi.goToBackOffice();
@@ -261,4 +261,70 @@ test('can replace multiple blocks', {tag: '@smoke'}, async ({page, umbracoApi, u
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.doesBlockListPropertyHaveBlockAmount(groupName, blockListDataTypeName, 1);
+});
+
+test('can copy block from a block list to a block grid',  async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  const blockGridDataTypeName = 'TestBlockGridEditor';
+  const blockGridGroupName = 'BlockGridGroup';
+  const blockGridPropertyValue = 'This is a block grid test';
+  await umbracoApi.document.createDefaultDocumentWithABlockListEditorAndBlockGridEditorWithSameAllowedBlock(contentName, documentTypeName, blockListDataTypeName, blockGridDataTypeName, elementTypeId, AliasHelper.toAlias(elementPropertyName), blockPropertyValue, richTextDataTypeUiAlias, groupName, blockGridPropertyValue, richTextDataTypeUiAlias, blockGridGroupName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickCopyBlockListBlockButton(groupName, blockListDataTypeName, elementTypeName);
+  await umbracoUi.content.clickPasteFromClipboardButtonForProperty(blockGridGroupName, blockGridDataTypeName);
+  await umbracoUi.content.selectClipboardEntryWithName(contentName, blockListDataTypeName, elementTypeName);
+  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
+  // Original blocks
+  // Block List
+  await umbracoUi.content.goToBlockListBlockWithName(groupName, blockListDataTypeName, elementTypeName, 0);
+  await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
+  await umbracoUi.content.clickCloseButton();
+  // Block Grid
+  await umbracoUi.content.goToBlockGridBlockWithName(blockGridGroupName, blockGridDataTypeName, elementTypeName, 0);
+  await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockGridPropertyValue);
+  await umbracoUi.content.clickCloseButton();
+
+  // Copied block
+  await umbracoUi.content.goToBlockGridBlockWithName(blockGridGroupName, blockGridDataTypeName, elementTypeName, 1);
+  await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
+});
+
+test('can not copy a block from a block list to a block grid without allowed blocks', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  const blockGridElementTypeName = 'SecondElementType';
+  const blockGridDataTypeName = 'TestBlockGridEditor';
+  const blockGridGroupName = 'BlockGridGroup';
+  const blockGridPropertyValue = 'This is a block grid test';
+  const blockGridElementPropertyName = 'SecondTipTapProperty';
+  await umbracoApi.documentType.ensureNameNotExists(blockGridElementTypeName);
+  const secondElementTypeId = await umbracoApi.documentType.createDefaultElementType(blockGridElementTypeName, elementGroupName, blockGridElementPropertyName, tipTapDataTypeId);
+  await umbracoApi.document.createDefaultDocumentWithABlockListEditorAndBlockGridEditorWithDifferentAllowedBlock(contentName, documentTypeName, blockListDataTypeName, blockGridDataTypeName, elementTypeId, AliasHelper.toAlias(elementPropertyName), blockPropertyValue, richTextDataTypeUiAlias, groupName, secondElementTypeId, AliasHelper.toAlias(blockGridElementPropertyName), blockGridPropertyValue, richTextDataTypeUiAlias, blockGridGroupName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickCopyBlockListBlockButton(groupName, blockListDataTypeName, elementTypeName);
+
+  // Assert
+  // Checks if the block is visible in the blockList
+  await umbracoUi.content.clickPasteFromClipboardButtonForProperty(blockGridGroupName, blockGridDataTypeName);
+  await umbracoUi.content.doesClipboardContainCopiedBlocksCount(0);
+  await umbracoUi.content.clickCloseButton();
+
+  await umbracoUi.waitForTimeout(500);
+  // Checks if the block is visible in the blockGrid
+  await umbracoUi.content.clickPasteFromClipboardButtonForProperty(groupName, blockListDataTypeName);
+  await umbracoUi.content.doesClipboardContainCopiedBlocksCount(1);
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(blockGridElementTypeName);
 });
