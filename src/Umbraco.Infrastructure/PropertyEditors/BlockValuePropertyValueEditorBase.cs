@@ -320,10 +320,10 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
         // remove all the blocks that are no longer part of the layout
         target.BlockValue.ContentData.RemoveAll(contentBlock =>
-            target.Layout!.Any(layoutItem => layoutItem.ContentKey == contentBlock.Key) is false);
+            target.Layout!.Any(layoutItem => layoutItem.ReferencesContent(contentBlock.Key)) is false);
 
         target.BlockValue.SettingsData.RemoveAll(settingsBlock =>
-            target.Layout!.Any(layoutItem => layoutItem.SettingsKey == settingsBlock.Key) is false);
+            target.Layout!.Any(layoutItem => layoutItem.ReferencesSetting(settingsBlock.Key)) is false);
 
         CleanupVariantValues(source.BlockValue.ContentData, target.BlockValue.ContentData, canUpdateInvariantData, allowedCultures);
         CleanupVariantValues(source.BlockValue.SettingsData, target.BlockValue.SettingsData, canUpdateInvariantData, allowedCultures);
