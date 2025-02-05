@@ -10,8 +10,8 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		api: () => import('./default-media-type-create-option-action.js'),
 		forEntityTypes: [UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE, UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE],
 		meta: {
-			icon: 'icon-add',
-			label: '#actions_create',
+			icon: 'icon-picture',
+			label: '#content_mediatype',
 		},
 	},
 ];
