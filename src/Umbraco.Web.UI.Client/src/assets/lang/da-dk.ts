@@ -1930,6 +1930,8 @@ export default {
 		chooseUserGroup: (multiple: boolean) => {
 			return multiple ? 'Vælg brugergrupper' : 'Vælg brugergruppe';
 		},
+		entityPermissionsLabel: 'Handlingsrettigheder',
+		entityPermissionsDescription: 'Tildel tilladelser til handlinger',
 		noStartNode: 'Ingen startnode valgt',
 		noStartNodes: 'Ingen startnoder valgt',
 		startnode: 'Indhold startnode',
