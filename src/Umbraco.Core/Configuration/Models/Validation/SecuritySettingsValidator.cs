@@ -19,7 +19,6 @@ public class SecuritySettingsValidator
             return ValidateOptionsResult.Fail(message);
         }
 
-
         return ValidateOptionsResult.Success;
     }
 

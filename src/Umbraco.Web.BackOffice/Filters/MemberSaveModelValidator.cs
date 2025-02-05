@@ -20,8 +20,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters;
 /// <summary>
 ///     Validator for <see cref="ContentItemSave" />
 /// </summary>
-internal class
-    MemberSaveModelValidator : ContentModelValidator<IMember, MemberSave, IContentProperties<ContentPropertyBasic>>
+internal class MemberSaveModelValidator : ContentModelValidator<IMember, MemberSave, IContentProperties<ContentPropertyBasic>>
 {
     private readonly IBackOfficeSecurity? _backofficeSecurity;
     private readonly IMemberService _memberService;
@@ -35,14 +34,15 @@ internal class
        IMemberTypeService memberTypeService,
        IMemberService memberService,
        IShortStringHelper shortStringHelper,
-       IPropertyValidationService propertyValidationService)
+       IPropertyValidationService propertyValidationService,
+       SecuritySettings securitySettings)
        : base(logger, propertyValidationService)
     {
         _backofficeSecurity = backofficeSecurity;
         _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
         _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
         _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
-        _securitySettings = StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>().Value;
+        _securitySettings = securitySettings;
     }
 
     public override bool ValidatePropertiesData(
@@ -70,7 +70,7 @@ internal class
                 $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
         }
 
-        if (_securitySettings.MemberRequireUniqueEmail && ValidateUniqueEmail(model) == false)
+        if (_securitySettings.MemberRequireUniqueEmail && ValidateUniqueEmail(model) is false)
         {
             modelState.AddPropertyError(
                 new ValidationResult("Email address is already in use", new[] { "value" }),

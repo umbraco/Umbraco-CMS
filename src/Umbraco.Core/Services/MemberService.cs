@@ -393,10 +393,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="email">Email to use for retrieval</param>
         /// <returns><see cref="IMember"/></returns>
-        public IMember? GetByEmail(string email)
-        {
-            return this.GetMembersByEmail(email).FirstOrDefault();
-        }
+        public IMember? GetByEmail(string email) => GetMembersByEmail(email).FirstOrDefault();
 
         /// <summary>
         /// Get an list of <see cref="IMember"/> for all members with the specified email.

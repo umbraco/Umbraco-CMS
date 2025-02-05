@@ -25,7 +25,6 @@ public sealed class ConfigureMemberIdentityOptions : IConfigureOptions<IdentityO
         options.SignIn.RequireConfirmedPhoneNumber = false; // not implemented
 
         options.User.RequireUniqueEmail = _securitySettings.MemberRequireUniqueEmail;
-        ;
 
         // Support validation of member names using Down-Level Logon Name format
         options.User.AllowedUserNameCharacters = _securitySettings.AllowedUserNameCharacters;
