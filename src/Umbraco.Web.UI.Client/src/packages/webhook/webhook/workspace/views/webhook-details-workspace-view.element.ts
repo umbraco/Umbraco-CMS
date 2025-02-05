@@ -61,20 +61,6 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 		this.#webhookWorkspaceContext?.setUrl(value);
 	}
 
-	#onNameChange(event: UUIInputEvent) {
-		const value = event.target.value;
-		if (typeof value !== 'string') return;
-
-		this.#webhookWorkspaceContext?.setName(value);
-	}
-
-	#onDescriptionChange(event: UUIInputEvent) {
-		const value = event.target.value;
-		if (typeof value !== 'string') return;
-
-		this.#webhookWorkspaceContext?.setDescription(value);
-	}
-
 	#onEnabledChange(event: UUIBooleanInputEvent) {
 		this.#webhookWorkspaceContext?.setEnabled(event.target.checked);
 	}
@@ -127,22 +113,6 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 						slot="editor"
 						required="true"
 						${umbFocus()}></uui-input>
-				</umb-property-layout>
-				<umb-property-layout
-					label=${this.localize.term('general_name')}
-					description=${this.localize.term('webhooks_nameDescription')}>
-					<uui-input
-						@input=${this.#onNameChange}
-						.value=${this._webhook.name}
-						slot="editor"></uui-input>
-				</umb-property-layout>
-				<umb-property-layout
-					label=${this.localize.term('webhooks_description')}
-					description=${this.localize.term('webhooks_descriptionDescription')}>
-					<uui-textarea
-						@input=${this.#onDescriptionChange}
-						.value=${this._webhook.description}
-						slot="editor"></uui-textarea>
 				</umb-property-layout>
 				<umb-property-layout
 					label=${this.localize.term('webhooks_events')}
