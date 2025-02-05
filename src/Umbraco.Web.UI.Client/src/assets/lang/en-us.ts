@@ -99,10 +99,6 @@ export default {
 		createblueprint: 'Allow access to create a Document Blueprint',
 		notify: 'Allow access to setup notifications for content nodes',
 	},
-	userRights: {
-		permissionLabel: 'Permissions',
-		permissionsDescription: 'Assign permissions for an action type',
-	},
 	apps: {
 		umbContent: 'Content',
 		umbInfo: 'Info',
@@ -1987,6 +1983,8 @@ export default {
 		chooseUserGroup: (multiple: boolean) => {
 			return multiple ? 'Choose User Groups' : 'Choose User Group';
 		},
+		entityPermissionsLabel: 'Permissions',
+		entityPermissionsDescription: 'Assign permissions for actions',
 		noStartNode: 'No start node selected',
 		noStartNodes: 'No start nodes selected',
 		startnode: 'Content start node',

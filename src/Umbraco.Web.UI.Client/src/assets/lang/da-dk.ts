@@ -93,10 +93,6 @@ export default {
 		createblueprint: 'Tillad adgang til at oprette en indholdsskabelon',
 		notify: 'Tillad adgang til at oprette notificeringer for noder',
 	},
-	userRights: {
-		permissionLabel: 'Handlingsrettigheder',
-		permissionsDescription: 'Tildel tilladelser til en handlingstype',
-	},
 	apps: {
 		umbContent: 'Indhold',
 		umbInfo: 'Info',
@@ -1934,6 +1930,8 @@ export default {
 		chooseUserGroup: (multiple: boolean) => {
 			return multiple ? 'Vælg brugergrupper' : 'Vælg brugergruppe';
 		},
+		entityPermissionsLabel: 'Handlingsrettigheder',
+		entityPermissionsDescription: 'Tildel tilladelser til handlinger',
 		noStartNode: 'Ingen startnode valgt',
 		noStartNodes: 'Ingen startnoder valgt',
 		startnode: 'Indhold startnode',
