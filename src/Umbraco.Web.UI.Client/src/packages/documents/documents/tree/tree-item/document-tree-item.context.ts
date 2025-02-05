@@ -46,17 +46,11 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 		// we don't wont to update if the document type is not the same
 		if (treeItem.documentType.unique !== event.getUnique()) return;
 
-		const parentUnique = treeItem.parent?.unique;
-
-		// TODO add method to tree item context to reload parent
-		const customEvent = new CustomEvent('temp-reload-tree-item-parent', {
-			detail: { unique: parentUnique },
-			bubbles: true,
-			composed: true,
-		});
-
-		// TODO: debounce
-		this.getHostElement().dispatchEvent(customEvent);
+		if (this.parentTreeItemContext) {
+			this.parentTreeItemContext?.loadChildren();
+		} else {
+			this.treeContext?.loadTree();
+		}
 	};
 
 	#removeEventListeners() {
