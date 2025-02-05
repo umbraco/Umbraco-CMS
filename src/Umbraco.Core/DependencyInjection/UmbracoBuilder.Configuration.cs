@@ -44,6 +44,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IValidateOptions<GlobalSettings>, GlobalSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<HealthChecksSettings>, HealthChecksSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidator>();
+        builder.Services.AddSingleton<IValidateOptions<SecuritySettings>, SecuritySettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<UnattendedSettings>, UnattendedSettingsValidator>();
 
         // Register configuration sections.
