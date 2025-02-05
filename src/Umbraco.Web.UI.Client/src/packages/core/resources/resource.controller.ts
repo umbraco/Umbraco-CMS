@@ -12,6 +12,7 @@ import {
 	CancelError,
 	type ProblemDetails,
 } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbDeprecation } from '../utils/deprecation/deprecation.js';
 
 export class UmbResourceController extends UmbControllerBase {
 	#promise: Promise<any>;
@@ -48,10 +49,19 @@ export class UmbResourceController extends UmbControllerBase {
 	/**
 	 * Wrap the {tryExecute} function in a try/catch block and return the result.
 	 * If the executor function throws an error, then show the details in a notification.
-	 * @param options
+	 * @param _options
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async tryExecuteAndNotify<T>(options?: UmbNotificationOptions): Promise<UmbDataSourceResponse<T>> {
 		const { data, error } = await UmbResourceController.tryExecute<T>(this.#promise);
+
+		if (options) {
+			new UmbDeprecation({
+				deprecated: 'tryExecuteAndNotify `options` argument is deprecated.',
+				removeInVersion: '17.0.0',
+				solution: 'Use the method without arguments.',
+			}).warn();
+		}
 
 		if (error) {
 			/**
