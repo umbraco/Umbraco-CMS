@@ -2,7 +2,7 @@ import { UMB_WEBHOOK_WORKSPACE_CONTEXT } from '../webhook-workspace.context-toke
 import type { UmbInputWebhookHeadersElement } from '../../../components/input-webhook-headers.element.js';
 import type { UmbInputWebhookEventsElement } from '../../../webhook-event/input-webhook-events.element.js';
 import { css, customElement, html, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputDocumentTypeElement } from '@umbraco-cms/backoffice/document-type';
