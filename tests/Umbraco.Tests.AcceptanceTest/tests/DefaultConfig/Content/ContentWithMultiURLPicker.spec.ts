@@ -6,6 +6,7 @@ const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const link = 'https://docs.umbraco.com';
 const linkTitle = 'Umbraco Documentation';
+const warningEmptyLink = 'Please enter an anchor or querystring, or select a published document or media item, or manually configure the URL';
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -276,13 +277,14 @@ test('cannot submit the empty link', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
-  await umbracoUi.content.isSubmitButtonDisabled();
+  await umbracoUi.content.clickManualLinkButton();
   await umbracoUi.content.enterLink('');
   await umbracoUi.content.enterAnchorOrQuerystring('');
   await umbracoUi.content.enterLinkTitle('');
+  await umbracoUi.content.clickAddButton();
 
   // Assert
-  await umbracoUi.content.isSubmitButtonDisabled();
+  await umbracoUi.content.isTextWithMessageVisible(warningText);
 });
 
 test('cannot update the URL picker with empty link', async ({umbracoApi, umbracoUi}) => {
@@ -295,18 +297,19 @@ test('cannot update the URL picker with empty link', async ({umbracoApi, umbraco
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickLinkWithName(linkTitle);
   await umbracoUi.content.enterLink('');
   await umbracoUi.content.enterAnchorOrQuerystring('');
   await umbracoUi.content.enterLinkTitle('');
+  await umbracoUi.content.clickUpdateButton();
 
   // Assert
-  await umbracoUi.content.isSubmitButtonDisabled();
+  await umbracoUi.content.isTextWithMessageVisible(warningEmptyLink);
 });
 
-// TODO: Remove skip when the front-end ready. Currently it still accept the empty link using spacebar
+// TODO: Remove skip when the front-end ready. Currently it still accept the empty link with an anchor or querystring
 // Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17411
-test.skip('cannot submit the empty link with spacebar', async ({umbracoApi, umbracoUi}) => {
+test.skip('cannot submit the empty URL with an anchor or query', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -317,11 +320,34 @@ test.skip('cannot submit the empty link with spacebar', async ({umbracoApi, umbr
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
-  await umbracoUi.content.isSubmitButtonDisabled();
+  await umbracoUi.content.clickManualLinkButton();
+  await umbracoUi.content.enterLink('');
+  await umbracoUi.content.enterAnchorOrQuerystring('#value');
+  await umbracoUi.content.clickAddButton();
+
+  // Assert
+  await umbracoUi.content.isTextWithMessageVisible(warningEmptyLink);
+});
+
+// TODO: Remove skip when the front-end ready. Currently it still accept the empty link using spacebar
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17411
+test.skip('cannot submit the empty link using spacebar', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickManualLinkButton();
   await umbracoUi.content.enterLink('Space', true);
   await umbracoUi.content.enterAnchorOrQuerystring('Space', true);
   await umbracoUi.content.enterLinkTitle('Space', true);
+  await umbracoUi.content.clickAddButton();
 
   // Assert
-  await umbracoUi.content.isSubmitButtonDisabled();
+  await umbracoUi.content.isTextWithMessageVisible(warningEmptyLink);
 });

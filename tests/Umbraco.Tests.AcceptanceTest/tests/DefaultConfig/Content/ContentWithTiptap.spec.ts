@@ -5,6 +5,7 @@ const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const customDataTypeName = 'Test RTE Tiptap';
 let customDataTypeId = null;
+const warningEmptyLink = 'Please enter an anchor or querystring, or select a published document or media item, or manually configure the URL';
 
 test.beforeEach(async ({umbracoApi}) => {
   customDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customDataTypeName);
@@ -142,9 +143,7 @@ test('can add a video in RTE Tiptap property editor', async ({umbracoApi, umbrac
   expect(contentData.values[0].value.markup).toContain(videoURL);
 });
 
-// TODO: Remove skip when the front-end ready. Currently it still accept the empty link using spacebar
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17411
-test.skip('cannot submit the empty link in the link picker', async ({umbracoApi, umbracoUi}) => {
+test('cannot submit the empty link in the link picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconTitle = 'Link';
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
@@ -155,10 +154,34 @@ test.skip('cannot submit the empty link in the link picker', async ({umbracoApi,
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickTipTapToolbarIconWithTitle(iconTitle);
-  await umbracoUi.content.enterLink('Space', true);
-  await umbracoUi.content.enterAnchorOrQuerystring('Space', true);
-  await umbracoUi.content.enterLinkTitle('Space', true);
+  await umbracoUi.content.clickManualLinkButton();
+  await umbracoUi.content.enterLink('');
+  await umbracoUi.content.enterAnchorOrQuerystring('');
+  await umbracoUi.content.enterLinkTitle('');
+  await umbracoUi.content.clickAddButton();
 
   // Assert
-  await umbracoUi.content.isSubmitButtonDisabled();
+  await umbracoUi.content.isTextWithMessageVisible(warningEmptyLink);
+});
+
+// TODO: Remove skip when the front-end ready. Currently it still accept the empty link with an anchor or querystring
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17411
+test('cannot submit the empty URL with an anchor or querystring in the link picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const iconTitle = 'Link';
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickTipTapToolbarIconWithTitle(iconTitle);
+  await umbracoUi.content.clickManualLinkButton();
+  await umbracoUi.content.enterLink('');
+  await umbracoUi.content.enterAnchorOrQuerystring('#value');
+  await umbracoUi.content.clickAddButton();
+
+  // Assert
+  await umbracoUi.content.isTextWithMessageVisible(warningEmptyLink);
 });
