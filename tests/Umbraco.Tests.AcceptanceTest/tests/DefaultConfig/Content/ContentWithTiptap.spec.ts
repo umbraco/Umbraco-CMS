@@ -1,11 +1,10 @@
-﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const customDataTypeName = 'Test RTE Tiptap';
 let customDataTypeId = null;
-const warningEmptyLink = 'Please enter an anchor or querystring, or select a published document or media item, or manually configure the URL';
 
 test.beforeEach(async ({umbracoApi}) => {
   customDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customDataTypeName);
@@ -143,7 +142,7 @@ test('can add a video in RTE Tiptap property editor', async ({umbracoApi, umbrac
   expect(contentData.values[0].value.markup).toContain(videoURL);
 });
 
-test('cannot submit the empty link in the link picker', async ({umbracoApi, umbracoUi}) => {
+test('cannot submit an empty link in the link picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconTitle = 'Link';
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
@@ -161,12 +160,12 @@ test('cannot submit the empty link in the link picker', async ({umbracoApi, umbr
   await umbracoUi.content.clickAddButton();
 
   // Assert
-  await umbracoUi.content.isTextWithMessageVisible(warningEmptyLink);
+  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
 // TODO: Remove skip when the front-end ready. Currently it still accept the empty link with an anchor or querystring
 // Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17411
-test('cannot submit the empty URL with an anchor or querystring in the link picker', async ({umbracoApi, umbracoUi}) => {
+test.skip('cannot submit an empty URL with an anchor or querystring in the link picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconTitle = 'Link';
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
@@ -183,5 +182,37 @@ test('cannot submit the empty URL with an anchor or querystring in the link pick
   await umbracoUi.content.clickAddButton();
 
   // Assert
-  await umbracoUi.content.isTextWithMessageVisible(warningEmptyLink);
+  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
+});
+
+// TODO: Remove skip when the front-end ready. Currently it is impossible to link to unpublished document
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17974
+test.skip('can create content with the link to an unpublished document', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const iconTitle = 'Link';
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  // Create a document to link
+  const documentTypeForLinkedDocumentName = 'TestDocumentType';
+  const documentTypeForLinkedDocumentId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeForLinkedDocumentName);
+  const linkedDocumentName = 'LinkedDocument';
+  await umbracoApi.document.createDefaultDocument(linkedDocumentName, documentTypeForLinkedDocumentId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickTipTapToolbarIconWithTitle(iconTitle);
+  await umbracoUi.content.clickDocumentLinkButton();
+  await umbracoUi.content.selectLinkByName(linkedDocumentName);
+  await umbracoUi.content.clickButtonWithName('Choose');
+  await umbracoUi.content.clickAddButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeForLinkedDocumentName);
+  await umbracoApi.document.ensureNameNotExists(linkedDocumentName);
 });

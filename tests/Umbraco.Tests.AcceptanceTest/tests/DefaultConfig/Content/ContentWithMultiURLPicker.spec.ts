@@ -6,7 +6,6 @@ const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const link = 'https://docs.umbraco.com';
 const linkTitle = 'Umbraco Documentation';
-const warningEmptyLink = 'Please enter an anchor or querystring, or select a published document or media item, or manually configure the URL';
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -266,7 +265,7 @@ test('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) =
   expect(contentData.values[0].value[0].url).toEqual(link);
 });
 
-test('cannot submit the empty link', async ({umbracoApi, umbracoUi}) => {
+test('cannot submit an empty link', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -284,10 +283,10 @@ test('cannot submit the empty link', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickAddButton();
 
   // Assert
-  await umbracoUi.content.isTextWithMessageVisible(warningEmptyLink);
+  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
-test('cannot update the URL picker with empty link', async ({umbracoApi, umbracoUi}) => {
+test('cannot update the URL picker with an empty link', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -304,12 +303,12 @@ test('cannot update the URL picker with empty link', async ({umbracoApi, umbraco
   await umbracoUi.content.clickUpdateButton();
 
   // Assert
-  await umbracoUi.content.isTextWithMessageVisible(warningEmptyLink);
+  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
 // TODO: Remove skip when the front-end ready. Currently it still accept the empty link with an anchor or querystring
 // Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17411
-test.skip('cannot submit the empty URL with an anchor or query', async ({umbracoApi, umbracoUi}) => {
+test.skip('cannot submit an empty URL with an anchor or query', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -326,12 +325,12 @@ test.skip('cannot submit the empty URL with an anchor or query', async ({umbraco
   await umbracoUi.content.clickAddButton();
 
   // Assert
-  await umbracoUi.content.isTextWithMessageVisible(warningEmptyLink);
+  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
 // TODO: Remove skip when the front-end ready. Currently it still accept the empty link using spacebar
 // Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17411
-test.skip('cannot submit the empty link using spacebar', async ({umbracoApi, umbracoUi}) => {
+test.skip('cannot submit an empty link using spacebar', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -349,7 +348,7 @@ test.skip('cannot submit the empty link using spacebar', async ({umbracoApi, umb
   await umbracoUi.content.clickAddButton();
 
   // Assert
-  await umbracoUi.content.isTextWithMessageVisible(warningEmptyLink);
+  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
 // TODO: Remove skip when the front-end ready. Currently it is impossible to link to unpublished document
