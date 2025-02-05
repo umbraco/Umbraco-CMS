@@ -45,7 +45,7 @@ Here are some suggestions based on how we work on developing Umbraco at HQ.
 
 ### First checkout
 
-When you first clone the source code, rebuild the whole solution via your IDE. You can then start the application via the IDE or the command line and should find everything across front and back-end is built and running.
+When you first clone the source code, build the whole solution via your IDE. You can then start the `Umbraco.Web.UI` project via the IDE or the command line and should find everything across front and back-end is built and running.
 
 ```
 cd <solution root>\src\Umbraco.Web.UI
