@@ -434,6 +434,61 @@ public class MemberControllerUnitTests
 
     [Test]
     [AutoMoqData]
+    public void PostSaveMember_SaveNew_WhenMemberEmailAlreadyExists_AndDuplicateEmailsAreAllowed_ExpectSuccessResponse(
+        [Frozen] IMemberManager umbracoMembersUserManager,
+        IMemberService memberService,
+        IMemberTypeService memberTypeService,
+        IMemberGroupService memberGroupService,
+        IDataTypeService dataTypeService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IBackOfficeSecurity backOfficeSecurity,
+        IPasswordChanger<MemberIdentityUser> passwordChanger,
+        IOptions<GlobalSettings> globalSettings,
+        ITwoFactorLoginService twoFactorLoginService)
+    {
+        // arrange
+        var member = SetupMemberTestData(out var fakeMemberData, out _, ContentSaveAction.SaveNew);
+        Mock.Get(umbracoMembersUserManager)
+            .Setup(x => x.CreateAsync(It.IsAny<MemberIdentityUser>()))
+            .ReturnsAsync(() => IdentityResult.Success);
+        Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
+        Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
+        Mock.Get(umbracoMembersUserManager)
+            .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
+            .ReturnsAsync(() => IdentityResult.Success);
+        Mock.Get(umbracoMembersUserManager)
+            .Setup(x => x.AddToRolesAsync(It.IsAny<MemberIdentityUser>(), It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync(() => IdentityResult.Success);
+
+        Mock.Get(memberService).SetupSequence(
+                x => x.GetByEmail(It.IsAny<string>()))
+            .Returns(() => member);
+
+        var securitySettings = Options.Create(new SecuritySettings { MemberRequireUniqueEmail = false });
+
+        var sut = CreateSut(
+            memberService,
+            memberTypeService,
+            memberGroupService,
+            umbracoMembersUserManager,
+            dataTypeService,
+            backOfficeSecurityAccessor,
+            passwordChanger,
+            globalSettings,
+            twoFactorLoginService,
+            securitySettings);
+
+        // act
+        var result = sut.PostSave(fakeMemberData).Result;
+        var validation = result.Result as ValidationErrorResult;
+
+        // assert
+        Assert.IsNull(result.Result);
+        Assert.IsNotNull(result.Value);
+    }
+
+    [Test]
+    [AutoMoqData]
     public async Task PostSaveMember_SaveExistingMember_WithNoRoles_Add1Role_ExpectSuccessResponse(
         [Frozen] IMemberManager umbracoMembersUserManager,
         IMemberService memberService,
