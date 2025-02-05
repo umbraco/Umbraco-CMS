@@ -57,7 +57,7 @@ public class MemberController : ContentControllerBase
     private readonly ITwoFactorLoginService _twoFactorLoginService;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly IUmbracoMapper _umbracoMapper;
-    private readonly SecuritySettings? _securitySettings;
+    private readonly SecuritySettings _securitySettings;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MemberController" /> class.
@@ -78,6 +78,7 @@ public class MemberController : ContentControllerBase
     /// <param name="passwordChanger">The password changer</param>
     /// <param name="scopeProvider">The core scope provider</param>
     /// <param name="twoFactorLoginService">The two factor login service</param>
+    /// <param name="securitySettings">The security settings</param>
     [ActivatorUtilitiesConstructor]
     public MemberController(
         ICultureDictionary cultureDictionary,
@@ -95,7 +96,8 @@ public class MemberController : ContentControllerBase
         IJsonSerializer jsonSerializer,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         ICoreScopeProvider scopeProvider,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IOptions<SecuritySettings> securitySettings)
         : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, jsonSerializer)
     {
         _propertyEditors = propertyEditors;
@@ -111,10 +113,49 @@ public class MemberController : ContentControllerBase
         _passwordChanger = passwordChanger;
         _scopeProvider = scopeProvider;
         _twoFactorLoginService = twoFactorLoginService;
-        _securitySettings = StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>().Value;
+        _securitySettings = securitySettings.Value;
     }
 
-    [Obsolete("Use constructor that also takes an ITwoFactorLoginService. Scheduled for removal in V13")]
+    [Obsolete("Use constructor that all paramters. Scheduled for removal in V14")]
+    public MemberController(
+        ICultureDictionary cultureDictionary,
+        ILoggerFactory loggerFactory,
+        IShortStringHelper shortStringHelper,
+        IEventMessagesFactory eventMessages,
+        ILocalizedTextService localizedTextService,
+        PropertyEditorCollection propertyEditors,
+        IUmbracoMapper umbracoMapper,
+        IMemberService memberService,
+        IMemberTypeService memberTypeService,
+        IMemberManager memberManager,
+        IDataTypeService dataTypeService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IJsonSerializer jsonSerializer,
+        IPasswordChanger<MemberIdentityUser> passwordChanger,
+        ICoreScopeProvider scopeProvider,
+        ITwoFactorLoginService twoFactorLoginService)
+        : this(
+              cultureDictionary,
+              loggerFactory,
+              shortStringHelper,
+              eventMessages,
+              localizedTextService,
+              propertyEditors,
+              umbracoMapper,
+              memberService,
+              memberTypeService,
+              memberManager,
+              dataTypeService,
+              backOfficeSecurityAccessor,
+              jsonSerializer,
+              passwordChanger,
+              scopeProvider,
+              twoFactorLoginService,
+              StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
+    {
+    }
+
+    [Obsolete("Use constructor that all paramters. Scheduled for removal in V14")]
     public MemberController(
         ICultureDictionary cultureDictionary,
         ILoggerFactory loggerFactory,
