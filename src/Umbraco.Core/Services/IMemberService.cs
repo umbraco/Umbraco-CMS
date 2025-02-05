@@ -218,7 +218,12 @@ public interface IMemberService : IMembershipMemberService
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
     IEnumerable<IMember> GetMembersByEmail(string email)
-        => throw new NotImplementedException();
+        =>
+        // TODO (V16): Remove this default implementation.
+        // The following is very inefficient, but will return the correct data, so probably better than throwing a NotImplementedException
+        // in the default implentation here, for, presumably rare, cases where a custom IMemberService implementation has been registered and
+        // does not override this method.
+        GetAllMembers().Where(x => x.Email.Equals(email));
 
     /// <summary>
     ///     Gets all Members for the specified MemberType alias
