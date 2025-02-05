@@ -2,7 +2,7 @@ import {test} from '@umbraco/playwright-testhelpers';
 
 test('can register new user with google external provider', async () => {
   // Arrange
-  // Preconditions: User has an existing account linked with Google.
+  // Preconditions: User has no existing Umbraco account.
   // 1. Go to the login page.
 
   // Act
@@ -16,7 +16,7 @@ test('can register new user with google external provider', async () => {
 
 test('can login with google external provider', async () => {
   // Arrange
-  // Preconditions: User has no existing Umbraco account.
+  // Preconditions: User has an existing account linked with Google.
   // 1. Go to the login page.
 
   // Act
