@@ -21,7 +21,7 @@ Did you read ["Are you sure"](#are-you-sure)?
 
 If you want to run a build without debugging, see [Building from source](#building-from-source) below. This runs the build in the same way it is run on our build servers.
 
-If you've got this far and are keen to get stuck in helping us fix a big or implement a feature, great! Please read on...
+If you've got this far and are keen to get stuck in helping us fix a bug or implement a feature, great! Please read on...
 
 ### Prerequisites
 
