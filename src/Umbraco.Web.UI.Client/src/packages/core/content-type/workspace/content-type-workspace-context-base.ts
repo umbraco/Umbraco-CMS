@@ -13,6 +13,7 @@ import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { jsonStringComparison, type Observable } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
+	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
@@ -147,12 +148,15 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 			this._data.setPersisted(this.structure.getOwnerContentType());
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadStructureForEntityEvent({
-				unique: this.getUnique()!,
-				entityType: this.getEntityType(),
-			});
 
+			const unique = this.getUnique()!;
+			const entityType = this.getEntityType();
+
+			const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 			actionEventContext.dispatchEvent(event);
+
+			const updatedEvent = new UmbEntityUpdatedEvent({ unique, entityType, eventUnique: this._workspaceEventUnique });
+			actionEventContext.dispatchEvent(updatedEvent);
 		} catch (error) {
 			console.error(error);
 		}
