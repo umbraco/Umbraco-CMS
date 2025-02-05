@@ -142,7 +142,7 @@ test('can add a video in RTE Tiptap property editor', async ({umbracoApi, umbrac
   expect(contentData.values[0].value.markup).toContain(videoURL);
 });
 
-test('cannot submit an empty link in the link picker', async ({umbracoApi, umbracoUi}) => {
+test('cannot submit an empty link in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconTitle = 'Link';
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
@@ -165,7 +165,7 @@ test('cannot submit an empty link in the link picker', async ({umbracoApi, umbra
 
 // TODO: Remove skip when the front-end ready. Currently it still accept the empty link with an anchor or querystring
 // Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17411
-test.skip('cannot submit an empty URL with an anchor or querystring in the link picker', async ({umbracoApi, umbracoUi}) => {
+test.skip('cannot submit an empty URL with an anchor or querystring in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconTitle = 'Link';
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
@@ -187,7 +187,7 @@ test.skip('cannot submit an empty URL with an anchor or querystring in the link 
 
 // TODO: Remove skip when the front-end ready. Currently it is impossible to link to unpublished document
 // Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17974
-test.skip('can create content with the link to an unpublished document', async ({umbracoApi, umbracoUi}) => {
+test.skip('can insert a link to an unpublished document in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconTitle = 'Link';
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
