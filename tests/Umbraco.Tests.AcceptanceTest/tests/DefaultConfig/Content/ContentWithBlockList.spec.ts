@@ -132,7 +132,7 @@ test('can delete block element in the content', async ({umbracoApi, umbracoUi}) 
   expect(blockGridValue).toBeFalsy();
 });
 
-test('cannot add number of block element greater than the maxiumm amount', async ({umbracoApi, umbracoUi}) => {
+test('cannot add number of block element greater than the maximum amount', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const customDataTypeId = await umbracoApi.dataType.createBlockListWithABlockAndMinAndMaxAmount(customDataTypeName, elementTypeId, 0, 1);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
