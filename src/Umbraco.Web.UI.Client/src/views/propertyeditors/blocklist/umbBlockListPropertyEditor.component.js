@@ -37,6 +37,9 @@
         let copyAllBlocksAction = null;
         let deleteAllBlocksAction = null;
         let pasteSingleBlockAction = null;
+        let resetSingleBlock = null;
+
+        let scopeOfExistence = null;
 
         var inlineEditing = false;
         var liveEditing = true;
@@ -124,12 +127,12 @@
                 vm.listWrapperStyles['max-width'] = vm.model.config.maxPropertyWidth;
             }
 
-            // We need to ensure that the property model value is an object, this is needed for modelObject to recive a reference and keep that updated.
+            // We need to ensure that the property model value is an object, this is needed for modelObject to receive a reference and keep that updated.
             if (typeof vm.model.value !== 'object' || vm.model.value === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
                 vm.model.value = {};
             }
 
-            var scopeOfExistence = $scope;
+            scopeOfExistence = $scope;
             if (vm.umbVariantContentEditors && vm.umbVariantContentEditors.getScope) {
                 scopeOfExistence = vm.umbVariantContentEditors.getScope();
             } else if(vm.umbElementEditorContent && vm.umbElementEditorContent.getScope) {
@@ -179,9 +182,18 @@
                 useLegacyIcon: false
             };
 
+            resetSingleBlock = {
+                labelKey: "content_removeItem",
+                labelTokens: [],
+                icon: "icon-trash",
+                method: requestResetSingleBlock,
+                isDisabled: false,
+                useLegacyIcon: false
+            };
+
             var propertyActions = [copyAllBlocksAction, deleteAllBlocksAction];
 
-            var propertyActionsForSingleBlockMode = [pasteSingleBlockAction];
+            var propertyActionsForSingleBlockMode = [pasteSingleBlockAction, resetSingleBlock];
 
             if (vm.umbProperty) {
                 if (vm.singleBlockMode) {
@@ -838,6 +850,24 @@
                     },
                     submit: function () {
                         deleteAllBlocks();
+                        overlayService.close();
+                    }
+                });
+            });
+        }
+
+        function requestResetSingleBlock() {
+            localizationService.localizeMany(["content_nestedContentDeleteItem", "general_delete"]).then(function (data) {
+                overlayService.confirmDelete({
+                    title: data[1],
+                    content: data[0],
+                    close: function () {
+                        overlayService.close();
+                    },
+                    submit: function () {
+                        deleteAllBlocks();
+                        modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks, scopeOfExistence, $scope);
+                        modelObject.load().then(onLoaded);
                         overlayService.close();
                     }
                 });

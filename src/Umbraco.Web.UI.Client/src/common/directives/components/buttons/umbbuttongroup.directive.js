@@ -126,7 +126,7 @@ Use this directive to render a button with a dropdown of alternative actions.
       // to the label key of the default button, and if detected, we update the button label with the localized value
       // received from the localization service
       $scope.$watch("defaultButton.labelKey", function () {
-        if (!$scope.defaultButton.labelKey) return;
+        if (!$scope.defaultButton?.labelKey) return;
         localizationService.localize($scope.defaultButton.labelKey).then(value => {
           if (value && value.indexOf("[") === 0) return;
           $scope.defaultButton.label = value;
