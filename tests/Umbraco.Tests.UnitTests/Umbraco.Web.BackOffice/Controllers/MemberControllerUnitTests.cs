@@ -70,7 +70,6 @@ public class MemberControllerUnitTests
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
-        IUser user,
         ITwoFactorLoginService twoFactorLoginService,
         IOptions<SecuritySettings> securitySettings)
     {
@@ -118,7 +117,6 @@ public class MemberControllerUnitTests
         IBackOfficeSecurity backOfficeSecurity,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
-        IUser user,
         ITwoFactorLoginService twoFactorLoginService,
         IOptions<SecuritySettings> securitySettings)
     {
@@ -174,7 +172,6 @@ public class MemberControllerUnitTests
         IBackOfficeSecurity backOfficeSecurity,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
-        IUser user,
         ITwoFactorLoginService twoFactorLoginService,
         IOptions<SecuritySettings> securitySettings)
     {
@@ -392,7 +389,6 @@ public class MemberControllerUnitTests
         IBackOfficeSecurity backOfficeSecurity,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
-        IUser user,
         ITwoFactorLoginService twoFactorLoginService,
         IOptions<SecuritySettings> securitySettings)
     {
@@ -526,6 +522,7 @@ public class MemberControllerUnitTests
     /// <param name="passwordChanger">Password changer class</param>
     /// <param name="globalSettings">The global settings</param>
     /// <param name="twoFactorLoginService">The two factor login service</param>
+    /// <param name="securitySettings">The security settings</param>
     /// <returns>A member controller for the tests</returns>
     private MemberController CreateSut(
         IMemberService memberService,
@@ -638,7 +635,8 @@ public class MemberControllerUnitTests
             new ConfigurationEditorJsonSerializer(),
             passwordChanger,
             scopeProvider,
-            twoFactorLoginService);
+            twoFactorLoginService,
+            securitySettings);
     }
 
     /// <summary>
