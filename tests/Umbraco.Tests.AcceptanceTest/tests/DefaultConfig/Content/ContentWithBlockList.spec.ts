@@ -143,8 +143,10 @@ test('cannot add number of block element greater than the maximum amount', async
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
   await umbracoUi.content.clickCreateModalButton();
 
   // Assert
