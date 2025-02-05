@@ -10,9 +10,6 @@ export class UmbWebhookWorkspaceEditorElement extends UmbLitElement {
 	#workspaceContext?: typeof UMB_WEBHOOK_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	_isNew?: boolean;
-
-	@state()
 	_url: string = '';
 
 	@state()
@@ -26,7 +23,6 @@ export class UmbWebhookWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_WEBHOOK_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
-			this.observe(this.#workspaceContext.isNew, (isNew) => (this._isNew = isNew));
 			this.observe(this.#workspaceContext.url, (url) => (this._url = url ?? ''));
 			this.observe(this.#workspaceContext.name, (name) => (this._name = name ?? ''));
 			this.observe(this.#workspaceContext.description, (description) => (this._description = description ?? ''));
