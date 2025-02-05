@@ -123,7 +123,7 @@ cd <solution root>\src\Umbraco.Web.UI.Client
 npm run generate:server-api-dev
 ```
 
-Please also update the `OpenApi.json` file held in the solution by copying and pasting the output from `/umbraco/swagger/management/swagger.json`. Be careful to undo any automated formatting carried out after pasting by the IDE.
+Please also update the `OpenApi.json` file held in the solution by copying and pasting the output from `/umbraco/swagger/management/swagger.json`.
 
 ## Building from source
 
