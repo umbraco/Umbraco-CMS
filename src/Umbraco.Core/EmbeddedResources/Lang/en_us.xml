@@ -165,6 +165,7 @@
     <key alias="move">Media moved</key>
     <key alias="copy">Media copied</key>
     <key alias="save">Media saved</key>
+    <key alias="new">Media created</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
@@ -189,6 +190,7 @@
     <key alias="smallPublishVariant">Publish</key>
     <key alias="smallMove">Move</key>
     <key alias="smallSave">Save</key>
+    <key alias="smallNew">New</key>
     <key alias="smallSaveVariant">Save</key>
     <key alias="smallDelete">Delete</key>
     <key alias="smallUnpublish">Unpublish</key>
@@ -1732,6 +1734,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="publishWithMissingDomain">There is no domain configured for %0%, please contact an administrator, see
       log for more information
     </key>
+    <key alias="publishWithNoUrl">The document does not have a URL, possibly due to a naming collision with another document. More details can be found under Info.</key>
     <key alias="preventCleanupEnableError">An error occurred while enabling version cleanup for %0%</key>
     <key alias="preventCleanupDisableError">An error occurred while disabling version cleanup for %0%</key>
     <key alias="copySuccessMessage">Your system information has successfully been copied to the clipboard</key>
@@ -2035,7 +2038,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="webhookKey">Webhook key</key>
     <key alias="retryCount">Retry count</key>
     <key alias="toggleDebug">Toggle debug mode for more information.</key>
-    <key alias="statusNotOk">Not OK status code</key>    
+    <key alias="statusNotOk">Not OK status code</key>
     <key alias="urlDescription">The url to call when the webhook is triggered.</key>
     <key alias="eventDescription">The events for which the webhook should be triggered.</key>
     <key alias="contentTypeDescription">Only trigger the webhook for a specific content type.</key>
@@ -3096,7 +3099,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
           We will send:
           <ul>
             <li>Anonymized site ID, Umbraco version, and packages installed.</li>
-            <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, Backoffice external login providers, and Property Editors in use.</li>
+            <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Property Types, Compositions, Templates, Languages, Domains, User Group, Users, Members, Backoffice external login providers, Webhooks, rich text datatypes, blocks used in rich text datatypes, and Property Editors in use.</li>
             <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>
             <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, whether the delivery API is enabled, and allows public access, and if you are in debug mode.</li>
           </ul>

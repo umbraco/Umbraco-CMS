@@ -22,28 +22,13 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
     private const string TextNodeName = "#text";
     private const string CommentNodeName = "#comment";
 
-    [Obsolete($"Please use the constructor that accepts {nameof(IApiElementBuilder)}. Will be removed in V15.")]
     public ApiRichTextElementParser(
         IApiContentRouteBuilder apiContentRouteBuilder,
-        IPublishedUrlProvider publishedUrlProvider,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        ILogger<ApiRichTextElementParser> logger)
-        : this(
-            apiContentRouteBuilder,
-            publishedUrlProvider,
-            publishedSnapshotAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IApiElementBuilder>(),
-            logger)
-    {
-    }
-
-    public ApiRichTextElementParser(
-        IApiContentRouteBuilder apiContentRouteBuilder,
-        IPublishedUrlProvider publishedUrlProvider,
+        IApiMediaUrlProvider mediaUrlProvider,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IApiElementBuilder apiElementBuilder,
         ILogger<ApiRichTextElementParser> logger)
-        : base(apiContentRouteBuilder, publishedUrlProvider)
+        : base(apiContentRouteBuilder, mediaUrlProvider)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _apiElementBuilder = apiElementBuilder;
@@ -116,8 +101,9 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         // - non-#comment nodes
         // - non-#text nodes
         // - non-empty #text nodes
+        // - empty #text between inline elements (see #17037)
         HtmlNode[] childNodes = element.ChildNodes
-            .Where(c => c.Name != CommentNodeName && (c.Name != TextNodeName || string.IsNullOrWhiteSpace(c.InnerText) is false))
+            .Where(c => c.Name != CommentNodeName && (c.Name != TextNodeName || c.NextSibling is not null || string.IsNullOrWhiteSpace(c.InnerText) is false))
             .ToArray();
 
         var tag = TagName(element);

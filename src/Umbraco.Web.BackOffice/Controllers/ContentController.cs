@@ -1134,8 +1134,12 @@ public class ContentController : ContentControllerBase
             {
                 PublishResult publishStatus = PublishInternal(contentItem, defaultCulture, cultureForInvariantErrors, out wasCancelled, out var successfulCultures);
                 // Add warnings if domains are not set up correctly
-                AddDomainWarnings(publishStatus.Content, successfulCultures, globalNotifications);
+                var addedDomainWarnings = AddDomainWarnings(publishStatus.Content, successfulCultures, globalNotifications, defaultCulture);
                 AddPublishStatusNotifications(new[] { publishStatus }, globalNotifications, notifications, successfulCultures);
+                if (addedDomainWarnings is false)
+                {
+                    AddPublishRoutableErrorNotifications(new[] { publishStatus }, globalNotifications, successfulCultures);
+                }
             }
                 break;
             case ContentSaveAction.PublishWithDescendants:
@@ -1151,8 +1155,12 @@ public class ContentController : ContentControllerBase
                 }
 
                 var publishStatus = PublishBranchInternal(contentItem, false, cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
-                AddDomainWarnings(publishStatus, successfulCultures, globalNotifications);
+                var addedDomainWarnings = AddDomainWarnings(publishStatus, successfulCultures, globalNotifications, defaultCulture);
                 AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
+                if (addedDomainWarnings is false)
+                {
+                    AddPublishRoutableErrorNotifications(publishStatus, globalNotifications, successfulCultures);
+                }
             }
                 break;
             case ContentSaveAction.PublishWithDescendantsForce:
@@ -1232,6 +1240,48 @@ public class ContentController : ContentControllerBase
         foreach (var c in successfulCultures ?? Array.Empty<string>())
         {
             AddMessageForPublishStatus(publishStatus, variantNotifications.GetOrCreate(c), successfulCultures);
+        }
+    }
+
+    private void AddPublishRoutableErrorNotifications(
+        IReadOnlyCollection<PublishResult> publishStatus,
+        SimpleNotificationModel globalNotifications,
+        string[]? successfulCultures)
+    {
+        IContent? content = publishStatus.FirstOrDefault()?.Content;
+        if (content is null)
+        {
+            return;
+        }
+
+        if (content.ContentType.VariesByCulture() is false)
+        {
+            // successfulCultures will be null here - change it to a wildcard and utilize this below
+            successfulCultures = ["*"];
+        }
+
+        if (successfulCultures?.Any() is not true)
+        {
+            return;
+        }
+
+        ContentItemDisplay? contentItemDisplay = _umbracoMapper.Map<ContentItemDisplay>(publishStatus.FirstOrDefault()?.Content);
+        if (contentItemDisplay?.Urls is null)
+        {
+            return;
+        }
+
+        foreach (var culture in successfulCultures)
+        {
+            if (contentItemDisplay.Urls.Where(u => u.Culture == culture || culture == "*").All(u => u.IsUrl is false))
+            {
+                globalNotifications.AddWarningNotification(
+                    _localizedTextService.Localize("auditTrails", "publish"),
+                    _localizedTextService.Localize("speechBubbles", "publishWithNoUrl"));
+
+                // only add one warning here, even though there might actually be more
+                break;
+            }
         }
     }
 
@@ -1770,12 +1820,15 @@ public class ContentController : ContentControllerBase
         }
     }
 
-    private void AddDomainWarnings(IEnumerable<PublishResult> publishResults, string[]? culturesPublished, SimpleNotificationModel globalNotifications)
+    private bool AddDomainWarnings(IEnumerable<PublishResult> publishResults, string[]? culturesPublished, SimpleNotificationModel globalNotifications, string? defaultCulture)
     {
+        var addedDomainWarnings = false;
         foreach (PublishResult publishResult in publishResults)
         {
-            AddDomainWarnings(publishResult.Content, culturesPublished, globalNotifications);
+            addedDomainWarnings &= AddDomainWarnings(publishResult.Content, culturesPublished, globalNotifications, defaultCulture);
         }
+
+        return addedDomainWarnings;
     }
 
     /// <summary>
@@ -1788,24 +1841,25 @@ public class ContentController : ContentControllerBase
     /// <param name="persistedContent"></param>
     /// <param name="culturesPublished"></param>
     /// <param name="globalNotifications"></param>
-    internal void AddDomainWarnings(IContent? persistedContent, string[]? culturesPublished, SimpleNotificationModel globalNotifications)
+    /// <param name="defaultCulture"></param>
+    internal bool AddDomainWarnings(IContent? persistedContent, string[]? culturesPublished, SimpleNotificationModel globalNotifications, string? defaultCulture)
     {
         if (_contentSettings.ShowDomainWarnings is false)
         {
-            return;
+            return false;
         }
 
         // Don't try to verify if no cultures were published
         if (culturesPublished is null)
         {
-            return;
+            return false;
         }
 
         var publishedCultures = GetPublishedCulturesFromAncestors(persistedContent).ToList();
         // If only a single culture is published we shouldn't have any routing issues
         if (publishedCultures.Count < 2)
         {
-            return;
+            return false;
         }
 
         // If more than a single culture is published we need to verify that there's a domain registered for each published culture
@@ -1827,6 +1881,12 @@ public class ContentController : ContentControllerBase
         // No domains at all, add a warning, to add domains.
         if (assignedDomains is null || assignedDomains.Count == 0)
         {
+            // If only the default culture was published we shouldn't have any routing issues
+            if (culturesPublished.Length == 1 && culturesPublished[0].InvariantEquals(defaultCulture))
+            {
+                return false;
+            }
+
             globalNotifications.AddWarningNotification(
                 _localizedTextService.Localize("auditTrails", "publish"),
                 _localizedTextService.Localize("speechBubbles", "publishWithNoDomains"));
@@ -1835,14 +1895,16 @@ public class ContentController : ContentControllerBase
                 "The root node {RootNodeName} was published with multiple cultures, but no domains are configured, this will cause routing and caching issues, please register domains for: {Cultures}",
                 persistedContent?.Name,
                 string.Join(", ", publishedCultures));
-            return;
+            return true;
         }
 
         // If there is some domains, verify that there's a domain for each of the published cultures
+        var addedDomainWarnings = false;
         foreach (var culture in culturesPublished
                      .Where(culture => assignedDomains.Any(x =>
                          x.LanguageIsoCode?.Equals(culture, StringComparison.OrdinalIgnoreCase) ?? false) is false))
         {
+            addedDomainWarnings = true;
             globalNotifications.AddWarningNotification(
                 _localizedTextService.Localize("auditTrails", "publish"),
                 _localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new[] { culture }));
@@ -1852,6 +1914,8 @@ public class ContentController : ContentControllerBase
                 persistedContent?.Name,
                 culture);
         }
+
+        return addedDomainWarnings;
     }
 
     /// <summary>
@@ -2254,7 +2318,12 @@ public class ContentController : ContentControllerBase
             return null;
         }
 
-        _contentService.Move(toMove, move.ParentId, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+        OperationResult moveResult = _contentService.AttemptMove(toMove, move.ParentId, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+
+        if (!moveResult.Success)
+        {
+            return ValidationProblem();
+        }
 
         return Content(toMove.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
     }

@@ -29,7 +29,7 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
 
         List<LogDto>? dtos = Database.Fetch<LogDto>(sql);
 
-        return dtos.Select(x => new AuditItem(x.NodeId, Enum<AuditType>.Parse(x.Header), x.UserId ?? Constants.Security.UnknownUserId, x.EntityType, x.Comment, x.Parameters)).ToList();
+        return dtos.Select(x => new AuditItem(x.NodeId, Enum<AuditType>.Parse(x.Header), x.UserId ?? Constants.Security.UnknownUserId, x.EntityType, x.Datestamp, x.Comment, x.Parameters)).ToList();
     }
 
     public void CleanLogs(int maximumAgeOfLogsInMinutes)
@@ -104,7 +104,7 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
         totalRecords = page.TotalItems;
 
         var items = page.Items.Select(
-            dto => new AuditItem(dto.NodeId, Enum<AuditType>.ParseOrNull(dto.Header) ?? AuditType.Custom, dto.UserId ?? Constants.Security.UnknownUserId, dto.EntityType, dto.Comment, dto.Parameters)).ToList();
+            dto => new AuditItem(dto.NodeId, Enum<AuditType>.ParseOrNull(dto.Header) ?? AuditType.Custom, dto.UserId ?? Constants.Security.UnknownUserId, dto.EntityType, dto.Datestamp, dto.Comment, dto.Parameters)).ToList();
 
         // map the DateStamp
         for (var i = 0; i < items.Count; i++)
@@ -144,12 +144,12 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
     protected override IAuditItem? PerformGet(int id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false);
-        sql.Where(GetBaseWhereClause(), new { Id = id });
+        sql.Where(GetBaseWhereClause(), new { id = id });
 
         LogDto? dto = Database.First<LogDto>(sql);
         return dto == null
             ? null
-            : new AuditItem(dto.NodeId, Enum<AuditType>.Parse(dto.Header), dto.UserId ?? Constants.Security.UnknownUserId, dto.EntityType, dto.Comment, dto.Parameters);
+            : new AuditItem(dto.NodeId, Enum<AuditType>.Parse(dto.Header), dto.UserId ?? Constants.Security.UnknownUserId, dto.EntityType, dto.Datestamp, dto.Comment, dto.Parameters);
     }
 
     protected override IEnumerable<IAuditItem> PerformGetAll(params int[]? ids) => throw new NotImplementedException();
@@ -162,7 +162,7 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
 
         List<LogDto>? dtos = Database.Fetch<LogDto>(sql);
 
-        return dtos.Select(x => new AuditItem(x.NodeId, Enum<AuditType>.Parse(x.Header), x.UserId ?? Constants.Security.UnknownUserId, x.EntityType, x.Comment, x.Parameters)).ToList();
+        return dtos.Select(x => new AuditItem(x.NodeId, Enum<AuditType>.Parse(x.Header), x.UserId ?? Constants.Security.UnknownUserId, x.EntityType, x.Datestamp,  x.Comment, x.Parameters)).ToList();
     }
 
     protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
@@ -184,7 +184,7 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => "id = @id";
+    protected override string GetBaseWhereClause() => "umbracoLog.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses() => throw new NotImplementedException();
 }

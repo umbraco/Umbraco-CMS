@@ -136,15 +136,7 @@
                 editorService.mediaTypeEditor(editor);
             };
 
-            scope.openSVG = () => {
-                var popup = window.open('', '_blank');
-                var html = '<!DOCTYPE html><body><img src="' + scope.nodeUrl + '"/>' +
-                    '<script>history.pushState(null, null,"' + $location.$$absUrl + '");</script></body>';
-                
-                popup.document.open();
-                popup.document.write(html);
-                popup.document.close();
-            }
+          scope.openSVG = () => mediaHelper.openSVG(scope.nodeUrl);
 
             // watch for content updates - reload content when node is saved, published etc.
             scope.$watch('node.updateDate', function(newValue, oldValue){

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -27,6 +28,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
@@ -234,6 +236,10 @@ public static partial class UmbracoBuilderExtensions
 
         builder.AddDeliveryApiCoreServices();
         builder.Services.AddTransient<IWebhookFiringService, WebhookFiringService>();
+
+        builder.Services.AddSingleton<IBlockEditorElementTypeCache, BlockEditorElementTypeCache>();
+
+        builder.Services.AddSingleton<IRichTextRequiredValidator, RichTextRequiredValidator>();
 
         return builder;
     }
@@ -448,6 +454,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IRequestRedirectService, NoopRequestRedirectService>();
         builder.Services.AddSingleton<IRequestPreviewService, NoopRequestPreviewService>();
         builder.Services.AddSingleton<IRequestMemberAccessService, NoopRequestMemberAccessService>();
+        builder.Services.AddTransient<ICurrentMemberClaimsProvider, NoopCurrentMemberClaimsProvider>();
         builder.Services.AddSingleton<IApiAccessService, NoopApiAccessService>();
         builder.Services.AddSingleton<IApiContentQueryService, NoopApiContentQueryService>();
         builder.Services.AddSingleton<IApiMediaQueryService, NoopApiMediaQueryService>();

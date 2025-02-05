@@ -708,6 +708,8 @@ public class AuthenticationController : UmbracoApiControllerBase
             return Ok();
         }
 
+
+
         await _signInManager.SignOutAsync();
 
         _logger.LogInformation("User {UserName} from IP address {RemoteIpAddress} has logged out",
