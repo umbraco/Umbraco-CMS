@@ -39,8 +39,8 @@ export class UmbPropertyEditorUINumberElement
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
-		this._min = this.#parseNumber(config.getValueByAlias('min')) || 0;
-		this._max = this.#parseNumber(config.getValueByAlias('max')) || Infinity;
+		this._min = this.#parseNumber(config.getValueByAlias('min'));
+		this._max = this.#parseNumber(config.getValueByAlias('max'));
 		this._step = this.#parseNumber(config.getValueByAlias('step'));
 		this._placeholder = config.getValueByAlias('placeholder');
 	}
@@ -82,7 +82,7 @@ export class UmbPropertyEditorUINumberElement
 
 	#parseNumber(input: unknown): number | undefined {
 		const num = Number(input);
-		return Number.isNaN(num) ? undefined : num;
+		return Number.isFinite(num) ? num : undefined;
 	}
 
 	#onChange(event: InputEvent & { target: HTMLInputElement }) {
