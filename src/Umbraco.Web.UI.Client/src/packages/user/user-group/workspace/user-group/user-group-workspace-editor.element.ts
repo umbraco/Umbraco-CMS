@@ -247,7 +247,6 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 						<umb-property-layout label=${this.localize.term('userRights_permissionLabel')} description=${this.localize.term('userRights_permissionsDescription')}>
 							<umb-user-group-entity-user-permission-list slot="editor"></umb-user-group-entity-user-permission-list>
 						</umb-property-layout>
-						${this.#renderLanguageAccess()} ${this.#renderDocumentAccess()} ${this.#renderMediaAccess()}
 					</uui-box>
 
 					<uui-box>
