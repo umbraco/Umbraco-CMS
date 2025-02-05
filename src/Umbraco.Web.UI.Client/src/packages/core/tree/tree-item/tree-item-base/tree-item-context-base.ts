@@ -142,7 +142,7 @@ export abstract class UmbTreeItemContextBase<
 	 * Load children of the tree item
 	 * @memberof UmbTreeItemContextBase
 	 */
-	public loadChildren = () => this.#loadChildren();
+	public loadChildren = debounce(() => this.#loadChildren(), 100);
 
 	/**
 	 * Load more children of the tree item
