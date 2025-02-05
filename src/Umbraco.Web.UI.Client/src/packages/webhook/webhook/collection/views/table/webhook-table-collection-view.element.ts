@@ -7,6 +7,7 @@ import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/
 
 import './column-layouts/name/webhook-table-name-column-layout.element.js';
 import './column-layouts/content-type/webhook-table-name-column-layout.element.js';
+import { UMB_EDIT_WEBHOOK_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 
 @customElement('umb-webhook-table-collection-view')
 export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
@@ -74,6 +75,7 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 	#createTableItems(webhooks: Array<UmbWebhookDetailModel>) {
 		this._tableItems = webhooks.map((webhook) => {
 			const name = webhook.name || `(${this.#unnamedWebhookLabel})`;
+			const path = UMB_EDIT_WEBHOOK_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: webhook.unique });
 
 			return {
 				id: webhook.unique,
@@ -81,7 +83,7 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 				data: [
 					{
 						columnAlias: 'name',
-						value: html`<a href=${'section/settings/workspace/webhook/edit/' + webhook.unique}>${name}</a>`,
+						value: html`<a href=${path}>${name}</a>`,
 					},
 					{
 						columnAlias: 'url',
