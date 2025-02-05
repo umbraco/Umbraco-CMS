@@ -53,7 +53,6 @@ export class UmbWebhookWorkspaceEditorElement extends UmbLitElement {
 							placeholder=${this.localize.term('placeholders_entername')}
 							.value=${this._name}
 							@change=${this.#onNameChange}
-							required
 							${umbFocus()}>
 						</uui-input>
 
