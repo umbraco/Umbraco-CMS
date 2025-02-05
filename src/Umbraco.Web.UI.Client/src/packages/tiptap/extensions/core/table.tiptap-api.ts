@@ -56,7 +56,7 @@ export default class UmbTiptapTableExtensionApi extends UmbTiptapExtensionApiBas
 					position: absolute;
 					right: -2px;
 					top: 0;
-					width: 3px;
+					width: 4px;
 				}
 			}
 

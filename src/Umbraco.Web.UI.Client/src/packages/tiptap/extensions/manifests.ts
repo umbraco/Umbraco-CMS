@@ -473,10 +473,10 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 	},
 	{
 		type: 'tiptapToolbarExtension',
-		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Table',
 		name: 'Table Tiptap Extension',
 		api: () => import('./toolbar/table.tiptap-toolbar-api.js'),
+		element: () => import('../extensions/table/table-tiptap-toolbar-button.element.js'),
 		forExtensions: ['Umb.Tiptap.Table'],
 		meta: {
 			alias: 'table',
