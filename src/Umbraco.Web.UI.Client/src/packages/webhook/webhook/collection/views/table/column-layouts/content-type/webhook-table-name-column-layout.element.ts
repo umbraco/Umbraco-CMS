@@ -1,5 +1,5 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { html, nothing, customElement, property, css, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbMediaTypeItemRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbDocumentTypeItemRepository } from '@umbraco-cms/backoffice/document-type';
@@ -42,14 +42,7 @@ export class UmbWebhookTableContentTypeColumnLayoutElement extends UmbLitElement
 		return html`${this._contentTypes}`;
 	}
 
-	static override styles = [
-		UmbTextStyles,
-		css`
-			:host {
-				white-space: nowrap;
-			}
-		`,
-	];
+	static override styles = [UmbTextStyles];
 }
 
 declare global {

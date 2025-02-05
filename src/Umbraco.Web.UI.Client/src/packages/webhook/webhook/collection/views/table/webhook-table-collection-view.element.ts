@@ -18,12 +18,12 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableColumns: Array<UmbTableColumn> = [
 		{
-			name: this.localize.term('webhooks_url'),
-			alias: 'url',
-		},
-		{
 			name: this.localize.term('general_name'),
 			alias: 'name',
+		},
+		{
+			name: this.localize.term('webhooks_url'),
+			alias: 'url',
 		},
 		{
 			name: this.localize.term('webhooks_events'),
@@ -51,12 +51,14 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 	#collectionContext?: UmbDefaultCollectionContext<UmbWebhookDetailModel>;
 	#enabledLabel: string;
 	#disabledLabel: string;
+	#unnamedWebhookLabel: string;
 
 	constructor() {
 		super();
 
 		this.#enabledLabel = this.localize.term('webhooks_enabled');
 		this.#disabledLabel = this.localize.term('webhooks_disabled');
+		this.#unnamedWebhookLabel = this.localize.term('webhooks_unnamedWebhook');
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
@@ -71,17 +73,19 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 
 	#createTableItems(webhooks: Array<UmbWebhookDetailModel>) {
 		this._tableItems = webhooks.map((webhook) => {
+			const name = webhook.name || this.#unnamedWebhookLabel;
+
 			return {
 				id: webhook.unique,
 				icon: 'icon-webhook',
 				data: [
 					{
-						columnAlias: 'url',
-						value: html`<a href=${'section/settings/workspace/webhook/edit/' + webhook.unique}>${webhook.url}</a>`,
+						columnAlias: 'name',
+						value: html`<a href=${'section/settings/workspace/webhook/edit/' + webhook.unique}>${name}</a>`,
 					},
 					{
-						columnAlias: 'name',
-						value: html`${webhook.name}`,
+						columnAlias: 'url',
+						value: webhook.url,
 					},
 					{
 						columnAlias: 'events',
