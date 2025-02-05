@@ -116,7 +116,7 @@ public class MemberController : ContentControllerBase
         _securitySettings = securitySettings.Value;
     }
 
-    [Obsolete("Use constructor that all paramters. Scheduled for removal in V14")]
+    [Obsolete("Please use the constructor that takes all paramters. Scheduled for removal in V14")]
     public MemberController(
         ICultureDictionary cultureDictionary,
         ILoggerFactory loggerFactory,
@@ -155,7 +155,7 @@ public class MemberController : ContentControllerBase
     {
     }
 
-    [Obsolete("Use constructor that all paramters. Scheduled for removal in V14")]
+    [Obsolete("Please use the constructor that takes all paramters. Scheduled for removal in V14")]
     public MemberController(
         ICultureDictionary cultureDictionary,
         ILoggerFactory loggerFactory,
