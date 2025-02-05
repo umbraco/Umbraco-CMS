@@ -1,5 +1,4 @@
 import { manifests as authManifests } from './auth/manifests.js';
-import { manifests as clipboardManifests } from './clipboard/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as contentManifests } from './content/manifests.js';
 import { manifests as contentTypeManifests } from './content-type/manifests.js';
@@ -20,6 +19,7 @@ import { manifests as propertyTypeManifests } from './property-type/manifests.js
 import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
 import { manifests as sectionManifests } from './section/manifests.js';
 import { manifests as serverFileSystemManifests } from './server-file-system/manifests.js';
+import { manifests as temporaryFileManifests } from './temporary-file/manifests.js';
 import { manifests as themeManifests } from './themes/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
@@ -28,7 +28,6 @@ import type { UmbExtensionManifestKind } from './extension-registry/index.js';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	...authManifests,
-	...clipboardManifests,
 	...collectionManifests,
 	...contentManifests,
 	...contentTypeManifests,
@@ -49,6 +48,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...recycleBinManifests,
 	...sectionManifests,
 	...serverFileSystemManifests,
+	...temporaryFileManifests,
 	...themeManifests,
 	...treeManifests,
 	...workspaceManifests,

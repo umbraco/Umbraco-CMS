@@ -66,12 +66,12 @@ public sealed class EntityContainer : TreeEntityBase, IUmbracoEntity
     /// <returns>The object type of containers containing objects of the contained object type.</returns>
     public static Guid GetContainerObjectType(Guid containedObjectType)
     {
-        if (ObjectTypeMap.ContainsKey(containedObjectType) == false)
+        if (ObjectTypeMap.TryGetValue(containedObjectType, out Guid containerObjectType) == false)
         {
             throw new ArgumentException("Not a contained object type.", nameof(containedObjectType));
         }
 
-        return ObjectTypeMap[containedObjectType];
+        return containerObjectType;
     }
 
     /// <summary>

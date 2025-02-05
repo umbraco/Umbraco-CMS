@@ -1,6 +1,7 @@
-import { TemporaryFileService } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbDataSourceResponse } from '../repository/index.js';
+import { TemporaryFileService, type PostTemporaryFileResponse } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecuteAndNotify, tryXhrRequest } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source to upload temporary files to the server
@@ -26,16 +27,24 @@ export class UmbTemporaryFileServerDataSource {
 	 * @returns {*}
 	 * @memberof UmbTemporaryFileServerDataSource
 	 */
-	async create(id: string, file: File) {
-		return tryExecuteAndNotify(
-			this.#host,
-			TemporaryFileService.postTemporaryFile({
-				formData: {
-					Id: id,
-					File: file,
-				},
-			}),
-		);
+	async create(
+		id: string,
+		file: File,
+		onProgress?: (progress: ProgressEvent) => void,
+		abortSignal?: AbortSignal,
+	): Promise<UmbDataSourceResponse<PostTemporaryFileResponse>> {
+		const body = new FormData();
+		body.append('Id', id);
+		body.append('File', file);
+		const xhrRequest = tryXhrRequest<PostTemporaryFileResponse>({
+			url: '/umbraco/management/api/v1/temporary-file',
+			method: 'POST',
+			responseHeader: 'Umb-Generated-Resource',
+			body,
+			onProgress,
+			abortSignal,
+		});
+		return tryExecuteAndNotify(this.#host, xhrRequest);
 	}
 
 	/**

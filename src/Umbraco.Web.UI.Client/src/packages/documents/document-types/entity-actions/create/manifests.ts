@@ -1,7 +1,9 @@
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../../tree/index.js';
+import { manifests as folderManifests } from './folder/manifests.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<UmbExtensionManifest> = [
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
 		type: 'entityAction',
 		kind: 'create',
@@ -67,17 +69,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 			description: '#create_elementTypeDescription',
 		},
 	},
-	{
-		type: 'entityCreateOptionAction',
-		alias: 'Umb.EntityCreateOptionAction.DocumentType.Folder',
-		name: 'Folder Document Type Entity Create Option Action',
-		weight: 70,
-		api: () => import('./folder/document-type-folder-create-option-action.js'),
-		forEntityTypes: [UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE, UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE],
-		meta: {
-			icon: 'icon-folder',
-			label: '#create_folder',
-			description: '#create_folderDescription',
-		},
-	},
+	...folderManifests,
 ];

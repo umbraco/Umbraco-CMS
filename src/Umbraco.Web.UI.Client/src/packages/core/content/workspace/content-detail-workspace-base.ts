@@ -35,7 +35,6 @@ import {
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 	UmbDataPathVariantQuery,
 	UmbServerModelValidatorContext,
-	UmbValidationContext,
 	UmbVariantsValidationPathTranslator,
 	UmbVariantValuesValidationPathTranslator,
 } from '@umbraco-cms/backoffice/validation';
@@ -43,6 +42,7 @@ import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
+	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
@@ -201,7 +201,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			},
 		);
 
-		this.addValidationContext(new UmbValidationContext(this));
 		new UmbVariantValuesValidationPathTranslator(this);
 		new UmbVariantsValidationPathTranslator(this);
 
@@ -711,14 +710,27 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 		this._data.setCurrent(newCurrentData);
 
+		const unique = this.getUnique()!;
+		const entityType = this.getEntityType();
+
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		const event = new UmbRequestReloadStructureForEntityEvent({
-			entityType: this.getEntityType(),
-			unique: this.getUnique()!,
+		const structureEvent = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
+		eventContext.dispatchEvent(structureEvent);
+
+		const updatedEvent = new UmbEntityUpdatedEvent({
+			unique,
+			entityType,
+			eventUnique: this._workspaceEventUnique,
 		});
 
-		eventContext.dispatchEvent(event);
+		eventContext.dispatchEvent(updatedEvent);
+
 		this._closeModal();
+	}
+
+	override resetState() {
+		super.resetState();
+		this.readOnlyState.clear();
 	}
 
 	abstract getContentTypeUnique(): string | undefined;

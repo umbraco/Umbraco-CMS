@@ -52,19 +52,21 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	@property()
+	/** @deprecated will be removed in v17 */
 	public set alias(value: string | undefined) {
-		this.#linkPickerModal.setUniquePathValue('propertyAlias', value);
+		//this.#linkPickerModal.setUniquePathValue('propertyAlias', value);
 	}
 	public get alias(): string | undefined {
-		return this.#linkPickerModal.getUniquePathValue('propertyAlias');
+		return undefined; //this.#linkPickerModal.getUniquePathValue('propertyAlias');
 	}
 
 	@property()
+	/** @deprecated will be removed in v17 */
 	public set variantId(value: string | UmbVariantId | undefined) {
-		this.#linkPickerModal.setUniquePathValue('variantId', value?.toString());
+		//this.#linkPickerModal.setUniquePathValue('variantId', value?.toString());
 	}
 	public get variantId(): string | undefined {
-		return this.#linkPickerModal.getUniquePathValue('variantId');
+		return undefined; //this.#linkPickerModal.getUniquePathValue('variantId');
 	}
 
 	/**
@@ -176,7 +178,6 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 
 		this.#linkPickerModal = new UmbModalRouteRegistrationController(this, UMB_LINK_PICKER_MODAL)
 			.addAdditionalPath(`:index`)
-			.addUniquePaths(['propertyAlias', 'variantId'])
 			.onSetup((params) => {
 				// Get index:
 				const indexParam = params.index;
@@ -199,6 +200,7 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 					},
 					data: {
 						index: index,
+						isNew: index === null,
 						config: {
 							hideAnchor: this.hideAnchor,
 						},

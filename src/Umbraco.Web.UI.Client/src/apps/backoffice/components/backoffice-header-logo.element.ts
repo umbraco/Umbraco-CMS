@@ -3,9 +3,10 @@ import { isCurrentUserAnAdmin } from '@umbraco-cms/backoffice/current-user';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_NEWVERSION_MODAL, UMB_SYSINFO_MODAL } from '@umbraco-cms/backoffice/sysinfo';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import type { UmbServerUpgradeCheck } from '@umbraco-cms/backoffice/sysinfo';
 
 @customElement('umb-backoffice-header-logo')
 export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
@@ -16,7 +17,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 	private _isUserAdmin = false;
 
 	@state()
-	private _serverUpgradeCheck = false;
+	private _serverUpgradeCheck: UmbServerUpgradeCheck | null = null;
 
 	@state()
 	private _serverUrl = '';
@@ -52,7 +53,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 		this._isUserAdmin = await isCurrentUserAnAdmin(this);
 
 		if (this._isUserAdmin) {
-			this._serverUpgradeCheck = this.#backofficeContext ? await this.#backofficeContext.serverUpgradeCheck() : false;
+			this._serverUpgradeCheck = this.#backofficeContext ? await this.#backofficeContext.serverUpgradeCheck() : null;
 		}
 	}
 
@@ -76,7 +77,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 						${this._serverUpgradeCheck
 							? html`<uui-button
 									@click=${this.#openNewVersion}
-									color="danger"
+									color="positive"
 									label=${this.localize.term('general_newVersionAvailable')}></uui-button>`
 							: ''}
 
@@ -98,9 +99,15 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 	}
 
 	async #openNewVersion() {
+		if (!this._serverUpgradeCheck) return;
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		modalManager
-			.open(this, UMB_NEWVERSION_MODAL)
+			.open(this, UMB_NEWVERSION_MODAL, {
+				data: {
+					comment: this._serverUpgradeCheck.comment,
+					downloadUrl: this._serverUpgradeCheck.url,
+				},
+			})
 			.onSubmit()
 			.catch(() => {});
 	}

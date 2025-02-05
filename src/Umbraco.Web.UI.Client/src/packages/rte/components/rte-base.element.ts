@@ -1,21 +1,17 @@
 import type { UmbPropertyEditorUiValueType } from '../types.js';
 import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../constants.js';
 import { property, state } from '@umbraco-cms/backoffice/external/lit';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBlockRteEntriesContext, UmbBlockRteManagerContext } from '@umbraco-cms/backoffice/block-rte';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type { UmbBlockRteTypeModel } from '@umbraco-cms/backoffice/block-rte';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import {
-	UmbBlockRteEntriesContext,
-	UmbBlockRteManagerContext,
-	type UmbBlockRteTypeModel,
-} from '@umbraco-cms/backoffice/block-rte';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
-// eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name
 export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement implements UmbPropertyEditorUiElement {
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -178,14 +174,17 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 	}
 
 	protected _filterUnusedBlocks(usedContentKeys: (string | null)[]) {
-		const unusedBlockContents = this.#managerContext.getContents().filter((x) => usedContentKeys.indexOf(x.key) === -1);
-		unusedBlockContents.forEach((blockContent) => {
-			this.#managerContext.removeOneContent(blockContent.key);
-		});
-		const unusedBlocks = this.#managerContext.getLayouts().filter((x) => usedContentKeys.indexOf(x.contentKey) === -1);
-		unusedBlocks.forEach((blockLayout) => {
-			this.#managerContext.removeOneLayout(blockLayout.contentKey);
-		});
+		const unusedLayouts = this.#managerContext.getLayouts().filter((x) => usedContentKeys.indexOf(x.contentKey) === -1);
+
+		const unusedContentKeys = unusedLayouts.map((x) => x.contentKey);
+
+		const unusedSettingsKeys = unusedLayouts
+			.map((x) => x.settingsKey)
+			.filter((x) => typeof x === 'string') as Array<string>;
+
+		this.#managerContext.removeManyContent(unusedContentKeys);
+		this.#managerContext.removeManySettings(unusedSettingsKeys);
+		this.#managerContext.removeManyLayouts(unusedContentKeys);
 	}
 
 	protected _fireChangeEvent() {

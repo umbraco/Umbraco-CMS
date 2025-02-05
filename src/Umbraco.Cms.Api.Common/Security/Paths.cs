@@ -31,6 +31,8 @@ public static class Paths
 
         public static readonly string RevokeEndpoint = EndpointPath($"{EndpointTemplate}/revoke");
 
+        public static readonly string UserinfoEndpoint = EndpointPath($"{EndpointTemplate}/userinfo");
+
         // NOTE: we're NOT using /api/v1.0/ here because it will clash with the Delivery API docs
         private static string EndpointPath(string relativePath) => $"/umbraco/delivery/api/v1/{relativePath}";
     }

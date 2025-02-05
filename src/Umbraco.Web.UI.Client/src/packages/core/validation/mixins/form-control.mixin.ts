@@ -125,11 +125,11 @@ export function UmbFormControlMixin<
 		 */
 		@property({ reflect: false }) // Do not 'reflect' as the attribute value is used as fallback. [NL]
 		get value(): ValueType | DefaultValueType {
+			// For some reason we need to keep this as setters and getters for inherited classes for work properly when they override these methods. [NL]
 			return this.#value;
 		}
 		set value(newValue: ValueType | DefaultValueType) {
 			this.#value = newValue;
-			this._runValidators();
 		}
 
 		// Validation
@@ -168,7 +168,6 @@ export function UmbFormControlMixin<
 				/*if (e.composedPath().some((x) => x === this)) {
 					return;
 				}*/
-				this.pristine = false;
 				this.checkValidity();
 			});
 		}

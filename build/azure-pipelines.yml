@@ -492,22 +492,22 @@ stages:
           matrix:
             LinuxPart1Of3:
               vmImage: "ubuntu-latest"
-              testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --shard=1/3'
+              testCommand: "npm run smokeTest -- --shard=1/3"
             LinuxPart2Of3:
               vmImage: "ubuntu-latest"
-              testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --shard=2/3'
+              testCommand: "npm run smokeTest -- --shard=2/3"
             LinuxPart3Of3:
               vmImage: "ubuntu-latest"
-              testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --shard=3/3'
+              testCommand: "npm run smokeTest -- --shard=3/3"
             WindowsPart1Of3:
               vmImage: "windows-latest"
-              testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --shard=1/3'
+              testCommand: "npm run smokeTest -- --shard=1/3"
             WindowsPart2Of3:
               vmImage: "windows-latest"
-              testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --shard=2/3'
+              testCommand: "npm run smokeTest -- --shard=2/3"
             WindowsPart3Of3:
               vmImage: "windows-latest"
-              testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --shard=3/3'
+              testCommand: "npm run smokeTest -- --shard=3/3"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -612,7 +612,7 @@ stages:
           # Copy artifacts
           - pwsh: |
               if (Test-Path tests/Umbraco.Tests.AcceptanceTest/results/*) {
-                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results $(Build.ArtifactStagingDirectory) -Recurse
+                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results/* $(Build.ArtifactStagingDirectory) -Recurse
               }
             displayName: Copy Playwright results
             condition: succeededOrFailed()
@@ -623,8 +623,7 @@ stages:
             condition: succeededOrFailed()
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
-              artifact: "Acceptance Tests - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
-
+              artifact: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
       - job:
         displayName: E2E Tests (SQL Server)
         variables:
@@ -635,29 +634,29 @@ stages:
           matrix:
             ${{ if eq(parameters.sqlServerLinuxAcceptanceTests, True) }}:
               LinuxPart1Of3:
-                testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --grep-invert "Users" --shard=1/3'
+                testCommand: "npm run smokeTestSqlite -- --shard=1/3"
                 vmImage: "ubuntu-latest"
                 SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
                 CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
               LinuxPart2Of3:
-                testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --grep-invert "Users" --shard=2/3'
+                testCommand: "npm run smokeTestSqlite -- --shard=2/3"
                 vmImage: "ubuntu-latest"
                 SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
                 CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
               LinuxPart3Of3:
-                testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --grep-invert "Users" --shard=3/3'
+                testCommand: "npm run smokeTestSqlite -- --shard=3/3"
                 vmImage: "ubuntu-latest"
                 SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
                 CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
             WindowsPart1Of3:
               vmImage: "windows-latest"
-              testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --grep-invert "Users" --shard=1/3'
+              testCommand: "npm run smokeTestSqlite -- --shard=1/3"
             WindowsPart2Of3:
               vmImage: "windows-latest"
-              testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --grep-invert "Users" --shard=2/3'
+              testCommand: "npm run smokeTestSqlite -- --shard=2/3"
             WindowsPart3Of3:
               vmImage: "windows-latest"
-              testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --grep-invert "Users" --shard=3/3'
+              testCommand: "npm run smokeTestSqlite -- --shard=3/3"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -779,7 +778,7 @@ stages:
           # Copy artifacts
           - pwsh: |
               if (Test-Path tests/Umbraco.Tests.AcceptanceTest/results/*) {
-                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results $(Build.ArtifactStagingDirectory) -Recurse
+                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results/* $(Build.ArtifactStagingDirectory) -Recurse
               }
             displayName: Copy Playwright results
             condition: succeededOrFailed()
@@ -790,8 +789,7 @@ stages:
             condition: succeededOrFailed()
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
-              artifact: "Acceptance Tests - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
-
+              artifact: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
   ###############################################
   ## Release
   ###############################################

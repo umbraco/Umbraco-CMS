@@ -22,7 +22,7 @@ import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 
 import '../../components/block-list-entry/index.js';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import { ExtractJsonQueryProps, UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -35,6 +35,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryE
 	},
 	//identifier: 'block-list-editor',
 	itemSelector: 'umb-block-list-entry',
+	disabledItemSelector: '[unsupported]',
 	//containerSelector: 'EMPTY ON PURPOSE, SO IT BECOMES THE HOST ELEMENT',
 };
 
@@ -54,10 +55,6 @@ export class UmbPropertyEditorUIBlockListElement
 	#contentDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 	#settingsDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 
-	//#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
-
-	private _value: UmbBlockListValueModel | undefined = undefined;
-
 	#lastValue: UmbBlockListValueModel | undefined = undefined;
 
 	@property({ attribute: false })
@@ -65,7 +62,7 @@ export class UmbPropertyEditorUIBlockListElement
 		this.#lastValue = value;
 
 		if (!value) {
-			this._value = undefined;
+			super.value = undefined;
 			return;
 		}
 
@@ -74,15 +71,15 @@ export class UmbPropertyEditorUIBlockListElement
 		buildUpValue.contentData ??= [];
 		buildUpValue.settingsData ??= [];
 		buildUpValue.expose ??= [];
-		this._value = buildUpValue as UmbBlockListValueModel;
+		super.value = buildUpValue as UmbBlockListValueModel;
 
-		this.#managerContext.setLayouts(this._value.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? []);
-		this.#managerContext.setContents(this._value.contentData);
-		this.#managerContext.setSettings(this._value.settingsData);
-		this.#managerContext.setExposes(this._value.expose);
+		this.#managerContext.setLayouts(super.value.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? []);
+		this.#managerContext.setContents(super.value.contentData);
+		this.#managerContext.setSettings(super.value.settingsData);
+		this.#managerContext.setExposes(super.value.expose);
 	}
 	public override get value(): UmbBlockListValueModel | undefined {
-		return this._value;
+		return super.value;
 	}
 
 	@state()
@@ -184,6 +181,27 @@ export class UmbPropertyEditorUIBlockListElement
 				'observePropertyAlias',
 			);
 
+			// Observe Blocks and clean up validation messages for content/settings that are not in the block list anymore:
+			this.observe(this.#managerContext.layouts, (layouts) => {
+				const contentKeys = layouts.map((x) => x.contentKey);
+				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.contentData').forEach((message) => {
+					// get the KEY from this string: $.contentData[?(@.key == 'KEY')]
+					const key = ExtractJsonQueryProps(message.path).key;
+					if (key && contentKeys.indexOf(key) === -1) {
+						this.#validationContext.messages.removeMessageByKey(message.key);
+					}
+				});
+
+				const settingsKeys = layouts.map((x) => x.settingsKey).filter((x) => x !== undefined) as string[];
+				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.settingsData').forEach((message) => {
+					// get the key from this string: $.settingsData[?(@.key == 'KEY')]
+					const key = ExtractJsonQueryProps(message.path).key;
+					if (key && settingsKeys.indexOf(key) === -1) {
+						this.#validationContext.messages.removeMessageByKey(message.key);
+					}
+				});
+			});
+
 			this.observe(
 				observeMultiple([
 					this.#managerContext.layouts,
@@ -193,10 +211,10 @@ export class UmbPropertyEditorUIBlockListElement
 				]).pipe(debounceTime(20)),
 				([layouts, contents, settings, exposes]) => {
 					if (layouts.length === 0) {
-						this._value = undefined;
+						super.value = undefined;
 					} else {
-						this._value = {
-							...this._value,
+						super.value = {
+							...super.value,
 							layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
 							contentData: contents,
 							settingsData: settings,
@@ -206,11 +224,11 @@ export class UmbPropertyEditorUIBlockListElement
 
 					// If we don't have a value set from the outside or an internal value, we don't want to set the value.
 					// This is added to prevent the block list from setting an empty value on startup.
-					if (this.#lastValue === undefined && this._value === undefined) {
+					if (this.#lastValue === undefined && super.value === undefined) {
 						return;
 					}
 
-					context.setValue(this._value);
+					context.setValue(super.value);
 				},
 				'motherObserver',
 			);
@@ -338,7 +356,7 @@ export class UmbPropertyEditorUIBlockListElement
 				look="placeholder"
 				href=${this._catalogueRouteBuilder?.({ view: 'clipboard', index: -1 }) ?? ''}
 				?disabled=${this.readonly}>
-				<uui-icon name="icon-paste-in"></uui-icon>
+				<uui-icon name="icon-clipboard-paste"></uui-icon>
 			</uui-button>
 		`;
 	}

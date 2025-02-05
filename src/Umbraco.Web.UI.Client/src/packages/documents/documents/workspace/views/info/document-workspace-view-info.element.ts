@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_PROPERTY_DATASET_CONTEXT, UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../../constants.js';
 import type { UmbDocumentVariantModel } from '../../../types.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from '../../../publishing/index.js';
-import { TimeOptions } from './utils.js';
+import { TimeOptions } from '../../../utils.js';
 import { css, customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -11,11 +11,9 @@ import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UMB_TEMPLATE_PICKER_MODAL, UmbTemplateItemRepository } from '@umbraco-cms/backoffice/template';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
-
-// import of local components
-import './document-workspace-view-info-links.element.js';
-import './document-workspace-view-info-history.element.js';
-import './document-workspace-view-info-reference.element.js';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
+import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 
 @customElement('umb-document-workspace-view-info')
 export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
@@ -47,6 +45,9 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 	@state()
 	private _variantsWithPendingChanges: Array<any> = [];
+
+	@state()
+	private _hasSettingsAccess: boolean = false;
 
 	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 	#templateRepository = new UmbTemplateItemRepository(this);
@@ -83,6 +84,17 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			this.#documentPublishingWorkspaceContext = instance;
 			this.#observePendingChanges();
 		});
+
+		createExtensionApiByAlias(this, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					match: UMB_SETTINGS_SECTION_ALIAS,
+				},
+				onChange: (permitted: boolean) => {
+					this._hasSettingsAccess = permitted;
+				},
+			},
+		]);
 	}
 
 	#observeContent() {
@@ -165,10 +177,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	override render() {
 		return html`
 			<div class="container">
-				<umb-document-workspace-view-info-links></umb-document-workspace-view-info-links>
-				<umb-document-workspace-view-info-reference
-					.documentUnique=${this._documentUnique}></umb-document-workspace-view-info-reference>
-				<umb-document-workspace-view-info-history></umb-document-workspace-view-info-history>
+				<umb-extension-slot id="workspace-info-apps" type="workspaceInfoApp"></umb-extension-slot>
 			</div>
 			<div class="container">
 				<uui-box headline=${this.localize.term('general_general')} id="general-section">
@@ -189,7 +198,10 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 				<strong><umb-localize key="content_documentType">Document Type</umb-localize></strong>
 				<uui-ref-node-document-type
 					standalone
-					href=${editDocumentTypePath + 'edit/' + this._documentTypeUnique}
+					href=${ifDefined(
+						this._hasSettingsAccess ? editDocumentTypePath + 'edit/' + this._documentTypeUnique : undefined,
+					)}
+					?readonly=${!this._hasSettingsAccess}
 					name=${ifDefined(this.localize.string(this._documentTypeName ?? ''))}>
 					<umb-icon slot="icon" name=${ifDefined(this._documentTypeIcon)}></umb-icon>
 				</uui-ref-node-document-type>
@@ -215,7 +227,10 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 							<uui-ref-node
 								standalone
 								name=${ifDefined(this._templateName)}
-								href=${editTemplatePath + 'edit/' + this._templateUnique}>
+								href=${ifDefined(
+									this._hasSettingsAccess ? editTemplatePath + 'edit/' + this._templateUnique : undefined,
+								)}
+								?readonly=${!this._hasSettingsAccess}>
 								<uui-icon slot="icon" name="icon-document-html"></uui-icon>
 								<uui-action-bar slot="actions">
 									<uui-button
@@ -310,6 +325,11 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 			.variant-state > span {
 				color: var(--uui-color-divider-emphasis);
+			}
+
+			uui-ref-node-document-type[readonly] {
+				padding-top: 7px;
+				padding-bottom: 7px;
 			}
 		`,
 	];

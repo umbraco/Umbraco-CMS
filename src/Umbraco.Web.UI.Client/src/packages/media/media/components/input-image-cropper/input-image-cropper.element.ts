@@ -12,19 +12,34 @@ import './image-cropper.element.js';
 import './image-cropper-focus-setter.element.js';
 import './image-cropper-preview.element.js';
 import './image-cropper-field.element.js';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+
+const DefaultFocalPoint = { left: 0.5, top: 0.5 };
+const DefaultValue = {
+	temporaryFileId: null,
+	src: '',
+	crops: [],
+	focalPoint: DefaultFocalPoint,
+};
 
 @customElement('umb-input-image-cropper')
-export class UmbInputImageCropperElement extends UmbLitElement {
+export class UmbInputImageCropperElement extends UmbFormControlMixin<
+	UmbImageCropperPropertyEditorValue,
+	typeof UmbLitElement,
+	undefined
+>(UmbLitElement, undefined) {
 	@query('#dropzone')
 	private _dropzone?: UUIFileDropzoneElement;
 
-	@property({ attribute: false })
-	value: UmbImageCropperPropertyEditorValue = {
-		temporaryFileId: null,
-		src: '',
-		crops: [],
-		focalPoint: { left: 0.5, top: 0.5 },
-	};
+	/**
+	 * Sets the input to required, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	required?: boolean;
+
+	@property({ type: String })
+	requiredMessage?: string;
 
 	@property({ attribute: false })
 	crops: UmbImageCropperPropertyEditorValue['crops'] = [];
@@ -40,6 +55,14 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.#manager = new UmbTemporaryFileManager(this);
+
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => {
+				return !!this.required && (!this.value || (this.value.src === '' && this.value.temporaryFileId == null));
+			},
+		);
 	}
 
 	protected override firstUpdated(): void {
@@ -54,7 +77,7 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 		this.file = file;
 		this.fileUnique = unique;
 
-		this.value = assignToFrozenObject(this.value, { temporaryFileId: unique });
+		this.value = assignToFrozenObject(this.value ?? DefaultValue, { temporaryFileId: unique });
 
 		this.#manager?.uploadOne({ temporaryUnique: unique, file });
 
@@ -68,7 +91,7 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 	}
 
 	#onRemove = () => {
-		this.value = assignToFrozenObject(this.value, { src: '', temporaryFileId: null });
+		this.value = undefined;
 		if (this.fileUnique) {
 			this.#manager?.removeOne(this.fileUnique);
 		}
@@ -79,25 +102,27 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 	};
 
 	#mergeCrops() {
-		// Replace crops from the value with the crops from the config while keeping the coordinates from the value if they exist.
-		const filteredCrops = this.crops.map((crop) => {
-			const cropFromValue = this.value.crops.find((valueCrop) => valueCrop.alias === crop.alias);
-			const result = {
-				...crop,
-				coordinates: cropFromValue?.coordinates ?? undefined,
+		if (this.value) {
+			// Replace crops from the value with the crops from the config while keeping the coordinates from the value if they exist.
+			const filteredCrops = this.crops.map((crop) => {
+				const cropFromValue = this.value!.crops.find((valueCrop) => valueCrop.alias === crop.alias);
+				const result = {
+					...crop,
+					coordinates: cropFromValue?.coordinates ?? undefined,
+				};
+
+				return result;
+			});
+
+			this.value = {
+				...this.value,
+				crops: filteredCrops,
 			};
-
-			return result;
-		});
-
-		this.value = {
-			...this.value,
-			crops: filteredCrops,
-		};
+		}
 	}
 
 	override render() {
-		if (this.value.src || this.file) {
+		if (this.value?.src || this.file) {
 			return this.#renderImageCropper();
 		}
 
@@ -116,12 +141,18 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 		const value = (e.target as UmbInputImageCropperFieldElement).value;
 
 		if (!value) {
-			this.value = { src: '', crops: [], focalPoint: { left: 0.5, top: 0.5 }, temporaryFileId: null };
+			this.value = undefined;
 			this.dispatchEvent(new UmbChangeEvent());
 			return;
 		}
 
-		this.value = value;
+		if (this.value && this.value.temporaryFileId) {
+			value.temporaryFileId = this.value.temporaryFileId;
+		}
+
+		if (value.temporaryFileId || value.src !== '') {
+			this.value = value;
+		}
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 

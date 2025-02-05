@@ -13,7 +13,7 @@ export class UmbIconRegistryContext extends UmbContextBase<UmbIconRegistryContex
 	#manifestMap = new Map();
 	#icons = new UmbArrayState<UmbIconDefinition>([], (x) => x.name);
 	readonly icons = this.#icons.asObservable();
-	readonly approvedIcons = this.#icons.asObservablePart((icons) => icons.filter((x) => x.legacy !== true));
+	readonly approvedIcons = this.#icons.asObservablePart((icons) => icons.filter((x) => x.hidden !== true));
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_ICON_REGISTRY_CONTEXT);

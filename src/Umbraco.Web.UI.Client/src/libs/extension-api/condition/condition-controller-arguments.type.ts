@@ -3,4 +3,9 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export type UmbConditionControllerArguments<
 	ConditionConfigType extends UmbConditionConfigBase = UmbConditionConfigBase,
-> = { host: UmbControllerHost; config: ConditionConfigType; onChange: () => void };
+	ConditionOnChangeCallbackType = () => void,
+> = {
+	host: UmbControllerHost;
+	config: ConditionConfigType;
+	onChange: ConditionOnChangeCallbackType;
+};

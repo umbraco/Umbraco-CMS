@@ -1,4 +1,5 @@
 import { manifests as examineManifests } from './examine-management-dashboard/manifests.js';
+import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -32,7 +33,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.SectionAlias',
-				match: 'Umb.Section.Settings',
+				match: UMB_SETTINGS_SECTION_ALIAS,
 			},
 		],
 	},

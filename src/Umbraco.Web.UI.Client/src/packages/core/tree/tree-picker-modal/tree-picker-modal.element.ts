@@ -55,7 +55,17 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 		if (_changedProperties.has('data')) {
 			if (this.data?.search) {
-				this.#pickerContext.search.updateConfig({ ...this.data?.search, searchFrom: this.data?.startNode });
+				this.#pickerContext.search.updateConfig({
+					...this.data.search,
+					searchFrom: this.data.startNode,
+				});
+
+				const searchQueryParams = this.data.search.queryParams;
+				if (searchQueryParams) {
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					//@ts-ignore - TODO wire up types
+					this.#pickerContext.search.setQuery(searchQueryParams);
+				}
 			}
 
 			const multiple = this.data?.multiple ?? false;
@@ -148,7 +158,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	override render() {
 		return html`
-			<umb-body-layout headline="Select">
+			<umb-body-layout headline=${this.localize.term('general_choose')}>
 				<uui-box> ${this.#renderSearch()} ${this.#renderTree()}</uui-box>
 				${this.#renderActions()}
 			</umb-body-layout>
