@@ -351,3 +351,48 @@ test.skip('cannot submit the empty link using spacebar', async ({umbracoApi, umb
   // Assert
   await umbracoUi.content.isTextWithMessageVisible(warningEmptyLink);
 });
+
+// TODO: Remove skip when the front-end ready. Currently it is impossible to link to unpublished document
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17974
+test.skip('can create content with the link to an unpublished document', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const expectedState = 'Draft';
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  // Create a document to link
+  const documentTypeForLinkedDocumentName = 'TestDocumentType';
+  const documentTypeForLinkedDocumentId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeForLinkedDocumentName);
+  const linkedDocumentName = 'LinkedDocument';
+  const linkedDocumentId = await umbracoApi.document.createDefaultDocument(linkedDocumentName, documentTypeForLinkedDocumentId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuAtRoot();
+  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.chooseDocumentType(documentTypeName);
+  await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickDocumentLinkButton();
+  await umbracoUi.content.selectLinkByName(linkedDocumentName);
+  await umbracoUi.content.clickButtonWithName('Choose');
+  await umbracoUi.content.clickAddButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe(expectedState);
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
+  expect(contentData.values[0].value.length).toBe(1);
+  expect(contentData.values[0].value[0].type).toEqual('document');
+  expect(contentData.values[0].value[0].icon).toEqual('icon-document');
+  expect(contentData.values[0].value[0].target).toBeNull();
+  expect(contentData.values[0].value[0].unique).toEqual(linkedDocumentId);
+  expect(contentData.values[0].value[0].name).toEqual(linkedDocumentName);
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeForLinkedDocumentName);
+  await umbracoApi.document.ensureNameNotExists(linkedDocumentName);
+});
