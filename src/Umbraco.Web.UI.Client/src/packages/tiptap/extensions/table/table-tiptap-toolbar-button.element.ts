@@ -1,5 +1,5 @@
 import { UmbTiptapToolbarButtonElement } from '../../components/toolbar/tiptap-toolbar-button.element.js';
-import type UmbTiptapToolbarTableExtensionApi from '../toolbar/table.tiptap-toolbar-api.js';
+import type UmbTiptapToolbarTableExtensionApi from './table.tiptap-toolbar-api.js';
 import { css, customElement, html, ifDefined, query, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
@@ -126,7 +126,7 @@ export class UmbTiptapToolbarTableToolbarButtonElement extends UmbTiptapToolbarB
 							(item) => item.label,
 							(item) => html`
 								<uui-menu-item label=${item.label} @click-label=${() => this.#onClick(item)}>
-									${when(!item.icon, (icon) => html`<umb-icon slot="icon" name=${icon}></umb-icon>`)}
+									${when(item.icon, (icon) => html`<umb-icon slot="icon" name=${icon}></umb-icon>`)}
 								</uui-menu-item>
 							`,
 						)}
