@@ -211,6 +211,21 @@ public interface IMemberService : IMembershipMemberService
     IMember? GetById(int id);
 
     /// <summary>
+    ///     Get an list of <see cref="IMember"/> for all members with the specified email.
+    /// </summary>
+    //// <param name="email">Email to use for retrieval</param>
+    /// <returns>
+    ///     <see cref="IEnumerable{IMember}" />
+    /// </returns>
+    IEnumerable<IMember> GetMembersByEmail(string email)
+        =>
+        // TODO (V16): Remove this default implementation.
+        // The following is very inefficient, but will return the correct data, so probably better than throwing a NotImplementedException
+        // in the default implentation here, for, presumably rare, cases where a custom IMemberService implementation has been registered and
+        // does not override this method.
+        GetAllMembers().Where(x => x.Email.Equals(email));
+
+    /// <summary>
     ///     Gets all Members for the specified MemberType alias
     /// </summary>
     /// <param name="memberTypeAlias">Alias of the MemberType</param>
