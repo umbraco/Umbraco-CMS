@@ -17,6 +17,7 @@ export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel> exten
 	hasActions: Observable<boolean>;
 	path: Observable<string>;
 	pagination: UmbPaginationManager;
+	getTreeItem(): TreeItemType | undefined;
 	setTreeItem(treeItem: TreeItemType | undefined): void;
 	loadChildren(): void;
 	toggleContextMenu(): void;
