@@ -70,11 +70,13 @@ public class MemberControllerUnitTests
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
-        ITwoFactorLoginService twoFactorLoginService,
-        IOptions<SecuritySettings> securitySettings)
+        ITwoFactorLoginService twoFactorLoginService)
     {
         // arrange
         SetupMemberTestData(out var fakeMemberData, out _, ContentSaveAction.SaveNew);
+
+        var securitySettings = Options.Create(new SecuritySettings());
+
         var sut = CreateSut(
             memberService,
             memberTypeService,
@@ -117,8 +119,7 @@ public class MemberControllerUnitTests
         IBackOfficeSecurity backOfficeSecurity,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
-        ITwoFactorLoginService twoFactorLoginService,
-        IOptions<SecuritySettings> securitySettings)
+        ITwoFactorLoginService twoFactorLoginService)
     {
         // arrange
         var member = SetupMemberTestData(out var fakeMemberData, out var memberDisplay, ContentSaveAction.SaveNew);
@@ -138,6 +139,8 @@ public class MemberControllerUnitTests
             .Returns(() => null)
             .Returns(() => member);
         Mock.Get(memberService).Setup(x => x.GetByUsername(It.IsAny<string>())).Returns(() => member);
+
+        var securitySettings = Options.Create(new SecuritySettings());
 
         var sut = CreateSut(
             memberService,
@@ -172,8 +175,7 @@ public class MemberControllerUnitTests
         IBackOfficeSecurity backOfficeSecurity,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
-        ITwoFactorLoginService twoFactorLoginService,
-        IOptions<SecuritySettings> securitySettings)
+        ITwoFactorLoginService twoFactorLoginService)
     {
         // arrange
         var member = SetupMemberTestData(out var fakeMemberData, out var memberDisplay, ContentSaveAction.SaveNew);
@@ -193,6 +195,8 @@ public class MemberControllerUnitTests
             .Returns(() => null)
             .Returns(() => member);
         Mock.Get(memberService).Setup(x => x.GetByUsername(It.IsAny<string>())).Returns(() => member);
+
+        var securitySettings = Options.Create(new SecuritySettings());
 
         var sut = CreateSut(
             memberService,
@@ -228,8 +232,7 @@ public class MemberControllerUnitTests
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
         IUser user,
-        ITwoFactorLoginService twoFactorLoginService,
-        IOptions<SecuritySettings> securitySettings)
+        ITwoFactorLoginService twoFactorLoginService)
     {
         // arrange
         var member = SetupMemberTestData(out var fakeMemberData, out var memberDisplay, ContentSaveAction.Save);
@@ -259,6 +262,8 @@ public class MemberControllerUnitTests
                 x => x.GetByEmail(It.IsAny<string>()))
             .Returns(() => null)
             .Returns(() => member);
+
+        var securitySettings = Options.Create(new SecuritySettings());
 
         var sut = CreateSut(
             memberService,
@@ -294,8 +299,7 @@ public class MemberControllerUnitTests
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
         IUser user,
-        ITwoFactorLoginService twoFactorLoginService,
-        IOptions<SecuritySettings> securitySettings)
+        ITwoFactorLoginService twoFactorLoginService)
     {
         // arrange
         var member = SetupMemberTestData(out var fakeMemberData, out _, ContentSaveAction.Save);
@@ -321,6 +325,8 @@ public class MemberControllerUnitTests
                 x => x.GetByEmail(It.IsAny<string>()))
             .Returns(() => null)
             .Returns(() => member);
+
+        var securitySettings = Options.Create(new SecuritySettings());
 
         var sut = CreateSut(
             memberService,
@@ -389,8 +395,7 @@ public class MemberControllerUnitTests
         IBackOfficeSecurity backOfficeSecurity,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
-        ITwoFactorLoginService twoFactorLoginService,
-        IOptions<SecuritySettings> securitySettings)
+        ITwoFactorLoginService twoFactorLoginService)
     {
         // arrange
         var member = SetupMemberTestData(out var fakeMemberData, out _, ContentSaveAction.SaveNew);
@@ -409,6 +414,8 @@ public class MemberControllerUnitTests
         Mock.Get(memberService).SetupSequence(
                 x => x.GetByEmail(It.IsAny<string>()))
             .Returns(() => member);
+
+        var securitySettings = Options.Create(new SecuritySettings());
 
         var sut = CreateSut(
             memberService,
@@ -447,18 +454,23 @@ public class MemberControllerUnitTests
         ITwoFactorLoginService twoFactorLoginService)
     {
         // arrange
-        var member = SetupMemberTestData(out var fakeMemberData, out _, ContentSaveAction.SaveNew);
+        var member = SetupMemberTestData(out var fakeMemberData, out var memberDisplay, ContentSaveAction.SaveNew);
         Mock.Get(umbracoMembersUserManager)
-            .Setup(x => x.CreateAsync(It.IsAny<MemberIdentityUser>()))
+            .Setup(x => x.CreateAsync(It.IsAny<MemberIdentityUser>(), It.IsAny<string>()))
             .ReturnsAsync(() => IdentityResult.Success);
-        Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
-        Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
         Mock.Get(umbracoMembersUserManager)
             .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
             .ReturnsAsync(() => IdentityResult.Success);
         Mock.Get(umbracoMembersUserManager)
-            .Setup(x => x.AddToRolesAsync(It.IsAny<MemberIdentityUser>(), It.IsAny<IEnumerable<string>>()))
-            .ReturnsAsync(() => IdentityResult.Success);
+            .Setup(x => x.GetRolesAsync(It.IsAny<MemberIdentityUser>()))
+            .ReturnsAsync(() => Array.Empty<string>());
+        Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
+        Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
+        Mock.Get(memberService).SetupSequence(
+                x => x.GetByEmail(It.IsAny<string>()))
+            .Returns(() => null)
+            .Returns(() => member);
+        Mock.Get(memberService).Setup(x => x.GetByUsername(It.IsAny<string>())).Returns(() => member);
 
         Mock.Get(memberService).SetupSequence(
                 x => x.GetByEmail(It.IsAny<string>()))
@@ -500,8 +512,7 @@ public class MemberControllerUnitTests
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
         IUser user,
-        ITwoFactorLoginService twoFactorLoginService,
-        IOptions<SecuritySettings> securitySettings)
+        ITwoFactorLoginService twoFactorLoginService)
     {
         // arrange
         var roleName = "anyrole";
@@ -536,6 +547,9 @@ public class MemberControllerUnitTests
                 x => x.GetByEmail(It.IsAny<string>()))
             .Returns(() => null)
             .Returns(() => member);
+
+        var securitySettings = Options.Create(new SecuritySettings());
+
         var sut = CreateSut(
             memberService,
             memberTypeService,
@@ -589,7 +603,7 @@ public class MemberControllerUnitTests
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
         ITwoFactorLoginService twoFactorLoginService,
-        IOptions<SecuritySettings>? securitySettings)
+        IOptions<SecuritySettings> securitySettings)
     {
         var httpContextAccessor = new HttpContextAccessor();
 
