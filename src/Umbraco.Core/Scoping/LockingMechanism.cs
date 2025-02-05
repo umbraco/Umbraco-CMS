@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Collections;
@@ -189,14 +190,14 @@ public class LockingMechanism : ILockingMechanism
     /// <param name="lockId">Lock ID to increment.</param>
     /// <param name="instanceId">Instance ID of the scope requesting the lock.</param>
     /// <param name="locks">Reference to the dictionary to increment on</param>
-    private void IncrementLock(int lockId, Guid instanceId, ref Dictionary<Guid, Dictionary<int, int>>? locks)
+    private static void IncrementLock(int lockId, Guid instanceId, ref Dictionary<Guid, Dictionary<int, int>>? locks)
     {
         // Since we've already checked that we're the parent in the WriteLockInner method, we don't need to check again.
         // If it's the very first time a lock has been requested the WriteLocks dict hasn't been instantiated yet.
         locks ??= new Dictionary<Guid, Dictionary<int, int>>();
 
         // Try and get the dict associated with the scope id.
-        var locksDictFound = locks.TryGetValue(instanceId, out Dictionary<int, int>? locksDict);
+        ref Dictionary<int, int>? locksDict = ref CollectionsMarshal.GetValueRefOrAddDefault(locks, instanceId, out bool locksDictFound);
         if (locksDictFound)
         {
             locksDict!.TryGetValue(lockId, out var value);
@@ -205,8 +206,7 @@ public class LockingMechanism : ILockingMechanism
         else
         {
             // The scope hasn't requested a lock yet, so we have to create a dict for it.
-            locks.Add(instanceId, new Dictionary<int, int>());
-            locks[instanceId][lockId] = 1;
+            locksDict = new Dictionary<int, int> { { lockId, 1 } };
         }
     }
 
