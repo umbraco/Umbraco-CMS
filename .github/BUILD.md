@@ -104,6 +104,14 @@ cd <solution root>\src\Umbraco.Web.UI.Login
 npm run build
 ```
 
+In both front-end projects, if you've refreshed your branch from the latest on GitHub you may need to update front-end dependencies.
+
+To do that, run:
+
+```
+npm ci --no-fund --no-audit --prefer-offline
+```
+
 ### Full-stack changes
 
 If working across both front and back-end, follow both methods and use `dotnet watch`, or re-run `dotnet run` (or `dotnet build` followed by `dotnet run --no-build`) whenever you need to update the back-end code.
