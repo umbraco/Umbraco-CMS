@@ -284,7 +284,7 @@ test('cannot submit the empty link', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickAddButton();
 
   // Assert
-  await umbracoUi.content.isTextWithMessageVisible(warningText);
+  await umbracoUi.content.isTextWithMessageVisible(warningEmptyLink);
 });
 
 test('cannot update the URL picker with empty link', async ({umbracoApi, umbracoUi}) => {
