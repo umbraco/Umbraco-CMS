@@ -744,13 +744,16 @@ public class MemberController : ContentControllerBase
             return false;
         }
 
-        IMember? byEmail = _memberService.GetByEmail(contentItem.Email);
-        if (_securitySettings != null && _securitySettings.MemberRequireUniqueEmail && byEmail != null && byEmail.Key != contentItem.Key)
+        if (_securitySettings.MemberRequireUniqueEmail)
         {
-            ModelState.AddPropertyError(
-                new ValidationResult("Email address is already in use", new[] { "value" }),
-                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
-            return false;
+            IMember? byEmail = _memberService.GetByEmail(contentItem.Email);
+            if (byEmail != null && byEmail.Key != contentItem.Key)
+            {
+                ModelState.AddPropertyError(
+                    new ValidationResult("Email address is already in use", new[] { "value" }),
+                    $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
+                return false;
+            }
         }
 
         return true;

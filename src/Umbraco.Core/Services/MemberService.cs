@@ -392,7 +392,7 @@ namespace Umbraco.Cms.Core.Services
         /// Get an <see cref="IMember"/> by email. If RequireUniqueEmailForMembers is set to false, then the first member found with the specified email will be returned.
         /// </summary>
         /// <param name="email">Email to use for retrieval</param>
-        /// <returns><see cref="IMember"/></returns>        
+        /// <returns><see cref="IMember"/></returns>
         public IMember? GetByEmail(string email)
         {
             return this.GetMembersByEmail(email).FirstOrDefault();
