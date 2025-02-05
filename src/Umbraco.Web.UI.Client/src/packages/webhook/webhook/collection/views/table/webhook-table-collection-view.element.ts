@@ -73,7 +73,7 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 
 	#createTableItems(webhooks: Array<UmbWebhookDetailModel>) {
 		this._tableItems = webhooks.map((webhook) => {
-			const name = webhook.name || this.#unnamedWebhookLabel;
+			const name = webhook.name || `(${this.#unnamedWebhookLabel})`;
 
 			return {
 				id: webhook.unique,
