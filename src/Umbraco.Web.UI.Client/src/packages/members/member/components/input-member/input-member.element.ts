@@ -5,10 +5,8 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/member-type';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-input-member')
 export class UmbInputMemberElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -133,15 +131,6 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 	constructor() {
 		super();
 
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath('member')
-			.onSetup(() => {
-				return { data: { entityType: 'member', preset: {} } };
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._editMemberPath = routeBuilder({});
-			});
-
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
@@ -172,10 +161,6 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 		);
 	}
 
-	#onRemove(item: UmbMemberItemModel) {
-		this.#pickerContext.requestRemoveItem(item.unique);
-	}
-
 	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
@@ -187,7 +172,11 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 				${repeat(
 					this._items,
 					(item) => item.unique,
-					(item) => this.#renderItem(item),
+					(item) =>
+						html`<umb-entity-item-ref
+							.item=${item}
+							?readonly=${this.readonly}
+							?standalone=${this.max === 1}></umb-entity-item-ref>`,
 				)}
 			</uui-ref-list>
 		`;
@@ -207,36 +196,6 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 					?disabled=${this.readonly}></uui-button>
 			`;
 		}
-	}
-
-	#renderItem(item: UmbMemberItemModel) {
-		if (!item.unique) return nothing;
-		return html`
-			<uui-ref-node-member name=${item.name} id=${item.unique} ?readonly=${this.readonly}>
-				${when(item.memberType.icon, (icon) => html`<umb-icon slot="icon" name=${icon}></umb-icon>`)}
-				<uui-action-bar slot="actions">
-					${this.#renderOpenButton(item)} ${this.#renderRemoveButton(item)}
-				</uui-action-bar>
-			</uui-ref-node-member>
-		`;
-	}
-
-	#renderOpenButton(item: UmbMemberItemModel) {
-		if (!this.showOpenButton) return nothing;
-		return html`
-			<uui-button
-				href="${this._editMemberPath}edit/${item.unique}"
-				label="${this.localize.term('general_open')} ${item.name}">
-				<umb-localize key="general_open"></umb-localize>
-			</uui-button>
-		`;
-	}
-
-	#renderRemoveButton(item: UmbMemberItemModel) {
-		if (this.readonly) return nothing;
-		return html`
-			<uui-button @click=${() => this.#onRemove(item)} label=${this.localize.term('general_remove')}></uui-button>
-		`;
 	}
 
 	static override styles = [
