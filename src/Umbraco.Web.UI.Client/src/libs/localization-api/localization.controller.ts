@@ -191,9 +191,10 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * If the term is found in the localization set, it will be replaced with the localized term.
 	 * If the term is not found, the original term will be returned.
 	 * @param {string} text The text to translate.
+	 * @param {...any} args The arguments to parse for this localization entry.
 	 * @returns {string} The translated text.
 	 */
-	string(text: unknown): string {
+	string(text: unknown, ...args: any): string {
 		if (typeof text !== 'string') {
 			return '';
 		}
@@ -203,10 +204,10 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 
 		const localizedText = text.replace(regex, (match: string) => {
 			const key = match.slice(1);
-			// TODO: find solution to pass dynamic string to term
+
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
-			const localized = this.term(key);
+			const localized = this.term(key, ...args);
 			// we didn't find a localized string, so we return the original string with the #
 			return localized === key ? match : localized;
 		});
