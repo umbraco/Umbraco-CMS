@@ -7,6 +7,7 @@ import {
 	ifDefined,
 	nothing,
 	property,
+	state,
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -25,6 +26,9 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	@property({ type: Boolean })
 	standalone = false;
 
+	@state()
+	_isPickerInput = false;
+
 	_editDocumentPath = '';
 
 	#pickerInputContext?: typeof UMB_PICKER_INPUT_CONTEXT.TYPE;
@@ -34,6 +38,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 
 		this.consumeContext(UMB_PICKER_INPUT_CONTEXT, (context) => {
 			this.#pickerInputContext = context;
+			this._isPickerInput = context !== undefined;
 		});
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
@@ -54,8 +59,9 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		return `${this._editDocumentPath}/edit/${item.unique}`;
 	}
 
-	#onRemove(item: UmbDocumentItemModel) {
-		this.#pickerInputContext?.requestRemoveItem(item.unique);
+	#onRemove() {
+		if (!this.item) return;
+		this.#pickerInputContext?.requestRemoveItem(this.item.unique);
 	}
 
 	override render() {
@@ -69,18 +75,20 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 				href=${ifDefined(this.#getHref(this.item))}
 				?readonly=${this.readonly}
 				?standalone=${this.standalone}>
-				${this.#renderIcon(this.item)} ${this.#renderIsTrashed(this.item)}
-				${when(
-					!this.readonly,
-					() => html`
-						<uui-action-bar slot="actions">
-							<uui-button
-								label=${this.localize.term('general_remove')}
-								@click=${() => this.#onRemove(this.item)}></uui-button>
-						</uui-action-bar>
-					`,
-				)}
+				${this.#renderIcon(this.item)} ${this.#renderIsTrashed(this.item)} ${this.#renderActions()}
 			</uui-ref-node>
+		`;
+	}
+
+	#renderActions() {
+		if (this.readonly) return;
+		if (!this.item) return;
+		if (!this._isPickerInput) return;
+
+		return html`
+			<uui-action-bar slot="actions">
+				<uui-button label=${this.localize.term('general_remove')} @click=${this.#onRemove}></uui-button>
+			</uui-action-bar>
 		`;
 	}
 
