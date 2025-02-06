@@ -1869,4 +1869,67 @@ internal partial class BlockListElementLevelVariationTests
             Assert.AreEqual("blocks", publishResult.InvalidProperties.First().Alias);
         });
     }
+
+    [Test]
+    public async Task Can_Handle_Elements_Level_Property_Cache()
+    {
+        var elementType = new ContentTypeBuilder()
+            .WithAlias("myElementType")
+            .WithName("My Element Type")
+            .WithIsElement(true)
+            .WithContentVariation(ContentVariation.Culture)
+            .AddPropertyType()
+            .WithAlias("contentPicker")
+            .WithName("Content Picker")
+            .WithDataTypeId(1046)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.ContentPicker)
+            .WithValueStorageType(ValueStorageType.Nvarchar)
+            .WithVariations(ContentVariation.Culture)
+            .Done()
+            .Build();
+        ContentTypeService.Save(elementType);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var pickedContent1 = CreateContent(contentType, elementType, [], true);
+        var pickedContent2 = CreateContent(contentType, elementType, [], true);
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            [
+                new BlockProperty(
+                    new List<BlockPropertyValue>
+                    {
+                        new() { Alias = "contentPicker", Value = pickedContent1.GetUdi().ToString(), Culture = "en-US" },
+                        new() { Alias = "contentPicker", Value = pickedContent2.GetUdi().ToString(), Culture = "da-DK" },
+                    },
+                    [],
+                    null,
+                    null)
+            ],
+            true);
+
+        AssertPropertyValues("en-US", pickedContent1);
+
+        AssertPropertyValues("da-DK", pickedContent2);
+
+        void AssertPropertyValues(string culture, IContent expectedPickedContent)
+        {
+            SetVariationContext(culture, null);
+            var publishedContent = GetPublishedContent(content.Key);
+
+            var value = publishedContent.Value<BlockListModel>("blocks");
+            Assert.IsNotNull(value);
+            Assert.AreEqual(1, value.Count);
+
+            var blockListItem = value.First();
+            Assert.AreEqual(1, blockListItem.Content.Properties.Count());
+            // need to ensure the property type cache level, otherwise this test has little value
+            Assert.AreEqual(PropertyCacheLevel.Elements, blockListItem.Content.Properties.First().PropertyType.CacheLevel);
+            var actualPickedPublishedContent = blockListItem.Content.Value<IPublishedContent>("contentPicker");
+            Assert.IsNotNull(actualPickedPublishedContent);
+            Assert.AreEqual(expectedPickedContent.Key, actualPickedPublishedContent.Key);
+        }
+    }
 }

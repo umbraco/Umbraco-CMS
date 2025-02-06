@@ -509,7 +509,6 @@ export default {
 		anchorLinkPicker: 'Anchor or querystring',
 		anchorInsert: 'Name',
 		closeThisWindow: 'Close this window',
-		confirmdelete: 'Are you sure you want to delete',
 		confirmdeleteNumberOfItems: 'Are you sure you want to delete <strong>%0%</strong> of <strong>%1%</strong> items',
 		confirmdisable: 'Are you sure you want to disable',
 		confirmremove: 'Are you sure you want to remove',

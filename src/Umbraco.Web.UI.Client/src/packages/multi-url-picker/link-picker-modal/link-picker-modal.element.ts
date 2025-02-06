@@ -242,7 +242,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				<uui-button
 					data-mark="action:document"
 					look="placeholder"
-					label=${this.localize.term('general_document')}
+					label=${this.localize.term('general_content')}
 					@click=${this.#triggerDocumentPicker}></uui-button>
 				<uui-button
 					data-mark="action:media"
