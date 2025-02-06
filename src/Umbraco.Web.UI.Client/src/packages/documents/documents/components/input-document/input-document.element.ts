@@ -183,15 +183,18 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	#renderItems() {
 		if (!this._items) return;
 		return html`
-			${repeat(
-				this._items,
-				(item) => item.unique,
-				(item) =>
-					html`<umb-entity-item-ref
+			<uui-ref-list>
+				${repeat(
+					this._items,
+					(item) => item.unique,
+					(item) =>
+						html`<umb-entity-item-ref
 						.item=${item}
 						?readonly=${this.readonly}
-						?standalone=${this.max === 1}></umb-entity-item-ref>`,
-			)}
+						?standalone=${this.max === 1}></umb-entity-item-ref>
+						</uui-ref-list>`,
+				)}
+			</uui-ref-list>
 		`;
 	}
 
