@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Cms.Api.Delivery.Querying.Selectors;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi.Selectors;
@@ -30,8 +31,8 @@ public class DescendantsSelectorTests
         var subject = new DescendantsSelector(
             requestRoutingServiceMock.Object,
             Mock.Of<IRequestPreviewService>(),
-            Mock.Of<IRequestCultureService>(),
-            new ApiDocumentUrlService(documentUrlServiceMock.Object));
+            new ApiDocumentUrlService(documentUrlServiceMock.Object),
+            Mock.Of<IVariationContextAccessor>());
 
         var result = subject.BuildSelectorOption("descendants:/some/where");
         Assert.AreEqual(1, result.Values.Length);
@@ -46,8 +47,8 @@ public class DescendantsSelectorTests
         var subject = new DescendantsSelector(
             Mock.Of<IRequestRoutingService>(),
             Mock.Of<IRequestPreviewService>(),
-            Mock.Of<IRequestCultureService>(),
-            Mock.Of<IApiDocumentUrlService>());
+            Mock.Of<IApiDocumentUrlService>(),
+            Mock.Of<IVariationContextAccessor>());
 
         var result = subject.BuildSelectorOption($"descendants:{documentKey:D}");
         Assert.AreEqual(1, result.Values.Length);
