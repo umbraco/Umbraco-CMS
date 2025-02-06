@@ -4,7 +4,7 @@ export interface UmbTrashConfirmModalData {
 	unique: string;
 	entityType: string;
 	itemRepositoryAlias: string;
-	referenceRepositoryAlias: string;
+	referenceRepositoryAlias?: string;
 }
 
 export type UmbTrashConfirmModalValue = undefined;

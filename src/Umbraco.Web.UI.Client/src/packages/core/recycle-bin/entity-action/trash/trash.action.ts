@@ -6,7 +6,6 @@ import { UmbEntityTrashedEvent } from './trash.event.js';
 import { UMB_TRASH_CONFIRM_MODAL } from './modal/constants.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 /**

@@ -1,5 +1,5 @@
 import type { UmbTrashConfirmModalData, UmbTrashConfirmModalValue } from './trash-confirm-modal.token.js';
-import { html, customElement, property, css, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, css, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
@@ -30,10 +30,13 @@ export class UmbTrashConfirmModalElement extends UmbLitElement {
 	}
 
 	@state()
-	referencedBy: any[] = [];
+	_item: any;
 
 	@state()
-	_item: any;
+	_referencedBy: any[] = [];
+
+	@state()
+	_totalReferencedBy: number = 0;
 
 	#itemRepository?: UmbItemRepository<any>;
 	#referenceRepository?: any;
@@ -61,12 +64,20 @@ export class UmbTrashConfirmModalElement extends UmbLitElement {
 
 		this._item = item.name;
 
+		this.#loadReferencedBy();
+	}
+
+	async #loadReferencedBy() {
+		// Skip if there is no reference repository
+		if (!this._data?.referenceRepositoryAlias) return;
+
 		this.#referenceRepository = await createExtensionApiByAlias<any>(this, this._data.referenceRepositoryAlias);
 
-		const { data: referencesData } = await this.#referenceRepository.requestReferencedBy(this._data.unique);
+		const { data: referencesData } = await this.#referenceRepository.requestReferencedBy(this._data.unique, 0, 5);
 
 		if (referencesData) {
-			this.referencedBy = [...referencesData.items];
+			this._referencedBy = [...referencesData.items];
+			this._totalReferencedBy = referencesData.total;
 		}
 	}
 
@@ -74,10 +85,7 @@ export class UmbTrashConfirmModalElement extends UmbLitElement {
 		return html`
 			<uui-dialog-layout class="uui-text" headline="Trash">
 				<p>Are you sure you want to move <strong>${this._item}</strong> to the recycle bin?</p>
-
-				<uui-ref-list>
-					${this.referencedBy.map((reference) => html`<umb-ref-item .name=${reference.name}></umb-ref-item> `)}
-				</uui-ref-list>
+				${this.#renderReferencedBy()}
 
 				<uui-button slot="actions" id="cancel" label="Cancel" @click=${this._handleCancel}></uui-button>
 
@@ -93,11 +101,33 @@ export class UmbTrashConfirmModalElement extends UmbLitElement {
 		`;
 	}
 
+	#renderReferencedBy() {
+		if (this._totalReferencedBy === 0) return nothing;
+
+		return html`
+			<h5 id="reference-headline">${this.localize.term('references_labelDependsOnThis')}</h5>
+			<uui-ref-list>
+				${this._referencedBy.map((reference) => html`<umb-ref-item .name=${reference.name} readonly></umb-ref-item> `)}
+			</uui-ref-list>
+			${this._totalReferencedBy > 5
+				? html`<span>${this.localize.term('references_labelMoreReferences', this._totalReferencedBy - 5)}</span>`
+				: nothing}
+		`;
+	}
+
 	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-dialog-layout {
 				max-inline-size: 60ch;
+			}
+
+			#reference-headline {
+				margin-bottom: var(--uui-size-3);
+			}
+
+			uui-ref-list {
+				margin-bottom: var(--uui-size-2);
 			}
 		`,
 	];
