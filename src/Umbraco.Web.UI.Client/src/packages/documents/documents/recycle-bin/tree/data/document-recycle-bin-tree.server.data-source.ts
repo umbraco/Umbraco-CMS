@@ -1,6 +1,6 @@
-import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../constants.js';
-import type { UmbDocumentRecycleBinTreeItemModel } from './types.js';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
+import { UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../../constants.js';
+import type { UmbDocumentRecycleBinTreeItemModel } from '../types.js';
 import type { DocumentRecycleBinItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
