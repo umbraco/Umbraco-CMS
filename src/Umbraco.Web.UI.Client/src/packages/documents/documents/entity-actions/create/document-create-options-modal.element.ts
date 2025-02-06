@@ -1,4 +1,4 @@
-import { UmbDocumentItemRepository } from '../../repository/index.js';
+import { UmbDocumentItemRepository } from '../../item/index.js';
 import type {
 	UmbDocumentCreateOptionsModalData,
 	UmbDocumentCreateOptionsModalValue,

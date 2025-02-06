@@ -1,5 +1,5 @@
-import type { UmbDocumentItemModel } from '../repository/types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
+import type { UmbDocumentItemModel } from './types.js';
 import {
 	classMap,
 	customElement,
@@ -8,7 +8,6 @@ import {
 	nothing,
 	property,
 	state,
-	when,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';

@@ -1,4 +1,5 @@
-import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../item/constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_USER_PERMISSION_DOCUMENT_DELETE } from '../user-permissions/constants.js';
 import { manifests as createBlueprintManifests } from './create-blueprint/manifests.js';
