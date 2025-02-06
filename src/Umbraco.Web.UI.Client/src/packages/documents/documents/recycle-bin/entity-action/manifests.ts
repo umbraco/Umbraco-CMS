@@ -6,6 +6,7 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_MOVE,
 } from '../../constants.js';
 import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../repository/constants.js';
+import { UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS } from '../../reference/constants.js';
 import {
 	UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 	UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS,
@@ -21,6 +22,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
 			recycleBinRepositoryAlias: UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
+			referenceRepositoryAlias: UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
