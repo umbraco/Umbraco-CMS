@@ -57,7 +57,8 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 	static override styles = [
 		css`
 			:host {
-				display: contents;
+				display: block;
+				position: relative;
 			}
 		`,
 	];
