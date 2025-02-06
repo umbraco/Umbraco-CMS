@@ -197,11 +197,14 @@ public class LockingMechanism : ILockingMechanism
         locks ??= new Dictionary<Guid, Dictionary<int, int>>();
 
         // Try and get the dict associated with the scope id.
+        // GetValueRefOrAddDefault does lookup or creation with only one hash key generation, bucket lookup and value lookup in bucket
+        // Compared to doing it twice when initializing, one for the lookup and one for the insertion of the initial value
         ref Dictionary<int, int>? locksDict = ref CollectionsMarshal.GetValueRefOrAddDefault(locks, instanceId, out bool locksDictFound);
         if (locksDictFound)
         {
-            locksDict!.TryGetValue(lockId, out var value);
-            locksDict[lockId] = value + 1;
+            // By getting a reference to any existing or default 0 value, we can increment it without the expensive write back into the dictionary
+            ref int value = ref CollectionsMarshal.GetValueRefOrAddDefault(locksDict!, lockId, out _);
+            value++;
         }
         else
         {
