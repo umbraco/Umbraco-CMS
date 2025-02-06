@@ -137,24 +137,12 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	#readonly = false;
 
 	@state()
-	private _editDocumentPath = '';
-
-	@state()
 	private _items?: Array<UmbDocumentItemModel>;
 
 	#pickerContext = new UmbDocumentPickerInputContext(this);
 
 	constructor() {
 		super();
-
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath('document')
-			.onSetup(() => {
-				return { data: { entityType: 'document', preset: {} } };
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._editDocumentPath = routeBuilder({});
-			});
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -172,10 +160,6 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
 	}
 
-	#isDraft(item: UmbDocumentItemModel) {
-		return item.variants[0]?.state === 'Draft';
-	}
-
 	#openPicker() {
 		this.#pickerContext.openPicker(
 			{
@@ -189,10 +173,6 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 				})),
 			},
 		);
-	}
-
-	#onRemove(item: UmbDocumentItemModel) {
-		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
 	override render() {
@@ -218,50 +198,16 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	#renderItems() {
 		if (!this._items) return;
 		return html`
-			<uui-ref-list>
-				${repeat(
-					this._items,
-					(item) => item.unique,
-					(item) => this.#renderItem(item),
-				)}
-			</uui-ref-list>
+			${repeat(
+				this._items,
+				(item) => item.unique,
+				(item) =>
+					html`<umb-entity-item-ref
+						.item=${item}
+						?readonly=${this.readonly}
+						?standalone=${this.max === 1}></umb-entity-item-ref>`,
+			)}
 		`;
-	}
-
-	#renderItem(item: UmbDocumentItemModel) {
-		if (!item.unique) return;
-		const href = !this.readonly && this.showOpenButton ? `${this._editDocumentPath}edit/${item.unique}` : undefined;
-		return html`
-			<uui-ref-node
-				id=${item.unique}
-				class=${classMap({ draft: this.#isDraft(item) })}
-				name=${item.name}
-				href=${ifDefined(href)}
-				?readonly=${this.readonly}
-				?standalone=${this.max === 1}>
-				${this.#renderIcon(item)} ${this.#renderIsTrashed(item)}
-				${when(
-					!this.readonly,
-					() => html`
-						<uui-action-bar slot="actions">
-							<uui-button
-								label=${this.localize.term('general_remove')}
-								@click=${() => this.#onRemove(item)}></uui-button>
-						</uui-action-bar>
-					`,
-				)}
-			</uui-ref-node>
-		`;
-	}
-
-	#renderIcon(item: UmbDocumentItemModel) {
-		if (!item.documentType.icon) return;
-		return html`<umb-icon slot="icon" name=${item.documentType.icon}></umb-icon>`;
-	}
-
-	#renderIsTrashed(item: UmbDocumentItemModel) {
-		if (!item.isTrashed) return;
-		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
 	}
 
 	static override styles = [
@@ -270,12 +216,8 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 				display: block;
 			}
 
-			uui-ref-node[drag-placeholder] {
+			umb-entity-item-ref[drag-placeholder] {
 				opacity: 0.2;
-			}
-
-			.draft {
-				opacity: 0.6;
 			}
 		`,
 	];
