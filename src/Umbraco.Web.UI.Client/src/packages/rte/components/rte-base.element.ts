@@ -1,19 +1,16 @@
 import type { UmbPropertyEditorUiValueType } from '../types.js';
 import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../constants.js';
 import { property, state } from '@umbraco-cms/backoffice/external/lit';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBlockRteEntriesContext, UmbBlockRteManagerContext } from '@umbraco-cms/backoffice/block-rte';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type { UmbBlockRteTypeModel } from '@umbraco-cms/backoffice/block-rte';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import {
-	UmbBlockRteEntriesContext,
-	UmbBlockRteManagerContext,
-	type UmbBlockRteTypeModel,
-} from '@umbraco-cms/backoffice/block-rte';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement implements UmbPropertyEditorUiElement {
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -189,6 +186,7 @@ export abstract class UmbPropertyEditorUiRteElementBase extends UmbLitElement im
 		this.#managerContext.removeManySettings(unusedSettingsKeys);
 		this.#managerContext.removeManyLayouts(unusedContentKeys);
 	}
+
 	protected _fireChangeEvent() {
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}

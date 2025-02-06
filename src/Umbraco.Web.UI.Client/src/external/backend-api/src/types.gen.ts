@@ -1942,6 +1942,11 @@ export type PagedWebhookEventModel = {
     items: Array<(WebhookEventModel)>;
 };
 
+export type PagedWebhookLogResponseModel = {
+    total: number;
+    items: Array<(WebhookLogResponseModel)>;
+};
+
 export type PagedWebhookResponseModel = {
     total: number;
     items: Array<(WebhookResponseModel)>;
@@ -2879,6 +2884,22 @@ export type WebhookItemResponseModel = {
     events: string;
     url: string;
     types: string;
+};
+
+export type WebhookLogResponseModel = {
+    key: string;
+    webhookKey: string;
+    statusCode: string;
+    isSuccessStatusCode: boolean;
+    date: string;
+    eventAlias: string;
+    url: string;
+    retryCount: number;
+    requestHeaders: string;
+    requestBody: string;
+    responseHeaders: string;
+    responseBody: string;
+    exceptionOccured: boolean;
 };
 
 export type WebhookResponseModel = {
@@ -5356,6 +5377,14 @@ export type PutWebhookByIdData = {
 
 export type PutWebhookByIdResponse = (string);
 
+export type GetWebhookByIdLogsData = {
+    id: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetWebhookByIdLogsResponse = ((PagedWebhookLogResponseModel));
+
 export type GetWebhookEventsData = {
     skip?: number;
     take?: number;
@@ -5368,4 +5397,4 @@ export type GetWebhookLogsData = {
     take?: number;
 };
 
-export type GetWebhookLogsResponse = ((WebhookResponseModel));
+export type GetWebhookLogsResponse = ((PagedWebhookLogResponseModel));

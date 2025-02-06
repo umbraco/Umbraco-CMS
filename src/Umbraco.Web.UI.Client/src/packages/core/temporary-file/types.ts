@@ -11,6 +11,7 @@ export interface UmbTemporaryFileModel {
 	temporaryUnique: string;
 	status?: TemporaryFileStatus;
 	onProgress?: (progress: number) => void;
+	abortSignal?: AbortSignal;
 }
 
 export type UmbQueueHandlerCallback<TItem extends UmbTemporaryFileModel> = (item: TItem) => Promise<void>;

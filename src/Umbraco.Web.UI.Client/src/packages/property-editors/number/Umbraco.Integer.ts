@@ -18,6 +18,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 						label: 'Maximum',
 						description: 'Enter the maximum amount of number to be entered',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
+						config: [{ alias: 'placeholder', value: '∞' }],
 					},
 					{
 						alias: 'step',
