@@ -12,24 +12,24 @@ export const manifests: Array<UmbExtensionManifest> = [
 						label: 'Minimum',
 						description: 'Enter the minimum amount of number to be entered',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
+						config: [{ alias: 'step', value: '0.001' }],
 					},
 					{
 						alias: 'max',
 						label: 'Maximum',
 						description: 'Enter the maximum amount of number to be entered',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
+						config: [
+							{ alias: 'placeholder', value: '∞' },
+							{ alias: 'step', value: '0.001' },
+						],
 					},
 					{
 						alias: 'step',
 						label: 'Step size',
 						description: 'Enter the intervals amount between each step of number to be entered',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
-						config: [
-							{
-								alias: 'step',
-								value: '0.01',
-							},
-						],
+						config: [{ alias: 'step', value: '0.001' }],
 					},
 				],
 			},

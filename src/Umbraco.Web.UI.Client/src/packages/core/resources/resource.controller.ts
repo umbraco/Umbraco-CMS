@@ -272,6 +272,12 @@ export class UmbResourceController extends UmbControllerBase {
 			});
 		});
 
+		if (options.abortSignal) {
+			options.abortSignal.addEventListener('abort', () => {
+				promise.cancel();
+			});
+		}
+
 		return promise;
 	}
 

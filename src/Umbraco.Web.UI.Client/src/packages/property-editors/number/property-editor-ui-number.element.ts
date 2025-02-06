@@ -2,6 +2,7 @@ import { css, customElement, html, ifDefined, property, state } from '@umbraco-c
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -22,6 +23,9 @@ export class UmbPropertyEditorUINumberElement
 	readonly = false;
 
 	@state()
+	private _label?: string;
+
+	@state()
 	private _max?: number;
 
 	@state()
@@ -35,14 +39,18 @@ export class UmbPropertyEditorUINumberElement
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
-		this._min = this.#parseInt(config.getValueByAlias('min'));
-		this._max = this.#parseInt(config.getValueByAlias('max'));
-		this._step = this.#parseInt(config.getValueByAlias('step'));
+		this._min = this.#parseNumber(config.getValueByAlias('min'));
+		this._max = this.#parseNumber(config.getValueByAlias('max'));
+		this._step = this.#parseNumber(config.getValueByAlias('step'));
 		this._placeholder = config.getValueByAlias('placeholder');
 	}
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			this._label = context.getLabel();
+		});
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -63,13 +71,24 @@ export class UmbPropertyEditorUINumberElement
 		);
 	}
 
-	#parseInt(input: unknown): number | undefined {
-		const num = Number(input);
-		return Number.isNaN(num) ? undefined : num;
+	protected override firstUpdated() {
+		if (this._min && this._max && this._min > this._max) {
+			console.warn(
+				`Property '${this._label}' (Numeric) has been misconfigured, 'min' is greater than 'max'. Please correct your data type configuration.`,
+				this,
+			);
+		}
 	}
 
-	#onInput(e: InputEvent & { target: HTMLInputElement }) {
-		this.value = this.#parseInt(e.target.value);
+	#parseNumber(input: unknown): number | undefined {
+		const num = Number(input);
+		return Number.isFinite(num) ? num : undefined;
+	}
+
+	#onChange(event: InputEvent & { target: HTMLInputElement }) {
+		const newValue = event.target.value === '' ? undefined : this.#parseNumber(event.target.value);
+		if (newValue === this.value) return;
+		this.value = newValue;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
@@ -77,12 +96,13 @@ export class UmbPropertyEditorUINumberElement
 		return html`
 			<uui-input
 				type="number"
+				label=${ifDefined(this._label)}
 				min=${ifDefined(this._min)}
 				max=${ifDefined(this._max)}
 				step=${ifDefined(this._step)}
 				placeholder=${ifDefined(this._placeholder)}
-				value=${this.value?.toString() ?? (this._placeholder ? '' : '0')}
-				@input=${this.#onInput}
+				value=${this.value?.toString() ?? ''}
+				@change=${this.#onChange}
 				?readonly=${this.readonly}>
 			</uui-input>
 		`;

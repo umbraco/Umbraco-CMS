@@ -8,6 +8,10 @@ export interface ManifestEntityActionDeleteKind extends ManifestEntityAction<Met
 export interface MetaEntityActionDeleteKind extends MetaEntityActionDefaultKind {
 	detailRepositoryAlias: string;
 	itemRepositoryAlias: string;
+	confirm?: {
+		headline?: string;
+		message?: string;
+	};
 }
 
 declare global {

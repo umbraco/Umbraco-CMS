@@ -173,11 +173,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	@state()
 	private _routeBuilder?: UmbModalRouteBuilder;
 
-	readonly #itemManager = new UmbRepositoryItemsManager<UmbMediaItemModel>(
-		this,
-		UMB_MEDIA_ITEM_REPOSITORY_ALIAS,
-		(x) => x.unique,
-	);
+	readonly #itemManager = new UmbRepositoryItemsManager<UmbMediaItemModel>(this, UMB_MEDIA_ITEM_REPOSITORY_ALIAS);
 
 	constructor() {
 		super();

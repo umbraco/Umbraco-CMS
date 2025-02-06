@@ -16,27 +16,43 @@ export const manifests: Array<UmbExtensionManifest> = [
 				properties: [
 					{
 						alias: 'default',
-						label: 'Initial State',
-						description:
-							'The initial state for the toggle, when it is displayed for the first time in the backoffice, eg. for a new content item.',
+						label: 'Preset value',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
+						config: [
+	
+							{
+								alias: "ariaLabel",
+								value: 'toggle for the initial state of this data type'
+							}
+						]
 					},
 					{
 						alias: 'showLabels',
-						label: 'Show toggle labels',
-						description: 'Show labels next to toggle button.',
+						label: 'Show on/off labels',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
+						config: [
+	
+							{
+								alias: "ariaLabel",
+								value: 'toggle for weather if label should be displayed'
+							}
+						]
 					},
 					{
 						alias: 'labelOn',
 						label: 'Label On',
-						description: 'Label text when enabled.',
+						description: 'Displays text when enabled.',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 					},
 					{
 						alias: 'labelOff',
 						label: 'Label Off',
-						description: 'Label text when disabled.',
+						description: 'Displays text when disabled.',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+					},
+					{
+						alias: 'ariaLabel',
+						label: 'Screen Reader Label',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 					},
 				],

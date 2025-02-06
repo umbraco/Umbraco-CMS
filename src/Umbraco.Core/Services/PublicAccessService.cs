@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -99,9 +100,9 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
         {
             // This will retrieve from cache!
             var entries = _publicAccessRepository.GetMany().ToList();
-            foreach (var id in ids)
+            foreach (var id in CollectionsMarshal.AsSpan(ids))
             {
-                PublicAccessEntry? found = entries.FirstOrDefault(x => x.ProtectedNodeId == id);
+                PublicAccessEntry? found = entries.Find(x => x.ProtectedNodeId == id);
                 if (found != null)
                 {
                     return found;
