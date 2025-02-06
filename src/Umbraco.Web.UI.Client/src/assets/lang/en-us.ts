@@ -1967,6 +1967,8 @@ export default {
 		permissionsDefault: 'Default permissions',
 		permissionsGranular: 'Granular permissions',
 		permissionsGranularHelp: 'Set permissions for specific nodes',
+		granularRightsLabel: 'Documents',
+		granularRightsDescription: 'Assign permissions to specific documents',
 		permissionsEntityGroup_document: 'Content',
 		permissionsEntityGroup_media: 'Media',
 		permissionsEntityGroup_member: 'Member',
