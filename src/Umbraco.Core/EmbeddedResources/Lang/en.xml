@@ -309,6 +309,7 @@
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
     <key alias="includeUnpublished">Include unpublished content items.</key>
+    <key alias="forceRepublish">Publish unchanged items.</key>
     <key alias="isSensitiveValue">This value is hidden. If you need access to view this value please contact your
       website administrator.
     </key>

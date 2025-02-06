@@ -431,6 +431,7 @@ public interface IContentService : IContentServiceBase<IContent>
     ///         published. The root of the branch is always published, regardless of <paramref name="force" />.
     ///     </para>
     /// </remarks>
+    [Obsolete("This method is not longer used as the 'force' parameter has been split into publishing unpublished and force re-published. Please use the overload containing parameters for those options instead.")]
     IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = Constants.Security.SuperUserId);
 
     /// <summary>
@@ -447,7 +448,48 @@ public interface IContentService : IContentServiceBase<IContent>
     ///         published. The root of the branch is always published, regardless of <paramref name="force" />.
     ///     </para>
     /// </remarks>
+    [Obsolete("This method is not longer used as the 'force' parameter has been split into publishing unpublished and force re-published. Please use the overload containing parameters for those options instead.")]
     IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Saves and publishes a document branch.
+    /// </summary>
+    /// <param name="content">The root document.</param>
+    /// <param name="forceUnpublished">A value indicating whether to publish documents that are currently unpublished.</param>
+    /// <param name="forceRepublish">A value indicating whether to publish documents irrespective of whether they have any pending changes.</param>
+    /// <param name="culture">A culture, or "*" for all cultures.</param>
+    /// <param name="userId">The identifier of the user performing the operation.</param>
+    /// <remarks>
+    ///     <para>
+    ///         Unless specified, all cultures are re-published. Otherwise, one culture can be specified. To act on more
+    ///         than one culture, see the other overloads of this method.
+    ///     </para>
+    ///     <para>
+    ///         The root of the branch is always published, regardless of <paramref name="forceUnpublished" /> and <paramref name="forceRepublish" />.
+    ///     </para>
+    /// </remarks>
+    IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool forceUnpublished, bool forceRepublish, string culture = "*", int userId = Constants.Security.SuperUserId)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => SaveAndPublishBranch(content, forceUnpublished, culture, userId);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    /// <summary>
+    ///     Saves and publishes a document branch.
+    /// </summary>
+    /// <param name="content">The root document.</param>
+    /// <param name="forceUnpublished">A value indicating whether to publish documents that are currently unpublished.</param>
+    /// <param name="forceRepublish">A value indicating whether to publish documents irrespective of whether they have any pending changes.</param>
+    /// <param name="cultures">The cultures to publish.</param>
+    /// <param name="userId">The identifier of the user performing the operation.</param>
+    /// <remarks>
+    ///     <para>
+    ///         The root of the branch is always published, regardless of <paramref name="forceUnpublished" /> and <paramref name="forceRepublish" />.
+    ///     </para>
+    /// </remarks>
+    IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool forceUnpublished, bool forceRepublish, string[] cultures, int userId = Constants.Security.SuperUserId)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => SaveAndPublishBranch(content, forceUnpublished, cultures, userId);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     ///// <summary>
     ///// Saves and publishes a document branch.
