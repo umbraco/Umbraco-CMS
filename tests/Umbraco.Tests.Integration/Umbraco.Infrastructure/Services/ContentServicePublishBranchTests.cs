@@ -423,7 +423,7 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
     [TestCase(false, true)]
     [TestCase(true, false)]
     [TestCase(true, true)]
-    public void Can_Publish_With_Force_Options(bool forceUnpublished, bool forceRepublish)
+    public void Can_Publish_Invariant_Branch_With_Force_Options(bool forceUnpublished, bool forceRepublish)
     {
         CreateTypes(out var iContentType, out _);
 
@@ -431,66 +431,141 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
         IContent iRoot = new Content("iroot", -1, iContentType);
         iRoot.SetValue("ip", "iroot");
         ContentService.SaveAndPublish(iRoot);
+
         IContent ii1 = new Content("ii1", iRoot, iContentType);
         ii1.SetValue("ip", "vii1");
         ContentService.SaveAndPublish(ii1);
+
         IContent ii2 = new Content("ii2", iRoot, iContentType);
         ii2.SetValue("ip", "vii2");
         ContentService.Save(ii2);
+
         IContent ii3 = new Content("ii3", iRoot, iContentType);
         ii3.SetValue("ip", "vii3");
         ContentService.SaveAndPublish(ii3);
         ii3.SetValue("ip", "vii3a");
         ContentService.Save(ii3);
 
-        string[] GetExpectedContentNames(bool forceUnpublished)
-        {
-            if (forceUnpublished)
-            {
-                return ["iroot", "ii1", "ii2", "ii3"];
-            }
-
-            return ["iroot", "ii1", "ii3"];
-        }
-
-        PublishResultType[] GetExpectedPublishResultTypes(bool forceUnpublished, bool forceRepublish)
-        {
-            if (forceUnpublished && forceRepublish)
-            {
-                return [PublishResultType.SuccessPublish,
-                    PublishResultType.SuccessPublish,
-                    PublishResultType.SuccessPublish,
-                    PublishResultType.SuccessPublish];
-            }
-
-            if (forceUnpublished)
-            {
-                return [PublishResultType.SuccessPublishAlready,
-                    PublishResultType.SuccessPublishAlready,
-                    PublishResultType.SuccessPublish,
-                    PublishResultType.SuccessPublish];
-            }
-
-            if (forceRepublish)
-            {
-                return [PublishResultType.SuccessPublish,
-                    PublishResultType.SuccessPublish,
-                    PublishResultType.SuccessPublish];
-            }
-
-            return [PublishResultType.SuccessPublishAlready,
-                PublishResultType.SuccessPublishAlready,
-                PublishResultType.SuccessPublish];
-        }
-
         var result = ContentService.SaveAndPublishBranch(iRoot, forceUnpublished, forceRepublish).ToArray();
-        var expectedContentNames = GetExpectedContentNames(forceUnpublished);
-        var expectedPublishResultTypes = GetExpectedPublishResultTypes(forceUnpublished, forceRepublish);
+
+        var expectedContentNames = GetExpectedContentNamesForForceOptions(forceUnpublished);
+        var expectedPublishResultTypes = GetExpectedPublishResultTypesForForceOptions(forceUnpublished, forceRepublish);
         AssertPublishResults(result, x => x.Content.Name, expectedContentNames);
         AssertPublishResults(
             result,
             x => x.Result,
             expectedPublishResultTypes);
+    }
+
+    [TestCase("*", false, false)]
+    [TestCase("*", false, true)]
+    [TestCase("*", true, false)]
+    [TestCase("*", true, true)]
+    [TestCase("de", false, false)]
+    [TestCase("de", false, true)]
+    [TestCase("de", true, false)]
+    [TestCase("de", true, true)]
+    public void Can_Publish_Variant_Branch_With_Force_Options(string culture, bool forceUnpublished, bool forceRepublish)
+    {
+        CreateTypes(out _, out var vContentType);
+
+        // Create content (published root, published child, unpublished child, changed child).
+        IContent vRoot = new Content("vroot", -1, vContentType);
+        vRoot.SetCultureName("vroot.de", "de");
+        vRoot.SetCultureName("vroot.ru", "ru");
+        vRoot.SetValue("ip", "vroot");
+        vRoot.SetValue("vp", "vroot.de", "de");
+        vRoot.SetValue("vp", "vroot.ru", "ru");
+        ContentService.SaveAndPublish(vRoot);
+
+        IContent iv1 = new Content("iv1", vRoot, vContentType, "de");
+        iv1.SetCultureName("iv1.de", "de");
+        iv1.SetCultureName("iv1.ru", "ru");
+        iv1.SetValue("ip", "iv1");
+        iv1.SetValue("vp", "iv1.de", "de");
+        iv1.SetValue("vp", "iv1.ru", "ru");
+        ContentService.SaveAndPublish(iv1);
+
+        IContent iv2 = new Content("iv2", vRoot, vContentType, "de");
+        iv2.SetCultureName("iv2.de", "de");
+        iv2.SetCultureName("iv2.ru", "ru");
+        iv2.SetValue("ip", "iv2");
+        iv2.SetValue("vp", "iv2.de", "de");
+        iv2.SetValue("vp", "iv2.ru", "ru");
+        ContentService.Save(iv2);
+
+        // When testing with a specific culture, publish the other one, so we can test that
+        // the specified unpublished culture is handled correctly.
+        if (culture != "*")
+        {
+            ContentService.SaveAndPublish(iv2, "ru");
+        }
+
+        IContent iv3 = new Content("iv3", vRoot, vContentType, "de");
+        iv3.SetCultureName("iv3.de", "de");
+        iv3.SetCultureName("iv3.ru", "ru");
+        iv3.SetValue("ip", "iv3");
+        iv3.SetValue("vp", "iv3.de", "de");
+        iv3.SetValue("vp", "iv3.ru", "ru");
+        ContentService.SaveAndPublish(iv3);
+        iv3.SetValue("ip", "iv3a");
+        iv3.SetValue("vp", "iv3a.de", "de");
+        iv3.SetValue("vp", "iv3a.ru", "ru");
+        ContentService.Save(iv3);
+
+        var result = ContentService.SaveAndPublishBranch(vRoot, forceUnpublished, forceRepublish, culture).ToArray();
+
+        var expectedContentNames = GetExpectedContentNamesForForceOptions(forceUnpublished, true);
+        var expectedPublishResultTypes = GetExpectedPublishResultTypesForForceOptions(forceUnpublished, forceRepublish, true);
+        AssertPublishResults(result, x => x.Content.Name, expectedContentNames);
+        AssertPublishResults(
+            result,
+            x => x.Result,
+            expectedPublishResultTypes);
+    }
+
+    private static string[] GetExpectedContentNamesForForceOptions(bool forceUnpublished, bool isVariant = false)
+    {
+        var rootName = isVariant ? "vroot.de" : "iroot";
+        var childPrefix = isVariant ? "iv" : "ii";
+        var childSuffix = isVariant ? ".de" : string.Empty;
+        if (forceUnpublished)
+        {
+            return [rootName, $"{childPrefix}1{childSuffix}", $"{childPrefix}2{childSuffix}", $"{childPrefix}3{childSuffix}"];
+        }
+
+        return [rootName, $"{childPrefix}1{childSuffix}", $"{childPrefix}3{childSuffix}"];
+    }
+
+    private static PublishResultType[] GetExpectedPublishResultTypesForForceOptions(bool forceUnpublished, bool forceRepublish, bool isVariant = false)
+    {
+        var successPublish = isVariant ? PublishResultType.SuccessPublishCulture : PublishResultType.SuccessPublish;
+        if (forceUnpublished && forceRepublish)
+        {
+            return [successPublish,
+                    successPublish,
+                    successPublish,
+                    successPublish];
+        }
+
+        if (forceUnpublished)
+        {
+            return [PublishResultType.SuccessPublishAlready,
+                    PublishResultType.SuccessPublishAlready,
+                    successPublish,
+                    successPublish];
+        }
+
+        if (forceRepublish)
+        {
+            return [successPublish,
+                    successPublish,
+                    successPublish];
+        }
+
+        return [PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublishAlready,
+                successPublish];
     }
 
     private void AssertPublishResults<T>(PublishResult[] values, Func<PublishResult, T> getter, params T[] expected)

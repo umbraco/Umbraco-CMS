@@ -2042,8 +2042,8 @@ public class ContentService : RepositoryService, IContentService
                 return culturesToPublish;
             }
 
-            // if not published, publish if force/root else do nothing
-            return forceUnpublished || forceRepublish || isRoot
+            // if not published, publish if forcing unpublished/root else do nothing
+            return forceUnpublished || isRoot
                 ? new HashSet<string> { "*" } // "*" means 'publish all'
                 : null; // null means 'nothing to do'
         }
@@ -2088,8 +2088,8 @@ public class ContentService : RepositoryService, IContentService
                 return culturesToPublish;
             }
 
-            // if not published, publish if force/root else do nothing
-            return forceUnpublished || forceRepublish || isRoot
+            // if not published, publish if forcing unpublished/root else do nothing
+            return forceUnpublished ||  isRoot
                 ? new HashSet<string>(cultures) // means 'publish specified cultures'
                 : null; // null means 'nothing to do'
         }
