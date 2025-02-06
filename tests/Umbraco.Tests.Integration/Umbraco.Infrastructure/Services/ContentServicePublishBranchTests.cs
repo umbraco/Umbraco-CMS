@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -16,8 +14,7 @@ using Umbraco.Cms.Tests.Integration.Testing;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true,
-    WithApplication = true)]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true, WithApplication = true)]
 public class ContentServicePublishBranchTests : UmbracoIntegrationTest
 {
     private IContentService ContentService => GetRequiredService<IContentService>();
@@ -420,6 +417,80 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
         Assert.AreEqual("changed", iv11.GetValue("ip", published: true));
         Assert.AreEqual("changed.de", iv11.GetValue("vp", "de", published: true));
         Assert.AreEqual("changed.ru", iv11.GetValue("vp", "ru", published: true));
+    }
+
+    [TestCase(false, false)]
+    [TestCase(false, true)]
+    [TestCase(true, false)]
+    [TestCase(true, true)]
+    public void Can_Publish_With_Force_Options(bool forceUnpublished, bool forceRepublish)
+    {
+        CreateTypes(out var iContentType, out _);
+
+        // Create content (published root, published child, unpublished child, changed child).
+        IContent iRoot = new Content("iroot", -1, iContentType);
+        iRoot.SetValue("ip", "iroot");
+        ContentService.SaveAndPublish(iRoot);
+        IContent ii1 = new Content("ii1", iRoot, iContentType);
+        ii1.SetValue("ip", "vii1");
+        ContentService.SaveAndPublish(ii1);
+        IContent ii2 = new Content("ii2", iRoot, iContentType);
+        ii2.SetValue("ip", "vii2");
+        ContentService.Save(ii2);
+        IContent ii3 = new Content("ii3", iRoot, iContentType);
+        ii3.SetValue("ip", "vii3");
+        ContentService.SaveAndPublish(ii3);
+        ii3.SetValue("ip", "vii3a");
+        ContentService.Save(ii3);
+
+        string[] GetExpectedContentNames(bool forceUnpublished)
+        {
+            if (forceUnpublished)
+            {
+                return ["iroot", "ii1", "ii2", "ii3"];
+            }
+
+            return ["iroot", "ii1", "ii3"];
+        }
+
+        PublishResultType[] GetExpectedPublishResultTypes(bool forceUnpublished, bool forceRepublish)
+        {
+            if (forceUnpublished && forceRepublish)
+            {
+                return [PublishResultType.SuccessPublish,
+                    PublishResultType.SuccessPublish,
+                    PublishResultType.SuccessPublish,
+                    PublishResultType.SuccessPublish];
+            }
+
+            if (forceUnpublished)
+            {
+                return [PublishResultType.SuccessPublishAlready,
+                    PublishResultType.SuccessPublishAlready,
+                    PublishResultType.SuccessPublish,
+                    PublishResultType.SuccessPublish];
+            }
+
+            if (forceRepublish)
+            {
+                return [PublishResultType.SuccessPublish,
+                    PublishResultType.SuccessPublish,
+                    PublishResultType.SuccessPublish];
+            }
+
+            return [PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublish];
+        }
+
+        var result = ContentService.SaveAndPublishBranch(iRoot, forceUnpublished, forceRepublish).ToArray();
+        var expectedContentNames = GetExpectedContentNames(forceUnpublished);
+        var expectedPublishResultTypes = GetExpectedPublishResultTypes(forceUnpublished, forceRepublish);
+        AssertPublishResults(result, x => x.Content.Name, expectedContentNames);
+        AssertPublishResults(
+            result,
+            x => x.Result,
+            expectedPublishResultTypes);
     }
 
     private void AssertPublishResults<T>(PublishResult[] values, Func<PublishResult, T> getter, params T[] expected)
