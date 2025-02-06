@@ -4,6 +4,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 
 export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	UmbDocumentTreeItemModel,
@@ -38,7 +39,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 		const entityType = event.getEntityType();
 
 		// we don't want to update unless it's a document type
-		if (entityType !== 'document-type') return;
+		if (entityType !== UMB_DOCUMENT_TYPE_ENTITY_TYPE) return;
 
 		const treeItem = this.getTreeItem();
 		if (!treeItem) return;
