@@ -12,7 +12,7 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 	#item?: UmbEntityModel;
 
 	@state()
-	_component?: HTMLElement;
+	_component?: any; // TODO: Add type
 
 	@property({ type: Object, attribute: false })
 	public get item(): UmbEntityModel | undefined {
@@ -22,6 +22,32 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 		if (value === this.#item || !value) return;
 		this.#item = value;
 		this.#createController(value.entityType);
+	}
+
+	#readonly = false;
+	@property({ type: Boolean, attribute: 'readonly' })
+	public get readonly() {
+		return this.#readonly;
+	}
+	public set readonly(value) {
+		this.#readonly = value;
+
+		if (this._component) {
+			this._component.readonly = this.#readonly;
+		}
+	}
+
+	#standalone = false;
+	@property({ type: Boolean, attribute: 'standalone' })
+	public get standalone() {
+		return this.#standalone;
+	}
+	public set standalone(value) {
+		this.#standalone = value;
+
+		if (this._component) {
+			this._component.standalone = this.#standalone;
+		}
 	}
 
 	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -47,8 +73,10 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 					return;
 				}
 
-				// assign the item to the component
+				// assign the properties to the component
 				component.item = this.#item;
+				component.readonly = this.readonly;
+				component.standalone = this.standalone;
 
 				// Proxy the actions slot to the component
 				const slotElement = document.createElement('slot');
