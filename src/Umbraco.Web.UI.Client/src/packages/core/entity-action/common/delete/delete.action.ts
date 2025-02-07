@@ -5,9 +5,11 @@ import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-reg
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbDetailRepository, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 export class UmbDeleteEntityAction extends UmbEntityActionBase<MetaEntityActionDeleteKind> {
 	// TODO: make base type for item and detail models
+	#localize = new UmbLocalizationController(this);
 
 	override async execute() {
 		if (!this.args.unique) throw new Error('Cannot delete an item without a unique identifier.');
@@ -21,12 +23,15 @@ export class UmbDeleteEntityAction extends UmbEntityActionBase<MetaEntityActionD
 		const item = data?.[0];
 		if (!item) throw new Error('Item not found.');
 
+		const headline = this.args.meta.confirm?.headline ?? '#actions_delete';
+		const message = this.args.meta.confirm?.message ?? '#defaultdialogs_confirmdelete';
+
 		// TODO: handle items with variants
 		await umbConfirmModal(this._host, {
-			headline: `Delete`,
-			content: `Are you sure you want to delete ${(item.name && item.name.length > 0 ? item.name : "this item")}?`,
+			headline,
+			content: this.#localize.string(message, item.name),
 			color: 'danger',
-			confirmLabel: 'Delete',
+			confirmLabel: '#general_delete',
 		});
 
 		const detailRepository = await createExtensionApiByAlias<UmbDetailRepository<any>>(

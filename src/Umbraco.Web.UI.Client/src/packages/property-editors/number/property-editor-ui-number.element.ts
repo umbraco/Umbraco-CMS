@@ -39,9 +39,9 @@ export class UmbPropertyEditorUINumberElement
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
-		this._min = this.#parseInt(config.getValueByAlias('min')) || 0;
-		this._max = this.#parseInt(config.getValueByAlias('max')) || Infinity;
-		this._step = this.#parseInt(config.getValueByAlias('step'));
+		this._min = this.#parseNumber(config.getValueByAlias('min'));
+		this._max = this.#parseNumber(config.getValueByAlias('max'));
+		this._step = this.#parseNumber(config.getValueByAlias('step'));
 		this._placeholder = config.getValueByAlias('placeholder');
 	}
 
@@ -80,13 +80,15 @@ export class UmbPropertyEditorUINumberElement
 		}
 	}
 
-	#parseInt(input: unknown): number | undefined {
+	#parseNumber(input: unknown): number | undefined {
 		const num = Number(input);
-		return Number.isNaN(num) ? undefined : num;
+		return Number.isFinite(num) ? num : undefined;
 	}
 
-	#onInput(e: InputEvent & { target: HTMLInputElement }) {
-		this.value = this.#parseInt(e.target.value);
+	#onChange(event: InputEvent & { target: HTMLInputElement }) {
+		const newValue = event.target.value === '' ? undefined : this.#parseNumber(event.target.value);
+		if (newValue === this.value) return;
+		this.value = newValue;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
@@ -99,8 +101,8 @@ export class UmbPropertyEditorUINumberElement
 				max=${ifDefined(this._max)}
 				step=${ifDefined(this._step)}
 				placeholder=${ifDefined(this._placeholder)}
-				value=${this.value?.toString() ?? (this._placeholder ? '' : '0')}
-				@input=${this.#onInput}
+				value=${this.value?.toString() ?? ''}
+				@change=${this.#onChange}
 				?readonly=${this.readonly}>
 			</uui-input>
 		`;

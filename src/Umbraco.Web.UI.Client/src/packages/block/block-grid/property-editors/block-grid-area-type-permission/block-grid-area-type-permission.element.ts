@@ -40,7 +40,6 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 	#itemsManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
 		this,
 		UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
-		(x) => x.unique,
 	);
 
 	constructor() {

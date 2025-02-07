@@ -297,7 +297,7 @@ export class UmbDocumentWorkspaceContext
 	public async publish() {
 		new UmbDeprecation({
 			deprecated: 'The Publish method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17',
+			removeInVersion: '17.0.0',
 			solution: 'Use the Publish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
@@ -311,7 +311,7 @@ export class UmbDocumentWorkspaceContext
 	public async saveAndPublish(): Promise<void> {
 		new UmbDeprecation({
 			deprecated: 'The SaveAndPublish method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17',
+			removeInVersion: '17.0.0',
 			solution: 'Use the SaveAndPublish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
@@ -325,7 +325,7 @@ export class UmbDocumentWorkspaceContext
 	public async schedule() {
 		new UmbDeprecation({
 			deprecated: 'The Schedule method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17',
+			removeInVersion: '17.0.0',
 			solution: 'Use the Schedule method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
@@ -339,7 +339,7 @@ export class UmbDocumentWorkspaceContext
 	public async unpublish() {
 		new UmbDeprecation({
 			deprecated: 'The Unpublish method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17',
+			removeInVersion: '17.0.0',
 			solution: 'Use the Unpublish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
@@ -353,7 +353,7 @@ export class UmbDocumentWorkspaceContext
 	public async publishWithDescendants() {
 		new UmbDeprecation({
 			deprecated: 'The PublishWithDescendants method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17',
+			removeInVersion: '17.0.0',
 			solution: 'Use the PublishWithDescendants method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');

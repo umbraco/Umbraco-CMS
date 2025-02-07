@@ -501,7 +501,7 @@ export default {
 		anchorLinkPicker: 'Anchor or querystring',
 		anchorInsert: 'Name',
 		closeThisWindow: 'Close this window',
-		confirmdelete: 'Are you sure you want to delete',
+		confirmdelete: (name: string) => `Are you sure you want to delete${name ? ` <strong>${name}</strong>` : ''}?`,
 		confirmdeleteNumberOfItems: 'Are you sure you want to delete <strong>%0%</strong> of <strong>%1%</strong> items',
 		confirmdisable: 'Are you sure you want to disable',
 		confirmremove: 'Are you sure you want to remove',
@@ -2411,6 +2411,8 @@ export default {
 		labelForRemoveAllEntries: 'Remove all items',
 		labelForClearClipboard: 'Clear clipboard',
 		labelForCopyToClipboard: 'Copy to clipboard',
+		confirmDeleteHeadline: 'Delete from clipboard',
+		confirmDeleteDescription: 'Are you sure you want to delete <strong>{0}</strong> from the clipboard?',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Open Property Actions',

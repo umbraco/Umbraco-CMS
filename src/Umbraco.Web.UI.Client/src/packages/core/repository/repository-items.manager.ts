@@ -1,3 +1,4 @@
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -9,6 +10,7 @@ import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
 
 const ObserveRepositoryAlias = Symbol();
 
+// TODO: v16 - add entityType to the type
 export class UmbRepositoryItemsManager<ItemType extends { unique: string }> extends UmbControllerBase {
 	//
 	repository?: UmbItemRepository<ItemType>;
@@ -29,8 +31,13 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 	#items = new UmbArrayState<ItemType>([], (x) => this.#getUnique(x));
 	items = this.#items.asObservable();
 
-	/* TODO: find a better way to have a getUniqueMethod. If we want to support trees/items of different types,
-	then it need to be bound to the type and can't be a generic method we pass in. */
+	/**
+	 * Creates an instance of UmbRepositoryItemsManager.
+	 * @param {UmbControllerHost} host - The host for the controller.
+	 * @param {string} repositoryAlias - The alias of the repository to use.
+	 * @param {((entry: ItemType) => string | undefined)} [getUniqueMethod] - DEPRECATED since 15.3. Will be removed in v. 17: A method to get the unique key from the item.
+	 * @memberof UmbRepositoryItemsManager
+	 */
 	constructor(
 		host: UmbControllerHost,
 		repositoryAlias: string,
@@ -38,7 +45,16 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 	) {
 		super(host);
 
-		this.#getUnique = getUniqueMethod || ((entry) => entry.unique);
+		this.#getUnique = getUniqueMethod
+			? (entry: ItemType) => {
+					new UmbDeprecation({
+						deprecated: 'The getUniqueMethod parameter.',
+						removeInVersion: '17.0.0',
+						solution: 'The required unique property on the item will be used instead.',
+					}).warn();
+					return getUniqueMethod(entry);
+				}
+			: (entry) => entry.unique;
 
 		this.#init = new UmbExtensionApiInitializer<ManifestRepository<UmbItemRepository<ItemType>>>(
 			this,
