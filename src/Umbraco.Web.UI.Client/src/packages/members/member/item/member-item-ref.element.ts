@@ -1,5 +1,5 @@
 import { UMB_MEMBER_ENTITY_TYPE } from '../entity.js';
-import type { UmbMemberItemModel } from '../repository/index.js';
+import type { UmbMemberItemModel } from './repository/types.js';
 import { customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';

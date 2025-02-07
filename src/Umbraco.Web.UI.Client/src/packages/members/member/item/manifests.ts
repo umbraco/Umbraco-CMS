@@ -1,4 +1,5 @@
 import { UMB_MEMBER_ENTITY_TYPE } from '../entity.js';
+import { manifests as repositoryManifests } from './repository/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -8,4 +9,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		element: () => import('./member-item-ref.element.js'),
 		forEntityTypes: [UMB_MEMBER_ENTITY_TYPE],
 	},
+	...repositoryManifests,
 ];
