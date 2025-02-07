@@ -2104,10 +2104,12 @@ public class ContentService : RepositoryService, IContentService
         // and not to == them, else we would be comparing references, and that is a bad thing
         cultures ??= Array.Empty<string>();
 
-        if (content.ContentType.VariesByCulture() is false && cultures.Length == 0)
+        if (content.ContentType.VariesByCulture() is false && (cultures.Length == 0 || (cultures.Length == 1 && cultures[0] == "invariant")))
         {
             cultures = ["*"];
         }
+
+        var defaultCulture = _languageRepository.GetDefaultIsoCode();
 
         // determines cultures to be published
         // can be: null (content is not impacted), an empty set (content is impacted but already published), or cultures
@@ -2127,9 +2129,13 @@ public class ContentService : RepositoryService, IContentService
             {
                 // then some (and maybe all) cultures will be 'already published' (unless forcing),
                 // others will have to 'republish this culture'
-                foreach (var x in cultures)
+                foreach (var culture in cultures)
                 {
-                    PublishBranch_ShouldPublish(ref culturesToPublish, x, c.IsCulturePublished(x), c.IsCultureEdited(x), isRoot, forceUnpublished, forceRepublish);
+                    // We could be publishing a parent invariant page, with descendents that are variant.
+                    // So convert the invariant request to a request for the default culture.
+                    var specificCulture = culture == "*" ? defaultCulture : culture;
+
+                    PublishBranch_ShouldPublish(ref culturesToPublish, specificCulture, c.IsCulturePublished(specificCulture), c.IsCultureEdited(specificCulture), isRoot, forceUnpublished, forceRepublish);
                 }
 
                 return culturesToPublish;
@@ -3120,7 +3126,7 @@ public class ContentService : RepositoryService, IContentService
     {
         var pathMatch = content.Path + ",";
         IQuery<IContent> query = Query<IContent>()
-            .Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch) /*&& x.Trashed == false*/);
+            .Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch) /*&& culture.Trashed == false*/);
         IEnumerable<IContent> contents = _documentRepository.Get(query);
 
         // beware! contents contains all published version below content
