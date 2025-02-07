@@ -83,6 +83,7 @@
           }
       }));
 
+
       vm.layout = []; // The layout object specific to this Block Editor, will be a direct reference from Property Model.
       vm.availableBlockTypes = []; // Available block entries of this property editor.
       vm.labels = {};
@@ -189,6 +190,9 @@
           vm.containerWidth = "auto";
           vm.containerHeight = "auto";
           vm.containerOverflow = "inherit"
+
+          // Add client validation for the markup part.
+          unsubscribe.push($scope.$watch(() => vm.model?.value?.markup, validate));
 
           //queue file loading
           tinyMceAssets.forEach(function (tinyJsAsset) {
@@ -336,6 +340,18 @@
           vm.tinyMceEditor.focus();
         }
       }
+
+      function validate() {
+        var isValid = !vm.model.validation.mandatory || (
+            vm.model.value != null
+            && vm.model.value.markup != null
+            && vm.model.value.markup != ""
+        );
+        vm.propertyForm.$setValidity("required", isValid);
+        if (vm.umbProperty) {
+          vm.umbProperty.setPropertyError(vm.model.validation.mandatoryMessage || "Value cannot be empty");
+        }
+    };
 
       // Called when we save the value, the server may return an updated data and our value is re-synced
       // we need to deal with that here so that our model values are all in sync so we basically re-initialize.
