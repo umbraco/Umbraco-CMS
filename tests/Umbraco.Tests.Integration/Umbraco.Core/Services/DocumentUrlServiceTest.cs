@@ -66,7 +66,7 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
     [Test]
     public async Task Deleted_documents_do_not_have_a_url_segment__Parent_deleted()
     {
-        ContentService.PublishBranch(Textpage, true, new[] { "*" });
+        ContentService.PublishBranch(Textpage, true, false, ["*"]);
 
         ContentService.Delete(Textpage);
 
@@ -80,7 +80,7 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
     [Test]
     public async Task Deleted_documents_do_not_have_a_url_segment()
     {
-        ContentService.PublishBranch(Textpage, true, new[] { "*" });
+        ContentService.PublishBranch(Textpage, true, false, ["*"]);
 
         ContentService.Delete(Subpage2);
 
@@ -104,7 +104,7 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
     {
         if (loadDraft is false)
         {
-            ContentService.PublishBranch(Textpage, true, new[] { "*" });
+            ContentService.PublishBranch(Textpage, true, false, ["*"]);
         }
 
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
@@ -121,7 +121,7 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
     public void Unpublished_Pages_Are_not_available()
     {
         //Arrange
-        ContentService.PublishBranch(Textpage, true, new[] { "*" });
+        ContentService.PublishBranch(Textpage, true, false, ["*"]);
 
         Assert.Multiple(() =>
         {
@@ -161,7 +161,7 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
 
         if (loadDraft is false)
         {
-            ContentService.PublishBranch(Textpage, true, new[] { "*" });
+            ContentService.PublishBranch(Textpage, true, false, ["*"]);
         }
 
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
@@ -180,8 +180,8 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
 
         if (loadDraft is false)
         {
-            ContentService.PublishBranch(Textpage, true, new[] { "*" });
-            ContentService.PublishBranch(secondRoot, true, new[] { "*" });
+            ContentService.PublishBranch(Textpage, true, false, ["*"]);
+            ContentService.PublishBranch(secondRoot, true, false, ["*"]);
         }
 
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
@@ -206,8 +206,8 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
         if (loadDraft is false)
         {
 
-            ContentService.PublishBranch(Textpage, true, new[] { "*" });
-            ContentService.PublishBranch(secondRoot, true, new[] { "*" });
+            ContentService.PublishBranch(Textpage, true, false, ["*"]);
+            ContentService.PublishBranch(secondRoot, true, false, ["*"]);
         }
 
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();

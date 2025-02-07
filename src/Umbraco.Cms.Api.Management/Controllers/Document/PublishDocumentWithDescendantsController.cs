@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -54,6 +54,7 @@ public class PublishDocumentWithDescendantsController : DocumentControllerBase
             id,
             requestModel.Cultures,
             requestModel.IncludeUnpublishedDescendants,
+            requestModel.ForceRepublish,
             CurrentUserKey(_backOfficeSecurityAccessor));
 
         return attempt.Success

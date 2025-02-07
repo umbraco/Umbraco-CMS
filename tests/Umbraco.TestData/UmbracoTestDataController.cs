@@ -86,7 +86,7 @@ public class UmbracoTestDataController : SurfaceController
             var imageIds = CreateMediaTree(company, faker, count, depth).ToList();
             var contentIds = CreateContentTree(company, faker, count, depth, imageIds, out var root).ToList();
 
-            Services.ContentService.PublishBranch(root, true, new[] { "*" });
+            Services.ContentService.PublishBranch(root, true, false, ["*"]);
 
             scope.Complete();
         }
