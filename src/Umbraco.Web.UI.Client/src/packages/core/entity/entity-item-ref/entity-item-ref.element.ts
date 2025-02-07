@@ -41,7 +41,16 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 			(manifest: ManifestEntityItemRef) => manifest.forEntityTypes.includes(entityType),
 			(extensionControllers) => {
 				const component = extensionControllers[0]?.component;
+
+				// assign the item to the component
 				component.item = this.#item;
+
+				// Proxy the actions slot to the component
+				const slotElement = document.createElement('slot');
+				slotElement.name = 'actions';
+				slotElement.setAttribute('slot', 'actions');
+				component.appendChild(slotElement);
+
 				this._component = component;
 			},
 			undefined, // We can leave the alias to undefined, as we destroy this our selfs.

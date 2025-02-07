@@ -161,6 +161,10 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 		);
 	}
 
+	#onRemove(item: UmbMemberItemModel) {
+		this.#pickerContext.requestRemoveItem(item.unique);
+	}
+
 	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
@@ -172,13 +176,20 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 				${repeat(
 					this._items,
 					(item) => item.unique,
-					(item) =>
-						html`<umb-entity-item-ref
-							.item=${item}
-							?readonly=${this.readonly}
-							?standalone=${this.max === 1}></umb-entity-item-ref>`,
+					(item) => this.#renderItem(item),
 				)}
 			</uui-ref-list>
+		`;
+	}
+
+	#renderItem(item: UmbMemberItemModel) {
+		if (!item.unique) return nothing;
+		return html`
+			<umb-entity-item-ref .item=${item} ?readonly=${this.readonly} ?standalone=${this.max === 1}>
+				<uui-action-bar slot="actions">
+					${this.#renderOpenButton(item)} ${this.#renderRemoveButton(item)}
+				</uui-action-bar>
+			</umb-entity-item-ref>
 		`;
 	}
 
@@ -198,13 +209,31 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 		}
 	}
 
+	#renderOpenButton(item: UmbMemberItemModel) {
+		if (!this.showOpenButton) return nothing;
+		return html`
+			<uui-button
+				href="${this._editMemberPath}edit/${item.unique}"
+				label="${this.localize.term('general_open')} ${item.name}">
+				${this.localize.term('general_open')}
+			</uui-button>
+		`;
+	}
+
+	#renderRemoveButton(item: UmbMemberItemModel) {
+		if (this.readonly) return nothing;
+		return html`
+			<uui-button @click=${() => this.#onRemove(item)} label=${this.localize.term('general_remove')}></uui-button>
+		`;
+	}
+
 	static override styles = [
 		css`
 			#btn-add {
 				display: block;
 			}
 
-			uui-ref-node[drag-placeholder] {
+			umb-entity-item-ref[drag-placeholder] {
 				opacity: 0.2;
 			}
 		`,

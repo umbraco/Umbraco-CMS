@@ -1,5 +1,5 @@
 import { UmbDocumentPickerInputContext } from './input-document.context.js';
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -160,6 +160,10 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 		);
 	}
 
+	#onRemove(item: UmbDocumentItemModel) {
+		this.#pickerContext.requestRemoveItem(item.unique);
+	}
+
 	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
@@ -188,11 +192,18 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 					this._items,
 					(item) => item.unique,
 					(item) =>
-						html`<umb-entity-item-ref
-						.item=${item}
-						?readonly=${this.readonly}
-						?standalone=${this.max === 1}></umb-entity-item-ref>
-						</uui-ref-list>`,
+						html`<umb-entity-item-ref .item=${item} ?readonly=${this.readonly} ?standalone=${this.max === 1}>
+							${when(
+								!this.readonly,
+								() => html`
+									<uui-action-bar slot="actions">
+										<uui-button
+											label=${this.localize.term('general_remove')}
+											@click=${() => this.#onRemove(item)}></uui-button>
+									</uui-action-bar>
+								`,
+							)}
+						</umb-entity-item-ref>`,
 				)}
 			</uui-ref-list>
 		`;
