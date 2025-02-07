@@ -20,7 +20,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 			return modelEntry;
 		},
 		identifier: 'Umb.SorterIdentifier.InputMember',
-		itemSelector: 'uui-ref-node',
+		itemSelector: 'umb-entity-item-ref',
 		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selection = model;
@@ -185,7 +185,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 	#renderItem(item: UmbMemberItemModel) {
 		if (!item.unique) return nothing;
 		return html`
-			<umb-entity-item-ref .item=${item} ?readonly=${this.readonly} ?standalone=${this.max === 1}>
+			<umb-entity-item-ref id=${item.unique} .item=${item} ?readonly=${this.readonly} ?standalone=${this.max === 1}>
 				<uui-action-bar slot="actions">
 					${this.#renderOpenButton(item)} ${this.#renderRemoveButton(item)}
 				</uui-action-bar>
