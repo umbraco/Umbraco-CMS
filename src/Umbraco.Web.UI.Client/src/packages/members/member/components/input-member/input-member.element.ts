@@ -82,9 +82,6 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 		return this.#pickerContext.getSelection();
 	}
 
-	@property({ type: Boolean })
-	showOpenButton?: boolean;
-
 	@property({ type: Array })
 	allowedContentTypeIds?: string[] | undefined;
 
@@ -186,9 +183,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 		if (!item.unique) return nothing;
 		return html`
 			<umb-entity-item-ref id=${item.unique} .item=${item} ?readonly=${this.readonly} ?standalone=${this.max === 1}>
-				<uui-action-bar slot="actions">
-					${this.#renderOpenButton(item)} ${this.#renderRemoveButton(item)}
-				</uui-action-bar>
+				<uui-action-bar slot="actions">${this.#renderRemoveButton(item)} </uui-action-bar>
 			</umb-entity-item-ref>
 		`;
 	}
@@ -207,17 +202,6 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 					?disabled=${this.readonly}></uui-button>
 			`;
 		}
-	}
-
-	#renderOpenButton(item: UmbMemberItemModel) {
-		if (!this.showOpenButton) return nothing;
-		return html`
-			<uui-button
-				href="${this._editMemberPath}edit/${item.unique}"
-				label="${this.localize.term('general_open')} ${item.name}">
-				${this.localize.term('general_open')}
-			</uui-button>
-		`;
 	}
 
 	#renderRemoveButton(item: UmbMemberItemModel) {
