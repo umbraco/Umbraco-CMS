@@ -1673,6 +1673,7 @@ export default {
 		elementDoesNotSupport: 'Dette benyttes ikke for en Element-type',
 		propertyHasChanges: 'Du har lavet ændringer til denne egenskab. Er du sikker på at du vil kassere dem?\n    ',
 		displaySettingsHeadline: 'Visning',
+		displaySettingsLabelOnLeft: 'Label på venstre side',
 		displaySettingsLabelOnTop: 'Label hen over (fuld bredde)',
 		removeChildNode: 'Du fjerner noden',
 		removeChildNodeWarning:
@@ -2020,6 +2021,7 @@ export default {
 	},
 	validation: {
 		validation: 'Validering',
+		validateNothing: 'Ingen validering',
 		validateAsEmail: 'Valider som e-mail',
 		validateAsNumber: 'Valider som tal',
 		validateAsUrl: 'Valider som URL',
