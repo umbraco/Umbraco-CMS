@@ -1914,6 +1914,8 @@ export default {
 		permissionsDefault: 'Standardrettigheder',
 		permissionsGranular: 'Granulære rettigheder',
 		permissionsGranularHelp: 'Sæt rettigheder for specifikke noder',
+		granularRightsLabel: 'Dokumenter',
+		granularRightsDescription: 'Tillad adgang til specifikke dokumenter',
 		permissionsEntityGroup_document: 'Indhold',
 		permissionsEntityGroup_media: 'Medie',
 		permissionsEntityGroup_member: 'Medlemmer',
