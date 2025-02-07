@@ -1,9 +1,12 @@
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
@@ -28,6 +31,8 @@ public class PropertyValueConverterTests : DeliveryApiTests
     protected Mock<IPublishedMediaCache> PublishedMediaCacheMock { get; private set; }
 
     protected Mock<IPublishedUrlProvider> PublishedUrlProviderMock { get; private set; }
+
+    protected Mock<IDocumentNavigationQueryService> DocumentNavigationQueryServiceMock { get; private set; }
 
     [SetUp]
     public override void Setup()
@@ -74,6 +79,10 @@ public class PropertyValueConverterTests : DeliveryApiTests
             .Returns("the-media-url");
         PublishedUrlProvider = PublishedUrlProviderMock.Object;
         ApiContentPathProvider = new ApiContentPathProvider(PublishedUrlProvider);
+
+        DocumentNavigationQueryServiceMock = new Mock<IDocumentNavigationQueryService>();
+        IEnumerable<Guid> ancestorsKeys = [];
+        DocumentNavigationQueryServiceMock.Setup(x => x.TryGetAncestorsKeys(contentKey, out ancestorsKeys)).Returns(true);
     }
 
     protected Mock<IPublishedContent> SetupPublishedContent(string name, Guid key, PublishedItemType itemType, IPublishedContentType contentType)
@@ -106,5 +115,29 @@ public class PropertyValueConverterTests : DeliveryApiTests
         PublishedMediaCacheMock
             .Setup(pcc => pcc.GetById(It.IsAny<bool>(), media.Key))
             .Returns(media);
+    }
+
+    protected override ApiContentRouteBuilder CreateContentRouteBuilder(
+        IApiContentPathProvider contentPathProvider,
+        IOptions<GlobalSettings> globalSettings,
+        IVariationContextAccessor? variationContextAccessor = null,
+        IRequestPreviewService? requestPreviewService = null,
+        IOptionsMonitor<RequestHandlerSettings>? requestHandlerSettingsMonitor = null,
+        IPublishedContentCache? contentCache = null,
+        IDocumentNavigationQueryService? navigationQueryService = null,
+        IPublishStatusQueryService? publishStatusQueryService = null)
+    {
+        contentCache ??= PublishedContentCacheMock.Object;
+        navigationQueryService ??= DocumentNavigationQueryServiceMock.Object;
+
+        return base.CreateContentRouteBuilder(
+            contentPathProvider,
+            globalSettings,
+            variationContextAccessor,
+            requestPreviewService,
+            requestHandlerSettingsMonitor,
+            contentCache,
+            navigationQueryService,
+            publishStatusQueryService);
     }
 }

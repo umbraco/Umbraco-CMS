@@ -21,7 +21,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         var contentNameProvider = new ApiContentNameProvider();
         var apiUrProvider = new ApiMediaUrlProvider(PublishedUrlProvider);
-        routeBuilder = routeBuilder ?? CreateContentRouteBuilder(ApiContentPathProvider, CreateGlobalSettings());
+        routeBuilder ??= CreateContentRouteBuilder(ApiContentPathProvider, CreateGlobalSettings());
         return new MultiNodeTreePickerValueConverter(
             Mock.Of<IUmbracoContextAccessor>(),
             Mock.Of<IMemberService>(),

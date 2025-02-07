@@ -3,7 +3,7 @@
     <IsTestProject>true</IsTestProject>
     <RootNamespace>Umbraco.Cms.Tests.UnitTests</RootNamespace>
   </PropertyGroup>
-  
+
   <PropertyGroup>
     <!--
       TODO: Fix and remove overrides:
@@ -27,7 +27,7 @@
     -->
     <WarningsNotAsErrors>$(WarningsNotAsErrors),SYSLIB0013,CS0618,CS1998,SA1117,CS0067,CA1822,CA1416,IDE0028,SA1401,SA1405,IDE0060,ASP0019,CS0114,CS0661,CS0659,CS0414,CS0252,CS0612,IDE1006</WarningsNotAsErrors>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="NUnit3TestAdapter" />
@@ -45,6 +45,15 @@
     </Compile>
     <Compile Update="Umbraco.Cms.Api.Management\Services\BackOfficeExternalLoginServiceTests.UnLinkLoginAsync.cs">
       <DependentUpon>BackOfficeExternalLoginServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\PublishStatus\PublishedContentStatusFilteringServiceTests.FilterChildren.cs">
+      <DependentUpon>PublishedContentStatusFilteringServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\PublishStatus\PublishedContentStatusFilteringServiceTests.FilterDescendants.cs">
+      <DependentUpon>PublishedContentStatusFilteringServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\PublishStatus\PublishedContentStatusFilteringServiceTests.FilterSiblings.cs">
+      <DependentUpon>PublishedContentStatusFilteringServiceTests.cs</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>
