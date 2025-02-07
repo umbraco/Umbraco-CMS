@@ -93,12 +93,14 @@ public class ConvertersTests
             elementType1,
             Guid.NewGuid(),
             new Dictionary<string, object> { { "prop1", "val1" } },
-            false);
+            false,
+            new VariationContext());
         var element2 = new PublishedElement(
             elementType2,
             Guid.NewGuid(),
             new Dictionary<string, object> { { "prop2", "1003" } },
-            false);
+            false,
+            new VariationContext());
         var cnt1 = new InternalPublishedContent(contentType1)
         {
             Id = 1003,
