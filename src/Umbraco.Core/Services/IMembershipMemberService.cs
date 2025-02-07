@@ -140,8 +140,8 @@ public interface IMembershipMemberService<T> : IService
     /// </summary>
     /// <remarks>An <see cref="IMembershipUser" /> can be of type <see cref="IMember" /> or <see cref="IUser" /></remarks>
     /// <param name="entity"><see cref="IMember" /> or <see cref="IUser" /> to Save</param>
-    /// <param name="publishNotifications"> Whether notifications should be published or not</param>
-    void Save(T entity, bool publishNotifications) => Save(entity);
+    /// <param name="publishNotificationSaveOptions"> Enum for deciding which notifications to publish.</param>
+    void Save(T entity, PublishNotificationSaveOptions publishNotificationSaveOptions) => Save(entity);
 
     /// <summary>
     ///     Saves a list of <see cref="IMembershipUser" /> objects

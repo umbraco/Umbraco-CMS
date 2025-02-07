@@ -736,9 +736,9 @@ namespace Umbraco.Cms.Core.Services
         public void SetLastLogin(string username, DateTime date) => throw new NotImplementedException();
 
         /// <inheritdoc />
-        public void Save(IMember member) => Save(member, true);
+        public void Save(IMember member) => Save(member, PublishNotificationSaveOptions.All);
 
-        public void Save(IMember member, bool publishNotifications)
+        public void Save(IMember member, PublishNotificationSaveOptions publishNotificationSaveOptions)
         {
             // trimming username and email to make sure we have no trailing space
             member.Username = member.Username.Trim();
@@ -747,11 +747,14 @@ namespace Umbraco.Cms.Core.Services
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
-            var savingNotification = new MemberSavingNotification(member, evtMsgs);
-            if (scope.Notifications.PublishCancelable(savingNotification))
+            if (publishNotificationSaveOptions is PublishNotificationSaveOptions.All or PublishNotificationSaveOptions.Saving)
             {
-                scope.Complete();
-                return;
+                var savingNotification = new MemberSavingNotification(member, evtMsgs);
+                if (scope.Notifications.PublishCancelable(savingNotification))
+                {
+                    scope.Complete();
+                    return;
+                }
             }
 
             if (string.IsNullOrWhiteSpace(member.Name))
@@ -763,8 +766,9 @@ namespace Umbraco.Cms.Core.Services
 
             _memberRepository.Save(member);
 
-            if (publishNotifications)
+            if (publishNotificationSaveOptions is PublishNotificationSaveOptions.All or PublishNotificationSaveOptions.Saved)
             {
+                var savingNotification = new MemberSavingNotification(member, evtMsgs);
                 scope.Notifications.Publish(new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
             }
 
