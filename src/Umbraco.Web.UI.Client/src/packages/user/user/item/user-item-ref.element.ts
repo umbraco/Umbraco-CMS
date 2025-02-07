@@ -1,12 +1,12 @@
 import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import type { UmbUserItemModel } from '../repository/index.js';
-import { css, customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-user-item-ref')
-export class UmbDocumentItemRefElement extends UmbLitElement {
+export class UmbUserItemRefElement extends UmbLitElement {
 	@property({ type: Object })
 	item?: UmbUserItemModel;
 
@@ -16,6 +16,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	@property({ type: Boolean })
 	standalone = false;
 
+	@state()
 	_editPath = '';
 
 	constructor() {
@@ -39,7 +40,11 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		if (!this.item) return nothing;
 
 		return html`
-			<uui-ref-node-user name=${this.item.name} ?readonly=${this.readonly} ?standalone=${this.standalone}>
+			<uui-ref-node-user
+				name=${this.item.name}
+				href=${this.#getHref(this.item)}
+				?readonly=${this.readonly}
+				?standalone=${this.standalone}>
 				<umb-user-avatar
 					slot="icon"
 					.name=${this.item.name}
@@ -59,10 +64,10 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	];
 }
 
-export { UmbDocumentItemRefElement as element };
+export { UmbUserItemRefElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-item-ref': UmbDocumentItemRefElement;
+		'umb-user-item-ref': UmbUserItemRefElement;
 	}
 }

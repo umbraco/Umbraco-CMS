@@ -1,3 +1,4 @@
+import { UMB_PICKER_INPUT_CONTEXT } from './picker-input.context-token.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
@@ -6,7 +7,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
-import { UMB_PICKER_INPUT_CONTEXT } from './picker-input.context-token';
 
 type PickerItemBaseType = { name: string; unique: string };
 export class UmbPickerInputContext<
