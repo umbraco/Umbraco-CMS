@@ -21,7 +21,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 			return modelEntry;
 		},
 		identifier: 'Umb.SorterIdentifier.InputDocument',
-		itemSelector: 'uui-ref-node',
+		itemSelector: 'umb-entity-item-ref',
 		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selection = model;
@@ -192,7 +192,11 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 					this._items,
 					(item) => item.unique,
 					(item) =>
-						html`<umb-entity-item-ref .item=${item} ?readonly=${this.readonly} ?standalone=${this.max === 1}>
+						html`<umb-entity-item-ref
+							id=${item.unique}
+							.item=${item}
+							?readonly=${this.readonly}
+							?standalone=${this.max === 1}>
 							${when(
 								!this.readonly,
 								() => html`
