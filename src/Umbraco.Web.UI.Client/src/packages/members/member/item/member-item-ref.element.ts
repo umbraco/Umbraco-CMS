@@ -1,10 +1,9 @@
 import { UMB_MEMBER_ENTITY_TYPE } from '../entity.js';
 import type { UmbMemberItemModel } from '../repository/index.js';
-import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UMB_PICKER_INPUT_CONTEXT } from '@umbraco-cms/backoffice/picker-input';
 
 @customElement('umb-member-item-ref')
 export class UmbMemberItemRefElement extends UmbLitElement {
@@ -40,7 +39,7 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 		if (!this.item) return nothing;
 
 		return html`
-			<uui-ref-node
+			<uui-ref-node-member
 				id=${this.item.unique}
 				name=${this.item.name}
 				href=${ifDefined(this.#getHref(this.item))}
@@ -48,7 +47,7 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 				?standalone=${this.standalone}>
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon(this.item)}
-			</uui-ref-node>
+			</uui-ref-node-member>
 		`;
 	}
 
