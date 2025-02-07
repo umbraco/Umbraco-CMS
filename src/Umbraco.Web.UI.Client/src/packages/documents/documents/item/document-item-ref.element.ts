@@ -1,14 +1,6 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentItemModel } from './types.js';
-import {
-	classMap,
-	customElement,
-	html,
-	ifDefined,
-	nothing,
-	property,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
+import { classMap, css, customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
@@ -24,10 +16,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	@property({ type: Boolean })
 	standalone = false;
 
-	@state()
-	_isPickerInput = false;
-
-	_editDocumentPath = '';
+	_editPath = '';
 
 	constructor() {
 		super();
@@ -38,7 +27,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 				return { data: { entityType: UMB_DOCUMENT_ENTITY_TYPE, preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				this._editDocumentPath = routeBuilder({});
+				this._editPath = routeBuilder({});
 			});
 	}
 
@@ -47,7 +36,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	}
 
 	#getHref(item: UmbDocumentItemModel) {
-		return `${this._editDocumentPath}/edit/${item.unique}`;
+		return `${this._editPath}/edit/${item.unique}`;
 	}
 
 	override render() {
@@ -76,6 +65,14 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		if (!item.isTrashed) return;
 		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
 	}
+
+	static override styles = [
+		css`
+			.draft {
+				opacity: 0.6;
+			}
+		`,
+	];
 }
 
 export { UmbDocumentItemRefElement as element };
