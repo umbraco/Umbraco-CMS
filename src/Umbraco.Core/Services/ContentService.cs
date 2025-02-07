@@ -2048,7 +2048,7 @@ public class ContentService : RepositoryService, IContentService
                 : null; // null means 'nothing to do'
         }
 
-        return SaveAndPublishBranch(content, forceUnpublished, forceRepublish, ShouldPublish, SaveAndPublishBranch_PublishCultures, userId);
+        return SaveAndPublishBranch(content, ShouldPublish, SaveAndPublishBranch_PublishCultures, userId);
     }
 
     /// <inheritdoc />
@@ -2094,13 +2094,11 @@ public class ContentService : RepositoryService, IContentService
                 : null; // null means 'nothing to do'
         }
 
-        return SaveAndPublishBranch(content, forceUnpublished, forceRepublish, ShouldPublish, SaveAndPublishBranch_PublishCultures, userId);
+        return SaveAndPublishBranch(content, ShouldPublish, SaveAndPublishBranch_PublishCultures, userId);
     }
 
     internal IEnumerable<PublishResult> SaveAndPublishBranch(
         IContent document,
-        bool forceUnpublished,
-        bool forceRepublish,
         Func<IContent, HashSet<string>?> shouldPublish,
         Func<IContent, HashSet<string>, IReadOnlyCollection<ILanguage>, bool> publishCultures,
         int userId = Constants.Security.SuperUserId)
