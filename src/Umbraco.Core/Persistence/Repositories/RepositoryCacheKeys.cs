@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
 /// <summary>
@@ -11,7 +13,12 @@ public static class RepositoryCacheKeys
     public static string GetKey<T>()
     {
         Type type = typeof(T);
-        return Keys.TryGetValue(type, out var key) ? key : Keys[type] = "uRepo_" + type.Name + "_";
+
+        // look up the existing value or get a reference to the newly created default value
+        ref string? key = ref CollectionsMarshal.GetValueRefOrAddDefault(Keys, type, out _);
+
+        // as we have the reference, we can just assign it if null, without the expensive write back to the dictionary
+        return key ??= "uRepo_" + type.Name + "_";
     }
 
     public static string GetKey<T, TId>(TId? id)
