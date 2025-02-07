@@ -1,6 +1,6 @@
 import { UMB_MEMBER_ENTITY_TYPE } from '../entity.js';
 import type { UmbMemberItemModel } from './repository/types.js';
-import { customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
@@ -16,6 +16,7 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 	@property({ type: Boolean })
 	standalone = false;
 
+	@state()
 	_editPath = '';
 
 	constructor() {
