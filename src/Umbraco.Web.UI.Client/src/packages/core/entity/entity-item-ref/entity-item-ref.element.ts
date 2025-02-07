@@ -42,6 +42,11 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 			(extensionControllers) => {
 				const component = extensionControllers[0]?.component;
 
+				if (!component) {
+					this._component?.remove();
+					return;
+				}
+
 				// assign the item to the component
 				component.item = this.#item;
 
