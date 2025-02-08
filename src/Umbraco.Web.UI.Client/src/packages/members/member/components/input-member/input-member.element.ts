@@ -7,10 +7,6 @@ import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/member-type';
-import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
-import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
-import { UMB_MEMBER_MANAGEMENT_SECTION_ALIAS } from 'src/packages/members/section/constants.js';
 
 @customElement('umb-input-member')
 export class UmbInputMemberElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
