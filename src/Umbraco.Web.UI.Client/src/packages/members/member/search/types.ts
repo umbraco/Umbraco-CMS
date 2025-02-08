@@ -1,4 +1,4 @@
-import type { UmbMemberItemModel } from '../repository/index.js';
+import type { UmbMemberItemModel } from '../item/types.js';
 import type { UmbMemberTypeEntityType } from '@umbraco-cms/backoffice/member-type';
 import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 

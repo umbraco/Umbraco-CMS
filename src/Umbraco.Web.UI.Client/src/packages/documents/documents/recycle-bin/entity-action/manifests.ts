@@ -5,8 +5,8 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_DELETE,
 	UMB_USER_PERMISSION_DOCUMENT_MOVE,
 } from '../../constants.js';
-import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../repository/constants.js';
 import { UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS } from '../../reference/constants.js';
+import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../item/constants.js';
 import {
 	UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 	UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS,
