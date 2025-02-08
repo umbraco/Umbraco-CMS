@@ -3,7 +3,10 @@ import type { UmbUserItemModel } from '../repository/index.js';
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import { UMB_USER_MANAGEMENT_SECTION_ALIAS } from '../../section/constants.js';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-user-item-ref')
 export class UmbUserItemRefElement extends UmbLitElement {
@@ -19,8 +22,22 @@ export class UmbUserItemRefElement extends UmbLitElement {
 	@state()
 	_editPath = '';
 
+	@state()
+	_userHasSectionAccess = false;
+
 	constructor() {
 		super();
+
+		createExtensionApiByAlias(this, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					match: UMB_USER_MANAGEMENT_SECTION_ALIAS,
+				},
+				onChange: (permitted: boolean) => {
+					this._userHasSectionAccess = permitted;
+				},
+			},
+		]);
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath(UMB_USER_ENTITY_TYPE)
@@ -43,7 +60,7 @@ export class UmbUserItemRefElement extends UmbLitElement {
 			<uui-ref-node-user
 				name=${this.item.name}
 				href=${this.#getHref(this.item)}
-				?readonly=${this.readonly}
+				?readonly=${this.readonly || !this._userHasSectionAccess}
 				?standalone=${this.standalone}>
 				<umb-user-avatar
 					slot="icon"
