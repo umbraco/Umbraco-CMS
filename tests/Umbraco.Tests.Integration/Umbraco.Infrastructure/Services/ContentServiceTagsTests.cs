@@ -669,7 +669,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentService.Save(child2);
 
         // Act
-        ContentService.SaveAndPublishBranch(content, true, false);
+        ContentService.SaveAndPublishBranch(content, PublishBranchForceOptions.PublishUnpublished);
 
         // Assert
         var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;

@@ -1303,7 +1303,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         // publish parent & its branch
         // only those that are not already published
         // only invariant/neutral values
-        var parentPublished = ContentService.SaveAndPublishBranch(parent, true, false);
+        var parentPublished = ContentService.SaveAndPublishBranch(parent, PublishBranchForceOptions.PublishUnpublished);
 
         foreach (var result in parentPublished)
         {
@@ -1522,7 +1522,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         ContentService.Save(content);
 
         // Act
-        var published = ContentService.SaveAndPublishBranch(content, true, false);
+        var published = ContentService.SaveAndPublishBranch(content, PublishBranchForceOptions.PublishUnpublished);
 
         // Assert
         Assert.That(published.All(x => x.Success), Is.False);

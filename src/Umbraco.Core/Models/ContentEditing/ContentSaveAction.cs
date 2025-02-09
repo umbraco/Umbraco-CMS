@@ -59,14 +59,14 @@ public enum ContentSaveAction
     ///     Saves and publishes the content item including all descendants regardless of whether they have a published version
     ///     or not.
     /// </summary>
-    [Obsolete("This option is no longer used as the 'force' aspect has been split into publishing unpublished and force re-published. Please use one of those options instead.")]
+    [Obsolete("This option is no longer used as the 'force' aspect has been extended into options for publishing unpublished and re-publishing changed content. Please use one of those options instead.")]
     PublishWithDescendantsForce = 10,
 
     /// <summary>
     ///     Creates and publishes the new content item including all descendants regardless of whether they have a published
     ///     version or not.
     /// </summary>
-    [Obsolete("This option is no longer used as the 'force' aspect has been split into publishing unpublished and force re-published. Please use one of those options instead.")]
+    [Obsolete("This option is no longer used as the 'force' aspect has been extended into options for publishing unpublished and re-publishing changed content. Please use one of those options instead.")]
     PublishWithDescendantsForceNew = 11,
 
     /// <summary>
