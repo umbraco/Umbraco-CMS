@@ -423,7 +423,7 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
     [TestCase(PublishBranchForceOptions.PublishUnpublished)]
     [TestCase(PublishBranchForceOptions.ForceRepublish)]
     [TestCase(PublishBranchForceOptions.ForceAll)]
-    public void Can_Publish_Invariant_Branch_With_Force_Options(PublishBranchForceOptions options)
+    public void Can_Publish_Invariant_Branch_With_Force_Options(PublishBranchForceOptions forceOptions)
     {
         CreateTypes(out var iContentType, out _);
 
@@ -446,10 +446,10 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
         ii3.SetValue("ip", "vii3a");
         ContentService.Save(ii3);
 
-        var result = ContentService.SaveAndPublishBranch(iRoot, options).ToArray();
+        var result = ContentService.SaveAndPublishBranch(iRoot, forceOptions).ToArray();
 
-        var expectedContentNames = GetExpectedContentNamesForForceOptions(options);
-        var expectedPublishResultTypes = GetExpectedPublishResultTypesForForceOptions(options);
+        var expectedContentNames = GetExpectedContentNamesForForceOptions(forceOptions);
+        var expectedPublishResultTypes = GetExpectedPublishResultTypesForForceOptions(forceOptions);
         AssertPublishResults(result, x => x.Content.Name, expectedContentNames);
         AssertPublishResults(
             result,
@@ -465,7 +465,7 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
     [TestCase("de", PublishBranchForceOptions.PublishUnpublished)]
     [TestCase("de", PublishBranchForceOptions.ForceRepublish)]
     [TestCase("de", PublishBranchForceOptions.ForceAll)]
-    public void Can_Publish_Variant_Branch_With_Force_Options(string culture, PublishBranchForceOptions options)
+    public void Can_Publish_Variant_Branch_With_Force_Options(string culture, PublishBranchForceOptions forceOptions)
     {
         CreateTypes(out _, out var vContentType);
 
@@ -513,10 +513,10 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
         iv3.SetValue("vp", "iv3a.ru", "ru");
         ContentService.Save(iv3);
 
-        var result = ContentService.SaveAndPublishBranch(vRoot, options, culture).ToArray();
+        var result = ContentService.SaveAndPublishBranch(vRoot, forceOptions, culture).ToArray();
 
-        var expectedContentNames = GetExpectedContentNamesForForceOptions(options, true);
-        var expectedPublishResultTypes = GetExpectedPublishResultTypesForForceOptions(options, true);
+        var expectedContentNames = GetExpectedContentNamesForForceOptions(forceOptions, true);
+        var expectedPublishResultTypes = GetExpectedPublishResultTypesForForceOptions(forceOptions, true);
         AssertPublishResults(result, x => x.Content.Name, expectedContentNames);
         AssertPublishResults(
             result,
@@ -524,12 +524,12 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
             expectedPublishResultTypes);
     }
 
-    private static string[] GetExpectedContentNamesForForceOptions(PublishBranchForceOptions options, bool isVariant = false)
+    private static string[] GetExpectedContentNamesForForceOptions(PublishBranchForceOptions forceOptions, bool isVariant = false)
     {
         var rootName = isVariant ? "vroot.de" : "iroot";
         var childPrefix = isVariant ? "iv" : "ii";
         var childSuffix = isVariant ? ".de" : string.Empty;
-        if (options.HasFlag(PublishBranchForceOptions.PublishUnpublished))
+        if (forceOptions.HasFlag(PublishBranchForceOptions.PublishUnpublished))
         {
             return [rootName, $"{childPrefix}1{childSuffix}", $"{childPrefix}2{childSuffix}", $"{childPrefix}3{childSuffix}"];
         }
