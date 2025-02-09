@@ -42,7 +42,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	}
 
 	#isDraft(item: UmbDocumentItemModel) {
-		return item.variants[0]?.state === 'Draft';
+		return item.variants?.[0]?.state === 'Draft';
 	}
 
 	#getHref(item: UmbDocumentItemModel) {
