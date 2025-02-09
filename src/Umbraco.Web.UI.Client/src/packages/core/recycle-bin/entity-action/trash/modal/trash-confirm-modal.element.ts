@@ -107,7 +107,7 @@ export class UmbTrashConfirmModalElement extends UmbLitElement {
 		return html`
 			<h5 id="reference-headline">${this.localize.term('references_labelDependsOnThis')}</h5>
 			<uui-ref-list>
-				${this._referencedBy.map((reference) => html`<umb-ref-item .name=${reference.name} readonly></umb-ref-item> `)}
+				${this._referencedBy.map((reference) => html`<umb-entity-item-ref .item=${reference}></umb-entity-item-ref> `)}
 			</uui-ref-list>
 			${this._totalReferencedBy > 5
 				? html`<span>${this.localize.term('references_labelMoreReferences', this._totalReferencedBy - 5)}</span>`
