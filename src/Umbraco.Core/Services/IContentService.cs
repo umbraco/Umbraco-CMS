@@ -419,51 +419,25 @@ public interface IContentService : IContentServiceBase<IContent>
     ///         published. The root of the branch is always published, regardless of <paramref name="force" />.
     ///     </para>
     /// </remarks>
-    [Obsolete("This method is not longer used as the 'force' parameter has been split into publishing unpublished and force re-published. Please use the overload containing parameters for those options instead. Will be removed in V17.")]
+    [Obsolete("This method is not longer used as the 'force' parameter has been extended into options for publishing unpublished and re-publishing changed content. Please use the overload containing the parameter for those options instead. Will be removed in V17.")]
     IEnumerable<PublishResult> PublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Publishes a document branch.
     /// </summary>
     /// <param name="content">The root document.</param>
-    /// <param name="forceUnpublished">A value indicating whether to publish documents that are currently unpublished.</param>
-    /// <param name="forceRepublish">A value indicating whether to publish documents irrespective of whether they have any pending changes.</param>
+    /// <param name="forceOptions">A value indicating options for force publishing unpublished or re-publishing unchanged content.</param>
     /// <param name="cultures">The cultures to publish.</param>
     /// <param name="userId">The identifier of the user performing the operation.</param>
     /// <remarks>
     ///     <para>
-    ///         The root of the branch is always published, regardless of <paramref name="forceUnpublished" /> and <paramref name="forceRepublish" />.
+    ///         The root of the branch is always published, regardless of <paramref name="forceOptions" />.
     ///     </para>
     /// </remarks>
-    IEnumerable<PublishResult> PublishBranch(IContent content, bool forceUnpublished, bool forceRepublish, string[] cultures, int userId = Constants.Security.SuperUserId)
+    IEnumerable<PublishResult> PublishBranch(IContent content, PublishBranchForceOptions forceOptions, string[] cultures, int userId = Constants.Security.SuperUserId)
 #pragma warning disable CS0618 // Type or member is obsolete
-        => SaveAndPublishBranch(content, forceUnpublished, cultures, userId);
+        => SaveAndPublishBranch(content, forceOptions.HasFlag(PublishBranchForceOptions.PublishUnpublished), cultures, userId);
 #pragma warning restore CS0618 // Type or member is obsolete
-
-    ///// <summary>
-    ///// Saves and publishes a document branch.
-    ///// </summary>
-    ///// <param name="content">The root document.</param>
-    ///// <param name="force">A value indicating whether to force-publish documents that are not already published.</param>
-    ///// <param name="shouldPublish">A function determining cultures to publish.</param>
-    ///// <param name="publishCultures">A function publishing cultures.</param>
-    ///// <param name="userId">The identifier of the user performing the operation.</param>
-    ///// <remarks>
-    ///// <para>The <paramref name="force"/> parameter determines which documents are published. When <c>false</c>,
-    ///// only those documents that are already published, are republished. When <c>true</c>, all documents are
-    ///// published. The root of the branch is always published, regardless of <paramref name="force"/>.</para>
-    ///// <para>The <paramref name="editing"/> parameter is a function which determines whether a document has
-    ///// changes to publish (else there is no need to publish it). If one wants to publish only a selection of
-    ///// cultures, one may want to check that only properties for these cultures have changed. Otherwise, other
-    ///// cultures may trigger an unwanted republish.</para>
-    ///// <para>The <paramref name="publishCultures"/> parameter is a function to execute to publish cultures, on
-    ///// each document. It can publish all, one, or a selection of cultures. It returns a boolean indicating
-    ///// whether the cultures could be published.</para>
-    ///// </remarks>
-    // IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force,
-    //    Func<IContent, HashSet<string>> shouldPublish,
-    //    Func<IContent, HashSet<string>, bool> publishCultures,
-    //    int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Unpublishes a document.

@@ -27,7 +27,7 @@ public interface IContentPublishingService
     /// <param name="force">A value indicating whether to force-publish content that is not already published.</param>
     /// <param name="userKey">The identifier of the user performing the operation.</param>
     /// <returns>Result of the publish operation.</returns>
-    [Obsolete("This method is not longer used as the 'force' parameter has been split into publishing unpublished and force re-published. Please use the overload containing parameters for those options instead. Will be removed in V17.")]
+    [Obsolete("This method is not longer used as the 'force' parameter has been extended into options for publishing unpublished and re-publishing changed content. Please use the overload containing the parameter for those options instead. Will be removed in V17.")]
     Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, bool force, Guid userKey);
 
     /// <summary>
@@ -35,13 +35,12 @@ public interface IContentPublishingService
     /// </summary>
     /// <param name="key">The key of the root content.</param>
     /// <param name="cultures">The cultures to publish.</param>
-    /// <param name="forceUnpublished">A value indicating whether to publish documents that are currently unpublished.</param>
-    /// <param name="forceRepublish">A value indicating whether to publish documents irrespective of whether they have any pending changes.</param>
+    /// <param name="forceOptions">A value indicating options for force publishing unpublished or re-publishing unchanged content.</param>
     /// <param name="userKey">The identifier of the user performing the operation.</param>
     /// <returns>Result of the publish operation.</returns>
-    Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, bool forceUnpublished, bool forceRepublish, Guid userKey)
+    Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, PublishBranchForceOptions forceOptions, Guid userKey)
 #pragma warning disable CS0618 // Type or member is obsolete
-        => PublishBranchAsync(key, cultures, forceUnpublished, userKey);
+        => PublishBranchAsync(key, cultures, forceOptions.HasFlag(PublishBranchForceOptions.PublishUnpublished), userKey);
 #pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>

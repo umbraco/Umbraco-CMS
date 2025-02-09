@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Security.Authorization;
@@ -53,12 +54,27 @@ public class PublishDocumentWithDescendantsController : DocumentControllerBase
         Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus> attempt = await _contentPublishingService.PublishBranchAsync(
             id,
             requestModel.Cultures,
-            requestModel.IncludeUnpublishedDescendants,
-            requestModel.ForceRepublish,
+            GetPublishBranchForceOptions(requestModel),
             CurrentUserKey(_backOfficeSecurityAccessor));
 
         return attempt.Success
             ? Ok()
             : DocumentPublishingOperationStatusResult(attempt.Status, failedBranchItems: attempt.Result.FailedItems);
+    }
+
+    private static PublishBranchForceOptions GetPublishBranchForceOptions(PublishDocumentWithDescendantsRequestModel requestModel)
+    {
+        PublishBranchForceOptions forceOptions = PublishBranchForceOptions.None;
+        if (requestModel.IncludeUnpublishedDescendants)
+        {
+            forceOptions |= PublishBranchForceOptions.PublishUnpublished;
+        }
+
+        if (requestModel.ForceRepublish)
+        {
+            forceOptions |= PublishBranchForceOptions.ForceRepublish;
+        }
+
+        return forceOptions;
     }
 }

@@ -50,7 +50,7 @@ public class DocumentUrlServiceTest_HideTopLevel_False : UmbracoIntegrationTestW
     {
         if (loadDraft is false)
         {
-            ContentService.PublishBranch(Textpage, true, false, ["*"]);
+            ContentService.PublishBranch(Textpage, PublishBranchForceOptions.PublishUnpublished, ["*"]);
         }
 
 
@@ -70,7 +70,7 @@ public class DocumentUrlServiceTest_HideTopLevel_False : UmbracoIntegrationTestW
 
         if (loadDraft is false)
         {
-            ContentService.PublishBranch(Textpage, true, false, ["*"]);
+            ContentService.PublishBranch(Textpage, PublishBranchForceOptions.PublishUnpublished, ["*"]);
         }
 
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
@@ -89,8 +89,8 @@ public class DocumentUrlServiceTest_HideTopLevel_False : UmbracoIntegrationTestW
 
         if (loadDraft is false)
         {
-            ContentService.PublishBranch(Textpage, true, false, ["*"]);
-            ContentService.PublishBranch(secondRoot, true, false, ["*"]);
+            ContentService.PublishBranch(Textpage, PublishBranchForceOptions.PublishUnpublished, ["*"]);
+            ContentService.PublishBranch(secondRoot, PublishBranchForceOptions.PublishUnpublished, ["*"]);
         }
 
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
@@ -114,8 +114,8 @@ public class DocumentUrlServiceTest_HideTopLevel_False : UmbracoIntegrationTestW
         // Publish both the main root and the second root with descendants
         if (loadDraft is false)
         {
-            ContentService.PublishBranch(Textpage, true, false, ["*"]);
-            ContentService.PublishBranch(secondRoot, true, false, ["*"]);
+            ContentService.PublishBranch(Textpage, PublishBranchForceOptions.PublishUnpublished, ["*"]);
+            ContentService.PublishBranch(secondRoot, PublishBranchForceOptions.PublishUnpublished, ["*"]);
         }
 
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();

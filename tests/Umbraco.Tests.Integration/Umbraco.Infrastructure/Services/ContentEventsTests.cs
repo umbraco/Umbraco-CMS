@@ -719,7 +719,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             // branch is:
             ResetEvents();
-            ContentService.PublishBranch(content1, forceUnpublished: false, forceRepublish: false, cultures: content1.AvailableCultures.ToArray()); // force = false, don't publish unpublished items
+            ContentService.PublishBranch(content1, PublishBranchForceOptions.None, cultures: content1.AvailableCultures.ToArray()); // PublishBranchForceOptions.None: don't publish unpublished items
 
             foreach (EventInstance e in _events)
             {
@@ -756,7 +756,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Unpublish(content1);
 
             ResetEvents();
-            ContentService.PublishBranch(content1, forceUnpublished: true, forceRepublish: false, cultures: content1.AvailableCultures.ToArray()); // forceUnpublished = true, also publish unpublished items
+            ContentService.PublishBranch(content1, PublishBranchForceOptions.PublishUnpublished, cultures: content1.AvailableCultures.ToArray()); // PublishBranchForceOptions.PublishUnpublished: also publish unpublished items
 
             foreach (EventInstance e in _events)
             {
