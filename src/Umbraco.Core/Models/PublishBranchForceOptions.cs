@@ -19,7 +19,7 @@ public enum PublishBranchForceOptions
     /// <summary>
     /// For publishing a branch, force republishing of all content, including content that has not changed.
     /// </summary>
-    ForceRepublish,
+    ForceRepublish = 2,
 
     /// <summary>
     /// For publishing a branch, publish all content, including content that is not published and content that has not changed.
