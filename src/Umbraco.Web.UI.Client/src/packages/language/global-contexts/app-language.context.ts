@@ -5,13 +5,16 @@ import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observabl
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbReadOnlyStateManager } from '@umbraco-cms/backoffice/utils';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
 // TODO: Make a store for the App Languages.
 // TODO: Implement default language end-point, in progress at backend team, so we can avoid getting all languages.
 export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext> implements UmbApi {
+	#languagesResolve!: () => void;
+	#languagesPromise = new Promise<void>((resolve) => {
+		this.#languagesResolve = resolve;
+	});
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 
 	#appLanguage = new UmbObjectState<UmbLanguageDetailModel | undefined>(undefined);
@@ -26,7 +29,8 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 	public readonly appMandatoryLanguages = this.#languages.asObservablePart((languages) =>
 		languages.filter((language) => language.isMandatory),
 	);
-	getMandatoryLanguages() {
+	async getMandatoryLanguages() {
+		await this.#languagesPromise;
 		return this.#languages.getValue().filter((language) => language.isMandatory);
 	}
 
@@ -91,6 +95,7 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 		// TODO: make this observable / update when languages are added/removed/updated
 		if (data) {
 			this.#languages.setValue(data.items);
+			this.#languagesResolve();
 
 			// If the app language is not set, set it to the default language
 			if (!this.#appLanguage.getValue()) {
