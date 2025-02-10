@@ -2104,12 +2104,8 @@ public class ContentService : RepositoryService, IContentService
     {
         // note: EditedValue and PublishedValue are objects here, so it is important to .Equals()
         // and not to == them, else we would be comparing references, and that is a bad thing
-        cultures ??= Array.Empty<string>();
 
-        if (content.ContentType.VariesByCulture() is false && (cultures.Length == 0 || (cultures.Length == 1 && cultures[0] == "invariant")))
-        {
-            cultures = ["*"];
-        }
+        cultures = EnsureCultures(content, cultures);
 
         string? defaultCulture;
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -2155,6 +2151,19 @@ public class ContentService : RepositoryService, IContentService
         }
 
         return PublishBranch(content, ShouldPublish, PublishBranch_PublishCultures, userId);
+    }
+
+    private static string[] EnsureCultures(IContent content, string[] cultures)
+    {
+        cultures ??= Array.Empty<string>();
+
+        // Ensure consistent indication of "all cultures" for variant content.
+        if (content.ContentType.VariesByCulture() is false && (cultures.Length == 0 || (cultures.Length == 1 && cultures[0] == "invariant")))
+        {
+            cultures = ["*"];
+        }
+
+        return cultures;
     }
 
     internal IEnumerable<PublishResult> PublishBranch(
