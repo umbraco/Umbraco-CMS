@@ -2155,16 +2155,18 @@ public class ContentService : RepositoryService, IContentService
 
     private static string[] EnsureCultures(IContent content, string[] cultures)
     {
-        cultures ??= Array.Empty<string>();
+        cultures ??= [];
 
         // Ensure consistent indication of "all cultures" for variant content.
-        if (content.ContentType.VariesByCulture() is false && (cultures.Length == 0 || (cultures.Length == 1 && cultures[0] == "invariant")))
+        if (content.ContentType.VariesByCulture() is false && ProvidedCulturesIndicatePublishAll(cultures))
         {
             cultures = ["*"];
         }
 
         return cultures;
     }
+
+    private static bool ProvidedCulturesIndicatePublishAll(string[] cultures) => cultures.Length == 0 || (cultures.Length == 1 && cultures[0] == "invariant");
 
     internal IEnumerable<PublishResult> PublishBranch(
         IContent document,
