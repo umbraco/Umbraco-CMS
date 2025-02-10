@@ -2054,16 +2054,18 @@ public class ContentService : RepositoryService, IContentService
             var isRoot = c.Id == content.Id;
             HashSet<string>? culturesToPublish = null;
 
+            PublishBranchForceOptions forceOptions = force ? PublishBranchForceOptions.PublishUnpublished : PublishBranchForceOptions.None;
+
             // invariant content type
             if (!c.ContentType.VariesByCulture())
             {
-                return PublishBranch_ShouldPublish(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, force ? PublishBranchForceOptions.PublishUnpublished : PublishBranchForceOptions.None);
+                return PublishBranch_ShouldPublish(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, forceOptions);
             }
 
             // variant content type, specific culture
             if (culture != "*")
             {
-                return PublishBranch_ShouldPublish(ref culturesToPublish, culture, c.IsCulturePublished(culture), c.IsCultureEdited(culture), isRoot, force ? PublishBranchForceOptions.PublishUnpublished : PublishBranchForceOptions.None);
+                return PublishBranch_ShouldPublish(ref culturesToPublish, culture, c.IsCulturePublished(culture), c.IsCultureEdited(culture), isRoot, forceOptions);
             }
 
             // variant content type, all cultures
@@ -2073,7 +2075,7 @@ public class ContentService : RepositoryService, IContentService
                 // others will have to 'republish this culture'
                 foreach (var x in c.AvailableCultures)
                 {
-                    PublishBranch_ShouldPublish(ref culturesToPublish, x, c.IsCulturePublished(x), c.IsCultureEdited(x), isRoot, force ? PublishBranchForceOptions.PublishUnpublished : PublishBranchForceOptions.None);
+                    PublishBranch_ShouldPublish(ref culturesToPublish, x, c.IsCulturePublished(x), c.IsCultureEdited(x), isRoot, forceOptions);
                 }
 
                 return culturesToPublish;
