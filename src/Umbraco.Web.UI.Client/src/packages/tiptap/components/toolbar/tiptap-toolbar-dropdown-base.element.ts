@@ -1,7 +1,6 @@
 import { css, html, nothing, repeat, type TemplateResult } from '@umbraco-cms/backoffice/external/lit';
-import type { PopoverContainerPlacement, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { PopoverContainerPlacement, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 
 export type TiptapDropdownItem = {
 	alias: string;
@@ -51,15 +50,17 @@ export abstract class UmbTiptapToolbarDropdownBaseElement extends UmbLitElement 
 		items: Array<TiptapDropdownItem>,
 		placement: PopoverContainerPlacement = 'right-start',
 	): TemplateResult {
-		return html` <uui-popover-container placement=${placement} id=${this.makeAlias(label)}>
-			<div class="popover-content">
-				${repeat(
-					items,
-					(item) => item.alias,
-					(item) => html`${this.renderItem(item)}`,
-				)}
-			</div>
-		</uui-popover-container>`;
+		return html`
+			<uui-popover-container placement=${placement} id=${this.makeAlias(label)}>
+				<div class="popover-content">
+					${repeat(
+						items,
+						(item) => item.alias,
+						(item) => html`${this.renderItem(item)}`,
+					)}
+				</div>
+			</uui-popover-container>
+		`;
 	}
 	protected override render() {
 		return html`
@@ -72,7 +73,6 @@ export abstract class UmbTiptapToolbarDropdownBaseElement extends UmbLitElement 
 	}
 
 	static override readonly styles = [
-		UmbTextStyles,
 		css`
 			button {
 				border: unset;
