@@ -15,9 +15,10 @@ import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/documen
 import { UmbContentTypeStructureManager, type UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
+import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
 	layout: LayoutEntryType;
@@ -402,21 +403,36 @@ export abstract class UmbBlockManagerContext<
 		}
 
 		// Expose inserted block:
-		this.contentTypesLoaded.then(() => {
-			const contentStructure = this.getStructure(content.contentTypeKey);
-			if (!contentStructure) {
-				throw new Error(`Cannot expose block, missing content structure for ${content.contentTypeKey}`);
-			}
-			const variantId = this.getVariantId();
-			if (!variantId) {
-				throw new Error(`Cannot expose block, missing variantId`);
-			}
-			const blockVariantId = variantId.toVariant(
-				contentStructure.getVariesByCulture(),
-				contentStructure.getVariesBySegment(),
-			);
-			this.setOneExpose(content.key, blockVariantId);
-		});
+		this.#setInitialBlockExpose(content);
+	}
+
+	async #setInitialBlockExpose(content: UmbBlockDataModel) {
+		await this.contentTypesLoaded;
+		const contentStructure = this.getStructure(content.contentTypeKey);
+		if (!contentStructure) {
+			throw new Error(`Cannot expose block, missing content structure for ${content.contentTypeKey}`);
+		}
+		const variantId = this.getVariantId();
+		if (!variantId) {
+			throw new Error(`Cannot expose block, missing variantId`);
+		}
+
+		const varyByCulture = contentStructure.getVariesByCulture();
+		const varyBySegment = contentStructure.getVariesBySegment();
+		const blockVariantId = variantId.toVariant(varyByCulture, varyBySegment);
+		this.setOneExpose(content.key, blockVariantId);
+
+		if (varyByCulture) {
+			// get all mandatory cultures:
+			const appLanguageContext = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
+			const mandatoryLanguages = await appLanguageContext.getMandatoryLanguages();
+			mandatoryLanguages.forEach((x) => {
+				// No need to insert the same expose twice:
+				if (blockVariantId.culture !== x.unique) {
+					this.setOneExpose(content.key, new UmbVariantId(x.unique));
+				}
+			});
+		}
 	}
 
 	protected removeBlockKey(contentKey: string) {
