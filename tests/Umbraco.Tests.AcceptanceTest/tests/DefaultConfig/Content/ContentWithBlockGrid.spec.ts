@@ -261,3 +261,7 @@ test.skip('can add settings model for the block in the content', async ({umbraco
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(settingModelName);
 });
+
+test.skip('can move blocks in the content', async ({umbracoApi, umbracoUi}) => {
+  // TODO: Implement it later
+});
