@@ -1783,6 +1783,7 @@ export default {
 		selectEventFirst: 'Please select an event first.',
 		selectEvents: 'Select events',
 		statusCode: 'Status code',
+		unnamedWebhook: 'Unnamed webhook',
 	},
 	languages: {
 		addLanguage: 'Add language',
