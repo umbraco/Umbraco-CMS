@@ -59,6 +59,7 @@ export interface UmbContentDetailWorkspaceContextArgs<
 	contentTypeDetailRepository: UmbDetailRepositoryConstructor<ContentTypeDetailModelType>;
 	contentValidationRepository?: ClassConstructor<UmbContentValidationRepository<DetailModelType>>;
 	skipValidationOnSubmit?: boolean;
+	ignorerValidationOnSubmit?: boolean;
 	contentVariantScaffold: VariantModelType;
 	saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
 }
@@ -140,6 +141,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	public readonly variantOptions;
 
 	#validateOnSubmit: boolean;
+	#ignorerValidationOnSubmit: boolean;
 	#serverValidation = new UmbServerModelValidatorContext(this);
 	#validationRepositoryClass?: ClassConstructor<UmbContentValidationRepository<DetailModelType>>;
 	#validationRepository?: UmbContentValidationRepository<DetailModelType>;
@@ -163,6 +165,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const contentTypeDetailRepository = new args.contentTypeDetailRepository(this);
 		this.#validationRepositoryClass = args.contentValidationRepository;
 		this.#validateOnSubmit = args.skipValidationOnSubmit ? !args.skipValidationOnSubmit : true;
+		this.#ignorerValidationOnSubmit = args.ignorerValidationOnSubmit ? !args.ignorerValidationOnSubmit : true;
 		this.structure = new UmbContentTypeStructureManager<ContentTypeDetailModelType>(this, contentTypeDetailRepository);
 		this.variesByCulture = this.structure.ownerContentTypeObservablePart((x) => x?.variesByCulture);
 		this.variesBySegment = this.structure.ownerContentTypeObservablePart((x) => x?.variesBySegment);
@@ -616,7 +619,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 					return this.performCreateOrUpdate(variantIds, saveData);
 				},
 				async () => {
-					return this.invalidSubmit();
+					if (this.#ignorerValidationOnSubmit) {
+						return this.performCreateOrUpdate(variantIds, saveData);
+					} else {
+						return this.invalidSubmit();
+					}
 				},
 			);
 		} else {

@@ -74,7 +74,7 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 			<div id="headerColumn">
 				<uui-label id="label" title=${this.alias} ?required=${this.mandatory}>
 					${this.localize.string(this.label)}
-					${when(this.invalid, () => html`<uui-badge color="danger" attention>!</uui-badge>`)}
+					${when(this.invalid, () => html`<uui-badge color="invalid" attention>!</uui-badge>`)}
 				</uui-label>
 				<slot name="action-menu"></slot>
 				${this.#renderDescription()}
@@ -134,10 +134,17 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 				word-break: break-word;
 			}
 			:host([invalid]) #label {
-				color: var(--uui-color-danger);
+				color: var(--umb-validation-look-danger, var(--uui-color-danger))
+					var(--umb-validation-look-warning, var(--uui-color-warning-standalone));
 			}
 			uui-badge {
 				right: -30px;
+
+				background-color: var(--umb-validation-look-danger, var(--uui-color-danger))
+					var(--umb-validation-look-warning, var(--uui-color-warning));
+
+				color: var(--umb-validation-look-danger, var(--uui-color-danger-contrast))
+					var(--umb-validation-look-warning, var(--uui-color-warning-contrast));
 			}
 
 			#description {
