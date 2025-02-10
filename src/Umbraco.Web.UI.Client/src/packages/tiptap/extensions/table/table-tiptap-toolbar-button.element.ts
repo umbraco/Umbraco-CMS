@@ -16,72 +16,72 @@ export class UmbTiptapToolbarTableToolbarButtonElement extends UmbTiptapToolbarB
 		{
 			label: 'Insert table',
 			icon: 'icon-table',
-			execute: (editor: Editor) => editor.commands.insertTable({ rows: 3, cols: 3, withHeaderRow: true }),
+			execute: (editor: Editor) => editor.chain().focus().insertTable({ rows: 2, cols: 2, withHeaderRow: false }).run(),
 		},
 		{
 			label: 'Add column before',
 			icon: 'icon-table',
-			execute: (editor: Editor) => editor.commands.addColumnBefore(),
+			execute: (editor: Editor) => editor.chain().focus().addColumnBefore().run(),
 		},
 		{
 			label: 'Add column after',
 			icon: 'icon-table',
-			execute: (editor: Editor) => editor.commands.addColumnAfter(),
+			execute: (editor: Editor) => editor.chain().focus().addColumnAfter().run(),
 		},
 		{
 			label: 'Delete column',
 			icon: 'icon-trash',
-			execute: (editor: Editor) => editor.commands.deleteColumn(),
+			execute: (editor: Editor) => editor.chain().focus().deleteColumn().run(),
 		},
 		{
 			label: 'Add row before',
 			icon: 'icon-table',
-			execute: (editor: Editor) => editor.commands.addRowBefore(),
+			execute: (editor: Editor) => editor.chain().focus().addRowBefore().run(),
 		},
 		{
 			label: 'Add row after',
 			icon: 'icon-table',
-			execute: (editor: Editor) => editor.commands.addRowAfter(),
+			execute: (editor: Editor) => editor.chain().focus().addRowAfter().run(),
 		},
 		{
 			label: 'Delete row',
 			icon: 'icon-trash',
-			execute: (editor: Editor) => editor.commands.deleteRow(),
+			execute: (editor: Editor) => editor.chain().focus().deleteRow().run(),
 		},
 		{
 			label: 'Delete table',
 			icon: 'icon-trash',
-			execute: (editor: Editor) => editor.commands.deleteTable(),
+			execute: (editor: Editor) => editor.chain().focus().deleteTable().run(),
 		},
 		{
 			label: 'Merge cells',
 			icon: 'icon-table',
-			execute: (editor: Editor) => editor.commands.mergeCells(),
+			execute: (editor: Editor) => editor.chain().focus().mergeCells().run(),
 		},
 		{
 			label: 'Split cell',
 			icon: 'icon-table',
-			execute: (editor: Editor) => editor.commands.splitCell(),
+			execute: (editor: Editor) => editor.chain().focus().splitCell().run(),
 		},
 		{
 			label: 'Toggle header column',
 			icon: 'icon-table',
-			execute: (editor: Editor) => editor.commands.toggleHeaderColumn(),
+			execute: (editor: Editor) => editor.chain().focus().toggleHeaderColumn().run(),
 		},
 		{
 			label: 'Toggle header row',
 			icon: 'icon-table',
-			execute: (editor: Editor) => editor.commands.toggleHeaderRow(),
+			execute: (editor: Editor) => editor.chain().focus().toggleHeaderRow().run(),
 		},
 		{
 			label: 'Toggle header cell',
 			icon: 'icon-table',
-			execute: (editor: Editor) => editor.commands.toggleHeaderCell(),
+			execute: (editor: Editor) => editor.chain().focus().toggleHeaderCell().run(),
 		},
 		{
 			label: 'Merge or split',
 			icon: 'icon-table',
-			execute: (editor: Editor) => editor.commands.mergeOrSplit(),
+			execute: (editor: Editor) => editor.chain().focus().mergeOrSplit().run(),
 		},
 	];
 

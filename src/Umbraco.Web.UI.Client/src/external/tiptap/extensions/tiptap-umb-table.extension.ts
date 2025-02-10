@@ -62,7 +62,7 @@ export const UmbTableHeader = TableHeader.extend({
 								decorations.push(
 									Decoration.widget(pos + 1, () => {
 										const colSelected = isColumnSelected(index)(selection);
-										const className = 'grip-column' + (colSelected ? ' selected' : '');
+										const className = colSelected ? 'grip-column selected' : 'grip-column';
 
 										const grip = document.createElement('a');
 										grip.appendChild(document.createElement('uui-symbol-more'));
@@ -145,7 +145,7 @@ export const UmbTableCell = TableCell.extend({
 								decorations.push(
 									Decoration.widget(pos + 1, () => {
 										const rowSelected = isRowSelected(index)(selection);
-										const className = 'grip-row' + (rowSelected ? ' selected' : '');
+										const className = rowSelected ? 'grip-row selected' : 'grip-row';
 
 										const grip = document.createElement('a');
 										grip.appendChild(document.createElement('uui-symbol-more'));
@@ -172,9 +172,9 @@ export const UmbTableCell = TableCell.extend({
 	},
 });
 
-// ###############################################
-// ##################### UTILS ###################
-// ###############################################
+/* ###############################################
+   ##################### UTILS ###################
+   ############################################### */
 
 const isRectSelected = (rect: Rect) => (selection: CellSelection) => {
 	const map = TableMap.get(selection.$anchorCell.node(-1));

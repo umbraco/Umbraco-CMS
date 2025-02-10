@@ -14,13 +14,13 @@ export default class UmbTiptapTableExtensionApi extends UmbTiptapExtensionApiBas
 				border-radius: 0.25rem;
 				border-color: rgba(0, 0, 0, 0.1);
 				box-sizing: border-box;
-				width: 100%;
+				max-width: 100%;
 
 				td,
 				th {
 					box-sizing: border-box;
 					position: relative;
-					min-width: 100px;
+					min-width: 50px;
 					border: 1px solid var(--uui-color-border);
 					padding: 0.5rem;
 					text-align: left;
