@@ -9,42 +9,53 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services.PublishStatus;
 public partial class PublishedContentStatusFilteringServiceTests
 {
     [Test]
-    public void FilterDescendants_Invariant_ForNonPreview_YieldsOnlyRoutablePublishedItems()
+    public void FilterAncestors_Invariant_ForNonPreview_ItemWithUnpublishedAncestor_YieldsNoAncestors()
     {
-        var (sut, items) = SetupForDescendantsInvariant(false);
+        var (sut, items) = SetupForAncestorsInvariant(false);
 
-        var descendants = sut.FilterDescendants(items.Keys, null).ToArray();
-        Assert.AreEqual(4, descendants.Length);
+        // document keys must be passed in reverse (down-top) order, as is expected by the ancestor filtering
+        var ancestors = sut.FilterAncestors(items.Keys.Reverse(), null).ToArray();
+        // the furthest descendant has several unpublished ancestors, so this should yield no published ancestors
+        Assert.AreEqual(0, ancestors.Length);
+    }
+
+    [Test]
+    public void FilterAncestors_Invariant_ForNonPreview_ClosestPublishedDescendant_YieldsAllItems()
+    {
+        var (sut, items) = SetupForAncestorsInvariant(false);
+
+        // document keys must be passed in reverse (down-top) order, as is expected by the ancestor filtering
+        var ancestors = sut.FilterAncestors(items.Keys.Take(3).Reverse(), null).ToArray();
+        // items 2, 1 and 0 are all published
+        Assert.AreEqual(3, ancestors.Length);
         Assert.Multiple(() =>
         {
-            // 3 is not published
-            // 5 is not published, which means 6 should not be returned even though it's published
-            // 7 is not published, which means 8 and 9 should not be returned even though they're published
-            Assert.AreEqual(0, descendants[0].Id);
-            Assert.AreEqual(1, descendants[1].Id);
-            Assert.AreEqual(2, descendants[2].Id);
-            Assert.AreEqual(4, descendants[3].Id);
+            Assert.AreEqual(0, ancestors[2].Id);
+            Assert.AreEqual(1, ancestors[1].Id);
+            Assert.AreEqual(2, ancestors[0].Id);
         });
     }
 
     [Test]
-    public void FilterDescendants_Invariant_ForPreview_YieldsUnpublishedItems()
+    public void FilterAncestors_Invariant_ForPreview_YieldsUnpublishedItems()
     {
-        var (sut, items) = SetupForDescendantsInvariant(true);
+        var (sut, items) = SetupForAncestorsInvariant(true);
 
-        var descendants = sut.FilterDescendants(items.Keys, null).ToArray();
-        Assert.AreEqual(10, descendants.Length);
+        // document keys must be passed in reverse (down-top) order, as is expected by the ancestor filtering
+        var ancestors = sut.FilterAncestors(items.Keys.Reverse(), null).ToArray();
+        Assert.AreEqual(10, ancestors.Length);
         for (var i = 0; i < 10; i++)
         {
-            Assert.AreEqual(i, descendants[i].Id);
+            var expectedId = 9 - i;
+            Assert.AreEqual(expectedId, ancestors[i].Id);
         }
     }
 
     // sets up invariant test data:
     // - 10 documents with IDs 0 through 9
-    // - divided into three structures of three, where 0 is the root of all - [0 > 1 > 2 > 3], [0 > 4 > 5 > 6] and [0 > 7 > 8 > 9]
+    // - each document is a child to the previous one - that is, [0 > 1 > 2 > 3 > 4 > 5 > 6 > 7 > 8 > 9]
     // - 3, 5 and 7 are unpublished, the rest are published
-    private (PublishedContentStatusFilteringService PublishedContentStatusFilteringService, Dictionary<Guid, IPublishedContent> Items) SetupForDescendantsInvariant(bool forPreview)
+    private (PublishedContentStatusFilteringService PublishedContentStatusFilteringService, Dictionary<Guid, IPublishedContent> Items) SetupForAncestorsInvariant(bool forPreview)
     {
         var contentType = new Mock<IPublishedContentType>();
         contentType.SetupGet(c => c.Variations).Returns(ContentVariation.Nothing);
@@ -76,9 +87,7 @@ public partial class PublishedContentStatusFilteringServiceTests
                 var id = items[childKey].Id;
                 parentKey = id is 0
                     ? null
-                    : new[] { 1, 4, 7 }.Contains(id)
-                        ? items.First().Key
-                        : items.Values.First(item => item.Id == id - 1).Key;
+                    : items.Values.First(item => item.Id == id - 1).Key;
             }));
 
         var variationContextAccessor = SetupVariantContextAccessor(null);

@@ -11,6 +11,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services.PublishStatus;
 [TestFixture]
 public partial class PublishedContentStatusFilteringServiceTests
 {
+    public delegate void TryGetParentKeyCallback(Guid childKey, out Guid? parentKey);
+
     private IPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items)
         => SetupPublishStatusQueryService(items, id => id % 2 == 0);
 

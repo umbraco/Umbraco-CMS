@@ -209,6 +209,7 @@ public partial class PublishedContentStatusFilteringServiceTests
             new PublishedContentStatusFilteringService(
                 variationContextAccessor,
                 publishStatusQueryService,
+                Mock.Of<IDocumentNavigationQueryService>(),
                 previewService,
                 publishedContentCache),
             items);
@@ -254,6 +255,7 @@ public partial class PublishedContentStatusFilteringServiceTests
             new PublishedContentStatusFilteringService(
                 variationContextAccessor,
                 publishStatusQueryService,
+                Mock.Of<IDocumentNavigationQueryService>(),
                 previewService,
                 publishedContentCache),
             items);
@@ -308,6 +310,7 @@ public partial class PublishedContentStatusFilteringServiceTests
             new PublishedContentStatusFilteringService(
                 variationContextAccessor,
                 publishStatusQueryService,
+                Mock.Of<IDocumentNavigationQueryService>(),
                 previewService,
                 publishedContentCache),
             items);

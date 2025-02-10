@@ -8,13 +8,20 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
 {
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IPublishStatusQueryService _publishStatusQueryService;
+    private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private readonly IPreviewService _previewService;
     private readonly IPublishedContentCache _publishedContentCache;
 
-    public PublishedContentStatusFilteringService(IVariationContextAccessor variationContextAccessor, IPublishStatusQueryService publishStatusQueryService, IPreviewService previewService, IPublishedContentCache publishedContentCache)
+    public PublishedContentStatusFilteringService(
+        IVariationContextAccessor variationContextAccessor,
+        IPublishStatusQueryService publishStatusQueryService,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IPreviewService previewService,
+        IPublishedContentCache publishedContentCache)
     {
         _variationContextAccessor = variationContextAccessor;
         _publishStatusQueryService = publishStatusQueryService;
+        _documentNavigationQueryService = documentNavigationQueryService;
         _previewService = previewService;
         _publishedContentCache = publishedContentCache;
     }
@@ -25,7 +32,13 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
 
         return FilterKeys(
             ancestorsKeys,
-            keys => keys.TakeWhile(ancestorKey => _publishStatusQueryService.IsDocumentPublished(ancestorKey, culture)),
+            keys =>
+            {
+                Guid[] keysAsArray = keys as Guid[] ?? keys.ToArray();
+                return keysAsArray.All(ancestorKey => _publishStatusQueryService.IsDocumentPublished(ancestorKey, culture))
+                    ? keysAsArray
+                    : [];
+            },
             culture);
     }
 
@@ -36,7 +49,35 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
         => DefaultFilter(childrenKeys, culture);
 
     public IEnumerable<IPublishedContent> FilterDescendants(IEnumerable<Guid> descendantKeys, string? culture)
-        => DefaultFilter(descendantKeys, culture);
+    {
+        culture = CultureOrEmpty(culture);
+        return FilterKeys(
+            descendantKeys,
+            keys =>
+            {
+                // NOTE: the descendant keys are expected in top-down order by path, as per the
+                //       content navigation service implementations
+                Guid[] keysAsArray = keys as Guid[] ?? keys.ToArray();
+                Guid[] publishedKeys = keysAsArray
+                    .Where(key => _publishStatusQueryService.IsDocumentPublished(key, culture))
+                    .OrderBy(keysAsArray.IndexOf)
+                    .ToArray();
+
+                var result = publishedKeys.ToList();
+
+                foreach (Guid key in publishedKeys)
+                {
+                    if (_documentNavigationQueryService.TryGetParentKey(key, out Guid? parentKey) is false
+                        || (parentKey.HasValue && result.Contains(parentKey.Value) is false))
+                    {
+                        result.Remove(key);
+                    }
+                }
+
+                return result;
+            },
+            culture);
+    }
 
     private IEnumerable<IPublishedContent> DefaultFilter(IEnumerable<Guid> candidateKeys, string? culture)
     {
