@@ -1,3 +1,4 @@
+export * from './bytes/bytes.function.js';
 export * from './debounce/debounce.function.js';
 export * from './direction/index.js';
 export * from './download/blob-download.function.js';

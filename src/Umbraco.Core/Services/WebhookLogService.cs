@@ -1,7 +1,6 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Webhooks;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -29,5 +28,11 @@ public class WebhookLogService : IWebhookLogService
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
         return await _webhookLogRepository.GetPagedAsync(skip, take);
+    }
+
+    public async Task<PagedModel<WebhookLog>> Get(Guid webhookKey, int skip = 0, int take = int.MaxValue)
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
+        return await _webhookLogRepository.GetPagedAsync(webhookKey, skip, take);
     }
 }

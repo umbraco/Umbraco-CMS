@@ -7,20 +7,7 @@ import type { UmbContextProviderController } from '@umbraco-cms/backoffice/conte
 import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-
-/**
- * Helper method to replace the start of a string with another string.
- * @param path {string}
- * @param startFrom {string}
- * @param startTo {string}
- * @returns {string}
- */
-function ReplaceStartOfString(path: string, startFrom: string, startTo: string): string {
-	if (path.startsWith(startFrom + '.')) {
-		return startTo + path.slice(startFrom.length);
-	}
-	return path;
-}
+import { ReplaceStartOfPath } from '../utils/replace-start-of-path.function.js';
 
 /**
  * Validation Context is the core of Validation.
@@ -143,7 +130,12 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 					}
 					this.#parentMessages = msgs;
 					msgs.forEach((msg) => {
-						const path = ReplaceStartOfString(msg.path, this.#baseDataPath!, '$');
+						const path = ReplaceStartOfPath(msg.path, this.#baseDataPath!, '$');
+						if (path === undefined) {
+							throw new Error(
+								'Path was not transformed correctly and can therefor not be transfered to the local validation context messages.',
+							);
+						}
 						// Notice, the local message uses the same key. [NL]
 						this.messages.addMessage(msg.type, path, msg.body, msg.key);
 					});
@@ -164,7 +156,12 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 					this.#localMessages = msgs;
 					msgs.forEach((msg) => {
 						// replace this.#baseDataPath (if it starts with it) with $ in the path, so it becomes relative to the parent context
-						const path = ReplaceStartOfString(msg.path, '$', this.#baseDataPath!);
+						const path = ReplaceStartOfPath(msg.path, '$', this.#baseDataPath!);
+						if (path === undefined) {
+							throw new Error(
+								'Path was not transformed correctly and can therefor not be synced with parent messages.',
+							);
+						}
 						// Notice, the parent message uses the same key. [NL]
 						this.#parent!.messages.addMessage(msg.type, path, msg.body, msg.key);
 					});
@@ -192,6 +189,9 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 */
 	addValidator(validator: UmbValidator): void {
 		if (this.#validators.includes(validator)) return;
+		if (validator === this) {
+			throw new Error('Cannot add it self as validator');
+		}
 		this.#validators.push(validator);
 		//validator.addEventListener('change', this.#onValidatorChange);
 		if (this.#validationMode) {
@@ -231,7 +231,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 
 		if (!this.messages) {
 			// This Context has been destroyed while is was validating, so we should not continue.
-			return;
+			return Promise.reject();
 		}
 
 		// If we have any messages then we are not valid, otherwise lets check the validation results: [NL]
@@ -264,6 +264,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 */
 	reset(): void {
 		this.#validationMode = false;
+		this.messages.clear();
 		this.#validators.forEach((v) => v.reset());
 	}
 

@@ -8,6 +8,7 @@ import type {
 	UpdateMediaRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import type { UmbMediaDetailModel } from '@umbraco-cms/backoffice/media';
 
 export const detailHandlers = [
 	rest.post(umbracoPath(`${UMB_SLUG}`), async (req, res, ctx) => {
@@ -42,6 +43,23 @@ export const detailHandlers = [
 		if (!id) return res(ctx.status(400));
 		const response = umbMediaMockDb.detail.read(id);
 		return res(ctx.status(200), ctx.json(response));
+	}),
+
+	rest.put<UmbMediaDetailModel>(umbracoPath(`${UMB_SLUG}/:id/validate`), async (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return res(ctx.status(400));
+		const model = await req.json<UmbMediaDetailModel>();
+		if (!model) return res(ctx.status(400));
+
+		const hasMediaPickerOrFileUploadValue = model.values.some((v) => {
+			return v.editorAlias === 'Umbraco.UploadField' && v.value;
+		});
+
+		if (!hasMediaPickerOrFileUploadValue) {
+			return res(ctx.status(400, 'No media picker or file upload value found'));
+		}
+
+		return res(ctx.status(200));
 	}),
 
 	rest.put(umbracoPath(`${UMB_SLUG}/:id`), async (req, res, ctx) => {

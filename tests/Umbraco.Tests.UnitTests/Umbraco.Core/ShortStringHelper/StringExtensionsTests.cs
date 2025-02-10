@@ -387,4 +387,12 @@ public class StringExtensionsTests
             Assert.AreNotEqual(path, Path.GetFullPath(path));
         }
     }
+
+    [TestCase("1,2,3,4,5", "5,4,3,2,1")]
+    [TestCase("1,2,x,4,5", "5,4,2,1")]
+    public void GetIdsFromPathReversed(string input, string expected)
+    {
+        var ids = input.GetIdsFromPathReversed();
+        Assert.AreEqual(expected, string.Join(",", ids));
+    }
 }

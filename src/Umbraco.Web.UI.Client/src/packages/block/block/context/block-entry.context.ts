@@ -7,9 +7,7 @@ import type {
 	UmbBlockDataValueModel,
 } from '../types.js';
 import type { UmbBlockEntriesContext } from './block-entries.context.js';
-import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbBooleanState,
 	UmbClassState,
@@ -21,16 +19,19 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import { encodeFilePath, UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
+import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type {
 	UmbContentTypeModel,
 	UmbContentTypeStructureManager,
 	UmbPropertyTypeModel,
 } from '@umbraco-cms/backoffice/content-type';
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
-import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export abstract class UmbBlockEntryContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType>,
@@ -52,6 +53,10 @@ export abstract class UmbBlockEntryContext<
 	_entries?: BlockEntriesContextType;
 
 	#contentKey?: string;
+	#unsupported = new UmbBooleanState(undefined);
+	readonly unsupported = this.#unsupported.asObservable();
+
+	readonly #localize = new UmbLocalizationController(this);
 
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
@@ -515,6 +520,9 @@ export abstract class UmbBlockEntryContext<
 		this.observe(
 			this._manager.contentOf(this.#contentKey),
 			(content) => {
+				if (this.#unsupported.getValue() !== true) {
+					this.#unsupported.setValue(!content);
+				}
 				this.#content.setValue(content);
 			},
 			'observeContent',
@@ -599,6 +607,8 @@ export abstract class UmbBlockEntryContext<
 		this.#contentStructure = this._manager.getStructure(contentTypeKey);
 		this.#contentStructurePromiseResolve?.();
 
+		this.#unsupported.setValue(!this.#contentStructure);
+
 		this.observe(
 			this.#contentStructure?.ownerContentType,
 			(contentType) => {
@@ -660,7 +670,7 @@ export abstract class UmbBlockEntryContext<
 			this.observe(
 				this.contentElementTypeName,
 				(contentTypeName) => {
-					this.#label.setValue(contentTypeName ?? 'no name');
+					this.#label.setValue(this.#localize.string(contentTypeName) || 'no name');
 				},
 				'observeContentTypeName',
 			);
@@ -699,11 +709,10 @@ export abstract class UmbBlockEntryContext<
 
 	async requestDelete() {
 		const blockName = this.getName();
-		// TODO: Localizations missing [NL]
 		await umbConfirmModal(this, {
-			headline: `Delete ${blockName}`,
-			content: `Are you sure you want to delete this ${blockName}?`,
-			confirmLabel: 'Delete',
+			headline: this.#localize.term('blockEditor_confirmDeleteBlockTitle', blockName),
+			content: this.#localize.term('blockEditor_confirmDeleteBlockMessage', blockName),
+			confirmLabel: this.#localize.term('general_delete'),
 			color: 'danger',
 		});
 		this.delete();

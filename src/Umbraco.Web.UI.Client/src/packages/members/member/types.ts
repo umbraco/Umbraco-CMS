@@ -17,7 +17,10 @@ export interface UmbMemberDetailModel extends UmbContentDetailModel {
 	lastLockoutDate: string | null;
 	lastLoginDate: string | null;
 	lastPasswordChangeDate: string | null;
-	memberType: { unique: string };
+	memberType: {
+		unique: string;
+		 icon: string;
+	};
 	newPassword?: string;
 	oldPassword?: string;
 	unique: string;

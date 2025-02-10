@@ -19,11 +19,15 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'entityAction',
 		kind: 'delete',
 		alias: 'Umb.EntityAction.ClipboardEntry.Delete',
-		name: 'Delete Dictionary Entry Entity Action',
+		name: 'Delete Clipboard Entry Entity Action',
 		forEntityTypes: [UMB_CLIPBOARD_ENTRY_ENTITY_TYPE],
 		meta: {
 			itemRepositoryAlias: UMB_CLIPBOARD_ENTRY_ITEM_REPOSITORY_ALIAS,
 			detailRepositoryAlias: UMB_CLIPBOARD_ENTRY_DETAIL_REPOSITORY_ALIAS,
+			confirm: {
+				headline: '#clipboard_confirmDeleteHeadline',
+				message: '#clipboard_confirmDeleteDescription',
+			},
 		},
 	},
 ];

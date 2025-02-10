@@ -225,7 +225,7 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, 
 			.then(async (value) => {
 				if (!value) return;
 
-				const uniques = value.selection;
+				const uniques = value.selection.filter((unique) => unique !== null) as Array<string>;
 				const { data: mediaUrls } = await this.#mediaUrlRepository.requestItems(uniques);
 				const mediaUrl = mediaUrls?.length ? (mediaUrls[0].url ?? 'URL') : 'URL';
 

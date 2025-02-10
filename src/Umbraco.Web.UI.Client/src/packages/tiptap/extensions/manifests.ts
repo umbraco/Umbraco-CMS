@@ -17,6 +17,19 @@ const kinds: Array<UmbExtensionManifestKind> = [
 const coreExtensions: Array<ManifestTiptapExtension> = [
 	{
 		type: 'tiptapExtension',
+		alias: 'Umb.Tiptap.RichTextEssentials',
+		name: 'Rich Text Essentials Tiptap Extension',
+		api: () => import('./core/rich-text-essentials.tiptap-api.js'),
+		weight: 1000,
+		meta: {
+			icon: 'icon-browser-window',
+			label: 'Rich Text Essentials',
+			group: '#tiptap_extGroup_formatting',
+			description: 'This is a core extension, it is always enabled by default.',
+		},
+	},
+	{
+		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.Embed',
 		name: 'Embed Tiptap Extension',
 		api: () => import('./core/embedded-media.tiptap-api.js'),

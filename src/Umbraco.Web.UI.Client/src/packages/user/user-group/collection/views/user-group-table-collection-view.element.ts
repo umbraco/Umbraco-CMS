@@ -50,6 +50,7 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 		{
 			name: '',
 			alias: 'entityActions',
+			align: 'right',
 		},
 	];
 

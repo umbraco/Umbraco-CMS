@@ -200,7 +200,10 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectLink')}>
+			<umb-body-layout
+				headline=${this.localize.term(
+					this.modalContext?.data.isNew ? 'defaultdialogs_addLink' : 'defaultdialogs_updateLink',
+				)}>
 				<uui-box>
 					${this.#renderLinkType()} ${this.#renderLinkAnchorInput()} ${this.#renderLinkTitleInput()}
 					${this.#renderLinkTargetInput()}
@@ -210,7 +213,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					<uui-button
 						color="positive"
 						look="primary"
-						label=${this.localize.term('general_submit')}
+						label=${this.localize.term(this.modalContext?.data.isNew ? 'general_add' : 'general_update')}
 						?disabled=${!this.value.link.type}
 						@click=${this.#onSubmit}></uui-button>
 				</div>
@@ -239,7 +242,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				<uui-button
 					data-mark="action:document"
 					look="placeholder"
-					label=${this.localize.term('general_document')}
+					label=${this.localize.term('general_content')}
 					@click=${this.#triggerDocumentPicker}></uui-button>
 				<uui-button
 					data-mark="action:media"

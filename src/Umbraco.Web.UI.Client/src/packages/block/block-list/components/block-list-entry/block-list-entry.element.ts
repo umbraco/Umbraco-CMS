@@ -8,8 +8,6 @@ import {
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
-import '../ref-list-block/index.js';
-import '../inline-list-block/index.js';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
@@ -22,6 +20,9 @@ import { UUIBlinkAnimationValue } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 
+import '../ref-list-block/index.js';
+import '../inline-list-block/index.js';
+import '../unsupported-list-block/index.js';
 /**
  * @element umb-block-list-entry
  */
@@ -80,6 +81,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	_exposed?: boolean;
 
 	@state()
+	_unsupported?: boolean;
+
+	@state()
 	_workspaceEditContentPath?: string;
 
 	@state()
@@ -112,7 +116,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	constructor() {
 		super();
-
+		this.#init();
+	}
+	#init() {
 		this.observe(
 			this.#context.showContentEdit,
 			(showContentEdit) => {
@@ -158,6 +164,16 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			(exposed) => {
 				this.#updateBlockViewProps({ unpublished: !exposed });
 				this._exposed = exposed;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.unsupported,
+			(unsupported) => {
+				if (unsupported === undefined) return;
+				this.#updateBlockViewProps({ unsupported: unsupported });
+				this._unsupported = unsupported;
+				this.toggleAttribute('unsupported', unsupported);
 			},
 			null,
 		);
@@ -308,6 +324,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
+		if (this._unsupported) {
+			// If the block is unsupported, we should not allow any custom views to render.
+			return false;
+		}
+
 		if (
 			manifest.forContentTypeAlias &&
 			!stringOrStringArrayContains(manifest.forContentTypeAlias, this._contentTypeAlias!)
@@ -355,8 +376,26 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			${umbDestroyOnDisconnect()}></umb-inline-list-block>`;
 	}
 
+	#renderUnsupportedBlock() {
+		return html`<umb-unsupported-list-block
+			.config=${this._blockViewProps.config}
+			.content=${this._blockViewProps.content}
+			.settings=${this._blockViewProps.settings}
+			${umbDestroyOnDisconnect()}></umb-unsupported-list-block>`;
+	}
+
+	#renderBuiltinBlockView() {
+		if (this._unsupported) {
+			return this.#renderUnsupportedBlock();
+		}
+		if (this._inlineEditingMode) {
+			return this.#renderInlineBlock();
+		}
+		return this.#renderRefBlock();
+	}
+
 	#renderBlock() {
-		return this.contentKey && this._contentTypeAlias
+		return this.contentKey
 			? html`
 					<div class="umb-block-list__block">
 						<umb-extension-slot
@@ -366,7 +405,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 							.props=${this._blockViewProps}
 							.filter=${this.#extensionSlotFilterMethod}
 							single
-							>${this._inlineEditingMode ? this.#renderInlineBlock() : this.#renderRefBlock()}</umb-extension-slot
+							>${this.#renderBuiltinBlockView()}</umb-extension-slot
 						>
 						<uui-action-bar>
 							${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()}

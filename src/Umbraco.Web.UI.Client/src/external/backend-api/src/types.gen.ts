@@ -423,6 +423,8 @@ export type CreateUserRequestModel = {
 
 export type CreateWebhookRequestModel = {
     enabled: boolean;
+    name?: (string) | null;
+    description?: (string) | null;
     url: string;
     contentTypeKeys: Array<(string)>;
     headers: {
@@ -1942,6 +1944,11 @@ export type PagedWebhookEventModel = {
     items: Array<(WebhookEventModel)>;
 };
 
+export type PagedWebhookLogResponseModel = {
+    total: number;
+    items: Array<(WebhookLogResponseModel)>;
+};
+
 export type PagedWebhookResponseModel = {
     total: number;
     items: Array<(WebhookResponseModel)>;
@@ -2665,6 +2672,8 @@ export type UpdateUserRequestModel = {
 
 export type UpdateWebhookRequestModel = {
     enabled: boolean;
+    name?: (string) | null;
+    description?: (string) | null;
     url: string;
     contentTypeKeys: Array<(string)>;
     headers: {
@@ -2881,8 +2890,26 @@ export type WebhookItemResponseModel = {
     types: string;
 };
 
+export type WebhookLogResponseModel = {
+    key: string;
+    webhookKey: string;
+    statusCode: string;
+    isSuccessStatusCode: boolean;
+    date: string;
+    eventAlias: string;
+    url: string;
+    retryCount: number;
+    requestHeaders: string;
+    requestBody: string;
+    responseHeaders: string;
+    responseBody: string;
+    exceptionOccured: boolean;
+};
+
 export type WebhookResponseModel = {
     enabled: boolean;
+    name?: (string) | null;
+    description?: (string) | null;
     url: string;
     contentTypeKeys: Array<(string)>;
     headers: {
@@ -3316,6 +3343,7 @@ export type GetItemDocumentData = {
 export type GetItemDocumentResponse = (Array<(DocumentItemResponseModel)>);
 
 export type GetItemDocumentSearchData = {
+    allowedDocumentTypes?: Array<(string)>;
     parentId?: string;
     query?: string;
     skip?: number;
@@ -3884,6 +3912,7 @@ export type GetItemMediaData = {
 export type GetItemMediaResponse = (Array<(MediaItemResponseModel)>);
 
 export type GetItemMediaSearchData = {
+    allowedMediaTypes?: Array<(string)>;
     parentId?: string;
     query?: string;
     skip?: number;
@@ -4235,6 +4264,7 @@ export type GetItemMemberData = {
 export type GetItemMemberResponse = (Array<(MemberItemResponseModel)>);
 
 export type GetItemMemberSearchData = {
+    allowedMemberTypes?: Array<(string)>;
     query?: string;
     skip?: number;
     take?: number;
@@ -5353,6 +5383,14 @@ export type PutWebhookByIdData = {
 
 export type PutWebhookByIdResponse = (string);
 
+export type GetWebhookByIdLogsData = {
+    id: string;
+    skip?: number;
+    take?: number;
+};
+
+export type GetWebhookByIdLogsResponse = ((PagedWebhookLogResponseModel));
+
 export type GetWebhookEventsData = {
     skip?: number;
     take?: number;
@@ -5365,4 +5403,4 @@ export type GetWebhookLogsData = {
     take?: number;
 };
 
-export type GetWebhookLogsResponse = ((WebhookResponseModel));
+export type GetWebhookLogsResponse = ((PagedWebhookLogResponseModel));

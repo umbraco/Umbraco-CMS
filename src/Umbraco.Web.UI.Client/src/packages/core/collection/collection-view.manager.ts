@@ -80,7 +80,7 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 		if (views && views.length > 0) {
 			// find the default view from the config. If it doesn't exist, use the first view
 			const defaultView = views.find((view) => view.alias === this.#defaultViewAlias);
-			const fallbackView = defaultView?.meta.pathName || views[0].meta.pathName;
+			const fallbackView = defaultView ?? views[0];
 
 			routes = views.map((view) => {
 				return {
@@ -95,7 +95,10 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 			if (routes.length > 0) {
 				routes.push({
 					path: '',
-					redirectTo: fallbackView,
+					component: () => createExtensionElement(fallbackView),
+					setup: () => {
+						this.setCurrentView(fallbackView);
+					},
 				});
 			}
 

@@ -525,6 +525,7 @@ public class DocumentUrlService : IDocumentUrlService
     }
 
 
+    [Obsolete("This method is obsolete and will be removed in future versions. Use IPublishedUrlInfoProvider.GetAllAsync instead.")]
     public async Task<IEnumerable<UrlInfo>> ListUrlsAsync(Guid contentKey)
     {
         var result = new List<UrlInfo>();

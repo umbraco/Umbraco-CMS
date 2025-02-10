@@ -1,13 +1,13 @@
 import { UmbMediaSearchServerDataSource } from './media-search.server.data-source.js';
-import type { UmbMediaSearchItemModel } from './types.js';
-import type { UmbSearchRepository, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type { UmbMediaSearchItemModel, UmbMediaSearchRequestArgs } from './types.js';
+import type { UmbSearchRepository } from '@umbraco-cms/backoffice/search';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbMediaSearchRepository
 	extends UmbControllerBase
-	implements UmbSearchRepository<UmbMediaSearchItemModel>, UmbApi
+	implements UmbSearchRepository<UmbMediaSearchItemModel, UmbMediaSearchRequestArgs>, UmbApi
 {
 	#dataSource: UmbMediaSearchServerDataSource;
 
@@ -17,7 +17,7 @@ export class UmbMediaSearchRepository
 		this.#dataSource = new UmbMediaSearchServerDataSource(this);
 	}
 
-	search(args: UmbSearchRequestArgs) {
+	search(args: UmbMediaSearchRequestArgs) {
 		return this.#dataSource.search(args);
 	}
 }

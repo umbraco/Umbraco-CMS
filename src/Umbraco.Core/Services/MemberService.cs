@@ -791,7 +791,7 @@ namespace Umbraco.Cms.Core.Services
 
             scope.Notifications.Publish(new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
 
-            Audit(AuditType.Save, 0, member.Id);
+            Audit(AuditType.Save, userId, member.Id);
 
             scope.Complete();
             return OperationResult.Attempt.Succeed(evtMsgs);
@@ -858,7 +858,7 @@ namespace Umbraco.Cms.Core.Services
             scope.WriteLock(Constants.Locks.MemberTree);
             DeleteLocked(scope, member, evtMsgs, deletingNotification.State);
 
-            Audit(AuditType.Delete, 0, member.Id);
+            Audit(AuditType.Delete, userId, member.Id);
             scope.Complete();
 
             return OperationResult.Attempt.Succeed(evtMsgs);
