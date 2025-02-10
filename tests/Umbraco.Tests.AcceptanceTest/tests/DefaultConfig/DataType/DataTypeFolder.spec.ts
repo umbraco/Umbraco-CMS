@@ -71,7 +71,7 @@ test('can create a data type in a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.clickActionsMenuForDataType(dataTypeFolderName);
   await umbracoUi.dataType.clickActionsMenuCreateButton();
-  await umbracoUi.dataType.clickNewDataTypeButton();
+  await umbracoUi.dataType.clickDataTypeButton();
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor(propertyEditorName);
