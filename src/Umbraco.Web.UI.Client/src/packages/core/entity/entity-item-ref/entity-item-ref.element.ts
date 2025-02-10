@@ -6,6 +6,8 @@ import { UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extensi
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
+import './default-item-ref.element.js';
+
 @customElement('umb-entity-item-ref')
 export class UmbEntityItemRefElement extends UmbLitElement {
 	#extensionsController?: UmbExtensionsElementInitializer<any>;
@@ -66,12 +68,8 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 			'entityItemRef',
 			(manifest: ManifestEntityItemRef) => manifest.forEntityTypes.includes(entityType),
 			(extensionControllers) => {
-				const component = extensionControllers[0]?.component;
-
-				if (!component) {
-					this._component?.remove();
-					return;
-				}
+				this._component?.remove();
+				const component = extensionControllers[0]?.component || document.createElement('umb-default-item-ref');
 
 				// assign the properties to the component
 				component.item = this.#item;
