@@ -16,9 +16,11 @@ import './content-editor-tab.element.js';
 
 @customElement('umb-content-workspace-view-edit')
 export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
+	/*
 	// root properties is a possible feature with Bellissima, but as it is new its not fully implemented yet [NL]  
 	@state()
 	private _hasRootProperties = false;
+  */
 
 	@state()
 	private _hasRootGroups = false;
