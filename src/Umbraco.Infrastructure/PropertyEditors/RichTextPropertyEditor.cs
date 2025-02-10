@@ -274,6 +274,70 @@ public class RichTextPropertyEditor : DataEditor
             return configuration?.Blocks?.SelectMany(ConfiguredElementTypeKeys) ?? Enumerable.Empty<Guid>();
         }
 
+        internal override object? MergeVariantInvariantPropertyValue(
+            object? sourceValue,
+            object? targetValue,
+            bool canUpdateInvariantData,
+            HashSet<string> allowedCultures)
+        {
+            TryParseEditorValue(sourceValue, out RichTextEditorValue? sourceRichTextEditorValue);
+            TryParseEditorValue(targetValue, out RichTextEditorValue? targetRichTextEditorValue);
+
+            var mergedBlockValue = MergeBlockVariantInvariantData(
+                sourceRichTextEditorValue?.Blocks,
+                targetRichTextEditorValue?.Blocks,
+                canUpdateInvariantData,
+                allowedCultures);
+
+            var mergedMarkupValue = MergeMarkupValue(
+                sourceRichTextEditorValue?.Markup ?? string.Empty,
+                targetRichTextEditorValue?.Markup ?? string.Empty,
+                mergedBlockValue,
+                canUpdateInvariantData);
+
+            var mergedEditorValue = new RichTextEditorValue { Markup = mergedMarkupValue, Blocks = mergedBlockValue };
+            return RichTextPropertyEditorHelper.SerializeRichTextEditorValue(mergedEditorValue, _jsonSerializer);
+        }
+
+        private string MergeMarkupValue(
+            string source,
+            string target,
+            RichTextBlockValue? mergedBlockValue,
+            bool canUpdateInvariantData)
+        {
+            // pick source or target based on culture permissions
+            var mergedMarkup = canUpdateInvariantData ? target : source;
+
+            // todo? strip all invalid block links from markup, those tat are no longer in the layout
+            return mergedMarkup;
+        }
+
+        private RichTextBlockValue? MergeBlockVariantInvariantData(
+            RichTextBlockValue? sourceRichTextBlockValue,
+            RichTextBlockValue? targetRichTextBlockValue,
+            bool canUpdateInvariantData,
+            HashSet<string> allowedCultures)
+        {
+            if (sourceRichTextBlockValue is null && targetRichTextBlockValue is null)
+            {
+                return null;
+            }
+
+            BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem> sourceBlockEditorData =
+                (sourceRichTextBlockValue is not null ? ConvertAndClean(sourceRichTextBlockValue) : null)
+                ?? new BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>([], new RichTextBlockValue());
+
+            BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem> targetBlockEditorData =
+                (targetRichTextBlockValue is not null ? ConvertAndClean(targetRichTextBlockValue) : null)
+                ?? new BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>([], new RichTextBlockValue());
+
+            return MergeVariantInvariantPropertyValueTyped(
+                sourceBlockEditorData,
+                targetBlockEditorData,
+                canUpdateInvariantData,
+                allowedCultures);
+        }
+
         internal override object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture)
         {
             if (sourceValue is null || TryParseEditorValue(sourceValue, out RichTextEditorValue? sourceRichTextEditorValue) is false)
