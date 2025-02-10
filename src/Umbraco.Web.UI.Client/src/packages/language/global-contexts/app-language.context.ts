@@ -1,7 +1,7 @@
 import { UmbLanguageCollectionRepository } from '../collection/index.js';
 import type { UmbLanguageDetailModel } from '../types.js';
 import { UMB_APP_LANGUAGE_CONTEXT } from './app-language.context-token.js';
-import { UmbArrayState, UmbObjectState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -20,9 +20,15 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 
 	public readonly appLanguageReadOnlyState = new UmbReadOnlyStateManager(this);
 
-	public readonly appDefaultLanguage = createObservablePart(this.#languages.asObservable(), (languages) =>
+	public readonly appDefaultLanguage = this.#languages.asObservablePart((languages) =>
 		languages.find((language) => language.isDefault),
 	);
+	public readonly appMandatoryLanguages = this.#languages.asObservablePart((languages) =>
+		languages.filter((language) => language.isMandatory),
+	);
+	getMandatoryLanguages() {
+		return this.#languages.getValue().filter((language) => language.isMandatory);
+	}
 
 	public readonly moreThanOneLanguage = this.#languages.asObservablePart((x) => x.length > 1);
 
@@ -36,13 +42,7 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_APP_LANGUAGE_CONTEXT);
 
-		// TODO: We need to ensure this request is called every time the user logs in, but this should be done somewhere across the app and not here [JOV]
-		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
-			this.observe(authContext.isAuthorized, (isAuthorized) => {
-				if (!isAuthorized) return;
-				this.#observeLanguages();
-			});
-		});
+		this.#requestLanguages();
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
 			this.observe(context.languages, (languages) => {
@@ -85,7 +85,7 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 		this.#setIsReadOnly();
 	}
 
-	async #observeLanguages() {
+	async #requestLanguages() {
 		const { data } = await this.#languageCollectionRepository.requestCollection({});
 
 		// TODO: make this observable / update when languages are added/removed/updated
