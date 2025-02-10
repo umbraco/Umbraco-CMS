@@ -2,10 +2,10 @@
   "name": "acceptancetest",
   "private": true,
   "scripts": {
+    "test": "npx playwright test DefaultConfig",
+    "ui": "npx playwright test --ui DefaultConfig",
     "postinstall": "node postinstall.js",
     "config": "node config.js",
-    "ui": "npx playwright test --headed DefaultConfig",
-    "test": "npx playwright test DefaultConfig",
     "testSqlite": "npx playwright test DefaultConfig --grep-invert \"Users\"",
     "all": "npx playwright test",
     "createTest": "node createTest.js",
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@umbraco/json-models-builders": "^2.0.27",
-    "@umbraco/playwright-testhelpers": "^15.0.14",
+    "@umbraco/playwright-testhelpers": "^15.0.17",
     "camelize": "^1.0.0",
     "dotenv": "^16.3.1",
     "node-fetch": "^2.6.7"

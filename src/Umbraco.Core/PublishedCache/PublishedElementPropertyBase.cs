@@ -1,4 +1,3 @@
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
@@ -13,11 +12,11 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
     // to store eg routes, property converted values, anything - caching
     // means faster execution, but uses memory - not sure if we want it
     // so making it configurable.
-    private const bool FullCacheWhenPreviewing = true;
     private readonly Lock _locko = new();
     private readonly object? _sourceValue;
     protected readonly bool IsMember;
     protected readonly bool IsPreviewing;
+    private readonly VariationContext _variationContext;
     private readonly ICacheManager? _cacheManager;
     private CacheValues? _cacheValues;
 
@@ -30,6 +29,7 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
         IPublishedElement element,
         bool previewing,
         PropertyCacheLevel referenceCacheLevel,
+        VariationContext variationContext,
         ICacheManager? cacheManager,
         object? sourceValue = null)
         : base(propertyType, referenceCacheLevel)
@@ -37,16 +37,21 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
         _sourceValue = sourceValue;
         Element = element;
         IsPreviewing = previewing;
+        _variationContext = variationContext;
         _cacheManager = cacheManager;
         IsMember = propertyType.ContentType?.ItemType == PublishedItemType.Member;
     }
 
     // used to cache the CacheValues of this property
     // ReSharper disable InconsistentlySynchronizedField
-    internal string ValuesCacheKey => _valuesCacheKey ??= PropertyCacheValues(Element.Key, Alias, IsPreviewing);
+    private string ValuesCacheKey => _valuesCacheKey ??= PropertyCacheValuesKey();
 
+    [Obsolete("Do not use this. Will be removed in V17.")]
     public static string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing) =>
         "PublishedSnapshot.Property.CacheValues[" + (previewing ? "D:" : "P:") + contentUid + ":" + typeAlias + "]";
+
+    private string PropertyCacheValuesKey() =>
+        $"PublishedSnapshot.Property.CacheValues[{(IsPreviewing ? "D:" : "P:")}{Element.Key}:{Alias}:{_variationContext.Culture.IfNullOrWhiteSpace("inv")}+{_variationContext.Segment.IfNullOrWhiteSpace("inv")}]";
 
     // ReSharper restore InconsistentlySynchronizedField
     public override bool HasValue(string? culture = null, string? segment = null)
