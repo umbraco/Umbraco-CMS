@@ -78,23 +78,6 @@ export class UmbDefaultTreeContext<
 		// listen for page changes on the pagination manager
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
 
-		/* TODO: revisit. This is a temp solution to notify the parent it needs to reload its children
-		there might be a better way to do this through a tree item parent context.
-		It does not look like there is a way to have a "dynamic" parent context that will stop when a
-		specific parent is reached (a tree item unique that matches the parentUnique of this item) */
-		const hostElement = this.getHostElement();
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		hostElement.addEventListener('temp-reload-tree-item-parent', (event: CustomEvent) => {
-			const treeRoot = this.#treeRoot.getValue();
-			const unique = treeRoot?.unique;
-
-			if (event.detail.unique === unique) {
-				event.stopPropagation();
-				this.loadTree();
-			}
-		});
-
 		// always load the tree root because we need the root entity to reload the entire tree
 		this.#loadTreeRoot();
 	}
@@ -161,6 +144,8 @@ export class UmbDefaultTreeContext<
 			this.#loadRootItems(reload);
 			return;
 		}
+
+		this.#loadTreeRoot();
 	}
 
 	async #loadTreeRoot() {
@@ -300,24 +285,10 @@ export class UmbDefaultTreeContext<
 
 	#consumeContexts() {
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
+			this.#removeEventListeners();
 			this.#actionEventContext = instance;
 
-			this.#actionEventContext.removeEventListener(
-				UmbRequestReloadChildrenOfEntityEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-
-			this.#actionEventContext.removeEventListener(
-				UmbRequestReloadChildrenOfEntityEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-
-			this.#actionEventContext.addEventListener(
-				UmbRequestReloadChildrenOfEntityEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-
-			this.#actionEventContext.addEventListener(
+			this.#actionEventContext?.addEventListener(
 				UmbRequestReloadChildrenOfEntityEvent.TYPE,
 				this.#onReloadRequest as EventListener,
 			);
@@ -354,17 +325,15 @@ export class UmbDefaultTreeContext<
 		this.loadTree();
 	};
 
+	#removeEventListeners() {
+		this.#actionEventContext?.removeEventListener(
+			UmbRequestReloadChildrenOfEntityEvent.TYPE,
+			this.#onReloadRequest as EventListener,
+		);
+	}
+
 	override destroy(): void {
-		this.#actionEventContext?.removeEventListener(
-			UmbRequestReloadChildrenOfEntityEvent.TYPE,
-			this.#onReloadRequest as EventListener,
-		);
-
-		this.#actionEventContext?.removeEventListener(
-			UmbRequestReloadChildrenOfEntityEvent.TYPE,
-			this.#onReloadRequest as EventListener,
-		);
-
+		this.#removeEventListeners();
 		super.destroy();
 	}
 }

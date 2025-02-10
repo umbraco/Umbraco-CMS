@@ -2,6 +2,7 @@ import { UmbEntityActionBase } from '../../../entity-action/entity-action-base.j
 import { UmbRequestReloadStructureForEntityEvent } from '../../../entity-action/request-reload-structure-for-entity.event.js';
 import type { UmbRecycleBinRepository } from '../../recycle-bin-repository.interface.js';
 import type { MetaEntityActionTrashKind } from './types.js';
+import { UmbEntityTrashedEvent } from './trash.event.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
@@ -43,7 +44,12 @@ export class UmbTrashEntityAction extends UmbEntityActionBase<MetaEntityActionTr
 		);
 		await recycleBinRepository.requestTrash({ unique: this.args.unique });
 
+		this.#notify();
+	}
+
+	async #notify() {
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+
 		const event = new UmbRequestReloadStructureForEntityEvent({
 			unique: this.args.unique,
 			entityType: this.args.entityType,
@@ -51,7 +57,12 @@ export class UmbTrashEntityAction extends UmbEntityActionBase<MetaEntityActionTr
 
 		actionEventContext.dispatchEvent(event);
 
-		// TODO: reload destination
+		const trashedEvent = new UmbEntityTrashedEvent({
+			unique: this.args.unique,
+			entityType: this.args.entityType,
+		});
+
+		actionEventContext.dispatchEvent(trashedEvent);
 	}
 }
 

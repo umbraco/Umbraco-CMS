@@ -36,7 +36,7 @@ public class CacheTests : DeliveryApiTests
 
         var element = new Mock<IPublishedElement>();
 
-        var prop1 = new PublishedElementPropertyBase(propertyType, element.Object, false, cacheLevel, Mock.Of<ICacheManager>());
+        var prop1 = new PublishedElementPropertyBase(propertyType, element.Object, false, cacheLevel, new VariationContext(), Mock.Of<ICacheManager>());
 
         var results = new List<string>
         {

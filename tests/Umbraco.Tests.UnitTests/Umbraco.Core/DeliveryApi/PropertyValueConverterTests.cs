@@ -32,6 +32,8 @@ public class PropertyValueConverterTests : DeliveryApiTests
 
     protected Mock<IPublishedUrlProvider> PublishedUrlProviderMock { get; private set; }
 
+    protected VariationContext VariationContext { get; } = new();
+
     protected Mock<IDocumentNavigationQueryService> DocumentNavigationQueryServiceMock { get; private set; }
 
     [SetUp]
