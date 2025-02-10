@@ -14,3 +14,5 @@ export interface UmbRepositoryErrorResponse extends UmbDataSourceErrorResponse {
 export interface UmbRepositoryResponseWithAsObservable<T> extends UmbRepositoryResponse<T> {
 	asObservable: () => Observable<T | undefined>;
 }
+
+export type * from './data-mapper/types.js';

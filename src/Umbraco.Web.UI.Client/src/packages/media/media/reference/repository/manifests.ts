@@ -7,4 +7,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Media Reference Repository',
 		api: () => import('./media-reference.repository.js'),
 	},
+	{
+		type: '$typeDataMapper',
+		alias: 'Umb.$typeDataMapper.MediaReferenceResponseModel',
+		name: 'Media Reference Response Model to Client Model Data Mapper',
+		api: () => import('./media-reference-response-model.mapper.js'),
+		from$type: 'MediaReferenceResponseModel',
+	},
 ];
