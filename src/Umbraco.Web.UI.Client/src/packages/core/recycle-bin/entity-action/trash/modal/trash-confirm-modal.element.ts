@@ -41,6 +41,8 @@ export class UmbTrashConfirmModalElement extends UmbLitElement {
 	#itemRepository?: UmbItemRepository<any>;
 	#referenceRepository?: any;
 
+	#limitReferencedBy = 3;
+
 	constructor() {
 		super();
 		this.#initData();
@@ -73,7 +75,11 @@ export class UmbTrashConfirmModalElement extends UmbLitElement {
 
 		this.#referenceRepository = await createExtensionApiByAlias<any>(this, this._data.referenceRepositoryAlias);
 
-		const { data: referencesData } = await this.#referenceRepository.requestReferencedBy(this._data.unique, 0, 5);
+		const { data: referencesData } = await this.#referenceRepository.requestReferencedBy(
+			this._data.unique,
+			0,
+			this.#limitReferencedBy,
+		);
 
 		if (referencesData) {
 			this._referencedBy = [...referencesData.items];
@@ -107,10 +113,17 @@ export class UmbTrashConfirmModalElement extends UmbLitElement {
 		return html`
 			<h5 id="reference-headline">${this.localize.term('references_labelDependsOnThis')}</h5>
 			<uui-ref-list>
-				${this._referencedBy.map((reference) => html`<umb-entity-item-ref .item=${reference}></umb-entity-item-ref> `)}
+				${this._referencedBy.map(
+					(reference) => html`<umb-entity-item-ref .item=${reference} readonly></umb-entity-item-ref> `,
+				)}
 			</uui-ref-list>
-			${this._totalReferencedBy > 5
-				? html`<span>${this.localize.term('references_labelMoreReferences', this._totalReferencedBy - 5)}</span>`
+			${this._totalReferencedBy > this.#limitReferencedBy
+				? html`<span
+						>${this.localize.term(
+							'references_labelMoreReferences',
+							this._totalReferencedBy - this.#limitReferencedBy,
+						)}</span
+					>`
 				: nothing}
 		`;
 	}
