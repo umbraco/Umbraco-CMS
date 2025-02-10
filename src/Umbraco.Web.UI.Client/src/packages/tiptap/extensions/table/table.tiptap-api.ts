@@ -1,68 +1,131 @@
 import { UmbTiptapExtensionApiBase } from '../base.js';
 import { css } from '@umbraco-cms/backoffice/external/lit';
-import { Table, TableHeader, TableRow, TableCell } from '@umbraco-cms/backoffice/external/tiptap';
+import { UmbTable, UmbTableHeader, UmbTableRow, UmbTableCell } from '@umbraco-cms/backoffice/external/tiptap';
 
 export default class UmbTiptapTableExtensionApi extends UmbTiptapExtensionApiBase {
-	getTiptapExtensions = () => [Table.configure({ resizable: true }), TableHeader, TableRow, TableCell];
+	getTiptapExtensions = () => [UmbTable, UmbTableHeader, UmbTableRow, UmbTableCell];
 
 	override getStyles = () => css`
 		.tableWrapper {
 			margin: 1.5rem 0;
-			overflow-x: auto;
 
 			table {
 				border-collapse: collapse;
-				margin: 0;
-				overflow: hidden;
-				table-layout: fixed;
+				border-radius: 0.25rem;
+				border-color: rgba(0, 0, 0, 0.1);
+				box-sizing: border-box;
 				width: 100%;
 
 				td,
 				th {
-					border: 1px solid var(--uui-color-border);
 					box-sizing: border-box;
-					min-width: 1em;
-					padding: 6px 8px;
 					position: relative;
+					min-width: 100px;
+					border: 1px solid var(--uui-color-border);
+					padding: 0.5rem;
+					text-align: left;
 					vertical-align: top;
 
-					> * {
-						margin-bottom: 0;
+					&:first-of-type:not(a),
+					&:first-of-type:not(a) {
+						margin-top: 0;
+					}
+
+					p {
+						margin: 0;
+					}
+
+					p + p {
+						margin-top: 0.75rem;
 					}
 				}
 
 				th {
 					background-color: var(--uui-color-background);
 					font-weight: bold;
-					text-align: left;
-				}
-
-				.selectedCell:after {
-					background: var(--uui-color-surface-emphasis);
-					content: '';
-					left: 0;
-					right: 0;
-					top: 0;
-					bottom: 0;
-					pointer-events: none;
-					position: absolute;
-					z-index: 2;
 				}
 
 				.column-resize-handle {
-					background-color: var(--uui-color-default);
-					bottom: -2px;
-					pointer-events: none;
+					cursor: ew-resize;
+					cursor: col-resize;
+					display: flex;
 					position: absolute;
-					right: -2px;
 					top: 0;
-					width: 4px;
+					bottom: -2px;
+					right: -0.25rem;
+					width: 0.5rem;
 				}
-			}
 
-			.resize-cursor {
-				cursor: ew-resize;
-				cursor: col-resize;
+				.column-resize-handle:before {
+					margin-left: 0.5rem;
+					height: 100%;
+					width: 1px;
+				}
+
+				.column-resize-handle:before {
+					content: '';
+				}
+
+				.selectedCell {
+					background-color: var(--uui-color-current);
+				}
+
+				.grip-column,
+				.grip-row {
+					position: absolute;
+					z-index: 10;
+					display: flex;
+					cursor: pointer;
+					align-items: center;
+					justify-content: center;
+					background-color: rgba(0, 0, 0, 0.05);
+					border-color: rgba(0, 0, 0, 0.2);
+
+					uui-symbol-more {
+						visibility: hidden;
+					}
+
+					&:hover {
+						background-color: rgba(0, 0, 0, 0.1);
+					}
+
+					&.selected {
+						border-color: rgba(0, 0, 0, 0.3);
+						background-color: rgba(0, 0, 0, 0.3);
+						box-shadow:
+							0 0 #0000,
+							0 0 #0000,
+							0 0 rgba(0, 0, 0, 0.05);
+					}
+
+					&:hover uui-symbol-more,
+					&.selected uui-symbol-more {
+						visibility: visible;
+					}
+				}
+
+				.grip-column {
+					border-left-width: 1px;
+					top: -0.75rem;
+					left: 0;
+					height: 0.75rem;
+					width: calc(100% + 1px);
+					margin-left: -1px;
+				}
+
+				.grip-row {
+					border-top-width: 1px;
+					flex-direction: column;
+					top: 0;
+					left: -0.75rem;
+					height: calc(100% + 1px);
+					width: 0.75rem;
+					margin-top: -1px;
+
+					uui-symbol-more {
+						transform: rotate(90deg);
+					}
+				}
 			}
 		}
 	`;
