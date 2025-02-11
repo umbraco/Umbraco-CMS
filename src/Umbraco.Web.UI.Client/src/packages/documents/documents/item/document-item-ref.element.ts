@@ -16,8 +16,29 @@ import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-document-item-ref')
 export class UmbDocumentItemRefElement extends UmbLitElement {
+	#item?: UmbDocumentItemModel | undefined;
+
 	@property({ type: Object })
-	item?: UmbDocumentItemModel;
+	public get item(): UmbDocumentItemModel | undefined {
+		return this.#item;
+	}
+	public set item(value: UmbDocumentItemModel | undefined) {
+		this.#item = value;
+
+		if (!this.#item) {
+			this.#modalRoute?.destroy();
+			return;
+		}
+
+		this.#modalRoute = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath(UMB_DOCUMENT_ENTITY_TYPE + '/' + this.#item.unique)
+			.onSetup(() => {
+				return { data: { entityType: UMB_DOCUMENT_ENTITY_TYPE, preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editPath = routeBuilder({});
+			});
+	}
 
 	@property({ type: Boolean })
 	readonly = false;
@@ -28,18 +49,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	@state()
 	_editPath = '';
 
-	constructor() {
-		super();
-
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath(UMB_DOCUMENT_ENTITY_TYPE)
-			.onSetup(() => {
-				return { data: { entityType: UMB_DOCUMENT_ENTITY_TYPE, preset: {} } };
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._editPath = routeBuilder({});
-			});
-	}
+	#modalRoute?: any;
 
 	#isDraft(item: UmbDocumentItemModel) {
 		return item.variants[0]?.state === 'Draft';
