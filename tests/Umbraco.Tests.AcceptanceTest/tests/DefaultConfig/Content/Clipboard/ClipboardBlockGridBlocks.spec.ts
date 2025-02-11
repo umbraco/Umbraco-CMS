@@ -125,6 +125,7 @@ test('can copy and paste a single block into another document', async ({umbracoA
   await umbracoUi.content.clickSaveButton();
 
   // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
   // Copied block
   await umbracoUi.content.goToBlockGridBlockWithName(groupName, blockGridDataTypeName, elementTypeName, 0);
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
@@ -148,6 +149,8 @@ test('can copy and paste multiple blocks into the same document and group', {tag
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
 
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
   // Original blocks
   await umbracoUi.content.goToBlockGridBlockWithName(groupName, blockGridDataTypeName, elementTypeName, 0);
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
@@ -178,6 +181,8 @@ test('can copy and paste multiple blocks into the same document but different gr
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
 
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
   // Original blocks
   await umbracoUi.content.goToBlockGridBlockWithName(groupName, blockGridDataTypeName, elementTypeName, 0);
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
@@ -212,6 +217,8 @@ test('can copy and paste multiple blocks into another document',  async ({umbrac
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
 
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
   // Copied blocks
   await umbracoUi.content.goToBlockGridBlockWithName(groupName, blockGridDataTypeName, elementTypeName, 0);
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
