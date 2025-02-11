@@ -5,5 +5,5 @@ export interface UmbWorkspaceActionDefaultKind<ArgsMetaType = never> extends Umb
 	 * The action has additional options.
 	 * @returns {undefined | Promise<boolean | undefined>}
 	 */
-	hasAddionalOptions?(): Promise<boolean | undefined>;
+	hasAdditionalOptions?(): Promise<boolean | undefined>;
 }

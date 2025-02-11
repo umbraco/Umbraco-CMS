@@ -1,30 +1,37 @@
+import type { MetaWorkspaceAction } from '../../../../types.js';
 import { UMB_SUBMITTABLE_WORKSPACE_CONTEXT } from '../../../../contexts/tokens/index.js';
 import type { UmbSubmittableWorkspaceContext } from '../../../../contexts/tokens/index.js';
-import type { UmbWorkspaceActionArgs } from '../../types.js';
 import { UmbWorkspaceActionBase } from '../../workspace-action-base.controller.js';
+import type { UmbSubmitWorkspaceActionArgs } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbSubmitWorkspaceAction extends UmbWorkspaceActionBase<UmbSubmittableWorkspaceContext> {
-	#workspaceContext?: UmbSubmittableWorkspaceContext;
+export class UmbSubmitWorkspaceAction<
+	ArgsMetaType extends MetaWorkspaceAction = MetaWorkspaceAction,
+	WorkspaceContextType extends UmbSubmittableWorkspaceContext = UmbSubmittableWorkspaceContext,
+> extends UmbWorkspaceActionBase<ArgsMetaType> {
+	protected _init: Promise<unknown>;
+	protected _workspaceContext?: WorkspaceContextType;
 
-	constructor(host: UmbControllerHost, args: UmbWorkspaceActionArgs<UmbSubmittableWorkspaceContext>) {
+	constructor(host: UmbControllerHost, args: UmbSubmitWorkspaceActionArgs<ArgsMetaType>) {
 		super(host, args);
 
-		// TODO: Could we make change label depending on the state?
-		this.consumeContext(UMB_SUBMITTABLE_WORKSPACE_CONTEXT, (context) => {
-			this.#workspaceContext = context;
+		// TODO: Could we make change label depending on the state? [NL]
+		this._init = this.consumeContext(args.workspaceContextToken ?? UMB_SUBMITTABLE_WORKSPACE_CONTEXT, (context) => {
+			this._workspaceContext = context as WorkspaceContextType;
 			this.#observeUnique();
-		});
+			this._gotWorkspaceContext();
+		}).asPromise();
 	}
 
 	#observeUnique() {
 		this.observe(
-			this.#workspaceContext?.unique,
+			this._workspaceContext?.unique,
 			(unique) => {
 				// We can't save if we don't have a unique
 				if (unique === undefined) {
 					this.disable();
 				} else {
+					// Dangerous, cause this could enable despite a class extension decided to disable it?. [NL]
 					this.enable();
 				}
 			},
@@ -32,9 +39,13 @@ export class UmbSubmitWorkspaceAction extends UmbWorkspaceActionBase<UmbSubmitta
 		);
 	}
 
+	protected _gotWorkspaceContext() {
+		// Override in subclass
+	}
+
 	override async execute() {
-		const workspaceContext = await this.getContext(UMB_SUBMITTABLE_WORKSPACE_CONTEXT);
-		return await workspaceContext.requestSubmit();
+		await this._init;
+		return await this._workspaceContext!.requestSubmit();
 	}
 }
 

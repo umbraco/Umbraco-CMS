@@ -53,7 +53,7 @@ export class UmbWorkspaceActionElement<
 			this._href = href ?? this.manifest?.meta.href;
 		});
 
-		this.#api?.hasAddionalOptions?.().then((additionalOptions) => {
+		this.#api?.hasAdditionalOptions?.().then((additionalOptions) => {
 			this._additionalOptions = additionalOptions ?? this.manifest?.meta.additionalOptions;
 		});
 
@@ -158,15 +158,16 @@ export class UmbWorkspaceActionElement<
 	}
 
 	#renderButton() {
+		const label = this.#manifest?.meta.label
+			? this.localize.string(this.#manifest.meta.label)
+			: (this.#manifest?.name ?? '');
 		return html`
 			<uui-button
 				data-mark="workspace-action:${this.#manifest?.alias}"
 				.href=${this._href}
 				look=${this.#manifest?.meta.look ?? 'default'}
 				color=${this.#manifest?.meta.color ?? 'default'}
-				label=${ifDefined(
-					this.#manifest?.meta.label ? this.localize.string(this.#manifest.meta.label) : this.#manifest?.name,
-				)}
+				label=${this._additionalOptions ? label + '…' : label}
 				.disabled=${this._isDisabled}
 				.state=${this._buttonState}
 				@click=${this.#onClick}></uui-button>
