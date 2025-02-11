@@ -35,12 +35,12 @@ public interface IContentPublishingService
     /// </summary>
     /// <param name="key">The key of the root content.</param>
     /// <param name="cultures">The cultures to publish.</param>
-    /// <param name="forceOptions">A value indicating options for force publishing unpublished or re-publishing unchanged content.</param>
+    /// <param name="publishBranchFilter">A value indicating options for force publishing unpublished or re-publishing unchanged content.</param>
     /// <param name="userKey">The identifier of the user performing the operation.</param>
     /// <returns>Result of the publish operation.</returns>
-    Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, PublishBranchForceOptions forceOptions, Guid userKey)
+    Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, PublishBranchFilter publishBranchFilter, Guid userKey)
 #pragma warning disable CS0618 // Type or member is obsolete
-        => PublishBranchAsync(key, cultures, forceOptions.HasFlag(PublishBranchForceOptions.PublishUnpublished), userKey);
+        => PublishBranchAsync(key, cultures, publishBranchFilter.HasFlag(PublishBranchFilter.IncludeUnpublished), userKey);
 #pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>

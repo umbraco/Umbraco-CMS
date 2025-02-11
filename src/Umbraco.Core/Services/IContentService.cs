@@ -426,17 +426,17 @@ public interface IContentService : IContentServiceBase<IContent>
     ///     Publishes a document branch.
     /// </summary>
     /// <param name="content">The root document.</param>
-    /// <param name="forceOptions">A value indicating options for force publishing unpublished or re-publishing unchanged content.</param>
+    /// <param name="publishBranchFilter">A value indicating options for force publishing unpublished or re-publishing unchanged content.</param>
     /// <param name="cultures">The cultures to publish.</param>
     /// <param name="userId">The identifier of the user performing the operation.</param>
     /// <remarks>
     ///     <para>
-    ///         The root of the branch is always published, regardless of <paramref name="forceOptions" />.
+    ///         The root of the branch is always published, regardless of <paramref name="publishBranchFilter" />.
     ///     </para>
     /// </remarks>
-    IEnumerable<PublishResult> PublishBranch(IContent content, PublishBranchForceOptions forceOptions, string[] cultures, int userId = Constants.Security.SuperUserId)
+    IEnumerable<PublishResult> PublishBranch(IContent content, PublishBranchFilter publishBranchFilter, string[] cultures, int userId = Constants.Security.SuperUserId)
 #pragma warning disable CS0618 // Type or member is obsolete
-        => SaveAndPublishBranch(content, forceOptions.HasFlag(PublishBranchForceOptions.PublishUnpublished), cultures, userId);
+        => SaveAndPublishBranch(content, publishBranchFilter.HasFlag(PublishBranchFilter.IncludeUnpublished), cultures, userId);
 #pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>

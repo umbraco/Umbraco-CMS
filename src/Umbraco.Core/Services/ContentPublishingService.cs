@@ -241,10 +241,10 @@ internal sealed class ContentPublishingService : IContentPublishingService
     /// <inheritdoc />
     [Obsolete("This method is not longer used as the 'force' parameter has been split into publishing unpublished and force re-published. Please use the overload containing parameters for those options instead. Will be removed in V17.")]
     public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, bool force, Guid userKey)
-        => await PublishBranchAsync(key, cultures, force ? PublishBranchForceOptions.PublishUnpublished : PublishBranchForceOptions.None, userKey);
+        => await PublishBranchAsync(key, cultures, force ? PublishBranchFilter.IncludeUnpublished : PublishBranchFilter.Default, userKey);
 
     /// <inheritdoc />
-    public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, PublishBranchForceOptions forceOptions, Guid userKey)
+    public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, PublishBranchFilter publishBranchFilter, Guid userKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         IContent? content = _contentService.GetById(key);
@@ -265,7 +265,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
         }
 
         var userId = await _userIdKeyResolver.GetAsync(userKey);
-        IEnumerable<PublishResult> result = _contentService.PublishBranch(content, forceOptions, cultures.ToArray(), userId);
+        IEnumerable<PublishResult> result = _contentService.PublishBranch(content, publishBranchFilter, cultures.ToArray(), userId);
         scope.Complete();
 
         var itemResults = result.ToDictionary(r => r.Content.Key, ToContentPublishingOperationStatus);

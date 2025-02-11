@@ -62,19 +62,19 @@ public class PublishDocumentWithDescendantsController : DocumentControllerBase
             : DocumentPublishingOperationStatusResult(attempt.Status, failedBranchItems: attempt.Result.FailedItems);
     }
 
-    private static PublishBranchForceOptions GetPublishBranchForceOptions(PublishDocumentWithDescendantsRequestModel requestModel)
+    private static PublishBranchFilter GetPublishBranchForceOptions(PublishDocumentWithDescendantsRequestModel requestModel)
     {
-        PublishBranchForceOptions forceOptions = PublishBranchForceOptions.None;
+        PublishBranchFilter publishBranchFilter = PublishBranchFilter.Default;
         if (requestModel.IncludeUnpublishedDescendants)
         {
-            forceOptions |= PublishBranchForceOptions.PublishUnpublished;
+            publishBranchFilter |= PublishBranchFilter.IncludeUnpublished;
         }
 
         if (requestModel.ForceRepublish)
         {
-            forceOptions |= PublishBranchForceOptions.ForceRepublish;
+            publishBranchFilter |= PublishBranchFilter.ForceRepublish;
         }
 
-        return forceOptions;
+        return publishBranchFilter;
     }
 }

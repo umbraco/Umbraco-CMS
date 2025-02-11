@@ -4,25 +4,25 @@ namespace Umbraco.Cms.Core.Models;
 /// Describes the options available with publishing a content branch for force publishing.
 /// </summary>
 [Flags]
-public enum PublishBranchForceOptions
+public enum PublishBranchFilter
 {
     /// <summary>
-    /// No force options: the default behavior is to publish only the published content that has changed.
+    /// The default behavior is to publish only the published content that has changed.
     /// </summary>
-    None = 0,
+    Default = 0,
 
     /// <summary>
-    /// For publishing a branch, publish all content, including content that is not published.
+    /// For publishing a branch, publish all changed content, including content that is not published.
     /// </summary>
-    PublishUnpublished = 1,
+    IncludeUnpublished = 1,
 
     /// <summary>
-    /// For publishing a branch, force republishing of all content, including content that has not changed.
+    /// For publishing a branch, force republishing of all published content, including content that has not changed.
     /// </summary>
     ForceRepublish = 2,
 
     /// <summary>
     /// For publishing a branch, publish all content, including content that is not published and content that has not changed.
     /// </summary>
-    ForceAll = PublishUnpublished | ForceRepublish,
+    All = IncludeUnpublished | ForceRepublish,
 }

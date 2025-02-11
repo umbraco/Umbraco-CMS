@@ -2010,14 +2010,14 @@ public class ContentService : RepositoryService, IContentService
     }
 
     // utility 'ShouldPublish' func used by PublishBranch
-    private static HashSet<string>? PublishBranch_ShouldPublish(ref HashSet<string>? cultures, string c, bool published, bool edited, bool isRoot, PublishBranchForceOptions forceOptions)
+    private static HashSet<string>? PublishBranch_ShouldPublish(ref HashSet<string>? cultures, string c, bool published, bool edited, bool isRoot, PublishBranchFilter publishBranchFilter)
     {
         // if published, republish
         if (published)
         {
             cultures ??= new HashSet<string>(); // empty means 'already published'
 
-            if (edited || forceOptions.HasFlag(PublishBranchForceOptions.ForceRepublish))
+            if (edited || publishBranchFilter.HasFlag(PublishBranchFilter.ForceRepublish))
             {
                 cultures.Add(c); // <culture> means 'republish this culture'
             }
@@ -2026,7 +2026,7 @@ public class ContentService : RepositoryService, IContentService
         }
 
         // if not published, publish if force/root else do nothing
-        if (!forceOptions.HasFlag(PublishBranchForceOptions.PublishUnpublished) && !isRoot)
+        if (!publishBranchFilter.HasFlag(PublishBranchFilter.IncludeUnpublished) && !isRoot)
         {
             return cultures; // null means 'nothing to do'
         }
@@ -2054,18 +2054,18 @@ public class ContentService : RepositoryService, IContentService
             var isRoot = c.Id == content.Id;
             HashSet<string>? culturesToPublish = null;
 
-            PublishBranchForceOptions forceOptions = force ? PublishBranchForceOptions.PublishUnpublished : PublishBranchForceOptions.None;
+            PublishBranchFilter publishBranchFilter = force ? PublishBranchFilter.IncludeUnpublished : PublishBranchFilter.Default;
 
             // invariant content type
             if (!c.ContentType.VariesByCulture())
             {
-                return PublishBranch_ShouldPublish(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, forceOptions);
+                return PublishBranch_ShouldPublish(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, publishBranchFilter);
             }
 
             // variant content type, specific culture
             if (culture != "*")
             {
-                return PublishBranch_ShouldPublish(ref culturesToPublish, culture, c.IsCulturePublished(culture), c.IsCultureEdited(culture), isRoot, forceOptions);
+                return PublishBranch_ShouldPublish(ref culturesToPublish, culture, c.IsCulturePublished(culture), c.IsCultureEdited(culture), isRoot, publishBranchFilter);
             }
 
             // variant content type, all cultures
@@ -2075,7 +2075,7 @@ public class ContentService : RepositoryService, IContentService
                 // others will have to 'republish this culture'
                 foreach (var x in c.AvailableCultures)
                 {
-                    PublishBranch_ShouldPublish(ref culturesToPublish, x, c.IsCulturePublished(x), c.IsCultureEdited(x), isRoot, forceOptions);
+                    PublishBranch_ShouldPublish(ref culturesToPublish, x, c.IsCulturePublished(x), c.IsCultureEdited(x), isRoot, publishBranchFilter);
                 }
 
                 return culturesToPublish;
@@ -2092,15 +2092,15 @@ public class ContentService : RepositoryService, IContentService
 
     [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(PublishBranch)} instead. Will be removed in V16")]
     public IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId)
-        => PublishBranch(content, force ? PublishBranchForceOptions.PublishUnpublished : PublishBranchForceOptions.None, cultures, userId);
+        => PublishBranch(content, force ? PublishBranchFilter.IncludeUnpublished : PublishBranchFilter.Default, cultures, userId);
 
     /// <inheritdoc />
     [Obsolete("This method is not longer used as the 'force' parameter has been split into publishing unpublished and force re-published. Please use the overload containing parameters for those options instead. Will be removed in V16")]
     public IEnumerable<PublishResult> PublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId)
-        => PublishBranch(content, force ? PublishBranchForceOptions.PublishUnpublished : PublishBranchForceOptions.None, cultures, userId);
+        => PublishBranch(content, force ? PublishBranchFilter.IncludeUnpublished : PublishBranchFilter.Default, cultures, userId);
 
     /// <inheritdoc />
-    public IEnumerable<PublishResult> PublishBranch(IContent content, PublishBranchForceOptions forceOptions, string[] cultures, int userId = Constants.Security.SuperUserId)
+    public IEnumerable<PublishResult> PublishBranch(IContent content, PublishBranchFilter publishBranchFilter, string[] cultures, int userId = Constants.Security.SuperUserId)
     {
         // note: EditedValue and PublishedValue are objects here, so it is important to .Equals()
         // and not to == them, else we would be comparing references, and that is a bad thing
@@ -2124,7 +2124,7 @@ public class ContentService : RepositoryService, IContentService
             // invariant content type
             if (!c.ContentType.VariesByCulture())
             {
-                return PublishBranch_ShouldPublish(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, forceOptions);
+                return PublishBranch_ShouldPublish(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, publishBranchFilter);
             }
 
             // variant content type, specific cultures
@@ -2138,14 +2138,14 @@ public class ContentService : RepositoryService, IContentService
                     // So convert the invariant request to a request for the default culture.
                     var specificCulture = culture == "*" ? defaultCulture : culture;
 
-                    PublishBranch_ShouldPublish(ref culturesToPublish, specificCulture, c.IsCulturePublished(specificCulture), c.IsCultureEdited(specificCulture), isRoot, forceOptions);
+                    PublishBranch_ShouldPublish(ref culturesToPublish, specificCulture, c.IsCulturePublished(specificCulture), c.IsCultureEdited(specificCulture), isRoot, publishBranchFilter);
                 }
 
                 return culturesToPublish;
             }
 
             // if not published, publish if forcing unpublished/root else do nothing
-            return forceOptions.HasFlag(PublishBranchForceOptions.PublishUnpublished) || isRoot
+            return publishBranchFilter.HasFlag(PublishBranchFilter.IncludeUnpublished) || isRoot
                 ? new HashSet<string>(cultures) // means 'publish specified cultures'
                 : null; // null means 'nothing to do'
         }
@@ -2155,8 +2155,6 @@ public class ContentService : RepositoryService, IContentService
 
     private static string[] EnsureCultures(IContent content, string[] cultures)
     {
-        cultures ??= [];
-
         // Ensure consistent indication of "all cultures" for variant content.
         if (content.ContentType.VariesByCulture() is false && ProvidedCulturesIndicatePublishAll(cultures))
         {

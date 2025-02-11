@@ -21,8 +21,8 @@ public class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTestsBase
         ContentService.Save(childOfSecondRoot, -1, contentSchedule);
 
         // Publish both the main root and the second root with descendants
-        ContentService.PublishBranch(Textpage, PublishBranchForceOptions.PublishUnpublished, ["*"]);
-        ContentService.PublishBranch(secondRoot, PublishBranchForceOptions.PublishUnpublished, ["*"]);
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        ContentService.PublishBranch(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         var subPageUrls = await PublishedUrlInfoProvider.GetAllAsync(Subpage);
         var childOfSecondRootUrls = await PublishedUrlInfoProvider.GetAllAsync(childOfSecondRoot);
