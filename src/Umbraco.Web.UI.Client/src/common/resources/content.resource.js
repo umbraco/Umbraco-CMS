@@ -1010,9 +1010,9 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
             var action = "publishWithDescendants";
             if (includeUnpublished === true && forceRepublish) {
-                action += "ForceUnpublishedAndRepublish";
+                action += "IncludeUnpublishedAndForceRepublish";
             } else if (includeUnpublished === true) {
-                action += "ForceUnpublished";
+                action += "IncludeUnpublished";
             } else if (forceRepublish === true) {
                 action += "ForceRepublish";
             }

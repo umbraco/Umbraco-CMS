@@ -72,12 +72,12 @@ public enum ContentSaveAction
     /// <summary>
     ///     Saves and publishes the content item including all descendants including publishing previously unpublished content.
     /// </summary>
-    PublishWithDescendantsForceUnpublished = 12,
+    PublishWithDescendantsIncludeUnpublished = 12,
 
     /// <summary>
     ///     Saves and publishes the new content item including all descendants including publishing previously unpublished content.
     /// </summary>
-    PublishWithDescendantsForceUnpublishedNew = 13,
+    PublishWithDescendantsIncludeUnpublishedNew = 13,
 
     /// <summary>
     ///     Saves and publishes the content item including all descendants irrespective of whether there are any pending changes.
@@ -92,10 +92,10 @@ public enum ContentSaveAction
     /// <summary>
     ///     Saves and publishes the content item including all descendants including publishing previously unpublished content and irrespective of whether there are any pending changes.
     /// </summary>
-    PublishWithDescendantsForceUnpublishedAndRepublish = 16,
+    PublishWithDescendantsIncludeUnpublishedAndForceRepublish = 16,
 
     /// <summary>
     ///     Saves and publishes the new content item including all descendants including publishing previously unpublished content and irrespective of whether there are any pending changes.
     /// </summary>
-    PublishWithDescendantsForceUnpublishedAndRepublishNew = 17,
+    PublishWithDescendantsIncludeUnpublishedAndForceRepublishNew = 17,
 }

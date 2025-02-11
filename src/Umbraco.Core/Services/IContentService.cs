@@ -455,7 +455,7 @@ public interface IContentService : IContentServiceBase<IContent>
     ///     Saves and publishes a document branch.
     /// </summary>
     /// <param name="content">The root document.</param>
-    /// <param name="forceOptions">A value indicating options for force publishing unpublished or re-publishing unchanged content.</param>
+    /// <param name="publishBranchFilter">A value indicating options for force publishing unpublished or re-publishing unchanged content.</param>
     /// <param name="culture">A culture, or "*" for all cultures.</param>
     /// <param name="userId">The identifier of the user performing the operation.</param>
     /// <remarks>
@@ -464,29 +464,29 @@ public interface IContentService : IContentServiceBase<IContent>
     ///         than one culture, see the other overloads of this method.
     ///     </para>
     ///     <para>
-    ///         The root of the branch is always published, regardless of <paramref name="forceOptions" />.
+    ///         The root of the branch is always published, regardless of <paramref name="publishBranchFilter" />.
     ///     </para>
     /// </remarks>
-    IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, PublishBranchForceOptions forceOptions, string culture = "*", int userId = Constants.Security.SuperUserId)
+    IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, PublishBranchFilter publishBranchFilter, string culture = "*", int userId = Constants.Security.SuperUserId)
 #pragma warning disable CS0618 // Type or member is obsolete
-        => SaveAndPublishBranch(content, forceOptions.HasFlag(PublishBranchForceOptions.PublishUnpublished), culture, userId);
+        => SaveAndPublishBranch(content, publishBranchFilter.HasFlag(PublishBranchFilter.IncludeUnpublished), culture, userId);
 #pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Saves and publishes a document branch.
     /// </summary>
     /// <param name="content">The root document.</param>
-    /// <param name="forceOptions">A value indicating options for force publishing unpublished or re-publishing unchanged content.</param>
+    /// <param name="publishBranchFilter">A value indicating options for force publishing unpublished or re-publishing unchanged content.</param>
     /// <param name="cultures">The cultures to publish.</param>
     /// <param name="userId">The identifier of the user performing the operation.</param>
     /// <remarks>
     ///     <para>
-    ///         The root of the branch is always published, regardless of <paramref name="forceOptions" />.
+    ///         The root of the branch is always published, regardless of <paramref name="publishBranchFilter" />.
     ///     </para>
     /// </remarks>
-    IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, PublishBranchForceOptions forceOptions, string[] cultures, int userId = Constants.Security.SuperUserId)
+    IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, PublishBranchFilter publishBranchFilter, string[] cultures, int userId = Constants.Security.SuperUserId)
 #pragma warning disable CS0618 // Type or member is obsolete
-        => SaveAndPublishBranch(content, forceOptions.HasFlag(PublishBranchForceOptions.PublishUnpublished), cultures, userId);
+        => SaveAndPublishBranch(content, publishBranchFilter.HasFlag(PublishBranchFilter.IncludeUnpublished), cultures, userId);
 #pragma warning restore CS0618 // Type or member is obsolete
 
     ///// <summary>
