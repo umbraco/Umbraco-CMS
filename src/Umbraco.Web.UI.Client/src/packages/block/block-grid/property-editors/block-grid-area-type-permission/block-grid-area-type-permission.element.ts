@@ -123,6 +123,9 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 	}
 
 	override render() {
+		if (this._blockTypesWithElementName.length === 0) {
+			return nothing;
+		}
 		return html`<div id="permissions">
 				${repeat(
 					this._value,
