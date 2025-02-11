@@ -94,7 +94,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		if (this._allowedDocumentTypes.length !== 1) return;
 
 		const item = this._allowedDocumentTypes[0];
-		// TODO: Stop appending to labels, instead we need to parse the name as a argument to the label. [NL]
+		// TODO: Stop appending values to labels, instead we need to parse the name as a argument to the label. [NL]
 		const label =
 			(this.manifest?.meta.label
 				? this.localize.string(this.manifest?.meta.label)
