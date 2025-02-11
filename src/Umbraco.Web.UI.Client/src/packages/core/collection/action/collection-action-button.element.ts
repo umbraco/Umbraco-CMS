@@ -1,6 +1,6 @@
 import type { UmbCollectionAction } from './collection-action-base.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
-import { html, customElement, property, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
@@ -72,7 +72,7 @@ export class UmbCollectionActionButtonElement extends UmbLitElement {
 			: (this.manifest?.name ?? '');
 		return html`
 			<uui-button
-				data-mark="collection-action:${ifDefined(this.manifest?.alias)}"
+				data-mark="collection-action:${this.manifest?.alias}"
 				color="default"
 				look="outline"
 				.label=${this._additionalOptions ? label + '…' : label}
