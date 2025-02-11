@@ -1,86 +1,35 @@
-import type { UmbDocumentTreeItemModel, UmbDocumentTreeItemVariantModel } from '../types.js';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { css, html, nothing, customElement, state, classMap } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
-import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import type { UmbDocumentTreeItemModel } from '../types.js';
+import { css, html, nothing, customElement, classMap, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
+import { UMB_TREE_ITEM_CONTEXT, UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-document-tree-item')
 export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocumentTreeItemModel> {
-	#appLanguageContext?: UmbAppLanguageContext;
+	@state()
+	private _name = '';
 
 	@state()
-	_currentCulture?: string;
+	private _isDraft = false;
 
 	@state()
-	_defaultCulture?: string;
-
-	@state()
-	_variant?: UmbDocumentTreeItemVariantModel;
+	private _icon = '';
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
-			this.#appLanguageContext = instance;
-			this.#observeAppCulture();
-			this.#observeDefaultCulture();
+		this.consumeContext(UMB_TREE_ITEM_CONTEXT, (context) => {
+			this.observe(context.name, (name) => (this._name = name));
+			this.observe(context.isDraft, (isDraft) => (this._isDraft = isDraft));
+			this.observe(context.icon, (icon) => (this._icon = icon));
 		});
-	}
-
-	#observeAppCulture() {
-		this.observe(this.#appLanguageContext!.appLanguageCulture, (value) => {
-			this._currentCulture = value;
-			this._variant = this.#findVariant(value);
-		});
-	}
-
-	#observeDefaultCulture() {
-		this.observe(this.#appLanguageContext!.appDefaultLanguage, (value) => {
-			this._defaultCulture = value?.unique;
-		});
-	}
-
-	#findVariant(culture: string | undefined) {
-		return this.item?.variants.find((x) => x.culture === culture);
-	}
-
-	#isInvariant() {
-		const firstVariant = this.item?.variants[0];
-		return firstVariant?.culture === null && firstVariant?.segment === null;
-	}
-
-	// TODO: we should move the fallback name logic to a helper class. It will be used in multiple places
-	#getLabel() {
-		if (this.#isInvariant()) {
-			return this._item?.variants[0].name;
-		}
-
-		// ensure we always have the correct variant data
-		this._variant = this.#findVariant(this._currentCulture);
-
-		const fallbackName = this.#findVariant(this._defaultCulture)?.name ?? this._item?.variants[0].name ?? 'Unknown';
-		return this._variant?.name ?? `(${fallbackName})`;
-	}
-
-	#isDraft() {
-		if (this.#isInvariant()) {
-			return this._item?.variants[0].state === DocumentVariantStateModel.DRAFT;
-		}
-
-		// ensure we always have the correct variant data
-		this._variant = this.#findVariant(this._currentCulture);
-
-		return this._variant?.state === DocumentVariantStateModel.DRAFT;
 	}
 
 	override renderIconContainer() {
-		const icon = this.item?.documentType.icon;
+		const icon = this._icon;
 		const iconWithoutColor = icon?.split(' ')[0];
 
 		return html`
-			<span id="icon-container" slot="icon" class=${classMap({ draft: this.#isDraft() })}>
+			<span id="icon-container" slot="icon" class=${classMap({ draft: this._isDraft })}>
 				${icon && iconWithoutColor
 					? html`
 							<umb-icon id="icon" slot="icon" name="${this._isActive ? iconWithoutColor : icon}"></umb-icon>
@@ -92,9 +41,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 	}
 
 	override renderLabel() {
-		return html`<span id="label" slot="label" class=${classMap({ draft: this.#isDraft() })}
-			>${this.#getLabel()}</span
-		> `;
+		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft })}>${this._name}</span> `;
 	}
 
 	#renderStateIcon() {
