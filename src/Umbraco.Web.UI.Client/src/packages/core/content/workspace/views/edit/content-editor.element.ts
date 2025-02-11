@@ -130,9 +130,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 										<uui-tab
 											.label=${this.localize.term('general_generic')}
 											.active=${this._routerPath + '/root' === this._activePath}
-											.href=${this._routerPath + '/root'}
-											>Generic</uui-tab
-										>
+											.href=${this._routerPath + '/root'}></uui-tab>
 									`
 								: ''}
 							${repeat(
@@ -143,9 +141,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 									return html`<uui-tab
 										.label=${this.localize.string(tab.name ?? '#general_unnamed')}
 										.active=${path === this._activePath}
-										.href=${path}
-										>${this.localize.string(tab.name)}</uui-tab
-									>`;
+										.href=${path}></uui-tab>`;
 								},
 							)}
 						</uui-tab-group>`
