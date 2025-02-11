@@ -64,7 +64,6 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 
 		return html`
 			<uui-ref-node
-				id=${this.item.unique}
 				class=${classMap({ draft: this.#isDraft(this.item) })}
 				name=${this.item.name}
 				href=${ifDefined(this.#getHref(this.item))}
