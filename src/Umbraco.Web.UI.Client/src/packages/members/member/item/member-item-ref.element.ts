@@ -10,8 +10,29 @@ import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-member-item-ref')
 export class UmbMemberItemRefElement extends UmbLitElement {
+	#item?: UmbMemberItemModel | undefined;
+
 	@property({ type: Object })
-	item?: UmbMemberItemModel;
+	public get item(): UmbMemberItemModel | undefined {
+		return this.#item;
+	}
+	public set item(value: UmbMemberItemModel | undefined) {
+		this.#item = value;
+
+		if (!this.#item) {
+			this.#modalRoute?.destroy();
+			return;
+		}
+
+		this.#modalRoute = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath(UMB_MEMBER_ENTITY_TYPE + '/' + this.#item.unique)
+			.onSetup(() => {
+				return { data: { entityType: UMB_MEMBER_ENTITY_TYPE, preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editPath = routeBuilder({});
+			});
+	}
 
 	@property({ type: Boolean })
 	readonly = false;
@@ -24,6 +45,8 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 
 	@state()
 	_userHasSectionAccess = false;
+
+	#modalRoute?: any;
 
 	constructor() {
 		super();
@@ -58,7 +81,6 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 
 		return html`
 			<uui-ref-node-member
-				id=${this.item.unique}
 				name=${this.item.name}
 				href=${ifDefined(this.#getHref(this.item))}
 				?readonly=${this.readonly || !this._userHasSectionAccess}
