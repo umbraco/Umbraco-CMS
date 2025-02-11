@@ -26,6 +26,9 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 	private _activePath?: string;
 
 	@state()
+	private _defaultView?: string;
+
+	@state()
 	private _routes: Array<UmbRoute> = [];
 
 	constructor() {
@@ -75,7 +78,11 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 
 		const routes = [...dashboardRoutes, ...viewRoutes];
 		if (routes.length > 0) {
-			routes.push({ path: '', redirectTo: routes?.[0]?.path });
+			this._defaultView = routes[0].path;
+			routes.push({
+				...routes[0],
+				path: '',
+			});
 
 			routes.push({
 				path: `**`,
@@ -111,13 +118,16 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 					<uui-tab-group slot="header" id="dashboards">
 						${this._dashboards.map((dashboard) => {
 							const dashboardPath = this.#constructDashboardPath(dashboard);
+							// If this path matches, or if this is the default view and the active path is empty.
+							const isActive =
+								this._activePath === dashboardPath || (this._defaultView === dashboardPath && this._activePath === '');
 							return html`
 								<uui-tab
 									href="${this._routerPath}/${dashboardPath}"
 									label="${dashboard.meta.label
 										? this.localize.string(dashboard.meta.label)
 										: (dashboard.name ?? dashboard.alias)}"
-									?active="${this._activePath === dashboardPath}"></uui-tab>
+									?active="${isActive}"></uui-tab>
 							`;
 						})}
 					</uui-tab-group>
@@ -133,11 +143,11 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 						${this._views.map((view) => {
 							const viewName = view.meta.label ? this.localize.string(view.meta.label) : (view.name ?? view.alias);
 							const viewPath = this.#constructViewPath(view);
+							// If this path matches, or if this is the default view and the active path is empty.
+							const isActive =
+								this._activePath === viewPath || (this._defaultView === viewPath && this._activePath === '');
 							return html`
-								<uui-tab
-									href="${this._routerPath}/${viewPath}"
-									label="${viewName}"
-									?active="${this._activePath === viewPath}">
+								<uui-tab href="${this._routerPath}/${viewPath}" label="${viewName}" ?active="${isActive}">
 									<umb-icon slot="icon" name=${view.meta.icon}></umb-icon>
 									${viewName}
 								</uui-tab>
