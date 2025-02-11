@@ -23,6 +23,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		return this.#item;
 	}
 	public set item(value: UmbDocumentItemModel | undefined) {
+		const oldValue = this.#item;
 		this.#item = value;
 
 		if (!this.#item) {
@@ -30,14 +31,16 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 			return;
 		}
 
-		this.#modalRoute = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath(UMB_DOCUMENT_ENTITY_TYPE + '/' + this.#item.unique)
-			.onSetup(() => {
-				return { data: { entityType: UMB_DOCUMENT_ENTITY_TYPE, preset: {} } };
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._editPath = routeBuilder({});
-			});
+		if (oldValue?.unique !== this.#item.unique) {
+			this.#modalRoute = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+				.addAdditionalPath(UMB_DOCUMENT_ENTITY_TYPE + '/' + this.#item.unique)
+				.onSetup(() => {
+					return { data: { entityType: UMB_DOCUMENT_ENTITY_TYPE, preset: {} } };
+				})
+				.observeRouteBuilder((routeBuilder) => {
+					this._editPath = routeBuilder({});
+				});
+		}
 	}
 
 	@property({ type: Boolean })
