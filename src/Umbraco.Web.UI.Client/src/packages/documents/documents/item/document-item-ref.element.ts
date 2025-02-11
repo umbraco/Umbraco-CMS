@@ -14,6 +14,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-document-item-ref')
 export class UmbDocumentItemRefElement extends UmbLitElement {
@@ -85,7 +86,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	}
 
 	#isDraft() {
-		return this.#item.getState() === 'Draft';
+		return this.#item.getState() === DocumentVariantStateModel.DRAFT;
 	}
 
 	#renderIcon() {
