@@ -338,5 +338,15 @@ describe('UmbLocalizeController', () => {
 			await elementUpdated(element);
 			expect(element.localize.term('close')).to.equal('Luk');
 		});
+
+		it('should update the string when the language changes', async () => {
+			expect(element.localize.string('testing #close')).to.equal('testing Close');
+
+			// Switch browser to Danish
+			element.lang = danishRegional.$code;
+
+			await elementUpdated(element);
+			expect(element.localize.string('testing #close')).to.equal('testing Luk');
+		});
 	});
 });
