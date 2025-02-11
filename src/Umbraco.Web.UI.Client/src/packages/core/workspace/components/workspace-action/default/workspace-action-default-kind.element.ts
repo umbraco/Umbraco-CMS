@@ -160,7 +160,7 @@ export class UmbWorkspaceActionElement<
 	#renderButton() {
 		return html`
 			<uui-button
-				id="action-button"
+				data-mark="workspace-action:${this.#manifest?.alias}"
 				.href=${this._href}
 				@click=${this.#onClick}
 				look=${this.#manifest?.meta.look ?? 'default'}
