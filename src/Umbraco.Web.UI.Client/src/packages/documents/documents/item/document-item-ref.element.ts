@@ -3,7 +3,6 @@ import type { UmbDocumentItemModel } from './types.js';
 import { UmbDocumentItemDataResolver } from './document-item-data-resolver.js';
 import {
 	classMap,
-	css,
 	customElement,
 	html,
 	ifDefined,
@@ -80,7 +79,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 				?readonly=${this.readonly}
 				?standalone=${this.standalone}>
 				<slot name="actions" slot="actions"></slot>
-				${this.#renderIcon()} ${this.#renderIsTrashed()}
+				${this.#renderIcon()}${this.#renderIsDraft()} ${this.#renderIsTrashed()}
 			</uui-ref-node>
 		`;
 	}
@@ -100,13 +99,10 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
 	}
 
-	static override styles = [
-		css`
-			.draft {
-				opacity: 0.6;
-			}
-		`,
-	];
+	#renderIsDraft() {
+		if (!this.#isDraft()) return nothing;
+		return html`<uui-tag size="s" slot="tag" look="secondary" color="default">Draft</uui-tag>`;
+	}
 }
 
 export { UmbDocumentItemRefElement as element };
