@@ -9,18 +9,21 @@ export class UmbSubmitWorkspaceAction<
 	ArgsMetaType extends MetaWorkspaceAction = MetaWorkspaceAction,
 	WorkspaceContextType extends UmbSubmittableWorkspaceContext = UmbSubmittableWorkspaceContext,
 > extends UmbWorkspaceActionBase<ArgsMetaType> {
-	protected _init: Promise<unknown>;
+	protected _retrieveWorkspaceContext: Promise<unknown>;
 	protected _workspaceContext?: WorkspaceContextType;
 
 	constructor(host: UmbControllerHost, args: UmbSubmitWorkspaceActionArgs<ArgsMetaType>) {
 		super(host, args);
 
 		// TODO: Could we make change label depending on the state? [NL]
-		this._init = this.consumeContext(args.workspaceContextToken ?? UMB_SUBMITTABLE_WORKSPACE_CONTEXT, (context) => {
-			this._workspaceContext = context as WorkspaceContextType;
-			this.#observeUnique();
-			this._gotWorkspaceContext();
-		}).asPromise();
+		this._retrieveWorkspaceContext = this.consumeContext(
+			args.workspaceContextToken ?? UMB_SUBMITTABLE_WORKSPACE_CONTEXT,
+			(context) => {
+				this._workspaceContext = context as WorkspaceContextType;
+				this.#observeUnique();
+				this._gotWorkspaceContext();
+			},
+		).asPromise();
 	}
 
 	#observeUnique() {
@@ -44,7 +47,7 @@ export class UmbSubmitWorkspaceAction<
 	}
 
 	override async execute() {
-		await this._init;
+		await this._retrieveWorkspaceContext;
 		return await this._workspaceContext!.requestSubmit();
 	}
 }

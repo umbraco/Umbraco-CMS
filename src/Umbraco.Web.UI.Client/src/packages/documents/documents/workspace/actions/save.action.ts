@@ -23,7 +23,7 @@ export class UmbDocumentSaveWorkspaceAction
 	}
 
 	async hasAdditionalOptions() {
-		await this._init;
+		await this._retrieveWorkspaceContext;
 		const variantOptions = await this.observe(this._workspaceContext!.variantOptions).asPromise();
 		return variantOptions?.length > 1;
 	}
