@@ -298,8 +298,8 @@ describe('UmbLocalizeController', () => {
 		});
 
 		it('should return an empty string if the input is not a string', async () => {
-			expect(controller.string(123)).to.equal('');
-			expect(controller.string({})).to.equal('');
+			expect(controller.string(123 as any)).to.equal('');
+			expect(controller.string({} as any)).to.equal('');
 			expect(controller.string(undefined)).to.equal('');
 		});
 
