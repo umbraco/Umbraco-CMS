@@ -83,6 +83,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	/**
 	 * Gets the host element's directionality as determined by the `dir` attribute. The return value is transformed to
 	 * lowercase.
+	 * @returns {string} - the directionality.
 	 */
 	dir() {
 		return `${this.#hostEl?.dir || umbLocalizationManager.documentDirection}`.toLowerCase();
@@ -91,6 +92,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	/**
 	 * Gets the host element's language as determined by the `lang` attribute. The return value is transformed to
 	 * lowercase.
+	 * @returns {string} - the language code.
 	 */
 	lang() {
 		return `${this.#hostEl?.lang || umbLocalizationManager.documentLanguage}`.toLowerCase();
@@ -158,8 +160,9 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 
 	/**
 	 * Outputs a localized date in the specified format.
-	 * @param dateToFormat
-	 * @param options
+	 * @param {Date} dateToFormat - the date to format.
+	 * @param {Intl.DateTimeFormatOptions} options - the options to use when formatting the date.
+	 * @returns {string}
 	 */
 	date(dateToFormat: Date | string, options?: Intl.DateTimeFormatOptions): string {
 		dateToFormat = new Date(dateToFormat);
@@ -168,8 +171,9 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 
 	/**
 	 * Outputs a localized number in the specified format.
-	 * @param numberToFormat
-	 * @param options
+	 * @param {number | string} numberToFormat - the number or string to format.
+	 * @param {Intl.NumberFormatOptions} options - the options to use when formatting the number.
+	 * @returns {string} - the formatted number.
 	 */
 	number(numberToFormat: number | string, options?: Intl.NumberFormatOptions): string {
 		numberToFormat = Number(numberToFormat);
@@ -178,9 +182,10 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 
 	/**
 	 * Outputs a localized time in relative format.
-	 * @param value
-	 * @param unit
-	 * @param options
+	 * @param {number} value - the value to format.
+	 * @param {Intl.RelativeTimeFormatUnit} unit - the unit of time to format.
+	 * @param {Intl.RelativeTimeFormatOptions} options - the options to use when formatting the time.
+	 * @returns {string} - the formatted time.
 	 */
 	relativeTime(value: number, unit: Intl.RelativeTimeFormatUnit, options?: Intl.RelativeTimeFormatOptions): string {
 		return new Intl.RelativeTimeFormat(this.lang(), options).format(value, unit);
