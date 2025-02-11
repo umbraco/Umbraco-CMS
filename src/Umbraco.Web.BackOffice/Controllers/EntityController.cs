@@ -895,6 +895,7 @@ public class EntityController : UmbracoAuthorizedJsonController
                     // Filtering out child nodes after getting a paged result is an active choice here, even though the pagination might get off.
                     // This has been the case with this functionality in Umbraco for a long time.
                     .Where(entity => ignoreUserStartNodes ||
+                                     (objectType == UmbracoObjectTypes.Document || objectType == UmbracoObjectTypes.Media) is false ||
                                      (ContentPermissions.IsInBranchOfStartNode(entity.Path, startNodeIds, startNodePaths, out var hasPathAccess) &&
                                      hasPathAccess))
                     .Select(source =>
