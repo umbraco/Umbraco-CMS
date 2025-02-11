@@ -189,6 +189,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
           startNodeId: startNodeId,
           startNodeIsVirtual: startNodeIsVirtual,
           dataTypeKey: dialogOptions.dataTypeKey,
+          disableFolderSelect: true,
           submit: function (model) {
             var media = model.selection[0];
 

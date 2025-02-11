@@ -1,4 +1,4 @@
-﻿<div ng-controller="Umbraco.Editors.Users.DetailsController as vm" class="umb-user-details-details">
+<div ng-controller="Umbraco.Editors.Users.DetailsController as vm" class="umb-user-details-details">
 
     <div class="umb-user-details-details__main-content">
 
@@ -45,6 +45,8 @@
                                ng-model="model.user.username"
                                umb-auto-focus name="username"
                                required
+                               autocomplete="off"
+                               no-password-manager
                                val-server-field="Username" />
                         <span ng-messages="userProfileForm.username.$error" show-validation-on-submit>
                             <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>

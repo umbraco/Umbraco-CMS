@@ -202,6 +202,7 @@ public static partial class UmbracoBuilderExtensions
         {
             policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
             policy.Requirements.Add(new AdminUsersRequirement());
+            policy.Requirements.Add(new AdminUsersRequirement("ids"));
             policy.Requirements.Add(new AdminUsersRequirement("userIds"));
         });
 

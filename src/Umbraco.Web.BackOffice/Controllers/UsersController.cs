@@ -322,7 +322,7 @@ public class UsersController : BackOfficeNotificationsController
     /// <returns></returns>
     [OutgoingEditorModelEvent]
     [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
-    public ActionResult<IEnumerable<UserDisplay?>> GetByIds([FromJsonPath] int[] ids)
+    public ActionResult<IEnumerable<UserDisplay?>> GetByIds([FromQuery] int[] ids)
     {
         if (ids == null)
         {
@@ -713,6 +713,15 @@ public class UsersController : BackOfficeNotificationsController
         }
 
         var hasErrors = false;
+
+        // User names can only contain the configured allowed characters. This is validated by ASP.NET Identity on create
+        // as the setting is applied to the BackOfficeIdentityOptions, but we need to check ourselves for updates.
+        var allowedUserNameCharacters = _securitySettings.AllowedUserNameCharacters;
+        if (userSave.Username.Any(c => allowedUserNameCharacters.Contains(c) == false))
+        {
+            ModelState.AddModelError("Username", "Username contains invalid characters");
+            hasErrors = true;
+        }
 
         // we need to check if there's any Deny Local login providers present, if so we need to ensure that the user's email address cannot be changed
         var hasDenyLocalLogin = _externalLogins.HasDenyLocalLogin();

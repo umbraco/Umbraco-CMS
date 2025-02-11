@@ -33,18 +33,29 @@ public abstract class UmbracoUserStore<TUser, TRole>
 
     protected static int UserIdToInt(string? userId)
     {
-        if (int.TryParse(userId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
+        if (TryUserIdToInt(userId, out int result))
         {
             return result;
+        }
+
+        throw new InvalidOperationException($"Unable to convert user ID ({userId})to int using InvariantCulture");
+    }
+
+    protected static bool TryUserIdToInt(string? userId, out int result)
+    {
+        if (int.TryParse(userId, NumberStyles.Integer, CultureInfo.InvariantCulture, out result))
+        {
+            return true;
         }
 
         if (Guid.TryParse(userId, out Guid key))
         {
             // Reverse the IntExtensions.ToGuid
-            return BitConverter.ToInt32(key.ToByteArray(), 0);
+            result = BitConverter.ToInt32(key.ToByteArray(), 0);
+            return true;
         }
 
-        throw new InvalidOperationException($"Unable to convert user ID ({userId})to int using InvariantCulture");
+        return false;
     }
 
     protected static string UserIdToString(int userId) => string.Intern(userId.ToString(CultureInfo.InvariantCulture));
