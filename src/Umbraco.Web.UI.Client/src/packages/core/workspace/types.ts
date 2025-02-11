@@ -1,5 +1,6 @@
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
+export type * from './components/types.js';
 export type * from './conditions/types.js';
 export type * from './data-manager/types.js';
 export type * from './extensions/types.js';
