@@ -17,7 +17,7 @@ import './content-editor-tab.element.js';
 @customElement('umb-content-workspace-view-edit')
 export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	/*
-	// root properties is a possible feature with Bellissima, but as it is new its not fully implemented yet [NL]  
+	// root properties is a possible feature with Bellissima, but as it is new its not fully implemented yet [NL]
 	@state()
 	private _hasRootProperties = false;
   */
@@ -83,7 +83,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 
 		if (this._hasRootGroups) {
 			routes.push({
-				path: `tab/generic`,
+				path: `root`,
 				component: () => import('./content-editor-tab.element.js'),
 				setup: (component) => {
 					(component as UmbContentWorkspaceViewEditTabElement).containerId = null;
@@ -107,7 +107,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		if (routes.length !== 0) {
 			routes.push({
 				path: '',
-				redirectTo: routes[this._hasRootGroups && this._tabs.length > 0 ? 1 : 0]?.path,
+				redirectTo: routes[0].path,
 			});
 
 			routes.push({
@@ -129,8 +129,8 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 								? html`
 										<uui-tab
 											label="Generic"
-											.active=${this._routerPath + '/' === this._activePath}
-											href=${this._routerPath + '/tab/generic'}
+											.active=${this._routerPath + '/root' === this._activePath}
+											href=${this._routerPath + '/root'}
 											>Generic</uui-tab
 										>
 									`
