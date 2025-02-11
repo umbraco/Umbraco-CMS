@@ -5,11 +5,11 @@ import {
 } from '../../../user-permissions/constants.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from '../../workspace-context/constants.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../../constants.js';
-import { UmbWorkspaceActionBase } from '@umbraco-cms/backoffice/workspace';
+import { UmbWorkspaceActionBase, type UmbWorkspaceActionArgs } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceActionBase {
-	constructor(host: UmbControllerHost, args: any) {
+	constructor(host: UmbControllerHost, args: UmbWorkspaceActionArgs<never>) {
 		super(host, args);
 
 		/* The action is disabled by default because the onChange callback
