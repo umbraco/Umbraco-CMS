@@ -191,6 +191,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 		return new Intl.RelativeTimeFormat(this.lang(), options).format(value, unit);
 	}
 
+	// TODO: for V.16 we should set type to be string | undefined. [NL]
 	/**
 	 * Translates a string containing one or more terms. The terms should be prefixed with a `#` character.
 	 * If the term is found in the localization set, it will be replaced with the localized term.
