@@ -34,7 +34,7 @@ public class NodeDto
 
     [Column(ParentIdColumnName)]
     [ForeignKey(typeof(NodeDto))]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_parentId_nodeObjectType", ForColumns = "parentID,nodeObjectType", IncludeColumns = "trashed,nodeUser,level,path,sortOrder,uniqueID,text,createDate")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_parentId_nodeObjectType", ForColumns = "parentId,nodeObjectType", IncludeColumns = "trashed,nodeUser,level,path,sortOrder,uniqueId,text,createDate")]
     public int ParentId { get; set; }
 
     // NOTE: This index is primarily for the nucache data lookup, see https://github.com/umbraco/Umbraco-CMS/pull/8365#issuecomment-673404177
@@ -48,7 +48,7 @@ public class NodeDto
     public string Path { get; set; } = null!;
 
     [Column(SortOrderColumnName)]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType_trashed_sorted", ForColumns = "nodeObjectType,trashed,sortOrder,id", IncludeColumns = "uniqueID,parentID,level,path,nodeUser,text,createDate")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType_trashed_sorted", ForColumns = "nodeObjectType,trashed,sortOrder,id", IncludeColumns = "uniqued,parentId,level,path,nodeUser,text,createDate")]
     public int SortOrder { get; set; }
 
     [Column(TrashedColumnName)]
