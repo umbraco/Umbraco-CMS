@@ -196,8 +196,8 @@
 		"generate:ui-api-docs": "typedoc --options typedoc.config.js"
 	},
 	"engines": {
-		"node": ">=20.9 <21",
-		"npm": ">=10.1 < 11"
+		"node": ">=22",
+		"npm": ">=10.9"
 	},
 	"dependencies": {
 		"@tiptap/core": "2.11.2",

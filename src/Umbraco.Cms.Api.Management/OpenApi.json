@@ -35940,6 +35940,14 @@
           "enabled": {
             "type": "boolean"
           },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
           "url": {
             "minLength": 1,
             "type": "string"
@@ -36509,10 +36517,14 @@
       },
       "DefaultReferenceResponseModel": {
         "required": [
+          "$type",
           "id"
         ],
         "type": "object",
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -36530,7 +36542,13 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DefaultReferenceResponseModel": "#/components/schemas/DefaultReferenceResponseModel"
+          }
+        }
       },
       "DeleteUserGroupsRequestModel": {
         "required": [
@@ -37050,11 +37068,15 @@
       },
       "DocumentReferenceResponseModel": {
         "required": [
+          "$type",
           "documentType",
           "id"
         ],
         "type": "object",
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -37075,7 +37097,13 @@
             ]
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentReferenceResponseModel": "#/components/schemas/DocumentReferenceResponseModel"
+          }
+        }
       },
       "DocumentResponseModel": {
         "required": [
@@ -39183,11 +39211,15 @@
       },
       "MediaReferenceResponseModel": {
         "required": [
+          "$type",
           "id",
           "mediaType"
         ],
         "type": "object",
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -39204,7 +39236,13 @@
             ]
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "MediaReferenceResponseModel": "#/components/schemas/MediaReferenceResponseModel"
+          }
+        }
       },
       "MediaResponseModel": {
         "required": [
@@ -45448,6 +45486,14 @@
           "enabled": {
             "type": "boolean"
           },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
           "url": {
             "minLength": 1,
             "type": "string"
@@ -46338,6 +46384,14 @@
         "properties": {
           "enabled": {
             "type": "boolean"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
           },
           "url": {
             "minLength": 1,
