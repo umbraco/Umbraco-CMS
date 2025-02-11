@@ -1015,9 +1015,30 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isDeletable: true,
 		canIgnoreStartNodes: false,
 		values: [
+			{
+				alias: 'extensions',
+				value: [
+					'Umb.Tiptap.RichTextEssentials',
+					'Umb.Tiptap.Embed',
+					'Umb.Tiptap.Figure',
+					'Umb.Tiptap.Image',
+					'Umb.Tiptap.Link',
+					'Umb.Tiptap.MediaUpload',
+					'Umb.Tiptap.Subscript',
+					'Umb.Tiptap.Superscript',
+					'Umb.Tiptap.Table',
+					'Umb.Tiptap.TextAlign',
+					'Umb.Tiptap.Underline',
+				],
+			},
+			{
+				alias: 'toolbar',
+				value: [[['Umb.Tiptap.Toolbar.Table'], ['Umb.Tiptap.Toolbar.Heading1', 'Umb.Tiptap.Toolbar.SourceEditor']]],
+			},
 			{ alias: 'dimensions', value: { height: 500 } },
 			{ alias: 'maxImageSize', value: 500 },
 			{ alias: 'ignoreUserStartNodes', value: false },
+			{ alias: 'overlaySize', value: 'medium' },
 		],
 	},
 	{
