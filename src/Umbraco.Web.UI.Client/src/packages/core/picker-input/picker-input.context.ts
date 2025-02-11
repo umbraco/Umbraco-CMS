@@ -62,7 +62,6 @@ export class UmbPickerInputContext<
 	) {
 		super(host, UMB_PICKER_INPUT_CONTEXT);
 		this.modalAlias = modalAlias;
-		this.#getUnique = getUniqueMethod || ((entry) => entry.unique);
 
 		this.#getUnique = getUniqueMethod
 			? (entry: PickedItemType) => {
@@ -75,7 +74,7 @@ export class UmbPickerInputContext<
 				}
 			: (entry) => entry.unique;
 
-		this.#itemManager = new UmbRepositoryItemsManager<PickedItemType>(this, repositoryAlias, this.#getUnique);
+		this.#itemManager = new UmbRepositoryItemsManager<PickedItemType>(this, repositoryAlias, getUniqueMethod);
 
 		this.selection = this.#itemManager.uniques;
 		this.selectedItems = this.#itemManager.items;
