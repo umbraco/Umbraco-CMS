@@ -167,7 +167,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 
 			return {
 				id: item.unique,
-				icon: item.icon,
+				icon: item.documentType.icon,
 				entityType: UMB_DOCUMENT_ENTITY_TYPE,
 				data: data,
 			};
