@@ -100,7 +100,9 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
             GetSeedProviders(),
             new OptionsWrapper<CacheSettings>(new CacheSettings()),
             GetRequiredService<IPublishedModelFactory>(),
-            GetRequiredService<IPreviewService>());
+            GetRequiredService<IPreviewService>(),
+            GetRequiredService<IPublishStatusQueryService>(),
+            GetRequiredService<IDocumentNavigationQueryService>());
 
         _mockedCache = new DocumentCache(_mockDocumentCacheService,
             GetRequiredService<IPublishedContentTypeCache>(),
