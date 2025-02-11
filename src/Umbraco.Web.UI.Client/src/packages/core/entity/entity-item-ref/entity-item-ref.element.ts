@@ -21,8 +21,19 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 		return this.#item;
 	}
 	public set item(value: UmbEntityModel | undefined) {
-		if (value === this.#item || !value) return;
+		const oldValue = this.#item;
 		this.#item = value;
+
+		if (value === oldValue) return;
+		if (!value) return;
+
+		// If the component is already created and the entity type is the same, we can just update the item.
+		if (this._component && value.entityType === oldValue?.entityType) {
+			this._component.item = value;
+			return;
+		}
+
+		// If the component is already created, but the entity type is different, we need to destroy the component.
 		this.#createController(value.entityType);
 	}
 
