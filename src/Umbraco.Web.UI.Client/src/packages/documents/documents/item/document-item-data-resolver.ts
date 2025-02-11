@@ -1,3 +1,4 @@
+import { UmbDocumentVariantState } from '../types.js';
 import type { UmbDocumentItemModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -91,11 +92,20 @@ export class UmbDocumentItemDataResolver extends UmbControllerBase {
 	}
 
 	/**
+	 * Get the isDraft of the item
+	 * @returns {boolean} The isDraft of the item
+	 * @memberof UmbDocumentItemDataResolver
+	 */
+	getIsDraft(): boolean {
+		return this.getState() === UmbDocumentVariantState.DRAFT || false;
+	}
+
+	/**
 	 * Get the isTrashed of the item
 	 * @returns {boolean | undefined} The isTrashed of the item
 	 * @memberof UmbDocumentItemDataResolver
 	 */
-	isTrashed(): boolean {
+	getIsTrashed(): boolean {
 		return this.#item?.isTrashed ?? false;
 	}
 
