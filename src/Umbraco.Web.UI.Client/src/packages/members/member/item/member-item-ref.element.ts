@@ -61,15 +61,6 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 				},
 			},
 		]);
-
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath(UMB_MEMBER_ENTITY_TYPE)
-			.onSetup(() => {
-				return { data: { entityType: UMB_MEMBER_ENTITY_TYPE, preset: {} } };
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._editPath = routeBuilder({});
-			});
 	}
 
 	#getHref(item: UmbMemberItemModel) {
