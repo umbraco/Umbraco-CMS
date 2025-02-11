@@ -163,8 +163,8 @@ export class UmbWorkspaceActionElement<
 				id="action-button"
 				.href=${this._href}
 				@click=${this.#onClick}
-				look=${this.#manifest?.meta.look || 'default'}
-				color=${this.#manifest?.meta.color || 'default'}
+				look=${this.#manifest?.meta.look ?? 'default'}
+				color=${this.#manifest?.meta.color ?? 'default'}
 				label=${ifDefined(
 					this.#manifest?.meta.label ? this.localize.string(this.#manifest.meta.label) : this.#manifest?.name,
 				)}
@@ -177,8 +177,8 @@ export class UmbWorkspaceActionElement<
 		return html`
 			<umb-workspace-action-menu
 				.items=${this._items}
-				color="${this.#manifest?.meta.color || 'default'}"
-				look="${this.#manifest?.meta.look || 'default'}"></umb-workspace-action-menu>
+				color="${this.#manifest?.meta.color ?? 'default'}"
+				look="${this.#manifest?.meta.look ?? 'default'}"></umb-workspace-action-menu>
 		`;
 	}
 
