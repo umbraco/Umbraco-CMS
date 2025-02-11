@@ -32,6 +32,9 @@ export class UmbDocumentItemDataResolver extends UmbControllerBase {
 	#icon = new UmbStringState(undefined);
 	public readonly icon = this.#icon.asObservable();
 
+	#state = new UmbStringState(undefined);
+	public readonly state = this.#state.asObservable();
+
 	#isTrashed = new UmbBooleanState(undefined);
 	public readonly isTrashed = this.#isTrashed.asObservable();
 
@@ -44,22 +47,19 @@ export class UmbDocumentItemDataResolver extends UmbControllerBase {
 		// We do not depend on this context because we know is it only available in some cases
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
 			this.#propertyDataSetCulture = context.getVariantId();
-			this.#setName();
-			this.#setIsDraft();
+			this.#setObservableValues();
 		});
 
 		this.#init = Promise.all([
 			this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (context) => {
 				this.observe(context.appLanguageCulture, (culture) => {
 					this.#appCulture = culture;
-					this.#setName();
-					this.#setIsDraft();
+					this.#setObservableValues();
 				});
 
 				this.observe(context.appDefaultLanguage, (value) => {
 					this.#defaultCulture = value?.unique;
-					this.#setName();
-					this.#setIsDraft();
+					this.#setObservableValues();
 				});
 			}).asPromise(),
 		]);
@@ -156,6 +156,12 @@ export class UmbDocumentItemDataResolver extends UmbControllerBase {
 		return this.#item?.isTrashed ?? false;
 	}
 
+	#setObservableValues() {
+		this.#setName();
+		this.#setIsDraft();
+		this.#setState();
+	}
+
 	#setName() {
 		const variant = this.#getCurrentVariant();
 		const fallbackName = this.#findVariant(this.#defaultCulture)?.name;
@@ -167,6 +173,12 @@ export class UmbDocumentItemDataResolver extends UmbControllerBase {
 		const variant = this.#getCurrentVariant();
 		const isDraft = variant?.state === UmbDocumentVariantState.DRAFT || false;
 		this.#isDraft.setValue(isDraft);
+	}
+
+	#setState() {
+		const variant = this.#getCurrentVariant();
+		const state = variant?.state || UmbDocumentVariantState.NOT_CREATED;
+		this.#state.setValue(state);
 	}
 
 	#findVariant(culture: string | undefined) {
