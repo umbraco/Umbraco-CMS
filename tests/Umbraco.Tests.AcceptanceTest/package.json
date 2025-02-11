@@ -9,8 +9,8 @@
     "testSqlite": "npx playwright test DefaultConfig --grep-invert \"Users\"",
     "all": "npx playwright test",
     "createTest": "node createTest.js",
-    "smokeTest": "npx playwright test DefaultConfig/Content/Clipboard",
-    "smokeTestSqlite": "npx playwright test DefaultConfig/Content/Clipboard"
+    "smokeTest": "npx playwright test DefaultConfig --grep \"@smoke\"",
+    "smokeTestSqlite": "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\""
   },
   "devDependencies": {
     "@playwright/test": "^1.50",
