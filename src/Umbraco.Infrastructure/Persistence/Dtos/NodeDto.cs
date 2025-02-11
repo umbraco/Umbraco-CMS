@@ -48,7 +48,7 @@ public class NodeDto
     public string Path { get; set; } = null!;
 
     [Column(SortOrderColumnName)]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType_trashed_sorted", ForColumns = "nodeObjectType,trashed,sortOrder,id", IncludeColumns = "uniqued,parentId,level,path,nodeUser,text,createDate")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType_trashed_sorted", ForColumns = "nodeObjectType,trashed,sortOrder,id", IncludeColumns = "uniqueId,parentId,level,path,nodeUser,text,createDate")]
     public int SortOrder { get; set; }
 
     [Column(TrashedColumnName)]
