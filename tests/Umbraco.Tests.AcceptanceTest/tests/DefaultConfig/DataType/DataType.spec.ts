@@ -17,7 +17,7 @@ test('can create a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) 
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
   await umbracoUi.dataType.clickActionsMenuCreateButton();
-  await umbracoUi.dataType.clickNewDataTypeButton();
+  await umbracoUi.dataType.clickDataTypeButton();
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor('Text Box');
@@ -87,7 +87,7 @@ test('cannot create a data type without selecting the property editor', {tag: '@
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
   await umbracoUi.dataType.clickActionsMenuCreateButton();
-  await umbracoUi.dataType.clickNewDataTypeButton();
+  await umbracoUi.dataType.clickDataTypeButton();
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
   await umbracoUi.dataType.clickSaveButton();
 

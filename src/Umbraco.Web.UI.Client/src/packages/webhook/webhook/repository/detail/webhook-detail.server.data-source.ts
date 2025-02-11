@@ -41,6 +41,8 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 			events: [],
 			enabled: true,
 			url: '',
+			name: '',
+			description: '',
 			contentTypes: [],
 			...preset,
 		};
@@ -71,6 +73,8 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 			events: data.events,
 			enabled: data.enabled,
 			url: data.url,
+			name: data.name,
+			description: data.description,
 			contentTypes: data.contentTypeKeys,
 		};
 
@@ -93,6 +97,8 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 			events: model.events.map((event) => event.alias),
 			enabled: model.enabled,
 			url: model.url,
+			name: model.name,
+			description: model.description,
 			contentTypeKeys: model.contentTypes,
 		};
 
@@ -126,6 +132,8 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 			events: model.events.map((event) => event.alias),
 			enabled: model.enabled,
 			url: model.url,
+			name: model.name,
+			description: model.description,
 			contentTypeKeys: model.contentTypes,
 		};
 
