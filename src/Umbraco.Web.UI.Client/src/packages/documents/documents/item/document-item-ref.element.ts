@@ -43,6 +43,21 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	standalone = false;
 
 	@state()
+	_unique = '';
+
+	@state()
+	_name = '';
+
+	@state()
+	_icon = '';
+
+	@state()
+	_isTrashed = false;
+
+	@state()
+	_isDraft = false;
+
+	@state()
 	_editPath = '';
 
 	@state()
@@ -57,7 +72,16 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	#modalRoute?: any;
 
 	#getHref() {
-		return `${this._editPath}/edit/${this.#item.getUnique()}`;
+		return `${this._editPath}/edit/${this._unique}`;
+	}
+
+	constructor() {
+		super();
+		this.#item.observe(this.#item.unique, (unique) => (this._unique = unique ?? ''));
+		this.#item.observe(this.#item.name, (name) => (this._name = name ?? ''));
+		this.#item.observe(this.#item.icon, (icon) => (this._icon = icon ?? ''));
+		this.#item.observe(this.#item.isTrashed, (isTrashed) => (this._isTrashed = isTrashed ?? false));
+		this.#item.observe(this.#item.isDraft, (isDraft) => (this._isDraft = isDraft ?? false));
 	}
 
 	override render() {
@@ -65,7 +89,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 
 		return html`
 			<uui-ref-node
-				name=${this.#item.getName()}
+				name=${this._name}
 				href=${ifDefined(this.#getHref())}
 				?readonly=${this.readonly}
 				?standalone=${this.standalone}>
@@ -76,18 +100,17 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	}
 
 	#renderIcon() {
-		const icon = this.#item.getIcon();
-		if (!icon) return nothing;
-		return html`<umb-icon slot="icon" name=${ifDefined(icon)}></umb-icon>`;
+		if (!this._icon) return nothing;
+		return html`<umb-icon slot="icon" name=${this._icon}></umb-icon>`;
 	}
 
 	#renderIsTrashed() {
-		if (!this.#item.getIsTrashed()) return nothing;
+		if (!this._isTrashed) return nothing;
 		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
 	}
 
 	#renderIsDraft() {
-		if (!this.#item.getIsDraft()) return nothing;
+		if (!this._isDraft) return nothing;
 		return html`<uui-tag size="s" slot="tag" look="secondary" color="default">Draft</uui-tag>`;
 	}
 }
