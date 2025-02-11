@@ -16,8 +16,11 @@ import './content-editor-tab.element.js';
 
 @customElement('umb-content-workspace-view-edit')
 export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	//@state()
-	//private _hasRootProperties = false;
+	/*
+	// root properties is a possible feature with Bellissima, but as it is new its not fully implemented yet [NL]
+	@state()
+	private _hasRootProperties = false;
+  */
 
 	@state()
 	private _hasRootGroups = false;
@@ -78,6 +81,16 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		if (!this._tabs || !this.#structureManager) return;
 		const routes: UmbRoute[] = [];
 
+		if (this._hasRootGroups) {
+			routes.push({
+				path: `root`,
+				component: () => import('./content-editor-tab.element.js'),
+				setup: (component) => {
+					(component as UmbContentWorkspaceViewEditTabElement).containerId = null;
+				},
+			});
+		}
+
 		if (this._tabs.length > 0) {
 			this._tabs?.forEach((tab) => {
 				const tabName = tab.name ?? '';
@@ -91,23 +104,11 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 			});
 		}
 
-		if (this._hasRootGroups) {
+		if (routes.length !== 0) {
 			routes.push({
 				path: '',
-				component: () => import('./content-editor-tab.element.js'),
-				setup: (component) => {
-					(component as UmbContentWorkspaceViewEditTabElement).containerId = null;
-				},
+				redirectTo: routes[0].path,
 			});
-		}
-
-		if (routes.length !== 0) {
-			if (!this._hasRootGroups) {
-				routes.push({
-					path: '',
-					redirectTo: routes[0]?.path,
-				});
-			}
 
 			routes.push({
 				path: `**`,
@@ -127,10 +128,10 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 							${this._hasRootGroups && this._tabs.length > 0
 								? html`
 										<uui-tab
-											label="Content"
-											.active=${this._routerPath + '/' === this._activePath}
-											href=${this._routerPath + '/'}
-											>Content</uui-tab
+											label="Generic"
+											.active=${this._routerPath + '/root' === this._activePath}
+											href=${this._routerPath + '/root'}
+											>Generic</uui-tab
 										>
 									`
 								: ''}
