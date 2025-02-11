@@ -162,14 +162,14 @@ export class UmbWorkspaceActionElement<
 			<uui-button
 				data-mark="workspace-action:${this.#manifest?.alias}"
 				.href=${this._href}
-				@click=${this.#onClick}
 				look=${this.#manifest?.meta.look ?? 'default'}
 				color=${this.#manifest?.meta.color ?? 'default'}
 				label=${ifDefined(
 					this.#manifest?.meta.label ? this.localize.string(this.#manifest.meta.label) : this.#manifest?.name,
 				)}
 				.disabled=${this._isDisabled}
-				.state=${this._buttonState}></uui-button>
+				.state=${this._buttonState}
+				@click=${this.#onClick}></uui-button>
 		`;
 	}
 
