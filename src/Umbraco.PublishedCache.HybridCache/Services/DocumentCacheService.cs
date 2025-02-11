@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
@@ -24,8 +25,11 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     private readonly IEnumerable<IDocumentSeedKeyProvider> _seedKeyProviders;
     private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IPreviewService _previewService;
+    private readonly IPublishStatusQueryService _publishStatusQueryService;
+    private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private readonly CacheSettings _cacheSettings;
     private HashSet<Guid>? _seedKeys;
+
     private HashSet<Guid> SeedKeys
     {
         get
@@ -56,7 +60,9 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         IEnumerable<IDocumentSeedKeyProvider> seedKeyProviders,
         IOptions<CacheSettings> cacheSettings,
         IPublishedModelFactory publishedModelFactory,
-        IPreviewService previewService)
+        IPreviewService previewService,
+        IPublishStatusQueryService publishStatusQueryService,
+        IDocumentNavigationQueryService documentNavigationQueryService)
     {
         _databaseCacheRepository = databaseCacheRepository;
         _idKeyMap = idKeyMap;
@@ -67,6 +73,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         _seedKeyProviders = seedKeyProviders;
         _publishedModelFactory = publishedModelFactory;
         _previewService = previewService;
+        _publishStatusQueryService = publishStatusQueryService;
+        _documentNavigationQueryService = documentNavigationQueryService;
         _cacheSettings = cacheSettings.Value;
     }
 
@@ -101,6 +109,20 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             {
                 using ICoreScope scope = _scopeProvider.CreateCoreScope();
                 ContentCacheNode? contentCacheNode = await _databaseCacheRepository.GetContentSourceAsync(key, preview);
+
+                // If we can resolve the content cache node, we still need to check if the ancestor path is published.
+                // This does cost some performance, but it's necessary to ensure that the content is actually published.
+                // When unpublishing a node, a payload with RefreshBranch is published, so we don't have to worry about this.
+                // Similarly, when a branch is published, next time the content is requested, the parent will be published,
+                // this works because we don't cache null values.
+                if (preview is false && contentCacheNode is not null)
+                {
+                    if (HasPublishedAncestorPath(contentCacheNode.Key) is false)
+                    {
+                        return null;
+                    }
+                }
+
                 scope.Complete();
                 return contentCacheNode;
             },
@@ -114,6 +136,26 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         }
 
         return _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview).CreateModel(_publishedModelFactory);
+    }
+
+    private bool HasPublishedAncestorPath(Guid contentKey)
+    {
+        var success = _documentNavigationQueryService.TryGetAncestorsKeys(contentKey, out IEnumerable<Guid> keys);
+        if (success is false)
+        {
+            // This SHOULD never happen, since we already found the content in the cache, so if it does, we want to explode.
+            throw new InvalidOperationException($"{contentKey} not found in navigation structure.");
+        }
+
+        foreach (Guid key in keys)
+        {
+            if (_publishStatusQueryService.IsDocumentPublishedInAnyCulture(key) is false)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private bool GetPreview()
@@ -195,7 +237,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             var cacheKey = GetCacheKey(key, false);
 
                 // We'll use GetOrCreateAsync because it may be in the second level cache, in which case we don't have to re-seed.
-                ContentCacheNode? cachedValue = await _hybridCache.GetOrCreateAsync<ContentCacheNode?>(
+            ContentCacheNode? cachedValue = await _hybridCache.GetOrCreateAsync<ContentCacheNode?>(
                     cacheKey,
                     async cancel =>
                     {
@@ -212,13 +254,13 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
                         return cacheNode;
                     },
-                GetSeedEntryOptions(),
-                cancellationToken: cancellationToken);
+                    GetSeedEntryOptions(),
+                    cancellationToken: cancellationToken);
 
                 // If the value is null, it's likely because
-                if (cachedValue is null)
+            if (cachedValue is null)
             {
-                await _hybridCache.RemoveAsync(cacheKey);
+                await _hybridCache.RemoveAsync(cacheKey, cancellationToken);
             }
         }
     }
