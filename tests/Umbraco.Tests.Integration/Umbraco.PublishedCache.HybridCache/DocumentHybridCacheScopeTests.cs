@@ -3,6 +3,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -59,6 +60,9 @@ public class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEd
             scope.Complete();
         }
 
+        var navigationService = GetRequiredService<IDocumentNavigationManagementService>();
+        await navigationService.RebuildAsync();
+
         // Act
         var publishedPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId);
 
@@ -74,6 +78,10 @@ public class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEd
             await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
             scope.Complete();
         }
+
+        var navigationService = GetRequiredService<IDocumentNavigationManagementService>();
+        await navigationService.RebuildAsync();
+
 
         // Act
         var publishedPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value);
