@@ -600,7 +600,6 @@ stages:
           # Test
           - pwsh: $(testCommand)
             displayName: Run Playwright tests
-            continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
             env:
               CI: true
@@ -757,7 +756,6 @@ stages:
           # Test
           - pwsh: $(testCommand)
             displayName: Run Playwright tests
-            continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
             env:
               CI: true
@@ -805,7 +803,7 @@ stages:
     dependsOn:
       - Unit
       - Integration
-    #      - E2E
+      - E2E
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.myGetDeploy}}))
     jobs:
       - job:
