@@ -1175,7 +1175,7 @@ public class ContentController : ContentControllerBase
                     break;
                 }
 
-                var publishStatus = PublishBranchInternal(contentItem, GetPublishBranchForceOptions(contentItem.Action), cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
+                var publishStatus = PublishBranchInternal(contentItem, BuildPublishBranchFilter(contentItem.Action), cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
                 var addedDomainWarnings = AddDomainWarnings(publishStatus, successfulCultures, globalNotifications, defaultCulture);
                 AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
                 if (addedDomainWarnings is false)
@@ -1233,7 +1233,7 @@ public class ContentController : ContentControllerBase
         return display;
     }
 
-    private static PublishBranchFilter GetPublishBranchForceOptions(ContentSaveAction contentSaveAction)
+    private static PublishBranchFilter BuildPublishBranchFilter(ContentSaveAction contentSaveAction)
     {
         var includeUnpublished = contentSaveAction == ContentSaveAction.PublishWithDescendantsIncludeUnpublished
                                || contentSaveAction == ContentSaveAction.PublishWithDescendantsIncludeUnpublishedNew
