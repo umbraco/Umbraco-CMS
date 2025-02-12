@@ -213,7 +213,10 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         ContentCacheNode? publishedNode = await _databaseCacheRepository.GetContentSourceAsync(key, false);
         if (publishedNode is not null)
         {
-            await _hybridCache.SetAsync(GetCacheKey(publishedNode.Key, false), publishedNode, GetEntryOptions(publishedNode.Key));
+            if (HasPublishedAncestorPath(publishedNode.Key))
+            {
+                await _hybridCache.SetAsync(GetCacheKey(publishedNode.Key, false), publishedNode, GetEntryOptions(publishedNode.Key));
+            }
         }
 
         scope.Complete();
