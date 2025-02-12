@@ -122,7 +122,7 @@ public class MemberUserStoreTests
         _mockMemberService
             .Setup(x => x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(mockMember);
-        _mockMemberService.Setup(x => x.Save(mockMember, false));
+        _mockMemberService.Setup(x => x.Save(mockMember, PublishNotificationSaveOptions.Saving));
 
         // act
         var identityResult = await sut.CreateAsync(fakeUser, CancellationToken.None);
@@ -132,7 +132,7 @@ public class MemberUserStoreTests
         Assert.IsTrue(!identityResult.Errors.Any());
         _mockMemberService.Verify(x =>
             x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
-        _mockMemberService.Verify(x => x.Save(mockMember, false));
+        _mockMemberService.Verify(x => x.Save(mockMember, PublishNotificationSaveOptions.Saving));
     }
 
     [Test]

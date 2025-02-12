@@ -747,9 +747,10 @@ namespace Umbraco.Cms.Core.Services
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
-            if (publishNotificationSaveOptions is PublishNotificationSaveOptions.All or PublishNotificationSaveOptions.Saving)
+            MemberSavingNotification? savingNotification = null;
+            if (publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.Saving) || publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.All))
             {
-                var savingNotification = new MemberSavingNotification(member, evtMsgs);
+                savingNotification = new MemberSavingNotification(member, evtMsgs);
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
@@ -766,10 +767,12 @@ namespace Umbraco.Cms.Core.Services
 
             _memberRepository.Save(member);
 
-            if (publishNotificationSaveOptions is PublishNotificationSaveOptions.All or PublishNotificationSaveOptions.Saved)
+            if (publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.Saved) || publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.All))
             {
-                var savingNotification = new MemberSavingNotification(member, evtMsgs);
-                scope.Notifications.Publish(new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
+                scope.Notifications.Publish(
+                    savingNotification is null
+                    ? new MemberSavedNotification(member, evtMsgs)
+                    : new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
             }
 
             Audit(AuditType.Save, 0, member.Id);
