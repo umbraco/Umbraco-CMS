@@ -6,7 +6,6 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -25,10 +24,6 @@ public class DocumentHybridCacheAncestryTests : UmbracoIntegrationTestWithConten
     private IPublishedContentCache PublishedContentCache => GetRequiredService<IPublishedContentCache>();
 
     private IDocumentCacheService DocumentCacheService => GetRequiredService<IDocumentCacheService>();
-
-    private IPublishStatusManagementService PublishStatusManagementService => GetRequiredService<IPublishStatusManagementService>();
-
-    private IDocumentNavigationManagementService DocumentNavigationManagementService => GetRequiredService<IDocumentNavigationManagementService>();
 
     private Content SubSubPage;
 
