@@ -59,7 +59,8 @@ export abstract class UmbTiptapToolbarElementApiBase extends UmbControllerBase i
 	 * @see {ManifestTiptapToolbarExtension}
 	 * @param {Editor} editor The editor instance.
 	 */
-	public abstract execute(editor?: Editor): void;
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	public execute(editor?: Editor): void {}
 
 	/**
 	 * Informs the toolbar element if it is active or not. It uses the manifest meta alias to check if the toolbar element is active.
