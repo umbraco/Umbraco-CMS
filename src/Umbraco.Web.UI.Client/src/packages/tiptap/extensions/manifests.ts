@@ -460,6 +460,19 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 			label: '#general_embed',
 		},
 	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.StyleSelect',
+		name: 'Style Select Tiptap Extension',
+		api: () => import('./toolbar/redo.tiptap-toolbar-api.js'),
+		element: () => import('./toolbar/style-select.tiptap-toolbar-api.js'),
+		meta: {
+			alias: 'umbStyleSelect',
+			icon: 'icon-code',
+			label: 'Style Select',
+		},
+	},
 ];
 
 const extensions = [...coreExtensions, ...toolbarExtensions, ...tableExtensions];

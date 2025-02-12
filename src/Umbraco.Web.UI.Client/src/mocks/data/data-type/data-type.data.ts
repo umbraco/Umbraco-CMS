@@ -1033,7 +1033,13 @@ export const data: Array<UmbMockDataTypeModel> = [
 			},
 			{
 				alias: 'toolbar',
-				value: [[['Umb.Tiptap.Toolbar.Table'], ['Umb.Tiptap.Toolbar.Heading1', 'Umb.Tiptap.Toolbar.SourceEditor']]],
+				value: [
+					[
+						['Umb.Tiptap.Toolbar.StyleSelect'],
+						['Umb.Tiptap.Toolbar.Table'],
+						['Umb.Tiptap.Toolbar.Heading1', 'Umb.Tiptap.Toolbar.SourceEditor'],
+					],
+				],
 			},
 			{ alias: 'dimensions', value: { height: 500 } },
 			{ alias: 'maxImageSize', value: 500 },
