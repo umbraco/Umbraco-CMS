@@ -287,10 +287,6 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	}
 
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
-		if (!option.variant) {
-			// Not created variants are not publishable
-			return false;
-		}
 		const readOnlyCultures =
 			this.#documentWorkspaceContext?.readOnlyState.getStates().map((s) => s.variantId.culture) ?? [];
 		return readOnlyCultures.includes(option.culture) === false;

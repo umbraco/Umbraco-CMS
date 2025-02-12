@@ -482,10 +482,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	protected _saveableVariantsFilter = (option: VariantOptionModelType) => {
-		if (!option.variant) {
-			// If not created then it cannot be picked.
-			return false;
-		}
 		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
 		return readOnlyCultures.includes(option.culture) === false;
 	};

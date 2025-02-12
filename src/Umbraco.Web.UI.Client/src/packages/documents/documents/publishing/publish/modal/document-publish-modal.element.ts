@@ -21,6 +21,13 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 	@state()
 	_hasNotSelectedMandatory?: boolean;
 
+	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
+		if (!option.variant || option.variant.state === UmbDocumentVariantState.NOT_CREATED) {
+			return false;
+		}
+		return this.data?.pickableFilter ? this.data.pickableFilter(option) : true;
+	};
+
 	override firstUpdated() {
 		this.#configureSelectionManager();
 	}
@@ -41,9 +48,7 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 
 		let selected = this.value?.selection ?? [];
 
-		const validOptions = this.data?.pickableFilter
-			? this._options.filter((o) => this.data!.pickableFilter!(o))
-			: this._options;
+		const validOptions = this._options.filter((o) => this.#pickableFilter(o));
 
 		// Filter selection based on options:
 		selected = selected.filter((s) => validOptions.some((o) => o.unique === s));
@@ -91,7 +96,7 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 				.selectionManager=${this.#selectionManager}
 				.variantLanguageOptions=${this._options}
 				.requiredFilter=${isNotPublishedMandatory}
-				.pickableFilter=${this.data?.pickableFilter}></umb-document-variant-language-picker>
+				.pickableFilter=${this.#pickableFilter}></umb-document-variant-language-picker>
 
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>

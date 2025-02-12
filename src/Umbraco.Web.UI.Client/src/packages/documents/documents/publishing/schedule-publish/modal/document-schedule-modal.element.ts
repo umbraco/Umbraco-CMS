@@ -1,4 +1,5 @@
-import type { UmbDocumentVariantOptionModel } from '../../../types.js';
+import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
+import { isNotPublishedMandatory } from '../../utils.js';
 import { UmbDocumentVariantLanguagePickerElement } from '../../../modals/index.js';
 import type { UmbDocumentScheduleModalData, UmbDocumentScheduleModalValue } from './document-schedule-modal.token.js';
 import { css, customElement, html, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
@@ -19,10 +20,21 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	_options: Array<UmbDocumentVariantOptionModel> = [];
 
 	@state()
+	_hasNotSelectedMandatory?: boolean;
+
+	@state()
 	_selection: UmbDocumentScheduleModalValue['selection'] = [];
 
 	@state()
 	_isAllSelected?: boolean;
+
+	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
+		if (!option.variant || option.variant.state === UmbDocumentVariantState.NOT_CREATED) {
+			// If not data present, then its not pickable.
+			return false;
+		}
+		return this.data?.pickableFilter ? this.data.pickableFilter(option) : true;
+	};
 
 	constructor() {
 		super();
@@ -46,21 +58,22 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setMultiple(true);
 		this.#selectionManager.setSelectable(true);
 
-		const pickableFilter = this.data?.pickableFilter;
+		this.#selectionManager.setAllowLimitation((unique) => {
+			const option = this._options.find((o) => o.unique === unique);
+			return option ? this.#pickableFilter(option) : true;
+		});
 
-		if (pickableFilter) {
-			this.#selectionManager.setAllowLimitation((unique) => {
-				const option = this.data?.options.find((o) => o.unique === unique);
-				return option ? pickableFilter(option) : true;
-			});
-		}
+		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes.
+		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
+		this._options =
+			this.data?.options.filter(
+				(option) =>
+					(option.variant && option.variant.state === null) ||
+					isNotPublishedMandatory(option) ||
+					option.variant?.state !== UmbDocumentVariantState.NOT_CREATED,
+			) ?? [];
 
-		// Only display variants that are relevant to pick from, i.e. variants that are draft or published with pending changes:
-		this._options = this.data?.options ?? [];
-
-		const validOptions = this.data?.pickableFilter
-			? this._options.filter((o) => this.data!.pickableFilter!(o))
-			: this._options;
+		const validOptions = this._options.filter((o) => this.#pickableFilter!(o));
 
 		let selected = this.value?.selection ?? [];
 
@@ -68,6 +81,18 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		selected = selected.filter((s) => validOptions.some((o) => o.unique === s.unique));
 
 		this.#selectionManager.setSelection(selected.map((s) => s.unique));
+
+		this.observe(
+			this.#selectionManager.selection,
+			(selection: Array<string>) => {
+				if (!this._options && !selection) return;
+
+				//Getting not published mandatory options — the options that are mandatory and not currently published.
+				const missingMandatoryOptions = this._options.filter(isNotPublishedMandatory);
+				this._hasNotSelectedMandatory = missingMandatoryOptions.some((option) => !selection.includes(option.unique));
+			},
+			'observeSelection',
+		);
 	}
 
 	#submit() {
@@ -126,6 +151,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 					label="${this.localize.term('buttons_schedulePublish')}"
 					look="primary"
 					color="positive"
+					?disabled=${this._hasNotSelectedMandatory}
 					@click=${this.#submit}></uui-button>
 			</div>
 		</umb-body-layout> `;
@@ -147,7 +173,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	#renderItem(option: UmbDocumentVariantOptionModel) {
-		const pickable = this.data?.pickableFilter ? this.data.pickableFilter(option) : () => true;
+		const pickable = this.#pickableFilter(option);
 
 		return html`
 			<uui-menu-item
