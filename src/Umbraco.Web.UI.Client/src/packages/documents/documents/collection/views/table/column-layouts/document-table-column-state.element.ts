@@ -26,7 +26,7 @@ export class UmbDocumentTableColumnStateElement extends UmbLitElement implements
 	@state()
 	_state = '';
 
-	#item = new UmbDocumentItemDataResolver<UmbDocumentCollectionItemModel>(this);
+	#item = new UmbDocumentItemDataResolver(this);
 
 	constructor() {
 		super();

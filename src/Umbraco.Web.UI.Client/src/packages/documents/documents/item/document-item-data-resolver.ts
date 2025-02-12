@@ -21,7 +21,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	#defaultCulture?: string;
 	#appCulture?: string;
 	#propertyDataSetCulture?: UmbVariantId;
-	#data?: UmbDocumentItemDataResolverModel | undefined;
+	#data?: DataType | undefined;
 
 	#init: Promise<[UmbAppLanguageContext]>;
 
@@ -73,7 +73,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	getData(): DataType | undefined {
-		return this.#data as DataType;
+		return this.#data;
 	}
 
 	/**

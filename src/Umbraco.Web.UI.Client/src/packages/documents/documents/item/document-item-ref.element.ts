@@ -9,7 +9,7 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 @customElement('umb-document-item-ref')
 export class UmbDocumentItemRefElement extends UmbLitElement {
-	#item = new UmbDocumentItemDataResolver(this);
+	#item = new UmbDocumentItemDataResolver<UmbDocumentItemModel>(this);
 
 	@property({ type: Object })
 	public get item(): UmbDocumentItemModel | undefined {
