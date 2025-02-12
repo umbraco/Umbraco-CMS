@@ -1009,7 +1009,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 "PostSave");
 
             var action = "publishWithDescendants";
-            if (includeUnpublished === true && forceRepublish) {
+            if (includeUnpublished === true && forceRepublish === true) {
                 action += "IncludeUnpublishedAndForceRepublish";
             } else if (includeUnpublished === true) {
                 action += "IncludeUnpublished";
