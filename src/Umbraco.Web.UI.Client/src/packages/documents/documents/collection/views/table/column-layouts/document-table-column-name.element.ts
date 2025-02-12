@@ -18,7 +18,7 @@ export class UmbDocumentTableColumnNameElement extends UmbLitElement implements 
 		this.#value = value;
 
 		if (value.item) {
-			this.#item.setItem(value.item);
+			this.#item.setData(value.item);
 		}
 	}
 

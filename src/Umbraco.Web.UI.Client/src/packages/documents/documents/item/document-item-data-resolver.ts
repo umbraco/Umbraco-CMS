@@ -9,17 +9,19 @@ import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observa
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
+type UmbDocumentItemDataResolverModel = Omit<UmbDocumentItemModel, 'parent' | 'hasChildren' | 'isProtected'>;
+
 /**
  * A controller for resolving data for a document item
  * @exports
  * @class UmbDocumentItemDataResolver
  * @augments {UmbControllerBase}
  */
-export class UmbDocumentItemDataResolver extends UmbControllerBase {
+export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataResolverModel> extends UmbControllerBase {
 	#defaultCulture?: string;
 	#appCulture?: string;
 	#propertyDataSetCulture?: UmbVariantId;
-	#item?: UmbDocumentItemModel | undefined;
+	#data?: UmbDocumentItemDataResolverModel | undefined;
 
 	#init: Promise<[UmbAppLanguageContext]>;
 
@@ -67,22 +69,22 @@ export class UmbDocumentItemDataResolver extends UmbControllerBase {
 
 	/**
 	 * Get the current item
-	 * @returns {UmbDocumentItemModel | undefined} The current item
+	 * @returns {DataType | undefined} The current item
 	 * @memberof UmbDocumentItemDataResolver
 	 */
-	getItem(): UmbDocumentItemModel | undefined {
-		return this.#item;
+	getData(): DataType | undefined {
+		return this.#data as DataType;
 	}
 
 	/**
 	 * Set the current item
-	 * @param {UmbDocumentItemModel | undefined} item The current item
+	 * @param {DataType | undefined} data The current item
 	 * @memberof UmbDocumentItemDataResolver
 	 */
-	setItem(item: UmbDocumentItemModel | undefined) {
-		this.#item = item;
+	setData(data: DataType | undefined) {
+		this.#data = data;
 
-		if (!this.#item) {
+		if (!this.#data) {
 			this.#unique.setValue(undefined);
 			this.#name.setValue(undefined);
 			this.#icon.setValue(undefined);
@@ -91,9 +93,9 @@ export class UmbDocumentItemDataResolver extends UmbControllerBase {
 			return;
 		}
 
-		this.#unique.setValue(this.#item.unique);
-		this.#icon.setValue(this.#item.documentType.icon);
-		this.#isTrashed.setValue(this.#item.isTrashed);
+		this.#unique.setValue(this.#data.unique);
+		this.#icon.setValue(this.#data.documentType.icon);
+		this.#isTrashed.setValue(this.#data.isTrashed);
 		this.#setVariantAwareValues();
 	}
 
@@ -124,7 +126,7 @@ export class UmbDocumentItemDataResolver extends UmbControllerBase {
 	 */
 	async getIcon(): Promise<string | undefined> {
 		await this.#init;
-		return this.#item?.documentType.icon;
+		return this.#data?.documentType.icon;
 	}
 
 	/**
@@ -154,7 +156,7 @@ export class UmbDocumentItemDataResolver extends UmbControllerBase {
 	 */
 	async getIsTrashed(): Promise<boolean> {
 		await this.#init;
-		return this.#item?.isTrashed ?? false;
+		return this.#data?.isTrashed ?? false;
 	}
 
 	#setVariantAwareValues() {
@@ -183,12 +185,12 @@ export class UmbDocumentItemDataResolver extends UmbControllerBase {
 	}
 
 	#findVariant(culture: string | undefined) {
-		return this.#item?.variants.find((x) => x.culture === culture);
+		return this.#data?.variants.find((x) => x.culture === culture);
 	}
 
 	#getCurrentVariant() {
 		if (this.#isInvariant()) {
-			return this.#item?.variants?.[0];
+			return this.#data?.variants?.[0];
 		}
 
 		const culture = this.#propertyDataSetCulture?.culture || this.#appCulture;
@@ -196,6 +198,6 @@ export class UmbDocumentItemDataResolver extends UmbControllerBase {
 	}
 
 	#isInvariant() {
-		return this.#item?.variants?.[0]?.culture === null;
+		return this.#data?.variants?.[0]?.culture === null;
 	}
 }

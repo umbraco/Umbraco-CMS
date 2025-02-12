@@ -28,7 +28,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 
 	public override setTreeItem(treeItem: UmbDocumentTreeItemModel | undefined) {
 		super.setTreeItem(treeItem);
-		this.#item.setItem(treeItem);
+		this.#item.setData(treeItem);
 	}
 }
 

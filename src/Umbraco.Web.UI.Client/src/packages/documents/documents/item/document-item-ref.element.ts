@@ -13,11 +13,11 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 
 	@property({ type: Object })
 	public get item(): UmbDocumentItemModel | undefined {
-		return this.#item.getItem();
+		return this.#item.getData();
 	}
 	public set item(value: UmbDocumentItemModel | undefined) {
-		const oldValue = this.#item.getItem();
-		this.#item.setItem(value);
+		const oldValue = this.#item.getData();
+		this.#item.setData(value);
 
 		if (!value) {
 			this.#modalRoute?.destroy();
