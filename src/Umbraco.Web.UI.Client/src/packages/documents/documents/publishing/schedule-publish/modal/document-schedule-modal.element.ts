@@ -72,12 +72,12 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				(option) => option.variant && option.variant.state !== UmbDocumentVariantState.NOT_CREATED,
 			) ?? [];
 
-		let selected = this.value?.selection ?? [];
+		let selected = this.data?.activeVariants ?? [];
 
 		// Filter selection based on options:
-		selected = selected.filter((s) => this._options.some((o) => o.unique === s.unique));
+		selected = selected.filter((s) => this._options.some((o) => o.unique === s));
 
-		this.#selectionManager.setSelection(selected.map((s) => s.unique));
+		this.#selectionManager.setSelection(selected);
 	}
 
 	#submit() {
@@ -185,7 +185,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				<div>
 					<umb-input-date
 						type="datetime-local"
-						.value=${this.#getFromDate(option.unique)}
+						.value=${this.#formatDate(option.variant?.scheduledPublishDate)}
 						@change=${(e: Event) => this.#onFromDateChange(e, option.unique)}
 						label=${this.localize.term('general_publishDate')}></umb-input-date>
 				</div>
@@ -195,22 +195,12 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				<div>
 					<umb-input-date
 						type="datetime-local"
-						.value=${this.#getToDate(option.unique)}
+						.value=${this.#formatDate(option.variant?.scheduledUnpublishDate)}
 						@change=${(e: Event) => this.#onToDateChange(e, option.unique)}
 						label=${this.localize.term('general_publishDate')}></umb-input-date>
 				</div>
 			</uui-form-layout-item>
 		</div>`;
-	}
-
-	#getFromDate(unique: string) {
-		const variant = this._selection.find((s) => s.unique === unique);
-		return this.#formatDate(variant?.schedule?.publishTime);
-	}
-
-	#getToDate(unique: string) {
-		const variant = this._selection.find((s) => s.unique === unique);
-		return this.#formatDate(variant?.schedule?.unpublishTime);
 	}
 
 	/**

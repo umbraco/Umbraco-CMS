@@ -90,12 +90,16 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			.open(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
 				data: {
 					options,
+					activeVariants: selected,
 					pickableFilter: this.#readOnlyLanguageVariantsFilter,
 				},
 				value: {
-					selection: selected.map((unique) => ({
-						unique,
-						schedule: this.#getScheduleForModal(unique, options),
+					selection: options.map((option) => ({
+						unique: option.unique,
+						schedule: {
+							publishTime: option.variant?.scheduledPublishDate,
+							unpublishTime: option.variant?.scheduledUnpublishDate,
+						},
 					})),
 				},
 			})
@@ -127,21 +131,6 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
 			this.#eventContext?.dispatchEvent(structureEvent);
 		}
-	}
-
-	#getScheduleForModal(unique: string, options: UmbDocumentVariantOptionModel[]) {
-		const matchingOptions = options.filter(
-			(o) => o.culture === unique || (o.culture === null && unique === 'invariant'),
-		);
-		if (matchingOptions.length === 0) {
-			return {};
-		}
-
-		const matchingOption = matchingOptions[0];
-		return {
-			publishTime: matchingOption.variant?.scheduledPublishDate,
-			unpublishTime: matchingOption.variant?.scheduledUnpublishDate,
-		};
 	}
 
 	/**
