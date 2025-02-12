@@ -1,6 +1,10 @@
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
 import { UmbDocumentVariantLanguagePickerElement } from '../../../modals/index.js';
-import type { UmbDocumentScheduleModalData, UmbDocumentScheduleModalValue } from './document-schedule-modal.token.js';
+import type {
+	UmbDocumentScheduleModalData,
+	UmbDocumentScheduleModalValue,
+	UmbDocumentScheduleSelectionModel,
+} from './document-schedule-modal.token.js';
 import { css, customElement, html, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -29,7 +33,8 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		this.observe(
 			this.#selectionManager.selection,
 			(selection) => {
-				this._selection = selection.map((unique) => {
+				// New selections are mapped to the schedule data
+				this._selection = selection.map<UmbDocumentScheduleSelectionModel>((unique) => {
 					return { unique, schedule: this.#getSchedule(unique) };
 				});
 				this._isAllSelected = this.#isAllSelected();
@@ -38,13 +43,9 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		);
 	}
 
-	#getSchedule(unique: string) {
-		const matchedItem = this.value?.selection.filter((s) => s.unique === unique);
-		if (matchedItem.length === 0) {
-			return {};
-		}
-
-		return matchedItem[0].schedule;
+	#getSchedule(unique: string): UmbDocumentScheduleSelectionModel['schedule'] {
+		const matchedItem = this.value?.selection.find((s) => s.unique === unique);
+		return matchedItem?.schedule ?? {};
 	}
 
 	override firstUpdated() {
