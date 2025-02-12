@@ -39,7 +39,6 @@ test('can rename a media file', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
   // Arrange
-  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.media.clickLabelWithName(wrongMediaFileName, true);
   await umbracoUi.media.enterMediaItemName(mediaFileName);
   await umbracoUi.media.clickSaveButton();
@@ -51,12 +50,12 @@ test('can rename a media file', async ({umbracoApi, umbracoUi}) => {
 });
 
 const mediaFileTypes = [
-  {fileName: 'Article', filePath: 'Article.pdf'},
-  {fileName: 'Audio', filePath: 'Audio.mp3'},
-  {fileName: 'File', filePath: 'File.txt'},
-  {fileName: 'Image', filePath: 'Umbraco.png'},
-  {fileName: 'Vector Graphics (SVG)', filePath: 'VectorGraphics.svg'},
-  {fileName: 'Video', filePath: 'Video.mp4'}
+  {fileName: 'Article', filePath: 'Article.pdf', thumbnail: 'icon-article'},
+  {fileName: 'Audio', filePath: 'Audio.mp3', thumbnail: 'icon-audio-lines'},
+  {fileName: 'File', filePath: 'File.txt', thumbnail: 'icon-document'},
+  {fileName: 'Image', filePath: 'Umbraco.png', thumbnail: 'image'},
+  {fileName: 'Vector Graphics (SVG)', filePath: 'VectorGraphics.svg', thumbnail: 'image'},
+  {fileName: 'Video', filePath: 'Video.mp4', thumbnail: 'icon-video'}
 ];
 
 for (const mediaFileType of mediaFileTypes) {
@@ -73,6 +72,8 @@ for (const mediaFileType of mediaFileTypes) {
 
     // Assert
     await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+    const mediaData = await umbracoApi.media.getByName(mediaFileType.fileName);
+    await umbracoUi.media.doesMediaHaveThumbnail(mediaData.id, mediaFileType.thumbnail, mediaData.urls[0].url);
     await umbracoUi.media.reloadMediaTree();
     await umbracoUi.media.isMediaTreeItemVisible(mediaFileType.fileName);
     expect(await umbracoApi.media.doesNameExist(mediaFileType.fileName)).toBeTruthy();

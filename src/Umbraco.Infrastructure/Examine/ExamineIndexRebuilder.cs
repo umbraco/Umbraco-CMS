@@ -187,7 +187,7 @@ public class ExamineIndexRebuilder : IIndexRebuilder
             {
                 // If an index exists but it has zero docs we'll consider it empty and rebuild
                 IIndex[] indexes = (onlyEmptyIndexes
-                    ? _examineManager.Indexes.Where(x => ShouldRebuild(x))
+                    ? _examineManager.Indexes.Where(ShouldRebuild)
                     : _examineManager.Indexes).ToArray();
 
                 if (indexes.Length == 0)

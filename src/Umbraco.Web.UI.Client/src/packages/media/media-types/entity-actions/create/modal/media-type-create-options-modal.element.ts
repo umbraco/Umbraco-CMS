@@ -3,14 +3,28 @@ import type { UmbMediaTypeCreateOptionsModalData } from './constants.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
+/**
+ * @deprecated This element is deprecated and will be removed in v.17.0.0.
+ * Please use the UMB_ENTITY_CREATE_OPTION_ACTION_LIST_MODAL instead.
+ * @exports
+ * @class UmbMediaTypeCreateOptionsModalElement
+ * @augments {UmbModalBaseElement<UmbDataTypeCreateOptionsModalData>}
+ */
 @customElement('umb-media-type-create-options-modal')
-export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<UmbMediaTypeCreateOptionsModalData> {
+export class UmbMediaTypeCreateOptionsModalElement extends UmbModalBaseElement<UmbMediaTypeCreateOptionsModalData> {
 	#createFolderAction?: UmbCreateFolderEntityAction;
 
 	override connectedCallback(): void {
 		super.connectedCallback();
 		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
+
+		new UmbDeprecation({
+			deprecated: 'umb-media-type-create-options-modal',
+			removeInVersion: '17.0.0',
+			solution: 'Use UMB_ENTITY_CREATE_OPTION_ACTION_LIST_MODAL instead',
+		}).warn();
 
 		// TODO: render the info from this instance in the list of actions
 		this.#createFolderAction = new UmbCreateFolderEntityAction(this, {
@@ -68,10 +82,10 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 	}
 }
 
-export default UmbDataTypeCreateOptionsModalElement;
+export default UmbMediaTypeCreateOptionsModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-media-type-create-options-modal': UmbDataTypeCreateOptionsModalElement;
+		'umb-media-type-create-options-modal': UmbMediaTypeCreateOptionsModalElement;
 	}
 }

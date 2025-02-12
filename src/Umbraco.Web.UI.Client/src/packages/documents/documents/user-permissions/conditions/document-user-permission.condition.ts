@@ -3,25 +3,31 @@ import type { UmbDocumentUserPermissionConditionConfig } from './types.js';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { DocumentPermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbDocumentUserPermissionCondition
-	extends UmbConditionBase<UmbDocumentUserPermissionConditionConfig>
-	implements UmbExtensionCondition
-{
+// Do not export - for internal use only
+type UmbOnChangeCallbackType = (permitted: boolean) => void;
+
+export class UmbDocumentUserPermissionCondition extends UmbControllerBase implements UmbExtensionCondition {
+	config: UmbDocumentUserPermissionConditionConfig;
+	permitted = false;
+
 	#entityType: string | undefined;
 	#unique: string | null | undefined;
 	#documentPermissions: Array<DocumentPermissionPresentationModel> = [];
 	#fallbackPermissions: string[] = [];
+	#onChange: UmbOnChangeCallbackType;
 
 	constructor(
 		host: UmbControllerHost,
-		args: UmbConditionControllerArguments<UmbDocumentUserPermissionConditionConfig>,
+		args: UmbConditionControllerArguments<UmbDocumentUserPermissionConditionConfig, UmbOnChangeCallbackType>,
 	) {
-		super(host, args);
+		super(host);
+		this.config = args.config;
+		this.#onChange = args.onChange;
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
 			this.observe(
@@ -102,7 +108,11 @@ export class UmbDocumentUserPermissionCondition
 			oneOfPermitted = false;
 		}
 
-		this.permitted = allOfPermitted && oneOfPermitted;
+		const permitted = allOfPermitted && oneOfPermitted;
+		if (permitted === this.permitted) return;
+
+		this.permitted = permitted;
+		this.#onChange(permitted);
 	}
 }
 

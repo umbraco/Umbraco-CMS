@@ -223,6 +223,19 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
             return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, Guid>(GlobalIsolatedCache, ScopeAccessor,
                 options);
         }
+
+        protected override IEnumerable<IDictionaryItem> PerformGetAll(params Guid[]? ids)
+        {
+            Sql<ISqlContext> sql = GetBaseQuery(false).Where<DictionaryDto>(x => x.PrimaryKey > 0);
+            if (ids?.Any() ?? false)
+            {
+                sql.WhereIn<DictionaryDto>(x => x.UniqueId, ids);
+            }
+
+            return Database
+                .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
+                .Select(ConvertToEntity);
+        }
     }
 
     private class DictionaryByKeyRepository : SimpleGetRepository<string, IDictionaryItem, DictionaryDto>
@@ -265,6 +278,19 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
 
             return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, string>(GlobalIsolatedCache, ScopeAccessor,
                 options);
+        }
+
+        protected override IEnumerable<IDictionaryItem> PerformGetAll(params string[]? ids)
+        {
+            Sql<ISqlContext> sql = GetBaseQuery(false).Where<DictionaryDto>(x => x.PrimaryKey > 0);
+            if (ids?.Any() ?? false)
+            {
+                sql.WhereIn<DictionaryDto>(x => x.Key, ids);
+            }
+
+            return Database
+                .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
+                .Select(ConvertToEntity);
         }
     }
 

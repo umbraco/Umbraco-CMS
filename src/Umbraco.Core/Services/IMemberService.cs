@@ -23,6 +23,7 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IEnumerable{T}" />
     /// </returns>
+    [Obsolete("Please use the skip & take instead of pageIndex & pageSize, scheduled for removal in v17")]
     IEnumerable<IMember> GetAll(
         long pageIndex,
         int pageSize,

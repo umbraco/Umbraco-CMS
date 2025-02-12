@@ -1,4 +1,4 @@
-import { closestColumnSpanOption } from '../utils/index.js';
+import { closestColumnSpanOption, forEachBlockLayoutEntryOf } from '../utils/index.js';
 import type { UmbBlockGridValueModel } from '../types.js';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS, UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS } from '../constants.js';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context-token.js';
@@ -295,6 +295,22 @@ export class UmbBlockGridEntryContext
 		const contentData = content ? [structuredClone(content)] : [];
 		const settingsData = settings ? [structuredClone(settings)] : [];
 		const exposes = expose ? [structuredClone(expose)] : [];
+
+		// Find sub Blocks and append their data:
+		forEachBlockLayoutEntryOf(layout, async (entry) => {
+			const content = this._manager!.getContentOf(entry.contentKey);
+			if (!content) {
+				throw new Error('No content found');
+			}
+			contentData.push(structuredClone(content));
+
+			if (entry.settingsKey) {
+				const settings = this._manager!.getSettingsOf(entry.settingsKey);
+				if (settings) {
+					settingsData.push(structuredClone(settings));
+				}
+			}
+		});
 
 		const propertyValue: UmbBlockGridValueModel = {
 			layout: {

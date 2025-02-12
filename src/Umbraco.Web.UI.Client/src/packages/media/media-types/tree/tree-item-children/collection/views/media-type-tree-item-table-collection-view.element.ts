@@ -26,6 +26,7 @@ export class UmbMediaTypeTreeItemTableCollectionViewElement extends UmbLitElemen
 		{
 			name: '',
 			alias: 'entityActions',
+			align: 'right',
 		},
 	];
 

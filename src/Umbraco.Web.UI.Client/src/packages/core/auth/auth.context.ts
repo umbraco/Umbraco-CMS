@@ -1,7 +1,8 @@
 import { UmbAuthFlow } from './auth-flow.js';
-import { UMB_AUTH_CONTEXT, UMB_STORAGE_TOKEN_RESPONSE_NAME } from './auth.context.token.js';
+import { UMB_AUTH_CONTEXT } from './auth.context.token.js';
 import type { UmbOpenApiConfiguration } from './models/openApiConfiguration.js';
 import type { ManifestAuthProvider } from './auth-provider.extension.js';
+import { UMB_STORAGE_TOKEN_RESPONSE_NAME } from './constants.js';
 import { OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';

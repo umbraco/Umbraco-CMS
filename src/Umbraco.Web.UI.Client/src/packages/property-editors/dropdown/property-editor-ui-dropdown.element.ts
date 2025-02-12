@@ -1,4 +1,4 @@
-import { css, customElement, html, map, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, map, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
@@ -46,6 +46,18 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 							value: item.value,
 							selected: this.#selection.includes(item.value),
 						}));
+
+			// If selection includes a value that is not in the list, add it to the list
+			this.#selection.forEach((value) => {
+				if (!this._options.find((item) => item.value === value)) {
+					this._options.push({
+						name: `${value} (${this.localize.term('validation_legacyOption')})`,
+						value,
+						selected: true,
+						invalid: true,
+					});
+				}
+			});
 		}
 
 		this._multiple = config.getValueByAlias<boolean>('multiple') ?? false;
@@ -55,7 +67,7 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 	private _multiple: boolean = false;
 
 	@state()
-	private _options: Array<Option> = [];
+	private _options: Array<Option & { invalid?: boolean }> = [];
 
 	#onChange(event: UUISelectEvent) {
 		const value = event.target.value as string;
@@ -90,6 +102,7 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 					(item) => html`<option value=${item.value} ?selected=${item.selected}>${item.name}</option>`,
 				)}
 			</select>
+			${this.#renderDropdownValidation()}
 		`;
 	}
 
@@ -99,14 +112,33 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 				.options=${this._options}
 				@change=${this.#onChange}
 				?readonly=${this.readonly}></umb-input-dropdown-list>
+			${this.#renderDropdownValidation()}
 		`;
 	}
 
-	static override styles = [
+	#renderDropdownValidation() {
+		const selectionHasInvalids = this.#selection.some((value) => {
+			const option = this._options.find((item) => item.value === value);
+			return option ? option.invalid : false;
+		});
+
+		if (selectionHasInvalids) {
+			return html`<div class="error"><umb-localize key="validation_legacyOptionDescription"></umb-localize></div>`;
+		}
+
+		return nothing;
+	}
+
+	static override readonly styles = [
 		UUISelectElement.styles,
 		css`
 			#native {
 				height: auto;
+			}
+
+			.error {
+				color: var(--uui-color-danger);
+				font-size: var(--uui-font-size-small);
 			}
 		`,
 	];

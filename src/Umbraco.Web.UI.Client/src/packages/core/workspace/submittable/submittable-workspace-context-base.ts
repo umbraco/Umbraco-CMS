@@ -18,7 +18,6 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	// TODO: We could make a base type for workspace modal data, and use this here: As well as a base for the result, to make sure we always include the unique (instead of the object type)
 	public readonly modalContext?: UmbModalContext<{ preset: object }>;
 
-	//public readonly validation = new UmbValidationContext(this);
 	#validationContexts: Array<UmbValidationController> = [];
 
 	/**

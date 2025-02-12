@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
@@ -55,8 +56,8 @@ public class BackOfficeGraphicsController : Controller
 
     private IActionResult HandleFileRequest(string virtualPath)
     {
-        var filePath = Path.Combine(Constants.SystemDirectories.Umbraco, virtualPath).TrimStart(Constants.CharArrays.Tilde);
-        var fileInfo = _webHostEnvironment.WebRootFileProvider.GetFileInfo(filePath);
+        var filePath = $"{Constants.SystemDirectories.Umbraco}/{virtualPath}".TrimStart(Constants.CharArrays.Tilde);
+        IFileInfo fileInfo = _webHostEnvironment.WebRootFileProvider.GetFileInfo(filePath);
 
         if (fileInfo.PhysicalPath is null)
         {

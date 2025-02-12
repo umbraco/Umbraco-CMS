@@ -438,6 +438,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IRequestRedirectService, NoopRequestRedirectService>();
         builder.Services.AddSingleton<IRequestPreviewService, NoopRequestPreviewService>();
         builder.Services.AddSingleton<IRequestMemberAccessService, NoopRequestMemberAccessService>();
+        builder.Services.AddTransient<ICurrentMemberClaimsProvider, NoopCurrentMemberClaimsProvider>();
         builder.Services.AddSingleton<IApiAccessService, NoopApiAccessService>();
         builder.Services.AddSingleton<IApiContentQueryService, NoopApiContentQueryService>();
         builder.Services.AddSingleton<IApiMediaQueryService, NoopApiMediaQueryService>();
@@ -449,6 +450,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiRichTextElementParser, ApiRichTextElementParser>();
         builder.Services.AddSingleton<IApiRichTextMarkupParser, ApiRichTextMarkupParser>();
         builder.Services.AddSingleton<IApiPropertyRenderer, ApiPropertyRenderer>();
+        builder.Services.AddSingleton<IApiDocumentUrlService, ApiDocumentUrlService>();
 
         return builder;
     }

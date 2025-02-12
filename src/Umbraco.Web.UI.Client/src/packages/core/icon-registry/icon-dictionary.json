@@ -641,7 +641,8 @@
 		{
 			"name": "icon-document-dashed-line",
 			"file": "file.svg",
-			"missing": "TODO:"
+			"missing": "TODO: Legacy until se have made a custom",
+			"legacy": true
 		},
 		{
 			"name": "icon-document",
@@ -2360,6 +2361,11 @@
 		},
 		{
 			"name": "icon-umb-manifest",
+			"file": "puzzle.svg",
+			"internal": true
+		},
+		{
+			"name": "icon-puzzle-piece",
 			"file": "puzzle.svg"
 		},
 		{

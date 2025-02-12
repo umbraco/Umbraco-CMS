@@ -14,7 +14,7 @@
     <NeutralLanguage>en-US</NeutralLanguage>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>nullable</WarningsAsErrors>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>

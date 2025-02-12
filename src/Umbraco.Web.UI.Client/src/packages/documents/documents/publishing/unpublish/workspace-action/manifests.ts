@@ -1,5 +1,8 @@
+import {
+	UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
+	UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
+} from '../../../user-permissions/constants.js';
 import { UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
-import { UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH } from '../../../user-permissions/constants.js';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -17,7 +20,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.UserPermission.Document',
+				alias: UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH],
 			},
 			{
@@ -25,7 +28,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 			{
 				alias: UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS,
-				match: false
+				match: false,
 			},
 		],
 	},

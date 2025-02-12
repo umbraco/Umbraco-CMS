@@ -407,6 +407,27 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
+		name: 'Dropdown (Multiple)',
+		id: 'dt-dropdown-multiple',
+		parent: null,
+		editorAlias: 'Umbraco.DropDown.Flexible',
+		editorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		values: [
+			{
+				alias: 'multiple',
+				value: true,
+			},
+			{
+				alias: 'items',
+				value: ['First Option', 'Second Option', 'I Am the third Option'],
+			},
+		],
+	},
+	{
 		name: 'Dropdown Alignment Options',
 		id: 'dt-dropdown-align',
 		parent: null,
@@ -701,7 +722,70 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'fileExtensions',
-				value: ['jpg', 'jpeg', 'png', 'pdf'],
+				value: ['jpg', 'jpeg', 'png', 'svg'],
+			},
+			{
+				alias: 'multiple',
+				value: true,
+			},
+		],
+	},
+	{
+		name: 'Upload Field (Files)',
+		id: 'dt-uploadFieldFiles',
+		parent: null,
+		editorAlias: 'Umbraco.UploadField',
+		editorUiAlias: 'Umb.PropertyEditorUi.UploadField',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		values: [
+			{
+				alias: 'fileExtensions',
+				value: ['pdf', 'iso'],
+			},
+			{
+				alias: 'multiple',
+				value: true,
+			},
+		],
+	},
+	{
+		name: 'Upload Field (Movies)',
+		id: 'dt-uploadFieldMovies',
+		parent: null,
+		editorAlias: 'Umbraco.UploadField',
+		editorUiAlias: 'Umb.PropertyEditorUi.UploadField',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		values: [
+			{
+				alias: 'fileExtensions',
+				value: ['mp4', 'mov'],
+			},
+			{
+				alias: 'multiple',
+				value: true,
+			},
+		],
+	},
+	{
+		name: 'Upload Field (Vector)',
+		id: 'dt-uploadFieldVector',
+		parent: null,
+		editorAlias: 'Umbraco.UploadField',
+		editorUiAlias: 'Umb.PropertyEditorUi.UploadField',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		values: [
+			{
+				alias: 'fileExtensions',
+				value: ['svg'],
 			},
 			{
 				alias: 'multiple',
@@ -891,8 +975,16 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{
 				alias: 'layouts',
 				value: [
-					{ icon: 'icon-grid', isSystem: true, name: 'Grid', path: '', selected: true },
-					{ icon: 'icon-list', isSystem: true, name: 'Table', path: '', selected: true },
+					{
+						icon: 'icon-grid',
+						name: 'Media Grid Collection View',
+						collectionView: 'Umb.CollectionView.Media.Grid',
+					},
+					{
+						icon: 'icon-list',
+						name: 'Media Table Collection View',
+						collectionView: 'Umb.CollectionView.Media.Table',
+					},
 				],
 			},
 			{ alias: 'icon', value: 'icon-layers' },

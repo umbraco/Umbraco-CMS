@@ -1,4 +1,4 @@
-import { UMB_USER_ENTITY_TYPE } from '@umbraco-cms/backoffice/user';
+import { UMB_USER_ALLOW_CHANGE_PASSWORD_CONDITION_ALIAS, UMB_USER_ENTITY_TYPE } from '@umbraco-cms/backoffice/user';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -18,7 +18,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 				alias: 'Umb.Condition.User.IsDefaultKind',
 			},
 			{
-				alias: 'Umb.Condition.User.AllowChangePassword',
+				alias: UMB_USER_ALLOW_CHANGE_PASSWORD_CONDITION_ALIAS,
 			},
 		],
 	},

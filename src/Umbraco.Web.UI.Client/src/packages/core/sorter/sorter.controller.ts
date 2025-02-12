@@ -346,10 +346,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 	}
 
-	setModel(model: Array<T>): void {
-		if (this.#model) {
-			this.#model = model;
-		}
+	setModel(model: Array<T> | undefined): void {
+		this.#model = model ?? [];
 	}
 
 	/**

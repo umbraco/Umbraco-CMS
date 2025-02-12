@@ -51,7 +51,7 @@ export interface UmbBlockGridValueModel extends UmbBlockValueType<UmbBlockGridLa
 export interface UmbBlockGridLayoutModel extends UmbBlockLayoutBaseModel {
 	columnSpan: number;
 	rowSpan: number;
-	areas: Array<UmbBlockGridLayoutAreaItemModel>;
+	areas?: Array<UmbBlockGridLayoutAreaItemModel>;
 }
 
 export interface UmbBlockGridLayoutAreaItemModel {

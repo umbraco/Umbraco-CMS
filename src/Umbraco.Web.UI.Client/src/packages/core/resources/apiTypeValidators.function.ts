@@ -21,5 +21,5 @@ export function isCancelError(error: unknown): error is CancelError {
  * @param promise
  */
 export function isCancelablePromise<T>(promise: unknown): promise is CancelablePromise<T> {
-	return (promise as CancelablePromise<T>).cancel !== undefined;
+	return (promise as CancelablePromise<T>)?.cancel !== undefined;
 }

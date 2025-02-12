@@ -71,7 +71,6 @@ test('can disable history cleanup for a document type', async ({umbracoApi, umbr
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   // Is needed
-  await umbracoUi.waitForTimeout(200);
   await umbracoUi.documentType.clickDocumentTypeSettingsTab();
   await umbracoUi.documentType.clickPreventCleanupButton();
   await umbracoUi.documentType.clickSaveButton();

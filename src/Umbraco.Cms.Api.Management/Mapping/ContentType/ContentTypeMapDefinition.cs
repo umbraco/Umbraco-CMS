@@ -25,8 +25,8 @@ public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeModel,
                 {
                     Id = propertyType.Key,
                     SortOrder = propertyType.SortOrder,
-                    Container = groupKeysByPropertyKeys.ContainsKey(propertyType.Key)
-                        ? new ReferenceByIdModel(groupKeysByPropertyKeys[propertyType.Key])
+                    Container = groupKeysByPropertyKeys.TryGetValue(propertyType.Key, out Guid groupKey)
+                        ? new ReferenceByIdModel(groupKey)
                         : null,
                     Name = propertyType.Name,
                     Alias = propertyType.Alias,

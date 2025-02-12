@@ -1,4 +1,4 @@
-import type { UmbInputRadioButtonListElement } from '@umbraco-cms/backoffice/components';
+import type { UmbInputRadioButtonListElement, UmbRadioButtonItem } from '@umbraco-cms/backoffice/components';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
@@ -34,11 +34,16 @@ export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement imp
 				typeof items[0] === 'string'
 					? items.map((item) => ({ label: item, value: item }))
 					: items.map((item) => ({ label: item.name, value: item.value }));
+
+			// If selection includes a value that is not in the list, add it to the list
+			if (this.value && !this._list.find((item) => item.value === this.value)) {
+				this._list.push({ label: this.value, value: this.value, invalid: true });
+			}
 		}
 	}
 
 	@state()
-	private _list: UmbInputRadioButtonListElement['list'] = [];
+	private _list: Array<UmbRadioButtonItem> = [];
 
 	#onChange(event: CustomEvent & { target: UmbInputRadioButtonListElement }) {
 		this.value = event.target.value;

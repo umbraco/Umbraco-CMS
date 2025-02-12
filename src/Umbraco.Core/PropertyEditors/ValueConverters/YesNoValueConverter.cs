@@ -18,7 +18,7 @@ public class YesNoValueConverter : PropertyValueConverterBase
     {
         if (source is null)
         {
-            return null;
+            return false;
         }
 
         // in xml a boolean is: string
@@ -58,18 +58,5 @@ public class YesNoValueConverter : PropertyValueConverterBase
 
         // false for any other value
         return false;
-    }
-
-    /// <inheritdoc />
-    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object? source, bool preview)
-    {
-        // If source is null, whether we return true or false depends on the configured default value (initial state).
-        if (source is null)
-        {
-            TrueFalseConfiguration? configuration = propertyType.DataType.ConfigurationAs<TrueFalseConfiguration>();
-            return configuration?.InitialState ?? false;
-        }
-
-        return (bool)source;
     }
 }

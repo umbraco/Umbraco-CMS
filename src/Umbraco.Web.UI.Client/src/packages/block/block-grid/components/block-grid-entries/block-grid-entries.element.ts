@@ -31,7 +31,11 @@ function resolvePlacementAsBlockGrid(
 	args: UmbSorterResolvePlacementArgs<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>,
 ) {
 	// If this has areas, we do not want to move, unless we are at the edge
-	if (args.relatedModel.areas?.length > 0 && isWithinRect(args.pointerX, args.pointerY, args.relatedRect, -10)) {
+	if (
+		args.relatedModel.areas &&
+		args.relatedModel.areas.length > 0 &&
+		isWithinRect(args.pointerX, args.pointerY, args.relatedRect, -10)
+	) {
 		return null;
 	}
 
@@ -112,6 +116,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryE
 	resolvePlacement: resolvePlacementAsBlockGrid,
 	identifier: 'block-grid-editor',
 	itemSelector: 'umb-block-grid-entry',
+	disabledItemSelector: 'umb-block-grid-entry[unsupported]',
 	containerSelector: '.umb-block-grid__layout-container',
 };
 

@@ -10086,6 +10086,17 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "allowedDocumentTypes",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
           }
         ],
         "responses": {
@@ -15764,6 +15775,17 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "allowedMediaTypes",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
           }
         ],
         "responses": {
@@ -19637,6 +19659,17 @@
               "type": "integer",
               "format": "int32",
               "default": 100
+            }
+          },
+          {
+            "name": "allowedMemberTypes",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
             }
           }
         ],
@@ -33813,6 +33846,67 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/webhook/{id}/logs": {
+      "get": {
+        "tags": [
+          "Webhook"
+        ],
+        "operationId": "GetWebhookByIdLogs",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedWebhookLogResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/webhook/events": {
       "get": {
         "tags": [
@@ -33902,21 +33996,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/WebhookResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ProblemDetails"
+                      "$ref": "#/components/schemas/PagedWebhookLogResponseModel"
                     }
                   ]
                 }
@@ -35860,6 +35940,14 @@
           "enabled": {
             "type": "boolean"
           },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
           "url": {
             "minLength": 1,
             "type": "string"
@@ -35929,6 +36017,8 @@
       },
       "CurrenUserConfigurationResponseModel": {
         "required": [
+          "allowChangePassword",
+          "allowTwoFactor",
           "keepUserLoggedIn",
           "passwordConfiguration",
           "usernameIsEmail"
@@ -35948,6 +36038,12 @@
                 "$ref": "#/components/schemas/PasswordConfigurationResponseModel"
               }
             ]
+          },
+          "allowChangePassword": {
+            "type": "boolean"
+          },
+          "allowTwoFactor": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -35970,14 +36066,11 @@
           "mediaStartNodeIds",
           "name",
           "permissions",
+          "userGroupIds",
           "userName"
         ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "email": {
             "type": "string"
           },
@@ -35986,6 +36079,21 @@
           },
           "name": {
             "type": "string"
+          },
+          "userGroupIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
+            }
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
           },
           "languageIsoCode": {
             "type": "string",
@@ -36409,10 +36517,14 @@
       },
       "DefaultReferenceResponseModel": {
         "required": [
+          "$type",
           "id"
         ],
         "type": "object",
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -36430,7 +36542,13 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DefaultReferenceResponseModel": "#/components/schemas/DefaultReferenceResponseModel"
+          }
+        }
       },
       "DeleteUserGroupsRequestModel": {
         "required": [
@@ -36950,11 +37068,15 @@
       },
       "DocumentReferenceResponseModel": {
         "required": [
+          "$type",
           "documentType",
           "id"
         ],
         "type": "object",
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -36975,7 +37097,13 @@
             ]
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentReferenceResponseModel": "#/components/schemas/DocumentReferenceResponseModel"
+          }
+        }
       },
       "DocumentResponseModel": {
         "required": [
@@ -39083,11 +39211,15 @@
       },
       "MediaReferenceResponseModel": {
         "required": [
+          "$type",
           "id",
           "mediaType"
         ],
         "type": "object",
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -39104,7 +39236,13 @@
             ]
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "MediaReferenceResponseModel": "#/components/schemas/MediaReferenceResponseModel"
+          }
+        }
       },
       "MediaResponseModel": {
         "required": [
@@ -42267,6 +42405,30 @@
         },
         "additionalProperties": false
       },
+      "PagedWebhookLogResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/WebhookLogResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedWebhookResponseModel": {
         "required": [
           "items",
@@ -45324,6 +45486,14 @@
           "enabled": {
             "type": "boolean"
           },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
           "url": {
             "minLength": 1,
             "type": "string"
@@ -46137,6 +46307,70 @@
         },
         "additionalProperties": false
       },
+      "WebhookLogResponseModel": {
+        "required": [
+          "date",
+          "eventAlias",
+          "exceptionOccured",
+          "isSuccessStatusCode",
+          "key",
+          "requestBody",
+          "requestHeaders",
+          "responseBody",
+          "responseHeaders",
+          "retryCount",
+          "statusCode",
+          "url",
+          "webhookKey"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "webhookKey": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "statusCode": {
+            "type": "string"
+          },
+          "isSuccessStatusCode": {
+            "type": "boolean"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "eventAlias": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "retryCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "requestHeaders": {
+            "type": "string"
+          },
+          "requestBody": {
+            "type": "string"
+          },
+          "responseHeaders": {
+            "type": "string"
+          },
+          "responseBody": {
+            "type": "string"
+          },
+          "exceptionOccured": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "WebhookResponseModel": {
         "required": [
           "contentTypeKeys",
@@ -46150,6 +46384,14 @@
         "properties": {
           "enabled": {
             "type": "boolean"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
           },
           "url": {
             "minLength": 1,

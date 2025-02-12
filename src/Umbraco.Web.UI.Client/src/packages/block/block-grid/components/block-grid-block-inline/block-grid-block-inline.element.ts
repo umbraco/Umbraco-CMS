@@ -20,6 +20,8 @@ import {
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
@@ -30,6 +32,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	//
 	#blockContext?: typeof UMB_BLOCK_GRID_ENTRY_CONTEXT.TYPE;
 	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
+	#variantId: UmbVariantId | undefined;
 	#contentKey?: string;
 	#parentUnique?: string | null;
 	#areaKey?: string | null;
@@ -51,6 +54,9 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 
 	@state()
 	_inlineProperty?: UmbPropertyTypeModel;
+
+	@state()
+	_inlinePropertyDataPath?: string;
 
 	@state()
 	private _ownerContentTypeName?: string;
@@ -82,7 +88,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 			UMB_BLOCK_WORKSPACE_ALIAS,
 			apiArgsCreator,
 			(permitted, ctrl) => {
-				const context = ctrl.api as typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
+				const context = ctrl.api as typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE | undefined;
 				if (permitted && context) {
 					// Risky business, cause here we are lucky that it seems to be consumed and set before this is called and there for this is acceptable for now. [NL]
 					if (this.#parentUnique === undefined || this.#areaKey === undefined) {
@@ -101,6 +107,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 						this.#workspaceContext.content.structure.contentTypeProperties,
 						(contentTypeProperties) => {
 							this._inlineProperty = contentTypeProperties[0];
+							this.#generatePropertyDataPath();
 						},
 						'observeProperties',
 					);
@@ -116,9 +123,10 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 					this.observe(
 						context.variantId,
 						async (variantId) => {
+							this.#variantId = variantId;
+							this.#generatePropertyDataPath();
 							if (variantId) {
 								context.content.setup(this, variantId);
-								// TODO: Support segment name?
 								const culture = variantId.culture;
 								if (culture) {
 									const languageRepository = new UmbLanguageItemRepository(this);
@@ -140,6 +148,16 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	#load() {
 		if (!this.#workspaceContext || !this.#contentKey) return;
 		this.#workspaceContext.load(this.#contentKey);
+	}
+
+	#generatePropertyDataPath() {
+		if (!this.#variantId || !this._inlineProperty) return;
+		const property = this._inlineProperty;
+		this._inlinePropertyDataPath = `$.values[${UmbDataPathPropertyValueQuery({
+			alias: property.alias,
+			culture: property.variesByCulture ? this.#variantId!.culture : null,
+			segment: property.variesBySegment ? this.#variantId!.segment : null,
+		})}].value`;
 	}
 
 	#expose = () => {
@@ -189,6 +207,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 			return html`<div id="inside">
 				<umb-property-type-based-property
 					.property=${this._inlineProperty}
+					.dataPath=${this._inlinePropertyDataPath ?? ''}
 					slot="areas"></umb-property-type-based-property>
 				<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
 			</div>`;

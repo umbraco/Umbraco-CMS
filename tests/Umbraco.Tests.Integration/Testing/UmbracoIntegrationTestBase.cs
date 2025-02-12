@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 [NonParallelizable]
 public abstract class UmbracoIntegrationTestBase
 {
-    private static readonly object s_dbLocker = new();
+    private static readonly Lock s_dbLocker = new();
     private static ITestDatabase? s_dbInstance;
     private static TestDbMeta s_fixtureDbMeta;
     private static int s_testCount = 1;

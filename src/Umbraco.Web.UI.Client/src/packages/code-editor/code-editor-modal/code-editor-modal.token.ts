@@ -9,6 +9,7 @@ export interface UmbCodeEditorModalData {
 	language: 'razor' | 'typescript' | 'javascript' | 'css' | 'markdown' | 'json' | 'html';
 	color?: 'positive' | 'danger';
 	confirmLabel?: string;
+	formatOnLoad?: boolean;
 }
 
 export interface UmbCodeEditorModalValue {

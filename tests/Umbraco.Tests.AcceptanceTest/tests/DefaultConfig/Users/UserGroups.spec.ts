@@ -328,7 +328,7 @@ test('can add a media start node to a user group', async ({umbracoApi, umbracoUi
   // Act
   await umbracoUi.userGroup.clickChooseMediaStartNodeButton();
   await umbracoUi.userGroup.selectMediaWithName(mediaName);
-  await umbracoUi.userGroup.clickSubmitButton();
+  await umbracoUi.userGroup.clickChooseModalButton();
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert

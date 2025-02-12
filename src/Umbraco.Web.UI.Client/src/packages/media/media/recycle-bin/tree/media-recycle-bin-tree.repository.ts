@@ -21,7 +21,7 @@ export class UmbMediaRecycleBinTreeRepository
 		const data = {
 			unique: null,
 			entityType: UMB_MEDIA_RECYCLE_BIN_ROOT_ENTITY_TYPE,
-			name: 'Recycle Bin',
+			name: '#treeHeaders_contentRecycleBin',
 			icon: 'icon-trash',
 			hasChildren,
 			isContainer: false,

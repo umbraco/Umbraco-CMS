@@ -122,8 +122,6 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 
 		const focalPoint = { left, top } as UmbFocalPointModel;
 
-		console.log('setFocalPoint', focalPoint);
-
 		this.dispatchEvent(new UmbFocalPointChangeEvent(focalPoint));
 	}
 

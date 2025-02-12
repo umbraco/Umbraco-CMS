@@ -13,14 +13,14 @@ test.beforeEach(async ({umbracoApi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can create content with empty RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const expectedState = 'Draft'; 
+  const expectedState = 'Draft';
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -42,7 +42,7 @@ test('can create content with empty RTE Tiptap property editor', async ({umbraco
 
 test('can create content with non-empty RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const expectedState = 'Draft'; 
+  const expectedState = 'Draft';
   const inputText = 'Test Tiptap here';
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoUi.goToBackOffice();
@@ -101,7 +101,7 @@ test('can add a media in RTE Tiptap property editor', async ({umbracoApi, umbrac
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickTipTapToolbarIconWithTitle(iconTitle);
   await umbracoUi.content.selectMediaWithName(imageName);
-  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickMediaCaptionAltTextModalSubmitButton();
   await umbracoUi.content.clickSaveButton();
 
@@ -140,4 +140,79 @@ test('can add a video in RTE Tiptap property editor', async ({umbracoApi, umbrac
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.markup).toContain('data-embed-url');
   expect(contentData.values[0].value.markup).toContain(videoURL);
+});
+
+test('cannot submit an empty link in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const iconTitle = 'Link';
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickTipTapToolbarIconWithTitle(iconTitle);
+  await umbracoUi.content.clickManualLinkButton();
+  await umbracoUi.content.enterLink('');
+  await umbracoUi.content.enterAnchorOrQuerystring('');
+  await umbracoUi.content.enterLinkTitle('');
+  await umbracoUi.content.clickAddButton();
+
+  // Assert
+  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
+});
+
+// TODO: Remove skip when the front-end ready. Currently it still accept the empty link with an anchor or querystring
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17411
+test.skip('cannot submit an empty URL with an anchor or querystring in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const iconTitle = 'Link';
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickTipTapToolbarIconWithTitle(iconTitle);
+  await umbracoUi.content.clickManualLinkButton();
+  await umbracoUi.content.enterLink('');
+  await umbracoUi.content.enterAnchorOrQuerystring('#value');
+  await umbracoUi.content.clickAddButton();
+
+  // Assert
+  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
+});
+
+// TODO: Remove skip when the front-end ready. Currently it is impossible to link to unpublished document
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17974
+test.skip('can insert a link to an unpublished document in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const iconTitle = 'Link';
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  // Create a document to link
+  const documentTypeForLinkedDocumentName = 'TestDocumentType';
+  const documentTypeForLinkedDocumentId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeForLinkedDocumentName);
+  const linkedDocumentName = 'LinkedDocument';
+  await umbracoApi.document.createDefaultDocument(linkedDocumentName, documentTypeForLinkedDocumentId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickTipTapToolbarIconWithTitle(iconTitle);
+  await umbracoUi.content.clickDocumentLinkButton();
+  await umbracoUi.content.selectLinkByName(linkedDocumentName);
+  await umbracoUi.content.clickButtonWithName('Choose');
+  await umbracoUi.content.clickAddButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeForLinkedDocumentName);
+  await umbracoApi.document.ensureNameNotExists(linkedDocumentName);
 });
