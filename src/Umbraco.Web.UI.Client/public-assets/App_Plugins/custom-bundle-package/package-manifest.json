@@ -1,0 +1,12 @@
+{
+	"name": "My Package Name",
+	"version": "1.0.0",
+	"extensions": [
+		{
+			"type": "bundle",
+			"alias": "My.Package.Bundle",
+			"name": "My Package Bundle",
+			"js": "/App_Plugins/custom-bundle-package/index.js"
+		}
+	]
+}

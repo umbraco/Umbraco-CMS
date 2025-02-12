@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
@@ -201,6 +202,11 @@ public class DomainService : RepositoryService, IDomainService
         foreach (DomainModel domainModel in updateModel.Domains)
         {
             domainModel.DomainName = domainModel.DomainName.ToLowerInvariant();
+
+            if(Uri.IsWellFormedUriString(domainModel.DomainName, UriKind.RelativeOrAbsolute) is false)
+            {
+                return Attempt.FailWithStatus(DomainOperationStatus.InvalidDomainName, new DomainUpdateResult());
+            }
         }
 
         // make sure we're not attempting to assign duplicate domains
@@ -305,12 +311,17 @@ public class DomainService : RepositoryService, IDomainService
         var sortOrder = 0;
         foreach (DomainModel domainModel in updateModel.Domains)
         {
-            IDomain assignedDomain = currentlyAssignedDomains.FirstOrDefault(domain => domainModel.DomainName.InvariantEquals(domain.DomainName))
-                                     ?? new UmbracoDomain(domainModel.DomainName)
-                                     {
-                                         LanguageId = languageIdByIsoCode[domainModel.IsoCode],
-                                         RootContentId = contentId
-                                     };
+            IDomain? assignedDomain = currentlyAssignedDomains.FirstOrDefault(domain => domainModel.DomainName.InvariantEquals(domain.DomainName));
+
+            // If we do not have an assigned domain, or the domain-language has been changed, create new domain.
+            if (assignedDomain is null || assignedDomain.LanguageId != languageIdByIsoCode[domainModel.IsoCode])
+            {
+                assignedDomain = new UmbracoDomain(domainModel.DomainName)
+                {
+                    LanguageId = languageIdByIsoCode[domainModel.IsoCode],
+                    RootContentId = contentId
+                };
+            }
 
             assignedDomain.SortOrder = sortOrder++;
             newAssignedDomains.Add(assignedDomain);

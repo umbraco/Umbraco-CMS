@@ -32,7 +32,7 @@ public class ItemDocumentTypeItemController : DocumentTypeItemControllerBase
             return Ok(Enumerable.Empty<DocumentTypeItemResponseModel>());
         }
 
-        IEnumerable<IContentType> contentTypes = _contentTypeService.GetAll(ids);
+        IEnumerable<IContentType> contentTypes = _contentTypeService.GetMany(ids);
         List<DocumentTypeItemResponseModel> responseModels = _mapper.MapEnumerable<IContentType, DocumentTypeItemResponseModel>(contentTypes);
         return await Task.FromResult(Ok(responseModels));
     }

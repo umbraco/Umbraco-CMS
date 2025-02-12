@@ -41,7 +41,7 @@ public class MemberApplicationManager : OpenIdDictApplicationManagerBase, IMembe
             {
                 OpenIddictConstants.Permissions.Endpoints.Authorization,
                 OpenIddictConstants.Permissions.Endpoints.Token,
-                OpenIddictConstants.Permissions.Endpoints.Logout,
+                OpenIddictConstants.Permissions.Endpoints.EndSession,
                 OpenIddictConstants.Permissions.Endpoints.Revocation,
                 OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                 OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
@@ -64,4 +64,26 @@ public class MemberApplicationManager : OpenIdDictApplicationManagerBase, IMembe
 
     public async Task DeleteMemberApplicationAsync(CancellationToken cancellationToken = default)
         => await Delete(Constants.OAuthClientIds.Member, cancellationToken);
+
+    public async Task EnsureMemberClientCredentialsApplicationAsync(string clientId, string clientSecret, CancellationToken cancellationToken = default)
+    {
+        var applicationDescriptor = new OpenIddictApplicationDescriptor
+        {
+            DisplayName = $"Umbraco client credentials member access: {clientId}",
+            ClientId = clientId,
+            ClientSecret = clientSecret,
+            ClientType = OpenIddictConstants.ClientTypes.Confidential,
+            Permissions =
+            {
+                OpenIddictConstants.Permissions.Endpoints.Token,
+                OpenIddictConstants.Permissions.Endpoints.Revocation,
+                OpenIddictConstants.Permissions.GrantTypes.ClientCredentials
+            }
+        };
+
+        await CreateOrUpdate(applicationDescriptor, cancellationToken);
+    }
+
+    public async Task DeleteMemberClientCredentialsApplicationAsync(string clientId, CancellationToken cancellationToken = default)
+        => await Delete(clientId, cancellationToken);
 }

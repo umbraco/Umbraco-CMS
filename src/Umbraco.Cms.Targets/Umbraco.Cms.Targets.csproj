@@ -5,7 +5,17 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup>
-
+  
+  <PropertyGroup>
+    <!--
+      TODO: Fix and remove overrides:
+      [IDE0270] Simplify null checks
+      [CS0108] resolve hiding inherited members
+      [CS1998] remove async or make method synchronous
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),IDE0270,CS0108,CS1998</WarningsNotAsErrors>
+  </PropertyGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.Api.Delivery\Umbraco.Cms.Api.Delivery.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.StaticAssets\Umbraco.Cms.StaticAssets.csproj" />
@@ -20,7 +30,7 @@
   <PropertyGroup>
     <_UmbracoCmsJsonSchemaReference>appsettings-schema.Umbraco.Cms.json</_UmbracoCmsJsonSchemaReference>
     <_UmbracoCmsPackageSchemaReference>umbraco-package-schema.json</_UmbracoCmsPackageSchemaReference>
-    <NoWarn>NU5100;NU5128</NoWarn>
+    <NoWarn>$(NoWarn),NU5100,NU5128</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Umbraco.JsonSchema.Extensions" PrivateAssets="all" GeneratePathProperty="true" />
@@ -43,7 +53,7 @@
   <!-- Generate JSON schema on build (and before copying to project) -->
   <Target Name="GenerateAppsettingsSchema" BeforeTargets="Build;CopyUmbracoJsonSchemaFiles" Condition="!Exists('$(_UmbracoCmsJsonSchemaReference)')">
     <Message Text="Generating $(_UmbracoCmsJsonSchemaReference) because it doesn't exist" Importance="high" />
-    <Exec WorkingDirectory="$(MSBuildThisFileDirectory)..\..\tools\Umbraco.JsonSchema" Command="dotnet run --configuration $(Configuration) -- --outputFile &quot;$(MSBuildThisFileDirectory)$(_UmbracoCmsJsonSchemaReference)&quot;" />
+    <Exec WorkingDirectory="$(MSBuildThisFileDirectory)..\..\tools\Umbraco.JsonSchema" Command="dotnet run --configuration $(Configuration) -- --outputFile &quot;$(MSBuildThisFileDirectory)$(_UmbracoCmsJsonSchemaReference)&quot;" Timeout="600000" />
   </Target>
 
   <!-- Remove generated JSON schema on clean -->

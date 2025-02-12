@@ -77,16 +77,6 @@ public interface IDataTypeService : IService
     IDataType? GetDataType(int id);
 
     /// <summary>
-    ///     Gets a <see cref="IDataType" /> by its unique guid Id
-    /// </summary>
-    /// <param name="id">Unique guid Id of the DataType</param>
-    /// <returns>
-    ///     <see cref="IDataType" />
-    /// </returns>
-    [Obsolete("Please use GetAsync. Will be removed in V15.")]
-    IDataType? GetDataType(Guid id);
-
-    /// <summary>
     ///     Gets an <see cref="IDataType" /> by its Name
     /// </summary>
     /// <param name="name">Name of the <see cref="IDataType" /></param>
@@ -196,7 +186,7 @@ public interface IDataTypeService : IService
     /// </summary>
     /// <param name="propertyEditorAlias">Alias of the property editor</param>
     /// <returns>Collection of <see cref="IDataType" /> configured for the property editor</returns>
-    Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string propertyEditorAlias);
+    Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string propertyEditorAlias) => Task.FromResult(GetByEditorAlias(propertyEditorAlias));
 
     /// <summary>
     ///     Gets all <see cref="IDataType" /> for a given editor UI alias
@@ -240,4 +230,11 @@ public interface IDataTypeService : IService
     /// <param name="dataType">The data type whose configuration to validate.</param>
     /// <returns>One or more <see cref="ValidationResult"/> if the configuration data is invalid, an empty collection otherwise.</returns>
     IEnumerable<ValidationResult> ValidateConfigurationData(IDataType dataType);
+
+    /// <summary>
+    ///     Gets all <see cref="IDataType" /> for a set of property editors
+    /// </summary>
+    /// <param name="propertyEditorAlias">Aliases of the property editors</param>
+    /// <returns>Collection of <see cref="IDataType" /> configured for the property editors</returns>
+    Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string[] propertyEditorAlias) => Task.FromResult(propertyEditorAlias.SelectMany(x=>GetByEditorAlias(x)));
 }

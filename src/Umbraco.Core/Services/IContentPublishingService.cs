@@ -1,4 +1,7 @@
-﻿using Umbraco.Cms.Core.Models.ContentPublishing;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -9,9 +12,10 @@ public interface IContentPublishingService
     ///     Publishes a single content item.
     /// </summary>
     /// <param name="key">The key of the root content.</param>
-    /// <param name="cultures">The cultures to publish.</param>
+    /// <param name="cultureAndSchedule">The cultures to publish and their publishing schedules.</param>
     /// <param name="userKey">The identifier of the user performing the operation.</param>
     /// <returns>Result of the publish operation.</returns>
+    [Obsolete("Use non obsoleted version instead. Scheduled for removal in v17")]
     Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(Guid key, CultureAndScheduleModel cultureAndSchedule, Guid userKey);
 
     /// <summary>
@@ -32,4 +36,17 @@ public interface IContentPublishingService
     /// <param name="userKey">The identifier of the user performing the operation.</param>
     /// <returns>Status of the publish operation.</returns>
     Task<Attempt<ContentPublishingOperationStatus>> UnpublishAsync(Guid key, ISet<string>? cultures, Guid userKey);
+
+    /// <summary>
+    /// Publishes a single content item.
+    /// </summary>
+    /// <param name="key">The key of the root content.</param>
+    /// <param name="culturesToPublishOrSchedule">The cultures to publish or schedule.</param>
+    /// <param name="userKey">The identifier of the user performing the operation.</param>
+    /// <returns></returns>
+    Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
+        Guid key,
+        ICollection<CulturePublishScheduleModel> culturesToPublishOrSchedule,
+        Guid userKey) => StaticServiceProvider.Instance.GetRequiredService<ContentPublishingService>()
+        .PublishAsync(key, culturesToPublishOrSchedule, userKey);
 }

@@ -13,6 +13,7 @@ public class TrackedReferenceViewModelsMapDefinition : IMapDefinition
         mapper.Define<RelationItemModel, MediaReferenceResponseModel>((source, context) => new MediaReferenceResponseModel(), Map);
         mapper.Define<RelationItemModel, DefaultReferenceResponseModel>((source, context) => new DefaultReferenceResponseModel(), Map);
         mapper.Define<RelationItemModel, ReferenceByIdModel>((source, context) => new ReferenceByIdModel(), Map);
+        mapper.Define<Guid, ReferenceByIdModel>((source, context) => new ReferenceByIdModel(), Map);
     }
 
     // Umbraco.Code.MapAll
@@ -55,5 +56,11 @@ public class TrackedReferenceViewModelsMapDefinition : IMapDefinition
     private void Map(RelationItemModel source, ReferenceByIdModel target, MapperContext context)
     {
         target.Id = source.NodeKey;
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(Guid source, ReferenceByIdModel target, MapperContext context)
+    {
+        target.Id = source;
     }
 }

@@ -89,6 +89,8 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(operationStatus, null);
         }
 
+        await AdditionalCreateValidationAsync(model);
+
         // get the ID of the parent to create the content type under (we already validated that it exists)
         var parentId = GetParentId(model, containerKey) ?? throw new ArgumentException("Parent ID could not be found", nameof(model));
         TContentType contentType = CreateContentType(_shortStringHelper, parentId);
@@ -134,6 +136,10 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         contentType = await UpdateAsync(contentType, model, allContentTypeCompositions);
         return Attempt.SucceedWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
     }
+
+    protected virtual async Task<ContentTypeOperationStatus> AdditionalCreateValidationAsync(
+        ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
+        => await Task.FromResult(ContentTypeOperationStatus.Success);
 
     #region Sanitization
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Management.ViewModels;
@@ -32,7 +32,12 @@ internal class NotificationHeaderFilter : IOperationFilter
             response.Headers.TryAdd(Constants.Headers.Notifications, new OpenApiHeader
             {
                 Description = "The list of notifications produced during the request.",
-                Schema = new OpenApiSchema { Type = "array" , Nullable = true, Items = new OpenApiSchema(){
+                Schema = new OpenApiSchema
+                {
+                    Type = "array",
+                    Nullable = true,
+                    Items = new OpenApiSchema()
+                    {
                         Reference = new OpenApiReference()
                         {
                             Type = ReferenceType.Schema,

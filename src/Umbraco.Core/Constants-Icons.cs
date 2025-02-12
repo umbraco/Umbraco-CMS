@@ -67,7 +67,7 @@ public static partial class Constants
         /// <summary>
         ///     System media audio icon.
         /// </summary>
-        public const string MediaAudio = "icon-sound-waves";
+        public const string MediaAudio = "icon-audio-lines";
 
         /// <summary>
         ///     System media article icon
@@ -77,7 +77,7 @@ public static partial class Constants
         /// <summary>
         ///     System media vector icon.
         /// </summary>
-        public const string MediaVectorGraphics = "icon-picture";
+        public const string MediaVectorGraphics = "icon-origami";
 
         /// <summary>
         ///     System media folder icon.

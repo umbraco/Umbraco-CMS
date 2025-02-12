@@ -934,7 +934,8 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         Assert.AreEqual(2, savedTags.Length);
     }
 
-    private PropertyType CreateAndAddTagsPropertyType(ContentType contentType,
+    private PropertyType CreateAndAddTagsPropertyType(
+        ContentType contentType,
         ContentVariation variations = ContentVariation.Nothing)
     {
         var propertyType = new PropertyTypeBuilder()

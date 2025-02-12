@@ -14,7 +14,7 @@ public interface IPublishedMember : IPublishedContent
 
     public DateTime? LastLockoutDate { get; }
 
-    public DateTime CreationDate{ get; }
+    public DateTime CreationDate { get; }
 
     public DateTime? LastLoginDate { get; }
 

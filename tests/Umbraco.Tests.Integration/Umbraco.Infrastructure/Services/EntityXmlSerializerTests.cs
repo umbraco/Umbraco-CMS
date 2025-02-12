@@ -120,7 +120,7 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
         Assert.AreEqual(content.Name, (string)element.Attribute("nodeName"));
         Assert.AreEqual(urlName, (string)element.Attribute("urlName"));
         Assert.AreEqual(content.Path, (string)element.Attribute("path"));
-        Assert.AreEqual("", (string)element.Attribute("isDoc"));
+        Assert.AreEqual(string.Empty, (string)element.Attribute("isDoc"));
         Assert.AreEqual(content.ContentType.Id.ToString(), (string)element.Attribute("nodeType"));
         Assert.AreEqual(content.GetCreatorProfile(UserService).Name, (string)element.Attribute("creatorName"));
         Assert.AreEqual(content.GetWriterProfile(UserService).Name, (string)element.Attribute("writerName"));
@@ -128,11 +128,14 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
         Assert.AreEqual(content.TemplateId.ToString(), (string)element.Attribute("template"));
 
         Assert.AreEqual(content.Properties["title"].GetValue().ToString(), element.Elements("title").Single().Value);
-        Assert.AreEqual(content.Properties["bodyText"].GetValue().ToString(),
+        Assert.AreEqual(
+            content.Properties["bodyText"].GetValue().ToString(),
             element.Elements("bodyText").Single().Value);
-        Assert.AreEqual(content.Properties["keywords"].GetValue().ToString(),
+        Assert.AreEqual(
+            content.Properties["keywords"].GetValue().ToString(),
             element.Elements("keywords").Single().Value);
-        Assert.AreEqual(content.Properties["description"].GetValue().ToString(),
+        Assert.AreEqual(
+            content.Properties["description"].GetValue().ToString(),
             element.Elements("description").Single().Value);
     }
 
@@ -193,7 +196,7 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
         Assert.AreEqual(media.Name, (string)element.Attribute("nodeName"));
         Assert.AreEqual(urlName, (string)element.Attribute("urlName"));
         Assert.AreEqual(media.Path, (string)element.Attribute("path"));
-        Assert.AreEqual("", (string)element.Attribute("isDoc"));
+        Assert.AreEqual(string.Empty, (string)element.Attribute("isDoc"));
         Assert.AreEqual(media.ContentType.Id.ToString(), (string)element.Attribute("nodeType"));
         Assert.AreEqual(media.GetCreatorProfile(UserService).Name, (string)element.Attribute("writerName"));
         Assert.AreEqual(media.CreatorId.ToString(), (string)element.Attribute("writerID"));

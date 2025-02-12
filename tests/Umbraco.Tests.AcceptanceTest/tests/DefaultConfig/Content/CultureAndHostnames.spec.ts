@@ -40,6 +40,7 @@ test('can add a culture', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
   const domainsData = await umbracoApi.document.getDomains(contentId);
   expect(domainsData.defaultIsoCode).toEqual(isoCode);
 });
@@ -54,6 +55,7 @@ test('can add a domain', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
   const domainsData = await umbracoApi.document.getDomains(contentId);
   expect(domainsData.domains.length).toBe(1);
   expect(domainsData.domains[0].domainName).toEqual(domainName);
@@ -74,6 +76,7 @@ test('can update culture and hostname', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
   domainsData = await umbracoApi.document.getDomains(contentId);
   expect(domainsData.domains[0].domainName).toEqual(updatedDomainName);
   expect(domainsData.domains[0].isoCode).toEqual(isoCode);
@@ -92,6 +95,7 @@ test('can delete culture and hostname', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
   domainsData = await umbracoApi.document.getDomains(contentId);
   expect(domainsData.domains.length).toBe(0);
 });
@@ -116,6 +120,7 @@ test('can add culture and hostname for multiple languages', async ({umbracoApi, 
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
   const domainsData = await umbracoApi.document.getDomains(contentId);
   expect(domainsData.domains.length).toBe(2);
   expect(domainsData.domains[0].domainName).toEqual(domainName);

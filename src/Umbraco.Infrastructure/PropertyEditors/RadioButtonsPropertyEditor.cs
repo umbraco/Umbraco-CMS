@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -35,4 +36,7 @@ public class RadioButtonsPropertyEditor : DataEditor
     /// <returns></returns>
     protected override IConfigurationEditor CreateConfigurationEditor() =>
         new ValueListConfigurationEditor(_ioHelper, _configurationEditorJsonSerializer);
+
+    protected override IDataValueEditor CreateValueEditor() =>
+        DataValueEditorFactory.Create<RadioValueEditor>(Attribute!);
 }

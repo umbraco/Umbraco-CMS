@@ -59,6 +59,14 @@ public static class HttpContextExtensions
                 await httpContext.AuthenticateAsync(Constants.Security.BackOfficeExternalAuthenticationType);
         }
 
+        // Update the HttpContext's user with the authenticated user's principal to ensure
+        // that subsequent requests within the same context will recognize the user
+        // as authenticated.
+        if (result.Succeeded)
+        {
+            httpContext.User = result.Principal;
+        }
+
         return result;
     }
 

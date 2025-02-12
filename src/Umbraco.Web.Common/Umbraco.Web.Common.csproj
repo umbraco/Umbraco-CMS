@@ -5,7 +5,23 @@
     <Description>Contains the web assembly needed to run Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Web.Common</RootNamespace>
   </PropertyGroup>
-
+  
+  <PropertyGroup>
+    <!--
+      TODO: Fix and remove overrides:
+      [SA1117] params all on same line
+      [SA1401] make fields private
+      [SA1134] own line attributes
+      [ASP0019] use IHeaderDictionary.Append or the indexer to append or set headers
+      [CS0618]/[SYSLIB0051] adjust obsolete references
+      [IDE0040]/[SA1400] access modifiers
+      [SA1405] Debug assert message text
+      [CS0419]/[CS1574] cref ambiguities
+      [SA1649] file name match type
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),SA1117,SA1401,SA1134,ASP0019,CS0618,SYSLIB0051,IDE0040,SA1400,SA1405,CS0419,CS1574,SA1649</WarningsNotAsErrors>
+  </PropertyGroup>
+  
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
@@ -17,15 +33,22 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" />
     <PackageReference Include="MiniProfiler.AspNetCore.Mvc" />
     <PackageReference Include="Serilog.AspNetCore" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Take top-level depedendency on System.Net.Http, because Dazinator.Extensions.FileProviders depends on a vulnerable version -->
     <PackageReference Include="System.Net.Http" />
-    <!-- Take top-level depedendency on System.Text.RegularExpressions, because both Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc depend on a vulnerable version -->
+    <!-- Take top-level depedendency on System.Text.RegularExpressions, because Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc depends on a vulnerable version -->
     <PackageReference Include="System.Text.RegularExpressions" />
+    <!-- Take top-level depedendency on Microsoft.IdentityModel.JsonWebTokens, because OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" />
+    <!-- Take top-level depedendency on System.Text.Encodings.Web, because Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer, Dazinator.Extensions.FileProviders depends on a vulnerable version -->
+    <PackageReference Include="System.Text.Encodings.Web" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj" />
-    <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
+    <ProjectReference Include="..\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj" />
   </ItemGroup>
 
   <ItemGroup>

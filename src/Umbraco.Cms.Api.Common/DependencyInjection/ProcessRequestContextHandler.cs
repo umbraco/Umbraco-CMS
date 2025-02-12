@@ -10,14 +10,15 @@ public class ProcessRequestContextHandler
     : IOpenIddictServerHandler<OpenIddictServerEvents.ProcessRequestContext>, IOpenIddictValidationHandler<OpenIddictValidationEvents.ProcessRequestContext>
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly string _backOfficePathSegment;
+    private readonly string[] _pathsToHandle;
 
     public ProcessRequestContextHandler(IHttpContextAccessor httpContextAccessor)
     {
         _httpContextAccessor = httpContextAccessor;
-        _backOfficePathSegment = Constants.System.DefaultUmbracoPath.TrimStart(Constants.CharArrays.Tilde)
+        var backOfficePathSegment = Constants.System.DefaultUmbracoPath.TrimStart(Constants.CharArrays.Tilde)
             .EnsureStartsWith('/')
             .EnsureEndsWith('/');
+        _pathsToHandle = [backOfficePathSegment, "/.well-known/openid-configuration"];
     }
 
     public ValueTask HandleAsync(OpenIddictServerEvents.ProcessRequestContext context)
@@ -48,6 +49,14 @@ public class ProcessRequestContextHandler
             return false;
         }
 
-        return requestPath.StartsWith(_backOfficePathSegment) is false;
+        foreach (var path in _pathsToHandle)
+        {
+            if (requestPath.StartsWith(path))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

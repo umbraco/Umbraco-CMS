@@ -39,7 +39,7 @@ public class GetAuditLogDocumentController : DocumentControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionProtect.ActionLetter, id),
+            ContentPermissionResource.WithKeys(ActionBrowse.ActionLetter, id),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)

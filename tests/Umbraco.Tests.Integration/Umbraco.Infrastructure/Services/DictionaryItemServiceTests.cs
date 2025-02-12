@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -238,7 +238,8 @@ public class DictionaryItemServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("Testing12345", item.ItemKey);
         foreach (var language in allLangs)
         {
-            Assert.AreEqual($"Translation for: {language.IsoCode}",
+            Assert.AreEqual(
+                $"Translation for: {language.IsoCode}",
                 item.Translations.Single(x => x.LanguageIsoCode == language.IsoCode).Value);
         }
     }
@@ -627,8 +628,7 @@ public class DictionaryItemServiceTests : UmbracoIntegrationTest
         dictionaryResult = await DictionaryItemService.CreateAsync(
             new DictionaryItem(
                 parentItem.Key,
-                "Child"
-            )
+                "Child")
             {
                 Translations = new List<IDictionaryTranslation>
                 {

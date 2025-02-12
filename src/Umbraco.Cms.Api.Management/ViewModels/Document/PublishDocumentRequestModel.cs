@@ -17,7 +17,6 @@ public class CultureAndScheduleRequestModel
     /// Gets or sets the schedule of publishing. Null means immediately.
     /// </summary>
     public ScheduleRequestModel? Schedule { get; set; }
-
 }
 
 

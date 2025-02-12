@@ -1,5 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Delivery.Indexing.Selectors;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
 
@@ -9,8 +12,33 @@ public sealed class DescendantsSelector : QueryOptionBase, ISelectorHandler
 {
     private const string DescendantsSpecifier = "descendants:";
 
-    public DescendantsSelector(IPublishedSnapshotAccessor publishedSnapshotAccessor, IRequestRoutingService requestRoutingService)
-        : base(publishedSnapshotAccessor, requestRoutingService)
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
+    public DescendantsSelector(IPublishedContentCache publishedContentCache, IRequestRoutingService requestRoutingService)
+        : this(
+            requestRoutingService,
+            StaticServiceProvider.Instance.GetRequiredService<IRequestPreviewService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IApiDocumentUrlService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>())
+    {
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
+    public DescendantsSelector(
+        IPublishedContentCache publishedContentCache,
+        IRequestRoutingService requestRoutingService,
+        IRequestPreviewService requestPreviewService,
+        IApiDocumentUrlService apiDocumentUrlService,
+        IVariationContextAccessor variationContextAccessor)
+        : this(requestRoutingService, requestPreviewService, apiDocumentUrlService, variationContextAccessor)
+    {
+    }
+
+    public DescendantsSelector(
+        IRequestRoutingService requestRoutingService,
+        IRequestPreviewService requestPreviewService,
+        IApiDocumentUrlService apiDocumentUrlService,
+        IVariationContextAccessor variationContextAccessor)
+        : base(requestRoutingService, requestPreviewService, apiDocumentUrlService, variationContextAccessor)
     {
     }
 

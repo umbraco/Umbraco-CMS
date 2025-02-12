@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Configuration.Models.Validation;
-using Umbraco.Extensions;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.DependencyInjection;
 
@@ -85,7 +85,8 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<ContentDashboardSettings>()
             .AddUmbracoOptions<HelpPageSettings>()
             .AddUmbracoOptions<DataTypesSettings>()
-            .AddUmbracoOptions<WebhookSettings>();
+            .AddUmbracoOptions<WebhookSettings>()
+            .AddUmbracoOptions<CacheSettings>();
 
         // Configure connection string and ensure it's updated when the configuration changes
         builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();
@@ -103,20 +104,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.Configure<InstallDefaultDataSettings>(
             Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes,
             builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes}"));
-
-        // TODO: Remove this in V12
-        // This is to make the move of the AllowEditInvariantFromNonDefault setting from SecuritySettings to ContentSettings backwards compatible
-        // If there is a value in security settings, but no value in content setting we'll use that value, otherwise content settings always wins.
-        builder.Services.Configure<ContentSettings>(settings =>
-        {
-            var securitySettingsValue = builder.Config.GetSection($"{Constants.Configuration.ConfigSecurity}").GetValue<bool?>(nameof(SecuritySettings.AllowEditInvariantFromNonDefault));
-            var contentSettingsValue = builder.Config.GetSection($"{Constants.Configuration.ConfigContent}").GetValue<bool?>(nameof(ContentSettings.AllowEditInvariantFromNonDefault));
-
-            if (securitySettingsValue is not null && contentSettingsValue is null)
-            {
-                settings.AllowEditInvariantFromNonDefault = securitySettingsValue.Value;
-            }
-        });
 
         return builder;
     }

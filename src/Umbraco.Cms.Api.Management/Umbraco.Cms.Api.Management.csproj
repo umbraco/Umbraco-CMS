@@ -2,18 +2,34 @@
   <PropertyGroup>
     <Title>Umbraco CMS - Management API</Title>
     <Description>Contains the presentation layer for the Umbraco CMS Management API.</Description>
-    <IsPackable>true</IsPackable>
-    <EnablePackageValidation>false</EnablePackageValidation>
-    <AssemblyName>Umbraco.Cms.Api.Management</AssemblyName>
-    <RootNamespace>Umbraco.Cms.Api.Management</RootNamespace>
   </PropertyGroup>
-
+  
+  <PropertyGroup>
+    <!--
+      TODO: Fix and remove overrides:
+      [SA1117] params all on same line
+      [SA1401] make fields private
+      [SA1134] own line attributes
+      [CS0108] hidden inherited member
+      [CS0618]/[CS9042] update obsolete references
+      [CS1998] remove async or make method synchronous
+      [CS8524] switch statement
+      [IDE0060] removed unused parameter
+      [SA1649] file name match type
+      [CS0419] ambiguous reference
+      [CS1573] param tag for all parameters
+      [CS1574] unresolveable cref
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),SA1117,SA1401,SA1134,CS0108,CS0618,CS9042,CS1998,CS8524,IDE0060,SA1649,CS0419,CS1573,CS1574</WarningsNotAsErrors>
+  </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="JsonPatch.Net" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj" />
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
   </ItemGroup>
@@ -29,9 +45,5 @@
 
   <ItemGroup>
     <EmbeddedResource Include="OpenApi.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Security\Authorization\Dictionary\IDictionaryPermissionAuthorizer.cs" />
   </ItemGroup>
 </Project>

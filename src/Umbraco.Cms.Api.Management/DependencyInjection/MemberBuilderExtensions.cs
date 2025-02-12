@@ -10,7 +10,7 @@ internal static class MemberBuilderExtensions
 {
     internal static IUmbracoBuilder AddMember(this IUmbracoBuilder builder)
     {
-        builder.Services.AddTransient<IMemberPresentationFactory, MemberPresentationFactory>();
+        builder.Services.AddSingleton<IMemberPresentationFactory, MemberPresentationFactory>();
         builder.Services.AddTransient<IMemberEditingPresentationFactory, MemberEditingPresentationFactory>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<MemberMapDefinition>();

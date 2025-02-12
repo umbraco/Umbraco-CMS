@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -54,7 +55,6 @@ namespace Umbraco.Cms.Core.Services
             _shortStringHelper = shortStringHelper;
             _userIdKeyResolver = userIdKeyResolver;
         }
-
         [Obsolete("Use constructor that takes IUserIdKeyResolver as a parameter, scheduled for removal in V15")]
         public MediaService(
             ICoreScopeProvider provider,
@@ -76,8 +76,7 @@ namespace Umbraco.Cms.Core.Services
                 mediaTypeRepository,
                 entityRepository,
                 shortStringHelper,
-                StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>()
-                )
+                StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
         {
         }
 
@@ -769,6 +768,7 @@ namespace Umbraco.Cms.Core.Services
                 media.WriterId = userId;
 
                 _mediaRepository.Save(media);
+
                 scope.Notifications.Publish(new MediaSavedNotification(media, eventMessages).WithStateFrom(savingNotification));
                 // TODO: See note about suppressing events in content service
                 scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshNode, eventMessages));
@@ -1002,7 +1002,6 @@ namespace Umbraco.Cms.Core.Services
                 MoveToRecycleBinEventInfo<IMedia>[] moveInfo = moves.Select(x => new MoveToRecycleBinEventInfo<IMedia>(x.Item1, x.Item2)).ToArray();
                 scope.Notifications.Publish(new MediaMovedToRecycleBinNotification(moveInfo, messages).WithStateFrom(movingToRecycleBinNotification));
                 Audit(AuditType.Move, userId, media.Id, "Move Media to recycle bin");
-
                 scope.Complete();
             }
 
@@ -1070,6 +1069,8 @@ namespace Umbraco.Cms.Core.Services
         // trash indicates whether we are trashing, un-trashing, or not changing anything
         private void PerformMoveLocked(IMedia media, int parentId, IMedia? parent, int userId, ICollection<(IMedia, string)> moves, bool? trash)
         {
+            // Needed to update the in-memory navigation structure
+            var cameFromRecycleBin = media.ParentId == Constants.System.RecycleBinMedia;
             media.ParentId = parentId;
 
             // get the level delta (old pos to new pos)
@@ -1114,7 +1115,6 @@ namespace Umbraco.Cms.Core.Services
 
             }
             while (total > pageSize);
-
         }
 
         private void PerformMoveMediaLocked(IMedia media, bool? trash)
@@ -1421,7 +1421,6 @@ namespace Umbraco.Cms.Core.Services
         }
 
         #endregion
-
 
     }
 }

@@ -14,25 +14,34 @@ namespace Umbraco.Cms.Core.Cache;
 public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<ContentTypeCacheRefresherNotification, ContentTypeCacheRefresher.JsonPayload>
 {
     private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
-    private readonly IIdKeyMap _idKeyMap;
     private readonly IPublishedModelFactory _publishedModelFactory;
-    private readonly IPublishedSnapshotService _publishedSnapshotService;
+    private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
+    private readonly IDocumentCacheService _documentCacheService;
+    private readonly IPublishedContentTypeCache _publishedContentTypeCache;
+    private readonly IMediaCacheService _mediaCacheService;
+    private readonly IIdKeyMap _idKeyMap;
 
     public ContentTypeCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
-        IPublishedSnapshotService publishedSnapshotService,
-        IPublishedModelFactory publishedModelFactory,
         IIdKeyMap idKeyMap,
         IContentTypeCommonRepository contentTypeCommonRepository,
         IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory)
+        ICacheRefresherNotificationFactory factory,
+        IPublishedModelFactory publishedModelFactory,
+        IPublishedContentTypeFactory publishedContentTypeFactory,
+        IDocumentCacheService documentCacheService,
+        IPublishedContentTypeCache publishedContentTypeCache,
+        IMediaCacheService mediaCacheService)
         : base(appCaches, serializer, eventAggregator, factory)
     {
-        _publishedSnapshotService = publishedSnapshotService;
-        _publishedModelFactory = publishedModelFactory;
         _idKeyMap = idKeyMap;
         _contentTypeCommonRepository = contentTypeCommonRepository;
+        _publishedModelFactory = publishedModelFactory;
+        _publishedContentTypeFactory = publishedContentTypeFactory;
+        _documentCacheService = documentCacheService;
+        _publishedContentTypeCache = publishedContentTypeCache;
+        _mediaCacheService = mediaCacheService;
     }
 
     #region Json
@@ -115,9 +124,16 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
             MemberCacheRefresher.RefreshMemberTypes(AppCaches);
         }
 
-        // refresh the models and cache
+        _publishedContentTypeCache.ClearContentTypes(payloads.Select(x => x.Id));
+        _publishedContentTypeFactory.NotifyDataTypeChanges();
         _publishedModelFactory.WithSafeLiveFactoryReset(() =>
-            _publishedSnapshotService.Notify(payloads));
+        {
+            IEnumerable<int> documentTypeIds = payloads.Where(x => x.ItemType == nameof(IContentType)).Select(x => x.Id);
+            IEnumerable<int> mediaTypeIds = payloads.Where(x => x.ItemType == nameof(IMediaType)).Select(x => x.Id);
+
+            _documentCacheService.RebuildMemoryCacheByContentTypeAsync(documentTypeIds);
+            _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds);
+        });
 
         // now we can trigger the event
         base.Refresh(payloads);

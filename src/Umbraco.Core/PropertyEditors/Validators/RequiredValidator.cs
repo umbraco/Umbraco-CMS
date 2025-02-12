@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -7,7 +8,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 /// <summary>
 ///     A validator that validates that the value is not null or empty (if it is a string)
 /// </summary>
-public sealed class RequiredValidator : IValueRequiredValidator, IValueValidator
+public class RequiredValidator : IValueRequiredValidator, IValueValidator
 {
     [Obsolete($"Use the constructor that does not accept {nameof(ILocalizedTextService)}. Will be removed in V15.")]
     public RequiredValidator(ILocalizedTextService textService)
@@ -20,11 +21,11 @@ public sealed class RequiredValidator : IValueRequiredValidator, IValueValidator
     }
 
     /// <inheritdoc cref="IValueValidator.Validate" />
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration) =>
+    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext) =>
         ValidateRequired(value, valueType);
 
     /// <inheritdoc cref="IValueRequiredValidator.ValidateRequired" />
-    public IEnumerable<ValidationResult> ValidateRequired(object? value, string? valueType)
+    public virtual IEnumerable<ValidationResult> ValidateRequired(object? value, string? valueType)
     {
         if (value == null)
         {

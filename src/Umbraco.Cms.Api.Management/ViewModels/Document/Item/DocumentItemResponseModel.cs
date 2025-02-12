@@ -10,6 +10,10 @@ public class DocumentItemResponseModel : ItemResponseModelBase
 
     public bool IsProtected { get; set; }
 
+    public ReferenceByIdModel? Parent { get; set; }
+
+    public bool HasChildren { get; set; }
+
     public DocumentTypeReferenceResponseModel DocumentType { get; set; } = new();
 
     public IEnumerable<DocumentVariantItemResponseModel> Variants { get; set; } = Enumerable.Empty<DocumentVariantItemResponseModel>();

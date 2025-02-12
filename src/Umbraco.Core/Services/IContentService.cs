@@ -1,3 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
+
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -316,6 +320,21 @@ public interface IContentService : IContentServiceBase<IContent>
     OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
+    /// Attempts to move the <see cref="IContent"/> <paramref name="content"/> to under the node with id <paramref name="parentId"/>.
+    /// </summary>
+    /// <param name="content">The <see cref="IContent"/> that shall be moved.</param>
+    /// <param name="parentId">The id of the new parent node.</param>
+    /// <param name="userId">Id of the user attempting to move <paramref name="content"/>.</param>
+    /// <returns>Success if moving succeeded, otherwise Failed.</returns>
+    [Obsolete("Adds return type to Move method. Will be removed in V14, as the original method will be adjusted.")]
+    OperationResult
+        AttemptMove(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
+    {
+        Move(content, parentId, userId);
+        return OperationResult.Succeed(new EventMessages());
+    }
+
+    /// <summary>
     ///     Copies a document.
     /// </summary>
     /// <remarks>
@@ -523,4 +542,7 @@ public interface IContentService : IContentServiceBase<IContent>
     #endregion
 
     Task<OperationResult> EmptyRecycleBinAsync(Guid userId);
+
+ContentScheduleCollection GetContentScheduleByContentId(Guid contentId) => StaticServiceProvider.Instance
+    .GetRequiredService<ContentService>().GetContentScheduleByContentId(contentId);
 }

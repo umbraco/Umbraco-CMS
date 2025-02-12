@@ -1,4 +1,4 @@
-﻿import { ConstantHelper, test, AliasHelper } from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test, AliasHelper} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
@@ -20,6 +20,7 @@ for (const dataTypeName of dataTypeNames) {
     
     test(`can create content with the ${dataTypeName} data type`, async ({umbracoApi, umbracoUi}) => {
       // Arrange
+      const expectedState = 'Draft';
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
       await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -35,26 +36,27 @@ for (const dataTypeName of dataTypeNames) {
       await umbracoUi.content.isSuccessNotificationVisible();
       expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
       const contentData = await umbracoApi.document.getByName(contentName);
+      expect(contentData.variants[0].state).toBe(expectedState);
       expect(contentData.values).toEqual([]);
     });
     
     test(`can publish content with the ${dataTypeName} data type`, async ({umbracoApi, umbracoUi}) => {
       // Arrange
+      const expectedState = 'Published';
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-      await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+      const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+      await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
       await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     
       // Act
-      await umbracoUi.content.clickActionsMenuAtRoot();
-      await umbracoUi.content.clickCreateButton();
-      await umbracoUi.content.chooseDocumentType(documentTypeName);
-      await umbracoUi.content.enterContentName(contentName);
+      await umbracoUi.content.goToContentWithName(contentName);
       await umbracoUi.content.clickSaveAndPublishButton();
     
       // Assert
       await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
       expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
       const contentData = await umbracoApi.document.getByName(contentName);
+      expect(contentData.variants[0].state).toBe(expectedState);
       expect(contentData.values).toEqual([]);
     });
     
@@ -65,14 +67,12 @@ for (const dataTypeName of dataTypeNames) {
       const selectedOptions = dataTypeName === 'Dropdown' ? [optionValues[0]] : optionValues;
       const isMultiple = dataTypeName === 'Dropdown' ? false : true;
       const customDataTypeId = await umbracoApi.dataType.createDropdownDataType(customDataTypeName, isMultiple, optionValues);
-      await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+      const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+      await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
       await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     
       // Act
-      await umbracoUi.content.clickActionsMenuAtRoot();
-      await umbracoUi.content.clickCreateButton();
-      await umbracoUi.content.chooseDocumentType(documentTypeName);
-      await umbracoUi.content.enterContentName(contentName);
+      await umbracoUi.content.goToContentWithName(contentName);
       await umbracoUi.content.chooseDropdownOption(selectedOptions);
       await umbracoUi.content.clickSaveAndPublishButton();
     

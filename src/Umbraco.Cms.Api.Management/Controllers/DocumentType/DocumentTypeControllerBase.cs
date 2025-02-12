@@ -98,6 +98,18 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .WithTitle("Name was too long")
                     .WithDetail("Name cannot be more than 255 characters in length.")
                     .Build()),
+                ContentTypeOperationStatus.InvalidElementFlagDocumentHasContent => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Invalid IsElement flag")
+                    .WithDetail("Cannot change to element type because content has already been created with this document type.")
+                    .Build()),
+                ContentTypeOperationStatus.InvalidElementFlagElementIsUsedInPropertyEditorConfiguration => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Invalid IsElement flag")
+                    .WithDetail("Cannot change to document type because this element type is used in the configuration of a data type.")
+                    .Build()),
+                ContentTypeOperationStatus.InvalidElementFlagComparedToParent => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Invalid IsElement flag")
+                    .WithDetail("Can not create a documentType with inheritance composition where the parent and the new type's IsElement flag are different.")
+                    .Build()),
                 _ => new ObjectResult("Unknown content type operation status") { StatusCode = StatusCodes.Status500InternalServerError },
             });
 

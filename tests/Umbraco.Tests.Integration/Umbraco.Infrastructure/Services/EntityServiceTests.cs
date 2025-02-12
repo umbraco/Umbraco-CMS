@@ -836,9 +836,11 @@ public class EntityServiceTests : UmbracoIntegrationTest
     [Test]
     public void EntityService_Cannot_Get_Id_For_Key_With_Incorrect_Object_Type()
     {
-        var result1 = EntityService.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"),
+        var result1 = EntityService.GetId(
+            Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"),
             UmbracoObjectTypes.DocumentType);
-        var result2 = EntityService.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"),
+        var result2 = EntityService.GetId(
+            Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"),
             UmbracoObjectTypes.MediaType);
 
         Assert.IsTrue(result1.Success);
@@ -868,7 +870,7 @@ public class EntityServiceTests : UmbracoIntegrationTest
         Assert.IsFalse(EntityService.GetId(Guid.NewGuid(), UmbracoObjectTypes.DocumentType).Success);
     }
 
-    private static bool s_isSetup;
+    private static bool _isSetup;
 
     private int _folderId;
     private ContentType _contentType;
@@ -885,9 +887,9 @@ public class EntityServiceTests : UmbracoIntegrationTest
 
     public void CreateTestData()
     {
-        if (s_isSetup == false)
+        if (_isSetup == false)
         {
-            s_isSetup = true;
+            _isSetup = true;
 
             var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
             FileService.SaveTemplate(template); // else, FK violation on contentType!

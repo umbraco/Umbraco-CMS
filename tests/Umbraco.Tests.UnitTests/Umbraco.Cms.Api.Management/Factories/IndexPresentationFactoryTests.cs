@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using Examine;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Factories;
@@ -51,7 +52,8 @@ public class IndexPresentationFactoryTests
         var factory = new IndexPresentationFactory(
             indexDiagnosticsFactoryMock.Object,
             indexRebuilderMock.Object,
-            indexRebuilderServiceMock.Object);
+            indexRebuilderServiceMock.Object,
+            Mock.Of<ILogger<IndexPresentationFactory>>());
 
 
         // act

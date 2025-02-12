@@ -13,7 +13,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore.Locking;
 
-internal class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributedLockingMechanism
+internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributedLockingMechanism
     where T : DbContext
 {
     private ConnectionStrings _connectionStrings;
@@ -58,7 +58,7 @@ internal class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributedLocki
         return new SqlServerDistributedLock(this, lockId, DistributedLockType.WriteLock, obtainLockTimeout.Value);
     }
 
-    private class SqlServerDistributedLock : IDistributedLock
+    private sealed class SqlServerDistributedLock : IDistributedLock
     {
         private readonly SqlServerEFCoreDistributedLockingMechanism<T> _parent;
         private readonly TimeSpan _timeout;
@@ -170,7 +170,9 @@ internal class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributedLocki
                         "A transaction with minimum ReadCommitted isolation level is required.");
                 }
 
-                var rowsAffected = await dbContext.Database.ExecuteSqlAsync(@$"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={LockId}");
+#pragma warning disable EF1002
+                var rowsAffected = await dbContext.Database.ExecuteSqlRawAsync(@$"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={LockId}");
+#pragma warning restore EF1002
 
                 if (rowsAffected == 0)
                 {

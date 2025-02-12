@@ -45,8 +45,7 @@ public class ImageCropperValueConverterTests : PropertyValueConverterTests
                     }
                 },
                 FocalPoint = new ImageCropperValue.ImageCropperFocalPoint { Left = .2m, Top = .4m }
-            }
-        );
+            });
         var inter = valueConverter.ConvertSourceToIntermediate(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, source, false);
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as ApiImageCropperValue;
         Assert.NotNull(result);

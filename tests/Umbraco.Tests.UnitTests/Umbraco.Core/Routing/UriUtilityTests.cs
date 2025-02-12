@@ -23,7 +23,9 @@ public class UriUtilityTests
 
     // test that the trailing slash goes but not on hostname
     [TestCase("http://LocalHost/", "http://localhost/")]
+    [TestCase("http://LocalHost/////", "http://localhost/")]
     [TestCase("http://LocalHost/Home/", "http://localhost/home")]
+    [TestCase("http://LocalHost/Home/////", "http://localhost/home")]
     [TestCase("http://LocalHost/Home/?x=y", "http://localhost/home?x=y")]
     [TestCase("http://LocalHost/Home/Sub1/", "http://localhost/home/sub1")]
     [TestCase("http://LocalHost/Home/Sub1/?x=y", "http://localhost/home/sub1?x=y")]

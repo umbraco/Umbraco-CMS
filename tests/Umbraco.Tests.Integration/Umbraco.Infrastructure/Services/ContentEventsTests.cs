@@ -164,7 +164,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
         protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
-            builder.AddNuCache();
+            builder.AddUmbracoHybridCache();
             builder.Services.AddUnique<IServerMessenger, LocalServerMessenger>();
             builder.Services.AddUnique<IServerMessenger, LocalServerMessenger>();
             builder

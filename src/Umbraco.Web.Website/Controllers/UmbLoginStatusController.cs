@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Logging;
@@ -29,6 +30,7 @@ public class UmbLoginStatusController : SurfaceController
         => _signInManager = signInManager;
 
     [HttpPost]
+    [AllowAnonymous]
     [ValidateAntiForgeryToken]
     [ValidateUmbracoFormRouteString]
     public async Task<IActionResult> HandleLogout([Bind(Prefix = "logoutModel")] PostRedirectModel model)

@@ -24,7 +24,7 @@ test.afterEach(async ({umbracoApi}) => {
 test('can create child node', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
-  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId, true);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
   contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -33,11 +33,9 @@ test('can create child node', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickCreateButton();
   await umbracoUi.content.chooseDocumentType(childDocumentTypeName);
-  // This wait is needed 
-  await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.enterContentName(childContentName);
   await umbracoUi.content.clickSaveButton();
-  
+
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(childContentName)).toBeTruthy();
@@ -61,9 +59,9 @@ test('can create child node in child node', async ({umbracoApi, umbracoUi}) => {
   let childContentId: any;
   await umbracoApi.documentType.ensureNameNotExists(childOfChildDocumentTypeName);
   childOfChildDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childOfChildDocumentTypeName);
-  childDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(childDocumentTypeName, childOfChildDocumentTypeId, true);
-  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId, true);
-  contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);  
+  childDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(childDocumentTypeName, childOfChildDocumentTypeId);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
+  contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   childContentId = await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, contentId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -73,8 +71,7 @@ test('can create child node in child node', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickActionsMenuForContent(childContentName);
   await umbracoUi.content.clickCreateButton();
   await umbracoUi.content.chooseDocumentType(childOfChildDocumentTypeName);
-  // This wait is needed 
-  await umbracoUi.waitForTimeout(500);
+  // This wait is needed
   await umbracoUi.content.enterContentName(childOfChildContentName);
   await umbracoUi.content.clickSaveButton();
 
@@ -94,7 +91,7 @@ test('can create child node in child node', async ({umbracoApi, umbracoUi}) => {
 test('cannot publish child if the parent is not published', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
-  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId, true);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
   contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, contentId);
   await umbracoUi.goToBackOffice();
@@ -114,7 +111,7 @@ test('cannot publish child if the parent is not published', async ({umbracoApi, 
 test('can publish with descendants', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
-  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId, true);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
   contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, contentId);
   await umbracoUi.goToBackOffice();

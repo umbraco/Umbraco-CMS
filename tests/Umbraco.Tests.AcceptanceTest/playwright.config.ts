@@ -8,7 +8,7 @@ export const STORAGE_STATE = path.join(__dirname, 'playwright/.auth/user.json');
 export default defineConfig({
   testDir: './tests/',
   /* Maximum time one test can run for. */
-  timeout: 40 * 1000,
+  timeout: 30 * 1000,
   expect: {
     /**
      * Maximum time expect() should wait for the condition to be met.
@@ -19,7 +19,7 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 1,
+  retries: 2,
   // We don't want to run parallel, as tests might differ in state
   workers: 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -47,6 +47,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         // Use prepared auth state.
+        ignoreHTTPSErrors: true,
         storageState: STORAGE_STATE,
       },
     },

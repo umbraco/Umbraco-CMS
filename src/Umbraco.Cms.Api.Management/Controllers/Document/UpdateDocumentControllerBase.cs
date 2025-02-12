@@ -17,15 +17,15 @@ public abstract class UpdateDocumentControllerBase : DocumentControllerBase
 
     protected async Task<IActionResult> HandleRequest(Guid id, UpdateDocumentRequestModel requestModel, Func<Task<IActionResult>> authorizedHandler)
     {
-        IEnumerable<string> cultures = requestModel.Variants
-            .Where(v => v.Culture is not null)
-            .Select(v => v.Culture!);
+        // We intentionally don't pass in cultures here.
+        // This is to support the client sending values for all cultures even if the user doesn't have access to the language.
+        // Values for unauthorized languages are later ignored in the ContentEditingService.
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionUpdate.ActionLetter, id, cultures),
+            ContentPermissionResource.WithKeys(ActionUpdate.ActionLetter, id),
             AuthorizationPolicies.ContentPermissionByResource);
 
-        if (!authorizationResult.Succeeded)
+        if (authorizationResult.Succeeded is false)
         {
             return Forbidden();
         }

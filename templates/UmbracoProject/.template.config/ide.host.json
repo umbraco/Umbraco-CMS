@@ -9,10 +9,21 @@
   "symbolInfo": [
     {
       "id": "UmbracoVersion",
-      "isVisible": true
+      "isVisible": false
     },
     {
       "id": "UseHttpsRedirect",
+      "isVisible": true,
+      "persistenceScope": "templateGroup",
+      "defaultValue": "true"
+    },
+    {
+      "id": "UseDeliveryApi",
+      "isVisible": true,
+      "persistenceScope": "templateGroup"
+    },
+    {
+      "id": "ModelsBuilderMode",
       "isVisible": true,
       "persistenceScope": "templateGroup"
     },
@@ -54,6 +65,23 @@
     {
       "id": "NoNodesViewPath",
       "isVisible": true
+    },
+    {
+      "id": "Docker",
+      "isVisible": true
+    },
+    {
+      "id": "StarterKit",
+      "isVisible": true
+    },
+    {
+      "id": "UmbracoRelease",
+      "isVisible": true
+    },
+    {
+      "id": "DevelopmentMode",
+      "isVisible": true,
+      "defaultValue": "IDEDevelopment"
     }
   ]
 }

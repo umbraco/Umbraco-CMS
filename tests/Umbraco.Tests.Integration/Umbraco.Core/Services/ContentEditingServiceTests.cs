@@ -28,6 +28,8 @@ public class ContentEditingServiceTests : UmbracoIntegrationTestWithContent
 
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+
     [Test]
     public async Task Only_Supplied_Cultures_Are_Updated()
     {
@@ -107,7 +109,7 @@ public class ContentEditingServiceTests : UmbracoIntegrationTestWithContent
         await LanguageService.CreateAsync(langDa, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = new ContentTypeBuilder()
             .WithAlias("variantContent")
@@ -127,7 +129,7 @@ public class ContentEditingServiceTests : UmbracoIntegrationTestWithContent
             .Build();
 
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         return (langEn, langDa, contentType);
     }

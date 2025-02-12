@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class RichTextConfiguration : IIgnoreUserStartNodesConfig
 {
     [ConfigurationField("blocks")]
-    public RichTextBlockConfiguration[]? Blocks { get; set; } = null!;
+    public RichTextBlockConfiguration[]? Blocks { get; set; } = Array.Empty<RichTextBlockConfiguration>();
 
     [ConfigurationField("mediaParentId")]
     public Guid? MediaParentId { get; set; }

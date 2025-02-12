@@ -1,31 +1,58 @@
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 
 public class ModelsGenerator : IModelsGenerator
 {
-    private readonly IHostingEnvironment _hostingEnvironment;
     private readonly OutOfDateModelsStatus _outOfDateModels;
+    private readonly IHostEnvironment _hostEnvironment;
     private readonly UmbracoServices _umbracoService;
     private ModelsBuilderSettings _config;
 
+    [Obsolete("Use a not obsoleted constructor instead. Scheduled for removal in v16")]
     public ModelsGenerator(UmbracoServices umbracoService, IOptionsMonitor<ModelsBuilderSettings> config,
         OutOfDateModelsStatus outOfDateModels, IHostingEnvironment hostingEnvironment)
     {
         _umbracoService = umbracoService;
         _config = config.CurrentValue;
         _outOfDateModels = outOfDateModels;
-        _hostingEnvironment = hostingEnvironment;
+        config.OnChange(x => _config = x);
+
+        _hostEnvironment = StaticServiceProvider.Instance.GetRequiredService<IHostEnvironment>();
+    }
+
+    [Obsolete("Use a not obsoleted constructor instead. Scheduled for removal in v16")]
+    public ModelsGenerator(UmbracoServices umbracoService, IOptionsMonitor<ModelsBuilderSettings> config,
+        OutOfDateModelsStatus outOfDateModels, IHostingEnvironment hostingEnvironment, IHostEnvironment hostEnvironment)
+    {
+        _umbracoService = umbracoService;
+        _config = config.CurrentValue;
+        _outOfDateModels = outOfDateModels;
+        config.OnChange(x => _config = x);
+
+        _hostEnvironment = hostEnvironment;
+    }
+
+    public ModelsGenerator(UmbracoServices umbracoService, IOptionsMonitor<ModelsBuilderSettings> config,
+        OutOfDateModelsStatus outOfDateModels, IHostEnvironment hostEnvironment)
+    {
+        _umbracoService = umbracoService;
+        _config = config.CurrentValue;
+        _outOfDateModels = outOfDateModels;
+        _hostEnvironment = hostEnvironment;
         config.OnChange(x => _config = x);
     }
 
     public void GenerateModels()
     {
-        var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
+        var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostEnvironment);
         if (!Directory.Exists(modelsDirectory))
         {
             Directory.CreateDirectory(modelsDirectory);

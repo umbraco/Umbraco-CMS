@@ -406,4 +406,12 @@ public interface IUserService : IMembershipUserService
     Task<Attempt<UserInvitationResult, UserOperationStatus>> ResendInvitationAsync(Guid performingUserKey, UserResendInviteModel model);
 
     Task<Attempt<PasswordChangedModel, UserOperationStatus>> ResetPasswordAsync(Guid performingUserKey, Guid userKey);
+
+    Task<UserClientCredentialsOperationStatus> AddClientIdAsync(Guid userKey, string clientId);
+
+    Task<bool> RemoveClientIdAsync(Guid userKey, string clientId);
+
+    Task<IUser?> FindByClientIdAsync(string clientId);
+
+    Task<IEnumerable<string>> GetClientIdsAsync(Guid userKey);
 }

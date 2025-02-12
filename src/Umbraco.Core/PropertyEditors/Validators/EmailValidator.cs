@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Cms.Core.Models.Validation;
 
 namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 
@@ -8,7 +9,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 public sealed class EmailValidator : IValueValidator
 {
     /// <inheritdoc />
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
     {
         var asString = value == null ? string.Empty : value.ToString();
 

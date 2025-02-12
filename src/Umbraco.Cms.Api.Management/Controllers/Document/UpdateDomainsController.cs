@@ -66,6 +66,10 @@ public class UpdateDomainsController : DocumentControllerBase
                     .WithDetail("One or more of the specified domain names were conflicting with domain assignments to other content items.")
                     .WithExtension("conflictingDomainNames", _domainPresentationFactory.CreateDomainAssignmentModels(result.Result.ConflictingDomains.EmptyNull()))
                     .Build()),
+                DomainOperationStatus.InvalidDomainName => BadRequest(problemDetailsBuilder
+                    .WithTitle("Invalid domain name detected")
+                    .WithDetail("One or more of the specified domain names were invalid.")
+                    .Build()),
                 _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                     .WithTitle("Unknown domain update operation status.")
                     .Build()),

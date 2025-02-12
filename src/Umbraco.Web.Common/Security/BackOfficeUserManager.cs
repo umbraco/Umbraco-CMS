@@ -62,31 +62,6 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         _globalSettings = globalSettings.Value;
     }
 
-    /// <summary>
-    ///     Override to check the user approval value as well as the user lock out date, by default this only checks the user's
-    ///     locked out date
-    /// </summary>
-    /// <param name="user">The user</param>
-    /// <returns>True if the user is locked out, else false</returns>
-    /// <remarks>
-    ///     In the ASP.NET Identity world, there is only one value for being locked out, in Umbraco we have 2 so when checking
-    ///     this for Umbraco we need to check both values
-    /// </remarks>
-    public override async Task<bool> IsLockedOutAsync(BackOfficeIdentityUser user)
-    {
-        if (user == null)
-        {
-            throw new ArgumentNullException(nameof(user));
-        }
-
-        if (user.IsApproved == false)
-        {
-            return true;
-        }
-
-        return await base.IsLockedOutAsync(user);
-    }
-
     public override async Task<IdentityResult> AccessFailedAsync(BackOfficeIdentityUser user)
     {
         IdentityResult result = await base.AccessFailedAsync(user);
@@ -298,7 +273,8 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
             createModel.Email,
             _globalSettings.DefaultUILanguage,
             createModel.Name,
-            createModel.Id);
+            createModel.Id,
+            createModel.Kind);
 
         IdentityResult created = await CreateAsync(identityUser);
 

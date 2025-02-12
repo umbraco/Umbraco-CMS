@@ -35,6 +35,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .WithTitle("Email Cannot be changed")
                 .WithDetail("Local login is disabled, so the email cannot be changed.")
                 .Build()),
+            UserOperationStatus.InvalidUserName => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid username")
+                .WithDetail("The username contains one or more invalid characters.")
+                .Build()),
             UserOperationStatus.DuplicateUserName => BadRequest(problemDetailsBuilder
                 .WithTitle("Duplicate Username")
                 .WithDetail("The username is already in use.")
@@ -127,6 +131,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
             UserOperationStatus.SelfPasswordResetNotAllowed => BadRequest(problemDetailsBuilder
                 .WithTitle("Self password reset not allowed")
                 .WithDetail("It is not allowed to reset the password for the account you are logged in to.")
+                .Build()),
+            UserOperationStatus.InvalidUserType => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid user type")
+                .WithDetail("The target user type does not support this operation.")
                 .Build()),
             UserOperationStatus.Forbidden => Forbidden(),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder

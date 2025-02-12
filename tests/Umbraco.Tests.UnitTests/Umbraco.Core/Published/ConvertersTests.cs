@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.PublishedCache.Internal;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Extensions;
 
@@ -42,16 +43,16 @@ public class ConvertersTests
 
         var elementType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "element1", CreatePropertyTypes);
 
-        var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
+        var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false, new VariationContext());
 
         Assert.AreEqual(1234, element1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
 
         // 'null' would be considered a 'missing' value by the default, magic logic
-        var e = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", null } }, false);
+        var e = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", null } }, false, new VariationContext());
         Assert.IsFalse(e.HasValue("prop1"));
 
         // '0' would not - it's a valid integer - but the converter knows better
-        e = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "0" } }, false);
+        e = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "0" } }, false, new VariationContext());
         Assert.IsFalse(e.HasValue("prop1"));
     }
 
@@ -96,17 +97,11 @@ public class ConvertersTests
         var cacheContent = new Dictionary<int, IPublishedContent>();
         cacheMock.Setup(x => x.GetById(It.IsAny<int>()))
             .Returns<int>(id => cacheContent.TryGetValue(id, out var content) ? content : null);
-        var publishedSnapshotMock = new Mock<IPublishedSnapshot>();
-        publishedSnapshotMock.Setup(x => x.Content).Returns(cacheMock.Object);
-        var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
-        var localPublishedSnapshot = publishedSnapshotMock.Object;
-        publishedSnapshotAccessorMock.Setup(x => x.TryGetPublishedSnapshot(out localPublishedSnapshot)).Returns(true);
-        var publishedSnapshotAccessor = publishedSnapshotAccessorMock.Object;
 
-        var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[]
-        {
-            new SimpleConverter2(publishedSnapshotAccessor),
-        });
+        var converters = new PropertyValueConverterCollection(() =>
+        [
+            new SimpleConverter2(cacheMock.Object)
+        ]);
 
         var serializer = new SystemTextConfigurationEditorJsonSerializer();
         var dataTypeServiceMock = new Mock<IDataTypeService>();
@@ -125,7 +120,7 @@ public class ConvertersTests
 
         var elementType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "element1", CreatePropertyTypes);
 
-        var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
+        var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false, new VariationContext());
 
         var cntType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1001, "cnt1", t => Enumerable.Empty<PublishedPropertyType>());
         var cnt1 = new InternalPublishedContent(cntType1) { Id = 1234 };
@@ -136,12 +131,12 @@ public class ConvertersTests
 
     private class SimpleConverter2 : IPropertyValueConverter
     {
+        private readonly IPublishedContentCache _contentCache;
         private readonly PropertyCacheLevel _cacheLevel;
-        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-        public SimpleConverter2(IPublishedSnapshotAccessor publishedSnapshotAccessor, PropertyCacheLevel cacheLevel = PropertyCacheLevel.None)
+        public SimpleConverter2(IPublishedContentCache contentCache, PropertyCacheLevel cacheLevel = PropertyCacheLevel.None)
         {
-            _publishedSnapshotAccessor = publishedSnapshotAccessor;
+            _contentCache = contentCache;
             _cacheLevel = cacheLevel;
         }
 
@@ -172,8 +167,7 @@ public class ConvertersTests
             object inter,
             bool preview)
         {
-            var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-            return publishedSnapshot.Content.GetById((int)inter);
+            return _contentCache.GetById((int)inter)!;
         }
 
         public object ConvertIntermediateToXPath(
