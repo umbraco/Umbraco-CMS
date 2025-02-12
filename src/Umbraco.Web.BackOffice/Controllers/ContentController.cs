@@ -999,18 +999,29 @@ public class ContentController : ContentControllerBase
             // if there's only one variant and the model state is not valid we cannot publish so change it to save
             if (variantCount == 1)
             {
+
                 switch (contentItem.Action)
                 {
                     case ContentSaveAction.Publish:
                     case ContentSaveAction.PublishWithDescendants:
+#pragma warning disable CS0618 // Type or member is obsolete
                     case ContentSaveAction.PublishWithDescendantsForce:
+#pragma warning restore CS0618 // Type or member is obsolete
+                    case ContentSaveAction.PublishWithDescendantsIncludeUnpublished:
+                    case ContentSaveAction.PublishWithDescendantsForceRepublish:
+                    case ContentSaveAction.PublishWithDescendantsIncludeUnpublishedAndForceRepublish:
                     case ContentSaveAction.SendPublish:
                     case ContentSaveAction.Schedule:
                         contentItem.Action = ContentSaveAction.Save;
                         break;
                     case ContentSaveAction.PublishNew:
                     case ContentSaveAction.PublishWithDescendantsNew:
+#pragma warning disable CS0618 // Type or member is obsolete
                     case ContentSaveAction.PublishWithDescendantsForceNew:
+#pragma warning restore CS0618 // Type or member is obsolete
+                    case ContentSaveAction.PublishWithDescendantsIncludeUnpublishedNew:
+                    case ContentSaveAction.PublishWithDescendantsForceRepublishNew:
+                    case ContentSaveAction.PublishWithDescendantsIncludeUnpublishedAndForceRepublishNew:
                     case ContentSaveAction.SendPublishNew:
                     case ContentSaveAction.ScheduleNew:
                         contentItem.Action = ContentSaveAction.SaveNew;
@@ -1144,6 +1155,16 @@ public class ContentController : ContentControllerBase
                 break;
             case ContentSaveAction.PublishWithDescendants:
             case ContentSaveAction.PublishWithDescendantsNew:
+#pragma warning disable CS0618 // Type or member is obsolete
+            case ContentSaveAction.PublishWithDescendantsForce:
+            case ContentSaveAction.PublishWithDescendantsForceNew:
+#pragma warning restore CS0618 // Type or member is obsolete
+            case ContentSaveAction.PublishWithDescendantsIncludeUnpublished:
+            case ContentSaveAction.PublishWithDescendantsIncludeUnpublishedNew:
+            case ContentSaveAction.PublishWithDescendantsForceRepublish:
+            case ContentSaveAction.PublishWithDescendantsForceRepublishNew:
+            case ContentSaveAction.PublishWithDescendantsIncludeUnpublishedAndForceRepublish:
+            case ContentSaveAction.PublishWithDescendantsIncludeUnpublishedAndForceRepublishNew:
             {
                 if (!await ValidatePublishBranchPermissionsAsync(contentItem))
                 {
@@ -1154,29 +1175,13 @@ public class ContentController : ContentControllerBase
                     break;
                 }
 
-                var publishStatus = PublishBranchInternal(contentItem, false, cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
+                var publishStatus = PublishBranchInternal(contentItem, BuildPublishBranchFilter(contentItem.Action), cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
                 var addedDomainWarnings = AddDomainWarnings(publishStatus, successfulCultures, globalNotifications, defaultCulture);
                 AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
                 if (addedDomainWarnings is false)
                 {
                     AddPublishRoutableErrorNotifications(publishStatus, globalNotifications, successfulCultures);
                 }
-            }
-                break;
-            case ContentSaveAction.PublishWithDescendantsForce:
-            case ContentSaveAction.PublishWithDescendantsForceNew:
-            {
-                if (!await ValidatePublishBranchPermissionsAsync(contentItem))
-                {
-                    globalNotifications.AddErrorNotification(
-                        _localizedTextService.Localize(null, "publish"),
-                        _localizedTextService.Localize("publish", "invalidPublishBranchPermissions"));
-                    wasCancelled = false;
-                    break;
-                }
-
-                var publishStatus = PublishBranchInternal(contentItem, true, cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
-                AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
             }
                 break;
             default:
@@ -1226,6 +1231,31 @@ public class ContentController : ContentControllerBase
         }
 
         return display;
+    }
+
+    private static PublishBranchFilter BuildPublishBranchFilter(ContentSaveAction contentSaveAction)
+    {
+        var includeUnpublished = contentSaveAction == ContentSaveAction.PublishWithDescendantsIncludeUnpublished
+                               || contentSaveAction == ContentSaveAction.PublishWithDescendantsIncludeUnpublishedNew
+                               || contentSaveAction == ContentSaveAction.PublishWithDescendantsIncludeUnpublishedAndForceRepublish
+                               || contentSaveAction == ContentSaveAction.PublishWithDescendantsIncludeUnpublishedAndForceRepublishNew;
+        var forceRepublish = contentSaveAction == ContentSaveAction.PublishWithDescendantsForceRepublish
+                               || contentSaveAction == ContentSaveAction.PublishWithDescendantsForceRepublishNew
+                               || contentSaveAction == ContentSaveAction.PublishWithDescendantsIncludeUnpublishedAndForceRepublish
+                               || contentSaveAction == ContentSaveAction.PublishWithDescendantsIncludeUnpublishedAndForceRepublishNew;
+
+        PublishBranchFilter publishBranchFilter = PublishBranchFilter.Default;
+        if (includeUnpublished)
+        {
+            publishBranchFilter |= PublishBranchFilter.IncludeUnpublished;
+        }
+
+        if (forceRepublish)
+        {
+            publishBranchFilter |= PublishBranchFilter.ForceRepublish;
+        }
+
+        return publishBranchFilter;
     }
 
     private void AddPublishStatusNotifications(
@@ -1668,12 +1698,12 @@ public class ContentController : ContentControllerBase
         return authorizationResult.Succeeded;
     }
 
-    private IEnumerable<PublishResult> PublishBranchInternal(ContentItemSave contentItem, bool force, string? cultureForInvariantErrors, out bool wasCancelled, out string[]? successfulCultures)
+    private IEnumerable<PublishResult> PublishBranchInternal(ContentItemSave contentItem, PublishBranchFilter publishBranchFilter, string? cultureForInvariantErrors, out bool wasCancelled, out string[]? successfulCultures)
     {
         if (!contentItem.PersistedContent?.ContentType.VariesByCulture() ?? false)
         {
             //its invariant, proceed normally
-            IEnumerable<PublishResult> publishStatus = _contentService.SaveAndPublishBranch(contentItem.PersistedContent!, force, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+            IEnumerable<PublishResult> publishStatus = _contentService.SaveAndPublishBranch(contentItem.PersistedContent!, publishBranchFilter, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
             // TODO: Deal with multiple cancellations
             wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
             successfulCultures = null; //must be null! this implies invariant
@@ -1709,7 +1739,7 @@ public class ContentController : ContentControllerBase
         {
             //proceed to publish if all validation still succeeds
             IEnumerable<PublishResult> publishStatus = _contentService.SaveAndPublishBranch(
-                contentItem.PersistedContent!, force, culturesToPublish.WhereNotNull().ToArray(), _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+                contentItem.PersistedContent!, publishBranchFilter, culturesToPublish.WhereNotNull().ToArray(), _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
             // TODO: Deal with multiple cancellations
             wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
             successfulCultures = contentItem.Variants.Where(x => x.Publish).Select(x => x.Culture).WhereNotNull()

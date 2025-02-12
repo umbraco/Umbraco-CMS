@@ -17,6 +17,18 @@
             </umb-toggle>
         </div>
 
+        <div class="flex mb3">
+            <umb-toggle checked="vm.forceRepublish"
+                        on-click="vm.toggleForceRepublish()"
+                        class="mr2"
+                        input-id="includeUnpublished"
+                        label-on="{{vm.labels.forceRepublish}}"
+                        label-off="{{vm.labels.forceRepublish}}"
+                        label-position="right"
+                        show-labels="true">
+            </umb-toggle>
+        </div>
+
     </div>
 
     <div ng-if="vm.displayVariants.length > 1">
@@ -31,6 +43,18 @@
                         class="mr2"
                         label-on="{{vm.labels.includeUnpublished}}"
                         label-off="{{vm.labels.includeUnpublished}}"
+                        label-position="right"
+                        show-labels="true">
+            </umb-toggle>
+        </div>
+
+        <div class="flex mb3">
+            <umb-toggle checked="vm.forceRepublish"
+                        on-click="vm.toggleForceRepublish()"
+                        class="mr2"
+                        input-id="includeUnpublished"
+                        label-on="{{vm.labels.forceRepublish}}"
+                        label-off="{{vm.labels.forceRepublish}}"
                         label-position="right"
                         show-labels="true">
             </umb-toggle>

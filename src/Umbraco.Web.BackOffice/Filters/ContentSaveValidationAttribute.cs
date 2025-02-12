@@ -182,7 +182,12 @@ public sealed class ContentSaveValidationAttribute : TypeFilterAttribute
                     break;
                 case ContentSaveAction.Publish:
                 case ContentSaveAction.PublishWithDescendants:
+#pragma warning disable CS0618 // Type or member is obsolete
                 case ContentSaveAction.PublishWithDescendantsForce:
+#pragma warning restore CS0618 // Type or member is obsolete
+                case ContentSaveAction.PublishWithDescendantsIncludeUnpublished:
+                case ContentSaveAction.PublishWithDescendantsForceRepublish:
+                case ContentSaveAction.PublishWithDescendantsIncludeUnpublishedAndForceRepublish:
                     permissionToCheck.Add(ActionPublish.ActionLetter);
                     contentToCheck = contentItem.PersistedContent;
                     contentIdToCheck = contentToCheck?.Id ?? default;
@@ -232,7 +237,12 @@ public sealed class ContentSaveValidationAttribute : TypeFilterAttribute
                     break;
                 case ContentSaveAction.PublishNew:
                 case ContentSaveAction.PublishWithDescendantsNew:
+#pragma warning disable CS0618 // Type or member is obsolete
                 case ContentSaveAction.PublishWithDescendantsForceNew:
+#pragma warning restore CS0618 // Type or member is obsolete
+                case ContentSaveAction.PublishWithDescendantsIncludeUnpublishedNew:
+                case ContentSaveAction.PublishWithDescendantsForceRepublishNew:
+                case ContentSaveAction.PublishWithDescendantsIncludeUnpublishedAndForceRepublishNew:
                     //Publish new requires both ActionNew AND ActionPublish
                     // TODO: Shouldn't publish also require ActionUpdate since it will definitely perform an update to publish but maybe that's just implied
 
