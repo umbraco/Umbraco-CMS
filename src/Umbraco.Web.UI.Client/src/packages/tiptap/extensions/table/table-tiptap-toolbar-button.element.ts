@@ -1,27 +1,12 @@
 import { UmbTiptapToolbarButtonElement } from '../../components/toolbar/tiptap-toolbar-button.element.js';
-import type { UmbTiptapToolbarTableExtensionApi, UmbTiptapToolbarTableMenuItem } from './table.tiptap-toolbar-api.js';
-import { css, customElement, html, ifDefined, query, repeat, when } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbTiptapToolbarTableExtensionApi } from './table.tiptap-toolbar-api.js';
+import { css, customElement, html, ifDefined, when } from '@umbraco-cms/backoffice/external/lit';
 
-@customElement('umb-table-tiptap-toolbar-button')
-export class UmbTiptapToolbarTableToolbarButtonElement extends UmbTiptapToolbarButtonElement {
-	@query('#table-menu-popover')
-	private _popover?: UUIPopoverContainerElement;
+import '../../components/cascading-menu-popover/cascading-menu-popover.element.js';
 
+@customElement('umb-tiptap-toolbar-table-button')
+export class UmbTiptapToolbarTableButtonElement extends UmbTiptapToolbarButtonElement {
 	override api?: UmbTiptapToolbarTableExtensionApi;
-
-	#onClick(item: UmbTiptapToolbarTableMenuItem) {
-		if (!item.execute || !this.editor) return;
-
-		item.execute(this.editor);
-
-		setTimeout(() => {
-			// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			this._popover?.hidePopover();
-		}, 100);
-	}
 
 	override render() {
 		return html`
@@ -36,26 +21,13 @@ export class UmbTiptapToolbarTableToolbarButtonElement extends UmbTiptapToolbarB
 					(icon) => html`<umb-icon name=${icon}></umb-icon>`,
 					() => html`<span>${this.manifest?.meta.label}</span>`,
 				)}
+				<uui-symbol-expand slot="extra" open></uui-symbol-expand>
 			</uui-button>
-
 			${when(
-				this.api?.getMenu(),
+				this.api?.getMenu(this.editor),
 				(menu) => html`
-					<uui-popover-container id="table-menu-popover" placement="bottom-start">
-						<umb-popover-layout>
-							<uui-scroll-container>
-								${repeat(
-									menu,
-									(item) => item.label,
-									(item) => html`
-										<uui-menu-item label=${item.label} @click-label=${() => this.#onClick(item)}>
-											${when(item.icon, (icon) => html`<umb-icon slot="icon" name=${icon}></umb-icon>`)}
-										</uui-menu-item>
-									`,
-								)}
-							</uui-scroll-container>
-						</umb-popover-layout>
-					</uui-popover-container>
+					<umb-cascading-menu-popover id="table-menu-popover" placement="bottom-start" .items=${menu}>
+					</umb-cascading-menu-popover>
 				`,
 			)}
 		`;
@@ -67,17 +39,17 @@ export class UmbTiptapToolbarTableToolbarButtonElement extends UmbTiptapToolbarB
 				--uui-menu-item-flat-structure: 1;
 			}
 
-			uui-scroll-container {
-				max-height: 500px;
+			uui-button > uui-symbol-expand {
+				margin-left: var(--uui-size-space-1);
 			}
 		`,
 	];
 }
 
-export { UmbTiptapToolbarTableToolbarButtonElement as element };
+export { UmbTiptapToolbarTableButtonElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-table-tiptap-toolbar-button': UmbTiptapToolbarTableToolbarButtonElement;
+		'umb-tiptap-toolbar-table-button': UmbTiptapToolbarTableButtonElement;
 	}
 }
