@@ -145,8 +145,8 @@ internal class FileSystemMainDomLock : IMainDomLock
                 {
                     _logger.LogDebug("Found lock release signal file, releasing lock on {lockFilePath}", _lockFilePath);
                 }
-                _lockFileStream?.Close();
-                _lockFileStream = null;
+
+                ReleaseLock();
                 break;
             }
 
