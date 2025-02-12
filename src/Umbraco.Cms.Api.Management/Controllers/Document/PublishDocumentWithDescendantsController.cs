@@ -2,7 +2,6 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
@@ -54,7 +53,7 @@ public class PublishDocumentWithDescendantsController : DocumentControllerBase
         Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus> attempt = await _contentPublishingService.PublishBranchAsync(
             id,
             requestModel.Cultures,
-            GetPublishBranchForceOptions(requestModel),
+            BuildPublishBranchFilter(requestModel),
             CurrentUserKey(_backOfficeSecurityAccessor));
 
         return attempt.Success
@@ -62,7 +61,7 @@ public class PublishDocumentWithDescendantsController : DocumentControllerBase
             : DocumentPublishingOperationStatusResult(attempt.Status, failedBranchItems: attempt.Result.FailedItems);
     }
 
-    private static PublishBranchFilter GetPublishBranchForceOptions(PublishDocumentWithDescendantsRequestModel requestModel)
+    private static PublishBranchFilter BuildPublishBranchFilter(PublishDocumentWithDescendantsRequestModel requestModel)
     {
         PublishBranchFilter publishBranchFilter = PublishBranchFilter.Default;
         if (requestModel.IncludeUnpublishedDescendants)
