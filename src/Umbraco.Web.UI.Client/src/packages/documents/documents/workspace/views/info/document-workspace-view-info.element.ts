@@ -192,8 +192,8 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 		return html`
 			<div class="general-item"><span>${this.#renderStateTag()}</span></div>
-			${this.#renderCreateDate()} ${this.#renderUpdateDate()} ${this.#renderScheduledPublishDate()}
-			${this.#renderScheduledUnpublishDate()}
+			${this.#renderCreateDate()} ${this.#renderUpdateDate()} ${this.#renderPublishDate()}
+			${this.#renderScheduledPublishDate()} ${this.#renderScheduledUnpublishDate()}
 
 			<div class="general-item">
 				<strong><umb-localize key="content_documentType">Document Type</umb-localize></strong>
@@ -258,6 +258,11 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	#renderUpdateDate() {
 		if (!this._variant?.updateDate) return nothing;
 		return this.#renderDate(this._variant.updateDate, 'content_updateDate', 'Last edited');
+	}
+
+	#renderPublishDate() {
+		if (!this._variant?.publishDate) return nothing;
+		return this.#renderDate(this._variant.publishDate, 'content_lastPublished', 'Last published');
 	}
 
 	#renderScheduledPublishDate() {
