@@ -610,6 +610,8 @@ export default {
 		deletingALayout:
 			'Modifying layout will result in loss of data for any existing content that is based on this configuration.',
 		selectEditorConfiguration: 'Select configuration',
+		seeErrorAction: 'See error',
+		seeErrorDialogHeadline: 'Error details',
 	},
 	dictionary: {
 		importDictionaryItemHelp:

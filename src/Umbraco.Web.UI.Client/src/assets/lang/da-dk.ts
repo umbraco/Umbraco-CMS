@@ -584,6 +584,8 @@ export default {
 		deleteLayout: 'You are deleting the layout',
 		deletingALayout:
 			'Modifying layout will result in loss of data for any existing content that is based on this configuration.',
+		seeErrorAction: 'Se fejlen',
+		seeErrorDialogHeadline: 'Fejl detaljer',
 	},
 	dictionary: {
 		noItems: 'Der er ingen ordbogselementer.',
