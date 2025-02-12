@@ -18,6 +18,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 > {
 	#selectionManager = new UmbSelectionManager<string>(this);
 	#includeUnpublishedDescendants = false;
+	#forceRepublish = false;
 
 	@state()
 	_options: Array<UmbDocumentVariantOptionModel> = [];
@@ -73,6 +74,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 		this.value = {
 			selection: this.#selectionManager.getSelection(),
 			includeUnpublishedDescendants: this.#includeUnpublishedDescendants,
+			forceRepublish: this.#forceRepublish,
 		};
 		this.modalContext?.submit();
 	}
@@ -111,6 +113,14 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 					label=${this.localize.term('content_includeUnpublished')}
 					?checked=${this.value?.includeUnpublishedDescendants}
 					@change=${() => (this.#includeUnpublishedDescendants = !this.#includeUnpublishedDescendants)}></uui-toggle>
+			</uui-form-layout-item>
+
+			<uui-form-layout-item>
+				<uui-toggle
+					id="forceRepublish"
+					label=${this.localize.term('content_forceRepublish')}
+					?checked=${this.value?.forceRepublish}
+					@change=${() => (this.#forceRepublish = !this.#forceRepublish)}></uui-toggle>
 			</uui-form-layout-item>
 
 			<div slot="actions">

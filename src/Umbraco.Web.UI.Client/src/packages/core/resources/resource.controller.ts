@@ -4,8 +4,7 @@ import { isApiError, isCancelError, isCancelablePromise } from './apiTypeValidat
 import type { XhrRequestOptions } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
+import { umbPeekError, type UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import {
 	ApiError,
@@ -13,33 +12,19 @@ import {
 	CancelError,
 	type ProblemDetails,
 } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbDeprecation } from '../utils/deprecation/deprecation.js';
 
 export class UmbResourceController extends UmbControllerBase {
 	#promise: Promise<any>;
-
-	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
-
-	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost, promise: Promise<any>, alias?: string) {
 		super(host, alias);
 
 		this.#promise = promise;
-
-		new UmbContextConsumerController(host, UMB_NOTIFICATION_CONTEXT, (_instance) => {
-			this.#notificationContext = _instance;
-		});
-
-		new UmbContextConsumerController(host, UMB_AUTH_CONTEXT, (_instance) => {
-			this.#authContext = _instance;
-		});
-	}
-
-	override hostConnected(): void {
-		// Do nothing
 	}
 
 	override hostDisconnected(): void {
+		super.hostDisconnected();
 		this.cancel();
 	}
 
@@ -48,6 +33,7 @@ export class UmbResourceController extends UmbControllerBase {
 	 * @param promise
 	 */
 	static async tryExecute<T>(promise: Promise<T>): Promise<UmbDataSourceResponse<T>> {
+		// TODO: tryExecute should not take a promise as argument, but should utilize the class property `#promise` instead. (In this way the promise can be cancelled when disconnected)
 		try {
 			return { data: await promise };
 		} catch (error) {
@@ -63,10 +49,19 @@ export class UmbResourceController extends UmbControllerBase {
 	/**
 	 * Wrap the {tryExecute} function in a try/catch block and return the result.
 	 * If the executor function throws an error, then show the details in a notification.
-	 * @param options
+	 * @param _options
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async tryExecuteAndNotify<T>(options?: UmbNotificationOptions): Promise<UmbDataSourceResponse<T>> {
 		const { data, error } = await UmbResourceController.tryExecute<T>(this.#promise);
+
+		if (options) {
+			new UmbDeprecation({
+				deprecated: 'tryExecuteAndNotify `options` argument is deprecated.',
+				removeInVersion: '17.0.0',
+				solution: 'Use the method without arguments.',
+			}).warn();
+		}
 
 		if (error) {
 			/**
@@ -82,6 +77,7 @@ export class UmbResourceController extends UmbControllerBase {
 				console.error('Request failed', error.request);
 				console.error('Request body', error.body);
 				console.error('Error', error);
+				console.groupEnd();
 
 				let problemDetails: ProblemDetails | null = null;
 
@@ -111,23 +107,14 @@ export class UmbResourceController extends UmbControllerBase {
 				switch (error.status ?? 0) {
 					case 401: {
 						// See if we can get the UmbAuthContext and let it know the user is timed out
-						if (this.#authContext) {
-							this.#authContext.timeOut();
-						} else {
-							// If we can't get the auth context, show a notification
-							this.#notificationContext?.peek('warning', {
-								data: {
-									headline: 'Session Expired',
-									message: 'Your session has expired. Please refresh the page.',
-								},
-							});
-						}
+						const authContext = await this.getContext(UMB_AUTH_CONTEXT);
+						authContext.timeOut();
 						break;
 					}
 					case 500:
 						// Server Error
 
-						if (!isCancelledByNotification && this.#notificationContext) {
+						if (!isCancelledByNotification) {
 							let headline = problemDetails?.title ?? error.name ?? 'Server Error';
 							let message = 'A fatal server error occurred. If this continues, please reach out to your administrator.';
 
@@ -141,19 +128,19 @@ export class UmbResourceController extends UmbControllerBase {
 									'The Umbraco object cache is corrupt, but your action may still have been executed. Please restart the server to reset the cache. This is a work in progress.';
 							}
 
-							this.#notificationContext.peek('danger', {
-								data: {
-									headline,
-									message,
-								},
-								...options,
+							umbPeekError(this, {
+								headline: headline,
+								message: message,
+								details: problemDetails?.errors ?? problemDetails?.detail,
 							});
 						}
 						break;
 					default:
 						// Other errors
-						if (!isCancelledByNotification && this.#notificationContext) {
-							this.#notificationContext.peek('danger', {
+						if (!isCancelledByNotification) {
+							/*
+							const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+							notificationContext.peek('danger', {
 								data: {
 									headline: problemDetails?.title ?? error.name ?? 'Server Error',
 									message: problemDetails?.detail ?? error.message ?? 'Something went wrong',
@@ -163,10 +150,14 @@ export class UmbResourceController extends UmbControllerBase {
 								},
 								...options,
 							});
+							*/
+							const headline = problemDetails?.title ?? error.name ?? 'Server Error';
+							umbPeekError(this, {
+								message: headline,
+								details: problemDetails?.errors ?? problemDetails?.detail,
+							});
 						}
 				}
-
-				console.groupEnd();
 			}
 		}
 
