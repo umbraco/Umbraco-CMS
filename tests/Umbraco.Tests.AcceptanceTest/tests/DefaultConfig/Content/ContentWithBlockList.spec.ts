@@ -166,6 +166,7 @@ test('can set the label of block element in the content', async ({umbracoApi, um
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButton();
 
@@ -192,6 +193,7 @@ test.skip('can add settings model for the block in the content', async ({umbraco
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
   await umbracoUi.content.enterTextstring(contentBlockInputText);
   await umbracoUi.content.clickAddBlockSettingsTabButton();
   await umbracoUi.content.enterTextArea(settingBlockInputText);
@@ -210,4 +212,184 @@ test.skip('can add settings model for the block in the content', async ({umbraco
 
 test.skip('can move blocks in the content', async ({umbracoApi, umbracoUi}) => {
   // TODO: Implement it later
+});
+
+test('can add an invariant block element with RTE Tiptap in the content', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const inputText = 'This is block test';
+  const customRTEDataTypeName = 'TestRTETiptap';
+  const customElementTypeName = 'BlockListWithRTEElement';
+  const customRTEDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customRTEDataTypeName);
+  const customElementTypeId = await umbracoApi.documentType.createDefaultElementType(customElementTypeName, groupName, customRTEDataTypeName, customRTEDataTypeId);
+  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, customElementTypeId, true, true);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickTextButtonWithName(customElementTypeName);
+  await umbracoUi.content.enterRTETipTapEditor(inputText);
+  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.dataType.ensureNameNotExists(customRTEDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(customElementTypeName);
+});
+
+test('can add an invariant block element with RTE TinyMCE in the content', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const inputText = 'This is block test';
+  const customRTEDataTypeName = 'TestRTETinyMCE';
+  const customElementTypeName = 'BlockListWithRTEElement';
+  const customRTEDataTypeId = await umbracoApi.dataType.createDefaultTinyMCEDataType(customRTEDataTypeName);
+  const customElementTypeId = await umbracoApi.documentType.createDefaultElementType(customElementTypeName, groupName, customRTEDataTypeName, customRTEDataTypeId);
+  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, customElementTypeId, true, true);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickTextButtonWithName(customElementTypeName);
+  await umbracoUi.content.enterRichTextArea(inputText);
+  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.dataType.ensureNameNotExists(customRTEDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(customElementTypeName);
+});
+
+test('can add an variant block element with an variant RTE Tiptap in the content', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const inputText = 'This is block test';
+  const customRTEDataTypeName = 'TestRTETiptap';
+  const customElementTypeName = 'BlockListWithRTEElement';
+  const customRTEDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customRTEDataTypeName);
+  const customElementTypeId = await umbracoApi.documentType.createDefaultElementType(customElementTypeName, groupName, customRTEDataTypeName, customRTEDataTypeId);
+  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, customElementTypeId, true, true);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'testGroup', true);
+  await umbracoApi.document.createDefaultDocumentWithCulture(contentName, documentTypeId, 'en-US');
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickTextButtonWithName(customElementTypeName);
+  await umbracoUi.content.enterRTETipTapEditor(inputText);
+  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.dataType.ensureNameNotExists(customRTEDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(customElementTypeName);
+});
+
+test('can add an variant block element with an variant RTE TinyMCE in the content', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const inputText = 'This is block test';
+  const customRTEDataTypeName = 'TestRTETiptap';
+  const customElementTypeName = 'BlockListWithRTEElement';
+  const customRTEDataTypeId = await umbracoApi.dataType.createDefaultTinyMCEDataType(customRTEDataTypeName);
+  const customElementTypeId = await umbracoApi.documentType.createDefaultElementType(customElementTypeName, groupName, customRTEDataTypeName, customRTEDataTypeId);
+  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, customElementTypeId, true, true);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'testGroup', true);
+  await umbracoApi.document.createDefaultDocumentWithCulture(contentName, documentTypeId, 'en-US');
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickTextButtonWithName(customElementTypeName);
+  await umbracoUi.content.enterRichTextArea(inputText);
+  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.dataType.ensureNameNotExists(customRTEDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(customElementTypeName);
+});
+
+test('can add an variant block element with an invariant RTE Tiptap in the content', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const inputText = 'This is block test';
+  const customRTEDataTypeName = 'TestRTETiptap';
+  const customElementTypeName = 'BlockListWithRTEElement';
+  const customRTEDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customRTEDataTypeName);
+  const customElementTypeId = await umbracoApi.documentType.createDefaultElementType(customElementTypeName, groupName, customRTEDataTypeName, customRTEDataTypeId);
+  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, customElementTypeId, true, true);
+  const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'testGroup', true);
+  await umbracoApi.document.createDefaultDocumentWithCulture(contentName, documentTypeId, 'en-US');
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickTextButtonWithName(customElementTypeName);
+  await umbracoUi.content.enterRTETipTapEditor(inputText);
+  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.dataType.ensureNameNotExists(customRTEDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(customElementTypeName);
+});
+
+test('can add an variant block element with an invariant RTE TinyMCE in the content', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const inputText = 'This is block test';
+  const customRTEDataTypeName = 'TestRTETiptap';
+  const customElementTypeName = 'BlockListWithRTEElement';
+  const customRTEDataTypeId = await umbracoApi.dataType.createDefaultTinyMCEDataType(customRTEDataTypeName);
+  const customElementTypeId = await umbracoApi.documentType.createDefaultElementType(customElementTypeName, groupName, customRTEDataTypeName, customRTEDataTypeId);
+  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, customElementTypeId, true, true);
+  const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'testGroup', true);
+  await umbracoApi.document.createDefaultDocumentWithCulture(contentName, documentTypeId, 'en-US');
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickTextButtonWithName(customElementTypeName);
+  await umbracoUi.content.enterRichTextArea(inputText);
+  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.dataType.ensureNameNotExists(customRTEDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(customElementTypeName);
 });
