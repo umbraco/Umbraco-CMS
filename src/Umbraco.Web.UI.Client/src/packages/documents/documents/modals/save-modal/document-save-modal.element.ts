@@ -30,8 +30,12 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 
 		let selected = this.value?.selection ?? [];
 
+		const validOptions = this.data?.pickableFilter
+			? this._options.filter((o) => this.data!.pickableFilter!(o))
+			: this._options;
+
 		// Filter selection based on options:
-		selected = selected.filter((s) => this._options.some((o) => o.unique === s));
+		selected = selected.filter((s) => validOptions.some((o) => o.unique === s));
 
 		this.#selectionManager.setSelection(selected);
 	}

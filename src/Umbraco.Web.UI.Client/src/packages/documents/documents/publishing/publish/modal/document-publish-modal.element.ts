@@ -41,8 +41,12 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 
 		let selected = this.value?.selection ?? [];
 
+		const validOptions = this.data?.pickableFilter
+			? this._options.filter((o) => this.data!.pickableFilter!(o))
+			: this._options;
+
 		// Filter selection based on options:
-		selected = selected.filter((s) => this._options.some((o) => o.unique === s));
+		selected = selected.filter((s) => validOptions.some((o) => o.unique === s));
 
 		// Additionally select mandatory languages:
 		// [NL]: I think for now lets make it an active choice to select the languages. If you just made them, they would be selected. So it just to underline the act of actually selecting these languages.
@@ -98,7 +102,7 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 					?disabled=${this._hasNotSelectedMandatory}
 					@click=${this.#submit}></uui-button>
 			</div>
-		</umb-body-layout> `;
+		</umb-body-layout>`;
 	}
 
 	static override styles = [
@@ -106,7 +110,7 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 		css`
 			:host {
 				display: block;
-				width: 400px;
+				min-width: 460px;
 				max-width: 90vw;
 			}
 		`,

@@ -1,4 +1,4 @@
-import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
+import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { UmbDocumentVariantLanguagePickerElement } from '../../../modals/index.js';
 import type { UmbDocumentScheduleModalData, UmbDocumentScheduleModalValue } from './document-schedule-modal.token.js';
 import { css, customElement, html, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
@@ -56,16 +56,16 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		}
 
 		// Only display variants that are relevant to pick from, i.e. variants that are draft or published with pending changes:
-		// TODO:[NL] I would say we should change this, the act of scheduling should be equivalent to save & publishing. Resulting in content begin saved as part of carrying out the action. (But this requires a update in the workspace.)
-		this._options =
-			this.data?.options.filter(
-				(option) => option.variant && option.variant.state !== UmbDocumentVariantState.NOT_CREATED,
-			) ?? [];
+		this._options = this.data?.options ?? [];
+
+		const validOptions = this.data?.pickableFilter
+			? this._options.filter((o) => this.data!.pickableFilter!(o))
+			: this._options;
 
 		let selected = this.value?.selection ?? [];
 
 		// Filter selection based on options:
-		selected = selected.filter((s) => this._options.some((o) => o.unique === s.unique));
+		selected = selected.filter((s) => validOptions.some((o) => o.unique === s.unique));
 
 		this.#selectionManager.setSelection(selected.map((s) => s.unique));
 	}
@@ -99,7 +99,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		const allUniques = this._options.map((o) => o.unique);
 		const filter = this.#selectionManager.getAllowLimitation();
 		const allowedUniques = allUniques.filter((unique) => filter(unique));
-		return this._selection.length === allowedUniques.length;
+		return this._selection.length !== 0 && this._selection.length === allowedUniques.length;
 	}
 
 	override render() {
