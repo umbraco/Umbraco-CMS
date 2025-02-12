@@ -1,9 +1,9 @@
 import { UmbNotificationHandler } from './notification-handler.js';
+import type { UmbNotificationColor, UmbNotificationOptions } from './types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbNotificationColor, UmbNotificationOptions } from './types.js';
 
 export class UmbNotificationContext extends UmbContextBase<UmbNotificationContext> {
 	// Notice this cannot use UniqueBehaviorSubject as it holds a HTML Element. which cannot be Serialized to JSON (it has some circular references)
