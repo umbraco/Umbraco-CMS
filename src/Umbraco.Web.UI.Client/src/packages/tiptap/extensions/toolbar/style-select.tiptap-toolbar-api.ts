@@ -1,71 +1,93 @@
-import { UmbTiptapToolbarDropdownBaseElement } from '../../components/index.js';
-import type { UmbTiptapToolbarDropdownItem } from '../../components/index.js';
+import type { ManifestTiptapToolbarExtension } from '../tiptap-toolbar.extension.js';
+import type { UmbCascadingMenuItem } from '../../components/cascading-menu-popover/cascading-menu-popover.element.js';
+import { css, customElement, html, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
-import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
-const elementName = 'umb-tiptap-style-select-toolbar-element';
+import '../../components/cascading-menu-popover/cascading-menu-popover.element.js';
 
-@customElement(elementName)
-export class UmbTiptapToolbarStyleSelectToolbarElement extends UmbTiptapToolbarDropdownBaseElement {
+@customElement('umb-tiptap-style-select-toolbar-element')
+export class UmbTiptapToolbarStyleSelectToolbarElement extends UmbLitElement {
+	#menu: Array<UmbCascadingMenuItem> = [
+		{
+			unique: 'headers',
+			label: 'Headers',
+			items: [
+				{
+					unique: 'h2',
+					label: 'Page heading',
+					execute: () => this.editor?.chain().focus().toggleHeading({ level: 2 }).run(),
+				},
+				{
+					unique: 'h3',
+					label: 'Section heading',
+					execute: () => this.editor?.chain().focus().toggleHeading({ level: 3 }).run(),
+				},
+				{
+					unique: 'h4',
+					label: 'Paragraph heading',
+					execute: () => this.editor?.chain().focus().toggleHeading({ level: 4 }).run(),
+				},
+			],
+		},
+		{
+			unique: 'blocks',
+			label: 'Blocks',
+			items: [
+				{
+					unique: 'p',
+					label: 'Paragraph',
+					execute: () => this.editor?.chain().focus().setParagraph().run(),
+				},
+			],
+		},
+		{
+			unique: 'containers',
+			label: 'Containers',
+			items: [
+				{ unique: 'blockquote', label: 'Quote', execute: () => this.editor?.chain().focus().toggleBlockquote().run() },
+				{ unique: 'code', label: 'Code', execute: () => this.editor?.chain().focus().toggleCodeBlock().run() },
+			],
+		},
+	];
+
 	public editor?: Editor;
 
-	protected override alias = 'style-select';
+	public manifest?: ManifestTiptapToolbarExtension;
 
-	protected override label = 'Style select';
-
-	@state()
-	protected override get items(): Array<UmbTiptapToolbarDropdownItem> {
-		return [
-			{
-				alias: 'headers',
-				label: 'Headers',
-				items: [
-					{
-						alias: 'h2',
-						label: 'Page heading',
-						execute: () => this.editor?.chain().focus().toggleHeading({ level: 2 }).run(),
-					},
-					{
-						alias: 'h3',
-						label: 'Section heading',
-						execute: () => this.editor?.chain().focus().toggleHeading({ level: 3 }).run(),
-					},
-					{
-						alias: 'h4',
-						label: 'Paragraph heading',
-						execute: () => this.editor?.chain().focus().toggleHeading({ level: 4 }).run(),
-					},
-				],
-			},
-			{
-				alias: 'blocks',
-				label: 'Blocks',
-				items: [
-					{
-						alias: 'p',
-						label: 'Paragraph',
-						execute: () => this.editor?.chain().focus().setParagraph().run(),
-					},
-				],
-			},
-			{
-				alias: 'containers',
-				label: 'Containers',
-				items: [
-					{ alias: 'blockquote', label: 'Quote', execute: () => this.editor?.chain().focus().toggleBlockquote().run() },
-					{ alias: 'code', label: 'Code', execute: () => this.editor?.chain().focus().toggleCodeBlock().run() },
-				],
-			},
-		];
+	override render() {
+		return html`
+			<uui-button
+				compact
+				look="secondary"
+				label=${ifDefined(this.manifest?.meta.label)}
+				popovertarget="style-select"
+				title=${this.manifest?.meta.label ? this.localize.string(this.manifest.meta.label) : ''}>
+				<span>Style select</span>
+				<uui-symbol-expand slot="extra" open></uui-symbol-expand>
+			</uui-button>
+			<umb-cascading-menu-popover id="style-select" placement="bottom-start" .items=${this.#menu}>
+			</umb-cascading-menu-popover>
+		`;
 	}
 
-	static override readonly styles = UmbTiptapToolbarDropdownBaseElement.styles;
+	static override readonly styles = [
+		css`
+			:host {
+				--uui-button-font-weight: normal;
+			}
+
+			uui-button > uui-symbol-expand {
+				margin-left: var(--uui-size-space-4);
+			}
+		`,
+	];
 }
 
 export { UmbTiptapToolbarStyleSelectToolbarElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbTiptapToolbarStyleSelectToolbarElement;
+		'umb-tiptap-style-select-toolbar-element': UmbTiptapToolbarStyleSelectToolbarElement;
 	}
 }
