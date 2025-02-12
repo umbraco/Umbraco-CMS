@@ -53,6 +53,9 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			(extensionControllers) => {
 				this._lookup = new Map(extensionControllers.map((ext) => [ext.alias, ext.component]));
 			},
+			undefined,
+			undefined,
+			() => import('../toolbar/default-tiptap-toolbar-element.api.js'),
 		);
 
 		this.#extensionsController.apiProperties = { configuration: this.configuration };
