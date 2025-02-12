@@ -767,7 +767,7 @@ namespace Umbraco.Cms.Core.Services
 
             _memberRepository.Save(member);
 
-            if (publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.Saved) || publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.All))
+            if (publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.Saved))
             {
                 scope.Notifications.Publish(
                     savingNotification is null
