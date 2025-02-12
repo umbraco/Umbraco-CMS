@@ -389,16 +389,23 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <summary>
-        /// Get an <see cref="IMember"/> by email
+        /// Get an <see cref="IMember"/> by email. If RequireUniqueEmailForMembers is set to false, then the first member found with the specified email will be returned.
         /// </summary>
         /// <param name="email">Email to use for retrieval</param>
         /// <returns><see cref="IMember"/></returns>
-        public IMember? GetByEmail(string email)
+        public IMember? GetByEmail(string email) => GetMembersByEmail(email).FirstOrDefault();
+
+        /// <summary>
+        /// Get an list of <see cref="IMember"/> for all members with the specified email.
+        /// </summary>
+        /// <param name="email">Email to use for retrieval</param>
+        /// <returns><see cref="IEnumerable{IMember}"/></returns>
+        public IEnumerable<IMember> GetMembersByEmail(string email)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);
             IQuery<IMember> query = Query<IMember>().Where(x => x.Email.Equals(email));
-            return _memberRepository.Get(query)?.FirstOrDefault();
+            return _memberRepository.Get(query);
         }
 
         /// <summary>

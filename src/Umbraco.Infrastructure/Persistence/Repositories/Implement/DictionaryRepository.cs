@@ -102,11 +102,10 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         var options = new RepositoryCachePolicyOptions
         {
             // allow zero to be cached
-            GetAllCacheAllowZeroCount = true,
+            GetAllCacheAllowZeroCount = true
         };
 
-        return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, int>(GlobalIsolatedCache, ScopeAccessor,
-            options);
+        return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, int>(GlobalIsolatedCache, ScopeAccessor, options);
     }
 
     protected IDictionaryItem ConvertFromDto(DictionaryDto dto)
@@ -190,11 +189,10 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
             var options = new RepositoryCachePolicyOptions
             {
                 // allow zero to be cached
-                GetAllCacheAllowZeroCount = true,
+                GetAllCacheAllowZeroCount = true
             };
 
-            return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, Guid>(GlobalIsolatedCache, ScopeAccessor,
-                options);
+            return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, Guid>(GlobalIsolatedCache, ScopeAccessor, options);
         }
     }
 
@@ -228,12 +226,13 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         {
             var options = new RepositoryCachePolicyOptions
             {
+                // allow null to be cached
+                CacheNullValues = true,
                 // allow zero to be cached
-                GetAllCacheAllowZeroCount = true,
+                GetAllCacheAllowZeroCount = true
             };
 
-            return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, string>(GlobalIsolatedCache, ScopeAccessor,
-                options);
+            return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, string>(GlobalIsolatedCache, ScopeAccessor, options);
         }
     }
 

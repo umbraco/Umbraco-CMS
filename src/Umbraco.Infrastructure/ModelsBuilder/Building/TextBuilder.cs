@@ -143,14 +143,17 @@ public class TextBuilder : Builder
     //
     // note that the blog post above clearly states that "Nor should it be applied at the type level if the type being generated is a partial class."
     // and since our models are partial classes, we have to apply the attribute against the individual members, not the class itself.
-    private static void WriteGeneratedCodeAttribute(StringBuilder sb, string tabs) => sb.AppendFormat(
+    private void WriteGeneratedCodeAttribute(StringBuilder sb, string tabs) => sb.AppendFormat(
         "{0}[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"Umbraco.ModelsBuilder.Embedded\", \"{1}\")]\n",
-        tabs, ApiVersion.Current.Version);
+        tabs,
+        Config.IncludeVersionNumberInGeneratedModels ? ApiVersion.Current.Version : null);
 
     // writes an attribute that specifies that an output may be null.
     // (useful for consuming projects with nullable reference types enabled)
     private static void WriteMaybeNullAttribute(StringBuilder sb, string tabs, bool isReturn = false) =>
-        sb.AppendFormat("{0}[{1}global::System.Diagnostics.CodeAnalysis.MaybeNull]\n", tabs,
+        sb.AppendFormat(
+            "{0}[{1}global::System.Diagnostics.CodeAnalysis.MaybeNull]\n",
+            tabs,
             isReturn ? "return: " : string.Empty);
 
     private static string MixinStaticGetterName(string clrName) => string.Format("Get{0}", clrName);

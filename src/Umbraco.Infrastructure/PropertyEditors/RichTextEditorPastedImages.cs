@@ -8,12 +8,14 @@ using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
@@ -38,6 +40,9 @@ public sealed class RichTextEditorPastedImages
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly string _tempFolderAbsolutePath;
     private readonly IImageUrlGenerator _imageUrlGenerator;
+    private readonly IEntityService _entityService;
+    private readonly IUserService _userService;
+    private readonly AppCaches _appCaches;
     private readonly ContentSettings _contentSettings;
     private readonly Dictionary<string, GuidUdi> _uploadedImages = new();
 
@@ -67,6 +72,7 @@ public sealed class RichTextEditorPastedImages
     {
     }
 
+    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in v14")]
     public RichTextEditorPastedImages(
         IUmbracoContextAccessor umbracoContextAccessor,
         ILogger<RichTextEditorPastedImages> logger,
@@ -78,6 +84,39 @@ public sealed class RichTextEditorPastedImages
         IShortStringHelper shortStringHelper,
         IPublishedUrlProvider publishedUrlProvider,
         IImageUrlGenerator imageUrlGenerator,
+        IOptions<ContentSettings> contentSettings)
+        : this(
+            umbracoContextAccessor,
+            logger,
+            hostingEnvironment,
+            mediaService,
+            contentTypeBaseServiceProvider,
+            mediaFileManager,
+            mediaUrlGenerators,
+            shortStringHelper,
+            publishedUrlProvider,
+            imageUrlGenerator,
+            StaticServiceProvider.Instance.GetRequiredService<IEntityService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IUserService>(),
+            StaticServiceProvider.Instance.GetRequiredService<AppCaches>(),
+            contentSettings)
+    {
+    }
+
+    public RichTextEditorPastedImages(
+        IUmbracoContextAccessor umbracoContextAccessor,
+        ILogger<RichTextEditorPastedImages> logger,
+        IHostingEnvironment hostingEnvironment,
+        IMediaService mediaService,
+        IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+        MediaFileManager mediaFileManager,
+        MediaUrlGeneratorCollection mediaUrlGenerators,
+        IShortStringHelper shortStringHelper,
+        IPublishedUrlProvider publishedUrlProvider,
+        IImageUrlGenerator imageUrlGenerator,
+        IEntityService entityService,
+        IUserService userService,
+        AppCaches appCaches,
         IOptions<ContentSettings> contentSettings)
     {
         _umbracoContextAccessor =
@@ -92,6 +131,9 @@ public sealed class RichTextEditorPastedImages
         _shortStringHelper = shortStringHelper;
         _publishedUrlProvider = publishedUrlProvider;
         _imageUrlGenerator = imageUrlGenerator;
+        _entityService = entityService;
+        _userService = userService;
+        _appCaches = appCaches;
         _contentSettings = contentSettings.Value;
 
         _tempFolderAbsolutePath = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempImageUploads);
@@ -270,7 +312,7 @@ public sealed class RichTextEditorPastedImages
                 : Constants.Conventions.MediaTypes.Image;
 
             IMedia mediaFile = mediaParentFolder == Guid.Empty
-                ? _mediaService.CreateMedia(mediaItemName, Constants.System.Root, mediaType, userId)
+                ? _mediaService.CreateMedia(mediaItemName, GetDefaultMediaRoot(userId), mediaType, userId)
                 : _mediaService.CreateMedia(mediaItemName, mediaParentFolder, mediaType, userId);
 
             var fileInfo = new FileInfo(absoluteTempImagePath);
@@ -354,4 +396,11 @@ public sealed class RichTextEditorPastedImages
     }
 
     private bool IsValidPath(string imagePath) => imagePath.StartsWith(_tempFolderAbsolutePath);
+
+    private int GetDefaultMediaRoot(int userId)
+    {
+        IUser user = _userService.GetUserById(userId) ?? throw new ArgumentException("User could not be found");
+        var userStartNodes = user.CalculateMediaStartNodeIds(_entityService, _appCaches);
+        return userStartNodes?.FirstOrDefault() ?? Constants.System.Root;
+    }
 }

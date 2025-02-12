@@ -19,6 +19,8 @@ public class SecuritySettings
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
     internal const bool StaticAllowConcurrentLogins = false;
     internal const string StaticAuthCookieName = "UMB_UCONTEXT";
+    internal const bool StaticUsernameIsEmail = true;
+    internal const bool StaticMemberRequireUniqueEmail = true;
 
     internal const string StaticAllowedUserNameCharacters =
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+\\";
@@ -58,7 +60,14 @@ public class SecuritySettings
     /// <summary>
     ///     Gets or sets a value indicating whether the user's email address is to be considered as their username.
     /// </summary>
-    public bool UsernameIsEmail { get; set; } = true;
+    [DefaultValue(StaticUsernameIsEmail)]
+    public bool UsernameIsEmail { get; set; } = StaticUsernameIsEmail;
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether the member's email address must be unique.
+    /// </summary>
+    [DefaultValue(StaticMemberRequireUniqueEmail)]
+    public bool MemberRequireUniqueEmail { get; set; } = StaticMemberRequireUniqueEmail;
 
     /// <summary>
     ///     Gets or sets the set of allowed characters for a username

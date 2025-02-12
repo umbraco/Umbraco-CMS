@@ -789,8 +789,7 @@ public class MediaController : ContentControllerBase
                     continue;
                 }
 
-                using var stream = new MemoryStream();
-                await formFile.CopyToAsync(stream);
+                await using var stream = formFile.OpenReadStream();
                 if (_fileStreamSecurityValidator != null && _fileStreamSecurityValidator.IsConsideredSafe(stream) == false)
                 {
                     tempFiles.Notifications.Add(new BackOfficeNotification(

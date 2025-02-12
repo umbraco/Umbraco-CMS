@@ -8,8 +8,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.ContentApps;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
@@ -26,7 +29,6 @@ using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.ModelBinders;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
@@ -55,6 +57,7 @@ public class MemberController : ContentControllerBase
     private readonly ITwoFactorLoginService _twoFactorLoginService;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly SecuritySettings _securitySettings;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MemberController" /> class.
@@ -75,6 +78,7 @@ public class MemberController : ContentControllerBase
     /// <param name="passwordChanger">The password changer</param>
     /// <param name="scopeProvider">The core scope provider</param>
     /// <param name="twoFactorLoginService">The two factor login service</param>
+    /// <param name="securitySettings">The security settings</param>
     [ActivatorUtilitiesConstructor]
     public MemberController(
         ICultureDictionary cultureDictionary,
@@ -92,7 +96,8 @@ public class MemberController : ContentControllerBase
         IJsonSerializer jsonSerializer,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         ICoreScopeProvider scopeProvider,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IOptions<SecuritySettings> securitySettings)
         : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, jsonSerializer)
     {
         _propertyEditors = propertyEditors;
@@ -108,9 +113,49 @@ public class MemberController : ContentControllerBase
         _passwordChanger = passwordChanger;
         _scopeProvider = scopeProvider;
         _twoFactorLoginService = twoFactorLoginService;
+        _securitySettings = securitySettings.Value;
     }
 
-    [Obsolete("Use constructor that also takes an ITwoFactorLoginService. Scheduled for removal in V13")]
+    [Obsolete("Please use the constructor that takes all paramters. Scheduled for removal in V14")]
+    public MemberController(
+        ICultureDictionary cultureDictionary,
+        ILoggerFactory loggerFactory,
+        IShortStringHelper shortStringHelper,
+        IEventMessagesFactory eventMessages,
+        ILocalizedTextService localizedTextService,
+        PropertyEditorCollection propertyEditors,
+        IUmbracoMapper umbracoMapper,
+        IMemberService memberService,
+        IMemberTypeService memberTypeService,
+        IMemberManager memberManager,
+        IDataTypeService dataTypeService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IJsonSerializer jsonSerializer,
+        IPasswordChanger<MemberIdentityUser> passwordChanger,
+        ICoreScopeProvider scopeProvider,
+        ITwoFactorLoginService twoFactorLoginService)
+        : this(
+              cultureDictionary,
+              loggerFactory,
+              shortStringHelper,
+              eventMessages,
+              localizedTextService,
+              propertyEditors,
+              umbracoMapper,
+              memberService,
+              memberTypeService,
+              memberManager,
+              dataTypeService,
+              backOfficeSecurityAccessor,
+              jsonSerializer,
+              passwordChanger,
+              scopeProvider,
+              twoFactorLoginService,
+              StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
+    {
+    }
+
+    [Obsolete("Please use the constructor that takes all paramters. Scheduled for removal in V14")]
     public MemberController(
         ICultureDictionary cultureDictionary,
         ILoggerFactory loggerFactory,
@@ -461,7 +506,7 @@ public class MemberController : ContentControllerBase
         }
 
         // now re-look up the member, which will now exist
-        IMember? member = _memberService.GetByEmail(contentItem.Email);
+        IMember? member = _memberService.GetByUsername(contentItem.Username);
 
         if (member is null)
         {
@@ -678,6 +723,17 @@ public class MemberController : ContentControllerBase
             return false;
         }
 
+        // User names can only contain the configured allowed characters. This is validated by ASP.NET Identity on create
+        // as the setting is applied to the IdentityOptions, but we need to check ourselves for updates.
+        var allowedUserNameCharacters = _securitySettings.AllowedUserNameCharacters;
+        if (contentItem.Username.Any(c => allowedUserNameCharacters.Contains(c) == false))
+        {
+            ModelState.AddPropertyError(
+                new ValidationResult("Username contains invalid characters"),
+                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login");
+            return false;
+        }
+
         if (contentItem.Password != null && !contentItem.Password.NewPassword.IsNullOrWhiteSpace())
         {
             IdentityResult validPassword = await _memberManager.ValidatePasswordAsync(contentItem.Password.NewPassword);
@@ -699,13 +755,16 @@ public class MemberController : ContentControllerBase
             return false;
         }
 
-        IMember? byEmail = _memberService.GetByEmail(contentItem.Email);
-        if (byEmail != null && byEmail.Key != contentItem.Key)
+        if (_securitySettings.MemberRequireUniqueEmail)
         {
-            ModelState.AddPropertyError(
-                new ValidationResult("Email address is already in use", new[] { "value" }),
-                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
-            return false;
+            IMember? byEmail = _memberService.GetByEmail(contentItem.Email);
+            if (byEmail != null && byEmail.Key != contentItem.Key)
+            {
+                ModelState.AddPropertyError(
+                    new ValidationResult("Email address is already in use", new[] { "value" }),
+                    $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
+                return false;
+            }
         }
 
         return true;
