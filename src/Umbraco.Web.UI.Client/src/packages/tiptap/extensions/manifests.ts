@@ -1,3 +1,4 @@
+import { manifests as blockExtensions } from './block/manifests.js';
 import { manifests as tableExtensions } from './table/manifests.js';
 import type { ManifestTiptapExtension } from './tiptap.extension.js';
 import type { ManifestTiptapToolbarExtension } from './tiptap-toolbar.extension.js';
@@ -475,6 +476,6 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 	},
 ];
 
-const extensions = [...coreExtensions, ...toolbarExtensions, ...tableExtensions];
+const extensions = [...coreExtensions, ...toolbarExtensions, ...blockExtensions, ...tableExtensions];
 
 export const manifests = [...kinds, ...extensions];
