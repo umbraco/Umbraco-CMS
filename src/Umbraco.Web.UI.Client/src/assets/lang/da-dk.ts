@@ -875,6 +875,7 @@ export default {
 		unknown: 'Ukendt',
 		unknownUser: 'Ukendt bruger',
 		under: 'under',
+		unnamed: 'Unavngivet',
 		up: 'Op',
 		update: 'Opdatér',
 		upgrade: 'Opdatér',

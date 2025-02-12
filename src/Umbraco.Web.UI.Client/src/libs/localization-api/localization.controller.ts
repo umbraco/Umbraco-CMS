@@ -190,11 +190,11 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * Translates a string containing one or more terms. The terms should be prefixed with a `#` character.
 	 * If the term is found in the localization set, it will be replaced with the localized term.
 	 * If the term is not found, the original term will be returned.
-	 * @param {string} text The text to translate.
+	 * @param {string | null | undefined} text The text to translate.
 	 * @param {...any} args The arguments to parse for this localization entry.
 	 * @returns {string} The translated text.
 	 */
-	string(text: unknown, ...args: any): string {
+	string(text: string | null | undefined, ...args: any): string {
 		if (typeof text !== 'string') {
 			return '';
 		}
@@ -204,6 +204,9 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 
 		const localizedText = text.replace(regex, (match: string) => {
 			const key = match.slice(1);
+			if (!this.#usedKeys.includes(key)) {
+				this.#usedKeys.push(key);
+			}
 
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore

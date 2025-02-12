@@ -913,6 +913,7 @@ export default {
 		unknown: 'Unknown',
 		unknownUser: 'Unknown user',
 		under: 'under',
+		unnamed: 'Unnamed',
 		up: 'Up',
 		update: 'Update',
 		upgrade: 'Upgrade',
