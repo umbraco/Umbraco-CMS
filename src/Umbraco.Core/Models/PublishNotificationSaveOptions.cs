@@ -9,20 +9,20 @@ public enum PublishNotificationSaveOptions
     /// <summary>
     /// Do not publish any notifications.
     /// </summary>
-    None,
+    None = 0,
 
     /// <summary>
     /// Only publish the saving notification.
     /// </summary>
-    Saving,
+    Saving = 1,
 
     /// <summary>
     /// Only publish the saved notification.
     /// </summary>
-    Saved,
+    Saved = 2,
 
     /// <summary>
     /// Publish all the notifications.
     /// </summary>
-    All,
+    All = Saving | Saved,
 }
