@@ -47,19 +47,19 @@ export class UmbDocumentItemDataResolver extends UmbControllerBase {
 		// We do not depend on this context because we know is it only available in some cases
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
 			this.#propertyDataSetCulture = context.getVariantId();
-			this.#setObservableValues();
+			this.#setVariantAwareValues();
 		});
 
 		this.#init = Promise.all([
 			this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (context) => {
 				this.observe(context.appLanguageCulture, (culture) => {
 					this.#appCulture = culture;
-					this.#setObservableValues();
+					this.#setVariantAwareValues();
 				});
 
 				this.observe(context.appDefaultLanguage, (value) => {
 					this.#defaultCulture = value?.unique;
-					this.#setObservableValues();
+					this.#setVariantAwareValues();
 				});
 			}).asPromise(),
 		]);
@@ -94,7 +94,7 @@ export class UmbDocumentItemDataResolver extends UmbControllerBase {
 		this.#unique.setValue(this.#item.unique);
 		this.#icon.setValue(this.#item.documentType.icon);
 		this.#isTrashed.setValue(this.#item.isTrashed);
-		this.#setObservableValues();
+		this.#setVariantAwareValues();
 	}
 
 	/**
@@ -157,7 +157,7 @@ export class UmbDocumentItemDataResolver extends UmbControllerBase {
 		return this.#item?.isTrashed ?? false;
 	}
 
-	#setObservableValues() {
+	#setVariantAwareValues() {
 		this.#setName();
 		this.#setIsDraft();
 		this.#setState();
