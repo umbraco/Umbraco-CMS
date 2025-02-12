@@ -748,7 +748,7 @@ namespace Umbraco.Cms.Core.Services
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
             MemberSavingNotification? savingNotification = null;
-            if (publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.Saving) || publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.All))
+            if (publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.Saving))
             {
                 savingNotification = new MemberSavingNotification(member, evtMsgs);
                 if (scope.Notifications.PublishCancelable(savingNotification))
