@@ -38,7 +38,6 @@ export class UmbPropertyEditorUIBlockGridElement
 	#settingsDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 	#managerContext = new UmbBlockGridManagerContext(this);
 	//
-	private _value: UmbBlockGridValueModel | undefined = undefined;
 
 	#lastValue: UmbBlockGridValueModel | undefined = undefined;
 
@@ -68,7 +67,7 @@ export class UmbPropertyEditorUIBlockGridElement
 		this.#lastValue = value;
 
 		if (!value) {
-			this._value = undefined;
+			super.value = undefined;
 			return;
 		}
 
@@ -77,15 +76,15 @@ export class UmbPropertyEditorUIBlockGridElement
 		buildUpValue.contentData ??= [];
 		buildUpValue.settingsData ??= [];
 		buildUpValue.expose ??= [];
-		this._value = buildUpValue as UmbBlockGridValueModel;
+		super.value = buildUpValue as UmbBlockGridValueModel;
 
-		this.#managerContext.setLayouts(this._value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? []);
-		this.#managerContext.setContents(this._value.contentData);
-		this.#managerContext.setSettings(this._value.settingsData);
-		this.#managerContext.setExposes(this._value.expose);
+		this.#managerContext.setLayouts(super.value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? []);
+		this.#managerContext.setContents(super.value.contentData);
+		this.#managerContext.setSettings(super.value.settingsData);
+		this.#managerContext.setExposes(super.value.expose);
 	}
 	public override get value(): UmbBlockGridValueModel | undefined {
-		return this._value;
+		return super.value;
 	}
 
 	constructor() {
@@ -121,10 +120,10 @@ export class UmbPropertyEditorUIBlockGridElement
 				]).pipe(debounceTime(20)),
 				([layouts, contents, settings, exposes]) => {
 					if (layouts.length === 0) {
-						this._value = undefined;
+						super.value = undefined;
 					} else {
-						this._value = {
-							...this._value,
+						super.value = {
+							...super.value,
 							layout: { [UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
 							contentData: contents,
 							settingsData: settings,
@@ -134,11 +133,11 @@ export class UmbPropertyEditorUIBlockGridElement
 
 					// If we don't have a value set from the outside or an internal value, we don't want to set the value.
 					// This is added to prevent the block grid from setting an empty value on startup.
-					if (this.#lastValue === undefined && this._value === undefined) {
+					if (this.#lastValue === undefined && super.value === undefined) {
 						return;
 					}
 
-					propertyContext.setValue(this._value);
+					propertyContext.setValue(super.value);
 				},
 				'motherObserver',
 			);
