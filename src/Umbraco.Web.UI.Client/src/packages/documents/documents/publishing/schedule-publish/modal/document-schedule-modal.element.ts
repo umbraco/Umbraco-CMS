@@ -26,7 +26,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	_selection: UmbDocumentScheduleModalValue['selection'] = [];
 
 	@state()
-	_isAllSelected?: boolean;
+	_isAllSelected = false;
 
 	constructor() {
 		super();
@@ -149,7 +149,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 					<uui-checkbox
 						@change=${this.#onSelectAllChange}
 						label=${this.localize.term('general_selectAll')}
-						.checked=${this._isAllSelected ?? false}></uui-checkbox>
+						.checked=${this._isAllSelected}></uui-checkbox>
 				`,
 			)}
 			${repeat(
