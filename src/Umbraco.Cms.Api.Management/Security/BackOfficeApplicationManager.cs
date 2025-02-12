@@ -48,7 +48,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         Uri[] backOfficeHostsAsArray = backOfficeHosts as Uri[] ?? backOfficeHosts.ToArray();
         if (backOfficeHostsAsArray.Any(url => url.IsAbsoluteUri) is false)
         {
-            throw new ArgumentException($"Expected an absolute URLs, got: {string.Join(", ", backOfficeHostsAsArray.Select(url => url.ToString()))}", nameof(backOfficeHosts));
+            throw new ArgumentException($"Expected absolute URLs, got: {string.Join(", ", backOfficeHostsAsArray.Select(url => url.ToString()))}", nameof(backOfficeHosts));
         }
 
         await CreateOrUpdate(
