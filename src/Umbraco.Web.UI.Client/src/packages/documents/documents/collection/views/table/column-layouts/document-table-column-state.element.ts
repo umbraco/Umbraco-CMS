@@ -1,4 +1,4 @@
-import type { UmbEditableDocumentCollectionItemModel } from '../../../types.js';
+import type { UmbDocumentCollectionItemModel, UmbEditableDocumentCollectionItemModel } from '../../../types.js';
 import { UmbDocumentItemDataResolver } from '../../../../item/index.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
@@ -26,11 +26,11 @@ export class UmbDocumentTableColumnStateElement extends UmbLitElement implements
 	@state()
 	_state = '';
 
-	#item = new UmbDocumentItemDataResolver(this);
+	#item = new UmbDocumentItemDataResolver<UmbDocumentCollectionItemModel>(this);
 
 	constructor() {
 		super();
-		this.#item.observe(this.#item.state, (state) => (this._state = state));
+		this.#item.observe(this.#item.state, (state) => (this._state = state || ''));
 	}
 
 	override render() {
