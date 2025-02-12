@@ -110,7 +110,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             UpdateMemberProperties(memberEntity, user, out bool _);
 
             // create the member
-            _memberService.Save(memberEntity);
+            _memberService.Save(memberEntity, PublishNotificationSaveOptions.Saving);
 
             // We need to add roles now that the member has an Id. It do not work implicit in UpdateMemberProperties
             _memberService.AssignRoles(
