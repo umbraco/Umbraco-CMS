@@ -192,9 +192,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 		return html`
 			<div class="general-item"><span>${this.#renderStateTag()}</span></div>
-			${this.#renderCreateDate()}
-			${this.#renderScheduledPublishDate()}
-			${this.#renderScheduledUnpublishDate()}
+			${this.#renderCreateDate()} ${this.#renderScheduledPublishDate()} ${this.#renderScheduledUnpublishDate()}
 
 			<div class="general-item">
 				<strong><umb-localize key="content_documentType">Document Type</umb-localize></strong>
@@ -253,17 +251,17 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 	#renderCreateDate() {
 		if (!this._variant?.createDate) return nothing;
-		return this.#renderDate(this._variant.createDate, "content_createDate", "Created");
+		return this.#renderDate(this._variant.createDate, 'content_createDate', 'Created');
 	}
 
 	#renderScheduledPublishDate() {
 		if (!this._variant?.scheduledPublishDate) return nothing;
-		return this.#renderDate(this._variant.scheduledPublishDate, "content_releaseDate", "Publish At");
+		return this.#renderDate(this._variant.scheduledPublishDate, 'content_releaseDate', 'Publish At');
 	}
 
 	#renderScheduledUnpublishDate() {
 		if (!this._variant?.scheduledUnpublishDate) return nothing;
-		return this.#renderDate(this._variant.scheduledUnpublishDate, "content_expireDate", "Remove At");
+		return this.#renderDate(this._variant.scheduledUnpublishDate, 'content_expireDate', 'Remove At');
 	}
 
 	#renderDate(date: string, labelKey: string, labelText: string) {
