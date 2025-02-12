@@ -9,6 +9,11 @@ parameters:
     displayName: Run SQL Server Linux Acceptance Tests
     type: boolean
     default: false
+    # Skipped due to DB locks, the tests are still being run on the Nightly build
+  - name: sqliteAcceptanceTests
+    displayName: Run SQLite Acceptance Tests
+    type: boolean
+    default: false
   - name: myGetDeploy
     displayName: Deploy to MyGet
     type: boolean
@@ -484,6 +489,8 @@ stages:
       # E2E Tests
       - job:
         displayName: E2E Tests (SQLite)
+        # currently disabled due to DB locks randomly occuring.
+        condition: eq(${{parameters.sqliteAcceptanceTests}}, True)
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
