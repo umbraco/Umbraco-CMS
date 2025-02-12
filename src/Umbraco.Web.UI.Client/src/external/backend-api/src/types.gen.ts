@@ -423,6 +423,8 @@ export type CreateUserRequestModel = {
 
 export type CreateWebhookRequestModel = {
     enabled: boolean;
+    name?: (string) | null;
+    description?: (string) | null;
     url: string;
     contentTypeKeys: Array<(string)>;
     headers: {
@@ -2043,6 +2045,7 @@ export type PublishDocumentRequestModel = {
 
 export type PublishDocumentWithDescendantsRequestModel = {
     includeUnpublishedDescendants: boolean;
+    forceRepublish: boolean;
     cultures: Array<(string)>;
 };
 
@@ -2670,6 +2673,8 @@ export type UpdateUserRequestModel = {
 
 export type UpdateWebhookRequestModel = {
     enabled: boolean;
+    name?: (string) | null;
+    description?: (string) | null;
     url: string;
     contentTypeKeys: Array<(string)>;
     headers: {
@@ -2904,6 +2909,8 @@ export type WebhookLogResponseModel = {
 
 export type WebhookResponseModel = {
     enabled: boolean;
+    name?: (string) | null;
+    description?: (string) | null;
     url: string;
     contentTypeKeys: Array<(string)>;
     headers: {

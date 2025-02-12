@@ -319,6 +319,7 @@ export default {
 		removeTextBox: 'Remove this text box',
 		contentRoot: 'Content root',
 		includeUnpublished: 'Include unpublished content items.',
+		forceRepublish: 'Publish unchanged items.',
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your\n      website administrator.\n    ',
 		isSensitiveValue_short: 'This value is hidden.',
@@ -614,6 +615,8 @@ export default {
 		deleteLayout: 'You are deleting the layout',
 		deletingALayout:
 			'Modifying layout will result in loss of data for any existing content that is based on this configuration.',
+		seeErrorAction: 'See error',
+		seeErrorDialogHeadline: 'Error details',
 	},
 	dictionary: {
 		importDictionaryItemHelp:
@@ -865,6 +868,7 @@ export default {
 		next: 'Next',
 		no: 'No',
 		nodeName: 'Node Name',
+		notFound: 'Not found',
 		of: 'of',
 		off: 'Off',
 		ok: 'OK',
