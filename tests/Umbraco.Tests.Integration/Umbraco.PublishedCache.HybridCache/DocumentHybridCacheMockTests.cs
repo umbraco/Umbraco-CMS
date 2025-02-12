@@ -124,7 +124,7 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
         return new List<IDocumentSeedKeyProvider>
         {
             new ContentTypeSeedKeyProvider(GetRequiredService<ICoreScopeProvider>(), GetRequiredService<IDatabaseCacheRepository>(), mock.Object),
-            new DocumentBreadthFirstKeyProvider(GetRequiredService<IDocumentNavigationQueryService>(), mock.Object),
+            new DocumentBreadthFirstKeyProvider(GetRequiredService<IDocumentNavigationQueryService>(), mock.Object, GetRequiredService<IPublishStatusQueryService>()),
         };
     }
 
