@@ -42,11 +42,17 @@ public partial class ContentPublishingServiceTests
         VerifyIsPublished(Subpage.Key);
     }
 
+    [Obsolete("Replaced by Publish_Branch_Does_Not_Publish_Unpublished_Children_Unless_Instructed_To. This will be removed in Umbraco 16.")]
+    public Task Publish_Branch_Does_Not_Publish_Unpublished_Children_Unless_Explicitly_Instructed_To(bool force)
+    {
+        return Task.CompletedTask;
+    }
+
     [TestCase(PublishBranchFilter.Default)]
     [TestCase(PublishBranchFilter.IncludeUnpublished)]
     [TestCase(PublishBranchFilter.ForceRepublish)]
     [TestCase(PublishBranchFilter.All)]
-    public async Task Publish_Branch_Does_Not_Publish_Unpublished_Children_Unless_Explicitly_Instructed_To(PublishBranchFilter publishBranchFilter)
+    public async Task Publish_Branch_Does_Not_Publish_Unpublished_Children_Unless_Instructed_To(PublishBranchFilter publishBranchFilter)
     {
         var result = await ContentPublishingService.PublishBranchAsync(Textpage.Key, _allCultures, publishBranchFilter, Constants.Security.SuperUserKey);
 
