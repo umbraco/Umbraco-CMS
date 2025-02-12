@@ -26,7 +26,6 @@ test('can create empty content', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   await umbracoUi.content.clickCreateButton();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
