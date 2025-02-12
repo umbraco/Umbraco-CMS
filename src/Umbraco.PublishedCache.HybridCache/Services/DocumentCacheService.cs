@@ -268,6 +268,9 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         }
     }
 
+    // Internal for test purposes.
+    internal void ResetSeedKeys() => _seedKeys = null;
+
     private HybridCacheEntryOptions GetSeedEntryOptions() => new()
     {
         Expiration = _cacheSettings.Entry.Document.SeedCacheDuration,
