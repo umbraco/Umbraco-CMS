@@ -298,8 +298,8 @@ describe('UmbLocalizeController', () => {
 		});
 
 		it('should return an empty string if the input is not a string', async () => {
-			expect(controller.string(123)).to.equal('');
-			expect(controller.string({})).to.equal('');
+			expect(controller.string(123 as any)).to.equal('');
+			expect(controller.string({} as any)).to.equal('');
 			expect(controller.string(undefined)).to.equal('');
 		});
 
@@ -337,6 +337,16 @@ describe('UmbLocalizeController', () => {
 
 			await elementUpdated(element);
 			expect(element.localize.term('close')).to.equal('Luk');
+		});
+
+		it('should update the string when the language changes', async () => {
+			expect(element.localize.string('testing #close')).to.equal('testing Close');
+
+			// Switch browser to Danish
+			element.lang = danishRegional.$code;
+
+			await elementUpdated(element);
+			expect(element.localize.string('testing #close')).to.equal('testing Luk');
 		});
 	});
 });
