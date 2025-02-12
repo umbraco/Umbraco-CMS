@@ -517,7 +517,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			throw new Error('One or more selected variants have not been created');
 		}
 		// Check variants have a name:
-		const variantsWithoutAName = saveData.variants.filter((x) => !x.name || x.name === '');
+		const variantsWithoutAName = saveData.variants.filter((x) => !x.name);
 		if (variantsWithoutAName.length > 0) {
 			const validationContext = await this.getContext(UMB_VALIDATION_CONTEXT);
 			variantsWithoutAName.forEach((variant) => {
