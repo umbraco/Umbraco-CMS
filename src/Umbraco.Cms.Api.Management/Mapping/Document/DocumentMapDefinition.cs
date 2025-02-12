@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.Mapping.Content;
+using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint;
@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Mapping;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Document;
@@ -76,6 +77,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         target.SortOrder = source.SortOrder;
         target.Creator = _commonMapper.GetOwnerName(source, context);
         target.Updater = _commonMapper.GetCreatorName(source, context);
+        target.IsTrashed = source.Trashed;
 
         // If there's a set of property aliases specified in the collection configuration, we will check if the current property's
         // value should be mapped. If it isn't one of the ones specified in 'includeProperties', we will just return the result

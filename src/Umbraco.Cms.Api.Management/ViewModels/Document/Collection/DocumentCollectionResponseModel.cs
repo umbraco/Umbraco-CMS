@@ -7,5 +7,7 @@ public class DocumentCollectionResponseModel : ContentCollectionResponseModelBas
 {
     public DocumentTypeCollectionReferenceResponseModel DocumentType { get; set; } = new();
 
+    public bool IsTrashed { get; set; }
+
     public string? Updater { get; set; }
 }
