@@ -22,12 +22,20 @@ export abstract class UmbTiptapToolbarDropdownBaseElement extends UmbLitElement 
 	readonly #onMouseEnter = (popoverId: string) => {
 		const popover = this.shadowRoot?.querySelector(`#${popoverId}`) as UUIPopoverContainerElement;
 		if (!popover) return;
+
+		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		popover.showPopover();
 	};
 
 	readonly #onMouseLeave = (popoverId: string) => {
 		const popover = this.shadowRoot?.querySelector(`#${popoverId}`) as UUIPopoverContainerElement;
 		if (!popover) return;
+
+		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		popover.hidePopover();
 	};
 
