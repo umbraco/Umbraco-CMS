@@ -1,10 +1,14 @@
 import type { UmbDocumentTreeItemModel } from '../types.js';
+import type { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
 import { css, html, nothing, customElement, classMap, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_TREE_ITEM_CONTEXT, UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-document-tree-item')
-export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocumentTreeItemModel> {
+export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
+	UmbDocumentTreeItemModel,
+	UmbDocumentTreeItemContext
+> {
 	@state()
 	private _name = '';
 

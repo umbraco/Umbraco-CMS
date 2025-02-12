@@ -4,7 +4,10 @@ import { UMB_TREE_ITEM_CONTEXT } from './tree-item-context-base.js';
 import { html, nothing, state, ifDefined, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeItemModel> extends UmbLitElement {
+export abstract class UmbTreeItemElementBase<
+	TreeItemModelType extends UmbTreeItemModel,
+	TreeItemContextType extends UmbTreeItemContext<TreeItemModelType> = UmbTreeItemContext<TreeItemModelType>,
+> extends UmbLitElement {
 	_item?: TreeItemModelType;
 	@property({ type: Object, attribute: false })
 	get item(): TreeItemModelType | undefined {
@@ -51,14 +54,14 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 	@state()
 	private _currentPage = 1;
 
-	#treeItemContext?: UmbTreeItemContext<TreeItemModelType>;
+	#treeItemContext?: TreeItemContextType;
 
 	constructor() {
 		super();
 
 		// TODO: Notice this can be retrieve via a api property. [NL]
 		this.consumeContext(UMB_TREE_ITEM_CONTEXT, (instance) => {
-			this.#treeItemContext = instance;
+			this.#treeItemContext = instance as TreeItemContextType;
 			if (!this.#treeItemContext) return;
 
 			this.#initTreeItem();
