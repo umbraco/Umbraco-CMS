@@ -39,7 +39,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	#getSchedule(unique: string) {
-		const matchedItem = this.value?.selection.filter(s => s.unique === unique);
+		const matchedItem = this.value?.selection.filter((s) => s.unique === unique);
 		if (matchedItem.length === 0) {
 			return {};
 		}
@@ -142,11 +142,15 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 	#renderOptions() {
 		return html`
-			<uui-checkbox
-				@change=${this.#onSelectAllChange}
-				label=${this.localize.term('general_selectAll')}
-				.checked=${this._isAllSelected ?? false}></uui-checkbox>
-
+			${when(
+				this._options.length > 1,
+				() => html`
+					<uui-checkbox
+						@change=${this.#onSelectAllChange}
+						label=${this.localize.term('general_selectAll')}
+						.checked=${this._isAllSelected ?? false}></uui-checkbox>
+				`,
+			)}
 			${repeat(
 				this._options,
 				(option) => option.unique,
@@ -200,7 +204,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 	#getFromDate(unique: string) {
 		const variant = this._selection.find((s) => s.unique === unique);
-		return variant?.schedule?.publishTime?.substring(0, 16);	// Only want date/time up to an including the minutes.
+		return variant?.schedule?.publishTime?.substring(0, 16); // Only want date/time up to an including the minutes.
 	}
 
 	#getToDate(unique: string) {
