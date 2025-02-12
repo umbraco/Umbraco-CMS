@@ -94,6 +94,7 @@ export class UmbDocumentItemDataResolver extends UmbControllerBase {
 		this.#unique.setValue(this.#item.unique);
 		this.#icon.setValue(this.#item.documentType.icon);
 		this.#isTrashed.setValue(this.#item.isTrashed);
+		this.#setObservableValues();
 	}
 
 	/**
