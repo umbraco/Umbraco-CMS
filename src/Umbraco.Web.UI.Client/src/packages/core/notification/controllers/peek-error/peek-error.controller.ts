@@ -28,6 +28,5 @@ export class UmbPeekErrorController extends UmbControllerBase {
  * @returns {UmbPeekErrorController} The notification peek controller instance
  */
 export function umbPeekError(host: UmbControllerHost, args: UmbPeekErrorArgs) {
-	console.log(host);
 	return new UmbPeekErrorController(host).open(args);
 }
