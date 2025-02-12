@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { UMB_AUTH_CONTEXT } from '../auth/index.js';
+import { UmbDeprecation } from '../utils/deprecation/deprecation.js';
 import { isApiError, isCancelError, isCancelablePromise } from './apiTypeValidators.function.js';
 import type { XhrRequestOptions } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { umbPeekError, type UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
+import type { UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import {
 	ApiError,
@@ -12,7 +13,6 @@ import {
 	CancelError,
 	type ProblemDetails,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbDeprecation } from '../utils/deprecation/deprecation.js';
 
 export class UmbResourceController extends UmbControllerBase {
 	#promise: Promise<any>;
@@ -128,7 +128,8 @@ export class UmbResourceController extends UmbControllerBase {
 									'The Umbraco object cache is corrupt, but your action may still have been executed. Please restart the server to reset the cache. This is a work in progress.';
 							}
 
-							umbPeekError(this, {
+							// This late importing is done to avoid circular reference [NL]
+							(await import('@umbraco-cms/backoffice/notification')).umbPeekError(this, {
 								headline: headline,
 								message: message,
 								details: problemDetails?.errors ?? problemDetails?.detail,
@@ -152,7 +153,8 @@ export class UmbResourceController extends UmbControllerBase {
 							});
 							*/
 							const headline = problemDetails?.title ?? error.name ?? 'Server Error';
-							umbPeekError(this, {
+							// This late importing is done to avoid circular reference [NL]
+							(await import('@umbraco-cms/backoffice/notification')).umbPeekError(this, {
 								message: headline,
 								details: problemDetails?.errors ?? problemDetails?.detail,
 							});
