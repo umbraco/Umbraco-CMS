@@ -1,14 +1,31 @@
 import type { UmbDocumentTreeItemModel } from '../types.js';
 import type { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
-import { css, html, nothing, customElement, classMap, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, classMap, state, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_TREE_ITEM_CONTEXT, UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
+import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-document-tree-item')
 export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	UmbDocumentTreeItemModel,
 	UmbDocumentTreeItemContext
 > {
+	#api: UmbDocumentTreeItemContext | undefined;
+	@property({ type: Object, attribute: false })
+	public override get api(): UmbDocumentTreeItemContext | undefined {
+		return this.#api;
+	}
+	public override set api(value: UmbDocumentTreeItemContext | undefined) {
+		this.#api = value;
+
+		if (this.#api) {
+			this.observe(this.#api.name, (name) => (this._name = name || ''));
+			this.observe(this.#api.isDraft, (isDraft) => (this._isDraft = isDraft || false));
+			this.observe(this.#api.icon, (icon) => (this._icon = icon || ''));
+		}
+
+		super.api = value;
+	}
+
 	@state()
 	private _name = '';
 
@@ -17,16 +34,6 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 
 	@state()
 	private _icon = '';
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_TREE_ITEM_CONTEXT, (context) => {
-			this.observe(context.name, (name) => (this._name = name));
-			this.observe(context.isDraft, (isDraft) => (this._isDraft = isDraft));
-			this.observe(context.icon, (icon) => (this._icon = icon));
-		});
-	}
 
 	override renderIconContainer() {
 		const icon = this._icon;
