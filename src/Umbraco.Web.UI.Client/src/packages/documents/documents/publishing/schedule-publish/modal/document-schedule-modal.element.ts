@@ -204,12 +204,40 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 	#getFromDate(unique: string) {
 		const variant = this._selection.find((s) => s.unique === unique);
-		return variant?.schedule?.publishTime?.substring(0, 16); // Only want date/time up to an including the minutes.
+		return this.#formatDate(variant?.schedule?.publishTime);
 	}
 
 	#getToDate(unique: string) {
 		const variant = this._selection.find((s) => s.unique === unique);
-		return variant?.schedule?.unpublishTime?.substring(0, 16);
+		return this.#formatDate(variant?.schedule?.unpublishTime);
+	}
+
+	/**
+	 * Formats the date to be compatible with the input type datetime-local
+	 * @param {string} dateStr The date to format, example: 2021-01-01T12:00:00.000+01:00
+	 * @returns {string | undefined} The formatted date in local time with no offset, example: 2021-01-01T11:00
+	 */
+	#formatDate(dateStr?: string | null): string | undefined {
+		if (!dateStr) return undefined;
+
+		const d = new Date(dateStr);
+
+		if (isNaN(d.getTime())) {
+			console.warn('[Schedule]: Invalid date:', dateStr);
+			return undefined;
+		}
+
+		return (
+			d.getFullYear() +
+			'-' +
+			String(d.getMonth() + 1).padStart(2, '0') +
+			'-' +
+			String(d.getDate()).padStart(2, '0') +
+			'T' +
+			String(d.getHours()).padStart(2, '0') +
+			':' +
+			String(d.getMinutes()).padStart(2, '0')
+		);
 	}
 
 	#onFromDateChange(e: Event, unique: string) {
@@ -232,12 +260,12 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		}
 	}
 
-	#getDateValue(e: Event) {
+	#getDateValue(e: Event): string | null {
 		const value = (e.target as UmbInputDateElement).value.toString();
-		return value.length > 0 ? value : null;
+		return value.length ? value : null;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			:host {
