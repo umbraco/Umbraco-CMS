@@ -26,6 +26,14 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 	@state()
 	_hasNotSelectedMandatory?: boolean;
 
+	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
+		if (!option.variant) {
+			// If not data present, then its not pickable.
+			return false;
+		}
+		return this.data?.pickableFilter ? this.data.pickableFilter(option) : true;
+	};
+
 	override firstUpdated() {
 		this.#configureSelectionManager();
 	}
@@ -42,8 +50,10 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 
 		let selected = this.value?.selection ?? [];
 
+		const validOptions = this._options.filter((o) => this.#pickableFilter!(o));
+
 		// Filter selection based on options:
-		selected = selected.filter((s) => this._options.some((o) => o.unique === s));
+		selected = selected.filter((s) => validOptions.some((o) => o.unique === s));
 
 		// Additionally select mandatory languages:
 		// [NL]: I think for now lets make it an active choice to select the languages. If you just made them, they would be selected. So it just to underline the act of actually selecting these languages.
@@ -105,7 +115,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 				.selectionManager=${this.#selectionManager}
 				.variantLanguageOptions=${this._options}
 				.requiredFilter=${isNotPublishedMandatory}
-				.pickableFilter=${this.data?.pickableFilter}></umb-document-variant-language-picker>
+				.pickableFilter=${this.#pickableFilter}></umb-document-variant-language-picker>
 
 			<uui-form-layout-item>
 				<uui-toggle
@@ -140,7 +150,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 		css`
 			:host {
 				display: block;
-				width: 400px;
+				min-width: 460px;
 				max-width: 90vw;
 			}
 		`,
