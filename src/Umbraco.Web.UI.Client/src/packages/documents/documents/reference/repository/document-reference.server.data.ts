@@ -1,5 +1,4 @@
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDataMapperResolver } from '@umbraco-cms/backoffice/repository';
@@ -12,17 +11,8 @@ export class UmbDocumentReferenceServerDataSource extends UmbControllerBase {
 	#dataMapperResolver = new UmbDataMapperResolver(this);
 
 	/**
-	 * Creates an instance of UmbDocumentReferenceServerDataSource.
-	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @memberof UmbDocumentReferenceServerDataSource
-	 */
-	constructor(host: UmbControllerHost) {
-		super(host);
-	}
-
-	/**
 	 * Fetches the item for the given unique from the server
-	 * @param {string} unique
+	 * @param {string} unique - The unique identifier of the item to fetch
 	 * @returns {*}
 	 * @memberof UmbDocumentReferenceServerDataSource
 	 */
