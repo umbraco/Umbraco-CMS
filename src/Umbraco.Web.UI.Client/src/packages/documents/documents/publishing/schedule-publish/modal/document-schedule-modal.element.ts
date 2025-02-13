@@ -11,6 +11,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';
 import type { UUIBooleanInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { partialUpdateFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-document-schedule-modal')
 export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
@@ -234,23 +235,27 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	#onFromDateChange(e: Event, unique: string) {
-		const variant = this._selection.find((s) => s.unique === unique);
-		if (variant) {
-			variant.schedule = {
-				...variant.schedule,
-				publishTime: this.#getDateValue(e),
-			};
-		}
+		this._selection = partialUpdateFrozenArray(
+			this.value.selection,
+			{
+				schedule: {
+					publishTime: this.#getDateValue(e),
+				},
+			},
+			(s) => s.unique === unique,
+		);
 	}
 
 	#onToDateChange(e: Event, unique: string) {
-		const variant = this._selection.find((s) => s.unique === unique);
-		if (variant) {
-			variant.schedule = {
-				...variant.schedule,
-				unpublishTime: this.#getDateValue(e),
-			};
-		}
+		this._selection = partialUpdateFrozenArray(
+			this.value.selection,
+			{
+				schedule: {
+					unpublishTime: this.#getDateValue(e),
+				},
+			},
+			(s) => s.unique === unique,
+		);
 	}
 
 	#getDateValue(e: Event): string | null {
