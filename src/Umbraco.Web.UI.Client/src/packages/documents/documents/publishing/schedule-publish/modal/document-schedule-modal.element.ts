@@ -36,8 +36,11 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	_internalValues: Array<UmbDocumentScheduleSelectionModel> = [];
 
 	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
+		if (isNotPublishedMandatory(option)) {
+			return true;
+		}
 		if (!option.variant || option.variant.state === UmbDocumentVariantState.NOT_CREATED) {
-			// If not data present, then its not pickable.
+			// If no data present, then its not pickable.
 			return false;
 		}
 		return this.data?.pickableFilter ? this.data.pickableFilter(option) : true;
@@ -78,20 +81,12 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes.
 		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
-		this._options =
-			this.data?.options.filter(
-				(option) =>
-					(option.variant && option.variant.state === null) ||
-					isNotPublishedMandatory(option) ||
-					option.variant?.state !== UmbDocumentVariantState.NOT_CREATED,
-			) ?? [];
+		this._options = this.data?.options.filter((option) => this.#pickableFilter(option)) ?? [];
 
 		let selected = this.data?.activeVariants ?? [];
 
-		const validOptions = this._options.filter((o) => this.#pickableFilter!(o));
-
 		// Filter selection based on options:
-		selected = selected.filter((unique) => validOptions.some((o) => o.unique === unique));
+		selected = selected.filter((unique) => this._options.some((o) => o.unique === unique));
 
 		this.#selectionManager.setSelection(selected);
 	}
