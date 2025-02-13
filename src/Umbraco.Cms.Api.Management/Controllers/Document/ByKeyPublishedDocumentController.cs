@@ -30,7 +30,6 @@ public class ByKeyPublishedDocumentController : DocumentControllerBase
         _documentPresentationFactory = documentPresentationFactory;
     }
 
-
     [HttpGet("{id:guid}/published")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PublishedDocumentResponseModel), StatusCodes.Status200OK)]
