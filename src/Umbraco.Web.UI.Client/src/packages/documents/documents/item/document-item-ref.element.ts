@@ -24,16 +24,11 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 			return;
 		}
 
-		if (oldValue?.unique !== value.unique) {
-			this.#modalRoute = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-				.addAdditionalPath(UMB_DOCUMENT_ENTITY_TYPE + '/' + value.unique)
-				.onSetup(() => {
-					return { data: { entityType: UMB_DOCUMENT_ENTITY_TYPE, preset: {} } };
-				})
-				.observeRouteBuilder((routeBuilder) => {
-					this._editPath = routeBuilder({});
-				});
+		if (oldValue?.unique === value.unique) {
+			return;
 		}
+
+		this.#modalRoute?.setUniquePathValue('unique', value.unique);
 	}
 
 	@property({ type: Boolean })
@@ -71,17 +66,28 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 
 	#modalRoute?: any;
 
-	#getHref() {
-		return `${this._editPath}/edit/${this._unique}`;
-	}
-
 	constructor() {
 		super();
+
+		this.#modalRoute = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath(UMB_DOCUMENT_ENTITY_TYPE)
+			.addUniquePaths(['unique'])
+			.onSetup(() => {
+				return { data: { entityType: UMB_DOCUMENT_ENTITY_TYPE, preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editPath = routeBuilder({});
+			});
+
 		this.#item.observe(this.#item.unique, (unique) => (this._unique = unique ?? ''));
 		this.#item.observe(this.#item.name, (name) => (this._name = name ?? ''));
 		this.#item.observe(this.#item.icon, (icon) => (this._icon = icon ?? ''));
 		this.#item.observe(this.#item.isTrashed, (isTrashed) => (this._isTrashed = isTrashed ?? false));
 		this.#item.observe(this.#item.isDraft, (isDraft) => (this._isDraft = isDraft ?? false));
+	}
+
+	#getHref() {
+		return `${this._editPath}/edit/${this._unique}`;
 	}
 
 	override render() {
