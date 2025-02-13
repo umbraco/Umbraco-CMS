@@ -3,7 +3,6 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
@@ -25,12 +24,33 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
         IDataTypeService dataTypeService,
         IEntityService entityService,
         IShortStringHelper shortStringHelper,
-        IElementSwitchValidator elementSwitchValidator)
+        IElementSwitchValidator elementSwitchValidator,
+        IReservedFieldNamesService reservedFieldNamesService)
         : base(contentTypeService, contentTypeService, dataTypeService, entityService, shortStringHelper)
     {
         _contentTypeService = contentTypeService;
         _templateService = templateService;
         _elementSwitchValidator = elementSwitchValidator;
+        _reservedFieldNamesService = reservedFieldNamesService;
+    }
+
+    [Obsolete("Use the constructor that is not marked obsolete, will be removed in v17")]
+    public ContentTypeEditingService(
+        IContentTypeService contentTypeService,
+        ITemplateService templateService,
+        IDataTypeService dataTypeService,
+        IEntityService entityService,
+        IShortStringHelper shortStringHelper,
+        IElementSwitchValidator elementSwitchValidator)
+        : this(
+            contentTypeService,
+            templateService,
+            dataTypeService,
+            entityService,
+            shortStringHelper,
+            elementSwitchValidator,
+            StaticServiceProvider.Instance.GetRequiredService<IReservedFieldNamesService>())
+    {
     }
 
     [Obsolete("Use the constructor that is not marked obsolete, will be removed in v16")]
@@ -40,11 +60,15 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
         IDataTypeService dataTypeService,
         IEntityService entityService,
         IShortStringHelper shortStringHelper)
-        : base(contentTypeService, contentTypeService, dataTypeService, entityService, shortStringHelper)
+        : this(
+            contentTypeService,
+            templateService,
+            dataTypeService,
+            entityService,
+            shortStringHelper,
+            StaticServiceProvider.Instance.GetRequiredService<IElementSwitchValidator>(),
+            StaticServiceProvider.Instance.GetRequiredService<IReservedFieldNamesService>())
     {
-        _contentTypeService = contentTypeService;
-        _templateService = templateService;
-        _elementSwitchValidator = StaticServiceProvider.Instance.GetRequiredService<IElementSwitchValidator>();
     }
 
     public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> CreateAsync(ContentTypeCreateModel model, Guid userKey)
