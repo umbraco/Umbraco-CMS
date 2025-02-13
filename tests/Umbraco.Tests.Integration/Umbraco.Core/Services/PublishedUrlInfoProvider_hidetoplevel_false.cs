@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
@@ -28,8 +28,8 @@ public class PublishedUrlInfoProvider_hidetoplevel_false : PublishedUrlInfoProvi
         ContentService.Save(childOfSecondRoot, -1, contentSchedule);
 
         // Publish both the main root and the second root with descendants
-        ContentService.PublishBranch(Textpage, true, new[] { "*" });
-        ContentService.PublishBranch(secondRoot, true, new[] { "*" });
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        ContentService.PublishBranch(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         var subPageUrls = await PublishedUrlInfoProvider.GetAllAsync(Subpage);
         var childOfSecondRootUrls = await PublishedUrlInfoProvider.GetAllAsync(childOfSecondRoot);

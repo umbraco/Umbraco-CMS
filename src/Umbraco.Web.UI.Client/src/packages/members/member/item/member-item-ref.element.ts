@@ -24,16 +24,11 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 			this.#modalRoute?.destroy();
 			return;
 		}
-		if (oldValue?.unique !== this.#item.unique) {
-			this.#modalRoute = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-				.addAdditionalPath(UMB_MEMBER_ENTITY_TYPE + '/' + this.#item.unique)
-				.onSetup(() => {
-					return { data: { entityType: UMB_MEMBER_ENTITY_TYPE, preset: {} } };
-				})
-				.observeRouteBuilder((routeBuilder) => {
-					this._editPath = routeBuilder({});
-				});
+		if (oldValue?.unique === this.#item.unique) {
+			return;
 		}
+
+		this.#modalRoute?.setUniquePathValue('unique', this.#item.unique);
 	}
 
 	@property({ type: Boolean })
@@ -63,6 +58,16 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 				},
 			},
 		]);
+
+		this.#modalRoute = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath(UMB_MEMBER_ENTITY_TYPE)
+			.addUniquePaths(['unique'])
+			.onSetup(() => {
+				return { data: { entityType: UMB_MEMBER_ENTITY_TYPE, preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editPath = routeBuilder({});
+			});
 	}
 
 	#getHref(item: UmbMemberItemModel) {

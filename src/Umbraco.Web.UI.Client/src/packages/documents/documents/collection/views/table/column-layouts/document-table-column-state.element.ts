@@ -1,5 +1,6 @@
-import type { UmbEditableDocumentCollectionItemModel } from '../../../types.js';
-import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbDocumentCollectionItemModel, UmbEditableDocumentCollectionItemModel } from '../../../types.js';
+import { UmbDocumentItemDataResolver } from '../../../../item/index.js';
+import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
@@ -9,11 +10,31 @@ export class UmbDocumentTableColumnStateElement extends UmbLitElement implements
 	column!: UmbTableColumn;
 	item!: UmbTableItem;
 
+	#value!: UmbEditableDocumentCollectionItemModel;
 	@property({ attribute: false })
-	value!: UmbEditableDocumentCollectionItemModel;
+	public get value(): UmbEditableDocumentCollectionItemModel {
+		return this.#value;
+	}
+	public set value(value: UmbEditableDocumentCollectionItemModel) {
+		this.#value = value;
+
+		if (value.item) {
+			this.#item.setData(value.item);
+		}
+	}
+
+	@state()
+	_state = '';
+
+	#item = new UmbDocumentItemDataResolver(this);
+
+	constructor() {
+		super();
+		this.#item.observe(this.#item.state, (state) => (this._state = state || ''));
+	}
 
 	override render() {
-		switch (this.value.item.state) {
+		switch (this._state) {
 			case 'Published':
 				return html`<uui-tag color="positive" look="secondary">${this.localize.term('content_published')}</uui-tag>`;
 			case 'PublishedPendingChanges':

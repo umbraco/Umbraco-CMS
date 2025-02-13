@@ -1,3 +1,4 @@
+import type { UmbDocumentItemVariantModel } from '../item/repository/types.js';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 
 export interface UmbDocumentCollectionFilterModel extends UmbCollectionFilterModel {
@@ -12,16 +13,46 @@ export interface UmbDocumentCollectionFilterModel extends UmbCollectionFilterMod
 export interface UmbDocumentCollectionItemModel {
 	unique: string;
 	entityType: string;
-	contentTypeAlias: string;
-	createDate: Date;
 	creator?: string | null;
-	icon: string;
-	name: string;
 	sortOrder: number;
-	state: string;
-	updateDate: Date;
 	updater?: string | null;
 	values: Array<{ alias: string; value: string }>;
+	documentType: {
+		unique: string;
+		icon: string;
+		alias: string;
+	};
+	variants: Array<UmbDocumentItemVariantModel>;
+
+	/**
+	 * @deprecated From 15.3.0. Will be removed in 17.0.0. Use state in variants array instead.
+	 */
+	state: string;
+
+	/**
+	 * @deprecated From 15.3.0. Will be removed in 17.0.0. Use name in variants array instead.
+	 */
+	name: string;
+
+	/**
+	 * @deprecated From 15.3.0. Will be removed in 17.0.0. Use updateDate in variants array instead.
+	 */
+	updateDate: Date;
+
+	/**
+	 * @deprecated From 15.3.0. Will be removed in 17.0.0. Use createDate in variants array instead.
+	 */
+	createDate: Date;
+
+	/**
+	 * @deprecated From 15.3.0. Will be removed in 17.0.0. Use alias on documentType instead.
+	 */
+	contentTypeAlias: string;
+
+	/**
+	 * @deprecated From 15.3.0. Will be removed in 17.0.0. Use icon on documentType instead.
+	 */
+	icon: string;
 }
 
 export interface UmbEditableDocumentCollectionItemModel {
