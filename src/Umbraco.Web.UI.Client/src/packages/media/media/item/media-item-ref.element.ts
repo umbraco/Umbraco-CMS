@@ -67,6 +67,7 @@ export class UmbMediaItemRefElement extends UmbLitElement {
 	}
 
 	#getHref(item: UmbMediaItemModel) {
+		if (!this._editPath) return;
 		return `${this._editPath}/edit/${item.unique}`;
 	}
 

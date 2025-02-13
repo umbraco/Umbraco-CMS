@@ -67,6 +67,7 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 	}
 
 	#getHref(item: UmbMemberItemModel) {
+		if (!this._editPath) return;
 		return `${this._editPath}/edit/${item.unique}`;
 	}
 

@@ -83,6 +83,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	}
 
 	#getHref() {
+		if (!this._editPath) return;
 		return `${this._editPath}/edit/${this._unique}`;
 	}
 
