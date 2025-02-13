@@ -7,7 +7,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	element: () => import('./property-editor-ui-accepted-upload-types.element.js'),
 	meta: {
 		label: 'Accepted Upload Types',
-		propertyEditorSchemaAlias: 'Umbraco.MultipleTextstring',
 		icon: 'icon-ordered-list',
 		group: 'lists',
 		supportsReadOnly: true,
