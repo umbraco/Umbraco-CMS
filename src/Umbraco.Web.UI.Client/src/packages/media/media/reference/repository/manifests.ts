@@ -8,10 +8,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 		api: () => import('./media-reference.repository.js'),
 	},
 	{
-		type: '$typeDataMapper',
-		alias: 'Umb.$typeDataMapper.MediaReferenceResponseModel',
+		type: 'dataMapper',
+		alias: 'Umb.DataMapper.MediaReferenceResponseModel',
 		name: 'Media Reference Response Model to Client Model Data Mapper',
 		api: () => import('./media-reference-response-model.mapper.js'),
-		from$type: 'MediaReferenceResponseModel',
+		identifier: 'MediaReferenceResponseModel',
 	},
 ];

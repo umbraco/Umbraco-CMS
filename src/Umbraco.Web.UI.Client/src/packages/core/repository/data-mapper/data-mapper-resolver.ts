@@ -6,12 +6,12 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 export class UmbDataMapperResolver extends UmbControllerBase {
 	#apiCache = new Map<string, UmbDataMapper>();
 
-	async resolve($type: string): Promise<UmbDataMapper | undefined> {
-		if (!$type) {
+	async resolve(identifier: string): Promise<UmbDataMapper | undefined> {
+		if (!identifier) {
 			throw new Error('data is required');
 		}
 
-		const manifest = this.#getManifestWithBestFit($type);
+		const manifest = this.#getManifestWithBestFit(identifier);
 
 		if (!manifest) {
 			return undefined;
@@ -38,8 +38,8 @@ export class UmbDataMapperResolver extends UmbControllerBase {
 		return dataMapper;
 	}
 
-	#getManifestWithBestFit($type: string) {
-		const supportedManifests = this.#getSupportedManifests($type);
+	#getManifestWithBestFit(identifier: string) {
+		const supportedManifests = this.#getSupportedManifests(identifier);
 
 		if (!supportedManifests.length) {
 			return undefined;
@@ -49,9 +49,9 @@ export class UmbDataMapperResolver extends UmbControllerBase {
 		return supportedManifests.sort((a: ManifestBase, b: ManifestBase): number => (b.weight || 0) - (a.weight || 0))[0];
 	}
 
-	#getSupportedManifests($type: string) {
-		const supportedManifests = umbExtensionsRegistry.getByTypeAndFilter('$typeDataMapper', (manifest) => {
-			return manifest.from$type === $type;
+	#getSupportedManifests(identifier: string) {
+		const supportedManifests = umbExtensionsRegistry.getByTypeAndFilter('dataMapper', (manifest) => {
+			return manifest.identifier === identifier;
 		});
 
 		return supportedManifests;
