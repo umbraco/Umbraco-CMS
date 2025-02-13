@@ -18,6 +18,13 @@ export class UmbMediaReferenceResponseModelMapper
 				name: data.mediaType.name,
 			},
 			name: data.name,
+			// TODO: this is a hardcoded array until the server can return the correct variants array
+			variants: [
+				{
+					culture: null,
+					name: data.name ?? '',
+				},
+			],
 			unique: data.id,
 		};
 	}
