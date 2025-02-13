@@ -1,3 +1,4 @@
+import type { UmbDocumentItemVariantModel } from '../item/types.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { TrackedReferenceDocumentTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
@@ -23,4 +24,5 @@ export interface UmbDocumentReferenceModel extends UmbEntityModel {
 	 */
 	published?: boolean | null;
 	documentType: TrackedReferenceDocumentTypeModel;
+	variants: Array<UmbDocumentItemVariantModel>;
 }
