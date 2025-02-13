@@ -154,7 +154,7 @@ test('cannot add number of block element greater than the maximum amount', async
   await umbracoUi.content.doesFormValidationMessageContainText('too many');
 });
 
-test('can set the label of block element in the content', async ({umbracoApi, umbracoUi}) => {
+test('can set the label of block element in the content', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   const blockLabel = 'Test Block Label';
   const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithLabel(customDataTypeName, elementTypeId, blockLabel);
@@ -166,6 +166,7 @@ test('can set the label of block element in the content', async ({umbracoApi, um
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButton();
 
