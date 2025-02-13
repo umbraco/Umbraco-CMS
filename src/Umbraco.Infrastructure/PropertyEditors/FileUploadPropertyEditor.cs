@@ -45,7 +45,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         SupportsReadOnly = true;
     }
 
-    public bool TryGetMediaPath(string? propertyEditorAlias, object? value, [MaybeNullWhen(false)] out string mediaPath)
+    public virtual bool TryGetMediaPath(string? propertyEditorAlias, object? value, [MaybeNullWhen(false)] out string mediaPath)
     {
         if (propertyEditorAlias == Alias &&
             value?.ToString() is var mediaPathValue &&
@@ -59,7 +59,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         return false;
     }
 
-    public void Handle(ContentCopiedNotification notification)
+    public virtual void Handle(ContentCopiedNotification notification)
     {
         // get the upload field properties with a value
         IEnumerable<IProperty> properties = notification.Original.Properties.Where(IsUploadField);
@@ -92,11 +92,11 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         }
     }
 
-    public void Handle(ContentDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
+    public virtual void Handle(ContentDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
-    public void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
+    public virtual void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
-    public void Handle(MediaSavingNotification notification)
+    public virtual void Handle(MediaSavingNotification notification)
     {
         foreach (IMedia entity in notification.SavedEntities)
         {
@@ -104,7 +104,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         }
     }
 
-    public void Handle(MemberDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
+    public virtual void Handle(MemberDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>
@@ -124,14 +124,14 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     /// <returns>
     ///     <c>true</c> if the specified property is an upload field; otherwise, <c>false</c>.
     /// </returns>
-    private static bool IsUploadField(IProperty property) => property.PropertyType.PropertyEditorAlias ==
+    protected virtual bool IsUploadField(IProperty property) => property.PropertyType.PropertyEditorAlias ==
                                                              Constants.PropertyEditors.Aliases.UploadField;
 
     /// <summary>
     ///     The paths to all file upload property files contained within a collection of content entities
     /// </summary>
     /// <param name="entities"></param>
-    private IEnumerable<string> ContainedFilePaths(IEnumerable<IContentBase> entities) => entities
+    protected virtual IEnumerable<string> ContainedFilePaths(IEnumerable<IContentBase> entities) => entities
         .SelectMany(x => x.Properties)
         .Where(IsUploadField)
         .SelectMany(GetFilePathsFromPropertyValues)
@@ -142,7 +142,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     /// </summary>
     /// <param name="prop"></param>
     /// <returns></returns>
-    private IEnumerable<string> GetFilePathsFromPropertyValues(IProperty prop)
+    protected virtual IEnumerable<string> GetFilePathsFromPropertyValues(IProperty prop)
     {
         IReadOnlyCollection<IPropertyValue> propVals = prop.Values;
         foreach (IPropertyValue propertyValue in propVals)
@@ -163,7 +163,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         }
     }
 
-    private void DeleteContainedFiles(IEnumerable<IContentBase> deletedEntities)
+    protected virtual void DeleteContainedFiles(IEnumerable<IContentBase> deletedEntities)
     {
         IEnumerable<string> filePathsToDelete = ContainedFilePaths(deletedEntities);
         _mediaFileManager.DeleteMediaFiles(filePathsToDelete);
@@ -172,7 +172,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     /// <summary>
     ///     Auto-fill properties (or clear).
     /// </summary>
-    private void AutoFillProperties(IContentBase model)
+    protected virtual void AutoFillProperties(IContentBase model)
     {
         IEnumerable<IProperty> properties = model.Properties.Where(IsUploadField);
 

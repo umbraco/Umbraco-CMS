@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     The value editor for the file upload property editor.
 /// </summary>
-internal class FileUploadPropertyValueEditor : DataValueEditor
+public class FileUploadPropertyValueEditor : DataValueEditor
 {
     private readonly MediaFileManager _mediaFileManager;
     private readonly IJsonSerializer _jsonSerializer;
@@ -147,7 +147,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         return filepath is null ? null : _mediaFileManager.FileSystem.GetUrl(filepath);
     }
 
-    private FileUploadValue? ParseFileUploadValue(object? editorValue)
+    protected virtual FileUploadValue? ParseFileUploadValue(object? editorValue)
     {
         if (editorValue is null)
         {
@@ -167,13 +167,13 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
             : throw new ArgumentException($"Could not parse editor value to a {nameof(FileUploadValue)} object.");
     }
 
-    private Guid? TryParseTemporaryFileKey(object? editorValue)
+    protected virtual Guid? TryParseTemporaryFileKey(object? editorValue)
         => ParseFileUploadValue(editorValue)?.TemporaryFileId;
 
-    private TemporaryFileModel? TryGetTemporaryFile(Guid temporaryFileKey)
+    protected virtual TemporaryFileModel? TryGetTemporaryFile(Guid temporaryFileKey)
         => _temporaryFileService.GetAsync(temporaryFileKey).GetAwaiter().GetResult();
 
-    private bool IsAllowedInDataTypeConfiguration(string extension, object? dataTypeConfiguration)
+    protected virtual bool IsAllowedInDataTypeConfiguration(string extension, object? dataTypeConfiguration)
     {
         if (dataTypeConfiguration is FileUploadConfiguration fileUploadConfiguration)
         {
@@ -186,7 +186,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         return false;
     }
 
-    private string? ProcessFile(TemporaryFileModel file, object? dataTypeConfiguration, Guid contentKey, Guid propertyTypeKey)
+    protected virtual string? ProcessFile(TemporaryFileModel file, object? dataTypeConfiguration, Guid contentKey, Guid propertyTypeKey)
     {
         // process the file
         // no file, invalid file, reject change
