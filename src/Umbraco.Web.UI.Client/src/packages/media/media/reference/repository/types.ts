@@ -1,3 +1,4 @@
+import type { UmbMediaItemVariantModel } from '../../repository/item/types.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { TrackedReferenceMediaTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
@@ -23,4 +24,5 @@ export interface UmbMediaReferenceModel extends UmbEntityModel {
 	 */
 	published?: boolean | null;
 	mediaType: TrackedReferenceMediaTypeModel;
+	variants: Array<UmbMediaItemVariantModel>;
 }
