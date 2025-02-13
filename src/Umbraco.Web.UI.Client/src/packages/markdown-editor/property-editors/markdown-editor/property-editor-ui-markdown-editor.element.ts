@@ -39,6 +39,11 @@ export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement impl
 
 		this._preview = config.getValueByAlias('preview');
 		this._overlaySize = config.getValueByAlias('overlaySize') ?? 'small';
+
+		const defaultValue = config.getValueByAlias<string>('defaultValue');
+		if (defaultValue && !this.value) {
+			this.value = defaultValue;
+		}
 	}
 
 	#onChange(event: Event & { target: UmbInputMarkdownElement }) {

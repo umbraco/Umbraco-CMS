@@ -24,7 +24,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 						alias: 'defaultValue',
 						label: 'Default value',
 						description: 'If value is blank, the editor will show this',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextArea',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.MarkdownEditor',
 					},
 					{
 						alias: 'overlaySize',
