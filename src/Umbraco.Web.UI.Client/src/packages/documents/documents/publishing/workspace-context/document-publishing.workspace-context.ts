@@ -91,7 +91,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 				data: {
 					options,
 					activeVariants: selected,
-					pickableFilter: this.#readOnlyLanguageVariantsFilter,
+					pickableFilter: this.#publishableVariantsFilter,
 				},
 				value: {
 					selection: options.map((option) => ({
@@ -176,7 +176,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			.open(this, UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL, {
 				data: {
 					options,
-					pickableFilter: this.#readOnlyLanguageVariantsFilter,
+					pickableFilter: this.#publishableVariantsFilter,
 				},
 				value: { selection: selected },
 			})
@@ -194,6 +194,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			unique,
 			variantIds,
 			result.includeUnpublishedDescendants ?? false,
+			result.forceRepublish ?? false,
 		);
 
 		if (!error) {
@@ -254,7 +255,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 				.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
 					data: {
 						options,
-						pickableFilter: this.#readOnlyLanguageVariantsFilter,
+						pickableFilter: this.#publishableVariantsFilter,
 					},
 					value: { selection: selected },
 				})
@@ -267,7 +268,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		}
 
 		const saveData = await this.#documentWorkspaceContext.constructSaveData(variantIds);
-		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData);
+		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
 		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
 
 		// TODO: Only validate the specified selection.. [NL]
@@ -318,7 +319,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		}
 	}
 
-	#readOnlyLanguageVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
+	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
 		const readOnlyCultures =
 			this.#documentWorkspaceContext?.readOnlyState.getStates().map((s) => s.variantId.culture) ?? [];
 		return readOnlyCultures.includes(option.culture) === false;
@@ -341,6 +342,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		selected = selected.filter((x) => options.some((o) => o.unique === x));
 
 		// Filter out read-only variants
+		// TODO: This would not work with segments, as the 'selected'-array is an array of strings, not UmbVariantId's. [NL]
+		// Please have a look at the implementation in the content-detail workspace context, as that one compares variantIds. [NL]
 		const readOnlyCultures = this.#documentWorkspaceContext.readOnlyState.getStates().map((s) => s.variantId.culture);
 		selected = selected.filter((x) => readOnlyCultures.includes(x) === false);
 
@@ -354,8 +357,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 		const activeVariants = this.#documentWorkspaceContext.splitView
 			.getActiveVariants()
-			.map((activeVariant) => UmbVariantId.Create(activeVariant))
-			.map((x) => x.toString());
+			.map((activeVariant) => UmbVariantId.Create(activeVariant).toString());
 		const changedVariants = this.#documentWorkspaceContext.getChangedVariants().map((x) => x.toString());
 		const selection = [...activeVariants, ...changedVariants];
 		return [...new Set(selection)];

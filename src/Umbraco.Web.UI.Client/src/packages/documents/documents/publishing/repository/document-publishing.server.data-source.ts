@@ -92,18 +92,21 @@ export class UmbDocumentPublishingServerDataSource {
 	 * @param unique
 	 * @param variantIds
 	 * @param includeUnpublishedDescendants
+	 * @param forceRepublish
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async publishWithDescendants(
 		unique: string,
 		variantIds: Array<UmbVariantId>,
 		includeUnpublishedDescendants: boolean,
+		forceRepublish: boolean,
 	) {
 		if (!unique) throw new Error('Id is missing');
 
 		const requestBody: PublishDocumentWithDescendantsRequestModel = {
 			cultures: variantIds.map((variant) => variant.toCultureString()),
 			includeUnpublishedDescendants,
+			forceRepublish,
 		};
 
 		return tryExecuteAndNotify(

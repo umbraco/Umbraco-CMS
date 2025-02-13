@@ -1,4 +1,5 @@
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
+import { isNotPublishedMandatory } from '../../utils.js';
 import { UmbDocumentVariantLanguagePickerElement } from '../../../modals/index.js';
 import type {
 	UmbDocumentScheduleModalData,
@@ -11,7 +12,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';
 import type { UUIBooleanInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { partialUpdateFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-document-schedule-modal')
 export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
@@ -24,21 +24,38 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	_options: Array<UmbDocumentVariantOptionModel> = [];
 
 	@state()
+	_hasNotSelectedMandatory?: boolean;
+
+	@state()
 	_selection: UmbDocumentScheduleModalValue['selection'] = [];
 
 	@state()
 	_isAllSelected = false;
+
+	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
+		if (!option.variant || option.variant.state === UmbDocumentVariantState.NOT_CREATED) {
+			// If not data present, then its not pickable.
+			return false;
+		}
+		return this.data?.pickableFilter ? this.data.pickableFilter(option) : true;
+	};
 
 	constructor() {
 		super();
 		this.observe(
 			this.#selectionManager.selection,
 			(selection) => {
+				if (!this._options && !selection) return;
+
 				// New selections are mapped to the schedule data
 				this._selection = selection.map<UmbDocumentScheduleSelectionModel>((unique) => {
 					return { unique, schedule: this.#getSchedule(unique) };
 				});
 				this._isAllSelected = this.#isAllSelected();
+
+				//Getting not published mandatory options — the options that are mandatory and not currently published.
+				const missingMandatoryOptions = this._options.filter(isNotPublishedMandatory);
+				this._hasNotSelectedMandatory = missingMandatoryOptions.some((option) => !selection.includes(option.unique));
 			},
 			'_selection',
 		);
@@ -57,26 +74,27 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setMultiple(true);
 		this.#selectionManager.setSelectable(true);
 
-		const pickableFilter = this.data?.pickableFilter;
+		this.#selectionManager.setAllowLimitation((unique) => {
+			const option = this._options.find((o) => o.unique === unique);
+			return option ? this.#pickableFilter(option) : true;
+		});
 
-		if (pickableFilter) {
-			this.#selectionManager.setAllowLimitation((unique) => {
-				const option = this.data?.options.find((o) => o.unique === unique);
-				return option ? pickableFilter(option) : true;
-			});
-		}
-
-		// Only display variants that are relevant to pick from, i.e. variants that are draft or published with pending changes:
-		// TODO:[NL] I would say we should change this, the act of scheduling should be equivalent to save & publishing. Resulting in content begin saved as part of carrying out the action. (But this requires a update in the workspace.)
+		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes.
+		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
 		this._options =
 			this.data?.options.filter(
-				(option) => option.variant && option.variant.state !== UmbDocumentVariantState.NOT_CREATED,
+				(option) =>
+					(option.variant && option.variant.state === null) ||
+					isNotPublishedMandatory(option) ||
+					option.variant?.state !== UmbDocumentVariantState.NOT_CREATED,
 			) ?? [];
 
 		let selected = this.data?.activeVariants ?? [];
 
+		const validOptions = this._options.filter((o) => this.#pickableFilter!(o));
+
 		// Filter selection based on options:
-		selected = selected.filter((s) => this._options.some((o) => o.unique === s));
+		selected = selected.filter((unique) => validOptions.some((o) => o.unique === unique));
 
 		this.#selectionManager.setSelection(selected);
 	}
@@ -110,7 +128,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		const allUniques = this._options.map((o) => o.unique);
 		const filter = this.#selectionManager.getAllowLimitation();
 		const allowedUniques = allUniques.filter((unique) => filter(unique));
-		return this._selection.length === allowedUniques.length;
+		return this._selection.length !== 0 && this._selection.length === allowedUniques.length;
 	}
 
 	override render() {
@@ -137,6 +155,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 					label="${this.localize.term('buttons_schedulePublish')}"
 					look="primary"
 					color="positive"
+					?disabled=${!this._selection.length || this._hasNotSelectedMandatory}
 					@click=${this.#submit}></uui-button>
 			</div>
 		</umb-body-layout> `;
@@ -162,7 +181,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	#renderItem(option: UmbDocumentVariantOptionModel) {
-		const pickable = this.data?.pickableFilter ? this.data.pickableFilter(option) : () => true;
+		const pickable = this.#pickableFilter(option);
 
 		return html`
 			<uui-menu-item
@@ -235,27 +254,21 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	#onFromDateChange(e: Event, unique: string) {
-		this._selection = partialUpdateFrozenArray(
-			this.value.selection,
-			{
-				schedule: {
-					publishTime: this.#getDateValue(e),
-				},
-			},
-			(s) => s.unique === unique,
-		);
+		const variant = this._selection.find((s) => s.unique === unique);
+		if (!variant) return;
+		variant.schedule = {
+			...variant.schedule,
+			publishTime: this.#getDateValue(e),
+		};
 	}
 
 	#onToDateChange(e: Event, unique: string) {
-		this._selection = partialUpdateFrozenArray(
-			this.value.selection,
-			{
-				schedule: {
-					unpublishTime: this.#getDateValue(e),
-				},
-			},
-			(s) => s.unique === unique,
-		);
+		const variant = this._selection.find((s) => s.unique === unique);
+		if (!variant) return;
+		variant.schedule = {
+			...variant.schedule,
+			unpublishTime: this.#getDateValue(e),
+		};
 	}
 
 	#getDateValue(e: Event): string | null {

@@ -1,11 +1,11 @@
-import type { UmbWorkspaceAction } from '../workspace-action.interface.js';
 import type {
 	ManifestWorkspaceAction,
 	ManifestWorkspaceActionMenuItem,
 	MetaWorkspaceActionDefaultKind,
+	UmbWorkspaceActionDefaultKind,
 } from '../../../types.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
-import { html, customElement, property, state, ifDefined, when } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -19,7 +19,7 @@ import '../../workspace-action-menu/index.js';
 @customElement('umb-workspace-action')
 export class UmbWorkspaceActionElement<
 	MetaType extends MetaWorkspaceActionDefaultKind = MetaWorkspaceActionDefaultKind,
-	ApiType extends UmbWorkspaceAction<MetaType> = UmbWorkspaceAction<MetaType>,
+	ApiType extends UmbWorkspaceActionDefaultKind<MetaType> = UmbWorkspaceActionDefaultKind<MetaType>,
 > extends UmbLitElement {
 	#manifest?: ManifestWorkspaceAction<MetaType>;
 	#api?: ApiType;
@@ -29,21 +29,14 @@ export class UmbWorkspaceActionElement<
 		ManifestWorkspaceActionMenuItem
 	>;
 
-	@state()
-	private _buttonState?: UUIButtonState;
-
-	@state()
-	_href?: string;
-
-	@state()
-	_isDisabled = false;
-
 	@property({ type: Object, attribute: false })
 	public set manifest(value: ManifestWorkspaceAction<MetaType> | undefined) {
 		if (!value) return;
 		const oldValue = this.#manifest;
-		this.#manifest = value;
-		if (oldValue !== this.#manifest) {
+		if (oldValue !== value) {
+			this.#manifest = value;
+			this._href = value?.meta.href;
+			this._additionalOptions = value?.meta.additionalOptions;
 			this.#createAliases();
 			this.requestUpdate('manifest', oldValue);
 		}
@@ -56,10 +49,12 @@ export class UmbWorkspaceActionElement<
 	public set api(api: ApiType | undefined) {
 		this.#api = api;
 
-		// TODO: Fix so when we use a HREF it does not refresh the page?
 		this.#api?.getHref?.().then((href) => {
-			this._href = href;
-			// TODO: Do we need to update the component here? [NL]
+			this._href = href ?? this.manifest?.meta.href;
+		});
+
+		this.#api?.hasAdditionalOptions?.().then((additionalOptions) => {
+			this._additionalOptions = additionalOptions ?? this.manifest?.meta.additionalOptions;
 		});
 
 		this.#observeIsDisabled();
@@ -67,6 +62,18 @@ export class UmbWorkspaceActionElement<
 	public get api(): ApiType | undefined {
 		return this.#api;
 	}
+
+	@state()
+	private _buttonState?: UUIButtonState;
+
+	@state()
+	private _additionalOptions?: boolean;
+
+	@state()
+	private _href?: string;
+
+	@state()
+	_isDisabled = false;
 
 	@state()
 	private _items: Array<UmbExtensionElementAndApiInitializer<ManifestWorkspaceActionMenuItem>> = [];
@@ -92,21 +99,28 @@ export class UmbWorkspaceActionElement<
 		this.#observeExtensions(Array.from(aliases));
 	}
 
-	private async _onClick(event: MouseEvent) {
+	async #onClick(event: MouseEvent) {
 		if (this._href) {
 			event.stopPropagation();
 		}
+		// If its a link or has additional options, then we do not want to display state on the button. [NL]
+		if (!this._href) {
+			if (!this._additionalOptions) {
+				this._buttonState = 'waiting';
+			}
 
-		this._buttonState = 'waiting';
-
-		try {
-			if (!this.#api) throw new Error('No api defined');
-			await this.#api.execute();
-			this._buttonState = 'success';
-		} catch {
-			this._buttonState = 'failed';
+			try {
+				if (!this.#api) throw new Error('No api defined');
+				await this.#api.execute();
+				if (!this._additionalOptions) {
+					this._buttonState = 'success';
+				}
+			} catch {
+				if (!this._additionalOptions) {
+					this._buttonState = 'failed';
+				}
+			}
 		}
-
 		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 
@@ -144,18 +158,19 @@ export class UmbWorkspaceActionElement<
 	}
 
 	#renderButton() {
+		const label = this.#manifest?.meta.label
+			? this.localize.string(this.#manifest.meta.label)
+			: (this.#manifest?.name ?? '');
 		return html`
 			<uui-button
-				id="action-button"
+				data-mark="workspace-action:${this.#manifest?.alias}"
 				.href=${this._href}
-				@click=${this._onClick}
-				look=${this.#manifest?.meta.look || 'default'}
-				color=${this.#manifest?.meta.color || 'default'}
-				label=${ifDefined(
-					this.#manifest?.meta.label ? this.localize.string(this.#manifest.meta.label) : this.#manifest?.name,
-				)}
+				look=${this.#manifest?.meta.look ?? 'default'}
+				color=${this.#manifest?.meta.color ?? 'default'}
+				label=${this._additionalOptions ? label + '…' : label}
 				.disabled=${this._isDisabled}
-				.state=${this._buttonState}></uui-button>
+				.state=${this._buttonState}
+				@click=${this.#onClick}></uui-button>
 		`;
 	}
 
@@ -163,8 +178,8 @@ export class UmbWorkspaceActionElement<
 		return html`
 			<umb-workspace-action-menu
 				.items=${this._items}
-				color="${this.#manifest?.meta.color || 'default'}"
-				look="${this.#manifest?.meta.look || 'default'}"></umb-workspace-action-menu>
+				color="${this.#manifest?.meta.color ?? 'default'}"
+				look="${this.#manifest?.meta.look ?? 'default'}"></umb-workspace-action-menu>
 		`;
 	}
 
