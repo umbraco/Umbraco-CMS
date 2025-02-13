@@ -3,7 +3,7 @@ import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbReferenceItemModel, UmbReferenceModel } from '@umbraco-cms/backoffice/relations';
+import type { UmbReferenceItemModel } from '@umbraco-cms/backoffice/relations';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
