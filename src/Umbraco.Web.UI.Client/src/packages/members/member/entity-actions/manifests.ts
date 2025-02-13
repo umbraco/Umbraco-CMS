@@ -1,4 +1,4 @@
-import { UMB_MEMBER_ITEM_REPOSITORY_ALIAS } from '../repository/constants.js';
+import { UMB_MEMBER_ITEM_REPOSITORY_ALIAS } from '../item/constants.js';
 import { UMB_MEMBER_ENTITY_TYPE } from '../entity.js';
 import { UMB_MEMBER_DETAIL_REPOSITORY_ALIAS } from '../repository/detail/manifests.js';
 import { manifests as createManifests } from './create/manifests.js';
