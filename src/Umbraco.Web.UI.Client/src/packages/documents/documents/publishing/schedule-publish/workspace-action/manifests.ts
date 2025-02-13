@@ -13,7 +13,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.Document.WorkspaceActionMenuItem.SchedulePublishing',
 		name: 'Schedule publishing',
 		weight: 20,
-		api: () => import('./schedule.action.js'),
+		api: () => import('./save-and-schedule.action.js'),
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
 			label: '#buttons_schedulePublish',
@@ -29,7 +29,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 			{
 				alias: UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS,
-				match: false
+				match: false,
 			},
 		],
 	},
