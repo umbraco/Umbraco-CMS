@@ -61,7 +61,7 @@ public class DocumentHybridCacheAncestryTests : UmbracoIntegrationTestWithConten
         await ContentPublishingService.PublishBranchAsync(Textpage.Key, Array.Empty<string>(), true, Constants.Security.SuperUserKey);
 
         var published = await PublishedContentCache.GetByIdAsync(SubSubPage.Key);
-        AssertPage(SubSubPage, published);
+        CacheTestsHelper.AssertPage(SubSubPage, published);
     }
 
     [Test]
@@ -85,36 +85,9 @@ public class DocumentHybridCacheAncestryTests : UmbracoIntegrationTestWithConten
 
         // We should however be able to get the still published root Text Page
         var publishedTextPage = await PublishedContentCache.GetByIdAsync(Textpage.Key);
-        AssertPage(Textpage, publishedTextPage);
+        CacheTestsHelper.AssertPage(Textpage, publishedTextPage);
 
     }
 
-    private void AssertPage(Content baseContent, IPublishedContent? comparisonContent, bool isPublished = true)
-    {
-        Assert.Multiple(() =>
-        {
-            Assert.IsNotNull(comparisonContent);
-            Assert.That(comparisonContent.Name, Is.EqualTo(baseContent.Name));
-            Assert.That(comparisonContent.IsPublished(), Is.EqualTo(isPublished));
-        });
 
-        AssertProperties(baseContent.Properties, comparisonContent!.Properties);
-    }
-
-    private void AssertProperties(IPropertyCollection propertyCollection, IEnumerable<IPublishedProperty> publishedProperties)
-    {
-        foreach (var prop in propertyCollection)
-        {
-            AssertProperty(prop, publishedProperties.First(x => x.Alias == prop.Alias));
-        }
-    }
-
-    private void AssertProperty(IProperty property, IPublishedProperty publishedProperty)
-    {
-        Assert.Multiple(() =>
-        {
-            Assert.AreEqual(property.Alias, publishedProperty.Alias);
-            Assert.AreEqual(property.PropertyType.Alias, publishedProperty.PropertyType.Alias);
-        });
-    }
 }
