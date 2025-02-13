@@ -1,79 +1,82 @@
 import type { UmbCollectionAction } from './collection-action-base.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
-import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-
-const manifest: UmbExtensionManifestKind = {
-	type: 'kind',
-	alias: 'Umb.Kind.CollectionAction.Button',
-	matchKind: 'button',
-	matchType: 'collectionAction',
-	manifest: {
-		type: 'collectionAction',
-		kind: 'button',
-		elementName: 'umb-collection-action-button',
-	},
-};
-umbExtensionsRegistry.register(manifest);
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-collection-action-button')
 export class UmbCollectionActionButtonElement extends UmbLitElement {
-	@state()
-	private _buttonState?: UUIButtonState;
+	#api?: UmbCollectionAction;
 
-	private _manifest?: ManifestCollectionAction;
 	@property({ type: Object, attribute: false })
 	public get manifest() {
 		return this._manifest;
 	}
 	public set manifest(value: ManifestCollectionAction | undefined) {
-		if (!value) return;
 		const oldValue = this._manifest;
-		this._manifest = value;
-		if (oldValue !== this._manifest) {
+		if (oldValue !== value) {
+			this._manifest = value;
+			this._href = this.manifest?.meta.href;
+			this._additionalOptions = this.manifest?.meta.additionalOptions;
 			this.#createApi();
 			this.requestUpdate('manifest', oldValue);
 		}
 	}
+	private _manifest?: ManifestCollectionAction;
 
 	async #createApi() {
 		if (!this._manifest) throw new Error('No manifest defined');
 		if (!this._manifest.api) return;
-		this.#api = (await createExtensionApi(this, this._manifest)) as unknown as UmbCollectionAction;
+		this.#api = await createExtensionApi<UmbCollectionAction>(this, this._manifest);
+
+		this._href = (await this.#api?.getHref?.()) ?? this.manifest?.meta.href;
+		this._additionalOptions = (await this.#api?.hasAddionalOptions?.()) ?? this.manifest?.meta.additionalOptions;
 	}
 
-	#api?: UmbCollectionAction;
+	@state()
+	private _buttonState?: UUIButtonState;
+
+	@state()
+	private _additionalOptions?: boolean;
+
+	@state()
+	private _href?: string;
 
 	private async _onClick() {
-		if (!this.#api) return;
+		// If its a link or has additional options, then we do not want to display state on the button. [NL]
+		if (!this._href) {
+			if (!this._additionalOptions) {
+				this._buttonState = 'waiting';
+			}
 
-		this._buttonState = 'waiting';
-
-		try {
-			if (!this.#api) throw new Error('No api defined');
-			await this.#api.execute();
-			this._buttonState = 'success';
-		} catch {
-			this._buttonState = 'failed';
+			try {
+				if (!this.#api) throw new Error('No api defined');
+				await this.#api.execute();
+				if (!this._additionalOptions) {
+					this._buttonState = 'success';
+				}
+			} catch {
+				if (!this._additionalOptions) {
+					this._buttonState = 'failed';
+				}
+			}
 		}
-
 		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 
 	override render() {
-		const label = this.manifest?.meta.label ? this.localize.string(this.manifest.meta.label) : this.manifest?.name;
+		const label = this.manifest?.meta.label
+			? this.localize.string(this.manifest.meta.label)
+			: (this.manifest?.name ?? '');
 		return html`
 			<uui-button
-				id="action-button"
+				data-mark="collection-action:${this.manifest?.alias}"
 				color="default"
 				look="outline"
-				label=${ifDefined(label)}
-				href=${ifDefined(this.manifest?.meta.href)}
+				.label=${this._additionalOptions ? label + '…' : label}
+				.href=${this._href}
 				.state=${this._buttonState}
 				@click=${this._onClick}></uui-button>
 		`;
