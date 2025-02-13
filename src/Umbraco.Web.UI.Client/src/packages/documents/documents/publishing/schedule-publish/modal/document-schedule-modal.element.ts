@@ -62,11 +62,6 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		);
 	}
 
-	#getSchedule(unique: string): UmbDocumentScheduleSelectionModel['schedule'] {
-		const matchedItem = this.value?.selection.find((s) => s.unique === unique);
-		return matchedItem?.schedule ?? {};
-	}
-
 	override firstUpdated() {
 		this._internalValues = this.data?.prevalues ? [...this.data.prevalues] : [];
 		this.#configureSelectionManager();
