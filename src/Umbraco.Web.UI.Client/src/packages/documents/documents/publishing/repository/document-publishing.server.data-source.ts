@@ -155,6 +155,8 @@ export class UmbDocumentPublishingServerDataSource {
 					publishDate: variant.publishDate || null,
 					createDate: variant.createDate,
 					updateDate: variant.updateDate,
+					scheduledPublishDate: variant.scheduledPublishDate || null,
+					scheduledUnpublishDate: variant.scheduledUnpublishDate || null,
 				};
 			}),
 			urls: data.urls.map((url) => {
