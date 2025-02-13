@@ -31,16 +31,11 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 			return;
 		}
 
-		if (oldValue?.unique !== this.#item.unique) {
-			this.#modalRoute = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-				.addAdditionalPath(UMB_DOCUMENT_ENTITY_TYPE + '/' + this.#item.unique)
-				.onSetup(() => {
-					return { data: { entityType: UMB_DOCUMENT_ENTITY_TYPE, preset: {} } };
-				})
-				.observeRouteBuilder((routeBuilder) => {
-					this._editPath = routeBuilder({});
-				});
+		if (oldValue?.unique === this.#item.unique) {
+			return;
 		}
+
+		this.#modalRoute?.setUniquePathValue('unique', this.#item.unique);
 	}
 
 	@property({ type: Boolean })
@@ -53,6 +48,20 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	_editPath = '';
 
 	#modalRoute?: any;
+
+	constructor() {
+		super();
+
+		this.#modalRoute = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath(UMB_DOCUMENT_ENTITY_TYPE)
+			.addUniquePaths(['unique'])
+			.onSetup(() => {
+				return { data: { entityType: UMB_DOCUMENT_ENTITY_TYPE, preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editPath = routeBuilder({});
+			});
+	}
 
 	#isDraft(item: UmbDocumentItemModel) {
 		return item.variants[0]?.state === 'Draft';
