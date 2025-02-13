@@ -218,6 +218,8 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 			return undefined;
 		}
 
+		// We need to subtract the offset to get the correct time in the input field
+		// the input field expects local time without offset and the Date object will convert the date to local time
 		return (
 			d.getFullYear() +
 			'-' +
