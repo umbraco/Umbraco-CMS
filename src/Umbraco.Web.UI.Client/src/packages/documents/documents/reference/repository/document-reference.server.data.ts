@@ -35,7 +35,13 @@ export class UmbDocumentReferenceServerDataSource extends UmbControllerBase {
 		if (data) {
 			const promises = data.items.map(async (item) => {
 				const mapper = await this.#dataMapperResolver.resolve(item.$type);
-				return mapper ? mapper.map(item) : item;
+				return mapper
+					? mapper.map(item)
+					: {
+							...item,
+							unique: item.id,
+							entityType: 'unknown',
+						};
 			});
 
 			const items = await Promise.all(promises);
