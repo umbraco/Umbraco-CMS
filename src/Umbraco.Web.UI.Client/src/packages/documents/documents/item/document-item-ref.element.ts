@@ -27,8 +27,6 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		if (oldValue?.unique === value.unique) {
 			return;
 		}
-
-		this.#modalRoute?.setUniquePathValue('unique', value.unique);
 	}
 
 	@property({ type: Boolean })
@@ -70,8 +68,6 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		super();
 
 		this.#modalRoute = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath(UMB_DOCUMENT_ENTITY_TYPE)
-			.addUniquePaths(['unique'])
 			.onSetup(() => {
 				return { data: { entityType: UMB_DOCUMENT_ENTITY_TYPE, preset: {} } };
 			})
