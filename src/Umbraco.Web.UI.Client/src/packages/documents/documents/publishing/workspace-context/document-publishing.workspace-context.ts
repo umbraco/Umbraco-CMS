@@ -92,9 +92,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 					options,
 					activeVariants: selected,
 					pickableFilter: this.#publishableVariantsFilter,
-				},
-				value: {
-					selection: options.map((option) => ({
+					prevalues: options.map((option) => ({
 						unique: option.unique,
 						schedule: {
 							publishTime: option.variant?.scheduledPublishDate,

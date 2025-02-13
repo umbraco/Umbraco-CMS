@@ -27,10 +27,13 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	_hasNotSelectedMandatory?: boolean;
 
 	@state()
-	_selection: UmbDocumentScheduleModalValue['selection'] = [];
+	_selection: Array<string> = [];
 
 	@state()
 	_isAllSelected = false;
+
+	@state()
+	_internalValues: Array<UmbDocumentScheduleSelectionModel> = [];
 
 	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
 		if (!option.variant || option.variant.state === UmbDocumentVariantState.NOT_CREATED) {
@@ -48,9 +51,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				if (!this._options && !selection) return;
 
 				// New selections are mapped to the schedule data
-				this._selection = selection.map<UmbDocumentScheduleSelectionModel>((unique) => {
-					return { unique, schedule: this.#getSchedule(unique) };
-				});
+				this._selection = selection;
 				this._isAllSelected = this.#isAllSelected();
 
 				//Getting not published mandatory options — the options that are mandatory and not currently published.
@@ -67,6 +68,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	override firstUpdated() {
+		this._internalValues = this.data?.prevalues ? [...this.data.prevalues] : [];
 		this.#configureSelectionManager();
 	}
 
@@ -100,7 +102,9 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	#submit() {
-		this.value = { selection: this._selection };
+		this.value = {
+			selection: this._internalValues,
+		};
 		this.modalContext?.submit();
 	}
 
@@ -109,7 +113,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	#isSelected(unique: string) {
-		return this._selection.some((s) => s.unique === unique);
+		return this._selection.includes(unique);
 	}
 
 	#onSelectAllChange(event: Event) {
@@ -199,13 +203,16 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	#renderPublishDateInput(option: UmbDocumentVariantOptionModel) {
+		const fromDate = this.#fromDate(option.unique);
+		const toDate = this.#toDate(option.unique);
+
 		return html`<div class="publish-date">
 			<uui-form-layout-item>
 				<uui-label slot="label"><umb-localize key="content_releaseDate">Publish at</umb-localize></uui-label>
 				<div>
 					<umb-input-date
 						type="datetime-local"
-						.value=${this.#formatDate(option.variant?.scheduledPublishDate)}
+						.value=${fromDate}
 						@change=${(e: Event) => this.#onFromDateChange(e, option.unique)}
 						label=${this.localize.term('general_publishDate')}></umb-input-date>
 				</div>
@@ -215,7 +222,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				<div>
 					<umb-input-date
 						type="datetime-local"
-						.value=${this.#formatDate(option.variant?.scheduledUnpublishDate)}
+						.value=${toDate}
 						@change=${(e: Event) => this.#onToDateChange(e, option.unique)}
 						label=${this.localize.term('general_publishDate')}></umb-input-date>
 				</div>
@@ -223,19 +230,29 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		</div>`;
 	}
 
+	#fromDate(unique: string): string {
+		const variant = this._internalValues.find((s) => s.unique === unique);
+		return this.#formatDate(variant?.schedule?.publishTime);
+	}
+
+	#toDate(unique: string): string {
+		const variant = this._internalValues.find((s) => s.unique === unique);
+		return this.#formatDate(variant?.schedule?.unpublishTime);
+	}
+
 	/**
 	 * Formats the date to be compatible with the input type datetime-local
 	 * @param {string} dateStr The date to format, example: 2021-01-01T12:00:00.000+01:00
 	 * @returns {string | undefined} The formatted date in local time with no offset, example: 2021-01-01T11:00
 	 */
-	#formatDate(dateStr?: string | null): string | undefined {
-		if (!dateStr) return undefined;
+	#formatDate(dateStr?: string | null): string {
+		if (!dateStr) return '';
 
 		const d = new Date(dateStr);
 
 		if (isNaN(d.getTime())) {
 			console.warn('[Schedule]: Invalid date:', dateStr);
-			return undefined;
+			return '';
 		}
 
 		// We need to subtract the offset to get the correct time in the input field
@@ -254,7 +271,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	#onFromDateChange(e: Event, unique: string) {
-		const variant = this._selection.find((s) => s.unique === unique);
+		const variant = this._internalValues.find((s) => s.unique === unique);
 		if (!variant) return;
 		variant.schedule = {
 			...variant.schedule,
@@ -263,7 +280,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	#onToDateChange(e: Event, unique: string) {
-		const variant = this._selection.find((s) => s.unique === unique);
+		const variant = this._internalValues.find((s) => s.unique === unique);
 		if (!variant) return;
 		variant.schedule = {
 			...variant.schedule,

@@ -11,6 +11,7 @@ export interface UmbDocumentScheduleSelectionModel {
 
 export interface UmbDocumentScheduleModalData extends UmbDocumentVariantPickerData {
 	activeVariants: Array<string>;
+	prevalues: Array<UmbDocumentScheduleSelectionModel>;
 }
 
 export interface UmbDocumentScheduleModalValue {
