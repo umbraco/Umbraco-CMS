@@ -1,6 +1,6 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbDataMapperResolver } from '@umbraco-cms/backoffice/repository';
+import { UmbDataMapper } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -8,7 +8,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {RepositoryDetailDataSource}
  */
 export class UmbMediaReferenceServerDataSource extends UmbControllerBase {
-	#dataMapperResolver = new UmbDataMapperResolver(this);
+	#dataMapper = new UmbDataMapper(this);
 
 	/**
 	 * Fetches the item for the given id from the server
@@ -24,14 +24,17 @@ export class UmbMediaReferenceServerDataSource extends UmbControllerBase {
 
 		if (data) {
 			const promises = data.items.map(async (item) => {
-				const mapper = await this.#dataMapperResolver.resolve(item.$type);
-				return mapper
-					? mapper.map(item)
-					: {
+				return this.#dataMapper.map({
+					identifier: item.$type,
+					data: item,
+					fallback: async () => {
+						return {
 							...item,
 							unique: item.id,
 							entityType: 'unknown',
 						};
+					},
+				});
 			});
 
 			const items = await Promise.all(promises);
