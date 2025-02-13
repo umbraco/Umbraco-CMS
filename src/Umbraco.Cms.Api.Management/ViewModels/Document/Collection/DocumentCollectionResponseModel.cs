@@ -9,5 +9,7 @@ public class DocumentCollectionResponseModel : ContentCollectionResponseModelBas
 
     public bool IsTrashed { get; set; }
 
+    public bool IsProtected { get; set; }
+
     public string? Updater { get; set; }
 }
