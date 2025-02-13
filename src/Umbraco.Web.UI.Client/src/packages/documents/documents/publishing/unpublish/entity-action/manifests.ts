@@ -23,7 +23,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 			{
 				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
-			}
+			},
 		],
 	},
 ];
