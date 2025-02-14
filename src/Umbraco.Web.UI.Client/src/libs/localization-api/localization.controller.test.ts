@@ -284,11 +284,11 @@ describe('UmbLocalizeController', () => {
 
 	describe('list format', () => {
 		it('should return a list with conjunction', () => {
-			expect(controller.listFormat(['one', 'two', 'three'], { type: 'conjunction' })).to.equal('one, two, and three');
+			expect(controller.list(['one', 'two', 'three'], { type: 'conjunction' })).to.equal('one, two, and three');
 		});
 
 		it('should return a list with disjunction', () => {
-			expect(controller.listFormat(['one', 'two', 'three'], { type: 'disjunction' })).to.equal('one, two, or three');
+			expect(controller.list(['one', 'two', 'three'], { type: 'disjunction' })).to.equal('one, two, or three');
 		});
 	});
 
