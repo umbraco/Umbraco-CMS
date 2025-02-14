@@ -24,6 +24,12 @@ export class UmbLocalizeDateElement extends UmbLitElement {
 	@property({ type: Object })
 	options?: Intl.DateTimeFormatOptions;
 
+	/**
+	 * Do not show the duration in the title.
+	 */
+	@property({ type: Boolean })
+	skipDuration = false;
+
 	override updated() {
 		this.#setTitle();
 	}
@@ -33,6 +39,10 @@ export class UmbLocalizeDateElement extends UmbLitElement {
 	}
 
 	#setTitle() {
+		if (this.skipDuration) {
+			return;
+		}
+
 		let title = '';
 
 		if (this.date) {

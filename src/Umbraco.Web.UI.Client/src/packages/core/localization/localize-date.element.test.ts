@@ -49,5 +49,12 @@ describe('umb-localize-date', () => {
 			await aTimeout(0);
 			expect(element.title).to.equal('2 years ago');
 		});
+
+		it('should not set a title', async () => {
+			element.skipDuration = true;
+			element.title = 'Another title';
+			await element.updateComplete;
+			expect(element.title).to.equal('Another title');
+		});
 	});
 });
