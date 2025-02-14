@@ -90,6 +90,9 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
 
         _mockedNucacheRepository.Setup(r => r.DeleteContentItemAsync(It.IsAny<int>()));
 
+        var mockedPublishedStatusService = new Mock<IPublishStatusQueryService>();
+        mockedPublishedStatusService.Setup(x => x.IsDocumentPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
+
         _mockDocumentCacheService = new DocumentCacheService(
             _mockedNucacheRepository.Object,
             GetRequiredService<IIdKeyMap>(),
@@ -97,11 +100,11 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
             GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>(),
             GetRequiredService<IPublishedContentFactory>(),
             GetRequiredService<ICacheNodeFactory>(),
-            GetSeedProviders(),
+            GetSeedProviders(mockedPublishedStatusService.Object),
             new OptionsWrapper<CacheSettings>(new CacheSettings()),
             GetRequiredService<IPublishedModelFactory>(),
             GetRequiredService<IPreviewService>(),
-            GetRequiredService<IPublishStatusQueryService>(),
+            mockedPublishedStatusService.Object,
             GetRequiredService<IDocumentNavigationQueryService>());
 
         _mockedCache = new DocumentCache(_mockDocumentCacheService,
@@ -113,7 +116,7 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
 
     // We want to be able to alter the settings for the providers AFTER the test has started
     // So we'll manually create them with a magic options mock.
-    private IEnumerable<IDocumentSeedKeyProvider> GetSeedProviders()
+    private IEnumerable<IDocumentSeedKeyProvider> GetSeedProviders(IPublishStatusQueryService publishStatusQueryService)
     {
         _cacheSettings = new CacheSettings();
         _cacheSettings.DocumentBreadthFirstSeedCount = 0;
@@ -123,8 +126,8 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
 
         return new List<IDocumentSeedKeyProvider>
         {
-            new ContentTypeSeedKeyProvider(GetRequiredService<ICoreScopeProvider>(), GetRequiredService<IDatabaseCacheRepository>(), mock.Object),
-            new DocumentBreadthFirstKeyProvider(GetRequiredService<IDocumentNavigationQueryService>(), mock.Object, GetRequiredService<IPublishStatusQueryService>()),
+            new ContentTypeSeedKeyProvider(GetRequiredService<ICoreScopeProvider>(), GetRequiredService<IDatabaseCacheRepository>(), mock.Object, publishStatusQueryService),
+            new DocumentBreadthFirstKeyProvider(GetRequiredService<IDocumentNavigationQueryService>(), mock.Object, publishStatusQueryService),
         };
     }
 
