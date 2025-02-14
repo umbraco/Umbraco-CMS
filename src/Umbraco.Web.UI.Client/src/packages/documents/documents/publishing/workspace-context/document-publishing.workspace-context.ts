@@ -344,6 +344,14 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		);
 
 		if (!error) {
+			const variants = saveData.variants.filter((v) => variantIds.some((id) => id.culture === v.culture));
+			this.#notificationContext?.peek('positive', {
+				data: {
+					headline: this.#localize.term('speechBubbles_editContentPublishedHeader'),
+					message: `${this.#localize.list(variants.map((v) => v.culture ?? v.name))} ${this.#localize.term('speechBubbles_editContentPublishedText')}`,
+				},
+			});
+
 			// reload the document so all states are updated after the publish operation
 			await this.#documentWorkspaceContext.reload();
 			this.#loadAndProcessLastPublished();
