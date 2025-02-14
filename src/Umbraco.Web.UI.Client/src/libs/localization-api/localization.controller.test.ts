@@ -282,6 +282,47 @@ describe('UmbLocalizeController', () => {
 		});
 	});
 
+	describe('relative compounded time', () => {
+		it('should return a relative compounded time', () => {
+			const now = new Date();
+			const inTwoDays = new Date();
+			inTwoDays.setDate(inTwoDays.getDate() + 3);
+			inTwoDays.setHours(11, 30, 5);
+
+			expect(controller.relativeCompoundedTime(inTwoDays, now)).to.equal('in 2 days, in 22 hours, and in 58 minutes');
+		});
+
+		it('should return a date in seconds if the date is less than a minute away', () => {
+			const now = new Date();
+			const inTenSeconds = new Date(now.getTime() + 10000);
+
+			expect(controller.relativeCompoundedTime(inTenSeconds, now)).to.equal('in 10 seconds');
+		});
+
+		it('should compare between two dates', () => {
+			const twoDaysAgo = new Date();
+			twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+			const inTwoDays = new Date();
+			inTwoDays.setDate(inTwoDays.getDate() + 2);
+
+			expect(controller.relativeCompoundedTime(inTwoDays, twoDaysAgo)).to.equal('in 4 days');
+		});
+
+		it('should update the relative compounded time when the language changes', async () => {
+			const now = new Date();
+			const inTwoDays = new Date();
+			inTwoDays.setDate(inTwoDays.getDate() + 2);
+
+			expect(controller.relativeCompoundedTime(inTwoDays, now)).to.equal('in 2 days');
+
+			// Switch browser to Danish
+			document.documentElement.lang = danishRegional.$code;
+			await aTimeout(0);
+
+			expect(controller.relativeCompoundedTime(inTwoDays, now)).to.equal('om 2 dage');
+		});
+	});
+
 	describe('list format', () => {
 		it('should return a list with conjunction', () => {
 			expect(controller.listFormat(['one', 'two', 'three'], { type: 'conjunction' })).to.equal('one, two, and three');

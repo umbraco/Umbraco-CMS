@@ -192,6 +192,51 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	}
 
 	/**
+	 * Outputs a localized compounded time in a relative list format.
+	 * @example "2 days, 3 hours, 5 minutes"
+	 * @param {Date} fromDate - the date to compare from.
+	 * @param {Date} toDate - the date to compare to, usually the current date (default: current date).
+	 * @param {Intl.RelativeTimeFormatOptions} options - the options to use when formatting the time.
+	 * @param {Intl.ListFormatOptions} listOptions - the options to use when formatting the list.
+	 * @returns {string} - the formatted time, example: "2 days, 3 hours, 5 minutes"
+	 */
+	relativeCompoundedTime(
+		fromDate: Date,
+		toDate?: Date,
+		options?: Intl.RelativeTimeFormatOptions,
+		listOptions?: Intl.ListFormatOptions,
+	): string {
+		const diff = fromDate.getTime() - (toDate?.getTime() ?? Date.now());
+		const diffInDays = Math.floor(diff / (1000 * 60 * 60 * 24));
+		const restDiffInHours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+		const restDiffInMins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+		const relativeTimeArr: string[] = [];
+
+		if (diffInDays) {
+			relativeTimeArr.push(this.relativeTime(diffInDays, diffInDays > 1 ? 'days' : 'day', options));
+		}
+
+		if (restDiffInHours) {
+			relativeTimeArr.push(this.relativeTime(restDiffInHours, restDiffInHours > 1 ? 'hours' : 'hour', options));
+		}
+
+		if (restDiffInMins) {
+			relativeTimeArr.push(this.relativeTime(restDiffInMins, restDiffInMins > 1 ? 'minutes' : 'minute', options));
+		}
+
+		// If we have no days, hours or minutes, we should at least show seconds.
+		if (!relativeTimeArr.length) {
+			const diffInSeconds = Math.floor(diff / 1000);
+			relativeTimeArr.push(this.relativeTime(diffInSeconds, diffInSeconds > 1 ? 'seconds' : 'second', options));
+		}
+
+		const relativeTime = this.listFormat(relativeTimeArr, { type: 'conjunction', ...listOptions });
+
+		return relativeTime;
+	}
+
+	/**
 	 * Outputs a localized list of values in the specified format.
 	 * @example "one, two, and three"
 	 * @param {Iterable<string>} values - the values to format.
