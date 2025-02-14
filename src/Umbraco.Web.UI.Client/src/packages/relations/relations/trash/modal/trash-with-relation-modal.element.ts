@@ -146,7 +146,10 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 		return html`
 			<h5 id="reference-headline">${this.localize.term(headline)}</h5>
 			<uui-ref-list>
-				${items.map((item) => html`<umb-entity-item-ref .item=${item} readonly></umb-entity-item-ref> `)}
+				${items.map(
+					(item) =>
+						html`<umb-entity-item-ref .item=${item} readonly ?standalone=${total === 1}></umb-entity-item-ref> `,
+				)}
 			</uui-ref-list>
 			${total > this.#limitItems
 				? html`<span>${this.localize.term('references_labelMoreReferences', total - this.#limitItems)}</span>`
