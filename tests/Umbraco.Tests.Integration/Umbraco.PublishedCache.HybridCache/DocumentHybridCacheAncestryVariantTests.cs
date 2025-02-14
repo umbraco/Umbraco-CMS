@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
@@ -74,6 +75,61 @@ public class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrationTest
         {
             Assert.IsNull(publishedGrandChild);
         }
+    }
+
+    [Test]
+    public async Task SingleCultureUnpublished()
+    {
+        var publishAttempt = await ContentPublishingService.PublishBranchAsync(rootContent.Key, [_englishIsoCode, _danishIsoCode], true, Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Result.SucceededItems.Count(), Is.EqualTo(3));
+
+        // Unpublish only english culture
+        var unpublishAttempt = await ContentPublishingService.UnpublishAsync(childNode.Key, new HashSet<string> { _englishIsoCode }, Constants.Security.SuperUserKey);
+        Assert.IsTrue(unpublishAttempt.Success);
+
+        var publishedGrandChild = await PublishedContentCache.GetByIdAsync(grandChildNode.Key, false);
+        CacheTestsHelper.AssertPage(grandChildNode, publishedGrandChild, false);
+        Assert.IsTrue(publishedGrandChild!.IsPublished(_danishIsoCode));
+    }
+
+    [Test]
+    public async Task SingleCulturePublished()
+    {
+        var publishAttempt = await ContentPublishingService.PublishAsync(
+            rootContent.Key,
+            new List<CulturePublishScheduleModel>
+            {
+                new() { Culture = _danishIsoCode },
+                new() { Culture = _englishIsoCode },
+            },
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishAttempt.Success);
+
+        // Publish only single culture.
+        var publishChildAttempt = await ContentPublishingService.PublishAsync(
+            childNode.Key,
+            new List<CulturePublishScheduleModel>
+            {
+                new() { Culture = _danishIsoCode },
+            },
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishChildAttempt.Success);
+
+        var publishGrandChildAttempt = await ContentPublishingService.PublishAsync(
+            grandChildNode.Key,
+            new List<CulturePublishScheduleModel>
+            {
+                new() { Culture = _danishIsoCode },
+            },
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishGrandChildAttempt.Success);
+
+        var publishedGrandChild = await PublishedContentCache.GetByIdAsync(grandChildNode.Key, false);
+
+        CacheTestsHelper.AssertPage(grandChildNode, publishedGrandChild, false);
+        Assert.IsTrue(publishedGrandChild!.IsPublished(_danishIsoCode));
+        Assert.IsFalse(publishedGrandChild.IsPublished(_englishIsoCode));
     }
 
     private async Task CreateTestData()

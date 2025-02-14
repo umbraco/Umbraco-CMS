@@ -15,7 +15,11 @@ internal static class CacheTestsHelper
             {
                 foreach (var culture in baseContent.CultureInfos ?? Enumerable.Empty<ContentCultureInfos>())
                 {
-                    var publishedCulture = comparisonContent.Cultures[culture.Culture];
+                    if (comparisonContent.Cultures.TryGetValue(culture.Culture, out var publishedCulture) is false)
+                    {
+                        continue;
+                    }
+
                     Assert.That(publishedCulture.Name, Is.EqualTo(culture.Name));
                 }
             }
