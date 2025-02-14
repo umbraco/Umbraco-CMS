@@ -13,7 +13,7 @@ import {
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
-		kind: 'trash',
+		kind: 'trashWithRelation',
 		alias: 'Umb.EntityAction.Media.RecycleBin.Trash',
 		name: 'Trash Media Entity Action',
 		forEntityTypes: [UMB_MEDIA_ENTITY_TYPE],

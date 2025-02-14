@@ -1,22 +1,32 @@
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbDataMapper } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbDataMapper } from '@umbraco-cms/backoffice/repository';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityReferenceDataSource, UmbReferenceItemModel } from '@umbraco-cms/backoffice/relations';
+import type { UmbPagedModel, UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * @class UmbMediaReferenceServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbMediaReferenceServerDataSource extends UmbControllerBase {
+export class UmbMediaReferenceServerDataSource extends UmbControllerBase implements UmbEntityReferenceDataSource {
 	#dataMapper = new UmbDataMapper(this);
 
 	/**
-	 * Fetches the item for the given id from the server
+	 * Fetches the item for the given unique from the server
 	 * @param {string} unique - The unique identifier of the item to fetch
-	 * @returns {*}
+	 * @param {number} skip - The number of items to skip
+	 * @param {number} take - The number of items to take
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferenceItemModel>>>} - Items that are referenced by the given unique
 	 * @memberof UmbMediaReferenceServerDataSource
 	 */
-	async getReferencedBy(unique: string, skip = 0, take = 20) {
+	async getReferencedBy(
+		unique: string,
+		skip: number = 0,
+		take: number = 20,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferenceItemModel>>> {
 		const { data, error } = await tryExecuteAndNotify(
 			this,
 			MediaService.getMediaByIdReferencedBy({ id: unique, skip, take }),
@@ -38,6 +48,38 @@ export class UmbMediaReferenceServerDataSource extends UmbControllerBase {
 			});
 
 			const items = await Promise.all(promises);
+
+			return { data: { items, total: data.total } };
+		}
+
+		return { data, error };
+	}
+
+	/**
+	 * Returns any descendants of the given unique that is referenced by other items
+	 * @param {string} unique - The unique identifier of the item to fetch descendants for
+	 * @param {number} skip - The number of items to skip
+	 * @param {number} take - The number of items to take
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbEntityModel>>>} - Any descendants of the given unique that is referenced by other items
+	 * @memberof UmbMediaReferenceServerDataSource
+	 */
+	async getReferencedDescendants(
+		unique: string,
+		skip: number = 0,
+		take: number = 20,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbEntityModel>>> {
+		const { data, error } = await tryExecuteAndNotify(
+			this,
+			MediaService.getMediaByIdReferencedDescendants({ id: unique, skip, take }),
+		);
+
+		if (data) {
+			const items: Array<UmbEntityModel> = data.items.map((item) => {
+				return {
+					unique: item.id,
+					entityType: UMB_MEDIA_ENTITY_TYPE,
+				};
+			});
 
 			return { data: { items, total: data.total } };
 		}
