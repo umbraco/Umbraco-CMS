@@ -282,21 +282,21 @@ describe('UmbLocalizeController', () => {
 		});
 	});
 
-	describe('relative compounded time', () => {
-		it('should return a relative compounded time', () => {
+	describe('duration', () => {
+		it('should return a duration', () => {
 			const now = new Date('2020-01-01T00:00:00');
 			const inTwoDays = new Date(now.getTime());
 			inTwoDays.setDate(inTwoDays.getDate() + 2);
 			inTwoDays.setHours(11, 30, 5);
 
-			expect(controller.relativeCompoundedTime(inTwoDays, now)).to.equal('in 2 days, in 11 hours, and in 30 minutes');
+			expect(controller.duration(inTwoDays, now)).to.equal('2 days, 11 hours, 30 minutes, 5 seconds');
 		});
 
 		it('should return a date in seconds if the date is less than a minute away', () => {
 			const now = new Date();
 			const inTenSeconds = new Date(now.getTime() + 10000);
 
-			expect(controller.relativeCompoundedTime(inTenSeconds, now)).to.equal('in 10 seconds');
+			expect(controller.duration(inTenSeconds, now)).to.equal('10 seconds');
 		});
 
 		it('should compare between two dates', () => {
@@ -305,7 +305,15 @@ describe('UmbLocalizeController', () => {
 			const inTwoDays = new Date();
 			inTwoDays.setDate(inTwoDays.getDate() + 2);
 
-			expect(controller.relativeCompoundedTime(inTwoDays, twoDaysAgo)).to.equal('in 4 days');
+			expect(controller.duration(inTwoDays, twoDaysAgo)).to.equal('4 days');
+		});
+
+		it('should return a negative duration', () => {
+			const now = new Date();
+			const twoDaysAgo = new Date(now.getTime());
+			twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+
+			expect(controller.duration(now, twoDaysAgo)).to.equal('2 days');
 		});
 
 		it('should update the relative compounded time when the language changes', async () => {
@@ -313,23 +321,23 @@ describe('UmbLocalizeController', () => {
 			const inTwoDays = new Date();
 			inTwoDays.setDate(inTwoDays.getDate() + 2);
 
-			expect(controller.relativeCompoundedTime(inTwoDays, now)).to.equal('in 2 days');
+			expect(controller.duration(inTwoDays, now)).to.equal('2 days');
 
 			// Switch browser to Danish
 			document.documentElement.lang = danishRegional.$code;
 			await aTimeout(0);
 
-			expect(controller.relativeCompoundedTime(inTwoDays, now)).to.equal('om 2 dage');
+			expect(controller.duration(inTwoDays, now)).to.equal('2 dage');
 		});
 	});
 
 	describe('list format', () => {
 		it('should return a list with conjunction', () => {
-			expect(controller.listFormat(['one', 'two', 'three'], { type: 'conjunction' })).to.equal('one, two, and three');
+			expect(controller.list(['one', 'two', 'three'], { type: 'conjunction' })).to.equal('one, two, and three');
 		});
 
 		it('should return a list with disjunction', () => {
-			expect(controller.listFormat(['one', 'two', 'three'], { type: 'disjunction' })).to.equal('one, two, or three');
+			expect(controller.list(['one', 'two', 'three'], { type: 'disjunction' })).to.equal('one, two, or three');
 		});
 	});
 
