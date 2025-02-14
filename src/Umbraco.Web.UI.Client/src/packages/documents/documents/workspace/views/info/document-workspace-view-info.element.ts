@@ -280,7 +280,10 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			<div class="general-item">
 				<strong><umb-localize .key=${labelKey}>${labelText}</umb-localize></strong>
 				<span>
-					<umb-localize-date .date=${date} .options=${TimeOptions}></umb-localize-date>
+					<umb-localize-date
+						title=${this.localize.relativeCompoundedTime(date)}
+						.date=${date}
+						.options=${TimeOptions}></umb-localize-date>
 				</span>
 			</div>
 		`;
