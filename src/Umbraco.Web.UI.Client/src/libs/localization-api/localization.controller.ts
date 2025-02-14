@@ -191,6 +191,17 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 		return new Intl.RelativeTimeFormat(this.lang(), options).format(value, unit);
 	}
 
+	/**
+	 * Outputs a localized list of values in the specified format.
+	 * @example "one, two, and three"
+	 * @param {Iterable<string>} values - the values to format.
+	 * @param {Intl.ListFormatOptions} options - the options to use when formatting the list.
+	 * @returns {string} - the formatted list.
+	 */
+	listFormat(values: Iterable<string>, options?: Intl.ListFormatOptions): string {
+		return new Intl.ListFormat(this.lang(), options).format(values);
+	}
+
 	// TODO: for V.16 we should set type to be string | undefined. [NL]
 	/**
 	 * Translates a string containing one or more terms. The terms should be prefixed with a `#` character.
