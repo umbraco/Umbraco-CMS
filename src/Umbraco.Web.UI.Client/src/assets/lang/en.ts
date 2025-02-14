@@ -442,6 +442,7 @@ export default {
 			'Used to organise the Document Types, Compositions and Element Types created in this\n      Document Type tree.\n    ',
 		newFolder: 'New folder',
 		newDataType: 'New Data Type',
+		newDataTypeDescription: 'Used to define a configuration for a Property Type on a Content Type.',
 		newJavascriptFile: 'New JavaScript file',
 		newEmptyPartialView: 'New empty partial view',
 		newPartialViewMacro: 'New partial view macro',
