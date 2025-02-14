@@ -201,12 +201,14 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * @returns {string} - the formatted time, example: "2 days, 3 hours, 5 minutes"
 	 */
 	relativeCompoundedTime(
-		fromDate: Date,
-		toDate?: Date,
+		fromDate: Date | string,
+		toDate?: Date | string,
 		options?: Intl.RelativeTimeFormatOptions,
 		listOptions?: Intl.ListFormatOptions,
 	): string {
-		const diff = fromDate.getTime() - (toDate?.getTime() ?? Date.now());
+		const d1 = new Date(fromDate);
+		const d2 = new Date(toDate ?? Date.now());
+		const diff = d1.getTime() - d2.getTime();
 		const diffInDays = Math.floor(diff / (1000 * 60 * 60 * 24));
 		const restDiffInHours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
 		const restDiffInMins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
