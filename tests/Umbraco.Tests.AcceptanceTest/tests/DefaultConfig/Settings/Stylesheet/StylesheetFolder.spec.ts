@@ -19,7 +19,7 @@ test('can create a folder', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.stylesheet.clickActionsMenuAtRoot();
-  await umbracoUi.stylesheet.createFolder(stylesheetFolderName);
+  await umbracoUi.stylesheet.createStylesheetFolder(stylesheetFolderName);
 
   // Assert
   await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
@@ -52,7 +52,7 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.stylesheet.reloadStylesheetTree();
   await umbracoUi.stylesheet.clickActionsMenuForStylesheet(stylesheetFolderName);
-  await umbracoUi.stylesheet.createFolder(childFolderName);
+  await umbracoUi.stylesheet.createStylesheetFolder(childFolderName);
 
   //Assert
   await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
@@ -75,7 +75,7 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   await umbracoUi.stylesheet.reloadStylesheetTree();
   await umbracoUi.stylesheet.clickCaretButtonForName(stylesheetFolderName);
   await umbracoUi.stylesheet.clickActionsMenuForStylesheet(childFolderName);
-  await umbracoUi.stylesheet.createFolder(childOfChildFolderName);
+  await umbracoUi.stylesheet.createStylesheetFolder(childOfChildFolderName);
 
   // Assert
   await umbracoUi.stylesheet.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);

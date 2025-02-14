@@ -18,7 +18,7 @@ test.afterEach(async ({umbracoApi}) => {
   }
 });
 
-test('can update initial state', async ({umbracoApi, umbracoUi}) => {
+test('can update preset value state', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedDataTypeValues = {
     "alias": "default",
@@ -26,7 +26,7 @@ test('can update initial state', async ({umbracoApi, umbracoUi}) => {
   };
 
   // Act
-  await umbracoUi.dataType.clickInitialStateSlider();
+  await umbracoUi.dataType.clickPresetValueSlider();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
