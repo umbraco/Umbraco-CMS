@@ -34,10 +34,10 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
                 context.SetIncludedProperties(collectionPropertyAliases);
             });
 
-        await SetUnmappedProperties(collectionResponseModels);
+        await SetUnmappedProperties(contentCollection, collectionResponseModels);
 
         return collectionResponseModels;
     }
 
-    protected virtual Task SetUnmappedProperties(List<TCollectionResponseModel> collectionResponseModels) => Task.CompletedTask;
+    protected virtual Task SetUnmappedProperties(ListViewPagedModel<TContent> contentCollection, List<TCollectionResponseModel> collectionResponseModels) => Task.CompletedTask;
 }
