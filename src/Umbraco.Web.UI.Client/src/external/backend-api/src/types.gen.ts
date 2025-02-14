@@ -423,6 +423,8 @@ export type CreateUserRequestModel = {
 
 export type CreateWebhookRequestModel = {
     enabled: boolean;
+    name?: (string) | null;
+    description?: (string) | null;
     url: string;
     contentTypeKeys: Array<(string)>;
     headers: {
@@ -563,6 +565,7 @@ export type DataTypeTreeItemResponseModel = {
 };
 
 export type DefaultReferenceResponseModel = {
+    $type: string;
     id: string;
     name?: (string) | null;
     type?: (string) | null;
@@ -684,6 +687,7 @@ export type DocumentRecycleBinItemResponseModel = {
 };
 
 export type DocumentReferenceResponseModel = {
+    $type: string;
     id: string;
     name?: (string) | null;
     published?: (boolean) | null;
@@ -1211,6 +1215,7 @@ export type MediaRecycleBinItemResponseModel = {
 };
 
 export type MediaReferenceResponseModel = {
+    $type: string;
     id: string;
     name?: (string) | null;
     mediaType: (TrackedReferenceMediaTypeModel);
@@ -2043,6 +2048,7 @@ export type PublishDocumentRequestModel = {
 
 export type PublishDocumentWithDescendantsRequestModel = {
     includeUnpublishedDescendants: boolean;
+    forceRepublish: boolean;
     cultures: Array<(string)>;
 };
 
@@ -2670,6 +2676,8 @@ export type UpdateUserRequestModel = {
 
 export type UpdateWebhookRequestModel = {
     enabled: boolean;
+    name?: (string) | null;
+    description?: (string) | null;
     url: string;
     contentTypeKeys: Array<(string)>;
     headers: {
@@ -2904,6 +2912,8 @@ export type WebhookLogResponseModel = {
 
 export type WebhookResponseModel = {
     enabled: boolean;
+    name?: (string) | null;
+    description?: (string) | null;
     url: string;
     contentTypeKeys: Array<(string)>;
     headers: {

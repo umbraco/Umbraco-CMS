@@ -7,4 +7,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Document Reference Repository',
 		api: () => import('./document-reference.repository.js'),
 	},
+	{
+		type: 'dataMapper',
+		alias: 'Umb.DataMapper.DocumentReferenceResponseModel',
+		name: 'Document Reference Response Model to Client Model Data Mapper',
+		api: () => import('./document-reference-response-model.mapper.js'),
+		identifier: 'DocumentReferenceResponseModel',
+	},
 ];
