@@ -90,9 +90,16 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			.open(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
 				data: {
 					options,
+					activeVariants: selected,
 					pickableFilter: this.#publishableVariantsFilter,
+					prevalues: options.map((option) => ({
+						unique: option.unique,
+						schedule: {
+							publishTime: option.variant?.scheduledPublishDate,
+							unpublishTime: option.variant?.scheduledUnpublishDate,
+						},
+					})),
 				},
-				value: { selection: selected.map((unique) => ({ unique, schedule: {} })) },
 			})
 			.onSubmit()
 			.catch(() => undefined);
@@ -103,7 +110,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		const variants =
 			result?.selection.map<UmbDocumentVariantPublishModel>((x) => ({
 				variantId: UmbVariantId.FromString(x.unique),
-				schedule: x.schedule,
+				schedule: {
+					publishTime: this.#convertToDateTimeOffset(x.schedule?.publishTime),
+					unpublishTime: this.#convertToDateTimeOffset(x.schedule?.unpublishTime),
+				},
 			})) ?? [];
 
 		if (!variants.length) return;
@@ -119,6 +129,27 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
 			this.#eventContext?.dispatchEvent(structureEvent);
 		}
+	}
+
+	/**
+	 * Convert a date string to a server time string in ISO format, example: 2021-01-01T12:00:00.000+00:00.
+	 * The input must be a valid date string, otherwise it will return null.
+	 * The output matches the DateTimeOffset format in C#.
+	 */
+	#convertToDateTimeOffset(dateString: string | null | undefined) {
+		if (!dateString || dateString.length === 0) {
+			return null;
+		}
+
+		const date = new Date(dateString);
+
+		if (isNaN(date.getTime())) {
+			console.warn(`[Schedule]: Invalid date: ${dateString}`);
+			return null;
+		}
+
+		// Convert the date to UTC time in ISO format before sending it to the server
+		return date.toISOString();
 	}
 
 	/**

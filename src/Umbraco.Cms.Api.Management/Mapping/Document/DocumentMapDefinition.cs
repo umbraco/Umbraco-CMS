@@ -137,7 +137,10 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
     {
         foreach (ContentSchedule schedule in source.FullSchedule)
         {
-            DocumentVariantResponseModel? variant = target.Variants.FirstOrDefault(v => v.Culture == schedule.Culture || (v.Culture.IsNullOrWhiteSpace() && schedule.Culture.IsNullOrWhiteSpace()));
+            DocumentVariantResponseModel? variant = target.Variants
+                .FirstOrDefault(v =>
+                    v.Culture == schedule.Culture ||
+                    (IsInvariant(v.Culture) && IsInvariant(schedule.Culture)));
             if (variant is null)
             {
                 continue;
@@ -154,4 +157,6 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
             }
         }
     }
+
+    private static bool IsInvariant(string? culture) => culture.IsNullOrWhiteSpace() || culture == Core.Constants.System.InvariantCulture;
 }
