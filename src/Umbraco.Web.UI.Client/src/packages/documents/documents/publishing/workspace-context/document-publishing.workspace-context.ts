@@ -317,9 +317,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 				// Notifying that the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
 				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 				// TODO: Get rid of the save notification.
-				// TODO: Translate this message [NL]
 				notificationContext.peek('danger', {
-					data: { message: 'Document was not published, but we saved it for you.' },
+					data: { message: this.#localize.term('speechBubbles_editContentPublishedFailedByValidation') },
 				});
 				// Reject even thought the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
 				return await Promise.reject();

@@ -1421,6 +1421,7 @@ export default {
 		cssSavedText: 'Stylesheet saved without any errors',
 		dataTypeSaved: 'Datatype saved',
 		dictionaryItemSaved: 'Dictionary item saved',
+		editContentPublishedFailedByValidation: 'Content could not be published, but we saved it for you',
 		editContentPublishedFailedByParent: 'Content could not be published, because a parent page is not published',
 		editContentPublishedHeader: 'Content published',
 		editContentPublishedText: 'and visible on the website',
