@@ -16,10 +16,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
     private readonly CommonMapper _commonMapper;
 
     public DocumentMapDefinition(PropertyEditorCollection propertyEditorCollection, CommonMapper commonMapper)
-        : base(propertyEditorCollection)
-    {
-        _commonMapper = commonMapper;
-    }
+        : base(propertyEditorCollection) => _commonMapper = commonMapper;
 
     public void DefineMaps(IUmbracoMapper mapper)
     {
