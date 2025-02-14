@@ -282,6 +282,16 @@ describe('UmbLocalizeController', () => {
 		});
 	});
 
+	describe('list format', () => {
+		it('should return a list with conjunction', () => {
+			expect(controller.listFormat(['one', 'two', 'three'], { type: 'conjunction' })).to.equal('one, two, and three');
+		});
+
+		it('should return a list with disjunction', () => {
+			expect(controller.listFormat(['one', 'two', 'three'], { type: 'disjunction' })).to.equal('one, two, or three');
+		});
+	});
+
 	describe('string', () => {
 		it('should replace words prefixed with a # with translated value', async () => {
 			const str = '#close';
