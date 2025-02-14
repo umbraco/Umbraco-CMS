@@ -294,7 +294,7 @@ export default {
 		notmemberof: 'Not a member of group(s)',
 		childItems: 'Child items',
 		target: 'Target',
-		scheduledPendingChanges: 'This schedule has changes that will take effect when you click "Schedule".',
+		scheduledPendingChanges: 'This schedule has changes that will take effect when you click "%0%".',
 		scheduledPublishServerTime: 'This translates to the following time on the server:',
 		scheduledPublishDocumentation:
 			'<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">What does this mean?</a>',
