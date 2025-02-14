@@ -309,11 +309,7 @@ describe('UmbLocalizeController', () => {
 		});
 
 		it('should return a negative duration', () => {
-			const now = new Date();
-			const twoDaysAgo = new Date(now.getTime());
-			twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-
-			expect(controller.duration(now, twoDaysAgo)).to.equal('2 days');
+			expect(controller.duration('2020-01-01', '2019-12-30')).to.equal('2 days');
 		});
 
 		it('should update the relative compounded time when the language changes', async () => {
