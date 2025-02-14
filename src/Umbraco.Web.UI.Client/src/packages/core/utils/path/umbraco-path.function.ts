@@ -3,6 +3,6 @@
  *
  * @param path
  */
-export function umbracoPath(path: string) {
-	return `/umbraco/management/api/v1${path}`;
+export function umbracoPath(path: string, version = 'v1') {
+	return `/umbraco/management/api/${version}${path}`;
 }
