@@ -198,7 +198,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * @param {Intl.ListFormatOptions} options - the options to use when formatting the list.
 	 * @returns {string} - the formatted list.
 	 */
-	listFormat(values: Iterable<string>, options?: Intl.ListFormatOptions): string {
+	list(values: Iterable<string>, options?: Intl.ListFormatOptions): string {
 		return new Intl.ListFormat(this.lang(), options).format(values);
 	}
 
