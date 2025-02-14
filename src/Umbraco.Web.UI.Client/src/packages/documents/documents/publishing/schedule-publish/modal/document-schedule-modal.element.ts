@@ -206,7 +206,22 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 						type="datetime-local"
 						.value=${this.#formatDate(fromDate)}
 						@change=${(e: Event) => this.#onFromDateChange(e, option.unique)}
-						label=${this.localize.term('general_publishDate')}></umb-input-date>
+						label=${this.localize.term('general_publishDate')}>
+						<div slot="append">
+							${when(
+								fromDate !== option.variant?.scheduledPublishDate,
+								() => html`
+									<uui-button
+										compact
+										label=${this.localize.term('general_clear')}
+										title=${this.localize.term('general_clear')}
+										@click=${() => this.#removeFromDate(option.unique)}>
+										<uui-icon name="remove"></uui-icon>
+									</uui-button>
+								`,
+							)}
+						</div>
+					</umb-input-date>
 				</div>
 			</uui-form-layout-item>
 			<uui-form-layout-item>
@@ -216,7 +231,22 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 						type="datetime-local"
 						.value=${this.#formatDate(toDate)}
 						@change=${(e: Event) => this.#onToDateChange(e, option.unique)}
-						label=${this.localize.term('general_publishDate')}></umb-input-date>
+						label=${this.localize.term('general_publishDate')}>
+						<div slot="append">
+							${when(
+								toDate !== option.variant?.scheduledUnpublishDate,
+								() => html`
+									<uui-button
+										compact
+										label=${this.localize.term('general_clear')}
+										title=${this.localize.term('general_clear')}
+										@click=${() => this.#removeToDate(option.unique)}>
+										<uui-icon name="remove"></uui-icon>
+									</uui-button>
+								`,
+							)}
+						</div>
+					</umb-input-date>
 				</div>
 			</uui-form-layout-item>
 		</div>`;
@@ -230,6 +260,26 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	#toDate(unique: string): string | null {
 		const variant = this._internalValues.find((s) => s.unique === unique);
 		return variant?.schedule?.unpublishTime ?? null;
+	}
+
+	#removeFromDate(unique: string): void {
+		const variant = this._internalValues.find((s) => s.unique === unique);
+		if (!variant) return;
+		variant.schedule = {
+			...variant.schedule,
+			publishTime: null,
+		};
+		this.requestUpdate('_internalValues');
+	}
+
+	#removeToDate(unique: string): void {
+		const variant = this._internalValues.find((s) => s.unique === unique);
+		if (!variant) return;
+		variant.schedule = {
+			...variant.schedule,
+			unpublishTime: null,
+		};
+		this.requestUpdate('_internalValues');
 	}
 
 	/**
