@@ -203,8 +203,8 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	duration(fromDate: Date | string, toDate?: Date | string, options?: any): string {
 		const d1 = new Date(fromDate);
 		const d2 = new Date(toDate ?? Date.now());
-		const diff = d1.getTime() - d2.getTime();
-		const diffInSecs = Math.floor(diff / 1000);
+		const diff = Math.abs(d1.getTime() - d2.getTime());
+		const diffInSecs = Math.abs(Math.floor(diff / 1000));
 
 		if (false === 'DurationFormat' in Intl) {
 			return `${diffInSecs} seconds`;
