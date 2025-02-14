@@ -141,7 +141,7 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 	}
 
 	#renderItems(headline: string, items: Array<UmbReferenceItemModel>, total: number) {
-		if (!items) return nothing;
+		if (total === 0) return nothing;
 
 		return html`
 			<h5 id="reference-headline">${this.localize.term(headline)}</h5>
