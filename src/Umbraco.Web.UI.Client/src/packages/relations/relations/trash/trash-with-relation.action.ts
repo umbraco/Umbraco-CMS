@@ -1,41 +1,36 @@
-import type { UmbRecycleBinRepository } from '../../recycle-bin-repository.interface.js';
-import type { MetaEntityActionTrashKind } from './types.js';
-import { UmbEntityTrashedEvent } from './trash.event.js';
+import type { MetaEntityActionTrashWithRelationKind } from './types.js';
+import { UMB_TRASH_WITH_RELATION_CONFIRM_MODAL } from './modal/constants.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbEntityTrashedEvent } from '@umbraco-cms/backoffice/recycle-bin';
 
 /**
- * Entity action for trashing an item.
- * @class UmbTrashEntityAction
- * @augments {UmbEntityActionBase<MetaEntityActionTrashKind>}
+ * Entity action for trashing an item with relations.
+ * @class UmbTrashWithRelationEntityAction
+ * @augments {UmbEntityActionBase<MetaEntityActionTrashWithRelationKind>}
  */
-export class UmbTrashEntityAction extends UmbEntityActionBase<MetaEntityActionTrashKind> {
+export class UmbTrashWithRelationEntityAction extends UmbEntityActionBase<MetaEntityActionTrashWithRelationKind> {
 	/**
 	 * Executes the action.
-	 * @memberof UmbTrashEntityAction
+	 * @memberof UmbTrashWithRelationEntityAction
 	 */
 	override async execute() {
 		if (!this.args.unique) throw new Error('Cannot trash an item without a unique identifier.');
 
-		const itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(
-			this,
-			this.args.meta.itemRepositoryAlias,
-		);
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 
-		const { data } = await itemRepository.requestItems([this.args.unique]);
-		const item = data?.[0];
-		if (!item) throw new Error('Item not found.');
-
-		// TODO: handle items with variants
-		await umbConfirmModal(this._host, {
-			headline: `Trash`,
-			content: `Are you sure you want to move ${item.name} to the recycle bin?`,
-			color: 'danger',
-			confirmLabel: 'Trash',
+		const modal = modalManager.open(this, UMB_TRASH_WITH_RELATION_CONFIRM_MODAL, {
+			data: {
+				unique: this.args.unique,
+				entityType: this.args.entityType,
+				itemRepositoryAlias: this.args.meta.itemRepositoryAlias,
+				referenceRepositoryAlias: this.args.meta.referenceRepositoryAlias,
+			},
 		});
+
+		await modal.onSubmit();
 
 		const recycleBinRepository = await createExtensionApiByAlias<UmbRecycleBinRepository>(
 			this,
@@ -66,4 +61,4 @@ export class UmbTrashEntityAction extends UmbEntityActionBase<MetaEntityActionTr
 	}
 }
 
-export { UmbTrashEntityAction as api };
+export { UmbTrashWithRelationEntityAction as api };

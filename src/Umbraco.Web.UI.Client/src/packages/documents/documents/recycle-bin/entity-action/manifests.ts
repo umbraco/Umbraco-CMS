@@ -15,7 +15,7 @@ import {
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
-		kind: 'trash',
+		kind: 'trashWithRelation',
 		alias: 'Umb.EntityAction.Document.RecycleBin.Trash',
 		name: 'Trash Document Entity Action',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],

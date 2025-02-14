@@ -1,4 +1,5 @@
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type {
 	DefaultReferenceResponseModel,
 	DocumentReferenceResponseModel,
@@ -14,7 +15,7 @@ export type UmbReferenceModel =
 	| DocumentReferenceResponseModel
 	| MediaReferenceResponseModel;
 
-export interface UmbEntityReferenceRepository {
+export interface UmbEntityReferenceRepository extends UmbApi {
 	requestReferencedBy(
 		unique: string,
 		skip?: number,

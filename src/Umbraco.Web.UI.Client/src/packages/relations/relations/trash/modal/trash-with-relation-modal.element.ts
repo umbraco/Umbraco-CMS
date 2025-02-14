@@ -1,82 +1,73 @@
-import type { UmbTrashConfirmModalData, UmbTrashConfirmModalValue } from './trash-confirm-modal.token.js';
-import { html, customElement, property, css, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbEntityReferenceRepository, UmbReferenceItemModel } from '../../types.js';
+import type {
+	UmbTrashWithRelationConfirmModalData,
+	UmbTrashWithRelationConfirmModalValue,
+} from './trash-with-relation-modal.token.js';
+import { html, customElement, css, state, nothing, type PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbNamedEntityModel } from '@umbraco-cms/backoffice/entity';
 
-@customElement('umb-trash-confirm-modal')
-export class UmbTrashConfirmModalElement extends UmbLitElement {
-	@property({ attribute: false })
-	modalContext?: UmbModalContext<UmbTrashConfirmModalData, UmbTrashConfirmModalValue>;
-
-	@property({ type: Object, attribute: false })
-	private _data?: UmbTrashConfirmModalData | undefined;
-	public get data(): UmbTrashConfirmModalData | undefined {
-		return this._data;
-	}
-	public set data(value: UmbTrashConfirmModalData | undefined) {
-		this._data = value;
-		this.#initData();
-	}
-
-	private _handleConfirm() {
-		this.modalContext?.submit();
-	}
-
-	private _handleCancel() {
-		this.modalContext?.reject();
-	}
+@customElement('umb-trash-with-relation-confirm-modal')
+export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement<
+	UmbTrashWithRelationConfirmModalData,
+	UmbTrashWithRelationConfirmModalValue
+> {
+	@state()
+	_name?: string;
 
 	@state()
-	_item: any;
-
-	@state()
-	_referencedBy: any[] = [];
+	_referencedBy: Array<UmbReferenceItemModel> = [];
 
 	@state()
 	_totalReferencedBy: number = 0;
 
-	#itemRepository?: UmbItemRepository<any>;
-	#referenceRepository?: any;
+	#itemRepository?: UmbItemRepository<UmbNamedEntityModel>;
+	#referenceRepository?: UmbEntityReferenceRepository;
 
 	#limitReferencedBy = 3;
 
-	constructor() {
-		super();
+	protected override firstUpdated(_changedProperties: PropertyValues): void {
+		super.firstUpdated(_changedProperties);
 		this.#initData();
 	}
 
 	async #initData() {
-		if (!this._data) {
+		if (!this.data) {
 			this.#itemRepository?.destroy();
 			this.#referenceRepository?.destroy();
 			return;
 		}
 
-		this.#itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(
+		this.#itemRepository = await createExtensionApiByAlias<UmbItemRepository<UmbNamedEntityModel>>(
 			this,
-			this._data.itemRepositoryAlias,
+			this.data.itemRepositoryAlias,
 		);
 
-		const { data } = await this.#itemRepository.requestItems([this._data.unique]);
+		const { data } = await this.#itemRepository.requestItems([this.data.unique]);
 		const item = data?.[0];
 		if (!item) throw new Error('Item not found.');
 
-		this._item = item.name;
+		this._name = item.name;
 
 		this.#loadReferencedBy();
 	}
 
 	async #loadReferencedBy() {
-		// Skip if there is no reference repository
-		if (!this._data?.referenceRepositoryAlias) return;
+		if (!this.data?.referenceRepositoryAlias) {
+			throw new Error('Missing referenceRepositoryAlias in data.');
+		}
 
-		this.#referenceRepository = await createExtensionApiByAlias<any>(this, this._data.referenceRepositoryAlias);
+		this.#referenceRepository = await createExtensionApiByAlias<UmbEntityReferenceRepository>(
+			this,
+			this.data?.referenceRepositoryAlias,
+		);
 
 		const { data: referencesData } = await this.#referenceRepository.requestReferencedBy(
-			this._data.unique,
+			this.data.unique,
 			0,
 			this.#limitReferencedBy,
 		);
@@ -90,10 +81,10 @@ export class UmbTrashConfirmModalElement extends UmbLitElement {
 	override render() {
 		return html`
 			<uui-dialog-layout class="uui-text" headline="Trash">
-				<p>Are you sure you want to move <strong>${this._item}</strong> to the recycle bin?</p>
+				<p>Are you sure you want to move <strong>${this._name}</strong> to the recycle bin?</p>
 				${this.#renderReferencedBy()}
 
-				<uui-button slot="actions" id="cancel" label="Cancel" @click=${this._handleCancel}></uui-button>
+				<uui-button slot="actions" id="cancel" label="Cancel" @click=${this._rejectModal}></uui-button>
 
 				<uui-button
 					slot="actions"
@@ -101,7 +92,7 @@ export class UmbTrashConfirmModalElement extends UmbLitElement {
 					color="danger"
 					look="primary"
 					label="Trash"
-					@click=${this._handleConfirm}
+					@click=${this._submitModal}
 					${umbFocus()}></uui-button>
 			</uui-dialog-layout>
 		`;
@@ -146,10 +137,10 @@ export class UmbTrashConfirmModalElement extends UmbLitElement {
 	];
 }
 
-export { UmbTrashConfirmModalElement as element };
+export { UmbTrashWithRelationConfirmModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-trash-confirm-modal': UmbTrashConfirmModalElement;
+		'umb-trash-with-relation-confirm-modal': UmbTrashWithRelationConfirmModalElement;
 	}
 }

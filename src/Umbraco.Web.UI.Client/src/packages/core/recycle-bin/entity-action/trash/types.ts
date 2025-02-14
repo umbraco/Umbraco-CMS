@@ -8,7 +8,6 @@ export interface ManifestEntityActionTrashKind extends ManifestEntityAction<Meta
 export interface MetaEntityActionTrashKind extends MetaEntityActionDefaultKind {
 	recycleBinRepositoryAlias: string;
 	itemRepositoryAlias: string;
-	referenceRepositoryAlias?: string;
 }
 
 declare global {
