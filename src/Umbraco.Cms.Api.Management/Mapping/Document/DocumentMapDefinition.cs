@@ -1,15 +1,12 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Mapping;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Document;
@@ -17,22 +14,11 @@ namespace Umbraco.Cms.Api.Management.Mapping.Document;
 public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValueResponseModel, DocumentVariantResponseModel>, IMapDefinition
 {
     private readonly CommonMapper _commonMapper;
-    private readonly IPublicAccessService _publicAccessService;
 
-    [Obsolete("Please use the contructor with all parameters. This constructor will be removed in Umbraco 17.")]
     public DocumentMapDefinition(PropertyEditorCollection propertyEditorCollection, CommonMapper commonMapper)
-        : this(
-            propertyEditorCollection,
-            commonMapper,
-            StaticServiceProvider.Instance.GetRequiredService<IPublicAccessService>())
-    {
-    }
-
-    public DocumentMapDefinition(PropertyEditorCollection propertyEditorCollection, CommonMapper commonMapper, IPublicAccessService publicAccessService)
         : base(propertyEditorCollection)
     {
         _commonMapper = commonMapper;
-        _publicAccessService = publicAccessService;
     }
 
     public void DefineMaps(IUmbracoMapper mapper)
@@ -84,7 +70,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         target.IsTrashed = source.Trashed;
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -IsProtected
     private void Map(IContent source, DocumentCollectionResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -93,7 +79,6 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         target.Creator = _commonMapper.GetOwnerName(source, context);
         target.Updater = _commonMapper.GetCreatorName(source, context);
         target.IsTrashed = source.Trashed;
-        target.IsProtected = _publicAccessService.IsProtected(source).Success;
 
         // If there's a set of property aliases specified in the collection configuration, we will check if the current property's
         // value should be mapped. If it isn't one of the ones specified in 'includeProperties', we will just return the result
