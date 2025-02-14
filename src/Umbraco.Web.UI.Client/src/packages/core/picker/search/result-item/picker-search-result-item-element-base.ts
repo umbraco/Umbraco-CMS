@@ -1,8 +1,8 @@
+import type { UmbPickerContext } from '../../picker.context.js';
+import { UMB_PICKER_CONTEXT } from '../../picker.context.token.js';
 import type { UmbNamedEntityModel } from '@umbraco-cms/backoffice/entity';
 import { html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_PICKER_CONTEXT } from '@umbraco-cms/backoffice/picker';
-import type { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
 
 export abstract class UmbPickerSearchResultItemElementBase<ItemType extends UmbNamedEntityModel> extends UmbLitElement {
 	#item: ItemType | undefined;
