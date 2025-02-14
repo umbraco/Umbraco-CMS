@@ -1492,6 +1492,7 @@ export default {
 		editVariantPublishedText: '%0% published and visible on the website',
 		editMultiVariantPublishedText: '%0% documents published for languages %1% and visible on the website',
 		editContentScheduledSavedText: 'A schedule for publishing has been updated',
+		editContentScheduledNotSavedText: 'The schedule for publishing could not be updated',
 		editVariantSavedText: '%0% saved',
 		editVariantSendToPublishText: '%0% changes have been sent for approval',
 		contentCultureUnpublished: 'Content variation %0% unpublished',
