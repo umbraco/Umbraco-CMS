@@ -284,12 +284,12 @@ describe('UmbLocalizeController', () => {
 
 	describe('relative compounded time', () => {
 		it('should return a relative compounded time', () => {
-			const now = new Date();
-			const inTwoDays = new Date();
-			inTwoDays.setDate(inTwoDays.getDate() + 3);
+			const now = new Date('2020-01-01T00:00:00');
+			const inTwoDays = new Date(now.getTime());
+			inTwoDays.setDate(inTwoDays.getDate() + 2);
 			inTwoDays.setHours(11, 30, 5);
 
-			expect(controller.relativeCompoundedTime(inTwoDays, now)).to.equal('in 2 days, in 22 hours, and in 58 minutes');
+			expect(controller.relativeCompoundedTime(inTwoDays, now)).to.equal('in 2 days, in 11 hours, and in 30 minutes');
 		});
 
 		it('should return a date in seconds if the date is less than a minute away', () => {
