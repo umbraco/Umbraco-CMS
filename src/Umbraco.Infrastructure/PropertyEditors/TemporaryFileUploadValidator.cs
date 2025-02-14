@@ -6,20 +6,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal class TemporaryFileUploadValidator : IValueValidator
+public class TemporaryFileUploadValidator : IValueValidator
 {
     private readonly GetContentSettings _getContentSettings;
     private readonly ParseTemporaryFileKey _parseTemporaryFileKey;
     private readonly GetTemporaryFileModel _getTemporaryFileModel;
     private readonly ValidateFileType? _validateFileType;
 
-    internal delegate ContentSettings GetContentSettings();
+    public delegate ContentSettings GetContentSettings();
 
-    internal delegate Guid? ParseTemporaryFileKey(object? editorValue);
+    public delegate Guid? ParseTemporaryFileKey(object? editorValue);
 
-    internal delegate TemporaryFileModel? GetTemporaryFileModel(Guid temporaryFileKey);
+    public delegate TemporaryFileModel? GetTemporaryFileModel(Guid temporaryFileKey);
 
-    internal delegate bool ValidateFileType(string extension, object? dataTypeConfiguration);
+    public delegate bool ValidateFileType(string extension, object? dataTypeConfiguration);
 
     public TemporaryFileUploadValidator(
         GetContentSettings getContentSettings,
@@ -33,7 +33,7 @@ internal class TemporaryFileUploadValidator : IValueValidator
         _validateFileType = validateFileType;
     }
 
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
+    public virtual IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
     {
         Guid? temporaryFileKey = _parseTemporaryFileKey(value);
         if (temporaryFileKey.HasValue == false)
