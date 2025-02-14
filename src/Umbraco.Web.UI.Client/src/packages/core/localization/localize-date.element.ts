@@ -1,4 +1,4 @@
-import { css, customElement, html, property, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
@@ -24,13 +24,25 @@ export class UmbLocalizeDateElement extends UmbLitElement {
 	@property({ type: Object })
 	options?: Intl.DateTimeFormatOptions;
 
-	@state()
-	protected get text(): string {
-		return this.localize.date(this.date!, this.options);
+	override updated() {
+		this.#setTitle();
 	}
 
 	override render() {
-		return this.date ? html`${unsafeHTML(this.text)}` : html`<slot></slot>`;
+		return this.date ? this.localize.date(this.date, this.options) : nothing;
+	}
+
+	#setTitle() {
+		let title = '';
+
+		if (this.date) {
+			const now = new Date();
+			const d = new Date(this.date);
+			const duration = this.localize.duration(d, now);
+			title = this.localize.term('general_duration', duration, d, now);
+		}
+
+		this.title = title;
 	}
 
 	static override styles = [
