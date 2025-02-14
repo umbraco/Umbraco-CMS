@@ -499,22 +499,22 @@ stages:
           matrix:
             LinuxPart1Of3:
               vmImage: "ubuntu-latest"
-              testCommand: "npm run smokeTest -- --shard=1/3"
+              testCommand: "npm run smokeTestSqlite -- --shard=1/3"
             LinuxPart2Of3:
               vmImage: "ubuntu-latest"
-              testCommand: "npm run smokeTest -- --shard=2/3"
+              testCommand: "npm run smokeTestSqlite -- --shard=2/3"
             LinuxPart3Of3:
               vmImage: "ubuntu-latest"
-              testCommand: "npm run smokeTest -- --shard=3/3"
+              testCommand: "npm run smokeTestSqlite -- --shard=3/3"
             WindowsPart1Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run smokeTest -- --shard=1/3"
+              testCommand: "npm run smokeTestSqlite -- --shard=1/3"
             WindowsPart2Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run smokeTest -- --shard=2/3"
+              testCommand: "npm run smokeTestSqlite -- --shard=2/3"
             WindowsPart3Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run smokeTest -- --shard=3/3"
+              testCommand: "npm run smokeTestSqlite -- --shard=3/3"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -609,11 +609,11 @@ stages:
           # Stop application
           - bash: kill -15 $(AcceptanceTestProcessId)
             displayName: Stop application (Linux)
-            condition: and(succeeded(), ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Linux'))
+            condition: and(ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Linux'))
 
           - pwsh: Stop-Process -Id $(AcceptanceTestProcessId)
             displayName: Stop application (Windows)
-            condition: and(succeeded(), ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Windows_NT'))
+            condition: and(ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Windows_NT'))
 
           # Copy artifacts
           - pwsh: |
@@ -640,29 +640,29 @@ stages:
           matrix:
             ${{ if eq(parameters.sqlServerLinuxAcceptanceTests, True) }}:
               LinuxPart1Of3:
-                testCommand: "npm run smokeTestSqlite -- --shard=1/3"
+                testCommand: "npm run smokeTest -- --shard=1/3"
                 vmImage: "ubuntu-latest"
                 SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
                 CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
               LinuxPart2Of3:
-                testCommand: "npm run smokeTestSqlite -- --shard=2/3"
+                testCommand: "npm run smokeTest -- --shard=2/3"
                 vmImage: "ubuntu-latest"
                 SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
                 CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
               LinuxPart3Of3:
-                testCommand: "npm run smokeTestSqlite -- --shard=3/3"
+                testCommand: "npm run smokeTest -- --shard=3/3"
                 vmImage: "ubuntu-latest"
                 SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
                 CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
             WindowsPart1Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run smokeTestSqlite -- --shard=1/3"
+              testCommand: "npm run smokeTest -- --shard=1/3"
             WindowsPart2Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run smokeTestSqlite -- --shard=2/3"
+              testCommand: "npm run smokeTest -- --shard=2/3"
             WindowsPart3Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run smokeTestSqlite -- --shard=3/3"
+              testCommand: "npm run smokeTest -- --shard=3/3"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -765,20 +765,20 @@ stages:
           # Stop application
           - bash: kill -15 $(AcceptanceTestProcessId)
             displayName: Stop application (Linux)
-            condition: and(succeeded(), ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Linux'))
+            condition: and(ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Linux'))
 
           - pwsh: Stop-Process -Id $(AcceptanceTestProcessId)
             displayName: Stop application (Windows)
-            condition: and(succeeded(), ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Windows_NT'))
+            condition: and(ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Windows_NT'))
 
           # Stop SQL Server
           - pwsh: docker stop mssql
             displayName: Stop SQL Server Docker image (Linux)
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+            condition: and(eq(variables['Agent.OS'], 'Linux'))
 
           - pwsh: SqlLocalDB stop MSSQLLocalDB
             displayName: Stop SQL Server LocalDB (Windows)
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
+            condition: and(eq(variables['Agent.OS'], 'Windows_NT'))
 
           # Copy artifacts
           - pwsh: |
