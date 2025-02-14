@@ -18,7 +18,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.language.ensureNameNotExists(secondLanguageName);
 });
 
-test('can create content with allow vary by culture enabled', async ({page, umbracoApi, umbracoUi}) => {
+test('can create content with allow vary by culture enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.documentType.createDocumentTypeWithAllowVaryByCulture(documentTypeName);
   await umbracoUi.goToBackOffice();
