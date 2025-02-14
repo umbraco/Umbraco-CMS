@@ -40,6 +40,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	#publishingRepository = new UmbDocumentPublishingRepository(this);
 	#publishedDocumentData?: UmbDocumentDetailModel;
 	#currentUnique?: UmbEntityUnique;
+	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	readonly #localize = new UmbLocalizationController(this);
 
 	constructor(host: UmbControllerHost) {
@@ -55,6 +56,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 				this.#eventContext = context;
 			}).asPromise(),
 		]);
+
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
+			this.#notificationContext = context;
+		});
 	}
 
 	public async publish() {
@@ -141,6 +146,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 					return Promise.reject(error);
 				}
 
+				const notification = { data: { message: this.#localize.term('speechBubbles_editContentScheduledSavedText') } };
+				this.#notificationContext?.peek('positive', notification);
+
 				// reload the document so all states are updated after the publish operation
 				await this.#documentWorkspaceContext.reload();
 				this.#loadAndProcessLastPublished();
@@ -152,7 +160,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			async () => {
 				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 				notificationContext.peek('danger', {
-					data: { message: this.#localize.term('content_editContentScheduledNotSavedText') },
+					data: { message: this.#localize.term('speechBubbles_editContentScheduledNotSavedText') },
 				});
 
 				return Promise.reject();
