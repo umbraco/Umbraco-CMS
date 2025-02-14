@@ -16,7 +16,7 @@ export class UmbDocumentReferenceRepository extends UmbControllerBase implements
 		return this.#referenceSource.getReferencedBy(unique, skip, take);
 	}
 
-	async requestReferencedDescendants(unique: string, skip = 0, take = 20) {
+	async requestDescendantsWithReferences(unique: string, skip = 0, take = 20) {
 		if (!unique) throw new Error(`unique is required`);
 		return this.#referenceSource.getReferencedDescendants(unique, skip, take);
 	}

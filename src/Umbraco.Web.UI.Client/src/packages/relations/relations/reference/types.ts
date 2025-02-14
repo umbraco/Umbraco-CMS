@@ -21,7 +21,7 @@ export interface UmbEntityReferenceRepository extends UmbApi {
 		skip?: number,
 		take?: number,
 	): Promise<UmbRepositoryResponse<UmbPagedModel<UmbReferenceItemModel>>>;
-	requestReferencedDescendants?(
+	requestDescendantsWithReferences?(
 		unique: string,
 		skip?: number,
 		take?: number,

@@ -9,7 +9,6 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbNamedEntityModel } from '@umbraco-cms/backoffice/entity';
 
 @customElement('umb-trash-with-relation-confirm-modal')
 export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement<
@@ -20,15 +19,21 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 	_name?: string;
 
 	@state()
-	_referencedBy: Array<UmbReferenceItemModel> = [];
+	_referencedByItems: Array<UmbReferenceItemModel> = [];
 
 	@state()
-	_totalReferencedBy: number = 0;
+	_totalReferencedByItems: number = 0;
 
-	#itemRepository?: UmbItemRepository<UmbNamedEntityModel>;
+	@state()
+	_totalDescendantsWithReferences: number = 0;
+
+	@state()
+	_descendantsWithReferences: Array<any> = [];
+
+	#itemRepository?: UmbItemRepository<any>;
 	#referenceRepository?: UmbEntityReferenceRepository;
 
-	#limitReferencedBy = 3;
+	#limitItems = 3;
 
 	protected override firstUpdated(_changedProperties: PropertyValues): void {
 		super.firstUpdated(_changedProperties);
@@ -42,10 +47,7 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 			return;
 		}
 
-		this.#itemRepository = await createExtensionApiByAlias<UmbItemRepository<UmbNamedEntityModel>>(
-			this,
-			this.data.itemRepositoryAlias,
-		);
+		this.#itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(this, this.data.itemRepositoryAlias);
 
 		const { data } = await this.#itemRepository.requestItems([this.data.unique]);
 		const item = data?.[0];
@@ -53,10 +55,6 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 
 		this._name = item.name;
 
-		this.#loadReferencedBy();
-	}
-
-	async #loadReferencedBy() {
 		if (!this.data?.referenceRepositoryAlias) {
 			throw new Error('Missing referenceRepositoryAlias in data.');
 		}
@@ -66,15 +64,54 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 			this.data?.referenceRepositoryAlias,
 		);
 
-		const { data: referencesData } = await this.#referenceRepository.requestReferencedBy(
+		this.#loadReferencedBy();
+		this.#loadDescendantsWithReferences();
+	}
+
+	async #loadReferencedBy() {
+		if (!this.#referenceRepository) {
+			throw new Error('Failed to create reference repository.');
+		}
+
+		if (!this.data?.unique) {
+			throw new Error('Missing unique in data.');
+		}
+
+		const { data } = await this.#referenceRepository.requestReferencedBy(this.data.unique, 0, this.#limitItems);
+
+		if (data) {
+			this._referencedByItems = [...data.items];
+			this._totalReferencedByItems = data.total;
+		}
+	}
+
+	async #loadDescendantsWithReferences() {
+		if (!this.#referenceRepository) {
+			throw new Error('Failed to create reference repository.');
+		}
+
+		if (!this.#itemRepository) {
+			throw new Error('Failed to create item repository.');
+		}
+
+		// If the repository does not have the method, we don't need to load the referenced descendants.
+		if (!this.#referenceRepository.requestDescendantsWithReferences) return;
+
+		if (!this.data?.unique) {
+			throw new Error('Missing unique in data.');
+		}
+
+		const { data } = await this.#referenceRepository.requestDescendantsWithReferences(
 			this.data.unique,
 			0,
-			this.#limitReferencedBy,
+			this.#limitItems,
 		);
 
-		if (referencesData) {
-			this._referencedBy = [...referencesData.items];
-			this._totalReferencedBy = referencesData.total;
+		if (data) {
+			this._totalDescendantsWithReferences = data.total;
+			const uniques = data.items.map((item) => item.unique).filter((unique) => unique) as Array<string>;
+			const { data: items } = await this.#itemRepository.requestItems(uniques);
+			this._descendantsWithReferences = items ?? [];
 		}
 	}
 
@@ -82,7 +119,12 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 		return html`
 			<uui-dialog-layout class="uui-text" headline="Trash">
 				<p>Are you sure you want to move <strong>${this._name}</strong> to the recycle bin?</p>
-				${this.#renderReferencedBy()}
+				${this.#renderItems('references_labelDependsOnThis', this._referencedByItems, this._totalReferencedByItems)}
+				${this.#renderItems(
+					'references_labelDependentDescendants',
+					this._descendantsWithReferences,
+					this._totalDescendantsWithReferences,
+				)}
 
 				<uui-button slot="actions" id="cancel" label="Cancel" @click=${this._rejectModal}></uui-button>
 
@@ -98,23 +140,16 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 		`;
 	}
 
-	#renderReferencedBy() {
-		if (this._totalReferencedBy === 0) return nothing;
+	#renderItems(headline: string, items: Array<UmbReferenceItemModel>, total: number) {
+		if (!items) return nothing;
 
 		return html`
-			<h5 id="reference-headline">${this.localize.term('references_labelDependsOnThis')}</h5>
+			<h5 id="reference-headline">${this.localize.term(headline)}</h5>
 			<uui-ref-list>
-				${this._referencedBy.map(
-					(reference) => html`<umb-entity-item-ref .item=${reference} readonly></umb-entity-item-ref> `,
-				)}
+				${items.map((item) => html`<umb-entity-item-ref .item=${item} readonly></umb-entity-item-ref> `)}
 			</uui-ref-list>
-			${this._totalReferencedBy > this.#limitReferencedBy
-				? html`<span
-						>${this.localize.term(
-							'references_labelMoreReferences',
-							this._totalReferencedBy - this.#limitReferencedBy,
-						)}</span
-					>`
+			${total > this.#limitItems
+				? html`<span>${this.localize.term('references_labelMoreReferences', total - this.#limitItems)}</span>`
 				: nothing}
 		`;
 	}
