@@ -193,10 +193,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				${UmbDocumentVariantLanguagePickerElement.renderLabel(option)}
 			</uui-menu-item>
 			${when(this.#isSelected(option.unique), () => this.#renderPublishDateInput(option, fromDate, toDate))}
-			${when(
-				isChanged,
-				() => html`<p class="label-status">${this.localize.term('content_scheduledPendingChanges')}</p>`,
-			)}
+			${when(isChanged, () => html`<p>${this.localize.term('content_scheduledPendingChanges')}</p>`)}
 		`;
 	}
 
