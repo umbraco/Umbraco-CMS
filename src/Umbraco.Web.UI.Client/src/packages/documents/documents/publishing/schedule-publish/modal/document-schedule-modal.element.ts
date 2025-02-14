@@ -176,6 +176,10 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 	#renderItem(option: UmbDocumentVariantOptionModel) {
 		const pickable = this.#pickableFilter(option);
+		const fromDate = this.#fromDate(option.unique);
+		const toDate = this.#toDate(option.unique);
+		const isChanged =
+			fromDate !== option.variant?.scheduledPublishDate || toDate !== option.variant?.scheduledUnpublishDate;
 
 		return html`
 			<uui-menu-item
@@ -188,21 +192,22 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				<uui-icon slot="icon" name="icon-globe"></uui-icon>
 				${UmbDocumentVariantLanguagePickerElement.renderLabel(option)}
 			</uui-menu-item>
-			${when(this.#isSelected(option.unique), () => this.#renderPublishDateInput(option))}
+			${when(this.#isSelected(option.unique), () => this.#renderPublishDateInput(option, fromDate, toDate))}
+			${when(
+				isChanged,
+				() => html`<p class="label-status">${this.localize.term('content_scheduledPendingChanges')}</p>`,
+			)}
 		`;
 	}
 
-	#renderPublishDateInput(option: UmbDocumentVariantOptionModel) {
-		const fromDate = this.#fromDate(option.unique);
-		const toDate = this.#toDate(option.unique);
-
+	#renderPublishDateInput(option: UmbDocumentVariantOptionModel, fromDate: string | null, toDate: string | null) {
 		return html`<div class="publish-date">
 			<uui-form-layout-item>
 				<uui-label slot="label"><umb-localize key="content_releaseDate">Publish at</umb-localize></uui-label>
 				<div>
 					<umb-input-date
 						type="datetime-local"
-						.value=${fromDate}
+						.value=${this.#formatDate(fromDate)}
 						@change=${(e: Event) => this.#onFromDateChange(e, option.unique)}
 						label=${this.localize.term('general_publishDate')}></umb-input-date>
 				</div>
@@ -212,7 +217,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				<div>
 					<umb-input-date
 						type="datetime-local"
-						.value=${toDate}
+						.value=${this.#formatDate(toDate)}
 						@change=${(e: Event) => this.#onToDateChange(e, option.unique)}
 						label=${this.localize.term('general_publishDate')}></umb-input-date>
 				</div>
@@ -220,14 +225,14 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		</div>`;
 	}
 
-	#fromDate(unique: string): string {
+	#fromDate(unique: string): string | null {
 		const variant = this._internalValues.find((s) => s.unique === unique);
-		return this.#formatDate(variant?.schedule?.publishTime);
+		return variant?.schedule?.publishTime ?? null;
 	}
 
-	#toDate(unique: string): string {
+	#toDate(unique: string): string | null {
 		const variant = this._internalValues.find((s) => s.unique === unique);
-		return this.#formatDate(variant?.schedule?.unpublishTime);
+		return variant?.schedule?.unpublishTime ?? null;
 	}
 
 	/**
@@ -235,7 +240,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	 * @param {string} dateStr The date to format, example: 2021-01-01T12:00:00.000+01:00
 	 * @returns {string | undefined} The formatted date in local time with no offset, example: 2021-01-01T11:00
 	 */
-	#formatDate(dateStr?: string | null): string {
+	#formatDate(dateStr: string | null): string {
 		if (!dateStr) return '';
 
 		const d = new Date(dateStr);
@@ -267,6 +272,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 			...variant.schedule,
 			publishTime: this.#getDateValue(e),
 		};
+		this.requestUpdate('_internalValues');
 	}
 
 	#onToDateChange(e: Event, unique: string) {
@@ -276,6 +282,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 			...variant.schedule,
 			unpublishTime: this.#getDateValue(e),
 		};
+		this.requestUpdate('_internalValues');
 	}
 
 	#getDateValue(e: Event): string | null {
