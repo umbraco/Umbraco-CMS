@@ -11,12 +11,16 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {
 		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
 		const entityType = entityContext.getEntityType();
 		const unique = entityContext.getUnique();
+
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		const localize = new UmbLocalizationController(this);
 
 		if (!entityType) throw new Error('Entity type not found');
 		if (unique === undefined) throw new Error('Entity unique not found');
@@ -46,7 +50,7 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 				updateDate: null,
 				segment: null,
 				scheduledPublishDate: null,
-				scheduledUnpublishDate: null
+				scheduledUnpublishDate: null,
 			},
 			unique: new UmbVariantId(language.unique, null).toString(),
 			culture: language.unique,
@@ -81,7 +85,16 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 				const publishingRepository = new UmbDocumentPublishingRepository(this._host);
 				for (let i = 0; i < this.selection.length; i++) {
 					const id = this.selection[i];
-					await publishingRepository.publish(id, [{ variantId }]);
+					const { error } = await publishingRepository.publish(id, [{ variantId }]);
+
+					if (!error) {
+						notificationContext.peek('positive', {
+							data: {
+								headline: localize.term('speechBubbles_editContentPublishedHeader'),
+								message: localize.term('speechBubbles_editContentPublishedText'),
+							},
+						});
+					}
 				}
 
 				eventContext.dispatchEvent(event);
@@ -123,6 +136,13 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 				);
 				eventContext.dispatchEvent(event);
 			}
+
+			// TODO: Some documents could have failed publishing, how do we handle that?
+			notificationContext.peek('positive', {
+				data: {
+					message: localize.term('speechBubbles_editContentPublishedHeader'),
+				},
+			});
 		}
 	}
 }
