@@ -2211,9 +2211,6 @@ export default {
 		notificationEmailsCheckSuccessMessage: 'Notification email has been set to <strong>%0%</strong>.',
 		notificationEmailsCheckErrorMessage:
 			'Notification email is still set to the default value of <strong>%0%</strong>.',
-		scheduledHealthCheckEmailBody:
-			'<html><body><p>Results of the scheduled Umbraco Health Checks run on %0% at %1% are as follows:</p>%2%</body></html>',
-		scheduledHealthCheckEmailSubject: 'Umbraco Health Check Status: %0%',
 		checkGroup: 'Check group',
 		helpText:
 			'\n        <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.\n        You can add your own health checks, have a look at <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>\n        ',
