@@ -1,4 +1,4 @@
-import type { UmbEntityReferenceRepository, UmbReferenceItemModel } from '../../types.js';
+import type { UmbEntityReferenceRepository, UmbReferenceItemModel } from '../../../types.js';
 import type {
 	UmbTrashWithRelationConfirmModalData,
 	UmbTrashWithRelationConfirmModalValue,
