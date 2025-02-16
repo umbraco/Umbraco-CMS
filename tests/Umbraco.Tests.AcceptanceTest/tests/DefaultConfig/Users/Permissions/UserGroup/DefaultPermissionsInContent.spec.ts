@@ -583,6 +583,7 @@ test('can rollback content with rollback permission enabled', async ({umbracoApi
   await umbracoUi.content.clickRollbackContainerButton();
 
   // Assert
+  await umbracoUi.content.clickContentTab();
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, documentText);
 });
 
