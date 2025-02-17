@@ -215,7 +215,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 						label=${this.localize.term('general_publishDate')}>
 						<div slot="append">
 							${when(
-								fromDate !== option.variant?.scheduledPublishDate,
+								fromDate,
 								() => html`
 									<uui-button
 										compact
@@ -240,7 +240,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 						label=${this.localize.term('general_publishDate')}>
 						<div slot="append">
 							${when(
-								toDate !== option.variant?.scheduledUnpublishDate,
+								toDate,
 								() => html`
 									<uui-button
 										compact
