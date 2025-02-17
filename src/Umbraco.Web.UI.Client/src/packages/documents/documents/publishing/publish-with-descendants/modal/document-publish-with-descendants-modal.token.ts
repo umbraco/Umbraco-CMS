@@ -8,6 +8,7 @@ export interface UmbDocumentPublishWithDescendantsModalData extends UmbDocumentV
 
 export interface UmbDocumentPublishWithDescendantsModalValue extends UmbDocumentVariantPickerValue {
 	includeUnpublishedDescendants?: boolean;
+	forceRepublish?: boolean;
 }
 
 export const UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL = new UmbModalToken<

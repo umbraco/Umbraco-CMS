@@ -1,4 +1,4 @@
-import type { UmbMemberItemModel } from '../../repository/index.js';
+import type { UmbMemberItemModel } from '../../item/types.js';
 import { UMB_MEMBER_SEARCH_PROVIDER_ALIAS } from '../../search/constants.js';
 import type { UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';

@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders;
 
@@ -21,8 +21,8 @@ public class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTestsBase
         ContentService.Save(childOfSecondRoot, -1, contentSchedule);
 
         // Publish both the main root and the second root with descendants
-        ContentService.PublishBranch(Textpage, true, new[] { "*" });
-        ContentService.PublishBranch(secondRoot, true, new[] { "*" });
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        ContentService.PublishBranch(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         var subPageUrls = await PublishedUrlInfoProvider.GetAllAsync(Subpage);
         var childOfSecondRootUrls = await PublishedUrlInfoProvider.GetAllAsync(childOfSecondRoot);
