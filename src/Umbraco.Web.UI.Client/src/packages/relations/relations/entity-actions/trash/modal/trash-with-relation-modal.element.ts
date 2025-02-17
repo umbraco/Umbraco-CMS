@@ -2,7 +2,15 @@ import type {
 	UmbTrashWithRelationConfirmModalData,
 	UmbTrashWithRelationConfirmModalValue,
 } from './trash-with-relation-modal.token.js';
-import { html, customElement, css, state, type PropertyValues, nothing } from '@umbraco-cms/backoffice/external/lit';
+import {
+	html,
+	customElement,
+	css,
+	state,
+	type PropertyValues,
+	nothing,
+	unsafeHTML,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
@@ -52,9 +60,12 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 	}
 
 	override render() {
+		const headline = this.localize.string('#actions_trash');
+		const content = this.localize.string('#defaultdialogs_confirmtrash', this._name);
+
 		return html`
-			<uui-dialog-layout class="uui-text" headline="Trash">
-				<p>Are you sure you want to move <strong>${this._name}</strong> to the recycle bin?</p>
+			<uui-dialog-layout class="uui-text" headline=${headline}>
+				<p>${unsafeHTML(content)}</p>
 
 				${this._referencesConfig
 					? html`<umb-confirm-action-modal-entity-references
@@ -68,7 +79,7 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 					id="confirm"
 					color="danger"
 					look="primary"
-					label="Trash"
+					label=${this.localize.term('actions_trash')}
 					@click=${this._submitModal}
 					${umbFocus()}></uui-button>
 			</uui-dialog-layout>

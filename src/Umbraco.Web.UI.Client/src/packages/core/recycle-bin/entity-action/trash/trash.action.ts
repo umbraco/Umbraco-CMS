@@ -6,6 +6,7 @@ import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 /**
  * Entity action for trashing an item.
@@ -13,6 +14,8 @@ import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@u
  * @augments {UmbEntityActionBase<MetaEntityActionTrashKind>}
  */
 export class UmbTrashEntityAction extends UmbEntityActionBase<MetaEntityActionTrashKind> {
+	#localize = new UmbLocalizationController(this);
+
 	/**
 	 * Executes the action.
 	 * @memberof UmbTrashEntityAction
@@ -29,12 +32,15 @@ export class UmbTrashEntityAction extends UmbEntityActionBase<MetaEntityActionTr
 		const item = data?.[0];
 		if (!item) throw new Error('Item not found.');
 
+		const headline = '#actions_trash';
+		const message = '#defaultdialogs_confirmtrash';
+
 		// TODO: handle items with variants
 		await umbConfirmModal(this._host, {
-			headline: `Trash`,
-			content: `Are you sure you want to move ${item.name} to the recycle bin?`,
+			headline,
+			content: this.#localize.string(message, item.name),
 			color: 'danger',
-			confirmLabel: 'Trash',
+			confirmLabel: '#actions_trash',
 		});
 
 		const recycleBinRepository = await createExtensionApiByAlias<UmbRecycleBinRepository>(
