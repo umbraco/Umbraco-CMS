@@ -1,3 +1,4 @@
+import type { UmbDocumentEntityType } from '../entity.js';
 import type { UmbDocumentItemVariantModel } from '../item/repository/types.js';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 
@@ -12,11 +13,13 @@ export interface UmbDocumentCollectionFilterModel extends UmbCollectionFilterMod
 
 export interface UmbDocumentCollectionItemModel {
 	unique: string;
-	entityType: string;
+	entityType: UmbDocumentEntityType;
 	creator?: string | null;
 	sortOrder: number;
 	updater?: string | null;
 	values: Array<{ alias: string; value: string }>;
+	isProtected: boolean;
+	isTrashed: boolean;
 	documentType: {
 		unique: string;
 		icon: string;

@@ -9,7 +9,7 @@ import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observa
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
-type UmbDocumentItemDataResolverModel = Omit<UmbDocumentItemModel, 'parent' | 'hasChildren' | 'isProtected'>;
+type UmbDocumentItemDataResolverModel = Omit<UmbDocumentItemModel, 'parent' | 'hasChildren'>;
 
 /**
  * A controller for resolving data for a document item
