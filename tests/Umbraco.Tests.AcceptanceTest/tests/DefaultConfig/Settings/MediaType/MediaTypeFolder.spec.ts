@@ -16,7 +16,10 @@ test.afterEach(async ({umbracoApi}) => {
 test('can create a empty media type folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.mediaType.clickActionsMenuForName('Media Types');
-  await umbracoUi.mediaType.createFolder(mediaTypeFolderName);
+  await umbracoUi.mediaType.clickActionsMenuCreateButton();
+  await umbracoUi.mediaType.clickFolderButton();
+  await umbracoUi.mediaType.enterFolderName(mediaTypeFolderName);
+  await umbracoUi.mediaType.clickConfirmCreateFolderButton();
 
   // Assert
   await umbracoUi.mediaType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
@@ -69,7 +72,10 @@ test('can create a media type folder in a folder', async ({umbracoApi, umbracoUi
   // Act
   await umbracoUi.mediaType.clickRootFolderCaretButton();
   await umbracoUi.mediaType.clickActionsMenuForName(mediaTypeFolderName);
-  await umbracoUi.mediaType.createFolder(childFolderName);
+  await umbracoUi.mediaType.clickActionsMenuCreateButton();
+  await umbracoUi.mediaType.clickFolderButton();
+  await umbracoUi.mediaType.enterFolderName(childFolderName);
+  await umbracoUi.mediaType.clickConfirmCreateFolderButton();
 
   // Assert
   await umbracoUi.mediaType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
@@ -95,7 +101,10 @@ test('can create a media type folder in a folder in a folder', async ({umbracoAp
   await umbracoUi.mediaType.clickRootFolderCaretButton();
   await umbracoUi.mediaType.clickCaretButtonForName(grandparentFolderName);
   await umbracoUi.mediaType.clickActionsMenuForName(mediaTypeFolderName);
-  await umbracoUi.mediaType.createFolder(childFolderName);
+  await umbracoUi.mediaType.clickActionsMenuCreateButton();
+  await umbracoUi.mediaType.clickFolderButton();
+  await umbracoUi.mediaType.enterFolderName(childFolderName);
+  await umbracoUi.mediaType.clickConfirmCreateFolderButton();
 
   // Assert
   await umbracoUi.mediaType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);

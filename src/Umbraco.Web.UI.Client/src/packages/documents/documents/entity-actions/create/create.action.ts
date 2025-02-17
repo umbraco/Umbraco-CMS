@@ -1,4 +1,4 @@
-import { UmbDocumentItemRepository } from '../../repository/index.js';
+import { UmbDocumentItemRepository } from '../../item/index.js';
 import { UMB_DOCUMENT_CREATE_OPTIONS_MODAL } from './document-create-options-modal.token.js';
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';

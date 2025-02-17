@@ -1,5 +1,6 @@
+import { UMB_PICKER_INPUT_CONTEXT } from './picker-input.context-token.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -13,7 +14,7 @@ export class UmbPickerInputContext<
 	PickerItemType extends PickerItemBaseType = PickedItemType,
 	PickerModalConfigType extends UmbPickerModalData<PickerItemType> = UmbPickerModalData<PickerItemType>,
 	PickerModalValueType extends UmbPickerModalValue = UmbPickerModalValue,
-> extends UmbControllerBase {
+> extends UmbContextBase<UmbPickerInputContext> {
 	modalAlias: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>;
 	repository?: UmbItemRepository<PickedItemType>;
 	#getUnique: (entry: PickedItemType) => string | undefined;
@@ -59,9 +60,8 @@ export class UmbPickerInputContext<
 		modalAlias: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>,
 		getUniqueMethod?: (entry: PickedItemType) => string | undefined,
 	) {
-		super(host);
+		super(host, UMB_PICKER_INPUT_CONTEXT);
 		this.modalAlias = modalAlias;
-		this.#getUnique = getUniqueMethod || ((entry) => entry.unique);
 
 		this.#getUnique = getUniqueMethod
 			? (entry: PickedItemType) => {
@@ -74,7 +74,7 @@ export class UmbPickerInputContext<
 				}
 			: (entry) => entry.unique;
 
-		this.#itemManager = new UmbRepositoryItemsManager<PickedItemType>(this, repositoryAlias, this.#getUnique);
+		this.#itemManager = new UmbRepositoryItemsManager<PickedItemType>(this, repositoryAlias, getUniqueMethod);
 
 		this.selection = this.#itemManager.uniques;
 		this.selectedItems = this.#itemManager.items;

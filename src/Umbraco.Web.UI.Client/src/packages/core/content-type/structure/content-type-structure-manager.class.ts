@@ -317,8 +317,7 @@ export class UmbContentTypeStructureManager<
 		if (!contentType) {
 			throw new Error('Could not find the Content Type to ensure containers for');
 		}
-		const containers = contentType?.containers;
-		const container = containers?.find((x) => x.id === containerId);
+		const container = contentType?.containers?.find((x) => x.id === containerId);
 		if (!container) {
 			return this.cloneContainerTo(containerId, contentTypeUnique);
 		}
@@ -346,6 +345,7 @@ export class UmbContentTypeStructureManager<
 			...container,
 			id: UmbId.new(),
 		};
+
 		if (container.parent) {
 			// Investigate parent container. (See if we have one that matches if not, then clone it.)
 			const parentContainer = await this.ensureContainerOf(container.parent.id, toContentTypeUnique);
@@ -361,6 +361,7 @@ export class UmbContentTypeStructureManager<
 		const containers = [
 			...(this.#contentTypes.getValue().find((x) => x.unique === toContentTypeUnique)?.containers ?? []),
 		];
+
 		//.filter((x) => x.name !== clonedContainer.name && x.type === clonedContainer.type);
 		containers.push(clonedContainer);
 
@@ -541,7 +542,9 @@ export class UmbContentTypeStructureManager<
 
 		// If we have a container, we need to ensure it exists, and then update the container with the new parent id. [NL]
 		if (property.container) {
+			this.#contentTypes.mute();
 			const container = await this.ensureContainerOf(property.container.id, contentTypeUnique);
+			this.#contentTypes.unmute();
 			if (!container) {
 				throw new Error('Container for inserting property could not be found or created');
 			}
