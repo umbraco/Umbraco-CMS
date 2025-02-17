@@ -61,6 +61,15 @@ export class UmbConfirmActionEntityReferencesElement extends UmbLitElement {
 			this.config?.referenceRepositoryAlias,
 		);
 
+		if (!this.config?.itemRepositoryAlias) {
+			throw new Error('Missing itemRepositoryAlias in config.');
+		}
+
+		this.#itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(
+			this,
+			this.config.itemRepositoryAlias,
+		);
+
 		this.#loadReferencedBy();
 		this.#loadDescendantsWithReferences();
 	}
