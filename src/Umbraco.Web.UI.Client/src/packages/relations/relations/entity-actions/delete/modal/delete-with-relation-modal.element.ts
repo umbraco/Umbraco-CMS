@@ -48,8 +48,6 @@ export class UmbDeleteWithRelationConfirmModalElement extends UmbModalBaseElemen
 			itemRepositoryAlias: this.data.itemRepositoryAlias,
 			referenceRepositoryAlias: this.data.referenceRepositoryAlias,
 		};
-
-		debugger;
 	}
 
 	override render() {
