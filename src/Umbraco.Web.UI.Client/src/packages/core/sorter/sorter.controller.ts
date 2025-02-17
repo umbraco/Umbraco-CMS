@@ -300,7 +300,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		// Set defaults:
 		config.identifier ??= Symbol();
-		config.ignorerSelector ??= 'a, img, iframe, input, textarea, button, select, option, [draggable="false"]';
+		config.ignorerSelector ??= 'a, img, iframe, input, textarea, select, option, [draggable="false"]';
 		if (!config.placeholderClass && !config.placeholderAttr) {
 			config.placeholderAttr = 'drag-placeholder';
 		}
