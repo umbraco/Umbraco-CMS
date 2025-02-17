@@ -348,7 +348,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 			this.#notificationContext?.peek('positive', {
 				data: {
 					headline: this.#localize.term('speechBubbles_editContentPublishedHeader'),
-					message: `${this.#localize.list(variants.map((v) => v.culture ?? v.name))} ${this.#localize.term('speechBubbles_editContentPublishedText')}`,
+					message: `${this.#localize.list(variants.map((v) => v.culture ?? v.name))} ${this.#localize.term('speechBubbles_editVariantPublishedText')}`,
 				},
 			});
 
