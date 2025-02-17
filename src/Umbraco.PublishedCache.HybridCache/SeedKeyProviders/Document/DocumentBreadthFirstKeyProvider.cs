@@ -6,7 +6,6 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders.Document;
 
 internal sealed class DocumentBreadthFirstKeyProvider : BreadthFirstKeyProvider, IDocumentSeedKeyProvider
 {
-    private readonly IDocumentNavigationQueryService _navigationQueryService;
     private readonly IPublishStatusQueryService _publishStatusService;
     private readonly int _seedCount;
 
@@ -16,7 +15,6 @@ internal sealed class DocumentBreadthFirstKeyProvider : BreadthFirstKeyProvider,
         IPublishStatusQueryService publishStatusService)
         : base(documentNavigationQueryService, cacheSettings.Value.DocumentBreadthFirstSeedCount)
     {
-        _navigationQueryService = documentNavigationQueryService;
         _publishStatusService = publishStatusService;
         _seedCount = cacheSettings.Value.DocumentBreadthFirstSeedCount;
     }
@@ -32,7 +30,7 @@ internal sealed class DocumentBreadthFirstKeyProvider : BreadthFirstKeyProvider,
         HashSet<Guid> keys = [];
         int keyCount = 0;
 
-        if (_navigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false)
+        if (NavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false)
         {
             return new HashSet<Guid>();
         }
@@ -54,7 +52,7 @@ internal sealed class DocumentBreadthFirstKeyProvider : BreadthFirstKeyProvider,
         {
             Guid key = keyQueue.Dequeue();
 
-            if (_navigationQueryService.TryGetChildrenKeys(key, out IEnumerable<Guid> childKeys) is false)
+            if (NavigationQueryService.TryGetChildrenKeys(key, out IEnumerable<Guid> childKeys) is false)
             {
                 continue;
             }
