@@ -144,7 +144,7 @@ export const foundConsts = [{
 			},
 {
 				path: '@umbraco-cms/backoffice/entity-action',
-				consts: ["UMB_ENTITY_CREATE_OPTION_ACTION_LIST_MODAL_ALIAS","UMB_ENTITY_CREATE_OPTION_ACTION_LIST_MODAL","UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST"]
+				consts: ["UMB_ENTITY_CREATE_OPTION_ACTION_LIST_MODAL_ALIAS","UMB_ENTITY_CREATE_OPTION_ACTION_LIST_MODAL","UMB_ENTITY_ACTION_DELETE_KIND_MANIFEST","UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST"]
 			},
 {
 				path: '@umbraco-cms/backoffice/entity-bulk-action',
@@ -284,7 +284,7 @@ export const foundConsts = [{
 			},
 {
 				path: '@umbraco-cms/backoffice/recycle-bin',
-				consts: ["UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS","UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS","UMB_IS_TRASHED_ENTITY_CONTEXT","UMB_RESTORE_FROM_RECYCLE_BIN_MODAL"]
+				consts: ["UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS","UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS","UMB_IS_TRASHED_ENTITY_CONTEXT","UMB_RESTORE_FROM_RECYCLE_BIN_MODAL","UMB_ENTITY_ACTION_TRASH_KIND_MANIFEST"]
 			},
 {
 				path: '@umbraco-cms/backoffice/relation-type',
@@ -292,11 +292,11 @@ export const foundConsts = [{
 			},
 {
 				path: '@umbraco-cms/backoffice/relations',
-				consts: ["UMB_RELATION_COLLECTION_REPOSITORY_ALIAS","UMB_RELATION_ENTITY_TYPE"]
+				consts: ["UMB_RELATION_COLLECTION_REPOSITORY_ALIAS","UMB_DELETE_WITH_RELATION_CONFIRM_MODAL","UMB_TRASH_WITH_RELATION_CONFIRM_MODAL","UMB_RELATION_ENTITY_TYPE"]
 			},
 {
 				path: '@umbraco-cms/backoffice/repository',
-				consts: []
+				consts: ["UMB_MANAGEMENT_API_DATA_SOURCE_IDENTIFIER"]
 			},
 {
 				path: '@umbraco-cms/backoffice/resources',
