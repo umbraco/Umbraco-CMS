@@ -63,7 +63,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(richTextDataTypeName);
 });
 
-test('can update property value nested in a block grid area with an RTE with a block list editor', async ({umbracoApi, umbracoUi}) => {
+test('can update property value nested in a block grid area with an RTE with a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   // ElementType with Textstring And REGEX only accept letters and numbers
   const textStringElementDataType = await umbracoApi.dataType.getByName(textStringElementDataTypeName);
