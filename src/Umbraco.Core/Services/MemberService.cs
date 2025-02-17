@@ -408,16 +408,23 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <summary>
-        /// Get an <see cref="IMember"/> by email
+        /// Get an <see cref="IMember"/> by email. If RequireUniqueEmailForMembers is set to false, then the first member found with the specified email will be returned.
         /// </summary>
         /// <param name="email">Email to use for retrieval</param>
         /// <returns><see cref="IMember"/></returns>
-        public IMember? GetByEmail(string email)
+        public IMember? GetByEmail(string email) => GetMembersByEmail(email).FirstOrDefault();
+
+        /// <summary>
+        /// Get an list of <see cref="IMember"/> for all members with the specified email.
+        /// </summary>
+        /// <param name="email">Email to use for retrieval</param>
+        /// <returns><see cref="IEnumerable{IMember}"/></returns>
+        public IEnumerable<IMember> GetMembersByEmail(string email)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);
             IQuery<IMember> query = Query<IMember>().Where(x => x.Email.Equals(email));
-            return _memberRepository.Get(query)?.FirstOrDefault();
+            return _memberRepository.Get(query);
         }
 
         /// <summary>
@@ -765,6 +772,9 @@ namespace Umbraco.Cms.Core.Services
 
         /// <inheritdoc />
         public Attempt<OperationResult?> Save(IMember member, int userId = Constants.Security.SuperUserId)
+        	=> Save(member, PublishNotificationSaveOptions.All, userId);
+
+        public Attempt<OperationResult?> Save(IMember member, PublishNotificationSaveOptions publishNotificationSaveOptions, int userId = Constants.Security.SuperUserId)
         {
             // trimming username and email to make sure we have no trailing space
             member.Username = member.Username.Trim();
@@ -773,11 +783,15 @@ namespace Umbraco.Cms.Core.Services
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
-            var savingNotification = new MemberSavingNotification(member, evtMsgs);
-            if (scope.Notifications.PublishCancelable(savingNotification))
+            MemberSavingNotification? savingNotification = null;
+            if (publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.Saving))
             {
-                scope.Complete();
-                return OperationResult.Attempt.Cancel(evtMsgs);
+                savingNotification = new MemberSavingNotification(member, evtMsgs);
+                if (scope.Notifications.PublishCancelable(savingNotification))
+                {
+                    scope.Complete();
+                    return OperationResult.Attempt.Cancel(evtMsgs);
+                }
             }
 
             if (string.IsNullOrWhiteSpace(member.Name))
@@ -789,7 +803,13 @@ namespace Umbraco.Cms.Core.Services
 
             _memberRepository.Save(member);
 
-            scope.Notifications.Publish(new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
+            if (publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.Saved))
+            {
+                scope.Notifications.Publish(
+                    savingNotification is null
+                    ? new MemberSavedNotification(member, evtMsgs)
+                    : new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
+            }
 
             Audit(AuditType.Save, 0, member.Id);
 
