@@ -2,11 +2,11 @@ import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import type { UmbMediaReferenceModel } from './types.js';
 import type { MediaReferenceResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbDataMapper } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataMapping } from '@umbraco-cms/backoffice/repository';
 
-export class UmbMediaReferenceResponseModelMapper
+export class UmbMediaReferenceResponseModelDataMapping
 	extends UmbControllerBase
-	implements UmbDataMapper<MediaReferenceResponseModel, UmbMediaReferenceModel>
+	implements UmbDataMapping<MediaReferenceResponseModel, UmbMediaReferenceModel>
 {
 	async map(data: MediaReferenceResponseModel): Promise<UmbMediaReferenceModel> {
 		return {
@@ -30,4 +30,4 @@ export class UmbMediaReferenceResponseModelMapper
 	}
 }
 
-export { UmbMediaReferenceResponseModelMapper as api };
+export { UmbMediaReferenceResponseModelDataMapping as api };

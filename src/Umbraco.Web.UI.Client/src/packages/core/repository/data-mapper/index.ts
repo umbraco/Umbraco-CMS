@@ -1,2 +1,2 @@
-export * from './data-mapper-resolver.js';
 export * from './data-mapper.js';
+export * from './mapping/index.js';

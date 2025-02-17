@@ -15,4 +15,4 @@ export interface UmbRepositoryResponseWithAsObservable<T> extends UmbRepositoryR
 	asObservable: () => Observable<T | undefined>;
 }
 
-export type * from './data-mapper/types.js';
+export type * from './data-mapper/mapping/types.js';

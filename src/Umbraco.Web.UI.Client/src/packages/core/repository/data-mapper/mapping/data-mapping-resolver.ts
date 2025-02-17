@@ -1,12 +1,12 @@
-import type { UmbDataMapper } from './types.js';
+import type { UmbDataMapping } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi, type ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbDataMapperResolver extends UmbControllerBase {
-	#apiCache = new Map<string, UmbDataMapper>();
+export class UmbDataMappingResolver extends UmbControllerBase {
+	#apiCache = new Map<string, UmbDataMapping>();
 
-	async resolve(identifier: string): Promise<UmbDataMapper | undefined> {
+	async resolve(identifier: string): Promise<UmbDataMapping | undefined> {
 		if (!identifier) {
 			throw new Error('data is required');
 		}
@@ -22,20 +22,20 @@ export class UmbDataMapperResolver extends UmbControllerBase {
 			return this.#apiCache.get(manifest.alias)!;
 		}
 
-		const dataMapper = await createExtensionApi<UmbDataMapper>(this, manifest);
+		const dataMapping = await createExtensionApi<UmbDataMapping>(this, manifest);
 
-		if (!dataMapper) {
+		if (!dataMapping) {
 			return undefined;
 		}
 
-		if (!dataMapper.map) {
-			throw new Error('Data Mapper does not have a map method.');
+		if (!dataMapping.map) {
+			throw new Error('Data Mapping does not have a map method.');
 		}
 
 		// Cache the api instance for future use
-		this.#apiCache.set(manifest.alias, dataMapper);
+		this.#apiCache.set(manifest.alias, dataMapping);
 
-		return dataMapper;
+		return dataMapping;
 	}
 
 	#getManifestWithBestFit(identifier: string) {
@@ -50,7 +50,7 @@ export class UmbDataMapperResolver extends UmbControllerBase {
 	}
 
 	#getSupportedManifests(identifier: string) {
-		const supportedManifests = umbExtensionsRegistry.getByTypeAndFilter('dataMapper', (manifest) => {
+		const supportedManifests = umbExtensionsRegistry.getByTypeAndFilter('dataMapping', (manifest) => {
 			return manifest.identifier === identifier;
 		});
 
