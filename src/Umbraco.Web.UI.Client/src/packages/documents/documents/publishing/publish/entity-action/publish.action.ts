@@ -126,7 +126,10 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
 				notificationContext.peek('positive', {
 					data: {
 						headline: localize.term('speechBubbles_editContentPublishedHeader'),
-						message: `${localize.list(documentVariants.map((v) => v.culture ?? v.name))} ${localize.term('speechBubbles_editVariantPublishedText')}`,
+						message: localize.term(
+							'speechBubbles_editVariantPublishedText',
+							localize.list(documentVariants.map((v) => v.culture ?? v.name)),
+						),
 					},
 				});
 			}
