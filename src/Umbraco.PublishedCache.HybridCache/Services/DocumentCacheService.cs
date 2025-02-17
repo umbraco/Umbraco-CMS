@@ -143,8 +143,10 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         var success = _documentNavigationQueryService.TryGetAncestorsKeys(contentKey, out IEnumerable<Guid> keys);
         if (success is false)
         {
-            // This SHOULD never happen, since we already found the content in the cache, so if it does, we want to explode.
-            throw new InvalidOperationException($"{contentKey} not found in navigation structure.");
+            // This might happen is certain cases, since 0notifications are not ordered, for instance, if you save and publish a content node in the same scope.
+            // In this case we'll try and update the node in the cache even though it hasn't been updated in the document navigation cache yet.
+            // It's okay to just return false here, since the node will be loaded later when it's actually requested.
+            return false;
         }
 
         foreach (Guid key in keys)
