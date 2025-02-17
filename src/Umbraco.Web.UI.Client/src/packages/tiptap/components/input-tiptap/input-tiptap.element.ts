@@ -124,7 +124,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			editable: !this.readonly,
 			extensions: tiptapExtensions,
 			content: this.#value,
-			enableContentCheck: true,
+			//enableContentCheck: true,
 			onBeforeCreate: ({ editor }) => {
 				this._extensions.forEach((ext) => ext.setEditor(editor));
 			},
@@ -153,12 +153,12 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				`,
 			)}
 			<div id="editor"></div>
-			<div id="umbTableColumnMenu" style="visibility: collapse;--uui-menu-item-flat-structure: 1;">
+			<div id="divUmbTableColumnMenu" style="visibility: collapse;--uui-menu-item-flat-structure: 1;">
 				<uui-menu-item label="Add column before" @click-label=${() => this._editor?.chain().focus().addColumnBefore().run()}><umb-icon slot="icon" name="icon-table"></umb-icon></uui-menu-item>
 				<uui-menu-item label="Add column after" @click-label=${() => this._editor?.chain().focus().addColumnAfter().run()}><umb-icon slot="icon" name="icon-table"></umb-icon></uui-menu-item>
 				<uui-menu-item label="Delete column" @click-label=${() => this._editor?.chain().focus().deleteColumn().run()}><umb-icon slot="icon" name="icon-table"></umb-icon></uui-menu-item>
 			</div>
-			<div id="umbTableRowMenu" style="visibility: collapse;--uui-menu-item-flat-structure: 1;">
+			<div id="divUmbTableRowMenu" style="visibility: collapse;--uui-menu-item-flat-structure: 1;">
 				<uui-menu-item label="Add row before" @click-label=${() => this._editor?.chain().focus().addRowBefore().run()}><umb-icon slot="icon" name="icon-table"></umb-icon></uui-menu-item>
 				<uui-menu-item label="Add row after" @click-label=${() => this._editor?.chain().focus().addRowAfter().run()}><umb-icon slot="icon" name="icon-table"></umb-icon></uui-menu-item>
 				<uui-menu-item label="Delete row" @click-label=${() => this._editor?.chain().focus().deleteRow().run()}><umb-icon slot="icon" name="icon-table"></umb-icon></uui-menu-item>

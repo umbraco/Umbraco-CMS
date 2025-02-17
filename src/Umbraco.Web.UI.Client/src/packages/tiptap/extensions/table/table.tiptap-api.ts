@@ -16,10 +16,10 @@ export default class UmbTiptapTableExtensionApi extends UmbTiptapExtensionApiBas
 		UmbTableRow,
 		UmbTableCell,
 		UmbTableColumnMenu.configure({
-			element: this.getHostElement().shadowRoot?.querySelector('#umbTableColumnMenu') as HTMLElement,
+			element: this.getHostElement().shadowRoot?.querySelector('#divUmbTableColumnMenu') as HTMLElement,
 		}),
 		UmbTableRowMenu.configure({
-			element: this.getHostElement().shadowRoot?.querySelector('#umbTableRowMenu') as HTMLElement,
+			element: this.getHostElement().shadowRoot?.querySelector('#divUmbTableRowMenu') as HTMLElement,
 		}),
 	];
 

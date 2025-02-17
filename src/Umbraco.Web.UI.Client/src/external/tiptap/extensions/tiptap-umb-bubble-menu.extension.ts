@@ -138,7 +138,7 @@ export class UmbBubbleMenuView {
 
 	popover: HTMLElement;
 
-	constructor({ editor, element, view, updateDelay = 250, shouldShow }: UmbBubbleMenuViewProps) {
+	constructor({ editor, element, pluginKey, shouldShow, view, updateDelay = 250 }: UmbBubbleMenuViewProps) {
 		this.editor = editor;
 		this.element = element;
 		this.view = view;
@@ -161,9 +161,11 @@ export class UmbBubbleMenuView {
 		this.popover.style.backgroundColor = 'white';
 		this.popover.setAttribute('placement', 'top');
 		this.popover.setAttribute('popover', 'manual');
-		this.popover.id = 'umb-bubble-menu';
+		this.popover.id = pluginKey.toString();
 		this.popover.appendChild(this.element);
 
+		// TODO: [LK] Figure out how to position the popover container.
+		// It might need to be done using a ProseMirror Decoration.
 		this.view.dom.parentElement?.setAttribute('popovertarget', this.popover.id);
 		this.view.dom.parentElement?.appendChild(this.popover);
 	}
