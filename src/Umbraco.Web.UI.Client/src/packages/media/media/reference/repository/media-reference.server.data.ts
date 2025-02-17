@@ -1,6 +1,6 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbDataMapper } from '@umbraco-cms/backoffice/repository';
+import { UmbManagementApiDataMapper } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -8,7 +8,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {RepositoryDetailDataSource}
  */
 export class UmbMediaReferenceServerDataSource extends UmbControllerBase {
-	#dataMapper = new UmbDataMapper(this);
+	#dataMapper = new UmbManagementApiDataMapper(this);
 
 	/**
 	 * Fetches the item for the given id from the server
@@ -25,7 +25,6 @@ export class UmbMediaReferenceServerDataSource extends UmbControllerBase {
 		if (data) {
 			const promises = data.items.map(async (item) => {
 				return this.#dataMapper.map({
-					dataSourceIdentifier: 'Umb.ManagementApi',
 					dataModelIdentifier: item.$type,
 					data: item,
 					fallback: async () => {
