@@ -7,7 +7,7 @@ import {
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbDataMapping } from '@umbraco-cms/backoffice/repository';
 
-export class UmbDocumentReferenceResponseModelDataMapping
+export class UmbDocumentReferenceResponseManagementApiDataMapping
 	extends UmbControllerBase
 	implements UmbDataMapping<DocumentReferenceResponseModel, UmbDocumentReferenceModel>
 {
@@ -35,4 +35,4 @@ export class UmbDocumentReferenceResponseModelDataMapping
 	}
 }
 
-export { UmbDocumentReferenceResponseModelDataMapping as api };
+export { UmbDocumentReferenceResponseManagementApiDataMapping as api };

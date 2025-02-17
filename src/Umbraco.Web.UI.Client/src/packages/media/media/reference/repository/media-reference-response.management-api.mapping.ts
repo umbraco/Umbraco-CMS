@@ -4,7 +4,7 @@ import type { MediaReferenceResponseModel } from '@umbraco-cms/backoffice/extern
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbDataMapping } from '@umbraco-cms/backoffice/repository';
 
-export class UmbMediaReferenceResponseModelDataMapping
+export class UmbMediaReferenceResponseManagementApiDataMapping
 	extends UmbControllerBase
 	implements UmbDataMapping<MediaReferenceResponseModel, UmbMediaReferenceModel>
 {
@@ -30,4 +30,4 @@ export class UmbMediaReferenceResponseModelDataMapping
 	}
 }
 
-export { UmbMediaReferenceResponseModelDataMapping as api };
+export { UmbMediaReferenceResponseManagementApiDataMapping as api };

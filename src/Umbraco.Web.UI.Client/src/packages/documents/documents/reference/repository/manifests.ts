@@ -10,9 +10,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'dataMapping',
-		alias: 'Umb.DataMapping.DocumentReferenceResponseModel',
-		name: 'Document Reference Response Model to Client Model Data Mapping',
-		api: () => import('./document-reference-response-model.mapping.js'),
+		alias: 'Umb.DataMapping.ManagementApi.DocumentReferenceResponse',
+		name: 'Document Reference Response Management Api Data Mapping',
+		api: () => import('./document-reference-response.management-api.mapping.js'),
 		dataSourceIdentifier: UMB_MANAGEMENT_API_DATA_SOURCE_IDENTIFIER,
 		dataModelIdentifier: 'DocumentReferenceResponseModel',
 	},
