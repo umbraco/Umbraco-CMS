@@ -226,8 +226,12 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 				opacity: 0.5;
 			}
 
-			:host([drag-placeholder]) > uui-box > * {
+			:host([drag-placeholder]) > uui-box {
+				--uui-box-default-padding: 0;
+			}
+			:host([drag-placeholder]) umb-content-type-design-editor-properties {
 				visibility: hidden;
+				position: absolute;
 			}
 
 			div[slot='header'] {

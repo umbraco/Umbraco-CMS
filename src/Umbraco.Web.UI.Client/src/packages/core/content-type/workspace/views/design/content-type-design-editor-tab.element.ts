@@ -211,13 +211,14 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 
 	static override styles = [
 		css`
-			[drag-placeholder] {
+			/*[drag-placeholder] {
 				opacity: 0.5;
 			}
+				*/
 
-			[drag-placeholder] > * {
+			/*[drag-placeholder] > * {
 				visibility: hidden;
-			}
+			}*/
 
 			#btn-add {
 				width: 100%;
