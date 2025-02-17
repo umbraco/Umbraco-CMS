@@ -158,7 +158,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	// TODO: impl UMB_EDIT_DOCUMENT_TYPE_PATH_PATTERN, but we need either a generic type or a way to get the path pattern.... [NL]
 	#renderContainerHeader() {
 		return html`
-			<div slot="header">
+			<div slot="header" class="drag-handle">
 				<div>
 					${when(
 						this.sortModeActive && this._hasOwnerContainer,
