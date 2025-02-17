@@ -641,6 +641,8 @@ export type DocumentCollectionResponseModel = {
     creator?: (string) | null;
     sortOrder: number;
     documentType: (DocumentTypeCollectionReferenceResponseModel);
+    isTrashed: boolean;
+    isProtected: boolean;
     updater?: (string) | null;
 };
 

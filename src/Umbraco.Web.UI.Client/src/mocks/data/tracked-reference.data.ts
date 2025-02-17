@@ -19,7 +19,7 @@ export const items: Array<
 		},
 	} satisfies DocumentReferenceResponseModel,
 	{
-		$type: 'MediaReferenceResponseModel',
+		$type: 'DocumentReferenceResponseModel',
 		id: '1234',
 		name: 'Image Block',
 		published: true,
