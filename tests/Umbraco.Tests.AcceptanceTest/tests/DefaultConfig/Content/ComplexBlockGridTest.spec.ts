@@ -1,5 +1,5 @@
 ﻿import {expect} from '@playwright/test';
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 // DocumentType
 const documentTypeName = 'TestDocumentType';
@@ -10,7 +10,7 @@ const groupName = 'TestGroup';
 const contentName = 'TestContent';
 let contentId = '';
 
-// Property Valuea
+// Property Value
 const wrongPropertyValue = 'This is a test with wrong value**';
 const correctPropertyValue = 'Test';
 
@@ -105,8 +105,8 @@ test('can update property value nested in a block grid area with an RTE with a b
   await umbracoUi.content.clickCreateButtonForModalWithElementTypeNameAndGroupName(richTextEditorElementTypeName, richTextEditorElementGroupName);
   await umbracoUi.content.clickSaveAndPublishButton();
   // Checks that the error notification is shown since the textstring block has the wrong value
-  await umbracoUi.content.doesSuccessNotificationHaveText(ConstantHelper.notificationMessages.saved, true, true);
-  await umbracoUi.content.doesErrorNotificationHaveText(ConstantHelper.notificationMessages.documentWasNotPublished, true, true);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved, true, true);
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentWasNotPublished, true, true);
   // Updates the textstring block with the correct value
   await umbracoUi.content.clickBlockElementWithName(blockListElementTypeName);
   await umbracoUi.content.clickEditBlockListEntryWithName(textStringElementTypeName);
@@ -116,8 +116,8 @@ test('can update property value nested in a block grid area with an RTE with a b
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(ConstantHelper.notificationMessages.saved, true, true);
-  await umbracoUi.content.doesSuccessNotificationHaveText(ConstantHelper.notificationMessages.published, true, true);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved, true, true);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published, true, true);
   // Checks if published
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');
