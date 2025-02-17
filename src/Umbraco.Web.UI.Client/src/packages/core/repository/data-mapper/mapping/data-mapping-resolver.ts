@@ -6,12 +6,16 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 export class UmbDataMappingResolver extends UmbControllerBase {
 	#apiCache = new Map<string, UmbDataMapping>();
 
-	async resolve(identifier: string): Promise<UmbDataMapping | undefined> {
-		if (!identifier) {
-			throw new Error('data is required');
+	async resolve(dataSourceIdentifier: string, dataModelIdentifier: string): Promise<UmbDataMapping | undefined> {
+		if (!dataSourceIdentifier) {
+			throw new Error('data source identifier is required');
 		}
 
-		const manifest = this.#getManifestWithBestFit(identifier);
+		if (!dataModelIdentifier) {
+			throw new Error('data identifier is required');
+		}
+
+		const manifest = this.#getManifestWithBestFit(dataSourceIdentifier, dataModelIdentifier);
 
 		if (!manifest) {
 			return undefined;
@@ -38,8 +42,8 @@ export class UmbDataMappingResolver extends UmbControllerBase {
 		return dataMapping;
 	}
 
-	#getManifestWithBestFit(identifier: string) {
-		const supportedManifests = this.#getSupportedManifests(identifier);
+	#getManifestWithBestFit(dataSourceIdentifier: string, dataModelIdentifier: string) {
+		const supportedManifests = this.#getSupportedManifests(dataSourceIdentifier, dataModelIdentifier);
 
 		if (!supportedManifests.length) {
 			return undefined;
@@ -49,9 +53,11 @@ export class UmbDataMappingResolver extends UmbControllerBase {
 		return supportedManifests.sort((a: ManifestBase, b: ManifestBase): number => (b.weight || 0) - (a.weight || 0))[0];
 	}
 
-	#getSupportedManifests(identifier: string) {
+	#getSupportedManifests(dataSourceIdentifier: string, dataModelIdentifier: string) {
 		const supportedManifests = umbExtensionsRegistry.getByTypeAndFilter('dataMapping', (manifest) => {
-			return manifest.identifier === identifier;
+			return (
+				manifest.dataSourceIdentifier === dataSourceIdentifier && manifest.dataModelIdentifier === dataModelIdentifier
+			);
 		});
 
 		return supportedManifests;

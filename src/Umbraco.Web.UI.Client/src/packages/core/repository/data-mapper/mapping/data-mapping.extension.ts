@@ -4,7 +4,8 @@ import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
 export interface ManifestDataMapping<MetaType extends MetaDataMapping = MetaDataMapping>
 	extends ManifestApi<UmbDataMapping> {
 	type: 'dataMapping';
-	identifier: string;
+	dataSourceIdentifier: string;
+	dataModelIdentifier: string;
 	meta: MetaType;
 }
 

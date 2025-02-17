@@ -25,7 +25,8 @@ export class UmbMediaReferenceServerDataSource extends UmbControllerBase {
 		if (data) {
 			const promises = data.items.map(async (item) => {
 				return this.#dataMapper.map({
-					identifier: item.$type,
+					dataSourceIdentifier: 'Umb.ManagementApi',
+					dataModelIdentifier: item.$type,
 					data: item,
 					fallback: async () => {
 						return {
