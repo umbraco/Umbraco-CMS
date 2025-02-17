@@ -321,9 +321,20 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             throw new ArgumentNullException(nameof(userId));
         }
 
-        IMember? user = Guid.TryParse(userId, out Guid key)
-            ? _memberService.GetByKey(key)
-            : _memberService.GetById(UserIdToInt(userId));
+        // With external member providers we can get a ID here that's not a GUID or integer.
+        // We can't retrieve the member, but if that's the case we shouldn't throw an exception,
+        // just return null in the same way as when the member isn't found.
+        // See: https://github.com/umbraco/Umbraco-CMS/issues/14713
+        IMember? user = null;
+        if (Guid.TryParse(userId, out Guid key))
+        {
+            user = _memberService.GetByKey(key);
+        }
+        else if (TryUserIdToInt(userId, out int id))
+        {
+            user = _memberService.GetById(id);
+        }
+
         if (user == null)
         {
             return Task.FromResult((MemberIdentityUser)null!)!;
