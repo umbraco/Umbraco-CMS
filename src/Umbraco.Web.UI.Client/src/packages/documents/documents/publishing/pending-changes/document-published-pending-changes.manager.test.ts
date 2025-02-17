@@ -70,6 +70,8 @@ describe('UmbSelectionManager', () => {
 						name: 'Document 1',
 						createDate: '2023-02-06T15:32:05.350038',
 						updateDate: '2023-02-06T15:32:24.957009',
+						scheduledPublishDate: null,
+						scheduledUnpublishDate: null,
 					},
 				],
 				values: [
@@ -138,6 +140,8 @@ describe('UmbSelectionManager', () => {
 						name: 'Document 1 (en-US)',
 						createDate: '2023-02-06T15:32:05.350038',
 						updateDate: '2023-02-06T15:32:24.957009',
+						scheduledPublishDate: null,
+						scheduledUnpublishDate: null,
 					},
 					{
 						state: DocumentVariantStateModel.PUBLISHED,
@@ -147,6 +151,8 @@ describe('UmbSelectionManager', () => {
 						name: 'Document 1 (da-DK)',
 						createDate: '2023-02-06T15:32:05.350038',
 						updateDate: '2023-02-06T15:32:24.957009',
+						scheduledPublishDate: null,
+						scheduledUnpublishDate: null,
 					},
 				],
 				values: [
