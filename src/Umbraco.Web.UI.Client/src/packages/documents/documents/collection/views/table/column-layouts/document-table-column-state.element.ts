@@ -1,4 +1,4 @@
-import type { UmbDocumentCollectionItemModel, UmbEditableDocumentCollectionItemModel } from '../../../types.js';
+import type { UmbEditableDocumentCollectionItemModel } from '../../../types.js';
 import { UmbDocumentItemDataResolver } from '../../../../item/index.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';

@@ -43,6 +43,8 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 					createDate: new Date(variant.createDate),
 					creator: item.creator,
 					icon: item.documentType.icon,
+					isProtected: item.isProtected,
+					isTrashed: item.isTrashed,
 					name: variant.name,
 					sortOrder: item.sortOrder,
 					state: variant.state,

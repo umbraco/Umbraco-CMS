@@ -2,17 +2,17 @@ import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbDataMapper } from '@umbraco-cms/backoffice/repository';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbEntityReferenceDataSource, UmbReferenceItemModel } from '@umbraco-cms/backoffice/relations';
 import type { UmbPagedModel, UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import { UmbManagementApiDataMapper } from '@umbraco-cms/backoffice/repository';
 
 /**
  * @class UmbDocumentReferenceServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
 export class UmbDocumentReferenceServerDataSource extends UmbControllerBase implements UmbEntityReferenceDataSource {
-	#dataMapper = new UmbDataMapper(this);
+	#dataMapper = new UmbManagementApiDataMapper(this);
 
 	/**
 	 * Fetches the item for the given unique from the server
@@ -35,7 +35,7 @@ export class UmbDocumentReferenceServerDataSource extends UmbControllerBase impl
 		if (data) {
 			const promises = data.items.map(async (item) => {
 				return this.#dataMapper.map({
-					identifier: item.$type,
+					dataModelIdentifier: item.$type,
 					data: item,
 					fallback: async () => {
 						return {

@@ -1,4 +1,5 @@
 import { UMB_MEDIA_REFERENCE_REPOSITORY_ALIAS } from './constants.js';
+import { UMB_MANAGEMENT_API_DATA_SOURCE_IDENTIFIER } from '@umbraco-cms/backoffice/repository';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -8,10 +9,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 		api: () => import('./media-reference.repository.js'),
 	},
 	{
-		type: 'dataMapper',
-		alias: 'Umb.DataMapper.MediaReferenceResponseModel',
-		name: 'Media Reference Response Model to Client Model Data Mapper',
-		api: () => import('./media-reference-response-model.mapper.js'),
-		identifier: 'MediaReferenceResponseModel',
+		type: 'dataMapping',
+		alias: 'Umb.DataMapping.ManagementApi.MediaReferenceResponse',
+		name: 'Media Reference Response Management Api Data Mapping',
+		api: () => import('./media-reference-response.management-api.mapping.js'),
+		dataSourceIdentifier: UMB_MANAGEMENT_API_DATA_SOURCE_IDENTIFIER,
+		dataModelIdentifier: 'MediaReferenceResponseModel',
 	},
 ];

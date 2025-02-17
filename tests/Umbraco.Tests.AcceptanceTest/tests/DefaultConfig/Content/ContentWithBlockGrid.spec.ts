@@ -180,7 +180,7 @@ test('can set the label of create button in root', async ({umbracoApi, umbracoUi
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Assert
-  await umbracoUi.content.isAddBlockElementButtonWithLabelVisible(createButtonLabel);
+  await umbracoUi.content.isAddBlockElementButtonWithLabelVisible(customDataTypeName, createButtonLabel);
 });
 
 test('can set the label of block element in the content', async ({umbracoApi, umbracoUi}) => {

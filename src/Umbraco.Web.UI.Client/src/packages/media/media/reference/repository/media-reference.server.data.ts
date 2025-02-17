@@ -1,8 +1,8 @@
 import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbManagementApiDataMapper } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbDataMapper } from '@umbraco-cms/backoffice/repository';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbEntityReferenceDataSource, UmbReferenceItemModel } from '@umbraco-cms/backoffice/relations';
 import type { UmbPagedModel, UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
@@ -12,7 +12,7 @@ import type { UmbPagedModel, UmbDataSourceResponse } from '@umbraco-cms/backoffi
  * @implements {RepositoryDetailDataSource}
  */
 export class UmbMediaReferenceServerDataSource extends UmbControllerBase implements UmbEntityReferenceDataSource {
-	#dataMapper = new UmbDataMapper(this);
+	#dataMapper = new UmbManagementApiDataMapper(this);
 
 	/**
 	 * Fetches the item for the given unique from the server
@@ -35,7 +35,7 @@ export class UmbMediaReferenceServerDataSource extends UmbControllerBase impleme
 		if (data) {
 			const promises = data.items.map(async (item) => {
 				return this.#dataMapper.map({
-					identifier: item.$type,
+					dataModelIdentifier: item.$type,
 					data: item,
 					fallback: async () => {
 						return {

@@ -19,7 +19,7 @@ test('can create a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
 
   // Act
   await umbracoUi.script.clickActionsMenuAtRoot();
-  await umbracoUi.script.createFolder(scriptFolderName);
+  await umbracoUi.script.createScriptFolder(scriptFolderName);
 
   // Assert
   await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
@@ -78,7 +78,7 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.script.reloadScriptTree();
   await umbracoUi.script.clickActionsMenuForScript(scriptFolderName);
-  await umbracoUi.script.createFolder(childFolderName);
+  await umbracoUi.script.createScriptFolder(childFolderName);
 
   // Assert
   await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
@@ -101,7 +101,7 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   await umbracoUi.script.reloadScriptTree();
   await umbracoUi.script.clickCaretButtonForName(scriptFolderName);
   await umbracoUi.script.clickActionsMenuForScript(childFolderName);
-  await umbracoUi.script.createFolder(childOfChildFolderName);
+  await umbracoUi.script.createScriptFolder(childOfChildFolderName);
 
   // Assert
   await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
