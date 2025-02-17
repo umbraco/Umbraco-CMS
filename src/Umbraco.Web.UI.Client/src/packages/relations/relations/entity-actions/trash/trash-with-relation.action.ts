@@ -4,7 +4,7 @@ import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-reg
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbEntityTrashedEvent } from '@umbraco-cms/backoffice/recycle-bin';
+import { UmbEntityTrashedEvent, type UmbRecycleBinRepository } from '@umbraco-cms/backoffice/recycle-bin';
 
 /**
  * Entity action for trashing an item with relations.
