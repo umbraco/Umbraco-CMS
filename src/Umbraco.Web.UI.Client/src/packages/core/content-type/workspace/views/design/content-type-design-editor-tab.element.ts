@@ -211,15 +211,6 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 
 	static override styles = [
 		css`
-			/*[drag-placeholder] {
-				opacity: 0.5;
-			}
-				*/
-
-			/*[drag-placeholder] > * {
-				visibility: hidden;
-			}*/
-
 			#btn-add {
 				width: 100%;
 				--uui-button-height: var(--uui-size-24);

@@ -223,10 +223,15 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 		UmbTextStyles,
 		css`
 			:host([drag-placeholder]) {
+				cursor: grabbing;
 				opacity: 0.5;
 			}
 
-			:host([drag-placeholder]) > uui-box {
+			:host([drag-placeholder]) > div > * {
+				cursor: auto;
+			}
+
+			:host([drag-placeholder]) uui-box {
 				--uui-box-default-padding: 0;
 			}
 			:host([drag-placeholder]) umb-content-type-design-editor-properties {
@@ -234,11 +239,17 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 				position: absolute;
 			}
 
+			uui-box {
+				--uui-box-header-padding: 0;
+			}
+
 			div[slot='header'] {
 				flex: 1;
 				display: flex;
 				align-items: center;
 				justify-content: space-between;
+				cursor: grab;
+				padding: var(--uui-size-space-4) var(--uui-size-space-5);
 			}
 
 			div[slot='header'] > div {

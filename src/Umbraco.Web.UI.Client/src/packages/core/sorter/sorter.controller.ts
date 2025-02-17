@@ -300,7 +300,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		// Set defaults:
 		config.identifier ??= Symbol();
-		config.ignorerSelector ??= 'a, img, iframe';
+		config.ignorerSelector ??= 'a, img, iframe, input, textarea, button, select, option, [draggable="false"]';
 		if (!config.placeholderClass && !config.placeholderAttr) {
 			config.placeholderAttr = 'drag-placeholder';
 		}
@@ -512,12 +512,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		if (!this.#config.disabledItemSelector || !element.matches(this.#config.disabledItemSelector)) {
 			// Idea: to make sure on does not get initialized twice: if ((element as HTMLElement).draggable === true) return;
 			const draggableElement = this.#getDraggableElement(element);
-			if (this.#config.handleSelector) {
-				const handleElement = this.#getHandleElement(element);
-				handleElement.addEventListener('mousedown', this.#handleHandleMouseDown);
-			} else {
-				(draggableElement as HTMLElement).draggable = true;
-			}
+			const handleElement = this.#getHandleElement(element);
+			handleElement.addEventListener('mousedown', this.#handleHandleMouseDown);
+			// Will be set to true by the 'mousedown' event if approved:
+			(draggableElement as HTMLElement).draggable = false;
 			draggableElement.addEventListener('dragstart', this.#handleDragStart);
 			draggableElement.addEventListener('dragend', this.#handleDragEnd);
 		}
@@ -590,6 +588,28 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	}
 
 	#handleHandleMouseDown = (event: MouseEvent) => {
+		const target = event.target as HTMLElement;
+
+		// Test for a match with the ignore selectors:
+		if (this.#config.ignorerSelector) {
+			if (target.matches(this.#config.ignorerSelector)) {
+				return;
+			}
+
+			const composedPath = event.composedPath();
+			// filter composedPath for only elements descending from the event.target:
+			const index = composedPath.indexOf(target);
+			const composedPathBelowTarget = index !== -1 ? composedPath.slice(0, index) : undefined;
+
+			if (composedPathBelowTarget) {
+				const ignoreThis = composedPathBelowTarget.find((x) =>
+					(x as HTMLElement).matches?.(this.#config.ignorerSelector),
+				);
+				if (ignoreThis) {
+					return;
+				}
+			}
+		}
 		if (event.target && event.button === 0) {
 			const element = this.#getElement(event.target as HTMLElement);
 			if (!element) return;
