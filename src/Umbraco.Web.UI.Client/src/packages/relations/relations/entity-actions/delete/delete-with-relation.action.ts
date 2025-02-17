@@ -3,6 +3,8 @@ import { UMB_DELETE_WITH_RELATION_CONFIRM_MODAL } from './modal/constants.js';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 
 /**
  * Entity action for deleting an item with relations.
@@ -30,7 +32,14 @@ export class UmbDeleteWithRelationEntityAction extends UmbEntityActionBase<MetaE
 
 		await modal.onSubmit();
 
-		this.#notify();
+		const detailRepository = await createExtensionApiByAlias<UmbDetailRepository<any>>(
+			this,
+			this.args.meta.detailRepositoryAlias,
+		);
+
+		await detailRepository.delete(this.args.unique);
+
+		await this.#notify();
 	}
 
 	async #notify() {

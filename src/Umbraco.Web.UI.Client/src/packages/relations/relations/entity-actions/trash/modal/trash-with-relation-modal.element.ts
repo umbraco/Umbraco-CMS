@@ -57,8 +57,8 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 				<p>Are you sure you want to move <strong>${this._name}</strong> to the recycle bin?</p>
 
 				${this._referencesConfig
-					? html`<umb-confirm-action-entity-references
-							.config=${this._referencesConfig}></umb-confirm-action-entity-references>`
+					? html`<umb-confirm-action-modal-entity-references
+							.config=${this._referencesConfig}></umb-confirm-action-modal-entity-references>`
 					: nothing}
 
 				<uui-button slot="actions" id="cancel" label="Cancel" @click=${this._rejectModal}></uui-button>

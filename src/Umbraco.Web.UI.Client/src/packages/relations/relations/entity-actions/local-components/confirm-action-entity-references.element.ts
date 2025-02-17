@@ -13,8 +13,8 @@ import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-@customElement('umb-confirm-action-entity-references')
-export class UmbConfirmActionEntityReferencesElement extends UmbLitElement {
+@customElement('umb-confirm-action-modal-entity-references')
+export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	config?: {
 		itemRepositoryAlias: string;
@@ -163,10 +163,10 @@ export class UmbConfirmActionEntityReferencesElement extends UmbLitElement {
 	];
 }
 
-export { UmbConfirmActionEntityReferencesElement as element };
+export { UmbConfirmActionModalEntityReferencesElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-confirm-action-entity-references': UmbConfirmActionEntityReferencesElement;
+		'umb-confirm-action-modal-entity-references': UmbConfirmActionModalEntityReferencesElement;
 	}
 }
