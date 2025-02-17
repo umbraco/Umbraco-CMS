@@ -49,7 +49,9 @@ function getParentScrollElement(el: Element, includeSelf: boolean) {
  * @param ignorerSelectors
  */
 function setupIgnorerElements(element: HTMLElement, ignorerSelectors: string) {
-	ignorerSelectors.split(',').forEach(function (criteria) {
+	const selectors = ignorerSelectors.split(',');
+	selectors.push('[draggable="false"]');
+	selectors.forEach(function (criteria) {
 		element.querySelectorAll(criteria.trim()).forEach(setupPreventEvent);
 	});
 }
@@ -59,7 +61,9 @@ function setupIgnorerElements(element: HTMLElement, ignorerSelectors: string) {
  * @param ignorerSelectors
  */
 function destroyIgnorerElements(element: HTMLElement, ignorerSelectors: string) {
-	ignorerSelectors.split(',').forEach(function (criteria: string) {
+	const selectors = ignorerSelectors.split(',');
+	selectors.push('[draggable="false"]');
+	selectors.forEach(function (criteria: string) {
 		element.querySelectorAll(criteria.trim()).forEach(destroyPreventEvent);
 	});
 }
@@ -68,6 +72,7 @@ function destroyIgnorerElements(element: HTMLElement, ignorerSelectors: string) 
  * @param element
  */
 function setupPreventEvent(element: Element) {
+	console.log('prevent on', element);
 	(element as HTMLElement).draggable = false;
 	//(element as HTMLElement).setAttribute('draggable', 'false');
 }
@@ -300,7 +305,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		// Set defaults:
 		config.identifier ??= Symbol();
-		config.ignorerSelector ??= 'a, img, iframe, input, textarea, select, option, [draggable="false"]';
+		config.ignorerSelector ??= 'a,img,iframe,input,textarea,select,option';
 		if (!config.placeholderClass && !config.placeholderAttr) {
 			config.placeholderAttr = 'drag-placeholder';
 		}
@@ -544,10 +549,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		draggableElement.removeEventListener('dragstart', this.#handleDragStart);
 		draggableElement.removeEventListener('dragend', this.#handleDragEnd);
 
-		if (this.#config.handleSelector) {
-			const handleElement = this.#getHandleElement(element);
-			handleElement.removeEventListener('mousedown', this.#handleHandleMouseDown);
-		}
+		const handleElement = this.#getHandleElement(element);
+		handleElement.removeEventListener('mousedown', this.#handleHandleMouseDown);
 
 		(draggableElement as HTMLElement).draggable = false;
 
@@ -601,20 +604,31 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			const composedPathBelowTarget = index !== -1 ? composedPath.slice(0, index) : undefined;
 
 			if (composedPathBelowTarget) {
-				const ignoreThis = composedPathBelowTarget.find((x) =>
-					(x as HTMLElement).matches?.(this.#config.ignorerSelector),
+				const ignoreThis = composedPathBelowTarget.some((x) =>
+					(x as HTMLElement).matches?.('[draggable="false"],' + this.#config.ignorerSelector),
 				);
 				if (ignoreThis) {
 					return;
 				}
 			}
 		}
+
 		if (event.target && event.button === 0) {
 			const element = this.#getElement(event.target as HTMLElement);
 			if (!element) return;
 			const dragElement = this.#getDraggableElement(element);
 			if (!dragElement) return;
+
+			dragElement.addEventListener('mouseup', this.#handleDragElementMouseUp);
 			dragElement.draggable = true;
+		}
+	};
+
+	#handleDragElementMouseUp = (event: MouseEvent) => {
+		const target = event.target as HTMLElement | null;
+		if (target) {
+			target.removeEventListener('mouseup', this.#handleDragElementMouseUp);
+			target.draggable = false;
 		}
 	};
 
