@@ -172,11 +172,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 var branchKeys = descendantsKeys.ToList();
                 branchKeys.Add(key);
 
-                // If unpublished cultures has one or more values, but published cultures does not, this means that the branch is unpublished entirely
-                // And therefore should no longer be resolve-able from the cache, so we need to remove it instead.
-                // Otherwise, some culture is still published, so it should be resolve-able from cache, and published cultures should instead be used.
-                if (payload.UnpublishedCultures is not null && payload.UnpublishedCultures.Length != 0 &&
-                    (payload.PublishedCultures is null || payload.PublishedCultures.Length == 0))
+                // If the branch is unpublished, we need to remove it from cache instead of refreshing it
+                if (IsBranchUnpublished(payload))
                 {
                     foreach (Guid branchKey in branchKeys)
                     {
@@ -202,6 +199,15 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         {
             _documentCacheService.RemoveFromMemoryCacheAsync(key).GetAwaiter().GetResult();
         }
+    }
+
+    private bool IsBranchUnpublished(JsonPayload payload)
+    {
+        // If unpublished cultures has one or more values, but published cultures does not, this means that the branch is unpublished entirely
+        // And therefore should no longer be resolve-able from the cache, so we need to remove it instead.
+        // Otherwise, some culture is still published, so it should be resolve-able from cache, and published cultures should instead be used.
+        return payload.UnpublishedCultures is not null && payload.UnpublishedCultures.Length != 0 &&
+               (payload.PublishedCultures is null || payload.PublishedCultures.Length == 0);
     }
 
     private void HandleNavigation(JsonPayload payload)
