@@ -13,7 +13,9 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
  * @class UmbTrashEntityAction
  * @augments {UmbEntityActionBase<MetaEntityActionTrashKind>}
  */
-export class UmbTrashEntityAction extends UmbEntityActionBase<MetaEntityActionTrashKind> {
+export class UmbTrashEntityAction<
+	MetaKindType extends MetaEntityActionTrashKind = MetaEntityActionTrashKind,
+> extends UmbEntityActionBase<MetaKindType> {
 	#localize = new UmbLocalizationController(this);
 
 	/**
@@ -23,15 +25,21 @@ export class UmbTrashEntityAction extends UmbEntityActionBase<MetaEntityActionTr
 	override async execute() {
 		if (!this.args.unique) throw new Error('Cannot trash an item without a unique identifier.');
 
-		const itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(
+		const item = await this.#requestItem();
+
+		await this._confirmTrash(item);
+
+		const recycleBinRepository = await createExtensionApiByAlias<UmbRecycleBinRepository>(
 			this,
-			this.args.meta.itemRepositoryAlias,
+			this.args.meta.recycleBinRepositoryAlias,
 		);
 
-		const { data } = await itemRepository.requestItems([this.args.unique]);
-		const item = data?.[0];
-		if (!item) throw new Error('Item not found.');
+		await recycleBinRepository.requestTrash({ unique: this.args.unique });
 
+		this.#notify();
+	}
+
+	protected async _confirmTrash(item: any) {
 		const headline = '#actions_trash';
 		const message = '#defaultdialogs_confirmtrash';
 
@@ -42,15 +50,20 @@ export class UmbTrashEntityAction extends UmbEntityActionBase<MetaEntityActionTr
 			color: 'danger',
 			confirmLabel: '#actions_trash',
 		});
+	}
 
-		const recycleBinRepository = await createExtensionApiByAlias<UmbRecycleBinRepository>(
+	async #requestItem() {
+		if (!this.args.unique) throw new Error('Cannot trash an item without a unique identifier.');
+
+		const itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(
 			this,
-			this.args.meta.recycleBinRepositoryAlias,
+			this.args.meta.itemRepositoryAlias,
 		);
 
-		await recycleBinRepository.requestTrash({ unique: this.args.unique });
-
-		this.#notify();
+		const { data } = await itemRepository.requestItems([this.args.unique]);
+		const item = data?.[0];
+		if (!item) throw new Error('Item not found.');
+		return item;
 	}
 
 	async #notify() {
