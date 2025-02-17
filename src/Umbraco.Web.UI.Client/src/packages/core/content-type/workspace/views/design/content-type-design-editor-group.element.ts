@@ -4,7 +4,7 @@ import { css, customElement, html, nothing, property, repeat, state, when } from
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UUIBlinkAnimationValue, UUIBlinkKeyframes, type UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import './content-type-design-editor-properties.element.js';
 
@@ -221,22 +221,57 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 
 	static override styles = [
 		UmbTextStyles,
+		UUIBlinkKeyframes,
 		css`
+			:host {
+				position: relative;
+			}
+
 			:host([drag-placeholder]) {
-				cursor: grabbing;
 				opacity: 0.5;
 			}
 
-			:host([drag-placeholder]) > div > * {
-				cursor: auto;
+			:host::before,
+			:host::after {
+				content: '';
+				position: absolute;
+				pointer-events: none;
+				inset: 0;
+				border-radius: var(--uui-border-radius);
+				opacity: 0;
+				transition:
+					opacity 60ms linear 1ms,
+					border-color,
+					10ms;
+			}
+
+			:host::after {
+				display: block;
+				z-index: 1;
+				border: 2px solid transparent;
+			}
+
+			:host([drag-placeholder])::after {
+				opacity: 1;
+				border-color: var(--uui-color-interactive-emphasis);
+				animation: ${UUIBlinkAnimationValue};
+			}
+			:host([drag-placeholder])::before {
+				background-color: var(--uui-color-interactive-emphasis);
+				opacity: 0.12;
 			}
 
 			:host([drag-placeholder]) uui-box {
 				--uui-box-default-padding: 0;
 			}
+			:host([drag-placeholder]) div[slot='header'],
+			:host([drag-placeholder]) div[slot='header-actions'] {
+				transition: opacity 60ms linear 1ms;
+				opacity: 0;
+			}
 			:host([drag-placeholder]) umb-content-type-design-editor-properties {
 				visibility: hidden;
-				position: absolute;
+				display: none;
 			}
 
 			uui-box {
@@ -272,8 +307,8 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 				vertical-align: sub;
 			}
 
-			:host([sort-mode-active]) div[slot='header'] {
-				cursor: grab;
+			div[slot='header-actions'] {
+				padding: var(--uui-size-space-4) var(--uui-size-space-5);
 			}
 		`,
 	];

@@ -589,14 +589,13 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	#handleHandleMouseDown = (event: MouseEvent) => {
 		const target = event.target as HTMLElement;
+		const composedPath = event.composedPath();
 
 		// Test for a match with the ignore selectors:
 		if (this.#config.ignorerSelector) {
 			if (target.matches(this.#config.ignorerSelector)) {
 				return;
 			}
-
-			const composedPath = event.composedPath();
 			// filter composedPath for only elements descending from the event.target:
 			const index = composedPath.indexOf(target);
 			const composedPathBelowTarget = index !== -1 ? composedPath.slice(0, index) : undefined;
@@ -613,7 +612,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		if (event.target && event.button === 0) {
 			const element = this.#getElement(event.target as HTMLElement);
 			if (!element) return;
-			element.draggable = true;
+			const dragElement = this.#getDraggableElement(element);
+			if (!dragElement) return;
+			dragElement.draggable = true;
 		}
 	};
 
@@ -629,6 +630,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		event.stopPropagation();
 		if (event.dataTransfer) {
+			const dragElement = UmbSorterController.activeDragElement ?? element;
+			const activeDragRect = dragElement.getBoundingClientRect();
+			event.dataTransfer.setDragImage(dragElement, event.clientX - activeDragRect.x, event.clientY - activeDragRect.y);
+			event.dataTransfer.dropEffect = 'move';
 			event.dataTransfer.effectAllowed = 'all'; // copyMove when we enhance the drag with clipboard data.// defaults to 'all'
 		}
 
@@ -638,7 +643,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		this.#setCurrentElement(element as ElementType);
 
-		element.addEventListener('dragend', this.#handleDragEnd);
+		UmbSorterController.activeDragElement?.addEventListener('dragend', this.#handleDragEnd);
 		window.addEventListener('mouseup', this.#handleMouseUp);
 		window.addEventListener('mouseout', this.#handleMouseUp);
 		window.addEventListener('mouseleave', this.#handleMouseUp);
@@ -657,8 +662,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		// Get the current index of the item:
 		UmbSorterController.activeIndex = UmbSorterController.originalIndex;
-
-		UmbSorterController.activeElement!.style.transform = 'translateZ(0)'; // Solves problem with FireFox and ShadowDom in the drag-image.
+		UmbSorterController.activeDragElement!.style.transform = 'translateZ(0)'; // Solves problem with FireFox and ShadowDom in the drag-image.
 
 		if (this.#config.dataTransferResolver) {
 			this.#config.dataTransferResolver(event.dataTransfer, UmbSorterController.activeItem as T);
@@ -679,8 +683,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		UmbSorterController.rqaId = requestAnimationFrame(() => {
 			// It should be okay to use the same rqaId, as the move does not, or is okay not, to happen on first frame/drag-move.
 			UmbSorterController.rqaId = undefined;
-			if (UmbSorterController.activeElement) {
-				UmbSorterController.activeElement.style.transform = '';
+			if (UmbSorterController.activeDragElement) {
+				UmbSorterController.activeDragElement.style.transform = '';
 			}
 		});
 
@@ -724,17 +728,17 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		const element = UmbSorterController.activeElement;
 
-		if (this.#config.handleSelector && UmbSorterController.activeDragElement) {
+		if (UmbSorterController.activeDragElement) {
+			UmbSorterController.activeDragElement.style.transform = '';
 			UmbSorterController.activeDragElement.draggable = false;
+			UmbSorterController.activeDragElement.removeEventListener('dragend', this.#handleDragEnd);
 		}
 
-		element.removeEventListener('dragend', this.#handleDragEnd);
 		window.removeEventListener('mouseup', this.#handleMouseUp);
 		window.removeEventListener('mouseout', this.#handleMouseUp);
 		window.removeEventListener('mouseleave', this.#handleMouseUp);
 		window.removeEventListener('mousemove', this.#handleMouseMove);
 
-		element.style.transform = '';
 		this.#removePlaceholderStyle();
 		this.#stopAutoScroll();
 		this.removeAllowIndication();
