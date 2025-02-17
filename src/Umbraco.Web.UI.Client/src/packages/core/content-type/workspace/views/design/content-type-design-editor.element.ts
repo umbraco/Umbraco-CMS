@@ -140,7 +140,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
 			this.#tabsStructureHelper.setStructureManager(workspaceContext.structure);
-			new UmbContentTypeMoveRootGroupsIntoFirstTabHelper(this, workspaceContext.structure);
 
 			this.#observeRootGroups();
 		});
@@ -281,11 +280,19 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			return;
 		}
 
+		if (!this.#workspaceContext) {
+			throw new Error('Workspace context has not been found');
+		}
+
 		if (!this._tabs) return;
 
 		const len = this._tabs.length;
 		const sortOrder = len === 0 ? 0 : this._tabs[len - 1].sortOrder + 1;
-		const tab = await this.#workspaceContext?.structure.createContainer(null, null, 'Tab', sortOrder);
+		const tab = await this.#workspaceContext.structure.createContainer(null, null, 'Tab', sortOrder);
+		// If length was 0 before, then we need to move the root groups into the first tab: [NL]
+		if (len === 0) {
+			new UmbContentTypeMoveRootGroupsIntoFirstTabHelper(this, this.#workspaceContext.structure);
+		}
 		if (tab) {
 			const path = this._routerPath + '/tab/' + encodeFolderName(tab.name && tab.name !== '' ? tab.name : '-');
 			window.history.replaceState(null, '', path);
