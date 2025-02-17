@@ -1,3 +1,4 @@
+import { manifests as blockExtensions } from './block/manifests.js';
 import type { ManifestTiptapExtension } from './tiptap.extension.js';
 import type { ManifestTiptapToolbarExtension } from './tiptap-toolbar.extension.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
@@ -486,6 +487,6 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 	},
 ];
 
-const extensions = [...coreExtensions, ...toolbarExtensions];
+const extensions = [...coreExtensions, ...toolbarExtensions, ...blockExtensions];
 
 export const manifests = [...kinds, ...extensions];
