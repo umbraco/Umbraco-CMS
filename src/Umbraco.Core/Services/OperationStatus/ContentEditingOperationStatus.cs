@@ -20,5 +20,6 @@ public enum ContentEditingOperationStatus
     InvalidCulture,
     DuplicateKey,
     DuplicateName,
+    CannotDeleteWhenReferenced,
     Unknown,
 }

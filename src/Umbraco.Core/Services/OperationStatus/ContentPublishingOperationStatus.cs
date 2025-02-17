@@ -23,6 +23,7 @@ public enum ContentPublishingOperationStatus
     UnpublishTimeNeedsToBeAfterPublishTime,
     UpublishTimeNeedsToBeInFuture,
     PublishTimeNeedsToBeInFuture,
+    CannotUnpublishWhenReferenced,
     FailedBranch,
     Failed, // unspecified failure (can happen on unpublish at the time of writing)
     Unknown,

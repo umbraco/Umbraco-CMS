@@ -76,6 +76,10 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Duplicate name")
                 .WithDetail("The supplied name is already in use for the same content type.")
                 .Build()),
+            ContentEditingOperationStatus.CannotDeleteWhenReferenced => BadRequest(problemDetailsBuilder
+                .WithTitle("Cannot delete a referenced content item")
+                .WithDetail("Cannot delete a referenced document, while the setting ContentSettings.DisableDeleteWhenReferenced is enabled.")
+                .Build()),
             ContentEditingOperationStatus.Unknown => StatusCode(
                 StatusCodes.Status500InternalServerError,
                 problemDetailsBuilder

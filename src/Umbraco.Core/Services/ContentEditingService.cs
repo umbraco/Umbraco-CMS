@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
@@ -20,6 +21,7 @@ internal sealed class ContentEditingService
     private readonly IUserService _userService;
     private readonly ILocalizationService _localizationService;
     private readonly ILanguageService _languageService;
+    private readonly IRelationService _relationService;
     private readonly ContentSettings _contentSettings;
 
     public ContentEditingService(
@@ -36,7 +38,8 @@ internal sealed class ContentEditingService
         IUserService userService,
         ILocalizationService localizationService,
         ILanguageService languageService,
-        IOptions<ContentSettings> contentSettings)
+        IOptions<ContentSettings> contentSettings,
+        IRelationService relationService)
         : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, contentValidationService, treeEntitySortingService)
     {
         _propertyEditorCollection = propertyEditorCollection;
@@ -45,6 +48,7 @@ internal sealed class ContentEditingService
         _userService = userService;
         _localizationService = localizationService;
         _languageService = languageService;
+        _relationService = relationService;
         _contentSettings = contentSettings.Value;
     }
 
@@ -304,10 +308,24 @@ internal sealed class ContentEditingService
         => ContentService.Copy(content, newParentId, relateToOriginal, includeDescendants, userId);
 
     protected override OperationResult? MoveToRecycleBin(IContent content, int userId)
-        => ContentService.MoveToRecycleBin(content, userId);
+    {
+        if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id))
+        {
+            return new OperationResult(OperationResultType.FailedCannot, new EventMessages());
+        }
+
+        return ContentService.MoveToRecycleBin(content, userId);
+    }
 
     protected override OperationResult? Delete(IContent content, int userId)
-        => ContentService.Delete(content, userId);
+    {
+        if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id))
+        {
+            return new OperationResult(OperationResultType.FailedCannot, new EventMessages());
+        }
+
+        return ContentService.Delete(content, userId);
+    }
 
     protected override IEnumerable<IContent> GetPagedChildren(int parentId, int pageIndex, int pageSize, out long total)
         => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total);
