@@ -83,19 +83,23 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 			if (confirm !== false) {
 				const variantId = new UmbVariantId(options[0].language.unique, null);
 				const publishingRepository = new UmbDocumentPublishingRepository(this._host);
+				let documentCnt = 0;
+
 				for (let i = 0; i < this.selection.length; i++) {
 					const id = this.selection[i];
 					const { error } = await publishingRepository.publish(id, [{ variantId }]);
 
 					if (!error) {
-						notificationContext.peek('positive', {
-							data: {
-								headline: localize.term('speechBubbles_editContentPublishedHeader'),
-								message: localize.term('speechBubbles_editContentPublishedText'),
-							},
-						});
+						documentCnt++;
 					}
 				}
+
+				notificationContext.peek('positive', {
+					data: {
+						headline: localize.term('speechBubbles_editContentPublishedHeader'),
+						message: localize.term('speechBubbles_editMultiContentPublishedText', documentCnt),
+					},
+				});
 
 				eventContext.dispatchEvent(event);
 			}
@@ -129,20 +133,30 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 		const repository = new UmbDocumentPublishingRepository(this._host);
 
 		if (variantIds.length) {
+			let documentCnt = 0;
 			for (const unique of this.selection) {
-				await repository.publish(
+				const { error } = await repository.publish(
 					unique,
 					variantIds.map((variantId) => ({ variantId })),
 				);
-				eventContext.dispatchEvent(event);
+
+				if (!error) {
+					documentCnt++;
+				}
 			}
 
-			// TODO: Some documents could have failed publishing, how do we handle that?
 			notificationContext.peek('positive', {
 				data: {
-					message: localize.term('speechBubbles_editContentPublishedHeader'),
+					headline: localize.term('speechBubbles_editContentPublishedHeader'),
+					message: localize.term(
+						'speechBubbles_editMultiVariantPublishedText',
+						documentCnt,
+						localize.list(variantIds.map((v) => v.culture ?? '')),
+					),
 				},
 			});
+
+			eventContext.dispatchEvent(event);
 		}
 	}
 }
