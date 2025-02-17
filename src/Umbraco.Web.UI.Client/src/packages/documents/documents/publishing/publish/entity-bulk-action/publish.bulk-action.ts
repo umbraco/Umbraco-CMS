@@ -11,12 +11,16 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {
 		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
 		const entityType = entityContext.getEntityType();
 		const unique = entityContext.getUnique();
+
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		const localize = new UmbLocalizationController(this);
 
 		if (!entityType) throw new Error('Entity type not found');
 		if (unique === undefined) throw new Error('Entity unique not found');
@@ -46,7 +50,7 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 				updateDate: null,
 				segment: null,
 				scheduledPublishDate: null,
-				scheduledUnpublishDate: null
+				scheduledUnpublishDate: null,
 			},
 			unique: new UmbVariantId(language.unique, null).toString(),
 			culture: language.unique,
@@ -79,10 +83,23 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 			if (confirm !== false) {
 				const variantId = new UmbVariantId(options[0].language.unique, null);
 				const publishingRepository = new UmbDocumentPublishingRepository(this._host);
+				let documentCnt = 0;
+
 				for (let i = 0; i < this.selection.length; i++) {
 					const id = this.selection[i];
-					await publishingRepository.publish(id, [{ variantId }]);
+					const { error } = await publishingRepository.publish(id, [{ variantId }]);
+
+					if (!error) {
+						documentCnt++;
+					}
 				}
+
+				notificationContext.peek('positive', {
+					data: {
+						headline: localize.term('speechBubbles_editContentPublishedHeader'),
+						message: localize.term('speechBubbles_editMultiContentPublishedText', documentCnt),
+					},
+				});
 
 				eventContext.dispatchEvent(event);
 			}
@@ -116,13 +133,30 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 		const repository = new UmbDocumentPublishingRepository(this._host);
 
 		if (variantIds.length) {
+			let documentCnt = 0;
 			for (const unique of this.selection) {
-				await repository.publish(
+				const { error } = await repository.publish(
 					unique,
 					variantIds.map((variantId) => ({ variantId })),
 				);
-				eventContext.dispatchEvent(event);
+
+				if (!error) {
+					documentCnt++;
+				}
 			}
+
+			notificationContext.peek('positive', {
+				data: {
+					headline: localize.term('speechBubbles_editContentPublishedHeader'),
+					message: localize.term(
+						'speechBubbles_editMultiVariantPublishedText',
+						documentCnt,
+						localize.list(variantIds.map((v) => v.culture ?? '')),
+					),
+				},
+			});
+
+			eventContext.dispatchEvent(event);
 		}
 	}
 }
