@@ -91,6 +91,14 @@ export class UmbRouteContext extends UmbContextBase<UmbRouteContext> {
 		const routesToRemove = this.#modalRoutes.filter(
 			(route) => !this.#modalRegistrations.find((x) => x.key === route.__modalKey),
 		);
+		// If one the of the removed modals are active we should close it.
+		routesToRemove.some((route) => {
+			if (route.path === this.#activeModalPath) {
+				this.#modalContext?.close(route.__modalKey);
+				return true;
+			}
+			return false;
+		});
 
 		const cleanedRoutes = this.#modalRoutes.filter((route) => !routesToRemove.includes(route));
 
