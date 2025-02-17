@@ -244,13 +244,71 @@ internal sealed class ContentEditingService
     }
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)
-        => await HandleMoveToRecycleBinAsync(key, userKey);
+    {
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        IContent? content = ContentService.GetById(key);
+        if (content == null)
+        {
+            return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
+        }
+
+        // checking the trash status is not done when it is irrelevant
+        if (content.Trashed)
+        {
+            return await Task.FromResult(Attempt.FailWithStatus<IContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.InTrash, content));
+        }
+
+        if (_contentSettings.DisableUnpublishWhenReferenced && _relationService.IsRelated(content.Id))
+        {
+            return Attempt.FailWithStatus<IContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced, content);
+        }
+
+        var userId = await GetUserIdAsync(userKey);
+        OperationResult? deleteResult = MoveToRecycleBin(content, userId);
+
+        scope.Complete();
+
+        return OperationResultToAttempt(content, deleteResult);
+    }
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteFromRecycleBinAsync(Guid key, Guid userKey)
-        => await HandleDeleteAsync(key, userKey, true);
+        => await HandleDeletionAsync(key, userKey, ContentTrashStatusRequirement.MustBeTrashed, Delete);
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteAsync(Guid key, Guid userKey)
-        => await HandleDeleteAsync(key, userKey, false);
+        => await HandleDeletionAsync(key, userKey, ContentTrashStatusRequirement.Irrelevant, Delete);
+
+    private async Task<Attempt<IContent?, ContentEditingOperationStatus>> HandleDeletionAsync(Guid key, Guid userKey, ContentTrashStatusRequirement trashStatusRequirement, Func<IContent, int, OperationResult?> performDelete)
+    {
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        IContent? content = ContentService.GetById(key);
+        if (content == null)
+        {
+            return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
+        }
+
+        // checking the trash status is not done when it is irrelevant
+        if ((trashStatusRequirement is ContentTrashStatusRequirement.MustBeTrashed && content.Trashed is false)
+            || (trashStatusRequirement is ContentTrashStatusRequirement.MustNotBeTrashed && content.Trashed))
+        {
+            ContentEditingOperationStatus status = trashStatusRequirement is ContentTrashStatusRequirement.MustBeTrashed
+                ? ContentEditingOperationStatus.NotInTrash
+                : ContentEditingOperationStatus.InTrash;
+            return await Task.FromResult(Attempt.FailWithStatus<IContent?, ContentEditingOperationStatus>(status, content));
+        }
+
+        if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id))
+        {
+            return Attempt.FailWithStatus<IContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.CannotDeleteWhenReferenced, content);
+        }
+
+        var userId = await GetUserIdAsync(userKey);
+        OperationResult? deleteResult = performDelete(content, userId);
+
+        scope.Complete();
+
+        return OperationResultToAttempt(content, deleteResult);
+    }
+
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleMoveAsync(key, parentKey, userKey);
@@ -307,25 +365,9 @@ internal sealed class ContentEditingService
     protected override IContent? Copy(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
         => ContentService.Copy(content, newParentId, relateToOriginal, includeDescendants, userId);
 
-    protected override OperationResult? MoveToRecycleBin(IContent content, int userId)
-    {
-        if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id))
-        {
-            return new OperationResult(OperationResultType.FailedCannot, new EventMessages());
-        }
+    protected override OperationResult? MoveToRecycleBin(IContent content, int userId) => ContentService.MoveToRecycleBin(content, userId);
 
-        return ContentService.MoveToRecycleBin(content, userId);
-    }
-
-    protected override OperationResult? Delete(IContent content, int userId)
-    {
-        if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id))
-        {
-            return new OperationResult(OperationResultType.FailedCannot, new EventMessages());
-        }
-
-        return ContentService.Delete(content, userId);
-    }
+    protected override OperationResult? Delete(IContent content, int userId) => ContentService.Delete(content, userId);
 
     protected override IEnumerable<IContent> GetPagedChildren(int parentId, int pageIndex, int pageSize, out long total)
         => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total);

@@ -250,7 +250,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             : Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.CancelledByNotification, null);
     }
 
-    private Attempt<TContent?, ContentEditingOperationStatus> OperationResultToAttempt(TContent? content, OperationResult? operationResult)
+    protected internal Attempt<TContent?, ContentEditingOperationStatus> OperationResultToAttempt(TContent? content, OperationResult? operationResult)
     {
         ContentEditingOperationStatus operationStatus = OperationResultToOperationStatus(operationResult);
         return operationStatus == ContentEditingOperationStatus.Success
@@ -480,7 +480,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <summary>
     /// Should never be made public, serves the purpose of a nullable bool but more readable.
     /// </summary>
-    private enum ContentTrashStatusRequirement
+    protected internal enum ContentTrashStatusRequirement
     {
         Irrelevant,
         MustBeTrashed,
