@@ -108,31 +108,25 @@ stages:
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.Sqlite
         strategy:
           matrix:
-            # Default configuration
-            #            LinuxPart1Of3:
-            #              vmImage: "ubuntu-latest"
-            #              testFolder: "DefaultConfig"
-            #              testCommand: "npx playwright test $testFolder --shard=1/3"
-            #            LinuxPart2Of3:
-            #              vmImage: "ubuntu-latest"
-            #              testFolder: "DefaultConfig"
-            #              testCommand: "npx playwright test $testFolder --shard=2/3"
-            #            LinuxPart3Of3:
-            #              vmImage: "ubuntu-latest"
-            #              testFolder: "DefaultConfig"
-            #              testCommand: "npx playwright test $testFolder --shard=3/3"
-            #            WindowsPart1Of3:
-            #              vmImage: "windows-latest"
-            #              testFolder: "DefaultConfig"
-            #              testCommand: "npx playwright test $testFolder --shard=1/3"
-            #            WindowsPart2Of3:
-            #              vmImage: "windows-latest"
-            #              testFolder: "DefaultConfig"
-            #              testCommand: "npx playwright test $testFolder --shard=2/3"
-            #            WindowsPart3Of3:
-            #              vmImage: "windows-latest"
-            #              testFolder: "DefaultConfig"
-            #              testCommand: "npx playwright test $testFolder --shard=3/3"
+            # Default test configurations
+#            LinuxPart1Of3:
+#              vmImage: "ubuntu-latest"
+#              testCommand: "npm run test -- --shard=1/3"
+#            LinuxPart2Of3:
+#              vmImage: "ubuntu-latest"
+#              testCommand: "npm run test -- --shard=2/3"
+#            LinuxPart3Of3:
+#              vmImage: "ubuntu-latest"
+#              testCommand: "npm run test -- --shard=3/3"
+#            WindowsPart1Of3:
+#              vmImage: "windows-latest"
+#              testCommand: "npm run test -- --shard=1/3"
+#            WindowsPart2Of3:
+#              vmImage: "windows-latest"
+#              testCommand: "npm run test -- --shard=2/3"
+#            WindowsPart3Of3:
+#              vmImage: "windows-latest"
+#              testCommand: "npm run test -- --shard=3/3"
             # Additional test configurations can be added here
             # UnattendedInstallConfig
             WindowsUnattendedInstallConfig:
@@ -218,19 +212,20 @@ stages:
             displayName: Build application
             workingDirectory: $(Agent.BuildDirectory)/app
 
-          # Run application
+          # Run application for Linux
           - bash: |
               nohup dotnet run --project UmbracoProject --configuration $(buildConfiguration) --no-build --no-launch-profile > $(Build.ArtifactStagingDirectory)/playwright.log 2>&1 &
               echo "##vso[task.setvariable variable=AcceptanceTestProcessId]$!"
             displayName: Run application (Linux)
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+            condition: eq(variables['Agent.OS'], 'Linux')
             workingDirectory: $(Agent.BuildDirectory)/app
 
+          # Run application for Windows
           - pwsh: |
               $process = Start-Process dotnet "run --project UmbracoProject --configuration $(buildConfiguration) --no-build --no-launch-profile 2>&1" -PassThru -NoNewWindow -RedirectStandardOutput $(Build.ArtifactStagingDirectory)/playwright.log
               Write-Host "##vso[task.setvariable variable=AcceptanceTestProcessId]$($process.Id)"
             displayName: Run application (Windows)
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
+            condition: eq(variables['Agent.OS'], 'Windows_NT')
             workingDirectory: $(Agent.BuildDirectory)/app
 
           # Ensures we have the package wait-on installed
@@ -250,7 +245,6 @@ stages:
           # Test
           - pwsh: $(testCommand)
             displayName: Run Playwright tests
-            continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
             env:
               CI: true
@@ -260,16 +254,16 @@ stages:
           # Stop application
           - bash: kill -15 $(AcceptanceTestProcessId)
             displayName: Stop application (Linux)
-            condition: and(succeeded(), ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Linux'))
+            condition:  ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Linux')
 
           - pwsh: Stop-Process -Id $(AcceptanceTestProcessId)
             displayName: Stop application (Windows)
-            condition: and(succeeded(), ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Windows_NT'))
+            condition: ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Windows_NT')
 
           # Copy artifacts
           - pwsh: |
               if (Test-Path tests/Umbraco.Tests.AcceptanceTest/results/*) {
-                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results $(Build.ArtifactStagingDirectory) -Recurse
+                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results/* $(Build.ArtifactStagingDirectory) -Recurse
               }
             displayName: Copy Playwright results
             condition: succeededOrFailed()
@@ -280,7 +274,7 @@ stages:
             condition: succeededOrFailed()
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
-              artifact: 'Acceptance Tests - $(Agent.JobName) - Attempt #$(System.JobAttempt)'
+              artifact: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
 
 #      - job:
 #        displayName: E2E Tests (SQL Server)
