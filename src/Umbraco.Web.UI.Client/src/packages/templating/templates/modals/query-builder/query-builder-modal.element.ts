@@ -254,7 +254,9 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 								(sample) => html`<span><umb-icon name=${sample.icon}></umb-icon>${sample.name}</span>`,
 							) ?? ''}
 						</div>
-						<umb-code-block language="C#" copy>${this._templateQuery?.queryExpression ?? ''}</umb-code-block>
+						<umb-code-block style="max-height:500px;" language="C#" copy
+							>${this._templateQuery?.queryExpression ?? ''}</umb-code-block
+						>
 					</uui-box>
 				</div>
 

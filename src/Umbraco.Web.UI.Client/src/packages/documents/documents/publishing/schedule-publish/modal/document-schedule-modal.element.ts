@@ -1,6 +1,11 @@
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
+import { isNotPublishedMandatory } from '../../utils.js';
 import { UmbDocumentVariantLanguagePickerElement } from '../../../modals/index.js';
-import type { UmbDocumentScheduleModalData, UmbDocumentScheduleModalValue } from './document-schedule-modal.token.js';
+import type {
+	UmbDocumentScheduleModalData,
+	UmbDocumentScheduleModalValue,
+	UmbDocumentScheduleSelectionModel,
+} from './document-schedule-modal.token.js';
 import { css, customElement, html, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -19,26 +24,49 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	_options: Array<UmbDocumentVariantOptionModel> = [];
 
 	@state()
-	_selection: UmbDocumentScheduleModalValue['selection'] = [];
+	_hasNotSelectedMandatory?: boolean;
 
 	@state()
-	_isAllSelected?: boolean;
+	_selection: Array<string> = [];
+
+	@state()
+	_isAllSelected = false;
+
+	@state()
+	_internalValues: Array<UmbDocumentScheduleSelectionModel> = [];
+
+	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
+		if (isNotPublishedMandatory(option)) {
+			return true;
+		}
+		if (!option.variant || option.variant.state === UmbDocumentVariantState.NOT_CREATED) {
+			// If no data present, then its not pickable.
+			return false;
+		}
+		return this.data?.pickableFilter ? this.data.pickableFilter(option) : true;
+	};
 
 	constructor() {
 		super();
 		this.observe(
 			this.#selectionManager.selection,
 			(selection) => {
-				this._selection = selection.map((unique) => {
-					return { unique, schedule: {} };
-				});
+				if (!this._options && !selection) return;
+
+				// New selections are mapped to the schedule data
+				this._selection = selection;
 				this._isAllSelected = this.#isAllSelected();
+
+				//Getting not published mandatory options — the options that are mandatory and not currently published.
+				const missingMandatoryOptions = this._options.filter(isNotPublishedMandatory);
+				this._hasNotSelectedMandatory = missingMandatoryOptions.some((option) => !selection.includes(option.unique));
 			},
 			'_selection',
 		);
 	}
 
 	override firstUpdated() {
+		this._internalValues = this.data?.prevalues ? [...this.data.prevalues] : [];
 		this.#configureSelectionManager();
 	}
 
@@ -46,32 +74,27 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setMultiple(true);
 		this.#selectionManager.setSelectable(true);
 
-		const pickableFilter = this.data?.pickableFilter;
+		this.#selectionManager.setAllowLimitation((unique) => {
+			const option = this._options.find((o) => o.unique === unique);
+			return option ? this.#pickableFilter(option) : true;
+		});
 
-		if (pickableFilter) {
-			this.#selectionManager.setAllowLimitation((unique) => {
-				const option = this.data?.options.find((o) => o.unique === unique);
-				return option ? pickableFilter(option) : true;
-			});
-		}
+		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes.
+		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
+		this._options = this.data?.options.filter((option) => this.#pickableFilter(option)) ?? [];
 
-		// Only display variants that are relevant to pick from, i.e. variants that are draft or published with pending changes:
-		// TODO:[NL] I would say we should change this, the act of scheduling should be equivalent to save & publishing. Resulting in content begin saved as part of carrying out the action. (But this requires a update in the workspace.)
-		this._options =
-			this.data?.options.filter(
-				(option) => option.variant && option.variant.state !== UmbDocumentVariantState.NOT_CREATED,
-			) ?? [];
-
-		let selected = this.value?.selection ?? [];
+		let selected = this.data?.activeVariants ?? [];
 
 		// Filter selection based on options:
-		selected = selected.filter((s) => this._options.some((o) => o.unique === s.unique));
+		selected = selected.filter((unique) => this._options.some((o) => o.unique === unique));
 
-		this.#selectionManager.setSelection(selected.map((s) => s.unique));
+		this.#selectionManager.setSelection(selected);
 	}
 
 	#submit() {
-		this.value = { selection: this._selection };
+		this.value = {
+			selection: this._internalValues,
+		};
 		this.modalContext?.submit();
 	}
 
@@ -80,7 +103,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	#isSelected(unique: string) {
-		return this._selection.some((s) => s.unique === unique);
+		return this._selection.includes(unique);
 	}
 
 	#onSelectAllChange(event: Event) {
@@ -99,7 +122,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		const allUniques = this._options.map((o) => o.unique);
 		const filter = this.#selectionManager.getAllowLimitation();
 		const allowedUniques = allUniques.filter((unique) => filter(unique));
-		return this._selection.length === allowedUniques.length;
+		return this._selection.length !== 0 && this._selection.length === allowedUniques.length;
 	}
 
 	override render() {
@@ -126,6 +149,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 					label="${this.localize.term('buttons_schedulePublish')}"
 					look="primary"
 					color="positive"
+					?disabled=${!this._selection.length || this._hasNotSelectedMandatory}
 					@click=${this.#submit}></uui-button>
 			</div>
 		</umb-body-layout> `;
@@ -133,11 +157,15 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 	#renderOptions() {
 		return html`
-			<uui-checkbox
-				@change=${this.#onSelectAllChange}
-				label=${this.localize.term('general_selectAll')}
-				.checked=${this._isAllSelected ?? false}></uui-checkbox>
-
+			${when(
+				this._options.length > 1,
+				() => html`
+					<uui-checkbox
+						@change=${this.#onSelectAllChange}
+						label=${this.localize.term('general_selectAll')}
+						.checked=${this._isAllSelected}></uui-checkbox>
+				`,
+			)}
 			${repeat(
 				this._options,
 				(option) => option.unique,
@@ -147,7 +175,11 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	#renderItem(option: UmbDocumentVariantOptionModel) {
-		const pickable = this.data?.pickableFilter ? this.data.pickableFilter(option) : () => true;
+		const pickable = this.#pickableFilter(option);
+		const fromDate = this.#fromDate(option.unique);
+		const toDate = this.#toDate(option.unique);
+		const isChanged =
+			fromDate !== option.variant?.scheduledPublishDate || toDate !== option.variant?.scheduledUnpublishDate;
 
 		return html`
 			<uui-menu-item
@@ -160,19 +192,42 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				<uui-icon slot="icon" name="icon-globe"></uui-icon>
 				${UmbDocumentVariantLanguagePickerElement.renderLabel(option)}
 			</uui-menu-item>
-			${when(this.#isSelected(option.unique), () => this.#renderPublishDateInput(option))}
+			${when(this.#isSelected(option.unique), () => this.#renderPublishDateInput(option, fromDate, toDate))}
+			${when(
+				isChanged,
+				() =>
+					html`<p>
+						${this.localize.term('content_scheduledPendingChanges', this.localize.term('buttons_schedulePublish'))}
+					</p>`,
+			)}
 		`;
 	}
 
-	#renderPublishDateInput(option: UmbDocumentVariantOptionModel) {
+	#renderPublishDateInput(option: UmbDocumentVariantOptionModel, fromDate: string | null, toDate: string | null) {
 		return html`<div class="publish-date">
 			<uui-form-layout-item>
 				<uui-label slot="label"><umb-localize key="content_releaseDate">Publish at</umb-localize></uui-label>
 				<div>
 					<umb-input-date
 						type="datetime-local"
+						.value=${this.#formatDate(fromDate)}
 						@change=${(e: Event) => this.#onFromDateChange(e, option.unique)}
-						label=${this.localize.term('general_publishDate')}></umb-input-date>
+						label=${this.localize.term('general_publishDate')}>
+						<div slot="append">
+							${when(
+								fromDate,
+								() => html`
+									<uui-button
+										compact
+										label=${this.localize.term('general_clear')}
+										title=${this.localize.term('general_clear')}
+										@click=${() => this.#removeFromDate(option.unique)}>
+										<uui-icon name="remove"></uui-icon>
+									</uui-button>
+								`,
+							)}
+						</div>
+					</umb-input-date>
 				</div>
 			</uui-form-layout-item>
 			<uui-form-layout-item>
@@ -180,34 +235,115 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				<div>
 					<umb-input-date
 						type="datetime-local"
+						.value=${this.#formatDate(toDate)}
 						@change=${(e: Event) => this.#onToDateChange(e, option.unique)}
-						label=${this.localize.term('general_publishDate')}></umb-input-date>
+						label=${this.localize.term('general_publishDate')}>
+						<div slot="append">
+							${when(
+								toDate,
+								() => html`
+									<uui-button
+										compact
+										label=${this.localize.term('general_clear')}
+										title=${this.localize.term('general_clear')}
+										@click=${() => this.#removeToDate(option.unique)}>
+										<uui-icon name="remove"></uui-icon>
+									</uui-button>
+								`,
+							)}
+						</div>
+					</umb-input-date>
 				</div>
 			</uui-form-layout-item>
 		</div>`;
 	}
 
-	#onFromDateChange(e: Event, unique: string) {
-		const variant = this._selection.find((s) => s.unique === unique);
-		if (variant) {
-			variant.schedule = {
-				...variant.schedule,
-				publishTime: (e.target as UmbInputDateElement).value.toString(),
-			};
+	#fromDate(unique: string): string | null {
+		const variant = this._internalValues.find((s) => s.unique === unique);
+		return variant?.schedule?.publishTime ?? null;
+	}
+
+	#toDate(unique: string): string | null {
+		const variant = this._internalValues.find((s) => s.unique === unique);
+		return variant?.schedule?.unpublishTime ?? null;
+	}
+
+	#removeFromDate(unique: string): void {
+		const variant = this._internalValues.find((s) => s.unique === unique);
+		if (!variant) return;
+		variant.schedule = {
+			...variant.schedule,
+			publishTime: null,
+		};
+		this.requestUpdate('_internalValues');
+	}
+
+	#removeToDate(unique: string): void {
+		const variant = this._internalValues.find((s) => s.unique === unique);
+		if (!variant) return;
+		variant.schedule = {
+			...variant.schedule,
+			unpublishTime: null,
+		};
+		this.requestUpdate('_internalValues');
+	}
+
+	/**
+	 * Formats the date to be compatible with the input type datetime-local
+	 * @param {string} dateStr The date to format, example: 2021-01-01T12:00:00.000+01:00
+	 * @returns {string | undefined} The formatted date in local time with no offset, example: 2021-01-01T11:00
+	 */
+	#formatDate(dateStr: string | null): string {
+		if (!dateStr) return '';
+
+		const d = new Date(dateStr);
+
+		if (isNaN(d.getTime())) {
+			console.warn('[Schedule]: Invalid date:', dateStr);
+			return '';
 		}
+
+		// We need to subtract the offset to get the correct time in the input field
+		// the input field expects local time without offset and the Date object will convert the date to local time
+		return (
+			d.getFullYear() +
+			'-' +
+			String(d.getMonth() + 1).padStart(2, '0') +
+			'-' +
+			String(d.getDate()).padStart(2, '0') +
+			'T' +
+			String(d.getHours()).padStart(2, '0') +
+			':' +
+			String(d.getMinutes()).padStart(2, '0')
+		);
+	}
+
+	#onFromDateChange(e: Event, unique: string) {
+		const variant = this._internalValues.find((s) => s.unique === unique);
+		if (!variant) return;
+		variant.schedule = {
+			...variant.schedule,
+			publishTime: this.#getDateValue(e),
+		};
+		this.requestUpdate('_internalValues');
 	}
 
 	#onToDateChange(e: Event, unique: string) {
-		const variant = this._selection.find((s) => s.unique === unique);
-		if (variant) {
-			variant.schedule = {
-				...variant.schedule,
-				unpublishTime: (e.target as UmbInputDateElement).value.toString(),
-			};
-		}
+		const variant = this._internalValues.find((s) => s.unique === unique);
+		if (!variant) return;
+		variant.schedule = {
+			...variant.schedule,
+			unpublishTime: this.#getDateValue(e),
+		};
+		this.requestUpdate('_internalValues');
 	}
 
-	static override styles = [
+	#getDateValue(e: Event): string | null {
+		const value = (e.target as UmbInputDateElement).value.toString();
+		return value.length ? value : null;
+	}
+
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			:host {
@@ -230,6 +366,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				gap: 1rem;
 				border-top: 1px solid var(--uui-color-border);
 				border-bottom: 1px solid var(--uui-color-border);
+				margin-top: var(--uui-size-space-4);
 			}
 
 			.publish-date > uui-form-layout-item {

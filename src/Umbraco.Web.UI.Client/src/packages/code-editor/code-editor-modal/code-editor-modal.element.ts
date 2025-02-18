@@ -37,7 +37,7 @@ export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditor
 					slot="actions"
 					color=${this.data?.color || 'positive'}
 					look="primary"
-					label=${this.data?.confirmLabel || this.localize.term('general_submit')}
+					label=${this.localize.string(this.data?.confirmLabel) || this.localize.term('general_submit')}
 					@click=${this.#handleConfirm}></uui-button>
 			</umb-body-layout>
 		`;
