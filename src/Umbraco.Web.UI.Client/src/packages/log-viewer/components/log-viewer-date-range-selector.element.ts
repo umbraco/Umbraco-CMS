@@ -4,6 +4,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property, queryAll, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/router';
+import { UMB_THEME_CONTEXT } from '@umbraco-cms/backoffice/themes';
 
 @customElement('umb-log-viewer-date-range-selector')
 export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
@@ -12,12 +13,15 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 
 	@state()
 	private _endDate = '';
-
+	
 	@queryAll('input')
 	private _inputs!: NodeListOf<HTMLInputElement>;
 
 	@property({ type: Boolean, reflect: true })
 	horizontal = false;
+
+	@property({ type: String, reflect: true })
+	theme = '';
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 
@@ -27,6 +31,12 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
 			this.#logViewerContext = instance;
 			this.#observeStuff();
+		});
+
+		this.consumeContext(UMB_THEME_CONTEXT, (instance) => {
+			this.observe(instance.theme, (themeAlias) => {
+				this.theme = themeAlias;
+			});
 		});
 	}
 	override disconnectedCallback(): void {
@@ -70,7 +80,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 		return html`
 			<div class="input-container">
 				<uui-label for="start-date">From:</uui-label>
-				<input
+				<input 
 					@click=${(e: Event) => {
 						(e.target as HTMLInputElement).showPicker();
 					}}
@@ -103,6 +113,10 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-space-3);
+			}
+
+			:host([theme='umb-dark-theme']) input[type='date']::-webkit-calendar-picker-indicator {
+				filter: invert(1);
 			}
 
 			input {
