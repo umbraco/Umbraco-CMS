@@ -1,2 +1,2 @@
 export * from './input-tiptap/index.js';
-export * from './toolbar/tiptap-toolbar-dropdown-base.element.js';
+export * from './cascading-menu-popover/cascading-menu-popover.element.js';

@@ -1,4 +1,5 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
+import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import type { UmbDocumentItemModel } from './types.js';
 import { UmbDocumentItemDataResolver } from './document-item-data-resolver.js';
 import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -16,17 +17,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		return this.#item.getData();
 	}
 	public set item(value: UmbDocumentItemModel | undefined) {
-		const oldValue = this.#item.getData();
 		this.#item.setData(value);
-
-		if (!value) {
-			this.#modalRoute?.destroy();
-			return;
-		}
-
-		if (oldValue?.unique === value.unique) {
-			return;
-		}
 	}
 
 	@property({ type: Boolean })
@@ -62,12 +53,10 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	@state()
 	_propertyDataSetCulture?: UmbVariantId;
 
-	#modalRoute?: any;
-
 	constructor() {
 		super();
 
-		this.#modalRoute = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.onSetup(() => {
 				return { data: { entityType: UMB_DOCUMENT_ENTITY_TYPE, preset: {} } };
 			})
@@ -83,8 +72,9 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	}
 
 	#getHref() {
-		if (!this._editPath) return;
-		return `${this._editPath}/edit/${this._unique}`;
+		if (!this._unique) return undefined;
+		const path = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this._unique });
+		return `${this._editPath}/${path}`;
 	}
 
 	override render() {

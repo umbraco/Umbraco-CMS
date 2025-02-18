@@ -282,6 +282,16 @@ describe('UmbLocalizeController', () => {
 		});
 	});
 
+	describe('list format', () => {
+		it('should return a list with conjunction', () => {
+			expect(controller.list(['one', 'two', 'three'], { type: 'conjunction' })).to.equal('one, two, and three');
+		});
+
+		it('should return a list with disjunction', () => {
+			expect(controller.list(['one', 'two', 'three'], { type: 'disjunction' })).to.equal('one, two, or three');
+		});
+	});
+
 	describe('duration', () => {
 		it('should return a duration', () => {
 			const now = new Date('2020-01-01T00:00:00');

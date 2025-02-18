@@ -25,6 +25,7 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDocumentPublishingWorkspaceContext> {
 	/**
@@ -39,6 +40,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	#publishingRepository = new UmbDocumentPublishingRepository(this);
 	#publishedDocumentData?: UmbDocumentDetailModel;
 	#currentUnique?: UmbEntityUnique;
+	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+	readonly #localize = new UmbLocalizationController(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT);
@@ -53,6 +56,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 				this.#eventContext = context;
 			}).asPromise(),
 		]);
+
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
+			this.#notificationContext = context;
+		});
 	}
 
 	public async publish() {
@@ -118,17 +125,47 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 
 		if (!variants.length) return;
 
-		// TODO: Validate content & Save changes for the selected variants — This was how it worked in v.13 [NL]
-		const { error } = await this.#publishingRepository.publish(unique, variants);
-		if (!error) {
-			// reload the document so all states are updated after the publish operation
-			await this.#documentWorkspaceContext.reload();
-			this.#loadAndProcessLastPublished();
+		const variantIds = variants.map((x) => x.variantId);
+		const saveData = await this.#documentWorkspaceContext.constructSaveData(variantIds);
+		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData);
+		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
 
-			// request reload of this entity
-			const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
-			this.#eventContext?.dispatchEvent(structureEvent);
-		}
+		// TODO: Only validate the specified selection.. [NL]
+		return this.#documentWorkspaceContext.validateAndSubmit(
+			async () => {
+				if (!this.#documentWorkspaceContext) {
+					throw new Error('Document workspace context is missing');
+				}
+
+				// Save the document before scheduling
+				await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
+
+				// Schedule the document
+				const { error } = await this.#publishingRepository.publish(unique, variants);
+				if (error) {
+					return Promise.reject(error);
+				}
+
+				const notification = { data: { message: this.#localize.term('speechBubbles_editContentScheduledSavedText') } };
+				this.#notificationContext?.peek('positive', notification);
+
+				// reload the document so all states are updated after the publish operation
+				await this.#documentWorkspaceContext.reload();
+				this.#loadAndProcessLastPublished();
+
+				// request reload of this entity
+				const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
+				this.#eventContext?.dispatchEvent(structureEvent);
+			},
+			async () => {
+				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+				notificationContext.peek('danger', {
+					data: { message: this.#localize.term('speechBubbles_editContentScheduledNotSavedText') },
+				});
+
+				return Promise.reject();
+			},
+		);
 	}
 
 	/**
@@ -280,9 +317,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 				// Notifying that the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
 				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 				// TODO: Get rid of the save notification.
-				// TODO: Translate this message [NL]
 				notificationContext.peek('danger', {
-					data: { message: 'Document was not published, but we saved it for you.' },
+					data: { message: this.#localize.term('speechBubbles_editContentPublishedFailedByValidation') },
 				});
 				// Reject even thought the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
 				return await Promise.reject();
@@ -308,6 +344,17 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 		);
 
 		if (!error) {
+			const variants = saveData.variants.filter((v) => variantIds.some((id) => id.culture === v.culture));
+			this.#notificationContext?.peek('positive', {
+				data: {
+					headline: this.#localize.term('speechBubbles_editContentPublishedHeader'),
+					message: this.#localize.term(
+						'speechBubbles_editVariantPublishedText',
+						this.#localize.list(variants.map((v) => v.culture ?? v.name)),
+					),
+				},
+			});
+
 			// reload the document so all states are updated after the publish operation
 			await this.#documentWorkspaceContext.reload();
 			this.#loadAndProcessLastPublished();
