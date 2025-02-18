@@ -81,8 +81,8 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                 .WithDetail("Cannot delete a referenced document, while the setting ContentSettings.DisableDeleteWhenReferenced is enabled.")
                 .Build()),
             ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced => BadRequest(problemDetailsBuilder
-                .WithTitle("Cannot move a referenced content item")
-                .WithDetail("Cannot delete a referenced document, while the setting ContentSettings.DisableDeleteWhenReferenced is enabled.")
+                .WithTitle("Cannot move a referenced document to the recycle bin")
+                .WithDetail("Cannot move a referenced document to the recycle bin, while the setting ContentSettings.DisableUnpublishWhenReferenced is enabled.")
                 .Build()),
             ContentEditingOperationStatus.Unknown => StatusCode(
                 StatusCodes.Status500InternalServerError,
