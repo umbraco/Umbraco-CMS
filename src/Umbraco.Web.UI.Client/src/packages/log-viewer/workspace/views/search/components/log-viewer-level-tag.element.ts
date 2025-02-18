@@ -24,7 +24,7 @@ export class UmbLogViewerLevelTagElement extends LitElement {
 		Error: { look: 'primary', color: 'danger' },
 		Fatal: {
 			look: 'primary',
-			style: 'background-color: var(--umb-log-viewer-fatal-color); color: var(--uui-color-surface)',
+			style: 'background-color: var(--umb-log-viewer-fatal-color)',
 		},
 	};
 
