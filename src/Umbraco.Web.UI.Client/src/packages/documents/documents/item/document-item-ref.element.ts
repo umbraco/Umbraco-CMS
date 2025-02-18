@@ -1,4 +1,5 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
+import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import type { UmbDocumentItemModel } from './types.js';
 import { UmbDocumentItemDataResolver } from './document-item-data-resolver.js';
 import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -77,7 +78,8 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	}
 
 	#getHref() {
-		return `${this._editPath}/edit/${this._unique}`;
+		const path = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this._unique });
+		return `${this._editPath}/${path}`;
 	}
 
 	override render() {
