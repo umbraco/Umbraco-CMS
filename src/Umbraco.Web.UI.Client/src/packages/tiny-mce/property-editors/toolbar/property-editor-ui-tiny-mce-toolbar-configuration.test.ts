@@ -1,3 +1,5 @@
+/*
+// Disabled because TinyMCE is not included in the test runner
 import { UmbPropertyEditorUITinyMceToolbarConfigurationElement } from './property-editor-ui-tiny-mce-toolbar-configuration.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
@@ -21,3 +23,4 @@ describe('UmbPropertyEditorUITinyMceToolbarConfigurationElement', () => {
 		});
 	}
 });
+*/
