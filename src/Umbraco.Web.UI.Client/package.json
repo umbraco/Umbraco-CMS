@@ -214,7 +214,7 @@
 		"@tiptap/extension-underline": "2.11.5",
 		"@tiptap/pm": "2.11.5",
 		"@tiptap/starter-kit": "2.11.5",
-		"@types/diff": "^6.0.0",
+		"@types/diff": "^7.0.1",
 		"@umbraco-ui/uui": "^1.12.2",
 		"@umbraco-ui/uui-css": "^1.12.1",
 		"diff": "^7.0.0",
