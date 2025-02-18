@@ -5,7 +5,6 @@ import { customElement, html, ifDefined, nothing, property, state } from '@umbra
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 @customElement('umb-document-item-ref')
 export class UmbDocumentItemRefElement extends UmbLitElement {
@@ -54,15 +53,6 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 
 	@state()
 	_editPath = '';
-
-	@state()
-	_defaultCulture?: string;
-
-	@state()
-	_appCulture?: string;
-
-	@state()
-	_propertyDataSetCulture?: UmbVariantId;
 
 	#modalRoute?: any;
 
