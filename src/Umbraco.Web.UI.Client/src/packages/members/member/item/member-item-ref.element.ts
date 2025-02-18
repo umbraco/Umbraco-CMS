@@ -7,6 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import { UMB_EDIT_MEMBER_WORKSPACE_PATH_PATTERN } from '../paths.js';
 
 @customElement('umb-member-item-ref')
 export class UmbMemberItemRefElement extends UmbLitElement {
@@ -68,7 +69,8 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 
 	#getHref(item: UmbMemberItemModel) {
 		if (!this._editPath) return;
-		return `${this._editPath}/edit/${item.unique}`;
+		const path = UMB_EDIT_MEMBER_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique });
+		return `${this._editPath}/${path}`;
 	}
 
 	override render() {
