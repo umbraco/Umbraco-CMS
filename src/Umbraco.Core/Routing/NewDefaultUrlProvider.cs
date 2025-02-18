@@ -89,8 +89,6 @@ public class NewDefaultUrlProvider : IUrlProvider
             yield break;
         }
 
-
-
         // look for domains, walking up the tree
         IPublishedContent? n = node;
         IEnumerable<DomainAndUri>? domainUris =
