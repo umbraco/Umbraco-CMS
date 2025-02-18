@@ -101,7 +101,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             UpdateMemberProperties(memberEntity, user, out bool _);
 
             // create the member
-            Attempt<OperationResult?> saveAttempt = _memberService.Save(memberEntity);
+            Attempt<OperationResult?> saveAttempt = _memberService.Save(memberEntity, PublishNotificationSaveOptions.Saving);
             if (saveAttempt.Success is false)
             {
                 scope.Complete();
