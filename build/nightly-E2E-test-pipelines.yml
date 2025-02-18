@@ -193,6 +193,7 @@ stages:
 
           - pwsh: |
               $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)"
+              $destinationPath = "UmbracoProject"
               $jsonFiles = Get-ChildItem -Path $sourcePath -Filter "*.json"
               if ($jsonFiles) {
                 $jsonFiles | ForEach-Object {
@@ -207,6 +208,7 @@ stages:
 
           - pwsh: |
               $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)"
+              $destinationPath = "UmbracoProject"
               $csharpFiles = Get-ChildItem -Path $sourcePath -Filter "*.cs"
               if ($csharpFiles) {
                 $csharpFiles | ForEach-Object {
