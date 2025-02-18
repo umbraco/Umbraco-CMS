@@ -83,19 +83,19 @@ stages:
       SERILOG__WRITETO__0__NAME: Async
       SERILOG__WRITETO__0__ARGS__CONFIGURE__0__NAME: Console
       # Set unattended install settings
-      UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERNAME: Playwright Test
-      UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD: UmbracoAcceptance123!
-      UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL: playwright@umbraco.com
+#      UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERNAME: Playwright Test
+#      UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD: UmbracoAcceptance123!
+#      UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL: playwright@umbraco.com
       # Custom Umbraco settings
-      UMBRACO__CMS__CONTENT__CONTENTVERSIONCLEANUPPOLICY__ENABLECLEANUP: false
-      UMBRACO__CMS__GLOBAL__DISABLEELECTIONFORSINGLESERVER: true
-      UMBRACO__CMS__GLOBAL__INSTALLMISSINGDATABASE: true
-      UMBRACO__CMS__GLOBAL__ID: 00000000-0000-0000-0000-000000000042
-      UMBRACO__CMS__GLOBAL__VERSIONCHECKPERIOD: 0
-      UMBRACO__CMS__GLOBAL__USEHTTPS: true
-      UMBRACO__CMS__HEALTHCHECKS__NOTIFICATION__ENABLED: false
-      UMBRACO__CMS__KEEPALIVE__DISABLEKEEPALIVETASK: true
-      UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL: https://localhost:44331/
+#      UMBRACO__CMS__CONTENT__CONTENTVERSIONCLEANUPPOLICY__ENABLECLEANUP: false
+#      UMBRACO__CMS__GLOBAL__DISABLEELECTIONFORSINGLESERVER: true
+#      UMBRACO__CMS__GLOBAL__INSTALLMISSINGDATABASE: true
+#      UMBRACO__CMS__GLOBAL__ID: 00000000-0000-0000-0000-000000000042
+#      UMBRACO__CMS__GLOBAL__VERSIONCHECKPERIOD: 0
+#      UMBRACO__CMS__GLOBAL__USEHTTPS: true
+#      UMBRACO__CMS__HEALTHCHECKS__NOTIFICATION__ENABLED: false
+#      UMBRACO__CMS__KEEPALIVE__DISABLEKEEPALIVETASK: true
+#      UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL: https://localhost:44331/
       ASPNETCORE_URLS: https://localhost:44331
     jobs:
       # E2E Tests
@@ -103,15 +103,15 @@ stages:
         displayName: E2E Tests (SQLite)
         timeoutInMinutes: 180
         variables:
-          # Connection string
-          CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
-          CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.Sqlite
+          PlaywrightPassword: UmbracoAcceptance123!
+          PlaywrightUserEmail: playwright@umbraco.com
         strategy:
           matrix:
             # Default test configurations
-            #            LinuxPart1Of3:
-            #              vmImage: "ubuntu-latest"
-            #              testCommand: "npm run test -- --shard=1/3"
+            LinuxPart1Of3:
+              vmImage: "ubuntu-latest"
+              testFolder: "DefaultConfig"
+              testCommand: "npm run test -- --shard=1/3"
             #            LinuxPart2Of3:
             #              vmImage: "ubuntu-latest"
             #              testCommand: "npm run test -- --shard=2/3"
@@ -159,8 +159,8 @@ stages:
               useGlobalJson: true
 
           - pwsh: |
-              "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
-              UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
+              "UMBRACO_USER_LOGIN=$(PlaywrightUserEmail)
+              UMBRACO_USER_PASSWORD=$(PlaywrightUserPassword)
               URL=$(ASPNETCORE_URLS)
               STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json" | Out-File .env
             displayName: Generate .env
