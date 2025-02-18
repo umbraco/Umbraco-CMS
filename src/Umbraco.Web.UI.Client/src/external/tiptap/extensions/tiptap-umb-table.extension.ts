@@ -10,7 +10,6 @@ import { Table } from '@tiptap/extension-table';
 import { TableCell } from '@tiptap/extension-table-cell';
 import { TableHeader } from '@tiptap/extension-table-header';
 import { TableRow } from '@tiptap/extension-table-row';
-import { UmbBubbleMenu } from './tiptap-umb-bubble-menu.extension.js';
 import type { Rect } from '@tiptap/pm/tables';
 
 export const UmbTable = Table.configure({ resizable: true });
@@ -170,20 +169,6 @@ export const UmbTableCell = TableCell.extend({
 				},
 			}),
 		];
-	},
-});
-
-export const UmbTableColumnMenu = UmbBubbleMenu.configure({
-	pluginKey: 'umbTableColumnMenu',
-	shouldShow(props) {
-		return isColumnGripSelected(props);
-	},
-});
-
-export const UmbTableRowMenu = UmbBubbleMenu.configure({
-	pluginKey: 'umbTableRowMenu',
-	shouldShow(props) {
-		return isRowGripSelected(props);
 	},
 });
 

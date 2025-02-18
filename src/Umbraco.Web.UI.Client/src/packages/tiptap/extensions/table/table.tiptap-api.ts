@@ -1,27 +1,9 @@
 import { UmbTiptapExtensionApiBase } from '../base.js';
 import { css } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UmbTable,
-	UmbTableHeader,
-	UmbTableRow,
-	UmbTableCell,
-	UmbTableColumnMenu,
-	UmbTableRowMenu,
-} from '@umbraco-cms/backoffice/external/tiptap';
+import { UmbTable, UmbTableHeader, UmbTableRow, UmbTableCell } from '@umbraco-cms/backoffice/external/tiptap';
 
 export default class UmbTiptapTableExtensionApi extends UmbTiptapExtensionApiBase {
-	getTiptapExtensions = () => [
-		UmbTable,
-		UmbTableHeader,
-		UmbTableRow,
-		UmbTableCell,
-		UmbTableColumnMenu.configure({
-			element: this.getHostElement().shadowRoot?.querySelector('#divUmbTableColumnMenu') as HTMLElement,
-		}),
-		UmbTableRowMenu.configure({
-			element: this.getHostElement().shadowRoot?.querySelector('#divUmbTableRowMenu') as HTMLElement,
-		}),
-	];
+	getTiptapExtensions = () => [UmbTable, UmbTableHeader, UmbTableRow, UmbTableCell];
 
 	override getStyles = () => css`
 		.tableWrapper {
