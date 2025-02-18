@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.PropertyEditors.Validation;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
@@ -71,7 +72,8 @@ public class MediaPicker3PropertyEditor : DataEditor
             IScopeProvider scopeProvider,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IDataTypeConfigurationCache dataTypeReadCache,
-            ILocalizedTextService localizedTextService)
+            ILocalizedTextService localizedTextService,
+            IMediaTypeService mediaTypeService)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
@@ -81,7 +83,12 @@ public class MediaPicker3PropertyEditor : DataEditor
             _scopeProvider = scopeProvider;
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _dataTypeReadCache = dataTypeReadCache;
-            Validators.Add(new MinMaxValidator(jsonSerializer, localizedTextService));
+            var validators = new TypedJsonValidatorRunner<List<MediaWithCropsDto>, MediaPicker3Configuration>(
+                jsonSerializer,
+                new MinMaxValidator(localizedTextService),
+                new AllowedTypeValidator(localizedTextService, mediaTypeService));
+
+            Validators.Add(validators);
         }
 
         [Obsolete("Use non obsoleted constructor instead. Scheduled for removal in v17")]
@@ -107,7 +114,8 @@ public class MediaPicker3PropertyEditor : DataEditor
                 scopeProvider,
                 backOfficeSecurityAccessor,
                 dataTypeReadCache,
-                StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>())
+                StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>(),
+                StaticServiceProvider.Instance.GetRequiredService<IMediaTypeService>())
         {
         }
 
@@ -328,32 +336,21 @@ public class MediaPicker3PropertyEditor : DataEditor
             }
         }
 
-        private class MinMaxValidator : IValueValidator
+        private class MinMaxValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
         {
-            private readonly IJsonSerializer _jsonSerializer;
             private readonly ILocalizedTextService _localizedTextService;
 
-            public MinMaxValidator(IJsonSerializer jsonSerializer, ILocalizedTextService localizedTextService)
-            {
-                _jsonSerializer = jsonSerializer;
-                _localizedTextService = localizedTextService;
-            }
+            public MinMaxValidator(ILocalizedTextService localizedTextService) => _localizedTextService = localizedTextService;
 
             public IEnumerable<ValidationResult> Validate(
-                object? value,
+                List<MediaWithCropsDto>? mediaWithCropsDtos,
+                MediaPicker3Configuration? mediaPickerConfiguration,
                 string? valueType,
-                object? dataTypeConfiguration,
                 PropertyValidationContext validationContext)
             {
                 var validationResults = new List<ValidationResult>();
 
-                if (dataTypeConfiguration is not MediaPicker3Configuration mediaPickerConfiguration)
-                {
-                    return validationResults;
-                }
-
-                if (value is null ||
-                    _jsonSerializer.TryDeserialize(value, out List<MediaWithCropsDto>? mediaWithCropsDtos) is false)
+                if (mediaWithCropsDtos is null || mediaPickerConfiguration is null)
                 {
                     return validationResults;
                 }
@@ -381,6 +378,56 @@ public class MediaPicker3PropertyEditor : DataEditor
                 }
 
                 return validationResults;
+            }
+        }
+
+        private class AllowedTypeValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
+        {
+            private readonly ILocalizedTextService _localizedTextService;
+            private readonly IMediaTypeService _mediaTypeService;
+
+            public AllowedTypeValidator(ILocalizedTextService localizedTextService, IMediaTypeService mediaTypeService)
+            {
+                _localizedTextService = localizedTextService;
+                _mediaTypeService = mediaTypeService;
+            }
+
+
+            public IEnumerable<ValidationResult> Validate(
+                List<MediaWithCropsDto>? value,
+                MediaPicker3Configuration? configuration,
+                string? valueType,
+                PropertyValidationContext validationContext)
+            {
+                if (value is null || configuration is null)
+                {
+                    return [];
+                }
+
+                var allowedTypes = configuration.Filter?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
+
+                // No allowed types = all types are allowed
+                if (allowedTypes is null || allowedTypes.Length == 0)
+                {
+                    return [];
+                }
+
+                foreach (MediaWithCropsDto media in value)
+                {
+                    IMediaType? type = _mediaTypeService.Get(media.MediaTypeAlias);
+
+                    if (type is null || allowedTypes.Contains(type.Key.ToString()) is false)
+                    {
+                        return
+                        [
+                            new ValidationResult(
+                                _localizedTextService.Localize("validation", "invalidMediaType"),
+                                new[] { "invalidMediaType" })
+                        ];
+                    }
+                }
+
+                return [];
             }
         }
     }
