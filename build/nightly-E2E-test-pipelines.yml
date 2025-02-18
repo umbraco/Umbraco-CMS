@@ -109,24 +109,24 @@ stages:
         strategy:
           matrix:
             # Default test configurations
-#            LinuxPart1Of3:
-#              vmImage: "ubuntu-latest"
-#              testCommand: "npm run test -- --shard=1/3"
-#            LinuxPart2Of3:
-#              vmImage: "ubuntu-latest"
-#              testCommand: "npm run test -- --shard=2/3"
-#            LinuxPart3Of3:
-#              vmImage: "ubuntu-latest"
-#              testCommand: "npm run test -- --shard=3/3"
-#            WindowsPart1Of3:
-#              vmImage: "windows-latest"
-#              testCommand: "npm run test -- --shard=1/3"
-#            WindowsPart2Of3:
-#              vmImage: "windows-latest"
-#              testCommand: "npm run test -- --shard=2/3"
-#            WindowsPart3Of3:
-#              vmImage: "windows-latest"
-#              testCommand: "npm run test -- --shard=3/3"
+            #            LinuxPart1Of3:
+            #              vmImage: "ubuntu-latest"
+            #              testCommand: "npm run test -- --shard=1/3"
+            #            LinuxPart2Of3:
+            #              vmImage: "ubuntu-latest"
+            #              testCommand: "npm run test -- --shard=2/3"
+            #            LinuxPart3Of3:
+            #              vmImage: "ubuntu-latest"
+            #              testCommand: "npm run test -- --shard=3/3"
+            #            WindowsPart1Of3:
+            #              vmImage: "windows-latest"
+            #              testCommand: "npm run test -- --shard=1/3"
+            #            WindowsPart2Of3:
+            #              vmImage: "windows-latest"
+            #              testCommand: "npm run test -- --shard=2/3"
+            #            WindowsPart3Of3:
+            #              vmImage: "windows-latest"
+            #              testCommand: "npm run test -- --shard=3/3"
             # Additional test configurations can be added here
             # UnattendedInstallConfig
             WindowsUnattendedInstallConfig:
@@ -192,24 +192,36 @@ stages:
             workingDirectory: $(Agent.BuildDirectory)/app
 
           - pwsh: |
-              if (Test-Path $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.json ) {
-                Write-Host $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.json
-                cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.json UmbracoProject
+              $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)"
+              $jsonFiles = Get-ChildItem -Path $sourcePath -Filter "*.json"
+              if ($jsonFiles) {
+                $jsonFiles | ForEach-Object {
+                  Write-Host "Copying: $($_.FullName)"
+                  Copy-Item -Path $_.FullName -Destination $destinationPath -Force
+                }
+              } else {
+                Write-Host "No JSON files found."
               }
             displayName: Update application to use necessary app settings
             workingDirectory: $(Agent.BuildDirectory)/app
 
           - pwsh: |
-              if (Test-Path $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.cs ) {
-                Write-Host $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.cs
-                cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.cs UmbracoProject
+              $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)"
+              $csharpFiles = Get-ChildItem -Path $sourcePath -Filter "*.cs"
+              if ($csharpFiles) {
+                $csharpFiles | ForEach-Object {
+                  Write-Host "Copying: $($_.FullName)"
+                  Copy-Item -Path $_.FullName -Destination $destinationPath -Force
+                }
+              } else {
+                Write-Host "No C# files found."
               }
             displayName: Update application to use necessary classes
             workingDirectory: $(Agent.BuildDirectory)/app
 
           # Build application
           - pwsh: |
-              dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore
+              dotnet build UmbracoProject --configuration $(buildConfiguration)
               dotnet dev-certs https
             displayName: Build application
             workingDirectory: $(Agent.BuildDirectory)/app
@@ -256,7 +268,7 @@ stages:
           # Stop application
           - bash: kill -15 $(AcceptanceTestProcessId)
             displayName: Stop application (Linux)
-            condition:  and(ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Linux'))
+            condition: and(ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Linux'))
 
           - pwsh: Stop-Process -Id $(AcceptanceTestProcessId)
             displayName: Stop application (Windows)
