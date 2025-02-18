@@ -187,10 +187,6 @@ export const UmbTableRowMenu = UmbBubbleMenu.configure({
 	},
 });
 
-/* ###############################################
-   ##################### UTILS ###################
-   ############################################### */
-
 const isRectSelected = (rect: Rect) => (selection: CellSelection) => {
 	const map = TableMap.get(selection.$anchorCell.node(-1));
 	const start = selection.$anchorCell.start(-1);
