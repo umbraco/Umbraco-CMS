@@ -48,6 +48,8 @@ Open this file in an editor: `src/Umbraco.Web.UI/appsettings.Development.json` a
 
 This will override the backoffice host URL, enabling the Client to run from a different origin.
 
+Then start the backend server by running the command: `dotnet run` in the `Umbraco.Web.UI` folder.
+
 #### Run the front-end server
 
 Now start the Vite server by running the command: `npm run dev:server` in the `Umbraco.Web.UI.Client` folder.
