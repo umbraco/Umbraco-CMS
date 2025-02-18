@@ -48,7 +48,7 @@ export class UmbTiptapToolbarButtonElement extends UmbLitElement {
 				@click=${() => (this.api && this.editor ? this.api.execute(this.editor) : null)}>
 				${when(
 					this.manifest?.meta.icon,
-					() => html`<umb-icon name=${this.manifest!.meta.icon}></umb-icon>`,
+					(icon) => html`<umb-icon name=${icon}></umb-icon>`,
 					() => html`<span>${this.manifest?.meta.label}</span>`,
 				)}
 			</uui-button>
