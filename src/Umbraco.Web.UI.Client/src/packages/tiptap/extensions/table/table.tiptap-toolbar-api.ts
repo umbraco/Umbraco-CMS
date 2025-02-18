@@ -3,6 +3,8 @@ import { UmbTiptapToolbarElementApiBase } from '../base.js';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
 export class UmbTiptapToolbarTableExtensionApi extends UmbTiptapToolbarElementApiBase {
+	public override execute() {}
+
 	public getMenu = (editor?: Editor): Array<UmbCascadingMenuItem> => [
 		{
 			unique: 'table-menu-table',

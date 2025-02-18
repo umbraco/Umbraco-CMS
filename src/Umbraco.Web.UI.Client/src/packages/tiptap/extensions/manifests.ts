@@ -1,4 +1,5 @@
 import { manifests as blockExtensions } from './block/manifests.js';
+import { manifests as styleSelectExtensions } from './style-select/manifests.js';
 import { manifests as tableExtensions } from './table/manifests.js';
 import type { ManifestTiptapExtension } from './tiptap.extension.js';
 import type { ManifestTiptapToolbarExtension } from './tiptap-toolbar.extension.js';
@@ -461,20 +462,14 @@ const toolbarExtensions: Array<ManifestTiptapToolbarExtension> = [
 			label: '#general_embed',
 		},
 	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.StyleSelect',
-		name: 'Style Select Tiptap Extension',
-		element: () => import('./toolbar/style-select.tiptap-toolbar-api.js'),
-		meta: {
-			alias: 'umbStyleSelect',
-			icon: 'icon-code',
-			label: 'Style Select',
-		},
-	},
 ];
 
-const extensions = [...coreExtensions, ...toolbarExtensions, ...blockExtensions, ...tableExtensions];
+const extensions = [
+	...coreExtensions,
+	...toolbarExtensions,
+	...blockExtensions,
+	...styleSelectExtensions,
+	...tableExtensions,
+];
 
 export const manifests = [...kinds, ...extensions];
