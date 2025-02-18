@@ -106,10 +106,11 @@ public class NotificationService : INotificationService
             }
 
             // users are returned ordered by id, notifications are returned ordered by user id
-            var users = _userService.GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
-            foreach (IUser user in users)
+            var users = _userService.GetNextUsers(id, pagesz).ToList();
+            var approvedUsers = users.Where(x => x.IsApproved).ToList();
+            foreach (IUser approvedUser in approvedUsers)
             {
-                Notification[] userNotifications = notifications.Where(n => n.UserId == user.Id).ToArray();
+                Notification[] userNotifications = notifications.Where(n => n.UserId == approvedUser.Id).ToArray();
                 foreach (Notification notification in userNotifications)
                 {
                     // notifications are inherited down the tree - find the topmost entity
@@ -130,7 +131,7 @@ public class NotificationService : INotificationService
                     }
 
                     // queue notification
-                    NotificationRequest req = CreateNotificationRequest(operatingUser, user, entityForNotification, prevVersionDictionary[entityForNotification.Id], actionName, siteUri, createSubject, createBody);
+                    NotificationRequest req = CreateNotificationRequest(operatingUser, approvedUser, entityForNotification, prevVersionDictionary[entityForNotification.Id], actionName, siteUri, createSubject, createBody);
                     Enqueue(req);
                     break;
                 }
