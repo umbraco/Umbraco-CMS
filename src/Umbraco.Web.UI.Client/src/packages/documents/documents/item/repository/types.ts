@@ -7,7 +7,7 @@ export interface UmbDocumentItemModel {
 	documentType: {
 		unique: string;
 		icon: string;
-		collection: UmbReferenceByUnique | null;
+		collection?: UmbReferenceByUnique | null;
 	};
 	entityType: UmbDocumentEntityType;
 	hasChildren: boolean;
