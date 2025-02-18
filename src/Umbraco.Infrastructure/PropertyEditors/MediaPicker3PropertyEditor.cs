@@ -355,6 +355,13 @@ public class MediaPicker3PropertyEditor : DataEditor
                     return validationResults;
                 }
 
+                if(mediaPickerConfiguration.Multiple is false && mediaWithCropsDtos.Count > 1)
+                {
+                    validationResults.Add(new ValidationResult(
+                        _localizedTextService.Localize("validation", "multipleMediaNotAllowed"),
+                        new[] { "validationLimit" }));
+                }
+
                 if (mediaPickerConfiguration.ValidationLimit.Min is not null
                     && mediaWithCropsDtos.Count < mediaPickerConfiguration.ValidationLimit.Min)
                 {

@@ -389,6 +389,7 @@
     <key alias="entriesExceed"><![CDATA[Maximum %0% entries, <strong>%1%</strong> too many.]]></key>
     <key alias="entriesAreasMismatch">The content amount requirements are not met for one or more areas.</key>
     <key alias="invalidMediaType">The chosen media type is invalid.</key>
+    <key alias="multipleMediaNotAllowed">Multiple selected media is not allowed.</key>
   </area>
   <area alias="healthcheck">
     <!-- The following keys get these tokens passed in:

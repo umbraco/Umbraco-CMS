@@ -388,6 +388,7 @@
     <key alias="duplicateMemberGroupName">Member group name '%0%' is already taken</key>
     <key alias="duplicateUsername">Username '%0%' is already taken</key>
     <key alias="invalidMediaType">The chosen media type is invalid.</key>
+    <key alias="multipleMediaNotAllowed">Multiple selected media is not allowed.</key>
   </area>
   <area alias="healthcheck">
     <!-- The following keys get these tokens passed in:
