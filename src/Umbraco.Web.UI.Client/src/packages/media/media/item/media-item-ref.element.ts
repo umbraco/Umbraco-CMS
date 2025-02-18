@@ -48,6 +48,7 @@ export class UmbMediaItemRefElement extends UmbLitElement {
 		]);
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addUniquePaths(['unique'])
 			.onSetup(() => {
 				return { data: { entityType: UMB_MEDIA_ENTITY_TYPE, preset: {} } };
 			})

@@ -44,19 +44,11 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	@state()
 	_editPath = '';
 
-	@state()
-	_defaultCulture?: string;
-
-	@state()
-	_appCulture?: string;
-
-	@state()
-	_propertyDataSetCulture?: UmbVariantId;
-
 	constructor() {
 		super();
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addUniquePaths(['unique'])
 			.onSetup(() => {
 				return { data: { entityType: UMB_DOCUMENT_ENTITY_TYPE, preset: {} } };
 			})
