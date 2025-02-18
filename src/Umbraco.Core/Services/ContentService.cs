@@ -211,7 +211,6 @@ public class ContentService : RepositoryService, IContentService
             var rollingBackNotification = new ContentRollingBackNotification(content, evtMsgs);
             if (scope.Notifications.PublishCancelable(rollingBackNotification))
             {
-                scope.Complete();
                 return OperationResult.Cancel(evtMsgs);
             }
 
@@ -1081,7 +1080,6 @@ public class ContentService : RepositoryService, IContentService
             var savingNotification = new ContentSavingNotification(content, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return OperationResult.Cancel(eventMessages);
             }
 
@@ -1154,7 +1152,6 @@ public class ContentService : RepositoryService, IContentService
             var savingNotification = new ContentSavingNotification(contentsA, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return OperationResult.Cancel(eventMessages);
             }
 
@@ -2327,7 +2324,6 @@ public class ContentService : RepositoryService, IContentService
         {
             if (scope.Notifications.PublishCancelable(new ContentDeletingNotification(content, eventMessages)))
             {
-                scope.Complete();
                 return OperationResult.Cancel(eventMessages);
             }
 
@@ -2400,7 +2396,6 @@ public class ContentService : RepositoryService, IContentService
                 new ContentDeletingVersionsNotification(id, evtMsgs, dateToRetain: versionDate);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
             {
-                scope.Complete();
                 return;
             }
 
@@ -2433,7 +2428,6 @@ public class ContentService : RepositoryService, IContentService
             var deletingVersionsNotification = new ContentDeletingVersionsNotification(id, evtMsgs, versionId);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
             {
-                scope.Complete();
                 return;
             }
 
@@ -2484,7 +2478,6 @@ public class ContentService : RepositoryService, IContentService
                 new ContentMovingToRecycleBinNotification(moveEventInfo, eventMessages);
             if (scope.Notifications.PublishCancelable(movingToRecycleBinNotification))
             {
-                scope.Complete();
                 return OperationResult.Cancel(eventMessages); // causes rollback
             }
 
@@ -2556,7 +2549,6 @@ public class ContentService : RepositoryService, IContentService
             var movingNotification = new ContentMovingNotification(moveEventInfo, eventMessages);
             if (scope.Notifications.PublishCancelable(movingNotification))
             {
-                scope.Complete();
                 return OperationResult.Cancel(eventMessages); // causes rollback
             }
 
@@ -2684,7 +2676,6 @@ public class ContentService : RepositoryService, IContentService
             var deletingContentNotification = new ContentDeletingNotification(contents, eventMessages);
             if (scope.Notifications.PublishCancelable(emptyingRecycleBinNotification) || scope.Notifications.PublishCancelable(deletingContentNotification))
             {
-                scope.Complete();
                 return OperationResult.Cancel(eventMessages);
             }
 
@@ -2761,7 +2752,6 @@ public class ContentService : RepositoryService, IContentService
             // FIXME: Pass parent key in constructor too when proper Copy method is implemented
             if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(content, copy, parentId, eventMessages)))
             {
-                scope.Complete();
                 return null;
             }
 
@@ -2902,7 +2892,6 @@ public class ContentService : RepositoryService, IContentService
             var sendingToPublishNotification = new ContentSendingToPublishNotification(content, evtMsgs);
             if (scope.Notifications.PublishCancelable(sendingToPublishNotification))
             {
-                scope.Complete();
                 return false;
             }
 
@@ -3522,7 +3511,6 @@ public class ContentService : RepositoryService, IContentService
 
             if (scope.Notifications.PublishCancelable(new ContentDeletingNotification(contents, eventMessages)))
             {
-                scope.Complete();
                 return;
             }
 

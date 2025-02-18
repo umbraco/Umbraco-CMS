@@ -434,7 +434,6 @@ namespace Umbraco.Cms.Core.Services.Implement
                 var movingDataTypeNotification = new DataTypeMovingNotification(moveEventInfo, eventMessages);
                 if (scope.Notifications.PublishCancelable(movingDataTypeNotification))
                 {
-                    scope.Complete();
                     return Attempt.FailWithStatus(DataTypeOperationStatus.CancelledByNotification, toMove);
                 }
 
@@ -582,7 +581,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             var savingDataTypeNotification = new DataTypeSavingNotification(dataTypeDefinitions, evtMsgs);
             if (scope.Notifications.PublishCancelable(savingDataTypeNotification))
             {
-                scope.Complete();
                 return;
             }
 
@@ -635,7 +633,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             var deletingDataTypeNotification = new DataTypeDeletingNotification(dataType, eventMessages);
             if (await scope.Notifications.PublishCancelableAsync(deletingDataTypeNotification))
             {
-                scope.Complete();
                 return Attempt.FailWithStatus<IDataType?, DataTypeOperationStatus>(DataTypeOperationStatus.CancelledByNotification, dataType);
             }
 
@@ -752,7 +749,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             var savingDataTypeNotification = new DataTypeSavingNotification(dataType, eventMessages);
             if (await scope.Notifications.PublishCancelableAsync(savingDataTypeNotification))
             {
-                scope.Complete();
                 return Attempt.FailWithStatus(DataTypeOperationStatus.CancelledByNotification, dataType);
             }
 

@@ -193,7 +193,6 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
         {
-            scope.Complete();
             return Attempt.Fail(UserGroupOperationStatus.CancelledByNotification);
         }
 
@@ -302,7 +301,6 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         var savingNotification = new UserGroupSavingNotification(userGroup, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
-            scope.Complete();
             return Attempt.FailWithStatus(UserGroupOperationStatus.CancelledByNotification, userGroup);
         }
 
@@ -316,7 +314,6 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         var savingUserGroupWithUsersNotification = new UserGroupWithUsersSavingNotification(userGroupWithUsers, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingUserGroupWithUsersNotification))
         {
-            scope.Complete();
             return Attempt.FailWithStatus(UserGroupOperationStatus.CancelledByNotification, userGroup);
         }
 
@@ -384,7 +381,6 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         var savingNotification = new UserGroupSavingNotification(userGroup, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
-            scope.Complete();
             return Attempt.FailWithStatus(UserGroupOperationStatus.CancelledByNotification, userGroup);
         }
 
@@ -395,7 +391,6 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         var savingUserGroupWithUsersNotification = new UserGroupWithUsersSavingNotification(userGroupWithUsers, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingUserGroupWithUsersNotification))
         {
-            scope.Complete();
             return Attempt.FailWithStatus(UserGroupOperationStatus.CancelledByNotification, userGroup);
         }
 

@@ -169,7 +169,6 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
             var savingNotifiation = new PublicAccessEntrySavingNotification(entry, evtMsgs);
             if (scope.Notifications.PublishCancelable(savingNotifiation))
             {
-                scope.Complete();
                 return OperationResult.Attempt.Cancel(evtMsgs, entry);
             }
 
@@ -214,7 +213,6 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
             var savingNotifiation = new PublicAccessEntrySavingNotification(entry, evtMsgs);
             if (scope.Notifications.PublishCancelable(savingNotifiation))
             {
-                scope.Complete();
                 return OperationResult.Attempt.Cancel(evtMsgs);
             }
 
@@ -241,7 +239,6 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
             var savingNotifiation = new PublicAccessEntrySavingNotification(entry, evtMsgs);
             if (scope.Notifications.PublishCancelable(savingNotifiation))
             {
-                scope.Complete();
                 return OperationResult.Attempt.Cancel(evtMsgs);
             }
 
@@ -284,7 +281,6 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
             var savingNotification = new PublicAccessEntrySavingNotification(entry, eventMessages);
             if (await scope.Notifications.PublishCancelableAsync(savingNotification))
             {
-                scope.Complete();
                 return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.CancelledByNotification, null);
             }
 
@@ -374,7 +370,6 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
             var deletingNotification = new PublicAccessEntryDeletingNotification(entry, evtMsgs);
             if (scope.Notifications.PublishCancelable(deletingNotification))
             {
-                scope.Complete();
                 return OperationResult.Attempt.Cancel(evtMsgs);
             }
 
@@ -445,7 +440,6 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
             var deletingNotification = new PublicAccessEntryDeletingNotification(attempt.Result!, evtMsgs);
             if (scope.Notifications.PublishCancelable(deletingNotification))
             {
-                scope.Complete();
                 return Attempt.Fail(PublicAccessOperationStatus.CancelledByNotification);
             }
 

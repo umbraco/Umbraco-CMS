@@ -553,7 +553,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         SavingNotification<TItem> savingNotification = GetSavingNotification(item, eventMessages);
         if (scope.Notifications.PublishCancelable(savingNotification))
         {
-            scope.Complete();
             return;
         }
 
@@ -606,7 +605,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             SavingNotification<TItem> savingNotification = GetSavingNotification(itemsA, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return;
             }
 
@@ -663,7 +661,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         SavingNotification<TItem> savingNotification = GetSavingNotification(item, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
-            scope.Complete();
             return Attempt.Fail(ContentTypeOperationStatus.CancelledByNotification);
         }
 
@@ -755,7 +752,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             DeletingNotification<TItem> deletingNotification = GetDeletingNotification(item, eventMessages);
             if (scope.Notifications.PublishCancelable(deletingNotification))
             {
-                scope.Complete();
                 return;
             }
 
@@ -827,7 +823,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             DeletingNotification<TItem> deletingNotification = GetDeletingNotification(itemsA, eventMessages);
             if (scope.Notifications.PublishCancelable(deletingNotification))
             {
-                scope.Complete();
                 return;
             }
 
@@ -1008,7 +1003,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 SavingNotification<TItem> savingNotification = GetSavingNotification(copy, eventMessages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
-                    scope.Complete();
                     return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, eventMessages, copy);
                 }
 
@@ -1096,7 +1090,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             MovingNotification<TItem> movingNotification = GetMovingNotification(moveEventInfo, eventMessages);
             if (scope.Notifications.PublishCancelable(movingNotification))
             {
-                scope.Complete();
                 return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, eventMessages);
             }
 
@@ -1255,7 +1248,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             var savingNotification = new EntityContainerSavingNotification(container, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return OperationResult.Attempt.Cancel(eventMessages, container);
             }
 
@@ -1299,7 +1291,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             var savingNotification = new EntityContainerSavingNotification(container, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return OperationResult.Attempt.Cancel(eventMessages);
             }
 
@@ -1390,7 +1381,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         var deletingNotification = new EntityContainerDeletingNotification(container, eventMessages);
         if (scope.Notifications.PublishCancelable(deletingNotification))
         {
-            scope.Complete();
             return Attempt.Fail(new OperationResult(OperationResultType.FailedCancelledByEvent, eventMessages));
         }
 
@@ -1428,7 +1418,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 var renamingNotification = new EntityContainerRenamingNotification(container, eventMessages);
                 if (scope.Notifications.PublishCancelable(renamingNotification))
                 {
-                    scope.Complete();
                     return OperationResult.Attempt.Cancel<EntityContainer>(eventMessages);
                 }
 
