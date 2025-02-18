@@ -33,8 +33,6 @@ export class UmbMediaItemRefElement extends UmbLitElement {
 	@state()
 	_userHasSectionAccess = false;
 
-	#modalRoute?: any;
-
 	constructor() {
 		super();
 
