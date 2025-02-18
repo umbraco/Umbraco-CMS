@@ -7,6 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../paths.js';
 
 @customElement('umb-media-item-ref')
 export class UmbMediaItemRefElement extends UmbLitElement {
@@ -17,16 +18,7 @@ export class UmbMediaItemRefElement extends UmbLitElement {
 		return this.#item;
 	}
 	public set item(value: UmbMediaItemModel | undefined) {
-		const oldValue = this.#item;
 		this.#item = value;
-
-		if (!this.#item) {
-			this.#modalRoute?.destroy();
-			return;
-		}
-		if (oldValue?.unique === this.#item.unique) {
-			return;
-		}
 	}
 
 	@property({ type: Boolean })
@@ -67,8 +59,9 @@ export class UmbMediaItemRefElement extends UmbLitElement {
 	}
 
 	#getHref(item: UmbMediaItemModel) {
-		if (!this._editPath) return;
-		return `${this._editPath}/edit/${item.unique}`;
+		if (!this._editPath) return undefined;
+		const path = UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique });
+		return `${this._editPath}/${path}`;
 	}
 
 	override render() {
