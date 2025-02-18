@@ -47,7 +47,7 @@ export class UmbMediaItemRefElement extends UmbLitElement {
 			},
 		]);
 
-		this.#modalRoute = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.onSetup(() => {
 				return { data: { entityType: UMB_MEDIA_ENTITY_TYPE, preset: {} } };
 			})
