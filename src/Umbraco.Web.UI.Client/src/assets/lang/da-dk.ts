@@ -1681,6 +1681,7 @@ export default {
 		elementDoesNotSupport: 'Dette benyttes ikke for en Element-type',
 		propertyHasChanges: 'Du har lavet ændringer til denne egenskab. Er du sikker på at du vil kassere dem?\n    ',
 		displaySettingsHeadline: 'Visning',
+		displaySettingsLabelOnLeft: 'Label på venstre side',
 		displaySettingsLabelOnTop: 'Label hen over (fuld bredde)',
 		removeChildNode: 'Du fjerner noden',
 		removeChildNodeWarning:
@@ -1922,6 +1923,8 @@ export default {
 		permissionsDefault: 'Standardrettigheder',
 		permissionsGranular: 'Granulære rettigheder',
 		permissionsGranularHelp: 'Sæt rettigheder for specifikke noder',
+		granularRightsLabel: 'Dokumenter',
+		granularRightsDescription: 'Tillad adgang til specifikke dokumenter',
 		permissionsEntityGroup_document: 'Indhold',
 		permissionsEntityGroup_media: 'Medie',
 		permissionsEntityGroup_member: 'Medlemmer',
@@ -1938,6 +1941,8 @@ export default {
 		chooseUserGroup: (multiple: boolean) => {
 			return multiple ? 'Vælg brugergrupper' : 'Vælg brugergruppe';
 		},
+		entityPermissionsLabel: 'Handlingsrettigheder',
+		entityPermissionsDescription: 'Tildel tilladelser til handlinger',
 		noStartNode: 'Ingen startnode valgt',
 		noStartNodes: 'Ingen startnoder valgt',
 		startnode: 'Indhold startnode',
@@ -2024,6 +2029,7 @@ export default {
 	},
 	validation: {
 		validation: 'Validering',
+		validateNothing: 'Ingen validering',
 		validateAsEmail: 'Valider som e-mail',
 		validateAsNumber: 'Valider som tal',
 		validateAsUrl: 'Valider som URL',
