@@ -1,16 +1,18 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Web.Common.Events;
 
-[Obsolete("This has been moved into Umbraco.Cms.Web.Common and is no longer used in the core project. This class will be removed in Umbraco 16.")]
 public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationHandler<ContentPublishedNotification>
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IOptions<ContentSettings> _contentSettings;
     private readonly IContentService _contentService;
     private readonly IDomainService _domainService;
@@ -18,12 +20,14 @@ public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationH
     private readonly ILogger<AddDomainWarningsWhenPublishingNotificationHandler> _logger;
 
     public AddDomainWarningsWhenPublishingNotificationHandler(
+        IHttpContextAccessor httpContextAccessor,
         IOptions<ContentSettings> contentSettings,
         IContentService contentService,
         IDomainService domainService,
         IEventMessagesFactory eventMessagesFactory,
         ILogger<AddDomainWarningsWhenPublishingNotificationHandler> logger)
     {
+        _httpContextAccessor = httpContextAccessor;
         _contentSettings = contentSettings;
         _contentService = contentService;
         _domainService = domainService;
@@ -38,10 +42,14 @@ public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationH
             return;
         }
 
+        // Exit if not running in an HTTP context such as scheduled publishing, where there will be no editor to see the warnings.
+        if (_httpContextAccessor.HttpContext is null)
+        {
+            return;
+        }
 
         foreach (IContent content in notification.PublishedEntities)
         {
-
             var publishedCultures = GetPublishedCulturesFromAncestors(content).ToList();
             // If only a single culture is published we shouldn't have any routing issues
             if (publishedCultures.Count < 2)
@@ -86,7 +94,6 @@ public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationH
                              x.LanguageIsoCode?.Equals(culture, StringComparison.OrdinalIgnoreCase) ?? false) is false))
             {
                 eventMessages.Add(new EventMessage("Content published", $"There is no domain configured for '{culture}', please contact an administrator, see\\n      log for more information", EventMessageType.Warning));
-
 
                 _logger.LogWarning(
                     "The root node {RootNodeName} was published in culture {Culture}, but there's no domain configured for it, this will cause routing and caching issues, please register a domain for it",

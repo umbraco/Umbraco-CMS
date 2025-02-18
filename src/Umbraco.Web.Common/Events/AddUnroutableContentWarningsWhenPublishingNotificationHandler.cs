@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
@@ -11,11 +13,11 @@ using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Web.Common.Events;
 
-[Obsolete("This has been moved into Umbraco.Cms.Web.Common and is no longer used in the core project. This class will be removed in Umbraco 16.")]
 public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INotificationAsyncHandler<ContentPublishedNotification>
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IPublishedRouter _publishedRouter;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly ILanguageService _languageService;
@@ -31,6 +33,7 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INo
     private readonly ContentSettings _contentSettings;
 
     public AddUnroutableContentWarningsWhenPublishingNotificationHandler(
+        IHttpContextAccessor httpContextAccessor,
         IPublishedRouter publishedRouter,
         IUmbracoContextAccessor umbracoContextAccessor,
         ILanguageService languageService,
@@ -45,6 +48,7 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INo
         IEventMessagesFactory eventMessagesFactory,
         IOptions<ContentSettings> contentSettings)
     {
+        _httpContextAccessor = httpContextAccessor;
         _publishedRouter = publishedRouter;
         _umbracoContextAccessor = umbracoContextAccessor;
         _languageService = languageService;
@@ -63,6 +67,14 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INo
     public async Task HandleAsync(ContentPublishedNotification notification, CancellationToken cancellationToken)
     {
         if (_contentSettings.ShowUnroutableContentWarnings is false)
+        {
+            return;
+        }
+
+        // If we don't have an HTTP context, early return. We could be in a background job (e.g. scheduled publish).
+        // Without an HTTP context we'll get an exception from the following code, and in any case there's no value
+        // in generating visual warnings for the editor as they won't see them.
+        if (_httpContextAccessor.HttpContext is null)
         {
             return;
         }
