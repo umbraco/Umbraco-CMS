@@ -11,7 +11,6 @@ import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import type { Extensions } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
-import './tiptap-hover-menu.element.js';
 import './tiptap-toolbar.element.js';
 
 const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
