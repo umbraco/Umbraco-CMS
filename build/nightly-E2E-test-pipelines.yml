@@ -193,6 +193,7 @@ stages:
 
           - pwsh: |
               if (Test-Path $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.json ) {
+                Write-Host $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.json
                 cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.json UmbracoProject
               }
             displayName: Update application to use necessary app settings
@@ -200,6 +201,7 @@ stages:
 
           - pwsh: |
               if (Test-Path $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.cs ) {
+                Write-Host $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.cs
                 cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/*.cs UmbracoProject
               }
             displayName: Update application to use necessary classes
