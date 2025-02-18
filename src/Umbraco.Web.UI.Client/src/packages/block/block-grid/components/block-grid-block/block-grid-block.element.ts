@@ -36,7 +36,7 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 						><umb-localize key="blockEditor_notExposedLabel"></umb-localize
 					></uui-tag>`
 				: nothing}
-			<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
+			<umb-block-grid-areas-container slot="areas" draggable="false"></umb-block-grid-areas-container>
 		</umb-ref-grid-block>`;
 	}
 
