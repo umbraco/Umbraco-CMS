@@ -1,0 +1,1 @@
+export { UMB_ENTITY_BULK_ACTION_TRASH_KIND_MANIFEST as UMB_ENTITY_ACTION_TRASH_KIND_MANIFEST } from './bulk-trash.action.kind.js';
