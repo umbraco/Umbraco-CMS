@@ -20,7 +20,7 @@ public enum ContentEditingOperationStatus
     InvalidCulture,
     DuplicateKey,
     DuplicateName,
+    Unknown,
     CannotDeleteWhenReferenced,
     CannotMoveToRecycleBinWhenReferenced,
-    Unknown,
 }
