@@ -24,6 +24,6 @@ public class ContentMovedToRecycleBinWebhookEvent : WebhookEventBase<ContentMove
 
     public override string Alias => Constants.WebhookEvents.Aliases.ContentMovedToRecycleBin;
 
-    public override object? ConvertNotificationToRequestPayload(ContentMovedToRecycleBinNotification notification)
+    public override object ConvertNotificationToRequestPayload(ContentMovedToRecycleBinNotification notification)
         => notification.MoveInfoCollection;
 }

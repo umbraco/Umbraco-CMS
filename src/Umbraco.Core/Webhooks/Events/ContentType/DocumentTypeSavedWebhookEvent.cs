@@ -20,6 +20,6 @@ public class DocumentTypeSavedWebhookEvent : WebhookEventBase<ContentTypeSavedNo
 
     public override string Alias => Constants.WebhookEvents.Aliases.DocumentTypeSaved;
 
-    public override object? ConvertNotificationToRequestPayload(ContentTypeSavedNotification notification)
+    public override object ConvertNotificationToRequestPayload(ContentTypeSavedNotification notification)
         => notification.SavedEntities;
 }

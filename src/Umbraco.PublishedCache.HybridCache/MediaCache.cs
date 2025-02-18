@@ -34,7 +34,7 @@ public sealed class MediaCache : IPublishedMediaCache
     public IPublishedContent? GetById(Guid contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
 
 
-    public IPublishedContentType? GetContentType(Guid key) => _publishedContentTypeCache.Get(PublishedItemType.Media, key);
+    public IPublishedContentType GetContentType(Guid key) => _publishedContentTypeCache.Get(PublishedItemType.Media, key);
 
     public IPublishedContentType GetContentType(int id) => _publishedContentTypeCache.Get(PublishedItemType.Media, id);
 

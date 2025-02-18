@@ -76,13 +76,13 @@ internal sealed class MemberContentEditingService
     protected override IMember New(string? name, int parentId, IMemberType memberType)
         => throw new NotSupportedException("Member creation is not supported by this service. This should never be called.");
 
-    protected override OperationResult? Move(IMember member, int newParentId, int userId)
+    protected override OperationResult Move(IMember member, int newParentId, int userId)
         => throw new InvalidOperationException("Move is not supported for members");
 
-    protected override IMember? Copy(IMember member, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
+    protected override IMember Copy(IMember member, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
         => throw new NotSupportedException("Copy is not supported for Member");
 
-    protected override OperationResult? MoveToRecycleBin(IMember member, int userId)
+    protected override OperationResult MoveToRecycleBin(IMember member, int userId)
         => throw new InvalidOperationException("Recycle bin is not supported for members");
 
     protected override OperationResult? Delete(IMember member, int userId)
