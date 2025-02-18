@@ -146,6 +146,8 @@ const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionRespon
 			icon: model.documentType.icon,
 		},
 		id: model.id,
+		isProtected: model.isProtected,
+		isTrashed: model.isTrashed,
 		sortOrder: 0,
 		updater: null,
 		values: model.values,
