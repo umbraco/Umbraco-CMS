@@ -97,14 +97,13 @@ stages:
 #      UMBRACO__CMS__KEEPALIVE__DISABLEKEEPALIVETASK: true
 #      UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL: https://localhost:44331/
       ASPNETCORE_URLS: https://localhost:44331
+      PlaywrightPassword: UmbracoAcceptance123!
+      PlaywrightUserEmail: playwright@umbraco.com
     jobs:
       # E2E Tests
       - job:
         displayName: E2E Tests (SQLite)
         timeoutInMinutes: 180
-        variables:
-          PlaywrightPassword: UmbracoAcceptance123!
-          PlaywrightUserEmail: playwright@umbraco.com
         strategy:
           matrix:
             # Default test configurations
@@ -160,7 +159,7 @@ stages:
 
           - pwsh: |
               "UMBRACO_USER_LOGIN=$(PlaywrightUserEmail)
-              UMBRACO_USER_PASSWORD=$(PlaywrightUserPassword)
+              UMBRACO_USER_PASSWORD=$(PlaywrightPassword)
               URL=$(ASPNETCORE_URLS)
               STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json" | Out-File .env
             displayName: Generate .env
